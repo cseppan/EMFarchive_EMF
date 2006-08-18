@@ -175,7 +175,7 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
 
     protected void doAdd() {
         messagePanel.clear();
-        EfficiencyRecordView view = new NewEfficiencyRecordWindow(changeablesList, desktopManager, session);
+        NewEfficiencyRecordView view = new NewEfficiencyRecordWindow(changeablesList, desktopManager, session);
         NewEfficiencyRecordPresenter presenter = new NewEfficiencyRecordPresenter(this, view);
         
         presenter.display(measure,tableData.sources().length);
@@ -188,7 +188,7 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
 
     private void doEdit(EfficiencyRecord record) {
         messagePanel.clear();
-        EfficiencyRecordView view = new EditEfficiencyRecordWindow(changeablesList, desktopManager, session);
+        EditEfficiencyRecordView view = new EditEfficiencyRecordWindow(changeablesList, desktopManager, session);
         EditEfficiencyRecordPresenter presenter = new EditEfficiencyRecordPresenter(this, view);
         presenter.display(measure, record);
     }

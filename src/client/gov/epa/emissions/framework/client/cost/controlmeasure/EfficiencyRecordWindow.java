@@ -31,7 +31,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public abstract class EfficiencyRecordWindow extends DisposableInteralFrame implements EfficiencyRecordView {
+public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     protected ControlMeasure measure;
 
@@ -255,8 +255,6 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame impl
         saveEffectiveDate();
         record.setExistingMeasureAbbr(measureAbbreviation.getText().trim());
         saveExistingDevCode();
-
-        resetChanges();
     }
 
     private void savePollutant() throws EmfException {

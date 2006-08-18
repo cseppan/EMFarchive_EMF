@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
-public class NewEfficiencyRecordWindow extends EfficiencyRecordWindow {
+public class NewEfficiencyRecordWindow extends EfficiencyRecordWindow implements NewEfficiencyRecordView {
 
     private NewEfficiencyRecordPresenter presenter;
 
@@ -18,7 +18,6 @@ public class NewEfficiencyRecordWindow extends EfficiencyRecordWindow {
     public void display(ControlMeasure measure, EfficiencyRecord record) {
         super.display(measure,record);
         setDefaults();
-        resetChanges();
     }
 
     private void setDefaults() {
@@ -31,16 +30,13 @@ public class NewEfficiencyRecordWindow extends EfficiencyRecordWindow {
     }
 
     private void updateControlMeasureEfficiencyTab(EfficiencyRecord record) throws EmfException {
-        presenter.checkForDuplicates(record);
+        presenter.checkForDuplicate(record);
     }
 
     public void observe(NewEfficiencyRecordPresenter presenter) {
         this.presenter = presenter;
     }
 
-    public void observe(EditEfficiencyRecordPresenter presenter) {
-        // NOTE Auto-generated method stub
-    }
 
     public void save() {
         try {
