@@ -296,7 +296,7 @@ public class Case implements Comparable, Lockable {
     public void setIsFinal(boolean isFinal) {
         this.isFinal = isFinal;
     }
-
+    
     public User getLastModifiedBy() {
         return lastModifiedBy;
     }

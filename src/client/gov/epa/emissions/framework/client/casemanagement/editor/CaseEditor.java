@@ -39,7 +39,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private Case caseObj;
 
     public CaseEditor(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
-        super("Case Editor", new Dimension(800, 500), desktopManager);
+        super("Case Editor", new Dimension(800, 700), desktopManager);
         this.session = session;
         this.desktopManager = desktopManager;
         this.parentConsole = parentConsole;

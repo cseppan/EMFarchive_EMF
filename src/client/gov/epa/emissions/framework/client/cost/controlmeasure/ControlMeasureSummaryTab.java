@@ -273,6 +273,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         layoutGenerator.addLabelWidgetPair("Sectors:", listScroller, panel);
 
         layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
+        
         widgetLayout(6, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
