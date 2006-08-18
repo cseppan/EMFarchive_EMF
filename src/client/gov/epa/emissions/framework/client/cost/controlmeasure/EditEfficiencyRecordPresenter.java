@@ -34,14 +34,18 @@ public class EditEfficiencyRecordPresenter {
     public void checkForDuplicate(EfficiencyRecord record) throws EmfException {
         EfficiencyRecord[] records = parentView.records();
         for (int i = 0; i < records.length; i++) {
-            if(record.getRecordId()!=records[i].getRecordId()){
-                if(same(record,records[i])){
-                    throw new EmfException("Duplicate Record: edit");
+            if (record.getRecordId() != records[i].getRecordId()) {
+                if (same(record, records[i])) {
+                    throw new EmfException("Duplicate Record:" + duplicateRecordMsg());
                 }
             }
         }
     }
-    
+
+    private String duplicateRecordMsg() {
+        return "The combination of 'Pollutant', 'Locale', 'Effective Date' and 'Existing Measure' should be unique";
+    }
+
     private boolean same(EfficiencyRecord record1, EfficiencyRecord record2) {
         return record1.getPollutant().equals(record2.getPollutant()) && record1.getLocale().equals(record2.getLocale())
                 && sameEffectiveDate(record1, record2)
@@ -52,13 +56,13 @@ public class EditEfficiencyRecordPresenter {
     private boolean sameEffectiveDate(EfficiencyRecord record1, EfficiencyRecord record2) {
         Date effectiveDate1 = record1.getEffectiveDate();
         Date effectiveDate2 = record2.getEffectiveDate();
-        //if both are null mean user didn't enter a effective date=>equal
+        // if both are null mean user didn't enter a effective date=>equal
         if (effectiveDate1 == null && effectiveDate2 == null)
             return true;
-        //if either one is null =>not equal
+        // if either one is null =>not equal
         if (effectiveDate1 == null || effectiveDate2 == null)
             return false;
-        
+
         return effectiveDate1.equals(effectiveDate2);
     }
 

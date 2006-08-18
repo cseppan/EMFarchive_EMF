@@ -36,10 +36,14 @@ public class NewEfficiencyRecordPresenter {
         EfficiencyRecord[] records = parentView.records();
         for (int i = 0; i < records.length; i++) {
             if (same(record, records[i])) {
-                throw new EmfException("Duplicate record: ");
+                throw new EmfException("Duplicate record: " + duplicateRecordMsg());
             }
         }
 
+    }
+
+    private String duplicateRecordMsg() {
+        return "The combination of 'Pollutant', 'Locale', 'Effective Date' and 'Existing Measure' should be unique";
     }
 
     private boolean same(EfficiencyRecord record1, EfficiencyRecord record2) {
@@ -52,13 +56,13 @@ public class NewEfficiencyRecordPresenter {
     private boolean sameEffectiveDate(EfficiencyRecord record1, EfficiencyRecord record2) {
         Date effectiveDate1 = record1.getEffectiveDate();
         Date effectiveDate2 = record2.getEffectiveDate();
-        //if both are null mean user didn't enter a effective date=>equal
+        // if both are null mean user didn't enter a effective date=>equal
         if (effectiveDate1 == null && effectiveDate2 == null)
             return true;
-        //if either one is null =>not equal
+        // if either one is null =>not equal
         if (effectiveDate1 == null || effectiveDate2 == null)
             return false;
-        
+
         return effectiveDate1.equals(effectiveDate2);
     }
 

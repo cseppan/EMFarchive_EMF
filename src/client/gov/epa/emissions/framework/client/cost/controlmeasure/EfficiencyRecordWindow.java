@@ -77,7 +77,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame impl
 
     private String[] equationTypes = { "cpton" };
 
-    protected static DateFormat effectiveDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    public static DateFormat effectiveDateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     public EfficiencyRecordWindow(String title, ManageChangeables changeablesList, DesktopManager desktopManager,
             EmfSession session) {
@@ -93,14 +93,14 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame impl
         String name = measure.getName();
         if (name == null)
             name = "New Control Measure";
-        super.setLabel(super.getTitle() + " " + record.getRecordId()+ " for Control Measure: " + name);
+        super.setLabel(super.getTitle() + " " + record.getRecordId() + " for Control Measure: " + name);
         JPanel layout = createLayout();
         super.getContentPane().add(layout);
         super.display();
         this.record = record;
 
         resetChanges();
-        
+
     }
 
     private JPanel createLayout() {
@@ -209,8 +209,8 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame impl
 
         return panel;
     }
-    
-    public void addChangeable(Changeable changeable){
+
+    public void addChangeable(Changeable changeable) {
         super.addChangeable(changeable);
         changeablesList.addChangeable(changeable);
     }
@@ -255,7 +255,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame impl
         saveEffectiveDate();
         record.setExistingMeasureAbbr(measureAbbreviation.getText().trim());
         saveExistingDevCode();
-        
+
         resetChanges();
     }
 
@@ -292,20 +292,25 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame impl
 
     private void saveCapRecFactor() throws EmfException {
         float value = verifier.parseFloat(caprecFactor);
+        // if (value <= 0 || value > 100)
+        // throw new EmfException(
+        // "Enter the Capital Recovery Factory as a percent between 0 and 100. Eg: 1 = 1%. 0.01 = 0.01%");
         record.setCapRecFactor(value);
     }
 
     private void saveRulePenetration() throws EmfException {
         float value = verifier.parseFloat(rulePenetration);
-        if (value > 100)
-            throw new EmfException("Enter the Rule Penetration as a percent less than 100.  1 = 1%.  0.01 = 0.01%");
+        if (value <= 0 || value > 100)
+            throw new EmfException(
+                    "Enter the Rule Penetration as a percent between 0 and 100. Eg: 1 = 1%.  0.01 = 0.01%");
         record.setRulePenetration(value);
     }
 
     private void saveRuleEffectiveness() throws EmfException {
         float value = verifier.parseFloat(ruleEffectiveness);
-        if (value > 100)
-            throw new EmfException("Enter the Rule Effectiveness as a percent less than 100.  1 = 1%.  0.01 = 0.01%");
+        if (value <= 0 || value > 100)
+            throw new EmfException(
+                    "Enter the Rule Effectiveness as a percent between 0 and 100. Eg: 1 = 1%.  0.01 = 0.01%");
         record.setRuleEffectiveness(value);
     }
 
@@ -324,7 +329,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame impl
 
     private void saveCostPerTon() throws EmfException {
         float value = verifier.parseFloat(costperTon);
-        if (value == 0)
+        if (value <= 0)
             throw new EmfException("Please set the Cost Per Ton");
         record.setCostPerTon(value);
     }
@@ -334,12 +339,15 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame impl
         String string = value + "";
         if (string.length() != 4)
             throw new EmfException("Please enter the Cost Year as a four digit integer.");
+        if (value < 1980 || value > 2100) {
+            throw new EmfException("Please enter the Cost Year between 1980 and 2100");
+        }
         record.setCostYear(value);
     }
 
     private void saveEfficiency(TextField efficiency) throws EmfException {
         float value = verifier.parseFloat(efficiency);
-        if (value > 100)
+        if (value <= 0 )
             throw new EmfException("Enter the Control Efficiency as a percentage (e.g., 90%, or -10% for a disbenefit)");
         record.setEfficiency(value);
     }
