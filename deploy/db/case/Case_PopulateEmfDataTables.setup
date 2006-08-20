@@ -1,0 +1,18 @@
+-- cases.inputnames
+insert into cases.inputnames values(DEFAULT,'InputName one');
+insert into cases.inputnames values(DEFAULT,'InputName two');
+insert into cases.inputnames values(DEFAULT,'InputName three');
+-- cases.inputnames
+
+-- cases.programs
+insert into cases.programs values(DEFAULT,'Program one');
+insert into cases.programs values(DEFAULT,'Program two');
+insert into cases.programs values(DEFAULT,'Program three');
+-- cases.programs
+
+-- cases.input_envt_vars
+insert into cases.input_envt_vars values(DEFAULT,'Input Environment Variable One');
+insert into cases.input_envt_vars values(DEFAULT,'Input Environment Variable Two');
+insert into cases.input_envt_vars values(DEFAULT,'Input Environment Variable Three');
+-- cases.input_envt_vars
+
