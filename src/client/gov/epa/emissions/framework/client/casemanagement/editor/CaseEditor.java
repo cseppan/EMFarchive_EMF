@@ -42,7 +42,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private Case caseObj;
 
     public CaseEditor(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
-        super("Case Editor", new Dimension(800, 700), desktopManager);
+        super("Case Editor", new Dimension(750, 600), desktopManager);
         this.session = session;
         this.desktopManager = desktopManager;
         this.parentConsole = parentConsole;
@@ -52,8 +52,8 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         JTabbedPane tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Summary", createSummaryTab(caseObj, messagePanel));
-        tabbedPane.addTab("Parameters", new JPanel());
         tabbedPane.addTab("Inputs", createInputTab());
+        tabbedPane.addTab("Parameters", new JPanel());
         tabbedPane.addTab("Programs", new JPanel());
         tabbedPane.addTab("Outputs", createOutputTab());
         tabbedPane.addTab("History", new JPanel());

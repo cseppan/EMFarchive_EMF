@@ -115,6 +115,8 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private TextField endDate;
     
     private NumberFieldVerifier verifier;
+    
+    private Dimension defaultDimension = new Dimension(200,20);
 
     public EditableCaseSummaryTab(Case caseObj, EmfSession session, ManageChangeables changeablesList)
             throws EmfException {
@@ -143,7 +145,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 
         JPanel container = new JPanel();
-        container.setLayout(new FlowLayout(FlowLayout.CENTER, 100, 20));
+        container.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         container.add(createLeftOverviewSection());
         container.add(createRightOverviewSection());
 
@@ -162,10 +164,11 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description()), panel);
         layoutGenerator.addLabelWidgetPair("Run Status:", runStatus(), panel);
         layoutGenerator.addLabelWidgetPair("Last Modified By:", creator(), panel);
+        layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
-                5, 5, // initialX, initialY
+        layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
+                10, 10, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
@@ -181,9 +184,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Sectors:", sectors(), panel);
         layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
         layoutGenerator.addLabelWidgetPair("Template", template(), panel);
-        layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
+//       layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
 
-        layoutGenerator.makeCompactGrid(panel, 7, 2, 5, 5, 10, 10);
+        layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 10, 10);
 
         return panel;
     }
@@ -193,7 +196,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 
         JPanel container = new JPanel();
-        container.setLayout(new FlowLayout(FlowLayout.CENTER, 100, 20));
+        container.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         container.add(createLowerLeftSection());
         container.add(createLowerRightSection());
 
@@ -224,7 +227,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Speciation:", speciations(), panel);
         layoutGenerator.addLabelWidgetPair("Emissions Year:", emissionsYears(), panel);
         layoutGenerator.addLabelWidgetPair("Future Year:", futureYear(), panel);
-        layoutGenerator.addLabelWidgetPair("Meteorlogical Year:", meteorlogicalYears(), panel);
+        layoutGenerator.addLabelWidgetPair("Meteorological Year:", meteorlogicalYears(), panel);
         layoutGenerator.addLabelWidgetPair("End Date/Time", endDate(), panel);
         
         layoutGenerator.makeCompactGrid(panel, 6, 2, 5, 5, 10, 10);
@@ -243,6 +246,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private TextArea description() {
         description = new TextArea("description", caseObj.getDescription(), 12, 3);
         changeablesList.addChangeable(description);
+        description.setPreferredSize(new Dimension(200,60));
 
         return description;
     }
@@ -260,6 +264,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         futureYear = new TextField("Future Year", 10);
         futureYear.setText(caseObj.getFutureYear() + "");
         changeablesList.addChangeable(futureYear);
+        futureYear.setPreferredSize(defaultDimension);
         
         return futureYear;
     }
@@ -268,19 +273,20 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         template = new TextField("Template", 10);
         template.setText(caseObj.getTemplateUsed());
         template.setEditable(false);
-        
+        template.setPreferredSize(defaultDimension);
+       
         return template;
     }
 
     private JComponent isTemplate() {
-        isTemplate = new CheckBox("Is Template");
+        isTemplate = new CheckBox("");
         isTemplate.setSelected(caseObj.isCaseTemplate());
         
         return isTemplate;
     }
 
     private JComponent isFinal() {
-        isFinal = new CheckBox("Is Final");
+        isFinal = new CheckBox("");
         isFinal.setSelected(caseObj.getIsFinal());
         
         return isFinal;
@@ -291,7 +297,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         projectsCombo = new EditableComboBox(projects.names());
         String name = caseObj.getProject() != null ? caseObj.getProject().getName() : "";
         projectsCombo.setSelectedItem(name);
-        projectsCombo.setPreferredSize(new Dimension(113, 20));
+        projectsCombo.setPreferredSize(defaultDimension);
 
         changeablesList.addChangeable(projectsCombo);
 
@@ -304,7 +310,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         String name = caseObj.getModelingRegion() != null ? caseObj.getModelingRegion().getName() : "";
         modRegionsCombo.setSelectedItem(name);
-        modRegionsCombo.setPreferredSize(new Dimension(113, 20));
+        modRegionsCombo.setPreferredSize(defaultDimension);
 
         changeablesList.addChangeable(modRegionsCombo);
 
@@ -317,7 +323,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         
         String name = caseObj.getControlRegion() != null ? caseObj.getControlRegion().getName() : "";
         controlRegionsCombo.setSelectedItem(name);
-        controlRegionsCombo.setPreferredSize(new Dimension(113, 20));
+        controlRegionsCombo.setPreferredSize(defaultDimension);
 
         changeablesList.addChangeable(controlRegionsCombo);
 
@@ -331,7 +337,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         String name = caseObj.getAbbreviation() != null ? caseObj.getAbbreviation().getName() : "";
         abbreviationsCombo.setSelectedItem(name);
-        abbreviationsCombo.setPreferredSize(new Dimension(113, 20));
+        abbreviationsCombo.setPreferredSize(defaultDimension);
 
         changeablesList.addChangeable(abbreviationsCombo);
 
@@ -344,7 +350,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         String name = caseObj.getAirQualityModel() != null ? caseObj.getAirQualityModel().getName() : "";
         airQualityModelsCombo.setSelectedItem(name);
-        airQualityModelsCombo.setPreferredSize(new Dimension(113, 20));
+        airQualityModelsCombo.setPreferredSize(defaultDimension);
 
         changeablesList.addChangeable(airQualityModelsCombo);
 
@@ -357,14 +363,15 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         String name = caseObj.getCaseCategory() != null ? caseObj.getCaseCategory().getName() : "";
         categoriesCombo.setSelectedItem(name);
-        categoriesCombo.setPreferredSize(new Dimension(113, 20));
+        categoriesCombo.setPreferredSize(defaultDimension);
 
         changeablesList.addChangeable(categoriesCombo);
 
         return categoriesCombo;
     }
 
-    private JScrollPane sectors() {
+    private JScrollPane sectors() 
+    {
         sectorsList = new ListWidget(new String[] { "               " }, new String[] { "" });
         JScrollPane listScroller = new JScrollPane(sectorsList);
         listScroller.setPreferredSize(new Dimension(175, 60));
@@ -378,7 +385,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         String name = caseObj.getEmissionsYear() != null ? caseObj.getEmissionsYear().getName() : "";
         emissionsYearCombo.setSelectedItem(name);
-        emissionsYearCombo.setPreferredSize(new Dimension(113, 20));
+        emissionsYearCombo.setPreferredSize(defaultDimension);
 
         changeablesList.addChangeable(emissionsYearCombo);
 
@@ -391,7 +398,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         String name = caseObj.getGrid() != null ? caseObj.getGrid().getName() : "";
         gridCombo.setSelectedItem(name);
-        gridCombo.setPreferredSize(new Dimension(113, 20));
+        gridCombo.setPreferredSize(defaultDimension);
 
         changeablesList.addChangeable(gridCombo);
 
@@ -404,7 +411,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         String name = caseObj.getMeteorlogicalYear() != null ? caseObj.getMeteorlogicalYear().getName() : "";
         meteorlogicalYearCombo.setSelectedItem(name);
-        meteorlogicalYearCombo.setPreferredSize(new Dimension(113, 20));
+        meteorlogicalYearCombo.setPreferredSize(defaultDimension);
 
         changeablesList.addChangeable(meteorlogicalYearCombo);
 
@@ -417,7 +424,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         String name = caseObj.getSpeciation() != null ? caseObj.getSpeciation().getName() : "";
         speciationCombo.setSelectedItem(name);
-        speciationCombo.setPreferredSize(new Dimension(113, 20));
+        speciationCombo.setPreferredSize(defaultDimension);
 
         changeablesList.addChangeable(speciationCombo);
 
@@ -426,10 +433,14 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private ComboBox runStatus() {
         runStatuses = new RunStatuses();
-        String name = caseObj.getRunStatus() != null ? caseObj.getRunStatus() : "";
-        runStatusCombo = new ComboBox(name, runStatuses.all());
-        runStatusCombo.setPreferredSize(new Dimension(113, 20));
-
+        //String name = caseObj.getRunStatus() != null ? caseObj.getRunStatus() : "";
+        //runStatusCombo = new ComboBox(name, runStatuses.all());
+        runStatusCombo = new ComboBox(runStatuses.all());
+        runStatusCombo.setPreferredSize(defaultDimension);
+        if (caseObj.getRunStatus() == null)
+        {
+            runStatusCombo.setSelectedIndex(0);
+        }
         changeablesList.addChangeable(runStatusCombo);
 
         return runStatusCombo;
@@ -439,6 +450,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         startDate = new TextField("Start Date", 10);
         startDate.setText(format(caseObj.getStartDate()) + "");
         changeablesList.addChangeable(startDate);
+        startDate.setPreferredSize(defaultDimension);
         
         return startDate;
     }
@@ -447,6 +459,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         endDate = new TextField("End Date", 10);
         endDate.setText(format(caseObj.getEndDate()) + "");
         changeablesList.addChangeable(endDate);
+        endDate.setPreferredSize(defaultDimension);
         
         return endDate;
     }
