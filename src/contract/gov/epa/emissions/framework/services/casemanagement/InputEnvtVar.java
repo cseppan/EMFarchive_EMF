@@ -39,7 +39,7 @@ public class InputEnvtVar implements Serializable, Comparable {
         if (other == null || !(other instanceof InputEnvtVar))
             return false;
 
-        return ((InputEnvtVar) other).name.equals(this.name);
+        return ((InputEnvtVar) other).name.equals(this.name) || ((InputEnvtVar)other).id == id;
     }
 
     public int hashCode() {

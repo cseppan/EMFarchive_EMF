@@ -70,7 +70,11 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
         JPanel panel = new JPanel();
         Button ok = new Button("OK", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doNew(inputs);
+                try {
+                    doNew(inputs);
+                } catch (EmfException exc) {
+                    messagePanel.setError(exc.getMessage());
+                }
             }
         });
         getRootPane().setDefaultButton(ok);
@@ -87,7 +91,9 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
         return panel;
     }
 
-    private void doNew(CaseInput[] inputs) {
+    private void doNew(CaseInput[] inputs) throws EmfException {
+        doValidateFields();
+        doCheckDuplicate(inputs);
         shouldCreate = true;
         close();
     }
@@ -108,6 +114,14 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
 
     public void register(Object presenter) {
         this.presenter = (EditInputsTabPresenterImpl) presenter;
+    }
+    
+    private void doValidateFields() throws EmfException {
+        inputFieldsPanel.validateFields();
+    }
+    
+    private void doCheckDuplicate(CaseInput[] existingInputs) throws EmfException {
+        presenter.doCheckDuplicate(input(), existingInputs);
     }
 
     public void addChangeable(Changeable changeable) {

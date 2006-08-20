@@ -5,6 +5,8 @@ import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditor;
@@ -22,13 +24,12 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -114,8 +115,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         JPanel crudPanel = createCrudPanel();
 
         JPanel closePanel = new JPanel();
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(new ActionListener() {
+        Button closeButton = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
             }
@@ -144,13 +144,15 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
         Button newButton = new Button("New", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                clearMsgPanel();
                 createNewCase();
             }
         });
         crudPanel.add(newButton);
 
-        Button removeButton = new Button("Remove", new AbstractAction() {
+        Button removeButton = new RemoveButton("Remove", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                clearMsgPanel();
                 removeSelectedCases();
             }
         });
@@ -162,6 +164,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private SelectAwareButton editButton(ConfirmDialog confirmDialog) {
         Action editAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                clearMsgPanel();
                 editCases();
             }
 
@@ -173,6 +176,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private SelectAwareButton viewButton(ConfirmDialog confirmDialog) {
         Action viewAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                clearMsgPanel();
                 viewCases();
             }
         };
@@ -210,6 +214,15 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     }
 
     private void removeSelectedCases() {
+        String title = "Warning";
+        String message = "Are you sure you want to remove the selected template(s)?";
+        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (selection == JOptionPane.NO_OPTION) {
+            return;
+        }
+        
         for (Iterator iter = selected().iterator(); iter.hasNext();) {
             Case element = (Case) iter.next();
             try {
@@ -231,6 +244,10 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
     public EmfConsole getParentConsole() {
         return parentConsole;
+    }
+    
+    private void clearMsgPanel() {
+        messagePanel.clear();
     }
 
 }

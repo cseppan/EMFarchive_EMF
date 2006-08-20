@@ -96,7 +96,49 @@
     <array name="caseInputs" table="cases_caseinputs" schema="cases" cascade="save-update">
     		<key column="case_id" not-null="true"/>
     		<list-index column="list_index"/>
-    		<many-to-many class="gov.epa.emissions.framework.services.casemanagement.CaseInput" column="caseinputs_id"/>
+    		<composite-element class="gov.epa.emissions.framework.services.casemanagement.CaseInput">
+    			<property name="subdir"	column="sub_dir"	type="java.lang.String"	not-null="false"/>
+				<property name="required"	column="required"	type="boolean"	not-null="false"/>
+				<property name="show"	column="show"	type="boolean"	not-null="false"/>
+  
+    			<many-to-one cascade="save-update"
+   					name="inputName"
+        			class="gov.epa.emissions.framework.services.casemanagement.InputName"
+        			column="input_name_id"/> 
+
+    			<many-to-one
+   					name="sector" 
+        			class="gov.epa.emissions.commons.data.Sector"
+        			column="sector_id"/> 
+
+    			<many-to-one
+   					name="program" 
+        			class="gov.epa.emissions.framework.services.casemanagement.Program"
+        			column="program_id"
+        			update="false" insert="true"/>  
+        			
+ 
+    			<many-to-one
+   					name="envtVars" 
+        			class="gov.epa.emissions.framework.services.casemanagement.InputEnvtVar"
+        			column="envt_vars_id"
+        			update="false" insert="true"/>  
+ 
+    			<many-to-one
+   					name="dataset" 
+        			class="gov.epa.emissions.framework.services.data.EmfDataset"
+        			column="dataset_id"/> 
+
+    			<many-to-one
+   					name="version" 
+        			class="gov.epa.emissions.commons.db.version.Version"
+        			column="version_id"/> 
+
+    			<many-to-one
+   					name="datasetType" 
+        			class="gov.epa.emissions.commons.data.DatasetType"
+        			column="dataset_type_id"/> 
+    		</composite-element>
   	</array>
 
   </class> 

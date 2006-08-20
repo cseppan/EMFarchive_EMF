@@ -12,6 +12,5 @@ DROP TABLE cases.grid_resolutions CASCADE;
 DROP TABLE cases.programs CASCADE;
 DROP TABLE cases.inputnames CASCADE;
 DROP TABLE cases.input_envt_vars CASCADE;
-DROP TABLE cases.case_inputs CASCADE;
 DROP TABLE cases.cases_caseinputs CASCADE;
 

@@ -6,6 +6,9 @@ import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenter;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabPresenter;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabPresenterImpl;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabView;
+import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTabPresenter;
+import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTabPresenterImpl;
+import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTabView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
@@ -56,17 +59,17 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     }
 
     public void doSave() throws EmfException {
-        if (isDuplicate(caseObj))
-            throw new EmfException("A Case named '" + caseObj.getName() + "' already exists.");
-
         updateCase();
         closeView();
-        managerPresenter.doRefresh();
     }
 
     void updateCase() throws EmfException {
+        if (isDuplicate(caseObj))
+            throw new EmfException("Duplicate name - '" + caseObj.getName() + "'.");
+        
         saveTabs();
         service().updateCase(caseObj);
+        managerPresenter.doRefresh();
     }
 
     private void saveTabs() throws EmfException {
@@ -103,12 +106,30 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         presenters.add(inputPresenter);
     }
 
+    public void set(EditOutputsTabView OutputsView) throws EmfException {
+        EditOutputsTabPresenter outputPresenter = new EditOutputsTabPresenterImpl(session, OutputsView, caseObj);
+        outputPresenter.display();
+        
+        presenters.add(outputPresenter);
+    }
+
     public void doExport(User user, String dirName, String purpose, boolean overWrite, Case caseToExport) throws EmfException {
         service().export(user, mapToRemote(dirName), purpose, overWrite, caseToExport);
     }
     
     private String mapToRemote(String dir) {
         return session.preferences().mapLocalOutputPathToRemote(dir);
+    }
+
+    public void doSaveWithoutClose() throws EmfException {
+        updateCase();
+        managerPresenter.doRefresh();
+        
+        caseObj = service().obtainLocked(session.user(), caseObj); // get lock after release it
+        if (!caseObj.isLocked(session.user())) {// view mode, locked by another user
+            closeView();
+            return;
+        }
     }
 
 }

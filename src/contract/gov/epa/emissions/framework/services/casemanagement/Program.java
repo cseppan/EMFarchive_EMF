@@ -39,7 +39,7 @@ public class Program implements Serializable, Comparable {
         if (other == null || !(other instanceof Program))
             return false;
 
-        return ((Program) other).name.equals(this.name);
+        return ((Program) other).name.equals(this.name) || ((Program)other).id == id;
     }
 
     public int hashCode() {

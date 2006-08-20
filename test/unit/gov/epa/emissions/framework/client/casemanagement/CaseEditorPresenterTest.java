@@ -87,7 +87,7 @@ public class CaseEditorPresenterTest extends EmfMockObjectTestCase {
         try {
             p.doSave();
         } catch (EmfException e) {
-            assertEquals("A Case named 'case2' already exists.", e.getMessage());
+            assertEquals("Duplicate name - 'case2'.", e.getMessage());
             return;
         }
 

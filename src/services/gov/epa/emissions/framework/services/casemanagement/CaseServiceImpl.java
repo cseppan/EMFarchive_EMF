@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExportService;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.io.File;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -242,19 +243,6 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
-    public CaseInput[] getCaseInputs() throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            List results = dao.getCaseInputs(session);
-            session.close();
-
-            return (CaseInput[]) results.toArray(new CaseInput[0]);
-        } catch (RuntimeException e) {
-            LOG.error("Could not get all CaseInputs", e);
-            throw new EmfException("Could not get all CaseInputs");
-        }
-    }
-
     public InputName[] getInputNames() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
@@ -296,7 +284,19 @@ public class CaseServiceImpl implements CaseService {
 
     public void export(User user, String dirName, String purpose, boolean overWrite, Case caseToExport) throws EmfException {
         createExportService();
-        exportService.export(user, getInputDatasets(caseToExport), getInputDatasetVersions(caseToExport), dirName, purpose, overWrite);
+        EmfDataset[] datasets = getInputDatasets(caseToExport);
+        Version[] versions = getInputDatasetVersions(caseToExport);
+        String[] subdirs = getSubdirs(caseToExport);
+        
+        for (int i = 0; i < datasets.length; i++) {
+            String exportDir = dirName + System.getProperty("file.separator") + subdirs[i];
+            File dir = new File(exportDir);
+            if (!dir.exists())
+                dir.mkdirs();
+            
+            exportService.export(user, new EmfDataset[]{datasets[i]}, new Version[]{versions[i]},
+                    exportDir, purpose, overWrite);
+        }
     }
 
     private Version[] getInputDatasetVersions(Case caseToExport) {
@@ -317,6 +317,16 @@ public class CaseServiceImpl implements CaseService {
             datasets[i] = inputs[i].getDataset();
         
         return datasets;
+    }
+    
+    private String[] getSubdirs(Case caseToExport) {
+        CaseInput[] inputs = caseToExport.getCaseInputs();
+        String[] subdirs = new String[inputs.length];
+        
+        for (int i = 0; i < inputs.length; i++)
+            subdirs[i] = inputs[i].getSubdir();
+        
+        return subdirs;
     }
 
 }

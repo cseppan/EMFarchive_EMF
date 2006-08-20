@@ -65,10 +65,6 @@ public class CaseDAO {
         addObject(object, session);
     }
 
-    public void add(CaseInput object, Session session) {
-        addObject(object, session);
-    }
-
     public void add(Case object, Session session) {
         addObject(object, session);
     }
@@ -113,10 +109,6 @@ public class CaseDAO {
         return hibernateFacade.getAll(Case.class, Order.asc("name"), session);
     }
 
-    public List getCaseInputs(Session session) {
-        return hibernateFacade.getAll(CaseInput.class, Order.asc("name"), session);
-    }
- 
     public List getPrograms(Session session) {
         return hibernateFacade.getAll(Program.class, Order.asc("name"), session);
     }

@@ -1,9 +1,12 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTab;
+import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTab;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
@@ -52,7 +55,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         tabbedPane.addTab("Parameters", new JPanel());
         tabbedPane.addTab("Inputs", createInputTab());
         tabbedPane.addTab("Programs", new JPanel());
-        tabbedPane.addTab("Outputs", new JPanel());
+        tabbedPane.addTab("Outputs", createOutputTab());
         tabbedPane.addTab("History", new JPanel());
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -78,6 +81,17 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         } catch (EmfException e) {
             showError("Could not load Input Tab." + e.getMessage());
             return createErrorTab("Could not load Input Tab." + e.getMessage());
+        }
+    }
+
+    private JPanel createOutputTab() {
+        try {
+            EditOutputsTab view = new EditOutputsTab(parentConsole, this, messagePanel, desktopManager);
+            presenter.set(view);
+            return view;
+        } catch (EmfException e) {
+            showError("Could not load Output Tab." + e.getMessage());
+            return createErrorTab("Could not load Output Tab." + e.getMessage());
         }
     }
 
@@ -122,14 +136,14 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         });
         buttonsPanel.add(export);
         
-        Button save = new Button("Save", new AbstractAction() {
+        Button save = new SaveButton("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doSave();
             }
         });
         buttonsPanel.add(save);
 
-        Button close = new Button("Close", new AbstractAction() {
+        Button close = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doClose();
             }
@@ -141,7 +155,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     }
 
     protected void doExport() throws EmfException {
-        //doSave(); FIXME: needs to save the case object before exporting.
+        doSaveWithoutClose();
         String exportDir = caseObj.getInputFileDir();
         
         if (exportDir == null || exportDir.equals("")) {
@@ -151,6 +165,9 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         
         presenter.doExport(session.user(), exportDir, "To export input datasets",
                 true, caseObj);
+        
+        messagePanel.setMessage("Started export. Please monitor the Status window "
+                + "to track your Export request.");
     }
 
     public void observe(CaseEditorPresenter presenter) {
@@ -189,6 +206,15 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private void doSave() {
         try {
             presenter.doSave();
+            resetChanges();
+        } catch (EmfException e) {
+            showError(e.getMessage());
+        }
+    }
+
+    private void doSaveWithoutClose() {
+        try {
+            presenter.doSaveWithoutClose();
             resetChanges();
         } catch (EmfException e) {
             showError(e.getMessage());

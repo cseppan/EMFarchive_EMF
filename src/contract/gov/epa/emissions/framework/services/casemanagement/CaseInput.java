@@ -10,8 +10,6 @@ import java.io.Serializable;
 public class CaseInput implements Serializable, Comparable {
 
     private int id;
-
-    private String name;
     
     private InputName inputName;
     
@@ -40,10 +38,6 @@ public class CaseInput implements Serializable, Comparable {
         super();
     }
 
-    public CaseInput(String name) {
-        this.name = name;
-    }
-
     public int getId() {
         return id;
     }
@@ -52,23 +46,35 @@ public class CaseInput implements Serializable, Comparable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public boolean equals(Object other) {
         if (other == null || !(other instanceof CaseInput))
             return false;
-
-        return ((CaseInput) other).name.equals(this.name);
+        
+        boolean bool1 = evalToEqual(((CaseInput) other).inputName, this.inputName);
+        boolean bool2 = evalToEqual(((CaseInput) other).sector, this.sector);
+        boolean bool3 = evalToEqual(((CaseInput) other).program, this.program);
+        
+        return (bool1 && bool2 && bool3) || (this.id == ((CaseInput) other).getId());
+    }
+    
+    private boolean evalToEqual(Object obj, Object current) {
+        if (obj == null && current != null)
+            return false;
+        
+        if (obj != null && current == null)
+            return false;
+        
+        if (obj == null && current == null)
+            return true;
+        
+        if (obj.equals(current))
+            return true;
+        
+        return false;
     }
 
     public int hashCode() {
-        return name.hashCode();
+        return getName().hashCode() + sector.hashCode() + program.hashCode();
     }
 
     public String toString() {
@@ -76,7 +82,7 @@ public class CaseInput implements Serializable, Comparable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((CaseInput) other).getName());
+        return getName().compareTo(((CaseInput) other).getName());
     }
 
     public EmfDataset getDataset() {
@@ -157,6 +163,10 @@ public class CaseInput implements Serializable, Comparable {
 
     public void setInputName(InputName inputName) {
         this.inputName = inputName;
+    }
+
+    public String getName() {
+        return this.inputName.getName();
     }
 
 }

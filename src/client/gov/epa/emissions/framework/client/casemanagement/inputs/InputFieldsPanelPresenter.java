@@ -34,7 +34,6 @@ public class InputFieldsPanelPresenter {
     public void display(CaseInput input, JComponent container) throws EmfException {
         view.observe(this);
         view.display(input, container);
-        view.populateFields();
     }
     
     public InputName[] getInputNames() throws EmfException {
@@ -103,6 +102,10 @@ public class InputFieldsPanelPresenter {
     
     public void doSave() throws EmfException {
         view.setFields();
+    }
+
+    public void doValidateFields() throws EmfException {
+        view.setFields(); //FIXME: should do more check here
     }
     
 }

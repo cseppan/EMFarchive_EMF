@@ -43,4 +43,8 @@ public class EditInputPresenterImpl implements EditInputPresenter {
         parentView.refresh();
     }
 
+    public void doCheckDuplicate(CaseInput input) throws EmfException {
+        parentView.checkDuplicate(input);
+    }
+
 }

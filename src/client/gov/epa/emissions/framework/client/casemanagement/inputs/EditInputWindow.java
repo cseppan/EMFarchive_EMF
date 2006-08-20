@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
@@ -29,15 +31,20 @@ public class EditInputWindow extends DisposableInteralFrame implements EditInput
 
     private InputFieldsPanel inputFieldsPanel;
     
+    private CaseInput input;
+    
     public EditInputWindow(String title, DesktopManager desktopManager) {
         super("Edit Case Input", new Dimension(550, 520), desktopManager);
         super.setLabel(super.getTitle() + ": " + title);
     }
 
     public void display(CaseInput input) throws EmfException {
+        this.input = input;
         layout = createLayout(input);
+        
         super.getContentPane().add(layout);
         super.display();
+        super.resetChanges();
     }
 
     private JPanel createLayout(CaseInput input) throws EmfException {
@@ -56,7 +63,7 @@ public class EditInputWindow extends DisposableInteralFrame implements EditInput
     private JPanel buttonsPanel(final CaseInput input) {
         JPanel panel = new JPanel();
 
-        ok = new Button("Save", new AbstractAction() {
+        ok = new SaveButton("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doSave(input);
                 disposeView();
@@ -65,7 +72,7 @@ public class EditInputWindow extends DisposableInteralFrame implements EditInput
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new Button("Close", new AbstractAction() {
+        Button cancel = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doClose();
             }
@@ -78,10 +85,20 @@ public class EditInputWindow extends DisposableInteralFrame implements EditInput
     private void doSave(CaseInput input) {
         clearMessage();
         try {
+            doValidateFields();
+            doCheckDuplicate();
             presenter.doSave();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
+    }
+    
+    private void doValidateFields() throws EmfException {
+        inputFieldsPanel.validateFields();
+    }
+    
+    private void doCheckDuplicate() throws EmfException {
+        presenter.doCheckDuplicate(input);
     }
 
     private void clearMessage() {
@@ -104,7 +121,7 @@ public class EditInputWindow extends DisposableInteralFrame implements EditInput
         if (shouldDiscardChanges())
             super.disposeView();
     }
-
+    
     public void loadInput() throws EmfException {
         // NOTE Auto-generated method stub
         throw new EmfException("Under construction...");

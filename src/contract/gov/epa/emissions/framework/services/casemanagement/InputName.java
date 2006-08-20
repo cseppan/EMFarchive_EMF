@@ -39,7 +39,7 @@ public class InputName implements Serializable, Comparable {
         if (other == null || !(other instanceof InputName))
             return false;
 
-        return ((InputName) other).name.equals(this.name);
+        return (id == ((InputName)other).id) || ((InputName) other).name.equals(this.name);
     }
 
     public int hashCode() {

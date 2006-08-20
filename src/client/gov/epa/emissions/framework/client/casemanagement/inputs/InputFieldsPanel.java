@@ -186,7 +186,6 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     }
     
     public void setFields() throws EmfException {
-        input.setName(inputName.getSelectedItem().toString());
         updateInputName();
         updateProgram();
         updateEnvtVar();
@@ -199,14 +198,17 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         input.setShow(show.isSelected());
     }
     
-    private void updateInputName() {
+    private void updateInputName() throws EmfException {
         Object selected = inputName.getSelectedItem();
         if (selected instanceof String) {
             String newInputName = (String) selected;
             if (newInputName.length() > 0) {
                 InputName name = new InputName(newInputName);
                 input.setInputName(name);
+                return;
             }
+            
+            throw new EmfException("Input name field can not be empty");
         } else if (selected instanceof InputName) {
             input.setInputName((InputName) selected);
         }
@@ -219,7 +221,9 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             if (newProgramName.length() > 0) {
                 Program name = new Program(newProgramName);
                 input.setProgram(name);
+                return;
             }
+            
         } else if (selected instanceof Program) {
             input.setProgram((Program) selected);
         }
@@ -232,8 +236,10 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             if (newEnvtVar.length() > 0) {
                 InputEnvtVar name = new InputEnvtVar(newEnvtVar);
                 input.setEnvtVars(name);
-            }
-        } else if (selected instanceof InputName) {
+                return;
+            } 
+            
+        } else if (selected instanceof InputEnvtVar) {
             input.setEnvtVars((InputEnvtVar) selected);
         }
     }
@@ -263,15 +269,12 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         this.presenter = presenter;
     }
 
-    public void populateFields() {
-        try {
-            this.presenter.getInputNames();
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
-    }
-
     public CaseInput getInput() {
         return this.input;
     }
+
+    public void validateFields() throws EmfException {
+        presenter.doValidateFields();
+    }
+
 }
