@@ -237,7 +237,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
         for (Iterator iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = (CaseInput) iter.next();
-            EditInputView inputEditor = new EditInputWindow(input.getName() 
+            EditCaseInputView inputEditor = new EditCaseInputWindow(input.getName() 
                     + "(" + input.getId() + ")(" + caseObj.getName() + ")", desktopManager);
             presenter.doEditInput(input, inputEditor);
         }

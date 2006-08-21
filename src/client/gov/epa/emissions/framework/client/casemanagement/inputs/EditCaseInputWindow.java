@@ -17,13 +17,13 @@ import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-public class EditInputWindow extends DisposableInteralFrame implements EditInputView {
+public class EditCaseInputWindow extends DisposableInteralFrame implements EditCaseInputView {
 
     private boolean shouldCreate;
 
     private JPanel layout;
 
-    private EditInputPresenterImpl presenter;
+    private EditCaseInputPresenterImpl presenter;
 
     private MessagePanel messagePanel;
 
@@ -33,7 +33,7 @@ public class EditInputWindow extends DisposableInteralFrame implements EditInput
     
     private CaseInput input;
     
-    public EditInputWindow(String title, DesktopManager desktopManager) {
+    public EditCaseInputWindow(String title, DesktopManager desktopManager) {
         super("Edit Case Input", new Dimension(550, 520), desktopManager);
         super.setLabel(super.getTitle() + ": " + title);
     }
@@ -66,7 +66,6 @@ public class EditInputWindow extends DisposableInteralFrame implements EditInput
         ok = new SaveButton("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doSave(input);
-                disposeView();
             }
         });
         getRootPane().setDefaultButton(ok);
@@ -88,6 +87,7 @@ public class EditInputWindow extends DisposableInteralFrame implements EditInput
             doValidateFields();
             doCheckDuplicate();
             presenter.doSave();
+            disposeView();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -113,7 +113,7 @@ public class EditInputWindow extends DisposableInteralFrame implements EditInput
         return shouldCreate;
     }
 
-    public void observe(EditInputPresenterImpl presenter) {
+    public void observe(EditCaseInputPresenterImpl presenter) {
         this.presenter = presenter;
     }
 

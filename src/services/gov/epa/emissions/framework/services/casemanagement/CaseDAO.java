@@ -8,7 +8,9 @@ import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import java.util.List;
 
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 public class CaseDAO {
 
@@ -52,7 +54,7 @@ public class CaseDAO {
     public void add(Speciation object, Session session) {
         addObject(object, session);
     }
- 
+
     public void add(Program object, Session session) {
         addObject(object, session);
     }
@@ -78,7 +80,7 @@ public class CaseDAO {
     }
 
     public List getAirQualityModels(Session session) {
-        return hibernateFacade.getAll(AirQualityModel.class, Order.asc("name"), session);        
+        return hibernateFacade.getAll(AirQualityModel.class, Order.asc("name"), session);
     }
 
     public List getCaseCategories(Session session) {
@@ -112,11 +114,11 @@ public class CaseDAO {
     public List getPrograms(Session session) {
         return hibernateFacade.getAll(Program.class, Order.asc("name"), session);
     }
- 
+
     public List getInputNames(Session session) {
         return hibernateFacade.getAll(InputName.class, Order.asc("name"), session);
     }
- 
+
     public List getInputEnvtVars(Session session) {
         return hibernateFacade.getAll(InputEnvtVar.class, Order.asc("name"), session);
     }
@@ -135,6 +137,11 @@ public class CaseDAO {
 
     public Case update(Case locked, Session session) throws EmfException {
         return (Case) lockingScheme.releaseLockOnUpdate(locked, session, getCases(session));
+    }
+
+    public Object load(Class clazz, String name, Session session) {
+        Criterion criterion = Restrictions.eq("name", name);
+        return hibernateFacade.load(clazz, criterion, session);
     }
 
 }

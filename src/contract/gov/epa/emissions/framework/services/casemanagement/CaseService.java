@@ -41,4 +41,6 @@ public interface CaseService {
     
     void export(User user, String dirName, String purpose, boolean overWrite, Case caseToExport) throws EmfException;
 
+    InputName addCaseInputName(InputName name) throws EmfException;
+
 }

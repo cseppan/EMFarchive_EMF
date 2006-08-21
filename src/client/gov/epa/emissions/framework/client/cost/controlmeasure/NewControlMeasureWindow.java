@@ -90,6 +90,7 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
 
     private JPanel createSummaryTab(ControlMeasure measure, MessagePanel messagePanel) {
         EditableCMSummaryTab view = new EditableCMSummaryTab(measure, session, messagePanel, this);
+        view.populateFields();
         presenter.set(view);
         return view;
     }
@@ -133,7 +134,6 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
     }
 
     public void showError(String message) {
-        // TODO: error should go away at some point. when ?
         messagePanel.setError(message);
     }
 

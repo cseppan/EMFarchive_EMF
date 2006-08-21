@@ -101,7 +101,7 @@
 				<property name="required"	column="required"	type="boolean"	not-null="false"/>
 				<property name="show"	column="show"	type="boolean"	not-null="false"/>
   
-    			<many-to-one cascade="save-update"
+    			<many-to-one 
    					name="inputName"
         			class="gov.epa.emissions.framework.services.casemanagement.InputName"
         			column="input_name_id"/> 

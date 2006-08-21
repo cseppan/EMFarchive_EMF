@@ -43,6 +43,23 @@ public class HibernateFacade {
         }
     }
 
+    public boolean exists(Class clazz, Session session, Criterion[] criterions) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria criteria = session.createCriteria(clazz);
+            for (int i = 0; i < criterions.length; i++)
+                criteria.add(criterions[i]);
+
+            tx.commit();
+
+            return criteria.uniqueResult() != null;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
     public Object current(int id, Class clazz, Session session) {
         Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("id", new Integer(id)));
         return crit.uniqueResult();
@@ -146,7 +163,7 @@ public class HibernateFacade {
             throw e;
         }
     }
-    
+
     public List get(Class clazz, Criterion criterion, Session session) {
         Transaction tx = null;
         try {
@@ -154,6 +171,20 @@ public class HibernateFacade {
             List list = session.createCriteria(clazz).add(criterion).list();
             tx.commit();
             return list;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    public Object load(Class clazz, Criterion criterion, Session session) {
+        Transaction tx = null;
+
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(clazz).add(criterion);
+            tx.commit();
+            return crit.uniqueResult();
         } catch (HibernateException e) {
             tx.rollback();
             throw e;

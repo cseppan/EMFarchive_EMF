@@ -19,7 +19,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     private HibernateSessionFactory sessionFactory;
 
     private ControlMeasuresDAO dao;
-    
+
     private ControlTechnologiesDAO controlTechnologiesDAO;
 
     public ControlMeasureServiceImpl() throws Exception {
@@ -37,9 +37,8 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public ControlMeasure[] getMeasures() throws EmfException {
-        Session session = null;
+        Session session = sessionFactory.getSession();
         try {
-            session = sessionFactory.getSession();
             List all = dao.all(session);
 
             return (ControlMeasure[]) all.toArray(new ControlMeasure[0]);
@@ -47,36 +46,32 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             LOG.error("could not retrieve control measures.", e);
             throw new EmfException("could not retrieve control measures.");
         } finally {
-            if (session != null)
-                session.close();
+            session.close();
         }
     }
 
     public void addMeasure(ControlMeasure measure) throws EmfException {
-        Session session = null;
+        Session session = sessionFactory.getSession();
         try {
-            session = sessionFactory.getSession();
             dao.add(measure, session);
         } catch (RuntimeException e) {
             LOG.error("Could not add control measure: " + measure.getName(), e);
             throw new EmfException("Could not add control measure: " + measure.getName());
         } finally {
-            if (session != null)
-                session.close();
+            session.close();
         }
     }
 
     public void removeMeasure(ControlMeasure measure) throws EmfException {
-        Session session = null;
+        Session session = sessionFactory.getSession();
         try {
-            session = sessionFactory.getSession();
+
             dao.remove(measure, session);
         } catch (RuntimeException e) {
             LOG.error("Could not remove control measure: " + measure.getName(), e);
             throw new EmfException("Could not remove control measure: " + measure.getName());
         } finally {
-            if (session != null)
-                session.close();
+            session.close();
         }
     }
 
@@ -99,11 +94,9 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public ControlMeasure releaseLockedControlMeasure(ControlMeasure locked) throws EmfException {
-        Session session = null;
+        Session session = sessionFactory.getSession();
         try {
-            session = sessionFactory.getSession();
             ControlMeasure released = dao.releaseLocked(locked, session);
-
             return released;
         } catch (RuntimeException e) {
             LOG.error("Could not release lock for ControlMeasure: " + locked.getName() + " by owner: "
@@ -111,26 +104,27 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             throw new EmfException("Could not release lock for ControlMeasure: " + locked.getName() + " by owner: "
                     + locked.getLockOwner());
         } finally {
-            if (session != null)
-                session.close();
+            session.close();
         }
     }
 
     public ControlMeasure updateMeasure(ControlMeasure measure) throws EmfException {
-        Session session = null;
+        Session session = sessionFactory.getSession();
         try {
-            session = sessionFactory.getSession();
             ControlMeasure updated = dao.update(measure, session);
-
             return updated;
         } catch (RuntimeException e) {
             LOG.error("Could not update for ControlMeasure: " + measure.getName(), e);
             throw new EmfException("Could not update for ControlMeasure: " + measure.getName());
         } finally {
-            if (session != null)
-                session.close();
+            session.close();
         }
     }
+    
+//    private void checkForConstraints(ControlMeasure controlMeasure){
+//        String name = controlMeasure.getName();
+//        dao.exists();
+//    }
 
     public Scc[] getSccs(ControlMeasure measure) throws EmfException {
         try {
@@ -143,9 +137,8 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public ControlTechnology[] getControlTechnologies() throws EmfException {
-        Session session = null;
+        Session session = sessionFactory.getSession();
         try {
-            session = sessionFactory.getSession();
             List all = controlTechnologiesDAO.getAll(session);
 
             return (ControlTechnology[]) all.toArray(new ControlTechnology[0]);
@@ -153,35 +146,8 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             LOG.error("could not retrieve control technologies.", e);
             throw new EmfException("could not retrieve control technologies.");
         } finally {
-            if (session != null)
-                session.close();
+            session.close();
         }
-    }
-
-    public void addControlTechnology(ControlTechnology technology) throws EmfException {
-        Session session = null;
-        try {
-            session = sessionFactory.getSession();
-            controlTechnologiesDAO.addControlTechnology(technology, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not add control technology: " + technology.getName(), e);
-            throw new EmfException("Could not add control technology: " + technology.getName());
-        } finally {
-            if (session != null)
-                session.close();
-        }
-    }
-    
-    public ControlTechnology updateControlTechnology(ControlTechnology technology, Session session) throws EmfException {
-        return controlTechnologiesDAO.update(technology, session);
-    }
-    
-    public ControlTechnology obtainLockedControlTechnology(User user, ControlTechnology technology, Session session) {
-        return controlTechnologiesDAO.obtainLocked(user, technology, session);
-    }
-
-    public ControlTechnology releaseLockedControlTechnology(ControlTechnology locked, Session session)  {
-        return controlTechnologiesDAO.releaseLocked(locked, session);
     }
 
 }

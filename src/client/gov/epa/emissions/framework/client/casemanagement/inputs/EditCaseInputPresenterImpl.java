@@ -6,9 +6,9 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 
-public class EditInputPresenterImpl implements EditInputPresenter {
+public class EditCaseInputPresenterImpl implements EditInputPresenter {
 
-    private EditInputView view;
+    private EditCaseInputView view;
     
     private EditInputsTabView parentView;
     
@@ -18,7 +18,7 @@ public class EditInputPresenterImpl implements EditInputPresenter {
     
     private CaseInput input;
 
-    public EditInputPresenterImpl(EditInputView view, 
+    public EditCaseInputPresenterImpl(EditCaseInputView view, 
             EditInputsTabView parentView, EmfSession session) {
         this.view = view;
         this.parentView = parentView;

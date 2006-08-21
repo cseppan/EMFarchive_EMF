@@ -203,9 +203,10 @@ public class CaseServiceTransport implements CaseService {
         return (Program[]) call.requestResponse(new Object[] {});
     }
 
-    public void export(User user, String dirName, String purpose, boolean overWrite, Case caseToExport) throws EmfException {
+    public void export(User user, String dirName, String purpose, boolean overWrite, Case caseToExport)
+            throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("export");
         call.addParam("user", dataMappings.user());
         call.addStringParam("dirName");
@@ -217,4 +218,13 @@ public class CaseServiceTransport implements CaseService {
         call.request(new Object[] { user, dirName, purpose, Boolean.valueOf(overWrite), caseToExport });
     }
 
+    public InputName addCaseInputName(InputName name) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("addCaseInputName");
+        call.addParam("name", caseMappings.inputname());
+        call.setReturnType(caseMappings.inputname());
+
+        return (InputName) call.requestResponse(new Object[] { name });
+    }
 }

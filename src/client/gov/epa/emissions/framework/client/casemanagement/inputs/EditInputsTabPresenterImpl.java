@@ -41,8 +41,8 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
             view.addInput(dialog.input());
     }
 
-    public void doEditInput(CaseInput input, EditInputView inputEditor) throws EmfException {
-        EditInputPresenter editInputPresenter = new EditInputPresenterImpl(inputEditor, view, session);
+    public void doEditInput(CaseInput input, EditCaseInputView inputEditor) throws EmfException {
+        EditInputPresenter editInputPresenter = new EditCaseInputPresenterImpl(inputEditor, view, session);
         editInputPresenter.display(input);
     }
 

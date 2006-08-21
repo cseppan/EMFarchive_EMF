@@ -21,13 +21,13 @@ public class CaseServiceImpl implements CaseService {
     private static Log LOG = LogFactory.getLog(CaseServiceImpl.class);
 
     private CaseDAO dao;
-    
+
     private PooledExecutor threadPool;
 
     private HibernateSessionFactory sessionFactory;
-    
+
     private EmfDbServer dbServer;
-    
+
     private ExportService exportService;
 
     public CaseServiceImpl() {
@@ -39,7 +39,7 @@ public class CaseServiceImpl implements CaseService {
         this.dao = new CaseDAO();
         this.threadPool = createThreadPool();
     }
-    
+
     protected void finalize() throws Throwable {
         threadPool.shutdownAfterProcessingCurrentlyQueuedTasks();
         threadPool.awaitTerminationAfterShutdown();
@@ -53,7 +53,7 @@ public class CaseServiceImpl implements CaseService {
 
         return threadPool;
     }
-    
+
     private void createExportService() throws EmfException {
         try {
             this.dbServer = new EmfDbServer();
@@ -147,7 +147,7 @@ public class CaseServiceImpl implements CaseService {
             Session session = sessionFactory.getSession();
             List results = dao.getGridResolutions(session);
             session.close();
-            
+
             return (GridResolution[]) results.toArray(new GridResolution[0]);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Grid Resolutions", e);
@@ -282,51 +282,65 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
-    public void export(User user, String dirName, String purpose, boolean overWrite, Case caseToExport) throws EmfException {
+    public void export(User user, String dirName, String purpose, boolean overWrite, Case caseToExport)
+            throws EmfException {
         createExportService();
         EmfDataset[] datasets = getInputDatasets(caseToExport);
         Version[] versions = getInputDatasetVersions(caseToExport);
         String[] subdirs = getSubdirs(caseToExport);
-        
+
         for (int i = 0; i < datasets.length; i++) {
             String exportDir = dirName + System.getProperty("file.separator") + subdirs[i];
             File dir = new File(exportDir);
             if (!dir.exists())
                 dir.mkdirs();
-            
-            exportService.export(user, new EmfDataset[]{datasets[i]}, new Version[]{versions[i]},
-                    exportDir, purpose, overWrite);
+
+            exportService.export(user, new EmfDataset[] { datasets[i] }, new Version[] { versions[i] }, exportDir,
+                    purpose, overWrite);
         }
     }
 
     private Version[] getInputDatasetVersions(Case caseToExport) {
         CaseInput[] inputs = caseToExport.getCaseInputs();
         Version[] versions = new Version[inputs.length];
-        
+
         for (int i = 0; i < inputs.length; i++)
             versions[i] = inputs[i].getVersion();
-        
+
         return versions;
     }
 
     private EmfDataset[] getInputDatasets(Case caseToExport) {
         CaseInput[] inputs = caseToExport.getCaseInputs();
         EmfDataset[] datasets = new EmfDataset[inputs.length];
-        
+
         for (int i = 0; i < inputs.length; i++)
             datasets[i] = inputs[i].getDataset();
-        
+
         return datasets;
     }
-    
+
     private String[] getSubdirs(Case caseToExport) {
         CaseInput[] inputs = caseToExport.getCaseInputs();
         String[] subdirs = new String[inputs.length];
-        
+
         for (int i = 0; i < inputs.length; i++)
             subdirs[i] = inputs[i].getSubdir();
-        
+
         return subdirs;
+    }
+
+    public InputName addCaseInputName(InputName name) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(name, session);
+            return (InputName) dao.load(InputName.class, name.getName(), session);
+        } catch (Exception e) {
+            LOG.error("Could not add new case input name '" + name.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new case input name '" + name.getName() + "'");
+        } finally {
+            session.close();
+        }
     }
 
 }

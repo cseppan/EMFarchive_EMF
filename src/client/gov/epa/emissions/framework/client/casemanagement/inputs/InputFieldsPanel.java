@@ -55,7 +55,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     private ManageChangeables changeablesList;
 
     private InputFieldsPanelPresenter presenter;
-    
+
     private CaseInput input;
 
     public InputFieldsPanel(MessagePanel messagePanel, ManageChangeables changeablesList) {
@@ -69,7 +69,8 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         String width = "To make the combobox a bit wider ...............................";
 
-        inputName = new EditableComboBox(presenter.getInputNames());
+        InputName[] inputNames = presenter.getCaseInputNames().getAll();
+        inputName = new EditableComboBox(inputNames);
         changeablesList.addChangeable(inputName);
         inputName.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Input Name:", inputName, panel);
@@ -83,16 +84,16 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         changeablesList.addChangeable(envtVar);
         envtVar.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Envt. Variable:", envtVar, panel);
-        
+
         sector = new ComboBox(presenter.getSectors());
         changeablesList.addChangeable(sector);
         sector.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
 
         dsType = new ComboBox(presenter.getDSTypes());
-        dsType.addActionListener( new AbstractAction() {
+        dsType.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                fillDatasets((DatasetType)dsType.getSelectedItem());
+                fillDatasets((DatasetType) dsType.getSelectedItem());
             }
         });
         changeablesList.addChangeable(dsType);
@@ -101,9 +102,9 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
         DatasetType type = (DatasetType) dsType.getSelectedItem();
         dataset = new ComboBox(presenter.getDatasets(type));
-        dataset.addActionListener( new AbstractAction() {
+        dataset.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                fillVersions((EmfDataset)dataset.getSelectedItem());
+                fillVersions((EmfDataset) dataset.getSelectedItem());
             }
         });
         dataset.setEnabled(false);
@@ -141,16 +142,16 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         populateFields(input);
         container.add(panel);
     }
-    
+
     private void populateFields(CaseInput input) throws EmfException {
         inputName.setSelectedItem(input.getInputName());
         program.setSelectedItem(input.getProgram());
-        
+
         Sector sct = input.getSector();
         sector.setSelectedItem(input.getSector());
         if (sct == null)
             sector.setSelectedItem(presenter.getSectors()[0]);
-        
+
         envtVar.setSelectedItem(input.getEnvtVars());
         dataset.setSelectedItem(input.getDataset());
         version.setSelectedItem(input.getVersion());
@@ -184,36 +185,25 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             messagePanel.setError(e.getMessage());
         }
     }
-    
+
     public void setFields() throws EmfException {
         updateInputName();
         updateProgram();
         updateEnvtVar();
         updateSector();
-        input.setDatasetType((DatasetType)dsType.getSelectedItem());
-        input.setDataset((EmfDataset)dataset.getSelectedItem());
+        input.setDatasetType((DatasetType) dsType.getSelectedItem());
+        input.setDataset((EmfDataset) dataset.getSelectedItem());
         updateVersion();
         input.setSubdir(subDir.getText());
         input.setRequired(required.isSelected());
         input.setShow(show.isSelected());
     }
-    
+
     private void updateInputName() throws EmfException {
         Object selected = inputName.getSelectedItem();
-        if (selected instanceof String) {
-            String newInputName = (String) selected;
-            if (newInputName.length() > 0) {
-                InputName name = new InputName(newInputName);
-                input.setInputName(name);
-                return;
-            }
-            
-            throw new EmfException("Input name field can not be empty");
-        } else if (selected instanceof InputName) {
-            input.setInputName((InputName) selected);
-        }
+        input.setInputName(presenter.getInputName(selected));
     }
-    
+
     private void updateProgram() {
         Object selected = program.getSelectedItem();
         if (selected instanceof String) {
@@ -223,12 +213,12 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
                 input.setProgram(name);
                 return;
             }
-            
+
         } else if (selected instanceof Program) {
             input.setProgram((Program) selected);
         }
     }
-    
+
     private void updateEnvtVar() {
         Object selected = envtVar.getSelectedItem();
         if (selected instanceof String) {
@@ -237,34 +227,34 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
                 InputEnvtVar name = new InputEnvtVar(newEnvtVar);
                 input.setEnvtVars(name);
                 return;
-            } 
-            
+            }
+
         } else if (selected instanceof InputEnvtVar) {
             input.setEnvtVars((InputEnvtVar) selected);
         }
     }
-    
+
     private void updateSector() {
-        Sector selected = (Sector)sector.getSelectedItem();
-        
+        Sector selected = (Sector) sector.getSelectedItem();
+
         if (selected.getName().equalsIgnoreCase("All sectors")) {
             input.setSector(null);
             return;
         }
-        
+
         input.setSector(selected);
     }
-    
+
     private void updateVersion() throws EmfException {
-        EmfDataset ds = (EmfDataset)dataset.getSelectedItem();
-        Version ver = (Version)version.getSelectedItem();
-        
+        EmfDataset ds = (EmfDataset) dataset.getSelectedItem();
+        Version ver = (Version) version.getSelectedItem();
+
         if (ds != null && ver == null)
             throw new EmfException("Please select a dataset version.");
-        
+
         input.setVersion(ver);
     }
-    
+
     public void observe(InputFieldsPanelPresenter presenter) {
         this.presenter = presenter;
     }
