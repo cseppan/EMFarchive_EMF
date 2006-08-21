@@ -64,7 +64,9 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
     private JPanel createSummaryTab(Case caseObj, MessagePanel messagePanel) {
         try {
-            EditableCaseSummaryTab view = new EditableCaseSummaryTab(caseObj, session, this);
+            EditableCaseSummaryTab view = new EditableCaseSummaryTab(caseObj, session, this,parentConsole);
+            EditCaseSummaryTabPresenter summaryPresenter = new EditCaseSummaryTabPresenter(view,messagePanel,session);
+            view.observe(summaryPresenter);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
