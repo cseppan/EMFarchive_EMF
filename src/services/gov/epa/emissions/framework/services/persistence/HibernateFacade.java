@@ -146,5 +146,18 @@ public class HibernateFacade {
             throw e;
         }
     }
+    
+    public List get(Class clazz, Criterion criterion, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            List list = session.createCriteria(clazz).add(criterion).list();
+            tx.commit();
+            return list;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
 
 }

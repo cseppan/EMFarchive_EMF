@@ -9,7 +9,9 @@ import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import java.util.List;
 
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 public class DatasetTypesDAO {
 
@@ -37,7 +39,13 @@ public class DatasetTypesDAO {
     public DatasetType update(DatasetType type, Session session) throws EmfException {
         return (DatasetType) lockingScheme.releaseLockOnUpdate(type, session, getAll(session));
     }
-
+    
+    public DatasetType get(String name,Session session){
+        Criterion criterion = Restrictions.eq("name", name);
+        List list = hibernateFacade.get(DatasetType.class,criterion, session);
+        return (DatasetType) list.get(0);
+    }
+    
     public void add(DatasetType datasetType, Session session) {
         hibernateFacade.add(datasetType, session);
     }

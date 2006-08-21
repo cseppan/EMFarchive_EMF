@@ -101,6 +101,12 @@ public class MaxEmsRedStrategy implements Strategy {
     }
 
     public void run(User user) throws EmfException {
+//      TODO:
+        //create the table
+        //get all lines relevant to the target pollutant
+        //read each line of source
+        //get fips from source
+        //get effective date from control strategy
         try {
             calculateResult(datasets, user, datasource);
         } catch (Exception e) {
