@@ -333,14 +333,8 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     }
 
     private void saveCostYear() throws EmfException {
-        int value = verifier.parseInteger(costYear);
-        String string = value + "";
-        if (string.length() != 4)
-            throw new EmfException("Please enter the Cost Year as a four digit integer.");
-        if (value < 1980 || value > 2100) {
-            throw new EmfException("Please enter the Cost Year between 1980 and 2100");
-        }
-        record.setCostYear(value);
+        YearValidation validation = new YearValidation("Cost Year");
+        record.setCostYear(validation.value(costYear.getText()));
     }
 
     private void saveEfficiency(TextField efficiency) throws EmfException {

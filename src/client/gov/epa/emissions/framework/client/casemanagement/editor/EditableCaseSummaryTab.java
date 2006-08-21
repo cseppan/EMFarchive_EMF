@@ -17,6 +17,7 @@ import gov.epa.emissions.framework.client.casemanagement.Grids;
 import gov.epa.emissions.framework.client.casemanagement.MeteorlogicalYears;
 import gov.epa.emissions.framework.client.casemanagement.RunStatuses;
 import gov.epa.emissions.framework.client.casemanagement.Speciations;
+import gov.epa.emissions.framework.client.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.client.data.Projects;
 import gov.epa.emissions.framework.client.data.Regions;
@@ -29,7 +30,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -53,6 +55,10 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private TextField name;
     
     private TextField futureYear;
+    
+    private TextField numEmisLayer;
+    
+    private TextField numMetLayer;
     
     private TextField template;
 
@@ -145,7 +151,8 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 
         JPanel container = new JPanel();
-        container.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        container.setLayout(new GridLayout(1, 2));
+        //        container.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         container.add(createLeftOverviewSection());
         container.add(createRightOverviewSection());
 
@@ -196,7 +203,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 
         JPanel container = new JPanel();
-        container.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        container.setLayout(new GridLayout(1, 2));
         container.add(createLowerLeftSection());
         container.add(createLowerRightSection());
 
@@ -212,9 +219,11 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Modeling Region:", modRegions(), panel);
         layoutGenerator.addLabelWidgetPair("Control Region:", controlRegions(), panel);
         layoutGenerator.addLabelWidgetPair("I/O API Grid Name:", grids(), panel);
+        layoutGenerator.addLabelWidgetPair("# of Met Layers", numMetLayer(), panel);
+        layoutGenerator.addLabelWidgetPair("# of Emissions Layers", numEmisLayer(), panel);
         layoutGenerator.addLabelWidgetPair("Start Date:", startDate(), panel);
         
-        layoutGenerator.makeCompactGrid(panel, 4, 2, 5, 5, 10, 10);
+        layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 10, 10);
 
         return panel;
     }
@@ -225,12 +234,12 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         layoutGenerator.addLabelWidgetPair("Air Quality Model:", airQualityModels(), panel);
         layoutGenerator.addLabelWidgetPair("Speciation:", speciations(), panel);
-        layoutGenerator.addLabelWidgetPair("Emissions Year:", emissionsYears(), panel);
-        layoutGenerator.addLabelWidgetPair("Future Year:", futureYear(), panel);
         layoutGenerator.addLabelWidgetPair("Meteorological Year:", meteorlogicalYears(), panel);
+        layoutGenerator.addLabelWidgetPair("Base Year:", emissionsYears(), panel);
+        layoutGenerator.addLabelWidgetPair("Future Year:", futureYear(), panel);
         layoutGenerator.addLabelWidgetPair("End Date/Time", endDate(), panel);
         
-        layoutGenerator.makeCompactGrid(panel, 6, 2, 5, 5, 10, 10);
+        layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 10, 10);
 
         return panel;
     }
@@ -244,7 +253,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private TextArea description() {
-        description = new TextArea("description", caseObj.getDescription(), 12, 3);
+        description = new TextArea("description", caseObj.getDescription(), 19, 3);
         changeablesList.addChangeable(description);
         description.setPreferredSize(new Dimension(200,60));
 
@@ -252,7 +261,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private TextField name() {
-        name = new TextField("name", 10);
+        name = new TextField("name", 20);
         name.setText(caseObj.getName());
         name.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(name);
@@ -269,8 +278,26 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return futureYear;
     }
     
+    private TextField numEmisLayer() {
+        numEmisLayer = new TextField("Number of Emissions Layers", 10);
+        numEmisLayer.setText(caseObj.getNumEmissionsLayers() + "");
+        changeablesList.addChangeable(numEmisLayer);
+        numEmisLayer.setPreferredSize(defaultDimension);
+        
+        return numEmisLayer;
+    }
+    
+    private TextField numMetLayer() {
+        numMetLayer = new TextField("Number of Met Layers", 10);
+        numMetLayer.setText(caseObj.getNumMetLayers() + "");
+        changeablesList.addChangeable(numMetLayer);
+        numMetLayer.setPreferredSize(defaultDimension);
+        
+        return numMetLayer;
+    }
+    
     private TextField template() {
-        template = new TextField("Template", 10);
+        template = new TextField("Template", 20);
         template.setText(caseObj.getTemplateUsed());
         template.setEditable(false);
         template.setPreferredSize(defaultDimension);
@@ -496,7 +523,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     public void save(Case caseObj) throws EmfException {
         caseObj.setName(name.getText());
-        caseObj.setFutureYear(verifier.parseInteger(futureYear));
+        saveFutureYear();
+        caseObj.setNumEmissionsLayers(verifier.parseInteger(numEmisLayer));
+        caseObj.setNumMetLayers(verifier.parseInteger(numMetLayer));
         caseObj.setDescription(description.getText());
         caseObj.setCaseTemplate(isTemplate.isSelected());
         caseObj.setIsFinal(isFinal.isSelected());
@@ -511,8 +540,44 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         caseObj.setMeteorlogicalYear(meteorlogicalYears.get((String) meteorlogicalYearCombo.getSelectedItem()));
         caseObj.setSpeciation(speciations.get((String) speciationCombo.getSelectedItem()));
         caseObj.setRunStatus(runStatusCombo.getSelectedItem() + "");
-//        caseObj.setStartDate(DATE_FORMATTER.parse(startDate.getText()));
-//        caseObj.setEndDate(DATE_FORMATTER.parse(endDate.getText()));
+        saveStartDate();
+        saveEndDate();
+    }
+
+    private void saveFutureYear() throws EmfException {
+        String year = futureYear.getText().trim();
+        if (year.length() == 0) {
+            caseObj.setFutureYear(0);
+            return;
+        }
+        YearValidation validation = new YearValidation("Future Year");
+        caseObj.setFutureYear(validation.value(futureYear.getText()));        
+    }
+  
+    private void saveEndDate() throws EmfException {
+        try {
+            String date = startDate.getText().trim();
+            if (date.length() == 0) {
+                caseObj.setStartDate(null);
+                return;
+            }
+            caseObj.setStartDate(DATE_FORMATTER.parse(startDate.getText()));
+        } catch (ParseException e) {
+            throw new EmfException("Please enter the Start Date in the correct format (MM/dd/yyyy HH:mm)");
+        }
+    }
+
+    private void saveStartDate() throws EmfException {
+        try {
+            String date = endDate.getText().trim();
+            if (date.length() == 0) {
+                caseObj.setEndDate(null);
+                return;
+            }
+            caseObj.setEndDate(DATE_FORMATTER.parse(endDate.getText()));
+        } catch (ParseException e) {
+            throw new EmfException("Please enter the End Date in the correct format (MM/dd/yyyy HH:mm)");
+        }
     }
 
 }

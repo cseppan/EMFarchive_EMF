@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
+import gov.epa.emissions.framework.client.cost.controlmeasure.YearValidation;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 
 import java.util.ArrayList;
@@ -15,7 +17,7 @@ public class MeteorlogicalYears {
         this.list = new ArrayList(Arrays.asList(array));
     }
 
-    public MeteorlogicalYear get(String name) {
+    public MeteorlogicalYear get(String name) throws EmfException {
         if(name == null || name.trim().length() == 0)
             return null;
 
@@ -25,7 +27,12 @@ public class MeteorlogicalYears {
             if (item.getName().equalsIgnoreCase(name))
                 return item;
         }
+        validateYear(name);
         return new MeteorlogicalYear(name);
+    }
+
+    private void validateYear(String name) throws EmfException {
+        new YearValidation("Meteorological Year").value(name);
     }
 
     public String[] names() {
