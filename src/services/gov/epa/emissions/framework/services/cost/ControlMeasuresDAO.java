@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import java.util.List;
 
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 
 public class ControlMeasuresDAO {
 
@@ -24,6 +25,10 @@ public class ControlMeasuresDAO {
 
     public boolean exists(int id, Class clazz, Session session) {
         return hibernateFacade.exists(id, clazz, session);
+    }
+    
+    public boolean exists(Class clazz, Criterion criterion, Session session){
+        return hibernateFacade.exists(clazz,new Criterion[]{criterion},session);
     }
 
     /*

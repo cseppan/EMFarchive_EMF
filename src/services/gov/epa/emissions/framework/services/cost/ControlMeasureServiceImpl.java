@@ -11,6 +11,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 public class ControlMeasureServiceImpl implements ControlMeasureService {
 
@@ -51,6 +53,8 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public void addMeasure(ControlMeasure measure) throws EmfException {
+        checkForConstraints(measure);
+
         Session session = sessionFactory.getSession();
         try {
             dao.add(measure, session);
@@ -109,6 +113,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public ControlMeasure updateMeasure(ControlMeasure measure) throws EmfException {
+        //FIXME: checkForConstraints(measure);
         Session session = sessionFactory.getSession();
         try {
             ControlMeasure updated = dao.update(measure, session);
@@ -120,11 +125,33 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             session.close();
         }
     }
-    
-//    private void checkForConstraints(ControlMeasure controlMeasure){
-//        String name = controlMeasure.getName();
-//        dao.exists();
-//    }
+
+    private void checkForConstraints(ControlMeasure controlMeasure) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            nameConstraint(controlMeasure, session);
+            abbrConstraint(controlMeasure, session);
+        } finally {
+            session.close();
+        }
+    }
+
+    private void nameConstraint(ControlMeasure controlMeasure, Session session) throws EmfException {
+        String name = controlMeasure.getName();
+        Criterion criterion = Restrictions.eq("name", name);
+        if (dao.exists(ControlMeasure.class, criterion, session)) {
+            throw new EmfException("The Control Measure name already in use");
+        }
+    }
+
+    private void abbrConstraint(ControlMeasure controlMeasure, Session session) throws EmfException {
+        String abbr = controlMeasure.getAbbreviation();
+        Criterion criterion = Restrictions.eq("abbreviation", abbr);
+        if (dao.exists(ControlMeasure.class, criterion, session)) {
+            throw new EmfException("The Control Measure Abbreviation already in use");
+        }
+
+    }
 
     public Scc[] getSccs(ControlMeasure measure) throws EmfException {
         try {

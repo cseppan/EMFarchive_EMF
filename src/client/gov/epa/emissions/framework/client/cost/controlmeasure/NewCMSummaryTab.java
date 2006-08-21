@@ -6,17 +6,18 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
-public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements EditableCMTabView {
+public class NewCMSummaryTab extends ControlMeasureSummaryTab implements EditableCMTabView {
 
-    public EditableCMSummaryTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel,
+    public NewCMSummaryTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel,
             ManageChangeables changeablesList) {
         super(measure, session, messagePanel, changeablesList);
         super.setName("summary");
-
     }
 
     public void populateValues() {
         super.populateFields();
+        deviceCode.setText("");
+        equipmentLife.setText("");
     }
 
     public void save(ControlMeasure measure) throws EmfException {

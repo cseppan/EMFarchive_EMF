@@ -43,7 +43,7 @@ public class HibernateFacade {
         }
     }
 
-    public boolean exists(Class clazz, Session session, Criterion[] criterions) {
+    public boolean exists(Class clazz, Criterion[] criterions, Session session) {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();

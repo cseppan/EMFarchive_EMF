@@ -178,7 +178,7 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
         NewEfficiencyRecordView view = new NewEfficiencyRecordWindow(changeablesList, desktopManager, session);
         NewEfficiencyRecordPresenter presenter = new NewEfficiencyRecordPresenter(this, view);
         
-        presenter.display(measure,tableData.sources().length);
+        presenter.display(measure);
     }
 
     protected void doCopy(EfficiencyRecord record) {
