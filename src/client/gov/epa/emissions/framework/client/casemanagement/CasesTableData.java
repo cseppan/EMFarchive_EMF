@@ -17,8 +17,8 @@ public class CasesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Project", "Region", "Creator", "Category", "Run Status", "Abbreviation",
-                "Air Quality Model", "Emissions Year", "Meteorlogical Year", "Speciation", "Last Modified Date" };
+        return new String[] { "Name", "Project", "Modeling Regn.", "Creator", "Category", "Run Status", "Abbrev.",
+                "AQM", "Base Year", "Met. Year", "Speciation", "Last Modified Date" };
     }
 
     public Class getColumnClass(int col) {
@@ -76,7 +76,7 @@ public class CasesTableData extends AbstractTableData {
     }
 
     private String region(Case element) {
-        return element.getControlRegion() != null ? element.getControlRegion().getName() : "";
+        return element.getModelingRegion() != null ? element.getControlRegion().getName() : "";
     }
 
     private String caseCategory(Case element) {
