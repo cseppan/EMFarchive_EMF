@@ -162,12 +162,12 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         String exportDir = caseObj.getInputFileDir();
         
         if (exportDir == null || exportDir.equals("")) {
-            messagePanel.setMessage("Please select case input folder.");
+            messagePanel.setMessage("Please select the input folder before exporting the case.");
             return;
         }
         
         if (!checkDatasets()) {
-            messagePanel.setMessage("Please select input datasets before export case");
+            messagePanel.setMessage("Please select input datasets before exporting the case");
             return;
         }
         

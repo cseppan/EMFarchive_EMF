@@ -218,7 +218,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         }
 
         String title = "Warning";
-        String message = "Are you sure you want to remove the selected template(s)?";
+        String message = "Are you sure you want to remove the selected input(s)?";
         int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
