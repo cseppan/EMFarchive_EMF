@@ -185,7 +185,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Category:", categories(), panel);
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description()), panel);
         layoutGenerator.addLabelWidgetPair("Run Status:", runStatus(), panel);
-        layoutGenerator.addLabelWidgetPair("Last Modified By:", creator(), panel);
+        layoutGenerator.addLabelWidgetPair("Creator:", creator(), panel);
         layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
 
         // Lay out the panel.
@@ -236,7 +236,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("I/O API Grid Name:", grids(), panel);
         layoutGenerator.addLabelWidgetPair("# of Met. Layers:", numMetLayer(), panel);
         layoutGenerator.addLabelWidgetPair("# of Emissions Layers:", numEmisLayer(), panel);
-        layoutGenerator.addLabelWidgetPair("Start Date:", startDate(), panel);
+        layoutGenerator.addLabelWidgetPair("Start Date & Time:", startDate(), panel);
 
         layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 10, 10);
 
@@ -252,7 +252,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Meteorological Year:", meteorlogicalYears(), panel);
         layoutGenerator.addLabelWidgetPair("Base Year:", emissionsYears(), panel);
         layoutGenerator.addLabelWidgetPair("Future Year:", futureYear(), panel);
-        layoutGenerator.addLabelWidgetPair("End Date/Time", endDate(), panel);
+        layoutGenerator.addLabelWidgetPair("End Date & Time:", endDate(), panel);
 
         layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 10, 10);
 
