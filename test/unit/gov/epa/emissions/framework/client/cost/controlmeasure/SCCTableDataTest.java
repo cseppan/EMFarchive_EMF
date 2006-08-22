@@ -43,4 +43,15 @@ public class SCCTableDataTest extends TestCase {
         assertEquals(2, rows.size());
     }
 
+    public void testShouldNotAddDuplicates() {
+        List rows = data.rows();
+        assertNotNull("Should have 2 rows", rows);
+
+        Scc scc3 = new Scc("name3", "description3");
+        Scc[] newSccs = { sccs[0], scc3, sccs[1] };
+        data.add(newSccs);
+        rows = data.rows();
+        assertEquals(3, rows.size());
+    }
+
 }

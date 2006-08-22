@@ -9,7 +9,7 @@ public class Scc {
     private String status;
 
     public Scc() {
-        //Empty
+        // Empty
     }
 
     public Scc(String code, String description) {
@@ -39,6 +39,17 @@ public class Scc {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof Scc))
+            return false;
+        Scc other = (Scc) obj;
+        return code.equals(other.getCode());
+    }
+
+    public int hashCode() {
+        return code.hashCode();
     }
 
 }

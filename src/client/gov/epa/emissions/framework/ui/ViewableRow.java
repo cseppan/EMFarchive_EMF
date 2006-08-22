@@ -47,6 +47,18 @@ public class ViewableRow implements Row {
         return rowSource;
     }
 
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof ViewableRow))
+            return false;
+        ViewableRow other = (ViewableRow) obj;
+        return source.equals(other.source);
+
+    }
+
+    public int hashCode() {
+        return source.hashCode();
+    }
+
     public void setValueAt(Object value, int column) {
         // No Op
     }

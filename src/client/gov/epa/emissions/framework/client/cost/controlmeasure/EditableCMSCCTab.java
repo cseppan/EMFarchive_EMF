@@ -152,7 +152,10 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureTabView, C
     }
 
     public void add(Scc[] sccs) {
-        tableData.add(sccs);
+        for (int i = 0; i < sccs.length; i++) {
+            tableData.add(sccs);
+        }
+        
         SortFilterSelectionPanel panel = sortFilterPanel();
         mainPanel.removeAll();
         mainPanel.add(panel);

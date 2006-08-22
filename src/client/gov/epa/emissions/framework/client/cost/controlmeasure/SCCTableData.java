@@ -27,12 +27,12 @@ public class SCCTableData extends AbstractTableData {
     }
 
     private Row row(Scc scc) {
-        String [] values = {scc.getCode(),scc.getDescription()};
-        return  new ViewableRow(scc,values);
+        String[] values = { scc.getCode(), scc.getDescription() };
+        return new ViewableRow(scc, values);
     }
 
     public String[] columns() {
-        return new String[] {"SCC","Description" };
+        return new String[] { "SCC", "Description" };
     }
 
     public Class getColumnClass(int col) {
@@ -48,16 +48,18 @@ public class SCCTableData extends AbstractTableData {
     }
 
     public void add(Scc[] sccs) {
-        for(int i = 0; i < sccs.length; i++)
-            rows.add(row(sccs[i]));
-        
+        for (int i = 0; i < sccs.length; i++) {
+            Row row = row(sccs[i]);
+            if (!rows.contains(row))
+                rows.add(row);
+        }
         refresh();
     }
 
     public void refresh() {
         this.rows = createRows(sources());
     }
-    
+
     public Scc[] sources() {
         List sources = sourcesList();
         return (Scc[]) sources.toArray(new Scc[0]);
@@ -69,7 +71,7 @@ public class SCCTableData extends AbstractTableData {
             ViewableRow row = (ViewableRow) iter.next();
             sources.add(row.source());
         }
-        
+
         return sources;
     }
 
@@ -87,7 +89,7 @@ public class SCCTableData extends AbstractTableData {
     public void remove(Scc[] records) {
         for (int i = 0; i < records.length; i++)
             remove(records[i]);
-        
+
         refresh();
     }
 
