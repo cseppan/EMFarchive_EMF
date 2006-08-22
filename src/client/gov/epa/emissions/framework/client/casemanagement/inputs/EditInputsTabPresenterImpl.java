@@ -48,6 +48,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
     public void doAddInputFields(JComponent container, InputFieldsPanelView inputFields) throws EmfException {
         CaseInput newInput = new CaseInput();
+        newInput.setRecordID(view.numberOfRecord());
         newInput.setRequired(true);
         newInput.setShow(true);
 
@@ -56,11 +57,12 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     }
 
     public void doCheckDuplicate(CaseInput input, CaseInput[] existingInputs) throws EmfException {
-//        for (int i = 0; i < existingInputs.length; i++) {
-//            if (input.equals(existingInputs[i]))
-//                throw new EmfException("Case input: " + existingInputs[i].getInputName().getName()
-//                        + " has already existed.");
-//        }
+        for (int i = 0; i < existingInputs.length; i++) {
+            if (input.getRecordID() != existingInputs[i].getRecordID())
+                if (input.equals(existingInputs[i]))
+                    throw new EmfException("The combination of 'Input Name', 'Sector', and 'Program' " +
+                            "should be unique.");
+        }
 
         InputName[] names = caseService().getInputNames();
         InputName inputName = input.getInputName();
@@ -83,7 +85,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         InputEnvtVar[] envtVars = caseService().getInputEnvtVars();
         InputEnvtVar envtVar = input.getEnvtVars();
         for (int i = 0; i < envtVars.length; i++)
-            if (envtVar != null && envtVar.getId() != envtVars[0].getId())
+            if (envtVar != null && envtVar.getId() != envtVars[i].getId())
                 if (envtVar.equals(envtVars[i]))
                     throw new EmfException("InputEnvtVar: " + envtVar.getName() + "has already existed.");
 

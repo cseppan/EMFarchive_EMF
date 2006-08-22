@@ -75,12 +75,14 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         inputName.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Input Name:", inputName, panel);
 
-        program = new EditableComboBox(presenter.getPrograms());
+        Program[] programs = presenter.getCasePrograms().getAll();
+        program = new EditableComboBox(programs);
         changeablesList.addChangeable(program);
         program.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
-        envtVar = new EditableComboBox(presenter.getEnvtVars());
+        InputEnvtVar[] envtVars = presenter.getCaseInputEnvtVars().getAll();
+        envtVar = new EditableComboBox(envtVars);
         changeablesList.addChangeable(envtVar);
         envtVar.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Envt. Variable:", envtVar, panel);
@@ -204,34 +206,24 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         input.setInputName(presenter.getInputName(selected));
     }
 
-    private void updateProgram() {
+    private void updateProgram() throws EmfException {
         Object selected = program.getSelectedItem();
-        if (selected instanceof String) {
-            String newProgramName = (String) selected;
-            if (newProgramName.length() > 0) {
-                Program name = new Program(newProgramName);
-                input.setProgram(name);
-                return;
-            }
-
-        } else if (selected instanceof Program) {
-            input.setProgram((Program) selected);
+        if (selected == null) {
+            input.setProgram(null);
+            return;
         }
+        
+        input.setProgram(presenter.getCaseProgram(selected));
     }
 
-    private void updateEnvtVar() {
+    private void updateEnvtVar() throws EmfException {
         Object selected = envtVar.getSelectedItem();
-        if (selected instanceof String) {
-            String newEnvtVar = (String) selected;
-            if (newEnvtVar.length() > 0) {
-                InputEnvtVar name = new InputEnvtVar(newEnvtVar);
-                input.setEnvtVars(name);
-                return;
-            }
-
-        } else if (selected instanceof InputEnvtVar) {
-            input.setEnvtVars((InputEnvtVar) selected);
+        if (selected == null) {
+            input.setEnvtVars(null);
+            return;
         }
+        
+        input.setEnvtVars(presenter.getInputEnvtVar(selected));
     }
 
     private void updateSector() {

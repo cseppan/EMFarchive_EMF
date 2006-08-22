@@ -343,4 +343,30 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
+    public Program addProgram(Program program) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(program, session);
+            return (Program) dao.load(Program.class, program.getName(), session);
+        } catch (Exception e) {
+            LOG.error("Could not add new program '" + program.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new program '" + program.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
+    public InputEnvtVar addInputEnvtVar(InputEnvtVar inputEnvtVar) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(inputEnvtVar, session);
+            return (InputEnvtVar) dao.load(InputEnvtVar.class, inputEnvtVar.getName(), session);
+        } catch (Exception e) {
+            LOG.error("Could not add new InputEnvtVar '" + inputEnvtVar.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new InputEnvtVar '" + inputEnvtVar.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
 }

@@ -191,6 +191,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
                 clearMessagePanel();
             }
         });
+        showAll.setEnabled(false);
         container.add(showAll);
 
         JPanel panel = new JPanel(new BorderLayout());
@@ -238,7 +239,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         for (Iterator iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = (CaseInput) iter.next();
             EditCaseInputView inputEditor = new EditCaseInputWindow(input.getName() 
-                    + "(" + input.getId() + ")(" + caseObj.getName() + ")", desktopManager);
+                    + "(" + input.getRecordID() + ")(" + caseObj.getName() + ")", desktopManager);
             presenter.doEditInput(input, inputEditor);
         }
     }
@@ -250,29 +251,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         tablePanel.removeAll();
         tablePanel.add(createSortFilterPanel(parentConsole));
     }
-
-    // public void refresh() {
-    // tableData.refresh();
-    // selectModel.refresh();
-    //        
-    // tablePanel.removeAll();
-    // tablePanel.add(createSortFilterPanel(parentConsole));
-    // }
-    //
-    // private void refreshShowables() {
-    // tableData.refreshShowables();
-    // selectModel.refresh();
-    //        
-    // tablePanel.removeAll();
-    // tablePanel.add(createSortFilterPanel(parentConsole));
-    // }
-    //    
-    // private void doRefresh(JCheckBox showAll) {
-    // if (showAll.isSelected())
-    // refresh();
-    // else
-    // refreshShowables();
-    // }
 
     private void clearMessagePanel() {
         messagePanel.clear();
@@ -288,6 +266,10 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     public void checkDuplicate(CaseInput input) throws EmfException {
         presenter.doCheckDuplicate(input, tableData.sources());
+    }
+
+    public int numberOfRecord() {
+        return tableData.sources().length;
     }
 
 }

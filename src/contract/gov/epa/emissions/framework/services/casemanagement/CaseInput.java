@@ -8,9 +8,9 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import java.io.Serializable;
 
 public class CaseInput implements Serializable, Comparable {
-
-    private int id;
     
+    private int recordID;
+
     private InputName inputName;
     
     private Sector sector;
@@ -38,14 +38,6 @@ public class CaseInput implements Serializable, Comparable {
         super();
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public boolean equals(Object other) {
         if (other == null || !(other instanceof CaseInput))
             return false;
@@ -54,7 +46,7 @@ public class CaseInput implements Serializable, Comparable {
         boolean bool2 = evalToEqual(((CaseInput) other).sector, this.sector);
         boolean bool3 = evalToEqual(((CaseInput) other).program, this.program);
         
-        return (bool1 && bool2 && bool3) || (this.id == ((CaseInput) other).getId());
+        return (bool1 && bool2 && bool3) || (this.recordID == ((CaseInput) other).getRecordID());
     }
     
     private boolean evalToEqual(Object obj, Object current) {
@@ -167,6 +159,14 @@ public class CaseInput implements Serializable, Comparable {
 
     public String getName() {
         return this.inputName.getName();
+    }
+
+    public int getRecordID() {
+        return recordID;
+    }
+
+    public void setRecordID(int recordID) {
+        this.recordID = recordID;
     }
 
 }

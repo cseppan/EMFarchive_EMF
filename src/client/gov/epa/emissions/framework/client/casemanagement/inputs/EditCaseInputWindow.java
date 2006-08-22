@@ -124,12 +124,17 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
     
     public void loadInput() throws EmfException {
         // NOTE Auto-generated method stub
-        throw new EmfException("Under construction...");
+        throw new EmfException("");
     }
 
     public void populateFields() {
         // NOTE Auto-generated method stub
         
+    }
+    
+    public void signalChanges() {
+        clearMessage();
+        super.signalChanges();
     }
 
 }

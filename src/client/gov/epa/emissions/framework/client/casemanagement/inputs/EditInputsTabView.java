@@ -15,5 +15,7 @@ public interface EditInputsTabView {
     void refresh();
 
     void checkDuplicate(CaseInput input) throws EmfException;
+    
+    int numberOfRecord();
 
 }

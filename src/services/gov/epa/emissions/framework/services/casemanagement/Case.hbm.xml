@@ -97,6 +97,7 @@
     		<key column="case_id" not-null="true"/>
     		<list-index column="list_index"/>
     		<composite-element class="gov.epa.emissions.framework.services.casemanagement.CaseInput">
+    			<property name="recordID" column="record_id" type="integer" not-null="false"/>
     			<property name="subdir"	column="sub_dir"	type="java.lang.String"	not-null="false"/>
 				<property name="required"	column="required"	type="boolean"	not-null="false"/>
 				<property name="show"	column="show"	type="boolean"	not-null="false"/>

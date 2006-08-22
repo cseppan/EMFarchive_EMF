@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.ui.ErrorPanel;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -165,11 +166,26 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
             return;
         }
         
+        if (!checkDatasets()) {
+            messagePanel.setMessage("Please select input datasets before export case");
+            return;
+        }
+        
         presenter.doExport(session.user(), exportDir, "To export input datasets",
                 true, caseObj);
         
         messagePanel.setMessage("Started export. Please monitor the Status window "
                 + "to track your Export request.");
+    }
+
+    private boolean checkDatasets() {
+        CaseInput[] inputs = caseObj.getCaseInputs();
+        
+        for (int i = 0; i < inputs.length; i++)
+            if (inputs[i].getDatasetType() == null || inputs[i].getDataset() == null)
+                return false;
+        
+        return true;
     }
 
     public void observe(CaseEditorPresenter presenter) {

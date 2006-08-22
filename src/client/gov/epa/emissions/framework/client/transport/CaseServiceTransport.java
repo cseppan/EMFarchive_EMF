@@ -227,4 +227,24 @@ public class CaseServiceTransport implements CaseService {
 
         return (InputName) call.requestResponse(new Object[] { name });
     }
+
+    public Program addProgram(Program program) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("addProgram");
+        call.addParam("program", caseMappings.program());
+        call.setReturnType(caseMappings.program());
+        
+        return (Program) call.requestResponse(new Object[] { program });
+    }
+
+    public InputEnvtVar addInputEnvtVar(InputEnvtVar inputEnvtVar) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("addInputEnvtVar");
+        call.addParam("inputEnvtVar", caseMappings.inputEnvtVar());
+        call.setReturnType(caseMappings.inputEnvtVar());
+        
+        return (InputEnvtVar) call.requestResponse(new Object[] { inputEnvtVar });
+    }
 }

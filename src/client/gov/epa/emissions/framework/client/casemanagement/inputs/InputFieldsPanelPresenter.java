@@ -28,11 +28,17 @@ public class InputFieldsPanelPresenter {
     private InputFieldsPanelView view;
 
     private CaseInputNames caseInputNames;
+    
+    private CaseInputEnvtVars caseInputEnvtVars;
+    
+    private Programs programs;
 
     public InputFieldsPanelPresenter(InputFieldsPanelView inputFields, EmfSession session) throws EmfException {
         this.session = session;
         this.view = inputFields;
         this.caseInputNames = new CaseInputNames(session,getInputNames());
+        this.caseInputEnvtVars = new CaseInputEnvtVars(session, getEnvtVars());
+        this.programs = new Programs(session, getPrograms());
     }
 
     public void display(CaseInput input, JComponent container) throws EmfException {
@@ -42,6 +48,14 @@ public class InputFieldsPanelPresenter {
 
     public CaseInputNames getCaseInputNames() {
         return caseInputNames;
+    }
+
+    public CaseInputEnvtVars getCaseInputEnvtVars() {
+        return this.caseInputEnvtVars;
+    }
+
+    public Programs getCasePrograms() {
+        return this.programs;
     }
 
     public InputName[] getInputNames() throws EmfException {
@@ -118,6 +132,14 @@ public class InputFieldsPanelPresenter {
 
     public InputName getInputName(Object selected) throws EmfException {
         return caseInputNames.get(selected);
+    }
+
+    public InputEnvtVar getInputEnvtVar(Object selected) throws EmfException {
+        return caseInputEnvtVars.get(selected);
+    }
+
+    public Program getCaseProgram(Object selected) throws EmfException {
+        return programs.get(selected);
     }
 
 }
