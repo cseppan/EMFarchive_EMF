@@ -205,7 +205,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Is Template:", isTemplate(), panel);
         layoutGenerator.addLabelWidgetPair("Sectors:", sectors(), panel);
         layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
-        layoutGenerator.addLabelWidgetPair("Template", template(), panel);
+        layoutGenerator.addLabelWidgetPair("Template:", template(), panel);
         // layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
 
         layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 10, 10);
@@ -234,8 +234,8 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Modeling Region:", modRegions(), panel);
         layoutGenerator.addLabelWidgetPair("Control Region:", controlRegions(), panel);
         layoutGenerator.addLabelWidgetPair("I/O API Grid Name:", grids(), panel);
-        layoutGenerator.addLabelWidgetPair("# of Met Layers", numMetLayer(), panel);
-        layoutGenerator.addLabelWidgetPair("# of Emissions Layers", numEmisLayer(), panel);
+        layoutGenerator.addLabelWidgetPair("# of Met. Layers:", numMetLayer(), panel);
+        layoutGenerator.addLabelWidgetPair("# of Emissions Layers:", numEmisLayer(), panel);
         layoutGenerator.addLabelWidgetPair("Start Date:", startDate(), panel);
 
         layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 10, 10);
@@ -412,7 +412,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private JScrollPane sectors() {
-        sectorsList = new ListWidget(new String[] { "               " }, new String[] { "" });
+        sectorsList = new ListWidget(new String[] { "" }, new String[] { "" });
         JScrollPane listScroller = new JScrollPane(sectorsList);
         listScroller.setPreferredSize(new Dimension(175, 60));
 
