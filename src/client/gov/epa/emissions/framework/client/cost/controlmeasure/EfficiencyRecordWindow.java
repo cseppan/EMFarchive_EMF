@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.gui.Changeable;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -230,7 +231,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         getRootPane().setDefaultButton(save);
         panel.add(save);
 
-        Button cancel = new Button("Cancel", new AbstractAction() {
+        Button cancel = new CancelButton("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 disposeView();
             }

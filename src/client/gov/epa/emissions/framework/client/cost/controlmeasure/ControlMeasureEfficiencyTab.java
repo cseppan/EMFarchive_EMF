@@ -4,6 +4,10 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.commons.gui.buttons.CopyButton;
+import gov.epa.emissions.commons.gui.buttons.EditButton;
+import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -96,11 +100,11 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     }
 
     private JPanel controlPanel() {
-        Button addButton = new Button("Add", addAction());
-        Button editButton = new Button("Edit", editAction());
-        Button copyButton = new Button("Copy", copyAction());
+        Button addButton = new AddButton("Add", addAction());
+        Button editButton = new EditButton("Edit", editAction());
+        Button copyButton = new CopyButton("Copy", copyAction());
+        Button removeButton = new RemoveButton("Remove", removeAction());
         copyButton.setEnabled(false);
-        Button removeButton = new Button("Remove", removeAction());
 
         JPanel panel = new JPanel();
         panel.add(addButton);

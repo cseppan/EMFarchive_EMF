@@ -4,6 +4,8 @@ import gov.epa.emissions.commons.gui.Button;
 //import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.CancelButton;
+import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -126,9 +128,9 @@ public class NewCaseWindow extends DisposableInteralFrame implements NewCaseView
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button saveButton = new Button("Create", saveAction());
+        Button saveButton = new OKButton("OK", saveAction());
         container.add(saveButton);
-        container.add(new Button("Cancel", closeAction()));
+        container.add(new CancelButton("Cancel", closeAction()));
         getRootPane().setDefaultButton(saveButton);
 
         panel.add(container, BorderLayout.CENTER);

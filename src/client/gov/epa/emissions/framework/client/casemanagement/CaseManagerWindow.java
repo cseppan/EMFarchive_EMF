@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
@@ -142,7 +143,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         crudPanel.add(viewButton(confirmDialog));
         crudPanel.add(editButton(confirmDialog));
 
-        Button newButton = new Button("New", new AbstractAction() {
+        Button newButton = new NewButton("New", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMsgPanel();
                 createNewCase();

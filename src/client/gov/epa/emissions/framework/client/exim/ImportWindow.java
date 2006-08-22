@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.ImportButton;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
@@ -59,7 +60,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        JButton importButton = new Button("Import", new AbstractAction() {
+        JButton importButton = new ImportButton("Import", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doImport();
             }

@@ -6,6 +6,8 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -137,9 +139,10 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         layout.setVgap(10);
         container.setLayout(layout);
 
-        Button saveButton = new Button("Save", saveAction());
+        Button saveButton = new SaveButton("Save", saveAction());
         container.add(saveButton);
-        container.add(new Button("Close", closeAction()));
+        CloseButton closeButton = new CloseButton("Close", closeAction());
+        container.add(closeButton);
         getRootPane().setDefaultButton(saveButton);
 
         panel.add(container, BorderLayout.CENTER);

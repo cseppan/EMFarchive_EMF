@@ -4,6 +4,8 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
@@ -114,14 +116,14 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
     }
 
     private JPanel getFolderChooserPanel(final JTextField dir, final String title) {
-        Button button = new Button("Choose Folder", new AbstractAction() {
+        Button browseButton = new BrowseButton("Browse", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 selectFolder(dir, title);
             }
         });
         JPanel folderPanel = new JPanel(new BorderLayout());
         folderPanel.add(dir);
-        folderPanel.add(button, BorderLayout.EAST);
+        folderPanel.add(browseButton, BorderLayout.EAST);
 
         return folderPanel;
     }
@@ -141,7 +143,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
     private JPanel controlPanel(final EditOutputsTabPresenter presenter) {
         JPanel container = new JPanel();
 
-        Button add = new Button("Add", new AbstractAction() {
+        Button add = new AddButton("Add", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 //
             }

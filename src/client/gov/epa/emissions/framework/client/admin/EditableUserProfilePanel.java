@@ -5,6 +5,8 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.PasswordField;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.Widget;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.Border;
@@ -81,9 +83,9 @@ public class EditableUserProfilePanel extends JPanel {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button okButton = new Button("Save", okAction);
+        Button okButton = new OKButton("OK", okAction);
         container.add(okButton);
-        container.add(new Button("Close", cancelAction));
+        container.add(new CloseButton("Close", cancelAction));
 
         panel.add(container, BorderLayout.EAST);
 

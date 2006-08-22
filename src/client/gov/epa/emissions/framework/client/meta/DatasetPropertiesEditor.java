@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -193,20 +195,18 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private JPanel createControlPanel() {
         JPanel buttonsPanel = new JPanel();
 
-        Button save = new Button("Save", new AbstractAction() {
+        Button save = new SaveButton("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doSave();
             }
         });
-        save.setMnemonic('S');
         buttonsPanel.add(save);
 
-        Button close = new Button("Close", new AbstractAction() {
+        Button close = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doClose();
             }
         });
-        close.setMnemonic('L');
         getRootPane().setDefaultButton(close);
         buttonsPanel.add(close);
 

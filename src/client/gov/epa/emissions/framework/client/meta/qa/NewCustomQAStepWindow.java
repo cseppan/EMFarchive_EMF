@@ -7,6 +7,8 @@ import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.CancelButton;
+import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -160,7 +162,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
-        Button ok = new Button("OK", new AbstractAction() {
+        Button ok = new OKButton("OK", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doOk();
             }
@@ -168,7 +170,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new Button("Cancel", new AbstractAction() {
+        Button cancel = new CancelButton("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 disposeView();
             }

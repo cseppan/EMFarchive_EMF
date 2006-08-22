@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.DefaultEmfSession;
 import gov.epa.emissions.framework.client.EmfFrame;
@@ -87,7 +88,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
         container.add(signIn);
         setDefaultButton(signIn);
 
-        JButton cancel = new Button("Cancel", new AbstractAction() {
+        JButton cancel = new CancelButton("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 disposeView();
             }

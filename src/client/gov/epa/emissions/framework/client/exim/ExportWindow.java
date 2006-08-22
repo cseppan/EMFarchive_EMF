@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.commons.gui.buttons.BrowseButton;
+import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -92,7 +94,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         // folder
         folder = new JTextField(40);
         folder.setName("folder");
-        Button button = new Button("Choose Folder", new AbstractAction() {
+        Button button = new BrowseButton("Browse", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 selectFolder();
             }
@@ -145,7 +147,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        JButton exportButton = new Button("Export", new AbstractAction() {
+        JButton exportButton = new ExportButton("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 clearMessagePanel();
                 doExport();

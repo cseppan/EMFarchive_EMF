@@ -5,6 +5,8 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.CancelButton;
+import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -184,7 +186,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
 
     private JPanel buttonsPanel(final Note[] notes) {
         JPanel panel = new JPanel();
-        Button ok = new Button("OK", new AbstractAction() {
+        Button ok = new OKButton("OK", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doNew(notes);
             }
@@ -192,7 +194,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new Button("Cancel", new AbstractAction() {
+        Button cancel = new CancelButton("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 shouldCreate = false;
                 close();

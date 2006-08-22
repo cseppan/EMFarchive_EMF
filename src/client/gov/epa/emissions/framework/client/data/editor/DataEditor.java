@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.data.editor;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ChangeAwareButton;
+import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -163,7 +165,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private JPanel leftControlPanel() {
         JPanel panel = new JPanel();
 
-        Button addNote = new Button("Add Note", new AbstractAction() {
+        Button addNote = new AddButton("Add Note", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 messagePanel.clear();
                 NewNoteDialog view = new NewNoteDialog(parent);
@@ -190,7 +192,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     private Button closeButton() {
-        Button close = new Button("Close", new AbstractAction() {
+        Button close = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doClose();
             }

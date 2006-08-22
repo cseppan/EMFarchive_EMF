@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
@@ -195,7 +196,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     private JPanel buttonPanel() {
-        Button exportButton = new Button("Export", exportAction());
+        Button exportButton = new ExportButton("Export", exportAction());
         Button analysisButton = new Button("Analyze", analysisAction());
 
         JPanel buttonPanel = new JPanel();

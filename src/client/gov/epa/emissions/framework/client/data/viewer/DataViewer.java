@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.client.data.viewer;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -102,7 +104,7 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
 
     private JPanel leftPanel() {
         JPanel leftPanel = new JPanel();
-        Button addNote = new Button("Add Note", new AbstractAction() {
+        Button addNote = new AddButton("Add Note", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doAddNote();
             }
@@ -113,7 +115,7 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
 
     private JPanel rightPanel() {
         JPanel rightPanel = new JPanel();
-        Button close = new Button("Close", new AbstractAction() {
+        Button close = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doClose();
             }

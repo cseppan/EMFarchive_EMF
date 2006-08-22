@@ -2,11 +2,13 @@ package gov.epa.emissions.framework.client.data.datasettype;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAStepTemplate;
-import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.EditableTable;
 import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.commons.gui.buttons.EditButton;
+import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.qa.EditQAStepTemplateWindow;
@@ -107,21 +109,21 @@ public class EditQAStepTemplatesPanel extends JPanel implements QAStepTemplatesP
     private JPanel buttonsPanel() {
         JPanel container = new JPanel();
 
-        Button add = new BorderlessButton("Add", new AbstractAction() {
+        Button add = new AddButton("Add", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doAdd();
             }
         });
         container.add(add);
 
-        Button remove = new BorderlessButton("Remove", new AbstractAction() {
+        Button remove = new RemoveButton("Remove", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doRemove();
             }
         });
         container.add(remove);
 
-        Button update = new BorderlessButton("Edit", new AbstractAction() {
+        Button update = new EditButton("Edit", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doEdit();
             }

@@ -5,6 +5,9 @@ import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.ExportButton;
+import gov.epa.emissions.commons.gui.buttons.ImportButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -172,7 +175,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private JPanel createRightControlPanel() {
         JPanel panel = new JPanel();
 
-        Button importButton = new Button("Import", new AbstractAction() {
+        Button importButton = new ImportButton("Import", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
                     importDataset();
@@ -184,7 +187,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         importButton.setToolTipText("Import a new Dataset");
         panel.add(importButton);
 
-        Button exportButton = new Button("Export", new AbstractAction() {
+        Button exportButton = new ExportButton("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 exportSelectedDatasets();
             }
@@ -192,7 +195,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         exportButton.setToolTipText("Export existing Dataset(s)");
         panel.add(exportButton);
 
-        Button closeButton = new Button("Close", new AbstractAction() {
+        Button closeButton = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
             }

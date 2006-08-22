@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -49,7 +50,7 @@ public class DatasetChooserDialog extends JDialog {
     }
 
     private JPanel buttonPanel() {
-        Button ok = new Button("OK", selectDatasetset());
+        Button ok = new OKButton("OK", selectDatasetset());
         JPanel panel = new JPanel();
         panel.add(ok);
         return panel;

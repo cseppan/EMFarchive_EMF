@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.casemanagement.inputs;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.Changeable;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.buttons.CancelButton;
+import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
@@ -68,7 +70,7 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
 
     private JPanel buttonsPanel(final CaseInput[] inputs) {
         JPanel panel = new JPanel();
-        Button ok = new Button("OK", new AbstractAction() {
+        Button ok = new OKButton("OK", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     doNew(inputs);
@@ -80,7 +82,7 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new Button("Cancel", new AbstractAction() {
+        Button cancel = new CancelButton("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 shouldCreate = false;
                 close();

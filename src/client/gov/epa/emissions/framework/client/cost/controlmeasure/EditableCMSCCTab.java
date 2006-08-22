@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -78,8 +80,10 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureTabView, C
 
     private JPanel buttonPanel() {
         JPanel panel = new JPanel();
-        panel.add(new Button("Add", addAction()));
-        panel.add(new Button("Remove", removeAction()));
+        Button addButton = new AddButton("Add", addAction());
+        panel.add(addButton);
+        Button removeButton = new RemoveButton("Remove", removeAction());
+        panel.add(removeButton);
         
         JPanel container = new JPanel(new BorderLayout());
         container.add(panel, BorderLayout.LINE_START);

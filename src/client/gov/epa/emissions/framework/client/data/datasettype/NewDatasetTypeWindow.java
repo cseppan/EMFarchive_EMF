@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.data.datasettype;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -191,9 +193,9 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button saveButton = new Button("Save", saveAction());
+        Button saveButton = new SaveButton("Save", saveAction());
         container.add(saveButton);
-        container.add(new Button("Close", closeAction()));
+        container.add(new CloseButton("Close", closeAction()));
         getRootPane().setDefaultButton(saveButton);
 
         panel.add(container, BorderLayout.CENTER);

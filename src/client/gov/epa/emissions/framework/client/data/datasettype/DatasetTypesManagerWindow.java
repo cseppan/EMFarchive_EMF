@@ -6,6 +6,8 @@ import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -101,7 +103,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         JPanel crudPanel = createCrudPanel();
 
         JPanel closePanel = new JPanel();
-        Button closeButton = new Button("Close", new AbstractAction() {
+        Button closeButton = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
             }
@@ -141,7 +143,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
                 createDatasetType();
             }
         };
-        Button newButton = new Button("New", createAction);
+        Button newButton = new NewButton("New", createAction);
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
         crudPanel.add(viewButton);

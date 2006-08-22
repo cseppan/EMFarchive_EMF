@@ -30,7 +30,7 @@ public class CasesTableDataTest extends TestCase {
         case1 = new Case();
         case1.setName("name1");
         case1.setCaseCategory(new CaseCategory("category1"));
-        case1.setControlRegion(new Region("region1"));
+        case1.setModelingRegion(new Region("region1"));
         case1.setEmissionsYear(new EmissionsYear("2003"));
         case1.setMeteorlogicalYear(new MeteorlogicalYear("2002"));
         case1.setLastModifiedDate(new Date());
@@ -46,7 +46,7 @@ public class CasesTableDataTest extends TestCase {
         case2 = new Case();
         case2.setName("name2");
         case2.setCaseCategory(new CaseCategory("category2"));
-        case2.setControlRegion(new Region("region2"));
+        case2.setModelingRegion(new Region("region2"));
         case2.setEmissionsYear(new EmissionsYear("2003"));
         case2.setMeteorlogicalYear(new MeteorlogicalYear("2002"));
         case2.setLastModifiedDate(new Date());
@@ -67,14 +67,14 @@ public class CasesTableDataTest extends TestCase {
         assertEquals(12, columns.length);
         assertEquals("Name", columns[0]);
         assertEquals("Project", columns[1]);
-        assertEquals("Region", columns[2]);
+        assertEquals("Modeling Regn.", columns[2]);
         assertEquals("Creator", columns[3]);
         assertEquals("Category", columns[4]);
         assertEquals("Run Status", columns[5]);
-        assertEquals("Abbreviation", columns[6]);
-        assertEquals("Air Quality Model", columns[7]);
-        assertEquals("Emissions Year", columns[8]);
-        assertEquals("Meteorlogical Year", columns[9]);
+        assertEquals("Abbrev.", columns[6]);
+        assertEquals("AQM", columns[7]);
+        assertEquals("Base Year", columns[8]);
+        assertEquals("Met. Year", columns[9]);
         assertEquals("Speciation", columns[10]);
         assertEquals("Last Modified Date", columns[11]);
     }

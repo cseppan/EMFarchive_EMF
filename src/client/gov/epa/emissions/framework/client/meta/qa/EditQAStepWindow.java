@@ -8,6 +8,8 @@ import gov.epa.emissions.commons.gui.FormattedDateField;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
@@ -247,7 +249,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
-        Button ok = new Button("Save", new AbstractAction() {
+        Button ok = new SaveButton("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doEdit();
             }
@@ -255,7 +257,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new Button("Close", new AbstractAction() {
+        Button cancel = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doClose();
             }

@@ -3,6 +3,9 @@ package gov.epa.emissions.framework.client.meta.versions;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.EditButton;
+import gov.epa.emissions.commons.gui.buttons.NewButton;
+import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -119,7 +122,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     private JPanel leftControlPanel() {
         JPanel panel = new JPanel();
 
-        Button newButton = new Button("New", new AbstractAction() {
+        Button newButton = new NewButton("New", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doNew(tableData.getValues());
             }
@@ -199,7 +202,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     }
 
     private Button viewButton(final JComboBox tableCombo) {
-        Button view = new Button("View", new AbstractAction() {
+        Button view = new ViewButton("View", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doView(tableCombo);
             }
@@ -209,7 +212,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     }
 
     private Button editButton(final JComboBox tableCombo) {
-        Button edit = new Button("Edit", new AbstractAction() {
+        Button edit = new EditButton("Edit", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doEdit(tableCombo);
             }

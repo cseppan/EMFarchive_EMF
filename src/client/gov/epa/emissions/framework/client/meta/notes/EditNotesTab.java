@@ -4,6 +4,8 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -84,14 +86,14 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
     private JPanel controlPanel(final EditNotesTabPresenter presenter) {
         JPanel container = new JPanel();
 
-        Button add = new Button("Add", new AbstractAction() {
+        Button add = new AddButton("Add", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doNewNote(presenter);
             }
         });
         container.add(add);
 
-        Button view = new Button("View", new AbstractAction() {
+        Button view = new ViewButton("View", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doViewNote(presenter);
             }

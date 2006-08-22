@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
@@ -135,7 +136,7 @@ public class ImportInputPanel extends JPanel {
     }
 
     private JButton importFileButton() {
-        Button button = new Button("Choose File", new AbstractAction() {
+        Button button = new BrowseButton("Browse", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 clear();
                 selectFile();

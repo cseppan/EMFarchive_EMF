@@ -76,7 +76,7 @@ public class CasesTableData extends AbstractTableData {
     }
 
     private String region(Case element) {
-        return element.getModelingRegion() != null ? element.getControlRegion().getName() : "";
+        return element.getModelingRegion() != null ? element.getModelingRegion().getName() : "";
     }
 
     private String caseCategory(Case element) {

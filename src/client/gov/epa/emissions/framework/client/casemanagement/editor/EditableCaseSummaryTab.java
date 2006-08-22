@@ -9,6 +9,8 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.casemanagement.Abbreviations;
@@ -46,7 +48,6 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -236,7 +237,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("I/O API Grid Name:", grids(), panel);
         layoutGenerator.addLabelWidgetPair("# of Met. Layers:", numMetLayer(), panel);
         layoutGenerator.addLabelWidgetPair("# of Emissions Layers:", numEmisLayer(), panel);
-        layoutGenerator.addLabelWidgetPair("Start Date & Time:", startDate(), panel);
+        layoutGenerator.addLabelWidgetPair("Start Date:", startDate(), panel);
 
         layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 10, 10);
 
@@ -252,7 +253,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Meteorological Year:", meteorlogicalYears(), panel);
         layoutGenerator.addLabelWidgetPair("Base Year:", emissionsYears(), panel);
         layoutGenerator.addLabelWidgetPair("Future Year:", futureYear(), panel);
-        layoutGenerator.addLabelWidgetPair("End Date & Time:", endDate(), panel);
+        layoutGenerator.addLabelWidgetPair("End Date/Time", endDate(), panel);
 
         layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 10, 10);
 
@@ -520,8 +521,8 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         JPanel panel = new JPanel();
         // TBD: this needs to be changed so you have handles to the buttons
         // and can set actions
-        Button addButton = new Button("Add", addAction());
-        JButton removeButton = new JButton("Remove");
+        Button addButton = new AddButton("Add", addAction());
+        Button removeButton = new RemoveButton("Remove", null);
         removeButton.setEnabled(false);
 
         panel.add(addButton);

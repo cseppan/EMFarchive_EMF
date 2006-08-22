@@ -144,7 +144,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         Button edit = new EditButton("Edit", editAction());
         panel.add(edit);
 
-        Button exportButton = new Button("Export", exportAction());
+        Button exportButton = new ExportButton("Export", exportAction());
         exportButton.setToolTipText("Export existing Control Measure(s)");
         panel.add(exportButton);
         exportButton.setEnabled(false);
@@ -186,7 +186,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         });
         panel.add(getItem("Cost Year:", costYear));
 
-        Button importButton = new Button("Import", viewAction());
+        Button importButton = new ImportButton("Import", viewAction());
         panel.add(importButton);
         importButton.setEnabled(false);
 

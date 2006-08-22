@@ -93,7 +93,7 @@ public class ControlStrategyWindow extends DisposableInteralFrame implements Con
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button saveButton = new Button("Create", saveAction());
+        Button saveButton = new OKButton("OK", saveAction());
         container.add(saveButton);
         container.add(new CancelButton("Cancel", closeAction()));
         getRootPane().setDefaultButton(saveButton);

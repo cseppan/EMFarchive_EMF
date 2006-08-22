@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.qa;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.CancelButton;
+import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -76,7 +78,7 @@ public class NewQAStepTemplateWindow extends DisposableInteralFrame implements N
 
     private JPanel buttonsPanel(final DatasetType type) {
         JPanel panel = new JPanel();
-        Button ok = new Button("OK", new AbstractAction() {
+        Button ok = new OKButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doNew(type);
             }
@@ -84,7 +86,7 @@ public class NewQAStepTemplateWindow extends DisposableInteralFrame implements N
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new Button("Cancel", new AbstractAction() {
+        Button cancel = new CancelButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 disposeView();
             }

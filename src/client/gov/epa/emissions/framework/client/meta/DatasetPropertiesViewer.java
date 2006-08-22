@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -161,7 +162,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     private JPanel createControlPanel() {
         JPanel buttonsPanel = new JPanel();
 
-        Button close = new Button("Close", new AbstractAction() {
+        Button close = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
             }

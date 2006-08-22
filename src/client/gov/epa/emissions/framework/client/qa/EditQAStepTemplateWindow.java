@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.qa;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
@@ -86,7 +88,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     private JPanel buttonsPanel(final DatasetType type) {
         JPanel panel = new JPanel();
 
-        ok = new Button("Save", new AbstractAction() {
+        ok = new SaveButton("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doEdit(type);
                 disposeView();
@@ -95,7 +97,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new Button("Close", new AbstractAction() {
+        Button cancel = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doClose();
             }

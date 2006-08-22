@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.casemanagement.editor;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -128,7 +129,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private JPanel createControlPanel() {
         JPanel buttonsPanel = new JPanel();
 
-        Button export = new Button("Export", new AbstractAction() {
+        Button export = new ExportButton("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
                     doExport();
