@@ -76,7 +76,7 @@ public class DataServiceImpl implements DataService {
             Session session = sessionFactory.getSession();
 
             if (!dao.canUpdate(dataset, session))
-                throw new EmfException("Dataset name already in use");
+                throw new EmfException("The Dataset name is already in use");
 
             EmfDataset released = dao.update(dataset, session);
             session.close();

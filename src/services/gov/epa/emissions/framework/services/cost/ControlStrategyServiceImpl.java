@@ -129,7 +129,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         Session session = sessionFactory.getSession();
         try {
             if (!dao.canUpdate(element, session))
-                throw new EmfException("Control Strategy name already in use");
+                throw new EmfException("The Control Strategy name is already in use");
 
             ControlStrategy released = dao.update(element, session);
 

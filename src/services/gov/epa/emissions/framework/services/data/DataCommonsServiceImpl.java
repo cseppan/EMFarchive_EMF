@@ -95,7 +95,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             Session session = sessionFactory.getSession();
 
             if (!dao.canUpdate(sector, session))
-                throw new EmfException("Sector name already in use");
+                throw new EmfException("The Sector name is already in use");
 
             Sector released = dao.updateSector(sector, session);
             session.close();
@@ -103,7 +103,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             return released;
         } catch (RuntimeException e) {
             LOG.error("Could not update sector: " + sector.getName(), e);
-            throw new EmfException("Sector name already in use");
+            throw new EmfException("The Sector name is already in use");
         }
     }
 

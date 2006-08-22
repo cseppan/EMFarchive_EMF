@@ -142,7 +142,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         Criterion criterion2 = Restrictions.ne("id", new Integer(controlMeasure.getId()));
         Criterion[] criterions ={criterion1,criterion2};
         if (dao.exists(ControlMeasure.class, criterions, session)) {
-            throw new EmfException("The Control Measure name already in use");
+            throw new EmfException("The Control Measure name is already in use");
         }
     }
 

@@ -90,7 +90,7 @@ public class ImportTask implements Runnable {
     void addDataset(EmfDataset dataset, Session session) throws EmfException {
         DatasetDAO dao = new DatasetDAO();
         if (dao.nameUsed(dataset.getName(), EmfDataset.class, session))
-            throw new EmfException("The selected dataset name is already in use");
+            throw new EmfException("The selected Dataset name is already in use");
 
         dao.add(dataset, session);
     }

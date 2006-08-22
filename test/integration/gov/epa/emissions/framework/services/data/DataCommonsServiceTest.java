@@ -170,7 +170,7 @@ public class DataCommonsServiceTest extends ServiceTestCase {
 
             service.addDatasetType(type2);
         } catch (EmfException e) {
-            assertEquals("DatasetType name already in use", e.getMessage());
+            assertEquals("The DatasetType name is already in use", e.getMessage());
             return;
         } finally {
             remove(type1);

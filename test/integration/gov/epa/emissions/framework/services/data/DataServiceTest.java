@@ -232,7 +232,7 @@ public class DataServiceTest extends ServiceTestCase {
             dataset2.setName(dataset1.getName());
             service.updateDataset(dataset2);
         } catch (EmfException e) {
-            assertEquals("Dataset name already in use", e.getMessage());
+            assertEquals("The Dataset name is already in use", e.getMessage());
             return;
         } finally {
             remove(dataset1);
