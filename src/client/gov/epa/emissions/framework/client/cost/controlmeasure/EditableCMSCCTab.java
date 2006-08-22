@@ -23,7 +23,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCCTab {
+public class EditableCMSCCTab extends JPanel implements ControlMeasureTabView, CMSCCTab {
 
     private SCCTableData tableData;
 

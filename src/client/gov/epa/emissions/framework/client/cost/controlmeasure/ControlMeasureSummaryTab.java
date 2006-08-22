@@ -70,7 +70,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     protected ListWidget sectors;
 
-    protected ListWidget dataSources;
+    protected TextField dataSources;
 
     protected MessagePanel messagePanel;
 
@@ -125,6 +125,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
             lastModifiedTime.setText(DATE_FORMATTER.format(modifiedTime));
         abbreviation.setText(getText(measure.getAbbreviation()));
         dateReviewed.setText(formatDateReviewed());
+        dataSources.setText(getText(measure.getDataSouce()));
     }
 
     private String formatDateReviewed() {
@@ -181,12 +182,18 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         // AME: Moved temporarily to improve symmetry
         // lastModifiedTime = new JLabel("");
         // layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
-        JPanel tempPanel = new JPanel();
+        JPanel tempPanel = tempPanel(50,20);
         layoutGenerator.addLabelWidgetPair("", tempPanel, panel);
 
         widgetLayout(3, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
+    }
+
+    private JPanel tempPanel(int width, int height) {
+        JPanel tempPanel = new JPanel();
+        tempPanel.setPreferredSize(new Dimension(width,height));
+        return tempPanel;
     }
 
     private JPanel createAttributeSection() {
@@ -196,7 +203,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         container.add(createLeftPanel());
         container.add(createRightPanel());
 
-        panel.add(container, BorderLayout.LINE_START);
+        panel.add(container);
 
         return panel;
     }
@@ -221,18 +228,21 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         deviceCode = new TextField("NEI Device code", 15);
         changeablesList.addChangeable(deviceCode);
         layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
+        
+        equipmentLife = new TextField("Equipment life", 15);
+        changeablesList.addChangeable(equipmentLife);
+        layoutGenerator.addLabelWidgetPair("Equipment life (yrs):", equipmentLife, panel);
+
 
         dateReviewed = new TextField("Date Reviewed", 15);
         changeablesList.addChangeable(dateReviewed);
         layoutGenerator.addLabelWidgetPair("Date Reviewed:", dateReviewed, panel);
 
-        dataSources = new ListWidget(new String[] { "               " }, new String[] { "" });
-        JScrollPane listScroller = new JScrollPane(dataSources);
-        listScroller.setPreferredSize(new Dimension(170, 60));
-        layoutGenerator.addLabelWidgetPair("Data Sources:", listScroller, panel);
-
-        layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
-        widgetLayout(6, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        dataSources = new TextField("Data Sources:", 15);
+        layoutGenerator.addLabelWidgetPair("Data Sources:", dataSources, panel);
+        
+        layoutGenerator.addLabelWidgetPair("", tempPanel(20,20), panel);
+        widgetLayout(7, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
@@ -241,12 +251,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        // costYear = new TextField("Cost year", 15);
-        // changeablesList.addChangeable(costYear);
-        // layoutGenerator.addLabelWidgetPair(" ", new JLabel(" "), panel); // to hold the place
-
         cmClass = new ComboBox("Choose a class", classes);
-        cmClass.setPreferredSize(new Dimension(168, 20));
         changeablesList.addChangeable(cmClass);
         layoutGenerator.addLabelWidgetPair("Class:", cmClass, panel);
 
@@ -256,7 +261,6 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         } catch (EmfException e) {
             messagePanel.setError("Could not retrieve all Control Technologies");
         }
-        // controlTechnology.setSelectedIndex(0);
         changeablesList.addChangeable(controlTechnology);
         layoutGenerator.addLabelWidgetPair("Control Technology:", controlTechnology, panel);
 
@@ -266,13 +270,9 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         } catch (EmfException e) {
             messagePanel.setError("Could not retrieve Source Groups");
         }
-        // sourceGroup.setSelectedIndex(0);
+
         changeablesList.addChangeable(sourceGroup);
         layoutGenerator.addLabelWidgetPair("Source Group:", sourceGroup, panel);
-
-        equipmentLife = new TextField("Equipment life", 15);
-        changeablesList.addChangeable(equipmentLife);
-        layoutGenerator.addLabelWidgetPair("Equipment life (yrs):", equipmentLife, panel);
 
         sectors = new ListWidget(new String[] { "               " }, new String[] { "" });
         JScrollPane listScroller = new JScrollPane(sectors);
@@ -281,7 +281,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
         layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
 
-        widgetLayout(6, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(5, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
@@ -311,6 +311,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     }
 
     public void save(ControlMeasure measure) throws EmfException {
+        messagePanel.clear();
         validateFields();
         measure.setName(name.getText());
         measure.setDescription(description.getText());
@@ -326,6 +327,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         measure.setCmClass(selectedClass(cmClass.getSelectedItem()));
         measure.setLastModifiedTime(new Date());
         measure.setAbbreviation(abbreviation.getText());
+        measure.setDataSouce(dataSources.getText());
 
     }
 

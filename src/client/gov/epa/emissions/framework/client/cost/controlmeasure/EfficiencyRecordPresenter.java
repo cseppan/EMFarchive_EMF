@@ -7,9 +7,9 @@ import java.util.Date;
 
 public class EfficiencyRecordPresenter {
 
-    protected EditableEfficiencyTabView parentView;
+    protected ControlMeasureEfficiencyTabView parentView;
 
-    public EfficiencyRecordPresenter(EditableEfficiencyTabView parentView) {
+    public EfficiencyRecordPresenter(ControlMeasureEfficiencyTabView parentView) {
         this.parentView = parentView;
     }
 

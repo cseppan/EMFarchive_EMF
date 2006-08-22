@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
@@ -23,10 +24,9 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Pollutant", "Locale", "Effective Date", "Existing Measure", 
-                "Existing NEI Dev", "Cost Year", "Cost Per Ton", "Control Efficiency", "Rule Effectiveness",
-                "Rule Penetration", "Equation Type", "Capital Rec Fac", "Discount Rate", "Details",
-                 };
+        return new String[] { "Pollutant", "Locale", "Effective Date", "Existing Measure", "Existing NEI Dev",
+                "Cost Year", "Cost Per Ton", "Control Efficiency", "Rule Effectiveness", "Rule Penetration",
+                "Equation Type", "Capital Rec Fac", "Discount Rate", "Details", };
     }
 
     public List rows() {
@@ -48,7 +48,7 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     private String effectiveDate(Date effectiveDate) {
-        return effectiveDate == null ? "" : effectiveDate + "";//TODO: format the date
+        return effectiveDate == null ? "" : EmfDateFormat.format_MM_DD_YYYY(effectiveDate);
     }
 
     private List createRows(EfficiencyRecord[] records) {

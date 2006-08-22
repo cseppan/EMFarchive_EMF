@@ -57,12 +57,12 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
         parent.doRefresh();
     }
 
-    public void set(EditableCMTabView summary) {
+    public void set(ControlMeasureTabView summary) {
         EditableCMSummaryTabPresenterImpl summaryPresenter = new EditableCMSummaryTabPresenterImpl(summary);
         presenters.add(summaryPresenter);
     }
 
-    public void set(EditableEfficiencyTabView effTabView) {
+    public void set(ControlMeasureEfficiencyTabView effTabView) {
         EditableCMEfficiencyTabPresenterImpl effTabPresenter = new EditableCMEfficiencyTabPresenterImpl(effTabView);
         presenters.add(effTabPresenter);
     }

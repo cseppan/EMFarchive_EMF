@@ -5,9 +5,9 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 
 public class EditableCMSCCTabPresenterImpl implements ControlMeasureTabPresenter {
 
-    private EditableCMTabView view;
+    private ControlMeasureTabView view;
 
-    public EditableCMSCCTabPresenterImpl(EditableCMTabView view) {
+    public EditableCMSCCTabPresenterImpl(ControlMeasureTabView view) {
         this.view = view;
     }
 

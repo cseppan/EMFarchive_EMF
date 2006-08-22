@@ -27,8 +27,8 @@ public class ControlMeasuresDAO {
         return hibernateFacade.exists(id, clazz, session);
     }
     
-    public boolean exists(Class clazz, Criterion criterion, Session session){
-        return hibernateFacade.exists(clazz,new Criterion[]{criterion},session);
+    public boolean exists(Class clazz, Criterion[] criterions, Session session){
+        return hibernateFacade.exists(clazz,criterions,session);
     }
 
     /*

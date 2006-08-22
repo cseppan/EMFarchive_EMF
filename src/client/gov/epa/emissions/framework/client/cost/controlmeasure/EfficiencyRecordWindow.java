@@ -285,15 +285,14 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     private void saveDiscountRate() throws EmfException {
         float value = verifier.parseFloat(discountRate);
+        if (value < 0 || value > 20)
+            throw new EmfException(
+                    "Enter the Discount Rate as a percent between 0 and 20. Eg: 1 = 1%.  0.01 = 0.01%");
         record.setDiscountRate(value);
     }
 
     private void saveCapRecFactor() throws EmfException {
-        float value = verifier.parseFloat(caprecFactor);
-        // if (value <= 0 || value > 100)
-        // throw new EmfException(
-        // "Enter the Capital Recovery Factory as a percent between 0 and 100. Eg: 1 = 1%. 0.01 = 0.01%");
-        record.setCapRecFactor(value);
+        record.setCapRecFactor(verifier.parseFloat(caprecFactor));
     }
 
     private void saveRulePenetration() throws EmfException {

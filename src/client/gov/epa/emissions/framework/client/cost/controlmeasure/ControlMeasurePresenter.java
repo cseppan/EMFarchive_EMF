@@ -9,8 +9,8 @@ public interface ControlMeasurePresenter {
     void doClose() throws EmfException;
 
     void doSave() throws EmfException;
-
-    void set(EditableCMTabView controlMeasureTabView);
     
-    void set(EditableEfficiencyTabView effTabView);
+    void set(ControlMeasureTabView effTabView);
+
+    void set(ControlMeasureEfficiencyTabView effTabView);
 }

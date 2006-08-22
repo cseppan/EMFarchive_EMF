@@ -8,7 +8,7 @@ public class EditEfficiencyRecordPresenter extends EfficiencyRecordPresenter {
 
     private EditEfficiencyRecordView view;
 
-    public EditEfficiencyRecordPresenter(EditableEfficiencyTabView parentView, EditEfficiencyRecordView view) {
+    public EditEfficiencyRecordPresenter(ControlMeasureEfficiencyTabView parentView, EditEfficiencyRecordView view) {
         super(parentView);
         this.view = view;
         

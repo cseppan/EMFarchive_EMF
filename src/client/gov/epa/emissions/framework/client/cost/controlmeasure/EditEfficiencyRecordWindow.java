@@ -40,6 +40,7 @@ public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implement
 
     public void save() {
         try {
+            messagePanel.clear();
             doSave();
             updateControlMeasureEfficiencyTab(record);
             presenter.refresh();

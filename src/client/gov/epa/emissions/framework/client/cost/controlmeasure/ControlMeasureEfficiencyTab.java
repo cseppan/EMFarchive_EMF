@@ -24,7 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyTabView {
+public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasureEfficiencyTabView {
 
     private SortFilterSelectModel selectModel;
 
@@ -46,7 +46,7 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
 
     private EmfSession session;
 
-    public EditableEfficiencyTab(ControlMeasure measure, ManageChangeables changeablesList, EmfConsole parent,
+    public ControlMeasureEfficiencyTab(ControlMeasure measure, ManageChangeables changeablesList, EmfConsole parent,
             EmfSession session, DesktopManager desktopManager, MessagePanel messagePanel) {
         this.mainPanel = new JPanel(new BorderLayout());
         this.parentConsole = parent;
@@ -99,6 +99,7 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
         Button addButton = new Button("Add", addAction());
         Button editButton = new Button("Edit", editAction());
         Button copyButton = new Button("Copy", copyAction());
+        copyButton.setEnabled(false);
         Button removeButton = new Button("Remove", removeAction());
 
         JPanel panel = new JPanel();
@@ -207,6 +208,7 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
     }
 
     public void save(ControlMeasure measure) {
+        messagePanel.clear();
         measure.setEfficiencyRecords(tableData.sources());
     }
 

@@ -113,7 +113,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public ControlMeasure updateMeasure(ControlMeasure measure) throws EmfException {
-        //FIXME: checkForConstraints(measure);
+        checkForConstraints(measure);
         Session session = sessionFactory.getSession();
         try {
             ControlMeasure updated = dao.update(measure, session);
@@ -138,16 +138,20 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
 
     private void nameConstraint(ControlMeasure controlMeasure, Session session) throws EmfException {
         String name = controlMeasure.getName();
-        Criterion criterion = Restrictions.eq("name", name);
-        if (dao.exists(ControlMeasure.class, criterion, session)) {
+        Criterion criterion1 = Restrictions.eq("name", name);
+        Criterion criterion2 = Restrictions.ne("id", new Integer(controlMeasure.getId()));
+        Criterion[] criterions ={criterion1,criterion2};
+        if (dao.exists(ControlMeasure.class, criterions, session)) {
             throw new EmfException("The Control Measure name already in use");
         }
     }
 
     private void abbrConstraint(ControlMeasure controlMeasure, Session session) throws EmfException {
         String abbr = controlMeasure.getAbbreviation();
-        Criterion criterion = Restrictions.eq("abbreviation", abbr);
-        if (dao.exists(ControlMeasure.class, criterion, session)) {
+        Criterion criterion1 = Restrictions.eq("abbreviation", abbr);
+        Criterion criterion2 = Restrictions.ne("id", new Integer(controlMeasure.getId()));
+        Criterion[] criterions ={criterion1,criterion2};
+        if (dao.exists(ControlMeasure.class, criterions, session)) {
             throw new EmfException("The Control Measure Abbreviation already in use");
         }
 

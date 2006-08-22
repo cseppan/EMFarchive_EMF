@@ -26,7 +26,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-public class ControlMeasureEditor extends DisposableInteralFrame implements ControlMeasureView {
+public class EditControlMeasureWindow extends DisposableInteralFrame implements ControlMeasureView {
 
     private ControlMeasurePresenter presenter;
 
@@ -38,8 +38,8 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
 
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
-    public ControlMeasureEditor(EmfConsole parent, EmfSession session, DesktopManager desktopManager) {
-        super("Control Measure Editor", new Dimension(750, 510), desktopManager);
+    public EditControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager) {
+        super("Control Measure Editor", new Dimension(700, 475), desktopManager);
         this.desktopManager = desktopManager;
         this.session = session;
         this.parent = parent;
@@ -70,8 +70,6 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
         tabbedPane.addTab("Efficiencies", createEfficiencyTab(measure, messagePanel));
 
         tabbedPane.addTab("SCCs", createSCCTab(measure, messagePanel));
-        
-        tabbedPane.addTab("Data Sources", new JPanel());
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -79,14 +77,13 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
     }
 
     private JPanel createSCCTab(ControlMeasure measure, MessagePanel messagePanel) {
-        EditableCMTabView view;
-        view = new EditableCMSCCTab(measure, session,this, messagePanel, parent);
+        ControlMeasureTabView view = new EditableCMSCCTab(measure, session,this, messagePanel, parent);
         presenter.set(view);
         return (JPanel) view;
     }
     
     private Component createEfficiencyTab(ControlMeasure measure, MessagePanel messagePanel) {
-        EditableEfficiencyTab view = new EditableEfficiencyTab(measure, this, parent, session, desktopManager, messagePanel);
+        ControlMeasureEfficiencyTab view = new ControlMeasureEfficiencyTab(measure, this, parent, session, desktopManager, messagePanel);
         presenter.set(view);
         
         return view;

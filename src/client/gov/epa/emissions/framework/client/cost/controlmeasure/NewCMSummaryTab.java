@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
-public class NewCMSummaryTab extends ControlMeasureSummaryTab implements EditableCMTabView {
+public class NewCMSummaryTab extends ControlMeasureSummaryTab{
 
     public NewCMSummaryTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel,
             ManageChangeables changeablesList) {
