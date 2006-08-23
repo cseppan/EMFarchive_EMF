@@ -8,6 +8,8 @@ import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
+import gov.epa.emissions.framework.services.casemanagement.Grid;
+import gov.epa.emissions.framework.services.casemanagement.GridResolution;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
 import gov.epa.emissions.framework.ui.Row;
@@ -42,6 +44,13 @@ public class CasesTableDataTest extends TestCase {
         case1.setAbbreviation(new Abbreviation("abb1"));
         case1.setAirQualityModel(new AirQualityModel("aqm1"));
         case1.setSpeciation(new Speciation("sp1"));
+        case1.setGrid(new Grid("grid1"));
+        case1.setGridResolution(new GridResolution("res1"));
+        case1.setFutureYear(1999);
+        case1.setNumMetLayers(1);
+        case1.setStartDate(new Date());
+        case1.setEndDate(new Date());
+        case1.setIsFinal(1==1);
 
         case2 = new Case();
         case2.setName("name2");
@@ -62,9 +71,9 @@ public class CasesTableDataTest extends TestCase {
         data = new CasesTableData(new Case[] { case1, case2 });
     }
 
-    public void testShouldHaveTwelveColumns() {
+    public void testShouldHaveNineteenColumns() {
         String[] columns = data.columns();
-        assertEquals(12, columns.length);
+        assertEquals(19, columns.length);
         assertEquals("Name", columns[0]);
         assertEquals("Project", columns[1]);
         assertEquals("Modeling Regn.", columns[2]);
@@ -75,18 +84,30 @@ public class CasesTableDataTest extends TestCase {
         assertEquals("AQM", columns[7]);
         assertEquals("Base Year", columns[8]);
         assertEquals("Met. Year", columns[9]);
-        assertEquals("Speciation", columns[10]);
-        assertEquals("Last Modified Date", columns[11]);
+        assertEquals("Grid Name", columns[10]);
+        assertEquals("Grid Resolution", columns[11]);
+        assertEquals("Future Year", columns[12]);
+        assertEquals("Num Met Layers", columns[13]);
+        assertEquals("Start Date", columns[14]);
+        assertEquals("End Date", columns[15]);
+        assertEquals("Is Final", columns[16]);
+        assertEquals("Speciation", columns[17]);
+        assertEquals("Last Modified Date", columns[18]);
     }
 
     public void testShouldHaveAppropriateColumnClassDefinedForAllColumns() {
-        for (int i = 0; i < 11; i++)
-            assertEquals(String.class, data.getColumnClass(1));
-        assertEquals(Date.class, data.getColumnClass(11));
+        for (int i = 0; i < 18; i++) {
+            if (i == 14||i == 15||i == 18)
+                assertEquals(Date.class, data.getColumnClass(i));
+            else if (i == 16)
+                assertEquals(Boolean.class, data.getColumnClass(i));
+            else
+                assertEquals(String.class, data.getColumnClass(i));
+        }
     }
 
     public void testAllColumnsShouldBeEditable() {
-        for (int i = 0; i < 12; i++)
+        for (int i = 0; i < 18; i++)
             assertTrue("All cells should be uneditable", data.isEditable(i));
     }
 
@@ -110,8 +131,15 @@ public class CasesTableDataTest extends TestCase {
         assertEquals("aqm1", row.getValueAt(7));
         assertEquals("2003", row.getValueAt(8));
         assertEquals("2002", row.getValueAt(9));
-        assertEquals("sp1", row.getValueAt(10));
-        assertEquals(format(case1.getLastModifiedDate()), row.getValueAt(11));
+        assertEquals("grid1", row.getValueAt(10));
+        assertEquals("res1", row.getValueAt(11));
+        assertEquals("1999", row.getValueAt(12));
+        assertEquals("1", row.getValueAt(13));
+        assertEquals(format(case1.getStartDate()), row.getValueAt(14));
+        assertEquals(format(case1.getEndDate()), row.getValueAt(15));
+        assertEquals(case1.getIsFinal(), ((Boolean) row.getValueAt(16)).booleanValue());
+        assertEquals("sp1", row.getValueAt(17));
+        assertEquals(format(case1.getLastModifiedDate()), row.getValueAt(18));
     }
 
     private String format(Date date) {

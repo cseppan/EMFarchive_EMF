@@ -18,13 +18,17 @@ public class CasesTableData extends AbstractTableData {
 
     public String[] columns() {
         return new String[] { "Name", "Project", "Modeling Regn.", "Creator", "Category", "Run Status", "Abbrev.",
-                "AQM", "Base Year", "Met. Year", "Speciation", "Last Modified Date" };
+                "AQM", "Base Year", "Met. Year", "Grid Name", "Grid Resolution", "Future Year", "Num Met Layers",
+                "Start Date", "End Date", "Is Final", "Speciation", "Last Modified Date" };
     }
 
     public Class getColumnClass(int col) {
-        if (col == 11)
+        if (col == 14 || col ==15 ||col == 18)
             return Date.class;
-
+        
+        if (col == 16)
+            return Boolean.class;
+        
         return String.class;
     }
 
@@ -50,9 +54,30 @@ public class CasesTableData extends AbstractTableData {
     private Object[] rowValues(Case element) {
         Object[] values = { element.getName(), project(element), region(element), creator(element),
                 caseCategory(element), element.getRunStatus(), abbreviation(element), airQualityModel(element),
-                emissionsYear(element), meteorlogicalYear(element), speciation(element),
-                format(element.getLastModifiedDate()) };
+                emissionsYear(element), meteorlogicalYear(element), Grid(element), gridResolution(element),
+                futureYear(element), numMetLayers(element), format(element.getStartDate()), format(element.getEndDate()),
+                isFinal(element), speciation(element), format(element.getLastModifiedDate()) };
         return values;
+    }
+
+    private Object isFinal(Case element) {
+        return new Boolean(element.getIsFinal());
+    }
+
+    private Object numMetLayers(Case element) {
+        return element.getNumMetLayers()+"" != null ? element.getNumMetLayers()+"" : "";
+    }
+
+    private Object futureYear(Case element) {
+        return element.getFutureYear()+"" != null ? element.getFutureYear()+"" : "";
+    }
+
+    private Object gridResolution(Case element) {
+        return element.getGridResolution() != null ? element.getGridResolution().getName() : "";
+    }
+
+    private String Grid(Case element) {
+        return element.getGrid() != null ? element.getGrid().getName() : "";
     }
 
     private String abbreviation(Case element) {

@@ -24,7 +24,6 @@ import gov.epa.emissions.framework.client.data.Projects;
 import gov.epa.emissions.framework.client.data.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
-import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -54,10 +53,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private TextField futureYear;
 
-    private TextField numEmisLayer;
-
-    private TextField numMetLayer;
-
     private TextField template;
 
     private TextArea description;
@@ -83,6 +78,8 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private EditableComboBox meteorlogicalYearCombo;
 
     private EditableComboBox speciationCombo;
+    
+    private EditableComboBox gridResolution;
 
     private CheckBox isFinal;
 
@@ -109,6 +106,8 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private Regions modRegions;
 
     private Regions controlRegions;
+    
+    private String[] GridResolutions = { "TEST" };
 
     private RunStatuses runStatuses;
 
@@ -117,8 +116,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private TextField startDate;
 
     private TextField endDate;
-
-    private NumberFieldVerifier verifier;
 
     private Dimension defaultDimension = new Dimension(200, 20);
 
@@ -133,7 +130,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         this.session = session;
         this.changeablesList = changeablesList;
         this.parentConsole = parentConsole;
-        this.verifier = new NumberFieldVerifier("");
 
     }
 
@@ -151,6 +147,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         super.add(panel, BorderLayout.CENTER);
     }
+    
 
     private JPanel createOverviewSection() throws EmfException {
         JPanel panel = new JPanel(new BorderLayout());
@@ -196,7 +193,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Is Template:", isTemplate(), panel);
         layoutGenerator.addLabelWidgetPair("Sectors:", sectors(), panel);
         // layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
-        layoutGenerator.addLabelWidgetPair("Template:", template(), panel);
+        layoutGenerator.addLabelWidgetPair("Copied From:", template(), panel);
         // layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
 
         layoutGenerator.makeCompactGrid(panel, 5, 2, 10, 10, 10, 10);
@@ -225,11 +222,10 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Modeling Region:", modRegions(), panel);
         layoutGenerator.addLabelWidgetPair("Control Region:", controlRegions(), panel);
         layoutGenerator.addLabelWidgetPair("I/O API Grid Name:", grids(), panel);
-        layoutGenerator.addLabelWidgetPair("# of Met. Layers:", numMetLayer(), panel);
-        layoutGenerator.addLabelWidgetPair("# of Emissions Layers:", numEmisLayer(), panel);
-        layoutGenerator.addLabelWidgetPair("Start Date:", startDate(), panel);
+        layoutGenerator.addLabelWidgetPair("Grid Resolution:", gridResolution(), panel);
+        layoutGenerator.addLabelWidgetPair("Start Date & Time:", startDate(), panel);
 
-        layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 10, 10);
+        layoutGenerator.makeCompactGrid(panel, 5, 2, 10, 10, 10, 10);
 
         return panel;
     }
@@ -243,7 +239,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Meteorological Year:", meteorlogicalYears(), panel);
         layoutGenerator.addLabelWidgetPair("Base Year:", emissionsYears(), panel);
         layoutGenerator.addLabelWidgetPair("Future Year:", futureYear(), panel);
-        layoutGenerator.addLabelWidgetPair("End Date/Time", endDate(), panel);
+        layoutGenerator.addLabelWidgetPair("End Date & Time:", endDate(), panel);
 
         layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 10, 10);
 
@@ -282,24 +278,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         futureYear.setPreferredSize(defaultDimension);
 
         return futureYear;
-    }
-
-    private TextField numEmisLayer() {
-        numEmisLayer = new TextField("Number of Emissions Layers", 10);
-        numEmisLayer.setText(caseObj.getNumEmissionsLayers() + "");
-        changeablesList.addChangeable(numEmisLayer);
-        numEmisLayer.setPreferredSize(defaultDimension);
-
-        return numEmisLayer;
-    }
-
-    private TextField numMetLayer() {
-        numMetLayer = new TextField("Number of Met Layers", 10);
-        numMetLayer.setText(caseObj.getNumMetLayers() + "");
-        changeablesList.addChangeable(numMetLayer);
-        numMetLayer.setPreferredSize(defaultDimension);
-
-        return numMetLayer;
     }
 
     private TextField template() {
@@ -348,6 +326,14 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         changeablesList.addChangeable(modRegionsCombo);
 
         return modRegionsCombo;
+    }
+    
+    private EditableComboBox gridResolution() {
+        gridResolution = new EditableComboBox(GridResolutions);
+        gridResolution.setPreferredSize(defaultDimension);
+        changeablesList.addChangeable(gridResolution);
+        
+        return gridResolution;
     }
 
     private EditableComboBox controlRegions() throws EmfException {
@@ -553,8 +539,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     public void save(Case caseObj) throws EmfException {
         caseObj.setName(name.getText());
         saveFutureYear();
-        caseObj.setNumEmissionsLayers(verifier.parseInteger(numEmisLayer));
-        caseObj.setNumMetLayers(verifier.parseInteger(numMetLayer));
         caseObj.setDescription(description.getText());
         caseObj.setCaseTemplate(isTemplate.isSelected());
         caseObj.setIsFinal(isFinal.isSelected());

@@ -132,4 +132,9 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         }
     }
 
+    public void set(EditableCaseParameterTab parameterview) {
+        EditableCaseParameterTabPresenterImpl parameterPresenter = new EditableCaseParameterTabPresenterImpl(caseObj,
+                parameterview);
+        presenters.add(parameterPresenter);
+    }
 }

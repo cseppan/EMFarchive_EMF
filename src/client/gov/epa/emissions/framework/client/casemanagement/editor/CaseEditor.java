@@ -20,6 +20,7 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -55,7 +56,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
         tabbedPane.addTab("Summary", createSummaryTab(caseObj, messagePanel));
         tabbedPane.addTab("Inputs", createInputTab());
-        tabbedPane.addTab("Parameters", new JPanel());
+        tabbedPane.addTab("Parameters", createParameterTab(caseObj));
         tabbedPane.addTab("Programs", new JPanel());
         tabbedPane.addTab("Outputs", createOutputTab());
         tabbedPane.addTab("History", new JPanel());
@@ -64,9 +65,16 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         return tabbedPane;
     }
 
+    private Component createParameterTab(Case caseObj) {
+        EditableCaseParameterTab view = new EditableCaseParameterTab(caseObj, this);
+        view.display();
+        presenter.set(view);
+        return view;
+    }
+
     private JPanel createSummaryTab(Case caseObj, MessagePanel messagePanel) {
         try {
-            EditableCaseSummaryTab view = new EditableCaseSummaryTab(caseObj, session, this,parentConsole);
+            EditableCaseSummaryTab view = new EditableCaseSummaryTab(caseObj, session, this, parentConsole);
             EditCaseSummaryTabPresenter summaryPresenter = new EditCaseSummaryTabPresenter(view,messagePanel,session);
             view.observe(summaryPresenter);
             view.display();

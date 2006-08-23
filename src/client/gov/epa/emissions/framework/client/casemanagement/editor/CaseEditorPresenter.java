@@ -24,4 +24,6 @@ public interface CaseEditorPresenter {
 
     void set(EditOutputsTabView inputsView) throws EmfException;
 
+    void set(EditableCaseParameterTab parameterview);
+
 }
