@@ -19,6 +19,8 @@ public class Case implements Comparable, Lockable {
     private String name;
 
     private Abbreviation abbreviation;
+    
+    private ModelToRun model;
 
     private AirQualityModel airQualityModel;
 
@@ -27,6 +29,8 @@ public class Case implements Comparable, Lockable {
     private EmissionsYear emissionsYear;
 
     private Grid grid;
+    
+    private String gridDescription;
 
     private MeteorlogicalYear meteorlogicalYear;
 
@@ -49,6 +53,8 @@ public class Case implements Comparable, Lockable {
     private String runStatus;
 
     private Date lastModifiedDate;
+
+    private User creator;
 
     private User lastModifiedBy;
     
@@ -383,6 +389,30 @@ public class Case implements Comparable, Lockable {
 
     public void setCaseInputs(CaseInput[] caseInputs) {
         this.caseInputs = Arrays.asList(caseInputs);
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
+
+    public String getGridDescription() {
+        return gridDescription;
+    }
+
+    public void setGridDescription(String gridDescription) {
+        this.gridDescription = gridDescription;
+    }
+
+    public ModelToRun getModel() {
+        return model;
+    }
+
+    public void setModel(ModelToRun model) {
+        this.model = model;
     }
 
 }

@@ -101,6 +101,15 @@ CREATE TABLE cases.emissions_years
 WITHOUT OIDS;
 -- cases.emissions_years
 
+-- cases.model_to_runs
+CREATE TABLE cases.model_to_runs
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- cases.model_to_runs
+
 -- cases.cases
 CREATE TABLE cases.cases
 (
@@ -109,6 +118,8 @@ CREATE TABLE cases.cases
   abbreviation_id int4 REFERENCES cases.case_abbreviations(id),
   description text,
   user_id int4  REFERENCES emf.users(id),
+  creator_user_id int4  REFERENCES emf.users(id),
+  model_to_run_id int4  REFERENCES cases.model_to_runs(id),
   air_quality_model_id int4  REFERENCES cases.air_quality_models(id),
   category_id int4  REFERENCES cases.case_categories(id),
   project_id int4  REFERENCES emf.projects(id),
@@ -120,6 +131,7 @@ CREATE TABLE cases.cases
   case_template bool DEFAULT false,
   is_final bool DEFAULT false,
   template_used varchar(128),
+  grid_description text NULL DEFAULT '',
   grid_id int4 REFERENCES cases.grids(id),
   grid_resolution_id int4 REFERENCES cases.grid_resolutions(id),
   speciation_id int4 REFERENCES cases.speciations(id),

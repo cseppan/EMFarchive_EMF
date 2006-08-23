@@ -144,4 +144,8 @@ public class CaseDAO {
         return hibernateFacade.load(clazz, criterion, session);
     }
 
+    public List getModelToRuns(Session session) {
+        return hibernateFacade.getAll(ModelToRun.class, Order.asc("name"), session);
+    }
+
 }

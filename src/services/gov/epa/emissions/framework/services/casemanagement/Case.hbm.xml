@@ -23,7 +23,7 @@
     <property name="futureYear" column="future_year" type="integer" not-null="false"/>
     <property name="startDate" column="start_date" type="java.util.Date" not-null="false" length="4"/>
     <property name="endDate" column="end_date" type="java.util.Date" not-null="false" length="4"/>
-            
+    <property name="gridDescription" column="grid_description" type="java.lang.String" not-null="false"/>       
 	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
   	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
   	
@@ -31,6 +31,11 @@
             name="abbreviation" 
             class="gov.epa.emissions.framework.services.casemanagement.Abbreviation"
             column="abbreviation_id"/> 
+
+	 <many-to-one cascade="save-update"
+            name="model" 
+            class="gov.epa.emissions.framework.services.casemanagement.ModelToRun"
+            column="model_to_run_id"/> 
 
 	 <many-to-one cascade="save-update"
             name="airQualityModel" 
@@ -66,6 +71,11 @@
             name="speciation" 
             class="gov.epa.emissions.framework.services.casemanagement.Speciation"
             column="speciation_id"/> 
+
+	 <many-to-one
+            name="creator" 
+            class="gov.epa.emissions.commons.security.User"
+            column="creator_user_id"/> 
 
 	 <many-to-one
             name="lastModifiedBy" 

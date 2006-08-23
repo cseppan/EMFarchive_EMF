@@ -53,6 +53,7 @@
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/InputEnvtVar.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/Program.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/InputName.hbm.xml"/>
+    	<mapping resource="gov/epa/emissions/framework/services/casemanagement/ModelToRun.hbm.xml"/>
 
 		<!-- Mappings : CoST -->
 	   	<mapping resource="gov/epa/emissions/framework/services/cost/ControlStrategy.hbm.xml"/>

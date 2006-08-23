@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.casemanagement.GridResolution;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
+import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.Program;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
 
@@ -247,4 +248,14 @@ public class CaseServiceTransport implements CaseService {
         
         return (InputEnvtVar) call.requestResponse(new Object[] { inputEnvtVar });
     }
+
+    public ModelToRun[] getModelToRuns() throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getModelToRuns");
+        call.setReturnType(caseMappings.modelToRuns());
+        
+        return (ModelToRun[])call.requestResponse(new Object[] {});
+    }
+
 }

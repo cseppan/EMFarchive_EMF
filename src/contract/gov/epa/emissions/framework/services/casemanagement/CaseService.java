@@ -27,6 +27,8 @@ public interface CaseService {
  
     Program[] getPrograms() throws EmfException;
 
+    ModelToRun[] getModelToRuns() throws EmfException;
+
     Case[] getCases() throws EmfException;
 
     void addCase(Case element) throws EmfException;

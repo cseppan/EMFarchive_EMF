@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.casemanagement.GridResolution;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
+import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.Program;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
 
@@ -40,6 +41,7 @@ public class CaseMappings extends Mappings {
         bean(call, InputName.class, inputname());
         bean(call, InputEnvtVar.class, inputEnvtVar());
         bean(call, CaseInput.class, caseinput());
+        bean(call, ModelToRun.class, modelToRun());
         bean(call, Mutex.class, mutex());
     }
 
@@ -57,6 +59,7 @@ public class CaseMappings extends Mappings {
         array(call, InputName[].class, inputnames());
         array(call, InputEnvtVar[].class, inputEnvtVars());
         array(call, CaseInput[].class, caseinputs());
+        array(call, ModelToRun[].class, modelToRuns());
     }
 
     public QName caseObject() {
@@ -165,6 +168,14 @@ public class CaseMappings extends Mappings {
 
     public QName mutex() {
         return qname("Mutex");
+    }
+
+    public QName modelToRun() {
+        return qname("ModelToRun");
+    }
+    
+    public QName modelToRuns() {
+        return qname("ModelToRuns");
     }
     
 }

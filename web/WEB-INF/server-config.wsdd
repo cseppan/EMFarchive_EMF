@@ -399,6 +399,15 @@
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Program[]"
 		innerType="ns1:Program"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.ModelToRun"
+		qname="ns1:ModelToRun" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:ModelToRuns" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.ModelToRun[]"
+		innerType="ns1:ModelToRun"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
 	<!-- ================================================================= -->
 	

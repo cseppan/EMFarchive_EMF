@@ -281,6 +281,19 @@ public class CaseServiceImpl implements CaseService {
             throw new EmfException("Could not get all Programs");
         }
     }
+    
+    public ModelToRun[] getModelToRuns() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List results = dao.getModelToRuns(session);
+            session.close();
+
+            return (ModelToRun[]) results.toArray(new ModelToRun[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all ModelToRuns", e);
+            throw new EmfException("Could not get all ModelToRuns");
+        }
+    }
 
     public void export(User user, String dirName, String purpose, boolean overWrite, Case caseToExport)
             throws EmfException {

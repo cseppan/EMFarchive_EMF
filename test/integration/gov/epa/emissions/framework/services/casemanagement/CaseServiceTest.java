@@ -113,6 +113,20 @@ public class CaseServiceTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldGetModelToRuns() throws Exception {
+        int totalBeforeAdd = service.getModelToRuns().length;
+        ModelToRun element = new ModelToRun("test" + Math.random());
+        add(element);
+        
+        try {
+            List list = Arrays.asList(service.getModelToRuns());
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(element));
+        } finally {
+            remove(element);
+        }
+    }
+
     public void testShouldGetSpeciations() throws Exception {
         int totalBeforeAdd = service.getSpeciations().length;
         Speciation element = new Speciation("test" + Math.random());
