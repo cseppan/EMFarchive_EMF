@@ -86,14 +86,14 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
     private JPanel controlPanel(final EditNotesTabPresenter presenter) {
         JPanel container = new JPanel();
 
-        Button add = new AddButton("Add", new AbstractAction() {
+        Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doNewNote(presenter);
             }
         });
         container.add(add);
 
-        Button view = new ViewButton("View", new AbstractAction() {
+        Button view = new ViewButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doViewNote(presenter);
             }

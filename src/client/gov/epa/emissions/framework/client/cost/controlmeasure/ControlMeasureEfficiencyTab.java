@@ -100,10 +100,10 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     }
 
     private JPanel controlPanel() {
-        Button addButton = new AddButton("Add", addAction());
-        Button editButton = new EditButton("Edit", editAction());
-        Button copyButton = new CopyButton("Copy", copyAction());
-        Button removeButton = new RemoveButton("Remove", removeAction());
+        Button addButton = new AddButton(addAction());
+        Button editButton = new EditButton(editAction());
+        Button copyButton = new CopyButton(copyAction());
+        Button removeButton = new RemoveButton(removeAction());
         copyButton.setEnabled(false);
 
         JPanel panel = new JPanel();

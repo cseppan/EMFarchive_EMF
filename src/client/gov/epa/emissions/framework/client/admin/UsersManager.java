@@ -5,6 +5,8 @@ import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
@@ -132,7 +134,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
     private JPanel closePanel() {
         JPanel closePanel = new JPanel();
-        Button closeButton = new Button("Close", new AbstractAction() {
+        Button closeButton = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 messagePanel.clear();
                 presenter.doClose();
@@ -150,7 +152,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
                 displayRegisterUser();
             }
         };
-        Button newButton = new Button("New", newAction);
+        Button newButton = new NewButton(newAction);
 
         Action deleteAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {

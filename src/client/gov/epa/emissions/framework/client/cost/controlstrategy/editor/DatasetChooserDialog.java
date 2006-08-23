@@ -50,7 +50,7 @@ public class DatasetChooserDialog extends JDialog {
     }
 
     private JPanel buttonPanel() {
-        Button ok = new OKButton("OK", selectDatasetset());
+        Button ok = new OKButton(selectDatasetset());
         JPanel panel = new JPanel();
         panel.add(ok);
         return panel;

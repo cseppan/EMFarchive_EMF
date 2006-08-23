@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -111,7 +112,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
-        Button close = new Button("Close", new AbstractAction() {
+        Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 disposeView();
             }

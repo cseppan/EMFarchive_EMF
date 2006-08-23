@@ -94,7 +94,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         // folder
         folder = new JTextField(40);
         folder.setName("folder");
-        Button button = new BrowseButton("Browse", new AbstractAction() {
+        Button button = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 selectFolder();
             }
@@ -147,7 +147,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        JButton exportButton = new ExportButton("Export", new AbstractAction() {
+        JButton exportButton = new ExportButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 clearMessagePanel();
                 doExport();

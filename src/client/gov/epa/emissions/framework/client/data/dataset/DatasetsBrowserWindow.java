@@ -175,7 +175,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private JPanel createRightControlPanel() {
         JPanel panel = new JPanel();
 
-        Button importButton = new ImportButton("Import", new AbstractAction() {
+        Button importButton = new ImportButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
                     importDataset();
@@ -187,7 +187,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         importButton.setToolTipText("Import a new Dataset");
         panel.add(importButton);
 
-        Button exportButton = new ExportButton("Export", new AbstractAction() {
+        Button exportButton = new ExportButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 exportSelectedDatasets();
             }
@@ -195,7 +195,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         exportButton.setToolTipText("Export existing Dataset(s)");
         panel.add(exportButton);
 
-        Button closeButton = new CloseButton("Close", new AbstractAction() {
+        Button closeButton = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
             }

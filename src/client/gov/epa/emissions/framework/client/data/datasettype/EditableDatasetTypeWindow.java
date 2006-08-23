@@ -139,9 +139,9 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         layout.setVgap(10);
         container.setLayout(layout);
 
-        Button saveButton = new SaveButton("Save", saveAction());
+        Button saveButton = new SaveButton(saveAction());
         container.add(saveButton);
-        CloseButton closeButton = new CloseButton("Close", closeAction());
+        CloseButton closeButton = new CloseButton(closeAction());
         container.add(closeButton);
         getRootPane().setDefaultButton(saveButton);
 

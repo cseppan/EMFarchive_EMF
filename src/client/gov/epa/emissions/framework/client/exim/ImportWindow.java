@@ -60,7 +60,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        JButton importButton = new ImportButton("Import", new AbstractAction() {
+        JButton importButton = new ImportButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doImport();
             }

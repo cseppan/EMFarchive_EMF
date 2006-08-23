@@ -141,16 +141,19 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         layout.setVgap(15);
         container.setLayout(layout);
 
-        Button saveButton = new SaveButton("Save", saveAction());
+        Button saveButton = new SaveButton(saveAction());
         container.add(saveButton);
-        Button copyButton = new CopyButton("Copy", saveAction());
+        Button copyButton = new CopyButton(saveAction());
         container.add(copyButton);
-        container.add(new CloseButton("Close", closeAction()));
+        Button closeButton = new CloseButton(closeAction());
+        container.add(closeButton);
         getRootPane().setDefaultButton(saveButton);
 
         container.add(Box.createHorizontalStrut(20));
-        container.add(new RunButton("Run", runAction()));
-        container.add(new StopButton("Stop", stopAction()));
+        Button runButton = new RunButton(runAction());
+        container.add(runButton);
+        Button stopButton = new StopButton(stopAction());
+        container.add(stopButton);
         
         panel.add(container, BorderLayout.CENTER);
 

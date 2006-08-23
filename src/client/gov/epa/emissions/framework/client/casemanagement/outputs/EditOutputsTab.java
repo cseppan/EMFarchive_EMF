@@ -116,7 +116,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
     }
 
     private JPanel getFolderChooserPanel(final JTextField dir, final String title) {
-        Button browseButton = new BrowseButton("Browse", new AbstractAction() {
+        Button browseButton = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 selectFolder(dir, title);
             }
@@ -143,14 +143,14 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
     private JPanel controlPanel(final EditOutputsTabPresenter presenter) {
         JPanel container = new JPanel();
 
-        Button add = new AddButton("Add", new AbstractAction() {
+        Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 //
             }
         });
         container.add(add);
 
-        Button remove = new RemoveButton("Remove", new AbstractAction() {
+        Button remove = new RemoveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 //
             }
@@ -164,7 +164,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
         });
         container.add(defaultButton);
 
-        Button edit = new EditButton("Edit", new AbstractAction() {
+        Button edit = new EditButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 //
             }

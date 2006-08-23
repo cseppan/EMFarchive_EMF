@@ -123,7 +123,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     }
 
     private JPanel getFolderChooserPanel(final JTextField dir, final String title) {
-        Button browseButton = new BrowseButton("Choose Folder", new AbstractAction() {
+        Button browseButton = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 clearMessagePanel();
                 selectFolder(dir, title);
@@ -151,7 +151,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     private JPanel controlPanel(final EditInputsTabPresenter presenter) {
         JPanel container = new JPanel();
 
-        Button add = new AddButton("Add", new AbstractAction() {
+        Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMessagePanel();
                 doNewInput(presenter);
@@ -159,7 +159,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         });
         container.add(add);
 
-        Button remove = new RemoveButton("Remove", new AbstractAction() {
+        Button remove = new RemoveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMessagePanel();
                 doRemove();
@@ -167,7 +167,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         });
         container.add(remove);
 
-        Button edit = new EditButton("Edit", new AbstractAction() {
+        Button edit = new EditButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     clearMessagePanel();

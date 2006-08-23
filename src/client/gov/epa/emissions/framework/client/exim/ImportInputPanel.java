@@ -136,7 +136,7 @@ public class ImportInputPanel extends JPanel {
     }
 
     private JButton importFileButton() {
-        Button button = new BrowseButton("Browse", new AbstractAction() {
+        Button button = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 clear();
                 selectFile();

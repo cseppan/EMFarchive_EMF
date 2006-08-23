@@ -83,9 +83,10 @@ public class EditableUserProfilePanel extends JPanel {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button okButton = new OKButton("OK", okAction);
+        Button okButton = new OKButton(okAction);
         container.add(okButton);
-        container.add(new CloseButton("Close", cancelAction));
+        CloseButton closeButton = new CloseButton(cancelAction);
+        container.add(closeButton);
 
         panel.add(container, BorderLayout.EAST);
 

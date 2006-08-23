@@ -115,9 +115,9 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
         layout.setVgap(10);
         container.setLayout(layout);
 
-        Button saveButton = new SaveButton("Save", saveAction(sector));
+        Button saveButton = new SaveButton(saveAction(sector));
         container.add(saveButton);
-        container.add(new CloseButton("Close", closeAction()));
+        container.add(new CloseButton(closeAction()));
         getRootPane().setDefaultButton(saveButton);
 
         panel.add(container, BorderLayout.CENTER);

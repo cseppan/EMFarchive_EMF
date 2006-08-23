@@ -40,7 +40,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private EmfSession session;
 
     private EmfConsole parentConsole;
-
+    
     private Case caseObj;
 
     public CaseEditor(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
@@ -66,8 +66,8 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
     private JPanel createSummaryTab(Case caseObj, MessagePanel messagePanel) {
         try {
-            EditableCaseSummaryTab view = new EditableCaseSummaryTab(caseObj, session, this, parentConsole);
-            EditCaseSummaryTabPresenter summaryPresenter = new EditCaseSummaryTabPresenter(view, messagePanel, session);
+            EditableCaseSummaryTab view = new EditableCaseSummaryTab(caseObj, session, this,parentConsole);
+            EditCaseSummaryTabPresenter summaryPresenter = new EditCaseSummaryTabPresenter(view,messagePanel,session);
             view.observe(summaryPresenter);
             view.display();
             presenter.set(view);
@@ -77,7 +77,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
             return createErrorTab("Could not load Summary Tab." + e.getMessage());
         }
     }
-
+    
     private JPanel createInputTab() {
         try {
             EditInputsTab view = new EditInputsTab(parentConsole, this, messagePanel, desktopManager);
@@ -131,7 +131,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private JPanel createControlPanel() {
         JPanel buttonsPanel = new JPanel();
 
-        Button export = new ExportButton("Export", new AbstractAction() {
+        Button export = new ExportButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
                     doExport();
@@ -141,15 +141,15 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
             }
         });
         buttonsPanel.add(export);
-
-        Button save = new SaveButton("Save", new AbstractAction() {
+        
+        Button save = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doSave();
             }
         });
         buttonsPanel.add(save);
 
-        Button close = new CloseButton("Close", new AbstractAction() {
+        Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doClose();
             }
@@ -163,29 +163,29 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     protected void doExport() throws EmfException {
         doSaveWithoutClose();
         String exportDir = caseObj.getInputFileDir();
-
+        
         if (exportDir == null || exportDir.equals("")) {
             messagePanel.setMessage("Please select the input folder before exporting the case.");
             return;
         }
-
+        
         if (!checkDatasets()) {
             messagePanel.setMessage("Please select input datasets before exporting the case");
             return;
         }
-
+        
         presenter.doExport(session.user(), exportDir, "To export input datasets", true, caseObj);
-
+        
         messagePanel.setMessage("Started export. Please monitor the Status window " + "to track your Export request.");
     }
 
     private boolean checkDatasets() {
         CaseInput[] inputs = caseObj.getCaseInputs();
-
+        
         for (int i = 0; i < inputs.length; i++)
             if (inputs[i].getDatasetType() == null || inputs[i].getDataset() == null)
                 return false;
-
+        
         return true;
     }
 

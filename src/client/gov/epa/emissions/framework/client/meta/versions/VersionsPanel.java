@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.versions;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -123,7 +124,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
         tableCombo.setEditable(false);
         panel.add(tableCombo);
 
-        Button view = new Button("View", new AbstractAction() {
+        Button view = new ViewButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doView(tableCombo);
             }

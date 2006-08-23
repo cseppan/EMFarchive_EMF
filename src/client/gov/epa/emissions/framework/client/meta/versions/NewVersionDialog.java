@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.meta.versions;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.CancelButton;
+import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -83,7 +85,7 @@ public class NewVersionDialog extends Dialog {
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
-        Button ok = new Button("OK", new AbstractAction() {
+        Button ok = new OKButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 if (verifyInput()) {
                     shouldCreate = true;
@@ -94,7 +96,7 @@ public class NewVersionDialog extends Dialog {
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new Button("Cancel", new AbstractAction() {
+        Button cancel = new CancelButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 shouldCreate = false;
                 close();

@@ -146,14 +146,14 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         crudPanel.add(viewButton(confirmDialog));
         crudPanel.add(editButton(confirmDialog));
 
-        Button newButton = new NewButton("New", new AbstractAction() {
+        Button newButton = new NewButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 createNewCase();
             }
         });
         crudPanel.add(newButton);
 
-        Button removeButton = new RemoveButton("Remove", new AbstractAction() {
+        Button removeButton = new RemoveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     doRemove();

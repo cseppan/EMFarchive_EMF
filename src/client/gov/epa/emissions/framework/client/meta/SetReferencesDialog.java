@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.CancelButton;
+import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.ui.Dialog;
@@ -62,7 +64,7 @@ public class SetReferencesDialog extends Dialog {
     private JPanel controlPanel() {
         JPanel panel = new JPanel();
 
-        Button okButton = new Button("OK", new AbstractAction() {
+        Button okButton = new OKButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 List selectedValues = Arrays.asList(list.getSelectedValues());
                 selected = (Note[]) selectedValues.toArray(new Note[0]);
@@ -71,7 +73,7 @@ public class SetReferencesDialog extends Dialog {
         });
         panel.add(okButton);
 
-        Button cancelButton = new Button("Cancel", new AbstractAction() {
+        Button cancelButton = new CancelButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 close();
             }

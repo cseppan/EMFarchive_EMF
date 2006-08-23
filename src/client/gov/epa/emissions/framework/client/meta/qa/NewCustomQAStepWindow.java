@@ -162,7 +162,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
-        Button ok = new OKButton("OK", new AbstractAction() {
+        Button ok = new OKButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doOk();
             }
@@ -170,7 +170,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new CancelButton("Cancel", new AbstractAction() {
+        Button cancel = new CancelButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 disposeView();
             }

@@ -7,6 +7,8 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -146,7 +148,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
     private JPanel createViewButton(final EditableQAStepTemplateTableData data) {
         JPanel panel = new JPanel(new BorderLayout());
         
-        Button view = new Button("View", new AbstractAction() {
+        Button view = new ViewButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 showTemplateWindows(data);
             }
@@ -180,7 +182,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        Button closeButton = new Button("Close", closeAction());
+        Button closeButton = new CloseButton(closeAction());
         panel.add(closeButton, BorderLayout.LINE_END);
         getRootPane().setDefaultButton(closeButton);
 

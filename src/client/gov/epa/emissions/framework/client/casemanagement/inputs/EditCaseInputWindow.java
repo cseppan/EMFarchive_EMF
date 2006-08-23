@@ -63,7 +63,7 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
     private JPanel buttonsPanel(final CaseInput input) {
         JPanel panel = new JPanel();
 
-        ok = new OKButton("OK", new AbstractAction() {
+        ok = new OKButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doSave(input);
             }
@@ -71,7 +71,7 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new CloseButton("Close", new AbstractAction() {
+        Button cancel = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doClose();
             }

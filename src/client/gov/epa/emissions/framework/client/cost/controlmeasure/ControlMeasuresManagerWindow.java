@@ -137,23 +137,23 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private JPanel createLeftControlPanel() {
         JPanel panel = new JPanel();
 
-        Button view = new ViewButton("View", viewAction());
+        Button view = new ViewButton(viewAction());
         panel.add(view);
         view.setEnabled(false);
 
-        Button edit = new EditButton("Edit", editAction());
+        Button edit = new EditButton(editAction());
         panel.add(edit);
 
-        Button exportButton = new ExportButton("Export", exportAction());
+        Button exportButton = new ExportButton(exportAction());
         exportButton.setToolTipText("Export existing Control Measure(s)");
         panel.add(exportButton);
         exportButton.setEnabled(false);
 
-        Button copy = new CopyButton("Copy", copyAction());
+        Button copy = new CopyButton(copyAction());
         panel.add(copy);
         copy.setEnabled(false);
 
-        Button newControlMeasure = new NewButton("New", newControlMeasureAction());
+        Button newControlMeasure = new NewButton(newControlMeasureAction());
         panel.add(newControlMeasure);
 
         return panel;
@@ -186,7 +186,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         });
         panel.add(getItem("Cost Year:", costYear));
 
-        Button importButton = new ImportButton("Import", viewAction());
+        Button importButton = new ImportButton(viewAction());
         panel.add(importButton);
         importButton.setEnabled(false);
 

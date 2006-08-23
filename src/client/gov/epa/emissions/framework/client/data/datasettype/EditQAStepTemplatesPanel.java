@@ -109,21 +109,21 @@ public class EditQAStepTemplatesPanel extends JPanel implements QAStepTemplatesP
     private JPanel buttonsPanel() {
         JPanel container = new JPanel();
 
-        Button add = new AddButton("Add", new AbstractAction() {
+        Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doAdd();
             }
         });
         container.add(add);
 
-        Button remove = new RemoveButton("Remove", new AbstractAction() {
+        Button remove = new RemoveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doRemove();
             }
         });
         container.add(remove);
 
-        Button update = new EditButton("Edit", new AbstractAction() {
+        Button update = new EditButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doEdit();
             }

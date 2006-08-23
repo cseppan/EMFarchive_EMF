@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.revisions;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -85,7 +86,7 @@ public class ViewRevisionWindow extends DisposableInteralFrame implements Revisi
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
-        Button ok = new Button("OK", new AbstractAction() {
+        Button ok = new OKButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 disposeView();
             }

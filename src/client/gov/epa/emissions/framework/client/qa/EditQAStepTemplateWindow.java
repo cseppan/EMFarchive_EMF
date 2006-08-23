@@ -88,7 +88,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     private JPanel buttonsPanel(final DatasetType type) {
         JPanel panel = new JPanel();
 
-        ok = new SaveButton("Save", new AbstractAction() {
+        ok = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doEdit(type);
                 disposeView();
@@ -97,7 +97,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new CloseButton("Close", new AbstractAction() {
+        Button cancel = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doClose();
             }

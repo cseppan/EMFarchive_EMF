@@ -1,8 +1,9 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
-import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.buttons.CancelButton;
+import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.ui.EmfTableModel;
@@ -55,8 +56,8 @@ public class SCCSelectionDialog extends JDialog implements SCCSelectionView {
 
     private JPanel buttonPanel() {
         JPanel panel = new JPanel();
-        panel.add(new Button("OK", okAction()));
-        panel.add(new Button("Cancel", cancelAction()));
+        panel.add(new OKButton(okAction()));
+        panel.add(new CancelButton(cancelAction()));
         return panel;
     }
 

@@ -122,7 +122,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     private JPanel leftControlPanel() {
         JPanel panel = new JPanel();
 
-        Button newButton = new NewButton("New", new AbstractAction() {
+        Button newButton = new NewButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doNew(tableData.getValues());
             }
@@ -202,7 +202,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     }
 
     private Button viewButton(final JComboBox tableCombo) {
-        Button view = new ViewButton("View", new AbstractAction() {
+        Button view = new ViewButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doView(tableCombo);
             }
@@ -212,7 +212,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     }
 
     private Button editButton(final JComboBox tableCombo) {
-        Button edit = new EditButton("Edit", new AbstractAction() {
+        Button edit = new EditButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doEdit(tableCombo);
             }

@@ -110,7 +110,7 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
     private JPanel createControlPanel() {
         JPanel buttonsPanel = new JPanel();
 
-        Button save = new SaveButton("Save", new AbstractAction() {
+        Button save = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doSave();
             }
@@ -118,7 +118,7 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
         getRootPane().setDefaultButton(save);
         buttonsPanel.add(save);
 
-        Button close = new CloseButton("Close", new AbstractAction() {
+        Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doClose();
             }

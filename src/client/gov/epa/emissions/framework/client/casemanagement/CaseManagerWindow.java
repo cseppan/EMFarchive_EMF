@@ -116,7 +116,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         JPanel crudPanel = createCrudPanel();
 
         JPanel closePanel = new JPanel();
-        Button closeButton = new CloseButton("Close", new AbstractAction() {
+        Button closeButton = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
             }
@@ -143,7 +143,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         crudPanel.add(viewButton(confirmDialog));
         crudPanel.add(editButton(confirmDialog));
 
-        Button newButton = new NewButton("New", new AbstractAction() {
+        Button newButton = new NewButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMsgPanel();
                 createNewCase();
@@ -151,7 +151,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         });
         crudPanel.add(newButton);
 
-        Button removeButton = new RemoveButton("Remove", new AbstractAction() {
+        Button removeButton = new RemoveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMsgPanel();
                 removeSelectedCases();

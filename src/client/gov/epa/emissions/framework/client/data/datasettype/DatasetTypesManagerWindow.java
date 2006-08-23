@@ -103,7 +103,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         JPanel crudPanel = createCrudPanel();
 
         JPanel closePanel = new JPanel();
-        Button closeButton = new CloseButton("Close", new AbstractAction() {
+        Button closeButton = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
             }
@@ -143,7 +143,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
                 createDatasetType();
             }
         };
-        Button newButton = new NewButton("New", createAction);
+        Button newButton = new NewButton(createAction);
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
         crudPanel.add(viewButton);

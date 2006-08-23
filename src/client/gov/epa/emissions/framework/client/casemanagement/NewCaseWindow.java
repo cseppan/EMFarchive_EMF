@@ -128,9 +128,9 @@ public class NewCaseWindow extends DisposableInteralFrame implements NewCaseView
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button saveButton = new OKButton("OK", saveAction());
+        Button saveButton = new OKButton(saveAction());
         container.add(saveButton);
-        container.add(new CancelButton("Cancel", closeAction()));
+        container.add(new CancelButton(closeAction()));
         getRootPane().setDefaultButton(saveButton);
 
         panel.add(container, BorderLayout.CENTER);

@@ -249,7 +249,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
-        Button ok = new SaveButton("Save", new AbstractAction() {
+        Button ok = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doEdit();
             }
@@ -257,7 +257,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new CloseButton("Close", new AbstractAction() {
+        Button cancel = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doClose();
             }

@@ -186,7 +186,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
 
     private JPanel buttonsPanel(final Note[] notes) {
         JPanel panel = new JPanel();
-        Button ok = new OKButton("OK", new AbstractAction() {
+        Button ok = new OKButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doNew(notes);
             }
@@ -194,7 +194,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new CancelButton("Cancel", new AbstractAction() {
+        Button cancel = new CancelButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 shouldCreate = false;
                 close();

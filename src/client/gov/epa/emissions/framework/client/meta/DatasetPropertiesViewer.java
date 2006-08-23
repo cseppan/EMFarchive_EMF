@@ -162,7 +162,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     private JPanel createControlPanel() {
         JPanel buttonsPanel = new JPanel();
 
-        Button close = new CloseButton("Close", new AbstractAction() {
+        Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
             }

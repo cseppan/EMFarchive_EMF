@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.ui.Border;
@@ -48,7 +49,7 @@ public class ViewableUserProfilePanel extends JPanel {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button closeButton = new Button("Close", closeAction);
+        Button closeButton = new CloseButton(closeAction);
         container.add(closeButton);
 
         panel.add(container, BorderLayout.EAST);

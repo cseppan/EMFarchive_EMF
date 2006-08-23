@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -122,7 +123,7 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
         layout.setVgap(10);
         container.setLayout(layout);
 
-        Button closeButton = new Button("Close", closeAction());
+        Button closeButton = new CloseButton(closeAction());
         container.add(closeButton);
 
         panel.add(container, BorderLayout.CENTER);

@@ -70,7 +70,7 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
 
     private JPanel buttonsPanel(final CaseInput[] inputs) {
         JPanel panel = new JPanel();
-        Button ok = new OKButton("OK", new AbstractAction() {
+        Button ok = new OKButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     doNew(inputs);
@@ -82,7 +82,7 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new CancelButton("Cancel", new AbstractAction() {
+        Button cancel = new CancelButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 shouldCreate = false;
                 close();

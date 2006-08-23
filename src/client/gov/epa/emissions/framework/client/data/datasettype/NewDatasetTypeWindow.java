@@ -193,7 +193,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button saveButton = new SaveButton("Save", saveAction());
+        Button saveButton = new SaveButton(saveAction());
         container.add(saveButton);
         container.add(new CloseButton("Close", closeAction()));
         getRootPane().setDefaultButton(saveButton);

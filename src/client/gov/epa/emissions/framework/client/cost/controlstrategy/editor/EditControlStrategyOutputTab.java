@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -154,7 +155,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         JLabel folderLabel = new JLabel("Folder: ");
         folder = new TextField("folderName", 30);
 
-        Button browseButton = new Button("Browse", browseAction());
+        Button browseButton = new BrowseButton(browseAction());
 
         JPanel panel = new JPanel();
         panel.add(folderLabel);
@@ -196,7 +197,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     private JPanel buttonPanel() {
-        Button exportButton = new ExportButton("Export", exportAction());
+        Button exportButton = new ExportButton(exportAction());
         Button analysisButton = new Button("Analyze", analysisAction());
 
         JPanel buttonPanel = new JPanel();

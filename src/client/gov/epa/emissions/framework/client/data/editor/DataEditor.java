@@ -192,7 +192,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     private Button closeButton() {
-        Button close = new CloseButton("Close", new AbstractAction() {
+        Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doClose();
             }

@@ -80,9 +80,9 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureTabView, C
 
     private JPanel buttonPanel() {
         JPanel panel = new JPanel();
-        Button addButton = new AddButton("Add", addAction());
+        Button addButton = new AddButton(addAction());
         panel.add(addButton);
-        Button removeButton = new RemoveButton("Remove", removeAction());
+        Button removeButton = new RemoveButton(removeAction());
         panel.add(removeButton);
         
         JPanel container = new JPanel(new BorderLayout());

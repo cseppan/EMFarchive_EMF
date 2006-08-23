@@ -231,7 +231,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         getRootPane().setDefaultButton(save);
         panel.add(save);
 
-        Button cancel = new CancelButton("Cancel", new AbstractAction() {
+        Button cancel = new CancelButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 disposeView();
             }

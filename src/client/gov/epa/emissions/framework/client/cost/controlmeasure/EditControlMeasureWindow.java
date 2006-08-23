@@ -111,7 +111,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     private JPanel createControlPanel() {
         JPanel buttonsPanel = new JPanel();
 
-        Button save = new SaveButton("Save", new AbstractAction() {
+        Button save = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doSave();
             }
@@ -119,7 +119,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
 
         buttonsPanel.add(save);
 
-        Button close = new CloseButton("Close", new AbstractAction() {
+        Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doClose();
             }

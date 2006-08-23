@@ -115,7 +115,7 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
 
     private JPanel rightPanel() {
         JPanel rightPanel = new JPanel();
-        Button close = new CloseButton("Close", new AbstractAction() {
+        Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doClose();
             }
