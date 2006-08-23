@@ -280,7 +280,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             Session session = sessionFactory.getSession();
 
             if (dao.nameUsed(country.getName(), Country.class, session))
-                throw new EmfException("Country name already in use");
+                throw new EmfException("The Country name is already in use");
 
             dao.add(country, session);
             session.close();
@@ -295,7 +295,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             Session session = sessionFactory.getSession();
 
             if (dao.nameUsed(type.getName(), DatasetType.class, session))
-                throw new EmfException("DatasetType name already in use");
+                throw new EmfException("The DatasetType name is already in use");
 
             dao.add(type, session);
             session.close();

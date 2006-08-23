@@ -1,20 +1,29 @@
 package gov.epa.emissions.framework.ui;
 
-import java.util.Arrays;
-import java.util.List;
+import gov.epa.emissions.commons.gui.Changeable;
+import gov.epa.emissions.commons.gui.Changeables;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.ListModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.commons.collections.primitives.IntList;
 
-public class ListWidget extends JList {
+public class ListWidget extends JList implements Changeable {
 
-    private Object[] items;
+    private boolean changed;
+
+    private Changeables changeables;
+
+    private DefaultListModel model;
 
     public ListWidget(Object[] items) {
-        super(items);
-        this.items = items;
+        model = model(items);
+        this.setModel(model);
+        changed = false;
     }
 
     public ListWidget(Object[] items, Object[] selected) {
@@ -22,14 +31,76 @@ public class ListWidget extends JList {
         setSelected(selected);
     }
 
-    public void setSelected(Object[] selected) {
-        List all = Arrays.asList(items);
-        IntList indexes = new ArrayIntList();
+    private DefaultListModel model(Object[] items) {
+        DefaultListModel model = new DefaultListModel();
+        for (int i = 0; i < items.length; i++) {
+            model.addElement(items[i]);
+        }
+        return model;
+    }
 
+    public void setSelected(Object[] selected) {
+        IntList indexes = new ArrayIntList();
         for (int i = 0; i < selected.length; i++)
-            indexes.add(all.indexOf(selected[i]));
+            indexes.add(model.indexOf(selected[i]));
 
         super.setSelectedIndices(indexes.toArray());
+    }
+
+    public boolean hasChanges() {
+        return changed;
+    }
+
+    public void clear() {
+        changed = false;
+    }
+
+    public void observe(Changeables changeables) {
+        this.changeables = changeables;
+        addListDataListener();
+    }
+
+    private void addListDataListener() {
+        ListModel model = this.getModel();
+        model.addListDataListener(new ListDataListener() {
+            public void contentsChanged(ListDataEvent e) {
+                notifyChanges();
+            }
+
+            public void intervalAdded(ListDataEvent e) {
+                notifyChanges();
+            }
+
+            public void intervalRemoved(ListDataEvent e) {
+                notifyChanges();
+            }
+        });
+    }
+
+    void notifyChanges() {
+        changed = true;
+        if (changeables != null)
+            changeables.onChanges();
+    }
+
+    public boolean contains(Object obj) {
+        return model.contains(obj);
+    }
+
+    public void addElement(Object obj) {
+        model.addElement(obj);
+    }
+
+    public void removeElements(Object[] removeValues) {
+        for (int i = 0; i < removeValues.length; i++) {
+            model.removeElement(removeValues[i]);
+        }
+    }
+
+    public Object[] getAllElements() {
+        Object[] obj = new Object[model.getSize()];
+        model.copyInto(obj);
+        return obj;
     }
 
 }

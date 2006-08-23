@@ -274,7 +274,7 @@ public class DataCommonsServiceTest extends ServiceTestCase {
             sector2.setName(name);
             service.updateSector(sector2);
         } catch (EmfException e) {
-            assertEquals("Sector name already in use", e.getMessage());
+            assertEquals("The Sector name is already in use", e.getMessage());
             return;
         } finally {
             remove(sector1);

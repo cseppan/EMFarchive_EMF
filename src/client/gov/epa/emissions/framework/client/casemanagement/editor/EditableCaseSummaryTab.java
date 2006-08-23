@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
-import gov.epa.emissions.commons.data.Sector;
-import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
@@ -9,8 +7,6 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
-import gov.epa.emissions.commons.gui.buttons.AddButton;
-import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.casemanagement.Abbreviations;
@@ -28,7 +24,6 @@ import gov.epa.emissions.framework.client.data.Projects;
 import gov.epa.emissions.framework.client.data.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
-import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 
 import java.awt.BorderLayout;
@@ -36,23 +31,15 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListModel;
 import javax.swing.SpringLayout;
 
 public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummaryTabView {
@@ -101,7 +88,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private CheckBox isTemplate;
 
-    private ListWidget sectorsList;
+    private AddRemoveSectorWidget sectorsWidget;
 
     private Abbreviations abbreviations;
 
@@ -140,7 +127,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private EmfConsole parentConsole;
 
     public EditableCaseSummaryTab(Case caseObj, EmfSession session, ManageChangeables changeablesList,
-            EmfConsole parentConsole) throws EmfException {
+            EmfConsole parentConsole) {
         super.setName("summary");
         this.caseObj = caseObj;
         this.session = session;
@@ -148,6 +135,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         this.parentConsole = parentConsole;
         this.verifier = new NumberFieldVerifier("");
 
+    }
+
+    public void display() throws EmfException {
         setLayout();
     }
 
@@ -186,7 +176,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Category:", categories(), panel);
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description()), panel);
         layoutGenerator.addLabelWidgetPair("Run Status:", runStatus(), panel);
-        layoutGenerator.addLabelWidgetPair("Creator:", creator(), panel);
+        layoutGenerator.addLabelWidgetPair("Last Modified By:", creator(), panel);
         layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
 
         // Lay out the panel.
@@ -205,11 +195,11 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Is Final:", isFinal(), panel);
         layoutGenerator.addLabelWidgetPair("Is Template:", isTemplate(), panel);
         layoutGenerator.addLabelWidgetPair("Sectors:", sectors(), panel);
-        layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
+        // layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
         layoutGenerator.addLabelWidgetPair("Template:", template(), panel);
         // layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
 
-        layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 10, 10);
+        layoutGenerator.makeCompactGrid(panel, 5, 2, 10, 10, 10, 10);
 
         return panel;
     }
@@ -412,12 +402,10 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return categoriesCombo;
     }
 
-    private JScrollPane sectors() {
-        sectorsList = new ListWidget(new String[] { "" }, new String[] { "" });
-        JScrollPane listScroller = new JScrollPane(sectorsList);
-        listScroller.setPreferredSize(new Dimension(175, 60));
-
-        return listScroller;
+    private JPanel sectors() {
+        sectorsWidget = new AddRemoveSectorWidget(presenter.getAllSectors(), changeablesList, parentConsole);
+        sectorsWidget.setSectors(caseObj.getSectors());
+        return sectorsWidget;
     }
 
     private EditableComboBox emissionsYears() throws EmfException {
@@ -517,64 +505,50 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return label;
     }
 
-    private JPanel addRemoveButtonPanel() {
-        JPanel panel = new JPanel();
-        // TBD: this needs to be changed so you have handles to the buttons
-        // and can set actions
-        Button addButton = new AddButton("Add", addAction());
-        Button removeButton = new RemoveButton("Remove", null);
-        removeButton.setEnabled(false);
-
-        panel.add(addButton);
-        panel.add(removeButton);
-        // for now, disable these
-
-        return panel;
-    }
-
-    private Action addAction() {
-        return new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                addSectors();
-            }
-        };
-    }
-
-    private void addSectors() {
-        Sector[] allSectors = presenter.getAllSectors();
-        if (allSectors == null)
-            return;
-        SectorSelector sectorSelector = new SectorSelector(allSectors, parentConsole);
-        sectorSelector.display();
-        if (sectorSelector.clickedOK()) {
-            addNewSectors(sectorSelector);
-        }
-    }
-
-    private void addNewSectors(SectorSelector sectorSelector) {
-        Sector[] selected = sectorSelector.getSelected();
-        List currentSelection = currentSelection(sectorsList);
-        for (int i = 0; i < selected.length; i++) {
-            if (!currentSelection.contains(selected)) {
-                currentSelection.add(selected[i]);
-            }
-        }
-        DefaultListModel model = new DefaultListModel();
-        for (int i = 0; i < currentSelection.size(); i++) {
-            model.addElement(currentSelection.get(i));
-        }
-        sectorsList.setModel(model);
-        sectorsList.repaint();
-    }
-
-    private List currentSelection(ListWidget sectorsList) {
-        List list = new ArrayList();
-        ListModel model = sectorsList.getModel();
-        for (int i = 0; i < model.getSize(); i++) {
-            list.add(model.getElementAt(i));
-        }
-        return list;
-    }
+    // private JPanel addRemoveButtonPanel() {
+    // JPanel panel = new JPanel();
+    // // TBD: this needs to be changed so you have handles to the buttons
+    // // and can set actions
+    // Button addButton = new AddButton("Add", addAction());
+    // Button removeButton = new RemoveButton("Remove", removeAction());
+    //
+    // panel.add(addButton);
+    // panel.add(removeButton);
+    // // for now, disable these
+    //
+    // return panel;
+    // }
+    //
+    // private Action removeAction() {
+    // return new AbstractAction() {
+    // public void actionPerformed(ActionEvent e) {
+    // removeSectors();
+    // }
+    // };
+    // }
+    //
+    //    
+    // private Action addAction() {
+    // return new AbstractAction() {
+    // public void actionPerformed(ActionEvent e) {
+    // addSectors();
+    // }
+    // };
+    // }
+    //
+    // private void addSectors() {
+    // Sector[] allSectors = presenter.getAllSectors();
+    // if (allSectors == null)
+    // return;
+    // SectorSelector sectorSelector = new SectorSelector(allSectors, sectorsWidget, parentConsole);
+    // sectorSelector.display();
+    // }
+    //    
+    // protected void removeSectors() {
+    // Object[] removeValues = sectorsWidget.getSelectedValues();
+    // sectorsWidget.removeElements(removeValues);
+    //        
+    // }
 
     public void save(Case caseObj) throws EmfException {
         caseObj.setName(name.getText());
@@ -597,6 +571,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         caseObj.setRunStatus(runStatusCombo.getSelectedItem() + "");
         saveStartDate();
         saveEndDate();
+        caseObj.setSectors(sectorsWidget.getSectors());
     }
 
     private void saveFutureYear() throws EmfException {
