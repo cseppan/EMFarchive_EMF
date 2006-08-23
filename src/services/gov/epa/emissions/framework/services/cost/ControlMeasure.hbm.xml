@@ -27,7 +27,7 @@
             class="gov.epa.emissions.commons.security.User"
             column="creator"/> 
  
-        <many-to-one cascade="save-update"
+        <many-to-one 
             name="majorPollutant" 
             class="gov.epa.emissions.commons.data.Pollutant"
             column="major_pollutant"/> 

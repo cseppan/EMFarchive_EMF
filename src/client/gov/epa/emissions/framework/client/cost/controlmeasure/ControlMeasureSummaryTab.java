@@ -12,7 +12,6 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.data.ControlTechnologies;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
-import gov.epa.emissions.framework.client.data.Pollutants;
 import gov.epa.emissions.framework.client.data.SourceGroups;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
@@ -48,7 +47,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     private JLabel creator;
 
-    protected EditableComboBox majorPollutant;
+    protected ComboBox majorPollutant;
 
     protected EditableComboBox sourceGroup;
 
@@ -182,7 +181,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         // AME: Moved temporarily to improve symmetry
         // lastModifiedTime = new JLabel("");
         // layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
-        JPanel tempPanel = tempPanel(50,20);
+        JPanel tempPanel = tempPanel(50, 20);
         layoutGenerator.addLabelWidgetPair("", tempPanel, panel);
 
         widgetLayout(3, 2, 5, 5, 10, 10, layoutGenerator, panel);
@@ -192,7 +191,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     private JPanel tempPanel(int width, int height) {
         JPanel tempPanel = new JPanel();
-        tempPanel.setPreferredSize(new Dimension(width,height));
+        tempPanel.setPreferredSize(new Dimension(width, height));
         return tempPanel;
     }
 
@@ -217,22 +216,20 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
         try {
             allPollutants = session.dataCommonsService().getPollutants();
-            majorPollutant = new EditableComboBox(allPollutants);
+            majorPollutant = new ComboBox("Choose a pollutant", allPollutants);
         } catch (EmfException e1) {
             messagePanel.setError("Could not retrieve Pollutants");
         }
-        // majorPollutant.setSelectedIndex(0);
         changeablesList.addChangeable(majorPollutant);
         layoutGenerator.addLabelWidgetPair("Major Pollutant:", majorPollutant, panel);
 
         deviceCode = new TextField("NEI Device code", 15);
         changeablesList.addChangeable(deviceCode);
         layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
-        
+
         equipmentLife = new TextField("Equipment life", 15);
         changeablesList.addChangeable(equipmentLife);
         layoutGenerator.addLabelWidgetPair("Equipment life (yrs):", equipmentLife, panel);
-
 
         dateReviewed = new TextField("Date Reviewed", 15);
         changeablesList.addChangeable(dateReviewed);
@@ -240,8 +237,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
         dataSources = new TextField("Data Sources:", 15);
         layoutGenerator.addLabelWidgetPair("Data Sources:", dataSources, panel);
-        
-        layoutGenerator.addLabelWidgetPair("", tempPanel(20,20), panel);
+
+        layoutGenerator.addLabelWidgetPair("", tempPanel(20, 20), panel);
         widgetLayout(7, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
@@ -385,19 +382,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     private void updatePollutant() {
         Object selected = majorPollutant.getSelectedItem();
-        if (selected instanceof String) {
-            String pollutantName = (String) selected;
-            if (pollutantName.length() > 0) {
-                Pollutant pollutant = pollutant(pollutantName);// checking for duplicates
-                measure.setMajorPollutant(pollutant);
-            }
-        } else if (selected instanceof Pollutant) {
-            measure.setMajorPollutant((Pollutant) selected);
-        }
-    }
-
-    private Pollutant pollutant(String name) {
-        return new Pollutants(allPollutants).get(name);
+        measure.setMajorPollutant((Pollutant) selected);
     }
 
     private void validateFields() throws EmfException {
