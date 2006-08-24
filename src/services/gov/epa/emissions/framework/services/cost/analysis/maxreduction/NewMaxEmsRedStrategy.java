@@ -13,11 +13,15 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.DatasetCreator;
+import gov.epa.emissions.framework.services.cost.controlStrategy.GenerateSccControlMeasuresMap;
+import gov.epa.emissions.framework.services.cost.controlStrategy.SccControlMeasuresMap;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.SQLException;
+import java.util.Date;
 
 import org.hibernate.Session;
 
@@ -31,18 +35,18 @@ public class NewMaxEmsRedStrategy implements Strategy {
 
     private HibernateSessionFactory sessionFactory;
 
-    private User user;
-
     private DatasetCreator creator;
 
     private EmfDataset inputDataset;
 
     private int batchSize;
 
+    private DbServer dbServer;
+
     public NewMaxEmsRedStrategy(ControlStrategy strategy, User user, DbServer dbServer, Integer batchSize,
             HibernateSessionFactory sessionFactory) {
         this.controlStrategy = strategy;
-        this.user = user;
+        this.dbServer = dbServer;
         this.datasource = dbServer.getEmissionsDatasource();
         this.batchSize = batchSize.intValue();
         this.sessionFactory = sessionFactory;
@@ -52,47 +56,53 @@ public class NewMaxEmsRedStrategy implements Strategy {
     }
 
     public void run(User user2) throws EmfException {
-        //EmfDataset resutltDataset = 
-        resultDataset(user);
+        GenerateSccControlMeasuresMap mapGenerator = new GenerateSccControlMeasuresMap(dbServer,emissionTableName(inputDataset),controlStrategy,sessionFactory);
+        SccControlMeasuresMap map = mapGenerator.create();
+        EmfDataset resultDataset = resultDataset();
         createTable(creator.outputTableName());
         OptimizedQuery optimizedQuery = sourceQuery(inputDataset);
+        StrategyResult result = strategyResult(resultDataset);
+
         try {
-            while(optimizedQuery.execute()){
-                optimizedQuery.getResultSet();
-            }
-        } catch (SQLException e) {
-            throw new EmfException("Could not run control strategy");
-        }finally{
+            StrategyLoader loader = new StrategyLoader(creator.outputTableName(), tableFormat, dbServer, result,map,controlStrategy);
+            loader.load(optimizedQuery);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException("Could not run control strategy" + "\n" + e.getMessage());
+        } finally {
             close(optimizedQuery);
+            result.setCompletionTime(new Date());
         }
-        // TODO:
-        // create the table
-        // create a new dataset
-        // get all lines relevant to the target pollutant
-        // read each line of source
-        // get fips from source
-        // get effective date from control strategy
+        //update strateg result status 
+        controlStrategy.setStrategyResults(new StrategyResult[] { result });
+    }
+
+    private StrategyResult strategyResult(EmfDataset resultDataset) {
+        StrategyResult result = new StrategyResult();
+        result.setControlStrategyId(controlStrategy.getId());
+        result.setInputDatasetId(inputDataset.getId());
+        result.setDetailedResultDataset(resultDataset);
+        return result;
     }
 
     private void close(OptimizedQuery optimizedQuery) throws EmfException {
         try {
             optimizedQuery.close();
         } catch (SQLException e) {
-           throw new EmfException("Could not close optimized query-"+e.getMessage());
+            throw new EmfException("Could not close optimized query-" + e.getMessage());
         }
     }
 
-    private OptimizedQuery sourceQuery(EmfDataset dataset) {
-        String query = "SELECT * FROM " + emissionTableName(dataset)+
-        " WHERE poll=" + "\'" + controlStrategy.getTargetPollutant() + "\'";
+    private OptimizedQuery sourceQuery(EmfDataset dataset) throws EmfException {
+        String query = "SELECT * FROM " + emissionTableName(dataset) + " WHERE poll=" + "\'"
+                + controlStrategy.getTargetPollutant() + "\'";
         try {
-            return  datasource.optimizedQuery(query, batchSize);
+            return datasource.optimizedQuery(query, batchSize);
         } catch (SQLException e) {
-            // NOTE Auto-generated catch block
-            e.printStackTrace();
-            return null;
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+
         }
-        
+
     }
 
     private void createTable(String tableName) throws EmfException {
@@ -116,7 +126,7 @@ public class NewMaxEmsRedStrategy implements Strategy {
         return datasource.getName() + "." + table;
     }
 
-    private EmfDataset resultDataset(User user) throws EmfException {
+    private EmfDataset resultDataset() throws EmfException {
         return creator.addDataset(detailDatasetType(), description(controlStrategy), tableFormat,
                 source(controlStrategy), datasource);
     }
@@ -131,7 +141,6 @@ public class NewMaxEmsRedStrategy implements Strategy {
     }
 
     private String description(ControlStrategy controlStrategy) {
-        
         return "#Detail Resultset Dataset\n" + "Implements control strategy " + controlStrategy.getName() + "\n"
                 + "#Input dataset used " + inputDataset.getName();
     }
@@ -141,14 +150,17 @@ public class NewMaxEmsRedStrategy implements Strategy {
         return dataset.getName();
     }
 
-    public void close() {
-        // NOTE Auto-generated method stub
+    public void close() throws EmfException {
+        try {
+            dbServer.disconnect();
+        } catch (SQLException e) {
+            throw new EmfException(e.getMessage());
+        }
 
     }
 
     public ControlStrategy getControlStrategy() {
-        // NOTE Auto-generated method stub
-        return null;
+        return controlStrategy;
     }
 
 }

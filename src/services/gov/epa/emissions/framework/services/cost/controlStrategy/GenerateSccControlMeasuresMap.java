@@ -3,10 +3,15 @@ package gov.epa.emissions.framework.services.cost.controlStrategy;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.hibernate.Session;
+
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlMeasuresDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 public class GenerateSccControlMeasuresMap {
 
@@ -18,18 +23,22 @@ public class GenerateSccControlMeasuresMap {
 
     private SccControlMeasuresMap map;
 
-    private String emissionTableName;
+    private String qualifiedEmissionTableName;
 
-    public GenerateSccControlMeasuresMap(DbServer dbServer, String emissionTableName, ControlStrategy controlStrategy) {
+    private HibernateSessionFactory sessionFactory;
+
+    public GenerateSccControlMeasuresMap(DbServer dbServer, String qualifiedEmissionTableName, ControlStrategy controlStrategy,
+            HibernateSessionFactory sessionFactory) {
         this.emissionDatasource = dbServer.getEmissionsDatasource();
         this.emfDatasource = dbServer.getEmfDatasource();
-        this.emissionTableName = emissionTableName;
+        this.qualifiedEmissionTableName = qualifiedEmissionTableName;
         this.controlStrategy = controlStrategy;
+        this.sessionFactory = sessionFactory;
         map = new SccControlMeasuresMap();
     }
 
     public SccControlMeasuresMap create() throws EmfException {
-        String query = query(emissionTableName);
+        String query = query(qualifiedEmissionTableName);
         ResultSet rs = null;
         try {
             rs = emissionDatasource.query().executeQuery(query);
@@ -57,14 +66,23 @@ public class GenerateSccControlMeasuresMap {
         while (rs.next()) {
             String scc = rs.getString(1);
             int id = rs.getInt(2);
-            map.add(scc, id);
+            map.add(scc, controlMeasure(id));
         }
-
     }
 
-    private String query(String emissionTableName) {
-        return "SELECT DISTINCT a.scc,b.control_measures_id FROM " + qualifiedName(emissionTableName, emissionDatasource)
-                + " AS a, " + qualifiedName("control_measure_sccs", emfDatasource) + " AS b WHERE a.poll='"
+    private ControlMeasure controlMeasure(int id) {
+        Session session = sessionFactory.getSession();
+        try {
+            ControlMeasuresDAO dao = new ControlMeasuresDAO();
+            return dao.current(id, ControlMeasure.class, session);
+        } finally {
+            session.close();
+        }
+    }
+
+    private String query(String qualifiedEmissionTableName) {
+        return "SELECT DISTINCT a.scc,b.control_measures_id FROM " + qualifiedEmissionTableName + " AS a, "
+                + qualifiedName("control_measure_sccs", emfDatasource) + " AS b WHERE a.poll='"
                 + controlStrategy.getTargetPollutant() + "' AND a.scc=b.name";
     }
 

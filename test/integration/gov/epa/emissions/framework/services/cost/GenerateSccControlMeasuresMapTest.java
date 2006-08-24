@@ -17,22 +17,26 @@ public class GenerateSccControlMeasuresMapTest extends MaxEmsRedStrategyTestCase
             ControlMeasure cm2 = addControlMeasure("Control Measure 2", "CM2", sccs2(), new EfficiencyRecord[0]);
             ControlStrategy strategy = controlStrategy(inputDataset, "CS1", pm10Pollutant());
             GenerateSccControlMeasuresMap createMap = new GenerateSccControlMeasuresMap(dbServer(),
-                    emissionTableName(), strategy);
+                    qualfiedTableName(emissionTableName()), strategy, sessionFactory());
             SccControlMeasuresMap map = createMap.create();
             assertEquals("map size 9", 9, map.size());
-            int[] ids = map.getControlMeasureIds("2294000000");
-            assertEquals(1, ids.length);
-            assertEquals(cm1.getId(), ids[0]);
+            ControlMeasure[] measures = map.getControlMeasures("2294000000");
+            assertEquals(1, measures.length);
+            assertEquals(cm1.getId(), measures[0].getId());
 
-            ids = map.getControlMeasureIds("2801500000");
-            assertEquals(2, ids.length);
-            assertEquals(cm1.getId(), ids[0]);
-            assertEquals(cm2.getId(), ids[1]);
-        } finally {
+            measures = map.getControlMeasures("2801500000");
+            assertEquals(2, measures.length);
+            assertEquals(cm1.getId(), measures[0].getId());
+            assertEquals(cm2.getId(), measures[1].getId());
+        }finally {
             dropAll(ControlMeasure.class);
             dropAll(ControlStrategy.class);
         }
 
+    }
+
+    private String qualfiedTableName(String table) {
+        return dbServer().getEmissionsDatasource().getName() + "." + table;
     }
 
     private String emissionTableName() {

@@ -25,7 +25,7 @@ public class ControlMeasure implements Lockable, Serializable {
     private String description;
 
     private int deviceCode;
-    
+
     private int costYear;
 
     private float equipmentLife;
@@ -41,7 +41,7 @@ public class ControlMeasure implements Lockable, Serializable {
     private String abbreviation;
 
     private ControlTechnology controlTechnology;
-    
+
     private SourceGroup sourceGroup;
 
     private String dataSouce;
@@ -53,9 +53,9 @@ public class ControlMeasure implements Lockable, Serializable {
     private Mutex lock;
 
     private List sccs;
-    
+
     private List efficiencyRecords;
-    
+
     private List sectors;
 
     public ControlMeasure() {
@@ -162,14 +162,14 @@ public class ControlMeasure implements Lockable, Serializable {
         return lock.isLocked();
     }
 
-    public boolean equals(Object other) {
-        if (other == null || !(other instanceof ControlMeasure)) {
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof ControlMeasure)) {
             return false;
         }
 
-        ControlMeasure otherMeasure = (ControlMeasure) other;
+        ControlMeasure other = (ControlMeasure) obj;
 
-        return (id == otherMeasure.getId());
+        return (id == other.getId() || name.equals(other.getName()));
     }
 
     public int hashCode() {
@@ -249,7 +249,7 @@ public class ControlMeasure implements Lockable, Serializable {
     }
 
     public Scc[] getSccs() {
-        return (Scc[])sccs.toArray(new Scc[0]);
+        return (Scc[]) sccs.toArray(new Scc[0]);
     }
 
     public void setSccs(Scc[] sccs) {
@@ -257,7 +257,7 @@ public class ControlMeasure implements Lockable, Serializable {
     }
 
     public Sector[] getSectors() {
-        return (Sector[])sectors.toArray(new Sector[0]);
+        return (Sector[]) sectors.toArray(new Sector[0]);
     }
 
     public void setSectors(Sector[] sectors) {

@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
@@ -43,7 +44,9 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
 
     protected void doTearDown() throws Exception {
         dropTable("test", dbServer.getEmissionsDatasource());
+        dropAll(InternalSource.class);
         dropAll(EmfDataset.class);
+        
     }
 
 
@@ -55,6 +58,7 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         strategy.setDatasetType(inputDataset.getDatasetType());
         strategy.setDatasetVersion(0);// initial version
         strategy.setAnalysisYear(2000);
+        strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant.getName());
         strategy.setStrategyType(maxEmisRedStrategyType());
         add(strategy);
@@ -92,13 +96,15 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         return (ControlMeasure) load(ControlMeasure.class,measure.getName());
     }
 
-    protected EfficiencyRecord record(Pollutant pollutant, float efficiency, float cost) {
+    protected EfficiencyRecord record(Pollutant pollutant,String locale, float efficiency, float cost, int costYear) {
         EfficiencyRecord record = new EfficiencyRecord();
         record.setPollutant(pollutant);
+        record.setLocale(locale);
         record.setEfficiency(efficiency);
         record.setRuleEffectiveness(100);
         record.setRulePenetration(100);
         record.setCostPerTon(cost);
+        record.setCostYear(costYear);
         return record;
     }
 

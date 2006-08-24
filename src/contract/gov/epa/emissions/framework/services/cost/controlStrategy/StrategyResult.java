@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class StrategyResult implements Serializable {
 
-    private int id;
+    private int controlStrategyId;
 
     private int inputDatasetId;
 
@@ -31,12 +31,12 @@ public class StrategyResult implements Serializable {
         //
     }
     
-    public int getId() {
-        return id;
+    public int getControlStrategyId() {
+        return controlStrategyId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setControlStrategyId(int id) {
+        this.controlStrategyId = id;
     }
 
 
