@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
@@ -322,7 +323,7 @@ public class CaseServiceImpl implements CaseService {
         List list = new ArrayList();
 
         for (int i = 0; i < inputs.length; i++)
-            if (inputs[i].getDataset() != null)
+            if (inputs[i].getDataset() != null && !checkExternalDSType(inputs[i].getDatasetType()))
                 list.add(inputs[i].getVersion());
         
         return (Version[])list.toArray(new Version[0]);
@@ -333,10 +334,16 @@ public class CaseServiceImpl implements CaseService {
         List list = new ArrayList();
 
         for (int i = 0; i < inputs.length; i++)
-            if (inputs[i].getDataset() != null)
+            if (inputs[i].getDataset() != null && !checkExternalDSType(inputs[i].getDatasetType()))
                 list.add(inputs[i].getDataset());
 
         return (EmfDataset[])list.toArray(new EmfDataset[0]);
+    }
+    
+    private boolean checkExternalDSType(DatasetType type) {
+        String name = type.getName();
+        
+        return name.indexOf("External") >= 0;
     }
 
     private String[] getSubdirs(Case caseToExport) {

@@ -9,19 +9,24 @@ import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.mims.analysisengine.table.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -40,7 +45,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     private EditInputsTabPresenter presenter;
 
-    Case caseObj;
+    private Case caseObj;
 
     private InputsTableData tableData;
 
@@ -54,12 +59,17 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     private JTextField inputDir;
 
+    private EmfSession session;
+    
+    private ManageChangeables changeables;
+
     public EditInputsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager) {
         super.setName("editInputsTab");
         this.parentConsole = parentConsole;
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;
+        this.changeables = changeables;
 
         this.inputDir = new JTextField(30);
         inputDir.setName("inputdir");
@@ -67,12 +77,13 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         super.setLayout(new BorderLayout());
     }
 
-    public void display(Case caseObj, EditInputsTabPresenter presenter) {
+    public void display(EmfSession session, Case caseObj, EditInputsTabPresenter presenter) {
         super.removeAll();
         inputDir.setText(caseObj.getInputFileDir());
         super.add(createLayout(caseObj.getCaseInputs(), presenter, parentConsole), BorderLayout.CENTER);
         this.caseObj = caseObj;
         this.presenter = presenter;
+        this.session = session;
     }
 
     private void doRefresh(CaseInput[] inputs) {
@@ -94,6 +105,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     private JPanel tablePanel(CaseInput[] inputs, EmfConsole parentConsole) {
         tableData = new InputsTableData(inputs);
+        changeables.addChangeable(tableData);
         selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
 
         tablePanel = new JPanel(new BorderLayout());
@@ -104,10 +116,16 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
         SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-
+        sortFilterPanel.sort(sortCriteria());
+        
         JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
         sortFilterPanel.setPreferredSize(new Dimension(450, 60));
         return scrollPane;
+    }
+    
+    private SortCriteria sortCriteria() {
+        String[] columnNames = { "Sector", "Program", "Input"};
+        return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
     }
 
     public JPanel createFolderPanel() {
@@ -125,7 +143,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     private JPanel getFolderChooserPanel(final JTextField dir, final String title) {
         Button browseButton = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
-                clearMessagePanel();
+                clearMessage();
                 selectFolder(dir, title);
             }
         });
@@ -153,7 +171,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
         Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                clearMessagePanel();
+                clearMessage();
                 doNewInput(presenter);
             }
         });
@@ -161,7 +179,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
         Button remove = new RemoveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                clearMessagePanel();
+                clearMessage();
                 doRemove();
             }
         });
@@ -170,7 +188,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         Button edit = new EditButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    clearMessagePanel();
+                    clearMessage();
                     doEditInput(presenter);
                 } catch (EmfException ex) {
                     messagePanel.setError(ex.getMessage());
@@ -181,7 +199,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
         Button view = new ViewButton("View Dataset", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                clearMessagePanel();
+                doDisplayInputDatasetsPropertiesViewer();
             }
         });
         container.add(view);
@@ -190,7 +208,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         showAll.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 // doRefresh(showAll);
-                clearMessagePanel();
+                clearMessage();
             }
         });
         showAll.setEnabled(false);
@@ -240,10 +258,57 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
         for (Iterator iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = (CaseInput) iter.next();
-            EditCaseInputView inputEditor = new EditCaseInputWindow(input.getName() 
-                    + "(" + input.getRecordID() + ")(" + caseObj.getName() + ")", desktopManager);
+            EditCaseInputView inputEditor = new EditCaseInputWindow(input.getName() + "(" + input.getRecordID() + ")("
+                    + caseObj.getName() + ")", desktopManager);
             presenter.doEditInput(input, inputEditor);
         }
+    }
+
+    private void doDisplayInputDatasetsPropertiesViewer() {
+
+        List datasets = updateSelectedDatasets(getSelectedDatasets());
+        if (datasets.isEmpty()) {
+            messagePanel.setMessage("Please select one or more Datasets");
+            return;
+        }
+        for (Iterator iter = datasets.iterator(); iter.hasNext();) {
+            DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
+            EmfDataset dataset = (EmfDataset) iter.next();
+            presenter.doDisplayPropertiesView(view, dataset);
+        }
+    }
+
+    private List getSelectedDatasets() {
+        List list = selectModel.selected();
+        List datasetList = new ArrayList();
+
+        for (int i = 0; i < list.size(); i++) {
+            EmfDataset dataset = ((CaseInput) list.get(i)).getDataset();
+            if (dataset != null)
+                datasetList.add(dataset);
+        }
+
+        return datasetList;
+    }
+
+    private List updateSelectedDatasets(List selectedDatasets) {
+        // FIXME: update only datasets that user selected
+        List updatedDatasets = new ArrayList();
+        try {
+            EmfDataset[] updatedAllDatasets1 = session.dataService().getDatasets();
+            for (int i = 0; i < selectedDatasets.size(); i++) {
+                EmfDataset selDataset = (EmfDataset) selectedDatasets.get(i);
+                for (int j = 0; j < updatedAllDatasets1.length; j++) {
+                    if (selDataset.getId() == updatedAllDatasets1[j].getId()) {
+                        updatedDatasets.add(updatedAllDatasets1[j]);
+                        break;
+                    }
+                }
+            }
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+        return updatedDatasets;
     }
 
     public void addInput(CaseInput note) {
@@ -254,12 +319,12 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         tablePanel.add(createSortFilterPanel(parentConsole));
     }
 
-    private void clearMessagePanel() {
-        messagePanel.clear();
-    }
-    
     public CaseInput[] caseInputs() {
         return tableData.sources();
+    }
+
+    public void saveCaseInputFileDir() {
+        caseObj.setInputFileDir(inputDir.getText());
     }
 
     public void refresh() {
@@ -272,6 +337,10 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     public int numberOfRecord() {
         return tableData.sources().length;
+    }
+
+    public void clearMessage() {
+        messagePanel.clear();
     }
 
 }

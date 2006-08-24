@@ -19,7 +19,7 @@ public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
     }
 
     public void doSave() {
-        //
+        view.saveCaseOutputFileDir();
     }
 
 }

@@ -7,5 +7,7 @@ public interface EditOutputsTabView {
     void display(Case caseObj, EditOutputsTabPresenter presenter);
 
     void refresh();
+    
+    void saveCaseOutputFileDir();
 
 }

@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.meta.PropertiesView;
+import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
@@ -8,6 +10,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.Program;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import javax.swing.JComponent;
 
@@ -26,12 +29,14 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     }
 
     public void display() {
-        view.display(caseObj, this);
+        view.display(session, caseObj, this);
     }
 
     public void doSave() {
+        view.saveCaseInputFileDir();
         CaseInput[] inputs = view.caseInputs();
         caseObj.setCaseInputs(inputs);
+        view.refresh();
     }
 
     public void doAddInput(NewInputView dialog) {
@@ -39,11 +44,13 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         dialog.display(caseObj);
         if (dialog.shouldCreate())
             view.addInput(dialog.input());
+        view.refresh();
     }
 
     public void doEditInput(CaseInput input, EditCaseInputView inputEditor) throws EmfException {
         EditInputPresenter editInputPresenter = new EditCaseInputPresenterImpl(inputEditor, view, session);
         editInputPresenter.display(input);
+        view.refresh();
     }
 
     public void doAddInputFields(JComponent container, InputFieldsPanelView inputFields) throws EmfException {
@@ -93,6 +100,13 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
     private CaseService caseService() {
         return this.session.caseService();
+    }
+
+    public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) {
+        view.clearMessage();
+
+        PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
+        presenter.doDisplay(propertiesView);
     }
 
 }

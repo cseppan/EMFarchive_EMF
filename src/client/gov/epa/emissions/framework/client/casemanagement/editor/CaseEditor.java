@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
@@ -14,6 +15,7 @@ import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.ErrorPanel;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -182,19 +184,43 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
             return;
         }
         
+        if (!checkToWriteStartMessage()) {
+            messagePanel.setMessage("There were no datasets to export");
+            return;
+        }
+        
         presenter.doExport(session.user(), exportDir, "To export input datasets", true, caseObj);
         
         messagePanel.setMessage("Started export. Please monitor the Status window " + "to track your Export request.");
     }
 
     private boolean checkDatasets() {
-        CaseInput[] inputs = caseObj.getCaseInputs();
+        CaseInput[] inputs = getInputs();
         
         for (int i = 0; i < inputs.length; i++)
             if (inputs[i].isRequired() && inputs[i].getDataset() == null)
                 return false;
         
         return true;
+    }
+    
+    private boolean checkToWriteStartMessage() {
+        CaseInput[] inputs = getInputs();
+        int count = 0;
+        
+        for (int i = 0; i < inputs.length; i++) {
+            DatasetType type = inputs[i].getDatasetType();
+            EmfDataset dataset = inputs[i].getDataset();
+            if (type != null && dataset != null  && type.getName().indexOf("External") < 0)
+                count++;
+        }
+        
+        return count > 0;
+    }
+
+    private CaseInput[] getInputs() {
+        CaseInput[] inputs = caseObj.getCaseInputs();
+        return inputs;
     }
 
     public void observe(CaseEditorPresenter presenter) {

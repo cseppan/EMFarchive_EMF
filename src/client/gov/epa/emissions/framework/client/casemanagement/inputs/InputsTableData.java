@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
-import gov.epa.emissions.framework.ui.AbstractTableData;
+import gov.epa.emissions.framework.ui.ChangeableTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class InputsTableData extends AbstractTableData {
+public class InputsTableData extends ChangeableTableData {
 
     private List rows;
 
     private CaseInput[] values;
+    
+    private boolean changes = false;
 
     public InputsTableData(CaseInput[] values) {
         this.values = values;
@@ -34,6 +36,7 @@ public class InputsTableData extends AbstractTableData {
     }
 
     public void add(CaseInput input) {
+        this.changes = true;
         rows.add(row(input));
     }
 
@@ -59,6 +62,9 @@ public class InputsTableData extends AbstractTableData {
     }
     
     public void remove(CaseInput[] inputs) {
+        if (inputs.length > 0)
+            this.changes = true;
+        
         for (int i = 0; i < inputs.length; i++)
             remove(inputs[i]);
     }
@@ -75,6 +81,9 @@ public class InputsTableData extends AbstractTableData {
     }
     
     public void refresh() {
+        if (hasChanges())
+            super.notifyChanges();
+        
         this.rows = createRows(sources());
     }
 
@@ -92,6 +101,10 @@ public class InputsTableData extends AbstractTableData {
         }
 
         return sources;
+    }
+    
+    public boolean hasChanges() {
+        return this.changes;
     }
 
 }

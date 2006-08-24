@@ -251,12 +251,11 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     private void updateVersion() throws EmfException {
         EmfDataset ds = (EmfDataset) dataset.getSelectedItem();
         Version ver = (Version) version.getSelectedItem();
-        String type = ds.getDatasetType().getName();
         
-        
-        if (ds == null)
+        if (ds == null || ds.getName() == null)
             return;
-
+        
+        String type = ds.getDatasetType().getName();
         if (ds.getName() != null && ver == null && type.indexOf("External") < 0)
             throw new EmfException("Please select a dataset version.");
 

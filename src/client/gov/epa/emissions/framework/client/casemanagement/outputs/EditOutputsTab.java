@@ -35,7 +35,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
 
     private EditOutputsTabPresenter presenter;
 
-    Case caseObj;
+    private Case caseObj;
 
     private OutputsTableData tableData;
 
@@ -186,6 +186,10 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
 
     public void refresh() {
         doRefresh(tableData.sources());
+    }
+
+    public void saveCaseOutputFileDir() {
+        caseObj.setOutputFileDir(outputDir.getText());
     }
 
 }
