@@ -178,7 +178,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         }
         
         if (!checkDatasets()) {
-            messagePanel.setMessage("Please select input datasets before exporting the case");
+            messagePanel.setMessage("Please select input datasets for the required case inputs.");
             return;
         }
         
@@ -191,7 +191,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         CaseInput[] inputs = caseObj.getCaseInputs();
         
         for (int i = 0; i < inputs.length; i++)
-            if (inputs[i].getDatasetType() == null || inputs[i].getDataset() == null)
+            if (inputs[i].isRequired() && inputs[i].getDataset() == null)
                 return false;
         
         return true;

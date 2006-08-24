@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.exim.ExportService;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -301,6 +302,9 @@ public class CaseServiceImpl implements CaseService {
         EmfDataset[] datasets = getInputDatasets(caseToExport);
         Version[] versions = getInputDatasetVersions(caseToExport);
         String[] subdirs = getSubdirs(caseToExport);
+        
+        if (datasets.length == 0)
+            return;
 
         for (int i = 0; i < datasets.length; i++) {
             String exportDir = dirName + System.getProperty("file.separator") + subdirs[i];
@@ -315,22 +319,24 @@ public class CaseServiceImpl implements CaseService {
 
     private Version[] getInputDatasetVersions(Case caseToExport) {
         CaseInput[] inputs = caseToExport.getCaseInputs();
-        Version[] versions = new Version[inputs.length];
+        List list = new ArrayList();
 
         for (int i = 0; i < inputs.length; i++)
-            versions[i] = inputs[i].getVersion();
-
-        return versions;
+            if (inputs[i].getDataset() != null)
+                list.add(inputs[i].getVersion());
+        
+        return (Version[])list.toArray(new Version[0]);
     }
 
     private EmfDataset[] getInputDatasets(Case caseToExport) {
         CaseInput[] inputs = caseToExport.getCaseInputs();
-        EmfDataset[] datasets = new EmfDataset[inputs.length];
+        List list = new ArrayList();
 
         for (int i = 0; i < inputs.length; i++)
-            datasets[i] = inputs[i].getDataset();
+            if (inputs[i].getDataset() != null)
+                list.add(inputs[i].getDataset());
 
-        return datasets;
+        return (EmfDataset[])list.toArray(new EmfDataset[0]);
     }
 
     private String[] getSubdirs(Case caseToExport) {

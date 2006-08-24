@@ -18,6 +18,9 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
@@ -102,8 +105,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         dsType.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Dataset Type:", dsType, panel);
 
-        DatasetType type = (DatasetType) dsType.getSelectedItem();
-        dataset = new ComboBox(presenter.getDatasets(type));
+        dataset = new ComboBox();
         dataset.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 fillVersions((EmfDataset) dataset.getSelectedItem());
@@ -114,8 +116,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         dataset.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Dataset:", dataset, panel);
 
-        EmfDataset selected = (EmfDataset) dataset.getSelectedItem();
-        version = new ComboBox(presenter.getVersions(selected));
+        version = new ComboBox();
         version.setEnabled(false);
         changeablesList.addChangeable(version);
         version.setPrototypeDisplayValue(width);
@@ -155,9 +156,9 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             sector.setSelectedItem(presenter.getSectors()[0]);
 
         envtVar.setSelectedItem(input.getEnvtVars());
+        dsType.setSelectedItem(input.getDatasetType());
         dataset.setSelectedItem(input.getDataset());
         version.setSelectedItem(input.getVersion());
-        dsType.setSelectedItem(input.getDatasetType());
         qaStatus.setText("");
         subDir.setText(input.getSubdir());
         required.setSelected(input.isRequired());
@@ -165,12 +166,16 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     }
 
     private void fillDatasets(DatasetType type) {
-        dataset.setEnabled(true);
         try {
-            EmfDataset[] datasets = presenter.getDatasets(type);
+            List list = new ArrayList();
+            list.add(new EmfDataset());
+            list.addAll(Arrays.asList(presenter.getDatasets(type)));
+            EmfDataset[] datasets = (EmfDataset[])list.toArray(new EmfDataset[0]);
+            
             dataset.removeAllItems();
             dataset.setModel(new DefaultComboBoxModel(datasets));
             dataset.revalidate();
+            dataset.setEnabled(true);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -194,7 +199,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         updateEnvtVar();
         updateSector();
         input.setDatasetType((DatasetType) dsType.getSelectedItem());
-        input.setDataset((EmfDataset) dataset.getSelectedItem());
+        updateDataset();
         updateVersion();
         input.setSubdir(subDir.getText());
         input.setRequired(required.isSelected());
@@ -237,11 +242,22 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         input.setSector(selected);
     }
 
+    private void updateDataset() {
+        EmfDataset selected = (EmfDataset) dataset.getSelectedItem();
+        if (selected != null && selected.getName() != null)
+            input.setDataset(selected);
+    }
+
     private void updateVersion() throws EmfException {
         EmfDataset ds = (EmfDataset) dataset.getSelectedItem();
         Version ver = (Version) version.getSelectedItem();
+        String type = ds.getDatasetType().getName();
+        
+        
+        if (ds == null)
+            return;
 
-        if (ds != null && ver == null)
+        if (ds.getName() != null && ver == null && type.indexOf("External") < 0)
             throw new EmfException("Please select a dataset version.");
 
         input.setVersion(ver);
