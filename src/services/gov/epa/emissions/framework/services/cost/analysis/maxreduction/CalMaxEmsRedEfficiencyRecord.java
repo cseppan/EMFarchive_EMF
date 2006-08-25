@@ -30,7 +30,7 @@ public class CalMaxEmsRedEfficiencyRecord {
         map.put(record, measure);
     }
 
-    public MaxEmsRedContorlMeasure maxEmsReductionMeasure() {
+    public MaxEmsRedContorlMeasure maxEmsReductionMeasure() throws EmfException {
         if (map.size() == 0)
             return null;// FIXME: do we have to warn or error
 
@@ -43,12 +43,12 @@ public class CalMaxEmsRedEfficiencyRecord {
         }
 
         ControlMeasure controlMeasure = (ControlMeasure) map.get(maxRecord);
-        MaxEmsRedContorlMeasure maxMeasure = new MaxEmsRedContorlMeasure(controlMeasure,maxRecord,costYearTable);
+        MaxEmsRedContorlMeasure maxMeasure = new MaxEmsRedContorlMeasure(controlMeasure, maxRecord, costYearTable);
         return maxMeasure;
 
     }
 
-    private EfficiencyRecord findMax(EfficiencyRecord record, EfficiencyRecord maxRecord) {
+    private EfficiencyRecord findMax(EfficiencyRecord record, EfficiencyRecord maxRecord) throws EmfException {
         double diff = efficiencyRecordUtil.effectionReduction(record)
                 - efficiencyRecordUtil.effectionReduction(maxRecord);
         if (diff > tollerance) {
@@ -61,19 +61,9 @@ public class CalMaxEmsRedEfficiencyRecord {
     }
 
     // FIXME: for both record cost cannot be calculated
-    private EfficiencyRecord compareCost(EfficiencyRecord record, EfficiencyRecord maxRecord) {
-        double cost = 0;
-        try {
-            cost = efficiencyRecordUtil.cost(record, costYearTable);
-        } catch (EmfException e) {
-            cost = Double.MAX_VALUE;
-        }
-        double maxCost;
-        try {
-            maxCost = efficiencyRecordUtil.cost(maxRecord, costYearTable);
-        } catch (EmfException e) {
-            maxCost = Double.MAX_VALUE;
-        }
+    private EfficiencyRecord compareCost(EfficiencyRecord record, EfficiencyRecord maxRecord) throws EmfException {
+        double cost = efficiencyRecordUtil.cost(record, costYearTable);
+        double maxCost = efficiencyRecordUtil.cost(maxRecord, costYearTable);
 
         double diff = cost - maxCost;
 

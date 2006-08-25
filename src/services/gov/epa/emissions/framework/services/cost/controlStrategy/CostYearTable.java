@@ -41,7 +41,7 @@ public class CostYearTable {
     private double gdpValue(int year) throws EmfException {
         int index = year - startYear;
         if (index > size()-1) {
-            throw new EmfException("Could not find cost year conversion factor for year " + year);
+            throw new EmfException("The cost year conversion is available between 1929 to 2005");
         }
         return list.get(index);
     }

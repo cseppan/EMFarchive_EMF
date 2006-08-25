@@ -54,16 +54,17 @@ public class StrategyLoader {
         try {
             while (optimizedQuery.execute()) {
                 ResultSet resultSet = optimizedQuery.getResultSet();
-                doBatchInsert(resultSet, optimizedQuery);
+                doBatchInsert(resultSet);
             }
         } finally {
+            modifier.finish();
             modifier.close();
         }
         result.setTotalCost(totalCost);
         result.setTotalReduction(totalReduction);
     }
 
-    private void doBatchInsert(ResultSet resultSet, OptimizedQuery optimizedQuery) throws SQLException, Exception {
+    private void doBatchInsert(ResultSet resultSet) throws SQLException, Exception {
         int sourceCount = 0;
         try {
             while (resultSet.next()) {
@@ -75,7 +76,7 @@ public class StrategyLoader {
                 if (maxCM == null)
                     continue; // LOG???
                 try {
-                    NewRecordGenerator generator = new NewRecordGenerator(result);
+                    RecordGenerator generator = new RecordGenerator(result);
                     Record record = generator.getRecord(resultSet, maxCM);
                     totalCost += maxCM.cost();
                     totalReduction += generator.reducedEmission();
