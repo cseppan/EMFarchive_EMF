@@ -37,6 +37,7 @@ public class NewCasePresenter {
         if (isDuplicate(newCase))
             throw new EmfException("A Case named '" + newCase.getName() + "' already exists.");
 
+        newCase.setCreator(session.user());
         newCase.setLastModifiedBy(session.user());
         newCase.setLastModifiedDate(new Date());
         

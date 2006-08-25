@@ -56,9 +56,12 @@ public class CaseEditorPresenterTest extends EmfMockObjectTestCase {
         Case caseObj = new Case("name");
         expects(service, 1, "updateCase", same(caseObj));
         stub(service, "getCases", new Case[0]);
+        
+        Mock user = mock(User.class);
 
         Mock session = mock(EmfSession.class);
         stub(session, "caseService", service.proxy());
+        stub(session, "user", user.proxy());
 
         Mock managerPresenter = mock(CaseManagerPresenter.class);
         expects(managerPresenter, 1, "doRefresh");

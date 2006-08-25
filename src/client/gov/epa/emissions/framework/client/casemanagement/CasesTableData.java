@@ -141,7 +141,7 @@ public class CasesTableData extends AbstractTableData {
     }
 
     private String creator(Case element) {
-        return element.getLastModifiedBy() != null ? element.getLastModifiedBy().getName() : "";
+        return element.getCreator() != null ? element.getCreator().getName() : "";
     }
 
 }

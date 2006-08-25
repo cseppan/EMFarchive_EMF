@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -68,6 +69,8 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
             throw new EmfException("Duplicate name - '" + caseObj.getName() + "'.");
         
         saveTabs();
+        caseObj.setLastModifiedBy(session.user());
+        caseObj.setLastModifiedDate(new Date());
         service().updateCase(caseObj);
         managerPresenter.doRefresh();
     }

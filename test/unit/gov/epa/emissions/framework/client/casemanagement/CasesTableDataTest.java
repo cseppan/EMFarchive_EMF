@@ -40,6 +40,7 @@ public class CasesTableDataTest extends TestCase {
         case1.setProject(new Project("projec1"));
         User user1 = new User();
         user1.setName("user1");
+        case1.setCreator(user1);
         case1.setLastModifiedBy(user1);
         case1.setAbbreviation(new Abbreviation("abb1"));
         case1.setAirQualityModel(new AirQualityModel("aqm1"));
@@ -63,6 +64,7 @@ public class CasesTableDataTest extends TestCase {
         case2.setProject(new Project("projec1"));
         User user2 = new User();
         user2.setName("user2");
+        case2.setCreator(user2);
         case2.setLastModifiedBy(user2);
         case2.setAbbreviation(new Abbreviation("abb2"));
         case2.setAirQualityModel(new AirQualityModel("aqm2"));
