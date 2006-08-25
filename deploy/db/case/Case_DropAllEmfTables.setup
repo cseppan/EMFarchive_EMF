@@ -13,4 +13,4 @@ DROP TABLE cases.programs CASCADE;
 DROP TABLE cases.inputnames CASCADE;
 DROP TABLE cases.input_envt_vars CASCADE;
 DROP TABLE cases.cases_caseinputs CASCADE;
-
+DROP TABLE cases.model_to_runs CASCADE;

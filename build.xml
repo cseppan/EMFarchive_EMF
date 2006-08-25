@@ -219,10 +219,10 @@
 
 	<!-- DEFAULT target-->
 	<target name="nirvana" description="Runs ALL (except UAT AND Webservices) tests" depends="clean, init, all-dev-tests" />
-	
+
 	<!-- Runs Integration & Persistance Test !-->
 	<target name="Integration AND Persistane Tests" description="runs Intergration AND Persistance Test" depends="clean, init, integration-tests, persistence-tests" />
-	
+
 	<target name="moksha" description="Deploys application to Tomcat, runs ALL tests, and stops Tomcat">
 		<antcall target="run-webservice-tests">
 			<param name="tests-target" value="all-tests" />
@@ -310,11 +310,10 @@
 		<jar jarfile="${build.home}/${app.name}-client.jar" basedir="${build.classes.dir}">
 			<include name="**/*" />
 		</jar>
-		
+
 	</target>
 
-	<target name="client-installer-dist" depends="clean, init, compile-client, client-env, client-dist-sandbox, commons-dist" 
-		description="Builds the EMF Client installer distribution files excluding dependent jar file">
+	<target name="client-installer-dist" depends="clean, init, compile-client, client-env, client-dist-sandbox, commons-dist" description="Builds the EMF Client installer distribution files excluding dependent jar file">
 		<jar jarfile="${client.dist.dir}/${app.name}-client.jar">
 			<fileset dir="${build.classes.dir}" includes="**/*" />
 			<fileset dir="." includes="${scc.ref.dir}/scc.txt" />
@@ -322,18 +321,17 @@
 
 		<jar jarfile="${client.dist.dir}/emf-client-installer.jar">
 			<fileset dir="${build.classes.dir}" includes="gov/epa/emissions/framework/install/installer/*" />
-			
-            <manifest>
-                <attribute name="Main-Class"
-                    value="gov.epa.emissions.framework.install.installer.EMFClient" />
-            </manifest>
+
+			<manifest>
+				<attribute name="Main-Class" value="gov.epa.emissions.framework.install.installer.EMFClient" />
+			</manifest>
 		</jar>
-		
+
 		<ant dir="${commons.basedir}" target="do-dist" inheritall="false" />
 		<copy tofile="${client.dist.dir}/epa-commons.jar">
 			<fileset dir="${commons.basedir}/build/sandbox" includes="*.jar" />
 		</copy>
-		
+
 		<java classname="gov.epa.emissions.framework.install.installer.CreateDownloadFilesList" fork="true" failonerror="true">
 			<classpath>
 				<pathelement location="${client.jar}" />
@@ -399,14 +397,51 @@
 			<arg line="${tomcat.start}" />
 		</exec>
 	</target>
+
 	<target name="tomcat-stop">
 		<exec executable="${jdk.home}/bin/java.exe" dir="${build.home}" output="${build.home}/tomcat-stop.txt" error="${build.home}/tomcat-stop-error.txt" failonerror="false">
 			<arg line="${tomcat.stop}" />
 		</exec>
+		<echo>
+		</echo>
 		<echo message="Tomcat stopped." />
 	</target>
 
 	<!--  ===============END  Tomcat Deployment Targets ====================================== -->
+
+	<!--  ===============START DB setup scripts =============== -->
+	<target name="app-schema-setup">
+		<antcall target="schema-setup">
+			<param name="db.name" value="${appDatabase.name}"/>
+		</antcall>	
+	</target>	
+	
+	<target name="test-schema-setup">
+			<antcall target="schema-setup">
+				<param name="db.name" value="${testDatabase.name}"/>
+			</antcall>	
+		</target>	
+	
+	<target name="schema-setup" depends="data-schema-setup,cost-schema-setup,case-schema-setup"/>
+	
+	<target name="data-schema-setup">
+		<exec executable="psql.exe" error="${build.home}/db-setup-error.txt" failonerror="yes">
+			<arg line="-d ${db.name} -U emf -f deploy/db/data/Data.setup" />
+		</exec>
+	</target>
+	
+	<target name="cost-schema-setup">
+		<exec executable="psql.exe" error="${build.home}/db-setup-error.txt" failonerror="yes">
+			<arg line="-d ${db.name} -U emf -f deploy/db/cost/Cost.setup" />
+		</exec>
+	</target>
+
+	<target name="case-schema-setup">
+		<exec executable="psql.exe" error="${build.home}/db-setup-error.txt" failonerror="yes">
+			<arg line="-d ${db.name} -U emf -f deploy/db/case/Case.setup" />
+		</exec>
+	</target>
+	<!--  ===============END DB setup scripts =============== -->
 
 	<!--  ===============START  Coverage Targets =============================== -->
 	<path id="cobertura.classpath">
@@ -498,7 +533,7 @@
 	<property name="url" value="http://localhost:8080/emf/services" />
 	<property name="format_pref" location="sort_filter_selection_panel_format_pref.txt" />
 	<target name="launch-EMF">
-		<java classname="gov.epa.emissions.framework.client.EMFClient" classpathref="classpath" fork="true" failonerror="true" >
+		<java classname="gov.epa.emissions.framework.client.EMFClient" classpathref="classpath" fork="true" failonerror="true">
 			<jvmarg value="-DUSER_PREFERENCES=${format_pref}" />
 			<arg line="${url}" />
 

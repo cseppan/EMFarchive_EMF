@@ -1,0 +1,3 @@
+\i deploy/db/data/Data_DropAllEMFTables.setup
+\i deploy/db/data/Data_CreateEMFTables.setup
+\i deploy/db/data/Data_PopulateEmfDataTables.setup
