@@ -26,14 +26,8 @@ public class MaxEmsRedContorlMeasure {
         return controlMeasure;
     }
 
-    public double cost() {
-        double factor = 0;
-        try {
-            efficiencyRecordUtil.cost(maxRecord, table);
-        } catch (EmfException e) {
-            factor = Double.MAX_VALUE;
-        }
-        return factor * maxRecord.getCostPerTon();
+    public double cost() throws EmfException {
+        return efficiencyRecordUtil.cost(maxRecord, table) * maxRecord.getCostPerTon();
     }
 
     public double effectiveReduction() {
@@ -51,8 +45,8 @@ public class MaxEmsRedContorlMeasure {
     public double rulePenetration() {
         return maxRecord.getRulePenetration();
     }
-    
-    public double ruleEffectiveness(){
+
+    public double ruleEffectiveness() {
         return maxRecord.getRuleEffectiveness();
     }
 }

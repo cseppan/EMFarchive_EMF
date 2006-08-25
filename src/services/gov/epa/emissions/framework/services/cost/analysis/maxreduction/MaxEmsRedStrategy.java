@@ -79,7 +79,6 @@ public class MaxEmsRedStrategy implements Strategy {
             close(optimizedQuery);
             result.setCompletionTime(new Date());
         }
-        // update strateg result status
         controlStrategy.setStrategyResults(new StrategyResult[] { result });
     }
 

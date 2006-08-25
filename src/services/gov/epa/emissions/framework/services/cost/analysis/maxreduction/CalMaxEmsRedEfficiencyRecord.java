@@ -60,7 +60,6 @@ public class CalMaxEmsRedEfficiencyRecord {
         return compareCost(record, maxRecord);
     }
 
-    // FIXME: for both record cost cannot be calculated
     private EfficiencyRecord compareCost(EfficiencyRecord record, EfficiencyRecord maxRecord) throws EmfException {
         double cost = efficiencyRecordUtil.cost(record, costYearTable);
         double maxCost = efficiencyRecordUtil.cost(maxRecord, costYearTable);

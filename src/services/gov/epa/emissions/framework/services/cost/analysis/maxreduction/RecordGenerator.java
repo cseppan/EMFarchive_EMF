@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.analysis.maxreduction;
 
 import gov.epa.emissions.commons.Record;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 
 import java.sql.ResultSet;
@@ -21,14 +22,14 @@ public class RecordGenerator {
         comment = "";
     }
 
-    public Record getRecord(ResultSet resultSet, MaxEmsRedContorlMeasure maxCM) throws SQLException {
+    public Record getRecord(ResultSet resultSet, MaxEmsRedContorlMeasure maxCM) throws SQLException, EmfException {
         Record record = new Record();
         record.add(tokens(resultSet, maxCM));
 
         return record;
     }
 
-    private List tokens(ResultSet resultSet, MaxEmsRedContorlMeasure maxCM) throws SQLException {
+    private List tokens(ResultSet resultSet, MaxEmsRedContorlMeasure maxCM) throws SQLException, EmfException {
         List tokens = new ArrayList();
 
         tokens.add(""); // record id
@@ -67,7 +68,7 @@ public class RecordGenerator {
         double invenRuleEffectiveness = resultSet.getFloat("REFF");
         double originalEmissions = resultSet.getFloat("ANN_EMIS");
 
-        double invenEffectiveReduction = invenControlEfficiency * invenRulePenetration * invenRuleEffectiveness;
+        double invenEffectiveReduction = invenControlEfficiency * invenRulePenetration * invenRuleEffectiveness/(100*100*100); 
         double effectiveReduction = maxMeasure.effectiveReduction();
 
         reducedEmission = 0.0;
