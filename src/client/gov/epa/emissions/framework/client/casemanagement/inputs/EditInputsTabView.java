@@ -22,5 +22,7 @@ public interface EditInputsTabView {
     int numberOfRecord();
 
     void clearMessage();
+    
+    void notifychanges();
 
 }

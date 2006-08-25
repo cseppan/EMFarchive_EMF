@@ -14,5 +14,7 @@ public interface CaseManagerPresenter {
     void doClose();
 
     void doNew(NewCaseView view);
+    
+    void doSaveCopiedCase(Case newCase) throws EmfException;
 
 }

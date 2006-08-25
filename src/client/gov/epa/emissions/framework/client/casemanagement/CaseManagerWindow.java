@@ -6,8 +6,10 @@ import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
+import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditor;
@@ -41,6 +43,8 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private SortFilterSelectModel selectModel;
 
     private EmfTableModel model;
+    
+    private CasesTableData tableData;
 
     private JPanel layout;
 
@@ -81,7 +85,8 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     }
 
     private void doLayout(Case[] cases) {
-        model = new EmfTableModel(new CasesTableData(cases));
+        tableData = new CasesTableData(cases);
+        model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
         SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
 
@@ -159,6 +164,14 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         });
         crudPanel.add(removeButton);
 
+        Button copyButton = new CopyButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                clearMsgPanel();
+                copySelectedCases();
+            }
+        });
+        crudPanel.add(copyButton);
+
         return crudPanel;
     }
 
@@ -233,6 +246,28 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
                 showError("Could not remove " + element + "." + e.getMessage());
             }
         }
+    }
+    
+    private void copySelectedCases() {
+        cases = selected();
+        if (cases.isEmpty()) {
+            messagePanel.setMessage("Please select one or more Cases");
+            return;
+        }
+        
+        for (Iterator iter = selected().iterator(); iter.hasNext();) {
+            Case element = (Case) iter.next();
+            
+            try {
+                Case coppied = (Case)DeepCopy.copy(element);
+                coppied.setName("Copy of " + element.getName());
+                presenter.doSaveCopiedCase(coppied);
+                doRefresh();
+            } catch (Exception e) {
+                showError("Could not copy " + element + ". " + e.getMessage());
+            }
+        }
+        
     }
 
     private void showError(String message) {

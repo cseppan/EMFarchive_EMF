@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 public class CasesTableData extends AbstractTableData {
@@ -39,16 +40,43 @@ public class CasesTableData extends AbstractTableData {
     public boolean isEditable(int col) {
         return true;
     }
+    
+    public void add(Case caseObj) {
+        rows.add(row(caseObj));
+    }
+    
+    private Row row(Case caseObj) {
+        return new ViewableRow(caseObj, rowValues(caseObj));
+    }
+
 
     private List createRows(Case[] types) {
         List rows = new ArrayList();
 
-        for (int i = 0; i < types.length; i++) {
-            Row row = new ViewableRow(types[i], rowValues(types[i]));
-            rows.add(row);
-        }
+        for (int i = 0; i < types.length; i++) 
+            rows.add(row(types[i]));
 
         return rows;
+    }
+    
+    public void refresh() {
+        this.rows = createRows(sources());
+    }
+    
+    public Case[] sources() {
+        List sources = sourcesList();
+        return (Case[]) sources.toArray(new Case[0]);
+    }
+
+    private List sourcesList() {
+        List sources = new ArrayList();
+        
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            ViewableRow row = (ViewableRow) iter.next();
+            sources.add(row.source());
+        }
+
+        return sources;
     }
 
     private Object[] rowValues(Case element) {

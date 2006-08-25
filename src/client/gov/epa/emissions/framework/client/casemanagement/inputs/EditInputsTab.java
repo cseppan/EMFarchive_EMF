@@ -245,7 +245,13 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         if (selection == JOptionPane.YES_OPTION) {
             tableData.remove((CaseInput[]) inputs.toArray(new CaseInput[0]));
             refresh();
+            notifychanges();
         }
+    }
+
+    public void notifychanges() {
+        tableData.setChanges(true);
+        tableData.notifyChanges();
     }
 
     private void doEditInput(EditInputsTabPresenter presenter) throws EmfException {
@@ -255,11 +261,12 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
             messagePanel.setMessage("Please select an input item.");
             return;
         }
+        
 
         for (Iterator iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = (CaseInput) iter.next();
             EditCaseInputView inputEditor = new EditCaseInputWindow(input.getName() + "(" + input.getRecordID() + ")("
-                    + caseObj.getName() + ")", desktopManager);
+                    + caseObj.getName() + ")", this, desktopManager);
             presenter.doEditInput(input, inputEditor);
         }
     }

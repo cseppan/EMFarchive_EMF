@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
-public class ModelToRun {
+import java.io.Serializable;
+
+public class ModelToRun implements Serializable {
     private int id;
 
     private String name;

@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
-public class AirQualityModel implements Comparable {
+import java.io.Serializable;
+
+public class AirQualityModel implements Comparable, Serializable {
 
     private int id;
 

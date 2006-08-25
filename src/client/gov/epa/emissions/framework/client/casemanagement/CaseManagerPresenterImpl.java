@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
+import java.util.Date;
+
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenterImpl;
@@ -44,6 +46,27 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
     public void doNew(NewCaseView view) {
         NewCasePresenter presenter = new NewCasePresenter(session, view, this);
         presenter.doDisplay();
+    }
+
+    public void doSaveCopiedCase(Case newCase) throws EmfException {
+        if (isDuplicate(newCase))
+            throw new EmfException("A Case named '" + newCase.getName() + "' already exists.");
+
+        newCase.setLastModifiedBy(session.user());
+        newCase.setLastModifiedDate(new Date());
+
+        service().addCase(newCase);
+        doRefresh();
+    }
+    
+    private boolean isDuplicate(Case newCase) throws EmfException {
+        Case[] cases = service().getCases();
+        for (int i = 0; i < cases.length; i++) {
+            if (cases[i].getName().equals(newCase.getName()))
+                return true;
+        }
+
+        return false;
     }
 
     public void doEdit(CaseEditorView caseView, Case caseObj) throws EmfException {

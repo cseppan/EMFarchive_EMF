@@ -7,12 +7,13 @@ import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class Case implements Comparable, Lockable {
+public class Case implements Comparable, Lockable, Serializable {
 
     private int id;
 

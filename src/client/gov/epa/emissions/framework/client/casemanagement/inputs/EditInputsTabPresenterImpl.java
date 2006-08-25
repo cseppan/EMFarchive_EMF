@@ -44,13 +44,17 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         dialog.display(caseObj);
         if (dialog.shouldCreate())
             view.addInput(dialog.input());
+        refreshView();
+    }
+
+    private void refreshView() {
         view.refresh();
+        view.notifychanges();
     }
 
     public void doEditInput(CaseInput input, EditCaseInputView inputEditor) throws EmfException {
         EditInputPresenter editInputPresenter = new EditCaseInputPresenterImpl(inputEditor, view, session);
         editInputPresenter.display(input);
-        view.refresh();
     }
 
     public void doAddInputFields(JComponent container, InputFieldsPanelView inputFields) throws EmfException {

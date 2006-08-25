@@ -38,6 +38,7 @@ public class InputsTableData extends ChangeableTableData {
     public void add(CaseInput input) {
         this.changes = true;
         rows.add(row(input));
+        refresh();
     }
 
     private List createRows(CaseInput[] values) {
@@ -67,6 +68,8 @@ public class InputsTableData extends ChangeableTableData {
         
         for (int i = 0; i < inputs.length; i++)
             remove(inputs[i]);
+        
+        refresh();
     }
     
     private void remove(CaseInput input) {
@@ -80,11 +83,11 @@ public class InputsTableData extends ChangeableTableData {
         }
     }
     
-    public void refresh() {
-        if (hasChanges())
-            super.notifyChanges();
-        
+    private void refresh() {
         this.rows = createRows(sources());
+        
+        if (this.hasChanges())
+            notifyChanges();
     }
 
     public CaseInput[] sources() {
@@ -105,6 +108,10 @@ public class InputsTableData extends ChangeableTableData {
     
     public boolean hasChanges() {
         return this.changes;
+    }
+    
+    public void setChanges(boolean changes) {
+        this.changes = changes;
     }
 
 }
