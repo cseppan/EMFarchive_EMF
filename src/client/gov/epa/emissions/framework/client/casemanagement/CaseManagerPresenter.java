@@ -15,6 +15,6 @@ public interface CaseManagerPresenter {
 
     void doNew(NewCaseView view);
     
-    void doSaveCopiedCase(Case newCase) throws EmfException;
+    void doSaveCopiedCase(Case newCase, String templateused) throws EmfException;
 
 }

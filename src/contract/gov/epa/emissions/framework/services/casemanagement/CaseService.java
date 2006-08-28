@@ -46,6 +46,10 @@ public interface CaseService {
     InputName addCaseInputName(InputName name) throws EmfException;
 
     Program addProgram(Program program) throws EmfException;
+    
+    ModelToRun addModelToRun(ModelToRun model) throws EmfException;
+
+    GridResolution addGridResolution(GridResolution gridResolution) throws EmfException;
 
     InputEnvtVar addInputEnvtVar(InputEnvtVar inputEnvtVar) throws EmfException;
 

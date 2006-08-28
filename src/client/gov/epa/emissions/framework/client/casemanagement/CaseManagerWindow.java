@@ -261,7 +261,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             try {
                 Case coppied = (Case)DeepCopy.copy(element);
                 coppied.setName("Copy of " + element.getName());
-                presenter.doSaveCopiedCase(coppied);
+                presenter.doSaveCopiedCase(coppied, element.getName());
                 doRefresh();
             } catch (Exception e) {
                 showError("Could not copy " + element + ". " + e.getMessage());

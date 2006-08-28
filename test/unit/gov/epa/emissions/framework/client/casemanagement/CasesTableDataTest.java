@@ -79,7 +79,7 @@ public class CasesTableDataTest extends TestCase {
         assertEquals("Name", columns[0]);
         assertEquals("Project", columns[1]);
         assertEquals("Modeling Regn.", columns[2]);
-        assertEquals("Creator", columns[3]);
+        assertEquals("Last Modified By", columns[3]);
         assertEquals("Category", columns[4]);
         assertEquals("Run Status", columns[5]);
         assertEquals("Abbrev.", columns[6]);

@@ -24,6 +24,7 @@ import gov.epa.emissions.framework.client.data.Projects;
 import gov.epa.emissions.framework.client.data.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -61,6 +62,8 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EmfSession session;
 
+    private EditableComboBox modelToRunCombo;
+
     private EditableComboBox modRegionsCombo;
 
     private EditableComboBox controlRegionsCombo;
@@ -79,7 +82,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox speciationCombo;
     
-    private EditableComboBox gridResolution;
+    private EditableComboBox gridResolutionCombo;
+    
+    private TextField gridDescription;
 
     private CheckBox isFinal;
 
@@ -99,6 +104,8 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private Grids grids;
 
+    private ModelToRuns models;
+
     private MeteorlogicalYears meteorlogicalYears;
 
     private Speciations speciations;
@@ -107,7 +114,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private Regions controlRegions;
     
-    private String[] GridResolutions = { "TEST" };
+    private GridResolutions gridResolutions;
 
     private RunStatuses runStatuses;
 
@@ -219,13 +226,15 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
+        layoutGenerator.addLabelWidgetPair("Model to Run:", modelToRun(), panel);
         layoutGenerator.addLabelWidgetPair("Modeling Region:", modRegions(), panel);
         layoutGenerator.addLabelWidgetPair("Control Region:", controlRegions(), panel);
         layoutGenerator.addLabelWidgetPair("I/O API Grid Name:", grids(), panel);
         layoutGenerator.addLabelWidgetPair("Grid Resolution:", gridResolution(), panel);
+        layoutGenerator.addLabelWidgetPair("Grid Description:", gridDescription(), panel);
         layoutGenerator.addLabelWidgetPair("Start Date & Time:", startDate(), panel);
 
-        layoutGenerator.makeCompactGrid(panel, 5, 2, 10, 10, 10, 10);
+        layoutGenerator.makeCompactGrid(panel, 7, 2, 10, 10, 10, 10);
 
         return panel;
     }
@@ -283,6 +292,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private TextField template() {
         template = new TextField("Template", 20);
         template.setText(caseObj.getTemplateUsed());
+        template.setToolTipText(caseObj.getTemplateUsed());
         template.setEditable(false);
         template.setPreferredSize(defaultDimension);
 
@@ -315,6 +325,19 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return projectsCombo;
     }
 
+    private EditableComboBox modelToRun() throws EmfException {
+        models = new ModelToRuns(session, session.caseService().getModelToRuns());
+        modelToRunCombo = new EditableComboBox(models.getAll());
+        
+        ModelToRun model = caseObj.getModel();
+        modelToRunCombo.setSelectedItem(model);
+        modelToRunCombo.setPreferredSize(defaultDimension);
+        
+        changeablesList.addChangeable(modelToRunCombo);
+        
+        return modelToRunCombo;
+    }
+
     private EditableComboBox modRegions() throws EmfException {
         modRegions = new Regions(session.dataCommonsService().getRegions());
         modRegionsCombo = new EditableComboBox(modRegions.names());
@@ -328,12 +351,14 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return modRegionsCombo;
     }
     
-    private EditableComboBox gridResolution() {
-        gridResolution = new EditableComboBox(GridResolutions);
-        gridResolution.setPreferredSize(defaultDimension);
-        changeablesList.addChangeable(gridResolution);
+    private EditableComboBox gridResolution() throws EmfException {
+        gridResolutions = new GridResolutions(session, session.caseService().getGridResolutions());
+        gridResolutionCombo = new EditableComboBox(gridResolutions.getAll());
+        gridResolutionCombo.setSelectedItem(caseObj.getGridResolution());
+        gridResolutionCombo.setPreferredSize(defaultDimension);
+        changeablesList.addChangeable(gridResolutionCombo);
         
-        return gridResolution;
+        return gridResolutionCombo;
     }
 
     private EditableComboBox controlRegions() throws EmfException {
@@ -459,6 +484,15 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         return runStatusCombo;
     }
+    
+    private TextField gridDescription() {
+        gridDescription = new TextField("griddescription", 10);
+        gridDescription.setText(caseObj.getGridDescription());
+        changeablesList.addChangeable(gridDescription);
+
+        return gridDescription;
+    }
+
 
     private TextField startDate() {
         startDate = new TextField("Start Date", 10);
@@ -556,6 +590,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         saveStartDate();
         saveEndDate();
         caseObj.setSectors(sectorsWidget.getSectors());
+        caseObj.setModel(models.get(modelToRunCombo.getSelectedItem()));
+        caseObj.setGridDescription(gridDescription.getText());
+        caseObj.setGridResolution(gridResolutions.get(gridResolutionCombo.getSelectedItem()));
     }
 
     private void saveFutureYear() throws EmfException {

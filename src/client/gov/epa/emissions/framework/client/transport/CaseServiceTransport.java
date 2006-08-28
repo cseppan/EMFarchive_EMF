@@ -258,4 +258,24 @@ public class CaseServiceTransport implements CaseService {
         return (ModelToRun[])call.requestResponse(new Object[] {});
     }
 
+    public ModelToRun addModelToRun(ModelToRun model) throws EmfException {
+       EmfCall call = call();
+        
+        call.setOperation("addModelToRun");
+        call.addParam("model", caseMappings.modelToRun());
+        call.setReturnType(caseMappings.modelToRun());
+        
+        return (ModelToRun) call.requestResponse(new Object[] { model });
+    }
+
+    public GridResolution addGridResolution(GridResolution gridResolution) throws EmfException {
+       EmfCall call = call();
+        
+        call.setOperation("addGridResolution");
+        call.addParam("gridResolution", caseMappings.gridResolution());
+        call.setReturnType(caseMappings.gridResolution());
+        
+        return (GridResolution) call.requestResponse(new Object[] { gridResolution });
+    }
+
 }

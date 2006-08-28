@@ -395,4 +395,30 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
+    public ModelToRun addModelToRun(ModelToRun model) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(model, session);
+            return (ModelToRun) dao.load(ModelToRun.class, model.getName(), session);
+        } catch (Exception e) {
+            LOG.error("Could not add new ModelToRun '" + model.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new ModelToRun '" + model.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
+    public GridResolution addGridResolution(GridResolution gridResolution) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(gridResolution, session);
+            return (GridResolution) dao.load(GridResolution.class, gridResolution.getName(), session);
+        } catch (Exception e) {
+            LOG.error("Could not add new GridResolution '" + gridResolution.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new GridResolution '" + gridResolution.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
 }

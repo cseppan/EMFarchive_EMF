@@ -67,6 +67,10 @@ public class CaseDAO {
         addObject(object, session);
     }
 
+    public void add(ModelToRun object, Session session) {
+        addObject(object, session);
+    }
+
     public void add(Case object, Session session) {
         addObject(object, session);
     }

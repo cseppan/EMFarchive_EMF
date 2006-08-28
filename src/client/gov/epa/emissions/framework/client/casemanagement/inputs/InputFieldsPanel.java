@@ -168,7 +168,9 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     private void fillDatasets(DatasetType type) {
         try {
             List list = new ArrayList();
-            list.add(new EmfDataset());
+            EmfDataset blank = new EmfDataset();
+            blank.setName("Not selected");
+            list.add(blank);
             list.addAll(Arrays.asList(presenter.getDatasets(type)));
             EmfDataset[] datasets = (EmfDataset[])list.toArray(new EmfDataset[0]);
             
@@ -244,16 +246,22 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
     private void updateDataset() {
         EmfDataset selected = (EmfDataset) dataset.getSelectedItem();
-        if (selected != null && selected.getName() != null)
-            input.setDataset(selected);
+        if (selected != null && selected.getName().equalsIgnoreCase("Not selected")) {
+            input.setDataset(null);
+            return;
+        }
+        
+        input.setDataset(selected);
     }
 
     private void updateVersion() throws EmfException {
         EmfDataset ds = (EmfDataset) dataset.getSelectedItem();
         Version ver = (Version) version.getSelectedItem();
         
-        if (ds == null || ds.getName() == null)
+        if (ds == null || ds.getName().equalsIgnoreCase("Not selected")) {
+            input.setVersion(null);
             return;
+        }
         
         String type = ds.getDatasetType().getName();
         if (ds.getName() != null && ver == null && type.indexOf("External") < 0)

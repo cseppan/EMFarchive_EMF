@@ -40,6 +40,7 @@ public class EditCaseInputPresenterImpl implements EditInputPresenter {
     
     public void doSave() throws EmfException {
         inputFieldsPresenter.doSave();
+        parentView.refresh();
     }
 
     public void doCheckDuplicate(CaseInput input) throws EmfException {

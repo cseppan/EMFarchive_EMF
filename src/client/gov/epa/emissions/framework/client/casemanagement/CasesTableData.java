@@ -18,7 +18,7 @@ public class CasesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Project", "Modeling Regn.", "Creator", "Category", "Run Status", "Abbrev.",
+        return new String[] { "Name", "Project", "Modeling Regn.", "Last Modified By", "Category", "Run Status", "Abbrev.",
                 "AQM", "Base Year", "Met. Year", "Grid Name", "Grid Resolution", "Future Year", "Num Met Layers",
                 "Start Date", "End Date", "Is Final", "Speciation", "Last Modified Date" };
     }
@@ -80,7 +80,7 @@ public class CasesTableData extends AbstractTableData {
     }
 
     private Object[] rowValues(Case element) {
-        Object[] values = { element.getName(), project(element), region(element), creator(element),
+        Object[] values = { element.getName(), project(element), region(element), modifiedBy(element),
                 caseCategory(element), element.getRunStatus(), abbreviation(element), airQualityModel(element),
                 emissionsYear(element), meteorlogicalYear(element), Grid(element), gridResolution(element),
                 futureYear(element), numMetLayers(element), format(element.getStartDate()), format(element.getEndDate()),
@@ -140,8 +140,8 @@ public class CasesTableData extends AbstractTableData {
         return element.getProject() != null ? element.getProject().getName() : "";
     }
 
-    private String creator(Case element) {
-        return element.getCreator() != null ? element.getCreator().getName() : "";
+    private String modifiedBy(Case element) {
+        return element.getLastModifiedBy() != null ? element.getLastModifiedBy().getName() : "";
     }
 
 }

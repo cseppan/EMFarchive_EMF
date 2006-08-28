@@ -48,12 +48,13 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
         presenter.doDisplay();
     }
 
-    public void doSaveCopiedCase(Case newCase) throws EmfException {
+    public void doSaveCopiedCase(Case newCase, String templateused) throws EmfException {
         if (isDuplicate(newCase))
             throw new EmfException("A Case named '" + newCase.getName() + "' already exists.");
 
         newCase.setLastModifiedBy(session.user());
         newCase.setLastModifiedDate(new Date());
+        newCase.setTemplateUsed(templateused);
 
         service().addCase(newCase);
         doRefresh();
