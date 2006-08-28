@@ -35,7 +35,7 @@ public class YearValidation {
     }
 
     private String message(String name) {
-        return "Please enter a " + name + "(four digit integer) between " + startYear + " and " + endYear + ".";
+        return "Please enter a " + name + " (as a four digit integer) between " + startYear + " and " + endYear + ".";
     }
 
 }
