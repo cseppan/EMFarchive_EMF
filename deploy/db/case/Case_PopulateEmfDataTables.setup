@@ -1,18 +1,31 @@
 -- cases.inputnames
-insert into cases.inputnames values(DEFAULT,'InputName one');
-insert into cases.inputnames values(DEFAULT,'InputName two');
-insert into cases.inputnames values(DEFAULT,'InputName three');
+insert into cases.inputnames values(DEFAULT,'Grid Description List');
+insert into cases.inputnames values(DEFAULT,'Country, State, County Information');
+insert into cases.inputnames values(DEFAULT,'Inventory Table');
 -- cases.inputnames
 
 -- cases.programs
-insert into cases.programs values(DEFAULT,'Program one');
-insert into cases.programs values(DEFAULT,'Program two');
-insert into cases.programs values(DEFAULT,'Program three');
+insert into cases.programs values(DEFAULT,'Cntlmat');
+insert into cases.programs values(DEFAULT,'Elevpoint');
+insert into cases.programs values(DEFAULT,'Emisfac');
+insert into cases.programs values(DEFAULT,'Grdmat');
+insert into cases.programs values(DEFAULT,'Grwinven');
+insert into cases.programs values(DEFAULT,'Laypoint');
+insert into cases.programs values(DEFAULT,'Mrgelev');
+insert into cases.programs values(DEFAULT,'Mrggrid');
+insert into cases.programs values(DEFAULT,'Normbeis3');
+insert into cases.programs values(DEFAULT,'Premobl');
+insert into cases.programs values(DEFAULT,'Smkinven');
+insert into cases.programs values(DEFAULT,'Smkmerge');
+insert into cases.programs values(DEFAULT,'Spcmat');
+insert into cases.programs values(DEFAULT,'Temporal');
+insert into cases.programs values(DEFAULT,'Tmpbeis3');
+insert into cases.programs values(DEFAULT,'Tmpbio');
 -- cases.programs
 
 -- cases.input_envt_vars
-insert into cases.input_envt_vars values(DEFAULT,'Input Environment Variable One');
-insert into cases.input_envt_vars values(DEFAULT,'Input Environment Variable Two');
-insert into cases.input_envt_vars values(DEFAULT,'Input Environment Variable Three');
+insert into cases.input_envt_vars values(DEFAULT,'GRIDDESC');
+insert into cases.input_envt_vars values(DEFAULT,'COSTCY');
+insert into cases.input_envt_vars values(DEFAULT,'INVTABLE');
 -- cases.input_envt_vars
 
