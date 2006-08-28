@@ -191,7 +191,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Abbreviation:", abbreviations(), panel);
         layoutGenerator.addLabelWidgetPair("Is Final:", isFinal(), panel);
         layoutGenerator.addLabelWidgetPair("Is Template:", isTemplate(), panel);
-        layoutGenerator.addLabelWidgetPair("Sectors:", sectors(), panel);
+        layoutGenerator.addLabelWidgetPair("<html>Sectors:<br><br><br></html>", sectors(), panel);
         // layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
         layoutGenerator.addLabelWidgetPair("Copied From:", template(), panel);
         // layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
@@ -560,13 +560,13 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private void saveFutureYear() throws EmfException {
         String year = futureYear.getText().trim();
-        if (year.length() == 0) {
+        if (year.length() == 0 || year.equals("0")) {
             caseObj.setFutureYear(0);
             return;
         }
         YearValidation validation = new YearValidation("Future Year");
         caseObj.setFutureYear(validation.value(futureYear.getText()));
-    }
+     }
 
     private void saveEndDate() throws EmfException {
         try {
