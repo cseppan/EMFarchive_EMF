@@ -14,6 +14,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.client.data.Projects;
 import gov.epa.emissions.framework.client.data.Regions;
@@ -452,7 +453,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         isDatasetSelected(controlStrategy);
         controlStrategy.setDatasetVersion(versionPanel.datasetVersion());
         // controlStrategy.setDiscountRate(discountRate.getValue());
-        controlStrategy.setCostYear(costYear.getValue());
+        
+        controlStrategy.setCostYear(new YearValidation("Cost Year").value((costYear.getText())));
         controlStrategy.setAnalysisYear(analysisYear.getValue());
         updateRegion();
         controlStrategy.setTargetPollutant((String) majorPollutant.getSelectedItem());

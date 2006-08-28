@@ -57,7 +57,7 @@ public class MaxEmsRedStrategy implements Strategy {
         inputDataset = controlStrategy.getInputDatasets()[0];
     }
 
-    public void run(User user2) throws EmfException {
+    public void run() throws EmfException {
         GenerateSccControlMeasuresMap mapGenerator = new GenerateSccControlMeasuresMap(dbServer,
                 emissionTableName(inputDataset), controlStrategy, sessionFactory);
         SccControlMeasuresMap map = mapGenerator.create();

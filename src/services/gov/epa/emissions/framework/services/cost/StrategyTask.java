@@ -42,7 +42,7 @@ public class StrategyTask implements Runnable {
         try {
             session.setFlushMode(FlushMode.NEVER);
             prepare();
-            strategy.run(user);
+            strategy.run();
             csService.updateControlStrategyWithLock(strategy.getControlStrategy());
             complete();
         } catch (Exception e) {

@@ -22,7 +22,7 @@ public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
 
             MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServer(),
                     new Integer(500), sessionFactory());
-            maxEmfEmsRedStrategy.run(user);
+            maxEmfEmsRedStrategy.run();
             assertEquals("No of rows in the detail result table is 16", 16,
                     countRecords(detailResultDatasetTableName(strategy)));
         } catch (Exception e) {
