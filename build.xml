@@ -426,19 +426,19 @@
 	
 	<target name="data-schema-setup">
 		<exec executable="psql.exe" error="${build.home}/db-setup-error.txt" failonerror="yes">
-			<arg line="-d ${db.name} -U emf -f deploy/db/data/Data.setup" />
+			<arg line="-d ${db.name} -U ${database.username} -f deploy/db/data/Data.setup" />
 		</exec>
 	</target>
 	
 	<target name="cost-schema-setup">
 		<exec executable="psql.exe" error="${build.home}/db-setup-error.txt" failonerror="yes">
-			<arg line="-d ${db.name} -U emf -f deploy/db/cost/Cost.setup" />
+			<arg line="-d ${db.name} -U ${database.username} -f deploy/db/cost/Cost.setup" />
 		</exec>
 	</target>
 
 	<target name="case-schema-setup">
 		<exec executable="psql.exe" error="${build.home}/db-setup-error.txt" failonerror="yes">
-			<arg line="-d ${db.name} -U emf -f deploy/db/case/Case.setup" />
+			<arg line="-d ${db.name} -U ${database.username} -f deploy/db/case/Case.setup" />
 		</exec>
 	</target>
 	<!--  ===============END DB setup scripts =============== -->

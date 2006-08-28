@@ -10,7 +10,8 @@ app.version=0.1
 
 #database
 appDatabase.name=EMF
-testDatabase.name=EMF-Test
+testDatabase.name=EMF-test
+database.username=emf
   
 # basic settings - use '/' as a separator
 jdk.home=<full path to JDK home - use '/' as a separator>
