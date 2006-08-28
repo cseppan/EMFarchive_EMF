@@ -63,8 +63,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private Dimension comboSize = new Dimension(200, 20);
 
-    // private DoubleTextField discountRate;
-
     private MessagePanel messagePanel;
 
     private IntTextField costYear;
@@ -275,12 +273,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return panel;
     }
 
-    // private DoubleTextField discountRateTextField() {
-    // discountRate = new DoubleTextField("discount rate", 0.0, 1.0, 10);
-    // discountRate.setValue(controlStrategy.getDiscountRate());
-    // return discountRate;
-    // }
-
     private IntTextField costYearTextField() {
         costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 10);
         costYear.setValue(controlStrategy.getCostYear());
@@ -292,31 +284,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         analysisYear.setValue(controlStrategy.getAnalysisYear());
         return analysisYear;
     }
-
-    // private JPanel createLowerRightSection() {
-    // JPanel lowerRightPanel = new JPanel(new BorderLayout());
-    //
-    // // JPanel lowerRightUpperpanel = createLowerRightUpperPanel();
-    // lowerRightPanel.add(lowerRightUpperpanel);
-    // JPanel lowerRightLowerPanel = resultsPanel();
-    // lowerRightPanel.add(lowerRightLowerPanel, BorderLayout.SOUTH);
-    //
-    // return lowerRightPanel;
-    // }
-
-    // private JPanel createLowerRightUpperPanel() {
-    // JPanel panel = new JPanel(new SpringLayout());
-    //
-    // SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-    // // layoutGenerator.addLabelWidgetPair("Major Pollutant:", majorPollutantTextField(), panel);
-    //
-    // // Lay out the panel.
-    // layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-    // 5, 5, // initialX, initialY
-    // 10, 10);// xPad, yPad
-    //
-    // return panel;
-    // }
 
     private JLabel lastModifiedDate() {
         return createLeftAlignedLabel(format(controlStrategy.getLastModifiedDate()));
@@ -419,7 +386,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private double getReduction(ControlStrategy cs) {
-        StrategyResult[] results = {};// FIXME: cs.getStrategyResults();
+        StrategyResult[] results = cs.getStrategyResults();
         double totalReduction = 0;
 
         if (results.length > 0)
@@ -430,7 +397,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private double getTotalCost(ControlStrategy cs) {
-        StrategyResult[] results = {};// FIXME: cs.getStrategyResults();
+        StrategyResult[] results = cs.getStrategyResults();
         double totalCost = 0;
 
         if (results.length > 0)
@@ -445,6 +412,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     public void save(ControlStrategy controlStrategy) throws EmfException {
+        messagePanel.clear();
         controlStrategy.setName(name.getText());
         controlStrategy.setDescription(description.getText());
         updateProject();
@@ -452,15 +420,14 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setDatasetType(selectedDatasetType());
         isDatasetSelected(controlStrategy);
         controlStrategy.setDatasetVersion(versionPanel.datasetVersion());
-        // controlStrategy.setDiscountRate(discountRate.getValue());
-        
+
         controlStrategy.setCostYear(new YearValidation("Cost Year").value((costYear.getText())));
         controlStrategy.setAnalysisYear(analysisYear.getValue());
         updateRegion();
         controlStrategy.setTargetPollutant((String) majorPollutant.getSelectedItem());
         controlStrategy.setStartDate(this.controlStrategy.getStartDate());
         controlStrategy.setRunStatus(this.controlStrategy.getRunStatus());
-        controlStrategy.setProject((Project)projectsCombo.getSelectedItem());
+        controlStrategy.setProject((Project) projectsCombo.getSelectedItem());
         if (strategyTypeCombo.getSelectedIndex() == 0) {
             throw new EmfException("Please select a strategy type");
         }
@@ -508,6 +475,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     public void setRunMessage(ControlStrategy controlStrategy) {
+        messagePanel.clear();
         Date start = controlStrategy.getStartDate();
         if (start == null) {
             start = new Date();
@@ -521,6 +489,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     public void stopRun() {
+        messagePanel.clear();
         controlStrategy.setRunStatus("Stopped");
         completionDate.setText("Stopped.");
         clearResultPanel();
@@ -532,6 +501,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     public void doRefresh() {
+        messagePanel.clear();
         StrategyResult[] results = controlStrategy.getStrategyResults();
         if (results.length == 0) {
             completionDate.setText("");

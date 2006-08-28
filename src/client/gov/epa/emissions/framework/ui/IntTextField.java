@@ -39,7 +39,7 @@ public class IntTextField extends TextField implements Changeable {
     }
 
     public void setValue(int  value) {
-        setText(" "+ value);
+        setText(""+ value);
     }
 
 }
