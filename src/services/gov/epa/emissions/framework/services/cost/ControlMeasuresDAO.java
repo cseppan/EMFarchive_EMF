@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 public class ControlMeasuresDAO {
 
@@ -26,16 +27,9 @@ public class ControlMeasuresDAO {
     public boolean exists(int id, Class clazz, Session session) {
         return hibernateFacade.exists(id, clazz, session);
     }
-    
-    public boolean exists(Class clazz, Criterion[] criterions, Session session){
-        return hibernateFacade.exists(clazz,criterions,session);
-    }
 
-    /*
-     * Return true if the name is already used
-     */
-    public boolean nameUsed(String name, Class clazz, Session session) {
-        return hibernateFacade.nameUsed(name, clazz, session);
+    public boolean exists(Class clazz, Criterion[] criterions, Session session) {
+        return hibernateFacade.exists(clazz, criterions, session);
     }
 
     public ControlMeasure current(int id, Class clazz, Session session) {
@@ -55,6 +49,13 @@ public class ControlMeasuresDAO {
         return !nameUsed(measure.getName(), ControlMeasure.class, session);
     }
 
+    /*
+     * Return true if the name is already used
+     */
+    private boolean nameUsed(String name, Class clazz, Session session) {
+        return hibernateFacade.nameUsed(name, clazz, session);
+    }
+
     public boolean exists(String name, Session session) {
         return hibernateFacade.exists(name, ControlMeasure.class, session);
     }
@@ -63,7 +64,8 @@ public class ControlMeasuresDAO {
         return hibernateFacade.getAll(ControlMeasure.class, session);
     }
 
-    public void add(ControlMeasure measure, Session session) {
+    public void add(ControlMeasure measure, Session session) throws EmfException {
+        checkForConstraints(measure, session);
         hibernateFacade.add(measure, session);
     }
 
@@ -84,6 +86,7 @@ public class ControlMeasuresDAO {
     }
 
     public ControlMeasure update(ControlMeasure locked, Session session) throws EmfException {
+        checkForConstraints(locked, session);
         return (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, session, all(session));
     }
 
@@ -102,6 +105,36 @@ public class ControlMeasuresDAO {
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
+    }
+
+    public void checkForConstraints(ControlMeasure controlMeasure, Session session) throws EmfException {
+        if (nameExist(controlMeasure, session))
+            throw new EmfException("The Control Measure name is already in use: " + controlMeasure.getName());
+
+        if (abbrExist(controlMeasure, session))
+            throw new EmfException("The Control Measure Abbreviation already in use: "
+                    + controlMeasure.getAbbreviation());
+    }
+
+    private boolean nameExist(ControlMeasure controlMeasure, Session session) {
+        String name = controlMeasure.getName();
+        Criterion criterion1 = Restrictions.eq("name", name);
+        Criterion criterion2 = Restrictions.ne("id", new Integer(controlMeasure.getId()));
+        Criterion[] criterions = { criterion1, criterion2 };
+        return exists(ControlMeasure.class, criterions, session);
+    }
+
+    private boolean abbrExist(ControlMeasure controlMeasure, Session session) {
+        String abbr = controlMeasure.getAbbreviation();
+        Criterion criterion1 = Restrictions.eq("abbreviation", abbr);
+        Criterion criterion2 = Restrictions.ne("id", new Integer(controlMeasure.getId()));
+        Criterion[] criterions = { criterion1, criterion2 };
+        return exists(ControlMeasure.class, criterions, session);
+    }
+
+    public ControlMeasure load(ControlMeasure measure, Session session) {
+        return (ControlMeasure) hibernateFacade.load(ControlMeasure.class, Restrictions.eq("name", measure.getName()),
+                session);
     }
 
 }

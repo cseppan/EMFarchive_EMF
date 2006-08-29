@@ -3,16 +3,16 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.controlmeasure.io.CMImportTask;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.io.File;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
 
 public class ControlMeasureServiceImpl implements ControlMeasureService {
 
@@ -53,8 +53,6 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public void addMeasure(ControlMeasure measure) throws EmfException {
-        checkForConstraints(measure);
-
         Session session = sessionFactory.getSession();
         try {
             dao.add(measure, session);
@@ -113,7 +111,6 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public ControlMeasure updateMeasure(ControlMeasure measure) throws EmfException {
-        checkForConstraints(measure);
         Session session = sessionFactory.getSession();
         try {
             ControlMeasure updated = dao.update(measure, session);
@@ -124,37 +121,6 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         } finally {
             session.close();
         }
-    }
-
-    private void checkForConstraints(ControlMeasure controlMeasure) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            nameConstraint(controlMeasure, session);
-            abbrConstraint(controlMeasure, session);
-        } finally {
-            session.close();
-        }
-    }
-
-    private void nameConstraint(ControlMeasure controlMeasure, Session session) throws EmfException {
-        String name = controlMeasure.getName();
-        Criterion criterion1 = Restrictions.eq("name", name);
-        Criterion criterion2 = Restrictions.ne("id", new Integer(controlMeasure.getId()));
-        Criterion[] criterions ={criterion1,criterion2};
-        if (dao.exists(ControlMeasure.class, criterions, session)) {
-            throw new EmfException("The Control Measure name is already in use");
-        }
-    }
-
-    private void abbrConstraint(ControlMeasure controlMeasure, Session session) throws EmfException {
-        String abbr = controlMeasure.getAbbreviation();
-        Criterion criterion1 = Restrictions.eq("abbreviation", abbr);
-        Criterion criterion2 = Restrictions.ne("id", new Integer(controlMeasure.getId()));
-        Criterion[] criterions ={criterion1,criterion2};
-        if (dao.exists(ControlMeasure.class, criterions, session)) {
-            throw new EmfException("The Control Measure Abbreviation already in use");
-        }
-
     }
 
     public Scc[] getSccs(ControlMeasure measure) throws EmfException {
@@ -178,6 +144,16 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             throw new EmfException("could not retrieve control technologies.");
         } finally {
             session.close();
+        }
+    }
+
+    public ControlMeasure[] importControlMeasures(String folderPath, String[] fileNames,User user) throws EmfException {
+        try {
+            CMImportTask importTask = new CMImportTask(new File(folderPath),fileNames,user,sessionFactory);
+            return importTask.run();
+        } catch (RuntimeException e) {
+            LOG.error("could not import control measures.", e);
+            throw new EmfException("could not import control measures");
         }
     }
 

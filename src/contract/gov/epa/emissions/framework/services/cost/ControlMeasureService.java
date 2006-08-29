@@ -24,4 +24,6 @@ public interface ControlMeasureService extends EMFService {
 
     ControlTechnology[] getControlTechnologies() throws EmfException;
 
+    ControlMeasure[] importControlMeasures(String folderPath, String[] fileNames,User user) throws EmfException;
+
 }

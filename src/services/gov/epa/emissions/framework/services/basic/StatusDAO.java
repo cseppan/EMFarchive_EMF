@@ -22,10 +22,11 @@ public class StatusDAO {
 
     public void add(Status status) {
         Session session = sessionFactory.getSession();
-
-        dao.add(status, session);
-        session.flush();
-        session.close();
+        try {
+            dao.add(status, session);
+        } finally {
+            session.close();
+        }
     }
 
 }

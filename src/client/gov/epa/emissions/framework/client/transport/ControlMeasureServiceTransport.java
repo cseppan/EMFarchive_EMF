@@ -104,4 +104,17 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
 
         return technologies;
     }
+
+    public ControlMeasure[] importControlMeasures(String folderPath, String[] fileNames, User user) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("importControlMeasures");
+        call.addParam("folderPath", mappings.string());
+        call.addParam("fileNames", mappings.strings());
+        call.addParam("user", mappings.user());
+
+        call.setReturnType(mappings.controlMeasures());
+
+        return (ControlMeasure[]) call.requestResponse(new Object[] { folderPath, fileNames, user });
+    }
 }

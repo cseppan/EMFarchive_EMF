@@ -116,7 +116,7 @@ public class CMSummaryRecordReader {
             float noOfYears = 0;
             if (equipLife.length() != 0)
                 noOfYears = Float.parseFloat(equipLife);
-            
+
             cm.setEquipmentLife(noOfYears);
         } catch (NumberFormatException e) {
             throw new CMImporterException("Could not convert equip life into a floating point value. line no: "

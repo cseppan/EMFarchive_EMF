@@ -19,6 +19,7 @@ public class HibernateFacade {
             session.save(obj);
             tx.commit();
         } catch (HibernateException e) {
+            e.printStackTrace();
             tx.rollback();
             throw e;
         }

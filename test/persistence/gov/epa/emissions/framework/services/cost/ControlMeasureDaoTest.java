@@ -80,43 +80,26 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldUpdateQASteps() throws Exception {
+    public void testShouldUpdateControlMeasure() throws Exception {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
         add(cm);
 
         try {
-            ControlMeasure[] read = (ControlMeasure[]) dao.all(session).toArray(new ControlMeasure[0]);
-            assertEquals(1, read.length);
+            ControlMeasure[] allMeasures = (ControlMeasure[]) dao.all(session).toArray(new ControlMeasure[0]);
+            assertEquals(1, allMeasures.length);
 
-            read[0].setName("updated-name");
-            read[0].setDescription("updated-description");
+            allMeasures[0].setName("updated-name");
+            allMeasures[0].setDescription("updated-description");
 
-            dao.update(read, session);
+            dao.update(allMeasures, session);
             session.clear();// to ensure Hibernate does not return cached objects
 
             ControlMeasure[] updated = (ControlMeasure[]) dao.all(session).toArray(new ControlMeasure[0]);
             assertEquals(1, updated.length);
             assertEquals("updated-name", updated[0].getName());
             assertEquals("updated-description", updated[0].getDescription());
-        } finally {
-            remove(cm);
-        }
-    }
-
-    public void testShouldAddNewControlMeasuresOnUpdateQASteps() throws Exception {
-        ControlMeasure cm = new ControlMeasure();
-        cm.setName("cm one");
-        cm.setAbbreviation("12345678");
-
-        try {
-            dao.update(new ControlMeasure[] { cm }, session);
-            session.clear();// to ensure Hibernate does not return cached objects
-
-            ControlMeasure[] updated = (ControlMeasure[]) dao.all(session).toArray(new ControlMeasure[0]);
-            assertEquals(1, updated.length);
-            assertEquals("cm one", updated[0].getName());
         } finally {
             remove(cm);
         }
@@ -277,7 +260,6 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
             remove(cm);
         }
     }
-
 
     private EfficiencyRecord efficiencyRecord(Pollutant pollutant, String locale) {
         EfficiencyRecord record = new EfficiencyRecord();
