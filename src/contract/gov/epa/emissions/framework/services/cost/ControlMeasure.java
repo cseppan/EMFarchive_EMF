@@ -268,4 +268,8 @@ public class ControlMeasure implements Lockable, Serializable {
         this.efficiencyRecords.add(efficiencyRecord);
     }
 
+    public void addScc(Scc scc) {
+        this.sccs.add(scc);
+    }
+
 }

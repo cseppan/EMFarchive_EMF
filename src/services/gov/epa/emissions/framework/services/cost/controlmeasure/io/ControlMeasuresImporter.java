@@ -30,7 +30,7 @@ public class ControlMeasuresImporter implements Importer {
         runSummary(controlMeasures);
         runEfficiencyRecords(controlMeasures);
         runSCC(controlMeasures);
-        runReference(controlMeasures);
+        //TODO: read reference file
     }
 
     public ControlMeasure[] controlMeasures() {
@@ -38,7 +38,7 @@ public class ControlMeasuresImporter implements Importer {
         ControlMeasure[] measures = new ControlMeasure[controlMeasures.size()];
         int count = 0;
         while (keys.hasNext()) {
-            measures[count++] = (ControlMeasure)controlMeasures.get(keys.next());
+            measures[count++] = (ControlMeasure) controlMeasures.get(keys.next());
         }
         return measures;
     }
@@ -54,14 +54,9 @@ public class ControlMeasuresImporter implements Importer {
 
     }
 
-    private void runSCC(Map controlMeasures) {
-        // NOTE Auto-generated method stub
-
-    }
-
-    private void runReference(Map controlMeasures) {
-        // NOTE Auto-generated method stub
-
+    private void runSCC(Map controlMeasures) throws ImporterException {
+        CMSCCImporter sccImporter = cmImporters.sccImporter();
+        sccImporter.run(controlMeasures);
     }
 
     private File[] fileNames(File folder, String[] fileNames) throws ImporterException {
