@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
 import gov.epa.emissions.commons.data.Pollutant;
-import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -34,7 +33,7 @@ public class Pollutants {
         }
     }
 
-    public Pollutant getPollutant(String name) throws ImporterException {
+    public Pollutant getPollutant(String name) throws CMImporterException {
         Pollutant pollutant = new Pollutant(name);
         int index = pollutantList.indexOf(pollutant);
         if (index != -1) {
@@ -43,12 +42,12 @@ public class Pollutants {
         return saveAndLoad(pollutant);
     }
 
-    private Pollutant saveAndLoad(Pollutant pollutant) throws ImporterException {
+    private Pollutant saveAndLoad(Pollutant pollutant) throws CMImporterException {
         try {
             save(pollutant);
             return load(pollutant.getName());
         } catch (RuntimeException e) {
-            throw new ImporterException("Could not add a pollutant - " + pollutant.getName());
+            throw new CMImporterException("Could not add a pollutant - " + pollutant.getName());
         }
     }
 

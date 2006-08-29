@@ -33,7 +33,7 @@ public class SourceGroups {
         }
     }
 
-    public SourceGroup getSourceGroup(String name) {
+    public SourceGroup getSourceGroup(String name) throws CMImporterException {
         SourceGroup sourceGroup = new SourceGroup();
         sourceGroup.setName(name);
         int index = -1;
@@ -43,9 +43,13 @@ public class SourceGroups {
         return saveAndLoad(sourceGroup);
     }
 
-    private SourceGroup saveAndLoad(SourceGroup sourceGroup) {
-        save(sourceGroup);
-        return load(sourceGroup.getName());
+    private SourceGroup saveAndLoad(SourceGroup sourceGroup) throws CMImporterException {
+        try {
+            save(sourceGroup);
+            return load(sourceGroup.getName());
+        } catch (RuntimeException e) {
+            throw new CMImporterException("Could not add a source group - " + sourceGroup.getName());
+        }
     }
 
     private void save(SourceGroup sourceGroup) {

@@ -1,14 +1,14 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CMSummaryImporter implements Importer {
 
@@ -32,8 +32,8 @@ public class CMSummaryImporter implements Importer {
                 ControlMeasure cm = cmSummaryRecord.parse(record,reader.lineNumber());
                 controlMeasures.add(cm);
             }
-        } catch (ImporterException e) {
-            throw e;//FIXME:quit import or not
+        } catch (CMImporterException e) {
+            throw new ImporterException(e.getMessage());//FIXME:quit import or not
         }
 
     }

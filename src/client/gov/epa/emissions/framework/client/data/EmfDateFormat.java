@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -24,6 +25,11 @@ public class EmfDateFormat {
     public static String format_YYYY(Date date){
         dateFormatter.applyPattern("yyyy");
         return dateFormatter.format(date);
+    }
+    
+    public static Date parse_YYYY(String date) throws ParseException{
+        dateFormatter.applyPattern("yyyy");
+        return dateFormatter.parse(date);
     }
 
 }

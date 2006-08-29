@@ -33,7 +33,7 @@ public class ControlTechnologies {
         }
     }
 
-    public ControlTechnology getSourceGroup(String name) {
+    public ControlTechnology getControlTechnology(String name) throws CMImporterException {
         ControlTechnology controlTechnology = new ControlTechnology();
         controlTechnology.setName(name);
         int index = -1;
@@ -43,9 +43,13 @@ public class ControlTechnologies {
         return saveAndLoad(controlTechnology);
     }
 
-    private ControlTechnology saveAndLoad(ControlTechnology controlTechnology) {
-        save(controlTechnology);
-        return load(controlTechnology.getName());
+    private ControlTechnology saveAndLoad(ControlTechnology controlTechnology) throws CMImporterException {
+        try {
+            save(controlTechnology);
+            return load(controlTechnology.getName());
+        } catch (RuntimeException e) {
+            throw new CMImporterException("Could not add a control technology - " + controlTechnology.getName());
+        }
     }
 
     private void save(ControlTechnology controlTechnology) {

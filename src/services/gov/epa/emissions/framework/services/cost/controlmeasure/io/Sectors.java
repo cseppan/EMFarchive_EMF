@@ -34,7 +34,7 @@ public class Sectors {
     }
 
     //FIXME: handle arrays
-    public Sector getSector(String name) {
+    public Sector getSector(String name) throws CMImporterException {
         Sector sector = new Sector();
         sector.setName(name);
         int index = -1;
@@ -44,9 +44,13 @@ public class Sectors {
         return saveAndLoad(sector);
     }
 
-    private Sector saveAndLoad(Sector sector) {
-        save(sector);
-        return load(sector.getName());
+    private Sector saveAndLoad(Sector sector) throws CMImporterException {
+        try {
+            save(sector);
+            return load(sector.getName());
+        } catch (RuntimeException e) {
+            throw new CMImporterException("Could not add a sector - " + sector.getName());
+        }
     }
 
     private void save(Sector sector) {

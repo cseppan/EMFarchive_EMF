@@ -191,4 +191,16 @@ public class HibernateFacade {
         }
     }
 
+    public void delete(Object object, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.delete(object);
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
 }
