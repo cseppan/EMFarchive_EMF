@@ -36,8 +36,8 @@ public class ControlTechnologies {
     public ControlTechnology getControlTechnology(String name) throws CMImporterException {
         ControlTechnology controlTechnology = new ControlTechnology();
         controlTechnology.setName(name);
-        int index = -1;
-        if (controlTechnologiesList.indexOf(controlTechnology) != -1) {
+        int index = controlTechnologiesList.indexOf(controlTechnology);
+        if (index != -1) {
             return (ControlTechnology) controlTechnologiesList.get(index);
         }
         return saveAndLoad(controlTechnology);

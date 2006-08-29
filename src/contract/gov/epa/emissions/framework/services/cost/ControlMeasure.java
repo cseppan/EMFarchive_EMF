@@ -264,4 +264,8 @@ public class ControlMeasure implements Lockable, Serializable {
         this.sectors = Arrays.asList(sectors);
     }
 
+    public void addEfficiencyRecord(EfficiencyRecord efficiencyRecord) {
+        this.efficiencyRecords.add(efficiencyRecord);
+    }
+
 }

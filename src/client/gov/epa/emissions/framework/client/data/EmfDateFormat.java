@@ -16,19 +16,24 @@ public class EmfDateFormat {
         dateFormatter.applyPattern("MM/dd/yyyy");
         return dateFormatter.format(date);
     }
-    
+
     public static String format_MM_DD_YYYY_HH_mm(Date date) {
         dateFormatter.applyPattern("MM/dd/yyyy HH:mm");
         return dateFormatter.format(date);
     }
-    
-    public static String format_YYYY(Date date){
+
+    public static String format_YYYY(Date date) {
         dateFormatter.applyPattern("yyyy");
         return dateFormatter.format(date);
     }
-    
-    public static Date parse_YYYY(String date) throws ParseException{
+
+    public static Date parse_YYYY(String date) throws ParseException {
         dateFormatter.applyPattern("yyyy");
+        return dateFormatter.parse(date);
+    }
+
+    public static Date parse_MMddyyyy(String date) throws ParseException {
+        dateFormatter.applyPattern("MM/dd/yyyy");
         return dateFormatter.parse(date);
     }
 

@@ -65,7 +65,7 @@ public class CMImporters {
         String[] cols = fileFormat.cols();
         for (int i = 0; i < records.length; i++) {
             if (matches(cols, records[i].getTokens())) {
-                return new CMEfficiencyImporter(files[i], fileFormat);
+                return new CMEfficiencyImporter(files[i], fileFormat,sessionFactory);
             }
         }
 

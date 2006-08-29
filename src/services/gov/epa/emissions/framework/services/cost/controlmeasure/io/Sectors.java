@@ -33,12 +33,12 @@ public class Sectors {
         }
     }
 
-    //FIXME: handle arrays
+    // FIXME: handle arrays
     public Sector getSector(String name) throws CMImporterException {
         Sector sector = new Sector();
         sector.setName(name);
-        int index = -1;
-        if (sectorsList.indexOf(sector) != -1) {
+        int index = sectorsList.indexOf(sector);
+        if (index != -1) {
             return (Sector) sectorsList.get(index);
         }
         return saveAndLoad(sector);

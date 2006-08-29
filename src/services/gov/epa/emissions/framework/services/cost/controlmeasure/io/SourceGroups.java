@@ -36,8 +36,8 @@ public class SourceGroups {
     public SourceGroup getSourceGroup(String name) throws CMImporterException {
         SourceGroup sourceGroup = new SourceGroup();
         sourceGroup.setName(name);
-        int index = -1;
-        if (sourceGroupList.indexOf(sourceGroup) != -1) {
+        int index = sourceGroupList.indexOf(sourceGroup);
+        if (index != -1) {
             return (SourceGroup) sourceGroupList.get(index);
         }
         return saveAndLoad(sourceGroup);

@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
+import gov.epa.emissions.framework.services.cost.ControlMeasure;
 
 import java.io.File;
 
@@ -20,9 +21,20 @@ public class ControlMeasuresImporterTest extends ServiceTestCase {
     public void testShouldImportControlMeasureFiles() throws EmfException, Exception {
         File folder = new File("test/data/cost/controlMeasure");
         String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
-        //Importer importer = 
-        new ControlMeasuresImporter(folder, fileNames, sessionFactory());
-        //importer.run();
+        ControlMeasuresImporter importer = new ControlMeasuresImporter(folder, fileNames, sessionFactory());
+        importer.run();
+
+        ControlMeasure[] measures = importer.controlMeasures();
+        assertEquals(32, measures.length);
+        assertEquals(1132, noOfRecords(measures));
+    }
+
+    private int noOfRecords(ControlMeasure[] measures) {
+        int count = 0;
+        for (int i = 0; i < measures.length; i++) {
+            count += measures[i].getEfficiencyRecords().length;
+        }
+        return count;
     }
 
 }

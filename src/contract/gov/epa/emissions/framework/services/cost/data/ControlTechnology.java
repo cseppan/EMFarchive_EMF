@@ -77,15 +77,18 @@ public class ControlTechnology implements Serializable, Lockable {
         return lock.isLocked();
     }
 
-    public boolean equals(Object other) {
-        return (other instanceof ControlTechnology) && (((ControlTechnology) other).id == id);
+    public boolean equals(Object object) {
+        if (object == null || !(object instanceof ControlTechnology))
+            return false;
+        ControlTechnology other = (ControlTechnology) object;
+        return (id == other.getId()) || name.equals(other.getName());
     }
 
     public int hashCode() {
-        return id;
+        return name.hashCode();
     }
-    
-    public String toString(){
+
+    public String toString() {
         return name;
     }
 }

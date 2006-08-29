@@ -12,7 +12,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import java.text.ParseException;
 import java.util.Date;
 
-public class CMSummaryRecord {
+public class CMSummaryRecordReader {
 
     private CMSummaryFileFormat fileFormat;
 
@@ -24,7 +24,7 @@ public class CMSummaryRecord {
 
     private Sectors sectors;
 
-    public CMSummaryRecord(CMSummaryFileFormat fileFormat, HibernateSessionFactory sessionFactory) {
+    public CMSummaryRecordReader(CMSummaryFileFormat fileFormat, HibernateSessionFactory sessionFactory) {
         this.fileFormat = fileFormat;
         pollutants = new Pollutants(sessionFactory);
         controlTechnologies = new ControlTechnologies(sessionFactory);
@@ -112,9 +112,11 @@ public class CMSummaryRecord {
     }
 
     private void equipLife(ControlMeasure cm, String equipLife, int lineNo) throws CMImporterException {
-        float noOfYears = 0;
         try {
-            noOfYears = Float.parseFloat(equipLife);
+            float noOfYears = 0;
+            if (equipLife.length() != 0)
+                noOfYears = Float.parseFloat(equipLife);
+            
             cm.setEquipmentLife(noOfYears);
         } catch (NumberFormatException e) {
             throw new CMImporterException("Could not convert equip life into a floating point value. line no: "
@@ -130,7 +132,10 @@ public class CMSummaryRecord {
 
     private void deviceCode(ControlMeasure cm, String code, int lineNo) throws CMImporterException {
         try {
-            int deviceCode = Integer.parseInt(code);
+            int deviceCode = 0;
+            if (code.length() != 0)
+                deviceCode = Integer.parseInt(code);
+
             cm.setDeviceCode(deviceCode);
         } catch (NumberFormatException e) {
             throw new CMImporterException("Could not convert device code into a int value. line no: " + lineNo);
