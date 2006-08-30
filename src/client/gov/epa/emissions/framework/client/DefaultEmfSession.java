@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
+import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureImportService;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
@@ -95,5 +96,9 @@ public class DefaultEmfSession implements EmfSession {
 
     public ControlStrategyService controlStrategyService() {
         return serviceLocator.controlStrategyService();
+    }
+
+    public ControlMeasureImportService controlMeasureImportService() {
+        return serviceLocator.controlMeasureImportService();
     }
 }

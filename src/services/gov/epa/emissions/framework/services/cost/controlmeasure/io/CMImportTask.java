@@ -43,29 +43,28 @@ public class CMImportTask {
         this.statusDao = new StatusDAO(sessionFactory);
     }
 
-    public ControlMeasure[] run() {
+    public void run() {
         Session session = sessionFactory.getSession();
         try {
             session.setFlushMode(FlushMode.NEVER);
             prepare();
             ControlMeasuresImporter importer = new ControlMeasuresImporter(folder, files, user, sessionFactory);
             importer.run();
-            return complete(importer.controlMeasures(), session);
+            complete(importer.controlMeasures(), session);
         } catch (Exception e) {
             logError("Failed to import control measures", e); // FIXME: report generation
-            setStatus("Failed to import all control measures: "+e.getMessage());
+            setStatus("Failed to import all control measures: " + e.getMessage());
         } finally {
             session.flush();
             session.close();
         }
-        return new ControlMeasure[0];
     }
 
     private void prepare() {
         addStartStatus();
     }
 
-    private ControlMeasure[] complete(ControlMeasure[] measures, Session session) {
+    private void complete(ControlMeasure[] measures, Session session) {
         Date date = new Date();
         List messages = new ArrayList(); // FIXME: show the error messages
         List addedMeasures = new ArrayList();
@@ -82,7 +81,6 @@ public class CMImportTask {
             }
         }
         addCompletedStatus(count);
-        return (ControlMeasure[]) addedMeasures.toArray(new ControlMeasure[0]);
     }
 
     private void addStartStatus() {

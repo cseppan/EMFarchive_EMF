@@ -26,7 +26,7 @@ public class CMImportPresenter {
     void importControlMeasures(String directory, String[] files) throws EmfException {
         importRules.validate(directory, files);
         startImportMessage(view);
-        session.controlMeasureService().importControlMeasures(mapToRemote(directory), files, session.user());
+        session.controlMeasureImportService().importControlMeasures(mapToRemote(directory), files, session.user());
     }
 
     private void startImportMessage(CMImportView view) {
@@ -64,7 +64,7 @@ public class CMImportPresenter {
     }
 
     public Status[] getImportStatus() throws EmfException {
-        return session.controlMeasureService().getImportStatus(session.user());
+        return session.controlMeasureImportService().getImportStatus(session.user());
     }
 
 }

@@ -2,14 +2,10 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
-import gov.epa.emissions.framework.services.cost.controlmeasure.io.CMImportTask;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
-import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-import java.io.File;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -27,8 +23,6 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
 
     private ControlTechnologiesDAO controlTechnologiesDAO;
 
-    private DataCommonsDAO dataCommonsDAO;
-
     public ControlMeasureServiceImpl() throws Exception {
         this(HibernateSessionFactory.get());
     }
@@ -41,7 +35,6 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         this.sessionFactory = sessionFactory;
         dao = new ControlMeasuresDAO();
         controlTechnologiesDAO = new ControlTechnologiesDAO();
-        this.dataCommonsDAO = new DataCommonsDAO();
     }
 
     public ControlMeasure[] getMeasures() throws EmfException {
@@ -150,29 +143,6 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             throw new EmfException("could not retrieve control technologies.");
         } finally {
             session.close();
-        }
-    }
-
-    public ControlMeasure[] importControlMeasures(String folderPath, String[] fileNames, User user) throws EmfException {
-        try {
-            CMImportTask importTask = new CMImportTask(new File(folderPath), fileNames, user, sessionFactory);
-            return importTask.run();
-        } catch (RuntimeException e) {
-            LOG.error("Could not import control measures.", e);
-            throw new EmfException("Could not import control measures: " + e.getMessage());
-        }
-    }
-
-    public Status[] getImportStatus(User user) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try{
-            List controlMeasureImportStatuses = dataCommonsDAO.getControlMeasureImportStatuses(user.getUsername(),session);
-            return (Status[]) controlMeasureImportStatuses.toArray(new Status[0]);
-        } catch (RuntimeException e) {
-            LOG.error("Could not get detail import status messages.", e);
-            throw new EmfException("Could not get detail import status messages. " + e.getMessage());
-        }finally{
-            session.clear();
         }
     }
 
