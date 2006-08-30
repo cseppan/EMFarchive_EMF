@@ -22,8 +22,8 @@ public class CMSCCRecordReader {
                     + "' is not in the control measure summary file. line no: " + lineNo);
 
         Scc scc = new Scc();
-        scc.setCode(tokens[0]);
-        scc.setStatus(tokens[1]);
+        scc.setCode(tokens[1]);
+        scc.setStatus(tokens[2]);
         
         cm.addScc(scc);
 
