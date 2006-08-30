@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
+import gov.epa.emissions.framework.services.basic.UserDAO;
 
 import java.io.File;
 
@@ -25,13 +27,17 @@ public class ControlMeasuresImportIdentifierTest extends ServiceTestCase{
             files[i] = new File(folder, fileNames[i]);
         }
 
-        ControlMeasuresImportIdentifier identifier = new ControlMeasuresImportIdentifier(files,sessionFactory());
+        ControlMeasuresImportIdentifier identifier = new ControlMeasuresImportIdentifier(files,emfUser(), sessionFactory());
         CMImporters cmImporters = identifier.cmImporters();
         assertNotNull(cmImporters.summaryImporter());
         assertNotNull(cmImporters.efficiencyImporter());
         assertNotNull(cmImporters.sccImporter());
         assertNotNull(cmImporters.referenceImporter());
 
+    }
+    
+    private User emfUser() {
+        return new UserDAO().get("emf",session);
     }
 
 

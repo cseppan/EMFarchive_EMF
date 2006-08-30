@@ -23,6 +23,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -35,9 +36,9 @@ public class DataCommonsDAO {
     private KeywordsDAO keywordsDAO;
 
     private DatasetTypesDAO datasetTypesDAO;
-    
+
     private PollutantsDAO pollutantsDAO;
-    
+
     private SourceGroupsDAO sourceGroupsDAO;
 
     public DataCommonsDAO() {
@@ -97,53 +98,70 @@ public class DataCommonsDAO {
         return datasetTypesDAO.update(type, session);
     }
 
-    public Sector releaseLockedSector(Sector locked, Session session)  {
+    public Sector releaseLockedSector(Sector locked, Session session) {
         return sectorsDao.releaseLocked(locked, session);
     }
 
     public DatasetType releaseLockedDatasetType(DatasetType locked, Session session) {
         return datasetTypesDAO.releaseLocked(locked, session);
     }
-    
+
     public List getPollutants(Session session) {
         return pollutantsDAO.getAll(session);
     }
-    
+
     public Pollutant updatePollutant(Pollutant pollutant, Session session) throws EmfException {
         return pollutantsDAO.update(pollutant, session);
     }
-    
+
     public Pollutant obtainLockedPollutant(User user, Pollutant pollutant, Session session) {
         return pollutantsDAO.obtainLocked(user, pollutant, session);
     }
 
-    public Pollutant releaseLockedPollutant(Pollutant locked, Session session)  {
+    public Pollutant releaseLockedPollutant(Pollutant locked, Session session) {
         return pollutantsDAO.releaseLocked(locked, session);
     }
 
     public List getSourceGroups(Session session) {
         return sourceGroupsDAO.getAll(session);
     }
-    
+
     public SourceGroup updateSourceGroup(SourceGroup sourcegrp, Session session) throws EmfException {
         return sourceGroupsDAO.update(sourcegrp, session);
     }
-    
+
     public SourceGroup obtainLockedSourceGroup(User user, SourceGroup sourcegrp, Session session) {
         return sourceGroupsDAO.obtainLocked(user, sourcegrp, session);
     }
-    
-    public SourceGroup releaseLockedSourceGroup(SourceGroup locked, Session session)  {
+
+    public SourceGroup releaseLockedSourceGroup(SourceGroup locked, Session session) {
         return sourceGroupsDAO.releaseLocked(locked, session);
     }
-    
+
+    public List getControlMeasureImportStatuses(String username, Session session) {
+        Criterion criterion1 = Restrictions.eq("username", username);
+        Criterion criterion2 = Restrictions.eq("type", "CMImportDetailMsg");
+        return getStatus(username, new Criterion[] { criterion1, criterion2 }, session);
+    }
+
     public List getStatuses(String username, Session session) {
+        Criterion criterion1 = Restrictions.eq("username", username);
+        Criterion criterion2 = Restrictions.ne("type", "CMImportDetailMsg");
+        return getStatus(username, new Criterion[] { criterion1, criterion2 }, session);
+    }
+
+    private List getStatus(String username, Criterion[] criterions, Session session) {
         removeReadStatus(username, session);
 
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            Criteria crit = session.createCriteria(Status.class).add(Restrictions.eq("username", username));
+            // Criteria crit = session.createCriteria(Status.class).add();
+            Criteria crit = session.createCriteria(Status.class);
+
+            for (int i = 0; i < criterions.length; i++) {// add restrictions
+                crit = crit.add(criterions[i]);
+            }
             List all = crit.list();
 
             // mark read
@@ -225,7 +243,7 @@ public class DataCommonsDAO {
     public void add(Pollutant pollutant, Session session) {
         addObject(pollutant, session);
     }
-    
+
     public void add(SourceGroup sourcegrp, Session session) {
         addObject(sourcegrp, session);
     }

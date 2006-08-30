@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.io.importer.ImporterException;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -14,8 +15,11 @@ public class ControlMeasuresImportIdentifier {
 
     private HibernateSessionFactory sessionFactory;
 
-    public ControlMeasuresImportIdentifier(File[] files, HibernateSessionFactory sessionFactory) {
+    private User user;
+
+    public ControlMeasuresImportIdentifier(File[] files, User user, HibernateSessionFactory sessionFactory) {
         this.files = files;
+        this.user = user;
         this.sessionFactory = sessionFactory;
     }
 
@@ -24,7 +28,7 @@ public class ControlMeasuresImportIdentifier {
         for (int i = 0; i < files.length; i++) {
             records[i] = firstRecord(files[i]);
         }
-        return new CMImporters(files, records, sessionFactory);
+        return new CMImporters(files, records, user, sessionFactory);
 
     }
 

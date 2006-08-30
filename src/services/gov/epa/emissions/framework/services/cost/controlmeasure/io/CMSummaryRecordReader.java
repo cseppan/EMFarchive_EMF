@@ -4,13 +4,18 @@ import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class CMSummaryRecordReader {
 
@@ -24,94 +29,160 @@ public class CMSummaryRecordReader {
 
     private Sectors sectors;
 
-    public CMSummaryRecordReader(CMSummaryFileFormat fileFormat, HibernateSessionFactory sessionFactory) {
+    private User user;
+
+    private StatusDAO stausDao;
+
+    private List namesList;
+
+    private List abbrevList;
+
+    public CMSummaryRecordReader(CMSummaryFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) {
         this.fileFormat = fileFormat;
+        this.user = user;
+        this.stausDao = new StatusDAO(sessionFactory);
         pollutants = new Pollutants(sessionFactory);
         controlTechnologies = new ControlTechnologies(sessionFactory);
         sourceGroups = new SourceGroups(sessionFactory);
         sectors = new Sectors(sessionFactory);
+        this.namesList = new ArrayList();
+        this.abbrevList = new ArrayList();
     }
 
-    // FIXME: duplicate name,abbrev handling?????
-    public ControlMeasure parse(Record record, int lineNo) throws CMImporterException {
-        String[] tokens = modify(record);
-        return measure(tokens, lineNo);
+    public ControlMeasure parse(Record record, int lineNo) {
+        String[] tokens = null;
+        try {
+            tokens = modify(record);
+            return measure(tokens, lineNo);
+        } catch (CMImporterException e) {
+            addStatus(lineNo, new StringBuffer(format(e.getMessage())));
+            return null;
+        }
     }
 
-    // FIXME: throw an different kind of exceptions
-    private ControlMeasure measure(String[] tokens, int lineNo) throws CMImporterException {
-        ControlMeasure cm = new ControlMeasure();
-        name(cm, tokens[0], lineNo);
-        abbrev(cm, tokens[1], lineNo);
-        majorPollutant(cm, tokens[2], lineNo);
-        controlTechnology(cm, tokens[3], lineNo);
-        sourceGroup(cm, tokens[4], lineNo);
-        sector(cm, tokens[5], lineNo);
-        cmClass(cm, tokens[6], lineNo);
-        equipLife(cm, tokens[7], lineNo);
-        deviceCode(cm, tokens[8], lineNo);
-        dateReviewed(cm, tokens[9], lineNo);
-        datasource(cm, tokens[10]);
-        description(cm, tokens[11]);
+    private ControlMeasure measure(String[] tokens, int lineNo) {
+        StringBuffer sb = new StringBuffer();
+
+        ControlMeasure cm = null;
+        if (constraintCheck(tokens, sb)) {
+            cm = new ControlMeasure();
+            name(cm, tokens[0]);
+            abbrev(cm, tokens[1]);
+            majorPollutant(cm, tokens[2], sb);
+            controlTechnology(cm, tokens[3], sb);
+            sourceGroup(cm, tokens[4], sb);
+            sector(cm, tokens[5], sb);
+            cmClass(cm, tokens[6], sb);
+            equipLife(cm, tokens[7], sb);
+            deviceCode(cm, tokens[8], sb);
+            dateReviewed(cm, tokens[9], sb);
+            datasource(cm, tokens[10]);
+            description(cm, tokens[11]);
+        }
+        addStatus(lineNo, sb);
         return cm;
     }
 
-    private void name(ControlMeasure cm, String token, int lineNo) throws CMImporterException {
-        if (token.length() == 0) {
-            throw new CMImporterException("The name should not be empty. line no: " + lineNo);
+    private boolean constraintCheck(String[] tokens, StringBuffer sb) {
+        if (tokens[0].length() == 0) {
+            sb.append(format("name should not be empty"));
+            return false;
         }
+
+        if (tokens[1].length() == 0) {
+            sb.append(format("abbreviation should not be empty"));
+            return false;
+        }
+        if (namesList.contains(tokens[0])) {
+            sb.append(format("name alerady in the file-" + tokens[0]));
+            return false;
+        }
+        namesList.add(tokens[0]);
+
+        if (abbrevList.contains(tokens[1])) {
+            sb.append(format("abbreviation alerady in the file-" + tokens[1]));
+            return false;
+        }
+        namesList.add(tokens[1]);
+        return true;
+
+    }
+
+    private void addStatus(int lineNo, StringBuffer sb) {
+        String message = sb.toString();
+        if (message.length() > 0)
+            setStatus(lineNo + "\n" + message);
+    }
+
+    private void setStatus(String message) {
+        Status endStatus = new Status();
+        endStatus.setUsername(user.getUsername());
+        endStatus.setType("CMImportDetailMsg");
+        endStatus.setMessage(message);
+        endStatus.setTimestamp(new Date());
+
+        stausDao.add(endStatus);
+    }
+
+    private void name(ControlMeasure cm, String token) {
         cm.setName(token);
     }
 
-    private void abbrev(ControlMeasure cm, String token, int lineNo) throws CMImporterException {
-        if (token.length() == 0) {
-            throw new CMImporterException("The Abbreviation should not be empty. line no: " + lineNo);
-        }
+    private void abbrev(ControlMeasure cm, String token) {
         cm.setAbbreviation(token);
-
     }
 
-    private void majorPollutant(ControlMeasure cm, String name, int lineNo) throws CMImporterException {
-        if (name.length() == 0)
-            throw new CMImporterException("The Major Pollutant should not be empty. line no:" + lineNo);
+    private void majorPollutant(ControlMeasure cm, String name, StringBuffer sb) {
+        if (name.length() == 0) {
+            sb.append(format("major pollutant should not be empty"));
+            return;
+        }
 
         try {
             Pollutant pollutant = pollutants.getPollutant(name);
             cm.setMajorPollutant(pollutant);
         } catch (CMImporterException e) {
-            throw new CMImporterException(e.getMessage() + ". line no: " + lineNo);
+            sb.append(format(e.getMessage()));
         }
     }
 
-    private void controlTechnology(ControlMeasure cm, String name, int lineNo) throws CMImporterException {
+    private void controlTechnology(ControlMeasure cm, String name, StringBuffer sb) {
+        if (name.length() == 0)
+            return;
+
         try {
             ControlTechnology ct = controlTechnologies.getControlTechnology(name);
             cm.setControlTechnology(ct);
         } catch (CMImporterException e) {
-            throw new CMImporterException(e.getMessage() + ". line no: " + lineNo);
+            sb.append(format(e.getMessage()));
         }
     }
 
-    private void sourceGroup(ControlMeasure cm, String name, int lineNo) throws CMImporterException {
+    private void sourceGroup(ControlMeasure cm, String name, StringBuffer sb) {
+        if (name.length() == 0)
+            return;
+
         try {
             SourceGroup sourceGroup = sourceGroups.getSourceGroup(name);
             cm.setSourceGroup(sourceGroup);
         } catch (CMImporterException e) {
-            throw new CMImporterException(e.getMessage() + ". line no: " + lineNo);
+            sb.append(format(e.getMessage()));
         }
-
     }
 
-    private void sector(ControlMeasure cm, String name, int lineNo) throws CMImporterException {
+    private void sector(ControlMeasure cm, String name, StringBuffer sb) {
+        if (name.length() == 0)
+            return;
+
         try {
             Sector sector = sectors.getSector(name);
             cm.setSectors(new Sector[] { sector });
         } catch (CMImporterException e) {
-            throw new CMImporterException(e.getMessage() + ". line no: " + lineNo);
+            sb.append(format(e.getMessage()));
         }
     }
 
-    private void equipLife(ControlMeasure cm, String equipLife, int lineNo) throws CMImporterException {
+    private void equipLife(ControlMeasure cm, String equipLife, StringBuffer sb) {
         try {
             float noOfYears = 0;
             if (equipLife.length() != 0)
@@ -119,18 +190,19 @@ public class CMSummaryRecordReader {
 
             cm.setEquipmentLife(noOfYears);
         } catch (NumberFormatException e) {
-            throw new CMImporterException("Could not convert equip life into a floating point value. line no: "
-                    + lineNo);
+            sb.append(format("equip life is a floating point value-" + equipLife));
         }
-
     }
 
-    private void cmClass(ControlMeasure cm, String clazz, int lineNo) {
-        // TODO: do we throw an exception when there is no class specified
+    private void cmClass(ControlMeasure cm, String clazz, StringBuffer sb) {
+        if (clazz.length() == 0) {
+            sb.append(format("class shoule not be empty"));
+            return;
+        }
         cm.setCmClass(clazz);
     }
 
-    private void deviceCode(ControlMeasure cm, String code, int lineNo) throws CMImporterException {
+    private void deviceCode(ControlMeasure cm, String code, StringBuffer sb) {
         try {
             int deviceCode = 0;
             if (code.length() != 0)
@@ -138,16 +210,16 @@ public class CMSummaryRecordReader {
 
             cm.setDeviceCode(deviceCode);
         } catch (NumberFormatException e) {
-            throw new CMImporterException("Could not convert device code into a int value. line no: " + lineNo);
+            sb.append(format("device code is an int value-" + code));
         }
     }
 
-    private void dateReviewed(ControlMeasure cm, String date, int lineNo) throws CMImporterException {
+    private void dateReviewed(ControlMeasure cm, String date, StringBuffer sb) {
         try {
             Date dateReviewed = EmfDateFormat.parse_YYYY(date);
             cm.setDateReviewed(dateReviewed);
         } catch (ParseException e) {
-            throw new CMImporterException("Could not convert review date into a date value. line no: " + lineNo);
+            sb.append(format("expected date format YYYY-" + date));
         }
     }
 
@@ -172,6 +244,10 @@ public class CMSummaryRecordReader {
         }
 
         throw new CMImporterException("This record has more tokens");
+    }
+
+    private String format(String text) {
+        return "\t" + text + "\n";
     }
 
 }

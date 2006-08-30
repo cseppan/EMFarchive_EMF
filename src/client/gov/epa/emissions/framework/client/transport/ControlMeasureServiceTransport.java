@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
@@ -116,5 +117,16 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         call.setReturnType(mappings.controlMeasures());
 
         return (ControlMeasure[]) call.requestResponse(new Object[] { folderPath, fileNames, user });
+    }
+
+    public Status[] getImportStatus(User user) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getImportStatus");
+        call.addParam("user", mappings.user());
+        
+        call.setReturnType(mappings.statuses());
+        
+        return (Status[]) call.requestResponse(new Object[] { user });
     }
 }

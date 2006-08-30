@@ -36,6 +36,8 @@ public class CMImportInputPanel extends JPanel {
 
     private TextArea filenames;
 
+    private TextArea importStatusTextArea;
+
     private static File lastFolder = null;
 
     public CMImportInputPanel(MessagePanel messagePanel) {
@@ -61,12 +63,17 @@ public class CMImportInputPanel extends JPanel {
         layoutGenerator.addLabelWidgetPair("Pattern", apply, this);
 
         filenames = new TextArea("filenames", "", 35, 6);
-        JScrollPane fileTextArea = new JScrollPane(filenames, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+        JScrollPane fileTextAreaPane = new JScrollPane(filenames, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        layoutGenerator.addLabelWidgetPair("Filenames", fileTextArea, this);
+        layoutGenerator.addLabelWidgetPair("Filenames", fileTextAreaPane, this);
+
+        importStatusTextArea = new TextArea("Import Status", "", 35);
+        JScrollPane statusTextAreaPane = new JScrollPane(importStatusTextArea,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        layoutGenerator.addLabelWidgetPair("Status", statusTextAreaPane, this);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(this, 3, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(this, 4, 2, // rows, cols
                 10, 10, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -194,12 +201,17 @@ public class CMImportInputPanel extends JPanel {
         return nonEmptyList;
     }
 
-    public void setMessage(String message) {
+    public void setStartImportMessage(String message) {
+        importStatusTextArea.clear();
         messagePanel.setMessage(message);
     }
 
     private void clear() {
         messagePanel.clear();
+    }
+
+    public void addStatusMessage(String messages) {
+        importStatusTextArea.append(messages);
     }
 
 }

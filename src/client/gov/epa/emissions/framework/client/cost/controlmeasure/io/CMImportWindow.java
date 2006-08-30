@@ -5,7 +5,10 @@ import gov.epa.emissions.commons.gui.buttons.ImportButton;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshButton;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -15,10 +18,9 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
-public class CMImportWindow extends ReusableInteralFrame implements CMImportView {
+public class CMImportWindow extends ReusableInteralFrame implements CMImportView, RefreshObserver {
 
     private CMImportPresenter presenter;
 
@@ -27,7 +29,7 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
     private CMImportInputPanel importInputPanel;
 
     public CMImportWindow(DesktopManager desktopManager) {
-        super("Import Control Measures", new Dimension(650, 300), desktopManager);
+        super("Import Control Measures", new Dimension(650, 400), desktopManager);
         super.setName("importControlMeasures");
 
         this.getContentPane().add(createLayout());
@@ -39,6 +41,7 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
 
         messagePanel = new SingleLineMessagePanel();
         importInputPanel = new CMImportInputPanel(messagePanel);
+
         panel.add(messagePanel);
         panel.add(importInputPanel);
         panel.add(createButtonsPanel());
@@ -55,7 +58,7 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
         layout.setVgap(25);
         container.setLayout(layout);
 
-        JButton importButton = new ImportButton(new AbstractAction() {
+        Button importButton = new ImportButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doImport();
             }
@@ -63,13 +66,17 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
         container.add(importButton);
         getRootPane().setDefaultButton(importButton);
 
+        Button importStatusButton = new RefreshButton("Import Status", 16, true, this,
+                "Refresh Control Measure Import Status", messagePanel);
+
+        container.add(importStatusButton);
+
         Button done = new Button("Done", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doDone();
             }
         });
         container.add(done);
-
         panel.add(container, BorderLayout.EAST);
 
         return panel;
@@ -93,7 +100,20 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
     }
 
     public void setMessage(String message) {
-        importInputPanel.setMessage(message);
+        importInputPanel.setStartImportMessage(message);
 
+    }
+
+    public void doRefresh() throws EmfException {
+        doImportStatus();
+    }
+
+    protected void doImportStatus() throws EmfException {
+        Status[] importStatus = presenter.getImportStatus();
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < importStatus.length; i++) {
+            sb.append(importStatus[i].getMessage());
+        }
+        importInputPanel.addStatusMessage(sb.toString());
     }
 }

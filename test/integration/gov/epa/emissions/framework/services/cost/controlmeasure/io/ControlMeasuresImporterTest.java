@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
+import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 
 import java.io.File;
@@ -21,13 +23,17 @@ public class ControlMeasuresImporterTest extends ServiceTestCase {
     public void testShouldImportControlMeasureFiles() throws EmfException, Exception {
         File folder = new File("test/data/cost/controlMeasure");
         String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
-        ControlMeasuresImporter importer = new ControlMeasuresImporter(folder, fileNames, sessionFactory());
+        ControlMeasuresImporter importer = new ControlMeasuresImporter(folder, fileNames, emfUser(), sessionFactory());
         importer.run();
 
         ControlMeasure[] measures = importer.controlMeasures();
         assertEquals(32, measures.length);
         assertEquals(1132, noOfRecords(measures));
         assertEquals(124, noOfScc(measures));
+    }
+
+    private User emfUser() {
+        return new UserDAO().get("emf",session);
     }
 
     private int noOfScc(ControlMeasure[] measures) {

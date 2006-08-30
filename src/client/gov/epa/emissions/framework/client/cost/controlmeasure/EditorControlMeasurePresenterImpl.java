@@ -48,9 +48,8 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
     public void doClose() throws EmfException {
         session.controlMeasureService().releaseLockedControlMeasure(measure);
         view.disposeView();
-        parent.doRefresh();
     }
-    
+
     public void doSave() throws EmfException {
         save(measure, session.controlMeasureService(), presenters, view);
     }

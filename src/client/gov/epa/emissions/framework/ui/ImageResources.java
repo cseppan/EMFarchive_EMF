@@ -13,8 +13,8 @@ public class ImageResources {
         bundle = ResourceBundle.getBundle("images");
     }
 
-    public ImageIcon refresh(String tooltip) {
-        return image("refresh", tooltip);
+    public ImageIcon refresh(String tooltip, int size) {
+        return image("refresh"+size, tooltip);
     }
 
     public ImageIcon trash(String tooltip) {

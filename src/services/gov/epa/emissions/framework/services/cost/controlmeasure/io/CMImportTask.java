@@ -48,7 +48,7 @@ public class CMImportTask {
         try {
             session.setFlushMode(FlushMode.NEVER);
             prepare();
-            ControlMeasuresImporter importer = new ControlMeasuresImporter(folder, files, sessionFactory);
+            ControlMeasuresImporter importer = new ControlMeasuresImporter(folder, files, user, sessionFactory);
             importer.run();
             return complete(importer.controlMeasures(), session);
         } catch (Exception e) {

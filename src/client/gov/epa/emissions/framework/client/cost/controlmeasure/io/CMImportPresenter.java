@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlmeasure.io;
 
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.Status;
 
 import java.io.File;
 
@@ -29,7 +30,7 @@ public class CMImportPresenter {
     }
 
     private void startImportMessage(CMImportView view) {
-        String message = "Started Import. Please monitor the Status window to track your Import request.";
+        String message = "Started Import. Please use 'Status Window' and 'Import Status' button in the import window to track";
         view.setMessage(message);
     }
 
@@ -60,6 +61,10 @@ public class CMImportPresenter {
     // TODO: move the getFileNamesFromPattern () to a common service
     public String[] getFilesFromPatten(String folder, String pattern) throws EmfException {
         return session.eximService().getFilenamesFromPattern(mapToRemote(folder), pattern);
+    }
+
+    public Status[] getImportStatus() throws EmfException {
+        return session.controlMeasureService().getImportStatus(session.user());
     }
 
 }

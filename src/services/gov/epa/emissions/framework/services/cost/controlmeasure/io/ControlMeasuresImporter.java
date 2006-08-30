@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 import gov.epa.emissions.commons.io.importer.FileVerifier;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -18,10 +19,10 @@ public class ControlMeasuresImporter implements Importer {
 
     private Map controlMeasures;
 
-    public ControlMeasuresImporter(File folder, String[] fileNames, HibernateSessionFactory factory)
+    public ControlMeasuresImporter(File folder, String[] fileNames, User user, HibernateSessionFactory factory)
             throws EmfException, ImporterException {
         File[] files = fileNames(folder, fileNames);
-        ControlMeasuresImportIdentifier types = new ControlMeasuresImportIdentifier(files, factory);
+        ControlMeasuresImportIdentifier types = new ControlMeasuresImportIdentifier(files, user, factory);
         cmImporters = types.cmImporters();
         controlMeasures = new HashMap();
     }

@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
 import gov.epa.emissions.commons.Record;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -22,9 +23,12 @@ public class CMImporters {
 
     private HibernateSessionFactory sessionFactory;
 
-    public CMImporters(File[] files, Record[] records, HibernateSessionFactory sessionFactory) throws EmfException {
+    private User user;
+
+    public CMImporters(File[] files, Record[] records, User user, HibernateSessionFactory sessionFactory) throws EmfException {
         this.files = files;
         this.records = records;
+        this.user = user;
         this.sessionFactory = sessionFactory;
         summaryImporter = createSummaryImporter();
         efficiencyImporter = createEfficiencyImporter();
@@ -53,7 +57,7 @@ public class CMImporters {
         String[] cols = fileFormat.cols();
         for (int i = 0; i < records.length; i++) {
             if (matches(cols, records[i].getTokens())) {
-                return new CMSummaryImporter(files[i], fileFormat, sessionFactory);
+                return new CMSummaryImporter(files[i], fileFormat, user, sessionFactory);
             }
         }
 

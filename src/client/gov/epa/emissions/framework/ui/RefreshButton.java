@@ -10,8 +10,9 @@ import javax.swing.ImageIcon;
 
 public class RefreshButton extends Button {
 
-    public RefreshButton(final RefreshObserver observer, String message, final MessagePanel messagePanel) {
-        super("Refresh", new AbstractAction() {
+    public RefreshButton(String label, int iconSize, boolean borderPainted, final RefreshObserver observer,
+            String message, final MessagePanel messagePanel) {
+        super(label, new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     observer.doRefresh();
@@ -21,14 +22,18 @@ public class RefreshButton extends Button {
             }
         });
 
-        super.setIcon(refreshIcon(message));
+        super.setIcon(refreshIcon(message, iconSize));
         super.setToolTipText(message);
-        super.setBorderPainted(false);
+        super.setBorderPainted(borderPainted);
         this.setMnemonic('R');
     }
 
-    private ImageIcon refreshIcon(String message) {
-        return new ImageResources().refresh(message);
+    public RefreshButton(final RefreshObserver observer, String message, final MessagePanel messagePanel) {
+        this("Refresh", 24,false, observer, message, messagePanel);
+    }
+
+    private ImageIcon refreshIcon(String message, int size) {
+        return new ImageResources().refresh(message, size);
     }
 
 }

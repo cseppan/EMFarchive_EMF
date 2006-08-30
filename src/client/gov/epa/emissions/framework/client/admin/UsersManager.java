@@ -107,7 +107,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.CENTER);
 
-        Button button = new RefreshButton(this, "Refresh Datasets", messagePanel);
+        Button button = new RefreshButton(this, "Refresh Users", messagePanel);
         panel.add(button, BorderLayout.EAST);
 
         return panel;

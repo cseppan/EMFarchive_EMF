@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EMFService;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 
@@ -25,5 +26,7 @@ public interface ControlMeasureService extends EMFService {
     ControlTechnology[] getControlTechnologies() throws EmfException;
 
     ControlMeasure[] importControlMeasures(String folderPath, String[] fileNames,User user) throws EmfException;
+
+    Status[] getImportStatus(User user) throws EmfException;
 
 }
