@@ -53,7 +53,7 @@ public class CMImportTask {
             return complete(importer.controlMeasures(), session);
         } catch (Exception e) {
             logError("Failed to import control measures", e); // FIXME: report generation
-            setStatus("Failed to import all control measures"); // FIXME:
+            setStatus("Failed to import all control measures: "+e.getMessage());
         } finally {
             session.flush();
             session.close();

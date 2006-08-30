@@ -40,7 +40,10 @@ public class SourceGroups {
         if (index != -1) {
             return (SourceGroup) sourceGroupList.get(index);
         }
-        return saveAndLoad(sourceGroup);
+
+        sourceGroup = saveAndLoad(sourceGroup);
+        sourceGroupList.add(sourceGroup);
+        return sourceGroup;
     }
 
     private SourceGroup saveAndLoad(SourceGroup sourceGroup) throws CMImporterException {

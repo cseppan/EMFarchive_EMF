@@ -147,13 +147,13 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public ControlMeasure[] importControlMeasures(String folderPath, String[] fileNames,User user) throws EmfException {
+    public ControlMeasure[] importControlMeasures(String folderPath, String[] fileNames, User user) throws EmfException {
         try {
-            CMImportTask importTask = new CMImportTask(new File(folderPath),fileNames,user,sessionFactory);
+            CMImportTask importTask = new CMImportTask(new File(folderPath), fileNames, user, sessionFactory);
             return importTask.run();
         } catch (RuntimeException e) {
-            LOG.error("could not import control measures.", e);
-            throw new EmfException("could not import control measures");
+            LOG.error("Could not import control measures.", e);
+            throw new EmfException("Could not import control measures: " + e.getMessage());
         }
     }
 

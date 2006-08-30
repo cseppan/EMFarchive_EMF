@@ -41,7 +41,10 @@ public class Sectors {
         if (index != -1) {
             return (Sector) sectorsList.get(index);
         }
-        return saveAndLoad(sector);
+
+        sector = saveAndLoad(sector);
+        sectorsList.add(sector);
+        return sector;
     }
 
     private Sector saveAndLoad(Sector sector) throws CMImporterException {

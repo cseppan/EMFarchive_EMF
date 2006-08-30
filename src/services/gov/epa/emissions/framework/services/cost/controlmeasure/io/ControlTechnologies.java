@@ -40,7 +40,10 @@ public class ControlTechnologies {
         if (index != -1) {
             return (ControlTechnology) controlTechnologiesList.get(index);
         }
-        return saveAndLoad(controlTechnology);
+        
+        controlTechnology=saveAndLoad(controlTechnology);
+        controlTechnologiesList.add(controlTechnology);
+        return controlTechnology;
     }
 
     private ControlTechnology saveAndLoad(ControlTechnology controlTechnology) throws CMImporterException {

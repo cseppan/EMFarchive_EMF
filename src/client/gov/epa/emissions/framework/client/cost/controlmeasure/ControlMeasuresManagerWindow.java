@@ -11,6 +11,9 @@ import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlmeasure.io.CMImportPresenter;
+import gov.epa.emissions.framework.client.cost.controlmeasure.io.CMImportView;
+import gov.epa.emissions.framework.client.cost.controlmeasure.io.CMImportWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
@@ -137,19 +140,19 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private JPanel createLeftControlPanel() {
         JPanel panel = new JPanel();
 
-        Button view = new ViewButton(viewAction());
+        Button view = new ViewButton(null);
         panel.add(view);
         view.setEnabled(false);
 
         Button edit = new EditButton(editAction());
         panel.add(edit);
 
-        Button exportButton = new ExportButton(exportAction());
+        Button exportButton = new ExportButton(null);
         exportButton.setToolTipText("Export existing Control Measure(s)");
         panel.add(exportButton);
         exportButton.setEnabled(false);
 
-        Button copy = new CopyButton(copyAction());
+        Button copy = new CopyButton(null);
         panel.add(copy);
         copy.setEnabled(false);
 
@@ -186,9 +189,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         });
         panel.add(getItem("Cost Year:", costYear));
 
-        Button importButton = new ImportButton(viewAction());
+        Button importButton = new ImportButton(importAction());
         panel.add(importButton);
-        importButton.setEnabled(false);
 
         Button closeButton = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -198,6 +200,21 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         panel.add(closeButton);
 
         return panel;
+    }
+
+    private Action importAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                controlMeasureImport();
+            }
+        };
+    }
+
+    protected void controlMeasureImport() {
+        CMImportView view = new CMImportWindow(desktopManager);
+        CMImportPresenter presenter = new CMImportPresenter(session);
+        presenter.display(view);
+
     }
 
     private Component getItem(String label, JComboBox box) {
@@ -211,10 +228,6 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
                 5, 5);// xPad, yPad
 
         return panel;
-    }
-
-    private Action viewAction() {
-        return exportAction();
     }
 
     private Action editAction() {
@@ -253,20 +266,6 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         ControlMeasure measure = new ControlMeasure();
         measure.setCreator(session.user());
         presenter.doCreateNew(parentConsole, measure, desktopManager);
-    }
-
-    private Action copyAction() {
-        return exportAction();
-    }
-
-    private Action exportAction() {
-        Action action = new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                // TODO: Add Export Action
-            }
-        };
-
-        return action;
     }
 
     private List getSelectedMeasures() {

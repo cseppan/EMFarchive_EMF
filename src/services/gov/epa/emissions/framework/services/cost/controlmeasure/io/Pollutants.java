@@ -39,7 +39,10 @@ public class Pollutants {
         if (index != -1) {
             return (Pollutant) pollutantList.get(index);
         }
-        return saveAndLoad(pollutant);
+
+        pollutant = saveAndLoad(pollutant);
+        pollutantList.add(pollutant);
+        return pollutant;
     }
 
     private Pollutant saveAndLoad(Pollutant pollutant) throws CMImporterException {
