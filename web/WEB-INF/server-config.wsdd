@@ -286,6 +286,11 @@
 		qname="ns1:StrategyResultType" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 		
 
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable"
+		qname="ns1:CostYearTable" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+
 	<!-- CASE MANAGEMENT -->
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Case"

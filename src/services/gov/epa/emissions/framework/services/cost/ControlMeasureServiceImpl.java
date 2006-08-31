@@ -1,17 +1,21 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
-
 
 public class ControlMeasureServiceImpl implements ControlMeasureService {
 
@@ -146,4 +150,28 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
+    public CostYearTable getCostYearTable(int targetYear) throws EmfException {
+        DbServer dbServer = null;
+        try {
+            dbServer = new EmfDbServer();
+            CostYearTableReader reader = new CostYearTableReader(dbServer, targetYear);
+            return reader.costYearTable();
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            throw new EmfException(e.getMessage());
+        } finally {
+            close(dbServer);
+        }
+    }
+
+    private void close(DbServer dbServer) throws EmfException {
+        try {
+            if (dbServer != null)
+                dbServer.disconnect();
+
+        } catch (SQLException e) {
+            LOG.error("Could not close database server", e);
+            throw new EmfException("Could not close database server");
+        }
+    }
 }

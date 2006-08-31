@@ -40,10 +40,14 @@ public class CostYearTable {
 
     private double gdpValue(int year) throws EmfException {
         int index = year - startYear;
-        if (index > size()-1) {
+        if (index > size() - 1) {
             throw new EmfException("The cost year conversion is available between 1929 to 2005");
         }
         return list.get(index);
+    }
+
+    public void setTargetYear(int targetYear) {
+        this.targetYear = targetYear;
     }
 
 }

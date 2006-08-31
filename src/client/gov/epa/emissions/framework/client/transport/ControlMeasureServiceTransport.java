@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 
@@ -103,6 +104,17 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         ControlTechnology[] technologies = (ControlTechnology[]) call.requestResponse(new Object[] {});
 
         return technologies;
+    }
+
+    public CostYearTable getCostYearTable(int targetYear) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getCostYearTable");
+        call.addIntegerParam("targetYear");
+        
+        call.setReturnType(mappings.costYearTable());
+        
+        return (CostYearTable) call.requestResponse(new Object[] { new Integer(targetYear) });
     }
 
 }

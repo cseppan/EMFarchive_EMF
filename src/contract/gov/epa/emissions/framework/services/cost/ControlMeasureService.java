@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EMFService;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 
@@ -23,5 +24,7 @@ public interface ControlMeasureService extends EMFService {
     Scc[] getSccs(ControlMeasure measure) throws EmfException;
 
     ControlTechnology[] getControlTechnologies() throws EmfException;
+    
+    CostYearTable getCostYearTable(int targetYear) throws EmfException;
     
 }

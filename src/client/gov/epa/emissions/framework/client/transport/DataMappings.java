@@ -25,6 +25,7 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
@@ -104,6 +105,7 @@ public class DataMappings extends Mappings {
         bean(call, Scc.class, scc());
         bean(call, ControlStrategyResultsSummary.class, controlStrategyResultsSummary());
         bean(call, StrategyResultType.class, strategyResultType());
+        bean(call,CostYearTable.class,costYearTable());
     }
 
     private void registerArrays(Call call) {
@@ -402,6 +404,10 @@ public class DataMappings extends Mappings {
     
     public QName controlTechnologies() {
         return qname("ControlTechnologies");
+    }
+
+    public QName costYearTable() {
+        return qname("CostYearTable");
     }
     
 }

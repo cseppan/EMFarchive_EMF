@@ -2,7 +2,10 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
+import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
@@ -24,12 +27,17 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     private ControlMeasure[] allMeasures;
 
-    // private CostYearTable table;
+    private CostYearTable costYearTable;
 
     private Map maxEffMap;
 
-    public ControlMeasureTableData(ControlMeasure[] measures, String pollutant, String year) {
+    private int targetYear;
+
+    public ControlMeasureTableData(ControlMeasure[] measures, CostYearTable costYearTable, String pollutant, String year)
+            throws EmfException {
         this.allMeasures = measures;
+        this.costYearTable = costYearTable;
+
         maxEffMap = new HashMap();
         filter(pollutant, year);
         this.rows = createRows(measures);
@@ -45,12 +53,12 @@ public class ControlMeasureTableData extends AbstractTableData {
         return this.rows;
     }
 
-    public void refresh(String pollutant, String year) {
+    public void refresh(String pollutant, String year) throws EmfException {
         filter(pollutant, year);
         this.rows = createRows(allMeasures);
     }
 
-    private List createRows(ControlMeasure[] measures) {
+    private List createRows(ControlMeasure[] measures) throws EmfException {
         List rows = new ArrayList();
 
         for (int i = 0; i < measures.length; i++) {
@@ -128,8 +136,9 @@ public class ControlMeasureTableData extends AbstractTableData {
         return String.class;
     }
 
-    private void filter(String pollutant, String year) {
+    private void filter(String pollutant, String year) throws EmfException {
         maxEffMap.clear();
+        this.targetYear = new YearValidation("Cost Year").value(year);
         if (pollutant.equalsIgnoreCase("major"))
             measures(allMeasures);
         else
@@ -175,14 +184,16 @@ public class ControlMeasureTableData extends AbstractTableData {
         return (EfficiencyRecord[]) list.toArray(new EfficiencyRecord[0]);
     }
 
-    private Float getCostPerTon(EfficiencyRecord record) {
+    private String getCostPerTon(EfficiencyRecord record) throws EmfException {
         if (record == null)
             return null;
-        // int costYear = record.getCostYear();
+        int costYear = record.getCostYear();
         float costPerTon = record.getCostPerTon();
-        // change the target year; table.setTargetYear(
-        // table.factor(costYear);
-        return new Float(costPerTon);
+        if (costYearTable != null)// FIXME: REMOVE M
+            costYearTable.setTargetYear(targetYear);
+
+        double newCost = costPerTon * ((costYearTable == null) ? 1.0 : costYearTable.factor(costYear));
+        return new Double(newCost).toString();
     }
 
     private Float getControlEfficiency(EfficiencyRecord record) {
