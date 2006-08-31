@@ -6,8 +6,6 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
-import gov.epa.emissions.framework.services.basic.Status;
-import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -29,18 +27,15 @@ public class CMSummaryRecordReader {
 
     private Sectors sectors;
 
-    private User user;
-
-    private StatusDAO stausDao;
-
     private List namesList;
 
     private List abbrevList;
 
+    private CMAddImportStatus cmAddImportStatus;
+
     public CMSummaryRecordReader(CMSummaryFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) {
         this.fileFormat = fileFormat;
-        this.user = user;
-        this.stausDao = new StatusDAO(sessionFactory);
+        this.cmAddImportStatus = new CMAddImportStatus(user, sessionFactory);
         pollutants = new Pollutants(sessionFactory);
         controlTechnologies = new ControlTechnologies(sessionFactory);
         sourceGroups = new SourceGroups(sessionFactory);
@@ -55,7 +50,7 @@ public class CMSummaryRecordReader {
             tokens = modify(record);
             return measure(tokens, lineNo);
         } catch (CMImporterException e) {
-            addStatus(lineNo, new StringBuffer(format(e.getMessage())));
+            cmAddImportStatus.addStatus(lineNo, new StringBuffer(format(e.getMessage())));
             return null;
         }
     }
@@ -79,7 +74,7 @@ public class CMSummaryRecordReader {
             datasource(cm, tokens[10]);
             description(cm, tokens[11]);
         }
-        addStatus(lineNo, sb);
+        cmAddImportStatus.addStatus(lineNo, sb);
         return cm;
     }
 
@@ -106,22 +101,6 @@ public class CMSummaryRecordReader {
         namesList.add(tokens[1]);
         return true;
 
-    }
-
-    private void addStatus(int lineNo, StringBuffer sb) {
-        String message = sb.toString();
-        if (message.length() > 0)
-            setStatus(lineNo + "\n" + message);
-    }
-
-    private void setStatus(String message) {
-        Status endStatus = new Status();
-        endStatus.setUsername(user.getUsername());
-        endStatus.setType("CMImportDetailMsg");
-        endStatus.setMessage(message);
-        endStatus.setTimestamp(new Date());
-
-        stausDao.add(endStatus);
     }
 
     private void name(ControlMeasure cm, String token) {
@@ -247,7 +226,7 @@ public class CMSummaryRecordReader {
     }
 
     private String format(String text) {
-        return "\t" + text + "\n";
+        return cmAddImportStatus.format(text);
     }
 
 }

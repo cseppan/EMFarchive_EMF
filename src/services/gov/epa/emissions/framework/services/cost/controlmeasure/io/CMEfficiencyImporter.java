@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.io.importer.ImporterException;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
@@ -13,9 +14,9 @@ public class CMEfficiencyImporter {
     
     private CMEfficiencyRecordReader cmEfficiencyReader;
 
-    public CMEfficiencyImporter(File file, CMEfficiencyFileFormat fileFormat, HibernateSessionFactory sessionFactory) {
+    public CMEfficiencyImporter(File file, CMEfficiencyFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) {
         this.file = file;
-        this.cmEfficiencyReader = new CMEfficiencyRecordReader(fileFormat,sessionFactory);
+        this.cmEfficiencyReader = new CMEfficiencyRecordReader(fileFormat,user, sessionFactory);
     }
 
     public void run(Map controlMeasures) throws ImporterException {

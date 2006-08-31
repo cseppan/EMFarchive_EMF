@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
@@ -17,18 +18,22 @@ public class CMEfficiencyRecordReader {
 
     private Pollutants pollutants;
 
-    public CMEfficiencyRecordReader(CMEfficiencyFileFormat fileFormat, HibernateSessionFactory sessionFactory) {
+    private CMAddImportStatus status;
+
+    public CMEfficiencyRecordReader(CMEfficiencyFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) {
         this.fileFormat = fileFormat;
+        this.status = new CMAddImportStatus(user, sessionFactory);
         pollutants = new Pollutants(sessionFactory);
 
     }
 
     public void parse(Map controlMeasures, Record record, int lineNo) throws CMImporterException {
         String[] tokens = modify(record);
+        StringBuffer sb = new StringBuffer();
         ControlMeasure cm = (ControlMeasure) controlMeasures.get(tokens[0]);
         if (cm == null) {
-            throw new CMImporterException("The abbreviation '" + tokens[0]
-                    + "' is not in the control measure summary file");
+            sb.append(format("abbreviation '" + tokens[0] + "' is not in the control measure summary file"));
+            return;
         }
         EfficiencyRecord efficiencyRecord = new EfficiencyRecord();
         pollutant(efficiencyRecord, tokens[1], lineNo);
@@ -44,7 +49,7 @@ public class CMEfficiencyRecordReader {
         capitalRecoveryFactor(efficiencyRecord, tokens[12], lineNo);
         discountFactor(efficiencyRecord, tokens[13], lineNo);
         details(efficiencyRecord, tokens[14], lineNo);
-        
+
         cm.addEfficiencyRecord(efficiencyRecord);
     }
 
@@ -81,7 +86,7 @@ public class CMEfficiencyRecordReader {
         efficiencyRecord.setExistingMeasureAbbr(existMeasureAbbrev);
     }
 
-    //FIXME: handle exceptions related '%'
+    // FIXME: handle exceptions related '%'
     private void controlEfficiency(EfficiencyRecord efficiencyRecord, String controlEfficiency, int lineNo) {
         float ce = floatValue(controlEfficiency.split("%")[0]);
         efficiencyRecord.setEfficiency(ce);
@@ -149,4 +154,9 @@ public class CMEfficiencyRecordReader {
 
         throw new CMImporterException("This record has more tokens");
     }
+
+    private String format(String text) {
+        return status.format(text);
+    }
+
 }
