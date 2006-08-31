@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.cost.controlmeasure;
+package gov.epa.emissions.framework.services.cost.controlmeasure;
 
 import gov.epa.emissions.framework.services.EmfException;
 

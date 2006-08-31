@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.ui;
 
-import gov.epa.emissions.framework.client.data.EmfDateFormat;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

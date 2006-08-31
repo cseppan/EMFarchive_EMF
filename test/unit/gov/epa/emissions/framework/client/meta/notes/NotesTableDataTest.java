@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.gui.Changeables;
 import gov.epa.emissions.commons.gui.DefaultChangeables;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
-import gov.epa.emissions.framework.client.data.EmfDateFormat;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.ui.Row;

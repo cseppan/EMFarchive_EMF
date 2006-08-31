@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
-import gov.epa.emissions.framework.client.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
+import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 
 import java.util.ArrayList;
 import java.util.Arrays;

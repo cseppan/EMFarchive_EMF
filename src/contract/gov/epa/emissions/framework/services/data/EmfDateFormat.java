@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.data;
+package gov.epa.emissions.framework.services.data;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

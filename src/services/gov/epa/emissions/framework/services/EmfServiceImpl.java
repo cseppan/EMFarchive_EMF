@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.PerformanceMetrics;
 import gov.epa.emissions.commons.db.DbServer;
-import gov.epa.emissions.framework.client.data.EmfDateFormat;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.persistence.DataSourceFactory;
 
 import java.text.SimpleDateFormat;

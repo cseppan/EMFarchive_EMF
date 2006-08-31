@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.meta.revisions;
 
-import gov.epa.emissions.framework.client.data.EmfDateFormat;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.ui.RowSource;
 

@@ -15,13 +15,13 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
-import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.client.data.IntendedUses;
 import gov.epa.emissions.framework.client.data.Projects;
 import gov.epa.emissions.framework.client.data.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.ui.MessagePanel;
 

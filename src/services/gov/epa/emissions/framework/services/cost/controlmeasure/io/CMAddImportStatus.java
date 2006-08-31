@@ -21,7 +21,7 @@ public class CMAddImportStatus {
     public void addStatus(int lineNo, StringBuffer sb) {
         String message = sb.toString();
         if (message.length() > 0)
-            setStatus(lineNo + "\n" + message);
+            setStatus("Line No: "+lineNo + "\n" + message);
     }
 
     private void setStatus(String message) {
@@ -35,7 +35,7 @@ public class CMAddImportStatus {
     }
 
     public String format(String text) {
-        return "\t" + text + "\n";
+        return "   " + text + "\n";
     }
 
 }

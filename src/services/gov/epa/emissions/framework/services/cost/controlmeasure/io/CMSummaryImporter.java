@@ -31,14 +31,14 @@ public class CMSummaryImporter {
     }
 
     public void run(Map controlMeasures) throws ImporterException {
-        addStatus("Started reading summary file");
+        addStatus("Started reading Summary file");
         CMCSVFileReader reader = new CMCSVFileReader(file);
         for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
             ControlMeasure cm = cmSummaryRecord.parse(record, reader.lineNumber());
             if (cm != null)
                 controlMeasures.put(cm.getAbbreviation(), cm);
         }
-        addStatus("Finished reading summary file");
+        addStatus("Finished reading Summary file");
     }
 
     private void addStatus(String message) {

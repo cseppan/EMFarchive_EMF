@@ -14,7 +14,9 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -23,8 +25,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -77,8 +77,6 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     protected Pollutant[] allPollutants;
 
     private String[] equationTypes = { "cpton" };
-
-    public static DateFormat effectiveDateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     public EfficiencyRecordWindow(String title, ManageChangeables changeablesList, DesktopManager desktopManager,
             EmfSession session) {
@@ -218,7 +216,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     protected String formatEffectiveDate() {
         Date effectiveDate = record.getEffectiveDate();
-        return effectiveDate == null ? "" : effectiveDateFormat.format(effectiveDate);
+        return effectiveDate == null ? "" : EmfDateFormat.format_MM_DD_YYYY(effectiveDate);
     }
 
     private JPanel buttonsPanel() {
@@ -278,7 +276,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
                 record.setEffectiveDate(null);
                 return;
             }
-            record.setEffectiveDate(effectiveDateFormat.parse(date));
+            record.setEffectiveDate(EmfDateFormat.parse_MMddyyyy(date));
         } catch (Exception e) {
             throw new EmfException("Please Correct the Date Format(MM/dd/yyyy) in Effective Date");
         }
@@ -287,8 +285,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     private void saveDiscountRate() throws EmfException {
         float value = verifier.parseFloat(discountRate);
         if (value < 0 || value > 20)
-            throw new EmfException(
-                    "Enter the Discount Rate as a percent between 0 and 20. Eg: 1 = 1%.  0.01 = 0.01%");
+            throw new EmfException("Enter the Discount Rate as a percent between 0 and 20. Eg: 1 = 1%.  0.01 = 0.01%");
         record.setDiscountRate(value);
     }
 
@@ -339,7 +336,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     private void saveEfficiency(TextField efficiency) throws EmfException {
         float value = verifier.parseFloat(efficiency);
-        if (value <= 0 )
+        if (value <= 0)
             throw new EmfException("Enter the Control Efficiency as a percentage (e.g., 90%, or -10% for a disbenefit)");
         record.setEfficiency(value);
     }
