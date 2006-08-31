@@ -31,7 +31,7 @@ public class CalMaxEmsRedControlMeasure {
         this.localeFilter = new LocaleFilter();
     }
 
-    public MaxEmsRedContorlMeasure getControlMeasure(String scc, String fips) throws EmfException {
+    public MaxControlEffContorlMeasure getControlMeasure(String scc, String fips) throws EmfException {
         ControlMeasure[] controlMeasures = map.getControlMeasures(scc);
         // FIXME: if no control measure found for an scc log add warning msg
         CalMaxEmsRedEfficiencyRecord reduction = new CalMaxEmsRedEfficiencyRecord(costYearTable);
@@ -42,7 +42,7 @@ public class CalMaxEmsRedControlMeasure {
             }
         }
 
-        MaxEmsRedContorlMeasure maxMeasure = reduction.maxEmsReductionMeasure();
+        MaxControlEffContorlMeasure maxMeasure = reduction.maxEmsReductionMeasure();
         // FIXME: warn or error ?? if(maxEmsReductionMeasure==null)
         return maxMeasure;
     }

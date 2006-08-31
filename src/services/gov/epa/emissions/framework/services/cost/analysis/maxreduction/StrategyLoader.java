@@ -72,7 +72,7 @@ public class StrategyLoader {
                 String scc = resultSet.getString("scc");
                 String fips = resultSet.getString("fips");
 
-                MaxEmsRedContorlMeasure maxCM = maxEmsReduction.getControlMeasure(scc, fips);
+                MaxControlEffContorlMeasure maxCM = maxEmsReduction.getControlMeasure(scc, fips);
                 if (maxCM == null)
                     continue; // LOG???
                 try {

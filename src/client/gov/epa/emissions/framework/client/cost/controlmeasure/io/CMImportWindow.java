@@ -17,7 +17,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 public class CMImportWindow extends ReusableInteralFrame implements CMImportView, RefreshObserver {
@@ -36,15 +35,15 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
     }
 
     private JPanel createLayout() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JPanel panel = new JPanel(new BorderLayout());
+        // panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
         importInputPanel = new CMImportInputPanel(messagePanel);
 
-        panel.add(messagePanel);
+        panel.add(messagePanel, BorderLayout.NORTH);
         panel.add(importInputPanel);
-        panel.add(createButtonsPanel());
+        panel.add(createButtonsPanel(), BorderLayout.SOUTH);
 
         return panel;
     }

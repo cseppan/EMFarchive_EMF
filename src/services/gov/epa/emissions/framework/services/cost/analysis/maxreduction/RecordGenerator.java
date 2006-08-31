@@ -22,14 +22,14 @@ public class RecordGenerator {
         comment = "";
     }
 
-    public Record getRecord(ResultSet resultSet, MaxEmsRedContorlMeasure maxCM) throws SQLException, EmfException {
+    public Record getRecord(ResultSet resultSet, MaxControlEffContorlMeasure maxCM) throws SQLException, EmfException {
         Record record = new Record();
         record.add(tokens(resultSet, maxCM));
 
         return record;
     }
 
-    private List tokens(ResultSet resultSet, MaxEmsRedContorlMeasure maxCM) throws SQLException, EmfException {
+    private List tokens(ResultSet resultSet, MaxControlEffContorlMeasure maxCM) throws SQLException, EmfException {
         List tokens = new ArrayList();
 
         tokens.add(""); // record id
@@ -62,7 +62,7 @@ public class RecordGenerator {
         return tokens;
     }
 
-    private void emissions(List tokens, ResultSet resultSet, MaxEmsRedContorlMeasure maxMeasure) throws SQLException {
+    private void emissions(List tokens, ResultSet resultSet, MaxControlEffContorlMeasure maxMeasure) throws SQLException {
         double invenControlEfficiency = resultSet.getFloat("CEFF");
         double invenRulePenetration = resultSet.getFloat("RPEN");
         double invenRuleEffectiveness = resultSet.getFloat("REFF");

@@ -47,35 +47,41 @@ public class CMImportInputPanel extends JPanel {
     }
 
     private void initialize() {
-        setLayout(new SpringLayout());
+        
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new SpringLayout());
+        
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         JPanel chooser = new JPanel(new BorderLayout(6, 0));
         folder = new TextField("folder", 35);
         chooser.add(folder, BorderLayout.LINE_START);
         chooser.add(browseFileButton(), BorderLayout.LINE_END);
-        layoutGenerator.addLabelWidgetPair("Folder", chooser, this);
+        layoutGenerator.addLabelWidgetPair("Folder", chooser, mainPanel);
 
         JPanel apply = new JPanel(new BorderLayout(6, 0));
         pattern = new TextField("pattern", 35);
         apply.add(pattern, BorderLayout.LINE_START);
         apply.add(applyPatternButton(), BorderLayout.LINE_END);
-        layoutGenerator.addLabelWidgetPair("Pattern", apply, this);
+        layoutGenerator.addLabelWidgetPair("Pattern", apply, mainPanel);
 
         filenames = new TextArea("filenames", "", 35, 6);
         JScrollPane fileTextAreaPane = new JScrollPane(filenames, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        layoutGenerator.addLabelWidgetPair("Filenames", fileTextAreaPane, this);
+        layoutGenerator.addLabelWidgetPair("Filenames", fileTextAreaPane, mainPanel);
 
         importStatusTextArea = new TextArea("Import Status", "", 35);
         JScrollPane statusTextAreaPane = new JScrollPane(importStatusTextArea,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        layoutGenerator.addLabelWidgetPair("Status", statusTextAreaPane, this);
+        layoutGenerator.addLabelWidgetPair("Status", statusTextAreaPane, mainPanel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(this, 4, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(mainPanel, 4, 2, // rows, cols
                 10, 10, // initialX, initialY
                 10, 10);// xPad, yPad
+        
+        this.setLayout(new BorderLayout());
+        this.add(mainPanel);
 
     }
 

@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
-public class MaxEmsRedContorlMeasure {
+public class MaxControlEffContorlMeasure {
 
     private ControlMeasure controlMeasure;
 
@@ -15,7 +15,7 @@ public class MaxEmsRedContorlMeasure {
 
     private EfficiencyRecordUtil efficiencyRecordUtil;
 
-    public MaxEmsRedContorlMeasure(ControlMeasure controlMeasure, EfficiencyRecord record, CostYearTable table) {
+    public MaxControlEffContorlMeasure(ControlMeasure controlMeasure, EfficiencyRecord record, CostYearTable table) {
         this.controlMeasure = controlMeasure;
         this.maxRecord = record;
         this.table = table;

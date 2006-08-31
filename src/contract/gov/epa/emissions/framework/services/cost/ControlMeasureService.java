@@ -23,5 +23,5 @@ public interface ControlMeasureService extends EMFService {
     Scc[] getSccs(ControlMeasure measure) throws EmfException;
 
     ControlTechnology[] getControlTechnologies() throws EmfException;
-
+    
 }

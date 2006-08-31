@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
-import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
@@ -15,27 +14,40 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ControlMeasureTableData extends AbstractTableData {
 
     private List rows;
 
-    private static String pollutant = "Major";
+    private ControlMeasure[] allMeasures;
 
-    public ControlMeasureTableData(ControlMeasure[] measures) {
+    // private CostYearTable table;
+
+    private Map maxEffMap;
+
+    public ControlMeasureTableData(ControlMeasure[] measures, String pollutant, String year) {
+        this.allMeasures = measures;
+        maxEffMap = new HashMap();
+        filter(pollutant, year);
         this.rows = createRows(measures);
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Creator", "Abbreviation", "Control Eff.", "Cost per Ton", "Rule Eff.",
-                "Rule Pen.", "Major Poll.", "Description", "Equipment Life", "Class", "Last Modified Time",
-                "NEI Device Code", "Control Technology", "Source Group", "Date Reviewed", "Sectors", "Data Source" };
+        return new String[] { "Name", "Abbreviation", "Major Poll.", "Control Eff.", "Cost per Ton", "Rule Eff.",
+                "Rule Pen.", "Control Technology", "Source Group", "Equipment Life", "NEI Device Code", "Sectors",
+                "Class", "Last Modified Time", "Date Reviewed", "Creator", "Data Source", "Description", };
     }
 
     public List rows() {
         return this.rows;
+    }
+
+    public void refresh(String pollutant, String year) {
+        filter(pollutant, year);
+        this.rows = createRows(allMeasures);
     }
 
     private List createRows(ControlMeasure[] measures) {
@@ -43,18 +55,25 @@ public class ControlMeasureTableData extends AbstractTableData {
 
         for (int i = 0; i < measures.length; i++) {
             ControlMeasure measure = measures[i];
-            Object[] values = { measure.getName(), measure.getCreator().getName(), measure.getAbbreviation(),
-                    getControlEfficiency(measure), getCostPerTon(measure), new Float(0), new Float(0),
-                    measure.getMajorPollutant(), measure.getDescription(), new Float(measure.getEquipmentLife()),
-                    measureClass(measure.getCmClass()), getLastModifiedTime(measure),
-                    new Integer(measure.getDeviceCode()), getControlTechnology(measure), getSourceGroup(measure),
-                    getDateReviewed(measure), getSectors(measure), measure.getDataSouce() };
+            EfficiencyRecord record = (EfficiencyRecord) maxEffMap.get(measures[i].getAbbreviation());
+            Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(record),
+                    getControlEfficiency(record), getCostPerTon(record), ruleEffectiveness(record),
+                    rulePenetration(record), getControlTechnology(measure), getSourceGroup(measure),
+                    "" + measure.getEquipmentLife(), "" + measure.getDeviceCode(), getSectors(measure),
+                    measureClass(measure.getCmClass()), getLastModifiedTime(measure), getDateReviewed(measure),
+                    measure.getCreator().getName(), measure.getDataSouce(), measure.getDescription(), };
 
             Row row = new ViewableRow(measure, values);
             rows.add(row);
         }
 
         return rows;
+    }
+
+    private String pollutant(EfficiencyRecord record) {
+        if (record == null)
+            return "";
+        return record.getPollutant().getName();
     }
 
     private String measureClass(String cmClass) {
@@ -95,46 +114,6 @@ public class ControlMeasureTableData extends AbstractTableData {
         return technology.getName();
     }
 
-    private Float getCostPerTon(ControlMeasure measure) {
-        // CostRecord[] records = measure.getCostRecords();
-        // String localPollutant = getLocalPollutant(measure);
-        //
-        // if (records.length != 0) {
-        // for (int i = 0; i < records.length; i++)
-        // if (records[i].getPollutant().equalsIgnoreCase(localPollutant)) {
-        // if (year == -9999)
-        // return new Float(records[i].getCostPerTon());
-        // if (records[i].getCostYear() == year)
-        // return new Float(records[i].getCostPerTon());
-        // }
-        //
-        // }
-
-        return new Float(0);
-    }
-
-    private Float getControlEfficiency(ControlMeasure measure) {
-        EfficiencyRecord[] records = measure.getEfficiencyRecords();
-        if (records.length != 0) {
-            String localPollutant = getLocalPollutant(measure);
-            for (int i = 0; i < records.length; i++) {
-                if (records[i].getPollutant().getName().equalsIgnoreCase(localPollutant))
-                    return new Float(records[i].getEfficiency());
-            }
-        }
-
-        return null;
-    }
-
-    private String getLocalPollutant(ControlMeasure measure) {
-        String localPollutant = pollutant;
-        Pollutant majorPollutant = measure.getMajorPollutant();
-        if (pollutant.equalsIgnoreCase("Major"))
-            localPollutant = majorPollutant == null ? "" : majorPollutant.getName();
-
-        return localPollutant;
-    }
-
     private Object getLastModifiedTime(ControlMeasure measure) {
         DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
@@ -146,41 +125,83 @@ public class ControlMeasureTableData extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        if (col == 4 || col == 5 || col == 9)
-            return Float.class;
-
-        if (col == 12)
-            return Integer.class;
-
-        if (col < 0 || col > 12) {
-            throw new IllegalArgumentException("Allowed values are between 0 and 6, but the value is " + col);
-        }
         return String.class;
     }
 
-    public ControlMeasure[] sources() {
-        List sources = sourcesList();
-        return (ControlMeasure[]) sources.toArray(new ControlMeasure[0]);
+    private void filter(String pollutant, String year) {
+        maxEffMap.clear();
+        if (pollutant.equalsIgnoreCase("major"))
+            measures(allMeasures);
+        else
+            measures(allMeasures, pollutant);
+
     }
 
-    private List sourcesList() {
-        List sources = new ArrayList();
-        for (Iterator iter = rows.iterator(); iter.hasNext();) {
-            ViewableRow row = (ViewableRow) iter.next();
-            sources.add(row.source());
+    private void measures(ControlMeasure[] measures) {
+        for (int i = 0; i < measures.length; i++) {
+            EfficiencyRecord record = getMaxEffRecord(measures[i], measures[i].getMajorPollutant().getName());
+            maxEffMap.put(measures[i].getAbbreviation(), record);
+        }
+    }
+
+    private void measures(ControlMeasure[] measures, String pollutant) {
+        for (int i = 0; i < measures.length; i++) {
+            EfficiencyRecord record = getMaxEffRecord(measures[i], pollutant);
+            maxEffMap.put(measures[i].getAbbreviation(), record);
+        }
+    }
+
+    private EfficiencyRecord getMaxEffRecord(ControlMeasure measure, String pollutant) {
+        EfficiencyRecord[] efficiencyRecords = filterPollutant(measure, pollutant);
+        if (efficiencyRecords.length == 0)
+            return null;
+
+        EfficiencyRecord maxRecord = efficiencyRecords[0];
+        for (int i = 1; i < efficiencyRecords.length; i++) {
+            if (efficiencyRecords[i].getEfficiency() > maxRecord.getEfficiency())
+                maxRecord = efficiencyRecords[i];
         }
 
-        return sources;
+        return maxRecord;
     }
 
-    public void refresh() {
-        this.rows = createRows(sources());
+    private EfficiencyRecord[] filterPollutant(ControlMeasure measure, String pollutant) {
+        List list = new ArrayList();
+        EfficiencyRecord[] efficiencyRecords = measure.getEfficiencyRecords();
+        for (int i = 0; i < efficiencyRecords.length; i++) {
+            if (efficiencyRecords[i].getPollutant().getName().equals(pollutant))
+                list.add(efficiencyRecords[i]);
+        }
+        return (EfficiencyRecord[]) list.toArray(new EfficiencyRecord[0]);
     }
 
-    public void setPollutantAndYear(String pollutant, String year) {
-        this.pollutant = pollutant;
+    private Float getCostPerTon(EfficiencyRecord record) {
+        if (record == null)
+            return null;
+        // int costYear = record.getCostYear();
+        float costPerTon = record.getCostPerTon();
+        // change the target year; table.setTargetYear(
+        // table.factor(costYear);
+        return new Float(costPerTon);
+    }
 
-        refresh();
+    private Float getControlEfficiency(EfficiencyRecord record) {
+        if (record == null)
+            return null;
+
+        return new Float(record.getEfficiency());
+    }
+
+    private String ruleEffectiveness(EfficiencyRecord record) {
+        if (record == null)
+            return "";
+        return record.getRuleEffectiveness() + "";
+    }
+
+    private String rulePenetration(EfficiencyRecord record) {
+        if (record == null)
+            return "";
+        return record.getRulePenetration() + "";
     }
 
 }

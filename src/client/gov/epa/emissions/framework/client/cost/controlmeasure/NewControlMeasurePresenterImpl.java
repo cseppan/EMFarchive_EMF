@@ -36,9 +36,8 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
         view.display(measure);
     }
 
-    public void doClose() throws EmfException {
+    public void doClose() {
         view.disposeView();
-        parent.doRefresh();
     }
 
     public void doSave() throws EmfException {

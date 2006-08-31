@@ -29,8 +29,8 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
     }
 
     public void doRefresh() throws EmfException {
-        view.refresh(session.controlMeasureService().getMeasures());
         view.clearMessage();
+        view.refresh(session.controlMeasureService().getMeasures());
     }
 
     public void doEdit(EmfConsole parent, ControlMeasure measure, DesktopManager desktopManager) throws EmfException {

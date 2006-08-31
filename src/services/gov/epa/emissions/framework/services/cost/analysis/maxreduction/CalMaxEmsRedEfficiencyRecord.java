@@ -30,7 +30,7 @@ public class CalMaxEmsRedEfficiencyRecord {
         map.put(record, measure);
     }
 
-    public MaxEmsRedContorlMeasure maxEmsReductionMeasure() throws EmfException {
+    public MaxControlEffContorlMeasure maxEmsReductionMeasure() throws EmfException {
         if (map.size() == 0)
             return null;// FIXME: do we have to warn or error
 
@@ -43,7 +43,7 @@ public class CalMaxEmsRedEfficiencyRecord {
         }
 
         ControlMeasure controlMeasure = (ControlMeasure) map.get(maxRecord);
-        MaxEmsRedContorlMeasure maxMeasure = new MaxEmsRedContorlMeasure(controlMeasure, maxRecord, costYearTable);
+        MaxControlEffContorlMeasure maxMeasure = new MaxControlEffContorlMeasure(controlMeasure, maxRecord, costYearTable);
         return maxMeasure;
 
     }

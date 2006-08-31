@@ -65,7 +65,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private String[] pollutants = { "Major", "NOx", "PM10", "PM2.5", "SO2", "VOC", "CO", "CO2", "EC", "OC", "NH3", "Hg" };
 
-    private String[] years = { "Default", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006" };
+    private String[] years = {"1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006" };
 
     public ControlMeasuresManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager)
             throws EmfException {
@@ -77,7 +77,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         this.desktopManager = desktopManager;
 
         ControlMeasureService service = session.controlMeasureService();
-        tableData = new ControlMeasureTableData(service.getMeasures());
+        tableData = new ControlMeasureTableData(service.getMeasures(),pollutants[0],years[0]);
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
 
@@ -168,23 +168,16 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         pollutant = new ComboBox(pollutants);
         pollutant.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    getEfficiencyAndCost();
-                } catch (EmfException e1) {
-                    messagePanel.setError(e1.getMessage());
-                }
+                getEfficiencyAndCost();
             }
         });
         panel.add(getItem("Pollutant:", pollutant));
 
         costYear = new EditableComboBox(years);
+        costYear.setEditable(false);
         costYear.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    getEfficiencyAndCost();
-                } catch (EmfException e1) {
-                    messagePanel.setError(e1.getMessage());
-                }
+                getEfficiencyAndCost();
             }
         });
         panel.add(getItem("Cost Year:", costYear));
@@ -311,7 +304,11 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     public void refresh(ControlMeasure[] measures) {
-        model.refresh(new ControlMeasureTableData(measures));
+        model.refresh(new ControlMeasureTableData(measures,(String)pollutant.getSelectedItem(),(String)costYear.getSelectedItem()));
+        panelRefresh();
+    }
+
+    private void panelRefresh() {
         selectModel.refresh();
 
         // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
@@ -334,10 +331,9 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         presenter.doRefresh();
     }
 
-    public void getEfficiencyAndCost() throws EmfException {
-        tableData.setPollutantAndYear(pollutant.getSelectedItem().toString().trim(), costYear.getSelectedItem()
-                .toString().trim());
-        doRefresh();
+    public void getEfficiencyAndCost() {
+        tableData.refresh((String)pollutant.getSelectedItem(), (String)costYear.getSelectedItem());
+        panelRefresh();
     }
 
 }
