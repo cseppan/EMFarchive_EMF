@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.framework.services.cost.controlStrategy.DoubleValue;
+
 import org.apache.axis.client.Call;
 
 public class EmfMappings extends Mappings {
@@ -14,8 +16,10 @@ public class EmfMappings extends Mappings {
     }
 
     public void register(Call call) {
-        dataMappings.register(call);
         caseMappings.register(call);
+        dataMappings.register(call);
+        bean(call, DoubleValue.class, "DoubleValue");
+        array(call, DoubleValue[].class, "DoubleValueArray");
     }
 
 }

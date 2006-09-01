@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,12 +33,14 @@ public class ControlMeasureTableData extends AbstractTableData {
     private Map maxEffMap;
 
     private int targetYear;
+    
+    private DecimalFormat format;
 
     public ControlMeasureTableData(ControlMeasure[] measures, CostYearTable costYearTable, String pollutant, String year)
             throws EmfException {
         this.allMeasures = measures;
         this.costYearTable = costYearTable;
-
+        format = new DecimalFormat("0.00");
         maxEffMap = new HashMap();
         filter(pollutant, year);
         this.rows = createRows(measures);
@@ -189,18 +192,21 @@ public class ControlMeasureTableData extends AbstractTableData {
             return null;
         int costYear = record.getCostYear();
         float costPerTon = record.getCostPerTon();
-        if (costYearTable != null)// FIXME: REMOVE M
-            costYearTable.setTargetYear(targetYear);
+        costYearTable.setTargetYear(targetYear);
 
-        double newCost = costPerTon * ((costYearTable == null) ? 1.0 : costYearTable.factor(costYear));
-        return new Double(newCost).toString();
+        double newCost = costPerTon * costYearTable.factor(costYear);
+        return format(newCost);
+    }
+    
+    private String format(double value){
+        return format.format(value);
     }
 
-    private Float getControlEfficiency(EfficiencyRecord record) {
+    private String getControlEfficiency(EfficiencyRecord record) {
         if (record == null)
             return null;
 
-        return new Float(record.getEfficiency());
+        return format(record.getEfficiency());
     }
 
     private String ruleEffectiveness(EfficiencyRecord record) {

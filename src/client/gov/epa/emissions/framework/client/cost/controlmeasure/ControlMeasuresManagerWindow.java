@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
+import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
@@ -70,6 +71,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private CostYearTable costYearTable;
 
+    private YearValidation yearValidation;
+
     public ControlMeasuresManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager)
             throws EmfException {
         super("Control Measure Manager", new Dimension(825, 350), desktopManager);
@@ -81,6 +84,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
         ControlMeasureService service = session.controlMeasureService();
         costYearTable = service.getCostYearTable(1999);
+        yearValidation = new YearValidation("Cost Year");
         tableData = new ControlMeasureTableData(service.getMeasures(), costYearTable, pollutants[0], years[0]);
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
@@ -178,7 +182,6 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         panel.add(getItem("Pollutant:", pollutant));
 
         costYear = new EditableComboBox(years);
-        costYear.setEditable(false);
         costYear.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 getEfficiencyAndCost();
@@ -319,7 +322,6 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private void panelRefresh() {
         selectModel.refresh();
-
         // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
         browserPanel.removeAll();
         browserPanel.add(sortFilterPane(parentConsole));
@@ -341,8 +343,11 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     public void getEfficiencyAndCost() {
+        clearMessage();
         try {
-            tableData.refresh((String) pollutant.getSelectedItem(), (String) costYear.getSelectedItem());
+            String year = ((String) costYear.getSelectedItem()).trim();
+            yearValidation.value(year);
+            tableData.refresh((String) pollutant.getSelectedItem(), year);
             panelRefresh();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());

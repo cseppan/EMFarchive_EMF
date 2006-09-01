@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
-import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
@@ -17,12 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SpringLayout;
 
 public class CMImportInputPanel extends JPanel {
 
@@ -49,39 +51,60 @@ public class CMImportInputPanel extends JPanel {
     private void initialize() {
         
         JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new SpringLayout());
+        //mainPanel.setLayout(new SpringLayout());
+        mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
         
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        //SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        JPanel chooser = new JPanel(new BorderLayout(6, 0));
+        JPanel chooser = new JPanel(new BorderLayout(10,10));
         folder = new TextField("folder", 35);
-        chooser.add(folder, BorderLayout.LINE_START);
-        chooser.add(browseFileButton(), BorderLayout.LINE_END);
-        layoutGenerator.addLabelWidgetPair("Folder", chooser, mainPanel);
+        chooser.add(new JLabel("Folder     "),BorderLayout.WEST);
+        chooser.add(folder);
+        chooser.add(browseFileButton(), BorderLayout.EAST);
+        
+        //layoutGenerator.addLabelWidgetPair("Folder   ", chooser, mainPanel);
 
-        JPanel apply = new JPanel(new BorderLayout(6, 0));
+        JPanel apply = new JPanel(new BorderLayout(10,10));
         pattern = new TextField("pattern", 35);
-        apply.add(pattern, BorderLayout.LINE_START);
-        apply.add(applyPatternButton(), BorderLayout.LINE_END);
-        layoutGenerator.addLabelWidgetPair("Pattern", apply, mainPanel);
+        apply.add(new JLabel("Pattern   "),BorderLayout.WEST);
+        apply.add(pattern);
+        apply.add(applyPatternButton(), BorderLayout.EAST);
+        //layoutGenerator.addLabelWidgetPair("Pattern", apply, mainPanel);
 
+        JPanel fileNamesPanel = new JPanel(new BorderLayout(4,10));
         filenames = new TextArea("filenames", "", 35, 6);
         JScrollPane fileTextAreaPane = new JScrollPane(filenames, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        layoutGenerator.addLabelWidgetPair("Filenames", fileTextAreaPane, mainPanel);
+        fileNamesPanel.add(new JLabel("Filenames"),BorderLayout.WEST);
+        fileNamesPanel.add(fileTextAreaPane);
+        //layoutGenerator.addLabelWidgetPair("Filenames", fileTextAreaPane, mainPanel);
 
+        JPanel statusPanel = new JPanel(new BorderLayout(10,10));
         importStatusTextArea = new TextArea("Import Status", "", 35);
         JScrollPane statusTextAreaPane = new JScrollPane(importStatusTextArea,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        layoutGenerator.addLabelWidgetPair("Status", statusTextAreaPane, mainPanel);
+        
+        statusPanel.add(new JLabel("Status    "),BorderLayout.WEST);
+        statusPanel.add(statusTextAreaPane);
+        
+        //layoutGenerator.addLabelWidgetPair("Status", statusTextAreaPane, mainPanel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(mainPanel, 4, 2, // rows, cols
-                10, 10, // initialX, initialY
-                10, 10);// xPad, yPad
+        //layoutGenerator.makeCompactGrid(mainPanel, 4, 2, // rows, cols
+        //        10, 10, // initialX, initialY
+        //        10, 10);// xPad, yPad
         
-        this.setLayout(new BorderLayout());
-        this.add(mainPanel);
+        mainPanel.add(chooser);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(apply);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(fileNamesPanel);
+        mainPanel.add(Box.createVerticalStrut(10));
+        this.setBorder(BorderFactory.createEmptyBorder(10,10,10,20));
+        this.setLayout(new BorderLayout(10,10));
+        this.add(mainPanel,BorderLayout.NORTH);
+        this.add(statusPanel);
+        
 
     }
 
