@@ -57,7 +57,7 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         strategy.setInputDatasets(new EmfDataset[] { inputDataset });
         strategy.setDatasetType(inputDataset.getDatasetType());
         strategy.setDatasetVersion(0);// initial version
-        strategy.setAnalysisYear(2000);
+        strategy.setInventoryYear(2000);
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant.getName());
         strategy.setStrategyType(maxEmisRedStrategyType());

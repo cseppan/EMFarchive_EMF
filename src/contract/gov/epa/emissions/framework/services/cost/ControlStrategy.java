@@ -30,7 +30,7 @@ public class ControlStrategy implements Lockable {
 
     private int costYear;
 
-    private int analysisYear;
+    private int inventoryYear;
 
     private User creator;
 
@@ -80,12 +80,12 @@ public class ControlStrategy implements Lockable {
         return name.hashCode();
     }
 
-    public int getAnalysisYear() {
-        return analysisYear;
+    public int getInventoryYear() {
+        return inventoryYear;
     }
 
-    public void setAnalysisYear(int analysisYear) {
-        this.analysisYear = analysisYear;
+    public void setInventoryYear(int inventoryYear) {
+        this.inventoryYear = inventoryYear;
     }
 
     public int getCostYear() {

@@ -52,7 +52,7 @@ public class ControlStrategiesTableData extends AbstractTableData {
             Object[] values = { element.getName(), format(element.getLastModifiedDate()), region(element),
                     project(element), analysisType(element), dataset(element), version(element), 
                     datasetType(element), element.getTargetPollutant(),
-                    costYear(element), "" + element.getAnalysisYear(), "" + getTotalCost(element),
+                    costYear(element), "" + element.getInventoryYear(), "" + getTotalCost(element),
                     "" + getReduction(element), element.getRunStatus(), format(element.getCompletionDate()),
                     element.getCreator().getName()};
             Row row = new ViewableRow(element, values);

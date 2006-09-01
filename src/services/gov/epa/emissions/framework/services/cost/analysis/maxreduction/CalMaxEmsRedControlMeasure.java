@@ -7,10 +7,8 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.SccControlMeasuresMap;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class CalMaxEmsRedControlMeasure {
@@ -36,7 +34,7 @@ public class CalMaxEmsRedControlMeasure {
         // FIXME: if no control measure found for an scc log add warning msg
         CalMaxEmsRedEfficiencyRecord reduction = new CalMaxEmsRedEfficiencyRecord(costYearTable);
         for (int i = 0; i < controlMeasures.length; i++) {
-            EfficiencyRecord record = findRecord(controlMeasures[i], fips, controlStrategy.getCostYear());
+            EfficiencyRecord record = findRecord(controlMeasures[i], fips, controlStrategy.getInventoryYear());
             if (record != null) {
                 reduction.add(controlMeasures[i], record);
             }
@@ -47,11 +45,11 @@ public class CalMaxEmsRedControlMeasure {
         return maxMeasure;
     }
 
-    private EfficiencyRecord findRecord(ControlMeasure measure, String fips, int costYear) {
+    private EfficiencyRecord findRecord(ControlMeasure measure, String fips, int inventoryYear) {
         EfficiencyRecord[] efficiencyRecords = pollutantFilter(measure);
         efficiencyRecords = localeFilter(efficiencyRecords, fips);
-        efficiencyRecords = effectiveDateFilter(efficiencyRecords, costYear);
-
+        efficiencyRecords = effectiveDateFilter(efficiencyRecords, inventoryYear);
+        //TODO: add existing measure filter
         if (efficiencyRecords.length == 0)
             return null;
 
@@ -60,26 +58,8 @@ public class CalMaxEmsRedControlMeasure {
         // FIXME: what if we get more than one record
     }
 
-    private EfficiencyRecord[] effectiveDateFilter(EfficiencyRecord[] efficiencyRecords, int costYear) {
-        List records = new ArrayList();
-        for (int i = 0; i < efficiencyRecords.length; i++) {
-            Date effectiveDate = efficiencyRecords[i].getEffectiveDate();
-            dateFilter(records, efficiencyRecords[i], effectiveDate, costYear);
-        }
-        return (EfficiencyRecord[]) records.toArray(new EfficiencyRecord[0]);
-    }
-
-    private void dateFilter(List records, EfficiencyRecord record, Date effectiveDate, int costYear) {
-        if (effectiveDate == null) {
-            records.add(record);
-            return;
-        }
-
-        int recordYear = Integer.parseInt(EmfDateFormat.format_YYYY(effectiveDate));
-        if (recordYear <= costYear) {
-            records.add(record);
-        }
-
+    private EfficiencyRecord[] effectiveDateFilter(EfficiencyRecord[] efficiencyRecords, int inventoryYear) {
+        return new EffectiveDateFilter(efficiencyRecords, inventoryYear).filter();
     }
 
     private EfficiencyRecord[] pollutantFilter(ControlMeasure measure) {

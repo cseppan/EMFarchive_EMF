@@ -69,7 +69,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private EditableComboBox regionsCombo;
 
-    private IntTextField analysisYear;
+    private IntTextField inventoryYear;
 
     private ComboBox datasetTypeCombo;
 
@@ -261,7 +261,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         // layoutGenerator.addLabelWidgetPair("Discount Rate:", discountRateTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Cost Year:", costYearTextField(), panel);
-        layoutGenerator.addLabelWidgetPair("Inventory Year:", analysisYearTextField(), panel);
+        layoutGenerator.addLabelWidgetPair("Inventory Year:", inventoryYearTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Region:", regions(), panel);
         layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutants(), panel);
 
@@ -279,10 +279,10 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return costYear;
     }
 
-    private IntTextField analysisYearTextField() {
-        analysisYear = new IntTextField("Inventory year", 0, Integer.MAX_VALUE, 10);
-        analysisYear.setValue(controlStrategy.getAnalysisYear());
-        return analysisYear;
+    private IntTextField inventoryYearTextField() {
+        inventoryYear = new IntTextField("Inventory year", 0, Integer.MAX_VALUE, 10);
+        inventoryYear.setValue(controlStrategy.getInventoryYear());
+        return inventoryYear;
     }
 
     private JLabel lastModifiedDate() {
@@ -422,16 +422,29 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setDatasetVersion(versionPanel.datasetVersion());
 
         controlStrategy.setCostYear(new YearValidation("Cost Year").value((costYear.getText())));
-        controlStrategy.setAnalysisYear(analysisYear.getValue());
+        controlStrategy.setInventoryYear(new YearValidation("Inventory Year").value(inventoryYear.getText()));
         updateRegion();
-        controlStrategy.setTargetPollutant((String) majorPollutant.getSelectedItem());
+        controlStrategy.setTargetPollutant(majorPollutant());
         controlStrategy.setStartDate(this.controlStrategy.getStartDate());
         controlStrategy.setRunStatus(this.controlStrategy.getRunStatus());
         controlStrategy.setProject((Project) projectsCombo.getSelectedItem());
-        if (strategyTypeCombo.getSelectedIndex() == 0) {
+
+        controlStrategy.setStrategyType(strategyType());
+    }
+
+    private StrategyType strategyType() throws EmfException {
+        StrategyType strategyType = (StrategyType) this.strategyTypeCombo.getSelectedItem();
+        if (strategyType == null)
             throw new EmfException("Please select a strategy type");
+        return strategyType;
+    }
+
+    private String majorPollutant() throws EmfException {
+        String pollutant = (String) majorPollutant.getSelectedItem();
+        if (pollutant == null) {
+            throw new EmfException("Please select a target pollutant");
         }
-        controlStrategy.setStrategyType((StrategyType) this.strategyTypeCombo.getSelectedItem());
+        return pollutant;
     }
 
     private void isDatasetSelected(ControlStrategy controlStrategy) throws EmfException {

@@ -40,11 +40,11 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private SingleLineMessagePanel messagePanel;
 
     private EmfSession session;
-    
+
     private EmfConsole parentConsole;
 
     private ControlStrategy controlStrategy;
-    
+
     private DesktopManager desktopManager;
 
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
@@ -64,9 +64,9 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     public void display(ControlStrategy controlStrategy) {
         super.setLabel(super.getTitle() + ": " + controlStrategy.getName());
-        
+
         this.controlStrategy = controlStrategy;
-        
+
         doLayout(controlStrategy);
         pack();
         super.display();
@@ -99,7 +99,6 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         return tabbedPane;
     }
 
-
     private JPanel createSummaryTab(ControlStrategy controlStrategy) {
         try {
             EditControlStrategySummaryTabView view = new EditControlStrategySummaryTab(controlStrategy, session, this,
@@ -112,13 +111,14 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         }
 
     }
-    
+
     private JPanel outputPanel() {
-        EditControlStrategyOutputTabView view = new EditControlStrategyOutputTab(controlStrategy,messagePanel,desktopManager, parentConsole);
+        EditControlStrategyOutputTabView view = new EditControlStrategyOutputTab(controlStrategy, messagePanel,
+                desktopManager, parentConsole);
         this.presenter.set(view);
-        return (JPanel) view ;
+        return (JPanel) view;
     }
-    
+
     private JPanel createErrorTab(String message) {// TODO
         JPanel panel = new JPanel(false);
         JLabel label = new JLabel(message);
@@ -145,7 +145,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         container.add(saveButton);
         Button copyButton = new CopyButton(null);
         copyButton.setEnabled(false);
-        
+
         container.add(copyButton);
         Button closeButton = new CloseButton(closeAction());
         container.add(closeButton);
@@ -156,7 +156,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         container.add(runButton);
         Button stopButton = new StopButton(stopAction());
         container.add(stopButton);
-        
+
         panel.add(container, BorderLayout.CENTER);
 
         return panel;
@@ -179,8 +179,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         return new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    clearMessage();
-                    presenter.doSave();
+                    save();
                     presenter.setResults(controlStrategy);
                     presenter.runStrategy();
                 } catch (EmfException e) {
@@ -188,6 +187,12 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                 }
             }
         };
+    }
+
+    protected void save() throws EmfException {
+        clearMessage();
+        presenter.doSave();
+        resetChanges();
     }
 
     private Action closeAction() {
@@ -214,9 +219,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    clearMessage();
-                    presenter.doSave();
-                    resetChanges();
+                    save();
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
                 }
@@ -237,15 +240,15 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private String format(Date lockDate) {
         return dateFormat.format(lockDate);
     }
-    
+
     public void windowClosing() {
         doClose();
     }
-    
+
     private void clearMessage() {
         messagePanel.clear();
     }
-    
+
     public void signalChanges() {
         clearMessage();
         super.signalChanges();
