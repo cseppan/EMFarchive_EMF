@@ -180,11 +180,10 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Category:", categories(), panel);
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description()), panel);
         layoutGenerator.addLabelWidgetPair("Run Status:", runStatus(), panel);
-        layoutGenerator.addLabelWidgetPair("Last Modified By:", creator(), panel);
         layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
                 10, 10, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -196,13 +195,17 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Abbreviation:", abbreviations(), panel);
-        layoutGenerator.addLabelWidgetPair("Is Final:", isFinal(), panel);
-        layoutGenerator.addLabelWidgetPair("Is Template:", isTemplate(), panel);
+        JPanel finalTemplatePanel = new JPanel(new GridLayout(1,2));
+        finalTemplatePanel.add(isFinal());
+        finalTemplatePanel.add(isTemplate());
+        layoutGenerator.addLabelWidgetPair("Is Final:", finalTemplatePanel, panel);
+        //layoutGenerator.addLabelWidgetPair("Is Template:", isTemplate(), panel);
         layoutGenerator.addLabelWidgetPair("<html>Sectors:<br><br><br></html>", sectors(), panel);
         // layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
         layoutGenerator.addLabelWidgetPair("Copied From:", template(), panel);
         // layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
-
+        layoutGenerator.addLabelWidgetPair("Last Modified By:", creator(), panel);
+ 
         layoutGenerator.makeCompactGrid(panel, 5, 2, 10, 10, 10, 10);
 
         return panel;
@@ -300,7 +303,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private JComponent isTemplate() {
-        isTemplate = new CheckBox("");
+        isTemplate = new CheckBox(" Is Template");
         isTemplate.setSelected(caseObj.isCaseTemplate());
 
         return isTemplate;
@@ -486,7 +489,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
     
     private TextField gridDescription() {
-        gridDescription = new TextField("griddescription", 10);
+        gridDescription = new TextField("griddescription", 20);
         gridDescription.setText(caseObj.getGridDescription());
         changeablesList.addChangeable(gridDescription);
 
