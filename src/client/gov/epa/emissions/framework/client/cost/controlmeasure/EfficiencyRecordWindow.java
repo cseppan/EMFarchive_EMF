@@ -310,14 +310,14 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     }
 
     private void saveLocale() throws EmfException {
-        if (locale.getText().trim().length() == 0) {
+        String localeText = locale.getText().trim();
+        if (localeText.length() == 0) {
             record.setLocale("");
             return;
         }
-        int value = verifier.parseInteger(locale);
-        String string = value + "";
-        if (string.length() == 2 || string.length() == 5 || string.length() == 6)
-            record.setLocale(string);
+        verifier.parseInteger(locale);
+        if (localeText.length() == 2 || localeText.length() == 5 || localeText.length() == 6)
+            record.setLocale(localeText);
         else
             throw new EmfException("Locale must be a two, five, or six digit integer.");
     }
