@@ -49,7 +49,7 @@ public class RecordGenerator {
         tokens.add("" + maxCM.controlEfficiency());
         tokens.add("" + maxCM.rulePenetration() ); 
         tokens.add("" + maxCM.ruleEffectiveness());
-        tokens.add("" + maxCM.effectiveReduction());
+        tokens.add("" + maxCM.effectiveReduction()*100);
 
         emissions(tokens, resultSet, maxCM);
 

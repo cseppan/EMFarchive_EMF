@@ -80,6 +80,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             List list = selectModel.selected();
             EmfDataset[] datasets = (EmfDataset[]) list.toArray(new EmfDataset[0]);
             presenter.doExport(datasets, folder.getText());
+            messagePanel.setMessage("Started Export. Please monitor the Status window to track your export request");
         } catch (EmfException e) {
             messagePanel.setMessage(e.getMessage());
         }

@@ -204,7 +204,6 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     }
 
     private void editCases() {
-        //TODO: trouble?? RP 05/03/06
         cases = selected();
         if (cases.isEmpty()) {
             messagePanel.setMessage("Please select one or more Cases");

@@ -138,7 +138,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
             messagePanel.setError("Could not retrieve Pollutants");
         }
         this.addChangeable(pollutant);
-        layoutGenerator.addLabelWidgetPair("Pollutant:", pollutant, panel);
+        layoutGenerator.addLabelWidgetPair("Pollutant:*", pollutant, panel);
 
         locale = new TextField("Locale", 10);
         this.addChangeable(locale);
@@ -158,11 +158,11 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
         costYear = new TextField("Cost Year", 10);
         this.addChangeable(costYear);
-        layoutGenerator.addLabelWidgetPair("Cost Year:", costYear, panel);
+        layoutGenerator.addLabelWidgetPair("Cost Year:*", costYear, panel);
 
         costperTon = new TextField("Cost Per Ton Reduced", 10);
         this.addChangeable(costperTon);
-        layoutGenerator.addLabelWidgetPair("Cost Per Ton Reduced:", costperTon, panel);
+        layoutGenerator.addLabelWidgetPair("Cost Per Ton Reduced:*", costperTon, panel);
 
         widgetLayout(7, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
@@ -176,7 +176,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         efficiency = new TextField("", 10);
         efficiency.setName("Control Efficiency");
         this.addChangeable(efficiency);
-        layoutGenerator.addLabelWidgetPair("Control Efficiency (% Red):", efficiency, panel);
+        layoutGenerator.addLabelWidgetPair("Control Efficiency (% Red):*", efficiency, panel);
         efficiency.setToolTipText("Enter the Control Efficiency as a percentage (e.g., 90%, or -10% for a disbenefit)");
 
         ruleEffectiveness = new TextField("Rule Effectiveness", 10);
@@ -323,9 +323,10 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     }
 
     private void saveCostPerTon() throws EmfException {
-        float value = verifier.parseFloat(costperTon);
-        if (value <= 0)
+        if (costperTon.getText().trim().length() == 0)
             throw new EmfException("Please set the Cost Per Ton");
+
+        float value = verifier.parseFloat(costperTon);
         record.setCostPerTon(value);
     }
 
@@ -335,9 +336,10 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     }
 
     private void saveEfficiency(TextField efficiency) throws EmfException {
-        float value = verifier.parseFloat(efficiency);
-        if (value <= 0)
+        if (efficiency.getText().length() == 0)
             throw new EmfException("Enter the Control Efficiency as a percentage (e.g., 90%, or -10% for a disbenefit)");
+
+        float value = verifier.parseFloat(efficiency);
         record.setEfficiency(value);
     }
 

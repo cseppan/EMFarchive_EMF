@@ -33,7 +33,7 @@ public class ControlMeasureTableData extends AbstractTableData {
     private Map maxEffMap;
 
     private int targetYear;
-    
+
     private DecimalFormat format;
 
     public ControlMeasureTableData(ControlMeasure[] measures, CostYearTable costYearTable, String pollutant, String year)
@@ -47,9 +47,15 @@ public class ControlMeasureTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Abbreviation", "Pollutant", "Control Eff.", "Cost per Ton", "Rule Eff.",
-                "Rule Pen.", "Control Technology", "Source Group", "Equipment Life", "NEI Device Code", "Sectors",
-                "Class", "Last Modified Time", "Date Reviewed", "Creator", "Data Source", "Description", };
+        return new String[] { "Name", "Abbreviation", "Pollutant", "Max CE", "Cost per Ton", "Rule Eff.", "Rule Pen.",
+                "Control Technology", "Source Group", "Equipment Life", "NEI Device Code", "Sectors", "Class",
+                "Last Modified Time", "Date Reviewed", "Creator", "Data Source", "Description", };
+    }
+
+    public Class getColumnClass(int col) {
+        if ((col >= 3 && col <= 6) || col == 9)
+            return Double.class;
+        return String.class;
     }
 
     public List rows() {
@@ -70,7 +76,7 @@ public class ControlMeasureTableData extends AbstractTableData {
             Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(record),
                     getControlEfficiency(record), getCostPerTon(record), ruleEffectiveness(record),
                     rulePenetration(record), getControlTechnology(measure), getSourceGroup(measure),
-                    "" + measure.getEquipmentLife(), "" + measure.getDeviceCode(), getSectors(measure),
+                    new Double(measure.getEquipmentLife()), "" + measure.getDeviceCode(), getSectors(measure),
                     measureClass(measure.getCmClass()), getLastModifiedTime(measure), getDateReviewed(measure),
                     measure.getCreator().getName(), measure.getDataSouce(), measure.getDescription(), };
 
@@ -135,10 +141,6 @@ public class ControlMeasureTableData extends AbstractTableData {
         return false;
     }
 
-    public Class getColumnClass(int col) {
-        return String.class;
-    }
-
     private void filter(String pollutant, String year) throws EmfException {
         maxEffMap.clear();
         this.targetYear = new YearValidation("Cost Year").value(year);
@@ -187,7 +189,7 @@ public class ControlMeasureTableData extends AbstractTableData {
         return (EfficiencyRecord[]) list.toArray(new EfficiencyRecord[0]);
     }
 
-    private String getCostPerTon(EfficiencyRecord record) throws EmfException {
+    private Double getCostPerTon(EfficiencyRecord record) throws EmfException {
         if (record == null)
             return null;
         int costYear = record.getCostYear();
@@ -195,30 +197,30 @@ public class ControlMeasureTableData extends AbstractTableData {
         costYearTable.setTargetYear(targetYear);
 
         double newCost = costPerTon * costYearTable.factor(costYear);
-        return format(newCost);
+        return new Double(format(newCost));
     }
-    
-    private String format(double value){
+
+    private String format(double value) {
         return format.format(value);
     }
 
-    private String getControlEfficiency(EfficiencyRecord record) {
+    private Double getControlEfficiency(EfficiencyRecord record) {
         if (record == null)
             return null;
 
-        return format(record.getEfficiency());
+        return new Double(format(record.getEfficiency()));
     }
 
-    private String ruleEffectiveness(EfficiencyRecord record) {
+    private Double ruleEffectiveness(EfficiencyRecord record) {
         if (record == null)
-            return "";
-        return record.getRuleEffectiveness() + "";
+            return null;
+        return new Double(record.getRuleEffectiveness());
     }
 
-    private String rulePenetration(EfficiencyRecord record) {
+    private Double rulePenetration(EfficiencyRecord record) {
         if (record == null)
-            return "";
-        return record.getRulePenetration() + "";
+            return null;
+        return new Double(record.getRulePenetration());
     }
 
 }

@@ -427,7 +427,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setTargetPollutant(majorPollutant());
         controlStrategy.setStartDate(this.controlStrategy.getStartDate());
         controlStrategy.setRunStatus(this.controlStrategy.getRunStatus());
-        controlStrategy.setProject((Project) projectsCombo.getSelectedItem());
 
         controlStrategy.setStrategyType(strategyType());
     }
