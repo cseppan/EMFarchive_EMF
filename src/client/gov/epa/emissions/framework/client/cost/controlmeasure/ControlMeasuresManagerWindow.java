@@ -312,8 +312,9 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     public void refresh(ControlMeasure[] measures) {
         try {
-            model.refresh(new ControlMeasureTableData(measures, costYearTable, (String) pollutant.getSelectedItem(),
-                    (String) costYear.getSelectedItem()));
+            tableData = new ControlMeasureTableData(measures, costYearTable, (String) pollutant.getSelectedItem(),
+                    (String) costYear.getSelectedItem());
+            model.refresh(tableData);
             panelRefresh();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
