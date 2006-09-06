@@ -182,6 +182,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                     save();
                     presenter.setResults(controlStrategy);
                     presenter.runStrategy();
+                    messagePanel.setMessage("Please examine the status window for progress, and reopen this window after completion to see results");
                 } catch (EmfException e) {
                     messagePanel.setError("Error running strategy: " + e.getMessage());
                 }
