@@ -186,7 +186,7 @@ public class CaseServiceTest extends ServiceTestCase {
  
     public void testShouldGetPrograms() throws Exception {
         int totalBeforeAdd = service.getPrograms().length;
-        Program program = new Program("input name one" + Math.random());
+        CaseProgram program = new CaseProgram("input name one" + Math.random());
         add(program);
         
         try {

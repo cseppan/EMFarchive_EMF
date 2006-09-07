@@ -1,13 +1,12 @@
 package gov.epa.emissions.framework.client.transport;
 
-import javax.xml.namespace.QName;
-
 import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
 import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
 import gov.epa.emissions.framework.services.casemanagement.Grid;
 import gov.epa.emissions.framework.services.casemanagement.GridResolution;
@@ -15,8 +14,9 @@ import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
-import gov.epa.emissions.framework.services.casemanagement.Program;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
+
+import javax.xml.namespace.QName;
 
 import org.apache.axis.client.Call;
 
@@ -37,11 +37,12 @@ public class CaseMappings extends Mappings {
         bean(call, GridResolution.class, gridResolution());
         bean(call, MeteorlogicalYear.class, meteorlogicalYear());
         bean(call, Speciation.class, speciation());
-        bean(call, Program.class, program());
         bean(call, InputName.class, inputname());
         bean(call, InputEnvtVar.class, inputEnvtVar());
         bean(call, CaseInput.class, caseinput());
         bean(call, ModelToRun.class, modelToRun());
+        bean(call, CaseProgram.class, program());
+        
         bean(call, Mutex.class, mutex());
     }
 
@@ -55,11 +56,11 @@ public class CaseMappings extends Mappings {
         array(call, GridResolution[].class, gridResolutions());
         array(call, MeteorlogicalYear[].class, meteorlogicalYears());
         array(call, Speciation[].class, speciations());
-        array(call, Program[].class, programs());
         array(call, InputName[].class, inputnames());
         array(call, InputEnvtVar[].class, inputEnvtVars());
         array(call, CaseInput[].class, caseinputs());
         array(call, ModelToRun[].class, modelToRuns());
+        array(call, CaseProgram[].class, programs());
     }
 
     public QName caseObject() {
@@ -158,14 +159,6 @@ public class CaseMappings extends Mappings {
         return qname("InputNames");
     }
  
-    public QName program() {
-        return qname("Program");
-    }
-
-    public QName programs() {
-        return qname("Programs");
-    }
-
     public QName mutex() {
         return qname("Mutex");
     }
@@ -176,6 +169,14 @@ public class CaseMappings extends Mappings {
     
     public QName modelToRuns() {
         return qname("ModelToRuns");
+    }
+    
+    public QName program() {
+        return qname("CaseProgram");
+    }
+
+    public QName programs() {
+        return qname("CasePrograms");
     }
     
 }

@@ -39,6 +39,7 @@ import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.Revision;
+import gov.epa.emissions.framework.services.qa.QAProgram;
 
 import javax.xml.namespace.QName;
 
@@ -88,6 +89,7 @@ public class DataMappings extends Mappings {
 
         bean(call, QAStepTemplate.class, qaStepTemplate());
         bean(call, QAStep.class, qaStep());
+        bean(call, QAProgram.class, program());
 
         bean(call, TableMetadata.class, tablemetadata());
         bean(call, ColumnMetaData.class, columnmetadata());
@@ -105,7 +107,7 @@ public class DataMappings extends Mappings {
         bean(call, Scc.class, scc());
         bean(call, ControlStrategyResultsSummary.class, controlStrategyResultsSummary());
         bean(call, StrategyResultType.class, strategyResultType());
-        bean(call,CostYearTable.class,costYearTable());
+        bean(call, CostYearTable.class, costYearTable());
     }
 
     private void registerArrays(Call call) {
@@ -144,6 +146,7 @@ public class DataMappings extends Mappings {
 
         array(call, QAStepTemplate[].class, qaStepTemplates());
         array(call, QAStep[].class, qaSteps());
+        array(call, QAProgram[].class, programs());
 
         array(call, ControlMeasure[].class, controlMeasures());
         array(call, ControlTechnology[].class, controlTechnologies());
@@ -345,7 +348,7 @@ public class DataMappings extends Mappings {
     public QName strategyType() {
         return qname("StrategyType");
     }
-    
+
     public QName strategyTypes() {
         return qname("StrategyTypes");
     }
@@ -365,19 +368,19 @@ public class DataMappings extends Mappings {
     public QName sccs() {
         return qname("sccs");
     }
-    
+
     public QName strategyResult() {
         return qname("StrategyResult");
     }
-    
+
     public QName strategyResults() {
         return qname("StrategyResults");
     }
-    
+
     public QName controlStrategyResultsSummary() {
         return qname("ControlStrategyResultsSummary");
     }
-    
+
     public QName strategyResultType() {
         return qname("StrategyResultType");
     }
@@ -385,11 +388,11 @@ public class DataMappings extends Mappings {
     public QName pollutant() {
         return qname("Pollutant");
     }
-    
+
     public QName pollutants() {
         return qname("Pollutants");
     }
-    
+
     public QName sourceGroup() {
         return qname("SourceGroup");
     }
@@ -397,11 +400,11 @@ public class DataMappings extends Mappings {
     public QName sourceGroups() {
         return qname("SourceGroups");
     }
-    
+
     public QName controlTechnology() {
         return qname("ControlTechnology");
     }
-    
+
     public QName controlTechnologies() {
         return qname("ControlTechnologies");
     }
@@ -409,5 +412,13 @@ public class DataMappings extends Mappings {
     public QName costYearTable() {
         return qname("CostYearTable");
     }
-    
+
+    public QName program() {
+        return qname("QAProgram");
+    }
+
+    public QName programs() {
+        return qname("QAPrograms");
+    }
+
 }

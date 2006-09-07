@@ -124,7 +124,7 @@
 
     			<many-to-one
    					name="program" 
-        			class="gov.epa.emissions.framework.services.casemanagement.Program"
+        			class="gov.epa.emissions.framework.services.casemanagement.CaseProgram"
         			column="program_id"
         			update="false" insert="true"/>  
         			

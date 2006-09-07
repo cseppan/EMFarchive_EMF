@@ -18,6 +18,7 @@ public class EmfMappings extends Mappings {
     public void register(Call call) {
         caseMappings.register(call);
         dataMappings.register(call);
+
         bean(call, DoubleValue.class, "DoubleValue");
         array(call, DoubleValue[].class, "DoubleValueArray");
     }

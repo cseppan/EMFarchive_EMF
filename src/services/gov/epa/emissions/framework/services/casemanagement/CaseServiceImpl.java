@@ -271,13 +271,13 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
-    public Program[] getPrograms() throws EmfException {
+    public CaseProgram[] getPrograms() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List results = dao.getPrograms(session);
             session.close();
 
-            return (Program[]) results.toArray(new Program[0]);
+            return (CaseProgram[]) results.toArray(new CaseProgram[0]);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Programs", e);
             throw new EmfException("Could not get all Programs");
@@ -369,11 +369,11 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
-    public Program addProgram(Program program) throws EmfException {
+    public CaseProgram addProgram(CaseProgram program) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(program, session);
-            return (Program) dao.load(Program.class, program.getName(), session);
+            return (CaseProgram) dao.load(CaseProgram.class, program.getName(), session);
         } catch (Exception e) {
             LOG.error("Could not add new program '" + program.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new program '" + program.getName() + "'");

@@ -319,8 +319,21 @@ CREATE TABLE emf.qa_steps
   status varchar(15),
   description text,
   configuration varchar(255),
+  output_table varchar(255),
+  table_creation_status varchar(50),
+  table_creation_date timestamp,
+  table_current bool,
   UNIQUE (dataset_id, version, name)
 ) 
 WITHOUT OIDS;
 -- emf.qa_steps
+
+--emf.qa_programs
+CREATE TABLE emf.qa_programs
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- emf.qa_programs
 --

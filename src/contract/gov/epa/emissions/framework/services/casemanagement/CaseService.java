@@ -25,7 +25,7 @@ public interface CaseService {
 
     InputEnvtVar[] getInputEnvtVars() throws EmfException;
  
-    Program[] getPrograms() throws EmfException;
+    CaseProgram[] getPrograms() throws EmfException;
 
     ModelToRun[] getModelToRuns() throws EmfException;
 
@@ -45,7 +45,7 @@ public interface CaseService {
 
     InputName addCaseInputName(InputName name) throws EmfException;
 
-    Program addProgram(Program program) throws EmfException;
+    CaseProgram addProgram(CaseProgram program) throws EmfException;
     
     ModelToRun addModelToRun(ModelToRun model) throws EmfException;
 

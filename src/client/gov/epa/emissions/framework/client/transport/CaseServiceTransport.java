@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
 import gov.epa.emissions.framework.services.casemanagement.Grid;
@@ -15,7 +16,6 @@ import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
-import gov.epa.emissions.framework.services.casemanagement.Program;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
 
 public class CaseServiceTransport implements CaseService {
@@ -25,6 +25,7 @@ public class CaseServiceTransport implements CaseService {
     private DataMappings dataMappings;
 
     private CaseMappings caseMappings;
+
 
     public CaseServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
@@ -195,13 +196,13 @@ public class CaseServiceTransport implements CaseService {
         return (InputEnvtVar[]) call.requestResponse(new Object[] {});
     }
 
-    public Program[] getPrograms() throws EmfException {
+    public CaseProgram[] getPrograms() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getPrograms");
-        call.setReturnType(caseMappings.programs());
+        call.setReturnType(dataMappings.programs());
 
-        return (Program[]) call.requestResponse(new Object[] {});
+        return (CaseProgram[]) call.requestResponse(new Object[] {});
     }
 
     public void export(User user, String dirName, String purpose, boolean overWrite, Case caseToExport)
@@ -229,14 +230,14 @@ public class CaseServiceTransport implements CaseService {
         return (InputName) call.requestResponse(new Object[] { name });
     }
 
-    public Program addProgram(Program program) throws EmfException {
+    public CaseProgram addProgram(CaseProgram program) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("addProgram");
-        call.addParam("program", caseMappings.program());
-        call.setReturnType(caseMappings.program());
+        call.addParam("program", dataMappings.program());
+        call.setReturnType(dataMappings.program());
         
-        return (Program) call.requestResponse(new Object[] { program });
+        return (CaseProgram) call.requestResponse(new Object[] { program });
     }
 
     public InputEnvtVar addInputEnvtVar(InputEnvtVar inputEnvtVar) throws EmfException {

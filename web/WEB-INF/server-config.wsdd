@@ -251,6 +251,16 @@
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.commons.db.version.ChangeSet"
 		qname="ns1:ChangeSet" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.qa.QAProgram"
+		qname="ns1:QAProgram" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:QAPrograms" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.qa.QAProgram[]"
+		innerType="ns1:QAProgram"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+	
 
 	<!-- COST Mappings-->
 	<beanMapping
@@ -408,12 +418,12 @@
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<beanMapping
-		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Program"
-		qname="ns1:Program" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.CaseProgram"
+		qname="ns1:CaseProgram" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
 		
-	<arrayMapping qname="ns1:Programs" xmlns:ns1="urn:gov.epa.services.EmfService"
-		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Program[]"
-		innerType="ns1:Program"
+	<arrayMapping qname="ns1:CasePrograms" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.CaseProgram[]"
+		innerType="ns1:CaseProgram"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<beanMapping

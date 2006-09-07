@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.casemanagement.inputs;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
-import gov.epa.emissions.framework.services.casemanagement.Program;
+import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,12 +15,12 @@ public class Programs {
 
     private EmfSession session;
 
-    public Programs(EmfSession session, Program[] pgrograms) {
+    public Programs(EmfSession session, CaseProgram[] pgrograms) {
         this.session = session;
         this.list = new ArrayList(Arrays.asList(pgrograms));
     }
 
-    public Program get(Object selected) throws EmfException {
+    public CaseProgram get(Object selected) throws EmfException {
         if (selected instanceof String) {
             return editProgramType(selected);
         }
@@ -29,29 +29,29 @@ public class Programs {
             return null;
         
         int index = list.indexOf(selected);
-        return (Program) list.get(index);
+        return (CaseProgram) list.get(index);
     }
 
-    public Program[] getAll() {
-        return (Program[]) list.toArray(new Program[0]);
+    public CaseProgram[] getAll() {
+        return (CaseProgram[]) list.toArray(new CaseProgram[0]);
     }
 
-    private Program editProgramType(Object selected) throws EmfException {
+    private CaseProgram editProgramType(Object selected) throws EmfException {
         String newProgram = ((String) selected).trim();
         if (newProgram.length() == 0)
             return null;
 
-        Program name = new Program(newProgram);
+        CaseProgram name = new CaseProgram(newProgram);
         int index = list.indexOf(name);
         if (index == -1) {// new input name
-            Program persistName = persistName(name);
+            CaseProgram persistName = persistName(name);
             list.add(persistName);
             return persistName;
         }
-        return (Program) list.get(index);
+        return (CaseProgram) list.get(index);
     }
 
-    private Program persistName(Program name) throws EmfException {
+    private CaseProgram persistName(CaseProgram name) throws EmfException {
         CaseService service = session.caseService();
         return service.addProgram(name);
     }

@@ -5,7 +5,11 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 
 public interface QAService {
+
     QAStep[] getQASteps(EmfDataset dataset) throws EmfException;
 
+    QAProgram[] getQAPrograms() throws EmfException;
+
     void update(QAStep[] steps) throws EmfException;
+
 }

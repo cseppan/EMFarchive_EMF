@@ -9,7 +9,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
-import gov.epa.emissions.framework.services.casemanagement.Program;
+import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import javax.swing.JComponent;
@@ -86,8 +86,8 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
                     throw new EmfException("InputName: " + inputName.getName() + "has already existed.");
         }
 
-        Program[] prgs = caseService().getPrograms();
-        Program prg = input.getProgram();
+        CaseProgram[] prgs = caseService().getPrograms();
+        CaseProgram prg = input.getProgram();
         for (int i = 0; i < prgs.length; i++)
             if (prg != null && prg.getId() != prgs[i].getId())
                 if (prg.equals(prgs[i]))

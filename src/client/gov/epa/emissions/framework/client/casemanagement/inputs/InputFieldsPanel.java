@@ -13,7 +13,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
-import gov.epa.emissions.framework.services.casemanagement.Program;
+import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -78,7 +78,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         inputName.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Input Name:", inputName, panel);
 
-        Program[] programs = presenter.getCasePrograms().getAll();
+        CaseProgram[] programs = presenter.getCasePrograms().getAll();
         program = new EditableComboBox(programs);
         changeablesList.addChangeable(program);
         program.setPrototypeDisplayValue(width);

@@ -15,7 +15,7 @@ public class CaseInput implements Serializable, Comparable {
     
     private Sector sector;
     
-    private Program program;
+    private CaseProgram program;
     
     private InputEnvtVar envtVars;
     
@@ -101,11 +101,11 @@ public class CaseInput implements Serializable, Comparable {
         this.envtVars = envtVars;
     }
 
-    public Program getProgram() {
+    public CaseProgram getProgram() {
         return program;
     }
 
-    public void setProgram(Program program) {
+    public void setProgram(CaseProgram program) {
         this.program = program;
     }
 

@@ -15,7 +15,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
-import gov.epa.emissions.framework.services.casemanagement.Program;
+import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -70,7 +70,7 @@ public class InputFieldsPanelPresenter {
         return (Sector[]) list.toArray(new Sector[0]);
     }
 
-    public Program[] getPrograms() throws EmfException {
+    public CaseProgram[] getPrograms() throws EmfException {
         return caseService().getPrograms();
     }
 
@@ -138,7 +138,7 @@ public class InputFieldsPanelPresenter {
         return caseInputEnvtVars.get(selected);
     }
 
-    public Program getCaseProgram(Object selected) throws EmfException {
+    public CaseProgram getCaseProgram(Object selected) throws EmfException {
         return programs.get(selected);
     }
 

@@ -115,5 +115,9 @@ insert INTO emf.keywords VALUES (DEFAULT, 'REPLACED_BY_DATASET');
 -- emf.keywords
 --
 
+-- emf.qa_programs
+insert into emf.qa_programs values(DEFAULT,'SQL');
+insert into emf.qa_programs values(DEFAULT,'EmisView');
+insert into emf.qa_programs values(DEFAULT,'Smkinven');
 
 

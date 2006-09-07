@@ -1,8 +1,8 @@
-package gov.epa.emissions.framework.services.casemanagement;
+package gov.epa.emissions.framework.services.qa;
 
 import java.io.Serializable;
 
-public class Program implements Serializable, Comparable {
+public class QAProgram implements Serializable, Comparable {
 
     private int id;
 
@@ -11,11 +11,11 @@ public class Program implements Serializable, Comparable {
     /*
      * Default constructor needed for hibernate and axis serialization
      */
-    public Program() {
+    public QAProgram() {
         super();
     }
 
-    public Program(String name) {
+    public QAProgram(String name) {
         this.name = name;
     }
 
@@ -36,10 +36,10 @@ public class Program implements Serializable, Comparable {
     }
 
     public boolean equals(Object other) {
-        if (other == null || !(other instanceof Program))
+        if (other == null || !(other instanceof QAProgram))
             return false;
 
-        return ((Program) other).name.equals(this.name) || ((Program)other).id == id;
+        return ((QAProgram) other).name.equals(this.name) || ((QAProgram)other).id == id;
     }
 
     public int hashCode() {
@@ -51,6 +51,6 @@ public class Program implements Serializable, Comparable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((Program) other).getName());
+        return name.compareTo(((QAProgram) other).getName());
     }
 }

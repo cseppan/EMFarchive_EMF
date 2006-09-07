@@ -84,20 +84,6 @@ public class DatasetDAO {
         return (EmfDataset) lockingScheme.releaseLockOnUpdate(locked, session, all(session));
     }
 
-    public QAStep[] steps(EmfDataset dataset, Session session) {
-        Criterion criterion = Restrictions.eq("datasetId", new Integer(dataset.getId()));
-        
-        List steps = session.createCriteria(QAStep.class).add(criterion).list();
-        return (QAStep[]) steps.toArray(new QAStep[0]);
-    }
-
-    public void update(QAStep[] steps, Session session) {
-        hibernateFacade.update(steps, session);
-    }
-
-    public void add(QAStep[] steps, Session session) {
-        hibernateFacade.add(steps, session);
-    }
 
     public List getDatasets(Session session, DatasetType datasetType) {
         Criterion criterion = Restrictions.eq("datasetType", datasetType);
