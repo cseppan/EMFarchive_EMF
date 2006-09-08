@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.data.QAPrograms;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -320,16 +321,16 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         Button cancel = closeButton();
         panel.add(cancel);
-        
+
         panel.add(Box.createHorizontalStrut(50));
         Button run = runButton();
         panel.add(run);
-        
-        Button viewResults = new Button("View Results",null);
+
+        Button viewResults = new Button("View Results", null);
         viewResults.setEnabled(false);
         panel.add(viewResults);
-        
-        Button export = new Button("Export",null);
+
+        Button export = new Button("Export", null);
         export.setEnabled(false);
         panel.add(export);
         return panel;
@@ -345,14 +346,21 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     protected void doRun() {
-        // NOTE Auto-generated method stub
-        
+        try {
+            presenter.doRun();
+        } catch (EmfException e) {
+            messagePanel.setMessage(e.getMessage());
+        }
     }
 
     private Button okButton() {
         Button ok = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doEdit();
+                try {
+                    presenter.doSave();
+                } catch (EmfException e1) {
+                    messagePanel.setMessage(e1.getMessage());
+                }
             }
         });
         return ok;
@@ -372,10 +380,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             presenter.doClose();
     }
 
-    public void doEdit() {
+    public QAStep save() throws EmfException {
         if (order.getText().equals("")) {
-            messagePanel.setError("Order should be a floating point number");
-            return;
+            throw new EmfException("Order should be a floating point number");
         }
 
         step.setProgram(qaPrograms.get((String) program.getSelectedItem()));
@@ -389,8 +396,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         step.setWho(who.getText());
         step.setDate(date.value());
         step.setConfiguration(config.getText());
-
-        presenter.doEdit();
+        
+        return step;
     }
 
 }

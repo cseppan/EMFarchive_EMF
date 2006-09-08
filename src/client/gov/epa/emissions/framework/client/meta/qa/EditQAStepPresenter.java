@@ -33,9 +33,16 @@ public class EditQAStepPresenter {
         view.disposeView();
     }
 
-    public void doEdit() {
+    public void doSave() throws EmfException {
+        view.save();
         tabView.refresh();
         doClose();
+    }
+
+    public void doRun() throws EmfException {
+        QAStep step = view.save();
+        tabView.refresh();
+        session.qaService().runQAStep(step);
     }
 
 }

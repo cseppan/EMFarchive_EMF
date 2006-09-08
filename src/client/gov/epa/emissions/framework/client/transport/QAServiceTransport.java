@@ -50,4 +50,9 @@ public class QAServiceTransport implements QAService {
 
         return (QAProgram[]) call.requestResponse(new Object[] {});
     }
+
+    public void runQAStep(QAStep step) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

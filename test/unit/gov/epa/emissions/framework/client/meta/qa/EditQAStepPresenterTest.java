@@ -14,16 +14,17 @@ import org.jmock.core.Constraint;
 
 public class EditQAStepPresenterTest extends EmfMockObjectTestCase {
 
-    public void testShouldRefreshTabViewAndCloseOnEdit() {
+    public void testShouldRefreshTabViewAndCloseOnEdit() throws EmfException {
         Mock tabView = mock(EditableQATabView.class);
         expects(tabView, "refresh");
 
         Mock view = mock(EditQAStepView.class);
         expects(view, "disposeView");
+        expects(view, "save");
 
         EditQAStepPresenter presenter = new EditQAStepPresenter((EditQAStepView) view.proxy(), null,
                 (EditableQATabView) tabView.proxy(), null);
-        presenter.doEdit();
+        presenter.doSave();
     }
 
     public void testShouldCloseViewOnClose() {

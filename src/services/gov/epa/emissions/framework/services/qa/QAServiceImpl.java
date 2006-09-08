@@ -63,4 +63,9 @@ public class QAServiceImpl implements QAService {
             session.close();
         }
     }
+
+    public void runQAStep(QAStep step) {
+        // NOTE Auto-generated method stub
+
+    }
 }
