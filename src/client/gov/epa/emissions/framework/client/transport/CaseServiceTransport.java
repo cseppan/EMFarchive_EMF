@@ -200,7 +200,7 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("getPrograms");
-        call.setReturnType(dataMappings.programs());
+        call.setReturnType(caseMappings.programs());
 
         return (CaseProgram[]) call.requestResponse(new Object[] {});
     }

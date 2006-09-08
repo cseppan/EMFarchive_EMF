@@ -174,32 +174,30 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         doSaveWithoutClose();
         String exportDir = caseObj.getInputFileDir();
         
-        if (exportDir == null || exportDir.equals("")) {
-            messagePanel.setMessage("Please select the input folder before exporting the case.");
+        if (!checkExportDir(exportDir) || !checkDatasets() || !checkToWriteStartMessage())
             return;
-        }
-        
-        if (!checkDatasets()) {
-            messagePanel.setMessage("Please select input datasets for the required case inputs.");
-            return;
-        }
-        
-        if (!checkToWriteStartMessage()) {
-            messagePanel.setMessage("There were no datasets to export");
-            return;
-        }
         
         presenter.doExport(session.user(), exportDir, "To export input datasets", true, caseObj);
-        
         messagePanel.setMessage("Started export. Please monitor the Status window " + "to track your Export request.");
+    }
+    
+    private boolean checkExportDir(String exportDir) {
+        if (exportDir == null || exportDir.equals("")) {
+            messagePanel.setMessage("Please select the input folder before exporting the case.");
+            return false;
+        }
+        
+        return true;
     }
 
     private boolean checkDatasets() {
         CaseInput[] inputs = getInputs();
         
         for (int i = 0; i < inputs.length; i++)
-            if (inputs[i].isRequired() && inputs[i].getDataset() == null)
+            if (inputs[i].isRequired() && inputs[i].getDataset() == null) {
+                messagePanel.setMessage("Please specify a dataset for required input \"" + inputs[i].getName() + "\" before exporting.");
                 return false;
+            }
         
         return true;
     }
@@ -215,7 +213,12 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
                 count++;
         }
         
-        return count > 0;
+        if (count == 0) {
+            messagePanel.setMessage("There were no datasets to export");
+            return false;
+        }
+        
+        return true;
     }
 
     private CaseInput[] getInputs() {
