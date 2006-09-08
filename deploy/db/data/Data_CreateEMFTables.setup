@@ -16,6 +16,15 @@ CREATE TABLE emissions.versions
 WITHOUT OIDS;
 --emissions.versions
 --
+--emf.qa_programs
+CREATE TABLE emf.qa_programs
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- emf.qa_programs
+--
 -- emf.users
 CREATE TABLE emf.users
 (
@@ -328,12 +337,3 @@ CREATE TABLE emf.qa_steps
 WITHOUT OIDS;
 -- emf.qa_steps
 
---emf.qa_programs
-CREATE TABLE emf.qa_programs
-(
-  id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE
-) 
-WITHOUT OIDS;
--- emf.qa_programs
---

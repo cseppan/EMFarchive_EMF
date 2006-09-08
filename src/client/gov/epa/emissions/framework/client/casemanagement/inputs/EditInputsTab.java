@@ -25,6 +25,8 @@ import gov.epa.mims.analysisengine.table.SortCriteria;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -79,11 +81,18 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     public void display(EmfSession session, Case caseObj, EditInputsTabPresenter presenter) {
         super.removeAll();
-        inputDir.setText(caseObj.getInputFileDir());
-        super.add(createLayout(caseObj.getCaseInputs(), presenter, parentConsole), BorderLayout.CENTER);
+        
         this.caseObj = caseObj;
         this.presenter = presenter;
         this.session = session;
+        inputDir.setText(caseObj.getInputFileDir());
+        inputDir.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) {
+                saveCaseInputFileDir();
+            }
+        });
+        
+        super.add(createLayout(caseObj.getCaseInputs(), presenter, parentConsole), BorderLayout.CENTER);
     }
 
     private void doRefresh(CaseInput[] inputs) {
