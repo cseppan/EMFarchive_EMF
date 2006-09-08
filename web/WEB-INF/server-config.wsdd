@@ -253,11 +253,11 @@
 		qname="ns1:ChangeSet" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 		
 	<beanMapping
-		languageSpecificType="java:gov.epa.emissions.framework.services.qa.QAProgram"
+		languageSpecificType="java:gov.epa.emissions.commons.data.QAProgram"
 		qname="ns1:QAProgram" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
 		
 	<arrayMapping qname="ns1:QAPrograms" xmlns:ns1="urn:gov.epa.services.EmfService"
-		languageSpecificType="java:gov.epa.emissions.framework.services.qa.QAProgram[]"
+		languageSpecificType="java:gov.epa.emissions.commons.data.QAProgram[]"
 		innerType="ns1:QAProgram"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
