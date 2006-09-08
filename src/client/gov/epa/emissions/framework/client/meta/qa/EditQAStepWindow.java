@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.RunButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -35,6 +36,7 @@ import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -206,7 +208,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
+                40, 10);// xPad, yPad
 
         return panel;
 
@@ -312,22 +314,57 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
+        Button ok = okButton();
+        getRootPane().setDefaultButton(ok);
+        panel.add(ok);
+
+        Button cancel = closeButton();
+        panel.add(cancel);
+        
+        panel.add(Box.createHorizontalStrut(50));
+        Button run = runButton();
+        panel.add(run);
+        
+        Button viewResults = new Button("View Results",null);
+        viewResults.setEnabled(false);
+        panel.add(viewResults);
+        
+        Button export = new Button("Export",null);
+        export.setEnabled(false);
+        panel.add(export);
+        return panel;
+    }
+
+    private Button runButton() {
+        Button run = new RunButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doRun();
+            }
+        });
+        return run;
+    }
+
+    protected void doRun() {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    private Button okButton() {
         Button ok = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doEdit();
             }
         });
-        getRootPane().setDefaultButton(ok);
-        panel.add(ok);
+        return ok;
+    }
 
+    private Button closeButton() {
         Button cancel = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doClose();
             }
         });
-        panel.add(cancel);
-
-        return panel;
+        return cancel;
     }
 
     protected void doClose() {
