@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.qa;
 
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
@@ -8,6 +9,7 @@ import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.data.QAPrograms;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.NumberFormattedTextField;
 
@@ -39,10 +41,12 @@ public class QAStepTemplatePanel extends JPanel {
 
     private ManageChangeables changeablesList;
 
-    public QAStepTemplatePanel(MessagePanel messagePanel, ManageChangeables changeablesList) {
+    private QAPrograms qaPrograms;
+
+    public QAStepTemplatePanel(QAProgram[] programs, MessagePanel messagePanel, ManageChangeables changeablesList) {
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
-        
+        this.qaPrograms = new QAPrograms(programs);
         layout = inputPanel();
         add(layout);
     }
@@ -50,13 +54,12 @@ public class QAStepTemplatePanel extends JPanel {
     private JPanel inputPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        String[] defaultProgram = { "None", "EmisView", "Smkreport", "Smkinven" };
 
         name = new TextField("", 40);
         changeablesList.addChangeable(name);
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
-        program = new EditableComboBox(defaultProgram);
+        program = new EditableComboBox(qaPrograms.names());
         changeablesList.addChangeable(program);
         program.setPrototypeDisplayValue("To make the combobox a bit wider");
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
@@ -126,28 +129,28 @@ public class QAStepTemplatePanel extends JPanel {
             messagePanel.setError("Order should be a floating point number");
         }
     }
-    
+
     private void parseNumber() {
         if (!order.getText().equals(""))
             Float.parseFloat(order.getText());
     }
-    
+
     public String getTemplateName() {
         return name.getText();
     }
-    
-    public String getProgramName() {
-        return program.getSelectedItem().toString();
+
+    public QAProgram getProgram() {
+        return qaPrograms.get((String) program.getSelectedItem());
     }
-    
+
     public String getProgramArgs() {
         return programParameters.getText();
     }
-    
+
     public boolean getRequired() {
         return required.isSelected();
     }
-    
+
     public String getDescription() {
         return description.getText();
     }

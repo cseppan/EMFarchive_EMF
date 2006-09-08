@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.data.datasettype;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
@@ -38,7 +39,8 @@ public class EditableDatasetTypePresenterImpl implements EditableDatasetTypePres
 
         editable.observe(this);
         Keyword[] keywords = dataCommonsService().getKeywords();
-        editable.display(type, keywords);
+        QAProgram[] programs = session.qaService().getQAPrograms();
+        editable.display(type,programs, keywords);
     }
 
     private DataCommonsService service() {

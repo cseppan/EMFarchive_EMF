@@ -6,10 +6,6 @@ public class QAProperties {
         return new String[] { initialStatus(), "Skipped", "In Progress", "Complete", "Failed" };
     }
 
-    public static String[] programs() {
-        return new String[] { "EmisView", "Smkreport", "Smkinven" };
-    }
-
     public static String initialStatus() {
         return "Not Started";
     }

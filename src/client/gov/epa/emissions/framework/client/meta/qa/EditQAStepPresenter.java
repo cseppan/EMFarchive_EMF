@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 
@@ -21,9 +23,10 @@ public class EditQAStepPresenter {
         this.session = session;
     }
 
-    public void display(QAStep step, String versionName) {
+    public void display(QAStep step, String versionName) throws EmfException {
         view.observe(this);
-        view.display(step, dataset, session.user(), versionName);
+        QAProgram[] programs = session.qaService().getQAPrograms();
+        view.display(step, programs,dataset, session.user(), versionName);
     }
 
     public void doClose() {

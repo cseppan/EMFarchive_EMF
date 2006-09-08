@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data.datasettype;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.EditableTable;
@@ -18,8 +19,10 @@ import gov.epa.emissions.framework.client.qa.NewQAStepTemplateView;
 import gov.epa.emissions.framework.client.qa.NewQAStepTemplateWindow;
 import gov.epa.emissions.framework.client.qa.QAStepTemplatesPanelPresenter;
 import gov.epa.emissions.framework.client.qa.QAStepTemplatesPanelView;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Point;
@@ -54,11 +57,17 @@ public class EditQAStepTemplatesPanel extends JPanel implements QAStepTemplatesP
 
     private EmfConsole parent;
 
-    public EditQAStepTemplatesPanel(DatasetType type, ManageChangeables changeablesList, DesktopManager desktopManager,
-            EmfConsole parent) {
+    private QAProgram[] programs;
+
+    private SingleLineMessagePanel messagePanel;
+
+    public EditQAStepTemplatesPanel(DatasetType type, QAProgram[] programs, ManageChangeables changeablesList,
+            DesktopManager desktopManager, EmfConsole parent, SingleLineMessagePanel messagePanel) {
         this.changeablesList = changeablesList;
         this.type = type;
         this.parent = parent;
+        this.programs = programs;
+        this.messagePanel = messagePanel;
         tableData = new EditableQAStepTemplateTableData(type.getQaStepTemplates());
         this.desktopManager = desktopManager;
 
@@ -139,9 +148,13 @@ public class EditQAStepTemplatesPanel extends JPanel implements QAStepTemplatesP
     protected void doEdit() {
         QAStepTemplate[] selected = tableData.getSelected();
         for (int i = 0; i < selected.length; i++) {
-            EditQAStepTemplateWindow view = new EditQAStepTemplateWindow(selected[i].getName()+ 
-                    " - "+type.getName(), desktopManager);
-            presenter.doEdit(view, selected[i]);
+            EditQAStepTemplateWindow view = new EditQAStepTemplateWindow(
+                    selected[i].getName() + " - " + type.getName(), desktopManager);
+            try {
+                presenter.doEdit(view, selected[i]);
+            } catch (EmfException e) {
+                messagePanel.setError(e.getMessage());
+            }
         }
     }
 
@@ -198,7 +211,7 @@ public class EditQAStepTemplatesPanel extends JPanel implements QAStepTemplatesP
     private void doAdd() {
         NewQAStepTemplateView view = new NewQAStepTemplateWindow(desktopManager);
         NewQAStepTemplatePresenter newTemplatePresenter = new NewQAStepTemplatePresenter(this, view);
-        newTemplatePresenter.display(type);
+        newTemplatePresenter.display(type, programs);
     }
 
     public void add(QAStepTemplate template) {

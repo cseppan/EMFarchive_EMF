@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
@@ -39,7 +40,6 @@ import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.Revision;
-import gov.epa.emissions.framework.services.qa.QAProgram;
 
 import javax.xml.namespace.QName;
 

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ComboBox;
@@ -15,6 +16,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.data.QAPrograms;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -68,17 +70,19 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private User user;
 
     private TextField config;
-    
+
+    private QAPrograms qaPrograms;
+
     public EditQAStepWindow(DesktopManager desktopManager) {
         super("Edit QA Step", new Dimension(600, 625), desktopManager);
     }
 
-    public void display(QAStep step, EmfDataset dataset, User user, String versionName) {
+    public void display(QAStep step, QAProgram[] programs, EmfDataset dataset, User user, String versionName) {
         this.step = step;
         this.user = user;
-
-        super.setLabel(super.getTitle() + ": " +  
-                step.getName() + " - " + dataset.getName()+" (v"+step.getVersion()+")");
+        this.qaPrograms = new QAPrograms(programs);
+        super.setLabel(super.getTitle() + ": " + step.getName() + " - " + dataset.getName() + " (v" + step.getVersion()
+                + ")");
 
         JPanel layout = createLayout(step, versionName);
         super.getContentPane().add(layout);
@@ -134,10 +138,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         config = new TextField("config", step.getConfiguration(), 40);
         addChangeable(config);
-        config.setToolTipText("Enter the name of the Dataset that is the configuration " +
-                "file (e.g., a REPCONFIG file)");
+        config.setToolTipText("Enter the name of the Dataset that is the configuration "
+                + "file (e.g., a REPCONFIG file)");
         layoutGenerator.addLabelWidgetPair("Configuration:", config, panel);
-        
+
         comments = new TextArea("Comments", step.getComments(), 40, 3);
         addChangeable(comments);
         ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(comments);
@@ -175,7 +179,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         layoutGenerator.addLabelWidgetPair("Name:", new Label(step.getName()), panel);
         layoutGenerator.addLabelWidgetPair("Version:", new Label(versionName + " (" + step.getVersion() + ")"), panel);
 
-        program = new EditableComboBox(QAProperties.programs());
+        program = new EditableComboBox(qaPrograms.names());
         program.setPrototypeDisplayValue("To make the combobox a bit wider");
         program.setSelectedItem(step.getProgram());
         addChangeable(program);
@@ -273,12 +277,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     public void doEdit() {
-        if(order.getText().equals("")) {
+        if (order.getText().equals("")) {
             messagePanel.setError("Order should be a floating point number");
             return;
         }
-        
-        step.setProgram((String) program.getSelectedItem());
+
+        step.setProgram(qaPrograms.get((String) program.getSelectedItem()));
         step.setProgramArguments(programArguments.getText());
         step.setOrder(Float.parseFloat(order.getText()));
         step.setDescription(description.getText().trim());

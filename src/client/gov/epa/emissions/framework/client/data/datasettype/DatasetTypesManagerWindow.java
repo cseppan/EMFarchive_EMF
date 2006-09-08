@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -44,12 +45,15 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     private EmfConsole parentConsole;
 
-    public DatasetTypesManagerWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
+    private EmfSession session;
+
+    public DatasetTypesManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Type Manager", new Dimension(700, 350), desktopManager);
         super.setName("datasetTypeManager");
-
+        
+        this.session = session;
         this.parentConsole = parentConsole;
-
+        
         layout = new JPanel();
         this.getContentPane().add(layout);
     }
@@ -194,7 +198,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private EditableDatasetTypeView editableView() {
-        EditableDatasetTypeWindow view = new EditableDatasetTypeWindow(parentConsole, desktopManager);
+        EditableDatasetTypeWindow view = new EditableDatasetTypeWindow(session,parentConsole, desktopManager);
         return view;
     }
 

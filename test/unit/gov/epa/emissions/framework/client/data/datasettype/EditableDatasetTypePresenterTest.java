@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.data.datasettype;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.data.datasettype.EditableDatasetTypePresenter;
@@ -12,11 +13,13 @@ import gov.epa.emissions.framework.client.data.datasettype.ViewableDatasetTypePr
 import gov.epa.emissions.framework.client.data.datasettype.ViewableDatasetTypeView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.qa.QAService;
 
 import java.util.Date;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.core.Constraint;
 import org.jmock.core.constraint.IsInstanceOf;
 
 public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
@@ -29,20 +32,25 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
         type.setLockOwner(user.getUsername());
         type.setLockDate(new Date());
 
-        Mock service = mock(DataCommonsService.class);
-        service.expects(once()).method("obtainLockedDatasetType").with(same(user), same(type)).will(returnValue(type));
+        QAProgram[] programs = {};
+        Mock qaService = mock(QAService.class);
+        qaService.expects(once()).method("getQAPrograms").withNoArguments().will(returnValue(programs));
+        
+        Mock dcService = mock(DataCommonsService.class);
+        dcService.expects(once()).method("obtainLockedDatasetType").with(same(user), same(type)).will(returnValue(type));
 
         Keyword[] keywords = new Keyword[0];
-        service.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
+        dcService.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
 
-        Mock session = session(user, service.proxy());
+        Mock session = session(user, dcService.proxy());
+        session.stubs().method("qaService").withNoArguments().will(returnValue(qaService.proxy()));
 
         Mock view = mock(EditableDatasetTypeView.class);
 
         EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenterImpl((EmfSession) session.proxy(),
                 (EditableDatasetTypeView) view.proxy(), null, type);
         view.expects(once()).method("observe").with(eq(presenter));
-        view.expects(once()).method("display").with(same(type), same(keywords));
+        view.expects(once()).method("display").with(new Constraint[]{same(type),same(programs), same(keywords)});
 
         presenter.doDisplay();
     }
@@ -51,7 +59,7 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
         Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(user));
         session.stubs().method("dataCommonsService").withNoArguments().will(returnValue(dataCommonsServiceProxy));
-
+        
         return session;
     }
 

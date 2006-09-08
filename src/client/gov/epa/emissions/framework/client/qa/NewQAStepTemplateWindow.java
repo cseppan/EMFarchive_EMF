@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.qa;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
@@ -30,20 +31,20 @@ public class NewQAStepTemplateWindow extends DisposableInteralFrame implements N
         super("New QA Step Template", new Dimension(550, 480), desktopManager);
     }
 
-    public void display(DatasetType type) {
+    public void display(DatasetType type, QAProgram[] programs) {
         super.setLabel(super.getTitle() + ": " + type.getName());
-        JPanel layout = createLayout(type);
+        JPanel layout = createLayout(type,programs);
         super.getContentPane().add(layout);
         super.display();
     }
 
-    private JPanel createLayout(DatasetType type) {
+    private JPanel createLayout(DatasetType type, QAProgram[] programs) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.templatePanel = new QAStepTemplatePanel(messagePanel, this);
+        this.templatePanel = new QAStepTemplatePanel(programs,messagePanel,  this);
         panel.add(templatePanel);
         panel.add(buttonsPanel(type));
 
@@ -106,7 +107,7 @@ public class NewQAStepTemplateWindow extends DisposableInteralFrame implements N
     public QAStepTemplate template() {
         QAStepTemplate template = new QAStepTemplate();
         template.setName(templatePanel.getTemplateName().trim());
-        template.setProgram(templatePanel.getProgramName().trim());
+        template.setProgram(templatePanel.getProgram());
         template.setProgramArguments(templatePanel.getProgramArgs());
         template.setRequired(templatePanel.getRequired());
 

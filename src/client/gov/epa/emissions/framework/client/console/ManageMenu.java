@@ -209,7 +209,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
 
     private void doManageDatasetTypes(final EmfConsole parent, final MessagePanel messagePanel) {
         try {
-            DatasetTypesManagerView view = new DatasetTypesManagerWindow(parent, desktopManager);
+            DatasetTypesManagerView view = new DatasetTypesManagerWindow(session,parent, desktopManager);
             presenter.doDisplayDatasetTypesManager(view);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());

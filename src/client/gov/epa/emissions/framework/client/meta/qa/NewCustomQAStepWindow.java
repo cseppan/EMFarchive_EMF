@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
@@ -12,6 +13,7 @@ import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.data.QAPrograms;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -53,17 +55,19 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
 
     private EditableQATabView tabView;
 
+    private QAPrograms qaPrograms;
+
     public NewCustomQAStepWindow(DesktopManager desktopManager) {
         super("Add Custom QA Step", new Dimension(550, 450), desktopManager);
     }
 
-    public void display(EmfDataset dataset, Version[] versions, EditableQATabView tabView) {
+    public void display(EmfDataset dataset,QAProgram[] programs, Version[] versions, EditableQATabView tabView) {
         super.setTitle(super.getTitle() + ": " + dataset.getName());
 
         this.dataset = dataset;
         this.tabView = tabView;
         this.versionsSet = new VersionsSet(versions);
-
+        this.qaPrograms = new QAPrograms(programs);
         JPanel layout = createLayout();
         super.getContentPane().add(layout);
         super.display();
@@ -89,7 +93,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         name = new TextField("", 40);
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
-        program = new EditableComboBox(QAProperties.programs());
+        program = new EditableComboBox(qaPrograms.names());
         program.setSelectedItem("");
         program.setPrototypeDisplayValue("To make the combobox a bit wider");
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
@@ -192,7 +196,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         step.setRequired(required.isSelected());
 
         step.setName(name.getText());
-        step.setProgram((String) program.getSelectedItem());
+        step.setProgram(qaPrograms.get((String) program.getSelectedItem()));
         step.setProgramArguments(arguments.getText());
         step.setOrder(Float.parseFloat(order.getText()));
         step.setDescription(description.getText().trim());

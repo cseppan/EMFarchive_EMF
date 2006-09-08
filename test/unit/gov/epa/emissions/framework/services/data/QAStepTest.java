@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.data;
 
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 
 import java.util.Date;
@@ -11,7 +12,7 @@ public class QAStepTest extends TestCase {
     public void testShouldObtainAllParamsOfQAStepTemplate() {
         QAStepTemplate template = new QAStepTemplate();
         template.setName("template");
-        template.setProgram("program");
+        template.setProgram(new QAProgram("program"));
         template.setProgramArguments("args");
         template.setDescription("description");
         template.setRequired(true);

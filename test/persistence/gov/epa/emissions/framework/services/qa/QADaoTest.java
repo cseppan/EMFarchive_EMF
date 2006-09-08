@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
@@ -52,24 +53,26 @@ public class QADaoTest extends ServiceTestCase {
         step.setName("name");
         step.setVersion(2);
         add(step);
-
+        QAProgram program = new QAProgram("updated-program");
+        
         try {
             QAStep[] read = dao.steps(dataset, session);
             assertEquals(1, read.length);
 
             read[0].setName("updated-name");
-            read[0].setProgram("updated-program");
-
+            read[0].setProgram(program);
+            
             dao.update(read, session);
             session.clear();// to ensure Hibernate does not return cached objects
 
             QAStep[] updated = dao.steps(dataset, session);
             assertEquals(1, updated.length);
             assertEquals("updated-name", updated[0].getName());
-            assertEquals("updated-program", updated[0].getProgram());
+            assertEquals("updated-program", updated[0].getProgram().getName());
         } finally {
             remove(step);
             remove(dataset);
+            remove(program);
         }
     }
 

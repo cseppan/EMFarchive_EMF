@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.data;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
@@ -171,7 +172,7 @@ public class DatasetTypesDAOTest extends ServiceTestCase {
         QAStepTemplate template = new QAStepTemplate();
         template.setName("step1");
         type.addQaStepTemplate(template);
-
+        QAProgram program = new QAProgram("program-1");
         super.add(type);
 
         try {
@@ -182,16 +183,18 @@ public class DatasetTypesDAOTest extends ServiceTestCase {
             assertEquals(1, templates.length);
             QAStepTemplate updateTemplate = templates[0];
             updateTemplate.setName("updated-template");
-            updateTemplate.setProgram("program-1");
+
+            updateTemplate.setProgram(program);
 
             DatasetType updated = dao.update(modified, session);
 
             QAStepTemplate[] results = updated.getQaStepTemplates();
             assertEquals(1, results.length);
             assertEquals("updated-template", results[0].getName());
-            assertEquals("program-1", results[0].getProgram());
+            assertEquals("program-1", results[0].getProgram().getName());
         } finally {
             super.remove(type);
+            remove(program);
         }
     }
 

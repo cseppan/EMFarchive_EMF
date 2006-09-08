@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.qa;
 
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.framework.client.qa.QAStepTemplateTableData;
 import gov.epa.emissions.framework.ui.Row;
@@ -19,19 +20,23 @@ public class QAStepTemplateTableDataTest extends TestCase {
     protected void setUp() {
         template1 = new QAStepTemplate();
         template1.setName("name1");
-        template1.setProgram("program1");
+        template1.setProgram(program("program1"));
         template1.setProgramArguments("program-args1");
         template1.setRequired(true);
         template1.setOrder(1);
 
         template2 = new QAStepTemplate();
         template2.setName("name2");
-        template2.setProgram("program2");
+        template2.setProgram(program("program2"));
         template2.setProgramArguments("program-args2");
         template2.setRequired(false);
         template2.setOrder(2);
 
         data = new QAStepTemplateTableData(new QAStepTemplate[] { template1, template2 });
+    }
+    
+    private QAProgram program(String name) {
+        return new QAProgram(name);
     }
 
     public void testShouldHaveFiveColumns() {

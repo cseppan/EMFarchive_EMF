@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.gui.Changeables;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
@@ -24,7 +25,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
     protected void setUp() {
         step1 = new QAStep();
         step1.setName("name1");
-        step1.setProgram("program1");
+        step1.setProgram(new QAProgram("program1"));
         step1.setProgramArguments("program-args1");
         step1.setRequired(true);
         step1.setDate(new Date());
@@ -33,7 +34,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
 
         step2 = new QAStep();
         step2.setName("name2");
-        step2.setProgram("program2");
+        step2.setProgram(new QAProgram("program2"));
         step2.setProgramArguments("program-args2");
         step2.setDate(new Date());
         step2.setRequired(false);
@@ -103,7 +104,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
 
         assertEquals(step1.getWho(), row.getValueAt(6));
         assertEquals(step1.getComments(), row.getValueAt(7));
-        assertEquals(step1.getProgram(), row.getValueAt(8));
+        assertEquals(step1.getProgram().getName(), row.getValueAt(8));
         assertEquals(step1.getProgramArguments(), row.getValueAt(9));
     }
 
@@ -122,7 +123,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
     public void testShouldAddNewQAStepTemplateOnAddMethod() {
         QAStep step3 = new QAStep();
         step3.setName("name3");
-        step3.setProgram("program3");
+        step3.setProgram(new QAProgram("program3"));
         step3.setProgramArguments("program-args3");
         step3.setRequired(false);
         step3.setOrder(3);
@@ -145,7 +146,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
     public void testShouldRecreateRowsOnRefresh() {
         QAStep step3 = new QAStep();
         step3.setName("name3");
-        step3.setProgram("program3");
+        step3.setProgram(new QAProgram("program3"));
         step3.setProgramArguments("program-args3");
         step3.setRequired(false);
         step3.setOrder(3);

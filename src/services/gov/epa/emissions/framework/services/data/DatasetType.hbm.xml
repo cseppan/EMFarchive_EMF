@@ -33,7 +33,10 @@
       		<list-index column="list_index"/>
 		    <composite-element class="gov.epa.emissions.commons.data.QAStepTemplate">
 				<property name="name" column="name" type="java.lang.String" not-null="true"/>
-		        <property name="program" column="program" type="java.lang.String" not-null="false"/>
+        		<many-to-one cascade="save-update" name="program"
+     				 class ="gov.epa.emissions.commons.data.QAProgram"
+	     			 column="qa_program_id" unique="true" not-null="false"
+	     	     />
         		<property name="programArguments" column="program_arguments" type="java.lang.String" not-null="false"/>
 		        <property name="required" column="required" type="boolean" not-null="false"/>               
         		<property name="order" column="order_no" type="float" not-null="false"/>

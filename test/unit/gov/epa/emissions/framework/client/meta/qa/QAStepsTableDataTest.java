@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
@@ -24,7 +25,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         step1.setName("step1");
         step1.setWho("username1");
         step1.setDate(new Date());
-        step1.setProgram("program1");
+        step1.setProgram(program("program1"));
         step1.setRequired(true);
         step1.setOrder(1);
         step1.setComments("result1");
@@ -36,7 +37,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         step2.setName("step2");
         step2.setWho("username2");
         step2.setDate(new Date());
-        step2.setProgram("program2");
+        step2.setProgram(program("program2"));
         step2.setRequired(false);
         step2.setOrder(2);
         step2.setComments("result2");
@@ -44,6 +45,10 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         step2.setConfiguration("dataset two");
 
         data = new QAStepsTableData(new QAStep[] { step1, step2 });
+    }
+
+    private QAProgram program(String name) {
+        return new QAProgram(name);
     }
 
     public void testShouldHaveNineColumns() {
@@ -100,7 +105,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
 
         assertEquals(step1.getWho(), row.getValueAt(6));
         assertEquals(step1.getComments(), row.getValueAt(7));
-        assertEquals(step1.getProgram(), row.getValueAt(8));
+        assertEquals(step1.getProgram().getName(), row.getValueAt(8));
         assertEquals(step1.getProgramArguments(), row.getValueAt(9));
     }
 

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.qa;
 
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.framework.ui.RowSource;
 
@@ -28,7 +29,7 @@ public class EditableQAStepTemplateRowSource implements RowSource {
             source.setName((String) val);
             break;
         case 2:
-            source.setProgram((String) val);
+            source.setProgram((QAProgram) val);
             break;
         case 3:
             source.setProgramArguments((String) val);

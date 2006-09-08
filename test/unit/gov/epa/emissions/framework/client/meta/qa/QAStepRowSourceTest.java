@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 
@@ -16,7 +17,7 @@ public class QAStepRowSourceTest extends TestCase {
         step.setName("step");
         step.setWho("username");
         step.setDate(new Date());
-        step.setProgram("program");
+        step.setProgram(new QAProgram("sql"));
         step.setProgramArguments("args");
         step.setRequired(true);
         step.setOrder((float) 823.2);
@@ -39,7 +40,7 @@ public class QAStepRowSourceTest extends TestCase {
 
         assertEquals(step.getWho(), values[6]);
         assertEquals(step.getComments(), values[7]);
-        assertEquals(step.getProgram(), values[8]);
+        assertEquals(step.getProgram().getName(), values[8]);
         assertEquals(step.getProgramArguments(), values[9]);
         assertEquals(step.getConfiguration(), values[10]);
     }

@@ -5,6 +5,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
@@ -54,23 +55,29 @@ public class QAServiceTest extends ServiceTestCase {
         step.setVersion(2);
         add(step);
 
+        QAProgram program = program("updated-program");
         try {
             QAStep[] read = service.getQASteps(dataset);
             assertEquals(1, read.length);
 
             read[0].setName("updated-name");
-            read[0].setProgram("updated-program");
+            read[0].setProgram(program);
 
             service.update(read);
 
             QAStep[] updated = service.getQASteps(dataset);
             assertEquals(1, updated.length);
             assertEquals("updated-name", updated[0].getName());
-            assertEquals("updated-program", updated[0].getProgram());
+            assertEquals("updated-program", updated[0].getProgram().getName());
         } finally {
             remove(step);
             remove(dataset);
+            remove(program);
         }
+    }
+
+    private QAProgram program(String name) {
+        return new QAProgram(name);
     }
 
     private EmfDataset newDataset() {

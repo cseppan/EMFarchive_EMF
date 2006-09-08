@@ -47,7 +47,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     private MessagePanel messagePanel;
 
     private DesktopManager desktop;
-    
+
     private int datasetID;
 
     public EditableQATab(EmfConsole parent, DesktopManager desktop, ManageChangeables changeables,
@@ -86,7 +86,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         sortFilterPanel.setPreferredSize(new Dimension(450, 60));
         return scrollPane;
     }
-    
+
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Version", "Order" };
         return new SortCriteria(columnNames, new boolean[] { false, false }, new boolean[] { true, true });
@@ -155,15 +155,19 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         clearMessage();
 
         List selected = selectModel.selected();
-        if(selected.size() == 0) {
+        if (selected.size() == 0) {
             messagePanel.setMessage("Please select a QA step.");
             return;
         }
-        
+
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
             QAStep step = (QAStep) iter.next();
             EditQAStepWindow view = new EditQAStepWindow(desktop);
-            presenter.doEdit(step, view, versions.name(step.getVersion()));
+            try {
+                presenter.doEdit(step, view, versions.name(step.getVersion()));
+            } catch (EmfException e) {
+                messagePanel.setError(e.getMessage());
+            }
         }
     }
 

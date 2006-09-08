@@ -1,8 +1,10 @@
 package gov.epa.emissions.framework.client.qa;
 
 import org.jmock.Mock;
+import org.jmock.core.Constraint;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 
@@ -22,15 +24,17 @@ public class NewQAStepTemplatePresenterTest extends EmfMockObjectTestCase {
     
     public void testShouldDisplayView() {
         Mock view = mock(QAStepTemplatesPanelView.class);
+
         DatasetType type = new DatasetType();
+        QAProgram[] programs = {};
         Mock dialog = mock(NewQAStepTemplateView.class);
-        expects(dialog, 1, "display", same(type));
+        expects(dialog, 1, "display", new Constraint[]{same(type),same(programs)});
 
         NewQAStepTemplatePresenter presenter = new NewQAStepTemplatePresenter(
                 (QAStepTemplatesPanelView) view.proxy(), (NewQAStepTemplateView)dialog.proxy());
 
         expects(dialog, 1, "observe", same(presenter));
         
-        presenter.display(type);
+        presenter.display(type,programs);
     }
 }

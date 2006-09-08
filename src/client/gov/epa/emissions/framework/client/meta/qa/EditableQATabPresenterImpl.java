@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
@@ -59,8 +60,9 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         doAddCustomized(stepView, versions());
     }
 
-    void doAddCustomized(NewCustomQAStepView stepView, Version[] versions) {
-        stepView.display(dataset, versions, view);
+    void doAddCustomized(NewCustomQAStepView stepView, Version[] versions) throws EmfException {
+        QAProgram[] programs = session.qaService().getQAPrograms();
+        stepView.display(dataset,programs, versions, view);
     }
 
     public void doSetStatus(SetQAStatusView statusView, QAStep[] steps) {
@@ -68,7 +70,7 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         presenter.display();
     }
 
-    public void doEdit(QAStep step, EditQAStepView performView, String versionName) {
+    public void doEdit(QAStep step, EditQAStepView performView, String versionName) throws EmfException {
         EditQAStepPresenter presenter = new EditQAStepPresenter(performView, dataset, view, session);
         presenter.display(step, versionName);
     }

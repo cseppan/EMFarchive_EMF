@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
-import gov.epa.emissions.framework.services.qa.QAProgram;
 import gov.epa.emissions.framework.services.qa.QAService;
 
 public class QAServiceTransport implements QAService {

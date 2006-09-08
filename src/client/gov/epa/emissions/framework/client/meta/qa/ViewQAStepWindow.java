@@ -25,7 +25,7 @@ import javax.swing.SpringLayout;
 
 public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepView {
     private JPanel layout;
-    
+
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public ViewQAStepWindow(DesktopManager desktopManager) {
@@ -36,7 +36,8 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     }
 
     public void display(QAStep step) {
-        super.setLabel(super.getTitle() + " : " + step.getName() + " - " + step.getDatasetId() + " v("+step.getVersion() + ")");
+        super.setLabel(super.getTitle() + " : " + step.getName() + " - " + step.getDatasetId() + " v("
+                + step.getVersion() + ")");
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
 
         layout.add(inputPanel(step));
@@ -57,7 +58,8 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         version.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Version", version, panel);
 
-        TextField program = new TextField("", step.getProgram(), 40);
+        String qaProgram = (step.getProgram() != null) ? step.getProgram().getName() : "";
+        TextField program = new TextField("", qaProgram, 40);
         program.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Program", program, panel);
 

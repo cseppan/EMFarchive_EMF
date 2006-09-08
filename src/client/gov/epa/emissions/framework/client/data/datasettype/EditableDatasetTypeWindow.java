@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.data.datasettype;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Keyword;
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
@@ -9,6 +10,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -55,11 +57,14 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private EmfConsole parent;
 
-    public EditableDatasetTypeWindow(EmfConsole parent, DesktopManager desktopManager) {
+    private EmfSession session;
+
+    public EditableDatasetTypeWindow(EmfSession session, EmfConsole parent, DesktopManager desktopManager) {
         super("Edit Dataset Type", new Dimension(600, 550), desktopManager);
 
         this.desktopManager = desktopManager;
         this.parent = parent;
+        this.session = session;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -69,22 +74,22 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         this.presenter = presenter;
     }
 
-    public void display(DatasetType type, Keyword[] keywords) {
+    public void display(DatasetType type, QAProgram[] programs, Keyword[] keywords) {
         super.setTitle("Edit Dataset Type: " + type.getName());
         super.setName("datasetTypeEditor:" + type.getId());
-
+        
         layout.removeAll();
-        doLayout(layout, type, keywords);
+        doLayout(layout, type, keywords,programs);
 
         super.display();
     }
 
-    private void doLayout(JPanel layout, DatasetType type, Keyword[] keywords) {
+    private void doLayout(JPanel layout, DatasetType type, Keyword[] keywords, QAProgram[] programs) {
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
         layout.add(createInputPanel(type));
         layout.add(createKeywordsPanel(type, keywords));
-        layout.add(createQAStepTemplatesPanel(type));
+        layout.add(createQAStepTemplatesPanel(type,programs));
         layout.add(createButtonsPanel());
     }
 
@@ -122,9 +127,9 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         return keywordsPanel;
     }
 
-    private JPanel createQAStepTemplatesPanel(DatasetType type) {
-        qaStepTemplatesPanel = new EditQAStepTemplatesPanel(type, this, desktopManager, parent);
-        QAStepTemplatesPanelPresenter presenter = new QAStepTemplatesPanelPresenter(type, qaStepTemplatesPanel);
+    private JPanel createQAStepTemplatesPanel(DatasetType type, QAProgram[] programs) {
+        qaStepTemplatesPanel = new EditQAStepTemplatesPanel(type, programs, this, desktopManager, parent,messagePanel);
+        QAStepTemplatesPanelPresenter presenter = new QAStepTemplatesPanelPresenter(session,type, qaStepTemplatesPanel);
         presenter.display();
 
         return qaStepTemplatesPanel;

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data.datasettype;
 
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
@@ -115,11 +116,12 @@ public class ViewableQAStepTemplateWindow extends DisposableInteralFrame impleme
 
     public void populateFields(QAStepTemplate template) {
         name.setText(template.getName());
-        program.setText(template.getProgram());
+        QAProgram qaProgram = template.getProgram();
+        program.setText((qaProgram == null) ? "" : qaProgram.getName());
         programParameters.setText(template.getProgramArguments());
         required.setSelected(template.isRequired());
         order.setText(template.getOrder() + "");
         description.setText(template.getDescription());
     }
-    
+
 }

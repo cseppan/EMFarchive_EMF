@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.qa;
 
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.framework.client.qa.EditableQAStepTemplateTableData;
 import gov.epa.emissions.framework.ui.Row;
@@ -19,19 +20,23 @@ public class EditableQAStepTemplateTableDataTest extends TestCase {
     protected void setUp() {
         template1 = new QAStepTemplate();
         template1.setName("name1");
-        template1.setProgram("program1");
+        template1.setProgram(program("program1"));
         template1.setProgramArguments("program-args1");
         template1.setRequired(true);
         template1.setOrder(1);
 
         template2 = new QAStepTemplate();
         template2.setName("name2");
-        template2.setProgram("program2");
+        template2.setProgram(program("program2"));
         template2.setProgramArguments("program-args2");
         template2.setRequired(false);
         template2.setOrder(2);
 
         data = new EditableQAStepTemplateTableData(new QAStepTemplate[] { template1, template2 });
+    }
+
+    private QAProgram program(String name) {
+        return new QAProgram(name);
     }
 
     public void testShouldHaveSixColumns() {
@@ -105,7 +110,7 @@ public class EditableQAStepTemplateTableDataTest extends TestCase {
     public void testShouldAddNewQAStepTemplateOnAddMethod() {
         QAStepTemplate template3 = new QAStepTemplate();
         template3.setName("name3");
-        template3.setProgram("program3");
+        template3.setProgram(program("program3"));
         template3.setProgramArguments("program-args3");
         template3.setRequired(false);
         template3.setOrder(3);
@@ -122,10 +127,10 @@ public class EditableQAStepTemplateTableDataTest extends TestCase {
     public void testShouldReturnCorrectSelectedRows() {
         QAStepTemplate template3 = new QAStepTemplate();
         template3.setName("name3");
-        template3.setProgram("program3");
+        template3.setProgram(program("program3"));
         template3.setProgramArguments("program-args3");
         template3.setRequired(false);
-        template3.setOrder((float)2.8);
+        template3.setOrder((float) 2.8);
 
         data.add(template3);
         data.setValueAt(Boolean.TRUE, 0, 0);

@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
@@ -37,7 +38,7 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         EditableQATabPresenter presenter = new EditableQATabPresenterImpl(dataset, (EmfSession) session.proxy(),
                 (EditableQATabView) view.proxy());
         expectsOnce(view, "observe", presenter);
-        expectsOnce(view, "display", new Constraint[] {same(dataset), same(steps), same(versions) });
+        expectsOnce(view, "display", new Constraint[] { same(dataset), same(steps), same(versions) });
 
         presenter.display();
     }
@@ -65,32 +66,46 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         presenter.doAddUsingTemplate((NewQAStepView) newQAStepview.proxy());
     }
 
-    public void testShouldAddNewQAStepOnAddCustomized() {
+    public void testShouldAddNewQAStepOnAddCustomized() throws EmfException {
         EmfDataset dataset = new EmfDataset();
         dataset.setName("test");
 
         Version[] versions = {};
+        QAProgram[] programs = {};
+
         Mock tabview = mock(EditableQATabView.class);
         EditableQATabView tabViewProxy = (EditableQATabView) tabview.proxy();
 
-        Mock newQAStepview = mock(NewCustomQAStepView.class);
-        expects(newQAStepview, 1, "display", new Constraint[] { same(dataset), eq(versions), same(tabViewProxy) });
+        Mock qaService = mock(QAService.class);
+        expects(qaService, 1, "getQAPrograms", programs);
+        Mock session = mock(EmfSession.class);
+        expects(session, 1, "qaService", qaService.proxy());
 
-        EditableQATabPresenterImpl presenter = new EditableQATabPresenterImpl(dataset, null, tabViewProxy);
+        Mock newQAStepview = mock(NewCustomQAStepView.class);
+        expects(newQAStepview, 1, "display", new Constraint[] { same(dataset), same(programs), eq(versions),
+                same(tabViewProxy) });
+
+        EditableQATabPresenterImpl presenter = new EditableQATabPresenterImpl(dataset, (EmfSession) session.proxy(),
+                tabViewProxy);
 
         presenter.doAddCustomized((NewCustomQAStepView) newQAStepview.proxy(), versions);
     }
 
-    public void testShouldUpdateQAStepOnPerform() {
+    public void testShouldUpdateQAStepOnPerform() throws EmfException {
         EmfDataset dataset = new EmfDataset();
         QAStep step = new QAStep();
         User user = new User();
-
+        QAProgram[] programs = {};
+        
         Mock view = mock(EditQAStepView.class);
-        expectsOnce(view, "display", new Constraint[] { same(step), same(dataset), same(user), same("") });
+        expectsOnce(view, "display", new Constraint[] { same(step), same(programs),same(dataset), same(user), same("") });
         expects(view, "observe");
-
+        
+        
+        Mock qaService = mock(QAService.class);
+        expects(qaService, 1, "getQAPrograms", programs);
         Mock session = mock(EmfSession.class);
+        expects(session, 1, "qaService", qaService.proxy());
         stub(session, "user", user);
         
         EditableQATabPresenterImpl presenter = new EditableQATabPresenterImpl(dataset, (EmfSession) session.proxy(),

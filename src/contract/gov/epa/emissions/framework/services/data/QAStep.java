@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.version.Version;
 
@@ -10,7 +11,7 @@ public class QAStep {
 
     private String name;
 
-    private String program;
+    private QAProgram program;
 
     private int version;
 
@@ -31,17 +32,17 @@ public class QAStep {
     private int datasetId;
 
     private int id;
-    
+
     private String description;
-    
+
     private String configuration;
-    
+
     private InternalSource tableSource;
-    
+
     private String tableCreationStatus;
-    
+
     private Date tableCreationDate;
-    
+
     private boolean tableCurrent;
 
     public int getId() {
@@ -76,11 +77,11 @@ public class QAStep {
         this.description = template.getDescription();
     }
 
-    public String getProgram() {
+    public QAProgram getProgram() {
         return program;
     }
 
-    public void setProgram(String program) {
+    public void setProgram(QAProgram program) {
         this.program = program;
     }
 
@@ -179,7 +180,7 @@ public class QAStep {
     public void setConfiguration(String configuration) {
         this.configuration = configuration;
     }
-    
+
     public String toString() {
         return name;
     }
