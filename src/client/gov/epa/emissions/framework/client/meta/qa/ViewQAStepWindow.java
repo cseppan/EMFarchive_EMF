@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
@@ -29,7 +30,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public ViewQAStepWindow(DesktopManager desktopManager) {
-        super("View QA Step", new Dimension(550, 450), desktopManager);
+        super("View QA Step", new Dimension(625, 525), desktopManager);
 
         layout = new JPanel();
         super.getContentPane().add(layout);
@@ -90,6 +91,22 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         status.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Status", status, panel);
 
+        String creationStatus = step.getTableCreationStatus() != null ? step.getTableCreationStatus() : "";
+        TextField tableCreationStatus = new TextField("", creationStatus, 20);
+        tableCreationStatus.setEditable(false);
+        layoutGenerator.addLabelWidgetPair("Table Creation Status", tableCreationStatus, panel);
+
+        String creationDate = step.getTableCreationDate() != null ? EmfDateFormat.format_MM_DD_YYYY(step
+                .getTableCreationDate()) : "";
+        TextField tableCreationDate = new TextField("", creationDate, 20);
+        tableCreationDate.setEditable(false);
+        layoutGenerator.addLabelWidgetPair("Table Creation Date", tableCreationDate, panel);
+        
+        JCheckBox currentTable = new JCheckBox();
+        currentTable.setEnabled(false);
+        currentTable.setSelected(step.isTableCurrent());
+        layoutGenerator.addLabelWidgetPair("Current Table?", currentTable, panel);
+
         TextArea result = new TextArea("", step.getComments(), 40, 10);
         result.setLineWrap(true);
         result.setWrapStyleWord(true);
@@ -105,7 +122,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 11, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 14, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 

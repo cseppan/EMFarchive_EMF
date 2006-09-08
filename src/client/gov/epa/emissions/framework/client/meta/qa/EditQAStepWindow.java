@@ -36,6 +36,8 @@ import java.util.Date;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
@@ -121,6 +123,71 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     private JPanel lowerPanel(QAStep step) {
+
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+        topPanel.add(lowerTopLeftPanel(step));
+        topPanel.add(lowerTopRightPanel(step));
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.add(topPanel);
+        panel.add(lowerBottomPanel(step));
+        return panel;
+    }
+
+    private JPanel lowerTopRightPanel(QAStep step) {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        JLabel creationStatusLabel = new JLabel();
+        String tableCreationStatus = step.getTableCreationStatus();
+        creationStatusLabel.setText((tableCreationStatus != null) ? tableCreationStatus : "");
+        layoutGenerator.addLabelWidgetPair("Table Creation Status:", creationStatusLabel, panel);
+
+        JLabel creationDateLabel = new JLabel();
+        String creationDate = (step.getTableCreationDate() != null) ? EmfDateFormat.format_MM_DD_YYYY(step
+                .getTableCreationDate()) : "";
+        creationDateLabel.setText(creationDate);
+        layoutGenerator.addLabelWidgetPair("Table Creation Date:", creationDateLabel, panel);
+
+        JCheckBox currentTable = new JCheckBox();
+        currentTable.setEnabled(false);
+        currentTable.setSelected(step.isTableCurrent());
+        layoutGenerator.addLabelWidgetPair("Current Table?", currentTable, panel);
+
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
+        return panel;
+    }
+
+    private JPanel lowerBottomPanel(QAStep step) {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        config = new TextField("config", step.getConfiguration(), 40);
+        addChangeable(config);
+        config.setToolTipText("Enter the name of the Dataset that is the configuration "
+                + "file (e.g., a REPCONFIG file)");
+        layoutGenerator.addLabelWidgetPair("Configuration:", config, panel);
+
+        comments = new TextArea("Comments", step.getComments(), 40, 3);
+        addChangeable(comments);
+        ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(comments);
+        layoutGenerator.addLabelWidgetPair("Comments:", scrollableComment, panel);
+
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
+
+        return panel;
+
+    }
+
+    private JPanel lowerTopLeftPanel(QAStep step) {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -136,23 +203,13 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         addChangeable(date);
         layoutGenerator.addLabelWidgetPair("Date:", date, panel);
 
-        config = new TextField("config", step.getConfiguration(), 40);
-        addChangeable(config);
-        config.setToolTipText("Enter the name of the Dataset that is the configuration "
-                + "file (e.g., a REPCONFIG file)");
-        layoutGenerator.addLabelWidgetPair("Configuration:", config, panel);
-
-        comments = new TextArea("Comments", step.getComments(), 40, 3);
-        addChangeable(comments);
-        ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(comments);
-        layoutGenerator.addLabelWidgetPair("Comments:", scrollableComment, panel);
-
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
+
     }
 
     private ComboBox status(QAStep step) {
