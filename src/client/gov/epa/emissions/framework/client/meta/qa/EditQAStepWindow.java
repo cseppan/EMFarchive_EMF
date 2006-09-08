@@ -181,7 +181,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         program = new EditableComboBox(qaPrograms.names());
         program.setPrototypeDisplayValue("To make the combobox a bit wider");
-        program.setSelectedItem(step.getProgram());
+        QAProgram qaProgram = step.getProgram();
+        if (qaProgram != null)
+            program.setSelectedItem(qaProgram.getName());
         addChangeable(program);
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
