@@ -51,8 +51,14 @@ public class QAServiceTransport implements QAService {
         return (QAProgram[]) call.requestResponse(new Object[] {});
     }
 
-    public void runQAStep(QAStep step) {
-        // NOTE Auto-generated method stub
-        
+    public void runQAStep(QAStep step) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("runQAStep");
+        call.addParam("step", mappings.qaStep());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { step });
+
     }
 }

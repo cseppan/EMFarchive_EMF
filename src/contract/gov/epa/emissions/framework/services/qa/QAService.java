@@ -13,6 +13,6 @@ public interface QAService {
 
     void update(QAStep[] steps) throws EmfException;
 
-    void runQAStep(QAStep step);
+    void runQAStep(QAStep step) throws EmfException;
 
 }

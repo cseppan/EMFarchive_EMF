@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class StrategyFactory {
+    
     private static Log log = LogFactory.getLog(StrategyFactory.class);
 
     private int batchSize;
