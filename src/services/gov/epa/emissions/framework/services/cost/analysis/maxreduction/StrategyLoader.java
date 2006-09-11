@@ -108,7 +108,7 @@ public class StrategyLoader {
 
             dataModifier.insert((String[]) record.tokens().toArray(new String[0]));
         } catch (SQLException e) {
-            throw new EmfException("Error in inserting query\n" + e.getMessage());
+            throw new EmfException("Error processing insert query: " + e.getMessage());
         }
     }
 
