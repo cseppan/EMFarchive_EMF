@@ -22,7 +22,7 @@ public class InputsRowSource implements RowSource {
     }
     
     private String getSectorName(CaseInput input) {
-        return (input.getSector() == null) ? "" : input.getSector().getName();
+        return (input.getSector() == null) ? "All sectors" : input.getSector().getName();
     }
     
     private String getProgramName(CaseInput input) {

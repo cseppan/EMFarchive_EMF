@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
@@ -25,8 +26,6 @@ import gov.epa.mims.analysisengine.table.SortCriteria;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -59,7 +58,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     private DesktopManager desktopManager;
 
-    private JTextField inputDir;
+    private TextField inputDir;
 
     private EmfSession session;
     
@@ -73,8 +72,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         this.desktopManager = desktopManager;
         this.changeables = changeables;
 
-        this.inputDir = new JTextField(30);
-        inputDir.setName("inputdir");
+        this.inputDir = new TextField("inputdir", 30);
+        this.changeables.addChangeable(inputDir);
 
         super.setLayout(new BorderLayout());
     }
@@ -86,11 +85,11 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         this.presenter = presenter;
         this.session = session;
         inputDir.setText(caseObj.getInputFileDir());
-        inputDir.addKeyListener(new KeyAdapter() {
-            public void keyTyped(KeyEvent e) {
-                saveCaseInputFileDir();
-            }
-        });
+//        inputDir.addKeyListener(new KeyAdapter() {
+//            public void keyTyped(KeyEvent e) {
+//                saveCaseInputFileDir();
+//            }
+//        });
         
         super.add(createLayout(caseObj.getCaseInputs(), presenter, parentConsole), BorderLayout.CENTER);
     }
@@ -339,8 +338,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         return tableData.sources();
     }
 
-    public void saveCaseInputFileDir() {
-        caseObj.setInputFileDir(inputDir.getText());
+    public String getCaseInputFileDir() {
+        return inputDir.getText();
     }
 
     public void refresh() {

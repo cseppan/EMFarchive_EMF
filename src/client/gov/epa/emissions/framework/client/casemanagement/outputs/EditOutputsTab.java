@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
@@ -45,7 +46,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
 
     private ManageChangeables changeables;
 
-    private JTextField outputDir;
+    private TextField outputDir;
 
     public EditOutputsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager) {
@@ -53,9 +54,9 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
         this.parentConsole = parentConsole;
         this.changeables = changeables;
 
-        this.outputDir = new JTextField(20);
-        outputDir.setName("outputdir");
-
+        this.outputDir = new TextField("outputdir", 20);
+        this.changeables.addChangeable(outputDir);
+        
         super.setLayout(new BorderLayout());
     }
 

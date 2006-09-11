@@ -15,7 +15,7 @@ public interface EditInputsTabView {
     
     void refresh();
     
-    void saveCaseInputFileDir();
+    String getCaseInputFileDir();
 
     void checkDuplicate(CaseInput input) throws EmfException;
     

@@ -56,6 +56,7 @@ public class QAServiceTest extends ServiceTestCase {
         add(step);
 
         QAProgram program = program("updated-program");
+        
         try {
             QAStep[] read = service.getQASteps(dataset);
             assertEquals(1, read.length);
