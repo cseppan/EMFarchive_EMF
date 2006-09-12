@@ -176,9 +176,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Name:", name(), panel);
-        layoutGenerator.addLabelWidgetPair("Project:", projects(), panel);
         layoutGenerator.addLabelWidgetPair("Category:", categories(), panel);
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description()), panel);
+        layoutGenerator.addLabelWidgetPair("Project:", projects(), panel);
         layoutGenerator.addLabelWidgetPair("Run Status:", runStatus(), panel);
         layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
 
