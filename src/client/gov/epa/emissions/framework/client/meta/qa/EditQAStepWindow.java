@@ -196,15 +196,15 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         status = status(step);
         addChangeable(status);
-        layoutGenerator.addLabelWidgetPair("Status:", status, panel);
+        layoutGenerator.addLabelWidgetPair("QA Status:", status, panel);
 
-        who = new TextField("who", step.getWho(), 20);
+        who = new TextField("who", step.getWho(), 10);
         addChangeable(who);
         layoutGenerator.addLabelWidgetPair("User:", who, panel);
 
         date = new FormattedDateField("Date", step.getDate(), DATE_FORMATTER, messagePanel);
         addChangeable(date);
-        layoutGenerator.addLabelWidgetPair("Date:", date, panel);
+        layoutGenerator.addLabelWidgetPair("QA Date:", date, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
