@@ -67,20 +67,20 @@ public class ViewableQAStepTemplateWindow extends DisposableInteralFrame impleme
 
         name = new TextField("", 40);
         name.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Name", name, panel);
+        layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         program = new TextField("", 40);
         program.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Program", program, panel);
+        layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
         programParameters = new TextArea("", "", 40, 3);
         programParameters.setEditable(false);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programParameters);
-        layoutGenerator.addLabelWidgetPair("Parameters", scrollableDetails, panel);
+        layoutGenerator.addLabelWidgetPair("Parameters:", scrollableDetails, panel);
 
         order = new TextField("", 40);
         order.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Order", order, panel);
+        layoutGenerator.addLabelWidgetPair("Order:", order, panel);
 
         required = new CheckBox("");
         required.setEnabled(false);
@@ -91,7 +91,7 @@ public class ViewableQAStepTemplateWindow extends DisposableInteralFrame impleme
         description.setWrapStyleWord(true);
         description.setEditable(false);
         ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
-        layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
+        layoutGenerator.addLabelWidgetPair("Description:", scrollableDesc, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols

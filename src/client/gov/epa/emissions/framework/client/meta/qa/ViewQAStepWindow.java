@@ -30,7 +30,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public ViewQAStepWindow(DesktopManager desktopManager) {
-        super("View QA Step", new Dimension(625, 525), desktopManager);
+        super("View QA Step", new Dimension(625, 575), desktopManager);
 
         layout = new JPanel();
         super.getContentPane().add(layout);
@@ -53,25 +53,25 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
 
         TextField name = new TextField("", step.getName(), 20);
         name.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Name", name, panel);
+        layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         TextField version = new TextField("", step.getVersion() + "", 10);
         version.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Version", version, panel);
+        layoutGenerator.addLabelWidgetPair("Version:", version, panel);
 
         String qaProgram = (step.getProgram() != null) ? step.getProgram().getName() : "";
         TextField program = new TextField("", qaProgram, 40);
         program.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Program", program, panel);
+        layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
         TextArea programParameters = new TextArea("", step.getProgramArguments(), 40, 3);
         programParameters.setEditable(false);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programParameters);
-        layoutGenerator.addLabelWidgetPair("Arguments", scrollableDetails, panel);
+        layoutGenerator.addLabelWidgetPair("Arguments:", scrollableDetails, panel);
 
         TextField order = new TextField("", step.getOrder() + "", 10);
         order.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Order", order, panel);
+        layoutGenerator.addLabelWidgetPair("Order:", order, panel);
 
         CheckBox required = new CheckBox("", step.isRequired());
         required.setEnabled(false);
@@ -81,45 +81,45 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         if (step.getDate() != null)
             when.setText(dateFormat.format(step.getDate()));
         when.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("When", when, panel);
+        layoutGenerator.addLabelWidgetPair("When:", when, panel);
 
         TextField who = new TextField("", step.getWho(), 20);
         who.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Who", who, panel);
+        layoutGenerator.addLabelWidgetPair("Who:", who, panel);
 
         TextField status = new TextField("", step.getStatus(), 20);
         status.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Status", status, panel);
+        layoutGenerator.addLabelWidgetPair("Status:", status, panel);
 
         String creationStatus = step.getTableCreationStatus() != null ? step.getTableCreationStatus() : "";
         TextField tableCreationStatus = new TextField("", creationStatus, 20);
         tableCreationStatus.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Table Creation Status", tableCreationStatus, panel);
+        layoutGenerator.addLabelWidgetPair("Table Creation Status:", tableCreationStatus, panel);
 
         String creationDate = step.getTableCreationDate() != null ? EmfDateFormat.format_MM_DD_YYYY(step
                 .getTableCreationDate()) : "";
         TextField tableCreationDate = new TextField("", creationDate, 20);
         tableCreationDate.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Table Creation Date", tableCreationDate, panel);
+        layoutGenerator.addLabelWidgetPair("Table Creation Date:", tableCreationDate, panel);
         
         JCheckBox currentTable = new JCheckBox();
         currentTable.setEnabled(false);
         currentTable.setSelected(step.isTableCurrent());
         layoutGenerator.addLabelWidgetPair("Current Table?", currentTable, panel);
 
-        TextArea result = new TextArea("", step.getComments(), 40, 10);
+        TextArea result = new TextArea("", step.getComments(), 40, 3);
         result.setLineWrap(true);
         result.setWrapStyleWord(true);
         result.setEditable(false);
         ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(result);
-        layoutGenerator.addLabelWidgetPair("Comment", scrollableComment, panel);
+        layoutGenerator.addLabelWidgetPair("Comment:", scrollableComment, panel);
 
-        TextArea description = new TextArea("", step.getDescription(), 40, 10);
+        TextArea description = new TextArea("", step.getDescription(), 40, 3);
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
         description.setEditable(false);
         ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
-        layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
+        layoutGenerator.addLabelWidgetPair("Description:", scrollableDesc, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 14, 2, // rows, cols
