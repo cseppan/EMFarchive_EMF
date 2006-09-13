@@ -121,7 +121,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
         version.setLastModifiedDate(currentDate);
         
         try {
-            token = service.save(token, dataset);
+            token = service.save(token, dataset, version);
             tablePresenter.reloadCurrent();
             view.updateLockPeriod(token.lockStart(), token.lockEnd());
             changesSaved = true;

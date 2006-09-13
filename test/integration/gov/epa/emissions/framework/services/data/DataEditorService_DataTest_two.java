@@ -248,7 +248,7 @@ public class DataEditorService_DataTest_two extends ServiceTestCase {
         service.submit(token, page1ChangeSet, 1);
 
         int recordsBeforeSave = service.getTotalRecords(token);
-        service.save(token, dataset);
+        service.save(token, dataset, v1);
 
         assertEquals(recordsBeforeSave, service.getTotalRecords(token));
     }

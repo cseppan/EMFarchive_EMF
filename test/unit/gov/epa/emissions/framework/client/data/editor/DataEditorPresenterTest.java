@@ -130,7 +130,7 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
         DataAccessToken token = new DataAccessToken();
         Version version = new Version();
         token.setVersion(version);
-        service.expects(once()).method("save").with(same(token), same(dataset)).will(returnValue(token));
+        service.expects(once()).method("save").with(same(token), same(dataset),same(version)).will(returnValue(token));
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
         DataEditorView viewProxy = (DataEditorView) view.proxy();
@@ -153,10 +153,11 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
         EmfDataset dataset = new EmfDataset();
 
         Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("save").with(new IsInstanceOf(DataAccessToken.class), same(dataset)).will(
+        Version version = new Version();
+        service.expects(once()).method("save").with(new IsInstanceOf(DataAccessToken.class), same(dataset),same(version)).will(
                 throwException(new EmfException("Failure")));
 
-        DataAccessToken token = new DataAccessToken();
+        DataAccessToken token = new DataAccessToken(version,"table");
         service.expects(once()).method("discard").with(same(token));
 
         DataEditorView viewProxy = (DataEditorView) view.proxy();
@@ -171,7 +172,7 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
         closingRule.expects(once()).method("proceedWithClose");
         ClosingRule closingRuleProxy = (ClosingRule) closingRule.proxy();
 
-        DataEditorPresenterImpl p = new DataEditorPresenterImpl(dataset, new Version(), null, null);
+        DataEditorPresenterImpl p = new DataEditorPresenterImpl(dataset, version, null, null);
         p.save(viewProxy, token, tablePresenterProxy, serviceProxy, closingRuleProxy);
 
         assertFalse("Changes should not be saved on discard", p.areChangesSaved());

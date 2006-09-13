@@ -129,12 +129,20 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         }
     }
 
-    public DataAccessToken save(DataAccessToken token, EmfDataset dataset) throws EmfException {
-        if (!accessor.isLockOwned(token))
-            return token;// abort
+    public DataAccessToken save(DataAccessToken token, EmfDataset dataset, Version version) throws EmfException {
+        try {
+            if (!accessor.isLockOwned(token))
+                return token;// abort
 
-        DataAccessToken extended = accessor.renewLock(token);
-        return doSave(extended, cache, sessionFactory, dataset);
+            //updateVersion(version);
+            DataAccessToken extended = accessor.renewLock(token);
+            return doSave(extended, cache, sessionFactory, dataset);
+        } catch (Exception e) {
+            LOG.error("Could not save changes for Dataset: " + token.datasetId() + ". Version: " + token.getVersion()
+                    + "\t" + e.getMessage(), e);
+            throw new EmfException("Could not save changes for Dataset: " + token.datasetId() + ". Version: "
+                    + token.getVersion() + "\t" + e.getMessage());
+        }
     }
 
     private DataAccessToken doSave(DataAccessToken token, DataAccessCache cache,
@@ -155,6 +163,15 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         }
 
         return token;
+    }
+
+    void updateVersion(Version version) {
+        Session session = sessionFactory.getSession();
+        try {
+            versions.save(version, session);
+        } finally {
+            session.close();
+        }
     }
 
     Version doMarkFinal(Version derived) throws EmfException {
