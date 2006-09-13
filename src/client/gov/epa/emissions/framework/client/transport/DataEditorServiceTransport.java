@@ -68,12 +68,12 @@ public class DataEditorServiceTransport implements DataEditorService {
     public Version derive(Version baseVersion, User user, String name) throws EmfException {
         call.addParam("baseVersion", mappings.version());
         call.addParam("user",mappings.user());
-        
         call.addStringParam("name");
+
         call.setOperation("derive");
         call.setReturnType(mappings.version());
 
-        return (Version) call.requestResponse(new Object[] { baseVersion, name });
+        return (Version) call.requestResponse(new Object[] { baseVersion, user,name });
     }
 
     public void submit(DataAccessToken token, ChangeSet changeset, int pageNumber) throws EmfException {
