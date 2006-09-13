@@ -67,6 +67,8 @@ public class DataEditorServiceTransport implements DataEditorService {
 
     public Version derive(Version baseVersion, User user, String name) throws EmfException {
         call.addParam("baseVersion", mappings.version());
+        call.addParam("user",mappings.user());
+        
         call.addStringParam("name");
         call.setOperation("derive");
         call.setReturnType(mappings.version());
