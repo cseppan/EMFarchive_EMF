@@ -76,10 +76,12 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
     private EmfDataset addORLNonpointDataset() throws ImporterException {
         Version version = new Version();
         version.setVersion(0);
+        version.setDatasetId(inputDataset.getId());
+        
         File folder = new File("test/data/cost");
         String[] fileNames = { "orl-nonpoint-with-larger_values.txt" };
         ORLNonPointImporter importer = new ORLNonPointImporter(folder, fileNames, inputDataset, dbServer, sqlDataTypes,
-                new VersionedDataFormatFactory(version));
+                new VersionedDataFormatFactory(version, inputDataset));
         importer.run();
         add(inputDataset);
         session.flush();

@@ -49,7 +49,7 @@ public class ImporterFactory {
         Class[] classParams = new Class[] { File.class, String[].class, Dataset.class, DbServer.class,
                 SqlDataTypes.class, DataFormatFactory.class };
         Object[] params = new Object[] { folder, filePatterns, dataset, dbServer, sqlDataTypes,
-                new VersionedDataFormatFactory(null) };
+                new VersionedDataFormatFactory(null, dataset) };
 
         Constructor importerConstructor = importerClass.getDeclaredConstructor(classParams);
         return (Importer) importerConstructor.newInstance(params);

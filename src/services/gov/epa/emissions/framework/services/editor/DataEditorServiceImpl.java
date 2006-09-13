@@ -89,10 +89,10 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         return accessor.getTotalRecords(token);
     }
 
-    public Version derive(Version base, String name) throws EmfException {
+    public Version derive(Version base, User user, String name) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            Version derived = versions.derive(base, name, session);
+            Version derived = versions.derive(base, name, user, session);
             session.close();
 
             return derived;

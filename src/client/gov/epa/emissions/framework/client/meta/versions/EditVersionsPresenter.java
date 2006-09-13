@@ -38,7 +38,7 @@ public class EditVersionsPresenter {
     }
 
     public void doNew(Version base, String name) throws EmfException {
-        Version derived = editorService().derive(base, name);
+        Version derived = editorService().derive(base, session.user(), name);
         view.add(derived);
     }
 

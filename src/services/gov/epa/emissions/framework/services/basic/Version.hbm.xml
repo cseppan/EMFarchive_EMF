@@ -13,7 +13,7 @@
         <property name="name" column="name" type="java.lang.String" not-null="true" length="255"/>
         <property name="path" column="path" type="java.lang.String" not-null="true"/>
         <property name="finalVersion" column="final_version" type="boolean"/>
-        <property name="date" column="date" type="java.util.Date" not-null="false" length="4"/>
+        <property name="lastModifiedDate" column="date" type="java.util.Date" not-null="false" length="4"/>
         <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
         <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
     </class>

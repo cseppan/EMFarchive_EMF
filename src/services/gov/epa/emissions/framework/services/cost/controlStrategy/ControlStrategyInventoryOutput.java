@@ -36,17 +36,18 @@ public class ControlStrategyInventoryOutput {
 
     private User user;
 
-    public ControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy, HibernateSessionFactory sessionFactory) throws Exception {
+    public ControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
+            HibernateSessionFactory sessionFactory) throws Exception {
         this.controlStrategy = controlStrategy;
         this.user = user;
-        creator = new DatasetCreator("CSINVEN_", controlStrategy, user,sessionFactory);
+        creator = new DatasetCreator("CSINVEN_", controlStrategy, user, sessionFactory);
         this.tableFormat = new FileFormatFactory().tableFormat(datasetType(controlStrategy));
         this.statusServices = new StatusDAO();
     }
 
     private DatasetType datasetType(ControlStrategy strategy) throws EmfException {
         DatasetType type = strategy.getDatasetType();
-        if(type==null)
+        if (type == null)
             throw new EmfException("Please select a dataset type");
         return type;
     }
@@ -80,20 +81,20 @@ public class ControlStrategyInventoryOutput {
     private void copyAndUpdateData(EmfDbServer server, Datasource datasource, EmfDataset inputDataset,
             String inputTable, String outputInventoryTableName) throws EmfException {
         copyDataFromOriginalTable(inputTable, outputInventoryTableName, version(inputDataset, controlStrategy
-                .getDatasetVersion()), datasource);
+                .getDatasetVersion()), inputDataset, datasource);
 
         updateDataWithDetailDatasetTable(outputInventoryTableName, detailDatasetTable(controlStrategy), server
                 .getEmissionsDatasource());
 
-        EmfDataset dataset = creator.addDataset(controlStrategy.getDatasetType(), description(inputDataset), tableFormat, inputDataset
-                .getName(), datasource);
+        EmfDataset dataset = creator.addDataset(controlStrategy.getDatasetType(), description(inputDataset),
+                tableFormat, inputDataset.getName(), datasource);
         updateDatasetIdAndVersion(outputInventoryTableName, server.getEmissionsDatasource(), dataset.getId());
 
         updateControlStrategyResults(controlStrategy, dataset);
     }
 
     private String description(EmfDataset inputDataset) {
-        return inputDataset.getDescription()+"#"+"Implements control strategy: "+controlStrategy.getName()+"\n";
+        return inputDataset.getDescription() + "#" + "Implements control strategy: " + controlStrategy.getName() + "\n";
     }
 
     private void updateControlStrategyResults(ControlStrategy controlStrategy, EmfDataset dataset) throws EmfException {
@@ -172,8 +173,8 @@ public class ControlStrategyInventoryOutput {
     }
 
     private void copyDataFromOriginalTable(String inputTable, String outputInventoryTableName, Version version,
-            Datasource emissionsDatasource) throws EmfException {
-        String query = copyDataFromOriginalTableQuery(inputTable, outputInventoryTableName, version,
+            Dataset dataset, Datasource emissionsDatasource) throws EmfException {
+        String query = copyDataFromOriginalTableQuery(inputTable, outputInventoryTableName, version, dataset,
                 emissionsDatasource);
         try {
             emissionsDatasource.query().execute(query);
@@ -184,8 +185,9 @@ public class ControlStrategyInventoryOutput {
     }
 
     private String copyDataFromOriginalTableQuery(String inputTable, String outputTable, Version version,
-            Datasource datasource) {
-        String versionedQuery = new VersionedDatasetQuery(version).generate(qualifiedTable(inputTable, datasource));
+            Dataset dataset, Datasource datasource) {
+        String versionedQuery = new VersionedDatasetQuery(version, dataset).generate(qualifiedTable(inputTable,
+                datasource));
 
         return "INSERT INTO " + qualifiedTable(outputTable, datasource) + " " + versionedQuery;
     }

@@ -11,8 +11,10 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
+import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
@@ -49,9 +51,13 @@ public class DataEditorService_VersionsTest extends ServiceTestCase {
 
         doImport();
 
-        Version v1 = new Versions().derive(versionZero(), "v1", session);
+        Version v1 = new Versions().derive(versionZero(), "v1", user(), session);
         token = token(v1);
         service.openSession(userService.getUser("emf"), token);
+    }
+
+    private User user() {
+        return new UserDAO().get("emf",session);
     }
 
     private void doImport() throws ImporterException {
@@ -59,7 +65,7 @@ public class DataEditorService_VersionsTest extends ServiceTestCase {
         version.setVersion(0);
 
         File file = new File("test/data/orl/nc", "very-small-nonpoint.txt");
-        DataFormatFactory formatFactory = new VersionedDataFormatFactory(version);
+        DataFormatFactory formatFactory = new VersionedDataFormatFactory(version, dataset);
         ORLNonPointImporter importer = new ORLNonPointImporter(file.getParentFile(), new String[] { file.getName() },
                 dataset, dbServer(), sqlDataTypes(), formatFactory);
         new VersionedImporter(importer, dataset, dbServer()).run();
@@ -116,7 +122,7 @@ public class DataEditorService_VersionsTest extends ServiceTestCase {
         Version[] versions = service.getVersions(dataset.getId());
 
         Version versionZero = versions[0];
-        Version derived = service.derive(versionZero, "v 1");
+        Version derived = service.derive(versionZero, user(), "v 1");
 
         assertNotNull("Should be able to derive from a Final version", derived);
         assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
@@ -127,7 +133,7 @@ public class DataEditorService_VersionsTest extends ServiceTestCase {
 
     public void testShouldBeAbleToMarkADerivedVersionAsFinalAfterObtainingLockOnVersion() throws Exception {
         Version versionZero = versionZero();
-        Version derived = service.derive(versionZero, "v2");
+        Version derived = service.derive(versionZero, user(), "v2");
         assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
         assertEquals("v2", derived.getName());
 

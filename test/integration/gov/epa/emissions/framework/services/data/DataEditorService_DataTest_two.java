@@ -53,7 +53,7 @@ public class DataEditorService_DataTest_two extends ServiceTestCase {
         doImport(dataset);
 
         Versions versions = new Versions();
-        Version v1 = versions.derive(versionZero(), "v1", session);
+        Version v1 = versions.derive(versionZero(), "v1", user, session);
         openSession(userService, v1);
     }
 
@@ -68,7 +68,7 @@ public class DataEditorService_DataTest_two extends ServiceTestCase {
         version.setVersion(0);
 
         File file = new File("test/data/orl/nc", "onroad-15records.txt");
-        DataFormatFactory formatFactory = new VersionedDataFormatFactory(version);
+        DataFormatFactory formatFactory = new VersionedDataFormatFactory(version, dataset);
         Importer importer = new ORLOnRoadImporter(file.getParentFile(), new String[] { file.getName() }, dataset,
                 dbServer(), sqlDataTypes(), formatFactory);
         new VersionedImporter(importer, dataset, dbServer()).run();

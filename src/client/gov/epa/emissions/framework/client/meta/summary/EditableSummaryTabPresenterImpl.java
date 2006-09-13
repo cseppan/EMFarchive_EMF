@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client.meta.summary;
 
-import java.util.Date;
-
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
@@ -17,7 +15,6 @@ public class EditableSummaryTabPresenterImpl implements EditableSummaryTabPresen
     }
 
     public void doSave() throws EmfException {
-        dataset.setModifiedDateTime(new Date());
         view.save(dataset);
         verifyEmptyName(dataset);
 

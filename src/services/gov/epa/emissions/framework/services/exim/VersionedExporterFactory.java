@@ -37,7 +37,7 @@ public class VersionedExporterFactory {
 
             Class[] classParams = new Class[] { Dataset.class, DbServer.class, SqlDataTypes.class,
                     DataFormatFactory.class, Integer.class };
-            Object[] params = new Object[] { dataset, dbServer, sqlDataTypes, new VersionedDataFormatFactory(version),
+            Object[] params = new Object[] { dataset, dbServer, sqlDataTypes, new VersionedDataFormatFactory(version, dataset),
                     new Integer(batchSize) };
 
             Constructor exporterConstructor = exporterClass.getDeclaredConstructor(classParams);

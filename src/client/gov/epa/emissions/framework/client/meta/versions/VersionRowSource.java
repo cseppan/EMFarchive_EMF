@@ -23,7 +23,7 @@ public class VersionRowSource implements RowSource {
 
     public Object[] values() {
         return new Object[] { selected, source.getName(), new Integer(source.getVersion()), new Long(source.getBase()),
-                Boolean.valueOf(source.isFinalVersion()), format(source.getDate()) };
+                Boolean.valueOf(source.isFinalVersion()), format(source.getLastModifiedDate()) };
     }
 
     private Object format(Date date) {

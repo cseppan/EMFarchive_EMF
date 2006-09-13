@@ -25,13 +25,13 @@ public class VersionsTableDataTest extends TestCase {
         version0.setName("ver0");
         version0.setPath("");
         version0.setVersion(0);
-        version0.setDate(new Date());
+        version0.setLastModifiedDate(new Date());
 
         version1 = new Version();
         version1.setName("ver1");
         version1.setPath("0");
         version1.setVersion(1);
-        version1.setDate(new Date(version0.getDate().getTime() + 12000));
+        version1.setLastModifiedDate(new Date(version0.getLastModifiedDate().getTime() + 12000));
 
         data = new VersionsTableData(new Version[] { version0, version1 });
     }
@@ -80,7 +80,7 @@ public class VersionsTableDataTest extends TestCase {
         assertEquals(version0.getBase(), ((Long) row.getValueAt(3)).longValue());
         assertFalse(((Boolean) row.getValueAt(4)).booleanValue());
         DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
-        assertEquals(dateFormat.format(version0.getDate()), row.getValueAt(5));
+        assertEquals(dateFormat.format(version0.getLastModifiedDate()), row.getValueAt(5));
     }
 
     public void testShouldReturnARowRepresentingAVersionEntry() {

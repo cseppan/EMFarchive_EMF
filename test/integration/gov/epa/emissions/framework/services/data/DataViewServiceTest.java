@@ -10,8 +10,10 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
+import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.DataViewService;
 import gov.epa.emissions.framework.services.editor.DataViewServiceImpl;
@@ -53,7 +55,7 @@ public class DataViewServiceTest extends ServiceTestCase {
         version.setVersion(0);
 
         File file = new File("test/data/orl/nc", "midsize-onroad.txt");
-        DataFormatFactory formatFactory = new VersionedDataFormatFactory(version);
+        DataFormatFactory formatFactory = new VersionedDataFormatFactory(version, dataset);
         ORLOnRoadImporter importer = new ORLOnRoadImporter(file.getParentFile(), new String[] { file.getName() },
                 dataset, dbServer(), sqlDataTypes(), formatFactory);
         new VersionedImporter(importer, dataset, dbServer()).run();
@@ -76,7 +78,7 @@ public class DataViewServiceTest extends ServiceTestCase {
     public void testShouldFailWhenAttemptingToViewANonFinalVersion() throws Exception {
         Version v0 = versionZero();
         Versions versions = new Versions();
-        Version v1 = versions.derive(v0, "v1", session);
+        Version v1 = versions.derive(v0, "v1", user(), session);
 
         DataAccessToken token = token(v1);
         try {
@@ -86,6 +88,10 @@ public class DataViewServiceTest extends ServiceTestCase {
         }
 
         fail("Should have raised an error if attempting to view a non-final version");
+    }
+
+    private User user() {
+        return new UserDAO().get("emf",session);
     }
 
     public void testShouldReturnExactlyTwoPages() throws EmfException {

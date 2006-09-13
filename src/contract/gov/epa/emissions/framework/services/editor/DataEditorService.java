@@ -14,7 +14,7 @@ public interface DataEditorService extends DataAccessService {
 
     DataAccessToken save(DataAccessToken token, EmfDataset dataset) throws EmfException;
 
-    Version derive(Version baseVersion, String name) throws EmfException;
+    Version derive(Version baseVersion, User user, String name) throws EmfException;
 
     Version markFinal(DataAccessToken token) throws EmfException;
 

@@ -97,24 +97,25 @@ public class EditVersionsPresenterTest extends EmfMockObjectTestCase {
         String derivedName = "name";
 
         Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("derive").with(same(version), eq(derivedName)).will(returnValue(derived));
+        User user = new User();
+        service.expects(once()).method("derive").with(same(version),same(user), eq(derivedName)).will(returnValue(derived));
 
         Mock view = mock(EditVersionsView.class);
         view.expects(once()).method("add").with(same(derived));
 
-        EditVersionsPresenter presenter = displayPresenter(service, view);
+        EditVersionsPresenter presenter = displayPresenter(service,user, view);
 
         presenter.doNew(version, derivedName);
     }
 
-    private EditVersionsPresenter displayPresenter(Mock service, Mock view) throws EmfException {
+    private EditVersionsPresenter displayPresenter(Mock service, User user,Mock view) throws EmfException {
         EmfDataset dataset = new EmfDataset();
         dataset.setId(1);
         Version[] versions = new Version[0];
         InternalSource[] internalSources = new InternalSource[0];
 
         service.stubs().method("getVersions").with(eq(new Integer(dataset.getId()))).will(returnValue(versions));
-        EmfSession session = session(null, (DataEditorService) service.proxy(), null);
+        EmfSession session = session(user, (DataEditorService) service.proxy(), null);
         EditVersionsPresenter presenter = new EditVersionsPresenter(dataset, session);
         view.expects(once()).method("observe").with(same(presenter));
         view.expects(once()).method("display").with(eq(versions), eq(internalSources));
@@ -128,7 +129,7 @@ public class EditVersionsPresenterTest extends EmfMockObjectTestCase {
         Mock service = mock(DataEditorService.class);
         Mock view = mock(EditVersionsView.class);
 
-        displayPresenter(service, view);
+        displayPresenter(service,null, view);
     }
 
     public void testShouldMarkVersionAsFinalOnMarkFinal() throws Exception {
@@ -144,7 +145,7 @@ public class EditVersionsPresenterTest extends EmfMockObjectTestCase {
         Mock view = mock(EditVersionsView.class);
         view.expects(once()).method("reload").with(eq(versions));
 
-        EditVersionsPresenter p = displayPresenter(service, view);
+        EditVersionsPresenter p = displayPresenter(service,null, view);
 
         p.doMarkFinal(new Version[] { version });
     }

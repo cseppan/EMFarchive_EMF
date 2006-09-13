@@ -116,7 +116,10 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
     void save(DataEditorView view, DataAccessToken token, EditableTablePresenter tablePresenter,
             DataEditorService service, ClosingRule closingRule) throws EmfException {
         tablePresenter.submitChanges();
-        dataset.setModifiedDateTime(new Date());
+        Date currentDate = new Date();
+        dataset.setModifiedDateTime(currentDate);
+        version.setLastModifiedDate(currentDate);
+        
         try {
             token = service.save(token, dataset);
             tablePresenter.reloadCurrent();
