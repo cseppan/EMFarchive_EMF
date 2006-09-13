@@ -33,7 +33,7 @@ public class LoggingServiceImpl implements LoggingService {
 
         } catch (RuntimeException e) {
             LOG.error("Could not insert access log - " + accesslog, e);
-            throw new EmfException("Could not insert access log");
+            throw new EmfException("Could not insert access log - " + accesslog);
         }
 
     }

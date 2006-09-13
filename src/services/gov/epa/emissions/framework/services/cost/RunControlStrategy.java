@@ -55,9 +55,11 @@ public class RunControlStrategy {
         EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
         if (inputDatasets.length == 0)
             return;
-        DatasetType datasetType = inputDatasets[0].getDatasetType();
-        if (!datasetType.getName().equalsIgnoreCase(("ORL Nonpoint Inventory (ARINV)")))
-            throw new EmfException("The dataset type '" + datasetType.getName() + "' is not support yet.");
+        
+        DatasetType datasetType = controlStrategy.getDatasetType();
+        int indexOf = datasetType.getName().indexOf("Nonpoint");
+        if (indexOf==-1)
+            throw new EmfException("The dataset type '" + datasetType.getName() + "' is not supported yet.");
 
     }
 
