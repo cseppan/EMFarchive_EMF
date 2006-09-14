@@ -59,7 +59,7 @@ public class AddRemoveSectorWidget extends JPanel {
         JPanel panel = new JPanel();
         Button addButton = new AddButton("Add", addAction());
         Button removeButton = new RemoveButton("Remove", removeAction());
-        addButton.setMargin(new Insets(2, 2, 2, 2));      
+        addButton.setMargin(new Insets(1, 2, 1, 2));      
         removeButton.setMargin(new Insets(1, 2, 1, 2));
         panel.add(addButton);
         panel.add(removeButton);

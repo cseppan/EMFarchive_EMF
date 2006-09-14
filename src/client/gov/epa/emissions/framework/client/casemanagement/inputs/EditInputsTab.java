@@ -26,6 +26,7 @@ import gov.epa.mims.analysisengine.table.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
@@ -176,6 +177,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     }
 
     private JPanel controlPanel(final EditInputsTabPresenter presenter) {
+        Insets insets = new Insets(1,2,1,2);
+        
         JPanel container = new JPanel();
 
         Button add = new AddButton(new AbstractAction() {
@@ -184,6 +187,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
                 doNewInput(presenter);
             }
         });
+        add.setMargin(insets);
         container.add(add);
 
         Button remove = new RemoveButton(new AbstractAction() {
@@ -192,6 +196,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
                 doRemove();
             }
         });
+        remove.setMargin(insets);
         container.add(remove);
 
         Button edit = new EditButton(new AbstractAction() {
@@ -204,6 +209,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
                 }
             }
         });
+        edit.setMargin(insets);
         container.add(edit);
 
         Button view = new ViewButton("View Dataset", new AbstractAction() {
@@ -211,6 +217,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
                 doDisplayInputDatasetsPropertiesViewer();
             }
         });
+        view.setMargin(insets);
         container.add(view);
 
         final JCheckBox showAll = new JCheckBox("Show All", false);
@@ -228,6 +235,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
                 //doExportInputDatasets();
             }
         });
+        export.setMargin(insets);
         container.add(export);
 
         JPanel panel = new JPanel(new BorderLayout());
