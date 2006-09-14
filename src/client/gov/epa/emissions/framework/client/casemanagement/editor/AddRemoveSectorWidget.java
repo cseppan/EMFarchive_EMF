@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
 import java.awt.BorderLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 
@@ -49,7 +50,7 @@ public class AddRemoveSectorWidget extends JPanel {
         JScrollPane pane = new JScrollPane(sectorsList);
         JPanel buttonPanel = addRemoveButtonPanel();
 
-        this.setLayout(new BorderLayout(5, 5));
+        this.setLayout(new BorderLayout(1, 1));
         this.add(pane);
         this.add(buttonPanel, BorderLayout.SOUTH);
     }
@@ -58,7 +59,8 @@ public class AddRemoveSectorWidget extends JPanel {
         JPanel panel = new JPanel();
         Button addButton = new AddButton("Add", addAction());
         Button removeButton = new RemoveButton("Remove", removeAction());
-
+        addButton.setMargin(new Insets(2, 2, 2, 2));      
+        removeButton.setMargin(new Insets(1, 2, 1, 2));
         panel.add(addButton);
         panel.add(removeButton);
 
