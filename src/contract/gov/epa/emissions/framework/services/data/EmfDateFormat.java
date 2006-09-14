@@ -37,4 +37,9 @@ public class EmfDateFormat {
         return dateFormatter.parse(date);
     }
 
+    public static String format_ddMMMyyyy(Date date) {
+        dateFormatter.applyPattern("ddMMMyyyy");
+        return dateFormatter.format(date);
+    }
+
 }

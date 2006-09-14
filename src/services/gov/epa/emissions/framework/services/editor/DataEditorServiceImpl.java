@@ -134,7 +134,6 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
             if (!accessor.isLockOwned(token))
                 return token;// abort
 
-            //updateVersion(version);
             DataAccessToken extended = accessor.renewLock(token);
             return doSave(extended, cache, sessionFactory, dataset);
         } catch (Exception e) {

@@ -102,7 +102,7 @@ public class ExportService {
         String name = dataset.getName();
         String prefix = "", suffix = "";
         KeyVal[] keyvals = dataset.getKeyVals();
-        String date = EmfDateFormat.format_MM_DD_YYYY(version.getLastModifiedDate());
+        String date = EmfDateFormat.format_ddMMMyyyy(version.getLastModifiedDate());
 
         for (int i = 0; i < keyvals.length; i++) {
             prefix = keyvals[i].getKeyword().getName().equalsIgnoreCase("EXPORT_PREFIX") ? keyvals[i].getValue() : "";

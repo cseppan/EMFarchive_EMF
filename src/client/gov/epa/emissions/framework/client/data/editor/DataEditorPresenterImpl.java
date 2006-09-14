@@ -118,7 +118,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
         tablePresenter.submitChanges();
         Date currentDate = new Date();
         dataset.setModifiedDateTime(currentDate);
-        version.setLastModifiedDate(currentDate);
+        token.getVersion().setLastModifiedDate(currentDate);
         
         try {
             token = service.save(token, dataset, version);
