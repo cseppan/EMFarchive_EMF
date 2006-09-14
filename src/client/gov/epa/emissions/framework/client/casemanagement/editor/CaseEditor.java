@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
-import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
@@ -12,8 +11,6 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
-import gov.epa.emissions.framework.services.casemanagement.CaseInput;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.ErrorPanel;
 import gov.epa.emissions.framework.ui.InfoDialog;
@@ -43,8 +40,6 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
     private EmfConsole parentConsole;
     
-    private Case caseObj;
-
     public CaseEditor(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
         super("Case Editor", new Dimension(750, 580), desktopManager);
         this.session = session;
@@ -117,7 +112,6 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         super.setLabel("Case Editor: " + caseObj);
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
-        this.caseObj = caseObj;
 
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
@@ -158,62 +152,6 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         return buttonsPanel;
     }
 
-    protected void doExport() throws EmfException {
-        doSaveWithoutClose();
-        String exportDir = caseObj.getInputFileDir();
-        
-        if (!checkExportDir(exportDir) || !checkDatasets() || !checkToWriteStartMessage())
-            return;
-        
-        presenter.doExport(session.user(), exportDir, "To export input datasets", true, caseObj);
-        messagePanel.setMessage("Started export. Please monitor the Status window " + "to track your Export request.");
-    }
-    
-    private boolean checkExportDir(String exportDir) {
-        if (exportDir == null || exportDir.equals("")) {
-            messagePanel.setMessage("Please select the input folder before exporting the case.");
-            return false;
-        }
-        
-        return true;
-    }
-
-    private boolean checkDatasets() {
-        CaseInput[] inputs = getInputs();
-        
-        for (int i = 0; i < inputs.length; i++)
-            if (inputs[i].isRequired() && inputs[i].getDataset() == null) {
-                messagePanel.setMessage("Please specify a dataset for required input \"" + inputs[i].getName() + "\" before exporting.");
-                return false;
-            }
-        
-        return true;
-    }
-    
-    private boolean checkToWriteStartMessage() {
-        CaseInput[] inputs = getInputs();
-        int count = 0;
-        
-        for (int i = 0; i < inputs.length; i++) {
-            DatasetType type = inputs[i].getDatasetType();
-            EmfDataset dataset = inputs[i].getDataset();
-            if (type != null && dataset != null  && type.getName().indexOf("External") < 0)
-                count++;
-        }
-        
-        if (count == 0) {
-            messagePanel.setMessage("There were no datasets to export");
-            return false;
-        }
-        
-        return true;
-    }
-
-    private CaseInput[] getInputs() {
-        CaseInput[] inputs = caseObj.getCaseInputs();
-        return inputs;
-    }
-
     public void observe(CaseEditorPresenter presenter) {
         this.presenter = presenter;
     }
@@ -250,15 +188,6 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private void doSave() {
         try {
             presenter.doSave();
-            resetChanges();
-        } catch (EmfException e) {
-            showError(e.getMessage());
-        }
-    }
-
-    private void doSaveWithoutClose() {
-        try {
-            presenter.doSaveWithoutClose();
             resetChanges();
         } catch (EmfException e) {
             showError(e.getMessage());

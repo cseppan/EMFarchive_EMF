@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorTabPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.services.EmfException;
@@ -17,5 +18,9 @@ public interface EditInputsTabPresenter extends CaseEditorTabPresenter {
     void doCheckDuplicate(CaseInput input, CaseInput[] existingInputs) throws EmfException;
 
     void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset);
+    
+    void doExportWithOverwrite(EmfDataset[] datasets, Version[] versions, String folder, String purpose) throws EmfException;
+
+    void doExport(EmfDataset[] datasets, Version[] versions, String folder, String purpose) throws EmfException;
 
 }

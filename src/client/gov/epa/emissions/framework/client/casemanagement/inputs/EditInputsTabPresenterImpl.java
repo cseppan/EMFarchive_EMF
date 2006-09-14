@@ -1,16 +1,20 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
-import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.exim.ExImService;
+
+import java.util.Date;
 
 import javax.swing.JComponent;
 
@@ -112,6 +116,30 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
         PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
         presenter.doDisplay(propertiesView);
+    }
+    
+    public void doExportWithOverwrite(EmfDataset[] datasets, Version[] versions, String folder, String purpose) throws EmfException {
+        doExport(datasets, versions, folder, true, purpose);
+    }
+
+    public void doExport(EmfDataset[] datasets, Version[] versions, String folder, String purpose) throws EmfException {
+        doExport(datasets, versions, folder, false, purpose);
+    }
+
+    private void doExport(EmfDataset[] datasets, Version[] versions, String folder, boolean overwrite, String purpose) throws EmfException {
+        ExImService services = session.eximService();
+        
+        for (int i = 0; i < datasets.length; i++)
+            datasets[i].setAccessedDateTime(new Date());
+        
+        if (overwrite)
+            services.exportDatasetsWithOverwrite(session.user(), datasets, versions, mapToRemote(folder), purpose);
+        else
+            services.exportDatasets(session.user(), datasets, versions, mapToRemote(folder), purpose);
+    }
+
+    private String mapToRemote(String dir) {
+        return session.preferences().mapLocalOutputPathToRemote(dir);
     }
 
 }

@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
@@ -232,7 +234,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         
         Button export = new ExportButton("Export Inputs", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //doExportInputDatasets();
+                doExportInputDatasets(getSelectedInputs());
             }
         });
         export.setMargin(insets);
@@ -254,7 +256,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     }
 
     protected void doRemove() {
-        List inputs = selectModel.selected();
+        List inputs = getSelectedInputs();
 
         if (inputs.size() == 0) {
             messagePanel.setMessage("Please select an input item.");
@@ -279,7 +281,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     }
 
     private void doEditInput(EditInputsTabPresenter presenter) throws EmfException {
-        List inputs = selectModel.selected();
+        List inputs = getSelectedInputs();
 
         if (inputs.size() == 0) {
             messagePanel.setMessage("Please select an input item.");
@@ -296,10 +298,9 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     }
 
     private void doDisplayInputDatasetsPropertiesViewer() {
-
-        List datasets = updateSelectedDatasets(getSelectedDatasets());
+        List datasets = updateSelectedDatasets(getSelectedDatasets(getSelectedInputs()));
         if (datasets.isEmpty()) {
-            messagePanel.setMessage("Please select one or more Datasets");
+            messagePanel.setMessage("Please select one or more Datasets.");
             return;
         }
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
@@ -308,18 +309,110 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
             presenter.doDisplayPropertiesView(view, dataset);
         }
     }
+    
+    private void doExportInputDatasets(List inputlist) {
+        if (inputlist.size() == 0) {
+            messagePanel.setMessage("Please select input(s) to export.");
+            return;
+        }
+        
+        if (!checkExportDir(inputDir.getText()) || !checkDatasets(inputlist) || !checkToWriteStartMessage(inputlist))
+            return;
+        
+        EmfDataset[] datasets = (EmfDataset[])getSelectedDatasets(inputlist).toArray(new EmfDataset[0]);
+        int ok = checkOverWrite();
+        
+        try {
+            if (ok != JOptionPane.YES_OPTION)
+                presenter.doExport(datasets, getSelectedDatasetVersions(), inputDir.getText(), "");
+            else
+                presenter.doExportWithOverwrite(datasets, getSelectedDatasetVersions(), inputDir.getText(), "");
 
-    private List getSelectedDatasets() {
-        List list = selectModel.selected();
+            messagePanel.setMessage("Started export. Please monitor the Status window "
+                    + "to track your Export request.");
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+    
+    private boolean checkExportDir(String exportDir) {
+        if (exportDir == null || exportDir.equals("")) {
+            messagePanel.setMessage("Please select the input folder before export.");
+            return false;
+        }
+        
+        return true;
+    }
+
+    private boolean checkDatasets(List inputList) {
+        CaseInput[] inputs = (CaseInput[])inputList.toArray(new CaseInput[0]);
+        
+        for (int i = 0; i < inputs.length; i++)
+            if (inputs[i].isRequired() && inputs[i].getDataset() == null) {
+                messagePanel.setMessage("Please specify a dataset for required input \"" + inputs[i].getName() + "\".");
+                return false;
+            }
+        
+        return true;
+    }
+    
+    private boolean checkToWriteStartMessage(List inputList) {
+        CaseInput[] inputs = (CaseInput[])inputList.toArray(new CaseInput[0]);
+        int count = 0;
+        int external = 0;
+        String externalMsg = "";
+        
+        for (int i = 0; i < inputs.length; i++) {
+            DatasetType type = inputs[i].getDatasetType();
+            EmfDataset dataset = inputs[i].getDataset();
+            if (type != null && dataset != null  && type.getName().indexOf("External") < 0)
+                count++;
+            
+            if (type != null && dataset != null  && type.getName().indexOf("External") >= 0)
+                external++;
+        }
+        
+        if (external > 0)
+            externalMsg = "Export external type dataset(s) is not supported.";
+        
+        if (count == 0) {
+            messagePanel.setMessage("There were no datasets to export. " + externalMsg);
+            return false;
+        }
+        
+        return true;
+    }
+
+    private int checkOverWrite() {
+        String title = "Message";
+        String message = "Do you want to over write existing output dataset(s)?";
+        return JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+    }
+
+    private List getSelectedDatasets(List inputlist) {
         List datasetList = new ArrayList();
 
-        for (int i = 0; i < list.size(); i++) {
-            EmfDataset dataset = ((CaseInput) list.get(i)).getDataset();
+        for (int i = 0; i < inputlist.size(); i++) {
+            EmfDataset dataset = ((CaseInput) inputlist.get(i)).getDataset();
             if (dataset != null)
                 datasetList.add(dataset);
         }
 
         return datasetList;
+    }
+
+    private Version[] getSelectedDatasetVersions() {
+        List list = getSelectedInputs();
+        List versionList = new ArrayList();
+        
+        for (int i = 0; i < list.size(); i++) {
+            Version version = ((CaseInput) list.get(i)).getVersion();
+            if (version != null)
+                versionList.add(version);
+        }
+        
+        return (Version[])versionList.toArray(new Version[0]);
     }
 
     private List updateSelectedDatasets(List selectedDatasets) {
@@ -348,6 +441,10 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
         tablePanel.removeAll();
         tablePanel.add(createSortFilterPanel(parentConsole));
+    }
+    
+    private List getSelectedInputs() {
+        return selectModel.selected();
     }
 
     public CaseInput[] caseInputs() {
