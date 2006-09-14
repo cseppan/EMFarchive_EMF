@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
+import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfException;
@@ -24,6 +26,8 @@ public class EditableCaseParameterTab extends JPanel implements EditableCasePara
     private TextField numEmisLayer;
 
     private TextField numMetLayer;
+    
+    private TextArea gridDescription;
     
     private Dimension defaultDimension = new Dimension(100, 100);
     
@@ -49,8 +53,9 @@ public class EditableCaseParameterTab extends JPanel implements EditableCasePara
         
         layoutGenerator.addLabelWidgetPair("# of Met. Layers:", numMetLayer(), panel);
         layoutGenerator.addLabelWidgetPair("# of Emissions Layers:", numEmisLayer(), panel);
+        layoutGenerator.addLabelWidgetPair("Grid Description:", gridDescription(), panel);
 
-        layoutGenerator.makeCompactGrid(panel, 2, 2, 10, 10, 10, 10);
+        layoutGenerator.makeCompactGrid(panel, 3, 2, 10, 10, 10, 10);
 
         return panel;
     }
@@ -73,9 +78,20 @@ public class EditableCaseParameterTab extends JPanel implements EditableCasePara
         return numMetLayer;
     }
     
+    private ScrollableComponent gridDescription() {
+        gridDescription = new TextArea("griddescription", "", 20, 6);
+        gridDescription.setText(caseObj.getGridDescription());
+        changeablesList.addChangeable(gridDescription);
+
+        ScrollableComponent descScrollableTextArea = new ScrollableComponent(gridDescription);
+        descScrollableTextArea.setMinimumSize(defaultDimension);
+        return descScrollableTextArea;
+    }
+    
     public void save(Case caseObj) throws EmfException {
         caseObj.setNumEmissionsLayers(verifier.parseInteger(numEmisLayer));
-        caseObj.setNumMetLayers(verifier.parseInteger(numMetLayer));        
+        caseObj.setNumMetLayers(verifier.parseInteger(numMetLayer));
+        caseObj.setGridDescription(gridDescription.getText());
     }
 
 }

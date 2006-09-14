@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
+import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -221,6 +222,13 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         });
         showAll.setEnabled(false);
         container.add(showAll);
+        
+        Button export = new ExportButton("Export Inputs", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                //doExportInputDatasets();
+            }
+        });
+        container.add(export);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);

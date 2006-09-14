@@ -84,8 +84,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     
     private EditableComboBox gridResolutionCombo;
     
-    private TextField gridDescription;
-
     private CheckBox isFinal;
 
     private CheckBox isTemplate;
@@ -234,10 +232,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Control Region:", controlRegions(), panel);
         layoutGenerator.addLabelWidgetPair("I/O API Grid Name:", grids(), panel);
         layoutGenerator.addLabelWidgetPair("Grid Resolution:", gridResolution(), panel);
-        layoutGenerator.addLabelWidgetPair("Grid Description:", gridDescription(), panel);
         layoutGenerator.addLabelWidgetPair("Start Date & Time:", startDate(), panel);
 
-        layoutGenerator.makeCompactGrid(panel, 7, 2, 10, 10, 10, 10);
+        layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 10, 10);
 
         return panel;
     }
@@ -488,15 +485,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return runStatusCombo;
     }
     
-    private TextField gridDescription() {
-        gridDescription = new TextField("griddescription", 20);
-        gridDescription.setText(caseObj.getGridDescription());
-        changeablesList.addChangeable(gridDescription);
-
-        return gridDescription;
-    }
-
-
     private TextField startDate() {
         startDate = new TextField("Start Date", 10);
         startDate.setText(format(caseObj.getStartDate()) + "");
@@ -594,7 +582,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         saveEndDate();
         caseObj.setSectors(sectorsWidget.getSectors());
         caseObj.setModel(models.get(modelToRunCombo.getSelectedItem()));
-        caseObj.setGridDescription(gridDescription.getText());
         caseObj.setGridResolution(gridResolutions.get(gridResolutionCombo.getSelectedItem()));
     }
 
