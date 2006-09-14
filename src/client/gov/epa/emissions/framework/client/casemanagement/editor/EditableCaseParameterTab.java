@@ -79,7 +79,7 @@ public class EditableCaseParameterTab extends JPanel implements EditableCasePara
     }
     
     private ScrollableComponent gridDescription() {
-        gridDescription = new TextArea("griddescription", "", 20, 6);
+        gridDescription = new TextArea("griddescription", "", 40, 4);
         gridDescription.setText(caseObj.getGridDescription());
         changeablesList.addChangeable(gridDescription);
 
