@@ -416,6 +416,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private JPanel sectors() {
         sectorsWidget = new AddRemoveSectorWidget(presenter.getAllSectors(), changeablesList, parentConsole);
         sectorsWidget.setSectors(caseObj.getSectors());
+        sectorsWidget.setPreferredSize(new Dimension(220,80));
         return sectorsWidget;
     }
 
@@ -472,9 +473,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private ComboBox runStatus() {
-        runStatuses = new RunStatuses();
-        // String name = caseObj.getRunStatus() != null ? caseObj.getRunStatus() : "";
-        // runStatusCombo = new ComboBox(name, runStatuses.all());
         runStatusCombo = new ComboBox(runStatuses.all());
         runStatusCombo.setPreferredSize(defaultDimension);
         if (caseObj.getRunStatus() == null) {
