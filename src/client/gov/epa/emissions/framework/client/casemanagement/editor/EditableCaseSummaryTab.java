@@ -175,7 +175,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         layoutGenerator.addLabelWidgetPair("Name:", name(), panel);
         layoutGenerator.addLabelWidgetPair("Category:", categories(), panel);
-        layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description()), panel);
+        layoutGenerator.addLabelWidgetPair("Description:", description(), panel);
         layoutGenerator.addLabelWidgetPair("Project:", projects(), panel);
         layoutGenerator.addLabelWidgetPair("Run Status:", runStatus(), panel);
         layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
@@ -263,12 +263,14 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return createLeftAlignedLabel(caseObj.getLastModifiedBy().getName());
     }
 
-    private TextArea description() {
+    private ScrollableComponent description() {
         description = new TextArea("description", caseObj.getDescription(), 19, 3);
         changeablesList.addChangeable(description);
-        description.setPreferredSize(new Dimension(200, 60));
+        //description.setPreferredSize(new Dimension(200, 60));
 
-        return description;
+        ScrollableComponent descScrollableTextArea = new ScrollableComponent(description);
+        descScrollableTextArea.setMinimumSize(defaultDimension);
+        return descScrollableTextArea;
     }
 
     private TextField name() {

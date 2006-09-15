@@ -365,15 +365,15 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         for (int i = 0; i < inputs.length; i++) {
             DatasetType type = inputs[i].getDatasetType();
             EmfDataset dataset = inputs[i].getDataset();
-            if (type != null && dataset != null  && type.getName().indexOf("External") < 0)
+            if (type != null && dataset != null  && !type.isExternal())
                 count++;
             
-            if (type != null && dataset != null  && type.getName().indexOf("External") >= 0)
+            if (type != null && dataset != null  && type.isExternal())
                 external++;
         }
         
         if (external > 0)
-            externalMsg = "Export external type dataset(s) is not supported.";
+            externalMsg = "Export of external type dataset(s) is not supported.";
         
         if (count == 0) {
             messagePanel.setMessage("There were no datasets to export. " + externalMsg);
@@ -385,7 +385,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     private int checkOverWrite() {
         String title = "Message";
-        String message = "Do you want to over write existing output dataset(s)?";
+        String message = "Do you want to overwrite files if they exist?";
         return JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
     }

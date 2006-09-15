@@ -5,7 +5,7 @@ import java.util.List;
 
 public class RunStatuses {
  
-    private static String [] statusList;
+    private static final String [] statusList;
     
     static
     {
