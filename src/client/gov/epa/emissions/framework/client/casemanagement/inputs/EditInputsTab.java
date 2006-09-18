@@ -259,7 +259,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         List inputs = getSelectedInputs();
 
         if (inputs.size() == 0) {
-            messagePanel.setMessage("Please select an input item.");
+            messagePanel.setMessage("Please select input(s) to remove.");
             return;
         }
 
@@ -284,7 +284,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         List inputs = getSelectedInputs();
 
         if (inputs.size() == 0) {
-            messagePanel.setMessage("Please select an input item.");
+            messagePanel.setMessage("Please select input(s) to edit.");
             return;
         }
         
@@ -300,7 +300,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     private void doDisplayInputDatasetsPropertiesViewer() {
         List datasets = updateSelectedDatasets(getSelectedDatasets(getSelectedInputs()));
         if (datasets.isEmpty()) {
-            messagePanel.setMessage("Please select one or more Datasets.");
+            messagePanel.setMessage("Please select one or more inputs with specified datasets to view.");
             return;
         }
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
@@ -337,7 +337,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     
     private boolean checkExportDir(String exportDir) {
         if (exportDir == null || exportDir.equals("")) {
-            messagePanel.setMessage("Please select the input folder before export.");
+            messagePanel.setMessage("Please specify the input folder before export.");
             return false;
         }
         
@@ -360,7 +360,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         CaseInput[] inputs = (CaseInput[])inputList.toArray(new CaseInput[0]);
         int count = 0;
         int external = 0;
-        String externalMsg = "";
         
         for (int i = 0; i < inputs.length; i++) {
             DatasetType type = inputs[i].getDatasetType();
@@ -373,10 +372,13 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         }
         
         if (external > 0)
-            externalMsg = "Export of external type dataset(s) is not supported.";
+        {
+            messagePanel.setMessage("Please select some inputs to export which do not use external datasets");
+            return false;
+        }
         
         if (count == 0) {
-            messagePanel.setMessage("There were no datasets to export. " + externalMsg);
+            messagePanel.setMessage("Please select some inputs to export");
             return false;
         }
         
@@ -385,7 +387,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     private int checkOverWrite() {
         String title = "Message";
-        String message = "Do you want to overwrite files if they exist?";
+        String message = "Do you want to overwrite exported files if they already exist?";
         return JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
     }

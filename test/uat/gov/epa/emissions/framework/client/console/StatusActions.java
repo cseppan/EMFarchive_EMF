@@ -81,6 +81,6 @@ public class StatusActions {
     }
 
     private boolean isExportComplete(String dataset) {
-        return doesContain("Started export for " + dataset) && doesContain("Completed export for " + dataset);
+        return doesContain("Started exporting " + dataset) && doesContain("Completed export of " + dataset);
     }
 }
