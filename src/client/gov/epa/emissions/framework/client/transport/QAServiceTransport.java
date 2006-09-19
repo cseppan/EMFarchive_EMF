@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.data.QAProgram;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -51,14 +52,15 @@ public class QAServiceTransport implements QAService {
         return (QAProgram[]) call.requestResponse(new Object[] {});
     }
 
-    public void runQAStep(QAStep step) throws EmfException {
+    public void runQAStep(QAStep step, User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("runQAStep");
         call.addParam("step", mappings.qaStep());
+        call.addParam("user", mappings.user());
         call.setVoidReturnType();
 
-        call.request(new Object[] { step });
+        call.request(new Object[] { step, user });
 
     }
 }

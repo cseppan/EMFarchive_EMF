@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.commons.data.QAProgram;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -13,6 +14,6 @@ public interface QAService {
 
     void update(QAStep[] steps) throws EmfException;
 
-    void runQAStep(QAStep step) throws EmfException;
+    void runQAStep(QAStep step, User user) throws EmfException;
 
 }

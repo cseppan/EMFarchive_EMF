@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.commons.data.QAProgram;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -27,7 +28,7 @@ public class QAServiceImpl implements QAService {
         this(HibernateSessionFactory.get());
         this.threadPool = createThreadPool();
     }
-    
+
     private PooledExecutor createThreadPool() {
         PooledExecutor threadPool = new PooledExecutor(20);
         threadPool.setMinimumPoolSize(1);
@@ -78,28 +79,34 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    public void runQAStep(QAStep step) throws EmfException {
+    public void runQAStep(QAStep step, User user) throws EmfException {
         updateQAStepBeforeRun(step);
+        EmfDbServer dbServer = dbServer();
+        RunQAStep runner = new RunQAStep(step,user, dbServer, sessionFactory, threadPool);
+        runner.run();
+    }
+
+    private EmfDbServer dbServer() throws EmfException {
         EmfDbServer dbServer = null;
         try {
             dbServer = new EmfDbServer();
         } catch (Exception e) {
+            LOG.error("could not create EMF db server", e);
             throw new EmfException(e.getMessage());
         }
-        RunQAStep runner = new RunQAStep(step,dbServer,sessionFactory,threadPool);
-        runner.run();
+        return dbServer;
     }
 
     private void updateQAStepBeforeRun(QAStep step) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            dao.update(new QAStep[]{step},session);
+            dao.update(new QAStep[] { step }, session);
         } catch (RuntimeException e) {
             LOG.error("could not update QA Step before run", e);
             throw new EmfException("could not update QA Step before run");
         } finally {
             session.close();
         }
-        
+
     }
 }

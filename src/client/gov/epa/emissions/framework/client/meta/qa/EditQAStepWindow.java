@@ -324,7 +324,6 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         panel.add(Box.createHorizontalStrut(50));
         Button run = runButton();
-        run.setEnabled(false);
         panel.add(run);
 
         Button viewResults = new Button("View Results", null);

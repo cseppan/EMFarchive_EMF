@@ -26,7 +26,7 @@ public class EditQAStepPresenter {
     public void display(QAStep step, String versionName) throws EmfException {
         view.observe(this);
         QAProgram[] programs = session.qaService().getQAPrograms();
-        view.display(step, programs,dataset, session.user(), versionName);
+        view.display(step, programs, dataset, session.user(), versionName);
     }
 
     public void doClose() {
@@ -42,7 +42,7 @@ public class EditQAStepPresenter {
     public void doRun() throws EmfException {
         QAStep step = view.save();
         tabView.refresh();
-        session.qaService().runQAStep(step);
+        session.qaService().runQAStep(step, session.user());
     }
 
 }
