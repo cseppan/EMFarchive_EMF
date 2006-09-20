@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
@@ -9,6 +10,7 @@ import gov.epa.emissions.commons.gui.FormattedDateField;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.RunButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
@@ -22,9 +24,11 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.NumberFormattedTextField;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -32,6 +36,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -42,6 +47,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 public class EditQAStepWindow extends DisposableInteralFrame implements EditQAStepView {
@@ -78,8 +84,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private QAPrograms qaPrograms;
 
+    private JTextField exportFolder;
+
     public EditQAStepWindow(DesktopManager desktopManager) {
-        super("Edit QA Step", new Dimension(600, 625), desktopManager);
+        super("Edit QA Step", new Dimension(650, 675), desktopManager);
     }
 
     public void display(QAStep step, QAProgram[] programs, EmfDataset dataset, User user, String versionName) {
@@ -143,6 +151,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
+        InternalSource source = step.getTableSource();
+        String table = (source == null) ? "" : source.getTable();
+        TextField tableName = new TextField("tableName", table, 20);
+        tableName.setEditable(false);
+        layoutGenerator.addLabelWidgetPair("Table Name:", tableName, panel);
+
         JLabel creationStatusLabel = new JLabel();
         String tableCreationStatus = step.getTableCreationStatus();
         creationStatusLabel.setText((tableCreationStatus != null) ? tableCreationStatus : "");
@@ -160,7 +174,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         layoutGenerator.addLabelWidgetPair("Current Table?", currentTable, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
         return panel;
@@ -181,13 +195,45 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(comments);
         layoutGenerator.addLabelWidgetPair("Comments:", scrollableComment, panel);
 
+        layoutGenerator.addLabelWidgetPair("Folder", exportFolderPanel(), panel);
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
 
+    }
+
+    private JPanel exportFolderPanel() {
+        exportFolder = new JTextField(40);
+        exportFolder.setName("folder");
+        Button button = new BrowseButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                selectFolder();
+            }
+        });
+        JPanel folderPanel = new JPanel(new BorderLayout(10,10));
+        folderPanel.add(exportFolder);
+        folderPanel.add(button, BorderLayout.EAST);
+        return folderPanel;
+    }
+
+    private void selectFolder() {
+        FileChooser chooser = new FileChooser("Select Folder", new File(exportFolder.getText()), this);
+
+        chooser.setTitle("Select a folder");
+        File[] file = chooser.choose();
+        if (file == null || file.length==0)
+            return;
+
+        if (file[0].isDirectory()) {
+            exportFolder.setText(file[0].getAbsolutePath());
+        }
+
+        if (file[0].isFile()) {
+            exportFolder.setText(file[0].getParent());
+        }
     }
 
     private JPanel lowerTopLeftPanel(QAStep step) {
@@ -244,6 +290,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         QAProgram qaProgram = step.getProgram();
         if (qaProgram != null)
             program.setSelectedItem(qaProgram.getName());
+        else
+            program.setSelectedItem(null);
         addChangeable(program);
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
@@ -330,8 +378,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         viewResults.setEnabled(false);
         panel.add(viewResults);
 
-        Button export = new Button("Export", null);
-        export.setEnabled(false);
+        Button export = exportButton();
         panel.add(export);
         return panel;
     }
@@ -345,9 +392,26 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         return run;
     }
 
+    private Button exportButton() {
+        Button export = new Button("Export", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doExport();
+            }
+        });
+        return export;
+    }
+
     protected void doRun() {
         try {
             presenter.doRun();
+        } catch (EmfException e) {
+            messagePanel.setMessage(e.getMessage());
+        }
+    }
+
+    protected void doExport() {
+        try {
+            presenter.doExport(step, exportFolder.getText());
         } catch (EmfException e) {
             messagePanel.setMessage(e.getMessage());
         }

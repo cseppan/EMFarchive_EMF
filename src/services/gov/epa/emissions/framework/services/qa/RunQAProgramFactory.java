@@ -1,15 +1,14 @@
 package gov.epa.emissions.framework.services.qa;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
+
+import java.lang.reflect.Constructor;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class RunQAProgramFactory {
 
@@ -33,7 +32,9 @@ public class RunQAProgramFactory {
         }
     }
 
-    private QAProgramRunner doCreate() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    private QAProgramRunner doCreate() throws Exception {
+        if(qaStep.getProgram()==null)
+            throw new Exception("A program should be specified to run a QA Step");
         String runClassName = qaStep.getProgram().getRunClassName();
         Class clazz = Class.forName(runClassName);
         Class[] classParams = { DbServer.class, QAStep.class };

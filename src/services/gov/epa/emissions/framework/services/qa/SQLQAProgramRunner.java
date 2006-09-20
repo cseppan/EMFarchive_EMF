@@ -35,7 +35,6 @@ public class SQLQAProgramRunner implements QAProgramRunner {
             dbServer.getEmissionsDatasource().query().execute(query);
             success(qaStep, tableName);
         } catch (Exception e) {
-            e.printStackTrace();
             failure(qaStep);
             throw new EmfException("Check the query - " + query);
         }

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
@@ -43,6 +44,14 @@ public class EditQAStepPresenter {
         QAStep step = view.save();
         tabView.refresh();
         session.qaService().runQAStep(step, session.user());
+    }
+
+    public void doExport(QAStep step, String dirName) throws EmfException {
+        InternalSource source = step.getTableSource();
+        if (source == null || source.getTable() == null)
+            throw new EmfException("You have to run the QA step successfully before exporting ");
+        session.qaService().exportQAStep(step, dirName);
+
     }
 
 }

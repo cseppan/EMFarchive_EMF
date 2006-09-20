@@ -16,4 +16,8 @@ public interface QAService {
 
     void runQAStep(QAStep step, User user) throws EmfException;
 
+    public void exportQAStepWithOverwrite(QAStep step, String dirName) throws EmfException;
+
+    public void exportQAStep(QAStep step, String dirName) throws EmfException;
+
 }

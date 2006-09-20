@@ -56,7 +56,6 @@ public class RunQAStepTask implements Runnable {
     private void complete() {
         setStatus("Completed running qa step '" + qastep.getName() + "'");
         updateQAStep();
-
     }
 
     private void updateQAStep() {
