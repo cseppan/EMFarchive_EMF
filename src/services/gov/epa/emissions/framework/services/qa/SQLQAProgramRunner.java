@@ -35,6 +35,7 @@ public class SQLQAProgramRunner implements QAProgramRunner {
             dbServer.getEmissionsDatasource().query().execute(query);
             success(qaStep, tableName);
         } catch (Exception e) {
+            e.printStackTrace();
             failure(qaStep);
             throw new EmfException("Check the query - " + query);
         }
@@ -74,7 +75,7 @@ public class SQLQAProgramRunner implements QAProgramRunner {
     }
 
     private String tableName(QAStep qaStep) {
-        String result = qaStep.getName() + "_" + qaStep.getDatasetId();
+        String result = "QA" + qaStep.getName() + "_DSID" + qaStep.getDatasetId()+"_V"+qaStep.getVersion();
 
         for (int i = 0; i < result.length(); i++) {
             if (!Character.isJavaLetterOrDigit(result.charAt(i))) {
@@ -82,10 +83,6 @@ public class SQLQAProgramRunner implements QAProgramRunner {
             }
         }
 
-        if (Character.isDigit(result.charAt(0))) {
-            result = result.replace(result.charAt(0), '_');
-            result = "QA" + result;
-        }
         return result.trim().replaceAll(" ", "_");
     }
 

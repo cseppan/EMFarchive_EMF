@@ -20,23 +20,30 @@ public class SQLQAProgramRunnerTest extends ServiceTestCase {
 
     public void testShouldRunSQLQAStep() throws Exception {
         EmfDataset dataset = null;
+        String tableName = null;
         try {
             dataset = newDataset();
             QAStep step = new QAStep();
             step.setName("QA1");
             step.setProgramArguments("SELECT * FROM reference.pollutants");
             step.setDatasetId(dataset.getId());
+            step.setVersion(0);
             add(step);
-
+            tableName = tableName(step);
             SQLQAProgramRunner runner = new SQLQAProgramRunner(dbServer(), step);
             runner.run();
+            assertEquals(8, countRecords(tableName));
         } finally {
             if (dataset != null)
-                dropTable("QA1" + "_" + dataset.getId(), dbServer().getEmissionsDatasource());
+                dropTable(tableName, dbServer().getEmissionsDatasource());
             dropAll(QAStep.class);
             dropAll(EmfDataset.class);
         }
 
+    }
+
+    private String tableName(QAStep qaStep) {
+        return "QA" + qaStep.getName() + "_DSID" + qaStep.getDatasetId() + "_V" + qaStep.getVersion();
     }
 
     private EmfDataset newDataset() {
