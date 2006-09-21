@@ -37,7 +37,7 @@ public class RunQAStep {
     public void run() throws EmfException {
         RunQAProgramFactory factory = new RunQAProgramFactory(qaStep,dbServer);
         QAProgramRunner runQAProgram = factory.create();
-        RunQAStepTask task = new RunQAStepTask(qaStep, user, runQAProgram, sessionFactory);
+        RunQAStepTask task = new RunQAStepTask(qaStep, user, runQAProgram, dbServer, sessionFactory);
         try {
             threadPool.execute(new GCEnforcerTask("Run QA Program : " + qaStep.getProgram().getName(), task));
         } catch (InterruptedException e) {

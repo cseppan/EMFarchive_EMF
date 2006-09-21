@@ -34,14 +34,18 @@ public class DatabaseTableCSVExporter implements Exporter {
     }
 
     public void export(File file) throws ExporterException {
+        PrintWriter writer = printWriter(file);
+        write(file, writer);
+    }
+
+    private PrintWriter printWriter(File file) throws ExporterException {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
         } catch (IOException e) {
             throw new ExporterException("could not open file - " + file + " for writing");
         }
-
-        write(file, writer);
+        return writer;
     }
 
     protected void write(File file, PrintWriter writer) throws ExporterException {

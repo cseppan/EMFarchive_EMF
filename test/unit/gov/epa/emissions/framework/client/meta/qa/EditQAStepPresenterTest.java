@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -44,6 +45,7 @@ public class EditQAStepPresenterTest extends EmfMockObjectTestCase {
         
         Mock view = mock(EditQAStepView.class);
         expectsOnce(view, "display", new Constraint[] { same(step),same(programs), same(dataset), same(user), same("") });
+        expectsOnce(view,"setMostRecentUsedFolder","");
         
         Mock qaService = mock(QAService.class);
         expects(qaService,1,"getQAPrograms",programs);
@@ -51,11 +53,19 @@ public class EditQAStepPresenterTest extends EmfMockObjectTestCase {
         Mock session = mock(EmfSession.class);
         expects(session,1, "user", user);
         expects(session,1, "qaService",qaService.proxy());
+        setPreferences(session);
         
         EditQAStepPresenter presenter = new EditQAStepPresenter((EditQAStepView) view.proxy(), dataset, null,
                 (EmfSession) session.proxy());
         expects(view, "observe");
 
         presenter.display(step, "");
+    }
+    
+    private void setPreferences(Mock session) {
+        Mock prefs = mock(UserPreference.class);
+        session.stubs().method("preferences").will(returnValue(prefs.proxy()));
+        prefs.stubs().method("mapLocalOutputPathToRemote").will(returnValue(""));
+        prefs.stubs().method("outputFolder").will(returnValue(""));
     }
 }

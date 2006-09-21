@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import java.io.File;
+
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -17,6 +19,8 @@ public class EditQAStepPresenter {
 
     private EmfSession session;
 
+    private static String lastFolder = null;
+
     public EditQAStepPresenter(EditQAStepView view, EmfDataset dataset, EditableQATabView tabView, EmfSession session) {
         this.view = view;
         this.tabView = tabView;
@@ -28,6 +32,7 @@ public class EditQAStepPresenter {
         view.observe(this);
         QAProgram[] programs = session.qaService().getQAPrograms();
         view.display(step, programs, dataset, session.user(), versionName);
+        view.setMostRecentUsedFolder(getFolder());
     }
 
     public void doClose() {
@@ -47,11 +52,32 @@ public class EditQAStepPresenter {
     }
 
     public void doExport(QAStep step, String dirName) throws EmfException {
+        File dir = new File(dirName);
+        if (dir.isDirectory())
+            lastFolder = dirName;
+
         InternalSource source = step.getTableSource();
         if (source == null || source.getTable() == null)
             throw new EmfException("You have to run the QA step successfully before exporting ");
-        session.qaService().exportQAStep(step, dirName);
 
+        session.qaService().exportQAStep(step, session.user(), mapToRemote(dirName));
+
+    }
+
+    private String getFolder() {
+        return (lastFolder != null) ? lastFolder : getDefaultFolder();
+    }
+
+    private String getDefaultFolder() {
+        String folder = session.preferences().outputFolder();
+        if (!new File(folder).isDirectory())
+            folder = "";// default, if unspecified
+
+        return folder;
+    }
+
+    private String mapToRemote(String dir) {
+        return session.preferences().mapLocalOutputPathToRemote(dir);
     }
 
 }

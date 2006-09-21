@@ -64,23 +64,16 @@ public class QAServiceTransport implements QAService {
 
     }
 
-    public void exportQAStepWithOverwrite(QAStep step, String dirName) throws EmfException {
-        export(step, dirName);
-    }
-
-    public void exportQAStep(QAStep step, String dirName) throws EmfException {
-        export(step, dirName);
-    }
-
-    private void export(QAStep step, String dirName) throws EmfException {
+    public void exportQAStep(QAStep step, User user, String dirName) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("exportQAStep");
         call.addParam("step", mappings.qaStep());
+        call.addParam("user", mappings.user());
         call.addStringParam("dirName");
         call.setVoidReturnType();
 
-        call.request(new Object[] { step, dirName });
+        call.request(new Object[] { step, user, dirName });
     }
 
 }

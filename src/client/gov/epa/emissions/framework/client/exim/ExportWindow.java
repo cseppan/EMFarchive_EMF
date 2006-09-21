@@ -43,8 +43,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     public ExportWindow(EmfDataset[] datasets, DesktopManager desktopManager) {
         super(title(datasets), desktopManager);
-        super.setName("exportWindow:"+hashCode());
-        
+        super.setName("exportWindow:" + hashCode());
+
         this.datasets = datasets;
 
         this.getContentPane().add(createLayout());
@@ -201,7 +201,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
         chooser.setTitle("Select a folder");
         File[] file = chooser.choose();
-        if (file == null)
+        if (file == null || file.length == 0)
             return;
 
         if (file[0].isDirectory()) {

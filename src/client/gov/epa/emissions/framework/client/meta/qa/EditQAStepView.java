@@ -14,5 +14,7 @@ public interface EditQAStepView extends ManagedView {
     void observe(EditQAStepPresenter presenter);
     
     QAStep save() throws EmfException;
+    
+    void setMostRecentUsedFolder(String mostRecentUsedFolder);
 
 }

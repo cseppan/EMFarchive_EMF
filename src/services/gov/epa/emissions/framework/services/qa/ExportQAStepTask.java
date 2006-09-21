@@ -1,22 +1,21 @@
 package gov.epa.emissions.framework.services.qa;
 
+import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Session;
 
-public class RunQAStepTask implements Runnable {
-
-    private QAProgramRunner runQAProgram;
+public class ExportQAStepTask implements Runnable {
 
     private QAStep qastep;
 
@@ -24,38 +23,38 @@ public class RunQAStepTask implements Runnable {
 
     private StatusDAO statusDao;
 
-    private Log log = LogFactory.getLog(RunQAStepTask.class);
+    private Log log = LogFactory.getLog(ExportQAStepTask.class);
 
-    private QADAO qaDao;
+    private Exporter exporter;
 
-    private HibernateSessionFactory sessionFactory;
+    private File file;
 
-    private EmfDbServer dbServer;
+    private DbServer dbServer;
 
-    public RunQAStepTask(QAStep qaStep, User user, QAProgramRunner runQAProgram, EmfDbServer dbServer, HibernateSessionFactory sessionFactory) {
+    public ExportQAStepTask(File file, Exporter exporter, DbServer dbServer, QAStep qaStep, User user,
+            HibernateSessionFactory sessionFactory) {
+        this.file = file;
+        this.exporter = exporter;
+        this.dbServer = dbServer;
         this.qastep = qaStep;
         this.user = user;
-        this.runQAProgram = runQAProgram;
-        this.dbServer = dbServer;
-        this.sessionFactory = sessionFactory;
         this.statusDao = new StatusDAO(sessionFactory);
-        this.qaDao = new QADAO();
     }
 
     public void run() {
         try {
             prepare();
-            runQAProgram.run();
+            exporter.export(file);
             complete();
         } catch (Exception e) {
-            logError("Failed to run QA step : " + qastep.getName(), e);
-            setStatus("Failed to run QA step " + qastep.getName() + ". Reason: " + e.getMessage());
-        }finally{
+            logError("Failed to export QA step : " + qastep.getName(), e);
+            setStatus("Failed to export QA step " + qastep.getName() + ". Reason: " + e.getMessage());
+        } finally {
             disconnect(dbServer);
         }
     }
 
-    private void disconnect(EmfDbServer dbServer) {
+    private void disconnect(DbServer dbServer) {
         try {
             dbServer.disconnect();
         } catch (SQLException e) {
@@ -65,22 +64,12 @@ public class RunQAStepTask implements Runnable {
     }
 
     private void prepare() {
-        setStatus("Started running QA step '" + qastep.getName() + "'");
+        setStatus("Started exporting QA step '" + qastep.getName() + "'");
 
     }
 
     private void complete() {
-        setStatus("Completed running QA step '" + qastep.getName() + "'");
-        updateQAStep();
-    }
-
-    private void updateQAStep() {
-        Session session = sessionFactory.getSession();
-        try {
-            qaDao.update(new QAStep[] { qastep }, session);
-        } finally {
-            session.close();
-        }
+        setStatus("Completed exporting QA step '" + qastep.getName() + "'");
     }
 
     private void logError(String message, Exception e) {
@@ -91,7 +80,7 @@ public class RunQAStepTask implements Runnable {
     private void setStatus(String message) {
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());
-        endStatus.setType("RunQAStep");
+        endStatus.setType("ExportQAStep");
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 

@@ -213,7 +213,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 selectFolder();
             }
         });
-        JPanel folderPanel = new JPanel(new BorderLayout(10,10));
+        JPanel folderPanel = new JPanel(new BorderLayout(10, 10));
         folderPanel.add(exportFolder);
         folderPanel.add(button, BorderLayout.EAST);
         return folderPanel;
@@ -224,7 +224,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         chooser.setTitle("Select a folder");
         File[] file = chooser.choose();
-        if (file == null || file.length==0)
+        if (file == null || file.length == 0)
             return;
 
         if (file[0].isDirectory()) {
@@ -386,6 +386,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private Button runButton() {
         Button run = new RunButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                clear();
                 doRun();
             }
         });
@@ -395,6 +396,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private Button exportButton() {
         Button export = new Button("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                clear();
                 doExport();
             }
         });
@@ -403,17 +405,20 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     protected void doRun() {
         try {
+            messagePanel.setMessage("Started Run. Please monitor the Status window " + "to track your run request.");
             presenter.doRun();
         } catch (EmfException e) {
-            messagePanel.setMessage(e.getMessage());
+            messagePanel.setError(e.getMessage());
         }
     }
 
     protected void doExport() {
         try {
+            messagePanel.setMessage("Started Export. Please monitor the Status window "
+                    + "to track your export request.");
             presenter.doExport(step, exportFolder.getText());
         } catch (EmfException e) {
-            messagePanel.setMessage(e.getMessage());
+            messagePanel.setError(e.getMessage());
         }
     }
 
@@ -421,9 +426,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         Button ok = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
+                    clear();
                     presenter.doSave();
                 } catch (EmfException e1) {
-                    messagePanel.setMessage(e1.getMessage());
+                    messagePanel.setError(e1.getMessage());
                 }
             }
         });
@@ -433,6 +439,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private Button closeButton() {
         Button cancel = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                clear();
                 doClose();
             }
         });
@@ -464,4 +471,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         return step;
     }
 
+    public void setMostRecentUsedFolder(String mostRecentUsedFolder) {
+        if (mostRecentUsedFolder != null)
+            exportFolder.setText(mostRecentUsedFolder);
+    }
+
+    private void clear() {
+        messagePanel.clear();
+    }
 }
