@@ -76,7 +76,9 @@ public class EditQAStepPresenter {
         return folder;
     }
 
-    private String mapToRemote(String dir) {
+    private String mapToRemote(String dir) throws EmfException {
+        if(dir ==null || dir.trim().length()==0)
+            throw new EmfException("Please select a directory before export");
         return session.preferences().mapLocalOutputPathToRemote(dir);
     }
 

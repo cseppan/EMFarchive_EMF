@@ -1,11 +1,11 @@
 package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.commons.data.InternalSource;
-import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Date;
 
@@ -17,8 +17,11 @@ public class SQLQAProgramRunner implements QAProgramRunner {
 
     private TableCreator tableCreator;
 
-    public SQLQAProgramRunner(DbServer dbServer, QAStep qaStep) {
+    private HibernateSessionFactory sessionFactory;
+
+    public SQLQAProgramRunner(DbServer dbServer, HibernateSessionFactory sessionFactory, QAStep qaStep) {
         this.dbServer = dbServer;
+        this.sessionFactory = sessionFactory;
         this.qaStep = qaStep;
         this.tableCreator = new TableCreator(dbServer.getEmissionsDatasource());
     }
@@ -29,7 +32,7 @@ public class SQLQAProgramRunner implements QAProgramRunner {
             throw new EmfException("Please specify the sql query");
         }
         String tableName = tableName(qaStep);
-        String query = query(qaStep, tableName);
+        String query = query(dbServer, qaStep, tableName);
         try {
             dropTable(tableName);
             dbServer.getEmissionsDatasource().query().execute(query);
@@ -64,17 +67,13 @@ public class SQLQAProgramRunner implements QAProgramRunner {
         qaStep.setTableSource(new InternalSource());
     }
 
-    private String query(QAStep qaStep, String tableName) {
-        return "CREATE TABLE " + qualifiedName(dbServer.getEmissionsDatasource(), tableName) + " AS "
-                + qaStep.getProgramArguments();
-    }
-
-    private String qualifiedName(Datasource datasource, String tableName) {
-        return datasource.getName() + "." + tableName;
+    private String query(DbServer dbServer, QAStep qaStep, String tableName) throws EmfException {
+        SQLQueryParser parser = new SQLQueryParser(dbServer, sessionFactory, qaStep, tableName);
+        return parser.parse();
     }
 
     private String tableName(QAStep qaStep) {
-        String result = "QA" + qaStep.getName() + "_DSID" + qaStep.getDatasetId()+"_V"+qaStep.getVersion();
+        String result = "QA" + qaStep.getName() + "_DSID" + qaStep.getDatasetId() + "_V" + qaStep.getVersion();
 
         for (int i = 0; i < result.length(); i++) {
             if (!Character.isJavaLetterOrDigit(result.charAt(i))) {

@@ -30,7 +30,7 @@ public class SQLQAProgramRunnerTest extends ServiceTestCase {
             step.setVersion(0);
             add(step);
             tableName = tableName(step);
-            SQLQAProgramRunner runner = new SQLQAProgramRunner(dbServer(), step);
+            SQLQAProgramRunner runner = new SQLQAProgramRunner(dbServer(), sessionFactory(),step);
             runner.run();
             assertEquals(8, countRecords(tableName));
         } finally {

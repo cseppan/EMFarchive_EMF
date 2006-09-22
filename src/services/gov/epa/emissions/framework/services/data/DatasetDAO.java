@@ -84,17 +84,21 @@ public class DatasetDAO {
         return (EmfDataset) lockingScheme.releaseLockOnUpdate(locked, session, all(session));
     }
 
-
     public List getDatasets(Session session, DatasetType datasetType) {
         Criterion criterion = Restrictions.eq("datasetType", datasetType);
         Order order = Order.asc("name");
         return hibernateFacade.get(EmfDataset.class, criterion, order, session);
     }
-    
+
     public EmfDataset getDataset(Session session, String name) {
         Criterion criterion = Restrictions.eq("name", name);
         Order order = Order.asc("name");
         return (EmfDataset) hibernateFacade.get(EmfDataset.class, criterion, order, session).get(0);
+    }
+
+    public EmfDataset getDataset(Session session, int id) {
+        Criterion criterion = Restrictions.eq("id", new Integer(id));
+        return (EmfDataset) hibernateFacade.load(EmfDataset.class, criterion, session);
     }
 
 }

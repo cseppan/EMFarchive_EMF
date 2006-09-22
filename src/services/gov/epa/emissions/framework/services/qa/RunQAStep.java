@@ -35,7 +35,7 @@ public class RunQAStep {
     }
 
     public void run() throws EmfException {
-        RunQAProgramFactory factory = new RunQAProgramFactory(qaStep,dbServer);
+        RunQAProgramFactory factory = new RunQAProgramFactory(qaStep,dbServer,sessionFactory);
         QAProgramRunner runQAProgram = factory.create();
         RunQAStepTask task = new RunQAStepTask(qaStep, user, runQAProgram, dbServer, sessionFactory);
         try {
