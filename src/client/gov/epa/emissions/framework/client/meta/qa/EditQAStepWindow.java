@@ -87,7 +87,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private JTextField exportFolder;
 
     public EditQAStepWindow(DesktopManager desktopManager) {
-        super("Edit QA Step", new Dimension(650, 675), desktopManager);
+        super("Edit QA Step", new Dimension(650, 625), desktopManager);
     }
 
     public void display(QAStep step, QAProgram[] programs, EmfDataset dataset, User user, String versionName) {
@@ -190,12 +190,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 + "file (e.g., a REPCONFIG file)");
         layoutGenerator.addLabelWidgetPair("Configuration:", config, panel);
 
-        comments = new TextArea("Comments", step.getComments(), 40, 3);
+        comments = new TextArea("Comments", step.getComments(), 40, 2);
         addChangeable(comments);
         ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(comments);
         layoutGenerator.addLabelWidgetPair("Comments:", scrollableComment, panel);
 
-        layoutGenerator.addLabelWidgetPair("Folder", exportFolderPanel(), panel);
+        layoutGenerator.addLabelWidgetPair("Folder:", exportFolderPanel(), panel);
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
@@ -295,7 +295,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         addChangeable(program);
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
-        programArguments = new TextArea("", step.getProgramArguments(), 40, 2);
+        programArguments = new TextArea("", step.getProgramArguments(), 40, 3);
         addChangeable(programArguments);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programArguments);
         layoutGenerator.addLabelWidgetPair("Arguments:", scrollableDetails, panel);
@@ -311,7 +311,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             required.setEnabled(false);
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
-        description = new TextArea("", step.getDescription(), 40, 4);
+        description = new TextArea("", step.getDescription(), 40, 3);
         addChangeable(description);
         ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
         layoutGenerator.addLabelWidgetPair("Description:", scrollableDesc, panel);
