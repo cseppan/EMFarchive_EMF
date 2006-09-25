@@ -31,8 +31,8 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
         try {
             init(dbServer, dbServer.getEmissionsDatasource(), HibernateSessionFactory.get());
         } catch (Exception ex) {
-            LOG.error("could not initialize DataView Service", ex);
-            throw new InfrastructureException("could not initialize DataView Service");
+            LOG.error("Could not initialize DataView Service", ex);
+            throw new InfrastructureException("Could not initialize DataView Service");
         }
     }
 

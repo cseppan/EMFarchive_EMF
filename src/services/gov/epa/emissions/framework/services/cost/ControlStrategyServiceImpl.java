@@ -45,8 +45,8 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         try {
             factory = new StrategyFactory(batchSize());
         } catch (Exception e) {
-            LOG.error("could not access control measure service.");
-            throw new EmfException("could not access control measure service.");
+            LOG.error("Could not access control measure service.");
+            throw new EmfException("Could not access control measure service.");
         }
         runStrategy = new RunControlStrategy(factory, sessionFactory, threadPool);
     }
@@ -71,8 +71,8 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             List cs = dao.all(session);
             return (ControlStrategy[]) cs.toArray(new ControlStrategy[0]);
         } catch (HibernateException e) {
-            LOG.error("could not retrieve all control strategies.");
-            throw new EmfException("could not retrieve all control strategies.");
+            LOG.error("Could not retrieve all control strategies.");
+            throw new EmfException("Could not retrieve all control strategies.");
         } finally {
             session.close();
         }
@@ -214,9 +214,9 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,sessionFactory);
             output.create();
         } catch (Exception e) {
-            LOG.error("could not create inventory output. " + e.getMessage());
+            LOG.error("Could not create inventory output. " + e.getMessage());
             e.printStackTrace();
-            throw new EmfException("could not create inventory output. " + e.getMessage());
+            throw new EmfException("Could not create inventory output. " + e.getMessage());
         }
     }
 

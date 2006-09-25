@@ -43,7 +43,7 @@ public class DatabaseTableCSVExporter implements Exporter {
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
         } catch (IOException e) {
-            throw new ExporterException("could not open file - " + file + " for writing");
+            throw new ExporterException("Could not open file - " + file + " for writing");
         }
         return writer;
     }
@@ -54,7 +54,7 @@ public class DatabaseTableCSVExporter implements Exporter {
             writeColumnNames(writer, cols);
             writeData(writer, datasource, cols);
         } catch (SQLException e) {
-            throw new ExporterException("could not export file - " + file, e);
+            throw new ExporterException("Could not export file - " + file, e);
         } finally {
             writer.close();
         }

@@ -48,8 +48,8 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
 
             return (ControlMeasure[]) all.toArray(new ControlMeasure[0]);
         } catch (RuntimeException e) {
-            LOG.error("could not retrieve control measures.", e);
-            throw new EmfException("could not retrieve control measures.");
+            LOG.error("Could not retrieve control measures.", e);
+            throw new EmfException("Could not retrieve control measures.");
         } finally {
             session.close();
         }
@@ -143,8 +143,8 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
 
             return (ControlTechnology[]) all.toArray(new ControlTechnology[0]);
         } catch (RuntimeException e) {
-            LOG.error("could not retrieve control technologies.", e);
-            throw new EmfException("could not retrieve control technologies.");
+            LOG.error("Could not retrieve control technologies.", e);
+            throw new EmfException("Could not retrieve control technologies.");
         } finally {
             session.close();
         }

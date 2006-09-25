@@ -46,7 +46,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         try {
             init(dbServer, dbServer.getEmissionsDatasource(), HibernateSessionFactory.get());
         } catch (Exception ex) {
-            LOG.error("could not initialize Data Editor Service", ex);
+            LOG.error("Could not initialize Data Editor Service", ex);
             throw new InfrastructureException("Server configuration error");
         }
     }

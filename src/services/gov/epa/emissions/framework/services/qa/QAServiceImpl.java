@@ -48,8 +48,8 @@ public class QAServiceImpl implements QAService {
             QAStep[] results = dao.steps(dataset, session);
             return results;
         } catch (RuntimeException e) {
-            LOG.error("could not retrieve QA Steps for dataset: " + dataset.getName(), e);
-            throw new EmfException("could not retrieve QA Steps for dataset: " + dataset.getName());
+            LOG.error("Could not retrieve QA Steps for dataset: " + dataset.getName(), e);
+            throw new EmfException("Could not retrieve QA Steps for dataset: " + dataset.getName());
         } finally {
             session.close();
         }
@@ -60,8 +60,8 @@ public class QAServiceImpl implements QAService {
         try {
             dao.update(steps, session);
         } catch (RuntimeException e) {
-            LOG.error("could not update QA Steps", e);
-            throw new EmfException("could not update QA Steps");
+            LOG.error("Could not update QA Steps", e);
+            throw new EmfException("Could not update QA Steps");
         } finally {
             session.close();
         }
@@ -72,8 +72,8 @@ public class QAServiceImpl implements QAService {
         try {
             return dao.getQAPrograms(session);
         } catch (RuntimeException e) {
-            LOG.error("could not get QA Programs", e);
-            throw new EmfException("could not get QA Programs");
+            LOG.error("Could not get QA Programs", e);
+            throw new EmfException("Could not get QA Programs");
         } finally {
             session.close();
         }
@@ -94,8 +94,8 @@ public class QAServiceImpl implements QAService {
             ExportQAStep exportQATask = new ExportQAStep(step, dbServer, user, sessionFactory, threadPool);
             exportQATask.export(dirName);
         } catch (Exception e) {
-            LOG.error("could not export QA step", e);
-            throw new EmfException("could not export QA step. " + e.getMessage());
+            LOG.error("Could not export QA step", e);
+            throw new EmfException("Could not export QA step: " + e.getMessage());
         }
 
     }
@@ -103,7 +103,7 @@ public class QAServiceImpl implements QAService {
     private void checkRestrictions(QAStep step) throws EmfException {
         QAProgram program = step.getProgram();
         if (program == null || !program.getName().startsWith("SQL"))
-            throw new EmfException("Only SQL program is supported for running a QA Step");
+            throw new EmfException("SQL is the only program currently supported for running a QA Step");
     }
 
     private EmfDbServer dbServer() throws EmfException {
@@ -111,7 +111,7 @@ public class QAServiceImpl implements QAService {
         try {
             dbServer = new EmfDbServer();
         } catch (Exception e) {
-            LOG.error("could not create EMF db server", e);
+            LOG.error("Could not create EMF DB server", e);
             throw new EmfException(e.getMessage());
         }
         return dbServer;
@@ -122,8 +122,8 @@ public class QAServiceImpl implements QAService {
         try {
             dao.update(new QAStep[] { step }, session);
         } catch (RuntimeException e) {
-            LOG.error("could not update QA Step before run", e);
-            throw new EmfException("could not update QA Step before run");
+            LOG.error("Could not update QA Step before run", e);
+            throw new EmfException("Could not update QA Step before run");
         } finally {
             session.close();
         }
