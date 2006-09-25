@@ -155,23 +155,23 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         String table = (source == null) ? "" : source.getTable();
         TextField tableName = new TextField("tableName", table, 20);
         tableName.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Table Name:", tableName, panel);
+        layoutGenerator.addLabelWidgetPair("Ouput Name:", tableName, panel);
 
         JLabel creationStatusLabel = new JLabel();
         String tableCreationStatus = step.getTableCreationStatus();
         creationStatusLabel.setText((tableCreationStatus != null) ? tableCreationStatus : "");
-        layoutGenerator.addLabelWidgetPair("Table Creation Status:", creationStatusLabel, panel);
+        layoutGenerator.addLabelWidgetPair("Run Status:", creationStatusLabel, panel);
 
         JLabel creationDateLabel = new JLabel();
-        String creationDate = (step.getTableCreationDate() != null) ? EmfDateFormat.format_MM_DD_YYYY(step
+        String creationDate = (step.getTableCreationDate() != null) ? EmfDateFormat.format_MM_DD_YYYY_HH_mm(step
                 .getTableCreationDate()) : "";
         creationDateLabel.setText(creationDate);
-        layoutGenerator.addLabelWidgetPair("Table Creation Date:", creationDateLabel, panel);
+        layoutGenerator.addLabelWidgetPair("Run Date:", creationDateLabel, panel);
 
         JCheckBox currentTable = new JCheckBox();
         currentTable.setEnabled(false);
         currentTable.setSelected(step.isTableCurrent());
-        layoutGenerator.addLabelWidgetPair("Current Table?", currentTable, panel);
+        layoutGenerator.addLabelWidgetPair("Current Output?", currentTable, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
@@ -452,6 +452,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     public QAStep save() throws EmfException {
+//        if (step.getTableCreationStatus().equals("In Progress"))
+//            throw new EmfException("You can't save changes while running it");
         if (order.getText().equals("")) {
             throw new EmfException("Order should be a floating point number");
         }

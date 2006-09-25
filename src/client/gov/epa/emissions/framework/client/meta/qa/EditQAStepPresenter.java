@@ -48,6 +48,7 @@ public class EditQAStepPresenter {
     public void doRun() throws EmfException {
         QAStep step = view.save();
         tabView.refresh();
+        //step.setTableCreationStatus("In Progress");
         session.qaService().runQAStep(step, session.user());
     }
 

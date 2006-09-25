@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -64,6 +65,45 @@ public class SQLQueryParserTest extends ServiceTestCase {
         assertEquals(
                 "CREATE TABLE " + qualfiedName(qaStepOutputTable) + " AS SELECT * FROM " + qualfiedName(tableName)+" WHERE version IN (0) AND  delete_versions NOT SIMILAR TO '(0|0,%|%,0,%|%,0)' AND dataset_id="+dataset.getId(),
                 query);
+    }
+    
+    
+    public void testShoudThrowAnException_TableNoIsMoreThanExistingNumberOfTables() throws Exception {
+        String tableName = "table1";
+        EmfDataset dataset = addDataset(tableName);
+        setupVersionZero(dbServer().getEmissionsDatasource(), dataset.getId(), versionsTable);
+
+        QAStep qaStep = new QAStep();
+        qaStep.setName("Step1");
+        qaStep.setDatasetId(dataset.getId());
+        String userQuery = "SELECT * FROM $TABLE{2}";
+        qaStep.setProgramArguments(userQuery);
+        String qaStepOutputTable = "qa_table1";
+        SQLQueryParser parser = new SQLQueryParser(dbServer(), sessionFactory(), qaStep, qaStepOutputTable);
+        try {
+            parser.parse();
+            assertTrue("Should have throw an exception",false);
+        } catch (EmfException e) {
+            assertEquals("The table number is more than the number tables for the dataset",e.getMessage());
+        }
+    }
+    public void testShouldExpandTwoTagsOnTheQuery() throws Exception{
+        String tableName = "table1";
+        EmfDataset dataset = addDataset(tableName);
+        setupVersionZero(dbServer().getEmissionsDatasource(), dataset.getId(), versionsTable);
+
+        QAStep qaStep = new QAStep();
+        qaStep.setName("Step1");
+        qaStep.setDatasetId(dataset.getId());
+        String userQuery = "SELECT * FROM $TABLE{1} WHERE $TABLE{1}.scc=reference.scc.scc";
+        qaStep.setProgramArguments(userQuery);
+        String qaStepOutputTable = "qa_table1";
+        SQLQueryParser parser = new SQLQueryParser(dbServer(), sessionFactory(), qaStep, qaStepOutputTable);
+        String query = parser.parse();
+        assertEquals(
+                "CREATE TABLE " + qualfiedName(qaStepOutputTable) + " AS SELECT * FROM " + qualfiedName(tableName)+" WHERE emissions.table1.scc=reference.scc.scc AND version IN (0) AND  delete_versions NOT SIMILAR TO '(0|0,%|%,0,%|%,0)' AND dataset_id="+dataset.getId(),
+                query);
+    
     }
 
     private String qualfiedName(String tableName) {

@@ -43,32 +43,37 @@ public class SQLQueryParser {
         if (query.indexOf(startQueryTag) == -1)
             return query;
 
-        return expandTag(query);// TODO: parse the query
+        return expandTag(query);
     }
 
-    // ONE TAG PER STATEMENT
     // SELECT - REQUIRED to STARTS WITH
     // FROM - REQUIRED
     // WHERE - OPTIONAL
     // ASSUME table is emissions datasource
     // ASSUME table is versioned
     private String expandTag(String query) throws EmfException {
+        while ((query.indexOf(startQueryTag)) != -1) {
+            query = expandOneTag(query);
+        }
+        return query + versioned(query);
+    }
+
+    // error if end query tag is not found
+    private String expandOneTag(String query) throws EmfException {
         int index = query.indexOf(startQueryTag);
         String prefix = query.substring(0, index);
         String suffix = query.substring(index + startQueryTag.length());
-        // more than two tokens error?
-        // error if end query tag is not found
         String[] suffixTokens = suffixSplit(suffix);
 
-        return prefix + tableNameFromDataset(suffixTokens[0]) + versioned(suffixTokens[1]);
+        return prefix + tableNameFromDataset(suffixTokens[0]) +  suffixTokens[1];
     }
 
     private String versioned(String partQuery) {
         String versionClause = versionClause();
         if (partQuery.indexOf("WHERE") == -1)
-            return partQuery + " WHERE " + versionClause;
+            return " WHERE " + versionClause;
 
-        return partQuery + " AND " + versionClause;
+        return " AND " + versionClause;
     }
 
     private String versionClause() {
@@ -98,8 +103,8 @@ public class SQLQueryParser {
         try {
             EmfDataset dataset = dao.getDataset(session, qaStep.getDatasetId());
             InternalSource[] internalSources = dataset.getInternalSources();
-            if (internalSources.length < tableID - 1)
-                throw new EmfException("The table number is more than number tables for the dataset");
+            if (internalSources.length < tableID)
+                throw new EmfException("The table number is more than the number tables for the dataset");
             return qualifiedName(dbServer.getEmissionsDatasource(), internalSources[tableID - 1].getTable());
         } finally {
             session.close();
