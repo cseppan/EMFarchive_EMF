@@ -117,5 +117,6 @@ insert INTO emf.keywords VALUES (DEFAULT, 'REPLACED_BY_DATASET');
 
 -- emf.qa_programs
 insert into emf.qa_programs values(DEFAULT,'SQL','gov.epa.emissions.framework.services.qa.SQLQAProgramRunner');
+insert into emf.qa_programs values(DEFAULT,'Smkreport','');
 
 
