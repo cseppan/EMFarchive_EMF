@@ -286,6 +286,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         layoutGenerator.addLabelWidgetPair("Version:", new Label(versionName + " (" + step.getVersion() + ")"), panel);
 
         program = new EditableComboBox(qaPrograms.names());
+        program.setEditable(false);
         program.setPrototypeDisplayValue("To make the combobox a bit wider");
         QAProgram qaProgram = step.getProgram();
         if (qaProgram != null)

@@ -107,7 +107,8 @@ public class EditQAStepTemplatesPanel extends JPanel implements QAStepTemplatesP
         int rowIndex = table.rowAtPoint(p);
         int colIndex = table.columnAtPoint(p);
 
-        return table.getValueAt(rowIndex, colIndex).toString();
+        Object obj = table.getValueAt(rowIndex, colIndex);
+        return (obj == null) ? "" : obj.toString();
     }
 
     private void setColumnWidths(TableColumnModel model) {

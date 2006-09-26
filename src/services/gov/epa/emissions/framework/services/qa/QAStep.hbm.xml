@@ -12,7 +12,7 @@
         <property name="datasetId" column="dataset_id" type="integer" not-null="true"/>
         <property name="version" column="version" type="integer" not-null="true"/>   
 	 	<property name="name" column="name" type="java.lang.String" not-null="true"/>
-		<many-to-one cascade="save-update" name="program"
+		<many-to-one name="program"
     		 class ="gov.epa.emissions.commons.data.QAProgram"
 			 column="qa_program_id" unique="true" not-null="false"
 	     />

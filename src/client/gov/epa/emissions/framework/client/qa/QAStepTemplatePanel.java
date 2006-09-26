@@ -60,6 +60,7 @@ public class QAStepTemplatePanel extends JPanel {
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         program = new EditableComboBox(qaPrograms.names());
+        program.setEditable(false);
         changeablesList.addChangeable(program);
         program.setPrototypeDisplayValue("To make the combobox a bit wider");
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
