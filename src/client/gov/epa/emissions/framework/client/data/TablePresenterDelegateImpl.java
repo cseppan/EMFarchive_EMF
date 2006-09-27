@@ -100,6 +100,10 @@ public class TablePresenterDelegateImpl implements TablePresenterDelegate {
     private void validateColsInSortOrder(String sortOrder) throws EmfException {
         for (StringTokenizer tokenizer = new StringTokenizer(sortOrder.trim(), ","); tokenizer.hasMoreTokens();) {
             String col = tokenizer.nextToken().trim().toLowerCase();
+            if (col.toUpperCase().endsWith(" DESC"))
+            {
+                col = col.substring(0,col.length()-5);
+            }
             if (!tableMetadata.containsCol(col))
                 throw new EmfException("Sort Order contains an invalid column: " + col);
         }
