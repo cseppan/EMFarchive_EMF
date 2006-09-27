@@ -89,13 +89,13 @@ public class CMSummaryRecordReader {
             return false;
         }
         if (namesList.contains(tokens[0])) {
-            sb.append(format("name alerady in the file-" + tokens[0]));
+            sb.append(format("name already in the file: " + tokens[0]));
             return false;
         }
         namesList.add(tokens[0]);
 
         if (abbrevList.contains(tokens[1])) {
-            sb.append(format("abbreviation alerady in the file-" + tokens[1]));
+            sb.append(format("abbreviation already in the file: " + tokens[1]));
             return false;
         }
         namesList.add(tokens[1]);
@@ -169,13 +169,13 @@ public class CMSummaryRecordReader {
 
             cm.setEquipmentLife(noOfYears);
         } catch (NumberFormatException e) {
-            sb.append(format("equip life is a floating point value-" + equipLife));
+            sb.append(format("equip life should be a floating point value: " + equipLife));
         }
     }
 
     private void cmClass(ControlMeasure cm, String clazz, StringBuffer sb) {
         if (clazz.length() == 0) {
-            sb.append(format("class shoule not be empty"));
+            sb.append(format("class should not be empty"));
             return;
         }
         cm.setCmClass(clazz);
@@ -189,16 +189,22 @@ public class CMSummaryRecordReader {
 
             cm.setDeviceCode(deviceCode);
         } catch (NumberFormatException e) {
-            sb.append(format("device code is an int value-" + code));
+            sb.append(format("device code is an int value: " + code));
         }
     }
 
     private void dateReviewed(ControlMeasure cm, String date, StringBuffer sb) {
+        if (date == null || date.trim().length()==0) return;
         try {
             Date dateReviewed = EmfDateFormat.parse_YYYY(date);
             cm.setDateReviewed(dateReviewed);
         } catch (ParseException e) {
-            sb.append(format("expected date format YYYY-" + date));
+            try {
+                Date dateReviewed = EmfDateFormat.parse_MMddyyyy(date);
+                cm.setDateReviewed(dateReviewed);               
+            } catch (ParseException e2) {           
+               sb.append(format("expected date format YYYY or MM/DD/YYYY, but was: " + date));
+            }   
         }
     }
 
