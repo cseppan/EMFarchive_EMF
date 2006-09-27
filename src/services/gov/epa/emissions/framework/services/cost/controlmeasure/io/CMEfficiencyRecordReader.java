@@ -36,22 +36,29 @@ public class CMEfficiencyRecordReader {
         if (tokens == null || cm == null || !checkForConstraints(tokens, sb, lineNo))
             return;
 
-        EfficiencyRecord efficiencyRecord = new EfficiencyRecord();
-        pollutant(efficiencyRecord, tokens[1], sb);
-        locale(efficiencyRecord, tokens[2], sb);
-        effectiveDate(efficiencyRecord, tokens[3], sb);
-        existingMeasureAbbrev(efficiencyRecord, tokens[4]);
-        controlEfficiency(efficiencyRecord, tokens[6], sb);
-        costYear(efficiencyRecord, tokens[7], sb);
-        costPerTon(efficiencyRecord, tokens[8], sb);
-        ruleEffectiveness(efficiencyRecord, tokens[9], sb);
-        rulePenetration(efficiencyRecord, tokens[10], sb);
-        equationType(efficiencyRecord, tokens[11]);
-        capitalRecoveryFactor(efficiencyRecord, tokens[12], sb);
-        discountFactor(efficiencyRecord, tokens[13], sb);
-        details(efficiencyRecord, tokens[14]);
-
-        cm.addEfficiencyRecord(efficiencyRecord);
+        try
+        {
+            EfficiencyRecord efficiencyRecord = new EfficiencyRecord();
+            pollutant(efficiencyRecord, tokens[1], sb);
+            locale(efficiencyRecord, tokens[2], sb);
+            effectiveDate(efficiencyRecord, tokens[3], sb);
+            existingMeasureAbbrev(efficiencyRecord, tokens[4]);
+            controlEfficiency(efficiencyRecord, tokens[6], sb);
+            costYear(efficiencyRecord, tokens[7], sb);
+            costPerTon(efficiencyRecord, tokens[8], sb);
+            ruleEffectiveness(efficiencyRecord, tokens[9], sb);
+            rulePenetration(efficiencyRecord, tokens[10], sb);
+            equationType(efficiencyRecord, tokens[11]);
+            capitalRecoveryFactor(efficiencyRecord, tokens[12], sb);
+            discountFactor(efficiencyRecord, tokens[13], sb);
+            details(efficiencyRecord, tokens[14]);
+    
+            cm.addEfficiencyRecord(efficiencyRecord);
+        }
+        catch (EmfException e)
+        {
+            // don't add the efficiency record if the validation fails
+        }
         status.addStatus(lineNo, sb);
     }
 
@@ -103,13 +110,18 @@ public class CMEfficiencyRecordReader {
         efficiencyRecord.setExistingMeasureAbbr(existMeasureAbbrev);
     }
 
-    private void controlEfficiency(EfficiencyRecord efficiencyRecord, String ce, StringBuffer sb) {
+    private void controlEfficiency(EfficiencyRecord efficiencyRecord, String ce, StringBuffer sb) throws
+      EmfException
+    {
         String efficiency = (ce.indexOf('%') != -1) ? ce.split("%")[0] : ce;
 
         try {
             efficiencyRecord.setEfficiency(validation.efficiency(efficiency));
         } catch (EmfException e) {
-            sb.append(format(e.getMessage()));
+           sb.append(format(e.getMessage()));
+           // If control Efficiency is not valid, we want the validation process to stop
+           // so let the exception go up a level
+           throw e;
         }
     }
 
