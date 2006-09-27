@@ -347,7 +347,6 @@ CREATE TABLE emf.qa_step_results
   output_table varchar(255),
   table_creation_status varchar(50),
   table_creation_date timestamp,
-  table_current bool,
   UNIQUE(dataset_id,version,qa_step_id)
 ) 
 WITHOUT OIDS;
