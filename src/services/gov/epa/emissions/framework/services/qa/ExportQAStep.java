@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -55,9 +56,21 @@ public class ExportQAStep {
         }
     }
 
-    private Exporter exporter() {
-        String tableName = step.getTableSource().getTable();
+    private Exporter exporter() throws EmfException {
+        String tableName = tableName();
         return new DatabaseTableCSVExporter(tableName, dbServer.getEmissionsDatasource(), batchSize(sessionFactory));
+    }
+
+    private String tableName() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            QAStepResult result = new QADAO().qaStepResult(step, session);
+            if (result == null)
+                throw new EmfException("You have to first run the QA Step before export");
+            return result.getTable();
+        } finally {
+            session.close();
+        }
     }
 
     private File exportFile(String dirName, QAStep step) throws EmfException {

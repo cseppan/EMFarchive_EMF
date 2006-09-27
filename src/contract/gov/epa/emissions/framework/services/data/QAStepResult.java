@@ -11,8 +11,6 @@ public class QAStepResult implements Serializable {
 
     private Date tableCreationDate;
 
-    private boolean tableCurrent;
-
     private int qaStepId;
 
     private int datasetId;
@@ -85,14 +83,6 @@ public class QAStepResult implements Serializable {
 
     public void setTableCreationStatus(String tableCreationStatus) {
         this.tableCreationStatus = tableCreationStatus;
-    }
-
-    public boolean isTableCurrent() {
-        return tableCurrent;
-    }
-
-    public void setTableCurrent(boolean tableCurrent) {
-        this.tableCurrent = tableCurrent;
     }
 
 }

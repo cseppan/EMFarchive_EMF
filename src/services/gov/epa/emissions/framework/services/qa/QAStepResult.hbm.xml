@@ -14,7 +14,6 @@
         <property name="table" column="output_table" type="java.lang.String" not-null="false"/>
         <property name="tableCreationStatus" column="table_creation_status" type="java.lang.String" not-null="false"/> 
         <property name="tableCreationDate" column="table_creation_date" type="java.util.Date" not-null="false"/> 
-   		<property name="tableCurrent" column="table_current" type="boolean" not-null="false"/>               
     </class>
 </hibernate-mapping>  
 

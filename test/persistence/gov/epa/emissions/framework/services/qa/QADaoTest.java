@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.qa;
 
-import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
@@ -8,7 +7,7 @@ import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 
-import java.util.Date;
+import org.hibernate.Session;
 
 public class QADaoTest extends ServiceTestCase {
 
@@ -53,26 +52,34 @@ public class QADaoTest extends ServiceTestCase {
         step.setName("name");
         step.setVersion(2);
         add(step);
-        QAProgram program = new QAProgram("updated-program");
-        
+        QAProgram program = program();
+
         try {
             QAStep[] read = dao.steps(dataset, session);
             assertEquals(1, read.length);
 
             read[0].setName("updated-name");
             read[0].setProgram(program);
-            
+
             dao.update(read, session);
             session.clear();// to ensure Hibernate does not return cached objects
 
             QAStep[] updated = dao.steps(dataset, session);
             assertEquals(1, updated.length);
             assertEquals("updated-name", updated[0].getName());
-            assertEquals("updated-program", updated[0].getProgram().getName());
+            assertEquals("SQL", updated[0].getProgram().getName());
         } finally {
             remove(step);
             remove(dataset);
-            remove(program);
+        }
+    }
+
+    private QAProgram program() throws Exception {
+        Session session = sessionFactory().getSession();
+        try {
+            return new QADAO().getQAPrograms(session)[0];
+        } finally {
+            session.close();
         }
     }
 
@@ -105,12 +112,6 @@ public class QADaoTest extends ServiceTestCase {
         step.setDatasetId(dataset.getId());
         step.setName("name");
         step.setVersion(2);
-        InternalSource source = new InternalSource();
-        source.setTable("table");
-        step.setTableSource(source);
-        step.setTableCreationDate(new Date());
-        step.setTableCreationStatus("Created");
-        step.setTableCurrent(true);
 
         try {
             dao.add(new QAStep[] { step }, session);
@@ -129,7 +130,7 @@ public class QADaoTest extends ServiceTestCase {
 
     public void testShouldGetAllDefaultQAPrograms() {
         QAProgram[] programs = dao.getQAPrograms(session);
-        assertEquals(3, programs.length);
+        assertEquals(2, programs.length);
     }
 
     private EmfDataset newDataset(String name) {

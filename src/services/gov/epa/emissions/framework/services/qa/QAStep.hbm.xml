@@ -24,13 +24,8 @@
         <property name="comments" column="comments" type="java.lang.String" not-null="false"/> 
         <property name="date" column="date" type="java.util.Date" not-null="false"/> 
         <property name="who" column="who" type="java.lang.String" not-null="false"/> 
-        <property name="configuration" column="configuration" type="java.lang.String" not-null="false"/> 
-        <component name="tableSource" class="gov.epa.emissions.commons.data.InternalSource">
-            <property name="table" column="output_table" type="java.lang.String" not-null="false"/>
-        </component>
-        <property name="tableCreationStatus" column="table_creation_status" type="java.lang.String" not-null="false"/> 
-        <property name="tableCreationDate" column="table_creation_date" type="java.util.Date" not-null="false"/> 
-   		<property name="tableCurrent" column="table_current" type="boolean" not-null="false"/>               
+        <property name="configuration" column="configuration" type="java.lang.String" not-null="false"/>
+        <property name="outputFolder" column="output_folder" type="java.lang.String" not-null="false"/> 
     </class>
 </hibernate-mapping>  
 

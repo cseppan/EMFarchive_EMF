@@ -7,6 +7,6 @@ public interface QATabPresenter {
 
     void display() throws EmfException;
 
-    void doView(QAStep step, QAStepView view);
+    void doView(QAStep step, QAStepView view) throws EmfException;
 
 }

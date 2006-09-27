@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.qa;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
@@ -55,8 +56,8 @@ public class QAServiceTest extends ServiceTestCase {
         step.setVersion(2);
         add(step);
 
-        QAProgram program = program("updated-program");
-        
+        QAProgram program = program();
+
         try {
             QAStep[] read = service.getQASteps(dataset);
             assertEquals(1, read.length);
@@ -69,16 +70,20 @@ public class QAServiceTest extends ServiceTestCase {
             QAStep[] updated = service.getQASteps(dataset);
             assertEquals(1, updated.length);
             assertEquals("updated-name", updated[0].getName());
-            assertEquals("updated-program", updated[0].getProgram().getName());
+            assertEquals("SQL", updated[0].getProgram().getName());
         } finally {
             remove(step);
             remove(dataset);
-            remove(program);
         }
     }
 
-    private QAProgram program(String name) {
-        return new QAProgram(name);
+    private QAProgram program() throws Exception {
+        Session session = sessionFactory().getSession();
+        try {
+            return new QADAO().getQAPrograms(session)[0];
+        } finally {
+            session.close();
+        }
     }
 
     private EmfDataset newDataset() {

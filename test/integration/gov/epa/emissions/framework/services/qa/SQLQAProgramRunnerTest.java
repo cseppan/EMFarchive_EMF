@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 
 public class SQLQAProgramRunnerTest extends ServiceTestCase {
 
@@ -36,6 +37,7 @@ public class SQLQAProgramRunnerTest extends ServiceTestCase {
         } finally {
             if (dataset != null)
                 dropTable(tableName, dbServer().getEmissionsDatasource());
+            dropAll(QAStepResult.class);
             dropAll(QAStep.class);
             dropAll(EmfDataset.class);
         }

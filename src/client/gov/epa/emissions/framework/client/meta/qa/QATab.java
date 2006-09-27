@@ -4,8 +4,10 @@ import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -28,8 +30,11 @@ public class QATab extends JPanel implements QATabView {
 
     private EmfConsole parentConsole;
 
-    public QATab(EmfConsole parentConsole, DesktopManager desktopManager) {
+    private MessagePanel messagePanel;
+
+    public QATab(MessagePanel messagePanel, EmfConsole parentConsole, DesktopManager desktopManager) {
         super.setName("aqsteps");
+        this.messagePanel = messagePanel;
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
     }
@@ -82,7 +87,11 @@ public class QATab extends JPanel implements QATabView {
         for (Iterator iter = steps.iterator(); iter.hasNext();) {
             QAStep step = (QAStep) iter.next();
             ViewQAStepWindow view = new ViewQAStepWindow(desktopManager);
-            presenter.doView(step, view);
+            try {
+                presenter.doView(step, view);
+            } catch (EmfException e) {
+                messagePanel.setError(e.getMessage());
+            }
         }
     }
 

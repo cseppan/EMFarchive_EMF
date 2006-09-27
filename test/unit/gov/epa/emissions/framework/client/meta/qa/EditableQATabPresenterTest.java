@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
 import gov.epa.emissions.framework.services.qa.QAService;
 
@@ -97,16 +98,18 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         QAStep step = new QAStep();
         User user = new User();
         QAProgram[] programs = {};
-        
+        QAStepResult result = new QAStepResult();
         Mock view = mock(EditQAStepView.class);
-        expectsOnce(view, "display", new Constraint[] { same(step), same(programs),same(dataset), same(user), same("") });
+        expectsOnce(view, "display", new Constraint[] { same(step), same(result),same(programs),same(dataset), same(user), same("") });
         expects(view, "observe");
         expectsOnce(view,"setMostRecentUsedFolder","");
         
         Mock qaService = mock(QAService.class);
         expects(qaService, 1, "getQAPrograms", programs);
+        qaService.expects(once()).method("getQAStepResult").with(same(step)).will(returnValue(result));
         Mock session = mock(EmfSession.class);
         expects(session, 1, "qaService", qaService.proxy());
+        
         stub(session, "user", user);
         setPreferences(session);
         

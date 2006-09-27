@@ -38,6 +38,7 @@ import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.Revision;
 
@@ -90,6 +91,7 @@ public class DataMappings extends Mappings {
         bean(call, QAStepTemplate.class, qaStepTemplate());
         bean(call, QAStep.class, qaStep());
         bean(call, QAProgram.class, program());
+        bean(call, QAStepResult.class, qaStepResult());
 
         bean(call, TableMetadata.class, tablemetadata());
         bean(call, ColumnMetaData.class, columnmetadata());
@@ -419,6 +421,10 @@ public class DataMappings extends Mappings {
 
     public QName programs() {
         return qname("QAPrograms");
+    }
+
+    public QName qaStepResult() {
+        return qname("QAStepResult");
     }
 
 }

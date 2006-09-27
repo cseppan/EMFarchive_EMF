@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import org.apache.commons.logging.Log;
@@ -128,6 +129,18 @@ public class QAServiceImpl implements QAService {
             session.close();
         }
 
+    }
+
+    public QAStepResult getQAStepResult(QAStep step) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.qaStepResult(step, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve QA Step Result", e);
+            throw new EmfException("Could not retrieve QA Step Result");
+        } finally {
+            session.close();
+        }
     }
 
 }

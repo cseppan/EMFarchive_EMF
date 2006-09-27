@@ -10,9 +10,12 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
+import gov.epa.emissions.framework.services.qa.QADAO;
 
 import java.util.Iterator;
 import java.util.List;
+
+import org.hibernate.Session;
 
 public class DatasetTypesDAOTest extends ServiceTestCase {
 
@@ -172,7 +175,7 @@ public class DatasetTypesDAOTest extends ServiceTestCase {
         QAStepTemplate template = new QAStepTemplate();
         template.setName("step1");
         type.addQaStepTemplate(template);
-        QAProgram program = new QAProgram("program-1");
+        QAProgram program = program();
         super.add(type);
 
         try {
@@ -191,10 +194,18 @@ public class DatasetTypesDAOTest extends ServiceTestCase {
             QAStepTemplate[] results = updated.getQaStepTemplates();
             assertEquals(1, results.length);
             assertEquals("updated-template", results[0].getName());
-            assertEquals("program-1", results[0].getProgram().getName());
+            assertEquals("SQL", results[0].getProgram().getName());
         } finally {
             super.remove(type);
-            remove(program);
+        }
+    }
+    
+    private QAProgram program() throws Exception {
+        Session session = sessionFactory().getSession();
+        try {
+            return new QADAO().getQAPrograms(session)[0];
+        } finally {
+            session.close();
         }
     }
 

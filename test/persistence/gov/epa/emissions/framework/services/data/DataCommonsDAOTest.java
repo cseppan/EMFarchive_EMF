@@ -318,7 +318,7 @@ public class DataCommonsDAOTest extends ServiceTestCase {
 
     public void testShouldGetNoteTypes() {
         List allNoteTypes = dao.getNoteTypes(session);
-        assertEquals("7 note types", allNoteTypes.size(), 7);
+        assertEquals("8 note types", 8,allNoteTypes.size());
     }
 
     private Status newReadStatus(User emf) {

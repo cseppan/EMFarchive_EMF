@@ -92,9 +92,9 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         status.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Status:", status, panel);
 
-        if(qaStepResult==null)
-            qaStepResult  = new QAStepResult();
-        
+        if (qaStepResult == null)
+            qaStepResult = new QAStepResult();
+
         String creationStatus = qaStepResult.getTableCreationStatus() != null ? qaStepResult.getTableCreationStatus()
                 : "";
         TextField tableCreationStatus = new TextField("", creationStatus, 20);
@@ -109,7 +109,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
 
         JCheckBox currentTable = new JCheckBox();
         currentTable.setEnabled(false);
-        currentTable.setSelected(qaStepResult.isTableCurrent());
+        // TODO: calculate whether table is current
         layoutGenerator.addLabelWidgetPair("Current Table?", currentTable, panel);
 
         TextArea result = new TextArea("", step.getComments(), 40, 3);

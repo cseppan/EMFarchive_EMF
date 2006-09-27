@@ -159,6 +159,10 @@
 		qname="ns1:QAStep" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.data.QAStepResult"
+		qname="ns1:QAStepResult" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+	
+	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.editor.Revision"
 		qname="ns1:Revision" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 

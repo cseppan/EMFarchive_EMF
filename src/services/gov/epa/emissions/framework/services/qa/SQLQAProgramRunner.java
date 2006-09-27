@@ -1,13 +1,15 @@
 package gov.epa.emissions.framework.services.qa;
 
-import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Date;
+
+import org.hibernate.Session;
 
 public class SQLQAProgramRunner implements QAProgramRunner {
 
@@ -54,17 +56,28 @@ public class SQLQAProgramRunner implements QAProgramRunner {
     }
 
     private void success(QAStep qaStep, String tableName) {
-        qaStep.setTableCreationDate(new Date());
-        qaStep.setTableCreationStatus("Success");
-
-        InternalSource source = new InternalSource();
-        source.setTable(tableName);
-        qaStep.setTableSource(source);
+        updateQAStepResult(qaStep, "Success", tableName, new Date());
     }
 
     private void failure(QAStep qaStep) {
-        qaStep.setTableCreationStatus("Failed");
-        qaStep.setTableSource(new InternalSource());
+        updateQAStepResult(qaStep, "Failed", null, null);
+    }
+
+    private void updateQAStepResult(QAStep qaStep, String status, String tableName, Date date) {
+        Session session = sessionFactory.getSession();
+        try {
+            QADAO qadao = new QADAO();
+            QAStepResult result = qadao.qaStepResult(qaStep, session);
+            if (result == null) {
+                result = new QAStepResult(qaStep);
+            }
+            result.setTableCreationStatus(status);
+            result.setTable(tableName);
+            result.setTableCreationDate(date);
+            qadao.updateQAStepResult(result, session);
+        } finally {
+            session.close();
+        }
     }
 
     private String query(DbServer dbServer, QAStep qaStep, String tableName) throws EmfException {

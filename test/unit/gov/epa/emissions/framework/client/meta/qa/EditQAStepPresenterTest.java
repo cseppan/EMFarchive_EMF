@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.qa.QAService;
 
 import org.jmock.Mock;
@@ -38,17 +39,20 @@ public class EditQAStepPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldObserverAndDisplayViewOnDisplay() throws EmfException {
         QAStep step = new QAStep();
+        QAStepResult result = new QAStepResult();
+        
         EmfDataset dataset = new EmfDataset();
         User user = new User();
 
         QAProgram[] programs = {};
         
         Mock view = mock(EditQAStepView.class);
-        expectsOnce(view, "display", new Constraint[] { same(step),same(programs), same(dataset), same(user), same("") });
+        expectsOnce(view, "display", new Constraint[] { same(step),same(result),same(programs), same(dataset), same(user), same("") });
         expectsOnce(view,"setMostRecentUsedFolder","");
         
         Mock qaService = mock(QAService.class);
         expects(qaService,1,"getQAPrograms",programs);
+        qaService.expects(once()).method("getQAStepResult").with(same(step)).will(returnValue(result));
         
         Mock session = mock(EmfSession.class);
         expects(session,1, "user", user);

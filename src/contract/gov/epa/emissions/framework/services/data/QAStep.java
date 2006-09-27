@@ -1,13 +1,13 @@
 package gov.epa.emissions.framework.services.data;
 
-import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.version.Version;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class QAStep {
+public class QAStep implements Serializable{
 
     private String name;
 
@@ -36,14 +36,8 @@ public class QAStep {
     private String description;
 
     private String configuration;
-
-    private InternalSource tableSource;
-
-    private String tableCreationStatus;
-
-    private Date tableCreationDate;
-
-    private boolean tableCurrent;
+    
+    private String outputFolder;
 
     public int getId() {
         return id;
@@ -185,36 +179,12 @@ public class QAStep {
         return name;
     }
 
-    public boolean isTableCurrent() {
-        return tableCurrent;
+    public String getOutputFolder() {
+        return outputFolder;
     }
 
-    public void setTableCurrent(boolean tableCurrent) {
-        this.tableCurrent = tableCurrent;
-    }
-
-    public Date getTableCreationDate() {
-        return tableCreationDate;
-    }
-
-    public void setTableCreationDate(Date tableCreationDate) {
-        this.tableCreationDate = tableCreationDate;
-    }
-
-    public String getTableCreationStatus() {
-        return tableCreationStatus;
-    }
-
-    public void setTableCreationStatus(String tableCreationStatus) {
-        this.tableCreationStatus = tableCreationStatus;
-    }
-
-    public InternalSource getTableSource() {
-        return tableSource;
-    }
-
-    public void setTableSource(InternalSource tableSource) {
-        this.tableSource = tableSource;
+    public void setOutputFolder(String outputFolder) {
+        this.outputFolder = outputFolder;
     }
 
 }

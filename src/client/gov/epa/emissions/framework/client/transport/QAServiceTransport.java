@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.qa.QAService;
 
 public class QAServiceTransport implements QAService {
@@ -74,6 +75,17 @@ public class QAServiceTransport implements QAService {
         call.setVoidReturnType();
 
         call.request(new Object[] { step, user, dirName });
+    }
+
+    public QAStepResult getQAStepResult(QAStep step) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getQAStepResult");
+        call.addParam("step", mappings.qaStep());
+        call.setReturnType(mappings.qaStepResult());
+
+        return (QAStepResult) call.requestResponse(new Object[] { step });
+
     }
 
 }

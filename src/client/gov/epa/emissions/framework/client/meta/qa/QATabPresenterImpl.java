@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.qa;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.qa.QAService;
 
 public class QATabPresenterImpl implements QATabPresenter {
@@ -24,9 +25,10 @@ public class QATabPresenterImpl implements QATabPresenter {
         view.display(service.getQASteps(dataset));
     }
 
-    public void doView(QAStep step, QAStepView view) {
+    public void doView(QAStep step, QAStepView view) throws EmfException {
         ViewQAStepPresenter presenter = new ViewQAStepPresenter(view);
-        presenter.display(step);
+        QAStepResult stepResult = service.getQAStepResult(step);
+        presenter.display(step, stepResult);
     }
 
 }

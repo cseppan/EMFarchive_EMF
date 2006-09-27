@@ -4,9 +4,11 @@ import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.qa.QAService;
 
 import org.jmock.Mock;
+import org.jmock.core.Constraint;
 
 public class QATabPresenterTest extends EmfMockObjectTestCase {
 
@@ -28,13 +30,19 @@ public class QATabPresenterTest extends EmfMockObjectTestCase {
         presenter.display();
     }
 
-    public void testShouldDisplayQAStepViewOnView() {
-        QATabPresenter presenter = new QATabPresenterImpl(null, null, null);
-
+    public void testShouldDisplayQAStepViewOnView() throws EmfException {
         QAStep step = new QAStep();
-        Mock view = mock(QAStepView.class);
-        expectsOnce(view, "display", step);
+        QAStepResult result = new QAStepResult();
+        Mock service = mock(QAService.class);
+        service.expects(once()).method("getQAStepResult").with(same(step)).will(returnValue(result));
+        QATabPresenter presenter = new QATabPresenterImpl(null, null,(QAService) service.proxy());
 
+        
+        Mock view = mock(QAStepView.class);
+        expectsOnce(view, "display",new Constraint[]{eq(step),eq(result)});
+
+        
+        
         presenter.doView(step, (QAStepView) view.proxy());
     }
 
