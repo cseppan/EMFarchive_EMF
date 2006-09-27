@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -36,18 +37,18 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         super.getContentPane().add(layout);
     }
 
-    public void display(QAStep step) {
+    public void display(QAStep step, QAStepResult qaStepResult) {
         super.setLabel(super.getTitle() + " : " + step.getName() + " - " + step.getDatasetId() + " v("
                 + step.getVersion() + ")");
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
 
-        layout.add(inputPanel(step));
+        layout.add(inputPanel(step, qaStepResult));
         layout.add(buttonsPanel(), BorderLayout.PAGE_END);
 
         super.display();
     }
 
-    private JPanel inputPanel(QAStep step) {
+    private JPanel inputPanel(QAStep step, QAStepResult qaStepResult) {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -91,20 +92,24 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         status.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Status:", status, panel);
 
-        String creationStatus = step.getTableCreationStatus() != null ? step.getTableCreationStatus() : "";
+        if(qaStepResult==null)
+            qaStepResult  = new QAStepResult();
+        
+        String creationStatus = qaStepResult.getTableCreationStatus() != null ? qaStepResult.getTableCreationStatus()
+                : "";
         TextField tableCreationStatus = new TextField("", creationStatus, 20);
         tableCreationStatus.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Table Creation Status:", tableCreationStatus, panel);
 
-        String creationDate = step.getTableCreationDate() != null ? EmfDateFormat.format_MM_DD_YYYY(step
-                .getTableCreationDate()) : "";
+        String creationDate = qaStepResult.getTableCreationDate() != null ? EmfDateFormat
+                .format_MM_DD_YYYY(qaStepResult.getTableCreationDate()) : "";
         TextField tableCreationDate = new TextField("", creationDate, 20);
         tableCreationDate.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Table Creation Date:", tableCreationDate, panel);
-        
+
         JCheckBox currentTable = new JCheckBox();
         currentTable.setEnabled(false);
-        currentTable.setSelected(step.isTableCurrent());
+        currentTable.setSelected(qaStepResult.isTableCurrent());
         layoutGenerator.addLabelWidgetPair("Current Table?", currentTable, panel);
 
         TextArea result = new TextArea("", step.getComments(), 40, 3);
