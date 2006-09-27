@@ -39,7 +39,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public EditControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager) {
-        super("Control Measure Editor", new Dimension(700, 475), desktopManager);
+        super("Control Measure Editor", new Dimension(770, 475), desktopManager);
         this.desktopManager = desktopManager;
         this.session = session;
         this.parent = parent;
