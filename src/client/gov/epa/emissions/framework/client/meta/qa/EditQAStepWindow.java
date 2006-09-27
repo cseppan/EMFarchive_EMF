@@ -178,7 +178,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         JCheckBox currentTable = new JCheckBox();
         currentTable.setEnabled(false);
-        currentTable.setSelected(stepResult.isTableCurrent());
+        //TODO: calculate whether table is current
         layoutGenerator.addLabelWidgetPair("Current Output?", currentTable, panel);
 
         // Lay out the panel.

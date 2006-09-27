@@ -134,7 +134,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
 
     private Component createQAStepsTab(DesktopManager desktopManager) {
         try {
-            QATab view = new QATab(parentConsole, desktopManager);
+            QATab view = new QATab(messagePanel,parentConsole, desktopManager);
             presenter.set(view);
             return view;
         } catch (EmfException e) {

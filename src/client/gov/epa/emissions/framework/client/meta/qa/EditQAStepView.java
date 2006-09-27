@@ -6,10 +6,11 @@ import gov.epa.emissions.framework.client.ManagedView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 
 public interface EditQAStepView extends ManagedView {
 
-    void display(QAStep step, QAProgram[] programs, EmfDataset dataset, User user, String versionName);
+    void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset, User user, String versionName);
 
     void observe(EditQAStepPresenter presenter);
     
