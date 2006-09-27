@@ -29,12 +29,12 @@ public class CMSCCImporter{
     }
 
     public void run(Map controlMeasures) throws ImporterException {
-        addStatus("Started reading Scc file");
+        addStatus("Started reading SCC file");
         CMCSVFileReader reader = new CMCSVFileReader(file);
         for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
             sccReader.parse(controlMeasures,record, reader.lineNumber());
         }
-        addStatus("Finished reading Scc file");
+        addStatus("Finished reading SCC file");
 
     }
     
