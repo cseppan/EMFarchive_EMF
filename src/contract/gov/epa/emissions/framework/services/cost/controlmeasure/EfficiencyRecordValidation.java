@@ -66,6 +66,10 @@ public class EfficiencyRecordValidation {
             return "";
         }
         parseInteger("locale", locale);
+        // put this in to handle when Excel truncates leading zeros
+        if (locale.length() == 1)
+            return "0"+locale;
+        
         if (locale.length() == 2 || locale.length() == 5 || locale.length() == 6)
             return locale;
 
