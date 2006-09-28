@@ -21,6 +21,7 @@ DROP TABLE emf.sector_criteria CASCADE;
 --QA tables
 DROP TABLE emf.dataset_types_qa_step_templates CASCADE;
 DROP TABLE emf.qa_steps CASCADE;
+DROP TABLE emf.qa_step_results CASCADE;
 --QA table
 --
 -- emf ... KEYWORDS framework
