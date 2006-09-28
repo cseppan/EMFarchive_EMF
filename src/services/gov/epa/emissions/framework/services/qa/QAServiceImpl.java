@@ -107,6 +107,24 @@ public class QAServiceImpl implements QAService {
     }
 
     public void updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException {
+        updateIds(steps);
+        updateSteps(steps);
+    }
+
+    private void updateIds(QAStep[] steps) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.updateQAStepsIds(steps, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not set the ids", e);
+            throw new EmfException("Could not set the ids");
+        } finally {
+            session.close();
+        }
+
+    }
+
+    private void updateSteps(QAStep[] steps) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.update(steps, session);

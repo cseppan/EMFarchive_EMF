@@ -31,6 +31,15 @@ public class QADAO {
         hibernateFacade.update(steps, session);
     }
 
+    public void updateQAStepsIds(QAStep[] steps, Session session) {
+        for (int i = 0; i < steps.length; i++) {
+            Criterion[] criterions = qaStepKeyConstraints(steps[i]);
+            List list = hibernateFacade.get(QAStep.class, criterions, session);
+            if (!list.isEmpty())
+                steps[i].setId(((QAStep) list.get(0)).getId());
+        }
+    }
+
     public void add(QAStep[] steps, Session session) {
         hibernateFacade.add(steps, session);
     }
@@ -41,19 +50,15 @@ public class QADAO {
     }
 
     public QAStepResult qaStepResult(QAStep step, Session session) {
-        Criterion[] criterions = qaStepUniqueKeyConstraints(step);
+        Criterion c1 = Restrictions.eq("datasetId", new Integer(step.getDatasetId()));
+        Criterion c2 = Restrictions.eq("version", new Integer(step.getVersion()));
+        Criterion c3 = Restrictions.eq("qaStepId", new Integer(step.getId()));
+        Criterion[] criterions1 = { c1, c2, c3 };
+        Criterion[] criterions = criterions1;
         List list = hibernateFacade.get(QAStepResult.class, criterions, session);
         if (!list.isEmpty())
             return (QAStepResult) list.get(0);
         return null;
-    }
-
-    private Criterion[] qaStepUniqueKeyConstraints(QAStep step) {
-        Criterion c1 = Restrictions.eq("datasetId", new Integer(step.getDatasetId()));
-        Criterion c2 = Restrictions.eq("version", new Integer(step.getVersion()));
-        Criterion c3 = Restrictions.eq("qaStepId", new Integer(step.getId()));
-        Criterion[] criterions = { c1, c2, c3 };
-        return criterions;
     }
 
     public void updateQAStepResult(QAStepResult result, Session session) {
@@ -61,11 +66,16 @@ public class QADAO {
     }
 
     public boolean exists(QAStep step, Session session) {
+        Criterion[] criterions = qaStepKeyConstraints(step);
+        return hibernateFacade.exists(QAStep.class, criterions, session);
+    }
+
+    private Criterion[] qaStepKeyConstraints(QAStep step) {
         Criterion c1 = Restrictions.eq("datasetId", new Integer(step.getDatasetId()));
         Criterion c2 = Restrictions.eq("version", new Integer(step.getVersion()));
         Criterion c3 = Restrictions.eq("name", step.getName());
         Criterion[] criterions = { c1, c2, c3 };
-        return hibernateFacade.exists(QAStep.class, criterions, session);
+        return criterions;
     }
 
 }

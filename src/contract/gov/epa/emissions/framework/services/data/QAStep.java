@@ -83,6 +83,10 @@ public class QAStep implements Serializable {
         return false;
     }
 
+    public int hashCode() {
+        return name.hashCode();
+    }
+
     public QAProgram getProgram() {
         return program;
     }
