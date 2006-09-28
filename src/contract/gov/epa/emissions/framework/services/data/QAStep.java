@@ -7,7 +7,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import java.io.Serializable;
 import java.util.Date;
 
-public class QAStep implements Serializable{
+public class QAStep implements Serializable {
 
     private String name;
 
@@ -36,7 +36,7 @@ public class QAStep implements Serializable{
     private String description;
 
     private String configuration;
-    
+
     private String outputFolder;
 
     public int getId() {
@@ -69,6 +69,18 @@ public class QAStep implements Serializable{
         this.required = template.isRequired();
         this.order = template.getOrder();
         this.description = template.getDescription();
+    }
+
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof QAStep))
+            return false;
+
+        QAStep step = (QAStep) obj;
+        if (id == step.id
+                || (name.equals(step.getName()) && version == step.getVersion() && datasetId == step.getDatasetId()))
+            return true;
+
+        return false;
     }
 
     public QAProgram getProgram() {

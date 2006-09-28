@@ -34,10 +34,10 @@ public class QAServiceTransport implements QAService {
         return (QAStep[]) call.requestResponse(params);
     }
 
-    public void update(QAStep[] steps) throws EmfException {
+    public void updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException {
         EmfCall call = call();
 
-        call.setOperation("update");
+        call.setOperation("updateWitoutCheckingConstraints");
         call.addParam("steps", mappings.qaSteps());
         call.setVoidReturnType();
 
@@ -85,6 +85,17 @@ public class QAServiceTransport implements QAService {
         call.setReturnType(mappings.qaStepResult());
 
         return (QAStepResult) call.requestResponse(new Object[] { step });
+
+    }
+
+    public void update(QAStep step) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("update");
+        call.addParam("steps", mappings.qaStep());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { step });
 
     }
 

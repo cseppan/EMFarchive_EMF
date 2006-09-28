@@ -15,4 +15,6 @@ public interface EditableQATabPresenter extends PropertiesEditorTabPresenter {
 
     void doEdit(QAStep step, EditQAStepView performView, String versionName) throws EmfException;
 
+    void addFromTemplates(QAStep[] newSteps) throws EmfException;
+
 }

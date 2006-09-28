@@ -133,6 +133,27 @@ public class QADaoTest extends ServiceTestCase {
         assertEquals(2, programs.length);
     }
 
+    public void testShouldCheckExistQAStep() {
+        EmfDataset dataset = newDataset("dataset-dao-test");
+
+        QAStep step = new QAStep();
+        step.setDatasetId(dataset.getId());
+        step.setName("name");
+        step.setVersion(2);
+
+        try {
+            dao.add(new QAStep[] { step }, session);
+            session.clear();
+
+            boolean exist = dao.exists(step, session);
+            assertTrue(exist);
+        } finally {
+            remove(step);
+            remove(dataset);
+        }
+
+    }
+
     private EmfDataset newDataset(String name) {
         User owner = userDAO.get("emf", session);
 

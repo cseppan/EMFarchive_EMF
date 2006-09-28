@@ -56,18 +56,6 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    public void update(QAStep[] steps) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            dao.update(steps, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not update QA Steps", e);
-            throw new EmfException("Could not update QA Steps");
-        } finally {
-            session.close();
-        }
-    }
-
     public QAProgram[] getQAPrograms() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -81,7 +69,7 @@ public class QAServiceImpl implements QAService {
     }
 
     public void runQAStep(QAStep step, User user) throws EmfException {
-        updateQAStepBeforeRun(step);
+        updateWitoutCheckingConstraints(new QAStep[] { step });
         checkRestrictions(step);
         EmfDbServer dbServer = dbServer();
         RunQAStep runner = new RunQAStep(step, user, dbServer, sessionFactory, threadPool);
@@ -118,13 +106,28 @@ public class QAServiceImpl implements QAService {
         return dbServer;
     }
 
-    private void updateQAStepBeforeRun(QAStep step) throws EmfException {
+    public void updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
+            dao.update(steps, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not update QA Steps", e);
+            throw new EmfException("Could not update QA Steps");
+        } finally {
+            session.close();
+        }
+    }
+
+    public void update(QAStep step) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            if (dao.exists(step, session)) {
+                throw new EmfException("The selected QA Step name is already in use");
+            }
             dao.update(new QAStep[] { step }, session);
         } catch (RuntimeException e) {
-            LOG.error("Could not update QA Step before run", e);
-            throw new EmfException("Could not update QA Step before run");
+            LOG.error("Could not update QA Step", e);
+            throw new EmfException("Could not update QA Step -" + e.getMessage());
         } finally {
             session.close();
         }

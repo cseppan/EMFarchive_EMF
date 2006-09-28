@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.DatasetType;
-import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
@@ -39,8 +38,8 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         return session.qaService();
     }
 
-    public void doSave() throws EmfException {
-        qaService().update(view.steps());
+    public void doSave() {
+        // DO NOTHING
     }
 
     public void doAddUsingTemplate(NewQAStepView stepView) {
@@ -52,17 +51,18 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
 
         stepView.display(dataset, type);
         if (stepView.shouldCreate()) {
-            view.add(stepView.steps());
+            view.addFromTemplate(stepView.steps());
         }
     }
 
     public void doAddCustomized(NewCustomQAStepView stepView) throws EmfException {
-        doAddCustomized(stepView, versions());
+        NewCustomQAStepPresenter presenter = new NewCustomQAStepPresenter(stepView, dataset, versions(), view, session);
+        doAddCustomized(stepView, presenter);
     }
 
-    void doAddCustomized(NewCustomQAStepView stepView, Version[] versions) throws EmfException {
-        QAProgram[] programs = session.qaService().getQAPrograms();
-        stepView.display(dataset,programs, versions, view);
+    void doAddCustomized(NewCustomQAStepView stepView, NewCustomQAStepPresenter presenter) throws EmfException {
+        stepView.observe(presenter);
+        presenter.display();
     }
 
     public void doSetStatus(SetQAStatusView statusView, QAStep[] steps) {
@@ -73,6 +73,10 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
     public void doEdit(QAStep step, EditQAStepView performView, String versionName) throws EmfException {
         EditQAStepPresenter presenter = new EditQAStepPresenter(performView, dataset, view, session);
         presenter.display(step, versionName);
+    }
+
+    public void addFromTemplates(QAStep[] newSteps) throws EmfException {
+        session.qaService().updateWitoutCheckingConstraints(newSteps);
     }
 
 }

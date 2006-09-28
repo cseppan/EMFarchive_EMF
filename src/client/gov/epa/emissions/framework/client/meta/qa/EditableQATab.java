@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -40,8 +39,6 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     private EmfConsole parentConsole;
 
-    private ManageChangeables changeables;
-
     private VersionsSet versions;
 
     private MessagePanel messagePanel;
@@ -50,11 +47,9 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     private int datasetID;
 
-    public EditableQATab(EmfConsole parent, DesktopManager desktop, ManageChangeables changeables,
-            MessagePanel messagePanel) {
+    public EditableQATab(EmfConsole parent, DesktopManager desktop, MessagePanel messagePanel) {
         this.parentConsole = parent;
         this.desktop = desktop;
-        this.changeables = changeables;
         this.messagePanel = messagePanel;
     }
 
@@ -70,7 +65,6 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     protected JPanel tablePanel(QAStep[] steps) {
         tableData = new EditableQAStepsTableData(steps);
-        changeables.addChangeable(tableData);
         selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
 
         tablePanel = new JPanel(new BorderLayout());
@@ -175,21 +169,38 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         messagePanel.clear();
     }
 
-    public void add(QAStep[] steps) {
+    public void addFromTemplate(QAStep[] steps) {
+        QAStep[] newSteps = filterDuplicates(steps);
+        try {
+            presenter.addFromTemplates(newSteps);
+            addNewStepsToTable(newSteps);
+        } catch (Exception e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
+    public void addCustomQAStep(QAStep step) {
+        QAStep[] steps = new QAStep[] { step };
+        steps = filterDuplicates(steps);
+        addNewStepsToTable(steps);
+    }
+
+
+    private QAStep[] filterDuplicates(QAStep[] steps) {
         QASteps qaSteps = new QASteps(tableData.sources());
         QAStep[] newSteps = qaSteps.filterDuplicates(steps);
-        for (int i = 0; i < newSteps.length; i++) {
+        for (int i = 0; i < newSteps.length; i++)
             newSteps[i].setStatus("Not Started");
+        return newSteps;
+    }
+    
+    private void addNewStepsToTable(QAStep[] newSteps) {
+        for (int i = 0; i < newSteps.length; i++)
             tableData.add(newSteps[i]);
-        }
-
         refresh();
     }
 
-    public void add(QAStep step) {
-        add(new QAStep[] { step });
-    }
-
+    
     public void refresh() {
         tableData.refresh();
         selectModel.refresh();

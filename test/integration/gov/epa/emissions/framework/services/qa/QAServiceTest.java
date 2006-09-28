@@ -65,7 +65,7 @@ public class QAServiceTest extends ServiceTestCase {
             read[0].setName("updated-name");
             read[0].setProgram(program);
 
-            service.update(read);
+            service.updateWitoutCheckingConstraints(read);
 
             QAStep[] updated = service.getQASteps(dataset);
             assertEquals(1, updated.length);

@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -29,20 +30,17 @@ import javax.swing.BoxLayout;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.SpringLayout;
-
 
 public class SetQAStatusWindow extends DisposableInteralFrame implements SetQAStatusView {
 
     private ComboBox status;
 
-    private JTextField who;
+    private TextField who;
 
     private FormattedDateField date;
 
-    private JTextArea comment;
+    private TextArea comment;
 
     private SingleLineMessagePanel messagePanel;
 
@@ -55,8 +53,7 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
     private SetQAStatusPresenter presenter;
 
     public SetQAStatusWindow(DesktopManager desktop, int datasetID) {
-        super("Set Status for QA Steps ("+datasetID+")", 
-                new Dimension(550, 400), desktop);
+        super("Set Status for QA Steps (" + datasetID + ")", new Dimension(550, 400), desktop);
         // would rather have dataset name, but ID will keep window name unique
     }
 
@@ -85,21 +82,21 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        //layoutGenerator.addLabelWidgetPair("Steps", new Label(steps.namesList()), panel);
-        
+        // layoutGenerator.addLabelWidgetPair("Steps", new Label(steps.namesList()), panel);
+
         JList stepList = new JList(steps.all());
         JScrollPane scrollList = new JScrollPane(stepList);
-        stepList.setMinimumSize(new Dimension(350,80));
-        scrollList.setMinimumSize(new Dimension(350,80));
+        stepList.setMinimumSize(new Dimension(350, 80));
+        scrollList.setMinimumSize(new Dimension(350, 80));
         layoutGenerator.addWidgetPair(new Label("Steps"), scrollList, panel);
-      
+
         layoutGenerator.addLabelWidgetPair("Status", status(), panel);
 
         date = new FormattedDateField("When", new Date(), DATE_FORMATTER, messagePanel);
         layoutGenerator.addLabelWidgetPair("When", date, panel);
 
         who = new TextField(user.getName(), 40);
-        who.setText(user.getName());
+        who.setText(user.getUsername());
         layoutGenerator.addLabelWidgetPair("Who", who, panel);
 
         comment = new TextArea("", "", 40, 4);
@@ -117,8 +114,7 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
     }
 
     private ComboBox status() {
-        QAProperties qaProperties = new QAProperties();
-        status = new ComboBox("Choose a status", qaProperties.status());
+        status = new ComboBox("Choose a status", QAProperties.status());
 
         status.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
@@ -150,21 +146,27 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
     }
 
     private void doOk() {
-        Object statusObj = status.getSelectedItem();
-        if(statusObj == null) {
-            messagePanel.setMessage("Please select a status");
-            return;
+        try {
+            presenter.doSave();
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
         }
-            
+    }
+
+    public void save() throws EmfException {
+        String statusName = (String) status.getSelectedItem();
+        if (statusName == null) {
+            throw new EmfException("Please select a status");
+        }
+
         for (int i = 0; i < steps.size(); i++) {
             QAStep step = steps.get(i);
-            step.setStatus(statusObj.toString());
+            step.setStatus(statusName);
             step.setDate(date.value());
             step.setWho(who.getText());
 
             step.setComments(currentComment(step) + comment.getText());
         }
-        presenter.doSave();
     }
 
     private String currentComment(QAStep step) {

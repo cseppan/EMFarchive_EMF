@@ -13,7 +13,9 @@ public interface QAService {
 
     QAProgram[] getQAPrograms() throws EmfException;
 
-    void update(QAStep[] steps) throws EmfException;
+    void updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException;
+
+    void update(QAStep step) throws EmfException;
 
     void runQAStep(QAStep step, User user) throws EmfException;
 

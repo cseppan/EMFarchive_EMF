@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.data.QAStep;
-import gov.epa.emissions.framework.ui.ChangeableTableData;
+import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
 
@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-public class EditableQAStepsTableData extends ChangeableTableData {
+public class EditableQAStepsTableData extends AbstractTableData {
 
     private List rows;
 
@@ -24,13 +24,11 @@ public class EditableQAStepsTableData extends ChangeableTableData {
 
     public void refresh() {
         this.rows = createRows(steps);
-        notifyChanges();
     }
 
     public void add(QAStep step) {
         steps.add(step);
         rows.add(row(step));
-        notifyChanges();
     }
 
     public String[] columns() {

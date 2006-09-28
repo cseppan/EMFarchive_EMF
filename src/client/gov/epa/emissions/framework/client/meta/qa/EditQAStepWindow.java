@@ -418,6 +418,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         try {
             messagePanel.setMessage("Started Run. Please monitor the Status window " + "to track your run request.");
             presenter.doRun();
+            resetChanges();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

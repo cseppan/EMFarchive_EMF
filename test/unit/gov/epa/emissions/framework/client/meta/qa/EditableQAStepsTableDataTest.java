@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.QAProgram;
-import gov.epa.emissions.commons.gui.Changeables;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
@@ -11,8 +10,6 @@ import gov.epa.emissions.framework.ui.Row;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-
-import org.jmock.Mock;
 
 public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
 
@@ -128,10 +125,6 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         step3.setRequired(false);
         step3.setOrder(3);
 
-        Mock changeables = mock(Changeables.class);
-        expects(changeables, 1, "onChanges");
-        data.observe((Changeables) changeables.proxy());
-
         data.add(step3);
         assertEquals(3, data.rows().size());
         assertEquals(3, data.sources().length);
@@ -150,10 +143,6 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         step3.setProgramArguments("program-args3");
         step3.setRequired(false);
         step3.setOrder(3);
-        
-        Mock changeables = mock(Changeables.class);
-        expects(changeables, 2, "onChanges");
-        data.observe((Changeables) changeables.proxy());
         
         data.add(step3);
         data.refresh();

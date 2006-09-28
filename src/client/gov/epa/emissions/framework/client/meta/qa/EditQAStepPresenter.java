@@ -43,7 +43,8 @@ public class EditQAStepPresenter {
     }
 
     public void doSave() throws EmfException {
-        view.save();
+        QAStep step = view.save();
+        session.qaService().updateWitoutCheckingConstraints(new QAStep[]{step});
         tabView.refresh();
         doClose();
     }

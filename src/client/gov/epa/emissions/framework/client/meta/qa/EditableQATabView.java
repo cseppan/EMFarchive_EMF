@@ -11,9 +11,9 @@ public interface EditableQATabView {
 
     void observe(EditableQATabPresenter presenter);
 
-    void add(QAStep[] steps);
+    void addFromTemplate(QAStep[] steps);
 
-    void add(QAStep step);
+    void addCustomQAStep(QAStep step);
 
     QAStep[] steps();
 

@@ -53,7 +53,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Dataset Properties Editor", new Dimension(700, 510), desktopManager);
+        super("Dataset Properties Editor", new Dimension(700, 550), desktopManager);
         this.session = session;
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
@@ -96,7 +96,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private JPanel createQATab() {
-        EditableQATab view = new EditableQATab(parentConsole, desktopManager, this, messagePanel);
+        EditableQATab view = new EditableQATab(parentConsole, desktopManager, messagePanel);
         try {
             presenter.set(view);
         } catch (EmfException e) {

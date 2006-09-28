@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.data.QAPrograms;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.NumberFormattedTextField;
@@ -53,19 +54,18 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
 
     private CheckBox required;
 
-    private EditableQATabView tabView;
-
     private QAPrograms qaPrograms;
+
+    private NewCustomQAStepPresenter presenter;
 
     public NewCustomQAStepWindow(DesktopManager desktopManager) {
         super("Add Custom QA Step", new Dimension(550, 450), desktopManager);
     }
 
-    public void display(EmfDataset dataset,QAProgram[] programs, Version[] versions, EditableQATabView tabView) {
+    public void display(EmfDataset dataset, QAProgram[] programs, Version[] versions, EditableQATabView tabView) {
         super.setTitle(super.getTitle() + ": " + dataset.getName());
 
         this.dataset = dataset;
-        this.tabView = tabView;
         this.versionsSet = new VersionsSet(versions);
         this.qaPrograms = new QAPrograms(programs);
         JPanel layout = createLayout();
@@ -94,6 +94,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         program = new EditableComboBox(qaPrograms.names());
+        program.setEditable(false);
         program.setSelectedItem("");
         program.setPrototypeDisplayValue("To make the combobox a bit wider");
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
@@ -185,17 +186,34 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
     }
 
     private void doOk() {
-        tabView.add(step());
-        disposeView();
+        try {
+            presenter.doSave();
+            disposeView();
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
     }
 
-    public QAStep step() {
+    private Version selectedVersion() {
+        return versionsSet.getVersionFromNameAndNumber((String) versionsSelection.getSelectedItem());
+    }
+
+    public void observe(NewCustomQAStepPresenter presenter) {
+        this.presenter = presenter;
+    }
+
+    public QAStep save() throws EmfException {
+        
+        String stepName = name.getText().trim();
+        if(stepName.length()==0)
+            throw new EmfException("Please enter a name for QA step");
         QAStep step = new QAStep();
         step.setDatasetId(dataset.getId());
         step.setVersion(selectedVersion().getVersion());
         step.setRequired(required.isSelected());
 
-        step.setName(name.getText());
+        
+        step.setName(stepName);
         step.setProgram(qaPrograms.get((String) program.getSelectedItem()));
         step.setProgramArguments(arguments.getText());
         step.setOrder(Float.parseFloat(order.getText()));
@@ -203,10 +221,6 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         step.setWho(dataset.getCreator());
 
         return step;
-    }
-
-    private Version selectedVersion() {
-        return versionsSet.getVersionFromNameAndNumber((String) versionsSelection.getSelectedItem());
     }
 
 }
