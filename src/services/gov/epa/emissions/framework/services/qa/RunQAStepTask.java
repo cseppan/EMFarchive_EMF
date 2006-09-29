@@ -1,9 +1,11 @@
 package gov.epa.emissions.framework.services.qa;
 
+import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -26,31 +28,31 @@ public class RunQAStepTask implements Runnable {
 
     private Log log = LogFactory.getLog(RunQAStepTask.class);
 
-    private QADAO qaDao;
-
     private HibernateSessionFactory sessionFactory;
 
     private EmfDbServer dbServer;
 
-    public RunQAStepTask(QAStep qaStep, User user, QAProgramRunner runQAProgram, EmfDbServer dbServer, HibernateSessionFactory sessionFactory) {
+    public RunQAStepTask(QAStep qaStep, User user, QAProgramRunner runQAProgram, EmfDbServer dbServer,
+            HibernateSessionFactory sessionFactory) {
         this.qastep = qaStep;
         this.user = user;
         this.runQAProgram = runQAProgram;
         this.dbServer = dbServer;
         this.sessionFactory = sessionFactory;
         this.statusDao = new StatusDAO(sessionFactory);
-        this.qaDao = new QADAO();
     }
 
     public void run() {
+        String suffix = "";
         try {
-            prepare();
+            suffix = suffix();
+            prepare(suffix);
             runQAProgram.run();
-            complete();
+            complete(suffix);
         } catch (Exception e) {
-            logError("Failed to run QA step : " + qastep.getName(), e);
-            setStatus("Failed to run QA step " + qastep.getName() + ". Reason: " + e.getMessage());
-        }finally{
+            logError("Failed to run QA step : " + qastep.getName() + suffix, e);
+            setStatus("Failed to run QA step " + qastep.getName() + suffix + ". " + e.getMessage());
+        } finally {
             disconnect(dbServer);
         }
     }
@@ -64,23 +66,13 @@ public class RunQAStepTask implements Runnable {
         }
     }
 
-    private void prepare() {
-        setStatus("Started running QA step '" + qastep.getName() + "'");
+    private void prepare(String suffixMsg) {
+        setStatus("Started running QA step '" + qastep.getName() + suffixMsg);
 
     }
 
-    private void complete() {
-        setStatus("Completed running QA step '" + qastep.getName() + "'");
-        updateQAStep();
-    }
-
-    private void updateQAStep() {
-        Session session = sessionFactory.getSession();
-        try {
-            qaDao.update(new QAStep[] { qastep }, session);
-        } finally {
-            session.close();
-        }
+    private void complete(String suffixMsg) {
+        setStatus("Completed running QA step '" + qastep.getName() + suffixMsg);
     }
 
     private void logError(String message, Exception e) {
@@ -97,6 +89,29 @@ public class RunQAStepTask implements Runnable {
 
         statusDao.add(endStatus);
 
+    }
+
+    private String suffix() {
+        return "' for Version '" + versionName() + "' of Dataset '" + datasetName() + "'";
+    }
+
+    private String versionName() {
+        Session session = sessionFactory.getSession();
+        try {
+            return new Versions().get(qastep.getDatasetId(), qastep.getVersion(), session).getName();
+        } finally {
+            session.close();
+        }
+    }
+
+    private String datasetName() {
+        Session session = sessionFactory.getSession();
+        try {
+            DatasetDAO dao = new DatasetDAO();
+            return dao.getDataset(session, qastep.getDatasetId()).getName();
+        } finally {
+            session.close();
+        }
     }
 
 }

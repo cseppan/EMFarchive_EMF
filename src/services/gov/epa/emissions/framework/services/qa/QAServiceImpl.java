@@ -1,6 +1,10 @@
 package gov.epa.emissions.framework.services.qa;
 
+import java.util.Date;
+
 import gov.epa.emissions.commons.data.QAProgram;
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
@@ -155,13 +159,30 @@ public class QAServiceImpl implements QAService {
     public QAStepResult getQAStepResult(QAStep step) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            return dao.qaStepResult(step, session);
+            QAStepResult qaStepResult = dao.qaStepResult(step, session);
+            if (qaStepResult != null)
+                qaStepResult.setCurrentTable(isCurrentTable(qaStepResult, session));
+            return qaStepResult;
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve QA Step Result", e);
             throw new EmfException("Could not retrieve QA Step Result");
         } finally {
             session.close();
         }
+    }
+
+    private boolean isCurrentTable(QAStepResult qaStepResult, Session session) {
+        Version version = new Versions().get(qaStepResult.getDatasetId(), qaStepResult.getVersion(), session);
+        Date versionDate = version.getLastModifiedDate();
+        Date date = qaStepResult.getTableCreationDate();
+        if (date == null || versionDate == null)
+            return false;
+        int value = date.compareTo(versionDate);
+        if (value >= 0)
+            return true;
+
+        return false;
+
     }
 
 }

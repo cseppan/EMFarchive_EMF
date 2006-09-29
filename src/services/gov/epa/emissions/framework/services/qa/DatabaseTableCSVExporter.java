@@ -123,18 +123,18 @@ public class DatabaseTableCSVExporter implements Exporter {
     }
 
     protected String formatValue(String value) {
-        if (containsDelimiter(value))
-            return "\"" + value + "\"";
+        // if (containsDelimiter(value))
+        return "\"" + value + "\"";
 
-        return value;
+        // return value;
     }
 
     public void setDelimiter(String del) {
         this.delimiter = del;
     }
 
-    private boolean containsDelimiter(String s) {
-        return s.indexOf(delimiter) >= 0;
-    }
+    // private boolean containsDelimiter(String s) {
+    // return s.indexOf(delimiter) >= 0;
+    //    }
 
 }

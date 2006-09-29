@@ -2,7 +2,11 @@ package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.TableCreator;
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -81,8 +85,28 @@ public class SQLQAProgramRunner implements QAProgramRunner {
     }
 
     private String query(DbServer dbServer, QAStep qaStep, String tableName) throws EmfException {
-        SQLQueryParser parser = new SQLQueryParser(dbServer, sessionFactory, qaStep, tableName);
+        SQLQueryParser parser = new SQLQueryParser(qaStep, tableName, dbServer.getEmissionsDatasource().getName(),
+                dataset(qaStep), version(qaStep));
         return parser.parse();
+    }
+
+    private EmfDataset dataset(QAStep qaStep) {
+        DatasetDAO dao = new DatasetDAO();
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getDataset(session, qaStep.getDatasetId());
+        } finally {
+            session.close();
+        }
+    }
+
+    private Version version(QAStep qaStep) {
+        Session session = sessionFactory.getSession();
+        try {
+            return new Versions().get(qaStep.getDatasetId(), qaStep.getVersion(), session);
+        } finally {
+            session.close();
+        }
     }
 
     private String tableName(QAStep qaStep) {

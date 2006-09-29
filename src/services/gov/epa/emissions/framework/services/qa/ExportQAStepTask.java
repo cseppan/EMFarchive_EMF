@@ -1,10 +1,12 @@
 package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -14,6 +16,7 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
 
 public class ExportQAStepTask implements Runnable {
 
@@ -31,6 +34,8 @@ public class ExportQAStepTask implements Runnable {
 
     private DbServer dbServer;
 
+    private HibernateSessionFactory sessionFactory;
+
     public ExportQAStepTask(File file, Exporter exporter, DbServer dbServer, QAStep qaStep, User user,
             HibernateSessionFactory sessionFactory) {
         this.file = file;
@@ -38,17 +43,20 @@ public class ExportQAStepTask implements Runnable {
         this.dbServer = dbServer;
         this.qastep = qaStep;
         this.user = user;
+        this.sessionFactory = sessionFactory;
         this.statusDao = new StatusDAO(sessionFactory);
     }
 
     public void run() {
+        String suffix = "";
         try {
-            prepare();
+            suffix = suffix();
+            prepare(suffix);
             exporter.export(file);
-            complete();
+            complete(suffix);
         } catch (Exception e) {
-            logError("Failed to export QA step : " + qastep.getName(), e);
-            setStatus("Failed to export QA step " + qastep.getName() + ". Reason: " + e.getMessage());
+            logError("Failed to export QA step : " + qastep.getName() + suffix, e);
+            setStatus("Failed to export QA step " + qastep.getName() + suffix + ". Reason: " + e.getMessage());
         } finally {
             disconnect(dbServer);
         }
@@ -63,13 +71,13 @@ public class ExportQAStepTask implements Runnable {
         }
     }
 
-    private void prepare() {
-        setStatus("Started exporting QA step '" + qastep.getName() + "'");
+    private void prepare(String suffixMsg) {
+        setStatus("Started exporting QA step '" + qastep.getName() + "'" + suffixMsg);
 
     }
 
-    private void complete() {
-        setStatus("Completed exporting QA step '" + qastep.getName() + "'");
+    private void complete(String suffixMsg) {
+        setStatus("Completed exporting QA step '" + qastep.getName() + "'" + suffixMsg);
     }
 
     private void logError(String message, Exception e) {
@@ -86,6 +94,29 @@ public class ExportQAStepTask implements Runnable {
 
         statusDao.add(endStatus);
 
+    }
+
+    private String suffix() {
+        return "' for Version '" + versionName() + "' of Dataset '" + datasetName() + "'";
+    }
+
+    private String versionName() {
+        Session session = sessionFactory.getSession();
+        try {
+            return new Versions().get(qastep.getDatasetId(), qastep.getVersion(), session).getName();
+        } finally {
+            session.close();
+        }
+    }
+
+    private String datasetName() {
+        Session session = sessionFactory.getSession();
+        try {
+            DatasetDAO dao = new DatasetDAO();
+            return dao.getDataset(session, qastep.getDatasetId()).getName();
+        } finally {
+            session.close();
+        }
     }
 
 }

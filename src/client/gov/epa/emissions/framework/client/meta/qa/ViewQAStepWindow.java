@@ -108,8 +108,8 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         layoutGenerator.addLabelWidgetPair("Table Creation Date:", tableCreationDate, panel);
 
         JCheckBox currentTable = new JCheckBox();
+        currentTable.setSelected(qaStepResult.isCurrentTable());
         currentTable.setEnabled(false);
-        // TODO: calculate whether table is current
         layoutGenerator.addLabelWidgetPair("Current Table?", currentTable, panel);
 
         TextArea result = new TextArea("", step.getComments(), 40, 3);

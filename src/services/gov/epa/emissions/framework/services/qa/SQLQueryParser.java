@@ -1,38 +1,35 @@
 package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.commons.data.InternalSource;
-import gov.epa.emissions.commons.db.Datasource;
-import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
-import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
-
-import org.hibernate.Session;
 
 public class SQLQueryParser {
-
-    private DbServer dbServer;
 
     private QAStep qaStep;
 
     private String tableName;
 
-    private HibernateSessionFactory sessionFactory;
+    private String emissionDatasourceName;
 
-    private static final String startQueryTag = "$TABLE{";
+    private EmfDataset dataset;
 
-    private static final String endQueryTag = "}";
+    private Version version;
 
-    public SQLQueryParser(DbServer dbServer, HibernateSessionFactory sessionFactory, QAStep qaStep, String tableName) {
-        this.dbServer = dbServer;
-        this.sessionFactory = sessionFactory;
+    private static final String startQueryTag = "$TABLE[";
+
+    private static final String endQueryTag = "]";
+
+    public SQLQueryParser(QAStep qaStep, String tableName, String emissionDatasoureName, EmfDataset dataset,
+            Version version) {
         this.qaStep = qaStep;
         this.tableName = tableName;
+        this.emissionDatasourceName = emissionDatasoureName;
+        this.dataset = dataset;
+        this.version = version;
     }
 
     public String parse() throws EmfException {
@@ -40,6 +37,7 @@ public class SQLQueryParser {
     }
 
     private String userQuery(String query) throws EmfException {
+        query = query.toUpperCase();
         if (query.indexOf(startQueryTag) == -1)
             return query;
 
@@ -55,7 +53,7 @@ public class SQLQueryParser {
         while ((query.indexOf(startQueryTag)) != -1) {
             query = expandOneTag(query);
         }
-        return query + versioned(query);
+        return versioned(query);
     }
 
     // error if end query tag is not found
@@ -65,26 +63,37 @@ public class SQLQueryParser {
         String suffix = query.substring(index + startQueryTag.length());
         String[] suffixTokens = suffixSplit(suffix);
 
-        return prefix + tableNameFromDataset(suffixTokens[0]) +  suffixTokens[1];
+        return prefix + tableNameFromDataset(suffixTokens[0]) + suffixTokens[1];
     }
 
     private String versioned(String partQuery) {
         String versionClause = versionClause();
-        if (partQuery.indexOf("WHERE") == -1)
-            return " WHERE " + versionClause;
+        return insertVersionClause(partQuery, versionClause);
 
-        return " AND " + versionClause;
+    }
+
+    private String insertVersionClause(String partQuery, String versionClause) {
+        String[] keywords = { "GROUP BY", "HAVING", "ORDER BY", "LIMIT" };
+
+        String firstPart = partQuery;
+        String secondPart = "";
+        for (int i = 0; i < keywords.length; i++) {
+            int index = partQuery.indexOf(keywords[i]);
+            if (index != -1) {
+                firstPart = partQuery.substring(0, index);
+                secondPart = partQuery.substring(index);
+                break;
+            }
+        }
+        if (firstPart.indexOf("WHERE") == -1)
+            return firstPart + " WHERE " + versionClause + " " + secondPart;
+
+        return firstPart + " AND " + versionClause + " " + secondPart;
     }
 
     private String versionClause() {
-        Session session = sessionFactory.getSession();
-        try {
-            Version version = new Versions().get(qaStep.getDatasetId(), qaStep.getVersion(), session);
-            VersionedQuery query = new VersionedQuery(version);
-            return query.query();
-        } finally {
-            session.close();
-        }
+        VersionedQuery query = new VersionedQuery(version);
+        return query.query();
     }
 
     private String[] suffixSplit(String token) throws EmfException {
@@ -98,18 +107,10 @@ public class SQLQueryParser {
 
     private String tableNameFromDataset(String tableNo) throws EmfException {
         int tableID = tableID(tableNo);
-        DatasetDAO dao = new DatasetDAO();
-        Session session = sessionFactory.getSession();
-        try {
-            EmfDataset dataset = dao.getDataset(session, qaStep.getDatasetId());
-            InternalSource[] internalSources = dataset.getInternalSources();
-            if (internalSources.length < tableID)
-                throw new EmfException("The table number is more than the number tables for the dataset");
-            return qualifiedName(dbServer.getEmissionsDatasource(), internalSources[tableID - 1].getTable());
-        } finally {
-            session.close();
-        }
-
+        InternalSource[] internalSources = dataset.getInternalSources();
+        if (internalSources.length < tableID)
+            throw new EmfException("The table number is more than the number tables for the dataset");
+        return qualifiedName(emissionDatasourceName, internalSources[tableID - 1].getTable());
     }
 
     private int tableID(String tableNo) throws EmfException {
@@ -124,11 +125,11 @@ public class SQLQueryParser {
     }
 
     private String createTableQuery() {
-        return "CREATE TABLE " + qualifiedName(dbServer.getEmissionsDatasource(), tableName) + " AS ";
+        return "CREATE TABLE " + qualifiedName(emissionDatasourceName, tableName) + " AS ";
     }
 
-    private String qualifiedName(Datasource datasource, String tableName) {
-        return datasource.getName() + "." + tableName;
+    private String qualifiedName(String datasourceName, String tableName) {
+        return datasourceName + "." + tableName;
     }
 
 }

@@ -18,6 +18,8 @@ public class QAStepResult implements Serializable {
     private int version;
 
     private int id;
+    
+    private boolean currentTable;
 
     public QAStepResult() {
         // empty
@@ -83,6 +85,14 @@ public class QAStepResult implements Serializable {
 
     public void setTableCreationStatus(String tableCreationStatus) {
         this.tableCreationStatus = tableCreationStatus;
+    }
+
+    public boolean isCurrentTable() {
+        return currentTable;
+    }
+
+    public void setCurrentTable(boolean currentTable) {
+        this.currentTable = currentTable;
     }
 
 }

@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.qa.QAService;
 
 import java.io.File;
+import java.util.Date;
 
 public class EditQAStepPresenter {
 
@@ -44,13 +45,16 @@ public class EditQAStepPresenter {
 
     public void doSave() throws EmfException {
         QAStep step = view.save();
-        session.qaService().updateWitoutCheckingConstraints(new QAStep[]{step});
+        session.qaService().updateWitoutCheckingConstraints(new QAStep[] { step });
         tabView.refresh();
         doClose();
     }
 
     public void doRun() throws EmfException {
         QAStep step = view.save();
+        step.setStatus("In Progress");
+        step.setDate(new Date());
+        step.setWho(session.user().getUsername());
         tabView.refresh();
         // step.setTableCreationStatus("In Progress");
         session.qaService().runQAStep(step, session.user());
@@ -84,6 +88,10 @@ public class EditQAStepPresenter {
         if (dir == null || dir.trim().length() == 0)
             throw new EmfException("Please select a directory before export");
         return session.preferences().mapLocalOutputPathToRemote(dir);
+    }
+
+    public String userName() {
+        return session.user().getUsername();
     }
 
 }

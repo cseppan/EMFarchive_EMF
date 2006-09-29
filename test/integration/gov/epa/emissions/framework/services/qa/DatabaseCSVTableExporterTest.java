@@ -33,8 +33,8 @@ public class DatabaseCSVTableExporterTest extends ServiceTestCase {
         List data = readData(file);
         assertEquals(9, data.size());
         assertEquals("pollutant_code,pollutant_name", data.get(0));
-        assertEquals("CO,CO",data.get(1));
-        assertEquals("VOC,VOC",data.get(8));
+        assertEquals("\"CO\",\"CO\"",data.get(1));
+        assertEquals("\"VOC\",\"VOC\"",data.get(8));
 
     }
 

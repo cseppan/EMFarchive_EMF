@@ -88,6 +88,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private QAStepResult qaStepResult;
 
+    private Button saveButton;
+
     public EditQAStepWindow(DesktopManager desktopManager) {
         super("Edit QA Step", new Dimension(650, 625), desktopManager);
     }
@@ -178,7 +180,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         JCheckBox currentTable = new JCheckBox();
         currentTable.setEnabled(false);
-        //TODO: calculate whether table is current
+        currentTable.setSelected(stepResult.isCurrentTable());
         layoutGenerator.addLabelWidgetPair("Current Output?", currentTable, panel);
 
         // Lay out the panel.
@@ -374,9 +376,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
-        Button ok = okButton();
-        getRootPane().setDefaultButton(ok);
-        panel.add(ok);
+        saveButton = saveButton();
+        getRootPane().setDefaultButton(saveButton);
+        panel.add(saveButton);
 
         Button cancel = closeButton();
         panel.add(cancel);
@@ -417,7 +419,14 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     protected void doRun() {
         try {
             messagePanel.setMessage("Started Run. Please monitor the Status window " + "to track your run request.");
+            status.setSelectedItem("In Progress");
+            date.setValue(new Date());
+            who.setText(presenter.userName());
+
             presenter.doRun();
+
+            saveButton.setEnabled(false);// to prevent user from entering and click save after started running a qa
+                                            // step
             resetChanges();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
@@ -434,8 +443,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         }
     }
 
-    private Button okButton() {
-        Button ok = new SaveButton(new AbstractAction() {
+    private Button saveButton() {
+        Button save = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     clear();
@@ -445,7 +454,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 }
             }
         });
-        return ok;
+        return save;
     }
 
     private Button closeButton() {
