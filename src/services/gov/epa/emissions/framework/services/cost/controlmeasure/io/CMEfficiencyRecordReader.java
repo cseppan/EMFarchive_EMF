@@ -194,7 +194,7 @@ public class CMEfficiencyRecordReader {
             return record.getTokens();
         }
 
-        sb.append(format("This record has more tokens"));
+        sb.append(format("The new record has extra tokens"));
         status.addStatus(lineNo, sb);
         return null;
     }

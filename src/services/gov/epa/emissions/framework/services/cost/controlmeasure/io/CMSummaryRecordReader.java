@@ -228,7 +228,7 @@ public class CMSummaryRecordReader {
             return record.getTokens();
         }
 
-        throw new CMImporterException("This record has more tokens");
+        throw new CMImporterException("The new record has extra tokens");
     }
 
     private String format(String text) {
