@@ -1,4 +1,3 @@
-#,,,,,,,,,,,,,,
 CMAbbreviation,Pollutant,Locale,Effective Date,ExistingMeasureAbbr,NEIExistingDevCode,ControlEfficiency,CostYear,CostPerTon,RuleEff,RulePen,EquationType,CapRecFactor,DiscountRate,Details
 PAGBU,PM10,01,,,,63.0%,1992,2591.00,100,100,cpton,,,
 PAGBU,PM10,02,,,,61.8%,1992,3320.78,100,100,cpton,,,
@@ -1132,7 +1131,7 @@ PUHAP330,PM10,54,,,,65.7%,1990,734.70,100,100,cpton,,,
 PUHAP330,PM10,55,,,,67.5%,1990,547.06,100,100,cpton,,,
 PUHAP330,PM10,56,,,,65.9%,1990,281.06,100,100,cpton,,,
 PHDDRETRO,PM10,,,,,1.0%,1990,9500.00,100,100,cpton,,,
-SCHMADDHOM,SO2,,,,,75.0%,2002,2350.00,,,cpton,,,
+SCHMADDHOM,SO2,,,,,75.0%,2002,2350.00,100,100,cpton,,,
 VDCPERMACT,VOC,,,,,44.0%,1990,528.00,100,100,cpton,,,44% in base year (HDDV) - need cost info
 VARCTAIMFR,VOC,,09/11/1999,,,20.0%,1990,228.00,100,100,cpton,,,
 VARCTSCPH1,VOC,,01/01/1998,,,34.0%,1990,1443.00,100,100,cpton,,,not verified cost
@@ -1375,7 +1374,7 @@ NLNCMNGC96,NOx,,01/01/1996,,,0.0%,1990,0.00,0,0,cpton,,,new 9/24/99 - from 1997 
 NLNCMNGC99,NOx,,01/01/1999,,,0.0%,1990,0.00,0,0,cpton,,,new 9/24/99 - from 1997 AQMD
 NLNCMNGC00,NOx,,01/01/2000,,,0.0%,1990,0.00,0,0,cpton,,,new 9/24/99 - from 1997 AQMD
 NLNCMNGC02,NOx,,01/01/2002,,,0.0%,1990,0.00,0,0,cpton,,,new 9/24/99 - from 1997 AQMD
-NLNCMNGC03,NOx,,01/01/2003,,,75.0%,1990,595.00,100,0,cpton,,,new 9/24/99 - from 1997 AQMD
+NLNCMNGC03,NOx,,01/01/2003,,,75.0%,1990,595.00,100,20,cpton,,,new 9/24/99 - from 1997 AQMD
 NLNCMNGC05,NOx,,01/01/2005,,,75.0%,1990,595.00,100,20,cpton,,,new 9/24/99 - from 1997 AQMD
 NLNCMNGC06,NOx,,01/01/2006,,,75.0%,1990,595.00,100,40,cpton,,,new 9/24/99 - from 1997 AQMD
 NLNCMNGC07,NOx,,01/01/2007,,,75.0%,1990,595.00,100,48,cpton,,,new 9/24/99 - from 1997 AQMD
@@ -1435,7 +1434,7 @@ NLNRSNGC96,NOx,,01/01/1996,,,0.0%,1990,0.00,0,0,cpton,,,new 9/24/99 - from 1997 
 NLNRSNGC99,NOx,,01/01/1999,,,0.0%,1990,0.00,0,0,cpton,,,new 9/24/99 - from 1997 AQMD
 NLNRSNGC00,NOx,,01/01/2000,,,0.0%,1990,0.00,0,0,cpton,,,new 9/24/99 - from 1997 AQMD
 NLNRSNGC02,NOx,,01/01/2002,,,0.0%,1990,0.00,0,0,cpton,,,new 9/24/99 - from 1997 AQMD
-NLNRSNGC03,NOx,,01/01/2003,,,75.0%,1990,595.00,0,100,cpton,,,new 9/24/99 - from 1997 AQMD
+NLNRSNGC03,NOx,,01/01/2003,,,75.0%,1990,595.00,1,100,cpton,,,new 9/24/99 - from 1997 AQMD
 NLNRSNGC05,NOx,,01/01/2005,,,75.0%,1990,595.00,20,100,cpton,,,new 9/24/99 - from 1997 AQMD
 NLNRSNGC06,NOx,,01/01/2006,,,75.0%,1990,595.00,40,100,cpton,,,new 9/24/99 - from 1997 AQMD
 NLNRSNGC07,NOx,,01/01/2007,,,75.0%,1990,595.00,48,100,cpton,,,new 9/24/99 - from 1997 AQMD
