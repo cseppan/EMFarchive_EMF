@@ -316,7 +316,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
             return;
         }
         
-        if (!checkExportDir(inputDir.getText()) || !checkDatasets(inputlist) || !checkToWriteStartMessage(inputlist))
+        int numberToExport = checkToWriteStartMessage(inputlist);
+        if (!checkExportDir(inputDir.getText()) || !checkDatasets(inputlist) || numberToExport < 1)
             return;
         
         EmfDataset[] datasets = (EmfDataset[])getSelectedDatasets(inputlist).toArray(new EmfDataset[0]);
@@ -328,8 +329,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
             else
                 presenter.doExportWithOverwrite(datasets, getSelectedDatasetVersions(), inputDir.getText(), "");
 
-            messagePanel.setMessage("Started export. Please monitor the Status window "
-                    + "to track your Export request.");
+            messagePanel.setMessage("Started export of "+numberToExport+
+                    " input datasets.  Please see the Status Window for additional information.");
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -356,7 +357,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         return true;
     }
     
-    private boolean checkToWriteStartMessage(List inputList) {
+    // returns the number of datasets that will actually be exported
+    private int checkToWriteStartMessage(List inputList) {
         CaseInput[] inputs = (CaseInput[])inputList.toArray(new CaseInput[0]);
         int count = 0;
         int external = 0;
@@ -371,18 +373,19 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
                 external++;
         }
         
-        if (external > 0)
-        {
-            messagePanel.setMessage("Please select some inputs to export which do not use external datasets");
-            return false;
-        }
+        // this causes an error if there are any external.  We only want an error if they are all external
+//        if (external > 0)
+//        {
+//            messagePanel.setMessage("Please select some inputs to export which do not use external datasets");
+//            return false;
+//        }
         
         if (count == 0) {
-            messagePanel.setMessage("Please select some inputs to export");
-            return false;
+            messagePanel.setMessage("Please select some inputs to export (make sure they have datasets and are not all external)");
+            return count;
         }
         
-        return true;
+        return count;
     }
 
     private int checkOverWrite() {
