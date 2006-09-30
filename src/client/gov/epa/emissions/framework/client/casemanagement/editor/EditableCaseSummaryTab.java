@@ -480,6 +480,10 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         if (caseObj.getRunStatus() == null) {
             runStatusCombo.setSelectedIndex(0);
         }
+        else
+        {
+            runStatusCombo.setSelectedItem(caseObj.getRunStatus());
+        }
         changeablesList.addChangeable(runStatusCombo);
 
         return runStatusCombo;
