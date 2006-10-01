@@ -121,7 +121,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Name" };
-        return new SortCriteria(columnNames, new boolean[] { false }, new boolean[] { true });
+        return new SortCriteria(columnNames, new boolean[] { true }, new boolean[] { true });
     }
 
     private JPanel createTopPanel() {
