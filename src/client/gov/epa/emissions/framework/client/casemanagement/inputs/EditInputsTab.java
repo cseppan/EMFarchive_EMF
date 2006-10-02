@@ -442,6 +442,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     public void addInput(CaseInput note) {
         tableData.add(note);
+        caseObj.setCaseInputs(caseInputs());
         selectModel.refresh();
 
         tablePanel.removeAll();
