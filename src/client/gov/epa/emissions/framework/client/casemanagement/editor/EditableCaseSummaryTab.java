@@ -64,9 +64,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox modelToRunCombo;
 
-    private EditableComboBox modRegionsCombo;
+    private ComboBox modRegionsCombo;
 
-    private EditableComboBox controlRegionsCombo;
+    private ComboBox controlRegionsCombo;
 
     private EditableComboBox abbreviationsCombo;
 
@@ -340,9 +340,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return modelToRunCombo;
     }
 
-    private EditableComboBox modRegions() throws EmfException {
+    private ComboBox modRegions() throws EmfException {
         modRegions = new Regions(session.dataCommonsService().getRegions());
-        modRegionsCombo = new EditableComboBox(modRegions.names());
+        modRegionsCombo = new ComboBox(modRegions.names());
 
         String name = caseObj.getModelingRegion() != null ? caseObj.getModelingRegion().getName() : "";
         modRegionsCombo.setSelectedItem(name);
@@ -363,9 +363,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return gridResolutionCombo;
     }
 
-    private EditableComboBox controlRegions() throws EmfException {
+    private ComboBox controlRegions() throws EmfException {
         controlRegions = new Regions(session.dataCommonsService().getRegions());
-        controlRegionsCombo = new EditableComboBox(controlRegions.names());
+        controlRegionsCombo = new ComboBox(controlRegions.names());
 
         String name = caseObj.getControlRegion() != null ? caseObj.getControlRegion().getName() : "";
         controlRegionsCombo.setSelectedItem(name);

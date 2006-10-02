@@ -60,14 +60,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
         return tabbedPane;
     }
-
-    private Component createParameterTab(Case caseObj) {
-        EditableCaseParameterTab view = new EditableCaseParameterTab(caseObj, this);
-        view.display();
-        presenter.set(view);
-        return view;
-    }
-
+    
     private JPanel createSummaryTab(Case caseObj, MessagePanel messagePanel) {
         try {
             EditableCaseSummaryTab view = new EditableCaseSummaryTab(caseObj, session, this, parentConsole);
@@ -81,7 +74,14 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
             return createErrorTab("Could not load Summary Tab." + e.getMessage());
         }
     }
-    
+
+    private Component createParameterTab(Case caseObj) {
+        EditableCaseParameterTab view = new EditableCaseParameterTab(caseObj, this);
+        view.display();
+        presenter.set(view);
+        return view;
+    }
+
     private JPanel createInputTab() {
         try {
             EditInputsTab view = new EditInputsTab(parentConsole, this, messagePanel, desktopManager);

@@ -190,9 +190,21 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             version.removeAllItems();
             version.setModel(new DefaultComboBoxModel(versions));
             version.revalidate();
+            if (versions.length > 0)
+                version.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
+    }
+
+    private int getDefaultVersionIndex(Version[] versions, EmfDataset dataset) {
+        int defaultversion = dataset.getDefaultVersion();
+        
+        for (int i = 0; i < versions.length; i++)
+            if (defaultversion == versions[i].getVersion())
+                return i;
+        
+        return 0;
     }
 
     public void setFields() throws EmfException {

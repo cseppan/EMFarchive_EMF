@@ -18,16 +18,16 @@ public class CasesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Project", "Modeling Regn.", "Last Modified By", "Category", "Run Status", "Abbrev.",
-                "AQM", "Base Year", "Met. Year", "Grid Name", "Grid Resolution", "Future Year", "Num Met Layers",
+        return new String[] { "Name", "Project", "Model to Run", "Modeling Regn.", "Last Modified By", "Category", "Run Status", "Abbrev.",
+                "AQM", "Base Year", "Met. Year", "Future Year", "Grid Name", "Grid Resolution", "Num Met Layers",
                 "Start Date", "End Date", "Is Final", "Speciation", "Last Modified Date" };
     }
 
     public Class getColumnClass(int col) {
-        if (col == 14 || col ==15 ||col == 18)
+        if (col == 15 || col ==16 ||col == 19)
             return Date.class;
         
-        if (col == 16)
+        if (col == 17)
             return Boolean.class;
         
         return String.class;
@@ -80,27 +80,31 @@ public class CasesTableData extends AbstractTableData {
     }
 
     private Object[] rowValues(Case element) {
-        Object[] values = { element.getName(), project(element), region(element), modifiedBy(element),
+        Object[] values = { element.getName(), project(element), modelToRun(element), region(element), modifiedBy(element),
                 caseCategory(element), element.getRunStatus(), abbreviation(element), airQualityModel(element),
-                emissionsYear(element), meteorlogicalYear(element), Grid(element), gridResolution(element),
-                futureYear(element), numMetLayers(element), format(element.getStartDate()), format(element.getEndDate()),
+                emissionsYear(element), meteorlogicalYear(element), futureYear(element), Grid(element), gridResolution(element),
+                numMetLayers(element), format(element.getStartDate()), format(element.getEndDate()),
                 isFinal(element), speciation(element), format(element.getLastModifiedDate()) };
         return values;
     }
 
-    private Object isFinal(Case element) {
+    private String modelToRun(Case element) {
+        return element.getModel() != null ? element.getModel().getName() : "";
+    }
+    
+    private Boolean isFinal(Case element) {
         return new Boolean(element.getIsFinal());
     }
 
-    private Object numMetLayers(Case element) {
+    private String numMetLayers(Case element) {
         return element.getNumMetLayers()+"" != null ? element.getNumMetLayers()+"" : "";
     }
 
-    private Object futureYear(Case element) {
+    private String futureYear(Case element) {
         return element.getFutureYear()+"" != null ? element.getFutureYear()+"" : "";
     }
 
-    private Object gridResolution(Case element) {
+    private String gridResolution(Case element) {
         return element.getGridResolution() != null ? element.getGridResolution().getName() : "";
     }
 

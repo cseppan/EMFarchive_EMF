@@ -87,12 +87,12 @@
             class="gov.epa.emissions.commons.data.Project"
             column="project_id"/> 
 
-	<many-to-one cascade="save-update"
+	<many-to-one
             name="modelingRegion" 
             class="gov.epa.emissions.commons.data.Region"
             column="modeling_region_id"/> 
 
-	<many-to-one cascade="save-update"
+	<many-to-one
             name="controlRegion" 
             class="gov.epa.emissions.commons.data.Region"
             column="control_region_id"/> 

@@ -65,10 +65,11 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     }
 
     void updateCase() throws EmfException {
+        saveTabs();
+        
         if (isDuplicate(caseObj))
             throw new EmfException("Duplicate name - '" + caseObj.getName() + "'.");
         
-        saveTabs();
         caseObj.setLastModifiedBy(session.user());
         caseObj.setLastModifiedDate(new Date());
         service().updateCase(caseObj);
