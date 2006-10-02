@@ -28,7 +28,7 @@ public class ControlMeasuresManagerPresenterTest extends MockObjectTestCase {
 
         controlMeasureService = mock(ControlMeasureService.class);
         serviceLocator = mock(ServiceLocator.class);
-        serviceLocator.stubs().method("costService").withNoArguments().will(returnValue(controlMeasureService.proxy()));
+        serviceLocator.stubs().method("controlMeasureService").withNoArguments().will(returnValue(controlMeasureService.proxy()));
 
         session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(new User()));

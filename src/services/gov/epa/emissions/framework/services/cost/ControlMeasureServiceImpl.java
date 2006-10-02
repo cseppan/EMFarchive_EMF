@@ -45,13 +45,22 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         Session session = sessionFactory.getSession();
         try {
             List all = dao.all(session);
-
+            // shaveTheLoad(all);
             return (ControlMeasure[]) all.toArray(new ControlMeasure[0]);
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve control measures.", e);
             throw new EmfException("Could not retrieve control measures.");
         } finally {
             session.close();
+        }
+    }
+
+    protected void shaveTheLoad(List all) {
+        for (int i = 0; i < all.size(); i++) {
+            ControlMeasure cm = (ControlMeasure) all.get(i);
+            ControlMeasure cmNew = new ControlMeasure();
+            cmNew.setName(cm.getName());
+            all.set(i, cmNew);
         }
     }
 

@@ -91,7 +91,7 @@ public class DefaultEmfSession implements EmfSession {
     }
 
     public ControlMeasureService controlMeasureService() {
-        return serviceLocator.costService();
+        return serviceLocator.controlMeasureService();
     }
 
     public ControlStrategyService controlStrategyService() {

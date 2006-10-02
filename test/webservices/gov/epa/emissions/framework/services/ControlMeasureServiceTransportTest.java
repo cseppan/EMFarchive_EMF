@@ -11,7 +11,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.rmi.RemoteException;
 
-public class CostServiceTransportTest extends ServiceTestCase {
+public class ControlMeasureServiceTransportTest extends ServiceTestCase {
     private static final String DEFAULT_URL = "http://localhost:8080/emf/services";// default
 
     private ControlMeasureService service = null;
@@ -25,7 +25,7 @@ public class CostServiceTransportTest extends ServiceTestCase {
         help = new ControlMeasureServiceImpl(sessionFactory);
 
         RemoteServiceLocator rl = new RemoteServiceLocator(DEFAULT_URL);
-        service = rl.costService();
+        service = rl.controlMeasureService();
         userService = rl.userService();
     }
 

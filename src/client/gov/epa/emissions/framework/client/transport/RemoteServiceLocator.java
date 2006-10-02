@@ -69,7 +69,7 @@ public class RemoteServiceLocator implements ServiceLocator {
         return new CaseServiceTransport(baseUrl + "/gov.epa.emissions.framework.services.casemanagement.CaseService");
     }
     
-    public ControlMeasureService costService() {
+    public ControlMeasureService controlMeasureService() {
         return new ControlMeasureServiceTransport(baseUrl + "/gov.epa.emf.services.cost.ControlMeasureService");
     }
     

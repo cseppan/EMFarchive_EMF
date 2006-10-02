@@ -255,6 +255,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         try {
             allControlTechnologies = session.controlMeasureService().getControlTechnologies();
             controlTechnology = new EditableComboBox(allControlTechnologies);
+            controlTechnology.setPreferredSize(new Dimension(250, 25));
         } catch (EmfException e) {
             messagePanel.setError("Could not retrieve all Control Technologies");
         }
@@ -264,6 +265,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         try {
             allSourceGroups = session.dataCommonsService().getSourceGroups();
             sourceGroup = new EditableComboBox(allSourceGroups);
+            sourceGroup.setPreferredSize(new Dimension(250, 25));
         } catch (EmfException e) {
             messagePanel.setError("Could not retrieve Source Groups");
         }

@@ -1,6 +1,5 @@
 -------------------CoST Measure tables ----------------------------------------------
 
-DELETE FROM emf.control_measure_costrecords;
 DELETE FROM emf.control_measure_sccs;
 DELETE FROM emf.control_measure_efficiencyrecords;
 DELETE FROM emf.control_measurs_sectors;

@@ -42,4 +42,9 @@ public class EmfDateFormat {
         return dateFormatter.format(date);
     }
 
+    public static String format_MM_DD_YYYY_HH_mm_ss(Date date) {
+        dateFormatter.applyPattern("MM/dd/yyyy HH:mm:ss");
+        return dateFormatter.format(date);
+    }
+
 }

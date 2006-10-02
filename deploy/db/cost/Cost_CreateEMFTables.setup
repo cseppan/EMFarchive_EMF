@@ -149,7 +149,7 @@ CREATE TABLE emf.control_measure_efficiencyrecords
   discount_rate real,
   detail varchar(128),
   effective_date timestamp,
-  UNIQUE (pollutant_id,locale,existing_measure_abbr,effective_date)
+  UNIQUE (control_measures_id,pollutant_id,locale,existing_measure_abbr,effective_date)
 ) 
 WITHOUT OIDS;
 -- emf.control_measure_efficiencyrecords

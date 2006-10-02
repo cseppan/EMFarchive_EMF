@@ -33,7 +33,7 @@ public interface ServiceLocator {
 
     CaseService caseService();
 
-	ControlMeasureService costService();
+	ControlMeasureService controlMeasureService();
 	    
     ControlStrategyService controlStrategyService();
 
