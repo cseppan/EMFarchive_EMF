@@ -60,7 +60,7 @@ public class ControlStrategiesTableDataTest extends TestCase {
         assertEquals("Inv. Dataset", columns[5]);
         assertEquals("Version", columns[6]);
         assertEquals("Inventory Type", columns[7]);
-        assertEquals("Major Pollutant", columns[8]);
+        assertEquals("Target Pollutant", columns[8]);
         assertEquals("Cost Year", columns[9]);
         assertEquals("Inv. Year", columns[10]);
         assertEquals("Total Cost", columns[11]);
