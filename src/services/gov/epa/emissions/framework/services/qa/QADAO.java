@@ -50,6 +50,7 @@ public class QADAO {
     }
 
     public QAStepResult qaStepResult(QAStep step, Session session) {
+        updateQAStepsIds(new QAStep[]{step},session);
         Criterion c1 = Restrictions.eq("datasetId", new Integer(step.getDatasetId()));
         Criterion c2 = Restrictions.eq("version", new Integer(step.getVersion()));
         Criterion c3 = Restrictions.eq("qaStepId", new Integer(step.getId()));

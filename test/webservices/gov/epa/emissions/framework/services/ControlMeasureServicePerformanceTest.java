@@ -28,7 +28,7 @@ public class ControlMeasureServicePerformanceTest extends WebServicesTestCase {
         dumpMemory();
         ControlMeasure[] all = server.getMeasures();
         dumpMemory();
-        assertEquals(1067,all.length);
+        assertEquals(32,all.length);
     }
     
     public void itestShouldGetAllControlMeasures() throws EmfException {
