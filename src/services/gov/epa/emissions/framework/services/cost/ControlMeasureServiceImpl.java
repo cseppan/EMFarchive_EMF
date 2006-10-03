@@ -42,25 +42,25 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public ControlMeasure[] getMeasures() throws EmfException {
+        //System.out.println("$$" + EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(new Date()));
         Session session = sessionFactory.getSession();
         try {
             List all = dao.all(session);
-            // shaveTheLoad(all);
+            shaveOffSccs(all);
             return (ControlMeasure[]) all.toArray(new ControlMeasure[0]);
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve control measures.", e);
             throw new EmfException("Could not retrieve control measures.");
         } finally {
             session.close();
+            //System.out.println("$$" + EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(new Date()));
         }
     }
 
-    protected void shaveTheLoad(List all) {
+    protected void shaveOffSccs(List all) {
         for (int i = 0; i < all.size(); i++) {
             ControlMeasure cm = (ControlMeasure) all.get(i);
-            ControlMeasure cmNew = new ControlMeasure();
-            cmNew.setName(cm.getName());
-            all.set(i, cmNew);
+            cm.setSccs(new Scc[] {});
         }
     }
 

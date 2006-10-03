@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services;
 
+import java.io.File;
 import java.util.Date;
 
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
@@ -9,7 +10,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasureServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-public class ControlMeasureServicePerformanceTest extends ServiceTestCase {
+public class ControlMeasureServicePerformanceTest extends WebServicesTestCase {
     private static final String DEFAULT_URL = "http://localhost:8080/emf/services";// default
 
     private ControlMeasureService transport = null;
@@ -17,24 +18,24 @@ public class ControlMeasureServicePerformanceTest extends ServiceTestCase {
     private ControlMeasureService server;
 
     protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = sessionFactory();
+        HibernateSessionFactory sessionFactory = sessionFactory(new File("test/webservices.conf"));
         server = new ControlMeasureServiceImpl(sessionFactory);
         RemoteServiceLocator rl = new RemoteServiceLocator(DEFAULT_URL);
         transport = rl.controlMeasureService();
     }
 
-    public void itestShouldGetAllControlMeasures_AtServerSide() throws EmfException {
+    public void testShouldGetAllControlMeasures_AtServerSide() throws EmfException {
         dumpMemory();
         ControlMeasure[] all = server.getMeasures();
         dumpMemory();
-        assertEquals("0 types", all.length, 1067);
+        assertEquals(1067,all.length);
     }
     
-    public void testShouldGetAllControlMeasures() throws EmfException {
+    public void itestShouldGetAllControlMeasures() throws EmfException {
         dumpMemory();
         ControlMeasure[] all = transport.getMeasures();
         dumpMemory();
-        assertEquals("0 types", all.length, 1067);
+        assertEquals(all.length, 1067);
     }
 
  
