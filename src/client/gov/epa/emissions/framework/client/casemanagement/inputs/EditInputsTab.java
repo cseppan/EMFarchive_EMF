@@ -300,7 +300,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     private void doDisplayInputDatasetsPropertiesViewer() {
         List datasets = updateSelectedDatasets(getSelectedDatasets(getSelectedInputs()));
         if (datasets.isEmpty()) {
-            messagePanel.setMessage("Please select one or more inputs with specified datasets to view.");
+            messagePanel.setMessage("Please select one or more inputs with datasets specified to view.");
             return;
         }
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {

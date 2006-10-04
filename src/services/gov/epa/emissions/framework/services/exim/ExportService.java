@@ -130,8 +130,8 @@ public class ExportService {
         File path = validatePath(dirName);
 
         if (datasets.length != versions.length) {
-            log.error("Export failed: version numbers doesn't match specified datasets.");
-            throw new EmfException("Export failed: version numbers doesn't match " + "specified datasets.");
+            log.error("Export failed: version numbers do not match those for specified datasets.");
+            throw new EmfException("Export failed: version numbers do not match " + "those for specified datasets.");
         }
 
         try {
