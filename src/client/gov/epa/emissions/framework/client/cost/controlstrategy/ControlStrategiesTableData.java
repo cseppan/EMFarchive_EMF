@@ -24,9 +24,9 @@ public class ControlStrategiesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Last Modified", "Region", "Project", "Strategy Type","Inv. Dataset",
-                "Version", "Inventory Type", "Target Pollutant", "Cost Year", "Inv. Year",
-                "Total Cost", "Reduction", "Run Status", "Completion Date", "Creator" };
+        return new String[] { "Name", "Last Modified", "Region", "Project", "Strategy Type", "Inv. Dataset", "Version",
+                "Inventory Type", "Target Pollutant", "Cost Year", "Inv. Year", "Total Cost", "Reduction",
+                "Run Status", "Completion Date", "Creator" };
 
     }
 
@@ -50,11 +50,10 @@ public class ControlStrategiesTableData extends AbstractTableData {
         for (int i = 0; i < controlStrategies.length; i++) {
             ControlStrategy element = controlStrategies[i];
             Object[] values = { element.getName(), format(element.getLastModifiedDate()), region(element),
-                    project(element), analysisType(element), dataset(element), version(element), 
-                    datasetType(element), element.getTargetPollutant(),
-                    costYear(element), "" + element.getInventoryYear(), "" + getTotalCost(element),
-                    "" + getReduction(element), element.getRunStatus(), format(element.getCompletionDate()),
-                    element.getCreator().getName()};
+                    project(element), analysisType(element), dataset(element), version(element), datasetType(element),
+                    element.getTargetPollutant(), costYear(element), "" + element.getInventoryYear(),
+                    "" + getTotalCost(element), "" + getReduction(element), element.getRunStatus(),
+                    format(element.getCompletionDate()), element.getCreator().getName() };
             Row row = new ViewableRow(element, values);
             rows.add(row);
         }
@@ -63,24 +62,24 @@ public class ControlStrategiesTableData extends AbstractTableData {
     }
 
     private double getReduction(ControlStrategy element) {
-        StrategyResult[] results = {};//FIXME:element.getStrategyResults();
+        StrategyResult[] results = element.getStrategyResults();
         double totalReduction = 0;
-        
-        if(results.length > 0)
+
+        if (results.length > 0)
             for (int i = 0; i < results.length; i++)
                 totalReduction += results[i].getTotalReduction();
-        
+
         return totalReduction;
     }
 
     private double getTotalCost(ControlStrategy element) {
-        StrategyResult[] results = {};// FIXME:element.getStrategyResults();
+        StrategyResult[] results = element.getStrategyResults();
         double totalCost = 0;
-        
-        if(results.length > 0)
+
+        if (results.length > 0)
             for (int i = 0; i < results.length; i++)
                 totalCost += results[i].getTotalCost();
-        
+
         return totalCost;
     }
 
@@ -92,12 +91,12 @@ public class ControlStrategiesTableData extends AbstractTableData {
         Dataset[] datasets = element.getInputDatasets();
         if (datasets.length == 0)
             return "";
-        
+
         String name = datasets[0].getName();
         if (datasets.length > 1)
             name += "...";
-        
-        return  name;
+
+        return name;
     }
 
     private String project(ControlStrategy element) {
@@ -119,14 +118,14 @@ public class ControlStrategiesTableData extends AbstractTableData {
         return (datasetType != null) ? datasetType.getName() : "";
     }
 
-//    private String discountRate(ControlStrategy element) {
-//        return "" + element.getDiscountRate();
-//    }
+    // private String discountRate(ControlStrategy element) {
+    // return "" + element.getDiscountRate();
+    // }
 
     private String costYear(ControlStrategy element) {
         return "" + element.getCostYear();
     }
-    
+
     public ControlStrategy[] sources() {
         List sources = sourcesList();
         return (ControlStrategy[]) sources.toArray(new ControlStrategy[0]);
@@ -138,7 +137,7 @@ public class ControlStrategiesTableData extends AbstractTableData {
             ViewableRow row = (ViewableRow) iter.next();
             sources.add(row.source());
         }
-        
+
         return sources;
     }
 
