@@ -136,9 +136,9 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
             datasets[i].setAccessedDateTime(new Date());
 
             if (overwrite)
-                services.exportDatasetsWithOverwrite(session.user(), new EmfDataset[]{datasets[i]}, versions, mapToRemote(folders[i]), purpose);
+                services.exportDatasetsWithOverwrite(session.user(), new EmfDataset[]{datasets[i]}, new Version[]{versions[i]}, mapToRemote(folders[i]), purpose);
             else
-                services.exportDatasets(session.user(), new EmfDataset[]{datasets[i]}, versions, mapToRemote(folders[i]), purpose);
+                services.exportDatasets(session.user(), new EmfDataset[]{datasets[i]}, new Version[]{versions[i]}, mapToRemote(folders[i]), purpose);
         }
     }
 
