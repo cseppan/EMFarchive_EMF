@@ -325,9 +325,9 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         
         try {
             if (ok != JOptionPane.YES_OPTION)
-                presenter.doExport(datasets, getSelectedDatasetVersions(), inputDir.getText(), "");
+                presenter.doExport(datasets, getSelectedDatasetVersions(), getSelectedInputSubdirs(), "");
             else
-                presenter.doExportWithOverwrite(datasets, getSelectedDatasetVersions(), inputDir.getText(), "");
+                presenter.doExportWithOverwrite(datasets, getSelectedDatasetVersions(), getSelectedInputSubdirs(), "");
 
             messagePanel.setMessage("Started export of "+numberToExport+
                     " input datasets.  Please see the Status Window for additional information.");
@@ -418,6 +418,24 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         }
         
         return (Version[])versionList.toArray(new Version[0]);
+    }
+
+    private String[] getSelectedInputSubdirs() {
+        List list = getSelectedInputs();
+        List subDirList = new ArrayList();
+        String defaultExportDir = session.preferences().outputFolder();
+        if (!inputDir.getText().equals(""))
+            defaultExportDir = inputDir.getText();
+        
+        for (int i = 0; i < list.size(); i++) {
+            String subdir = ((CaseInput) list.get(i)).getSubdir();
+            if (!subdir.equals(""))
+                subDirList.add(defaultExportDir + File.separator + subdir);
+            else
+                subDirList.add(defaultExportDir);
+        }
+        
+        return (String[])subDirList.toArray(new String[0]);
     }
 
     private List updateSelectedDatasets(List selectedDatasets) {

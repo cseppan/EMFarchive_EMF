@@ -76,8 +76,8 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         for (int i = 0; i < existingInputs.length; i++) {
             if (input.getRecordID() != existingInputs[i].getRecordID())
                 if (input.equals(existingInputs[i]))
-                    throw new EmfException("The combination of 'Input Name', 'Sector', and 'Program' " +
-                            "should be unique.");
+                    throw new EmfException("The combination of 'Input Name', 'Sector', and 'Program' "
+                            + "should be unique.");
         }
 
         InputName[] names = caseService().getInputNames();
@@ -117,25 +117,29 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
         presenter.doDisplay(propertiesView);
     }
-    
-    public void doExportWithOverwrite(EmfDataset[] datasets, Version[] versions, String folder, String purpose) throws EmfException {
-        doExport(datasets, versions, folder, true, purpose);
+
+    public void doExportWithOverwrite(EmfDataset[] datasets, Version[] versions, String[] folders, String purpose)
+            throws EmfException {
+        doExport(datasets, versions, folders, true, purpose);
     }
 
-    public void doExport(EmfDataset[] datasets, Version[] versions, String folder, String purpose) throws EmfException {
-        doExport(datasets, versions, folder, false, purpose);
+    public void doExport(EmfDataset[] datasets, Version[] versions, String[] folders, String purpose)
+            throws EmfException {
+        doExport(datasets, versions, folders, false, purpose);
     }
 
-    private void doExport(EmfDataset[] datasets, Version[] versions, String folder, boolean overwrite, String purpose) throws EmfException {
+    private void doExport(EmfDataset[] datasets, Version[] versions, String[] folders, boolean overwrite, String purpose)
+            throws EmfException {
         ExImService services = session.eximService();
-        
-        for (int i = 0; i < datasets.length; i++)
+
+        for (int i = 0; i < datasets.length; i++) {
             datasets[i].setAccessedDateTime(new Date());
-        
-        if (overwrite)
-            services.exportDatasetsWithOverwrite(session.user(), datasets, versions, mapToRemote(folder), purpose);
-        else
-            services.exportDatasets(session.user(), datasets, versions, mapToRemote(folder), purpose);
+
+            if (overwrite)
+                services.exportDatasetsWithOverwrite(session.user(), new EmfDataset[]{datasets[i]}, versions, mapToRemote(folders[i]), purpose);
+            else
+                services.exportDatasets(session.user(), new EmfDataset[]{datasets[i]}, versions, mapToRemote(folders[i]), purpose);
+        }
     }
 
     private String mapToRemote(String dir) {

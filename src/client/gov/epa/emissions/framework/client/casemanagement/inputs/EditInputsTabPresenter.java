@@ -19,8 +19,8 @@ public interface EditInputsTabPresenter extends CaseEditorTabPresenter {
 
     void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset);
     
-    void doExportWithOverwrite(EmfDataset[] datasets, Version[] versions, String folder, String purpose) throws EmfException;
+    void doExportWithOverwrite(EmfDataset[] datasets, Version[] versions, String[] folders, String purpose) throws EmfException;
 
-    void doExport(EmfDataset[] datasets, Version[] versions, String folder, String purpose) throws EmfException;
+    void doExport(EmfDataset[] datasets, Version[] versions, String[] folders, String purpose) throws EmfException;
 
 }
