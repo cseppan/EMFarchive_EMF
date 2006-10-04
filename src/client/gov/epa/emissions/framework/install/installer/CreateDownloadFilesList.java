@@ -4,10 +4,14 @@ import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class CreateDownloadFilesList {
 
@@ -19,14 +23,13 @@ public class CreateDownloadFilesList {
 
     private int counter = 0;
     
-    private File sccFile, clientJarFile;
+    private File clientJarFile;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mmaaa");
 
     public CreateDownloadFilesList(String dir, char delimiter) {
         this.dir = dir;
         this.delimiter = delimiter;
-        this.sccFile = new File(Constants.SCC_FILE);
         this.clientJarFile = new File(Constants.CLIENT_JAR_FILE);
     }
 
@@ -35,12 +38,16 @@ public class CreateDownloadFilesList {
             throw new Exception("The '" + dir + "' is not a directory");
         }
 
-        File[] files = getFiles(dir);
+        List jarRefFiles = new ArrayList();
+        File[] jarFiles = getFiles(dir);
+        File[] refFiles = getRefFiles(Constants.REFERENCE_PATH);
+        jarRefFiles.addAll(Arrays.asList(jarFiles));
+        jarRefFiles.addAll(Arrays.asList(refFiles));
+        
         printer = new PrintWriter(new BufferedWriter(new FileWriter(System.getProperty("user.dir") + File.separatorChar
                 + "deploy" + File.separatorChar + "client" + File.separatorChar + Constants.FILE_LIST)));
         printHeader();
-        createFilesList(files);
-        print(sccFile);
+        createFilesList((File[])jarRefFiles.toArray(new File[0]));
         print(clientJarFile);
         printer.close();
     }
@@ -60,6 +67,17 @@ public class CreateDownloadFilesList {
         }
 
         return null;
+    }
+
+    private File[] getRefFiles(String dir) {
+        FileFilter fileFilter = new FileFilter() {
+            public boolean accept(File file) {
+                return file.isFile();
+            }
+        };
+        File path = new File(dir);
+        
+        return path.listFiles(fileFilter);
     }
 
     private void createFilesList(File[] files) {
@@ -108,6 +126,9 @@ public class CreateDownloadFilesList {
     private String getRelativePath(File file) {
         String absFilePath = file.getAbsolutePath();
         String relativePath = "/lib/" + file.getName();
+        String parentPath = file.getParent();
+        System.out.println("Parent path: " + parentPath);
+        System.out.println(Constants.REFERENCE_PATH);
         
         if (absFilePath.indexOf("epa-commons") >= 0)
             relativePath = "/lib/epa-commons.jar";
@@ -115,7 +136,7 @@ public class CreateDownloadFilesList {
         if (absFilePath.indexOf("analysis-engine") >= 0)
             relativePath = "/lib/analysis-engine.jar";
         
-        if(absFilePath.equalsIgnoreCase(Constants.SCC_FILE))
+        if(parentPath.equalsIgnoreCase(Constants.REFERENCE_PATH))
             relativePath = "/config/ref/delimited/" + file.getName();
         
         if(absFilePath.equalsIgnoreCase(Constants.CLIENT_JAR_FILE))
