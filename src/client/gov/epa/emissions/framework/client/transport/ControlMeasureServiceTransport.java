@@ -32,7 +32,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (ControlMeasure[]) call.requestResponse(new Object[] {});
     }
 
-    public void addMeasure(ControlMeasure measure) throws EmfException {
+    public void addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("addMeasure");
@@ -73,7 +73,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (ControlMeasure) call.requestResponse(new Object[] { locked });
     }
 
-    public ControlMeasure updateMeasure(ControlMeasure measure) throws EmfException {
+    public ControlMeasure updateMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateMeasure");

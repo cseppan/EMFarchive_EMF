@@ -64,7 +64,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public void addMeasure(ControlMeasure measure) throws EmfException {
+    public void addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(measure, session);
@@ -122,7 +122,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public ControlMeasure updateMeasure(ControlMeasure measure) throws EmfException {
+    public ControlMeasure updateMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             ControlMeasure updated = dao.update(measure, session);

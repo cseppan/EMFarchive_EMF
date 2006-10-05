@@ -35,7 +35,7 @@ public class ControlMeasureServicePerformanceTest extends WebServicesTestCase {
         dumpMemory();
         ControlMeasure[] all = transport.getMeasures();
         dumpMemory();
-        assertEquals(all.length, 1067);
+        assertEquals(1067,all.length);
     }
 
  

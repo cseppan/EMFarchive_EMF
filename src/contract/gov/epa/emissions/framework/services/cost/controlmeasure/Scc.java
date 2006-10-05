@@ -1,6 +1,10 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure;
 
 public class Scc {
+    
+    private int id;
+    
+    private int controlMeasureId;
 
     private String code;
 
@@ -10,6 +14,23 @@ public class Scc {
 
     public Scc() {
         // Empty
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    
+    public int getControlMeasureId() {
+        return controlMeasureId;
+    }
+
+    public void setControlMeasureId(int controlMeasureId) {
+        this.controlMeasureId = controlMeasureId;
     }
 
     public Scc(String code, String description) {

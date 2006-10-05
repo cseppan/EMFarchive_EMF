@@ -66,7 +66,7 @@ public class CMImportTask {
 
     private void complete(ControlMeasure[] measures, Session session) {
         Date date = new Date();
-        List messages = new ArrayList(); // FIXME: show the error messages
+        List messages = new ArrayList(); 
         List addedMeasures = new ArrayList();
         int count = 0;
         for (int i = 0; i < measures.length; i++) {

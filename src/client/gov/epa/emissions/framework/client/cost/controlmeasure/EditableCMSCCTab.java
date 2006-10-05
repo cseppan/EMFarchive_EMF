@@ -25,7 +25,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class EditableCMSCCTab extends JPanel implements ControlMeasureTabView, CMSCCTab {
+public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView, CMSCCTab {
 
     private SCCTableData tableData;
 
@@ -40,8 +40,10 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureTabView, C
     private JPanel mainPanel;
 
     private EmfSession session;
-    
+
     private ManageChangeables changeables;
+
+    private Scc[] sccs;
 
     public EditableCMSCCTab(ControlMeasure measure, EmfSession session, ManageChangeables changeables,
             MessagePanel messagePanel, EmfConsole parent) {
@@ -51,6 +53,7 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureTabView, C
         this.parent = parent;
         mainPanel = new JPanel(new BorderLayout());
         doLayout(measure, changeables);
+        sccs = new Scc[] {};
     }
 
     private void doLayout(ControlMeasure measure, ManageChangeables changeables) {
@@ -84,10 +87,10 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureTabView, C
         panel.add(addButton);
         Button removeButton = new RemoveButton(removeAction());
         panel.add(removeButton);
-        
+
         JPanel container = new JPanel(new BorderLayout());
         container.add(panel, BorderLayout.LINE_START);
-        
+
         return container;
     }
 
@@ -119,8 +122,8 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureTabView, C
 
     protected void remove() {
         List selected = sortFilterSelectModel.selected();
-        Scc[] records = (Scc[])selected.toArray(new Scc[0]);
-        
+        Scc[] records = (Scc[]) selected.toArray(new Scc[0]);
+
         if (records.length == 0)
             return;
 
@@ -140,29 +143,32 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureTabView, C
     private Scc[] createSccs(ControlMeasure measure) throws EmfException {
         ControlMeasureService service = session.controlMeasureService();
         Scc[] sccs = service.getSccs(measure);
-        
+
         return sccs;
     }
 
     public void save(ControlMeasure measure) {
-        List sccs = tableData.rows();
-        Scc[] newSccs = new Scc[sccs.size()];
-        for (int i = 0; i < sccs.size(); i++) {
-            ViewableRow row = (ViewableRow) sccs.get(i);
+        List sccsList = tableData.rows();
+        sccs = new Scc[sccsList.size()];
+        for (int i = 0; i < sccsList.size(); i++) {
+            ViewableRow row = (ViewableRow) sccsList.get(i);
             Scc scc = (Scc) row.source();
-            newSccs[i] = new Scc(scc.getCode(), ""); //FIXME: get scc description
+            sccs[i] = new Scc(scc.getCode(), "");
         }
-        measure.setSccs(newSccs);
     }
 
     public void add(Scc[] sccs) {
         for (int i = 0; i < sccs.length; i++) {
             tableData.add(sccs);
         }
-        
+
         SortFilterSelectionPanel panel = sortFilterPanel();
         mainPanel.removeAll();
         mainPanel.add(panel);
+    }
+
+    public Scc[] sccs() {
+        return sccs;
     }
 
 }

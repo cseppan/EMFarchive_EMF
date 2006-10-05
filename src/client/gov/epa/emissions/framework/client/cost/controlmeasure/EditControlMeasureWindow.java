@@ -77,15 +77,16 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     }
 
     private JPanel createSCCTab(ControlMeasure measure, MessagePanel messagePanel) {
-        ControlMeasureTabView view = new EditableCMSCCTab(measure, session,this, messagePanel, parent);
+        ControlMeasureSccTabView view = new EditableCMSCCTab(measure, session, this, messagePanel, parent);
         presenter.set(view);
         return (JPanel) view;
     }
-    
+
     private Component createEfficiencyTab(ControlMeasure measure, MessagePanel messagePanel) {
-        ControlMeasureEfficiencyTab view = new ControlMeasureEfficiencyTab(measure, this, parent, session, desktopManager, messagePanel);
+        ControlMeasureEfficiencyTab view = new ControlMeasureEfficiencyTab(measure, this, parent, session,
+                desktopManager, messagePanel);
         presenter.set(view);
-        
+
         return view;
     }
 

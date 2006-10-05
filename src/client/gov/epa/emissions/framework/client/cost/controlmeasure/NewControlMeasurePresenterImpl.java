@@ -22,6 +22,8 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
 
     private RefreshObserver parent;
 
+    private EditableCMSCCTab sccView;
+
     public NewControlMeasurePresenterImpl(ControlMeasure measure, ControlMeasureView view, EmfSession session,
             RefreshObserver parent) {
         this.measure = measure;
@@ -51,7 +53,7 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
             element.doSave(measure);
         }
 
-        service.addMeasure(measure);
+        service.addMeasure(measure, sccView.sccs());
         view.disposeView();
         parent.doRefresh();
     }
@@ -67,8 +69,14 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
     }
     
     public void set(EditableCMSCCTab sccView) {
+        this.sccView = sccView;
         EditableCMSCCTabPresenterImpl sccPresenter = new EditableCMSCCTabPresenterImpl(sccView);
         presenters.add(sccPresenter);
+    }
+
+    public void set(ControlMeasureSccTabView effTabView) {
+        // NOTE Auto-generated method stub
+        
     }
 
 

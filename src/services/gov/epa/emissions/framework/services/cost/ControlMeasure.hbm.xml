@@ -42,16 +42,7 @@
             class="gov.epa.emissions.framework.services.cost.data.ControlTechnology"
             column="control_technology"/> 
             
-       <array name="sccs" table="control_measure_sccs" >
-    		<key column="control_measures_id" not-null="true"/>
-	    	<list-index column="list_index"/>
-	    	 <composite-element class="gov.epa.emissions.framework.services.cost.controlmeasure.Scc">
-				<property name="code" column="name" type="string" not-null="true"/>
-				<property name="status" column="status" type="string" not-null="false"/>
-			</composite-element>
-	   </array>
-
- 	   <array name="efficiencyRecords" table="control_measure_efficiencyrecords" cascade="save-update">
+       <array name="efficiencyRecords" table="control_measure_efficiencyrecords" cascade="save-update">
       		<key column="control_measures_id" not-null="true"/>
       		<list-index column="list_index"/>
 		    <composite-element class="gov.epa.emissions.framework.services.cost.data.EfficiencyRecord">

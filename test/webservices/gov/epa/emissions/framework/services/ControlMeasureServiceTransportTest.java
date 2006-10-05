@@ -43,7 +43,7 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
         cm.setName("cm test added");
         cm.setEquipmentLife(12);
         cm.setAbbreviation("12345678");
-        service.addMeasure(cm);
+        service.addMeasure(cm, new Scc[]{});
 
         ControlMeasure[] all = service.getMeasures();
         assertEquals(all.length, 1);
@@ -59,12 +59,12 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
         cm.setEquipmentLife(12);
         cm.setName("cm test added");
         cm.setAbbreviation("12345678");
-        service.addMeasure(cm);
+        service.addMeasure(cm, new Scc[]{});
         
         ControlMeasure cmModified = service.obtainLockedMeasure(owner, service.getMeasures()[0]);
         cmModified.setEquipmentLife(120);
         cmModified.setName("cm updated");
-        ControlMeasure cm2 = service.updateMeasure(cmModified);
+        ControlMeasure cm2 = service.updateMeasure(cmModified, new Scc[]{});
         
         try {
             assertEquals("cm updated", cm2.getName());
@@ -79,7 +79,7 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("xxxx");
         cm.setAbbreviation("yyyyyyyy");
-        service.addMeasure(cm);
+        service.addMeasure(cm, new Scc[]{});
         
         ControlMeasure released = null;
 
@@ -103,7 +103,7 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
         
         //These scc numbers have to exist in the reference.scc table
         cm.setSccs(new Scc[] {new Scc("10100224", ""), new Scc("10100225", ""), new Scc("10100226", "")} ); 
-        service.addMeasure(cm);
+        service.addMeasure(cm, new Scc[]{});
         int measuresAfterAddOne = service.getMeasures().length;
         
         Scc[] sccs = service.getSccs(cm);

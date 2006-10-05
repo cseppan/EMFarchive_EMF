@@ -9,8 +9,10 @@ public interface ControlMeasurePresenter {
     void doClose() throws EmfException;
 
     void doSave() throws EmfException;
-    
+
     void set(ControlMeasureTabView effTabView);
+
+    void set(ControlMeasureSccTabView effTabView);
 
     void set(ControlMeasureEfficiencyTabView effTabView);
 }

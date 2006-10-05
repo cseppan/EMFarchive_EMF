@@ -22,6 +22,8 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
 
     private RefreshObserver parent;
 
+    private ControlMeasureSccTabView sccTabView;
+
     public EditorControlMeasurePresenterImpl(ControlMeasure measure, ControlMeasureView view, EmfSession session,
             RefreshObserver parent) {
         this.measure = measure;
@@ -61,7 +63,7 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
             element.doSave(measure);
         }
 
-        service.updateMeasure(measure);
+        service.updateMeasure(measure, sccTabView.sccs());
 
         view.disposeView();
         parent.doRefresh();
@@ -75,6 +77,12 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
     public void set(ControlMeasureEfficiencyTabView effTabView) {
         EditableCMEfficiencyTabPresenterImpl effTabPresenter = new EditableCMEfficiencyTabPresenterImpl(effTabView);
         presenters.add(effTabPresenter);
+    }
+
+    public void set(ControlMeasureSccTabView sccTabView) {
+        this.sccTabView = sccTabView;
+        ControlMeasureTabPresenterImpl sccPresenter = new ControlMeasureTabPresenterImpl(sccTabView);
+        presenters.add(sccPresenter);
     }
 
 }
