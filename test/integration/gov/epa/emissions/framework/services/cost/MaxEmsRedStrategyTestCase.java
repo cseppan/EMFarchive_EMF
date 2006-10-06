@@ -95,7 +95,12 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         measure.setEfficiencyRecords(records);
         measure.setSccs(sccs);
         add(measure);
-        return (ControlMeasure) load(ControlMeasure.class,measure.getName());
+        ControlMeasure load = (ControlMeasure) load(ControlMeasure.class,measure.getName());
+        for (int i = 0; i < sccs.length; i++) {
+            sccs[i].setControlMeasureId(load.getId());
+            add(sccs[i]);
+        }
+        return load;
     }
 
     protected EfficiencyRecord record(Pollutant pollutant,String locale, float efficiency, float cost, int costYear) {

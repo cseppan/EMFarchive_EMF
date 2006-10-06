@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
+import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 import java.util.List;
@@ -37,29 +38,15 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
+        Scc[] sccs = { new Scc("100232", "") };
         try {
-            dao.add(cm, session);
+            dao.add(cm, sccs, session);
             ControlMeasure result = load(cm);
 
             assertEquals(cm.getId(), result.getId());
             assertEquals(cm.getName(), result.getName());
         } finally {
-            remove(cm);
-        }
-    }
-
-    public void testShouldUpdateControlMeasureOnUpdate() throws Exception {
-        ControlMeasure cm = new ControlMeasure();
-
-        try {
-            cm.setName("cm one modified");
-            cm.setAbbreviation("12345678");
-            dao.updateWithoutLocking(cm, session);
-            ControlMeasure result = load(cm);
-
-            assertEquals(cm.getId(), result.getId());
-            assertEquals("cm one modified", result.getName());
-        } finally {
+            remove(sccs[0]);
             remove(cm);
         }
     }
@@ -180,7 +167,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
             assertEquals(locked.getLockOwner(), owner.getUsername());
             locked.setName("TEST");
 
-            ControlMeasure modified = dao.update(locked, session);
+            ControlMeasure modified = dao.update(locked,locked.getSccs(), session);
             assertEquals("TEST", locked.getName());
             assertEquals(modified.getLockOwner(), null);
         } finally {
@@ -242,12 +229,12 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         cm.setCreator(emfUser);
 
         try {
-            dao.add(cm, session);
+            dao.add(cm, cm.getSccs(), session);
             cm = dao.obtainLocked(emfUser, cm, session);
             EfficiencyRecord record1 = efficiencyRecord(pm10Pollutant(), "22");
             EfficiencyRecord record2 = efficiencyRecord(pm10Pollutant(), "22");
             cm.setEfficiencyRecords(new EfficiencyRecord[] { record1, record2 });
-            dao.update(cm, session);
+            dao.update(cm, cm.getSccs(), session);
 
             ControlMeasure newMeasure = load(cm);
             EfficiencyRecord[] efficiencyRecords = newMeasure.getEfficiencyRecords();

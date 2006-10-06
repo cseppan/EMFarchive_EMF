@@ -46,7 +46,6 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         Session session = sessionFactory.getSession();
         try {
             List all = dao.all(session);
-            shaveOffSccs(all);
             return (ControlMeasure[]) all.toArray(new ControlMeasure[0]);
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve control measures.", e);
@@ -57,17 +56,10 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    protected void shaveOffSccs(List all) {
-        for (int i = 0; i < all.size(); i++) {
-            ControlMeasure cm = (ControlMeasure) all.get(i);
-            cm.setSccs(new Scc[] {});
-        }
-    }
-
     public void addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            dao.add(measure, session);
+            dao.add(measure, sccs,session);
         } catch (RuntimeException e) {
             LOG.error("Could not add control measure: " + measure.getName(), e);
             throw new EmfException("Could not add control measure: " + measure.getName());
@@ -76,6 +68,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
+    //FIXME: remove associate sccs
     public void removeMeasure(ControlMeasure measure) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -125,7 +118,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     public ControlMeasure updateMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            ControlMeasure updated = dao.update(measure, session);
+            ControlMeasure updated = dao.update(measure,sccs, session);
             return updated;
         } catch (RuntimeException e) {
             LOG.error("Could not update for ControlMeasure: " + measure.getName(), e);

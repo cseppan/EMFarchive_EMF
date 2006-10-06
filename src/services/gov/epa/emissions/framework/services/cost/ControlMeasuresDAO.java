@@ -64,13 +64,21 @@ public class ControlMeasuresDAO {
         return hibernateFacade.getAll(ControlMeasure.class, session);
     }
 
-    public void add(ControlMeasure measure, Session session) throws EmfException {
+    // NOTE: it't not happening in one transaction. modify?
+    public void add(ControlMeasure measure, Scc[] sccs, Session session) throws EmfException {
         checkForConstraints(measure, session);
         hibernateFacade.add(measure, session);
+        controlMeasureIds(measure, sccs, session);
+        hibernateFacade.add(sccs, session);
     }
 
-    public void updateWithoutLocking(ControlMeasure measure, Session session) {
-        hibernateFacade.update(measure, session);
+    private void controlMeasureIds(ControlMeasure measure, Scc[] sccs, Session session) {
+        ControlMeasure cm = (ControlMeasure) hibernateFacade.load(ControlMeasure.class, Restrictions.eq("name", measure
+                .getName()), session);
+        int cmId = cm.getId();
+        for (int i = 0; i < sccs.length; i++) {
+            sccs[i].setControlMeasureId(cmId);
+        }
     }
 
     public void remove(ControlMeasure measure, Session session) {
@@ -85,9 +93,12 @@ public class ControlMeasuresDAO {
         return (ControlMeasure) lockingScheme.releaseLock(locked, session, all(session));
     }
 
-    public ControlMeasure update(ControlMeasure locked, Session session) throws EmfException {
+    public ControlMeasure update(ControlMeasure locked, Scc[] sccs, Session session) throws EmfException {
         checkForConstraints(locked, session);
-        return (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, session, all(session));
+        ControlMeasure releaseLockOnUpdate = (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, session,
+                all(session));
+        hibernateFacade.update(sccs, session);
+        return releaseLockOnUpdate;
     }
 
     public void update(ControlMeasure[] measures, Session session) {

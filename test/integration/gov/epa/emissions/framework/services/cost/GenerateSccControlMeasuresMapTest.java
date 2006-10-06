@@ -28,7 +28,8 @@ public class GenerateSccControlMeasuresMapTest extends MaxEmsRedStrategyTestCase
             assertEquals(2, measures.length);
             assertEquals(cm1.getId(), measures[0].getId());
             assertEquals(cm2.getId(), measures[1].getId());
-        }finally {
+        } finally {
+            dropAll(Scc.class);
             dropAll(ControlMeasure.class);
             dropAll(ControlStrategy.class);
         }

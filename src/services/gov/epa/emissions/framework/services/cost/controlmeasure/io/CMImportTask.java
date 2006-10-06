@@ -73,7 +73,7 @@ public class CMImportTask {
             measures[i].setCreator(user);
             measures[i].setLastModifiedTime(date);
             try {
-                controlMeasuresDao.add(measures[i], session);
+                controlMeasuresDao.add(measures[i],measures[i].getSccs(), session);
                 addedMeasures.add(controlMeasuresDao.load(measures[i], session));
                 count++;
             } catch (EmfException e) {

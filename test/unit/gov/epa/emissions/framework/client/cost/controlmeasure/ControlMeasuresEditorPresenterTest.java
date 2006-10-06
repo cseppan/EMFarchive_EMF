@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
+import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
 
         ControlMeasureView viewProxy = (ControlMeasureView) view.proxy();
         EmfSession sessionProxy = (EmfSession) session.proxy();
+        
         presenter = new EditorControlMeasurePresenterImpl(measure, viewProxy, sessionProxy, (RefreshObserver)managerPresenter.proxy());
     }
 
@@ -65,7 +67,11 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
     }
 
     public void testShouldUpdateDatasetRefreshDatasetsBrowserAndCloseWindowOnSave() throws Exception {
-        controlMeasureService.expects(once()).method("updateMeasure").with(eq(measure));
+        Mock sccTabView = mock(ControlMeasureSccTabView.class);
+        Scc[] sccs = new Scc[]{};
+        expects(sccTabView,1, "sccs",sccs);
+        presenter.set((ControlMeasureSccTabView) sccTabView.proxy());
+        controlMeasureService.expects(once()).method("updateMeasure").with(eq(measure),eq(sccs));
         expects(view, "disposeView");
         presenter.save(measure, (ControlMeasureService) controlMeasureService.proxy(), presenters(), (ControlMeasureView) view
                 .proxy());

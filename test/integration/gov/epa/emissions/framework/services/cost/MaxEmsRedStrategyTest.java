@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.analysis.maxreduction.MaxEmsRedStrategy;
@@ -30,8 +31,10 @@ public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
         } finally {
             if (strategy != null)
                 dropTable(detailResultDatasetTableName(strategy), dbServer().getEmissionsDatasource());
+            dropAll(Scc.class);
             dropAll(ControlMeasure.class);
             dropAll(ControlStrategy.class);
+            dropAll(Dataset.class);
         }
 
     }
