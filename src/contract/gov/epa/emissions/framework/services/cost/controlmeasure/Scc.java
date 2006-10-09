@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure;
 
 public class Scc {
-    
+
     private int id;
-    
+
     private int controlMeasureId;
 
     private String code;
@@ -24,7 +24,6 @@ public class Scc {
         this.id = id;
     }
 
-    
     public int getControlMeasureId() {
         return controlMeasureId;
     }
@@ -66,7 +65,7 @@ public class Scc {
         if (obj == null || !(obj instanceof Scc))
             return false;
         Scc other = (Scc) obj;
-        return code.equals(other.getCode());
+        return id == other.getId() ||( controlMeasureId == other.getControlMeasureId() && code.equals(other.getCode()));
     }
 
     public int hashCode() {

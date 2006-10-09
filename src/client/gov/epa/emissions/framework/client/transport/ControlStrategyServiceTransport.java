@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.services.cost.StrategyType;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 
 public class ControlStrategyServiceTransport implements ControlStrategyService {
 
@@ -131,6 +132,17 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
 
         call.request(new Object[] { user, controlStrategy });
         
+    }
+
+    public ControlStrategyResult controlStrategyResults(ControlStrategy controlStrategy) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("controlStrategyResults");
+        call.addParam("controlStrategy", mappings.controlStrategy());
+        
+        call.setReturnType(mappings.controlStrategyResult());
+
+        return (ControlStrategyResult) call.requestResponse(new Object[] { controlStrategy });
     }
 
 }

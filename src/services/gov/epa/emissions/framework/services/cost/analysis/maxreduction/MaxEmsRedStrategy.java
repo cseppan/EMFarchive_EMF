@@ -16,7 +16,7 @@ import gov.epa.emissions.framework.services.cost.analysis.Strategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.DatasetCreator;
 import gov.epa.emissions.framework.services.cost.controlStrategy.GenerateSccControlMeasuresMap;
 import gov.epa.emissions.framework.services.cost.controlStrategy.SccControlMeasuresMap;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -64,7 +64,7 @@ public class MaxEmsRedStrategy implements Strategy {
         EmfDataset resultDataset = resultDataset();
         createTable(creator.outputTableName());
         OptimizedQuery optimizedQuery = sourceQuery(inputDataset);
-        StrategyResult result = strategyResult(resultDataset);
+        ControlStrategyResult result = strategyResult(resultDataset);
 
         try {
             StrategyLoader loader = new StrategyLoader(creator.outputTableName(), tableFormat, dbServer, result, map,
@@ -79,11 +79,23 @@ public class MaxEmsRedStrategy implements Strategy {
             close(optimizedQuery);
             result.setCompletionTime(new Date());
         }
-        controlStrategy.setStrategyResults(new StrategyResult[] { result });
+        saveResults(result);
     }
 
-    private StrategyResult strategyResult(EmfDataset resultDataset) throws EmfException {
-        StrategyResult result = new StrategyResult();
+    private void saveResults(ControlStrategyResult result) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            ControlStrategyDAO dao = new ControlStrategyDAO();
+            dao.add(result, session);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not save control strategy results-" + e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+
+    private ControlStrategyResult strategyResult(EmfDataset resultDataset) throws EmfException {
+        ControlStrategyResult result = new ControlStrategyResult();
         result.setControlStrategyId(controlStrategy.getId());
         result.setInputDatasetId(inputDataset.getId());
         result.setDetailedResultDataset(resultDataset);

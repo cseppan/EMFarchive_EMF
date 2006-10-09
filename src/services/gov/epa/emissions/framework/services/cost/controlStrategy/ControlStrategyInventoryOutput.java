@@ -83,29 +83,45 @@ public class ControlStrategyInventoryOutput {
         copyDataFromOriginalTable(inputTable, outputInventoryTableName, version(inputDataset, controlStrategy
                 .getDatasetVersion()), inputDataset, datasource);
 
-        updateDataWithDetailDatasetTable(outputInventoryTableName, detailDatasetTable(controlStrategy), server
+        ControlStrategyResult result = controlStrategyResults(controlStrategy);
+        updateDataWithDetailDatasetTable(outputInventoryTableName, detailDatasetTable(result), server
                 .getEmissionsDatasource());
 
         EmfDataset dataset = creator.addDataset(controlStrategy.getDatasetType(), description(inputDataset),
                 tableFormat, inputDataset.getName(), datasource);
         updateDatasetIdAndVersion(outputInventoryTableName, server.getEmissionsDatasource(), dataset.getId());
 
-        updateControlStrategyResults(controlStrategy, dataset);
+        updateControlStrategyResults(result, dataset);
     }
 
     private String description(EmfDataset inputDataset) {
         return inputDataset.getDescription() + "#" + "Implements control strategy: " + controlStrategy.getName() + "\n";
     }
 
-    private void updateControlStrategyResults(ControlStrategy controlStrategy, EmfDataset dataset) throws EmfException {
-        StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
-        strategyResults[0].setControlledInventoryDataset(dataset);
-        ControlStrategyDAO dao = new ControlStrategyDAO();
+    private ControlStrategyResult controlStrategyResults(ControlStrategy controlStrategy) throws EmfException {
         Session session = HibernateSessionFactory.get().getSession();
         try {
-            dao.update(controlStrategy, session);
+            ControlStrategyDAO dao = new ControlStrategyDAO();
+            ControlStrategyResult result = dao.controlStrategyResult(controlStrategy, session);
+            if (result == null)
+                throw new EmfException("You have to run the control strategy to create control inventory output");
+            return result;
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+
+    }
+
+    private void updateControlStrategyResults(ControlStrategyResult result, EmfDataset dataset) throws EmfException {
+        Session session = HibernateSessionFactory.get().getSession();
+        try {
+            ControlStrategyDAO dao = new ControlStrategyDAO();
+            result.setControlledInventoryDataset(dataset);
+            dao.updateControlStrategyResults(result, session);
+        } catch (Exception e) {
+            throw new EmfException("Could not update control strategy results: " + e.getMessage());
         } finally {
             session.close();
         }
@@ -166,9 +182,8 @@ public class ControlStrategyInventoryOutput {
                 + qualifiedTable(outputTable, datasource) + ".record_id=b.source_id";
     }
 
-    private String detailDatasetTable(ControlStrategy controlStrategy) {
-        StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
-        Dataset detailedResultDataset = strategyResults[0].getDetailedResultDataset();
+    private String detailDatasetTable(ControlStrategyResult result) {
+        Dataset detailedResultDataset = result.getDetailedResultDataset();
         return detailedResultDataset.getInternalSources()[0].getTable();
     }
 

@@ -67,7 +67,8 @@ CREATE TABLE emf.control_measure_sccs
    id SERIAL PRIMARY KEY,
    control_measures_id  int4 NOT NULL REFERENCES emf.control_measures(id),
    name varchar(15),
-   status varchar(255)
+   status varchar(255),
+   UNIQUE(control_measures_id,name)
 )
 WITHOUT OIDS;
 -- emf.control_measure_sccs

@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
-import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -10,7 +9,7 @@ import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.LoggingService;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExImService;
 
@@ -57,8 +56,7 @@ public class EditControlStrategyOutputTabPresenterTest extends MockObjectTestCas
         user.setName("full name");
 
         EmfDataset dataset = new EmfDataset();
-        ControlStrategy controlStrategy = setupControlStrategy(dataset);
-
+        ControlStrategyResult result = result(dataset);
         Version version = new Version();
 
         Mock model = mock(ExImService.class);
@@ -74,25 +72,26 @@ public class EditControlStrategyOutputTabPresenterTest extends MockObjectTestCas
         EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter(
                 (EmfSession) session.proxy(), null);
 
-        presenter.doExport(datasets(controlStrategy), folder);
+        presenter.doExport(datasets(result), folder);
     }
 
-    private EmfDataset[] datasets(ControlStrategy controlStrategy) {
+    private ControlStrategyResult result(EmfDataset dataset) {
+        ControlStrategyResult result = new ControlStrategyResult();
+        result.setDetailedResultDataset(dataset);
+        result.setControlledInventoryDataset(dataset);
+        return result;
+    }
+
+    private EmfDataset[] datasets(ControlStrategyResult controlStrategyResult) {
         EmfDataset[] datasets = new EmfDataset[2];
-        StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
-        datasets[0] = (EmfDataset) strategyResults[0].getDetailedResultDataset();
-        datasets[1] = (EmfDataset) strategyResults[0].getControlledInventoryDataset();
+        datasets[0] = (EmfDataset) controlStrategyResult.getDetailedResultDataset();
+        datasets[1] = (EmfDataset) controlStrategyResult.getControlledInventoryDataset();
         return datasets;
     }
 
-    private ControlStrategy setupControlStrategy(Dataset dataset) {
-        StrategyResult result = new StrategyResult();
-        result.setDetailedResultDataset(dataset);
-        result.setControlledInventoryDataset(dataset);
-        StrategyResult[] results = { result };
+    private ControlStrategy setupControlStrategy() {
         ControlStrategy controlStrategy = new ControlStrategy();
         controlStrategy.setName("CS1");
-        controlStrategy.setStrategyResults(results);
         return controlStrategy;
     }
 
@@ -103,9 +102,10 @@ public class EditControlStrategyOutputTabPresenterTest extends MockObjectTestCas
         dataset.setAccessedDateTime(new Date());
         dataset.setId(id);
 
-        ControlStrategy controlStrategy = setupControlStrategy(dataset);
+        ControlStrategyResult result = result(dataset);
+        ControlStrategy controlStrategy = setupControlStrategy();
         String controlStrategyName = controlStrategy.getName();
-        
+
         Mock loggingService = mock(LoggingService.class);
 
         loggingService.expects(atLeastOnce()).method("getLastExportedFileName").with(eq(id)).will(
@@ -113,14 +113,14 @@ public class EditControlStrategyOutputTabPresenterTest extends MockObjectTestCas
         session.stubs().method("loggingService").withNoArguments().will(returnValue(loggingService.proxy()));
 
         Mock view = mock(EditControlStrategyOutputTabView.class);
-        
+
         view.expects(once()).method("displayAnalyzeTable").with(eq(controlStrategyName),
-                eq(new String[] { fileNameOnLocalDrive,fileNameOnLocalDrive }));
+                eq(new String[] { fileNameOnLocalDrive, fileNameOnLocalDrive }));
 
         EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter(
                 (EmfSession) session.proxy(), (EditControlStrategyOutputTabView) view.proxy());
 
-        presenter.doAnalyze(controlStrategyName, datasets(controlStrategy));
+        presenter.doAnalyze(controlStrategyName, datasets(result));
     }
 
 }

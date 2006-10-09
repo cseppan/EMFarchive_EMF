@@ -5,7 +5,9 @@ import gov.epa.emissions.commons.data.Dataset;
 import java.io.Serializable;
 import java.util.Date;
 
-public class StrategyResult implements Serializable {
+public class ControlStrategyResult implements Serializable {
+    
+    private int id;
 
     private int controlStrategyId;
 
@@ -27,10 +29,18 @@ public class StrategyResult implements Serializable {
     
     private StrategyResultType strategyResultType;
 
-    public StrategyResult() {
+    public ControlStrategyResult() {
         //
     }
     
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public int getControlStrategyId() {
         return controlStrategyId;
     }

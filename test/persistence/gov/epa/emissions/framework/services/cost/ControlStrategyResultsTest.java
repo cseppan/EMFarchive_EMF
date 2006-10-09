@@ -1,9 +1,10 @@
 package gov.epa.emissions.framework.services.cost;
 
-import java.util.List;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 
 import gov.epa.emissions.framework.services.ServiceTestCase;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -11,7 +12,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 public class ControlStrategyResultsTest extends ServiceTestCase {
 
     private ControlStrategyDAO controlStrategydao;
-    
+
     private DatasetDAO datasetDAO;
 
     protected void doSetUp() throws Exception {
@@ -24,42 +25,52 @@ public class ControlStrategyResultsTest extends ServiceTestCase {
         // NOTE Auto-generated method stub
 
     }
-    
-    //FIXME: save dataset indirrectly when saving control strategy
-    public void testShouldSaveControlStrategyWithResultsSummary(){
-        ControlStrategy element = new ControlStrategy("test" + Math.random());
-        
-        StrategyResult result = new StrategyResult();
+
+    public void testShouldSaveControlStrategyResultsSummary() throws HibernateException, Exception {
         EmfDataset dataset = dataset();
+        ControlStrategy element = controlStrategy(dataset);
+
+        ControlStrategyResult result = new ControlStrategyResult();
+        result.setControlStrategyId(element.getId());
         result.setDetailedResultDataset(dataset);
-        
         StrategyResultType detailedStrategyResultType = controlStrategydao.getDetailedStrategyResultType(session);
         result.setStrategyResultType(detailedStrategyResultType);
-        element.setStrategyResults(new StrategyResult[]{result});
-        
-        try{
-            controlStrategydao.add(element, session);
-            
-        List list = controlStrategydao.all(session);
-        //ControlStrategy retreivedCS = (ControlStrategy) list.get(0);
-        //assertEquals(element,retreivedCS);
-        assertTrue(list.contains(element));
-        }finally{
-            controlStrategydao.remove(element,session);
-            datasetDAO.remove(dataset,session);
+
+        try {
+            controlStrategydao.add(result, session);
+
+            ControlStrategyResult savedResult = controlStrategydao.controlStrategyResult(element, session);
+            assertEquals(element.getId(), savedResult.getControlStrategyId());
+        } finally {
+            dropAll(ControlStrategyResult.class);
+            dropAll(ControlStrategy.class);
+            dropAll(EmfDataset.class);
         }
     }
-    
-    public void testShouldGetDetailedStrategyResultType(){
+
+    private ControlStrategy controlStrategy(EmfDataset dataset) throws HibernateException, Exception {
+        Session session = sessionFactory().getSession();
+        ControlStrategy element = new ControlStrategy("test" + Math.random());
+        element.setInputDatasets(new EmfDataset[] { dataset });
+        ControlStrategyDAO dao = new ControlStrategyDAO();
+        try {
+            dao.add(element, session);
+            return (ControlStrategy) dao.all(session).get(0);
+        } finally {
+            session.close();
+        }
+    }
+
+    public void testShouldGetDetailedStrategyResultType() {
         StrategyResultType detailedStrategyResultType = controlStrategydao.getDetailedStrategyResultType(session);
-        assertEquals("Detailed Strategy Result",detailedStrategyResultType.getName());
+        assertEquals("Detailed Strategy Result", detailedStrategyResultType.getName());
     }
 
     private EmfDataset dataset() {
-        EmfDataset dataset=  new EmfDataset();
-        dataset.setName("test_dataset"+ Math.random());
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("test_dataset" + Math.random());
         dataset.setCreator("emf");
-        datasetDAO.add(dataset,session);
+        datasetDAO.add(dataset, session);
         return dataset;
     }
 

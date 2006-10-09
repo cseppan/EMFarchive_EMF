@@ -11,7 +11,7 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
 import gov.epa.emissions.framework.services.cost.controlStrategy.SccControlMeasuresMap;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,7 +22,7 @@ public class StrategyLoader {
 
     private OptimizedTableModifier modifier;
 
-    private StrategyResult result;
+    private ControlStrategyResult result;
 
     private CalMaxEmsRedControlMeasure maxEmsReduction;
 
@@ -30,7 +30,7 @@ public class StrategyLoader {
 
     private double totalReduction;
 
-    public StrategyLoader(String tableName, TableFormat tableFormat, DbServer dbServer, StrategyResult result,
+    public StrategyLoader(String tableName, TableFormat tableFormat, DbServer dbServer, ControlStrategyResult result,
             SccControlMeasuresMap map, ControlStrategy controlStrategy) throws EmfException {
         this.tableFormat = tableFormat;
         this.result = result;

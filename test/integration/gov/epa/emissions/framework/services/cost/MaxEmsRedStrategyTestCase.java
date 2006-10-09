@@ -13,12 +13,14 @@ import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.File;
+
+import org.hibernate.Session;
 
 public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
 
@@ -46,12 +48,10 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         dropTable("test", dbServer.getEmissionsDatasource());
         dropAll(InternalSource.class);
         dropAll(EmfDataset.class);
-        
+
     }
 
-
-
-    protected ControlStrategy controlStrategy(EmfDataset inputDataset,String name, Pollutant pollutant) {
+    protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant) {
         ControlStrategy strategy = new ControlStrategy();
         strategy.setName(name);
         strategy.setInputDatasets(new EmfDataset[] { inputDataset });
@@ -77,7 +77,7 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         Version version = new Version();
         version.setVersion(0);
         version.setDatasetId(inputDataset.getId());
-        
+
         File folder = new File("test/data/cost");
         String[] fileNames = { "orl-nonpoint-with-larger_values.txt" };
         ORLNonPointImporter importer = new ORLNonPointImporter(folder, fileNames, inputDataset, dbServer, sqlDataTypes,
@@ -88,14 +88,14 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         return (EmfDataset) load(EmfDataset.class, "test");
     }
 
-    protected ControlMeasure addControlMeasure(String name, String abbr,Scc[]sccs, EfficiencyRecord[] records) {
+    protected ControlMeasure addControlMeasure(String name, String abbr, Scc[] sccs, EfficiencyRecord[] records) {
         ControlMeasure measure = new ControlMeasure();
         measure.setName(name);
         measure.setAbbreviation(abbr);
         measure.setEfficiencyRecords(records);
         measure.setSccs(sccs);
         add(measure);
-        ControlMeasure load = (ControlMeasure) load(ControlMeasure.class,measure.getName());
+        ControlMeasure load = (ControlMeasure) load(ControlMeasure.class, measure.getName());
         for (int i = 0; i < sccs.length; i++) {
             sccs[i].setControlMeasureId(load.getId());
             add(sccs[i]);
@@ -103,7 +103,7 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         return load;
     }
 
-    protected EfficiencyRecord record(Pollutant pollutant,String locale, float efficiency, float cost, int costYear) {
+    protected EfficiencyRecord record(Pollutant pollutant, String locale, float efficiency, float cost, int costYear) {
         EfficiencyRecord record = new EfficiencyRecord();
         record.setPollutant(pollutant);
         record.setLocale(locale);
@@ -115,10 +115,15 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         return record;
     }
 
-    protected String detailResultDatasetTableName(ControlStrategy strategy) {
-        StrategyResult[] strategyResults = strategy.getStrategyResults();
-        Dataset detailedResultDataset = strategyResults[0].getDetailedResultDataset();
-        return detailedResultDataset.getInternalSources()[0].getTable();
+    protected String detailResultDatasetTableName(ControlStrategy strategy) throws Exception {
+        Session session = sessionFactory().getSession();
+        try {
+            ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, session);
+            Dataset detailedResultDataset = result.getDetailedResultDataset();
+            return detailedResultDataset.getInternalSources()[0].getTable();
+        } finally {
+            session.close();
+        }
     }
 
 }

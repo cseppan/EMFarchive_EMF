@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -62,23 +61,23 @@ public class ControlStrategiesTableData extends AbstractTableData {
     }
 
     private double getReduction(ControlStrategy element) {
-        StrategyResult[] results = element.getStrategyResults();
+        //ControlStrategyResult[] results = element.getStrategyResults();
         double totalReduction = 0;
 
-        if (results.length > 0)
-            for (int i = 0; i < results.length; i++)
-                totalReduction += results[i].getTotalReduction();
+//        if (results.length > 0)
+//            for (int i = 0; i < results.length; i++)
+//                totalReduction += results[i].getTotalReduction();
 
         return totalReduction;
     }
 
     private double getTotalCost(ControlStrategy element) {
-        StrategyResult[] results = element.getStrategyResults();
+//        ControlStrategyResult[] results = element.getStrategyResults();
         double totalCost = 0;
 
-        if (results.length > 0)
-            for (int i = 0; i < results.length; i++)
-                totalCost += results[i].getTotalCost();
+//        if (results.length > 0)
+//            for (int i = 0; i < results.length; i++)
+//                totalCost += results[i].getTotalCost();
 
         return totalCost;
     }

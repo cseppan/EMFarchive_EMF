@@ -3,17 +3,17 @@ package gov.epa.emissions.framework.services.cost.data;
 import java.text.SimpleDateFormat;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 
 public class ControlStrategyResultsSummary {
 
-    private StrategyResult[] strategyResults;
+    private ControlStrategyResult[] strategyResults;
     
     SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
     private User user;
     
-    public ControlStrategyResultsSummary(StrategyResult[] strategyResults){
+    public ControlStrategyResultsSummary(ControlStrategyResult[] strategyResults){
         this.strategyResults = strategyResults;
     }
 

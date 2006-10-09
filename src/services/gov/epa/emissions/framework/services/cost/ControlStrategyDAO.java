@@ -2,15 +2,18 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
 import java.util.List;
 
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 public class ControlStrategyDAO {
 
@@ -27,7 +30,7 @@ public class ControlStrategyDAO {
         addObject(element, session);
     }
 
-    public void add(StrategyResult element, Session session) {
+    public void add(ControlStrategyResult element, Session session) {
         addObject(element, session);
     }
 
@@ -100,5 +103,30 @@ public class ControlStrategyDAO {
                 return type;
         }
         return null;
+    }
+
+    public ControlStrategyResult controlStrategyResult(ControlStrategy controlStrategy, Session session) {
+        updateControlStrategyIds(controlStrategy, session);
+        Criterion c1 = Restrictions.eq("controlStrategyId", new Integer(controlStrategy.getId()));
+        EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
+        Criterion c2 = Restrictions.eq("detailedResultDataset", inputDatasets[0]);
+        Criterion[] criterions = { c1, c2 };
+        List list = hibernateFacade.get(ControlStrategyResult.class, criterions, session);
+        if (!list.isEmpty())
+            return (ControlStrategyResult) list.get(0);
+        return null;
+    }
+
+    private void updateControlStrategyIds(ControlStrategy controlStrategy, Session session) {
+        Criterion c1 = Restrictions.eq("name", controlStrategy.getName());
+        List list = hibernateFacade.get(ControlStrategy.class, c1, session);
+        if (!list.isEmpty()) {
+            ControlStrategy cs = (ControlStrategy) list.get(0);
+            controlStrategy.setId(cs.getId());
+        }
+    }
+
+    public void updateControlStrategyResults(ControlStrategyResult result, Session session) {
+        hibernateFacade.update(result, session);
     }
 }

@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.framework.services.cost.analysis.maxreduction.InventoryOutputQuery;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public class ControlStrategyInventoryOuputQuery {
@@ -22,7 +22,7 @@ public class ControlStrategyInventoryOuputQuery {
 
     // FIXME: what abt multiple tables
     // FIXME: add version query
-    public String query(StrategyResult result) {
+    public String query(ControlStrategyResult result) {
         String inputTableName = tableName(dataset);
         String detailResultTableName = tableName((EmfDataset) result.getDetailedResultDataset());
 

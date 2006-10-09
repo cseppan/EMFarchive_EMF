@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
 import gov.epa.emissions.framework.client.cost.controlstrategy.editor.ControlStrategyOutputTableData;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.Row;
@@ -14,10 +14,10 @@ public class ControlStrategyOutputTableDataTest extends TestCase {
 
     private ControlStrategyOutputTableData data;
 
-    private StrategyResult result;
+    private ControlStrategyResult result;
 
     protected void setUp() {
-        result = new StrategyResult();
+        result = new ControlStrategyResult();
         result.setInputDatasetId(101);
         EmfDataset detailDataset1 = detailDataset("detailed dataset1");
         result.setDetailedResultDataset(detailDataset1);

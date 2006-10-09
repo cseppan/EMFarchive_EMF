@@ -19,7 +19,7 @@ import gov.epa.emissions.framework.client.data.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -89,10 +89,14 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private ComboBox strategyTypeCombo;
 
-    public EditControlStrategySummaryTab(ControlStrategy controlStrategy, EmfSession session,
-            ManageChangeables changeablesList, MessagePanel messagePanel, EmfConsole parentConsole) throws EmfException {
+    private ControlStrategyResult controlStrategyResult;
+
+    public EditControlStrategySummaryTab(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResult,
+            EmfSession session, ManageChangeables changeablesList, MessagePanel messagePanel, EmfConsole parentConsole)
+            throws EmfException {
         super.setName("summary");
         this.controlStrategy = controlStrategy;
+        this.controlStrategyResult = controlStrategyResult;
         this.session = session;
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
@@ -366,10 +370,10 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         completionDate = new JLabel(completionDateString == null ? "" : completionDateString);
         completionDate.setBackground(Color.white);
 
-        costValue = new JLabel("" + getTotalCost(controlStrategy));
+        costValue = new JLabel("" + getTotalCost());
         costValue.setBackground(Color.white);
 
-        emissionReductionValue = new JLabel("" + getReduction(controlStrategy));
+        emissionReductionValue = new JLabel("" + getReduction());
         emissionReductionValue.setBackground(Color.white);
 
         layoutGenerator.addLabelWidgetPair("Start Date:", startDate, panel);
@@ -385,26 +389,18 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return panel;
     }
 
-    private double getReduction(ControlStrategy cs) {
-        StrategyResult[] results = cs.getStrategyResults();
-        double totalReduction = 0;
+    private double getReduction() {
+        if (controlStrategyResult == null)
+            return 0;
 
-        if (results.length > 0)
-            for (int i = 0; i < results.length; i++)
-                totalReduction += results[i].getTotalReduction();
-
-        return totalReduction;
+        return controlStrategyResult.getTotalReduction();
     }
 
-    private double getTotalCost(ControlStrategy cs) {
-        StrategyResult[] results = cs.getStrategyResults();
-        double totalCost = 0;
+    private double getTotalCost() {
+        if (controlStrategyResult == null)
+            return 0;
 
-        if (results.length > 0)
-            for (int i = 0; i < results.length; i++)
-                totalCost += results[i].getTotalCost();
-
-        return totalCost;
+        return controlStrategyResult.getTotalCost();
     }
 
     private String getFormmatedDate(Date date) {
@@ -512,9 +508,10 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         emissionReductionValue.setText("");
     }
 
+    //FIXME refresh when refresh button is clicked 
     public void doRefresh() {
         messagePanel.clear();
-        StrategyResult[] results = controlStrategy.getStrategyResults();
+        ControlStrategyResult[] results = {};//FIXME: controlStrategy.getStrategyResults();
         if (results.length == 0) {
             completionDate.setText("");
             return;

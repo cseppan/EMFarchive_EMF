@@ -6,7 +6,6 @@ import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.util.ArrayList;
@@ -52,14 +51,11 @@ public class ControlStrategy implements Lockable {
 
     private int datasetVersion;
 
-    private List strategyResults;
-
     private Mutex lock;
 
     public ControlStrategy() {
         this.lock = new Mutex();
         this.datasetsList = new ArrayList();
-        strategyResults = new ArrayList();
     }
 
     public ControlStrategy(String name) {
@@ -250,15 +246,6 @@ public class ControlStrategy implements Lockable {
 
     public void setStrategyType(StrategyType strategyType) {
         this.strategyType = strategyType;
-    }
-
-    public StrategyResult[] getStrategyResults() {
-        return (StrategyResult[]) strategyResults.toArray(new StrategyResult[0]);
-    }
-
-    public void setStrategyResults(StrategyResult[] strategyResults) {
-        this.strategyResults.clear();
-        this.strategyResults.addAll(Arrays.asList(strategyResults));
     }
 
 }

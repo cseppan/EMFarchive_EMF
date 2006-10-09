@@ -37,9 +37,10 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
 
         call.setOperation("addMeasure");
         call.addParam("measure", mappings.controlMeasure());
+        call.addParam("sccs", mappings.sccs());
         call.setVoidReturnType();
 
-        call.request(new Object[] { measure });
+        call.request(new Object[] { measure, sccs });
     }
 
     public void removeMeasure(ControlMeasure measure) throws EmfException {
@@ -78,9 +79,10 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
 
         call.setOperation("updateMeasure");
         call.addParam("measure", mappings.controlMeasure());
+        call.addParam("sccs", mappings.sccs());
         call.setReturnType(mappings.controlMeasure());
 
-        return (ControlMeasure) call.requestResponse(new Object[] { measure });
+        return (ControlMeasure) call.requestResponse(new Object[] { measure,sccs });
     }
 
     public Scc[] getSccs(ControlMeasure measure) throws EmfException {
@@ -108,12 +110,12 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
 
     public CostYearTable getCostYearTable(int targetYear) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("getCostYearTable");
         call.addIntegerParam("targetYear");
-        
+
         call.setReturnType(mappings.costYearTable());
-        
+
         return (CostYearTable) call.requestResponse(new Object[] { new Integer(targetYear) });
     }
 

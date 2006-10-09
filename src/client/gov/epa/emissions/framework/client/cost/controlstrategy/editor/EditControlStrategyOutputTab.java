@@ -11,7 +11,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.FileChooser;
@@ -51,20 +51,20 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private Button createButton;
 
-    public EditControlStrategyOutputTab(ControlStrategy controlStrategy, MessagePanel messagePanel,
-            DesktopManager desktopManager, EmfConsole parentConsole) {
+    public EditControlStrategyOutputTab(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults,
+            MessagePanel messagePanel, DesktopManager desktopManager, EmfConsole parentConsole) {
         super.setName("output");
         this.controlStrategy = controlStrategy;
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;
         this.parentConsole = parentConsole;
-        setLayout(controlStrategy);
+        setLayout(controlStrategy, controlStrategyResults);
     }
 
-    private void setLayout(ControlStrategy controlStrategy) {
+    private void setLayout(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
         setLayout(new BorderLayout());
-        add(outputPanel(controlStrategy));
-        add(bottomPanel(), BorderLayout.SOUTH);
+        add(outputPanel(controlStrategy, controlStrategyResults));
+        add(bottomPanel(controlStrategyResults), BorderLayout.SOUTH);
     }
 
     public void save(ControlStrategy controlStrategy) {
@@ -96,21 +96,20 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         }
     }
 
-    private JPanel bottomPanel() {
+    private JPanel bottomPanel(ControlStrategyResult controlStrategyResults) {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(productPanel());
         topPanel.add(createButtonPanel(), BorderLayout.SOUTH);
-        disableTopPanel();
+        disableTopPanel(controlStrategyResults);
         topPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createTitledBorder("Outputs")));
 
         return topPanel;
     }
 
-    private void disableTopPanel() {
-        StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
-        boolean enable = (strategyResults.length == 0) ? false : true;
-        if(enable)
+    private void disableTopPanel(ControlStrategyResult controlStrategyResult) {
+        boolean enable = (controlStrategyResult == null) ? false : true;
+        if (enable)
             return;
         inventoryCheckBox.setEnabled(enable);
         createButton.setEnabled(enable);
@@ -136,7 +135,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     protected void doInventory() {
         try {
             presenter.doInventory(controlStrategy);
-            messagePanel.setMessage("Watch the status window for progress of inventory creatin and reopen this window after completion.");
+            messagePanel
+                    .setMessage("Watch the status window for progress of inventory creatin and reopen this window after completion.");
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -167,8 +167,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         return panel;
     }
 
-    private JPanel outputPanel(ControlStrategy controlStrategy) {
-        JPanel tablePanel = tablePanel(controlStrategy);
+    private JPanel outputPanel(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
+        JPanel tablePanel = tablePanel(controlStrategy, controlStrategyResults);
         JPanel buttonPanel = buttonPanel();
 
         JPanel outputPanel = new JPanel(new BorderLayout(5, 10));
@@ -182,11 +182,10 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         return outputPanel;
     }
 
-    private JPanel tablePanel(ControlStrategy controlStrategy) {
-        StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
+    private JPanel tablePanel(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResult) {
         EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
-        // TODO: handle multiple strategy results
-        StrategyResult result = (strategyResults.length != 0) ? strategyResults[0] : new StrategyResult();
+        ControlStrategyResult result = (controlStrategyResult != null) ? controlStrategyResult
+                : new ControlStrategyResult();
         ControlStrategyOutputTableData tableData = new ControlStrategyOutputTableData(inputDatasets, result);
         EmfTableModel model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);

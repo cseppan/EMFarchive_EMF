@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.cost.controlstrategy.ControlStrategies
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,8 +45,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
             view.notifyLockFailure(controlStrategy);
             return;
         }
-
-        view.display(controlStrategy);
+        ControlStrategyResult controlStrategyResult = service().controlStrategyResults(controlStrategy);
+        view.display(controlStrategy, controlStrategyResult);
     }
 
     public void doClose() throws EmfException {

@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -170,6 +171,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
+    //FIXME: remove associate results
     private void remove(ControlStrategy element) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -215,8 +217,20 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             output.create();
         } catch (Exception e) {
             LOG.error("Could not create inventory output. " + e.getMessage());
-            e.printStackTrace();
             throw new EmfException("Could not create inventory output. " + e.getMessage());
+        }
+    }
+
+    public ControlStrategyResult controlStrategyResults(ControlStrategy controlStrategy) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            ControlStrategyResult controlStrategyResult = dao.controlStrategyResult(controlStrategy, session);
+            return controlStrategyResult;
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve ControlStrategy Result", e);
+            throw new EmfException("Could not retrieve ControlStrategy Result");
+        } finally {
+            session.close();
         }
     }
 

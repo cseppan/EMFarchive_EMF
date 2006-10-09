@@ -27,7 +27,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
@@ -104,7 +104,7 @@ public class DataMappings extends Mappings {
         bean(call, ControlTechnology.class, controlTechnology());
         bean(call, ControlStrategy.class, controlStrategy());
         bean(call, StrategyType.class, strategyType());
-        bean(call, StrategyResult.class, strategyResult());
+        bean(call, ControlStrategyResult.class, controlStrategyResult());
         bean(call, EfficiencyRecord.class, efficiencyRecord());
         bean(call, Scc.class, scc());
         bean(call, ControlStrategyResultsSummary.class, controlStrategyResultsSummary());
@@ -154,7 +154,7 @@ public class DataMappings extends Mappings {
         array(call, ControlTechnology[].class, controlTechnologies());
         array(call, ControlStrategy[].class, controlStrategies());
         array(call, StrategyType[].class, strategyTypes());
-        array(call, StrategyResult[].class, strategyResults());
+        array(call, ControlStrategyResult[].class, controlStrategyResults());
         array(call, EfficiencyRecord[].class, efficiencyRecords());
         array(call, Scc[].class, sccs());
     }
@@ -371,12 +371,12 @@ public class DataMappings extends Mappings {
         return qname("sccs");
     }
 
-    public QName strategyResult() {
-        return qname("StrategyResult");
+    public QName controlStrategyResult() {
+        return qname("ControlStrategyResult");
     }
 
-    public QName strategyResults() {
-        return qname("StrategyResults");
+    public QName controlStrategyResults() {
+        return qname("ControlStrategyResults");
     }
 
     public QName controlStrategyResultsSummary() {

@@ -95,10 +95,17 @@ public class ControlMeasuresDAO {
 
     public ControlMeasure update(ControlMeasure locked, Scc[] sccs, Session session) throws EmfException {
         checkForConstraints(locked, session);
+        updateControlMeasureIds(locked, sccs);
         ControlMeasure releaseLockOnUpdate = (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, session,
                 all(session));
         hibernateFacade.update(sccs, session);
         return releaseLockOnUpdate;
+    }
+
+    private void updateControlMeasureIds(ControlMeasure measure, Scc[] sccs) {
+        for (int i = 0; i < sccs.length; i++) {
+            sccs[i].setControlMeasureId(measure.getId());
+        }
     }
 
     public void update(ControlMeasure[] measures, Session session) {

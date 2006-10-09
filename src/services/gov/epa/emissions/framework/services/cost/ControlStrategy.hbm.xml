@@ -53,27 +53,5 @@
     	<many-to-many class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id"/>
 	</array>
 	
-	<array name="strategyResults" table="strategy_results" >
-    	<key column="control_strategy_id" not-null="true"/>
-    	<list-index column="list_index"/>
-    	<composite-element class="gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult">
-			<property name="inputDatasetId" column="dataset_id" type="integer" />
-			<property name="totalCost" column="total_cost" not-null="true"/>
-			<property name="totalReduction" column="total_reduction" type="double"  not-null="true" />
-			<property name="runStatus" column="run_status"	type="java.lang.String"	/>
-			<property name="completionTime" column="completion_time" type="java.util.Date" not-null="false" length="4"/>
-			<property name="startTime" column="start_time" type="java.util.Date" not-null="false" length="4"/>
-			<many-to-one cascade="save-update" name="strategyResultType"
-				 class ="gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType"
-				 column="strategy_result_type_id" unique="true" not-null="true"/>
-			<many-to-one cascade="save-update" name="detailedResultDataset"
-				 class ="gov.epa.emissions.framework.services.data.EmfDataset"
-				 column="detailed_result_dataset_id" unique="true" not-null="true"/>
-		    <many-to-one cascade="save-update" name="controlledInventoryDataset"
-				 class ="gov.epa.emissions.framework.services.data.EmfDataset"
-				 column="controlled_inven_dataset_id" unique="true" not-null="false"/>
-    	</composite-element>
-  	</array>
-	
   </class> 
 </hibernate-mapping>  

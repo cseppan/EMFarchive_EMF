@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.util.List;
@@ -55,16 +54,12 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
             assertEquals(locked.getLockOwner(), owner.getUsername());
             locked.setName("TEST");
             
-            setupControlStrategy(dataset,locked);
             session.clear();
             ControlStrategy modified = dao.update(locked, session);
             
             assertEquals("TEST", locked.getName());
             assertEquals(modified.getLockOwner(), null);
             
-            StrategyResult[] strategyResults = modified.getStrategyResults();
-            assertEquals(1,strategyResults.length);
-            assertEquals(101,strategyResults[0].getInputDatasetId());
         } finally {
             remove(element);
             remove(dataset);
@@ -80,14 +75,6 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
 
         save(dataset);
         return (EmfDataset) load(EmfDataset.class, dataset.getName());
-    }
-
-    private void setupControlStrategy(EmfDataset dataset, ControlStrategy element) {
-        StrategyResult result = new StrategyResult();
-        result.setDetailedResultDataset(dataset);
-        result.setStrategyResultType(dao.getDetailedStrategyResultType(session));
-        result.setInputDatasetId(101);
-        element.setStrategyResults(new StrategyResult[]{result});
     }
 
     public void testShouldRemoveControlStrategy() {

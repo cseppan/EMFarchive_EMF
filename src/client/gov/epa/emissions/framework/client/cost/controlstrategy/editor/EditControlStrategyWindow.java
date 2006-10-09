@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -62,17 +63,17 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     }
 
-    public void display(ControlStrategy controlStrategy) {
+    public void display(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
         super.setLabel(super.getTitle() + ": " + controlStrategy.getName());
 
         this.controlStrategy = controlStrategy;
 
-        doLayout(controlStrategy);
+        doLayout(controlStrategy,controlStrategyResults);
         pack();
         super.display();
     }
 
-    private void doLayout(ControlStrategy controlStrategy) {
+    private void doLayout(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
         Container contentPane = getContentPane();
         contentPane.removeAll();
 
@@ -81,27 +82,27 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         JPanel layout = new JPanel();
         layout.setLayout(new BorderLayout());
         layout.add(messagePanel, BorderLayout.PAGE_START);
-        layout.add(createTabbedPane(controlStrategy));
+        layout.add(createTabbedPane(controlStrategy,controlStrategyResults));
         layout.add(createButtonsPanel(), BorderLayout.PAGE_END);
 
         contentPane.add(layout);
     }
 
-    private JTabbedPane createTabbedPane(ControlStrategy controlStrategy) {
+    private JTabbedPane createTabbedPane(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
         JTabbedPane tabbedPane = new JTabbedPane();
 
-        tabbedPane.addTab("Summary", createSummaryTab(controlStrategy));
+        tabbedPane.addTab("Summary", createSummaryTab(controlStrategy,controlStrategyResults));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         // These are just added to illustrate what is coming later
         tabbedPane.addTab("Filters", new JPanel());
-        tabbedPane.addTab("Outputs", outputPanel());
+        tabbedPane.addTab("Outputs", outputPanel(controlStrategyResults));
 
         return tabbedPane;
     }
 
-    private JPanel createSummaryTab(ControlStrategy controlStrategy) {
+    private JPanel createSummaryTab(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
         try {
-            EditControlStrategySummaryTabView view = new EditControlStrategySummaryTab(controlStrategy, session, this,
+            EditControlStrategySummaryTabView view = new EditControlStrategySummaryTab(controlStrategy,controlStrategyResults, session, this,
                     messagePanel, parentConsole);
             this.presenter.set(view);
             return (JPanel) view;
@@ -112,8 +113,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     }
 
-    private JPanel outputPanel() {
-        EditControlStrategyOutputTabView view = new EditControlStrategyOutputTab(controlStrategy, messagePanel,
+    private JPanel outputPanel(ControlStrategyResult controlStrategyResults) {
+        EditControlStrategyOutputTabView view = new EditControlStrategyOutputTab(controlStrategy,controlStrategyResults, messagePanel,
                 desktopManager, parentConsole);
         this.presenter.set(view);
         return (JPanel) view;

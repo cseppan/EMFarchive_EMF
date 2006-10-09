@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.cost.analysis.maxreduction;
 
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,13 +11,13 @@ import java.util.List;
 
 public class RecordGenerator {
 
-    private StrategyResult strategyResult;
+    private ControlStrategyResult strategyResult;
 
     private String comment;
 
     private double reducedEmission;
 
-    public RecordGenerator(StrategyResult result) {
+    public RecordGenerator(ControlStrategyResult result) {
         this.strategyResult = result;
         comment = "";
     }
