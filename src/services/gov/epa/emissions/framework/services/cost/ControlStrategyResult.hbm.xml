@@ -9,7 +9,7 @@
 	  <generator class="identity"/>
  	</id>
 	<property name="controlStrategyId" column="control_strategy_id" type="integer" not-null="true" />
-	<property name="inputDatasetId" column="dataset_id" type="integer" />
+	<property name="inputDatasetId" column="dataset_id" type="integer" not-null="true"  />
 	<property name="totalCost" column="total_cost" not-null="true"/>
 	<property name="totalReduction" column="total_reduction" type="double"  not-null="true" />
 	<property name="runStatus" column="run_status"	type="java.lang.String"	/>

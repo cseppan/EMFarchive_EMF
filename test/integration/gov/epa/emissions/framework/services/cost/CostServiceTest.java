@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.cost;
 
+import java.util.List;
+
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
@@ -78,13 +80,13 @@ public class CostServiceTest extends ServiceTestCase {
         cm.setEquipmentLife(12);
         cm.setName(name);
         cm.setAbbreviation("12345688");
-        Scc scc1= new Scc("123232","");
-        service.addMeasure(cm, new Scc[]{scc1});
+        Scc scc1 = new Scc("123232", "");
+        service.addMeasure(cm, new Scc[] { scc1 });
 
         ControlMeasure cmModified = service.obtainLockedMeasure(owner, cm);
         cmModified.setEquipmentLife(120);
         cmModified.setName("cm updated");
-        ControlMeasure cm2 = service.updateMeasure(cmModified, new Scc[]{});
+        ControlMeasure cm2 = service.updateMeasure(cmModified, new Scc[] {});
 
         try {
             assertEquals("cm updated", cm2.getName());
@@ -100,8 +102,8 @@ public class CostServiceTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("xxxx" + Math.random());
         cm.setAbbreviation("yyyyyyyy");
-        Scc scc1= new Scc("123232","");
-        service.addMeasure(cm, new Scc[]{scc1});
+        Scc scc1 = new Scc("123232", "");
+        service.addMeasure(cm, new Scc[] { scc1 });
 
         try {
             ControlMeasure locked = service.obtainLockedMeasure(owner, cm);
@@ -120,8 +122,8 @@ public class CostServiceTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("xxxx" + Math.random());
         cm.setAbbreviation("yyyyyyyy");
-        Scc scc1= new Scc("123232","");
-        service.addMeasure(cm, new Scc[]{scc1});
+        Scc scc1 = new Scc("123232", "");
+        service.addMeasure(cm, new Scc[] { scc1 });
 
         try {
             ControlMeasure locked = service.obtainLockedMeasure(owner, cm);
@@ -136,15 +138,15 @@ public class CostServiceTest extends ServiceTestCase {
         }
     }
 
-    public void FIXME_testShouldRemoveOneControlMeasure() throws Exception {
+    public void testShouldRemoveOneControlMeasure() throws Exception {
 
         ControlMeasure cm = new ControlMeasure();
         String name = "cm test one" + Math.random();
         cm.setEquipmentLife(12);
         cm.setName(name);
         cm.setAbbreviation("12345678");
-        Scc scc1= new Scc("123232","");
-        service.addMeasure(cm, new Scc[]{scc1});
+        Scc scc1 = new Scc("123232", "");
+        service.addMeasure(cm, new Scc[] { scc1 });
 
         ControlMeasure[] cms = service.getMeasures();
 
@@ -152,8 +154,25 @@ public class CostServiceTest extends ServiceTestCase {
         assertEquals(name, cms[0].getName());
         assertEquals(new Float(12), new Float(cms[0].getEquipmentLife()));
 
-        service.removeMeasure(cm);//FIXME: remove measure 
+        service.removeMeasure(cm);
         assertEquals(0, service.getMeasures().length);
+        assertEquals(0,load(Scc.class).size());
+    }
+
+    private List load(Class clazz) {
+        session.clear();// flush cached objects
+
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(clazz);
+            tx.commit();
+            return crit.list();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+
     }
 
     private ControlMeasure load(ControlMeasure cm) {

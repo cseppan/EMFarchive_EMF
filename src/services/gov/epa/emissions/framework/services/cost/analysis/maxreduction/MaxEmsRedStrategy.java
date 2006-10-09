@@ -177,7 +177,7 @@ public class MaxEmsRedStrategy implements Strategy {
     }
 
     private String description(ControlStrategy controlStrategy) {
-        return "#Detail Resultset Dataset\n" + "Implements control strategy " + controlStrategy.getName() + "\n"
+        return "#Detail Resultset Dataset\n" + "#Implements control strategy " + controlStrategy.getName() + "\n"
                 + "#Input dataset used " + inputDataset.getName();
     }
 

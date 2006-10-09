@@ -168,18 +168,18 @@ CREATE TABLE emf.strategy_results
 (
   id SERIAL PRIMARY KEY,
   control_strategy_id int4 NOT NULL REFERENCES emf.control_strategies(id),
+  dataset_id int4 NOT NULL REFERENCES emf.datasets(id),
   strategy_result_type_id int4 NOT NULL REFERENCES emf.strategy_result_types(id),
   detailed_result_dataset_id int4 NOT NULL REFERENCES emf.datasets(id),
   controlled_inven_dataset_id int4 REFERENCES emf.datasets(id),
   list_index int4,
   total_cost real,
   total_reduction real,
-  dataset_id int4,
   start_time timestamp,
   completion_time timestamp,
   run_status VARCHAR(255),
   
-  UNIQUE (control_strategy_id,detailed_result_dataset_id)
+  UNIQUE (control_strategy_id,dataset_id)
 ) 
 WITHOUT OIDS;
 -- emf.strategy_results

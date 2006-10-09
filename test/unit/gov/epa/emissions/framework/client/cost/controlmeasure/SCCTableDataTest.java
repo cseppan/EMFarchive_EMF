@@ -15,8 +15,11 @@ public class SCCTableDataTest extends TestCase {
     protected void setUp() {
         sccs = new Scc[2];
         sccs[0] = new Scc("name1", "description1");
+        sccs[0].setId(1);
+        sccs[0].setControlMeasureId(1);
         sccs[1] = new Scc("name2", "description2");
-
+        sccs[1].setId(2);
+        sccs[1].setControlMeasureId(1);
         data = new SCCTableData(sccs);
     }
 
@@ -43,11 +46,13 @@ public class SCCTableDataTest extends TestCase {
         assertEquals(2, rows.size());
     }
 
-    public void FIXME_testShouldNotAddDuplicates() {
+    public void testShouldNotAddDuplicates() {
         List rows = data.rows();
         assertNotNull("Should have 2 rows", rows);
 
         Scc scc3 = new Scc("name3", "description3");
+        scc3.setId(3);
+        scc3.setControlMeasureId(1);
         Scc[] newSccs = { sccs[0], scc3, sccs[1] };
         data.add(newSccs);
         rows = data.rows();

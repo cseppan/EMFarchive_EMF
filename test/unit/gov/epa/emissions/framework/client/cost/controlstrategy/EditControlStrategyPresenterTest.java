@@ -10,25 +10,32 @@ import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditContro
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 
 import org.jmock.Mock;
+import org.jmock.core.Constraint;
 
 public class EditControlStrategyPresenterTest extends EmfMockObjectTestCase {
 
-    public void FIXME_testShouldObserveLockControlStrategyAndDisplayViewOnDisplay() throws EmfException {
+    public void testShouldObserveLockControlStrategyAndDisplayViewOnDisplay() throws EmfException {
+
+        Mock controlStrategy = mock(ControlStrategy.class);
+        stub(controlStrategy, "isLocked", Boolean.TRUE);
+
+        Mock result = mock(ControlStrategyResult.class);
         Mock view = mock(EditControlStrategyView.class);
-        Mock controlStrategyObj = mock(ControlStrategy.class);
-        expects(view, 1, "display", same(controlStrategyObj.proxy()));
-        stub(controlStrategyObj, "isLocked", Boolean.TRUE);
+        expects(view, 1, "display", new Constraint[] { same(controlStrategy.proxy()), same(result.proxy()) });
 
         Mock service = mock(ControlStrategyService.class);
         Mock session = mock(EmfSession.class);
         stub(session, "controlStrategyService", service.proxy());
         stub(session, "user", new User());
-        expects(service, 1, "obtainLocked", controlStrategyObj.proxy());
-
-        EditControlStrategyPresenter p = new EditControlStrategyPresenterImpl((ControlStrategy) controlStrategyObj.proxy(), (EmfSession) session.proxy(),
-                (EditControlStrategyView) view.proxy(), null);
+        expects(service, 1, "obtainLocked", controlStrategy.proxy());
+        service.expects(once()).method("controlStrategyResults").with(same(controlStrategy.proxy())).will(
+                returnValue(result.proxy()));
+        EditControlStrategyPresenter p = new EditControlStrategyPresenterImpl(
+                (ControlStrategy) controlStrategy.proxy(), (EmfSession) session.proxy(), (EditControlStrategyView) view
+                        .proxy(), null);
         expects(view, 1, "observe", same(p));
 
         p.doDisplay();
@@ -48,16 +55,16 @@ public class EditControlStrategyPresenterTest extends EmfMockObjectTestCase {
         expects(service, 1, "releaseLocked");
         expects(service, 1, "stopRunStrategy");
 
-        EditControlStrategyPresenter p = new EditControlStrategyPresenterImpl(null, (EmfSession) session.proxy(), (EditControlStrategyView) view
-                .proxy(), null);
-        p.set((EditControlStrategySummaryTabView)summaryTabView.proxy());
+        EditControlStrategyPresenter p = new EditControlStrategyPresenterImpl(null, (EmfSession) session.proxy(),
+                (EditControlStrategyView) view.proxy(), null);
+        p.set((EditControlStrategySummaryTabView) summaryTabView.proxy());
 
         p.doClose();
     }
 
     public void testShouldSaveControlStrategyAndCloseViewOnSave() throws EmfException {
         Mock view = mock(EditControlStrategyView.class);
-        //expects(view, 1, "disposeView");
+        // expects(view, 1, "disposeView");
 
         Mock service = mock(ControlStrategyService.class);
         ControlStrategy comtrolStrategy = new ControlStrategy("name");
@@ -71,30 +78,33 @@ public class EditControlStrategyPresenterTest extends EmfMockObjectTestCase {
         Mock managerPresenter = mock(ControlStrategiesManagerPresenter.class);
         expects(managerPresenter, 1, "doRefresh");
 
-        EditControlStrategyPresenter p = new EditControlStrategyPresenterImpl(comtrolStrategy, (EmfSession) session.proxy(),
-                (EditControlStrategyView) view.proxy(), (ControlStrategiesManagerPresenter) managerPresenter.proxy());
+        EditControlStrategyPresenter p = new EditControlStrategyPresenterImpl(comtrolStrategy, (EmfSession) session
+                .proxy(), (EditControlStrategyView) view.proxy(), (ControlStrategiesManagerPresenter) managerPresenter
+                .proxy());
 
         p.doSave();
     }
 
     public void testShouldRaiseErrorIfDuplicateControlStrategyNameOnSave() {
-        
+
         Mock view = mock(EditControlStrategyView.class);
 
         Mock service = mock(ControlStrategyService.class);
-        
+
         ControlStrategy duplicateControlStrategy = new ControlStrategy("controlStrategy2");
         duplicateControlStrategy.setId(1243);
         ControlStrategy controlStrategyObj = new ControlStrategy("controlStrategy2");
         controlStrategyObj.setId(9324);
-        
-        ControlStrategy[] controlStrategies = new ControlStrategy[] { new ControlStrategy("controlStrategy1"), duplicateControlStrategy, controlStrategyObj };
+
+        ControlStrategy[] controlStrategies = new ControlStrategy[] { new ControlStrategy("controlStrategy1"),
+                duplicateControlStrategy, controlStrategyObj };
         stub(service, "getControlStrategies", controlStrategies);
 
         Mock session = mock(EmfSession.class);
         stub(session, "controlStrategyService", service.proxy());
 
-        EditControlStrategyPresenter p = new EditControlStrategyPresenterImpl(controlStrategyObj, (EmfSession) session.proxy(), (EditControlStrategyView) view.proxy(), null);
+        EditControlStrategyPresenter p = new EditControlStrategyPresenterImpl(controlStrategyObj, (EmfSession) session
+                .proxy(), (EditControlStrategyView) view.proxy(), null);
 
         try {
             p.doSave();

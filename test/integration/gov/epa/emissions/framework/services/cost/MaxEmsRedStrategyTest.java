@@ -13,11 +13,7 @@ import java.util.List;
 
 public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
 
-    public void testDummy() {
-        assertTrue(true);
-    }
-
-    public void FIXME_testShouldRunMaxEmsRedStrategyWithOneControlMeasure() throws Exception {
+    public void testShouldRunMaxEmsRedStrategyWithOneControlMeasure() throws Exception {
         ControlStrategy strategy = null;
         try {
             EfficiencyRecord[] records = { record(pm10Pollutant(), "", 90, 900, 1989) };
@@ -29,7 +25,7 @@ public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
             MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServer(),
                     new Integer(500), sessionFactory());
             maxEmfEmsRedStrategy.run();
-            assertEquals("No of rows in the detail result table is 16", 16,
+            assertEquals("No of rows in the detail result table is 15", 15,
                     countRecords(detailResultDatasetTableName(strategy)));
         } catch (Exception e) {
             e.printStackTrace();

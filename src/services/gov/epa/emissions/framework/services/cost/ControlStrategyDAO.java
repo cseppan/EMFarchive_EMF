@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -107,11 +108,19 @@ public class ControlStrategyDAO {
 
     public ControlStrategyResult controlStrategyResult(ControlStrategy controlStrategy, Session session) {
         updateControlStrategyIds(controlStrategy, session);
+
+        List criterions = new ArrayList();
         Criterion c1 = Restrictions.eq("controlStrategyId", new Integer(controlStrategy.getId()));
+        criterions.add(c1);
+
         EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
-        Criterion c2 = Restrictions.eq("detailedResultDataset", inputDatasets[0]);
-        Criterion[] criterions = { c1, c2 };
-        List list = hibernateFacade.get(ControlStrategyResult.class, criterions, session);
+        if (inputDatasets.length != 0) {
+            Criterion c2 = Restrictions.eq("inputDatasetId", new Integer(inputDatasets[0].getId()));
+            criterions.add(c2);
+        }
+
+        List list = hibernateFacade.get(ControlStrategyResult.class,
+                (Criterion[]) criterions.toArray(new Criterion[0]), session);
         if (!list.isEmpty())
             return (ControlStrategyResult) list.get(0);
         return null;

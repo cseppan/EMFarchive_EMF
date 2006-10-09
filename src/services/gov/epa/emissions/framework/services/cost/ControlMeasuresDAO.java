@@ -82,7 +82,17 @@ public class ControlMeasuresDAO {
     }
 
     public void remove(ControlMeasure measure, Session session) {
+        removeSccs(measure, session);
+
         hibernateFacade.remove(measure, session);
+    }
+
+    private void removeSccs(ControlMeasure measure, Session session) {
+        Criterion c = Restrictions.eq("controlMeasureId", new Integer(measure.getId()));
+        List list = hibernateFacade.get(Scc.class, c, session);
+        for (int i = 0; i < list.size(); i++) {
+            hibernateFacade.remove(list.get(i), session);
+        }
     }
 
     public ControlMeasure obtainLocked(User user, ControlMeasure measure, Session session) {

@@ -68,11 +68,9 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    //FIXME: remove associate sccs
     public void removeMeasure(ControlMeasure measure) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-
             dao.remove(measure, session);
         } catch (RuntimeException e) {
             LOG.error("Could not remove control measure: " + measure.getName(), e);

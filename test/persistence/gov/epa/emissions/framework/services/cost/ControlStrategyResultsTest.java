@@ -28,11 +28,13 @@ public class ControlStrategyResultsTest extends ServiceTestCase {
 
     public void testShouldSaveControlStrategyResultsSummary() throws HibernateException, Exception {
         EmfDataset dataset = dataset();
+        EmfDataset detailDataset = dataset();
         ControlStrategy element = controlStrategy(dataset);
 
         ControlStrategyResult result = new ControlStrategyResult();
         result.setControlStrategyId(element.getId());
-        result.setDetailedResultDataset(dataset);
+        result.setInputDatasetId(dataset.getId());
+        result.setDetailedResultDataset(detailDataset);
         StrategyResultType detailedStrategyResultType = controlStrategydao.getDetailedStrategyResultType(session);
         result.setStrategyResultType(detailedStrategyResultType);
 

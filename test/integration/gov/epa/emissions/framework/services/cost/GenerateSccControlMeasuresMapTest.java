@@ -11,11 +11,7 @@ import java.util.List;
 
 public class GenerateSccControlMeasuresMapTest extends MaxEmsRedStrategyTestCase {
     
-    public void testDummy(){
-        assertTrue(true);
-    }
-
-    public void FIXME_testShouldCreateASccControlMeasureSccMap() throws Exception {
+    public void testShouldCreateASccControlMeasureSccMap() throws Exception {
         try {
             ControlMeasure cm1 = addControlMeasure("Control Measure 1", "CM1", sccs1(), new EfficiencyRecord[0]);
             ControlMeasure cm2 = addControlMeasure("Control Measure 2", "CM2", sccs2(), new EfficiencyRecord[0]);
