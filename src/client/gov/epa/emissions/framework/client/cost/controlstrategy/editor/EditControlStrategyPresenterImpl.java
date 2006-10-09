@@ -107,7 +107,6 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         this.summaryTabView = view;
         this.summaryTabPresenter = new EditControlStrategySummaryTabPresenterImpl(controlStrategy, view);
         presenters.add(summaryTabPresenter);
-        summaryTabPresenter.doRefresh();
     }
 
     public void set(EditControlStrategyOutputTabView view) {
@@ -132,6 +131,14 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     public void runStrategy() throws EmfException {
         service().runStrategy(session.user(), controlStrategy);
+    }
+
+    public void doRefresh() throws EmfException {
+        ControlStrategyResult result = session.controlStrategyService().controlStrategyResults(controlStrategy);
+        for (Iterator iter = presenters.iterator(); iter.hasNext();) {
+            EditControlStrategyTabPresenter element = (EditControlStrategyTabPresenter) iter.next();
+            element.doRefresh(result);
+        }
     }
 
 }

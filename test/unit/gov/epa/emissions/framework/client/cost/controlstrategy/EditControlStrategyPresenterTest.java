@@ -47,7 +47,6 @@ public class EditControlStrategyPresenterTest extends EmfMockObjectTestCase {
 
         Mock summaryTabView = mock(EditControlStrategySummaryTabView.class);
         expects(summaryTabView, 1, "stopRun");
-        expects(summaryTabView, 1, "doRefresh");
 
         Mock service = mock(ControlStrategyService.class);
         Mock session = mock(EmfSession.class);

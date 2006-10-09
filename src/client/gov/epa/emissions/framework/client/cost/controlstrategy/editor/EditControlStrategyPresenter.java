@@ -23,4 +23,6 @@ public interface EditControlStrategyPresenter {
 
     void stopRun() throws EmfException;
 
+    void doRefresh() throws EmfException;
+
 }

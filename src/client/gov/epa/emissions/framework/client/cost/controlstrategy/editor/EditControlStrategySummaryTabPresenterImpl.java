@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 
 public class EditControlStrategySummaryTabPresenterImpl implements EditControlStrategySummaryTabPresenter {
 
@@ -9,7 +10,8 @@ public class EditControlStrategySummaryTabPresenterImpl implements EditControlSt
 
     private ControlStrategy controlStrategy;
 
-    public EditControlStrategySummaryTabPresenterImpl(ControlStrategy controlStrategy, EditControlStrategySummaryTabView view) {
+    public EditControlStrategySummaryTabPresenterImpl(ControlStrategy controlStrategy,
+            EditControlStrategySummaryTabView view) {
         this.controlStrategy = controlStrategy;
         this.view = view;
     }
@@ -21,9 +23,9 @@ public class EditControlStrategySummaryTabPresenterImpl implements EditControlSt
     public void setResults(ControlStrategy controlStrategy) {
         view.setRunMessage(controlStrategy);
     }
-    
-    public void doRefresh() {
-        view.doRefresh();
+
+    public void doRefresh(ControlStrategyResult result) {
+        view.refresh(result);
     }
 
 }

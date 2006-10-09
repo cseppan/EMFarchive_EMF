@@ -63,6 +63,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private void setLayout(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
         setLayout(new BorderLayout());
+        removeAll();
         add(outputPanel(controlStrategy, controlStrategyResults));
         add(bottomPanel(controlStrategyResults), BorderLayout.SOUTH);
     }
@@ -260,6 +261,10 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     public void displayAnalyzeTable(String controlStrategyName, String[] fileNames) {
         AnalysisEngineTableApp app = new AnalysisEngineTableApp(controlStrategyName, desktopManager, parentConsole);
         app.display(fileNames);
+    }
+
+    public void refresh(ControlStrategyResult controlStrategyResult) {
+        setLayout(controlStrategy, controlStrategyResult);
     }
 
 }

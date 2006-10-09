@@ -389,18 +389,18 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return panel;
     }
 
-    private double getReduction() {
+    private String getReduction() {
         if (controlStrategyResult == null)
-            return 0;
+            return "";
 
-        return controlStrategyResult.getTotalReduction();
+        return "" + controlStrategyResult.getTotalReduction();
     }
 
-    private double getTotalCost() {
+    private String getTotalCost() {
         if (controlStrategyResult == null)
-            return 0;
+            return "";
 
-        return controlStrategyResult.getTotalCost();
+        return "" + controlStrategyResult.getTotalCost();
     }
 
     private String getFormmatedDate(Date date) {
@@ -508,16 +508,19 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         emissionReductionValue.setText("");
     }
 
-    //FIXME refresh when refresh button is clicked 
-    public void doRefresh() {
+    public void refresh(ControlStrategyResult controlStrategyResult) {
         messagePanel.clear();
-        ControlStrategyResult[] results = {};//FIXME: controlStrategy.getStrategyResults();
-        if (results.length == 0) {
+        if (controlStrategyResult == null) {
             completionDate.setText("");
+            costValue.setText("");
+            emissionReductionValue.setText("");
             return;
         }
+        ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(
+                new ControlStrategyResult[] { controlStrategyResult });
+        String runStatus = summary.getRunStatus();
 
-        ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(results);
+        completionDate.setText(runStatus.indexOf("Failed") == -1 ? summary.getCompletionTime() : "Failed");
         costValue.setText("" + summary.getStrategyTotalCost());
         emissionReductionValue.setText("" + summary.getStrategyTotalReduction());
     }

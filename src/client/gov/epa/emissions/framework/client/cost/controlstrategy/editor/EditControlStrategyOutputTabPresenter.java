@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExImService;
 
@@ -84,6 +85,10 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
 
     public void doInventory(ControlStrategy controlStrategy) throws EmfException {
         session.controlStrategyService().createInventory(session.user(),controlStrategy);
+    }
+
+    public void doRefresh(ControlStrategyResult result) {
+        view.refresh(result);
     }
 
 }

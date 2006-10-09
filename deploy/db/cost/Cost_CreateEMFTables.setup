@@ -179,7 +179,7 @@ CREATE TABLE emf.strategy_results
   completion_time timestamp,
   run_status VARCHAR(255),
   
-  UNIQUE (control_strategy_id,dataset_id)
+  UNIQUE (control_strategy_id,dataset_id,detailed_result_dataset_id)
 ) 
 WITHOUT OIDS;
 -- emf.strategy_results

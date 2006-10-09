@@ -8,6 +8,4 @@ public interface EditControlStrategySummaryTabView  extends EditControlStrategyT
 
     void stopRun();
 
-    void doRefresh();
-
 }

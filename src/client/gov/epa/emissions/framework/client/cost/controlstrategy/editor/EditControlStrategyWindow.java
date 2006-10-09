@@ -50,6 +50,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
+    private Button saveButton;
+
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
         super("Edit Control Strategy", new Dimension(650, 490), desktopManager);
         super.setMinimumSize(new Dimension(10, 10));
@@ -68,7 +70,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
         this.controlStrategy = controlStrategy;
 
-        doLayout(controlStrategy,controlStrategyResults);
+        doLayout(controlStrategy, controlStrategyResults);
         pack();
         super.display();
     }
@@ -82,7 +84,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         JPanel layout = new JPanel();
         layout.setLayout(new BorderLayout());
         layout.add(messagePanel, BorderLayout.PAGE_START);
-        layout.add(createTabbedPane(controlStrategy,controlStrategyResults));
+        layout.add(createTabbedPane(controlStrategy, controlStrategyResults));
         layout.add(createButtonsPanel(), BorderLayout.PAGE_END);
 
         contentPane.add(layout);
@@ -91,7 +93,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private JTabbedPane createTabbedPane(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
         JTabbedPane tabbedPane = new JTabbedPane();
 
-        tabbedPane.addTab("Summary", createSummaryTab(controlStrategy,controlStrategyResults));
+        tabbedPane.addTab("Summary", createSummaryTab(controlStrategy, controlStrategyResults));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         // These are just added to illustrate what is coming later
         tabbedPane.addTab("Filters", new JPanel());
@@ -102,8 +104,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     private JPanel createSummaryTab(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
         try {
-            EditControlStrategySummaryTabView view = new EditControlStrategySummaryTab(controlStrategy,controlStrategyResults, session, this,
-                    messagePanel, parentConsole);
+            EditControlStrategySummaryTabView view = new EditControlStrategySummaryTab(controlStrategy,
+                    controlStrategyResults, session, this, messagePanel, parentConsole);
             this.presenter.set(view);
             return (JPanel) view;
         } catch (EmfException e) {
@@ -114,8 +116,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
 
     private JPanel outputPanel(ControlStrategyResult controlStrategyResults) {
-        EditControlStrategyOutputTabView view = new EditControlStrategyOutputTab(controlStrategy,controlStrategyResults, messagePanel,
-                desktopManager, parentConsole);
+        EditControlStrategyOutputTabView view = new EditControlStrategyOutputTab(controlStrategy,
+                controlStrategyResults, messagePanel, desktopManager, parentConsole);
         this.presenter.set(view);
         return (JPanel) view;
     }
@@ -142,25 +144,46 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         layout.setVgap(15);
         container.setLayout(layout);
 
-        Button saveButton = new SaveButton(saveAction());
+        saveButton = new SaveButton(saveAction());
         container.add(saveButton);
+
         Button copyButton = new CopyButton(null);
         copyButton.setEnabled(false);
-
         container.add(copyButton);
+
         Button closeButton = new CloseButton(closeAction());
         container.add(closeButton);
         getRootPane().setDefaultButton(saveButton);
 
         container.add(Box.createHorizontalStrut(20));
+
         Button runButton = new RunButton(runAction());
         container.add(runButton);
+
+        Button refreshButton = new Button("Refresh", refreshAction());
+        container.add(refreshButton);
+
         Button stopButton = new StopButton(stopAction());
+        stopButton.setEnabled(false);
         container.add(stopButton);
 
         panel.add(container, BorderLayout.CENTER);
 
         return panel;
+    }
+
+    private Action refreshAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                clearMessage();
+                enableSaveButton(true);
+                try {
+                    presenter.doRefresh();
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
+            }
+        };
     }
 
     private Action stopAction() {
@@ -181,14 +204,21 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
             public void actionPerformed(ActionEvent event) {
                 try {
                     save();
+                    enableSaveButton(false);
                     presenter.setResults(controlStrategy);
                     presenter.runStrategy();
-                    messagePanel.setMessage("Please examine the status window for progress, and reopen this window after completion to see results");
+                    messagePanel
+                            .setMessage("Please examine the status window for progress, and reopen this window after completion to see results");
                 } catch (EmfException e) {
+                    enableSaveButton(true);
                     messagePanel.setError("Error running strategy: " + e.getMessage());
                 }
             }
         };
+    }
+
+    private void enableSaveButton(boolean enable) {
+        saveButton.setEnabled(enable);
     }
 
     protected void save() throws EmfException {
