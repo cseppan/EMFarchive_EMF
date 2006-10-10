@@ -62,7 +62,6 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
         try {
             presenter.doAddInputFields(panel, inputFieldsPanel);
         } catch (EmfException e) {
-            e.printStackTrace();
             messagePanel.setError(e.getMessage());
         }
 

@@ -34,6 +34,7 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
     }
 
     public void doEdit(EmfConsole parent, ControlMeasure measure, DesktopManager desktopManager) throws EmfException {
+        
         ControlMeasureView editor = new EditControlMeasureWindow(parent, session, desktopManager);
         ControlMeasurePresenter presenter = new EditorControlMeasurePresenterImpl(
                 measure, editor, session, this);

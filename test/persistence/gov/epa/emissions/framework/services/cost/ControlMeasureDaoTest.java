@@ -167,7 +167,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
             assertEquals(locked.getLockOwner(), owner.getUsername());
             locked.setName("TEST");
 
-            ControlMeasure modified = dao.update(locked,locked.getSccs(), session);
+            ControlMeasure modified = dao.update(locked,new Scc[]{},session);
             assertEquals("TEST", locked.getName());
             assertEquals(modified.getLockOwner(), null);
         } finally {
@@ -234,8 +234,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
             EfficiencyRecord record1 = efficiencyRecord(pm10Pollutant(), "22");
             EfficiencyRecord record2 = efficiencyRecord(pm10Pollutant(), "22");
             cm.setEfficiencyRecords(new EfficiencyRecord[] { record1, record2 });
-            dao.update(cm, cm.getSccs(), session);
-
+            dao.update(cm,cm.getSccs(),session);
             ControlMeasure newMeasure = load(cm);
             EfficiencyRecord[] efficiencyRecords = newMeasure.getEfficiencyRecords();
             assertEquals(2, efficiencyRecords.length);

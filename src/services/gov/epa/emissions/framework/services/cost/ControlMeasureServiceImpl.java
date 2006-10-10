@@ -42,7 +42,6 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public ControlMeasure[] getMeasures() throws EmfException {
-        //System.out.println("$$" + EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(new Date()));
         Session session = sessionFactory.getSession();
         try {
             List all = dao.all(session);
@@ -52,14 +51,13 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             throw new EmfException("Could not retrieve control measures.");
         } finally {
             session.close();
-            //System.out.println("$$" + EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(new Date()));
         }
     }
 
     public void addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            dao.add(measure, sccs,session);
+            dao.add(measure, sccs, session);
         } catch (RuntimeException e) {
             LOG.error("Could not add control measure: " + measure.getName(), e);
             throw new EmfException("Could not add control measure: " + measure.getName());
@@ -85,7 +83,6 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         try {
             session = sessionFactory.getSession();
             ControlMeasure locked = dao.obtainLocked(owner, measure, session);
-
             return locked;
         } catch (RuntimeException e) {
             LOG.error("Could not obtain lock for ControlMeasure: " + measure.getName() + " by owner: "

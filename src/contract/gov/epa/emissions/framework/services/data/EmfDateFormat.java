@@ -21,7 +21,7 @@ public class EmfDateFormat {
         dateFormatter.applyPattern("MM/dd/yyyy HH:mm");
         return dateFormatter.format(date);
     }
-
+    
     public static String format_YYYY(Date date) {
         dateFormatter.applyPattern("yyyy");
         return dateFormatter.format(date);

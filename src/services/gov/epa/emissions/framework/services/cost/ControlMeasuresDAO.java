@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
-import gov.epa.emissions.framework.services.persistence.LockingScheme;
+import gov.epa.emissions.framework.services.persistence.NewLockingScheme;
 
 import java.util.List;
 
@@ -15,12 +15,12 @@ import org.hibernate.criterion.Restrictions;
 
 public class ControlMeasuresDAO {
 
-    private LockingScheme lockingScheme;
+    private NewLockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
 
     public ControlMeasuresDAO() {
-        lockingScheme = new LockingScheme();
+        lockingScheme = new NewLockingScheme();
         hibernateFacade = new HibernateFacade();
     }
 
@@ -96,25 +96,39 @@ public class ControlMeasuresDAO {
     }
 
     public ControlMeasure obtainLocked(User user, ControlMeasure measure, Session session) {
-        return (ControlMeasure) lockingScheme.getLocked(user, measure, session, all(session));
+        return (ControlMeasure) lockingScheme.getLocked(user, current(measure, session), session);
+    }
+
+    private ControlMeasure current(ControlMeasure measure, Session session) {
+        return current(measure.getId(), ControlMeasure.class, session);
     }
 
     public ControlMeasure releaseLocked(ControlMeasure locked, Session session) {
-        return (ControlMeasure) lockingScheme.releaseLock(locked, session, all(session));
+        return (ControlMeasure) lockingScheme.releaseLock(current(locked, session), session);
     }
 
     public ControlMeasure update(ControlMeasure locked, Scc[] sccs, Session session) throws EmfException {
         checkForConstraints(locked, session);
-        updateControlMeasureIds(locked, sccs);
-        ControlMeasure releaseLockOnUpdate = (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, session,
-                all(session));
-        hibernateFacade.update(sccs, session);
+
+        ControlMeasure releaseLockOnUpdate = (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, current(locked,
+                session), session);
+        updateSccs(sccs, locked, session);
         return releaseLockOnUpdate;
     }
 
-    private void updateControlMeasureIds(ControlMeasure measure, Scc[] sccs) {
+    private void updateSccs(Scc[] sccs, ControlMeasure controlMeasure, Session session) {
+        updateSccsControlMeasureIds(sccs, controlMeasure);
         for (int i = 0; i < sccs.length; i++) {
-            sccs[i].setControlMeasureId(measure.getId());
+            Criterion c1 = Restrictions.eq("controlMeasureId", new Integer(sccs[i].getControlMeasureId()));
+            Criterion c2 = Restrictions.eq("code", sccs[i].getCode());
+            if (!hibernateFacade.exists(Scc.class, new Criterion[] { c1, c2 }, session))
+                hibernateFacade.add(sccs, session);
+        }
+    }
+
+    private void updateSccsControlMeasureIds(Scc[] sccs, ControlMeasure controlMeasure) {
+        for (int i = 0; i < sccs.length; i++) {
+            sccs[i].setControlMeasureId(controlMeasure.getId());
         }
     }
 

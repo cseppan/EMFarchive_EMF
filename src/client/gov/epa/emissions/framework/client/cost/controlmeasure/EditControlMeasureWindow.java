@@ -64,13 +64,9 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     private JTabbedPane createTabbedPane(ControlMeasure measure, MessagePanel messagePanel) {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
-
         tabbedPane.addTab("Summary", createSummaryTab(measure, messagePanel));
-
         tabbedPane.addTab("Efficiencies", createEfficiencyTab(measure, messagePanel));
-
         tabbedPane.addTab("SCCs", createSCCTab(measure, messagePanel));
-
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
         return tabbedPane;

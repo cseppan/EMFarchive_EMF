@@ -74,7 +74,6 @@ public class CaseServiceImpl implements CaseService {
             return (Case[]) cases.toArray(new Case[0]);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Cases", e);
-            e.printStackTrace();
             throw new EmfException("Could not get all Cases");
         }
     }

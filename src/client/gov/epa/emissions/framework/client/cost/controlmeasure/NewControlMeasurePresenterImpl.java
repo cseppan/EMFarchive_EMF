@@ -20,7 +20,7 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
 
     private EmfSession session;
 
-    private RefreshObserver parent;
+    //private RefreshObserver parent;
 
     private ControlMeasureSccTabView sccView;
 
@@ -29,7 +29,7 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
         this.measure = measure;
         this.view = view;
         this.session = session;
-        this.parent = parent;
+        //this.parent = parent;
         presenters = new ArrayList();
     }
 
@@ -55,7 +55,7 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
 
         service.addMeasure(measure, sccView.sccs());
         view.disposeView();
-        parent.doRefresh();
+        //parent.doRefresh();
     }
 
     public void set(ControlMeasureTabView summary) {
