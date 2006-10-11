@@ -50,6 +50,8 @@ public class ControlStrategy implements Lockable {
     private StrategyType strategyType;
 
     private int datasetVersion;
+    
+    private String filter;
 
     private Mutex lock;
 
@@ -246,6 +248,14 @@ public class ControlStrategy implements Lockable {
 
     public void setStrategyType(StrategyType strategyType) {
         this.strategyType = strategyType;
+    }
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
     }
 
 }

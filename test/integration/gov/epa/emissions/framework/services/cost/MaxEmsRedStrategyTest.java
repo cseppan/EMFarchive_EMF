@@ -27,7 +27,9 @@ public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
             maxEmfEmsRedStrategy.run();
             assertEquals("No of rows in the detail result table is 15", 15,
                     countRecords(detailResultDatasetTableName(strategy)));
-        } finally {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
             if (strategy != null)
                 dropTable(detailResultDatasetTableName(strategy), dbServer().getEmissionsDatasource());
             dropAll(Scc.class);
@@ -35,6 +37,7 @@ public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
             dropAll(ControlStrategyResult.class);
             dropAll(ControlStrategy.class);
             dropAll(Dataset.class);
+            
         }
 
     }

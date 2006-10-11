@@ -40,7 +40,7 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
         return element;
     }
 
-    public void testShouldUpdateControlStrategyOnUpdate() throws EmfException {
+public void testShouldUpdateControlStrategyOnUpdate() throws EmfException {
         UserDAO userDAO = new UserDAO();
         User owner = userDAO.get("emf", session);
 
@@ -53,20 +53,20 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
             
             assertEquals(locked.getLockOwner(), owner.getUsername());
             locked.setName("TEST");
+            locked.setFilter("WHERE SCC=20210000");
             
             session.clear();
             ControlStrategy modified = dao.update(locked, session);
             
             assertEquals("TEST", locked.getName());
+            assertEquals("WHERE SCC=20210000",locked.getFilter());
             assertEquals(modified.getLockOwner(), null);
             
         } finally {
             remove(element);
             remove(dataset);
         }
-    }
-    
-    private EmfDataset dataset(String name) {
+    }    private EmfDataset dataset(String name) {
         User owner = new UserDAO().get("emf", session);
 
         EmfDataset dataset = new EmfDataset();
@@ -82,7 +82,7 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
         ControlStrategy element = newControlStrategy();
         session.clear();
         int totalAfterAdd = dao.all(session).size();
-        
+
         assertEquals(totalAfterAdd, totalBeforeAdd + 1);
 
         try {

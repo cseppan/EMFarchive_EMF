@@ -110,6 +110,7 @@ CREATE TABLE emf.control_strategies
   strategy_type_id int4 REFERENCES emf.strategy_types(id),
   target_pollutant varchar(255),
   dataset_version int4,
+  filter varchar(255),
   lock_owner varchar(255),
   lock_date timestamp
 ) 

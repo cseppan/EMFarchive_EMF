@@ -63,7 +63,7 @@ public class MaxEmsRedStrategy implements Strategy {
         SccControlMeasuresMap map = mapGenerator.create();
         EmfDataset resultDataset = resultDataset();
         createTable(creator.outputTableName());
-        OptimizedQuery optimizedQuery = sourceQuery(inputDataset);
+        OptimizedQuery optimizedQuery = sourceQuery(inputDataset, controlStrategy);
         ControlStrategyResult result = strategyResult(resultDataset);
 
         try {
@@ -129,9 +129,8 @@ public class MaxEmsRedStrategy implements Strategy {
         }
     }
 
-    private OptimizedQuery sourceQuery(EmfDataset dataset) throws EmfException {
-        String query = "SELECT * FROM " + emissionTableName(dataset) + " WHERE poll=" + "\'"
-                + controlStrategy.getTargetPollutant() + "\'";
+    private OptimizedQuery sourceQuery(EmfDataset dataset, ControlStrategy controlStrategy) throws EmfException {
+        String query = "SELECT * FROM " + emissionTableName(dataset) + conditionForQuery(controlStrategy);
         try {
             return datasource.optimizedQuery(query, batchSize);
         } catch (SQLException e) {
@@ -139,6 +138,24 @@ public class MaxEmsRedStrategy implements Strategy {
 
         }
 
+    }
+
+    private String conditionForQuery(ControlStrategy controlStrategy) {
+        String filter = controlStrategy.getFilter();
+
+        String pollutantCondition = "poll=" + "\'" + controlStrategy.getTargetPollutant() + "\'";
+        if (filter == null || filter.length() == 0)
+            return " WHERE " + pollutantCondition;
+
+        String condition = whereTag(filter);
+        return condition + filter + " AND " + pollutantCondition;
+    }
+
+    private String whereTag(String filter) {
+        String condition = " ";
+        if (filter.toUpperCase().indexOf("WHERE") == -1)
+            condition = " WHERE ";
+        return condition;
     }
 
     private void createTable(String tableName) throws EmfException {
