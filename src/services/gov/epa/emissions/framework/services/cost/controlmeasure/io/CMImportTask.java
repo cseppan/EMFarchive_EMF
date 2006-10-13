@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 
-public class CMImportTask {
+public class CMImportTask implements Runnable {
 
     private static Log log = LogFactory.getLog(CMImportTask.class);
 
