@@ -6,9 +6,11 @@ import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
+import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
@@ -78,8 +80,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     public void export() {
         try {
-            List list = selectModel.selected();
-            EmfDataset[] datasets = (EmfDataset[]) list.toArray(new EmfDataset[0]);
+            EmfDataset[] datasets = getSelectedDatasets();
             presenter.doExport(datasets, folder.getText());
             messagePanel.setMessage("Started Export. Please monitor the Status window to track your export request");
         } catch (EmfException e) {
@@ -201,10 +202,11 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private JPanel buttonPanel() {
         Button exportButton = new ExportButton(exportAction());
         Button analysisButton = new Button("Analyze", analysisAction());
-
+        Button view = new ViewButton("View", viewAction());
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(exportButton);
         buttonPanel.add(analysisButton);
+        buttonPanel.add(view);
         return buttonPanel;
     }
 
@@ -223,6 +225,15 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             public void actionPerformed(ActionEvent e) {
                 messagePanel.clear();
                 analyze();
+            }
+        };
+    }
+
+    private Action viewAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
+                viewDataSets();
             }
         };
     }
@@ -265,6 +276,26 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     public void refresh(ControlStrategyResult controlStrategyResult) {
         setLayout(controlStrategy, controlStrategyResult);
+    }
+
+    private void viewDataSets() {
+        EmfDataset[] datasets = getSelectedDatasets();
+        if (datasets.length == 0) {
+            messagePanel.setMessage("Please select at least one item.");
+            return;
+        }
+
+        for (int i = 0; i < datasets.length; i++) {
+            DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
+            presenter.doDisplayPropertiesView(view, datasets[i]);
+        }
+    }
+
+    private EmfDataset[] getSelectedDatasets() {
+        List list = selectModel.selected();
+        EmfDataset[] datasets = (EmfDataset[]) list.toArray(new EmfDataset[0]);
+
+        return datasets;
     }
 
 }

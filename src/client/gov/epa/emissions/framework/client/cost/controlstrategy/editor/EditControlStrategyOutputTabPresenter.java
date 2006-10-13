@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.meta.PropertiesView;
+import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
@@ -89,6 +91,11 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
 
     public void doRefresh(ControlStrategyResult result) {
         view.refresh(result);
+    }
+    
+    public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) {
+        PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
+        presenter.doDisplay(propertiesView);
     }
 
 }

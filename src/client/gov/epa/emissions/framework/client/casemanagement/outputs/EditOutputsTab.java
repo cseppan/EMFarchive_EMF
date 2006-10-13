@@ -50,7 +50,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
 
     public EditOutputsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager) {
-        super.setName("editInputsTab");
+        super.setName("editOutputsTab");
         this.parentConsole = parentConsole;
         this.changeables = changeables;
 
