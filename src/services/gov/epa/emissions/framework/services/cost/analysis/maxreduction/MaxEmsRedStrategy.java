@@ -74,7 +74,7 @@ public class MaxEmsRedStrategy implements Strategy {
         } catch (Exception e) {
             result.setRunStatus("Failed. Error in processing input dataset: " + inputDataset.getName() + ". "
                     + result.getRunStatus());
-            throw new EmfException("Could not run control strategy" + "\n" + e.getMessage());
+            throw new EmfException("Could not run control strategy: " + e.getMessage());
         } finally {
             close(optimizedQuery);
             result.setCompletionTime(new Date());
