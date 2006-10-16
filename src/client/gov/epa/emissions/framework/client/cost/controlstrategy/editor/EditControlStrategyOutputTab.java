@@ -203,6 +203,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         Button exportButton = new ExportButton(exportAction());
         Button analysisButton = new Button("Analyze", analysisAction());
         Button view = new ViewButton("View", viewAction());
+        view.setToolTipText("View output datasets.");
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(exportButton);
         buttonPanel.add(analysisButton);
