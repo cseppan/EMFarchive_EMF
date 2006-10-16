@@ -13,10 +13,10 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.DatasetCreator;
 import gov.epa.emissions.framework.services.cost.controlStrategy.GenerateSccControlMeasuresMap;
 import gov.epa.emissions.framework.services.cost.controlStrategy.SccControlMeasuresMap;
-import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -74,7 +74,7 @@ public class MaxEmsRedStrategy implements Strategy {
         } catch (Exception e) {
             result.setRunStatus("Failed. Error in processing input dataset: " + inputDataset.getName() + ". "
                     + result.getRunStatus());
-            throw new EmfException("Could not run control strategy: " + e.getMessage());
+            throw new EmfException(e.getMessage());
         } finally {
             close(optimizedQuery);
             result.setCompletionTime(new Date());
