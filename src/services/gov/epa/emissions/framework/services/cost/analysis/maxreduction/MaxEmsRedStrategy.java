@@ -64,7 +64,7 @@ public class MaxEmsRedStrategy implements Strategy {
         EmfDataset resultDataset = resultDataset();
         createTable(creator.outputTableName());
         OptimizedQuery optimizedQuery = sourceQuery(inputDataset, controlStrategy);
-        ControlStrategyResult result = strategyResult(resultDataset);
+        ControlStrategyResult result = strategyResult(controlStrategy, resultDataset);
 
         try {
             StrategyLoader loader = new StrategyLoader(creator.outputTableName(), tableFormat, dbServer, result, map,
@@ -78,15 +78,15 @@ public class MaxEmsRedStrategy implements Strategy {
         } finally {
             close(optimizedQuery);
             result.setCompletionTime(new Date());
+            saveResults(result);
         }
-        saveResults(result);
     }
 
     private void saveResults(ControlStrategyResult result) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             ControlStrategyDAO dao = new ControlStrategyDAO();
-            dao.add(result, session);
+            dao.updateControlStrategyResults(result, session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not save control strategy results-" + e.getMessage());
         } finally {
@@ -94,8 +94,11 @@ public class MaxEmsRedStrategy implements Strategy {
         }
     }
 
-    private ControlStrategyResult strategyResult(EmfDataset resultDataset) throws EmfException {
-        ControlStrategyResult result = new ControlStrategyResult();
+    private ControlStrategyResult strategyResult(ControlStrategy controlStrategy, EmfDataset resultDataset)
+            throws EmfException {
+        ControlStrategyResult result = existingControlStrategyResult(controlStrategy);
+        if(result==null)
+            result = new ControlStrategyResult();
         result.setControlStrategyId(controlStrategy.getId());
         result.setInputDatasetId(inputDataset.getId());
         result.setDetailedResultDataset(resultDataset);
@@ -105,6 +108,18 @@ public class MaxEmsRedStrategy implements Strategy {
         result.setRunStatus("Created for input dataset: " + inputDataset.getName());
 
         return result;
+    }
+
+    private ControlStrategyResult existingControlStrategyResult(ControlStrategy controlStrategy) throws EmfException {
+        ControlStrategyDAO dao = new ControlStrategyDAO();
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.controlStrategyResult(controlStrategy, session);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not remove previous control strategy result");
+        } finally {
+            session.close();
+        }
     }
 
     private StrategyResultType getDetailedStrategyResultType() throws EmfException {

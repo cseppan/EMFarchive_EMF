@@ -11,7 +11,6 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.FlushMode;
 import org.hibernate.Session;
 
 public class StrategyTask implements Runnable {
@@ -40,7 +39,6 @@ public class StrategyTask implements Runnable {
     public void run() {
         Session session = sessionFactory.getSession();
         try {
-            session.setFlushMode(FlushMode.NEVER);
             prepare();
             strategy.run();
             csService.updateControlStrategyWithLock(strategy.getControlStrategy());
@@ -49,7 +47,6 @@ public class StrategyTask implements Runnable {
             logError("Failed to run strategy : ", e);
             setStatus("Failed to run strategy: " + "Reason: " + e.getMessage());
         } finally {
-            session.flush();
             session.close();
             closeConnection();
         }

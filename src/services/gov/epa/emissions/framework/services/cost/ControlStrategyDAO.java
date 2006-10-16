@@ -138,4 +138,5 @@ public class ControlStrategyDAO {
     public void updateControlStrategyResults(ControlStrategyResult result, Session session) {
         hibernateFacade.update(result, session);
     }
+
 }
