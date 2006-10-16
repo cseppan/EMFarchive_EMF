@@ -3,6 +3,9 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlmeasure.io.CMExportPresenter;
+import gov.epa.emissions.framework.client.cost.controlmeasure.io.CMExportView;
+import gov.epa.emissions.framework.client.cost.controlmeasure.io.CMExportWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.ui.RefreshObserver;
@@ -56,6 +59,12 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         }
         
         return null;
+    }
+
+    public void doExport(ControlMeasure[] measures, DesktopManager desktopManager, int totalMeasuers) {
+        CMExportView exportView = new CMExportWindow(measures, desktopManager, totalMeasuers);
+        CMExportPresenter exportPresenter = new CMExportPresenter(session);
+        exportPresenter.display(exportView);
     }
 
 }

@@ -228,8 +228,13 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         clearMessage();
         List cmList = getSelectedMeasures();
         
-        if (cmList.size() == 0)
+        if (cmList.size() == 0) {
             showError("Please select a control measure.");
+            return;
+        }
+        
+        presenter.doExport((ControlMeasure[])cmList.toArray(new ControlMeasure[0]), 
+                desktopManager, selectModel.getRowCount());
     }
 
     private Component getItem(String label, JComboBox box) {
