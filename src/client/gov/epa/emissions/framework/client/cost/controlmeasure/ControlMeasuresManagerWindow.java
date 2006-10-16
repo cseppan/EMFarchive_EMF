@@ -155,11 +155,6 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         Button edit = new EditButton(editAction());
         panel.add(edit);
 
-        Button exportButton = new ExportButton(null);
-        exportButton.setToolTipText("Export existing Control Measure(s)");
-        panel.add(exportButton);
-        exportButton.setEnabled(false);
-
         Button copy = new CopyButton(null);
         panel.add(copy);
         copy.setEnabled(false);
@@ -192,6 +187,10 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         Button importButton = new ImportButton(importAction());
         panel.add(importButton);
 
+        Button exportButton = new ExportButton(exportAction());
+        exportButton.setToolTipText("Export existing Control Measure(s)");
+        panel.add(exportButton);
+        
         Button closeButton = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
@@ -210,11 +209,27 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         };
     }
 
+    private Action exportAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                controlMeasureExport();
+            }
+        };
+    }
+
     protected void controlMeasureImport() {
         CMImportView view = new CMImportWindow(desktopManager);
         CMImportPresenter presenter = new CMImportPresenter(session);
         presenter.display(view);
 
+    }
+
+    protected void controlMeasureExport() {
+        clearMessage();
+        List cmList = getSelectedMeasures();
+        
+        if (cmList.size() == 0)
+            showError("Please select a control measure.");
     }
 
     private Component getItem(String label, JComboBox box) {
