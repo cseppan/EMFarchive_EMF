@@ -1,18 +1,26 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
-import java.io.File;
-
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
+import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.persistence.HibernateFacade;
+
+import java.io.File;
 
 public class CMImportTaskTest extends ServiceTestCase {
 
-    protected void doSetUp() throws Exception {
-        // NOTE Auto-generated method stub
+    private ControlMeasureDAO dao;
 
+    public CMImportTaskTest() {
+        this.dao = new ControlMeasureDAO();
+    }
+
+    protected void doSetUp() throws Exception {
+        //
     }
 
     protected void doTearDown() throws Exception {
@@ -20,40 +28,69 @@ public class CMImportTaskTest extends ServiceTestCase {
     }
 
     public void testShouldImportControlMeasureFiles() throws Exception {
-        //ControlMeasure[] measures = null;
         try {
             File folder = new File("test/data/cost/controlMeasure");
             String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
-            //CMImportTask task = 
-            new CMImportTask(folder, fileNames, emfUser(), sessionFactory());
-            //measures = task.run();
-            //assertEquals(32, measures.length);
-            //assertEquals(1132, noOfRecords(measures));
-            //assertEquals(124, noOfScc(measures));
-        } finally {
+            CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory());
+            task.run();
+            ControlMeasure[] measures = measures();
+            assertEquals(32, measures.length);
+            assertEquals(1132, noOfRecords(measures));
+            assertEquals(124, noOfScc());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            dropAll(Scc.class);
             dropAll(ControlMeasure.class);
             dropAll(Status.class);
         }
+    }
+    
+    public void testShouldImportControlMeasureFilesTwice() throws Exception {
+        try {
+            File folder = new File("test/data/cost/controlMeasure");
+            String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
+            CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory());
+            task.run();
+            ControlMeasure[] measures = measures();
+            assertEquals(32, measures.length);
+            assertEquals(1132, noOfRecords(measures));
+            assertEquals(124, noOfScc());
+            
+            task.run();
+            
+            measures = measures();
+            assertEquals(32, measures.length);
+            assertEquals(1132, noOfRecords(measures));
+            assertEquals(124, noOfScc());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            dropAll(Scc.class);
+            dropAll(ControlMeasure.class);
+            dropAll(Status.class);
+        }
+    }
+
+    private ControlMeasure[] measures() {
+        return (ControlMeasure[]) dao.all(session).toArray(new ControlMeasure[0]);
     }
 
     private User emfUser() {
         return new UserDAO().get("emf", session);
     }
 
-    // private int noOfScc(ControlMeasure[] measures) {
-    // int count = 0;
-    // for (int i = 0; i < measures.length; i++) {
-    // count += measures[i].getSccs().length;
-    // }
-    // return count;
-    // }
-    //
-    // private int noOfRecords(ControlMeasure[] measures) {
-    // int count = 0;
-    // for (int i = 0; i < measures.length; i++) {
-    // count += measures[i].getEfficiencyRecords().length;
-    //        }
-    //        return count;
-    //    }
+    private int noOfScc() {
+        HibernateFacade facade = new HibernateFacade();
+        return facade.getAll(Scc.class, session).size();
+    }
+
+    private int noOfRecords(ControlMeasure[] measures) {
+        int count = 0;
+        for (int i = 0; i < measures.length; i++) {
+            count += measures[i].getEfficiencyRecords().length;
+        }
+        return count;
+    }
 
 }

@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.ControlMeasuresDAO;
+import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.FlushMode;
 import org.hibernate.Session;
 
 public class CMImportTask implements Runnable {
@@ -32,31 +31,27 @@ public class CMImportTask implements Runnable {
 
     private HibernateSessionFactory sessionFactory;
 
-    private ControlMeasuresDAO controlMeasuresDao;
+    private ControlMeasureDAO controlMeasuresDao;
 
     public CMImportTask(File folder, String[] files, User user, HibernateSessionFactory sessionFactory) {
         this.folder = folder;
         this.files = files;
         this.user = user;
         this.sessionFactory = sessionFactory;
-        this.controlMeasuresDao = new ControlMeasuresDAO();
+        this.controlMeasuresDao = new ControlMeasureDAO();
         this.statusDao = new StatusDAO(sessionFactory);
     }
 
     public void run() {
-        Session session = sessionFactory.getSession();
+        
         try {
-            session.setFlushMode(FlushMode.NEVER);
             prepare();
             ControlMeasuresImporter importer = new ControlMeasuresImporter(folder, files, user, sessionFactory);
             importer.run();
-            complete(importer.controlMeasures(), session);
+            complete(importer.controlMeasures(), user);
         } catch (Exception e) {
             logError("Failed to import control measures", e); // FIXME: report generation
             setStatus("Failed to import all control measures: " + e.getMessage());
-        } finally {
-            session.flush();
-            session.close();
         }
     }
 
@@ -64,20 +59,21 @@ public class CMImportTask implements Runnable {
         addStartStatus();
     }
 
-    private void complete(ControlMeasure[] measures, Session session) {
+    private void complete(ControlMeasure[] measures, User user) {
         Date date = new Date();
         List messages = new ArrayList(); 
-        List addedMeasures = new ArrayList();
         int count = 0;
         for (int i = 0; i < measures.length; i++) {
             measures[i].setCreator(user);
             measures[i].setLastModifiedTime(date);
+            Session session = sessionFactory.getSession();
             try {
-                controlMeasuresDao.add(measures[i],measures[i].getSccs(), session);
-                addedMeasures.add(controlMeasuresDao.load(measures[i], session));
+                controlMeasuresDao.addFromImporter(measures[i],measures[i].getSccs(), user,session);
                 count++;
             } catch (EmfException e) {
                 messages.add(e.getMessage());
+            }finally{
+                session.close();
             }
         }
         addCompletedStatus(count);

@@ -23,7 +23,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
 
     private HibernateSessionFactory sessionFactory;
 
-    private ControlMeasuresDAO dao;
+    private ControlMeasureDAO dao;
 
     private ControlTechnologiesDAO controlTechnologiesDAO;
 
@@ -37,7 +37,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
 
     private void init(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
-        dao = new ControlMeasuresDAO();
+        dao = new ControlMeasureDAO();
         controlTechnologiesDAO = new ControlTechnologiesDAO();
     }
 

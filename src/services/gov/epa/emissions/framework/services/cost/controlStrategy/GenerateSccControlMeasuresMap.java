@@ -9,7 +9,7 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.ControlMeasuresDAO;
+import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -73,7 +73,7 @@ public class GenerateSccControlMeasuresMap {
     private ControlMeasure controlMeasure(int id) {
         Session session = sessionFactory.getSession();
         try {
-            ControlMeasuresDAO dao = new ControlMeasuresDAO();
+            ControlMeasureDAO dao = new ControlMeasureDAO();
             return dao.current(id, ControlMeasure.class, session);
         } finally {
             session.close();

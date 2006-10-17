@@ -4,22 +4,26 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.NewLockingScheme;
 
 import java.util.List;
 
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
-public class ControlMeasuresDAO {
+public class ControlMeasureDAO {
 
     private NewLockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
 
-    public ControlMeasuresDAO() {
+    public ControlMeasureDAO() {
         lockingScheme = new NewLockingScheme();
         hibernateFacade = new HibernateFacade();
     }
@@ -150,33 +154,79 @@ public class ControlMeasuresDAO {
     }
 
     public void checkForConstraints(ControlMeasure controlMeasure, Session session) throws EmfException {
-        if (nameExist(controlMeasure, session))
+
+        Criterion id = Restrictions.ne("id", new Integer(controlMeasure.getId()));
+        Criterion name = Restrictions.eq("name", controlMeasure.getName());
+        Criterion abbrev = Restrictions.eq("abbreviation", controlMeasure.getAbbreviation());
+
+        if (nameExist(new Criterion[] { id, name }, session))
             throw new EmfException("The Control Measure name is already in use: " + controlMeasure.getName());
 
-        if (abbrExist(controlMeasure, session))
+        if (abbrExist(new Criterion[] { id, abbrev }, session))
             throw new EmfException("The Control Measure Abbreviation already in use: "
                     + controlMeasure.getAbbreviation());
     }
 
-    private boolean nameExist(ControlMeasure controlMeasure, Session session) {
-        String name = controlMeasure.getName();
-        Criterion criterion1 = Restrictions.eq("name", name);
-        Criterion criterion2 = Restrictions.ne("id", new Integer(controlMeasure.getId()));
-        Criterion[] criterions = { criterion1, criterion2 };
+    private boolean nameExist(Criterion[] criterions, Session session) {
         return exists(ControlMeasure.class, criterions, session);
     }
 
-    private boolean abbrExist(ControlMeasure controlMeasure, Session session) {
-        String abbr = controlMeasure.getAbbreviation();
-        Criterion criterion1 = Restrictions.eq("abbreviation", abbr);
-        Criterion criterion2 = Restrictions.ne("id", new Integer(controlMeasure.getId()));
-        Criterion[] criterions = { criterion1, criterion2 };
+    private boolean abbrExist(Criterion[] criterions, Session session) {
         return exists(ControlMeasure.class, criterions, session);
     }
 
     public ControlMeasure load(ControlMeasure measure, Session session) {
         return (ControlMeasure) hibernateFacade.load(ControlMeasure.class, Restrictions.eq("name", measure.getName()),
                 session);
+    }
+
+    public void addFromImporter(ControlMeasure measure, Scc[] sccs, User user, Session session) throws EmfException {
+        Criterion name = Restrictions.eq("name", measure.getName());
+        Criterion abbrev = Restrictions.eq("abbreviation", measure.getAbbreviation());
+        boolean abbrExist = abbrExist(new Criterion[] { abbrev }, session);
+        boolean nameExist = nameExist(new Criterion[] { name }, session);
+
+        if (nameExist) {// overwrite if name exist regard less of abbrev
+            int id = controlMeasureId(measure, session);
+            measure.setId(id);
+            ControlMeasure obtainLocked = obtainLocked(user, measure, session);
+            measure.setLockDate(obtainLocked.getLockDate());
+            measure.setLockOwner(obtainLocked.getLockOwner());
+            if (obtainLocked == null)
+                throw new EmfException("Could not obtain the lock to update: " + measure.getName());
+            removeSccs(measure, session);
+            removeEfficiencyRecord(measure, session);
+            update(measure, sccs, session);
+        } else if (abbrExist) {
+            throw new EmfException("The Control Measure Abbreviation already in use: " + measure.getAbbreviation());
+        } else {
+            add(measure, sccs, session);
+        }
+    }
+
+    // use only after confirming measure is exist
+    private int controlMeasureId(ControlMeasure measure, Session session) {
+        Criterion criterion = Restrictions.eq("name", measure.getName());
+
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria criteria = session.createCriteria(ControlMeasure.class);
+            criteria.add(criterion);
+            tx.commit();
+            return ((ControlMeasure) criteria.uniqueResult()).getId();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    private void removeEfficiencyRecord(ControlMeasure measure, Session session) {
+        Criterion c = Restrictions.eq("controlMeasureId", new Integer(measure.getId()));
+        List list = hibernateFacade.get(EfficiencyRecord.class, c, session);
+        for (int i = 0; i < list.size(); i++) {
+            hibernateFacade.remove(list.get(i), session);
+        }
     }
 
 }

@@ -125,8 +125,11 @@ public abstract class ServiceTestCase extends TestCase {
                 session.delete(iter.next());
             tx.commit();
         } catch (HibernateException e) {
+            e.printStackTrace();
             tx.rollback();
             throw e;
+        }catch(Throwable e){
+            e.printStackTrace();
         }
     }
 

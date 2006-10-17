@@ -28,10 +28,10 @@ public class RetrieveSCCTest extends ServiceTestCase {
         // These scc numbers have to exist in the reference.scc table
         cm.setSccs(new Scc[] { scc1, scc2, scc3 });
 
-        ControlMeasuresDAO dao = null;
+        ControlMeasureDAO dao = null;
         Scc[] sccs = null;
         try {
-            dao = new ControlMeasuresDAO();
+            dao = new ControlMeasureDAO();
             addMeasure(cm, dao);
             RetrieveSCC retreiveSCC = new RetrieveSCC(cm, dbServer());
             sccs = retreiveSCC.sccs();
@@ -56,7 +56,7 @@ public class RetrieveSCCTest extends ServiceTestCase {
 
     }
 
-    private void addMeasure(ControlMeasure measure, ControlMeasuresDAO dao) throws HibernateException, Exception {
+    private void addMeasure(ControlMeasure measure, ControlMeasureDAO dao) throws HibernateException, Exception {
         Session session = sessionFactory().getSession();
         try {
             dao.add(measure,measure.getSccs(), session);
@@ -65,7 +65,7 @@ public class RetrieveSCCTest extends ServiceTestCase {
         }
     }
 
-    private void removeMeasure(ControlMeasure measure, ControlMeasuresDAO dao) throws HibernateException, Exception {
+    private void removeMeasure(ControlMeasure measure, ControlMeasureDAO dao) throws HibernateException, Exception {
         Session session = sessionFactory().getSession();
         try {
             dao.remove(measure, session);

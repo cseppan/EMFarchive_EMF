@@ -7,22 +7,25 @@ import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
+import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 
 import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
 public class ControlMeasureDaoTest extends ServiceTestCase {
 
-    private ControlMeasuresDAO dao;
+    private ControlMeasureDAO dao;
 
     private UserDAO userDAO;
 
     protected void doSetUp() throws Exception {
-        dao = new ControlMeasuresDAO();
+        dao = new ControlMeasureDAO();
         userDAO = new UserDAO();
     }
 
@@ -167,7 +170,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
             assertEquals(locked.getLockOwner(), owner.getUsername());
             locked.setName("TEST");
 
-            ControlMeasure modified = dao.update(locked,new Scc[]{},session);
+            ControlMeasure modified = dao.update(locked, new Scc[] {}, session);
             assertEquals("TEST", locked.getName());
             assertEquals(modified.getLockOwner(), null);
         } finally {
@@ -234,7 +237,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
             EfficiencyRecord record1 = efficiencyRecord(pm10Pollutant(), "22");
             EfficiencyRecord record2 = efficiencyRecord(pm10Pollutant(), "22");
             cm.setEfficiencyRecords(new EfficiencyRecord[] { record1, record2 });
-            dao.update(cm,cm.getSccs(),session);
+            dao.update(cm, cm.getSccs(), session);
             ControlMeasure newMeasure = load(cm);
             EfficiencyRecord[] efficiencyRecords = newMeasure.getEfficiencyRecords();
             assertEquals(2, efficiencyRecords.length);
@@ -245,6 +248,151 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         } finally {
             remove(cm);
         }
+    }
+
+    public void testShouldOverwriteCM_WhenImport_WithSameNameAndSameAbbrev() throws HibernateException,
+            Exception {
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
+        cm.setAbbreviation("12345678");
+        cm.setCmClass("Experiment");
+        User emfUser = emfUser();
+        cm.setCreator(emfUser);
+
+        EfficiencyRecord[] records1 = { efficiencyRecord(pm10Pollutant(), "01"),
+                efficiencyRecord(pm10Pollutant(), "23") };
+        Scc[] sccs1 = sccs("10031");
+        cm.setEfficiencyRecords(records1);
+
+        EfficiencyRecord[] records2 = { efficiencyRecord(COPollutant(), "32") };
+        Scc[] sccs2 = sccs("10231");
+        try {
+            addCMFromImporter(cm, emfUser, sccs1);
+
+            cm.setCmClass("Theory");
+            cm.setEfficiencyRecords(records2);
+            addCMFromImporter(cm, emfUser, sccs2);
+
+            ControlMeasure controlMeasure = (ControlMeasure) load(ControlMeasure.class, "cm one");
+            assertEquals("Theory", controlMeasure.getCmClass());
+
+            EfficiencyRecord[] efficiencyRecords = controlMeasure.getEfficiencyRecords();
+            assertEquals(1, efficiencyRecords.length);
+            assertEquals("32", efficiencyRecords[0].getLocale());
+
+            Scc[] sccs = loadSccs(controlMeasure);
+
+            assertEquals(1, sccs.length);
+            assertEquals("10231", sccs[0].getCode());
+        } finally {
+            dropAll(Scc.class);
+            dropAll(ControlMeasure.class);
+        }
+
+    }
+    
+    public void testShouldOverwriteCM_WhenImport_WithSameNameAndDifferenAbbrev() throws EmfException, Exception{
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
+        cm.setAbbreviation("12345678");
+        cm.setCmClass("Experiment");
+        User emfUser = emfUser();
+        cm.setCreator(emfUser);
+
+        EfficiencyRecord[] records1 = { efficiencyRecord(pm10Pollutant(), "01"),
+                efficiencyRecord(pm10Pollutant(), "23") };
+        Scc[] sccs1 = sccs("10031");
+        cm.setEfficiencyRecords(records1);
+
+        EfficiencyRecord[] records2 = { efficiencyRecord(COPollutant(), "32")};
+        Scc[] sccs2 = sccs("10231");
+        try {
+            addCMFromImporter(cm, emfUser, sccs1);
+            
+            cm.setAbbreviation("UNCCEP");
+            cm.setCmClass("Theory");
+            cm.setEfficiencyRecords(records2);
+            addCMFromImporter(cm, emfUser, sccs2);
+            
+            ControlMeasure controlMeasure = (ControlMeasure) load(ControlMeasure.class,"cm one");
+            assertEquals("UNCCEP",controlMeasure.getAbbreviation());
+            assertEquals("Theory",controlMeasure.getCmClass());
+
+            EfficiencyRecord[] efficiencyRecords = controlMeasure.getEfficiencyRecords();
+            assertEquals(1,efficiencyRecords.length);
+            assertEquals("32",efficiencyRecords[0].getLocale());
+            
+            Scc[] sccs = loadSccs(controlMeasure);
+            
+            assertEquals(1,sccs.length);
+            assertEquals("10231",sccs[0].getCode());
+        } finally {
+            dropAll(Scc.class);
+            dropAll(ControlMeasure.class);
+        }
+
+    
+    }
+    
+    public void testShouldOverwriteCM_WhenImport_WithDifferentNameAndSameAbbrev() throws Exception{
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
+        cm.setAbbreviation("12345678");
+        cm.setCmClass("Experiment");
+        User emfUser = emfUser();
+        cm.setCreator(emfUser);
+
+        EfficiencyRecord[] records1 = { efficiencyRecord(pm10Pollutant(), "01"),
+                efficiencyRecord(pm10Pollutant(), "23") };
+        Scc[] sccs1 = sccs("10031");
+        cm.setEfficiencyRecords(records1);
+
+        EfficiencyRecord[] records2 = { efficiencyRecord(COPollutant(), "32")};
+        Scc[] sccs2 = sccs("10231");
+        try {
+            addCMFromImporter(cm, emfUser, sccs1);
+            cm.setName("cm two");
+            cm.setCmClass("Theory");
+            cm.setEfficiencyRecords(records2);
+            addCMFromImporter(cm, emfUser, sccs2);
+            assertFalse("Should have throw an exception: abbrev exist",true);
+        }catch (Exception e) {
+            assertEquals("The Control Measure Abbreviation already in use: 12345678",e.getMessage());
+            assertTrue("The exception is thrown: abbrev exist",true);
+        } finally {
+            dropAll(Scc.class);
+            dropAll(ControlMeasure.class);
+        }
+
+    
+    }
+    
+    
+
+    private Scc[] loadSccs(ControlMeasure controlMeasure) throws HibernateException, Exception {
+        HibernateFacade facade = new  HibernateFacade();
+        Criterion c1 = Restrictions.eq("controlMeasureId",new Integer(controlMeasure.getId()));
+        Session session = sessionFactory().getSession();
+        try{
+            List list = facade.get(Scc.class,c1,session);
+            return (Scc[]) list.toArray(new Scc[0]);
+        }finally{
+            session.close();
+        }
+    }
+
+    private void addCMFromImporter(ControlMeasure cm, User emfUser, Scc[] sccs) throws Exception, EmfException {
+        Session session = sessionFactory().getSession();
+        try {
+            dao.addFromImporter(cm, sccs, emfUser, session);
+        } finally {
+            session.close();
+        }
+    }
+
+    private Scc[] sccs(String name) {
+        Scc scc = new Scc(name, "");
+        return new Scc[] { scc };
     }
 
     private EfficiencyRecord efficiencyRecord(Pollutant pollutant, String locale) {
@@ -270,6 +418,10 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
 
     private Pollutant pm10Pollutant() {
         return (Pollutant) load(Pollutant.class, "PM10");
+    }
+
+    private Pollutant COPollutant() {
+        return (Pollutant) load(Pollutant.class, "CO");
     }
 
 }
