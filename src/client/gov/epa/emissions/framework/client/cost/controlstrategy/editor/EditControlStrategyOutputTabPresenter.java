@@ -91,6 +91,7 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
 
     public void doRefresh(ControlStrategyResult result) {
         view.refresh(result);
+        view.recentExportFolder(folder());
     }
     
     public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) {
