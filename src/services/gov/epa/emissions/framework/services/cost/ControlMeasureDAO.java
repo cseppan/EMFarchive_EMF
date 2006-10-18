@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
-import gov.epa.emissions.framework.services.persistence.NewLockingScheme;
+import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
 import java.util.List;
 
@@ -19,12 +19,12 @@ import org.hibernate.criterion.Restrictions;
 
 public class ControlMeasureDAO {
 
-    private NewLockingScheme lockingScheme;
+    private LockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
 
     public ControlMeasureDAO() {
-        lockingScheme = new NewLockingScheme();
+        lockingScheme = new LockingScheme();
         hibernateFacade = new HibernateFacade();
     }
 

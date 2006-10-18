@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.services.casemanagement;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
-import gov.epa.emissions.framework.services.persistence.LockingScheme;
+import gov.epa.emissions.framework.services.persistence.OldLockingScheme;
 
 import java.util.List;
 
@@ -16,11 +16,11 @@ public class CaseDAO {
 
     private HibernateFacade hibernateFacade;
 
-    private LockingScheme lockingScheme;
+    private OldLockingScheme lockingScheme;
 
     public CaseDAO() {
         hibernateFacade = new HibernateFacade();
-        lockingScheme = new LockingScheme();
+        lockingScheme = new OldLockingScheme();
     }
 
     public void add(Abbreviation object, Session session) {

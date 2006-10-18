@@ -7,8 +7,6 @@ import gov.epa.emissions.framework.services.EmfProperties;
 import gov.epa.emissions.framework.services.EmfProperty;
 
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -20,13 +18,11 @@ public class LockingScheme {
     public LockingScheme() {
         propertiesDao = new EmfPropertiesDAO();
     }
-
-    public Lockable getLocked(User user, Lockable target, Session session, List all) {
-        Lockable current = current(target, all);
-        return getLocked(user, current, session);
-    }
-
-    private Lockable getLocked(User user, Lockable current, Session session) {
+    
+    
+    //throw an exception if the object is already locked
+    //
+    public Lockable getLocked(User user, Lockable current, Session session) {
         if (!current.isLocked()) {
             grabLock(user, current, session);
             return current;
@@ -46,16 +42,6 @@ public class LockingScheme {
         return Long.parseLong(timeInterval.getValue());
     }
 
-    private Lockable current(Lockable target, List list) {
-        for (Iterator iter = list.iterator(); iter.hasNext();) {
-            Lockable element = (Lockable) iter.next();
-            if (element.equals(target))
-                return element;
-        }
-
-        return null;
-    }
-
     private void grabLock(User user, Lockable lockable, Session session) {
         lockable.setLockOwner(user.getUsername());
         lockable.setLockDate(new Date());
@@ -70,12 +56,7 @@ public class LockingScheme {
         }
     }
 
-    public Lockable releaseLock(Lockable locked, Session session, List all) {
-        Lockable current = current(locked, all);
-        return releaseLock(current, session);
-    }
-
-    private Lockable releaseLock(Lockable current, Session session) {
+    public Lockable releaseLock(Lockable current, Session session) {
         if (!current.isLocked())
             return current;// abort
 
@@ -94,18 +75,18 @@ public class LockingScheme {
         return current;
     }
 
-    public Lockable releaseLockOnUpdate(Lockable target, Session session, List all) throws EmfException {
-        doUpdate(target, session, all);
+    public Lockable releaseLockOnUpdate(Lockable target, Lockable current,Session session) throws EmfException {
+        doUpdate(target,current, session);
         return releaseLock(target, session);
     }
 
-    public Lockable keepLockOnUpdate(Lockable target, Session session, List all) throws EmfException {
-        doUpdate(target, session, all);
+    //FIXME: same as renewLockOnUpdate remove one method
+    public Lockable keepLockOnUpdate(Lockable target, Lockable current,Session session) throws EmfException {
+        doUpdate(target,current, session);
         return target;
     }
 
-    private void doUpdate(Lockable target, Session session, List all) throws EmfException {
-        Lockable current = current(target, all);
+    private void doUpdate(Lockable target,Lockable current, Session session) throws EmfException {
         if (!current.isLocked(target.getLockOwner()))
             throw new EmfException("Cannot update without owning lock");
 
@@ -113,6 +94,12 @@ public class LockingScheme {
         doUpdate(session, target);
     }
 
+    //FIXME: same as keepLockOnUpdate remove one method
+    public Lockable renewLockOnUpdate(Lockable target, Lockable current,Session session) throws EmfException {
+        doUpdate(target,current, session);
+        return target;
+    }
+    
     private void doUpdate(Session session, Lockable target) {
         Transaction tx = session.beginTransaction();
         try {
@@ -123,11 +110,6 @@ public class LockingScheme {
             tx.rollback();
             throw e;
         }
-    }
-
-    public Lockable renewLockOnUpdate(Lockable target, Session session, List all) throws EmfException {
-        doUpdate(target, session, all);
-        return target;
     }
 
 }

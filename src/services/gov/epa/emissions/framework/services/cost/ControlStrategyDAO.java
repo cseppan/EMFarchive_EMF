@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
-import gov.epa.emissions.framework.services.persistence.LockingScheme;
+import gov.epa.emissions.framework.services.persistence.OldLockingScheme;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +18,12 @@ import org.hibernate.criterion.Restrictions;
 
 public class ControlStrategyDAO {
 
-    private LockingScheme lockingScheme;
+    private OldLockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
 
     public ControlStrategyDAO() {
-        lockingScheme = new LockingScheme();
+        lockingScheme = new OldLockingScheme();
         hibernateFacade = new HibernateFacade();
     }
 

@@ -210,8 +210,12 @@ public class UserServiceTest extends ServiceTestCase {
 
         User owner = service.getUser("emf");
         User locked = service.obtainLocked(owner, user);
-        service.deleteUser(locked);
-
+        try {
+            service.deleteUser(locked);
+        } catch (Exception e) {
+            remove(locked);
+            throw e;
+        }
         User result = user(locked.getUsername());
         assertNull("User should have been deleted", result);
     }

@@ -2,48 +2,32 @@ package gov.epa.emissions.framework.services.basic;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
 public class UserDAO {
 
     private LockingScheme lockingScheme;
 
+    private HibernateFacade facade;
+
     public UserDAO() {
         lockingScheme = new LockingScheme();
+        facade = new HibernateFacade();
     }
 
     public List all(Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            List all = session.createCriteria(User.class).list();
-            tx.commit();
-
-            return all;
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        return facade.getAll(User.class, session);
     }
 
     public void add(User user, Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            session.save(user);
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        facade.add(user, session);
     }
 
     public void remove(User user, Session session) {
@@ -51,29 +35,15 @@ public class UserDAO {
         if (!loaded.isLocked(user.getLockOwner()))
             throw new RuntimeException("Cannot remove user unless locked");
 
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            session.delete(loaded);
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        facade.remove(loaded, session);
     }
 
     public User get(String username, Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            Criteria crit = session.createCriteria(User.class).add(Restrictions.eq("username", username));
-            tx.commit();
-
-            return (User) crit.uniqueResult();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        Criterion criterion = Restrictions.eq("username", username);
+        List list = facade.get(User.class, criterion, session);
+        if (list.isEmpty())
+            return null;
+        return (User) list.get(0);
     }
 
     public boolean contains(String username, Session session) {
@@ -81,14 +51,22 @@ public class UserDAO {
     }
 
     public User obtainLocked(User lockOwner, User user, Session session) {
-        return (User) lockingScheme.getLocked(lockOwner, user, session, all(session));
+        return (User) lockingScheme.getLocked(lockOwner, current(user, session), session);
     }
 
     public User update(User user, Session session) throws EmfException {
-        return (User) lockingScheme.releaseLockOnUpdate(user, session, all(session));
+        return (User) lockingScheme.releaseLockOnUpdate(user, current(user, session), session);
     }
 
-    public User releaseLocked(User locked, Session session)  {
-        return (User) lockingScheme.releaseLock(locked, session, all(session));
+    public User releaseLocked(User locked, Session session) {
+        return (User) lockingScheme.releaseLock(current(locked, session), session);
+    }
+
+    private User current(User user, Session session) {
+        Criterion criterion = Restrictions.eq("id", new Integer(user.getId()));
+        List list = facade.get(User.class, criterion, session);
+        if (list.isEmpty())
+            return null;
+        return (User) list.get(0);
     }
 }

@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.persistence.LockingScheme;
+import gov.epa.emissions.framework.services.persistence.OldLockingScheme;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,11 +15,11 @@ public class LockableVersions {
 
     private Versions versions;
 
-    private LockingScheme lockingScheme;
+    private OldLockingScheme lockingScheme;
 
     public LockableVersions(Versions versions) {
         this.versions = versions;
-        lockingScheme = new LockingScheme();
+        lockingScheme = new OldLockingScheme();
     }
 
     public Version obtainLocked(User owner, Version version, Session session) {

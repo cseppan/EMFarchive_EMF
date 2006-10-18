@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
-import gov.epa.emissions.framework.services.persistence.LockingScheme;
+import gov.epa.emissions.framework.services.persistence.OldLockingScheme;
 
 import java.util.List;
 
@@ -13,12 +13,12 @@ import org.hibernate.criterion.Order;
 
 public class PollutantsDAO {
 
-    private LockingScheme lockingScheme;
+    private OldLockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
 
     public PollutantsDAO() {
-        lockingScheme = new LockingScheme();
+        lockingScheme = new OldLockingScheme();
         hibernateFacade = new HibernateFacade();
     }
 

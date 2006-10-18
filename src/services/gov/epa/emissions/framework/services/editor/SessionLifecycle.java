@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
-import gov.epa.emissions.framework.services.persistence.LockingScheme;
+import gov.epa.emissions.framework.services.persistence.OldLockingScheme;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -89,7 +89,7 @@ public class SessionLifecycle {
     }
 
     private long lockTimeInterval(Session session) {
-        return new LockingScheme().timeInterval(session);
+        return new OldLockingScheme().timeInterval(session);
     }
 
     public Version currentVersion(Version reference) throws EmfException {

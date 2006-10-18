@@ -104,6 +104,7 @@ public class HibernateFacade {
             session.delete(obj);
             tx.commit();
         } catch (HibernateException e) {
+            e.printStackTrace();
             tx.rollback();
             throw e;
         }
