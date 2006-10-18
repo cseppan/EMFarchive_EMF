@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
+import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureExportService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureImportService;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataService;
@@ -81,6 +82,10 @@ public class RemoteServiceLocator implements ServiceLocator {
         return new ControlMeasureImportServiceTransport(baseUrl + "/gov.epa.emf.services.cost.controlmeasure.ControlMeasureImportService");
     }
 
+    public ControlMeasureExportService controlMeasureExportService() {
+        return new ControlMeasureExportServiceTransport(baseUrl + "/gov.epa.emf.services.cost.controlmeasure.ControlMeasureExportService");
+    }
+    
     /*
      * Create a singleton reference to the Axis Service Call object This call object will be universal to all client
      * transport objects and will be passed in to via the transport object's constructor
@@ -90,7 +95,5 @@ public class RemoteServiceLocator implements ServiceLocator {
         CallFactory callFactory = new CallFactory(url);
         return callFactory.createSessionEnabledCall(service);
     }
-
-   
 
 }

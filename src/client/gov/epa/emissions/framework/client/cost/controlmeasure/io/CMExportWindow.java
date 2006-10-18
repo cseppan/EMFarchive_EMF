@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -147,7 +148,7 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
     }
 
     private void doExport() {
-        //try {
+        try {
             if (!overwrite.isSelected())
                 presenter.doExport(controlMeasures, folder.getText(), prefix.getText());
             else
@@ -156,10 +157,10 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");
             exportButton.setEnabled(false);
-        //} catch (EmfException e) {
-        //    exportButton.setEnabled(true);
-         //   messagePanel.setError(e.getMessage());
-        //}
+        } catch (EmfException e) {
+            exportButton.setEnabled(true);
+            messagePanel.setError(e.getMessage());
+        }
     }
 
     private void clearMessagePanel() {
