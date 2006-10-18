@@ -4,10 +4,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.persistence.OldLockingScheme;
-
-import java.util.Arrays;
-import java.util.List;
+import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
 import org.hibernate.Session;
 
@@ -15,32 +12,27 @@ public class LockableVersions {
 
     private Versions versions;
 
-    private OldLockingScheme lockingScheme;
+    private LockingScheme lockingScheme;
 
     public LockableVersions(Versions versions) {
         this.versions = versions;
-        lockingScheme = new OldLockingScheme();
+        lockingScheme = new LockingScheme();
     }
 
     public Version obtainLocked(User owner, Version version, Session session) {
-        return (Version) lockingScheme.getLocked(owner, version, session, all(version, session));
+        return (Version) lockingScheme.getLocked(owner, versions.current(version, session), session);
     }
 
-    private List all(Version version, Session session) {
-        Version[] all = versions.get(version.getDatasetId(), session);
-        return Arrays.asList(all);
-    }
-
-    public Version releaseLocked(Version locked, Session session)  {
-        return (Version) lockingScheme.releaseLock(locked, session, all(locked, session));
+    public Version releaseLocked(Version locked, Session session) {
+        return (Version) lockingScheme.releaseLock(versions.current(locked, session), session);
     }
 
     public Version releaseLockOnUpdate(Version locked, Session session) throws EmfException {
-        return (Version) lockingScheme.releaseLockOnUpdate(locked, session, all(locked, session));
+        return (Version) lockingScheme.releaseLockOnUpdate(locked, versions.current(locked, session), session);
     }
 
     public Version renewLockOnUpdate(Version locked, Session session) throws EmfException {
-        return (Version) lockingScheme.renewLockOnUpdate(locked, session, all(locked, session));
+        return (Version) lockingScheme.renewLockOnUpdate(locked, versions.current(locked, session), session);
     }
 
 }

@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
-import gov.epa.emissions.framework.services.persistence.OldLockingScheme;
+import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
 import java.util.List;
 
@@ -15,12 +15,12 @@ import org.hibernate.criterion.Restrictions;
 
 public class DatasetDAO {
 
-    private OldLockingScheme lockingScheme;
+    private LockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
 
     public DatasetDAO() {
-        lockingScheme = new OldLockingScheme();
+        lockingScheme = new LockingScheme();
         hibernateFacade = new HibernateFacade();
     }
 
@@ -73,15 +73,19 @@ public class DatasetDAO {
     }
 
     public EmfDataset obtainLocked(User user, EmfDataset dataset, Session session) {
-        return (EmfDataset) lockingScheme.getLocked(user, dataset, session, all(session));
+        return (EmfDataset) lockingScheme.getLocked(user, current(dataset, session), session);
     }
 
     public EmfDataset releaseLocked(EmfDataset locked, Session session) {
-        return (EmfDataset) lockingScheme.releaseLock(locked, session, all(session));
+        return (EmfDataset) lockingScheme.releaseLock(current(locked, session), session);
     }
 
     public EmfDataset update(EmfDataset locked, Session session) throws EmfException {
-        return (EmfDataset) lockingScheme.releaseLockOnUpdate(locked, session, all(session));
+        return (EmfDataset) lockingScheme.releaseLockOnUpdate(locked, current(locked, session), session);
+    }
+
+    private EmfDataset current(EmfDataset dataset, Session session) {
+        return current(dataset.getId(), EmfDataset.class, session);
     }
 
     public List getDatasets(Session session, DatasetType datasetType) {

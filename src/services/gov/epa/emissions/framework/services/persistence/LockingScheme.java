@@ -13,14 +13,14 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class LockingScheme {
+
     private EmfProperties propertiesDao;
 
     public LockingScheme() {
         propertiesDao = new EmfPropertiesDAO();
     }
-    
-    
-    //throw an exception if the object is already locked
+
+    // throw an exception if the object is already locked
     //
     public Lockable getLocked(User user, Lockable current, Session session) {
         if (!current.isLocked()) {
@@ -75,18 +75,12 @@ public class LockingScheme {
         return current;
     }
 
-    public Lockable releaseLockOnUpdate(Lockable target, Lockable current,Session session) throws EmfException {
-        doUpdate(target,current, session);
+    public Lockable releaseLockOnUpdate(Lockable target, Lockable current, Session session) throws EmfException {
+        doUpdate(target, current, session);
         return releaseLock(target, session);
     }
 
-    //FIXME: same as renewLockOnUpdate remove one method
-    public Lockable keepLockOnUpdate(Lockable target, Lockable current,Session session) throws EmfException {
-        doUpdate(target,current, session);
-        return target;
-    }
-
-    private void doUpdate(Lockable target,Lockable current, Session session) throws EmfException {
+    private void doUpdate(Lockable target, Lockable current, Session session) throws EmfException {
         if (!current.isLocked(target.getLockOwner()))
             throw new EmfException("Cannot update without owning lock");
 
@@ -94,12 +88,11 @@ public class LockingScheme {
         doUpdate(session, target);
     }
 
-    //FIXME: same as keepLockOnUpdate remove one method
-    public Lockable renewLockOnUpdate(Lockable target, Lockable current,Session session) throws EmfException {
-        doUpdate(target,current, session);
+    public Lockable renewLockOnUpdate(Lockable target, Lockable current, Session session) throws EmfException {
+        doUpdate(target, current, session);
         return target;
     }
-    
+
     private void doUpdate(Session session, Lockable target) {
         Transaction tx = session.beginTransaction();
         try {

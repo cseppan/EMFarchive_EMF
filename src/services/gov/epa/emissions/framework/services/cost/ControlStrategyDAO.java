@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
-import gov.epa.emissions.framework.services.persistence.OldLockingScheme;
+import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +18,12 @@ import org.hibernate.criterion.Restrictions;
 
 public class ControlStrategyDAO {
 
-    private OldLockingScheme lockingScheme;
+    private LockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
 
     public ControlStrategyDAO() {
-        lockingScheme = new OldLockingScheme();
+        lockingScheme = new LockingScheme();
         hibernateFacade = new HibernateFacade();
     }
 
@@ -50,19 +50,23 @@ public class ControlStrategyDAO {
 
     // TODO: gettig all the strategies to obtain the lock--- is it a good idea?
     public ControlStrategy obtainLocked(User owner, ControlStrategy element, Session session) {
-        return (ControlStrategy) lockingScheme.getLocked(owner, element, session, all(session));
+        return (ControlStrategy) lockingScheme.getLocked(owner, current(element, session), session);
     }
 
     public ControlStrategy releaseLocked(ControlStrategy locked, Session session) {
-        return (ControlStrategy) lockingScheme.releaseLock(locked, session, all(session));
+        return (ControlStrategy) lockingScheme.releaseLock(current(locked, session), session);
     }
 
     public ControlStrategy update(ControlStrategy locked, Session session) throws EmfException {
-        return (ControlStrategy) lockingScheme.releaseLockOnUpdate(locked, session, all(session));
+        return (ControlStrategy) lockingScheme.releaseLockOnUpdate(locked,current(locked, session),session);
     }
 
     public ControlStrategy updateWithLock(ControlStrategy locked, Session session) throws EmfException {
-        return (ControlStrategy) lockingScheme.keepLockOnUpdate(locked, session, all(session));
+        return (ControlStrategy) lockingScheme.renewLockOnUpdate(locked,current(locked, session), session);
+    }
+    
+    private ControlStrategy current(ControlStrategy strategy, Session session){
+        return current(strategy.getId(),ControlStrategy.class,session);
     }
 
     public boolean canUpdate(ControlStrategy controlStrategy, Session session) {

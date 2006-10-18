@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
-import gov.epa.emissions.framework.services.persistence.OldLockingScheme;
+import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
 import java.util.List;
 
@@ -13,12 +13,12 @@ import org.hibernate.criterion.Order;
 
 public class SectorsDAO {
 
-    private OldLockingScheme lockingScheme;
+    private LockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
 
     public SectorsDAO() {
-        lockingScheme = new OldLockingScheme();
+        lockingScheme = new LockingScheme();
         hibernateFacade = new HibernateFacade();
     }
 
@@ -27,15 +27,19 @@ public class SectorsDAO {
     }
 
     public Sector obtainLocked(User user, Sector sector, Session session) {
-        return (Sector) lockingScheme.getLocked(user, sector, session, getAll(session));
+        return (Sector) lockingScheme.getLocked(user, current(sector, session), session);
     }
 
     public Sector update(Sector sector, Session session) throws EmfException {
-        return (Sector) lockingScheme.releaseLockOnUpdate(sector, session, getAll(session));
+        return (Sector) lockingScheme.releaseLockOnUpdate(sector, current(sector, session), session);
     }
 
-    public Sector releaseLocked(Sector locked, Session session)  {
-        return (Sector) lockingScheme.releaseLock(locked, session, getAll(session));
+    public Sector releaseLocked(Sector locked, Session session) {
+        return (Sector) lockingScheme.releaseLock(current(locked, session), session);
+    }
+
+    private Sector current(Sector sector, Session session) {
+        return current(sector.getId(), Sector.class, session);
     }
 
     /*

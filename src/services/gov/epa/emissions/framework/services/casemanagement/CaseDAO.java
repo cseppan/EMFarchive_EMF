@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.services.casemanagement;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
-import gov.epa.emissions.framework.services.persistence.OldLockingScheme;
+import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
 import java.util.List;
 
@@ -16,11 +16,11 @@ public class CaseDAO {
 
     private HibernateFacade hibernateFacade;
 
-    private OldLockingScheme lockingScheme;
+    private LockingScheme lockingScheme;
 
     public CaseDAO() {
         hibernateFacade = new HibernateFacade();
-        lockingScheme = new OldLockingScheme();
+        lockingScheme = new LockingScheme();
     }
 
     public void add(Abbreviation object, Session session) {
@@ -132,15 +132,19 @@ public class CaseDAO {
     }
 
     public Case obtainLocked(User owner, Case element, Session session) {
-        return (Case) lockingScheme.getLocked(owner, element, session, getCases(session));
+        return (Case) lockingScheme.getLocked(owner, current(element, session), session);
     }
 
     public Case releaseLocked(Case locked, Session session) {
-        return (Case) lockingScheme.releaseLock(locked, session, getCases(session));
+        return (Case) lockingScheme.releaseLock(current(locked, session), session);
     }
 
     public Case update(Case locked, Session session) throws EmfException {
-        return (Case) lockingScheme.releaseLockOnUpdate(locked, session, getCases(session));
+        return (Case) lockingScheme.releaseLockOnUpdate(locked, current(locked, session), session);
+    }
+
+    private Case current(Case caze, Session session) {
+        return (Case) hibernateFacade.current(caze.getId(), Case.class, session);
     }
 
     public Object load(Class clazz, String name, Session session) {

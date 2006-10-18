@@ -10,9 +10,6 @@ import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
-import gov.epa.emissions.framework.services.data.IntendedUse;
-import gov.epa.emissions.framework.services.data.Note;
-import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 
@@ -110,32 +107,8 @@ public class DataCommonsDAO {
         return pollutantsDAO.getAll(session);
     }
 
-    public Pollutant updatePollutant(Pollutant pollutant, Session session) throws EmfException {
-        return pollutantsDAO.update(pollutant, session);
-    }
-
-    public Pollutant obtainLockedPollutant(User user, Pollutant pollutant, Session session) {
-        return pollutantsDAO.obtainLocked(user, pollutant, session);
-    }
-
-    public Pollutant releaseLockedPollutant(Pollutant locked, Session session) {
-        return pollutantsDAO.releaseLocked(locked, session);
-    }
-
     public List getSourceGroups(Session session) {
         return sourceGroupsDAO.getAll(session);
-    }
-
-    public SourceGroup updateSourceGroup(SourceGroup sourcegrp, Session session) throws EmfException {
-        return sourceGroupsDAO.update(sourcegrp, session);
-    }
-
-    public SourceGroup obtainLockedSourceGroup(User user, SourceGroup sourcegrp, Session session) {
-        return sourceGroupsDAO.obtainLocked(user, sourcegrp, session);
-    }
-
-    public SourceGroup releaseLockedSourceGroup(SourceGroup locked, Session session) {
-        return sourceGroupsDAO.releaseLocked(locked, session);
     }
 
     public List getControlMeasureImportStatuses(String username, Session session) {

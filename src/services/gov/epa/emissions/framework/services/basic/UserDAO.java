@@ -63,10 +63,6 @@ public class UserDAO {
     }
 
     private User current(User user, Session session) {
-        Criterion criterion = Restrictions.eq("id", new Integer(user.getId()));
-        List list = facade.get(User.class, criterion, session);
-        if (list.isEmpty())
-            return null;
-        return (User) list.get(0);
+        return (User) facade.current(user.getId(), User.class, session);
     }
 }
