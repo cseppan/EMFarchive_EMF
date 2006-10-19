@@ -11,7 +11,6 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
 import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
@@ -25,7 +24,7 @@ public class ControlMeasureExportServiceImpl implements ControlMeasureExportServ
     private HibernateSessionFactory sessionFactory;
 
     private DataCommonsDAO dataCommonsDAO;
-    
+
     private PooledExecutor threadPool;
 
     public ControlMeasureExportServiceImpl() throws Exception {
@@ -43,7 +42,7 @@ public class ControlMeasureExportServiceImpl implements ControlMeasureExportServ
         threadPool.awaitTerminationAfterShutdown();
         super.finalize();
     }
-    
+
     private PooledExecutor createThreadPool() {
         PooledExecutor threadPool = new PooledExecutor(20);
         threadPool.setMinimumPoolSize(1);
@@ -52,10 +51,24 @@ public class ControlMeasureExportServiceImpl implements ControlMeasureExportServ
         return threadPool;
     }
 
-    public void exportControlMeasures(String folderPath, String prefix, ControlMeasure[] controlMeasures, User user) throws EmfException {
+    public void exportControlMeasures(String folderPath, String prefix, ControlMeasure[] controlMeasures, User user)
+            throws EmfException {
+        doExport(folderPath, prefix, controlMeasures, user, false);
+    }
+
+    public void exportControlMeasuresWithOverwrite(String folderPath, String prefix, ControlMeasure[] controlMeasures,
+            User user) throws EmfException {
+        doExport(folderPath, prefix, controlMeasures, user, true);
+    }
+
+    private void doExport(String folderPath, String prefix, ControlMeasure[] controlMeasures, User user,
+            boolean overwrite) throws EmfException {
         try {
-            CMExportTask exportTask = new CMExportTask(new File(folderPath), prefix, controlMeasures, user, sessionFactory);
-            threadPool.execute(new GCEnforcerTask("Export control measures: " + controlMeasures[0].getName() + ", etc.", exportTask));
+            validateExportFile(new File(folderPath), prefix, overwrite);
+            CMExportTask exportTask = new CMExportTask(new File(folderPath), prefix, controlMeasures, user,
+                    sessionFactory);
+            threadPool.execute(new GCEnforcerTask(
+                    "Export control measures: " + controlMeasures[0].getName() + ", etc.", exportTask));
         } catch (Exception e) {
             LOG.error("Could not export control measures.", e);
             throw new EmfException("Could not export control measures: " + e.getMessage());
@@ -65,14 +78,26 @@ public class ControlMeasureExportServiceImpl implements ControlMeasureExportServ
     public Status[] getExportStatus(User user) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            List controlMeasureExportStatuses = dataCommonsDAO.getStatuses(user.getUsername(),
-                    session);
+            List controlMeasureExportStatuses = dataCommonsDAO.getStatuses(user.getUsername(), session);
             return (Status[]) controlMeasureExportStatuses.toArray(new Status[0]);
         } catch (RuntimeException e) {
             LOG.error("Could not get detail export status messages.", e);
             throw new EmfException("Could not get detail export status messages. " + e.getMessage());
         } finally {
             session.clear();
+        }
+    }
+
+    private void validateExportFile(File path, String prefix, boolean overwrite) throws EmfException {
+        File[] files = new File[] { new File(path, prefix + "_summary.csv"), new File(path, prefix + "_efficiencies.csv"),
+                new File(path, prefix + "_SCCs.csv") };
+
+        if (!overwrite) {
+            for (int i = 0; i < files.length; i++)
+                if (files[i].exists() && files[i].isFile()) {
+                    LOG.error("File exists and cannot be overwritten");
+                    throw new EmfException("Files exist.  Choose overwrite option");
+                }
         }
     }
 

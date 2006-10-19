@@ -21,10 +21,21 @@ public class ControlMeasureExportServiceTransport implements ControlMeasureExpor
         return callFactory.createCall("ControlMeasureExportService");
     }
 
-    public void exportControlMeasures(String folderPath, String prefix, ControlMeasure[] controlMeasures, User user) throws EmfException {
+    public void exportControlMeasures(String folderPath, String prefix, ControlMeasure[] controlMeasures, User user)
+            throws EmfException {
+        doExport("exportControlMeasures", folderPath, prefix, controlMeasures, user);
+    }
+
+    public void exportControlMeasuresWithOverwrite(String folderPath, String prefix, ControlMeasure[] controlMeasures,
+            User user) throws EmfException {
+        doExport("exportControlMeasuresWithOverwrite", folderPath, prefix, controlMeasures, user);
+    }
+
+    private void doExport(String operation, String folderPath, String prefix, ControlMeasure[] controlMeasures,
+            User user) throws EmfException {
         EmfCall call = call();
 
-        call.setOperation("exportControlMeasures");
+        call.setOperation(operation);
         call.addParam("folderPath", mappings.string());
         call.addParam("prefix", mappings.string());
         call.addParam("controlMeasures", mappings.controlMeasures());

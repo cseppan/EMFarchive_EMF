@@ -144,10 +144,19 @@ public class ControlMeasureDAO {
         hibernateFacade.add(measures, session);
     }
 
-    public Scc[] geSccs(ControlMeasure measure) throws EmfException {
+    public Scc[] getSccs(ControlMeasure measure) throws EmfException {
         try {
             RetrieveSCC retrieveSCC = new RetrieveSCC(measure, new EmfDbServer());
             return retrieveSCC.sccs();
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+    }
+
+    public String[] getCMAbbrevAndSccs(ControlMeasure measure) throws EmfException {
+        try {
+            RetrieveSCC retrieveSCC = new RetrieveSCC(measure, new EmfDbServer());
+            return retrieveSCC.cmAbbrevAndSccs();
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }

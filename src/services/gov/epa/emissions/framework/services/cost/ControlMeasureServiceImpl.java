@@ -125,7 +125,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
 
     public Scc[] getSccs(ControlMeasure measure) throws EmfException {
         try {
-            Scc[] sccs = dao.geSccs(measure);
+            Scc[] sccs = dao.getSccs(measure);
             return sccs;
         } catch (RuntimeException e) {
             LOG.error("Could not get SCCs for ControlMeasure: " + measure.getName(), e);

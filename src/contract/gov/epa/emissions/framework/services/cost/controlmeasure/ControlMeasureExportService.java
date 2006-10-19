@@ -8,7 +8,11 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 
 public interface ControlMeasureExportService extends EMFService {
 
-    void exportControlMeasures(String folderPath, String prefix, ControlMeasure[] controlMeasures, User user) throws EmfException;
+    void exportControlMeasures(String folderPath, String prefix, ControlMeasure[] controlMeasures,
+            User user) throws EmfException;
+
+    void exportControlMeasuresWithOverwrite(String folderPath, String prefix, ControlMeasure[] controlMeasures,
+            User user) throws EmfException;
 
     Status[] getExportStatus(User user) throws EmfException;
 

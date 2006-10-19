@@ -53,7 +53,7 @@ public class CMExportPresenter {
             lastFolder = folder;
 
         if (overwrite)
-            service.exportControlMeasures(mapToRemote(folder), prefix, controlMeasures, session.user());
+            service.exportControlMeasuresWithOverwrite(mapToRemote(folder), prefix, controlMeasures, session.user());
         else
             service.exportControlMeasures(mapToRemote(folder), prefix, controlMeasures, session.user());
     }
