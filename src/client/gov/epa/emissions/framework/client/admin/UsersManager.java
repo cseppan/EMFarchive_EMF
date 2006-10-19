@@ -8,7 +8,6 @@ import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -30,8 +29,6 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
 
 public class UsersManager extends ReusableInteralFrame implements UsersManagerView, RefreshObserver {
 
@@ -43,20 +40,16 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
     private EmfConsole parentConsole;
 
-    private EmfSession session;
-
     private UsersTableData tableData;
 
     private EmfTableModel model;
 
     private SortFilterSelectModel selectModel;
 
-    // FIXME: this class needs to be refactored into smaller components
-    public UsersManager(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
+    public UsersManager(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("User Manager", new Dimension(550, 300), desktopManager);
         super.setName("userManager");
 
-        this.session = session;
         this.parentConsole = parentConsole;
 
         layout = new JPanel();
@@ -182,13 +175,13 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     public UserView getUserView() {
-        ViewUserWindow view = new DisposableViewUserWindow(desktopManager);
+        ViewUserWindow view = new ViewUserWindow(desktopManager);
 
-        view.addInternalFrameListener(new InternalFrameAdapter() {
-            public void internalFrameClosed(InternalFrameEvent event) {
-                refresh();
-            }
-        });
+        // view.addInternalFrameListener(new InternalFrameAdapter() {
+        // public void internalFrameClosed(InternalFrameEvent event) {
+        // refresh();
+        // }
+        // });
 
         return view;
     }
@@ -208,18 +201,9 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     public UpdatableUserView getUpdateUserView(User updateUser) {
-        DisposableUpdateUserWindow updateUserWindowWithAdmin = new DisposableUpdateUserWindow(new AddAdminOption(
-                updateUser), desktopManager);
-        DisposableUpdateUserWindow updateUserWindow = new DisposableUpdateUserWindow(desktopManager);
-        UpdateUserWindow view = updateUser.equals(session.user()) ? updateUserWindow : updateUserWindowWithAdmin;
+        UpdateUserWindow updateUserWindow = new UpdateUserWindow(new AddAdminOption(), desktopManager);
 
-        view.addInternalFrameListener(new InternalFrameAdapter() {
-            public void internalFrameClosed(InternalFrameEvent event) {
-                refresh();
-            }
-        });
-
-        return view;
+        return updateUserWindow;
     }
 
     private User[] getSelectedUsers() {

@@ -138,6 +138,7 @@ public class EditableUserProfilePanel extends JPanel {
 
         JPanel optionsPanel = new JPanel();
         adminOption.add(optionsPanel);
+        adminOption.setAdmin(user);
         panel.add(optionsPanel);
 
         return panel;
@@ -191,9 +192,7 @@ public class EditableUserProfilePanel extends JPanel {
     protected void populateUser() throws EmfException {
         populateUserStrategy.populate(name.getText(), affiliation.getText(), phone.getText(), email.getText(), username
                 .value(), password.getPassword(), confirmPassword.getPassword());
-
-        // FIXME: where should we put this ?
-        adminOption.setInAdminGroup(user);
+        adminOption.isAdmin(user);
     }
 
     void setError(String message) {

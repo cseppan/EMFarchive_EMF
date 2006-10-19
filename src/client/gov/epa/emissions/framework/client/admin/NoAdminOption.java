@@ -10,7 +10,11 @@ public class NoAdminOption implements AdminOption {
         // Note: No Op
     }
 
-    public void setInAdminGroup(User user) {
+    public void isAdmin(User user) {
+        // Note: No Op
+    }
+
+    public void setAdmin(User user) {
         // Note: No Op
     }
 

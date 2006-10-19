@@ -2,12 +2,14 @@ package gov.epa.emissions.framework.client.console;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.admin.UpdateMyProfileWindow;
+import gov.epa.emissions.framework.client.admin.AddAdminOption;
 import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
 import gov.epa.emissions.framework.client.admin.UpdateUserPresenterImpl;
+import gov.epa.emissions.framework.client.admin.UpdateUserWindow;
+import gov.epa.emissions.framework.client.admin.UserView;
 import gov.epa.emissions.framework.client.admin.UsersManager;
 import gov.epa.emissions.framework.client.admin.UsersManagerView;
-import gov.epa.emissions.framework.client.admin.ViewMyProfileWindow;
+import gov.epa.emissions.framework.client.admin.ViewUserWindow;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerView;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerWindow;
 import gov.epa.emissions.framework.client.cost.controlmeasure.ControlMeasuresManagerView;
@@ -166,8 +168,8 @@ public class ManageMenu extends JMenu implements ManageMenuView {
     }
 
     private void displayMyProfile(EmfSession session, MessagePanel messagePanel) {
-        UpdateMyProfileWindow updatable = new UpdateMyProfileWindow(desktopManager);
-        ViewMyProfileWindow viewable = new ViewMyProfileWindow(desktopManager);
+        UpdateUserWindow updatable = new UpdateUserWindow(new AddAdminOption(false),desktopManager);
+        UserView viewable = new ViewUserWindow(desktopManager);
 
         UpdateUserPresenter presenter = new UpdateUserPresenterImpl(session, session.user(), session.userService());
         try {
@@ -178,7 +180,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
     }
 
     public void displayUserManager() throws EmfException {
-        UsersManagerView view = new UsersManager(session, parent, desktopManager);
+        UsersManagerView view = new UsersManager(parent, desktopManager);
         presenter.doDisplayUserManager(view);
     }
 

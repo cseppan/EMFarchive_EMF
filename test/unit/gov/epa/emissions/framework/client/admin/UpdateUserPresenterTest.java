@@ -58,7 +58,6 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
         userView.expects(once()).method("observe").with(new IsInstanceOf(ViewUserPresenter.class));
 
         Mock updatable = mock(UpdatableUserView.class);
-        updatable.expects(once()).method("disposeView").withNoArguments();
         
         presenter.display((UpdatableUserView) updatable.proxy(), (UserView) userView.proxy());
     }

@@ -13,17 +13,21 @@ public class AddAdminOption implements AdminOption {
         isAdmin = new JCheckBox("Is Admin?");
     }
 
-    public AddAdminOption(User user) {
+    public AddAdminOption(boolean enable) {
         this();
-        isAdmin.setSelected(user.isAdmin());
+        isAdmin.setEnabled(enable);
     }
 
     public void add(JPanel panel) {
         panel.add(isAdmin);
     }
 
-    public void setInAdminGroup(User user) {
+    public void isAdmin(User user) {
         user.setAdmin(isAdmin.isSelected());
+    }
+
+    public void setAdmin(User user) {
+        isAdmin.setSelected(user.isAdmin());
     }
 
 }

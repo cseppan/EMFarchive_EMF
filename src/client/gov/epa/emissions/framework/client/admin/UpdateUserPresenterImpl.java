@@ -25,10 +25,8 @@ public class UpdateUserPresenterImpl implements UpdateUserPresenter {
 
     public void display(UpdatableUserView update, UserView view) throws EmfException {
         user = service.obtainLocked(session.user(), user);
-
         if (!user.isLocked(session.user())) {// view mode, locked by another user
             new ViewUserPresenterImpl(user).display(view);
-            update.disposeView();// close the unnecessary
             return;
         }
 

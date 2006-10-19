@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.client.EmfInternalFrame;
+import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
@@ -9,15 +9,13 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-public abstract class ViewUserWindow extends EmfInternalFrame implements UserView {
+public class ViewUserWindow extends DisposableInteralFrame implements UserView {
 
     private ViewUserPresenter presenter;
 
@@ -25,11 +23,9 @@ public abstract class ViewUserWindow extends EmfInternalFrame implements UserVie
 
     private SingleLineMessagePanel messagePanel;
 
-    private static DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
-
     public ViewUserWindow(DesktopManager desktopManager) {
         super("User: ", new Dimension(350, 425), desktopManager);
-        
+
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -37,10 +33,9 @@ public abstract class ViewUserWindow extends EmfInternalFrame implements UserVie
 
     public void display(User user) {
         doLayout(user);
-        super.setName("userView:"+user.getId());
-        
+        super.setName("userView:" + user.getId());
+
         super.setTitle("User: " + user.getUsername());
-        super.dimensions(layout.getSize());
         super.setResizable(false);
 
         super.display();
@@ -58,7 +53,7 @@ public abstract class ViewUserWindow extends EmfInternalFrame implements UserVie
         if (!user.isLocked())
             return "";
 
-        return "Locked by " + user.getLockOwner() + " at " + dateFormat.format(user.getLockDate());
+        return "Locked by " + user.getLockOwner() + " at " + EmfDateFormat.format_MM_DD_YYYY_HH_mm(user.getLockDate());
     }
 
     private ViewableUserProfilePanel createProfilePanel(User user) {

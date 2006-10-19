@@ -18,7 +18,7 @@ public abstract class DisposableInteralFrame extends EmfInternalFrame {
         disposeView();
     }
 
-    final public void disposeView() {
+    public void disposeView() {
         super.dispose();
         super.disposeView();
     }

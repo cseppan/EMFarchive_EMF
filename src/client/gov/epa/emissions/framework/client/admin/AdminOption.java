@@ -8,6 +8,8 @@ public interface AdminOption {
 
     void add(JPanel profileValuesPanel);
 
-    void setInAdminGroup(User user);
+    void isAdmin(User user);
+
+    void setAdmin(User user);
 
 }

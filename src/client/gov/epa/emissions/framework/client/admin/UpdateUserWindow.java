@@ -3,18 +3,19 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.commons.gui.LabelWidget;
 import gov.epa.emissions.commons.gui.Widget;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.client.EmfInternalFrame;
+import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.YesNoDialog;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JPanel;
 
-public abstract class UpdateUserWindow extends EmfInternalFrame implements UpdatableUserView {
+public class UpdateUserWindow extends DisposableInteralFrame implements UpdatableUserView {
 
     private UpdateUserPresenter presenter;
 
@@ -25,14 +26,10 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
     private AdminOption adminOption;
 
     public UpdateUserWindow(AdminOption adminOption, DesktopManager desktopManager) {
-        super("Edit User", desktopManager);
+        super("Edit User",new Dimension(350, 425), desktopManager);
         this.adminOption = adminOption;
 
         super.setResizable(false);
-    }
-
-    public UpdateUserWindow(DesktopManager desktopManager) {
-        this(new NoAdminOption(), desktopManager);
     }
 
     public void display(User user) {
@@ -44,7 +41,6 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
         container.add(panel);
 
         super.getContentPane().add(container);
-        super.dimensions(panel.getSize());
 
         super.display();
     }
