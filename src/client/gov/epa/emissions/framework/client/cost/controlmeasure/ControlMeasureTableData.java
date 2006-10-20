@@ -99,10 +99,21 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     private String getSectors(ControlMeasure measure) {
         Sector[] sectors = measure.getSectors();
+        String sectorsString = "";
         if (sectors.length == 0)
             return null;
+        
+        for (int i = 0; i < sectors.length; i++) {
+            if (i == sectors.length - 1) {
+                sectorsString += sectors[i].getName();
+                break;
+            }
+            
+            sectorsString += sectors[i].getName() + "|";
+            
+        }
 
-        return sectors[0].getName() + "...";
+        return sectorsString;
     }
 
     private Object getDateReviewed(ControlMeasure measure) {

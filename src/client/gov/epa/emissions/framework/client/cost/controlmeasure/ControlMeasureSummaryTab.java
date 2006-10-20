@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
@@ -10,13 +11,13 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.casemanagement.editor.AddRemoveSectorWidget;
 import gov.epa.emissions.framework.client.data.ControlTechnologies;
 import gov.epa.emissions.framework.client.data.SourceGroups;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
-import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 
@@ -29,10 +30,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
 public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTabView {
@@ -67,7 +66,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     protected ComboBox cmClass;
 
-    protected ListWidget sectors;
+    private AddRemoveSectorWidget sectorsWidget;
 
     protected TextField dataSources;
 
@@ -125,6 +124,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         abbreviation.setText(getText(measure.getAbbreviation()));
         dateReviewed.setText(formatDateReviewed());
         dataSources.setText(getText(measure.getDataSouce()));
+        sectorsWidget.setSectors(measure.getSectors());
     }
 
     private String formatDateReviewed() {
@@ -273,16 +273,17 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         changeablesList.addChangeable(sourceGroup);
         layoutGenerator.addLabelWidgetPair("Source Group:", sourceGroup, panel);
 
-        sectors = new ListWidget(new String[] { "               " }, new String[] { "" });
-        JScrollPane listScroller = new JScrollPane(sectors);
-        listScroller.setPreferredSize(new Dimension(170, 60));
-        layoutGenerator.addLabelWidgetPair("Sectors:", listScroller, panel);
+        layoutGenerator.addLabelWidgetPair("Sectors:", sectors(), panel);
 
-        layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
-
-        widgetLayout(5, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(4, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
+    }
+    
+    private JPanel sectors() {
+        sectorsWidget = new AddRemoveSectorWidget(getAllSectors(), changeablesList, null);
+        sectorsWidget.setPreferredSize(new Dimension(220,80));
+        return sectorsWidget;
     }
 
     private void widgetLayout(int rows, int cols, int initX, int initY, int xPad, int yPad,
@@ -291,22 +292,6 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         layoutGenerator.makeCompactGrid(panel, rows, cols, // rows, cols
                 initX, initY, // initialX, initialY
                 xPad, yPad);// xPad, yPad
-    }
-
-    private JPanel addRemoveButtonPanel() {
-        JPanel panel = new JPanel();
-        // TBD: this needs to be changed so you have handles to the buttons
-        // and can set actions
-        JButton addButton = new JButton("Add");
-        addButton.setEnabled(false);
-        JButton removeButton = new JButton("Remove");
-        removeButton.setEnabled(false);
-
-        panel.add(addButton);
-        panel.add(removeButton);
-        // for now, disable these
-
-        return panel;
     }
 
     public void save(ControlMeasure measure) throws EmfException {
@@ -327,6 +312,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         measure.setLastModifiedTime(new Date());
         measure.setAbbreviation(abbreviation.getText());
         measure.setDataSouce(dataSources.getText());
+        measure.setSectors(sectorsWidget.getSectors());
 
     }
 
@@ -409,6 +395,15 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         if (equipmentLife.getText().trim().length() > 0)
             life = verifier.parseFloat(equipmentLife);
 
+    }
+    
+    private Sector[] getAllSectors() {
+        try {
+            return session.dataCommonsService().getSectors();
+        } catch (EmfException e) {
+            messagePanel.setError("Could not get all the sectors");
+        }
+        return null;
     }
 
 }
