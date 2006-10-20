@@ -10,21 +10,23 @@ import java.util.List;
 
 public class RetrieveSCC {
 
-    private ControlMeasure measure;
+    private int controlMeasureId;
 
     private DbServer dbServer;
 
     public RetrieveSCC(ControlMeasure measure, DbServer dbServer) throws Exception {
-        this.measure = measure;
+        this(measure.getId(), dbServer);
+    }
+
+    public RetrieveSCC(int measureId, DbServer dbServer) throws Exception {
+        this.controlMeasureId = measureId;
         this.dbServer = dbServer;
     }
 
     public Scc[] sccs() throws SQLException {
-        int id = measure.getId();
-
         Scc[] sccs;
         try {
-            ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(query(id));
+            ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(query(controlMeasureId));
             sccs = values(set);
         } catch (SQLException e) {
             throw e;
@@ -36,11 +38,9 @@ public class RetrieveSCC {
     }
 
     public String[] cmAbbrevAndSccs() throws SQLException {
-        int id = measure.getId();
-
         String[] cmAbbrevAndSccs;
         try {
-            ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(cmAbbrevAndSccQuery(id));
+            ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(cmAbbrevAndSccQuery(controlMeasureId));
             cmAbbrevAndSccs = getAbbrevAndSccStrings(set);
         } catch (SQLException e) {
             throw e;

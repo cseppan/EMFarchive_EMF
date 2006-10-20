@@ -4,13 +4,13 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.basic.Status;
-import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlmeasure.io.CMExportTask;
 import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
 import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
@@ -51,24 +51,24 @@ public class ControlMeasureExportServiceImpl implements ControlMeasureExportServ
         return threadPool;
     }
 
-    public void exportControlMeasures(String folderPath, String prefix, ControlMeasure[] controlMeasures, User user)
+    public void exportControlMeasures(String folderPath, String prefix, int[] controlMeasureIds, User user)
             throws EmfException {
-        doExport(folderPath, prefix, controlMeasures, user, false);
+        doExport(folderPath, prefix, controlMeasureIds, user, false);
     }
 
-    public void exportControlMeasuresWithOverwrite(String folderPath, String prefix, ControlMeasure[] controlMeasures,
+    public void exportControlMeasuresWithOverwrite(String folderPath, String prefix, int[] controlMeasureIds,
             User user) throws EmfException {
-        doExport(folderPath, prefix, controlMeasures, user, true);
+        doExport(folderPath, prefix, controlMeasureIds, user, true);
     }
 
-    private void doExport(String folderPath, String prefix, ControlMeasure[] controlMeasures, User user,
+    private void doExport(String folderPath, String prefix, int[] controlMeasureIds, User user,
             boolean overwrite) throws EmfException {
         try {
             validateExportFile(new File(folderPath), prefix, overwrite);
-            CMExportTask exportTask = new CMExportTask(new File(folderPath), prefix, controlMeasures, user,
+            CMExportTask exportTask = new CMExportTask(new File(folderPath), prefix, controlMeasureIds, user,
                     sessionFactory);
             threadPool.execute(new GCEnforcerTask(
-                    "Export control measures: " + controlMeasures[0].getName() + ", etc.", exportTask));
+                    "Export control measures (id): " + controlMeasureIds[0] + ", etc.", exportTask));
         } catch (Exception e) {
             LOG.error("Could not export control measures.", e);
             throw new EmfException("Could not export control measures: " + e.getMessage());

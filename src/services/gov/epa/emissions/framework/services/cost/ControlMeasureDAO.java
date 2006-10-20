@@ -153,9 +153,9 @@ public class ControlMeasureDAO {
         }
     }
 
-    public String[] getCMAbbrevAndSccs(ControlMeasure measure) throws EmfException {
+    public String[] getCMAbbrevAndSccs(int measureId) throws EmfException {
         try {
-            RetrieveSCC retrieveSCC = new RetrieveSCC(measure, new EmfDbServer());
+            RetrieveSCC retrieveSCC = new RetrieveSCC(measureId, new EmfDbServer());
             return retrieveSCC.cmAbbrevAndSccs();
         } catch (Exception e) {
             throw new EmfException(e.getMessage());

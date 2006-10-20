@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.client.transport;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
-import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureExportService;
 
 public class ControlMeasureExportServiceTransport implements ControlMeasureExportService {
@@ -21,28 +20,28 @@ public class ControlMeasureExportServiceTransport implements ControlMeasureExpor
         return callFactory.createCall("ControlMeasureExportService");
     }
 
-    public void exportControlMeasures(String folderPath, String prefix, ControlMeasure[] controlMeasures, User user)
+    public void exportControlMeasures(String folderPath, String prefix, int[] controlMeasureIds, User user)
             throws EmfException {
-        doExport("exportControlMeasures", folderPath, prefix, controlMeasures, user);
+        doExport("exportControlMeasures", folderPath, prefix, controlMeasureIds, user);
     }
 
-    public void exportControlMeasuresWithOverwrite(String folderPath, String prefix, ControlMeasure[] controlMeasures,
+    public void exportControlMeasuresWithOverwrite(String folderPath, String prefix, int[] controlMeasureIds,
             User user) throws EmfException {
-        doExport("exportControlMeasuresWithOverwrite", folderPath, prefix, controlMeasures, user);
+        doExport("exportControlMeasuresWithOverwrite", folderPath, prefix, controlMeasureIds, user);
     }
 
-    private void doExport(String operation, String folderPath, String prefix, ControlMeasure[] controlMeasures,
+    private void doExport(String operation, String folderPath, String prefix, int[] controlMeasureIds,
             User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation(operation);
         call.addParam("folderPath", mappings.string());
         call.addParam("prefix", mappings.string());
-        call.addParam("controlMeasures", mappings.controlMeasures());
+        call.addIntArrayParam();
         call.addParam("user", mappings.user());
         call.setVoidReturnType();
 
-        call.request(new Object[] { folderPath, prefix, controlMeasures, user });
+        call.request(new Object[] { folderPath, prefix, controlMeasureIds, user });
     }
 
     public Status[] getExportStatus(User user) throws EmfException {

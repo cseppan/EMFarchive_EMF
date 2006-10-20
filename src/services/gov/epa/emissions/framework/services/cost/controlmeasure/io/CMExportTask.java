@@ -26,7 +26,7 @@ public class CMExportTask implements Runnable {
     
     private String prefix;
 
-    private ControlMeasure[] controlMeasures;
+    private int[] controlMeasureIds;
 
     private User user;
 
@@ -34,11 +34,11 @@ public class CMExportTask implements Runnable {
 
     private ControlMeasureDAO controlMeasureDao;
     
-    public CMExportTask(File folder, String prefix, ControlMeasure[] controlMeasures, User user, HibernateSessionFactory sessionFactory) {
+    public CMExportTask(File folder, String prefix, int[] controlMeasureIds, User user, HibernateSessionFactory sessionFactory) {
         this.folder = folder;
         this.prefix = prefix;
         this.user = user;
-        this.controlMeasures = controlMeasures;
+        this.controlMeasureIds = controlMeasureIds;
         this.sessionFactory = sessionFactory;
         this.controlMeasureDao = new ControlMeasureDAO();
 //        this.statusDao = new StatusDAO(sessionFactory);
@@ -49,8 +49,8 @@ public class CMExportTask implements Runnable {
         try {
             session.setFlushMode(FlushMode.NEVER);
 //            prepare();
-            String[] selectedAbbrevAndSCCs = getSelectedAbbrevAndSCCs(controlMeasures, controlMeasureDao);
-            ControlMeasuresExporter exporter = new ControlMeasuresExporter(folder, prefix, controlMeasures, selectedAbbrevAndSCCs, user, sessionFactory);
+            String[] selectedAbbrevAndSCCs = getSelectedAbbrevAndSCCs(controlMeasureIds, controlMeasureDao);
+            ControlMeasuresExporter exporter = new ControlMeasuresExporter(folder, prefix, getControlMeasures(controlMeasureIds, session), selectedAbbrevAndSCCs, user, sessionFactory);
             exporter.run();
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,11 +62,21 @@ public class CMExportTask implements Runnable {
         }
     }
 
-    private String[] getSelectedAbbrevAndSCCs(ControlMeasure[] measures, ControlMeasureDAO dao) throws EmfException {
+    private ControlMeasure[] getControlMeasures(int[] ids, Session session) {
+        List cmList = new ArrayList();
+        int size = ids.length;
+        
+        for (int i = 0; i < size; i++)
+            cmList.add(controlMeasureDao.current(ids[i], ControlMeasure.class, session));
+        
+        return (ControlMeasure[])cmList.toArray(new ControlMeasure[0]);
+    }
+
+    private String[] getSelectedAbbrevAndSCCs(int[] measureIds, ControlMeasureDAO dao) throws EmfException {
         List selectedSccs = new ArrayList();
         
-        for (int i = 0; i < measures.length; i++)
-            selectedSccs.addAll(Arrays.asList(dao.getCMAbbrevAndSccs(measures[i])));
+        for (int i = 0; i < measureIds.length; i++)
+            selectedSccs.addAll(Arrays.asList(dao.getCMAbbrevAndSccs(measureIds[i])));
         
         return (String[])selectedSccs.toArray(new String[0]);
     }

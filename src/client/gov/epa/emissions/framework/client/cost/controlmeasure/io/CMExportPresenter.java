@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.cost.controlmeasure.io;
 
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureExportService;
 
 import java.io.File;
@@ -35,15 +34,15 @@ public class CMExportPresenter {
         return (lastFolder != null) ? lastFolder : getDefaultFolder();
     }
 
-    public void doExportWithOverwrite(ControlMeasure[] controlMeasures, String folder, String prefix) throws EmfException {
-        doExport(controlMeasures, folder, true, prefix);
+    public void doExportWithOverwrite(int[] controlMeasureIds, String folder, String prefix) throws EmfException {
+        doExport(controlMeasureIds, folder, true, prefix);
     }
 
-    public void doExport(ControlMeasure[] controlMeasures, String folder, String prefix) throws EmfException {
-        doExport(controlMeasures, folder, false, prefix);
+    public void doExportWithoutOverwrite(int[] controlMeasureIds, String folder, String prefix) throws EmfException {
+        doExport(controlMeasureIds, folder, false, prefix);
     }
 
-    private void doExport(ControlMeasure[] controlMeasures, String folder, boolean overwrite, String prefix) throws EmfException {
+    private void doExport(int[] controlMeasureIds, String folder, boolean overwrite, String prefix) throws EmfException {
         ControlMeasureExportService service = session.controlMeasureExportService();
         
         session.setMostRecentExportFolder(folder);
@@ -53,9 +52,9 @@ public class CMExportPresenter {
             lastFolder = folder;
 
         if (overwrite)
-            service.exportControlMeasuresWithOverwrite(mapToRemote(folder), prefix, controlMeasures, session.user());
+            service.exportControlMeasuresWithOverwrite(mapToRemote(folder), prefix, controlMeasureIds, session.user());
         else
-            service.exportControlMeasures(mapToRemote(folder), prefix, controlMeasures, session.user());
+            service.exportControlMeasures(mapToRemote(folder), prefix, controlMeasureIds, session.user());
     }
 
     private String mapToRemote(String dir) {

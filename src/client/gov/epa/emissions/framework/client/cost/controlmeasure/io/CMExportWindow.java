@@ -150,9 +150,9 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
     private void doExport() {
         try {
             if (!overwrite.isSelected())
-                presenter.doExport(controlMeasures, folder.getText(), prefix.getText());
+                presenter.doExportWithoutOverwrite(getControlMeasureIds(controlMeasures), folder.getText(), prefix.getText());
             else
-                presenter.doExportWithOverwrite(controlMeasures, folder.getText(), prefix.getText());
+                presenter.doExportWithOverwrite(getControlMeasureIds(controlMeasures), folder.getText(), prefix.getText());
 
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");
@@ -161,6 +161,15 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
             exportButton.setEnabled(true);
             messagePanel.setError(e.getMessage());
         }
+    }
+
+    private int[] getControlMeasureIds(ControlMeasure[] cms) {
+        int[] ids = new int[cms.length];
+        
+        for (int i = 0; i < cms.length; i++)
+            ids[i] = cms[i].getId();
+        
+        return ids;
     }
 
     private void clearMessagePanel() {
