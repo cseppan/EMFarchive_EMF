@@ -61,11 +61,12 @@ public class MaxEmsRedStrategy implements Strategy {
         GenerateSccControlMeasuresMap mapGenerator = new GenerateSccControlMeasuresMap(dbServer,
                 emissionTableName(inputDataset), controlStrategy, sessionFactory);
         SccControlMeasuresMap map = mapGenerator.create();
+        
+        removeControlStrategyResult(controlStrategy);
         EmfDataset resultDataset = resultDataset();
         createTable(creator.outputTableName());
         OptimizedQuery optimizedQuery = sourceQuery(inputDataset, controlStrategy);
         ControlStrategyResult result = strategyResult(controlStrategy, resultDataset);
-
         try {
             StrategyLoader loader = new StrategyLoader(creator.outputTableName(), tableFormat, dbServer, result, map,
                     controlStrategy);
@@ -96,9 +97,8 @@ public class MaxEmsRedStrategy implements Strategy {
 
     private ControlStrategyResult strategyResult(ControlStrategy controlStrategy, EmfDataset resultDataset)
             throws EmfException {
-        ControlStrategyResult result = existingControlStrategyResult(controlStrategy);
-        if(result==null)
-            result = new ControlStrategyResult();
+        
+        ControlStrategyResult result = result = new ControlStrategyResult();
         result.setControlStrategyId(controlStrategy.getId());
         result.setInputDatasetId(inputDataset.getId());
         result.setDetailedResultDataset(resultDataset);
@@ -110,11 +110,11 @@ public class MaxEmsRedStrategy implements Strategy {
         return result;
     }
 
-    private ControlStrategyResult existingControlStrategyResult(ControlStrategy controlStrategy) throws EmfException {
+    private void removeControlStrategyResult(ControlStrategy controlStrategy) throws EmfException {
         ControlStrategyDAO dao = new ControlStrategyDAO();
         Session session = sessionFactory.getSession();
         try {
-            return dao.controlStrategyResult(controlStrategy, session);
+            dao.removeControlStrategyResult(controlStrategy, session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not remove previous control strategy result");
         } finally {

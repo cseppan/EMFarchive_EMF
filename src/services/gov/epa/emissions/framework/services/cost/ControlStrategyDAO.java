@@ -155,4 +155,13 @@ public class ControlStrategyDAO {
         return controlStrategy.getRunStatus();
     }
 
+    public void removeControlStrategyResult(ControlStrategy controlStrategy, Session session) {
+        Criterion c = Restrictions.eq("controlStrategyId", new Integer(controlStrategy.getId()));
+        List list = hibernateFacade.get(ControlStrategyResult.class, c, session);
+        for (int i = 0; i < list.size(); i++) {
+            ControlStrategyResult result = (ControlStrategyResult) list.get(i);
+            hibernateFacade.delete(result,session);
+        }
+    }
+
 }
