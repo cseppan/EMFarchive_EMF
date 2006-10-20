@@ -11,7 +11,6 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Session;
 
 public class StrategyTask implements Runnable {
 
@@ -25,29 +24,26 @@ public class StrategyTask implements Runnable {
 
     private ControlStrategyService csService;
 
-    private HibernateSessionFactory sessionFactory;
-
     public StrategyTask(Strategy strategy, User user, Services services, ControlStrategyService service,
             HibernateSessionFactory factory) {
         this.user = user;
         this.services = services;
         this.strategy = strategy;
         this.csService = service;
-        this.sessionFactory = factory;
     }
 
     public void run() {
-        Session session = sessionFactory.getSession();
+        String completeStatus = "";
         try {
             prepare();
             strategy.run();
-            csService.updateControlStrategyWithLock(strategy.getControlStrategy());
-            complete();
+            completeStatus = "Finished";
         } catch (Exception e) {
+            completeStatus = "Failed";
             logError("Failed to run strategy : ", e);
             setStatus("Failed to run strategy: " + "Reason: " + e.getMessage());
         } finally {
-            session.close();
+            complete(completeStatus);
             closeConnection();
         }
     }
@@ -61,16 +57,28 @@ public class StrategyTask implements Runnable {
         }
     }
 
-    private void prepare() {
+    private void prepare() throws EmfException {
+        strategy.getControlStrategy().setRunStatus("Running");
+        csService.updateControlStrategyWithLock(strategy.getControlStrategy());
         addStartStatus();
-        strategy.getControlStrategy().setRunStatus("Started running strategy");
     }
 
-    private void complete() {
-        strategy.getControlStrategy().setRunStatus("Finished running strategy");
+    private void complete(String completeStatus) {
+        strategy.getControlStrategy().setRunStatus(completeStatus);
         strategy.getControlStrategy().setLastModifiedDate(new Date());
+        updateStrategy();
 
         addCompletedStatus();
+    }
+
+    private void updateStrategy() {
+        try {
+            csService.updateControlStrategy(strategy.getControlStrategy());
+        } catch (EmfException e) {
+            logError("Failed to update the strategy : ", e);
+            setStatus("Failed to update strategy: " + "Reason: " + e.getMessage());
+        }
+
     }
 
     private void addStartStatus() {

@@ -33,9 +33,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -46,8 +44,6 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 public class EditControlStrategySummaryTab extends JPanel implements EditControlStrategySummaryTabView {
-
-    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
 
     private ControlStrategy controlStrategy;
 
@@ -112,7 +108,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         panel.add(createmMainSection(), BorderLayout.NORTH);
         panel.add(createMiddleSection(), BorderLayout.CENTER);
         panel.add(createLowerSection(), BorderLayout.SOUTH);
-
         super.add(panel, BorderLayout.CENTER);
     }
 
@@ -290,7 +285,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private JLabel lastModifiedDate() {
-        return createLeftAlignedLabel(format(controlStrategy.getLastModifiedDate()));
+        return createLeftAlignedLabel(EmfDateFormat.format_MM_DD_YYYY_HH_mm(controlStrategy.getLastModifiedDate()));
     }
 
     private JLabel creator() {
@@ -345,10 +340,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return majorPollutant;
     }
 
-    private String format(Date date) {
-        return DATE_FORMATTER.format(date);
-    }
-
     private JLabel createLeftAlignedLabel(String name) {
         JLabel label = new JLabel(name);
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -361,50 +352,30 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         panel.setBorder(BorderFactory.createTitledBorder("Results"));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        String startDateString = getFormmatedDate(controlStrategy.getStartDate());
-        startDate = new JLabel(startDateString == null ? "Not started" : startDateString + " by "
-                + controlStrategy.getCreator().getName());
+        startDate = new JLabel("");
         startDate.setBackground(Color.white);
 
-        String completionDateString = getFormmatedDate(controlStrategy.getCompletionDate());
-        completionDate = new JLabel(completionDateString == null ? "" : completionDateString);
+        completionDate = new JLabel("");
         completionDate.setBackground(Color.white);
 
-        costValue = new JLabel("" + getTotalCost());
+        costValue = new JLabel("");
         costValue.setBackground(Color.white);
 
-        emissionReductionValue = new JLabel("" + getReduction());
+        emissionReductionValue = new JLabel("");
         emissionReductionValue.setBackground(Color.white);
+
+        updateSummaryResultPanel(controlStrategy, controlStrategyResult);
 
         layoutGenerator.addLabelWidgetPair("Start Date:", startDate, panel);
         layoutGenerator.addLabelWidgetPair("Completion Date:", completionDate, panel);
         layoutGenerator.addLabelWidgetPair("Total Annualized Cost:", costValue, panel);
         layoutGenerator.addLabelWidgetPair("Target Poll. Reduction:", emissionReductionValue, panel);
-
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
-    }
-
-    private String getReduction() {
-        if (controlStrategyResult == null)
-            return "";
-
-        return "" + controlStrategyResult.getTotalReduction();
-    }
-
-    private String getTotalCost() {
-        if (controlStrategyResult == null)
-            return "";
-
-        return "" + controlStrategyResult.getTotalCost();
-    }
-
-    private String getFormmatedDate(Date date) {
-        return date == null ? null : DATE_FORMATTER.format(date);
     }
 
     public void save(ControlStrategy controlStrategy) throws EmfException {
@@ -421,8 +392,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setInventoryYear(new YearValidation("Inventory Year").value(inventoryYear.getText()));
         updateRegion();
         controlStrategy.setTargetPollutant(majorPollutant());
-        controlStrategy.setStartDate(this.controlStrategy.getStartDate());
-        controlStrategy.setRunStatus(this.controlStrategy.getRunStatus());
 
         controlStrategy.setStrategyType(strategyType());
     }
@@ -484,45 +453,43 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     public void setRunMessage(ControlStrategy controlStrategy) {
         messagePanel.clear();
-        Date start = controlStrategy.getStartDate();
-        if (start == null) {
-            start = new Date();
-            controlStrategy.setStartDate(start);
-            startDate.setText(getFormmatedDate(start));
-        }
-        controlStrategy.setRunStatus("Running");
-
-        completionDate.setText("Running...");
-        clearResultPanel();
+        updateStartDate(controlStrategy);
+        updateSummaryPanelValuesExceptStartDate("Running", "", "");
     }
 
     public void stopRun() {
-        messagePanel.clear();
-        controlStrategy.setRunStatus("Stopped");
-        completionDate.setText("Stopped.");
-        clearResultPanel();
-    }
-
-    private void clearResultPanel() {
-        costValue.setText("");
-        emissionReductionValue.setText("");
+        // TODO:
     }
 
     public void refresh(ControlStrategyResult controlStrategyResult) {
         messagePanel.clear();
+        updateSummaryResultPanel(controlStrategy, controlStrategyResult);
+    }
+
+    private void updateSummaryResultPanel(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResult) {
+        updateStartDate(controlStrategy);
         if (controlStrategyResult == null) {
-            completionDate.setText("");
-            costValue.setText("");
-            emissionReductionValue.setText("");
+            updateSummaryPanelValuesExceptStartDate("", "", "");
             return;
         }
         ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(
                 new ControlStrategyResult[] { controlStrategyResult });
         String runStatus = summary.getRunStatus();
+        String completionTime = runStatus.indexOf("Failed") == -1 ? summary.getCompletionTime() : "Failed";
+        updateSummaryPanelValuesExceptStartDate(completionTime, "" + summary.getStrategyTotalCost(), ""
+                + summary.getStrategyTotalReduction());
+    }
 
-        completionDate.setText(runStatus.indexOf("Failed") == -1 ? summary.getCompletionTime() : "Failed");
-        costValue.setText("" + summary.getStrategyTotalCost());
-        emissionReductionValue.setText("" + summary.getStrategyTotalReduction());
+    private void updateStartDate(ControlStrategy controlStrategy) {
+        String startDateString = EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(controlStrategy.getStartDate());
+        startDate.setText((startDateString == null ? "Not started" : startDateString) + " by "
+                + controlStrategy.getCreator().getName());
+    }
+
+    private void updateSummaryPanelValuesExceptStartDate(String closeDate, String cost, String emisReduction) {
+        completionDate.setText(closeDate);
+        costValue.setText(cost);
+        emissionReductionValue.setText(emisReduction);
     }
 
 }

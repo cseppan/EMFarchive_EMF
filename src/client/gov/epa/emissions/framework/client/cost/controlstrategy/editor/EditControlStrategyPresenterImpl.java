@@ -39,8 +39,9 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     public void doDisplay() throws EmfException {
         view.observe(this);
-
+        
         controlStrategy = service().obtainLocked(session.user(), controlStrategy);
+        
         if (!controlStrategy.isLocked(session.user())) {// view mode, locked by another user
             view.notifyLockFailure(controlStrategy);
             return;
@@ -51,7 +52,6 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     public void doClose() throws EmfException {
         service().releaseLocked(controlStrategy);
-        stopRun();
         closeView();
     }
 
@@ -135,9 +135,12 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     public void doRefresh() throws EmfException {
         ControlStrategyResult result = session.controlStrategyService().controlStrategyResults(controlStrategy);
-        for (Iterator iter = presenters.iterator(); iter.hasNext();) {
-            EditControlStrategyTabPresenter element = (EditControlStrategyTabPresenter) iter.next();
-            element.doRefresh(result);
+        String runStatus = service().controlStrategyRunStatus(controlStrategy.getId());
+        if (runStatus == null || !runStatus.equalsIgnoreCase("Running")) {
+            for (Iterator iter = presenters.iterator(); iter.hasNext();) {
+                EditControlStrategyTabPresenter element = (EditControlStrategyTabPresenter) iter.next();
+                element.doRefresh(result);
+            }
         }
     }
 

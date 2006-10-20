@@ -109,12 +109,10 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public ControlStrategy releaseLocked(ControlStrategy locked) throws EmfException {
+    public void releaseLocked(ControlStrategy locked) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            ControlStrategy released = dao.releaseLocked(locked, session);
-
-            return released;
+            dao.releaseLocked(locked, session);
         } catch (RuntimeException e) {
             LOG.error(
                     "Could not release lock for Control Strategy : " + locked + " by owner: " + locked.getLockOwner(),
@@ -171,7 +169,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    //FIXME: remove associate results
+    // FIXME: remove associate results
     private void remove(ControlStrategy element) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -213,7 +211,8 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 
     public void createInventory(User user, ControlStrategy controlStrategy) throws EmfException {
         try {
-            ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,sessionFactory);
+            ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,
+                    sessionFactory);
             output.create();
         } catch (Exception e) {
             LOG.error("Could not create inventory output. " + e.getMessage());
@@ -229,6 +228,18 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve ControlStrategy Result", e);
             throw new EmfException("Could not retrieve ControlStrategy Result");
+        } finally {
+            session.close();
+        }
+    }
+
+    public String controlStrategyRunStatus(int id) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.controlStrategyRunStatus(id, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve ControlStrategy Status", e);
+            throw new EmfException("Could not retrieve ControlStrategy Status");
         } finally {
             session.close();
         }

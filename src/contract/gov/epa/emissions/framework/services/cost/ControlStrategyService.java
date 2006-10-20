@@ -17,7 +17,7 @@ public interface ControlStrategyService extends EMFService {
 
     ControlStrategy obtainLocked(User owner, ControlStrategy element) throws EmfException;
 
-    ControlStrategy releaseLocked(ControlStrategy locked) throws EmfException;
+    void releaseLocked(ControlStrategy locked) throws EmfException;
 
     ControlStrategy updateControlStrategy(ControlStrategy element) throws EmfException;
     
@@ -30,5 +30,7 @@ public interface ControlStrategyService extends EMFService {
     void createInventory(User user, ControlStrategy controlStrategy) throws EmfException;
     
     ControlStrategyResult controlStrategyResults(ControlStrategy controlStrategy) throws EmfException;
+    
+    String controlStrategyRunStatus(int id) throws EmfException;
     
 }

@@ -53,14 +53,14 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
 
     }
 
-    public ControlStrategy releaseLocked(ControlStrategy locked) throws EmfException {
+    public void releaseLocked(ControlStrategy locked) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("releaseLocked");
         call.addParam("element", mappings.controlStrategy());
         call.setReturnType(mappings.controlStrategy());
 
-        return (ControlStrategy) call.requestResponse(new Object[] { locked });
+        call.request(new Object[] { locked });
     }
 
     public ControlStrategy updateControlStrategy(ControlStrategy element) throws EmfException {
@@ -72,7 +72,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
 
         return (ControlStrategy) call.requestResponse(new Object[] { element });
     }
-    
+
     public ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException {
         EmfCall call = call();
 
@@ -82,7 +82,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
 
         return (ControlStrategy) call.requestResponse(new Object[] { element });
     }
-    
+
     public void removeControlStrategies(ControlStrategy[] elements) throws EmfException {
         EmfCall call = call();
 
@@ -119,7 +119,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.setOperation("stopRunStrategy");
         call.setVoidReturnType();
 
-        call.request(new Object[] { });
+        call.request(new Object[] {});
     }
 
     public void createInventory(User user, ControlStrategy controlStrategy) throws EmfException {
@@ -131,7 +131,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.setVoidReturnType();
 
         call.request(new Object[] { user, controlStrategy });
-        
+
     }
 
     public ControlStrategyResult controlStrategyResults(ControlStrategy controlStrategy) throws EmfException {
@@ -139,10 +139,21 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
 
         call.setOperation("controlStrategyResults");
         call.addParam("controlStrategy", mappings.controlStrategy());
-        
+
         call.setReturnType(mappings.controlStrategyResult());
 
         return (ControlStrategyResult) call.requestResponse(new Object[] { controlStrategy });
+    }
+
+    public String controlStrategyRunStatus(int id) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("controlStrategyRunStatus");
+        call.addIntParam();
+
+        call.setReturnType(mappings.string());
+
+        return (String) call.requestResponse(new Object[] { new Integer(id) });
     }
 
 }

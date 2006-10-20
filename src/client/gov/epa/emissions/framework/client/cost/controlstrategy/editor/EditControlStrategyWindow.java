@@ -89,6 +89,9 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         layout.add(createTabbedPane(controlStrategy, controlStrategyResults));
         layout.add(createButtonsPanel(), BorderLayout.PAGE_END);
 
+        if (controlStrategy.getRunStatus().equalsIgnoreCase("Running"))
+            enableButtons(false);
+
         contentPane.add(layout);
     }
 
@@ -184,7 +187,6 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         return new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 clearMessage();
-                enableButtons(true);
                 try {
                     presenter.doRefresh();
                 } catch (EmfException e) {
@@ -213,12 +215,12 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                 try {
                     save();
                     enableButtons(false);
+                    controlStrategy.setStartDate(new Date());
                     presenter.setResults(controlStrategy);
                     presenter.runStrategy();
                     messagePanel
                             .setMessage("Please examine the status window for progress, and reopen this window after completion to see results");
                 } catch (EmfException e) {
-                    enableButtons(true);
                     messagePanel.setError("Error running strategy: " + e.getMessage());
                 }
             }

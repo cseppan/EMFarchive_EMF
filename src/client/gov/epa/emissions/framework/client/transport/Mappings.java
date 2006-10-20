@@ -77,6 +77,11 @@ public class Mappings {
     public QName string() {
         return Constants.XSD_STRING;
     }
+    
+    public void addIntParam(Call call) {
+        Class cls = int.class;
+        call.addParameter("int",qname("int"),cls,ParameterMode.IN);
+    }
 
     public QName strings() {
         return qname("strings");

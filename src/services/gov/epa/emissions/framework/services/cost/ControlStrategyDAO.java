@@ -53,20 +53,23 @@ public class ControlStrategyDAO {
         return (ControlStrategy) lockingScheme.getLocked(owner, current(element, session), session);
     }
 
-    public ControlStrategy releaseLocked(ControlStrategy locked, Session session) {
-        return (ControlStrategy) lockingScheme.releaseLock(current(locked, session), session);
+    public void releaseLocked(ControlStrategy locked, Session session) {
+        ControlStrategy current = current(locked, session);
+        String runStatus = current.getRunStatus();
+        if (runStatus == null || !runStatus.equalsIgnoreCase("Running"))
+            lockingScheme.releaseLock(current, session);
     }
 
     public ControlStrategy update(ControlStrategy locked, Session session) throws EmfException {
-        return (ControlStrategy) lockingScheme.releaseLockOnUpdate(locked,current(locked, session),session);
+        return (ControlStrategy) lockingScheme.releaseLockOnUpdate(locked, current(locked, session), session);
     }
 
     public ControlStrategy updateWithLock(ControlStrategy locked, Session session) throws EmfException {
-        return (ControlStrategy) lockingScheme.renewLockOnUpdate(locked,current(locked, session), session);
+        return (ControlStrategy) lockingScheme.renewLockOnUpdate(locked, current(locked, session), session);
     }
-    
-    private ControlStrategy current(ControlStrategy strategy, Session session){
-        return current(strategy.getId(),ControlStrategy.class,session);
+
+    private ControlStrategy current(ControlStrategy strategy, Session session) {
+        return current(strategy.getId(), ControlStrategy.class, session);
     }
 
     public boolean canUpdate(ControlStrategy controlStrategy, Session session) {
@@ -141,6 +144,11 @@ public class ControlStrategyDAO {
 
     public void updateControlStrategyResults(ControlStrategyResult result, Session session) {
         hibernateFacade.update(result, session);
+    }
+
+    public String controlStrategyRunStatus(int id, Session session) {
+        ControlStrategy controlStrategy = (ControlStrategy) hibernateFacade.current(id, ControlStrategy.class, session);
+        return controlStrategy.getRunStatus();
     }
 
 }

@@ -100,4 +100,9 @@ public class EmfCall {
         mappings.setBooleanReturnType(call);
     }
 
+    public void addIntParam() {
+        mappings.addIntParam(call);
+        
+    }
+
 }
