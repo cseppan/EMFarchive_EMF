@@ -87,7 +87,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     }
 
     private JPanel createSummaryTab(ControlMeasure measure, MessagePanel messagePanel) {
-        EditableCMSummaryTab view = new EditableCMSummaryTab(measure, session, messagePanel, this);
+        EditableCMSummaryTab view = new EditableCMSummaryTab(measure, session, messagePanel, this, parent);
         view.populateValues();
         presenter.set(view);
         return view;

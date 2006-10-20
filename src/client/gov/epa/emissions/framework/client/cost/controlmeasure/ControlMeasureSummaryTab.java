@@ -12,6 +12,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.casemanagement.editor.AddRemoveSectorWidget;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.ControlTechnologies;
 import gov.epa.emissions.framework.client.data.SourceGroups;
 import gov.epa.emissions.framework.services.EmfException;
@@ -89,16 +90,19 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     protected ControlTechnology[] allControlTechnologies;
 
     private NumberFieldVerifier verifier;
+    
+    private EmfConsole parentConsole;
 
     protected static DateFormat dateReviewedFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     public ControlMeasureSummaryTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel,
-            ManageChangeables changeablesList) {
+            ManageChangeables changeablesList, EmfConsole parentConsole) {
         super.setName("summary");
         this.measure = measure;
         this.messagePanel = messagePanel;
         this.changeablesList = changeablesList;
         this.session = session;
+        this.parentConsole = parentConsole;
 
         super.setLayout(new BorderLayout());
         super.add(createOverviewSection(), BorderLayout.PAGE_START);
@@ -281,7 +285,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     }
     
     private JPanel sectors() {
-        sectorsWidget = new AddRemoveSectorWidget(getAllSectors(), changeablesList, null);
+        sectorsWidget = new AddRemoveSectorWidget(getAllSectors(), changeablesList, parentConsole);
         sectorsWidget.setPreferredSize(new Dimension(220,80));
         return sectorsWidget;
     }

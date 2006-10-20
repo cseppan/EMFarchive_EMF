@@ -10,7 +10,7 @@ public class NewCMSummaryTab extends ControlMeasureSummaryTab{
 
     public NewCMSummaryTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel,
             ManageChangeables changeablesList) {
-        super(measure, session, messagePanel, changeablesList);
+        super(measure, session, messagePanel, changeablesList, null);
         super.setName("summary");
     }
 
