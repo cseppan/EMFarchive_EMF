@@ -18,4 +18,6 @@ public interface ControlStrategiesManagerPresenter {
 
     void doRemove(ControlStrategy[] strategies) throws EmfException;
 
+    void doSaveCopiedStrategies(ControlStrategy coppied, String name) throws EmfException;
+
 }

@@ -1,11 +1,14 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.buttons.*;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.buttons.CopyButton;
+import gov.epa.emissions.commons.gui.buttons.NewButton;
+import gov.epa.emissions.commons.gui.buttons.RemoveButton;
+import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -25,6 +28,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -163,6 +167,14 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
             }
         });
         crudPanel.add(removeButton);
+        
+        Button copyButton = new CopyButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                copySelectedStrategy();
+            }
+        });
+        crudPanel.add(copyButton);
+
 
         return crudPanel;
     }
@@ -223,9 +235,31 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
                 JOptionPane.QUESTION_MESSAGE);
 
         if (selection == JOptionPane.YES_OPTION) {
-            tableData.remove(records);
-            refresh(tableData.sources());
-            presenter.doRemove(tableData.sources());
+            presenter.doRemove(records);
+            doRefresh();
+        }
+    }
+    
+    private void copySelectedStrategy() {
+        messagePanel.clear();
+        List strategies = selected();
+        if (strategies.isEmpty()) {
+            messagePanel.setMessage("Please select one or more control strategies.");
+            return;
+        }
+        
+        for (Iterator iter = selected().iterator(); iter.hasNext();) {
+            ControlStrategy element = (ControlStrategy) iter.next();
+            
+            try {
+                ControlStrategy coppied = (ControlStrategy)DeepCopy.copy(element);
+                coppied.setName("Copy of " + element.getName());
+                presenter.doSaveCopiedStrategies(coppied, element.getName());
+                doRefresh();
+            } catch (Exception e) {
+                e.printStackTrace();
+                messagePanel.setError(e.getMessage());
+            }
         }
     }
 

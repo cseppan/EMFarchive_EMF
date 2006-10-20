@@ -103,6 +103,10 @@ public class ControlStrategyDAO {
         hibernateFacade.remove(strategy, session);
     }
 
+    public void remove(ControlStrategyResult result, Session session) {
+        hibernateFacade.remove(result, session);
+    }
+
     public StrategyResultType getDetailedStrategyResultType(Session session) {
         List all = hibernateFacade.getAll(StrategyResultType.class, Order.asc("name"), session);
         for (int i = 0; i < all.size(); i++) {

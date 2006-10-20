@@ -9,6 +9,8 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
+import java.util.Date;
+
 public class ControlStrategiesManagerPresenterImpl implements RefreshObserver, ControlStrategiesManagerPresenter {
 
     private ControlStrategyManagerView view;
@@ -54,6 +56,25 @@ public class ControlStrategiesManagerPresenterImpl implements RefreshObserver, C
 
     public void doRemove(ControlStrategy[] strategies) throws EmfException {
         service().removeControlStrategies(strategies);
+    }
+
+    public void doSaveCopiedStrategies(ControlStrategy coppied, String name) throws EmfException {
+        if (isDuplicate(coppied))
+            throw new EmfException("A control strategy named '" + coppied.getName() + "' already exists.");
+
+        coppied.setLastModifiedDate(new Date());
+        service().addControlStrategy(coppied);
+        doRefresh();
+    }
+    
+    private boolean isDuplicate(ControlStrategy newStrategy) throws EmfException {
+        ControlStrategy[] strategies = service().getControlStrategies();
+        for (int i = 0; i < strategies.length; i++) {
+            if (strategies[i].getName().equals(newStrategy.getName()))
+                return true;
+        }
+
+        return false;
     }
 
 }

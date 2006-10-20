@@ -8,12 +8,13 @@ import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class ControlStrategy implements Lockable {
+public class ControlStrategy implements Lockable, Serializable {
 
     private int id;
 

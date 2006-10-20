@@ -169,15 +169,22 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    // FIXME: remove associate results
     private void remove(ControlStrategy element) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
+            
             if (!dao.canUpdate(element, session))
                 throw new EmfException("Control Strategy name already in use");
+
+            ControlStrategyResult result = controlStrategyResults(element);
+            if (result != null)
+                dao.remove(result, session);
+            
             dao.remove(element, session);
-        } finally {
             session.close();
+        } catch (RuntimeException e) {
+            LOG.error("Could not remove control strategy: " + element, e);
+            throw new EmfException("Could not remove control strategy: " + element.getName());
         }
     }
 
