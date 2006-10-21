@@ -1,11 +1,18 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.buttons.*;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.CopyButton;
+import gov.epa.emissions.commons.gui.buttons.EditButton;
+import gov.epa.emissions.commons.gui.buttons.ExportButton;
+import gov.epa.emissions.commons.gui.buttons.ImportButton;
+import gov.epa.emissions.commons.gui.buttons.NewButton;
+import gov.epa.emissions.commons.gui.buttons.ViewButton;
+import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -31,6 +38,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -155,9 +163,12 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         Button edit = new EditButton(editAction());
         panel.add(edit);
 
-        Button copy = new CopyButton(null);
+        Button copy = new CopyButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                copySelectedControlMeasures();
+            }
+        });
         panel.add(copy);
-        copy.setEnabled(false);
 
         Button newControlMeasure = new NewButton(newControlMeasureAction());
         panel.add(newControlMeasure);
@@ -266,6 +277,28 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
             }
         };
         return action;
+    }
+    
+    protected void copySelectedControlMeasures() {
+        messagePanel.clear();
+        List cmList = getSelectedMeasures();
+        if (cmList.isEmpty()) {
+            messagePanel.setMessage("Please select one or more control measures.");
+            return;
+        }
+        
+        for (Iterator iter = cmList.iterator(); iter.hasNext();) {
+            ControlMeasure element = (ControlMeasure) iter.next();
+            
+            try {
+                ControlMeasure coppied = (ControlMeasure)DeepCopy.copy(element);
+                coppied.setName("Copy of " + element.getName());
+                presenter.doSaveCopiedControlMeasure(coppied, element);
+                doRefresh();
+            } catch (Exception e) {
+                messagePanel.setError(e.getMessage());
+            }
+        }
     }
 
     private Action newControlMeasureAction() {

@@ -248,7 +248,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
             return;
         }
         
-        for (Iterator iter = selected().iterator(); iter.hasNext();) {
+        for (Iterator iter = strategies.iterator(); iter.hasNext();) {
             ControlStrategy element = (ControlStrategy) iter.next();
             
             try {
@@ -257,7 +257,6 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
                 presenter.doSaveCopiedStrategies(coppied, element.getName());
                 doRefresh();
             } catch (Exception e) {
-                e.printStackTrace();
                 messagePanel.setError(e.getMessage());
             }
         }
