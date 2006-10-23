@@ -98,7 +98,7 @@ public class MaxEmsRedStrategy implements Strategy {
     private ControlStrategyResult strategyResult(ControlStrategy controlStrategy, EmfDataset resultDataset)
             throws EmfException {
         
-        ControlStrategyResult result = result = new ControlStrategyResult();
+        ControlStrategyResult result = new ControlStrategyResult();
         result.setControlStrategyId(controlStrategy.getId());
         result.setInputDatasetId(inputDataset.getId());
         result.setDetailedResultDataset(resultDataset);
