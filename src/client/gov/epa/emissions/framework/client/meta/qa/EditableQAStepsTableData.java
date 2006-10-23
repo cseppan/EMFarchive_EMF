@@ -7,7 +7,6 @@ import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -60,9 +59,6 @@ public class EditableQAStepsTableData extends AbstractTableData {
     public Class getColumnClass(int col) {
         if (col == 2)
             return Boolean.class;
-
-        if (col == 5)
-            return Date.class;
 
         if (col == 6)
             return User.class;

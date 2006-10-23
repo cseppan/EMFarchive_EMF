@@ -6,7 +6,6 @@ import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class NotesTableData extends ChangeableTableData {
@@ -30,8 +29,6 @@ public class NotesTableData extends ChangeableTableData {
     public Class getColumnClass(int col) {
         if (col == 2)
             return Long.class;
-        if (col == 4)
-            return Date.class;
         return String.class;
     }
 

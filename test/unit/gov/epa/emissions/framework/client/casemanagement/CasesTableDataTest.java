@@ -103,9 +103,7 @@ public class CasesTableDataTest extends TestCase {
 
     public void testShouldHaveAppropriateColumnClassDefinedForAllColumns() {
         for (int i = 0; i < 18; i++) {
-            if (i == 15||i == 16||i == 19)
-                assertEquals(Date.class, data.getColumnClass(i));
-            else if (i == 17)
+            if (i == 17)
                 assertEquals(Boolean.class, data.getColumnClass(i));
             else
                 assertEquals(String.class, data.getColumnClass(i));

@@ -55,12 +55,12 @@ public class NotesTableDataTest extends EmfMockObjectTestCase {
         assertEquals("Details", columns[7]);
     }
 
-    public void testShouldReturnBooleanAsColumnClassForSelectColDateForDateColAndStringForAllOtherCols() {
+    public void testShouldReturnCorrectColumns() {
         assertEquals(String.class, data.getColumnClass(0));
         assertEquals(String.class, data.getColumnClass(1));
         assertEquals(Long.class, data.getColumnClass(2));
         assertEquals(String.class, data.getColumnClass(3));
-        assertEquals(Date.class, data.getColumnClass(4));
+        assertEquals(String.class, data.getColumnClass(4));
         assertEquals(String.class, data.getColumnClass(5));
         assertEquals(String.class, data.getColumnClass(6));
     }
@@ -83,7 +83,7 @@ public class NotesTableDataTest extends EmfMockObjectTestCase {
         assertEquals(new Long(note0.getId()), row.getValueAt(0));
         assertEquals(note0.getName(), row.getValueAt(1));
         assertEquals(note0.getNoteType().getType(), row.getValueAt(2));
-        assertEquals(note0.getVersion(), ((Long)row.getValueAt(3)).longValue());
+        assertEquals(note0.getVersion(), ((Long) row.getValueAt(3)).longValue());
         assertEquals(note0.getCreator().getName(), row.getValueAt(4));
 
         DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
@@ -110,7 +110,7 @@ public class NotesTableDataTest extends EmfMockObjectTestCase {
         Mock observer = mock(ChangeObserver.class);
         expects(observer, 2, "signalSaved");
         Changeables changeablesList = new DefaultChangeables((ChangeObserver) observer.proxy());
-        
+
         data.observe(changeablesList);
         data.add(note);
         data.add(note);

@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.ui;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class EmfDatasetTableData extends AbstractTableData {
@@ -44,8 +43,6 @@ public class EmfDatasetTableData extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        if (col == 1 || col == 8)
-            return Date.class;
         if (col < 0 || col > 8) {
             throw new IllegalArgumentException("Allowed values are between 0 and 8, but the value is " + col);
         }

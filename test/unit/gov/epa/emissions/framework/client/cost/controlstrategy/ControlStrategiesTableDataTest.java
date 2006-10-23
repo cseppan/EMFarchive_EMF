@@ -72,7 +72,7 @@ public class ControlStrategiesTableDataTest extends TestCase {
 
     public void testShouldHaveAppropriateColumnClassDefinedForAllColumns() {
         assertEquals(String.class, data.getColumnClass(0));
-        assertEquals(Date.class, data.getColumnClass(1));
+        assertEquals(String.class, data.getColumnClass(1));
         assertEquals(String.class, data.getColumnClass(2));
 
     }

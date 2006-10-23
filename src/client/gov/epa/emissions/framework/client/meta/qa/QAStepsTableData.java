@@ -7,7 +7,6 @@ import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class QAStepsTableData extends AbstractTableData {
@@ -29,9 +28,6 @@ public class QAStepsTableData extends AbstractTableData {
     public Class getColumnClass(int col) {
         if (col == 2)
             return Boolean.class;
-
-        if (col == 5)
-            return Date.class;
 
         if (col == 6)
             return User.class;

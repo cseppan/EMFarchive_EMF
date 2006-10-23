@@ -6,7 +6,6 @@ import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class RevisionsTableData extends AbstractTableData {
@@ -27,8 +26,6 @@ public class RevisionsTableData extends AbstractTableData {
     public Class getColumnClass(int col) {
         if (col == 0)
             return Boolean.class;
-        if (col == 6)
-            return Date.class;
         return String.class;
     }
 

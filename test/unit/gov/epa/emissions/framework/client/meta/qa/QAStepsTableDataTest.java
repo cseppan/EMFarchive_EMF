@@ -73,7 +73,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         assertEquals(Boolean.class, data.getColumnClass(2));
         assertEquals(String.class, data.getColumnClass(3));
         assertEquals(String.class, data.getColumnClass(4));
-        assertEquals(Date.class, data.getColumnClass(5));
+        assertEquals(String.class, data.getColumnClass(5));
         assertEquals(User.class, data.getColumnClass(6));
         assertEquals(String.class, data.getColumnClass(7));
         assertEquals(String.class, data.getColumnClass(8));

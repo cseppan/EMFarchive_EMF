@@ -16,14 +16,14 @@ public class EmfDatasetTableDataTest extends TestCase {
         EmfDatasetTableData data = new EmfDatasetTableData(new EmfDataset[0]);
 
         assertEquals(String.class, data.getColumnClass(0));
-        assertEquals(Date.class, data.getColumnClass(1));
+        assertEquals(String.class, data.getColumnClass(1));
         assertEquals(String.class, data.getColumnClass(2));
         assertEquals(String.class, data.getColumnClass(3));
         assertEquals(String.class, data.getColumnClass(4));
         assertEquals(String.class, data.getColumnClass(5));
         assertEquals(String.class, data.getColumnClass(6));
         assertEquals(String.class, data.getColumnClass(7));
-        assertEquals(Date.class, data.getColumnClass(8));
+        assertEquals(String.class, data.getColumnClass(8));
     }
 
     public void testShouldFormatDates() {

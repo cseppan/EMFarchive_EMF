@@ -10,7 +10,6 @@ import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,9 +29,6 @@ public class ControlStrategiesTableData extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        if (col == 1)
-            return Date.class;
-
         return String.class;
     }
 

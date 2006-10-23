@@ -6,7 +6,6 @@ import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -24,9 +23,6 @@ public class CasesTableData extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        if (col == 15 || col ==16 ||col == 19)
-            return Date.class;
-        
         if (col == 17)
             return Boolean.class;
         
