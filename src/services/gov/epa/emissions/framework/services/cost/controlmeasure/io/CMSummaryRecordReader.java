@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class CMSummaryRecordReader {
 
@@ -154,11 +155,29 @@ public class CMSummaryRecordReader {
             return;
 
         try {
-            Sector sector = sectors.getSector(name);
-            cm.setSectors(new Sector[] { sector });
+            Sector[] sectors = getSectors(name);
+            cm.setSectors(sectors);
         } catch (CMImporterException e) {
             sb.append(format(e.getMessage()));
         }
+    }
+
+    private Sector[] getSectors(String name) throws CMImporterException {
+        if (name.indexOf("|") < 0)
+            return new Sector[] { sectors.getSector(name) };
+        
+        StringTokenizer st = new StringTokenizer(name, "|");
+        String[] names = new String[st.countTokens()];
+        Sector[] sarray = new Sector[names.length];
+        
+        for (int i = 0; i < names.length; i++)
+            names[i] = st.nextToken().trim();
+        
+        for (int i = 0; i < names.length; i++) {
+            sarray[i] = sectors.getSector(names[i].trim());
+        }
+        
+        return sarray;
     }
 
     private void equipLife(ControlMeasure cm, String equipLife, StringBuffer sb) {
@@ -194,17 +213,18 @@ public class CMSummaryRecordReader {
     }
 
     private void dateReviewed(ControlMeasure cm, String date, StringBuffer sb) {
-        if (date == null || date.trim().length()==0) return;
+        if (date == null || date.trim().length() == 0)
+            return;
         try {
             Date dateReviewed = EmfDateFormat.parse_YYYY(date);
             cm.setDateReviewed(dateReviewed);
         } catch (ParseException e) {
             try {
                 Date dateReviewed = EmfDateFormat.parse_MMddyyyy(date);
-                cm.setDateReviewed(dateReviewed);               
-            } catch (ParseException e2) {           
-               sb.append(format("expected date format YYYY or MM/DD/YYYY, but was: " + date));
-            }   
+                cm.setDateReviewed(dateReviewed);
+            } catch (ParseException e2) {
+                sb.append(format("expected date format YYYY or MM/DD/YYYY, but was: " + date));
+            }
         }
     }
 
