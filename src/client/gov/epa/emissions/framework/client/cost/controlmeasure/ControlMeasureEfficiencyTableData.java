@@ -38,11 +38,13 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     private Row row(EfficiencyRecord record) {
-        Object[] values = { "" + record.getPollutant(), record.getLocale(), effectiveDate(record.getEffectiveDate()),
-                "" + record.getExistingMeasureAbbr(), "" + record.getExistingDevCode(), "" + record.getCostYear(),
-                "" + record.getCostPerTon(), "" + record.getEfficiency(), "" + record.getRuleEffectiveness(),
-                "" + record.getRulePenetration(), record.getEquationType(), "" + record.getCapRecFactor(),
-                "" + record.getDiscountRate(), record.getDetail() };
+        Object[] values = { record.getPollutant().getName(), record.getLocale(),
+                effectiveDate(record.getEffectiveDate()), record.getExistingMeasureAbbr(),
+                new Integer(record.getExistingDevCode()), new Integer(record.getCostYear()),
+                new Double(record.getCostPerTon()), new Double(record.getEfficiency()),
+                new Double(record.getRuleEffectiveness()), new Double(record.getRulePenetration()),
+                record.getEquationType(), new Double(record.getCapRecFactor()), new Double(record.getDiscountRate()),
+                record.getDetail() };
 
         return new ViewableRow(record, values);
     }
@@ -63,13 +65,13 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        if (col == 0)
-            return Boolean.class;
+        if (col == 4 || col == 5)
+            return Integer.class;
 
-        if (col == 1)
-            return String.class;
+        if (col == 6 || col == 7 || col == 8 || col == 9 || col == 11 || col == 12)
+            return Double.class;
 
-        return Float.class;
+        return String.class;
     }
 
     public EfficiencyRecord[] sources() {
