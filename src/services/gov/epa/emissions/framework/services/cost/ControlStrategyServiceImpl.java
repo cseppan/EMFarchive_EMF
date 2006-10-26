@@ -158,10 +158,13 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public void removeControlStrategies(ControlStrategy[] elements) throws EmfException {
+    public void removeControlStrategies(ControlStrategy[] elements, User user) throws EmfException {
         try {
-            for (int i = 0; i < elements.length; i++)
+            for (int i = 0; i < elements.length; i++) {
+                if (!user.equals(elements[i].getCreator()))
+                    throw new EmfException("Only the creator of " + elements[i].getName() + " can remove it from the database.");
                 remove(elements[i]);
+            }
 
         } catch (RuntimeException e) {
             LOG.error("Could not update Control Strategy: " + elements, e);

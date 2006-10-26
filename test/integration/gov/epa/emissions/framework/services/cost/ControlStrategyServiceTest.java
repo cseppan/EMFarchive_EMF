@@ -63,6 +63,49 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldRemoveControlStrategy() throws Exception {
+        User owner = userService.getUser("emf");
+        int totalBeforeAdd = service.getControlStrategies().length;
+        ControlStrategy element = new ControlStrategy("test" + Math.random());
+        element.setCreator(owner);
+        service.addControlStrategy(element);
+        
+        try {
+            List list = Arrays.asList(service.getControlStrategies());
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(element));
+
+            service.removeControlStrategies(new ControlStrategy[]{element}, owner);
+            List newlist = Arrays.asList(service.getControlStrategies());
+            assertEquals(totalBeforeAdd, newlist.size());
+            assertFalse(newlist.contains(element));
+        } catch (Exception e) {
+            throw new Exception("Cann't remove control strategy from database.");
+        }
+    }
+
+    public void testShouldFailToRemoveControlStrategy() throws Exception {
+        User owner = userService.getUser("emf");
+        User user = userService.getUser("admin");
+        int totalBeforeAdd = service.getControlStrategies().length;
+        ControlStrategy element = new ControlStrategy("test" + Math.random());
+        element.setCreator(owner);
+        service.addControlStrategy(element);
+        
+        try {
+            List list = Arrays.asList(service.getControlStrategies());
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(element));
+            
+            service.removeControlStrategies(new ControlStrategy[]{element}, user);
+        } catch (Exception e) {
+            remove(element);
+            return;
+        }
+        
+        fail("Only creator can delete the control strategy");
+    }
+
     public void testShouldObtainLockedControlStrategy() throws EmfException {
         User owner = userService.getUser("emf");
         ControlStrategy element = controlStrategy();

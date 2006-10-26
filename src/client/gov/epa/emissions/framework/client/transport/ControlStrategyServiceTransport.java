@@ -83,14 +83,15 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (ControlStrategy) call.requestResponse(new Object[] { element });
     }
 
-    public void removeControlStrategies(ControlStrategy[] elements) throws EmfException {
+    public void removeControlStrategies(ControlStrategy[] elements, User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("removeControlStrategies");
         call.addParam("elements", mappings.controlStrategies());
+        call.addParam("user", mappings.user());
         call.setVoidReturnType();
 
-        call.request(new Object[] { elements });
+        call.request(new Object[] { elements, user });
     }
 
     public void runStrategy(User user, ControlStrategy strategy) throws EmfException {

@@ -55,7 +55,7 @@ public class ControlStrategiesManagerPresenterImpl implements RefreshObserver, C
     }
 
     public void doRemove(ControlStrategy[] strategies) throws EmfException {
-        service().removeControlStrategies(strategies);
+        service().removeControlStrategies(strategies, session.user());
     }
 
     public void doSaveCopiedStrategies(ControlStrategy coppied, String name) throws EmfException {

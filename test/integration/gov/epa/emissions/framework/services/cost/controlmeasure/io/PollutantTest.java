@@ -37,8 +37,8 @@ public class PollutantTest extends ServiceTestCase {
             Pollutant pollutant = pollutant("New");
             assertNull(pollutant);
             Pollutants pollutants = new Pollutants(sessionFactory());
-            newPollutant = pollutants.getPollutant("New");
-            assertEquals("New", newPollutant.getName());
+            newPollutant = pollutants.getPollutant("NEW");
+            assertEquals("NEW", newPollutant.getName());
         } finally {
             drop(newPollutant);
         }
