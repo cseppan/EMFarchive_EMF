@@ -90,7 +90,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     protected ControlTechnology[] allControlTechnologies;
 
     private NumberFieldVerifier verifier;
-    
+
     private EmfConsole parentConsole;
 
     protected static DateFormat dateReviewedFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -283,10 +283,10 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
         return panel;
     }
-    
+
     private JPanel sectors() {
         sectorsWidget = new AddRemoveSectorWidget(getAllSectors(), changeablesList, parentConsole);
-        sectorsWidget.setPreferredSize(new Dimension(220,80));
+        sectorsWidget.setPreferredSize(new Dimension(220, 80));
         return sectorsWidget;
     }
 
@@ -341,11 +341,13 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         Object selected = controlTechnology.getSelectedItem();
         if (selected instanceof String) {
             String controltechnologyName = (String) selected;
-            if (controltechnologyName.length() > 0) {
-                ControlTechnology controltechnology = controltechnology(controltechnologyName);// checking for
-                // duplicates
-                measure.setControlTechnology(controltechnology);
+            if (controltechnologyName.length() == 0) {
+                measure.setControlTechnology(null);
+                return;
             }
+            ControlTechnology controltechnology = controltechnology(controltechnologyName);// checking for
+            // duplicates
+            measure.setControlTechnology(controltechnology);
         } else if (selected instanceof ControlTechnology) {
             measure.setControlTechnology((ControlTechnology) selected);
         }
@@ -357,12 +359,16 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     private void updateSourceGroup() {
         Object selected = sourceGroup.getSelectedItem();
+
         if (selected instanceof String) {
             String sourcegroupName = (String) selected;
-            if (sourcegroupName.length() > 0) {
-                SourceGroup sourcegroup = sourcegroup(sourcegroupName);// checking for duplicates
-                measure.setSourceGroup(sourcegroup);
+            if (sourcegroupName.length() == 0) {
+                measure.setSourceGroup(null);
+                return;
             }
+            SourceGroup sourcegroup = sourcegroup(sourcegroupName);// checking for duplicates
+            measure.setSourceGroup(sourcegroup);
+
         } else if (selected instanceof SourceGroup) {
             measure.setSourceGroup((SourceGroup) selected);
         }
@@ -400,7 +406,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
             life = verifier.parseFloat(equipmentLife);
 
     }
-    
+
     private Sector[] getAllSectors() {
         try {
             return session.dataCommonsService().getSectors();

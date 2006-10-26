@@ -33,6 +33,8 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     private int targetYear;
 
+    private final static Double NAN_VALUE = new Double(Double.NaN);
+
     public ControlMeasureTableData(ControlMeasure[] measures, CostYearTable costYearTable, String pollutant, String year)
             throws EmfException {
         this.allMeasures = measures;
@@ -98,15 +100,15 @@ public class ControlMeasureTableData extends AbstractTableData {
         String sectorsString = "";
         if (sectors.length == 0)
             return null;
-        
+
         for (int i = 0; i < sectors.length; i++) {
             if (i == sectors.length - 1) {
                 sectorsString += sectors[i].getName();
                 break;
             }
-            
+
             sectorsString += sectors[i].getName() + "|";
-            
+
         }
 
         return sectorsString;
@@ -198,7 +200,7 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     private Double getCostPerTon(EfficiencyRecord record) throws EmfException {
         if (record == null)
-            return null;
+            return NAN_VALUE;
         int costYear = record.getCostYear();
         float costPerTon = record.getCostPerTon();
         costYearTable.setTargetYear(targetYear);
@@ -209,20 +211,20 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     private Double getControlEfficiency(EfficiencyRecord record) {
         if (record == null)
-            return null;
+            return NAN_VALUE;
 
         return new Double(record.getEfficiency());
     }
 
     private Double ruleEffectiveness(EfficiencyRecord record) {
         if (record == null)
-            return null;
+            return NAN_VALUE;
         return new Double(record.getRuleEffectiveness());
     }
 
     private Double rulePenetration(EfficiencyRecord record) {
         if (record == null)
-            return null;
+            return NAN_VALUE;
         return new Double(record.getRulePenetration());
     }
 
