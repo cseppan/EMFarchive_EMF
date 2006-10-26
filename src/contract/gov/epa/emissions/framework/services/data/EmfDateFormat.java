@@ -14,37 +14,37 @@ public class EmfDateFormat {
 
     public static String format_MM_DD_YYYY(Date date) {
         dateFormatter.applyPattern("MM/dd/yyyy");
-        return dateFormatter.format(date);
+        return date == null ? "" : dateFormatter.format(date);
     }
 
     public static String format_MM_DD_YYYY_HH_mm(Date date) {
         dateFormatter.applyPattern("MM/dd/yyyy HH:mm");
-        return dateFormatter.format(date);
+        return date == null ? "" : dateFormatter.format(date);
     }
     
     public static String format_YYYY(Date date) {
         dateFormatter.applyPattern("yyyy");
-        return dateFormatter.format(date);
+        return date == null ? "" : dateFormatter.format(date);
     }
 
     public static Date parse_YYYY(String date) throws ParseException {
         dateFormatter.applyPattern("yyyy");
-        return dateFormatter.parse(date);
+        return date == null ? null : dateFormatter.parse(date);
     }
 
     public static Date parse_MMddyyyy(String date) throws ParseException {
         dateFormatter.applyPattern("MM/dd/yyyy");
-        return dateFormatter.parse(date);
+        return date == null ? null : dateFormatter.parse(date);
     }
 
     public static String format_ddMMMyyyy(Date date) {
         dateFormatter.applyPattern("ddMMMyyyy");
-        return dateFormatter.format(date);
+        return date == null ? "" : dateFormatter.format(date);
     }
 
     public static String format_MM_DD_YYYY_HH_mm_ss(Date date) {
         dateFormatter.applyPattern("MM/dd/yyyy HH:mm:ss");
-        return dateFormatter.format(date);
+        return date == null ? "" : dateFormatter.format(date);
     }
 
 }
