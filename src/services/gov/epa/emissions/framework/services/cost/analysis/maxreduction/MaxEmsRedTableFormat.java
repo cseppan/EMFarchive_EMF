@@ -63,7 +63,7 @@ public class MaxEmsRedTableFormat implements TableFormat {
     private Column[] baseCols() {
         Column disable = new Column("Disable", types.booleanType(), new StringFormatter(5));
         Column controlMeasureAbbr = new Column("CM_Abbrev", types.stringType(10), new StringFormatter(10), "DEFAULT ''");
-        Column pollutant = new Column("Pollutant", types.stringType(20), new StringFormatter(20));
+        Column pollutant = new Column("Poll", types.stringType(20), new StringFormatter(20));
         Column scc = new Column("SCC", types.stringType(10), new StringFormatter(10));
         Column fips = new Column("FIPS", types.stringType(6), new StringFormatter(6));
         Column annualCost = new Column("Annual_Cost", types.realType(), new RealFormatter());

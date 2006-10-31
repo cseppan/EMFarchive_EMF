@@ -29,12 +29,14 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
     private SqlDataTypes sqlDataTypes;
 
     protected EmfDataset inputDataset;
+    
+    protected String tableName = "test" + Math.round(Math.random() * 1000) % 1000;
 
     protected void doSetUp() throws Exception {
         dbServer = dbServer();
         sqlDataTypes = dbServer.getSqlDataTypes();
         inputDataset = new EmfDataset();
-        inputDataset.setName("test");
+        inputDataset.setName(tableName);
         inputDataset.setCreator(emfUser().getUsername());
         inputDataset.setDatasetType(orlNonpointDatasetType());
         inputDataset = addORLNonpointDataset();
@@ -45,7 +47,7 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
     }
 
     protected void doTearDown() throws Exception {
-        dropTable("test", dbServer.getEmissionsDatasource());
+        dropTable(tableName, dbServer.getEmissionsDatasource());
         dropAll(InternalSource.class);
         dropAll(EmfDataset.class);
 
@@ -85,7 +87,7 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         importer.run();
         add(inputDataset);
         session.flush();
-        return (EmfDataset) load(EmfDataset.class, "test");
+        return (EmfDataset) load(EmfDataset.class, tableName);
     }
 
     protected ControlMeasure addControlMeasure(String name, String abbr, Scc[] sccs, EfficiencyRecord[] records) {

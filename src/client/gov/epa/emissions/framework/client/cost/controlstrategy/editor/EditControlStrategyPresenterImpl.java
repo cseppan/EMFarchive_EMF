@@ -46,8 +46,12 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
             view.notifyLockFailure(controlStrategy);
             return;
         }
-        ControlStrategyResult controlStrategyResult = service().controlStrategyResults(controlStrategy);
+        ControlStrategyResult controlStrategyResult = getResult();
         view.display(controlStrategy, controlStrategyResult);
+    }
+
+    private ControlStrategyResult getResult() throws EmfException {
+        return service().controlStrategyResults(controlStrategy);
     }
 
     public void doClose() throws EmfException {
@@ -134,7 +138,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
 
     public void doRefresh() throws EmfException {
-        ControlStrategyResult result = session.controlStrategyService().controlStrategyResults(controlStrategy);
+        //ControlStrategyResult result = session.controlStrategyService().controlStrategyResults(controlStrategy);
+        ControlStrategyResult result = getResult();
         String runStatus = service().controlStrategyRunStatus(controlStrategy.getId());
         if (runStatus == null || !runStatus.equalsIgnoreCase("Running")) {
             for (Iterator iter = presenters.iterator(); iter.hasNext();) {

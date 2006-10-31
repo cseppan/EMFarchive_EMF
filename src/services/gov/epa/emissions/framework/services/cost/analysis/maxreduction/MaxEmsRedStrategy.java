@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost.analysis.maxreduction;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.OptimizedQuery;
@@ -20,10 +21,14 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.SccControlMeasu
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.services.qa.QADAO;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.hibernate.Session;
 
@@ -86,9 +91,11 @@ public class MaxEmsRedStrategy implements Strategy {
     private void saveResults(ControlStrategyResult result) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
+            setQASteps(result);
             ControlStrategyDAO dao = new ControlStrategyDAO();
             dao.updateControlStrategyResults(result, session);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             throw new EmfException("Could not save control strategy results-" + e.getMessage());
         } finally {
             session.close();
@@ -229,6 +236,57 @@ public class MaxEmsRedStrategy implements Strategy {
 
     public ControlStrategy getControlStrategy() {
         return controlStrategy;
+    }
+    
+    private void setQASteps(ControlStrategyResult result) throws EmfException {
+        EmfDataset resultDataset = (EmfDataset)result.getDetailedResultDataset();
+        QAStepTemplate[] resultTemplates = resultDataset.getDatasetType().getQaStepTemplates();
+        addQASteps(resultTemplates, resultDataset);
+        QAStepTemplate[] inputDatasetTemplates = inputDataset.getDatasetType().getQaStepTemplates();
+        addQASteps(inputDatasetTemplates, inputDataset);
+    }
+    
+    private void addQASteps(QAStepTemplate[] templates, EmfDataset dataset) throws EmfException {
+        List steps = new ArrayList();
+
+        for (int i = 0; i < templates.length; i++) {
+            QAStep step = new QAStep(templates[i], dataset.getDefaultVersion()); //FIXME: use current version
+            step.setDatasetId(dataset.getId());
+            steps.add(step);
+        }
+        
+        updateSteps((QAStep[])steps.toArray(new QAStep[0]));
+    }
+    
+    private void updateSteps(QAStep[] steps) throws EmfException {
+        Session session = sessionFactory.getSession();
+        QAStep[] nonExistingSteps = getNonExistingSteps(steps);
+        
+        try {
+            QADAO dao = new QADAO();
+            dao.updateQAStepsIds(nonExistingSteps, session);
+            dao.update(nonExistingSteps, session);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not update QA Steps");
+        } 
+    }
+
+    private QAStep[] getNonExistingSteps(QAStep[] steps) throws EmfException {
+        List stepsList = new ArrayList();
+
+        Session session = sessionFactory.getSession();
+        try {
+            QADAO dao = new QADAO();
+            for (int i = 0; i < steps.length; i++) {
+                if (!dao.exists(steps[i], session))
+                    stepsList.add(steps[i]);
+            }
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not check QA Steps");
+        } 
+        
+        
+        return (QAStep[])stepsList.toArray(new QAStep[0]);
     }
 
 }

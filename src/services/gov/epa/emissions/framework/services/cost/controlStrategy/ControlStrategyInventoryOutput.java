@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost.controlStrategy;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.db.version.Version;
@@ -17,10 +18,14 @@ import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.services.qa.QADAO;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.hibernate.Session;
 
@@ -36,10 +41,13 @@ public class ControlStrategyInventoryOutput {
 
     private User user;
 
+    private HibernateSessionFactory sessionFactory;
+
     public ControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
             HibernateSessionFactory sessionFactory) throws Exception {
         this.controlStrategy = controlStrategy;
         this.user = user;
+        this.sessionFactory = HibernateSessionFactory.get();
         creator = new DatasetCreator("CSINVEN_", controlStrategy, user, sessionFactory);
         this.tableFormat = new FileFormatFactory().tableFormat(datasetType(controlStrategy));
         this.statusServices = new StatusDAO();
@@ -73,6 +81,7 @@ public class ControlStrategyInventoryOutput {
             tableCreator.drop(outputInventoryTableName);
             throw e;
         } finally {
+            setQASteps();
             server.disconnect();
         }
         endStatus(statusServices);
@@ -93,13 +102,63 @@ public class ControlStrategyInventoryOutput {
 
         updateControlStrategyResults(result, dataset);
     }
+    
+    private void setQASteps() throws EmfException {
+        ControlStrategyResult result = controlStrategyResults(controlStrategy);
+        EmfDataset controlledDataset = (EmfDataset)result.getControlledInventoryDataset();
+        QAStepTemplate[] templates = controlledDataset.getDatasetType().getQaStepTemplates();
+        addQASteps(templates, controlledDataset);
+    }
+    
+    private void addQASteps(QAStepTemplate[] templates, EmfDataset dataset) throws EmfException {
+        List steps = new ArrayList();
+
+        for (int i = 0; i < templates.length; i++) {
+            QAStep step = new QAStep(templates[i], dataset.getDefaultVersion()); //FIXME: use current version
+            step.setDatasetId(dataset.getId());
+            steps.add(step);
+        }
+        
+        updateSteps((QAStep[])steps.toArray(new QAStep[0]));
+    }
+    
+    private void updateSteps(QAStep[] steps) throws EmfException {
+        Session session = sessionFactory.getSession();
+        QAStep[] nonExistingSteps = getNonExistingSteps(steps);
+        
+        try {
+            QADAO dao = new QADAO();
+            dao.updateQAStepsIds(nonExistingSteps, session);
+            dao.update(nonExistingSteps, session);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not update QA Steps");
+        } 
+    }
+
+    private QAStep[] getNonExistingSteps(QAStep[] steps) throws EmfException {
+        List stepsList = new ArrayList();
+
+        Session session = sessionFactory.getSession();
+        try {
+            QADAO dao = new QADAO();
+            for (int i = 0; i < steps.length; i++) {
+                if (!dao.exists(steps[i], session))
+                    stepsList.add(steps[i]);
+            }
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not check QA Steps");
+        } 
+        
+        
+        return (QAStep[])stepsList.toArray(new QAStep[0]);
+    }
 
     private String description(EmfDataset inputDataset) {
         return inputDataset.getDescription() + "#" + "Implements control strategy: " + controlStrategy.getName() + "\n";
     }
 
     private ControlStrategyResult controlStrategyResults(ControlStrategy controlStrategy) throws EmfException {
-        Session session = HibernateSessionFactory.get().getSession();
+        Session session = sessionFactory.getSession();
         try {
             ControlStrategyDAO dao = new ControlStrategyDAO();
             ControlStrategyResult result = dao.controlStrategyResult(controlStrategy, session);
@@ -115,7 +174,7 @@ public class ControlStrategyInventoryOutput {
     }
 
     private void updateControlStrategyResults(ControlStrategyResult result, EmfDataset dataset) throws EmfException {
-        Session session = HibernateSessionFactory.get().getSession();
+        Session session = sessionFactory.getSession();
         try {
             ControlStrategyDAO dao = new ControlStrategyDAO();
             result.setControlledInventoryDataset(dataset);
@@ -129,7 +188,7 @@ public class ControlStrategyInventoryOutput {
     }
 
     private Version version(EmfDataset inputDataset, int datasetVersion) {
-        Session session = HibernateSessionFactory.get().getSession();
+        Session session = sessionFactory.getSession();
         try {
             Versions versions = new Versions();
             return versions.get(inputDataset.getId(), datasetVersion, session);
