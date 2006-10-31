@@ -34,7 +34,8 @@ public class EditControlStrategyFilterTab extends JPanel implements EditControlS
         JScrollPane scrollPane = new JScrollPane(filter);
         changeablesList.addChangeable(filter);
 
-        JLabel label = new JLabel("SQL Filter: ");
+        JLabel label = new JLabel("Inventory Filter: ");
+        label.setToolTipText("Enter a filter that could be entered as a SQL where clause (e.g., ANN_EMIS>5000)");
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.add(label,BorderLayout.WEST);
