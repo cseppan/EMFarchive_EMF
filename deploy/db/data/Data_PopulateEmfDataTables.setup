@@ -30,6 +30,9 @@ insert into emf.properties values(DEFAULT, 'lock.time-interval', '3600000');
 insert into emf.properties values(DEFAULT, 'page-size', '100');
 insert into emf.properties values(DEFAULT, 'batch-size', '10000');
 insert into emf.properties values(DEFAULT, 'export-batch-size', '10000');
+insert into emf.properties values(DEFAULT, 'defaultQASummaries', 'Summarize by Pollutant|Summarize by SCC and Pollutant|Summarize by County and Pollutant');
+insert into emf.properties values(DEFAULT, 'PM10-PRI-alias', 'PM10');
+insert into emf.properties values(DEFAULT, 'PM2_5-PRI-alias', 'PM2_5');
 
 --emf.properties
 -- DO NOT CHANGE THE ORDER OF THE DATASET TYPE
@@ -127,16 +130,16 @@ insert into emf.dataset_types_qa_step_templates values(DEFAULT,'2','0','Summariz
 insert into emf.dataset_types_qa_step_templates values(DEFAULT,'3','0','Summarize by Pollutant','1','select POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by POLL order by POLL',false,'1.0','');
 insert into emf.dataset_types_qa_step_templates values(DEFAULT,'4','0','Summarize by Pollutant','1','select POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by POLL order by POLL',false,'1.0','');
 insert into emf.dataset_types_qa_step_templates values(DEFAULT,'47','0','Summarize by Pollutant','1','select POLL, sum(Annual_Cost) as Annual_Cost, sum(Final_emissions) as Final_emissions, sum(Emis_Reduction) as Emis_Reduction, sum(Inv_emissions) as Inv_emissions from $TABLE[1] group by POLL order by POLL',false,'1.0','');
-insert into emf.dataset_types_qa_step_templates values(DEFAULT,'1','1','Summarize by SCC and Pollutant','1','select SCC,POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by SCC,POLL order by SCC,POLL',false,'1.0','');
-insert into emf.dataset_types_qa_step_templates values(DEFAULT,'2','1','Summarize by SCC and Pollutant','1','select SCC,POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by SCC,POLL order by SCC,POLL',false,'1.0','');
-insert into emf.dataset_types_qa_step_templates values(DEFAULT,'3','1','Summarize by SCC and Pollutant','1','select SCC,POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by SCC,POLL order by SCC,POLL',false,'1.0','');
-insert into emf.dataset_types_qa_step_templates values(DEFAULT,'4','1','Summarize by SCC and Pollutant','1','select SCC,POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by SCC,POLL order by SCC,POLL',false,'1.0','');
-insert into emf.dataset_types_qa_step_templates values(DEFAULT,'47','1','Summarize by SCC and Pollutant','1','select SCC,POLL sum(Annual_Cost) as Annual_Cost, sum(Final_emissions) as Final_emissions, sum(Emis_Reduction) as Emis_Reduction, sum(Inv_emissions) as Inv_emissions from $TABLE[1] group by SCC,POLL order by SCC,POLL',false,'1.0','');
-insert into emf.dataset_types_qa_step_templates values(DEFAULT,'1','2','Summarize by County and Pollutant','1','select FIPS,POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by FIPS,POLL order by FIPS,POLL',false,'1.0','');
-insert into emf.dataset_types_qa_step_templates values(DEFAULT,'2','2','Summarize by County and Pollutant','1','select FIPS,POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by FIPS,POLL order by FIPS,POLL',false,'1.0','');
-insert into emf.dataset_types_qa_step_templates values(DEFAULT,'3','2','Summarize by County and Pollutant','1','select FIPS,POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by FIPS,POLL order by FIPS,POLL',false,'1.0','');
-insert into emf.dataset_types_qa_step_templates values(DEFAULT,'4','2','Summarize by County and Pollutant','1','select FIPS,POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by FIPS,POLL order by FIPS,POLL',false,'1.0','');
-insert into emf.dataset_types_qa_step_templates values(DEFAULT,'47','2','Summarize by County and Pollutant','1','select FIPS,POLL, sum(Annual_Cost) as Annual_Cost, sum(Final_emissions) as Final_emissions, sum(Emis_Reduction) as Emis_Reduction, sum(Inv_emissions) as Inv_emissions from $TABLE[1] group by FIPS,POLL order by FIPS,POLL',false,'1.0','');
+insert into emf.dataset_types_qa_step_templates values(DEFAULT,'1','1','Summarize by SCC and Pollutant','1','select SCC, POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by SCC,POLL order by SCC,POLL',false,'1.0','');
+insert into emf.dataset_types_qa_step_templates values(DEFAULT,'2','1','Summarize by SCC and Pollutant','1','select SCC, POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by SCC,POLL order by SCC,POLL',false,'1.0','');
+insert into emf.dataset_types_qa_step_templates values(DEFAULT,'3','1','Summarize by SCC and Pollutant','1','select SCC, POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by SCC,POLL order by SCC,POLL',false,'1.0','');
+insert into emf.dataset_types_qa_step_templates values(DEFAULT,'4','1','Summarize by SCC and Pollutant','1','select SCC, POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by SCC,POLL order by SCC,POLL',false,'1.0','');
+insert into emf.dataset_types_qa_step_templates values(DEFAULT,'47','1','Summarize by SCC and Pollutant','1','select SCC, POLL, sum(Annual_Cost) as Annual_Cost, sum(Final_emissions) as Final_emissions, sum(Emis_Reduction) as Emis_Reduction, sum(Inv_emissions) as Inv_emissions from $TABLE[1] group by SCC,POLL order by SCC,POLL',false,'1.0','');
+insert into emf.dataset_types_qa_step_templates values(DEFAULT,'1','2','Summarize by County and Pollutant','1','select FIPS, POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by FIPS,POLL order by FIPS,POLL',false,'1.0','');
+insert into emf.dataset_types_qa_step_templates values(DEFAULT,'2','2','Summarize by County and Pollutant','1','select FIPS, POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by FIPS,POLL order by FIPS,POLL',false,'1.0','');
+insert into emf.dataset_types_qa_step_templates values(DEFAULT,'3','2','Summarize by County and Pollutant','1','select FIPS, POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by FIPS,POLL order by FIPS,POLL',false,'1.0','');
+insert into emf.dataset_types_qa_step_templates values(DEFAULT,'4','2','Summarize by County and Pollutant','1','select FIPS, POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by FIPS,POLL order by FIPS,POLL',false,'1.0','');
+insert into emf.dataset_types_qa_step_templates values(DEFAULT,'47','2','Summarize by County and Pollutant','1','select FIPS, POLL, sum(Annual_Cost) as Annual_Cost, sum(Final_emissions) as Final_emissions, sum(Emis_Reduction) as Emis_Reduction, sum(Inv_emissions) as Inv_emissions from $TABLE[1] group by FIPS,POLL order by FIPS,POLL',false,'1.0','');
 -- emf.dataset_types_qa_step_templates
 --
 

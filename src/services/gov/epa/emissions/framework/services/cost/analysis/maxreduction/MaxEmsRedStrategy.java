@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.services.cost.analysis.maxreduction;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
-import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.OptimizedQuery;
@@ -11,6 +10,7 @@ import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.QAStepTask;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
@@ -21,14 +21,10 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.SccControlMeasu
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
-import gov.epa.emissions.framework.services.qa.QADAO;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.hibernate.Session;
 
@@ -49,6 +45,8 @@ public class MaxEmsRedStrategy implements Strategy {
     private int batchSize;
 
     private DbServer dbServer;
+    
+    private User user;
 
     public MaxEmsRedStrategy(ControlStrategy strategy, User user, DbServer dbServer, Integer batchSize,
             HibernateSessionFactory sessionFactory) {
@@ -57,6 +55,7 @@ public class MaxEmsRedStrategy implements Strategy {
         this.datasource = dbServer.getEmissionsDatasource();
         this.batchSize = batchSize.intValue();
         this.sessionFactory = sessionFactory;
+        this.user = user;
         this.tableFormat = new MaxEmsRedTableFormat(dbServer.getSqlDataTypes());
         creator = new DatasetCreator("CSDR_", controlStrategy, user, sessionFactory);
         inputDataset = controlStrategy.getInputDatasets()[0];
@@ -91,7 +90,7 @@ public class MaxEmsRedStrategy implements Strategy {
     private void saveResults(ControlStrategyResult result) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            setQASteps(result);
+            setAndRunQASteps(result);
             ControlStrategyDAO dao = new ControlStrategyDAO();
             dao.updateControlStrategyResults(result, session);
         } catch (RuntimeException e) {
@@ -238,55 +237,15 @@ public class MaxEmsRedStrategy implements Strategy {
         return controlStrategy;
     }
     
-    private void setQASteps(ControlStrategyResult result) throws EmfException {
+    private void setAndRunQASteps(ControlStrategyResult result) throws EmfException {
         EmfDataset resultDataset = (EmfDataset)result.getDetailedResultDataset();
-        QAStepTemplate[] resultTemplates = resultDataset.getDatasetType().getQaStepTemplates();
-        addQASteps(resultTemplates, resultDataset);
-        QAStepTemplate[] inputDatasetTemplates = inputDataset.getDatasetType().getQaStepTemplates();
-        addQASteps(inputDatasetTemplates, inputDataset);
+        excuteSetAndRunQASteps(resultDataset, 0);
+        excuteSetAndRunQASteps(inputDataset, controlStrategy.getDatasetVersion());
     }
     
-    private void addQASteps(QAStepTemplate[] templates, EmfDataset dataset) throws EmfException {
-        List steps = new ArrayList();
-
-        for (int i = 0; i < templates.length; i++) {
-            QAStep step = new QAStep(templates[i], dataset.getDefaultVersion()); //FIXME: use current version
-            step.setDatasetId(dataset.getId());
-            steps.add(step);
-        }
-        
-        updateSteps((QAStep[])steps.toArray(new QAStep[0]));
-    }
-    
-    private void updateSteps(QAStep[] steps) throws EmfException {
-        Session session = sessionFactory.getSession();
-        QAStep[] nonExistingSteps = getNonExistingSteps(steps);
-        
-        try {
-            QADAO dao = new QADAO();
-            dao.updateQAStepsIds(nonExistingSteps, session);
-            dao.update(nonExistingSteps, session);
-        } catch (RuntimeException e) {
-            throw new EmfException("Could not update QA Steps");
-        } 
-    }
-
-    private QAStep[] getNonExistingSteps(QAStep[] steps) throws EmfException {
-        List stepsList = new ArrayList();
-
-        Session session = sessionFactory.getSession();
-        try {
-            QADAO dao = new QADAO();
-            for (int i = 0; i < steps.length; i++) {
-                if (!dao.exists(steps[i], session))
-                    stepsList.add(steps[i]);
-            }
-        } catch (RuntimeException e) {
-            throw new EmfException("Could not check QA Steps");
-        } 
-        
-        
-        return (QAStep[])stepsList.toArray(new QAStep[0]);
+    private void excuteSetAndRunQASteps(EmfDataset dataset, int version) throws EmfException {
+        QAStepTask qaTask = new QAStepTask(sessionFactory, dataset, version, user);
+        qaTask.checkAndRunSummaryQASteps(qaTask.getDefaultSummaryQANames());
     }
 
 }

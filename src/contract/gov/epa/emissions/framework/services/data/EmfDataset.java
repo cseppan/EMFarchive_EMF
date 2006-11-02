@@ -9,9 +9,11 @@ import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Lockable;
 import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -416,6 +418,33 @@ public class EmfDataset implements Dataset, Lockable {
 
     public String toString() {
         return name;
+    }
+    
+    public void checkAndRunSummaryQASteps(QAStep[] summarySteps, int version) throws EmfException {
+        if (!templateExists(summarySteps))
+            throw new EmfException("Summary QAStepTemplate doesn't exist in dataset type: " + datasetType.getName());
+        
+        try {
+            //
+        } catch (Exception e) {
+            throw new EmfException("Cann't run summary QASteps: " + e.getMessage());
+        }
+    }
+
+    private boolean templateExists(QAStep[] summarySteps) {
+        QAStepTemplate[] templates = datasetType.getQaStepTemplates();
+        String[] names = new String[templates.length];
+        
+        for (int i = 0; i < templates.length; i++)
+            names[i] = templates[i].getName();
+        
+        List templateNames = Arrays.asList(names);
+        
+        for (int i = 0; i < summarySteps.length; i++)
+            if (!templateNames.contains(summarySteps[i].getName()))
+                return false;
+        
+        return true;
     }
 
 }
