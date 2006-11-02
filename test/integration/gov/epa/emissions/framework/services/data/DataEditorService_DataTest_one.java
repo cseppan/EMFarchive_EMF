@@ -75,7 +75,7 @@ public class DataEditorService_DataTest_one extends ServiceTestCase {
         DataFormatFactory formatFactory = new VersionedDataFormatFactory(version, dataset);
         Importer importer = new ORLOnRoadImporter(file.getParentFile(), new String[] { file.getName() }, dataset,
                 dbServer(), sqlDataTypes(), formatFactory);
-        new VersionedImporter(importer, dataset, dbServer()).run();
+        new VersionedImporter(importer, dataset, dbServer(), lastModifiedDate(file.getParentFile(), file.getName())).run();
     }
 
     private void setTestValues(EmfDataset dataset) {
@@ -232,8 +232,6 @@ public class DataEditorService_DataTest_one extends ServiceTestCase {
         assertEquals(v0RecordsCount + 3, reader.fetch(v1, dataset.getName(), session).total());
     }
 
-    
-
     private void addDataset() {
         UserDAO userDAO = new UserDAO();
         User owner = userDAO.get("emf", session);
@@ -329,6 +327,10 @@ public class DataEditorService_DataTest_one extends ServiceTestCase {
         DataAccessToken token = token(v1, table);
 
         assertFalse("Should confirm with No if session does not contains changes", service.hasChanges(token));
+    }
+
+    private Date lastModifiedDate(File folder, String fileName) {
+        return new Date(new File(folder, fileName).lastModified());
     }
 
 }

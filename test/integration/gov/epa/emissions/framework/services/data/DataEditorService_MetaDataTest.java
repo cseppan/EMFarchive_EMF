@@ -68,7 +68,7 @@ public class DataEditorService_MetaDataTest extends ServiceTestCase {
         DataFormatFactory formatFactory = new VersionedDataFormatFactory(version, dataset);
         Importer importer = new ORLOnRoadImporter(file.getParentFile(), new String[] { file.getName() }, dataset,
                 dbServer(), sqlDataTypes(), formatFactory);
-        new VersionedImporter(importer, dataset, dbServer()).run();
+        new VersionedImporter(importer, dataset, dbServer(), lastModifiedDate(file.getParentFile(),file.getName())).run();
     }
 
     private void setTestValues(EmfDataset dataset) {
@@ -120,6 +120,10 @@ public class DataEditorService_MetaDataTest extends ServiceTestCase {
         assertEquals("column name should match", cmd[3].getType(), "java.lang.String");
         assertEquals("column name should match", cmd[3].getSize(), -1);
 
+    }
+    
+    private Date lastModifiedDate(File folder, String fileName) {
+        return new Date(new File(folder,fileName).lastModified());
     }
 
 }

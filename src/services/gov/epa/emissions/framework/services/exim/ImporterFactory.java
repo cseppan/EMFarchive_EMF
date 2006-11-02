@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,9 +29,19 @@ public class ImporterFactory {
         this.sqlDataTypes = sqlDataTypes;
     }
 
-    public Importer createVersioned(EmfDataset dataset, File folder, String[] filePatterns) throws ImporterException {
-        Importer importer = create(dataset, folder, filePatterns);
-        return new VersionedImporter(importer, dataset, dbServer);
+    public Importer createVersioned(EmfDataset dataset, File folder, String[] fileNames) throws ImporterException {
+        Importer importer = create(dataset, folder, fileNames);
+        return new VersionedImporter(importer, dataset, dbServer, lastModifiedDate(folder, fileNames));
+    }
+
+    private Date lastModifiedDate(File folder, String[] fileNames) {
+        long mostLastModified = -1;
+        for (int i = 0; i < fileNames.length; i++) {
+            long lastModified = new File(folder, fileNames[i]).lastModified();
+            if (lastModified > mostLastModified)
+                mostLastModified = lastModified;
+        }
+        return new Date(mostLastModified);
     }
 
     private Importer create(EmfDataset dataset, File folder, String[] filePatterns) throws ImporterException {
@@ -42,13 +53,13 @@ public class ImporterFactory {
         }
     }
 
-    private Importer doCreate(EmfDataset dataset, File folder, String[] filePatterns) throws Exception {
+    private Importer doCreate(EmfDataset dataset, File folder, String[] fileNames) throws Exception {
         String importerClassName = dataset.getDatasetType().getImporterClassName();
         Class importerClass = Class.forName(importerClassName);
 
         Class[] classParams = new Class[] { File.class, String[].class, Dataset.class, DbServer.class,
                 SqlDataTypes.class, DataFormatFactory.class };
-        Object[] params = new Object[] { folder, filePatterns, dataset, dbServer, sqlDataTypes,
+        Object[] params = new Object[] { folder, fileNames, dataset, dbServer, sqlDataTypes,
                 new VersionedDataFormatFactory(null, dataset) };
 
         Constructor importerConstructor = importerClass.getDeclaredConstructor(classParams);

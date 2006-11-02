@@ -57,7 +57,7 @@ public class DataEditorService_VersionsTest extends ServiceTestCase {
     }
 
     private User user() {
-        return new UserDAO().get("emf",session);
+        return new UserDAO().get("emf", session);
     }
 
     private void doImport() throws ImporterException {
@@ -68,7 +68,8 @@ public class DataEditorService_VersionsTest extends ServiceTestCase {
         DataFormatFactory formatFactory = new VersionedDataFormatFactory(version, dataset);
         ORLNonPointImporter importer = new ORLNonPointImporter(file.getParentFile(), new String[] { file.getName() },
                 dataset, dbServer(), sqlDataTypes(), formatFactory);
-        new VersionedImporter(importer, dataset, dbServer()).run();
+        new VersionedImporter(importer, dataset, dbServer(), lastModifiedDate(file.getParentFile(), file.getName()))
+                .run();
     }
 
     private void setTestValues(EmfDataset dataset) {
@@ -162,6 +163,10 @@ public class DataEditorService_VersionsTest extends ServiceTestCase {
         }
 
         fail("Should have raised an error as the version is locked by another user");
+    }
+
+    private Date lastModifiedDate(File folder, String fileName) {
+        return new Date(new File(folder, fileName).lastModified());
     }
 
 }

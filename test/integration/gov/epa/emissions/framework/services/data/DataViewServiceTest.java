@@ -58,7 +58,8 @@ public class DataViewServiceTest extends ServiceTestCase {
         DataFormatFactory formatFactory = new VersionedDataFormatFactory(version, dataset);
         ORLOnRoadImporter importer = new ORLOnRoadImporter(file.getParentFile(), new String[] { file.getName() },
                 dataset, dbServer(), sqlDataTypes(), formatFactory);
-        new VersionedImporter(importer, dataset, dbServer()).run();
+        new VersionedImporter(importer, dataset, dbServer(), lastModifiedDate(file.getParentFile(), file.getName()))
+                .run();
     }
 
     private void setTestValues(EmfDataset dataset) {
@@ -91,7 +92,7 @@ public class DataViewServiceTest extends ServiceTestCase {
     }
 
     private User user() {
-        return new UserDAO().get("emf",session);
+        return new UserDAO().get("emf", session);
     }
 
     public void testShouldReturnExactlyTwoPages() throws EmfException {
@@ -183,6 +184,10 @@ public class DataViewServiceTest extends ServiceTestCase {
             }
         }
         assertTrue(!found);
+    }
+
+    private Date lastModifiedDate(File folder, String fileName) {
+        return new Date(new File(folder, fileName).lastModified());
     }
 
 }
