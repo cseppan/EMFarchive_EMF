@@ -1,8 +1,8 @@
 Country_Code,Country_abbr, Country_Name
-01,US,United States
-02,CA,Canada
-03,MX,Mexico
-04,BA,Bahamas
-05,CU,Cuba
-06,DR,Dominican Republic
-07,HA,Haiti
+01,US,UNITED STATES
+02,CA,CANADA
+03,MX,MEXICO
+04,BA,BAHAMAS
+05,CU,CUBA
+06,DR,DOMINICAN REPUBLIC
+07,HA,HAITI
