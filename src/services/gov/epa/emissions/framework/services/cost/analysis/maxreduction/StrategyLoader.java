@@ -72,19 +72,18 @@ public class StrategyLoader {
                 String scc = resultSet.getString("scc");
                 String fips = resultSet.getString("fips");
 
-                MaxControlEffContorlMeasure maxCM = maxEmsReduction.getControlMeasure(scc, fips);
+                MaxControlEffControlMeasure maxCM = maxEmsReduction.getControlMeasure(scc, fips);
                 if (maxCM == null)
                     continue; // LOG???
                 try {
                     RecordGenerator generator = new RecordGenerator(result);
                     Record record = generator.getRecord(resultSet, maxCM);
-                    totalCost += maxCM.cost();
+                    totalCost += generator.reducedEmission()*maxCM.adjustedCostPerTon();
                     totalReduction += generator.reducedEmission();
                     insertRecord(record, modifier);
                 } catch (SQLException e) {
                     result.setRunStatus("Failed. Error in processing record for source record: " + sourceCount + ".");
                 }
-
             }
         } finally {
             resultSet.close();

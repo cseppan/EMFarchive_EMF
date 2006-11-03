@@ -17,20 +17,32 @@ public class RecordGenerator {
 
     private double reducedEmission;
 
+    private double invenControlEfficiency;
+
+    private double invenRulePenetration;
+
+    private double invenRuleEffectiveness;
+
+    private double originalEmissions;
+
+    private double finalEmissions;
+
     public RecordGenerator(ControlStrategyResult result) {
         this.strategyResult = result;
         comment = "";
     }
 
-    public Record getRecord(ResultSet resultSet, MaxControlEffContorlMeasure maxCM) throws SQLException, EmfException {
+    public Record getRecord(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException {
         Record record = new Record();
         record.add(tokens(resultSet, maxCM));
 
         return record;
     }
 
-    private List tokens(ResultSet resultSet, MaxControlEffContorlMeasure maxCM) throws SQLException, EmfException {
+    private List tokens(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException {
         List tokens = new ArrayList();
+        
+        calculateEmissionReduction(resultSet,maxCM);
 
         tokens.add(""); // record id
         tokens.add("" + strategyResult.getDetailedResultDataset().getId());
@@ -44,14 +56,19 @@ public class RecordGenerator {
         tokens.add(resultSet.getString("scc"));
         tokens.add(resultSet.getString("fips"));
 
-        tokens.add("" + maxCM.cost());
-        tokens.add("" + maxCM.costPerTon());
+        tokens.add("" + maxCM.adjustedCostPerTon() * reducedEmission);
+        tokens.add("" + maxCM.adjustedCostPerTon());
         tokens.add("" + maxCM.controlEfficiency());
-        tokens.add("" + maxCM.rulePenetration() ); 
+        tokens.add("" + maxCM.rulePenetration());
         tokens.add("" + maxCM.ruleEffectiveness());
-        tokens.add("" + maxCM.effectiveReduction()*100);
+        tokens.add("" + maxCM.effectiveReduction() * 100);
 
-        emissions(tokens, resultSet, maxCM);
+        tokens.add("" + invenControlEfficiency);
+        tokens.add("" + invenRulePenetration);
+        tokens.add("" + invenRuleEffectiveness);
+        tokens.add("" + finalEmissions);
+        tokens.add("" + reducedEmission);
+        tokens.add("" + originalEmissions);
 
         tokens.add("" + resultSet.getInt("Record_Id"));
         tokens.add("" + strategyResult.getInputDatasetId());
@@ -62,30 +79,21 @@ public class RecordGenerator {
         return tokens;
     }
 
-    private void emissions(List tokens, ResultSet resultSet, MaxControlEffContorlMeasure maxMeasure) throws SQLException {
-        double invenControlEfficiency = resultSet.getFloat("CEFF");
-        double invenRulePenetration = resultSet.getFloat("RPEN");
-        double invenRuleEffectiveness = resultSet.getFloat("REFF");
-        double originalEmissions = resultSet.getFloat("ANN_EMIS");
+    private void calculateEmissionReduction(ResultSet resultSet, MaxControlEffControlMeasure maxMeasure) throws SQLException {
+        invenControlEfficiency = resultSet.getFloat("CEFF");
+        invenRulePenetration = resultSet.getFloat("RPEN");
+        invenRuleEffectiveness = resultSet.getFloat("REFF");
+        originalEmissions = resultSet.getFloat("ANN_EMIS");
 
-        double invenEffectiveReduction = invenControlEfficiency * invenRulePenetration * invenRuleEffectiveness/(100*100*100); 
+        double invenEffectiveReduction = invenControlEfficiency * invenRulePenetration * invenRuleEffectiveness
+                / (100 * 100 * 100);
         double effectiveReduction = maxMeasure.effectiveReduction();
 
         reducedEmission = 0.0;
-        double finalEmissions = 0.0;
-
-        tokens.add("" + invenControlEfficiency);
-        tokens.add("" + invenRulePenetration);
-        tokens.add("" + invenRuleEffectiveness);
+        finalEmissions = 0.0;
         if (invenEffectiveReduction == 0.0) {
             reducedEmission = originalEmissions * effectiveReduction;
             finalEmissions = originalEmissions - reducedEmission;
-            //tokens.add("" + maxMeasure.controlEfficiency());
-            //tokens.add("" + maxMeasure.rulePenetration());
-            //tokens.add("" + maxMeasure.ruleEffectiveness());
-            tokens.add("" + finalEmissions);
-            tokens.add("" + reducedEmission);
-            tokens.add("" + originalEmissions);
             return;
         }
 
@@ -94,12 +102,6 @@ public class RecordGenerator {
             originalEmissions = originalEmissions / invenEffectiveReduction;
             reducedEmission = originalEmissions * effectiveReduction;
             finalEmissions = originalEmissions - reducedEmission;
-            //tokens.add("" + maxMeasure.controlEfficiency());
-            //tokens.add("" + maxMeasure.rulePenetration());
-            //tokens.add("" + maxMeasure.ruleEffectiveness());
-            tokens.add("" + finalEmissions);
-            tokens.add("" + reducedEmission);
-            tokens.add("" + originalEmissions);
             return;
         }
 
@@ -107,12 +109,6 @@ public class RecordGenerator {
         originalEmissions = originalEmissions / invenControlEfficiency;
         reducedEmission = originalEmissions * invenEffectiveReduction;
         finalEmissions = originalEmissions - reducedEmission;
-        //tokens.add("" + invenControlEfficiency);
-        //tokens.add("" + invenRulePenetration);
-        //tokens.add("" + invenRuleEffectiveness);
-        tokens.add("" + finalEmissions);
-        tokens.add("" + reducedEmission);
-        tokens.add("" + originalEmissions);
     }
 
     public double reducedEmission() {

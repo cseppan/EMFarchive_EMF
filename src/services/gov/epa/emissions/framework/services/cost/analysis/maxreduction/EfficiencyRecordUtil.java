@@ -6,12 +6,12 @@ import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 public class EfficiencyRecordUtil {
 
-    public double effectionReduction(EfficiencyRecord record) {
-        return (record.getEfficiency() * record.getRuleEffectiveness() * record.getRuleEffectiveness())
+    public double effectiveReduction(EfficiencyRecord record) {
+        return (record.getEfficiency() * record.getRuleEffectiveness() * record.getRulePenetration())
                 / (100 * 100 * 100);
     }
 
-    public double cost(EfficiencyRecord record, CostYearTable costYearTable) throws EmfException {
+    public double adjustedCostPerTon(EfficiencyRecord record, CostYearTable costYearTable) throws EmfException {
         int costYear = record.getCostYear();
         double factor = costYearTable.factor(costYear);
         return factor * record.getCostPerTon();

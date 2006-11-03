@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
-public class MaxControlEffContorlMeasure {
+public class MaxControlEffControlMeasure {
 
     private ControlMeasure controlMeasure;
 
@@ -15,7 +15,7 @@ public class MaxControlEffContorlMeasure {
 
     private EfficiencyRecordUtil efficiencyRecordUtil;
 
-    public MaxControlEffContorlMeasure(ControlMeasure controlMeasure, EfficiencyRecord record, CostYearTable table) {
+    public MaxControlEffControlMeasure(ControlMeasure controlMeasure, EfficiencyRecord record, CostYearTable table) {
         this.controlMeasure = controlMeasure;
         this.maxRecord = record;
         this.table = table;
@@ -26,12 +26,12 @@ public class MaxControlEffContorlMeasure {
         return controlMeasure;
     }
 
-    public double cost() throws EmfException {
-        return efficiencyRecordUtil.cost(maxRecord, table) * maxRecord.getCostPerTon();
+    public double adjustedCostPerTon() throws EmfException {
+        return efficiencyRecordUtil.adjustedCostPerTon(maxRecord, table);
     }
 
     public double effectiveReduction() {
-        return efficiencyRecordUtil.effectionReduction(maxRecord);
+        return efficiencyRecordUtil.effectiveReduction(maxRecord);
     }
 
     public double costPerTon() {

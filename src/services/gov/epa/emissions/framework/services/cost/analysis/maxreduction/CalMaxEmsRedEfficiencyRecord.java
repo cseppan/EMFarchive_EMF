@@ -30,7 +30,7 @@ public class CalMaxEmsRedEfficiencyRecord {
         map.put(record, measure);
     }
 
-    public MaxControlEffContorlMeasure maxEmsReductionMeasure() throws EmfException {
+    public MaxControlEffControlMeasure maxEmsReductionMeasure() throws EmfException {
         if (map.size() == 0)
             return null;// FIXME: do we have to warn or error
 
@@ -43,14 +43,14 @@ public class CalMaxEmsRedEfficiencyRecord {
         }
 
         ControlMeasure controlMeasure = (ControlMeasure) map.get(maxRecord);
-        MaxControlEffContorlMeasure maxMeasure = new MaxControlEffContorlMeasure(controlMeasure, maxRecord, costYearTable);
+        MaxControlEffControlMeasure maxMeasure = new MaxControlEffControlMeasure(controlMeasure, maxRecord, costYearTable);
         return maxMeasure;
 
     }
 
     private EfficiencyRecord findMax(EfficiencyRecord record, EfficiencyRecord maxRecord) throws EmfException {
-        double diff = efficiencyRecordUtil.effectionReduction(record)
-                - efficiencyRecordUtil.effectionReduction(maxRecord);
+        double diff = efficiencyRecordUtil.effectiveReduction(record)
+                - efficiencyRecordUtil.effectiveReduction(maxRecord);
         if (diff > tollerance) {
             return record;
         }
@@ -61,8 +61,8 @@ public class CalMaxEmsRedEfficiencyRecord {
     }
 
     private EfficiencyRecord compareCost(EfficiencyRecord record, EfficiencyRecord maxRecord) throws EmfException {
-        double cost = efficiencyRecordUtil.cost(record, costYearTable);
-        double maxCost = efficiencyRecordUtil.cost(maxRecord, costYearTable);
+        double cost = efficiencyRecordUtil.adjustedCostPerTon(record, costYearTable);
+        double maxCost = efficiencyRecordUtil.adjustedCostPerTon(maxRecord, costYearTable);
 
         double diff = cost - maxCost;
 
