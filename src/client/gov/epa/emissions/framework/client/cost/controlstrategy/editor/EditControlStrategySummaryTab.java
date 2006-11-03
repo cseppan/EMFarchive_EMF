@@ -330,7 +330,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private ComboBox majorPollutants() {
-        String[] pollutants = { "NOx", "PM10", "PM2.5", "SO2", "VOC", "CO", "CO2", "EC", "OC", "NH3", "Hg" };
+        String[] pollutants = { "NOX", "PM10", "PM2_5", "SO2", "VOC", "CO", "CO2", "EC", "OC", "NH3", "Hg" };
         majorPollutant = new ComboBox(pollutants);
         majorPollutant.setSelectedItem(controlStrategy.getTargetPollutant());
         majorPollutant.setPreferredSize(comboSize);

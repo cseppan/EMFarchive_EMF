@@ -73,7 +73,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private DesktopManager desktopManager;
 
-    private String[] pollutants = { "Major", "NOx", "PM10", "PM2.5", "SO2", "VOC", "CO", "CO2", "EC", "OC", "NH3", "Hg" };
+    private String[] pollutants = { "Major", "NOX", "PM10", "PM2_5", "SO2", "VOC", "CO", "CO2", "EC", "OC", "NH3", "Hg" };
 
     private String[] years = { "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006" };
 
