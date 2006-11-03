@@ -35,12 +35,8 @@ public class Pollutants {
 
     public Pollutant getPollutant(String name) throws CMImporterException {
         Pollutant pollutant;
-        // having different versions of pollutant case in DB causes problems
-        // TODO: NOx is most prevalent example, but probably need to address others later
-        if (name.equals("NOX"))
-            pollutant = new Pollutant("NOx");
-        else
-           pollutant = new Pollutant(name);
+        // having different versions of pollutant in database with different cases causes problems
+        pollutant = new Pollutant(name.toUpperCase());
         int index = pollutantList.indexOf(pollutant);
         if (index != -1) {
             return (Pollutant) pollutantList.get(index);
