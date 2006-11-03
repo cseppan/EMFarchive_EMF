@@ -1,83 +1,75 @@
 package gov.epa.emissions.framework.services.qa;
 
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfDbServer;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-import java.sql.SQLException;
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 
-public class RunQAStepTask implements Runnable {
+public class RunQAStepTask {
 
-    private QAProgramRunner runQAProgram;
-
-    private QAStep qastep;
+    private QAStep[] qasteps;
 
     private User user;
 
     private StatusDAO statusDao;
 
-    private Log log = LogFactory.getLog(RunQAStepTask.class);
-
     private HibernateSessionFactory sessionFactory;
 
-    private EmfDbServer dbServer;
+    private DbServer dbServer;
 
-    public RunQAStepTask(QAStep qaStep, User user, QAProgramRunner runQAProgram, EmfDbServer dbServer,
-            HibernateSessionFactory sessionFactory) {
-        this.qastep = qaStep;
+    public RunQAStepTask(QAStep[] qaStep, User user, DbServer dbServer, HibernateSessionFactory sessionFactory) {
+        this.qasteps = qaStep;
         this.user = user;
-        this.runQAProgram = runQAProgram;
         this.dbServer = dbServer;
         this.sessionFactory = sessionFactory;
         this.statusDao = new StatusDAO(sessionFactory);
     }
 
-    public void run() {
-        String suffix = "";
+    public void run() throws EmfException {
+        QAStep qaStep = null;
         try {
-            suffix = suffix();
-            prepare(suffix);
-            runQAProgram.run();
-            complete(suffix);
-        } catch (Exception e) {
-            logError("Failed to run QA step : " + qastep.getName() + suffix, e);
-            setStatus("Failed to run QA step " + qastep.getName() + suffix + ". " + e.getMessage());
-        } finally {
-            disconnect(dbServer);
+            for (int i = 0; i < qasteps.length; i++) {
+                qaStep = qasteps[i];
+                runSteps(qaStep);
+            }
+        } catch (EmfException e) {
+            setStatus("Failed to run QA step " + qaStep.getName() + suffix(qaStep) + ". " + e.getMessage());
+            throw new EmfException("Failed to run QA step : " + qaStep.getName() + suffix(qaStep));
         }
     }
 
-    private void disconnect(EmfDbServer dbServer) {
+    private void runSteps(QAStep qaStep) throws EmfException {
+        String suffix = suffix(qaStep);
+        prepare(suffix, qaStep);
+        QAProgramRunner runQAProgram = qaProgramRunner(qaStep);
+        runQAProgram.run();
+        complete(suffix, qaStep);
+    }
+
+    private QAProgramRunner qaProgramRunner(QAStep step) throws EmfException {
+        RunQAProgramFactory factory = new RunQAProgramFactory(step, dbServer, sessionFactory);
         try {
-            dbServer.disconnect();
-        } catch (SQLException e) {
-            logError("Failed to close a connetion. " + qastep.getName(), e);
-            setStatus("Failed to close a connetion. Reason: " + e.getMessage());
+            return factory.create();
+        } catch (EmfException e) {
+            throw new EmfException("Could not create the program runner");
         }
     }
 
-    private void prepare(String suffixMsg) {
+    private void prepare(String suffixMsg, QAStep qastep) {
         setStatus("Started running QA step '" + qastep.getName() + suffixMsg);
-
     }
 
-    private void complete(String suffixMsg) {
+    private void complete(String suffixMsg, QAStep qastep) {
         setStatus("Completed running QA step '" + qastep.getName() + suffixMsg);
-    }
-
-    private void logError(String message, Exception e) {
-        log.error(message, e);
-
     }
 
     private void setStatus(String message) {
@@ -91,11 +83,11 @@ public class RunQAStepTask implements Runnable {
 
     }
 
-    private String suffix() {
-        return "' for Version '" + versionName() + "' of Dataset '" + datasetName() + "'";
+    private String suffix(QAStep qastep) {
+        return "' for Version '" + versionName(qastep) + "' of Dataset '" + datasetName(qastep) + "'";
     }
 
-    private String versionName() {
+    private String versionName(QAStep qastep) {
         Session session = sessionFactory.getSession();
         try {
             return new Versions().get(qastep.getDatasetId(), qastep.getVersion(), session).getName();
@@ -104,7 +96,7 @@ public class RunQAStepTask implements Runnable {
         }
     }
 
-    private String datasetName() {
+    private String datasetName(QAStep qastep) {
         Session session = sessionFactory.getSession();
         try {
             DatasetDAO dao = new DatasetDAO();

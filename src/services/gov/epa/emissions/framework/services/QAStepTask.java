@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.data.QAStepTemplate;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
@@ -10,7 +11,7 @@ import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.qa.QADAO;
-import gov.epa.emissions.framework.services.qa.RunQAStep;
+import gov.epa.emissions.framework.services.qa.RunQAStepTask;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,8 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 
-import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
-
 public class QAStepTask {
 
     private static Log LOG = LogFactory.getLog(QAStepTask.class);
@@ -31,32 +30,25 @@ public class QAStepTask {
 
     private EmfDataset dataset;
 
-    private PooledExecutor threadPool;
-
     private User user;
 
     private int version;
 
-    public QAStepTask(HibernateSessionFactory sessionFactory, EmfDataset dataset, int version, User user) {
+    private DbServer dbServer;
+
+    public QAStepTask(EmfDataset dataset, int version, User user, HibernateSessionFactory sessionFactory,
+            DbServer dbServer) {
         this.sessionFactory = sessionFactory;
         this.dataset = dataset;
-        this.threadPool = createThreadPool();
         this.user = user;
         this.version = version;
-    }
-
-    private PooledExecutor createThreadPool() {
-        PooledExecutor threadPool = new PooledExecutor(20);
-        threadPool.setMinimumPoolSize(1);
-        threadPool.setKeepAliveTime(1000 * 60 * 3);// terminate after 3 (unused) minutes
-
-        return threadPool;
+        this.dbServer = dbServer;
     }
 
     private QAStepTemplate[] getSummaryTemplates(String[] summaryQAStepNames) {
         List summaryTemplates = new ArrayList();
         QAStepTemplate[] templates = dataset.getDatasetType().getQaStepTemplates();
-        
+
         for (int i = 0; i < templates.length; i++) {
             String name = templates[i].getName().trim();
             for (int j = 0; j < summaryQAStepNames.length; j++)
@@ -68,42 +60,46 @@ public class QAStepTask {
         return (QAStepTemplate[]) summaryTemplates.toArray(new QAStepTemplate[0]);
     }
 
-    public void checkAndRunSummaryQASteps(String[] qaStepNames) throws EmfException {
+    public void runSummaryQASteps(String[] qaStepNames) throws EmfException {
+        QAStepTemplate[] summaryTemplates = loadQASummaryTemplates(qaStepNames);
+        QAStep[] summarySteps = addQASteps(summaryTemplates, dataset, version);
+        runQASteps(summarySteps);
+    }
+
+    private QAStepTemplate[] loadQASummaryTemplates(String[] qaStepNames) throws EmfException {
         QAStepTemplate[] summaryTemplates = getSummaryTemplates(qaStepNames);
-        
         if (summaryTemplates.length < qaStepNames.length)
             throw new EmfException("Summary QAStepTemplate doesn't exist in dataset type: "
                     + dataset.getDatasetTypeName());
+        return summaryTemplates;
+    }
 
-        QAStep[] summarySteps = addQASteps(summaryTemplates, dataset, version);
-
+    private void runQASteps(QAStep[] summarySteps) throws EmfException {
         try {
-            for (int i = 0; i < summarySteps.length; i++) {
-                QAStepResult qaResult = getQAStepResult(summarySteps[i]);
-                if (qaResult == null || (qaResult != null && !qaResult.isCurrentTable()))
-                    runQAStep(summarySteps[i]);
-            }
+            RunQAStepTask runner = new RunQAStepTask(removeUpToDateSteps(summarySteps), user, dbServer, sessionFactory);
+            runner.run();
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new EmfException("Cann't run summary QASteps: " + e.getMessage());
+            throw new EmfException("Can't run summary QASteps: " + e.getMessage());
         }
     }
 
-    private void runQAStep(QAStep step) throws EmfException {
-        EmfDbServer dbServer = dbServer();
-        RunQAStep runner = new RunQAStep(step, user, dbServer, sessionFactory, threadPool);
-        runner.run();
+    private QAStep[] removeUpToDateSteps(QAStep[] summarySteps) throws EmfException {
+        List notCurrentSteps = new ArrayList();
+        for (int i = 0; i < summarySteps.length; i++) {
+            QAStepResult qaResult = getQAStepResult(summarySteps[i]);
+            if (qaResult == null || (qaResult != null && !qaResult.isCurrentTable()))
+                notCurrentSteps.add(summarySteps[i]);
+        }
+        return (QAStep[]) notCurrentSteps.toArray(new QAStep[0]);
     }
 
     private QAStep[] addQASteps(QAStepTemplate[] templates, EmfDataset dataset, int version) throws EmfException {
         QAStep[] steps = new QAStep[templates.length];
-
         for (int i = 0; i < templates.length; i++) {
             QAStep step = new QAStep(templates[i], version);
             step.setDatasetId(dataset.getId());
             steps[i] = step;
         }
-
         updateSteps(getNonExistingSteps(steps));
 
         return steps;
@@ -111,13 +107,10 @@ public class QAStepTask {
 
     private void updateSteps(QAStep[] steps) throws EmfException {
         Session session = sessionFactory.getSession();
-
         try {
             QADAO dao = new QADAO();
-            dao.updateQAStepsIds(steps, session);
             dao.update(steps, session);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             throw new EmfException("Could not update QA Steps");
         }
     }
@@ -137,16 +130,6 @@ public class QAStepTask {
         }
 
         return (QAStep[]) stepsList.toArray(new QAStep[0]);
-    }
-
-    private EmfDbServer dbServer() throws EmfException {
-        EmfDbServer dbServer = null;
-        try {
-            dbServer = new EmfDbServer();
-        } catch (Exception e) {
-            throw new EmfException(e.getMessage());
-        }
-        return dbServer;
     }
 
     private QAStepResult getQAStepResult(QAStep step) throws EmfException {
@@ -177,23 +160,23 @@ public class QAStepTask {
 
         return false;
     }
-    
+
     public String[] getDefaultSummaryQANames() {
         Session session = sessionFactory.getSession();
         List summaryQAList = new ArrayList();
-        
+
         try {
             EmfProperty property = new EmfPropertiesDAO().getProperty("defaultQASummaries", session);
             String qaString = property.getValue().trim();
             StringTokenizer st = new StringTokenizer(qaString, "|");
-            
+
             while (st.hasMoreTokens())
                 summaryQAList.add(st.nextToken().trim());
-            
-            return (String[])summaryQAList.toArray(new String[0]);
+
+            return (String[]) summaryQAList.toArray(new String[0]);
         } finally {
             session.close();
         }
     }
-    
+
 }

@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
@@ -25,8 +27,6 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 
     private HibernateSessionFactory sessionFactory;
 
-    private RunControlStrategy runStrategy;
-
     private ControlStrategyDAO dao;
 
     public ControlStrategyServiceImpl() throws Exception {
@@ -37,19 +37,11 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         init(sessionFactory);
     }
 
-    private void init(HibernateSessionFactory sessionFactory) throws EmfException {
+    private void init(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         dao = new ControlStrategyDAO();
         threadPool = createThreadPool();
 
-        StrategyFactory factory;
-        try {
-            factory = new StrategyFactory(batchSize());
-        } catch (Exception e) {
-            LOG.error("Could not access control measure service.");
-            throw new EmfException("Could not access control measure service.");
-        }
-        runStrategy = new RunControlStrategy(factory, sessionFactory, threadPool);
     }
 
     protected void finalize() throws Throwable {
@@ -162,7 +154,8 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         try {
             for (int i = 0; i < elements.length; i++) {
                 if (!user.equals(elements[i].getCreator()))
-                    throw new EmfException("Only the creator of " + elements[i].getName() + " can remove it from the database.");
+                    throw new EmfException("Only the creator of " + elements[i].getName()
+                            + " can remove it from the database.");
                 remove(elements[i]);
             }
 
@@ -175,14 +168,14 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     private void remove(ControlStrategy element) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            
+
             if (!dao.canUpdate(element, session))
                 throw new EmfException("Control Strategy name already in use");
 
             ControlStrategyResult result = controlStrategyResults(element);
             if (result != null)
                 dao.remove(result, session);
-            
+
             dao.remove(element, session);
             session.close();
         } catch (RuntimeException e) {
@@ -192,11 +185,20 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     }
 
     public void runStrategy(User user, ControlStrategy strategy) throws EmfException {
+        StrategyFactory factory = new StrategyFactory(batchSize());
+        DbServer dbServer = null;
+        try {
+            dbServer = dbServer();
+        } catch (Exception e) {
+            LOG.error("Could not get the db connection.", e);
+            throw new EmfException("Could not get the db connection." + e.getMessage());
+        }
+        RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, dbServer, threadPool);
         runStrategy.run(user, strategy, this);
     }
 
     public void stopRunStrategy() {
-        runStrategy.stop();
+        // TODO:
     }
 
     public StrategyType[] getStrategyTypes() throws EmfException {
@@ -220,14 +222,32 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     }
 
     public void createInventory(User user, ControlStrategy controlStrategy) throws EmfException {
+        DbServer dbServer = null;
         try {
+            dbServer = dbServer();
             ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,
-                    sessionFactory);
+                    sessionFactory, dbServer);
             output.create();
         } catch (Exception e) {
             LOG.error("Could not create inventory output. " + e.getMessage());
             throw new EmfException("Could not create inventory output. " + e.getMessage());
+        } finally {
+            close(dbServer);
         }
+    }
+
+    private void close(DbServer dbServer) throws EmfException {
+        try {
+            if (dbServer != null)
+                dbServer.disconnect();
+        } catch (Exception e) {
+            LOG.error("Could not close database connection." + e.getMessage());
+            throw new EmfException("Could not close database connection." + e.getMessage());
+        }
+    }
+
+    private DbServer dbServer() throws Exception {
+        return new EmfDbServer();
     }
 
     public ControlStrategyResult controlStrategyResults(ControlStrategy controlStrategy) throws EmfException {

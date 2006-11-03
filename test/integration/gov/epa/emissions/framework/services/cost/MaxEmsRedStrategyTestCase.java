@@ -4,8 +4,10 @@ import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
+import gov.epa.emissions.commons.db.TableModifier;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
@@ -29,7 +31,7 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
     private SqlDataTypes sqlDataTypes;
 
     protected EmfDataset inputDataset;
-    
+
     protected String tableName = "test" + Math.round(Math.random() * 1000) % 1000;
 
     protected void doSetUp() throws Exception {
@@ -40,17 +42,24 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         inputDataset.setCreator(emfUser().getUsername());
         inputDataset.setDatasetType(orlNonpointDatasetType());
         inputDataset = addORLNonpointDataset();
+        addVersionZeroEntryToVersionsTable(inputDataset, dbServer.getEmissionsDatasource());
     }
 
     private DatasetType orlNonpointDatasetType() {
         return (DatasetType) load(DatasetType.class, "ORL Nonpoint Inventory (ARINV)");
     }
 
+    private void addVersionZeroEntryToVersionsTable(Dataset dataset, Datasource datasource) throws Exception {
+        TableModifier modifier = new TableModifier(datasource, "versions");
+        String[] data = { null, dataset.getId() + "", "0", "Initial Version", "", "true", null };
+        modifier.insertOneRow(data);
+    }
+
     protected void doTearDown() throws Exception {
         dropTable(tableName, dbServer.getEmissionsDatasource());
+        dropAll(Version.class);
         dropAll(InternalSource.class);
         dropAll(EmfDataset.class);
-
     }
 
     protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant) {

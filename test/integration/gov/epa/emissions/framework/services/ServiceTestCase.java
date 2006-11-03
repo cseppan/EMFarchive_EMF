@@ -117,6 +117,7 @@ public abstract class ServiceTestCase extends TestCase {
     }
 
     protected void dropAll(Class clazz) {
+        session.clear();
         Transaction tx = null;
         try {
             tx = session.beginTransaction();

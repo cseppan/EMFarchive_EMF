@@ -45,7 +45,7 @@ public class MaxEmsRedStrategy implements Strategy {
     private int batchSize;
 
     private DbServer dbServer;
-    
+
     private User user;
 
     public MaxEmsRedStrategy(ControlStrategy strategy, User user, DbServer dbServer, Integer batchSize,
@@ -65,24 +65,27 @@ public class MaxEmsRedStrategy implements Strategy {
         GenerateSccControlMeasuresMap mapGenerator = new GenerateSccControlMeasuresMap(dbServer,
                 emissionTableName(inputDataset), controlStrategy, sessionFactory);
         SccControlMeasuresMap map = mapGenerator.create();
-        
+
         removeControlStrategyResult(controlStrategy);
         EmfDataset resultDataset = resultDataset();
         createTable(creator.outputTableName());
         OptimizedQuery optimizedQuery = sourceQuery(inputDataset, controlStrategy);
         ControlStrategyResult result = strategyResult(controlStrategy, resultDataset);
+        String status = "";
         try {
             StrategyLoader loader = new StrategyLoader(creator.outputTableName(), tableFormat, dbServer, result, map,
                     controlStrategy);
             loader.load(optimizedQuery);
-            result.setRunStatus("Completed. Inutput dataset: " + inputDataset.getName() + ".");
+            status = "Completed. Inutput dataset: " + inputDataset.getName() + ".";
+            result.setRunStatus(status);
         } catch (Exception e) {
-            result.setRunStatus("Failed. Error in processing input dataset: " + inputDataset.getName() + ". "
-                    + result.getRunStatus());
+            status = "Failed. Error in processing input dataset: " + inputDataset.getName() + ". "
+                    + result.getRunStatus();
             throw new EmfException(e.getMessage());
         } finally {
             close(optimizedQuery);
             result.setCompletionTime(new Date());
+            result.setRunStatus(status);
             saveResults(result);
         }
     }
@@ -94,7 +97,6 @@ public class MaxEmsRedStrategy implements Strategy {
             ControlStrategyDAO dao = new ControlStrategyDAO();
             dao.updateControlStrategyResults(result, session);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             throw new EmfException("Could not save control strategy results-" + e.getMessage());
         } finally {
             session.close();
@@ -103,7 +105,7 @@ public class MaxEmsRedStrategy implements Strategy {
 
     private ControlStrategyResult strategyResult(ControlStrategy controlStrategy, EmfDataset resultDataset)
             throws EmfException {
-        
+
         ControlStrategyResult result = new ControlStrategyResult();
         result.setControlStrategyId(controlStrategy.getId());
         result.setInputDatasetId(inputDataset.getId());
@@ -236,16 +238,16 @@ public class MaxEmsRedStrategy implements Strategy {
     public ControlStrategy getControlStrategy() {
         return controlStrategy;
     }
-    
+
     private void setAndRunQASteps(ControlStrategyResult result) throws EmfException {
-        EmfDataset resultDataset = (EmfDataset)result.getDetailedResultDataset();
+        EmfDataset resultDataset = (EmfDataset) result.getDetailedResultDataset();
         excuteSetAndRunQASteps(resultDataset, 0);
         excuteSetAndRunQASteps(inputDataset, controlStrategy.getDatasetVersion());
     }
-    
+
     private void excuteSetAndRunQASteps(EmfDataset dataset, int version) throws EmfException {
-        QAStepTask qaTask = new QAStepTask(sessionFactory, dataset, version, user);
-        qaTask.checkAndRunSummaryQASteps(qaTask.getDefaultSummaryQANames());
+        QAStepTask qaTask = new QAStepTask(dataset, version, user, sessionFactory, dbServer);
+        qaTask.runSummaryQASteps(qaTask.getDefaultSummaryQANames());
     }
 
 }

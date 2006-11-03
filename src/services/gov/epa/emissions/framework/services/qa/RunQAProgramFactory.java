@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.commons.db.DbServer;
-import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -15,13 +14,13 @@ public class RunQAProgramFactory {
 
     private QAStep qaStep;
 
-    private EmfDbServer dbServer;
+    private DbServer dbServer;
 
     private Log log = LogFactory.getLog(RunQAProgramFactory.class);
 
     private HibernateSessionFactory sessionFactory;
 
-    public RunQAProgramFactory(QAStep qaStep, EmfDbServer dbServer, HibernateSessionFactory sessionFactory) {
+    public RunQAProgramFactory(QAStep qaStep, DbServer dbServer, HibernateSessionFactory sessionFactory) {
         this.qaStep = qaStep;
         this.dbServer = dbServer;
         this.sessionFactory = sessionFactory;

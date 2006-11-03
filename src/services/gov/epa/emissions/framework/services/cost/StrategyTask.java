@@ -5,7 +5,6 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
-import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Date;
 
@@ -24,8 +23,7 @@ public class StrategyTask implements Runnable {
 
     private ControlStrategyService csService;
 
-    public StrategyTask(Strategy strategy, User user, Services services, ControlStrategyService service,
-            HibernateSessionFactory factory) {
+    public StrategyTask(Strategy strategy, User user, Services services, ControlStrategyService service) {
         this.user = user;
         this.services = services;
         this.strategy = strategy;
@@ -38,6 +36,7 @@ public class StrategyTask implements Runnable {
             prepare();
             strategy.run();
             completeStatus = "Finished";
+            addCompletedStatus();
         } catch (Exception e) {
             completeStatus = "Failed";
             logError("Failed to run strategy : ", e);
@@ -67,8 +66,6 @@ public class StrategyTask implements Runnable {
         strategy.getControlStrategy().setRunStatus(completeStatus);
         strategy.getControlStrategy().setLastModifiedDate(new Date());
         updateStrategy();
-
-        addCompletedStatus();
     }
 
     private void updateStrategy() {

@@ -7,17 +7,15 @@ import gov.epa.emissions.framework.services.cost.analysis.maxreduction.MaxEmsRed
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
+import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
 
-    public void testTrue() {
-        assertTrue(true);
-    }
-
-    public void FIXME_testShouldRunMaxEmsRedStrategyWithOneControlMeasure() throws Exception {
+    public void testShouldRunMaxEmsRedStrategyWithOneControlMeasure() throws Exception {
         ControlStrategy strategy = null;
         try {
             EfficiencyRecord[] records = { record(pm10Pollutant(), "", 90, 900, 1989) };
@@ -36,14 +34,20 @@ public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
         } finally {
             if (strategy != null)
                 dropTable(detailResultDatasetTableName(strategy), dbServer().getEmissionsDatasource());
-            dropAll(Scc.class);
-            dropAll(ControlMeasure.class);
-            dropAll(ControlStrategyResult.class);
-            dropAll(ControlStrategy.class);
-            dropAll(Dataset.class);
+            removeData();
 
         }
 
+    }
+
+    private void removeData() {
+        dropAll(Scc.class);
+        dropAll(ControlMeasure.class);
+        dropAll(ControlStrategyResult.class);
+        dropAll(ControlStrategy.class);
+        dropAll(QAStepResult.class);
+        dropAll(QAStep.class);
+        dropAll(Dataset.class);
     }
 
     private Scc[] sccs() {

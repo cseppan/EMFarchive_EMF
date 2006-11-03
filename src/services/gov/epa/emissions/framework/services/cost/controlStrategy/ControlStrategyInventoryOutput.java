@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
@@ -39,11 +40,14 @@ public class ControlStrategyInventoryOutput {
 
     private HibernateSessionFactory sessionFactory;
 
+    private DbServer dbServer;
+
     public ControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
-            HibernateSessionFactory sessionFactory) throws Exception {
+            HibernateSessionFactory sessionFactory, DbServer dbServer) throws Exception {
         this.controlStrategy = controlStrategy;
         this.user = user;
         this.sessionFactory = HibernateSessionFactory.get();
+        this.dbServer = dbServer;
         creator = new DatasetCreator("CSINVEN_", controlStrategy, user, sessionFactory);
         this.tableFormat = new FileFormatFactory().tableFormat(datasetType(controlStrategy));
         this.statusServices = new StatusDAO();
@@ -102,8 +106,8 @@ public class ControlStrategyInventoryOutput {
     private void setandRunQASteps() throws EmfException {
         ControlStrategyResult result = controlStrategyResults(controlStrategy);
         EmfDataset controlledDataset = (EmfDataset)result.getControlledInventoryDataset();
-        QAStepTask qaTask = new QAStepTask(sessionFactory, controlledDataset, controlledDataset.getDefaultVersion(), user);
-        qaTask.checkAndRunSummaryQASteps(qaTask.getDefaultSummaryQANames());
+        QAStepTask qaTask = new QAStepTask(controlledDataset, controlledDataset.getDefaultVersion(), user, sessionFactory, dbServer);
+        qaTask.runSummaryQASteps(qaTask.getDefaultSummaryQANames());
     }
     
     private String description(EmfDataset inputDataset) {

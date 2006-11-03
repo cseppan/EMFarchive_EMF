@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
@@ -76,9 +77,14 @@ public class QAServiceImpl implements QAService {
         updateWitoutCheckingConstraints(new QAStep[] { step });
         checkRestrictions(step);
         EmfDbServer dbServer = dbServer();
-        RunQAStep runner = new RunQAStep(step, user, dbServer, sessionFactory, threadPool);
-        runner.run();
 
+        RunQAStep runner = new RunQAStep(new QAStep[] { step }, user, dbServer, sessionFactory);
+        try {
+            threadPool.execute(new GCEnforcerTask("Running QA Steps", runner));
+        } catch (InterruptedException e) {
+            LOG.error("Error running in qa step-" + step.getName(), e);
+            throw new EmfException("Error running in qa step-" + step.getName() + ":" + e.getMessage());
+        }
     }
 
     public void exportQAStep(QAStep step, User user, String dirName) throws EmfException {
@@ -104,8 +110,8 @@ public class QAServiceImpl implements QAService {
         try {
             dbServer = new EmfDbServer();
         } catch (Exception e) {
-            LOG.error("Could not create EMF DB server", e);
-            throw new EmfException(e.getMessage());
+            LOG.error("Could not get a connection", e);
+            throw new EmfException("Could not get a connection-" + e.getMessage());
         }
         return dbServer;
     }
