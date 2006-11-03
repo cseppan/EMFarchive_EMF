@@ -76,10 +76,10 @@ public class MaxEmsRedStrategy implements Strategy {
             StrategyLoader loader = new StrategyLoader(creator.outputTableName(), tableFormat, dbServer, result, map,
                     controlStrategy);
             loader.load(optimizedQuery);
-            status = "Completed. Inutput dataset: " + inputDataset.getName() + ".";
+            status = "Completed. Input dataset: " + inputDataset.getName() + ".";
             result.setRunStatus(status);
         } catch (Exception e) {
-            status = "Failed. Error in processing input dataset: " + inputDataset.getName() + ". "
+            status = "Failed. Error processing input dataset: " + inputDataset.getName() + ". "
                     + result.getRunStatus();
             throw new EmfException(e.getMessage());
         } finally {
@@ -148,7 +148,7 @@ public class MaxEmsRedStrategy implements Strategy {
         try {
             optimizedQuery.close();
         } catch (SQLException e) {
-            throw new EmfException("Could not close optimized query-" + e.getMessage());
+            throw new EmfException("Could not close optimized query -" + e.getMessage());
         }
     }
 
