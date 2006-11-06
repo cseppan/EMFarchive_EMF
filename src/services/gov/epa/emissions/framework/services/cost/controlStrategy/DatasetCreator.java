@@ -31,8 +31,11 @@ public class DatasetCreator {
 
     private HibernateSessionFactory sessionFactory;
 
-    public DatasetCreator(String prefix, ControlStrategy strategy, User user, HibernateSessionFactory sessionFactory) {
-        this.prefix = prefix;
+    private String datasetNamePrefix;
+
+    public DatasetCreator(String datasetNamePrefix, String tablePrefix, ControlStrategy strategy, User user, HibernateSessionFactory sessionFactory) {
+        this.datasetNamePrefix = datasetNamePrefix;
+        this.prefix = tablePrefix;
         this.user = user;
         this.sessionFactory = sessionFactory;
         this.outputDatasetName = getResultDatasetName(strategy.getName());
@@ -46,7 +49,7 @@ public class DatasetCreator {
         EmfDataset dataset = new EmfDataset();
         Date start = new Date();
 
-        dataset.setName(outputDatasetName);
+        dataset.setName(datasetNamePrefix+outputDatasetName);
         dataset.setCreator(user.getUsername());
         dataset.setDatasetType(type);
         dataset.setDescription(description);

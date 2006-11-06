@@ -57,7 +57,7 @@ public class MaxEmsRedStrategy implements Strategy {
         this.sessionFactory = sessionFactory;
         this.user = user;
         this.tableFormat = new MaxEmsRedTableFormat(dbServer.getSqlDataTypes());
-        creator = new DatasetCreator("CSDR_", controlStrategy, user, sessionFactory);
+        creator = new DatasetCreator("Strategy_", "CSDR_", controlStrategy, user, sessionFactory);
         inputDataset = controlStrategy.getInputDatasets()[0];
     }
 
@@ -79,8 +79,7 @@ public class MaxEmsRedStrategy implements Strategy {
             status = "Completed. Input dataset: " + inputDataset.getName() + ".";
             result.setRunStatus(status);
         } catch (Exception e) {
-            status = "Failed. Error processing input dataset: " + inputDataset.getName() + ". "
-                    + result.getRunStatus();
+            status = "Failed. Error processing input dataset: " + inputDataset.getName() + ". " + result.getRunStatus();
             throw new EmfException(e.getMessage());
         } finally {
             close(optimizedQuery);

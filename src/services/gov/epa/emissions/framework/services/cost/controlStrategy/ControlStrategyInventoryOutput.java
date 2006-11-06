@@ -48,7 +48,7 @@ public class ControlStrategyInventoryOutput {
         this.user = user;
         this.sessionFactory = HibernateSessionFactory.get();
         this.dbServer = dbServer;
-        creator = new DatasetCreator("CSINVEN_", controlStrategy, user, sessionFactory);
+        creator = new DatasetCreator("ControlledInventory_", "CSINVEN_", controlStrategy, user, sessionFactory);
         this.tableFormat = new FileFormatFactory().tableFormat(datasetType(controlStrategy));
         this.statusServices = new StatusDAO();
     }
@@ -102,14 +102,15 @@ public class ControlStrategyInventoryOutput {
 
         updateControlStrategyResults(result, dataset);
     }
-    
+
     private void setandRunQASteps() throws EmfException {
         ControlStrategyResult result = controlStrategyResults(controlStrategy);
-        EmfDataset controlledDataset = (EmfDataset)result.getControlledInventoryDataset();
-        QAStepTask qaTask = new QAStepTask(controlledDataset, controlledDataset.getDefaultVersion(), user, sessionFactory, dbServer);
+        EmfDataset controlledDataset = (EmfDataset) result.getControlledInventoryDataset();
+        QAStepTask qaTask = new QAStepTask(controlledDataset, controlledDataset.getDefaultVersion(), user,
+                sessionFactory, dbServer);
         qaTask.runSummaryQASteps(qaTask.getDefaultSummaryQANames());
     }
-    
+
     private String description(EmfDataset inputDataset) {
         return inputDataset.getDescription() + "#" + "Implements control strategy: " + controlStrategy.getName() + "\n" +
         "#DESC FIPS,SCC,SIC,MACT,SRCTYPE,POLL,ANN_EMIS,AVD_EMIS,CEFF,REFF,RPEN,PRI_DEV,SEC_DEV,DATA_SOURCE,YEAR,TRIBAL_CODE,MACT_FLAG,COMPLIANCE_STATUS,START_DATE,END_DATE,WINTER_PCT,SPRING_PCT,SUMMER_PCT,FALL_PCT,DAYS_PER_WEEK,WEEKS_PER_YEAR,HOURS_PER_DAY,HOURS_PER_YEAR,PERIOD_DAYS_PER_WEEK,PERIOD_WEEKS_PER_YEAR,PERIOD_HOURS_OF_DAY,PERIOD_HOURS_PER_PERIOD\n"
