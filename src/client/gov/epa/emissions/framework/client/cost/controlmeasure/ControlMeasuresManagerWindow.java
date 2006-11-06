@@ -115,8 +115,15 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
     
     private void getAllPollutants(EmfSession session) throws EmfException {
-        this.pollutants = session.dataCommonsService().getPollutants();
-    }
+        Pollutant [] pollsFromDB = session.dataCommonsService().getPollutants();
+        
+        pollutants = new Pollutant[pollsFromDB.length+1];
+        pollutants[0] = new Pollutant("Major");
+        for (int p = 1; p < pollutants.length; p++)
+        {
+            pollutants[p] = pollsFromDB[p-1];
+        }
+     }
 
     private JPanel createBrowserPanel(EmfConsole parentConsole) {
         browserPanel = new JPanel(new BorderLayout());
