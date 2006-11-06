@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
@@ -16,6 +17,7 @@ import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.QAStep;
 
 import java.io.File;
 import java.util.List;
@@ -33,9 +35,18 @@ public class QAStepTaskTest extends ServiceTestCase {
         dbserver = dbServer();
     }
     
-    protected void doTearDown() throws Exception {// no op
-        //dropAll(Version.class);
-        //dropAll(QAStep.class);
+    protected void doTearDown() throws Exception {
+        dropAll(EmfDataset.class);
+        dropAll(QAStep.class);
+        dropAll(Version.class);
+        dropAll(InternalSource.class);
+    }
+    
+    private void dropTables(EmfDataset dataset) throws Exception {
+        dropTable(tableName, dbServer().getEmissionsDatasource());
+        dropTable("qasummarize_by_county_and_pollutant_dsid" + dataset.getId() + "_v0", dbServer().getEmissionsDatasource());
+        dropTable("qasummarize_by_scc_and_pollutant_dsid" + dataset.getId() + "_v0", dbServer().getEmissionsDatasource());
+        dropTable("qasummarize_by_pollutant_dsid" + dataset.getId() + "_v0", dbServer().getEmissionsDatasource());
     }
     
     public void testShouldGetDefaultSummaryQANames() throws Exception {
@@ -51,7 +62,7 @@ public class QAStepTaskTest extends ServiceTestCase {
             assertEquals("Summarize by SCC and Pollutant", summaryQANames[1]);
             assertEquals("Summarize by County and Pollutant", summaryQANames[2]);
         } finally {
-            remove(dataset);
+            doTearDown();
         }
     }
     
@@ -69,7 +80,8 @@ public class QAStepTaskTest extends ServiceTestCase {
             String[] summaryQANames = qaTask.getDefaultSummaryQANames();
             qaTask.runSummaryQASteps(summaryQANames);
         } finally {
-            remove(inputDataset);
+          dropTables(inputDataset);
+          doTearDown();
         } 
     }
     
