@@ -146,9 +146,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private JPanel productPanel() {
         JPanel productPanel = new JPanel();
-        inventoryCheckBox = new CheckBox("Inventory");
+        inventoryCheckBox = new CheckBox("Controlled Inventory");
         inventoryCheckBox.setSelected(true);
-        CheckBox summaryFIPS = new CheckBox("FIPS Summary");
+        CheckBox summaryFIPS = new CheckBox("Custom Summaries");
         summaryFIPS.setEnabled(false);
         productPanel.add(inventoryCheckBox);
         productPanel.add(summaryFIPS);
