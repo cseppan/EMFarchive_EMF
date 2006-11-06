@@ -79,6 +79,7 @@ public class QAStepTask {
             RunQAStepTask runner = new RunQAStepTask(removeUpToDateSteps(summarySteps), user, dbServer, sessionFactory);
             runner.run();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new EmfException("Can't run summary QASteps: " + e.getMessage());
         }
     }
