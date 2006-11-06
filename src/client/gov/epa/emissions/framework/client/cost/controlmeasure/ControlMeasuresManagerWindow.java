@@ -2,12 +2,13 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
+import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.EditableComboBox;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.CopyButton;
-import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.ImportButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
@@ -160,7 +161,9 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         panel.add(view);
         view.setEnabled(false);
 
-        Button edit = new EditButton(editAction());
+        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+        SelectAwareButton edit = new SelectAwareButton("Edit", editAction(), selectModel, confirmDialog);
         panel.add(edit);
 
         Button copy = new CopyButton(new AbstractAction() {
