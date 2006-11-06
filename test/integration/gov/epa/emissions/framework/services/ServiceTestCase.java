@@ -176,7 +176,6 @@ public abstract class ServiceTestCase extends TestCase {
 
     protected Object load(Class clazz, String name) {
         Transaction tx = null;
-    
         try {
             tx = session.beginTransaction();
             Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("name", name));

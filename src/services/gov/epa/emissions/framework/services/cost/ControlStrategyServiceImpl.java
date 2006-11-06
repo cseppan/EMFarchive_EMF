@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
-import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
+import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -222,32 +222,24 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     }
 
     public void createInventory(User user, ControlStrategy controlStrategy) throws EmfException {
-        DbServer dbServer = null;
+        DbServer dbServer = dbServer();//the connection is closed at the end of the thread
         try {
-            dbServer = dbServer();
-            ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,
-                    sessionFactory, dbServer);
-            output.create();
+            ControlStrategyInventoryOutputTask task= new ControlStrategyInventoryOutputTask(user, controlStrategy,sessionFactory, dbServer);
+            if(task.shouldProceed())
+                threadPool.execute(new GCEnforcerTask("Create Inventory: " + controlStrategy.getName(), task));
         } catch (Exception e) {
-            LOG.error("Could not create inventory output. " + e.getMessage());
-            throw new EmfException("Could not create inventory output. " + e.getMessage());
-        } finally {
-            close(dbServer);
+            LOG.error("Error running control strategy: " + controlStrategy.getName(), e);
+            throw new EmfException(e.getMessage());
         }
     }
 
-    private void close(DbServer dbServer) throws EmfException {
+    private DbServer dbServer() throws EmfException {
         try {
-            if (dbServer != null)
-                dbServer.disconnect();
+            return new EmfDbServer();
         } catch (Exception e) {
-            LOG.error("Could not close database connection." + e.getMessage());
-            throw new EmfException("Could not close database connection." + e.getMessage());
+            LOG.error("Could not get database connection: " + e.getMessage());
+            throw new EmfException("Could not get database connection: " +e.getMessage());
         }
-    }
-
-    private DbServer dbServer() throws Exception {
-        return new EmfDbServer();
     }
 
     public ControlStrategyResult controlStrategyResults(ControlStrategy controlStrategy) throws EmfException {
