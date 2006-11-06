@@ -112,11 +112,13 @@ public class ImportTask implements Runnable {
     }
 
     private void addStartStatus() {
-        setStatus("Started import of " + dataset.getName() + "[" + dataset.getDatasetTypeName() + "]");
+        setStatus("Started import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] from "+
+                files[0]);
     }
 
     private void addCompletedStatus() {
-        setStatus("Completed import of " + dataset.getName() + "[" + dataset.getDatasetTypeName() + "]");
+        setStatus("Completed import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] from "+
+                files[0]);
     }
 
     private void setStatus(String message) {
