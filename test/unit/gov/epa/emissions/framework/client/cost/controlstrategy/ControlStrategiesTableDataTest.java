@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
@@ -30,7 +31,7 @@ public class ControlStrategiesTableDataTest extends TestCase {
         controlStrategy1.setDiscountRate(0.5);
         controlStrategy1.setCostYear(2000);
         controlStrategy1.setInventoryYear(2001);
-        controlStrategy1.setTargetPollutant("NoX");
+        controlStrategy1.setTargetPollutant(new Pollutant("NoX"));
         controlStrategy1.setLastModifiedDate(new Date());
         controlStrategy1.setCreator(new User("test user 1", "sss", "123-4567", "email@xxx.com", "xxx", "xxxxx123", false, false));
 
@@ -42,7 +43,7 @@ public class ControlStrategiesTableDataTest extends TestCase {
         controlStrategy2.setDiscountRate(0.5);
         controlStrategy2.setCostYear(2000);
         controlStrategy2.setInventoryYear(2001);
-        controlStrategy2.setTargetPollutant("PM3");
+        controlStrategy2.setTargetPollutant(new Pollutant("PM3"));
         controlStrategy2.setLastModifiedDate(new Date());
         controlStrategy2.setCreator(new User("test user 2", "sss", "123-4567", "email@xxx.com", "xxx", "xxxxx123", false, false));
         

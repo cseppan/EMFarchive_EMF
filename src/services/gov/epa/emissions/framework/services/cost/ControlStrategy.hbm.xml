@@ -18,7 +18,6 @@
   	<property name="startDate" column="start_date" type="java.util.Date" not-null="false" length="4"/>
   	<property name="completionDate" column="completion_date" type="java.util.Date" not-null="false" length="4"/>
 	<property name="datasetVersion" column="dataset_version" type="integer" not-null="true"/>
-	<property name="targetPollutant" column="target_pollutant" type="java.lang.String"/>
 	<property name="filter" column="filter" type="string" not-null="false"/>
 	
 	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
@@ -28,6 +27,11 @@
             name="region" 
             class="gov.epa.emissions.commons.data.Region"
             column="region_id"/> 
+
+	<many-to-one
+            name="targetPollutant" 
+            class="gov.epa.emissions.commons.data.Pollutant"
+            column="pollutant_id"/> 
             
 	<many-to-one cascade="save-update"
             name="project" 

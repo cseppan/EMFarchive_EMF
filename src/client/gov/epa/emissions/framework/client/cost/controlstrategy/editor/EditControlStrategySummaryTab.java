@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.db.version.Version;
@@ -329,8 +330,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return regionsCombo;
     }
 
-    private ComboBox majorPollutants() {
-        String[] pollutants = { "NOX", "PM10", "PM2_5", "SO2", "VOC", "CO", "CO2", "EC", "OC", "NH3", "Hg" };
+    private ComboBox majorPollutants() throws EmfException {
+        Pollutant[] pollutants = getAllPollutants(this.session);
         majorPollutant = new ComboBox(pollutants);
         majorPollutant.setSelectedItem(controlStrategy.getTargetPollutant());
         majorPollutant.setPreferredSize(comboSize);
@@ -338,6 +339,10 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         changeablesList.addChangeable(majorPollutant);
 
         return majorPollutant;
+    }
+    
+    private Pollutant[] getAllPollutants(EmfSession session) throws EmfException {
+        return session.dataCommonsService().getPollutants();
     }
 
     private JLabel createLeftAlignedLabel(String name) {
@@ -403,8 +408,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return strategyType;
     }
 
-    private String majorPollutant() throws EmfException {
-        String pollutant = (String) majorPollutant.getSelectedItem();
+    private Pollutant majorPollutant() throws EmfException {
+        Pollutant pollutant = (Pollutant) majorPollutant.getSelectedItem();
         if (pollutant == null) {
             throw new EmfException("Please select a target pollutant");
         }

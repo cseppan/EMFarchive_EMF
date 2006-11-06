@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Lockable;
 import gov.epa.emissions.commons.data.Mutex;
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
@@ -44,7 +45,7 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private List datasetsList;
 
-    private String targetPollutant;
+    private Pollutant targetPollutant;
 
     private String runStatus;
 
@@ -151,11 +152,11 @@ public class ControlStrategy implements Lockable, Serializable {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public String getTargetPollutant() {
+    public Pollutant getTargetPollutant() {
         return targetPollutant;
     }
 
-    public void setTargetPollutant(String targetPollutant) {
+    public void setTargetPollutant(Pollutant targetPollutant) {
         this.targetPollutant = targetPollutant;
     }
 

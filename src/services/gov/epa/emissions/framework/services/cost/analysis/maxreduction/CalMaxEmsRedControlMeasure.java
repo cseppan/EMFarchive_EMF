@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost.analysis.maxreduction;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.client.cost.controlstrategy.LocaleFilter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
@@ -65,9 +66,9 @@ public class CalMaxEmsRedControlMeasure {
     private EfficiencyRecord[] pollutantFilter(ControlMeasure measure) {
         List records = new ArrayList();
         EfficiencyRecord[] efficiencyRecords = measure.getEfficiencyRecords();
-        String targetPollutant = controlStrategy.getTargetPollutant();
+        Pollutant targetPollutant = controlStrategy.getTargetPollutant();
         for (int i = 0; i < efficiencyRecords.length; i++) {
-            if (efficiencyRecords[i].getPollutant().getName().equals(targetPollutant))
+            if (efficiencyRecords[i].getPollutant().equals(targetPollutant))
                 records.add(efficiencyRecords[i]);
         }
         return (EfficiencyRecord[]) records.toArray(new EfficiencyRecord[0]);

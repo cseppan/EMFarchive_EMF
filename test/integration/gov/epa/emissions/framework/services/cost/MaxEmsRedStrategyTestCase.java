@@ -70,7 +70,7 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         strategy.setDatasetVersion(0);// initial version
         strategy.setInventoryYear(2000);
         strategy.setCostYear(2000);
-        strategy.setTargetPollutant(pollutant.getName());
+        strategy.setTargetPollutant(pollutant);
         strategy.setStrategyType(maxEmisRedStrategyType());
         add(strategy);
         return strategy;

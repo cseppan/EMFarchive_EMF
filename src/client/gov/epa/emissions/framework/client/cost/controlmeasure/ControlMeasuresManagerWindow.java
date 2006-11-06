@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
@@ -74,7 +75,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private DesktopManager desktopManager;
 
-    private String[] pollutants = { "Major", "NOX", "PM10", "PM2_5", "SO2", "VOC", "CO", "CO2", "EC", "OC", "NH3", "Hg" };
+    private Pollutant[] pollutants;
 
     private String[] years = { "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006" };
 
@@ -91,10 +92,11 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
 
+        getAllPollutants(this.session);
         ControlMeasureService service = session.controlMeasureService();
         costYearTable = service.getCostYearTable(1999);
         yearValidation = new YearValidation("Cost Year");
-        tableData = new ControlMeasureTableData(service.getMeasures(), costYearTable, pollutants[0], years[0]);
+        tableData = new ControlMeasureTableData(service.getMeasures(), costYearTable, pollutants[0].getName(), years[0]);
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
 
@@ -110,6 +112,10 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         panel.add(createControlPanel(), BorderLayout.SOUTH);
 
         return panel;
+    }
+    
+    private void getAllPollutants(EmfSession session) throws EmfException {
+        this.pollutants = session.dataCommonsService().getPollutants();
     }
 
     private JPanel createBrowserPanel(EmfConsole parentConsole) {
@@ -368,7 +374,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     public void refresh(ControlMeasure[] measures) {
         try {
-            tableData = new ControlMeasureTableData(measures, costYearTable, (String) pollutant.getSelectedItem(),
+            tableData = new ControlMeasureTableData(measures, costYearTable, pollutant.getSelectedItem().toString(),
                     (String) costYear.getSelectedItem());
             model.refresh(tableData);
             panelRefresh();
@@ -404,7 +410,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         try {
             String year = ((String) costYear.getSelectedItem()).trim();
             yearValidation.value(year);
-            tableData.refresh((String) pollutant.getSelectedItem(), year);
+            tableData.refresh(pollutant.getSelectedItem().toString(), year);
             panelRefresh();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
