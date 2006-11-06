@@ -219,7 +219,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                     presenter.setResults(controlStrategy);
                     presenter.runStrategy();
                     messagePanel
-                            .setMessage("Please examine the status window for progress, and reopen this window after completion to see results");
+                           .setMessage("Running strategy. Monitor the status window for progress, and refresh this window after completion to see results");
                 } catch (EmfException e) {
                     messagePanel.setError("Error running strategy: " + e.getMessage());
                 }

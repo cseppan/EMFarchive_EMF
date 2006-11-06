@@ -137,8 +137,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     protected void doInventory() {
         try {
             presenter.doInventory(controlStrategy);
-            messagePanel
-                    .setMessage("Watch the status window for progress of inventory creatin and reopen this window after completion.");
+            messagePanel.setMessage(
+                    "Creating controlled inventory. Watch the status window for progress and refresh this window after completion.");
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
