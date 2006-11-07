@@ -431,7 +431,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
                 controlStrategy.setRegion(region);
             }
         } else if (selected instanceof Region) {
-            controlStrategy.setRegion((Region) selected);
+            controlStrategy.setRegion((Region)selected);
         }
     }
 
@@ -447,8 +447,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
                 Project project = project(projectName);// checking for duplicates
                 controlStrategy.setProject(project);
             }
-        } else if (selected instanceof Region) {
-            controlStrategy.setRegion((Region) selected);
+        } else if (selected instanceof Project) {
+            controlStrategy.setProject((Project)selected);
         }
     }
 
