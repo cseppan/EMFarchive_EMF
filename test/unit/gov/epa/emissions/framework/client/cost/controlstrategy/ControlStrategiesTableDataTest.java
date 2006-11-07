@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.ui.Row;
 
@@ -22,7 +23,7 @@ public class ControlStrategiesTableDataTest extends TestCase {
 
     private ControlStrategy controlStrategy2;
 
-    protected void setUp() {
+    protected void setUp() throws EmfException {
         controlStrategy1 = new ControlStrategy();
         controlStrategy1.setName("name1");
         controlStrategy1.setRegion(new Region("region1"));
@@ -47,7 +48,7 @@ public class ControlStrategiesTableDataTest extends TestCase {
         controlStrategy2.setLastModifiedDate(new Date());
         controlStrategy2.setCreator(new User("test user 2", "sss", "123-4567", "email@xxx.com", "xxx", "xxxxx123", false, false));
         
-        data = new ControlStrategiesTableData(new ControlStrategy[] { controlStrategy1, controlStrategy2 });
+        data = new ControlStrategiesTableData(new ControlStrategy[] { controlStrategy1, controlStrategy2 }, null);
     }
 
     public void testShouldHaveTwoColumns() {
@@ -112,4 +113,5 @@ public class ControlStrategiesTableDataTest extends TestCase {
         assertEquals(controlStrategy1, data.element(0));
         assertEquals(controlStrategy2, data.element(1));
     }
+
 }

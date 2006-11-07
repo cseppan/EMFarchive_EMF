@@ -71,13 +71,13 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         this.presenter = presenter;
     }
 
-    public void display(ControlStrategy[] controlStrategies) {
-        doLayout(controlStrategies);
+    public void display(ControlStrategy[] controlStrategies) throws EmfException {
+        doLayout(controlStrategies, this.session);
         super.display();
     }
 
-    public void refresh(ControlStrategy[] controlStrategies) {
-        doLayout(controlStrategies);
+    public void refresh(ControlStrategy[] controlStrategies) throws EmfException {
+        doLayout(controlStrategies, this.session);
         super.refreshLayout();
     }
 
@@ -85,8 +85,8 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         presenter.doRefresh();
     }
 
-    private void doLayout(ControlStrategy[] controlStrategies) {
-        tableData = new ControlStrategiesTableData(controlStrategies);
+    private void doLayout(ControlStrategy[] controlStrategies, EmfSession session) throws EmfException {
+        tableData = new ControlStrategiesTableData(controlStrategies, session);
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
         SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);

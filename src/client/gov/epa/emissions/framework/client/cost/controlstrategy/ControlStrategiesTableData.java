@@ -3,8 +3,12 @@ package gov.epa.emissions.framework.client.cost.controlstrategy;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -17,8 +21,8 @@ public class ControlStrategiesTableData extends AbstractTableData {
 
     private List rows;
 
-    public ControlStrategiesTableData(ControlStrategy[] controlStrategies) {
-        this.rows = createRows(controlStrategies);
+    public ControlStrategiesTableData(ControlStrategy[] controlStrategies, EmfSession session) throws EmfException {
+        this.rows = createRows(controlStrategies, session);
     }
 
     public String[] columns() {
@@ -40,14 +44,14 @@ public class ControlStrategiesTableData extends AbstractTableData {
         return false;
     }
 
-    private List createRows(ControlStrategy[] controlStrategies) {
+    private List createRows(ControlStrategy[] controlStrategies, EmfSession session) throws EmfException {
         List rows = new ArrayList();
         for (int i = 0; i < controlStrategies.length; i++) {
             ControlStrategy element = controlStrategies[i];
             Object[] values = { element.getName(), format(element.getLastModifiedDate()), region(element),
                     project(element), analysisType(element), dataset(element), version(element), datasetType(element),
                     element.getTargetPollutant(), costYear(element), "" + element.getInventoryYear(),
-                    "" + getTotalCost(element), "" + getReduction(element), element.getRunStatus(),
+                    "" + getTotalCost(element, session), "" + getReduction(element, session), element.getRunStatus(),
                     format(element.getCompletionDate()), element.getCreator().getName() };
             Row row = new ViewableRow(element, values);
             rows.add(row);
@@ -56,26 +60,32 @@ public class ControlStrategiesTableData extends AbstractTableData {
         return rows;
     }
 
-    private double getReduction(ControlStrategy element) {
-        //ControlStrategyResult[] results = element.getStrategyResults();
-        double totalReduction = 0;
-
-//        if (results.length > 0)
-//            for (int i = 0; i < results.length; i++)
-//                totalReduction += results[i].getTotalReduction();
-
-        return totalReduction;
+    private double getReduction(ControlStrategy element, EmfSession session) throws EmfException {
+        if (getResultSummary(element, session) == null)
+            return 0;
+        
+        return getResultSummary(element, session).getStrategyTotalReduction();
     }
 
-    private double getTotalCost(ControlStrategy element) {
-//        ControlStrategyResult[] results = element.getStrategyResults();
-        double totalCost = 0;
+    private double getTotalCost(ControlStrategy element, EmfSession session) throws EmfException {
+        if (getResultSummary(element, session) == null)
+            return 0;
 
-//        if (results.length > 0)
-//            for (int i = 0; i < results.length; i++)
-//                totalCost += results[i].getTotalCost();
+        return getResultSummary(element, session).getStrategyTotalCost();
+    }
 
-        return totalCost;
+    private ControlStrategyResultsSummary getResultSummary(ControlStrategy element, EmfSession session) throws EmfException {
+        if (getResult(element, session) == null)
+            return null;
+
+        return new ControlStrategyResultsSummary(new ControlStrategyResult[] { getResult(element, session) });
+    }
+
+    private ControlStrategyResult getResult(ControlStrategy element, EmfSession session) throws EmfException {
+        if (session == null)
+            return null;
+
+        return session.controlStrategyService().controlStrategyResults(element);
     }
 
     private String version(ControlStrategy element) {
@@ -150,10 +160,6 @@ public class ControlStrategiesTableData extends AbstractTableData {
     public void remove(ControlStrategy[] records) {
         for (int i = 0; i < records.length; i++)
             remove(records[i]);
-    }
-
-    public void refresh() {
-        this.rows = createRows(sources());
     }
 
 }
