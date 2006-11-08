@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.services.basic.UserService;
@@ -7,6 +8,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.ControlMeasureServiceImpl;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.rmi.RemoteException;
@@ -15,6 +17,8 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
     private static final String DEFAULT_URL = "http://localhost:8080/emf/services";// default
 
     private ControlMeasureService service = null;
+    
+    private DataCommonsService dataService = null;
 
     private ControlMeasureService help;
     
@@ -26,7 +30,12 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
 
         RemoteServiceLocator rl = new RemoteServiceLocator(DEFAULT_URL);
         service = rl.controlMeasureService();
+        dataService = rl.dataCommonsService();
         userService = rl.userService();
+    }
+
+    private String getRandomString() {
+        return Math.round(Math.random() * 100) % 100 + "";
     }
 
     public void testServiceActive() throws EmfException {
@@ -37,12 +46,31 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
         ControlMeasure[] all = service.getMeasures();
         assertEquals("0 types", all.length, 0);
     }
+    
+    public void testShouldGetControlMeasureByMajorPollutant() throws RemoteException {
+        Pollutant[] pollutants = dataService.getPollutants();
+        
+        ControlMeasure cm = new ControlMeasure();
+        String name = "cm test added" + getRandomString();
+        cm.setName(name);
+        cm.setEquipmentLife(12);
+        cm.setAbbreviation("12345678" + getRandomString());
+        cm.setMajorPollutant(pollutants[0]);
+        service.addMeasure(cm, new Scc[]{});
+
+        ControlMeasure[] target = service.getMeasures(pollutants[0]);
+        assertEquals(target.length, 1);
+        assertEquals(name, target[0].getName());
+        
+        service.removeMeasure(target[0]);
+    }
+
 
     public void testShouldAddOneControlMeasure() throws RemoteException {
         ControlMeasure cm = new ControlMeasure();
-        cm.setName("cm test added");
+        cm.setName("cm test added" + getRandomString());
         cm.setEquipmentLife(12);
-        cm.setAbbreviation("12345678");
+        cm.setAbbreviation("12345678" + getRandomString());
         service.addMeasure(cm, new Scc[]{});
 
         ControlMeasure[] all = service.getMeasures();
