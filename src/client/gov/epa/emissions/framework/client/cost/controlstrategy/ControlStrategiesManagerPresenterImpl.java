@@ -62,6 +62,7 @@ public class ControlStrategiesManagerPresenterImpl implements RefreshObserver, C
         if (isDuplicate(coppied))
             throw new EmfException("A control strategy named '" + coppied.getName() + "' already exists.");
 
+        coppied.setCreator(session.user());
         coppied.setLastModifiedDate(new Date());
         service().addControlStrategy(coppied);
         doRefresh();

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -83,6 +84,7 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         if (isDuplicate(coppied))
             throw new EmfException("A control measure with the same name or abbreviation already exists.");
 
+        coppied.setCreator(session.user());
         coppied.setLastModifiedTime(new Date());
         service().addMeasure(coppied, getSCCs(original));
         doRefresh();
@@ -115,6 +117,10 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
     
     public Scc[] getSCCs(ControlMeasure cm) throws EmfException {
         return service().getSccs(cm);
+    }
+
+    public ControlMeasure[] getControlMeasures(Pollutant pollutant) throws EmfException {
+        return service().getMeasures(pollutant);
     }
 
 }

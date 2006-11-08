@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
@@ -30,6 +31,16 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         call.setReturnType(mappings.controlMeasures());
 
         return (ControlMeasure[]) call.requestResponse(new Object[] {});
+    }
+    
+    public ControlMeasure[] getMeasures(Pollutant pollutant) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getMeasures");
+        call.addParam("pollutant", mappings.pollutant());
+        call.setReturnType(mappings.controlMeasures());
+
+        return (ControlMeasure[]) call.requestResponse(new Object[] { pollutant });
     }
 
     public void addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {

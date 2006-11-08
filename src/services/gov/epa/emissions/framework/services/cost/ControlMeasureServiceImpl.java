@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
@@ -49,6 +50,19 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve control measures.", e);
             throw new EmfException("Could not retrieve control measures.");
+        } finally {
+            session.close();
+        }
+    }
+    
+    public ControlMeasure[] getMeasures(Pollutant pollutant) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            List all = dao.getControlMeasures(pollutant, session);
+            return (ControlMeasure[]) all.toArray(new ControlMeasure[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve all control measures with major pollutant -- " + pollutant.getName(), e);
+            throw new EmfException("Could not retrieve all control measureswith major pollutant -- " + pollutant.getName());
         } finally {
             session.close();
         }
@@ -171,4 +185,5 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             throw new EmfException("Could not close database server");
         }
     }
+
 }

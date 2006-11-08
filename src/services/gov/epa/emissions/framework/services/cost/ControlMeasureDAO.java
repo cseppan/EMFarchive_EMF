@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
@@ -66,6 +67,11 @@ public class ControlMeasureDAO {
 
     public List all(Session session) {
         return hibernateFacade.getAll(ControlMeasure.class, session);
+    }
+
+    public List getControlMeasures(Pollutant poll, Session session) {
+        Criterion c = Restrictions.eq("majorPollutant", poll);
+        return hibernateFacade.get(ControlMeasure.class, c, session);
     }
 
     // NOTE: it't not happening in one transaction. modify?
