@@ -35,12 +35,13 @@ public class UserServiceTest extends ServiceTestCase {
 
         int initialCount = service.getUsers().length;
 
-        service.createUser(user);
+        User returnedUser = service.createUser(user);
 
         User loaded = user(user.getUsername());
         try {
             assertNotNull(loaded);
             assertEquals(initialCount + 1, service.getUsers().length);
+            assertEquals(loaded.getId(), returnedUser.getId());
         } finally {
             remove(loaded);
         }

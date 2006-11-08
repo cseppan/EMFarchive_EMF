@@ -15,10 +15,10 @@ public class RegisterUserPresenter {
     }
 
     // auto-login, upon registration
-    public void doRegister(User user) throws EmfException {
-        model.createUser(user);
-
+    public User doRegister(User user) throws EmfException {
+        user = model.createUser(user);// create and update with saved object(so that id is updated on the client side)
         model.authenticate(user.getUsername(), user.getEncryptedPassword());
+        return user;
     }
 
     public void doCancel() {
@@ -28,7 +28,7 @@ public class RegisterUserPresenter {
     public void display(RegisterUserView view) {
         this.view = view;
         this.view.observe(this);
-        
+
         view.display();
     }
 

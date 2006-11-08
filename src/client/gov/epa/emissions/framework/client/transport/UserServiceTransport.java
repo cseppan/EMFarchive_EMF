@@ -36,14 +36,14 @@ public class UserServiceTransport implements UserService {
         return (User) call.requestResponse(params);
     }
 
-    public void createUser(User user) throws EmfException {
+    public User createUser(User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("createUser");
         call.addParam("user", mappings.user());
-        call.setStringReturnType();
+        call.setReturnType(mappings.user());
 
-        call.request(new Object[] { user });
+        return (User) call.requestResponse(new Object[] { user });
     }
 
     private EmfCall call() throws EmfException {

@@ -18,90 +18,89 @@ import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 
 import java.io.File;
 import java.util.List;
 
 public class QAStepTaskTest extends ServiceTestCase {
-    
+
     private UserDAO userDAO;
-    
+
     private DbServer dbserver;
-    
+
     private String tableName = "test" + Math.round(Math.random() * 1000) % 1000;
 
     protected void doSetUp() throws Exception {
         userDAO = new UserDAO();
         dbserver = dbServer();
     }
-    
+
     protected void doTearDown() throws Exception {
-        dropAll(EmfDataset.class);
+        dropAll(QAStepResult.class);
         dropAll(QAStep.class);
         dropAll(Version.class);
         dropAll(InternalSource.class);
+        dropAll(EmfDataset.class);
     }
-    
+
     private void dropTables(EmfDataset dataset) throws Exception {
         dropTable(tableName, dbServer().getEmissionsDatasource());
-        dropTable("qasummarize_by_county_and_pollutant_dsid" + dataset.getId() + "_v0", dbServer().getEmissionsDatasource());
-        dropTable("qasummarize_by_scc_and_pollutant_dsid" + dataset.getId() + "_v0", dbServer().getEmissionsDatasource());
+        dropTable("qasummarize_by_county_and_pollutant_dsid" + dataset.getId() + "_v0", dbServer()
+                .getEmissionsDatasource());
+        dropTable("qasummarize_by_scc_and_pollutant_dsid" + dataset.getId() + "_v0", dbServer()
+                .getEmissionsDatasource());
         dropTable("qasummarize_by_pollutant_dsid" + dataset.getId() + "_v0", dbServer().getEmissionsDatasource());
     }
-    
+
     public void testShouldGetDefaultSummaryQANames() throws Exception {
         EmfDataset dataset = newDataset(tableName, "");
         User user = userDAO.get("emf", session);
-        
+
         QAStepTask qaTask = new QAStepTask(dataset, 0, user, sessionFactory(), dbServer());
         String[] summaryQANames = qaTask.getDefaultSummaryQANames();
-        
-        try {
-            assertEquals(3, summaryQANames.length);
-            assertEquals("Summarize by Pollutant", summaryQANames[0]);
-            assertEquals("Summarize by SCC and Pollutant", summaryQANames[1]);
-            assertEquals("Summarize by County and Pollutant", summaryQANames[2]);
-        } finally {
-            doTearDown();
-        }
+
+        assertEquals(3, summaryQANames.length);
+        assertEquals("Summarize by Pollutant", summaryQANames[0]);
+        assertEquals("Summarize by SCC and Pollutant", summaryQANames[1]);
+        assertEquals("Summarize by County and Pollutant", summaryQANames[2]);
     }
-    
+
     public void testShouldCheckAndRunSummaryQASteps() throws Exception {
         EmfDataset inputDataset = new EmfDataset();
         inputDataset.setName(tableName);
         inputDataset.setCreator(userDAO.get("emf", session).getUsername());
         inputDataset.setDatasetType(getDatasetType("ORL Nonpoint Inventory (ARINV)"));
         inputDataset = addORLNonpointDataset(inputDataset);
-        
+
         addVersionZeroEntryToVersionsTable(inputDataset, dbserver.getEmissionsDatasource());
-        
+
         try {
             QAStepTask qaTask = new QAStepTask(inputDataset, 0, userDAO.get("emf", session), sessionFactory(), dbserver);
             String[] summaryQANames = qaTask.getDefaultSummaryQANames();
             qaTask.runSummaryQASteps(summaryQANames);
         } finally {
-          dropTables(inputDataset);
-          doTearDown();
-        } 
+            dropTables(inputDataset);
+        }
     }
-    
+
     private void addVersionZeroEntryToVersionsTable(Dataset dataset, Datasource datasource) throws Exception {
         TableModifier modifier = new TableModifier(datasource, "versions");
         String[] data = { null, dataset.getId() + "", "0", "Initial Version", "", "true", null };
         modifier.insertOneRow(data);
     }
-    
+
     private EmfDataset newDataset(String name, String type) {
         User owner = userDAO.get("emf", session);
-        
+
         if (type.equals(""))
             type = "ORL Nonpoint Inventory (ARINV)";
-        
+
         EmfDataset dataset = new EmfDataset();
         dataset.setName(name);
         dataset.setCreator(owner.getUsername());
         dataset.setDatasetType(getDatasetType(type));
-        
+
         return (EmfDataset) load(EmfDataset.class, dataset.getName());
     }
 
@@ -110,12 +109,12 @@ public class QAStepTaskTest extends ServiceTestCase {
         List types = dcDao.getDatasetTypes(session);
 
         for (int i = 0; i < types.size(); i++)
-            if (((DatasetType)types.get(i)).getName().equalsIgnoreCase(type))
-                return (DatasetType)types.get(i);
-            
+            if (((DatasetType) types.get(i)).getName().equalsIgnoreCase(type))
+                return (DatasetType) types.get(i);
+
         return null;
     }
-    
+
     private EmfDataset addORLNonpointDataset(EmfDataset inputDataset) throws ImporterException {
         DbServer dbServer = dbServer();
         SqlDataTypes sqlDataTypes = dbServer.getSqlDataTypes();

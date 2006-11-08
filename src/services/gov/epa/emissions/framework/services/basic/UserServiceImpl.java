@@ -69,20 +69,21 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void createUser(User user) throws EmfException {
+    public User createUser(User user) throws EmfException {
         User existingUser = this.getUser(user.getUsername());
         if (existingUser != null) {
             throw new EmfException("Could not create new user. The username '" + user.getUsername()
                     + "' is already taken");
         }
-
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
             dao.add(user, session);
-            session.close();
+            return dao.get(user.getUsername(), session);
         } catch (RuntimeException e) {
             LOG.error("Could not create new user - " + user.getUsername(), e);
             throw new EmfException("Unable to fetch user due to data access failure");
+        } finally {
+            session.close();
         }
     }
 

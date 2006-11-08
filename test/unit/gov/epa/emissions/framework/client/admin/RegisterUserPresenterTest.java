@@ -30,7 +30,7 @@ public class RegisterUserPresenterTest extends MockObjectTestCase {
         user.setUsername("joey");
         user.setPassword("passwd234");
 
-        userServices.expects(once()).method("createUser").with(eq(user));
+        userServices.expects(once()).method("createUser").with(eq(user)).will(returnValue(user));
         userServices.expects(once()).method("authenticate").with(eq("joey"), eq(user.getEncryptedPassword()));
 
         presenter.doRegister(user);

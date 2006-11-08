@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.cost.analysis.maxreduction.MaxEmsRed
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 
@@ -32,12 +33,28 @@ public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (strategy != null)
-                dropTable(detailResultDatasetTableName(strategy), dbServer().getEmissionsDatasource());
+            dropTables(strategy);
             removeData();
 
         }
 
+    }
+
+    private void dropTables(ControlStrategy strategy) throws Exception {
+        if (strategy != null)
+            dropTable(detailResultDatasetTableName(strategy), dbServer().getEmissionsDatasource());
+        dropQASummaryTables(inputDataset);
+        ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, session);
+        dropQASummaryTables((EmfDataset) result.getDetailedResultDataset());
+
+    }
+
+    private void dropQASummaryTables(EmfDataset dataset) throws Exception {
+        dropTable("qasummarize_by_county_and_pollutant_dsid" + dataset.getId() + "_v0", dbServer()
+                .getEmissionsDatasource());
+        dropTable("qasummarize_by_scc_and_pollutant_dsid" + dataset.getId() + "_v0", dbServer()
+                .getEmissionsDatasource());
+        dropTable("qasummarize_by_pollutant_dsid" + dataset.getId() + "_v0", dbServer().getEmissionsDatasource());
     }
 
     private void removeData() {
