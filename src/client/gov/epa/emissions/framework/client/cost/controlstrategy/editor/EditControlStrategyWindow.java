@@ -33,6 +33,8 @@ import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class EditControlStrategyWindow extends DisposableInteralFrame implements EditControlStrategyView {
 
@@ -103,6 +105,11 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         // These are just added to illustrate what is coming later
         tabbedPane.addTab("Filters", createFilterTab(controlStrategy));
         tabbedPane.addTab("Outputs", outputPanel(controlStrategyResults));
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                messagePanel.clear();
+            }
+        });
 
         return tabbedPane;
     }

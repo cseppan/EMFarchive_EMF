@@ -122,7 +122,14 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 List list = selectModel.selected();
+                
+                if (list.size() == 0) {
+                    messagePanel.setError("Please select an item to edit.");
+                    return;
+                }
+                
                 EfficiencyRecord[] records = (EfficiencyRecord[]) list.toArray(new EfficiencyRecord[0]);
+
                 for (int i = 0; i < records.length; i++) {
                     doEdit(records[i]);
                 }
@@ -164,8 +171,10 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
 
         EfficiencyRecord[] records = getSelectedRecords();
 
-        if (records.length == 0)
+        if (records.length == 0) {
+            messagePanel.setError("Please select an item to remove.");
             return;
+        }
 
         String title = "Warning";
         String message = "Are you sure you want to remove the selected row(s)?";

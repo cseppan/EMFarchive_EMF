@@ -282,7 +282,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private void viewDataSets() {
         EmfDataset[] datasets = getSelectedDatasets();
         if (datasets.length == 0) {
-            messagePanel.setMessage("Please select at least one item.");
+            messagePanel.setError("Please select at least one item.");
             return;
         }
 

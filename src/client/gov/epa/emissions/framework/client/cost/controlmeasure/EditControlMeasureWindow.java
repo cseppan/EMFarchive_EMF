@@ -25,6 +25,8 @@ import java.text.SimpleDateFormat;
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class EditControlMeasureWindow extends DisposableInteralFrame implements ControlMeasureView {
 
@@ -61,13 +63,18 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
         super.resetChanges();
     }
 
-    private JTabbedPane createTabbedPane(ControlMeasure measure, MessagePanel messagePanel) {
+    private JTabbedPane createTabbedPane(ControlMeasure measure, final MessagePanel messagePanel) {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
         tabbedPane.addTab("Summary", createSummaryTab(measure, messagePanel));
         tabbedPane.addTab("Efficiencies", createEfficiencyTab(measure, messagePanel));
         tabbedPane.addTab("SCCs", createSCCTab(measure, messagePanel));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                messagePanel.clear();
+            }
+        });
 
         return tabbedPane;
     }

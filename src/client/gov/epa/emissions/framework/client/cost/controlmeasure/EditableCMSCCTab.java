@@ -103,6 +103,8 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
     }
 
     private void selectionView() {
+        messagePanel.clear();
+        
         SCCSelectionView view = new SCCSelectionDialog(parent, changeables);
         SCCSelectionPresenter presenter = new SCCSelectionPresenter(this, view);
         try {
@@ -121,7 +123,14 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
     }
 
     protected void remove() {
+        messagePanel.clear();
         List selected = sortFilterSelectModel.selected();
+        
+        if (selected.size() == 0) {
+            messagePanel.setError("Please select an item to remove.");
+            return;
+        }
+            
         Scc[] records = (Scc[]) selected.toArray(new Scc[0]);
 
         if (records.length == 0)
