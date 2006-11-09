@@ -93,7 +93,19 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         call.addParam("sccs", mappings.sccs());
         call.setReturnType(mappings.controlMeasure());
 
-        return (ControlMeasure) call.requestResponse(new Object[] { measure,sccs });
+        return (ControlMeasure) call.requestResponse(new Object[] { measure, sccs });
+    }
+
+    public Scc[] getSccsWithDescriptions(ControlMeasure measure) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getSccsWithDescriptions");
+        call.addParam("measure", mappings.controlMeasure());
+        call.setReturnType(mappings.sccs());
+
+        Scc[] sccs = (Scc[]) call.requestResponse(new Object[] { measure });
+
+        return sccs;
     }
 
     public Scc[] getSccs(ControlMeasure measure) throws EmfException {

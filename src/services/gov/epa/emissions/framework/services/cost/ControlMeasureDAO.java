@@ -9,6 +9,8 @@ import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -93,15 +95,13 @@ public class ControlMeasureDAO {
 
     public void remove(ControlMeasure measure, Session session) {
         removeSccs(measure, session);
-
         hibernateFacade.remove(measure, session);
     }
 
     private void removeSccs(ControlMeasure measure, Session session) {
-        Criterion c = Restrictions.eq("controlMeasureId", new Integer(measure.getId()));
-        List list = hibernateFacade.get(Scc.class, c, session);
-        for (int i = 0; i < list.size(); i++) {
-            hibernateFacade.remove(list.get(i), session);
+        Scc[] sccs = getSccs(measure, session);
+        for (int i = 0; i < sccs.length; i++) {
+            hibernateFacade.remove(sccs[i], session);
         }
     }
 
@@ -128,11 +128,25 @@ public class ControlMeasureDAO {
 
     private void updateSccs(Scc[] sccs, ControlMeasure controlMeasure, Session session) {
         updateSccsControlMeasureIds(sccs, controlMeasure);
-        for (int i = 0; i < sccs.length; i++) {
-            Criterion c1 = Restrictions.eq("controlMeasureId", new Integer(sccs[i].getControlMeasureId()));
-            Criterion c2 = Restrictions.eq("code", sccs[i].getCode());
-            if (!hibernateFacade.exists(Scc.class, new Criterion[] { c1, c2 }, session))
-                hibernateFacade.add(sccs, session);
+        Scc[] existingSccs = getSccs(controlMeasure, session);
+        List removeList = new ArrayList(Arrays.asList(existingSccs));
+        List newSccList = new ArrayList();
+        processSccsList(sccs, newSccList, removeList);
+
+        hibernateFacade.remove(removeList.toArray(new Scc[0]), session);
+        hibernateFacade.add(newSccList.toArray(new Scc[0]), session);
+
+    }
+
+    // initally all existing sccs in the removeScc list
+    private void processSccsList(Scc[] sccsFromClient, List newSccsList, List removeSccs) {
+        for (int i = 0; i < sccsFromClient.length; i++) {
+            int index = removeSccs.indexOf(sccsFromClient[i]);
+            if (index != -1) {
+                removeSccs.remove(index);
+            } else {
+                newSccsList.add(sccsFromClient[i]);
+            }
         }
     }
 
@@ -142,21 +156,19 @@ public class ControlMeasureDAO {
         }
     }
 
-    public void update(ControlMeasure[] measures, Session session) {
-        hibernateFacade.update(measures, session);
-    }
-
-    public void add(ControlMeasure[] measures, Session session) {
-        hibernateFacade.add(measures, session);
-    }
-
-    public Scc[] getSccs(ControlMeasure measure) throws EmfException {
+    public Scc[] getSccsWithDescriptions(ControlMeasure measure) throws EmfException {
         try {
             RetrieveSCC retrieveSCC = new RetrieveSCC(measure, new EmfDbServer());
             return retrieveSCC.sccs();
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
+    }
+
+    public Scc[] getSccs(ControlMeasure measure, Session session) {
+        Criterion id = Restrictions.eq("controlMeasureId", new Integer(measure.getId()));
+        List list = hibernateFacade.get(Scc.class, new Criterion[] { id }, session);
+        return (Scc[]) list.toArray(new Scc[0]);
     }
 
     public String[] getCMAbbrevAndSccs(int measureId) throws EmfException {
@@ -169,7 +181,6 @@ public class ControlMeasureDAO {
     }
 
     public void checkForConstraints(ControlMeasure controlMeasure, Session session) throws EmfException {
-
         Criterion id = Restrictions.ne("id", new Integer(controlMeasure.getId()));
         Criterion name = Restrictions.eq("name", controlMeasure.getName());
         Criterion abbrev = Restrictions.eq("abbreviation", controlMeasure.getAbbreviation());

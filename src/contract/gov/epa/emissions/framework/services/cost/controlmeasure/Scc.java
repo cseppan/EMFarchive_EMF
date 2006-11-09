@@ -61,11 +61,13 @@ public class Scc {
         this.status = status;
     }
 
+    // scc id field is not compared=> id initial values are zero so two new sccs with different codes will be equal
+    // before persisting
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof Scc))
             return false;
         Scc other = (Scc) obj;
-        return id == other.getId() ||( controlMeasureId == other.getControlMeasureId() && code.equals(other.getCode()));
+        return code.equals(other.getCode()) && controlMeasureId == other.getControlMeasureId();
     }
 
     public int hashCode() {

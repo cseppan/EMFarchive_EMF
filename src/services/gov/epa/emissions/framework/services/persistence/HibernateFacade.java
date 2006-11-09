@@ -97,6 +97,11 @@ public class HibernateFacade {
             update(objects[i], session);
     }
 
+    public void remove(Object[] objects, Session session) {
+        for (int i = 0; i < objects.length; i++)
+            remove(objects[i], session);
+    }
+
     public void remove(Object obj, Session session) {
         Transaction tx = null;
         try {
@@ -104,7 +109,6 @@ public class HibernateFacade {
             session.delete(obj);
             tx.commit();
         } catch (HibernateException e) {
-            e.printStackTrace();
             tx.rollback();
             throw e;
         }

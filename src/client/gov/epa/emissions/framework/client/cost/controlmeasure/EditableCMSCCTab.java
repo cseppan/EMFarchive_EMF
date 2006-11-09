@@ -103,8 +103,6 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
     }
 
     private void selectionView() {
-        messagePanel.clear();
-        
         SCCSelectionView view = new SCCSelectionDialog(parent, changeables);
         SCCSelectionPresenter presenter = new SCCSelectionPresenter(this, view);
         try {
@@ -151,7 +149,7 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
 
     private Scc[] createSccs(ControlMeasure measure) throws EmfException {
         ControlMeasureService service = session.controlMeasureService();
-        Scc[] sccs = service.getSccs(measure);
+        Scc[] sccs = service.getSccsWithDescriptions(measure);
 
         return sccs;
     }

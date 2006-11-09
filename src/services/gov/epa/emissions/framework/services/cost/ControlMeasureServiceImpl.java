@@ -127,7 +127,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     public ControlMeasure updateMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            ControlMeasure updated = dao.update(measure,sccs, session);
+            ControlMeasure updated = dao.update(measure, sccs, session);
             return updated;
         } catch (RuntimeException e) {
             LOG.error("Could not update for ControlMeasure: " + measure.getName(), e);
@@ -137,13 +137,26 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public Scc[] getSccs(ControlMeasure measure) throws EmfException {
+    public Scc[] getSccsWithDescriptions(ControlMeasure measure) throws EmfException {
         try {
-            Scc[] sccs = dao.getSccs(measure);
+            Scc[] sccs = dao.getSccsWithDescriptions(measure);
             return sccs;
         } catch (RuntimeException e) {
             LOG.error("Could not get SCCs for ControlMeasure: " + measure.getName(), e);
             throw new EmfException("Could not get SCCs for ControlMeasure: " + measure.getName());
+        }
+    }
+
+    public Scc[] getSccs(ControlMeasure measure) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            Scc[] sccs = dao.getSccs(measure, session);
+            return sccs;
+        } catch (RuntimeException e) {
+            LOG.error("Could not get SCCs for ControlMeasure: " + measure.getName(), e);
+            throw new EmfException("Could not get SCCs for ControlMeasure: " + measure.getName());
+        } finally {
+            session.close();
         }
     }
 

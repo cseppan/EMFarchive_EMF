@@ -22,6 +22,8 @@ public interface ControlMeasureService extends EMFService {
 
     ControlMeasure obtainLockedMeasure(User user, ControlMeasure measure) throws EmfException;
 
+    Scc[] getSccsWithDescriptions(ControlMeasure measure) throws EmfException;
+    
     Scc[] getSccs(ControlMeasure measure) throws EmfException;
 
     ControlTechnology[] getControlTechnologies() throws EmfException;

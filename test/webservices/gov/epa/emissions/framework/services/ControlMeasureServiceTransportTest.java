@@ -134,7 +134,7 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
         service.addMeasure(cm, new Scc[]{});
         int measuresAfterAddOne = service.getMeasures().length;
         
-        Scc[] sccs = service.getSccs(cm);
+        Scc[] sccs = service.getSccsWithDescriptions(cm);
         service.removeMeasure(cm);
         
 
