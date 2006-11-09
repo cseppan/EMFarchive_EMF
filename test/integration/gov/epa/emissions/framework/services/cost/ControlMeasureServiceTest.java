@@ -2,11 +2,14 @@ package gov.epa.emissions.framework.services.cost;
 
 import java.util.List;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import org.hibernate.Criteria;
@@ -14,18 +17,21 @@ import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public class CostServiceTest extends ServiceTestCase {
+public class ControlMeasureServiceTest extends ServiceTestCase {
 
     private ControlMeasureService service;
 
     private UserServiceImpl userService;
 
+    private DataCommonsService dataService;
+    
     private HibernateSessionFactory sessionFactory;
 
     public void doSetUp() throws Exception {
         sessionFactory = sessionFactory(configFile());
         userService = new UserServiceImpl(sessionFactory);
         service = new ControlMeasureServiceImpl(sessionFactory);
+        dataService = new DataCommonsServiceImpl(sessionFactory);
     }
 
     protected void doTearDown() throws Exception {// no op
@@ -47,6 +53,29 @@ public class CostServiceTest extends ServiceTestCase {
             assertEquals(name, cms[0].getName());
             assertEquals(new Float(12), new Float(cms[0].getEquipmentLife()));
         } finally {
+            remove(cm);
+        }
+    }
+    
+    public void testShouldGetControlMeasuresByMajorPollutant() throws Exception {
+        Pollutant poll = new Pollutant("newpollutant");
+        dataService.addPollutant(poll); 
+        ControlMeasure cm = new ControlMeasure();
+        String name = "cm test one" + Math.random();
+        cm.setEquipmentLife(12);
+        cm.setName(name);
+        cm.setAbbreviation("12345678");
+        cm.setMajorPollutant(dataService.getPollutants()[0]);
+        add(cm);
+        
+        try {
+            ControlMeasure[] cms = service.getMeasures(dataService.getPollutants()[0]);
+            
+            assertEquals(1, cms.length);
+            assertEquals(name, cms[0].getName());
+            assertEquals(new Float(12), new Float(cms[0].getEquipmentLife()));
+        } finally {
+            remove(poll);
             remove(cm);
         }
     }
