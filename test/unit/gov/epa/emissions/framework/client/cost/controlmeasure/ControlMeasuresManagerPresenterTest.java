@@ -35,10 +35,15 @@ public class ControlMeasuresManagerPresenterTest extends MockObjectTestCase {
 
         presenter = new ControlMeasuresManagerPresenter((EmfSession) session.proxy());
 
+        ControlMeasure[] measures = new ControlMeasure[0];
         view.expects(once()).method("observe").with(eq(presenter));
-        view.expects(once()).method("display").withNoArguments();
+        view.expects(once()).method("display").with(eq(measures));
 
-        presenter.doDisplay((ControlMeasuresManagerView) view.proxy());
+        try {
+            presenter.doDisplay((ControlMeasuresManagerView) view.proxy());
+        } catch (EmfException e) {
+            return;
+        }
     }
 
     public void testShouldCloseViewOnClickOfCloseButton() {
@@ -58,7 +63,7 @@ public class ControlMeasuresManagerPresenterTest extends MockObjectTestCase {
 
         ControlMeasuresManagerPresenter presenter = new ControlMeasuresManagerPresenter((EmfSession) session.proxy());
         view.expects(once()).method("observe").with(eq(presenter));
-        view.expects(once()).method("display").withNoArguments();
+        view.expects(once()).method("display").with(eq(measures));
         view.expects(once()).method("clearMessage").withNoArguments();
 
         presenter.doDisplay((ControlMeasuresManagerView) view.proxy());

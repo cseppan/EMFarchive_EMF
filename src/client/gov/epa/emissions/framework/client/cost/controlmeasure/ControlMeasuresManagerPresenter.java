@@ -27,11 +27,11 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         this.session = session;
     }
 
-    public void doDisplay(ControlMeasuresManagerView view) {
+    public void doDisplay(ControlMeasuresManagerView view) throws EmfException {
         this.view = view;
         view.observe(this);
 
-        view.display();
+        view.display(new ControlMeasure[0]);
     }
 
     public void doClose() {
@@ -87,7 +87,6 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         coppied.setCreator(session.user());
         coppied.setLastModifiedTime(new Date());
         service().addMeasure(coppied, getSCCs(original));
-        doRefresh();
     }
 
     private String getRandomString() {
@@ -120,6 +119,9 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
     }
 
     public ControlMeasure[] getControlMeasures(Pollutant pollutant) throws EmfException {
+        if (pollutant.getName().equals("ALL"))
+            return service().getMeasures();
+        
         return service().getMeasures(pollutant);
     }
 

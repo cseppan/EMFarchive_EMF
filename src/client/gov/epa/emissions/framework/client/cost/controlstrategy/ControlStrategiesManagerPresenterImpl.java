@@ -65,7 +65,6 @@ public class ControlStrategiesManagerPresenterImpl implements RefreshObserver, C
         coppied.setCreator(session.user());
         coppied.setLastModifiedDate(new Date());
         service().addControlStrategy(coppied);
-        doRefresh();
     }
     
     private boolean isDuplicate(ControlStrategy newStrategy) throws EmfException {

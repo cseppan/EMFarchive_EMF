@@ -148,7 +148,11 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         menuItem.setName("controlMeasures");
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                doDisplayControlMeasures(parent, messagePanel);
+                try {
+                    doDisplayControlMeasures(parent);
+                } catch (EmfException e) {
+                    messagePanel.setError("Can't display control measures: " + e.getMessage());
+                }
             }
         });
 
@@ -236,14 +240,10 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         }
     }
 
-    private void doDisplayControlMeasures(final EmfConsole parent, final MessagePanel messagePanel) {
-        try {
-            ControlMeasuresManagerView controlMeasuresManagerView = new ControlMeasuresManagerWindow(session, parent,
-                    desktopManager);
-            presenter.doDisplayControlMeasuresManager(controlMeasuresManagerView);
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
+    private void doDisplayControlMeasures(final EmfConsole parent) throws EmfException {
+        ControlMeasuresManagerView controlMeasuresManagerView = new ControlMeasuresManagerWindow(session, parent,
+                desktopManager);
+        presenter.doDisplayControlMeasuresManager(controlMeasuresManagerView);
     }
 
     private void doManageControlStrategies(final EmfConsole parent, final MessagePanel messagePanel) {

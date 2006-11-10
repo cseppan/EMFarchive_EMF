@@ -17,5 +17,7 @@ public interface ControlMeasuresManagerView extends ManagedView {
     void showError(String message);
 
     void clearMessage();
+    
+    void display(ControlMeasure[] measures) throws EmfException;
 
 }

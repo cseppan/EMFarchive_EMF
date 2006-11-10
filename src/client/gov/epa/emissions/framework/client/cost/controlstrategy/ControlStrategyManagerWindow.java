@@ -170,7 +170,11 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         
         Button copyButton = new CopyButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                copySelectedStrategy();
+                    try {
+                        copySelectedStrategy();
+                    } catch (EmfException excp) {
+                        messagePanel.setError("Error in copying control strategies: " + excp.getMessage());
+                    }
             }
         });
         crudPanel.add(copyButton);
@@ -226,8 +230,10 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         messagePanel.clear();
         ControlStrategy[] records = (ControlStrategy[])selected().toArray(new ControlStrategy[0]);
 
-        if (records.length == 0)
+        if (records.length == 0) {
+            messagePanel.setError("Please select an item to remove.");
             return;
+        }
 
         String title = "Warning";
         String message = "Are you sure you want to remove the selected row(s)?";
@@ -240,7 +246,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         }
     }
     
-    private void copySelectedStrategy() {
+    private void copySelectedStrategy() throws EmfException {
         messagePanel.clear();
         List strategies = selected();
         if (strategies.isEmpty()) {
@@ -255,11 +261,12 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
                 ControlStrategy coppied = (ControlStrategy)DeepCopy.copy(element);
                 coppied.setName("Copy of " + element.getName());
                 presenter.doSaveCopiedStrategies(coppied, element.getName());
-                doRefresh();
             } catch (Exception e) {
                 messagePanel.setError(e.getMessage());
             }
         }
+        
+        doRefresh();
     }
 
     private List selected() {

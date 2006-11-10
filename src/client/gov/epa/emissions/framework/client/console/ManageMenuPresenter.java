@@ -57,7 +57,7 @@ public class ManageMenuPresenter {
         new CaseManagerPresenterImpl(session, view).display();
     }
     
-    public void doDisplayControlMeasuresManager(ControlMeasuresManagerView view) {
+    public void doDisplayControlMeasuresManager(ControlMeasuresManagerView view) throws EmfException {
         ControlMeasuresManagerPresenter presenter = new ControlMeasuresManagerPresenter(session);
         presenter.doDisplay(view);
     }
