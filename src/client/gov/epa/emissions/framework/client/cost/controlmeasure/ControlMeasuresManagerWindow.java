@@ -132,6 +132,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private void getAllPollutants(EmfSession session) throws EmfException {
         Pollutant[] all = getPollutants(session);
         List dbPollList = new ArrayList();
+        //dbPollList.add(new Pollutant("Select one"));
         dbPollList.add(new Pollutant("All"));
         dbPollList.addAll(Arrays.asList(all));
         pollsFromDB = (Pollutant[])dbPollList.toArray(new Pollutant[0]);
@@ -162,12 +163,13 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private JPanel createTopPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-
-        panel.add(getItem("Major Pollutant:", majorPollutant), BorderLayout.LINE_START);
-
+        
+        panel.add(getItem("Major Pollutant:", majorPollutant), BorderLayout.WEST);
+        majorPollutant.setPreferredSize(new Dimension(100, 30));
+        
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.CENTER);
-
+        
         Button button = new RefreshButton(this, "Refresh Control Measures", messagePanel);
         panel.add(button, BorderLayout.EAST);
 
@@ -175,7 +177,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     private void createPollutantComboBox() {
-        majorPollutant = new ComboBox(pollsFromDB);
+        majorPollutant = new ComboBox("Select one", pollsFromDB);
         majorPollutant.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 Pollutant pol = getSelectedMajorPollutant();
@@ -190,7 +192,12 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     private Pollutant getSelectedMajorPollutant() {
-        return (Pollutant) majorPollutant.getSelectedItem();
+        Object selected = majorPollutant.getSelectedItem();
+        
+        if (selected == null)
+            return new Pollutant("Select one");
+        
+        return (Pollutant) selected;
     }
 
     protected void disPlayControlMeasures(Pollutant pollutant) throws EmfException {

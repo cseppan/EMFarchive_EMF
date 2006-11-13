@@ -119,6 +119,9 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
     }
 
     public ControlMeasure[] getControlMeasures(Pollutant pollutant) throws EmfException {
+        if (pollutant.getName().equalsIgnoreCase("Select one"))
+            return new ControlMeasure[0];
+        
         if (pollutant.getName().equals("ALL"))
             return service().getMeasures();
         
