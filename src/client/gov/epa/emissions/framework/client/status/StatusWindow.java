@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.status;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.ImageResources;
@@ -40,9 +41,12 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
 
     private StatusPresenter presenter;
 
-    public StatusWindow(Container parent, DesktopManager desktopManager) {
+    private EmfConsole parent;
+
+    public StatusWindow(EmfConsole parent, DesktopManager desktopManager) {
         super("Status", desktopManager);
         super.setName("status");
+        this.parent = parent;
 
         position(parent);
         super.setContentPane(createLayout());
@@ -161,6 +165,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
     }
 
     public void clear() {
+        parent.clearMesagePanel();
         statusTableModel.clear();
     }
 

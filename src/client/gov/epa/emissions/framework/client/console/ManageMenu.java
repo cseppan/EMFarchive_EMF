@@ -172,7 +172,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
     }
 
     private void displayMyProfile(EmfSession session, MessagePanel messagePanel) {
-        UpdateUserWindow updatable = new UpdateUserWindow(new AddAdminOption(false),desktopManager);
+        UpdateUserWindow updatable = new UpdateUserWindow(new AddAdminOption(false), desktopManager);
         UserView viewable = new ViewUserWindow(desktopManager);
 
         UpdateUserPresenter presenter = new UpdateUserPresenterImpl(session, session.user(), session.userService());
@@ -215,7 +215,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
 
     private void doManageDatasetTypes(final EmfConsole parent, final MessagePanel messagePanel) {
         try {
-            DatasetTypesManagerView view = new DatasetTypesManagerWindow(session,parent, desktopManager);
+            DatasetTypesManagerView view = new DatasetTypesManagerWindow(session, parent, desktopManager);
             presenter.doDisplayDatasetTypesManager(view);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
@@ -254,5 +254,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
             messagePanel.setError(e.getMessage());
         }
     }
+    
+    
 
 }

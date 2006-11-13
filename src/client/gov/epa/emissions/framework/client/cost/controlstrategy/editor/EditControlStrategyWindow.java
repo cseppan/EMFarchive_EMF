@@ -226,7 +226,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                     presenter.setResults(controlStrategy);
                     presenter.runStrategy();
                     messagePanel
-                           .setMessage("Running strategy. Monitor the status window for progress, and refresh this window after completion to see results");
+                            .setMessage("Running strategy. Monitor the status window for progress, and refresh this window after completion to see results");
                 } catch (EmfException e) {
                     messagePanel.setError("Error running strategy: " + e.getMessage());
                 }
@@ -258,11 +258,16 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     protected void doClose() {
         try {
-            if (shouldDiscardChanges())
+            //first check whether cs is running before checking the discard changes
+            if (isRunButtonClicked() || shouldDiscardChanges())
                 presenter.doClose();
         } catch (EmfException e) {
             messagePanel.setError("Could not close: " + e.getMessage());
         }
+    }
+
+    private boolean isRunButtonClicked() {
+        return !runButton.isEnabled();
     }
 
     private Action saveAction() {

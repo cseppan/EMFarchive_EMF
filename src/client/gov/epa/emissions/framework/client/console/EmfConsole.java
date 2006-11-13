@@ -21,6 +21,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 //FIXME: split this class up into smaller ones...getting too big
 
@@ -112,6 +114,8 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private WindowMenu createWindowMenu() {
         WindowMenu windowMenu = new WindowMenu();
+        addClearAction(windowMenu);
+
         windowMenuPresenter = new WindowMenuPresenter(windowMenu);
         windowMenu.setWindowMenuViewPresenter(windowMenuPresenter);
 
@@ -119,7 +123,9 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private JMenu createFileMenu(EmfSession session, MessagePanel messagePanel) {
-        return new FileMenu(session, this, messagePanel, desktopManager);
+        FileMenu fileMenu = new FileMenu(session, this, messagePanel, desktopManager);
+        addClearAction(fileMenu);
+        return fileMenu;
     }
 
     public void doClose() {
@@ -136,13 +142,15 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private JMenu createManageMenu(EmfSession session, MessagePanel messagePanel) {
         manageMenu = new ManageMenu(session, this, messagePanel, desktopManager);
+        addClearAction(manageMenu);
         new ManageMenuPresenter(manageMenu, session).observe();
-        
+
         return manageMenu;
     }
 
     private JMenu createHelpMenu() {
         JMenu menu = new JMenu("Help");
+        addClearAction(menu);
 
         menu.add(createDisabledMenuItem("User Guide"));
         menu.add(createDisabledMenuItem("Documentation"));
@@ -176,6 +184,26 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         String msg = "Some windows have unsaved changes.\nDo you want to continue closing these windows?";
         Confirm emfConfirmDialog = new YesNoDialog(this, "Unsaved Changes Exist", msg);
         return emfConfirmDialog;
+    }
+
+    private void addClearAction(final JMenu menu) {
+        menu.addMenuListener(new MenuListener() {
+            public void menuCanceled(MenuEvent e) {
+                clearMesagePanel();
+            }
+
+            public void menuDeselected(MenuEvent e) {
+                clearMesagePanel();
+            }
+
+            public void menuSelected(MenuEvent e) {
+                clearMesagePanel();
+            }
+        });
+    }
+
+    public void clearMesagePanel() {
+        messagePanel.clear();
     }
 
 }
