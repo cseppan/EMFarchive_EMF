@@ -23,12 +23,6 @@ public class RevisionsTableData extends AbstractTableData {
         return new String[] { "What", "Why", "References", "Version", "Creator", "Date" };
     }
 
-    public Class getColumnClass(int col) {
-        if (col == 0)
-            return Boolean.class;
-        return String.class;
-    }
-
     public List rows() {
         return rows;
     }
@@ -51,6 +45,11 @@ public class RevisionsTableData extends AbstractTableData {
 
     public Revision[] getValues() {
         return values;
+    }
+
+    public Class getColumnClass(int col) {
+        // NOTE Auto-generated method stub
+        return String.class;
     }
 
 }

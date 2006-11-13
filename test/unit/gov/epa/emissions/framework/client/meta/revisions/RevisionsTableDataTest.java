@@ -51,7 +51,7 @@ public class RevisionsTableDataTest extends TestCase {
     }
 
     public void testShouldReturnCorretColumnClass(){
-        assertEquals(Boolean.class, data.getColumnClass(0));
+        assertEquals(String.class, data.getColumnClass(0));
         assertEquals(String.class, data.getColumnClass(1));
         assertEquals(String.class, data.getColumnClass(2));
         assertEquals(String.class, data.getColumnClass(3));
