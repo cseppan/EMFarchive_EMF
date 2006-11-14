@@ -61,8 +61,9 @@ public class RunControlStrategy {
             return;
         
         DatasetType datasetType = controlStrategy.getDatasetType();
-        int indexOf = datasetType.getName().indexOf("Nonpoint");
-        if (indexOf==-1)
+        int indexOfNonpoint = datasetType.getName().indexOf("Nonpoint");
+        int indexOfOnroad = datasetType.getName().indexOf("Onroad");
+        if (indexOfNonpoint == -1 && indexOfOnroad == -1)
             throw new EmfException("The dataset type '" + datasetType.getName() + "' is not supported yet.");
 
     }
