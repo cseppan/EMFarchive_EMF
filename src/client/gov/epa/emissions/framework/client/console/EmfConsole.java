@@ -37,7 +37,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     private StatusPresenter presenter;
 
     private static String aboutMessage = "<html><center>Emissions Modeling Framework (EMF)<br>"
-            + "Version 1.7 - 11/6/2006<br>" + "Developed by the Carolina Environmental Program<br>"
+            + "Version 1.7 - 11/14/2006<br>" + "Developed by the Carolina Environmental Program<br>"
             + "University of North Carolina at Chapel Hill</center></html>";
 
     private DesktopManager desktopManager;
@@ -47,7 +47,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     private EmfSession session;
 
     public EmfConsole(EmfSession session) {
-        super("EMF Console", "Emissions Modeling Framework (EMF):  " + session.user().getName() + "("
+        super("EMF Console", "Emissions Modeling Framework (EMF):  " + session.user().getName() + " ("
                 + session.user().getUsername() + ")");
         this.session = session;
 
