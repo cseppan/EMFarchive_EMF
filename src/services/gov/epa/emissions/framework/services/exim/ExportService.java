@@ -122,7 +122,7 @@ public class ExportService {
             }
         }
 
-        return prefix + name + "_" + date.toLowerCase() + suffix;
+        return prefix + name + "_" + date.toLowerCase() + "_v" + + version.getVersion() + suffix;
     }
 
     public void export(User user, EmfDataset[] datasets, Version[] versions, String dirName, String purpose,
