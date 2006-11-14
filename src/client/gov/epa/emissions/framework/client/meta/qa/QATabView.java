@@ -5,5 +5,5 @@ import gov.epa.emissions.framework.services.data.QAStep;
 public interface QATabView {
     void display(QAStep[] steps);
 
-    void observe(QATabPresenter presenter);
+    void observe(ViewQATabPresenter presenter);
 }

@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.info.InfoTabView;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabView;
 import gov.epa.emissions.framework.client.meta.notes.NotesTabView;
-import gov.epa.emissions.framework.client.meta.qa.QATabPresenter;
+import gov.epa.emissions.framework.client.meta.qa.ViewQATabPresenter;
 import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabView;
 import gov.epa.emissions.framework.services.basic.LoggingService;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
@@ -98,12 +98,12 @@ public class PropertiesViewPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldDisplayQATabOnSetQATab() throws Exception {
-        Mock qaTabPresenter = mock(QATabPresenter.class);
+        Mock qaTabPresenter = mock(ViewQATabPresenter.class);
         qaTabPresenter.expects(once()).method("display");
 
         PropertiesViewPresenter presenter = new PropertiesViewPresenter(null, null);
 
-        presenter.set((QATabPresenter) qaTabPresenter.proxy());
+        presenter.set((ViewQATabPresenter) qaTabPresenter.proxy());
     }
 
     public void testShouldDisplayNotesTabOnSetNotesTab() throws Exception {

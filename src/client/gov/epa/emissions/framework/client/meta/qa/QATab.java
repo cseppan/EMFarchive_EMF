@@ -24,7 +24,7 @@ public class QATab extends JPanel implements QATabView {
 
     private DesktopManager desktopManager;
 
-    private QATabPresenter presenter;
+    private ViewQATabPresenter presenter;
 
     private SortFilterSelectModel selectModel;
 
@@ -45,7 +45,7 @@ public class QATab extends JPanel implements QATabView {
         super.add(createButtonsSection(), BorderLayout.PAGE_END);
     }
 
-    public void observe(QATabPresenter presenter) {
+    public void observe(ViewQATabPresenter presenter) {
         this.presenter = presenter;
     }
 
