@@ -198,7 +198,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
         discountRate = new TextField("Discount Rate", 10);
         this.addChangeable(discountRate);
-        layoutGenerator.addLabelWidgetPair("Discount Rate:", discountRate, panel);
+        layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate, panel);
 
         detail = new TextField("Details", 10);
         this.addChangeable(detail);

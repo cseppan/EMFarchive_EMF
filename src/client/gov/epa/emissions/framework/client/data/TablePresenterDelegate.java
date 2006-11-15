@@ -27,6 +27,8 @@ public interface TablePresenterDelegate {
 
     DataAccessToken token();
 
+    void setRowAndSortFilter(String rowFilter, String sortOrder);
+    
     void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException;
 
     int pageNumber();

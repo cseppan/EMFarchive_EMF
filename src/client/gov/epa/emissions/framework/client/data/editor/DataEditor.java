@@ -59,7 +59,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private ChangeAwareButton save, discard;
 
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
- 
+
     public DataEditor(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
         super("Data Editor: " + dataset.getName(), desktopManager);
         setDimension();
@@ -239,9 +239,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         clearMessages();
         try {
             presenter.doSave();
-            resetChanges();
             displayMessage("Saved changes.");
-            disableSaveDiscard();
         } catch (EmfException e) {
             displayError("Could not save: " + e.getMessage());
             return;
@@ -275,8 +273,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         clearMessages();
         try {
             presenter.doDiscard();
-            resetChanges();
-            disableSaveDiscard();
             displayMessage("Discarded changes.");
         } catch (EmfException e) {
             displayError("Could not discard: " + e.getMessage());
@@ -326,7 +322,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         discard.signalChanges();
     }
 
-    private void disableSaveDiscard() {
+    public void disableSaveDiscard() {
         save.signalSaved();
         discard.signalSaved();
     }

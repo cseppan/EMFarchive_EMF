@@ -17,20 +17,26 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldDelegateOnApplyConstraints() throws EmfException {
         Mock delegate = mock(TablePresenterDelegate.class);
-        expects(delegate, 1, "doApplyConstraints");
-
-        TablePresenter p = new EditableTablePresenterImpl((TablePresenterDelegate) delegate.proxy(), null, null);
+        expects(delegate, 1, "setRowAndSortFilter");
+        
+        TablePresenter p = new EditableTablePresenterImpl((TablePresenterDelegate) delegate.proxy(), null, null, parentPresenter());
 
         String rowFilter = "rowFilter";
         String sortOrder = "col2";
         p.doApplyConstraints(rowFilter, sortOrder);
     }
 
+    private DataEditorPresenter parentPresenter() {
+        Mock parentPresenter = mock(DataEditorPresenter.class);
+        expects(parentPresenter,1,"doSave");
+        return (DataEditorPresenter) parentPresenter.proxy();
+    }
+
     public void testShouldDelegateOnTotalRecords() throws Exception {
         Mock delegate = mock(TablePresenterDelegate.class);
         stub(delegate, "totalRecords", new Integer(28));
 
-        TablePresenter p = new EditableTablePresenterImpl((TablePresenterDelegate) delegate.proxy(), null, null);
+        TablePresenter p = new EditableTablePresenterImpl((TablePresenterDelegate) delegate.proxy(), null, null,null);
 
         assertEquals(28, p.totalRecords());
     }
@@ -44,7 +50,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         expects(delegate, 1, "doDisplayNext");
 
         TablePresenter p = new EditableTablePresenterImpl((TablePresenterDelegate) delegate.proxy(),
-                (EditorPanelView) view.proxy(), null);
+                (EditorPanelView) view.proxy(), null, null);
 
         p.doDisplayNext();
     }
@@ -58,7 +64,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         expects(delegate, 1, "doDisplay", eq(new Integer(21)));
 
         TablePresenter p = new EditableTablePresenterImpl((TablePresenterDelegate) delegate.proxy(),
-                (EditorPanelView) view.proxy(), null);
+                (EditorPanelView) view.proxy(), null, null);
 
         p.doDisplay(21);
     }
@@ -80,7 +86,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         stub(paginator, "isCurrent", Boolean.FALSE);
 
         TablePresenter p = new EditableTablePresenterImpl(null, (TablePaginator) paginator.proxy(), null,
-                (EditorPanelView) view.proxy(), null);
+                (EditorPanelView) view.proxy(), null, null);
 
         p.doDisplayPageWithRecord(21);
     }
@@ -93,7 +99,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         stub(paginator, "totalRecords", new Integer(20));
 
         TablePresenter p = new EditableTablePresenterImpl(null, (TablePaginator) paginator.proxy(), null,
-                (EditorPanelView) view.proxy(), null);
+                (EditorPanelView) view.proxy(), null, null);
 
         p.doDisplayFirst();
     }
@@ -118,7 +124,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
 
         EditableTablePresenter p = new EditableTablePresenterImpl((DatasetType) datasetType.proxy(),
                 (TablePaginator) paginator.proxy(), tableMetadataProxy, (EditorPanelView) view.proxy(),
-                (DataEditorService) service.proxy());
+                (DataEditorService) service.proxy(), null);
 
         Page page = new Page();
         service.expects(once()).method("applyConstraints").with(ANYTHING, eq(""), eq(sortOrder))
@@ -137,7 +143,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         stub(paginator, "totalRecords", new Integer(20));
 
         TablePresenter p = new EditableTablePresenterImpl(null, (TablePaginator) paginator.proxy(), null,
-                (EditorPanelView) view.proxy(), null);
+                (EditorPanelView) view.proxy(), null, null);
 
         p.doDisplayLast();
     }
@@ -147,7 +153,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         expects(delegate, 1, "reloadCurrent");
 
         EditableTablePresenterImpl p = new EditableTablePresenterImpl((TablePresenterDelegate) delegate.proxy(), null,
-                null);
+                null, null);
 
         p.reloadCurrent();
     }

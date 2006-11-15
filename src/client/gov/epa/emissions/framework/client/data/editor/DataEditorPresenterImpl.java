@@ -59,7 +59,6 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
     private void display(DataAccessToken token, DataEditorView view) throws EmfException {
         this.view = view;
         view.observe(this);
-
         displayView(view);
 
         view.updateLockPeriod(token.lockStart(), token.lockEnd());
@@ -74,7 +73,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
 
     public void displayTable(EditorPanelView tableView) throws EmfException {
         tablePresenter = new EditableTablePresenterImpl(dataset.getDatasetType(), token, tableView.tableMetadata(),
-                tableView, dataEditorService());
+                tableView, dataEditorService(), this);
         displayTable(tablePresenter);
     }
 
@@ -100,6 +99,12 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
 
     public void doDiscard() throws EmfException {
         discard(dataEditorService(), token, tablePresenter);
+        reset(view);
+    }
+
+    private void reset(DataEditorView view) {
+        view.resetChanges();
+        view.disableSaveDiscard();
     }
 
     void discard(DataEditorService service, DataAccessToken token, EditableTablePresenter tablePresenter)
@@ -125,6 +130,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
             tablePresenter.reloadCurrent();
             view.updateLockPeriod(token.lockStart(), token.lockEnd());
             changesSaved = true;
+            reset(view);
         } catch (EmfException e) {
             clearChangesSaved();
             view.notifySaveFailure(e.getMessage());

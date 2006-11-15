@@ -27,5 +27,7 @@ public interface DataEditorView extends ManagedView {
     Revision revision();
 
     boolean verifyRevisionInput();
+    
+    void disableSaveDiscard();
 
 }

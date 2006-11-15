@@ -122,7 +122,9 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldSubmitAnyChangesAndSaveChangesOnSave() throws Exception {
         Mock view = mock(DataEditorView.class);
-        view.expects(once()).method("updateLockPeriod");
+        expects(view,1,"updateLockPeriod");
+        expects(view,1,"resetChanges");
+        expects(view,1,"disableSaveDiscard");
         
         EmfDataset dataset = new EmfDataset();
 

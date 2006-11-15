@@ -19,20 +19,25 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
 
     private TablePresenterDelegate delegate;
 
+    private DataEditorPresenter parentPresenter;
+
     public EditableTablePresenterImpl(DatasetType datasetType, DataAccessToken token, TableMetadata tableMetadata,
-            EditorPanelView view, DataEditorService service) {
-        this(datasetType, new TablePaginatorImpl(token, view, service), tableMetadata, view, service);
+            EditorPanelView view, DataEditorService service, DataEditorPresenter parentPresenter) {
+        this(datasetType, new TablePaginatorImpl(token, view, service), tableMetadata, view, service, parentPresenter);
     }
 
     public EditableTablePresenterImpl(DatasetType datasetType, TablePaginator paginator, TableMetadata tableMetadata,
-            EditorPanelView view, DataEditorService service) {
-        this(new TablePresenterDelegateImpl(datasetType, paginator, tableMetadata, view, service), view, service);
+            EditorPanelView view, DataEditorService service, DataEditorPresenter parentPresenter) {
+        this(new TablePresenterDelegateImpl(datasetType, paginator, tableMetadata, view, service), view, service,
+                parentPresenter);
     }
 
-    public EditableTablePresenterImpl(TablePresenterDelegate delegate, EditorPanelView view, DataEditorService service) {
+    public EditableTablePresenterImpl(TablePresenterDelegate delegate, EditorPanelView view, DataEditorService service,
+            DataEditorPresenter parentPresenter) {
         this.service = service;
         this.view = view;
         this.delegate = delegate;
+        this.parentPresenter = parentPresenter;
     }
 
     public void display() throws EmfException {
@@ -97,7 +102,8 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
     }
 
     public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
-        delegate.doApplyConstraints(rowFilter, sortOrder);
+        delegate.setRowAndSortFilter(rowFilter, sortOrder);
+        parentPresenter.doSave();
     }
 
 }

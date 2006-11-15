@@ -91,10 +91,14 @@ public class TablePresenterDelegateImpl implements TablePresenterDelegate {
 
     Page applyConstraints(String rowFilter, String sortOrder) throws EmfException {
         validateColsInSortOrder(sortOrder);
-        this.rowFilter = rowFilter;
-        this.sortOrder = sortOrder;
+        setRowAndSortFilter(rowFilter, sortOrder);
 
         return service.applyConstraints(token(), rowFilter, sortOrder);
+    }
+
+    public void setRowAndSortFilter(String rowFilter, String sortOrder) {
+        this.rowFilter = rowFilter;
+        this.sortOrder = sortOrder;
     }
 
     private void validateColsInSortOrder(String sortOrder) throws EmfException {

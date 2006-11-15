@@ -81,7 +81,7 @@ public class EmfCall {
 
     public void enableSession() {
         call.setMaintainSession(true);
-        call.setTimeout(new Integer(0));  
+        call.setTimeout(new Integer(60*60));  
     }
 
     public void addIntegerParam(String id) {
