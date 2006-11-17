@@ -18,10 +18,10 @@
 	<many-to-one cascade="save-update" name="strategyResultType"
 		 class ="gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType"
 		 column="strategy_result_type_id" unique="true" not-null="true"/>
-	<many-to-one cascade="save-update" name="detailedResultDataset"
+	<many-to-one  name="detailedResultDataset"
 		 class ="gov.epa.emissions.framework.services.data.EmfDataset"
 		 column="detailed_result_dataset_id" unique="true" not-null="true"/>
-    <many-to-one cascade="save-update" name="controlledInventoryDataset"
+    <many-to-one name="controlledInventoryDataset"
 		 class ="gov.epa.emissions.framework.services.data.EmfDataset"
 		 column="controlled_inven_dataset_id" unique="true" not-null="false"/>
 	
