@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.GenerateSccCont
 import gov.epa.emissions.framework.services.cost.controlStrategy.SccControlMeasuresMap;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +14,12 @@ public class GenerateSccControlMeasuresMapTest extends MaxEmsRedStrategyTestCase
     
     public void testShouldCreateASccControlMeasureSccMap() throws Exception {
         try {
+            EmfDataset inputDS = setInputDataset("ORL nonpoint");
             ControlMeasure cm1 = addControlMeasure("Control Measure 1", "CM1", sccs1(), new EfficiencyRecord[0]);
             ControlMeasure cm2 = addControlMeasure("Control Measure 2", "CM2", sccs2(), new EfficiencyRecord[0]);
-            ControlStrategy strategy = controlStrategy(inputDataset, "CS1", pm10Pollutant());
+            ControlStrategy strategy = controlStrategy(inputDS, "CS1", pm10Pollutant());
             GenerateSccControlMeasuresMap createMap = new GenerateSccControlMeasuresMap(dbServer(),
-                    qualfiedTableName(emissionTableName()), strategy, sessionFactory());
+                    qualfiedTableName(emissionTableName(inputDS)), strategy, sessionFactory());
             SccControlMeasuresMap map = createMap.create();
             assertEquals("map size 9", 9, map.size());
             ControlMeasure[] measures = map.getControlMeasures("2294000000");
@@ -40,8 +42,8 @@ public class GenerateSccControlMeasuresMapTest extends MaxEmsRedStrategyTestCase
         return dbServer().getEmissionsDatasource().getName() + "." + table;
     }
 
-    private String emissionTableName() {
-        return inputDataset.getInternalSources()[0].getTable();
+    private String emissionTableName(EmfDataset inputDS) throws Exception {
+        return inputDS.getInternalSources()[0].getTable();
     }
 
     private Scc[] sccs1() {

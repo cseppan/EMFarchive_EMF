@@ -12,6 +12,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
+import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
@@ -30,19 +31,27 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
 
     private SqlDataTypes sqlDataTypes;
 
-    protected EmfDataset inputDataset;
-
     protected String tableName = "test" + Math.round(Math.random() * 1000) % 1000;
 
     protected void doSetUp() throws Exception {
         dbServer = dbServer();
         sqlDataTypes = dbServer.getSqlDataTypes();
-        inputDataset = new EmfDataset();
+    }
+
+    protected EmfDataset setInputDataset(String type) throws Exception {
+        EmfDataset inputDataset = new EmfDataset();
         inputDataset.setName(tableName);
         inputDataset.setCreator(emfUser().getUsername());
         inputDataset.setDatasetType(orlNonpointDatasetType());
-        inputDataset = addORLNonpointDataset();
+
+        if (type.equalsIgnoreCase("ORL nonpoint"))
+            inputDataset = addORLNonpointDataset(inputDataset);
+        
+        if (type.equalsIgnoreCase("ORL onroad"))
+            inputDataset = addORLOnroadDataset(inputDataset);
+        
         addVersionZeroEntryToVersionsTable(inputDataset, dbServer.getEmissionsDatasource());
+        return inputDataset;
     }
 
     private DatasetType orlNonpointDatasetType() {
@@ -84,7 +93,7 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         return (StrategyType) load(StrategyType.class, "Max Emissions Reduction");
     }
 
-    private EmfDataset addORLNonpointDataset() throws ImporterException {
+    private EmfDataset addORLNonpointDataset(EmfDataset inputDataset) throws ImporterException {
         Version version = new Version();
         version.setVersion(0);
         version.setDatasetId(inputDataset.getId());
@@ -92,6 +101,21 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         File folder = new File("test/data/cost");
         String[] fileNames = { "orl-nonpoint-with-larger_values.txt" };
         ORLNonPointImporter importer = new ORLNonPointImporter(folder, fileNames, inputDataset, dbServer, sqlDataTypes,
+                new VersionedDataFormatFactory(version, inputDataset));
+        importer.run();
+        add(inputDataset);
+        session.flush();
+        return (EmfDataset) load(EmfDataset.class, tableName);
+    }
+
+    private EmfDataset addORLOnroadDataset(EmfDataset inputDataset) throws ImporterException {
+        Version version = new Version();
+        version.setVersion(0);
+        version.setDatasetId(inputDataset.getId());
+
+        File folder = new File("test/data/orl/nc");
+        String[] fileNames = { "orl_onroad_with_poll_name_txt_17aug2006.txt" };
+        ORLOnRoadImporter importer = new ORLOnRoadImporter(folder, fileNames, inputDataset, dbServer, sqlDataTypes,
                 new VersionedDataFormatFactory(version, inputDataset));
         importer.run();
         add(inputDataset);

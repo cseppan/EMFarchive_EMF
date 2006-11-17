@@ -16,8 +16,10 @@ import java.util.List;
 
 public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
 
-    public void testShouldRunMaxEmsRedStrategyWithOneControlMeasure() throws Exception {
+    public void testShouldRunMaxEmsRedStrategyWithOneControlMeasureAndNonpointData() throws Exception {
         ControlStrategy strategy = null;
+        EmfDataset inputDataset = setInputDataset("ORL nonpoint");
+        
         try {
             EfficiencyRecord[] records = { record(pm10Pollutant(), "", 90, 900, 1989) };
             addControlMeasure("Control Measure 1", "CM1", sccs(), records);
@@ -33,14 +35,36 @@ public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            dropTables(strategy);
+            dropTables(strategy, inputDataset);
             removeData();
-
         }
-
     }
 
-    private void dropTables(ControlStrategy strategy) throws Exception {
+    public void testShouldRunMaxEmsRedStrategyWithOneControlMeasureAndOnroadData() throws Exception {
+        ControlStrategy strategy = null;
+        EmfDataset inputDataset = setInputDataset("ORL onroad");
+        
+        try {
+            EfficiencyRecord[] records = { record(pm10Pollutant(), "", 90, 900, 1989) };
+            addControlMeasure("Control Measure 1", "CM1", sccs(), records);
+            strategy = controlStrategy(inputDataset, "CS1", pm10Pollutant());
+            User user = emfUser();
+            strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
+            
+            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServer(),
+                    new Integer(500), sessionFactory());
+            maxEmfEmsRedStrategy.run();
+            assertEquals("No of rows in the detail result table is 3", 3,
+                    countRecords(detailResultDatasetTableName(strategy)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dropTables(strategy, inputDataset);
+            removeData();
+        }
+    }
+
+    private void dropTables(ControlStrategy strategy, EmfDataset inputDataset) throws Exception {
         if (strategy != null)
             dropTable(detailResultDatasetTableName(strategy), dbServer().getEmissionsDatasource());
         dropQASummaryTables(inputDataset);
