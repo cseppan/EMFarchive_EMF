@@ -31,7 +31,7 @@ public class FileFormatFactory {
         if (type.getName().startsWith("ORL Nonroad"))
             return new VersionedTableFormat(new ORLNonRoadFileFormat(types), types);
 
-        if (type.getName().startsWith("ORL OnRoad"))
+        if (type.getName().startsWith("ORL Onroad"))
             return new VersionedTableFormat(new ORLOnRoadFileFormat(types), types);
 
         if (type.getName().startsWith("ORL Point"))
