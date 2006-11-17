@@ -110,6 +110,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         yearValidation = new YearValidation("Cost Year");
         
         doLayout(this.parentConsole, measures);
+        this.messagePanel.setMessage("Please select a major pollutant to retrieve related control measures.");
         super.display();
     }
     
