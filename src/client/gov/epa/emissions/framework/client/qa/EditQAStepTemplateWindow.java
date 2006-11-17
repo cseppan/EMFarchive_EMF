@@ -41,7 +41,8 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         super.setLabel(super.getTitle() + ": " + title);
     }
 
-    public void display(DatasetType type, QAProgram[] programs) {
+    public void display(DatasetType type, QAProgram[] programs, QAStepTemplate template) {
+        this.template = template;
         layout = createLayout(type, programs);
         super.getContentPane().add(layout);
         super.display();
@@ -57,6 +58,8 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         panel.add(templatePanel);
         panel.add(buttonsPanel(type));
 
+        populateFields(this.template);
+        
         return panel;
     }
 
@@ -147,8 +150,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         return templatePanel.getOrder().length() == 0 ? 0 : Float.parseFloat(templatePanel.getOrder());
     }
 
-    public void populateFields(QAStepTemplate template) {
-        this.template = template;
+    private void populateFields(QAStepTemplate template) {
         templatePanel.setFields(template);
         resetChanges();
     }

@@ -19,8 +19,7 @@ public class EditQAStepTemplatesPresenterImpl implements EditQAStepTemplatesPres
     
     public void display(DatasetType type,QAProgram[] programs, QAStepTemplate template) {
         view.observe(this);
-        view.display(type,programs);
-        view.populateFields(template);
+        view.display(type,programs, template);
     }
     
     public void doEdit() throws EmfException {

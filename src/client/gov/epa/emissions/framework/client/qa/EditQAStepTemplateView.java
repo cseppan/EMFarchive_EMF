@@ -7,11 +7,9 @@ import gov.epa.emissions.framework.services.EmfException;
 
 public interface EditQAStepTemplateView {
 
-    void display(DatasetType type, QAProgram[] programs);
+    void display(DatasetType type, QAProgram[] programs, QAStepTemplate template);
 
     void observe(EditQAStepTemplatesPresenterImpl presenter);
 
     void loadTemplate() throws EmfException;
-
-    void populateFields(QAStepTemplate template);
 }

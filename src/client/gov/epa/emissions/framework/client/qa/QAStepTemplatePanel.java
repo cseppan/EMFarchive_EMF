@@ -162,10 +162,22 @@ public class QAStepTemplatePanel extends JPanel {
 
     public void setFields(QAStepTemplate template) {
         name.setText(template.getName());
-        program.setSelectedItem(template.getProgram());
+        program.setSelectedIndex(getItemIndex(template));
         programParameters.setText(template.getProgramArguments());
         required.setSelected(template.isRequired());
         order.setText(template.getOrder() + "");
         description.setText(template.getDescription());
+    }
+
+    private int getItemIndex(QAStepTemplate template) {
+        int size = program.getItemCount();
+
+        for (int i = 0; i < size; i++) {
+            String name = program.getItemAt(i).toString();
+            if (name.equalsIgnoreCase(template.getProgram().getName()))
+                return i;
+        }
+        
+        return 0;
     }
 }
