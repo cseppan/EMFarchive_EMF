@@ -40,6 +40,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private JCheckBox overwrite;
 
     private TextArea purpose;
+    
+    private JButton exportButton;
 
     public ExportWindow(EmfDataset[] datasets, DesktopManager desktopManager) {
         super(title(datasets), desktopManager);
@@ -147,7 +149,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        JButton exportButton = new ExportButton(new AbstractAction() {
+        exportButton = new ExportButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 clearMessagePanel();
                 doExport();
@@ -181,6 +183,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");
+            
+            exportButton.setEnabled(false);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
