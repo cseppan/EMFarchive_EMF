@@ -34,7 +34,7 @@ public class EmfCall {
     public void setStringReturnType() {
         mappings.setStringReturnType(call);
     }
-    
+
     public void request(Object[] params) throws EmfException {
         try {
             call.invoke(params);
@@ -81,13 +81,14 @@ public class EmfCall {
 
     public void enableSession() {
         call.setMaintainSession(true);
-        call.setTimeout(new Integer(60*60));  
+        // never time out
+        call.setTimeout(new Integer(0));
     }
 
     public void addIntegerParam(String id) {
         mappings.addIntegerParam(call, id);
     }
-    
+
     public void addIntArrayParam() {
         mappings.addIntArrayParam(call);
     }
@@ -102,7 +103,7 @@ public class EmfCall {
 
     public void addIntParam() {
         mappings.addIntParam(call);
-        
+
     }
 
 }
