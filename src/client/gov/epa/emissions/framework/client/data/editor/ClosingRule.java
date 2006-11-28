@@ -39,19 +39,19 @@ public class ClosingRule {
         return session.dataCommonsService();
     }
 
-    public void close(boolean changesSaved) throws EmfException {
+    public void close(boolean askForRevision) throws EmfException {
         if (shouldCancelClose())
             return;
 
-        proceedWithClose(changesSaved);
+        proceedWithClose(askForRevision);
     }
 
     public boolean shouldCancelClose() throws EmfException {
         return hasChanges() && !view.confirmDiscardChanges();
     }
 
-    public void proceedWithClose(boolean changesSaved) throws EmfException {
-        if (changesSaved)
+    public void proceedWithClose(boolean askForRevision) throws EmfException {
+        if (askForRevision)
             saveRevision();
 
         dataEditorService().closeSession(token);
