@@ -42,7 +42,6 @@ public class RunQAStepTask {
                 runSteps(qaStep);
             }
         } catch (EmfException e) {
-            e.printStackTrace();
             setStatus("Failed to run QA step " + qaStep.getName() + suffix(qaStep) + ". " + e.getMessage());
             throw new EmfException("Failed to run QA step : " + qaStep.getName() + suffix(qaStep));
         }
