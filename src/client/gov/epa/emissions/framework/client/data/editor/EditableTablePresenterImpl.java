@@ -104,6 +104,7 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
     public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
         delegate.setRowAndSortFilter(rowFilter, sortOrder);
         parentPresenter.doSave();
+        delegate.updateFilteredCount();
     }
 
 }
