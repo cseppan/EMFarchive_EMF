@@ -48,7 +48,6 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
             view.notifyLockFailure(token);
             return;
         }
-
         display(token, view);
     }
 
@@ -111,7 +110,6 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
             throws EmfException {
         service.discard(token);
         tablePresenter.reloadCurrent();
-        clearChangesSaved();
     }
 
     public void doSave() throws EmfException {
@@ -120,8 +118,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
 
     void save(DataEditorView view, DataAccessToken token, EditableTablePresenter tablePresenter,
             DataEditorService service, ClosingRule closingRule) throws EmfException {
-
-        tablePresenter.submitChanges();
+        changesSaved = changesSaved || tablePresenter.submitChanges();
         Date currentDate = new Date();
         dataset.setModifiedDateTime(currentDate);
         token.getVersion().setLastModifiedDate(currentDate);
@@ -130,18 +127,12 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
             token = service.save(token, dataset, version);
             tablePresenter.reloadCurrent();
             view.updateLockPeriod(token.lockStart(), token.lockEnd());
-            changesSaved = true;
             reset(view);
         } catch (EmfException e) {
-            clearChangesSaved();
             view.notifySaveFailure(e.getMessage());
             discard(service, token, tablePresenter);
             closingRule.proceedWithClose(areChangesSaved());
         }
-    }
-
-    private void clearChangesSaved() {
-        changesSaved = false;
     }
 
     public void doAddNote(NewNoteView view) throws EmfException {

@@ -83,14 +83,16 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
         return delegate.totalRecords();
     }
 
-    public void submitChanges() throws EmfException {
+    public boolean submitChanges() throws EmfException {
+        boolean dataWasChanged = false;
         ChangeSet changeset = view.changeset();
         if (changeset.hasChanges()) {
             service.submit(token(), changeset, delegate.pageNumber());
             changeset.clear();
+            dataWasChanged = true;
         }
-
         delegate.updateFilteredCount();
+        return dataWasChanged;
     }
 
     private DataAccessToken token() {
