@@ -120,11 +120,6 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
 
     void save(DataEditorView view, DataAccessToken token, EditableTablePresenter tablePresenter,
             DataEditorService service, ClosingRule closingRule) throws EmfException {
-        // FIXME: implement a good solution
-        boolean promptForRevision = false;
-        if (closingRule.hasChanges()) {
-            promptForRevision = true;
-        }
 
         tablePresenter.submitChanges();
         Date currentDate = new Date();
@@ -137,7 +132,6 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
             view.updateLockPeriod(token.lockStart(), token.lockEnd());
             changesSaved = true;
             reset(view);
-            changesSaved = promptForRevision;// FIXME:
         } catch (EmfException e) {
             clearChangesSaved();
             view.notifySaveFailure(e.getMessage());
