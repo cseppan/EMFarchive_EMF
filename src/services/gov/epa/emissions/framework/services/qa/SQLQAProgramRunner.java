@@ -39,6 +39,7 @@ public class SQLQAProgramRunner implements QAProgramRunner {
         }
         String tableName = tableName(qaStep);
         String query = query(dbServer, qaStep, tableName);
+        printQuery(query);
         try {
             dropTable(tableName);
             dbServer.getEmissionsDatasource().query().execute(query);
@@ -47,6 +48,10 @@ public class SQLQAProgramRunner implements QAProgramRunner {
             failure(qaStep);
             throw new EmfException("Check the query - " + query);
         }
+    }
+
+    private void printQuery(String query) {
+        System.out.println("QA Step '" + qaStep.getName() + "' query: " + query);
     }
 
     private void dropTable(String tableName) throws EmfException {
