@@ -18,6 +18,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
     public void testShouldDelegateOnApplyConstraints() throws EmfException {
         Mock delegate = mock(TablePresenterDelegate.class);
         expects(delegate, 1, "setRowAndSortFilter");
+        expects(delegate,1,"updateFilteredCount");
         
         TablePresenter p = new EditableTablePresenterImpl((TablePresenterDelegate) delegate.proxy(), null, null, parentPresenter());
 
