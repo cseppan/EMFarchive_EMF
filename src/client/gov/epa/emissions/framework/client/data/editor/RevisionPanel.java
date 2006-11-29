@@ -51,11 +51,11 @@ public class RevisionPanel extends JPanel {
         setReferencesDialog = new SetReferencesDialog(parent);
 
         super.add(createLayout());
-        super.setBorder(new Border("Revision Information"));
+        super.setBorder(new Border("Revision Information (auto-saved when window is closed)"));
     }
 
     private JPanel createLayout() {
-        JPanel panel = new JPanel(new BorderLayout(10, 3));
+        JPanel panel = new JPanel(new BorderLayout(10, 0));
 
         panel.add(mainPanel(), BorderLayout.CENTER);
         panel.add(referencesPanel(), BorderLayout.LINE_END);
