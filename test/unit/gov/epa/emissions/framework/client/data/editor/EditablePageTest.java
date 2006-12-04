@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.TableMetadata;
+import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.List;
@@ -34,11 +35,11 @@ public class EditablePageTest extends TestCase {
         page = new Page();
 
         record1 = new VersionedRecord();
-        record1.setTokens(new Object[] { "1", new Double(2.0), new Integer(3)});
+        record1.setTokens(new Object[] { "1", new Double(2.0), new Integer(3) });
         page.add(record1);
 
         record2 = new VersionedRecord();
-        record2.setTokens(new Object[] { "11", new Double(4.0), new Integer(6)});
+        record2.setTokens(new Object[] { "11", new Double(4.0), new Integer(6) });
         page.add(record2);
 
         cols = new String[] { "col1", "col2", "col3" };
@@ -90,13 +91,31 @@ public class EditablePageTest extends TestCase {
         assertEquals(Long.class, data.getColumnClass(5));
     }
 
+    public void testShouldSelectAllColumnsWhenSelectAllCalled() {
+        data.selectAll();
+        List rows = data.rows();
+        for (int i = 0; i < rows.size(); i++) {
+            EditableRow row = (EditableRow) rows.get(i);
+            assertEquals(Boolean.TRUE,row.getValueAt(0));
+        }
+    }
+    
+    public void testShouldClearAllColumnsWhenClearAllCalled() {
+        data.clearAll();
+        List rows = data.rows();
+        for (int i = 0; i < rows.size(); i++) {
+            EditableRow row = (EditableRow) rows.get(i);
+            assertEquals(Boolean.FALSE,row.getValueAt(0));
+        }
+    }
+
     public void testAllColumnsShouldBeEditableExceptLastTwo() {
         int length = data.columns().length;
-        for (int i = 0; i < length-2; i++){
+        for (int i = 0; i < length - 2; i++) {
             assertTrue("All cells should be editable", data.isEditable(i));
         }
-        assertFalse("not editable", data.isEditable(length-2));
-        assertFalse("not editable", data.isEditable(length-1));
+        assertFalse("not editable", data.isEditable(length - 2));
+        assertFalse("not editable", data.isEditable(length - 1));
     }
 
     public void testRowsShouldContainDataValuesOfRecord() {

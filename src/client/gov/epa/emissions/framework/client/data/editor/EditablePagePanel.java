@@ -69,6 +69,18 @@ public class EditablePagePanel extends JPanel {
         String nameDelete = "Delete";
         JButton buttonDelete = toolbar.add(deleteAction(tableData, nameDelete, iconDelete));
         buttonDelete.setToolTipText(nameDelete);
+
+        String selectAll = "/selectAll.jpeg";
+        ImageIcon iconSelectAll = createImageIcon(selectAll);
+        String nameSelectAll = "Select All";
+        JButton buttonSelectAll = toolbar.add(selectAction(true, tableData, nameSelectAll, iconSelectAll));
+        buttonSelectAll.setToolTipText(nameSelectAll);
+
+        String clearAll = "/clearAll.jpeg";
+        ImageIcon iconClearAll = createImageIcon(clearAll);
+        String nameClearAll = "Clear All";
+        JButton buttonClearAll = toolbar.add(selectAction(false, tableData, nameClearAll, iconClearAll));
+        buttonClearAll.setToolTipText(nameClearAll);
         return toolbar;
     }
 
@@ -101,6 +113,21 @@ public class EditablePagePanel extends JPanel {
         return new AbstractAction(name, icon) {
             public void actionPerformed(ActionEvent e) {
                 doAdd(tableData, editableTable, above);
+            }
+        };
+    }
+
+    private Action selectAction(final boolean select, final EditablePage tableData, String name, ImageIcon icon) {
+        return new AbstractAction(name, icon) {
+            public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
+                
+                if (select)
+                    tableData.selectAll();
+                else
+                    tableData.clearAll();
+                
+                refresh();
             }
         };
     }

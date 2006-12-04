@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class EditablePage extends AbstractEditableTableData implements SelectableTableData {
-    
+
     private List rows;
 
     private int datasetId;
@@ -28,7 +28,7 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
 
     private String[] columnNames;
 
-    private Class []columnClasses;
+    private Class[] columnClasses;
 
     public EditablePage(int datasetId, Version version, Page page, TableMetadata tableMetadata) {
         this.datasetId = datasetId;
@@ -53,16 +53,16 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
         for (int i = 4; i < cols.length; i++) {
             list.add(cols[i].getName());
         }
-        list.add(cols[0].getName());  //record_id
-        list.add(cols[2].getName());  //version
+        list.add(cols[0].getName()); // record_id
+        list.add(cols[2].getName()); // version
 
         return (String[]) list.toArray(new String[0]);
     }
-    
-    private Class[] columnClasses(){
+
+    private Class[] columnClasses() {
         List classes = new ArrayList();
         classes.add(Boolean.class);
-        for (int i = 1; i < columnNames.length; i++) {//first column is 'Select'
+        for (int i = 1; i < columnNames.length; i++) {// first column is 'Select'
             ColumnMetaData data = tableMetadata.columnMetadata(columnNames[i]);
             classes.add(classType(data.getType()));
         }
@@ -174,7 +174,7 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
         record.setVersion(version.getVersion());
         record.setDeleteVersions("");
         List tokens = new ArrayList();
-        //0-3 are record id and version related columns 
+        // 0-3 are record id and version related columns
         for (int i = 4; i < tableMetadata.getCols().length; i++) {
             tokens.add(null);
         }
@@ -183,7 +183,6 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
         rows.add(row, row(record));
         changeset.addNew(record);
     }
-
 
     public void removeSelected() {
         VersionedRecord[] records = getSelected();
@@ -195,13 +194,28 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
     public Class getColumnClass(int col) {
         return columnClasses[col];
     }
-    
+
     public ChangeSet changeset() {
         return changeset;
     }
 
     public TableMetadata getTableMetadata() {
         return tableMetadata;
+    }
+
+    public void selectAll() {
+        setValueForSelectColumn(Boolean.TRUE);
+    }
+
+    public void clearAll() {
+        setValueForSelectColumn(Boolean.FALSE);
+    }
+
+    private void setValueForSelectColumn(Boolean value) {
+        for (int i = 0; i < rows.size(); i++) {
+            EditableRow row = (EditableRow) rows.get(i);
+            row.setValueAt(value, 0);
+        }
     }
 
 }
