@@ -1,12 +1,22 @@
 package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -103,6 +113,71 @@ public class DatasetDAO {
     public EmfDataset getDataset(Session session, int id) {
         Criterion criterion = Restrictions.eq("id", new Integer(id));
         return (EmfDataset) hibernateFacade.load(EmfDataset.class, criterion, session);
+    }
+    
+    public long getDatasetRecordsNumber(DbServer dbServer, Session session, EmfDataset dataset, Version version) throws SQLException {
+        Datasource datasource = dbServer.getEmissionsDatasource();
+        InternalSource source = dataset.getInternalSources()[0];
+        String qualifiedTable = datasource.getName() + "." + source.getTable();
+        String countQuery = "SELECT count(*) FROM " + qualifiedTable + getWhereClause(version, session);
+        long totalCount = 0;
+        
+        try {
+            Connection connection = datasource.getConnection();
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(countQuery);
+            resultSet.next();
+            totalCount = resultSet.getInt(1);
+
+            resultSet.close();
+        } catch (SQLException e) {
+            throw new SQLException("Cannot get total records number on dataset: " + dataset.getName() +
+                    " Reason: " + e.getMessage());
+        } finally {
+            dbServer.disconnect();
+        }
+        
+        return totalCount;
+    }
+
+    private String getWhereClause(Version version, Session session) {
+        String versions = versionsList(version, session);
+        String deleteClause = createDeleteClause(versions);
+
+        String whereClause = " WHERE dataset_id = " + version.getDatasetId() + " AND version IN ("
+                + versions + ") AND " + deleteClause;
+        
+        return whereClause;
+    }
+
+    private String createDeleteClause(String versions) {
+        StringBuffer buffer = new StringBuffer();
+
+        StringTokenizer tokenizer = new StringTokenizer(versions, ",");
+        // e.g.: delete_version NOT SIMILAR TO '(6|6,%|%,6,%|%,6)'
+        while (tokenizer.hasMoreTokens()) {
+            String version = tokenizer.nextToken();
+            String regex = "(" + version + "|" + version + ",%|%," + version + ",%|%," + version + ")";
+            buffer.append(" delete_versions NOT SIMILAR TO '" + regex + "'");
+
+            if (tokenizer.hasMoreTokens())
+                buffer.append(" AND ");
+        }
+
+        return buffer.toString();
+    }
+
+    private String versionsList(Version finalVersion, Session session) {
+        Versions versions = new Versions();
+        Version[] path = versions.getPath(finalVersion.getDatasetId(), finalVersion.getVersion(), session);
+
+        StringBuffer result = new StringBuffer();
+        for (int i = 0; i < path.length; i++) {
+            result.append(path[i].getVersion());
+            if ((i + 1) < path.length)
+                result.append(",");
+        }
+        return result.toString();
     }
 
 }

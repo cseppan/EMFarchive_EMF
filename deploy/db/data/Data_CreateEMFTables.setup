@@ -177,11 +177,17 @@ CREATE TABLE emf.dataset_access_logs
 (
   id SERIAL PRIMARY KEY,
   dataset_id int4 REFERENCES emf.datasets (id) NOT NULL,
+  lines_exported int8,
   username varchar(255) REFERENCES emf.users (username) NOT NULL,
+  dataset_name varchar(255) NOT NULL,
   date timestamp NOT NULL,
+  start_date timestamp NOT NULL,
+  end_date timestamp NOT NULL,
+  time_reqrd real NOT NULL,
   version varchar(255) NOT NULL,
   description text NOT NULL,
-  "location" varchar(255) NOT NULL
+  "location" varchar(255) NOT NULL,
+  details text
 ) 
 WITHOUT OIDS;
 --emf.datasets

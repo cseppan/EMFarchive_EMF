@@ -11,16 +11,28 @@ public class AccessLog {
     private int id;
 
     private int datasetId;
+    
+    private String datasetname;
 
     private String username;
+    
+    private long linesExported;
 
     private Date timestamp;
+    
+    private Date startdate;
+    
+    private Date enddate;
+    
+    private double timereqrd;
 
     private String version = "v1";
 
     private String description;
 
     private String folderPath;
+    
+    private String details;
 
     public AccessLog() {// No argument constructor needed for hibernate mapping
     }
@@ -117,6 +129,57 @@ public class AccessLog {
 
     public int hashCode() {
         return toString().hashCode();
+    }
+
+    public String getDatasetname() {
+        return datasetname;
+    }
+
+    public void setDatasetname(String datasetname) {
+        this.datasetname = datasetname;
+    }
+
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+    public Date getEnddate() {
+        return enddate;
+    }
+
+    public void setEnddate(Date enddate) {
+        this.enddate = enddate;
+    }
+
+    public Date getStartdate() {
+        return startdate;
+    }
+
+    public void setStartdate(Date startdate) {
+        this.startdate = startdate;
+    }
+
+    public double getTimereqrd() {
+        if (startdate != null && enddate != null)
+            return enddate.getTime() - startdate.getTime();
+        
+        return timereqrd;
+    }
+
+    public void setTimereqrd(double timereqrd) {
+        this.timereqrd = timereqrd;
+    }
+
+    public long getLinesExported() {
+        return linesExported;
+    }
+
+    public void setLinesExported(long linesExported) {
+        this.linesExported = linesExported;
     }
 
 }

@@ -1,7 +1,10 @@
 package gov.epa.emissions.framework.services.exim;
 
+import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.AccessLog;
@@ -42,8 +45,10 @@ public class ExportTask implements Runnable {
 
     private HibernateSessionFactory sessionFactory;
 
+    private Version version;
+
     protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog,
-            Exporter exporter, HibernateSessionFactory sessionFactory) {
+            Exporter exporter, HibernateSessionFactory sessionFactory, Version version) {
         this.user = user;
         this.file = file;
         this.dataset = dataset;
@@ -52,20 +57,65 @@ public class ExportTask implements Runnable {
         this.exporter = exporter;
         this.accesslog = accesslog;
         this.sessionFactory = sessionFactory;
+        this.version = version;
     }
 
     public void run() {
         try {
             setStartStatus();
+            accesslog.setStartdate(new Date());
             exporter.export(file);
+            accesslog.setEnddate(new Date());
+            accesslog.setLinesExported(exporter.getExportedLinesCount());
 
             loggingService.setAccessLog(accesslog);
+            
+            printLogInfo(accesslog);
+            if (!compareDatasetRecordsNumbers())
+                return;
             //updateDataset(dataset);  //Disabled because of nothing updated during exporting
             setStatus("Completed export of " + dataset.getName() + " to " + file.getAbsolutePath());
         } catch (Exception e) {
-            log.error("Problem attempting to export file : " + file, e);
-            setStatus("Export failure." + e.getMessage());
+            setErrorStatus(e, e.getMessage());
         }
+    }
+    
+    private void printLogInfo(AccessLog log) {
+        System.out.println("Exported dataset: " + log.getDatasetname() +
+                " version: " + log.getVersion() + 
+                " start date: " + log.getStartdate() +
+                " end date: " + log.getEnddate() +
+                " time required (ms): " + log.getTimereqrd() +
+                " user: " + log.getUsername() + 
+                " path: " + log.getFolderPath() +
+                " details: " + log.getDetails());
+    }
+
+    private boolean compareDatasetRecordsNumbers() throws Exception {
+        DatasetDAO datasetDao = new DatasetDAO();
+        DbServer dbServer = new EmfDbServer();
+        Session session = sessionFactory.getSession();
+        
+        long records = datasetDao.getDatasetRecordsNumber(dbServer, session, dataset, version);
+        session.close();
+        
+        if (records != exporter.getExportedLinesCount()) {
+            setErrorStatus(null, "");
+            return false;
+        }
+        
+        return true;
+    }
+
+    private void setErrorStatus(Exception e, String message) {
+        if (e == null) {
+            log.error("Problem attempting to export file : " + file, new Exception(message));
+            setStatus("Export failure. " + message);
+            return;
+        }
+        
+        log.error("Problem attempting to export file : " + file, e);
+        setStatus("Export failure." + e.getMessage());
     }
 
     void updateDataset(EmfDataset dataset) throws EmfException {

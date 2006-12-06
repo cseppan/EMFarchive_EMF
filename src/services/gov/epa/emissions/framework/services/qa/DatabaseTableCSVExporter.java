@@ -25,6 +25,8 @@ public class DatabaseTableCSVExporter implements Exporter {
     private int batchSize;
 
     private String tableName;
+    
+    private long exportedLinesCount = 0;
 
     public DatabaseTableCSVExporter(String tableName, Datasource datasource, int optimizedBatchSize) {
         this.tableName = tableName;
@@ -115,6 +117,7 @@ public class DatabaseTableCSVExporter implements Exporter {
                 writer.print(delimiter);// delimiter
         }
         writer.println();
+        ++exportedLinesCount;
     }
 
     protected String getValue(String value) {
@@ -131,6 +134,10 @@ public class DatabaseTableCSVExporter implements Exporter {
 
     public void setDelimiter(String del) {
         this.delimiter = del;
+    }
+
+    public long getExportedLinesCount() {
+        return this.exportedLinesCount;
     }
 
     // private boolean containsDelimiter(String s) {

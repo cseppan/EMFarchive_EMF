@@ -36,6 +36,8 @@ public class ControlMeasuresExporter implements Exporter {
     
     private String[] cmAbbrevSccs;
 
+    private long exportedLinesCount = 0;
+
     public ControlMeasuresExporter(File folder, String prefix, ControlMeasure[] controlMeasures, String[] sccs,
             User user, HibernateSessionFactory factory) {
         this.controlMeasures = controlMeasures;
@@ -52,6 +54,7 @@ public class ControlMeasuresExporter implements Exporter {
             addStatus("Start exporting control measures to folder: " + folder.getAbsolutePath() +  ".");
             writeExportFiles();
             addStatus("Export control measures finished.");
+            exportedLinesCount = controlMeasures.length;
         } catch (Exception e) {
             e.printStackTrace();
             throw new ExporterException("Export control measures failed. Reason: " + e.getMessage());
@@ -231,5 +234,8 @@ public class ControlMeasuresExporter implements Exporter {
         throw new ExporterException("Not used method...");
     }
 
+    public long getExportedLinesCount() {
+        return this.exportedLinesCount;
+    }
 
 }

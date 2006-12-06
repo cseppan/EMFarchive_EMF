@@ -62,6 +62,10 @@ public class AccessLogPersistenceTest extends HibernateTestCase {
             save(dataset);
 
             alog = new AccessLog(user.getUsername(), dataset.getId(), new Date(), "0", "description", "folderPath");
+            alog.setDatasetname("");
+            alog.setEnddate(new Date());
+            alog.setStartdate(new Date());
+            alog.setTimereqrd(12345.0);
             save(alog);
 
             List allLogs = loadAccessLogs();

@@ -17,7 +17,9 @@ public class LogsTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "User", "Date", "Version", "Description", "Export Location" };
+        return new String[] { "User", "Dataset Name", "Version", 
+                "Access Date", "Start Date", "End Date", "Lines Exported", 
+                "Time Reqrd (ms)", "Description", "Export Location" };
     }
 
     public Class getColumnClass(int col) {
@@ -37,7 +39,10 @@ public class LogsTableData extends AbstractTableData {
 
         for (int i = 0; i < logs.length; i++) {
             AccessLog log = logs[i];
-            Object[] values = { log.getUsername(), log.getTimestamp(), log.getVersion(), log.getDescription(),
+            Object[] values = { log.getUsername(), log.getDatasetname(),
+                    log.getVersion(), log.getTimestamp(), log.getStartdate(),
+                    log.getEnddate(), log.getLinesExported() + "", 
+                    log.getTimereqrd() + "", log.getDescription(),
                     log.getFolderPath() };
 
             Row row = new ViewableRow(log, values);

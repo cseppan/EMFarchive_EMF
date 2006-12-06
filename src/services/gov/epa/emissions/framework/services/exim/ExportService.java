@@ -154,9 +154,10 @@ public class ExportService {
         File file = validateExportFile(path, getCleanDatasetName(dataset, version), overwrite);
         Exporter exporter = exporterFactory.create(dataset, version);
         AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getId(), dataset.getAccessedDateTime(),
-                "Version " + dataset.getDefaultVersion(), purpose, file.getAbsolutePath());
+                "Version " + version.getVersion(), purpose, file.getAbsolutePath());
+        accesslog.setDatasetname(dataset.getName());
 
-        ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, exporter, sessionFactory);
+        ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, exporter, sessionFactory, version);
         threadPool.execute(new GCEnforcerTask("Export of Dataset: " + dataset.getName(), eximTask));
     }
 
