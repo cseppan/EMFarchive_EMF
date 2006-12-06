@@ -1,0 +1,23 @@
+-- Use this to upgrade your schema for export logging
+-- 1. Back up your emf.dataset_access_logs table [with options INSERT commands, plain and data only]
+-- 2. DROP TABLE emf.dataset_access_logs
+-- 3. Create the table as shown below
+-- 4. Restore the data from the backup
+-- 5. Test to be sure that you can export and that you can view the old and new logs
+CREATE TABLE emf.dataset_access_logs
+(
+  id SERIAL PRIMARY KEY,
+  dataset_id int4 REFERENCES emf.datasets (id) NOT NULL,
+  lines_exported int8 DEFAULT 0,
+  username varchar(255) REFERENCES emf.users (username) NOT NULL,
+  dataset_name varchar(255),
+  date timestamp NOT NULL,
+  start_date timestamp,
+  end_date timestamp,
+  time_reqrd real DEFAULT 0,
+  version varchar(255) NOT NULL,
+  description text NOT NULL,
+  "location" varchar(255) NOT NULL,
+  details text
+) 
+WITHOUT OIDS;
