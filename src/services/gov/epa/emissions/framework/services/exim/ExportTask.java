@@ -81,14 +81,16 @@ public class ExportTask implements Runnable {
     }
     
     private void printLogInfo(AccessLog log) {
-        System.out.println("Exported dataset: " + log.getDatasetname() +
-                " version: " + log.getVersion() + 
-                " start date: " + log.getStartdate() +
-                " end date: " + log.getEnddate() +
-                " time required (ms): " + log.getTimereqrd() +
-                " user: " + log.getUsername() + 
-                " path: " + log.getFolderPath() +
-                " details: " + log.getDetails());
+        String info = "Exported dataset: " + log.getDatasetname() +
+                "; version: " + log.getVersion() + 
+                "; start date: " + log.getStartdate() +
+                "; end date: " + log.getEnddate() +
+                "; time required (ms): " + log.getTimereqrd() +
+                "; user: " + log.getUsername() + 
+                "; path: " + log.getFolderPath() +
+                "; details: " + log.getDetails();
+        System.out.println(info);
+        setStatus(info);
     }
 
     private boolean compareDatasetRecordsNumbers() throws Exception {
