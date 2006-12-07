@@ -19,7 +19,7 @@ public class LogsTableData extends AbstractTableData {
     public String[] columns() {
         return new String[] { "User", "Dataset Name", "Version", 
                 "Access Date", "Start Date", "End Date", "Lines Exported", 
-                "Time Reqrd (ms)", "Description", "Export Location" };
+                "Time Reqrd (minute)", "Description", "Export Location" };
     }
 
     public Class getColumnClass(int col) {

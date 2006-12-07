@@ -165,7 +165,7 @@ public class AccessLog {
 
     public double getTimereqrd() {
         if (startdate != null && enddate != null)
-            return enddate.getTime() - startdate.getTime();
+            return (enddate.getTime() - startdate.getTime()) / 60000.0; //make into minutes
         
         return timereqrd;
     }
