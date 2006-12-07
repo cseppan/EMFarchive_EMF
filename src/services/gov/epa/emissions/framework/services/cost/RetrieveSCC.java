@@ -40,7 +40,8 @@ public class RetrieveSCC {
     public String[] cmAbbrevAndSccs() throws SQLException {
         String[] cmAbbrevAndSccs;
         try {
-            ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(cmAbbrevAndSccQuery(controlMeasureId));
+            ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(
+                    cmAbbrevAndSccQuery(controlMeasureId));
             cmAbbrevAndSccs = getAbbrevAndSccStrings(set);
         } catch (SQLException e) {
             throw e;
@@ -67,7 +68,10 @@ public class RetrieveSCC {
         List sccs = new ArrayList();
         try {
             while (rs.next()) {
-                Scc scc = new Scc(rs.getString(1), rs.getString(2));
+                String desc = rs.getString(2);
+                if (desc == null)
+                    desc = "The SCC entry is not found in the reference.scc table";
+                Scc scc = new Scc(rs.getString(1), desc);
                 sccs.add(scc);
             }
         } finally {
@@ -77,8 +81,8 @@ public class RetrieveSCC {
     }
 
     private String query(int id) {
-        String query = "SELECT e.name,r.scc_description FROM emf.control_measure_sccs AS e, reference.scc AS r "
-                + "WHERE e.control_measures_id=" + id + " AND e.name=r.scc";
+        String query = "SELECT e.name,r.scc_description FROM emf.control_measure_sccs AS e LEFT OUTER JOIN reference.scc AS r "
+                + "ON (e.name=r.scc) WHERE e.control_measures_id=" + id;
         return query;
     }
 

@@ -22,11 +22,14 @@ public class RetrieveSCCTest extends ServiceTestCase {
         cm.setEquipmentLife(12);
         cm.setName("cm test added" + Math.random());
         cm.setAbbreviation("12345678");
+        Scc scc0 = new Scc("0ABBBBBB", "");
         Scc scc1 = new Scc("10100101", "");
         Scc scc2 = new Scc("10100226", "");
         Scc scc3 = new Scc("10100225", "");
+        Scc scc4 = new Scc("4BBBBBBB", "");
+
         // These scc numbers have to exist in the reference.scc table
-        cm.setSccs(new Scc[] { scc1, scc2, scc3 });
+        cm.setSccs(new Scc[] { scc0, scc1, scc2, scc3, scc4 });
 
         ControlMeasureDAO dao = null;
         Scc[] sccs = null;
@@ -36,30 +39,32 @@ public class RetrieveSCCTest extends ServiceTestCase {
             RetrieveSCC retreiveSCC = new RetrieveSCC(cm, dbServer());
             sccs = retreiveSCC.sccs();
         } finally {
-            remove(scc1);
-            remove(scc2);
-            remove(scc3);
+            dropAll(Scc.class);
             removeMeasure(cm, dao);
         }
-        assertEquals(3, sccs.length);
-        assertEquals("10100101", sccs[0].getCode());
-        assertEquals("10100225", sccs[1].getCode());
-        assertEquals("10100226", sccs[2].getCode());
-        assertEquals("External Combustion Boilers;Electric Generation;Anthracite Coal;Pulverized Coal", sccs[0]
+        assertEquals(5, sccs.length);
+        assertEquals("0ABBBBBB", sccs[0].getCode());
+        assertEquals("10100101", sccs[1].getCode());
+        assertEquals("10100225", sccs[2].getCode());
+        assertEquals("10100226", sccs[3].getCode());
+        assertEquals("4BBBBBBB", sccs[4].getCode());
+        assertEquals("The SCC entry is not found in the reference.scc table", sccs[0].getDescription());
+        assertEquals("External Combustion Boilers;Electric Generation;Anthracite Coal;Pulverized Coal", sccs[1]
                 .getDescription());
         assertEquals(
                 "External Combustion Boilers;Electric Generation;Bituminous/Subbituminous Coal;Traveling Grate (Overfeed) Stoker (Subbituminous Coal)",
-                sccs[1].getDescription());
+                sccs[2].getDescription());
         assertEquals(
                 "External Combustion Boilers;Electric Generation;Bituminous/Subbituminous Coal;Pulverized Coal: Dry Bottom Tangential (Subbituminous Coal)",
-                sccs[2].getDescription());
+                sccs[3].getDescription());
+        assertEquals("The SCC entry is not found in the reference.scc table", sccs[4].getDescription());
 
     }
 
     private void addMeasure(ControlMeasure measure, ControlMeasureDAO dao) throws HibernateException, Exception {
         Session session = sessionFactory().getSession();
         try {
-            dao.add(measure,measure.getSccs(), session);
+            dao.add(measure, measure.getSccs(), session);
         } finally {
             session.close();
         }
