@@ -69,55 +69,46 @@ public class ExportTask implements Runnable {
             accesslog.setLinesExported(exporter.getExportedLinesCount());
 
             loggingService.setAccessLog(accesslog);
-            
+
             printLogInfo(accesslog);
-            if (!compareDatasetRecordsNumbers())
+            if (!compareDatasetRecordsNumbers(accesslog))
                 return;
-            //updateDataset(dataset);  //Disabled because of nothing updated during exporting
+            // updateDataset(dataset); //Disabled because of nothing updated during exporting
             setStatus("Completed export of " + dataset.getName() + " to " + file.getAbsolutePath());
         } catch (Exception e) {
             setErrorStatus(e, e.getMessage());
         }
     }
-    
+
     private void printLogInfo(AccessLog log) {
-        String info = "Exported dataset: " + log.getDatasetname() +
-                "; version: " + log.getVersion() + 
-                "; start date: " + log.getStartdate() +
-                "; end date: " + log.getEnddate() +
-                "; time required (ms): " + log.getTimereqrd() +
-                "; user: " + log.getUsername() + 
-                "; path: " + log.getFolderPath() +
-                "; details: " + log.getDetails();
+        String info = "Exported dataset: " + log.getDatasetname() + "; version: " + log.getVersion() + "; start date: "
+                + log.getStartdate() + "; end date: " + log.getEnddate() + "; time required (minute): "
+                + log.getTimereqrd() + "; user: " + log.getUsername() + "; path: " + log.getFolderPath()
+                + "; details: " + log.getDetails();
         System.out.println(info);
         setStatus(info);
     }
 
-    private boolean compareDatasetRecordsNumbers() throws Exception {
+    private boolean compareDatasetRecordsNumbers(AccessLog log) throws Exception {
         DatasetDAO datasetDao = new DatasetDAO();
         DbServer dbServer = new EmfDbServer();
         Session session = sessionFactory.getSession();
-        
+
         long records = datasetDao.getDatasetRecordsNumber(dbServer, session, dataset, version);
         session.close();
-        
-        if (records != exporter.getExportedLinesCount()) {
-            setErrorStatus(null, "");
+
+        if (records != log.getLinesExported()) {
+            setErrorStatus(null, "No. of records in database: " + records + ", but" + " exported "
+                    + log.getLinesExported() + " lines");
             return false;
         }
-        
+
         return true;
     }
 
     private void setErrorStatus(Exception e, String message) {
-        if (e == null) {
-            log.error("Problem attempting to export file : " + file, new Exception(message));
-            setStatus("Export failure. " + message);
-            return;
-        }
-        
-        log.error("Problem attempting to export file : " + file, e);
-        setStatus("Export failure." + e.getMessage());
+        log.error("Problem attempting to export file : " + file + " " + message, e);
+        setStatus("Export failure. " + message + ((e == null) ? "" : e.getMessage()));
     }
 
     void updateDataset(EmfDataset dataset) throws EmfException {
