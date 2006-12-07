@@ -116,6 +116,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     
     private void doLayout(EmfConsole parentConsole, ControlMeasure[] measures) throws EmfException {
         tableData = new ControlMeasureTableData(measures, costYearTable, pollutants[0].getName(), years[0]);
+        refreshTableData();
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
         createLayout(parentConsole, this.layout);
@@ -466,6 +467,12 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
+    }
+
+    private void refreshTableData() throws EmfException {
+        String selectedPoll = ((Pollutant) pollutant.getSelectedItem()).getName();
+        String selectedYear = (String) costYear.getSelectedItem();
+        tableData.refresh(selectedPoll, selectedYear);
     }
 
 }
