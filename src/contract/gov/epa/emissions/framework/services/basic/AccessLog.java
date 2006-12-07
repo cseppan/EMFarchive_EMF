@@ -20,8 +20,6 @@ public class AccessLog {
 
     private Date timestamp;
     
-    private Date startdate;
-    
     private Date enddate;
     
     private double timereqrd;
@@ -155,17 +153,9 @@ public class AccessLog {
         this.enddate = enddate;
     }
 
-    public Date getStartdate() {
-        return startdate;
-    }
-
-    public void setStartdate(Date startdate) {
-        this.startdate = startdate;
-    }
-
     public double getTimereqrd() {
-        if (startdate != null && enddate != null)
-            return (enddate.getTime() - startdate.getTime()) / 60000.0; //make into minutes
+        if (timestamp != null && enddate != null)
+            return (enddate.getTime() - timestamp.getTime()) / 60000.0; //make into minutes
         
         return timereqrd;
     }

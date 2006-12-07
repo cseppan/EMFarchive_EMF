@@ -58,7 +58,6 @@ public class LoggingServiceTest extends ServiceTestCase {
             alog = accessLog(user, datasetFromDB, "folderPath");
             alog.setDatasetname("");
             alog.setEnddate(new Date());
-            alog.setStartdate(new Date());
             alog.setTimereqrd(12345.0);
 
             logService.setAccessLog(alog);
@@ -104,13 +103,11 @@ public class LoggingServiceTest extends ServiceTestCase {
             alog1 = accessLog(user, datasetFromDB, "folderPath1");
             alog1.setDatasetname("");
             alog1.setEnddate(new Date());
-            alog1.setStartdate(new Date());
             alog1.setTimereqrd(12345.0);
             
             alog2 = accessLog(user, datasetFromDB, "folderPath2");
             alog2.setDatasetname("");
             alog2.setEnddate(new Date());
-            alog2.setStartdate(new Date());
             alog2.setTimereqrd(12345.0);
 
             logService.setAccessLog(alog1);

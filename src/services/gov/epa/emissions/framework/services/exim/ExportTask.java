@@ -63,7 +63,7 @@ public class ExportTask implements Runnable {
     public void run() {
         try {
             setStartStatus();
-            accesslog.setStartdate(new Date());
+            accesslog.setTimestamp(new Date());
             exporter.export(file);
             accesslog.setEnddate(new Date());
             accesslog.setLinesExported(exporter.getExportedLinesCount());
@@ -74,7 +74,8 @@ public class ExportTask implements Runnable {
             if (!compareDatasetRecordsNumbers(accesslog))
                 return;
             // updateDataset(dataset); //Disabled because of nothing updated during exporting
-            setStatus("Completed export of " + dataset.getName() + " to " + file.getAbsolutePath());
+            setStatus("Completed export of " + dataset.getName() + " to " + file.getAbsolutePath() +
+                      " in " + accesslog.getTimereqrd() + " minutes.");
         } catch (Exception e) {
             setErrorStatus(e, e.getMessage());
         }
@@ -82,11 +83,11 @@ public class ExportTask implements Runnable {
 
     private void printLogInfo(AccessLog log) {
         String info = "Exported dataset: " + log.getDatasetname() + "; version: " + log.getVersion() + "; start date: "
-                + log.getStartdate() + "; end date: " + log.getEnddate() + "; time required (minute): "
+                + log.getTimestamp() + "; end date: " + log.getEnddate() + "; time required (minute): "
                 + log.getTimereqrd() + "; user: " + log.getUsername() + "; path: " + log.getFolderPath()
                 + "; details: " + log.getDetails();
         System.out.println(info);
-        setStatus(info);
+        //setStatus(info);
     }
 
     private boolean compareDatasetRecordsNumbers(AccessLog log) throws Exception {

@@ -173,6 +173,8 @@ CREATE TABLE emf.datasets
 ) 
 WITHOUT OIDS;
 --
+--
+--emf.dataset_access_logs
 CREATE TABLE emf.dataset_access_logs
 (
   id SERIAL PRIMARY KEY,
@@ -181,7 +183,6 @@ CREATE TABLE emf.dataset_access_logs
   username varchar(255) REFERENCES emf.users (username) NOT NULL,
   dataset_name varchar(255),
   date timestamp NOT NULL,
-  start_date timestamp,
   end_date timestamp,
   time_reqrd real DEFAULT 0,
   version varchar(255) NOT NULL,
@@ -190,7 +191,7 @@ CREATE TABLE emf.dataset_access_logs
   details text
 ) 
 WITHOUT OIDS;
---emf.datasets
+--emf.dataset_access_logs
 --
 --emf.notes
 CREATE TABLE emf.notes
