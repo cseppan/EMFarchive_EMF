@@ -103,7 +103,9 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         tabbedPane.addTab("Summary", createSummaryTab(controlStrategy, controlStrategyResults));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         // These are just added to illustrate what is coming later
-        tabbedPane.addTab("Filters", createFilterTab(controlStrategy));
+        tabbedPane.addTab("Inventory", createInventoryFilterTab(controlStrategy));
+        tabbedPane.addTab("Measures", createMeasuresTab(controlStrategy));
+        tabbedPane.addTab("Applied Measures", createAppliedMeasuresTab(controlStrategy));
         tabbedPane.addTab("Outputs", outputPanel(controlStrategyResults));
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -127,12 +129,25 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     }
 
-    private JPanel createFilterTab(ControlStrategy controlStrategy) {
-        EditControlStrategyTabView view = new EditControlStrategyFilterTab(controlStrategy, this);
+    private JPanel createInventoryFilterTab(ControlStrategy controlStrategy) {
+        EditControlStrategyTabView view = null;
+        try {
+            view = new EditControlStrategyInventoryFilterTab(controlStrategy, this,  messagePanel, parentConsole, session);
+        } catch (EmfException e) {
+            messagePanel.setError("Could not create Inventory tab.");
+        }
         this.presenter.set(view);
         return (JPanel) view;
     }
 
+    private JPanel createAppliedMeasuresTab(ControlStrategy controlStrategy2) {
+        return new JPanel();
+    }
+
+    private JPanel createMeasuresTab(ControlStrategy controlStrategy2) {
+        return new JPanel();
+    }
+    
     private JPanel outputPanel(ControlStrategyResult controlStrategyResults) {
         EditControlStrategyOutputTabView view = new EditControlStrategyOutputTab(controlStrategy,
                 controlStrategyResults, messagePanel, desktopManager, parentConsole);

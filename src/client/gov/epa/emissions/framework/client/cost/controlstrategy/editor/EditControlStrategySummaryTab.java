@@ -1,11 +1,8 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
-import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
-import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
@@ -23,7 +20,6 @@ import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.IntTextField;
@@ -33,12 +29,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -68,8 +59,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private IntTextField inventoryYear;
 
-    private ComboBox datasetTypeCombo;
-
     private ComboBox majorPollutant;
 
     private Region[] allRegions;
@@ -77,10 +66,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private Project[] allProjects;
 
     protected EmfConsole parentConsole;
-
-    private TextField datasetTextField;
-
-    private VersionPanel versionPanel;
 
     private JLabel startDate, completionDate, costValue, emissionReductionValue;
 
@@ -106,15 +91,14 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         super.setLayout(new BorderLayout());
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(createmMainSection(), BorderLayout.NORTH);
-        panel.add(createMiddleSection(), BorderLayout.CENTER);
-        panel.add(createLowerSection(), BorderLayout.SOUTH);
+        panel.add(getBorderedPanel(createmMainSection(), "Main"), BorderLayout.NORTH);
+        panel.add(createLowerSection(), BorderLayout.CENTER);
         super.add(panel, BorderLayout.CENTER);
     }
 
     private JPanel createmMainSection() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        //panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Name:", name(), panel);
@@ -123,96 +107,13 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         layoutGenerator.addLabelWidgetPair("Creator:", creator(), panel);
         layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
         layoutGenerator.addLabelWidgetPair("Copied From:", new JLabel("   "), panel);
-
+        layoutGenerator.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), panel);
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
-    }
-
-    private JPanel datasetAndVersionPanel() throws EmfException {
-        JPanel panel = new JPanel(new BorderLayout(25, 5));
-        panel.add(datasetPanel());
-
-        versionPanel = new VersionPanel(controlStrategy, session, changeablesList);
-        panel.add(versionPanel, BorderLayout.EAST);
-
-        return panel;
-    }
-
-    private JPanel datasetPanel() {
-        datasetTextField = new TextField("datasets", 25);
-        datasetTextField.setEditable(false);
-        datasetTextField.setText(selectedDatasets(controlStrategy.getInputDatasets()));
-        changeablesList.addChangeable(datasetTextField);
-
-        Button chooseButton = new Button("Choose", chooseDatasetAction());
-
-        JPanel panel = new JPanel(new BorderLayout(5, 5));
-        panel.add(datasetTextField);
-        panel.add(chooseButton, BorderLayout.EAST);
-        return panel;
-    }
-
-    private Action chooseDatasetAction() {
-        return new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    DatasetType datasetType = selectedDatasetType();
-                    DatasetChooserDialog dialog = new DatasetChooserDialog(datasetType, session, parentConsole,
-                            EditControlStrategySummaryTab.this);
-                    dialog.show();
-                    EmfDataset dataset = dialog.dataset();
-                    if (dataset != null) {
-                        datasetTextField.setText(dataset.getName());
-                        controlStrategy.setInputDatasets(new EmfDataset[] { dataset });
-                        Version[] versions = session.dataEditorService().getVersions(dataset.getId());
-                        versionPanel.update(versions);
-                    }
-                } catch (EmfException exp) {
-                    messagePanel.setError(exp.getMessage());
-                }
-            }
-        };
-    }
-
-    protected DatasetType selectedDatasetType() throws EmfException {
-        DatasetType datasetType = (DatasetType) datasetTypeCombo.getSelectedItem();
-        if (datasetType == null) {
-            throw new EmfException("Please select an inventory type");
-        }
-        return datasetType;
-    }
-
-    private String selectedDatasets(EmfDataset[] datasets) {
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < datasets.length - 1; i++) {
-            sb.append(datasets[i].getName() + "\n");
-        }
-        if (datasets.length > 0)
-            sb.append(datasets[datasets.length - 1].getName());
-
-        return sb.toString();
-    }
-
-    private ComboBox datasetTypeCombo() throws EmfException {
-        DatasetType[] datasetTypes = getORLTypes();
-        datasetTypeCombo = new ComboBox("Choose an inventory type", datasetTypes);
-        datasetTypeCombo.setSelectedItem(controlStrategy.getDatasetType());
-        changeablesList.addChangeable(datasetTypeCombo);
-        return datasetTypeCombo;
-    }
-
-    private DatasetType[] getORLTypes() throws EmfException {
-        List orlTypes = new ArrayList();
-        DatasetType[] datasetTypes = session.dataCommonsService().getDatasetTypes();
-        for (int i = 0; i < datasetTypes.length; i++)
-            if (datasetTypes[i].getImporterClassName().indexOf("ORL") >= 0)
-                orlTypes.add(datasetTypes[i]);
-
-        return (DatasetType[]) orlTypes.toArray(new DatasetType[0]);
     }
 
     private ComboBox typeOfAnalysis() throws EmfException {
@@ -222,21 +123,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         changeablesList.addChangeable(strategyTypeCombo);
 
         return strategyTypeCombo;
-    }
-
-    private JPanel createMiddleSection() throws EmfException {
-        JPanel middlePanel = new JPanel(new SpringLayout());
-
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        layoutGenerator.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), middlePanel);
-        layoutGenerator.addLabelWidgetPair("Inventory Type:", datasetTypeCombo(), middlePanel);
-        layoutGenerator.addLabelWidgetPair("Inventory Dataset:", datasetAndVersionPanel(), middlePanel);
-
-        layoutGenerator.makeCompactGrid(middlePanel, 3, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
-
-        return middlePanel;
     }
 
     private JPanel createLowerSection() throws EmfException {
@@ -389,10 +275,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setDescription(description.getText());
         updateProject();
 
-        controlStrategy.setDatasetType(selectedDatasetType());
         isDatasetSelected(controlStrategy);
-        controlStrategy.setDatasetVersion(versionPanel.datasetVersion());
-
         controlStrategy.setCostYear(new YearValidation("Cost Year").value((costYear.getText())));
         controlStrategy.setInventoryYear(new YearValidation("Inventory Year").value(inventoryYear.getText()));
         updateRegion();
