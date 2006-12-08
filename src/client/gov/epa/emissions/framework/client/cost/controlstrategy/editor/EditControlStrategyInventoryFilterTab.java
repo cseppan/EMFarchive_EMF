@@ -75,7 +75,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         if (value == null)
             value = "";
         
-        filter = new TextArea("filter", value, 25, 3);
+        filter = new TextArea("filter", value, 40, 4);
         filter.setToolTipText("Enter a filter that could be entered as a SQL where clause (e.g., ANN_EMIS>5000)");
         JScrollPane scrollPane = new JScrollPane(filter);
         changeablesList.addChangeable(filter);
@@ -83,7 +83,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         layoutGenerator.addLabelWidgetPair("Inventory Type:", datasetTypeCombo(controlStrategy), middlePanel);
         layoutGenerator.addLabelWidgetPair("Inventory Dataset:", datasetPanel(), middlePanel);
-        layoutGenerator.addLabelWidgetPair("Version:", versionPanel(), middlePanel);
+        layoutGenerator.addLabelWidgetPair("Dataset Version:", versionPanel(), middlePanel);
         layoutGenerator.addLabelWidgetPair("Inventory Filter:", scrollPane, middlePanel);
 
         layoutGenerator.makeCompactGrid(middlePanel, 4, 2, // rows, cols
@@ -124,7 +124,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     }
     
     private JPanel datasetPanel() {
-        datasetTextField = new TextField("datasets", 25);
+        datasetTextField = new TextField("datasets", 40);
         datasetTextField.setEditable(false);
         datasetTextField.setText(selectedDatasets(controlStrategy.getInputDatasets()));
         changeablesList.addChangeable(datasetTextField);
