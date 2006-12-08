@@ -82,10 +82,11 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         layoutGenerator.addLabelWidgetPair("Inventory Type:", datasetTypeCombo(controlStrategy), middlePanel);
-        layoutGenerator.addLabelWidgetPair("Inventory Dataset:", datasetAndVersionPanel(), middlePanel);
+        layoutGenerator.addLabelWidgetPair("Inventory Dataset:", datasetPanel(), middlePanel);
+        layoutGenerator.addLabelWidgetPair("Version:", versionPanel(), middlePanel);
         layoutGenerator.addLabelWidgetPair("Inventory Filter:", scrollPane, middlePanel);
 
-        layoutGenerator.makeCompactGrid(middlePanel, 3, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(middlePanel, 4, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -117,14 +118,9 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         return (DatasetType[]) orlTypes.toArray(new DatasetType[0]);
     }
     
-    private JPanel datasetAndVersionPanel() throws EmfException {
-        JPanel panel = new JPanel(new BorderLayout(25, 5));
-        panel.add(datasetPanel());
-
-        versionPanel = new VersionPanel(controlStrategy, session, changeablesList);
-        panel.add(versionPanel, BorderLayout.EAST);
-
-        return panel;
+    private JPanel versionPanel() throws EmfException {
+        this.versionPanel = new VersionPanelWithoutLabel(controlStrategy, session, changeablesList);
+        return versionPanel;
     }
     
     private JPanel datasetPanel() {

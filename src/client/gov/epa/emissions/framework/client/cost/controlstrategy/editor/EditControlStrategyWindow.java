@@ -134,18 +134,32 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         try {
             view = new EditControlStrategyInventoryFilterTab(controlStrategy, this,  messagePanel, parentConsole, session);
         } catch (EmfException e) {
-            messagePanel.setError("Could not create Inventory tab.");
+            showError("Could not create Inventory tab.");
         }
         this.presenter.set(view);
         return (JPanel) view;
     }
 
-    private JPanel createAppliedMeasuresTab(ControlStrategy controlStrategy2) {
-        return new JPanel();
+    private JPanel createAppliedMeasuresTab(ControlStrategy controlStrategy) {
+        EditControlStrategyTabView view = null;
+        try {
+            view = new EditControlStrategyAppliedMeasuresTab(controlStrategy, this,  messagePanel, parentConsole, session);
+        } catch (EmfException e) {
+            showError("Could not create Inventory tab.");
+        }
+        this.presenter.set(view);
+        return (JPanel) view;
     }
 
-    private JPanel createMeasuresTab(ControlStrategy controlStrategy2) {
-        return new JPanel();
+    private JPanel createMeasuresTab(ControlStrategy controlStrategy) {
+        EditControlStrategyTabView view = null;
+        try {
+            view = new EditControlStrategyMeasuresTab(controlStrategy, this,  messagePanel, parentConsole, session);
+        } catch (EmfException e) {
+            showError("Could not create Inventory tab.");
+        }
+        this.presenter.set(view);
+        return (JPanel) view;
     }
     
     private JPanel outputPanel(ControlStrategyResult controlStrategyResults) {

@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 
 public class VersionPanel extends JPanel {
 
-    private ComboBox comboBox;
+    protected ComboBox comboBox;
 
     protected String selected;
 
@@ -58,7 +58,7 @@ public class VersionPanel extends JPanel {
         return Integer.parseInt(selected.substring(forPerenth + 1, backPerenth));
     }
 
-    private void createLayout(ManageChangeables changeables) throws EmfException {
+    protected void createLayout(ManageChangeables changeables) throws EmfException {
         super.setLayout(new BorderLayout(5, 5));
 
         super.add(new JLabel("Version:"), BorderLayout.WEST);
@@ -75,14 +75,14 @@ public class VersionPanel extends JPanel {
         changeables.addChangeable(comboBox);
     }
 
-    private ComboBox comboBox() {
+    protected ComboBox comboBox() {
         ComboBox comboBox = new ComboBox();
         comboBox.setPreferredSize(new Dimension(150, 20));
         comboBox.setName("versions");
         return comboBox;
     }
 
-    private void initialize() throws EmfException {
+    protected void initialize() throws EmfException {
         EmfDataset[] datasets = controlStrategy.getInputDatasets();
         if (datasets.length == 0) {// new control strategy
             comboBox.setEnabled(false);
@@ -94,12 +94,12 @@ public class VersionPanel extends JPanel {
         }
     }
 
-    private String getVersion(VersionsSet versionsSet) {
+    protected String getVersion(VersionsSet versionsSet) {
         int ver = controlStrategy.getDatasetVersion();
         return versionsSet.getVersionName(ver) + " (" + ver + ")";
     }
 
-    private String[] labels(VersionsSet versionsSet) {
+    protected String[] labels(VersionsSet versionsSet) {
         return versionsSet.nameAndNumbers();
     }
 
