@@ -46,6 +46,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -165,8 +166,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private JPanel createTopPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        
-        panel.add(getItem("Major Pollutant:", majorPollutant), BorderLayout.WEST);
+        panel.setBorder(BorderFactory.createEmptyBorder(4,5,4,4));
+        panel.add(getItem("  Major Pollutant:", majorPollutant), BorderLayout.WEST);
         majorPollutant.setPreferredSize(new Dimension(100, 30));
         
         messagePanel = new SingleLineMessagePanel();
