@@ -41,19 +41,19 @@ public class EditControlStrategyAppliedMeasuresTab extends JPanel implements Edi
         
         TextField emisReduction = new TextField("emission reduction", 10);
         changeables.addChangeable(emisReduction);
-        layoutGenerator.addLabelWidgetPair("Emission Reduction  >", emisReduction, panel);
+        layoutGenerator.addLabelWidgetPair("Emissions Reduction  >", emisReduction, panel);
 
         TextField contrlEff = new TextField("control efficiency", 10);
         changeables.addChangeable(contrlEff);
-        layoutGenerator.addLabelWidgetPair("Control Efficiency      >", contrlEff, panel);
+        layoutGenerator.addLabelWidgetPair("Control Efficiency        >", contrlEff, panel);
 
         TextField costPerTon = new TextField("cost per ton", 10);
         changeables.addChangeable(costPerTon);
-        layoutGenerator.addLabelWidgetPair("Cost per Ton               >", costPerTon, panel);
+        layoutGenerator.addLabelWidgetPair("Cost per Ton                 <", costPerTon, panel);
 
         TextField annCost = new TextField("annual cost", 10);
         changeables.addChangeable(annCost);
-        layoutGenerator.addLabelWidgetPair("Annual Cost                >", annCost, panel);
+        layoutGenerator.addLabelWidgetPair("Annual Cost                  <", annCost, panel);
 
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 10, 10, // initialX, initialY
