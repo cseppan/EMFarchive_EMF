@@ -57,8 +57,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private Button runButton;
 
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
-        super("Edit Control Strategy", new Dimension(650, 490), desktopManager);
-        super.setMinimumSize(new Dimension(10, 10));
+        super("Edit Control Strategy", new Dimension(500, 350), desktopManager);
+        this.setMinimumSize(new Dimension(500, 350));
         this.session = session;
         this.desktopManager = desktopManager;
         this.parentConsole = parentConsole;
