@@ -1,4 +1,4 @@
-Country_Code,Country_num,FIPS,Abbrev,County,TZ,IgnoreDST,CenterLon,CenterLat,Area,WestLon,EastLon,SouthLat,NorthLat,pm25_na_designation,pm25_nastatus_2010,pm25_nastatus_2015,pm25_na_area,_8hro3_na_designation,_8hro3_nastatus_2010,_8hro3_nastatus_2015
+Country_Code,Country_num,state_county_fips,State_abbr,County,TZ,IgnoreDST,CenterLon,CenterLat,Area,WestLon,EastLon,SouthLat,NorthLat,pm25_na_designation,pm25_nastatus_2010,pm25_nastatus_2015,pm25_na_area,_8hro3_na_designation,_8hro3_nastatus_2010,_8hro3_nastatus_2015
 US,0,01001,AL,Autauga Co,CST,,-86.658,32.52,602,-86.9126,-86.406,32.322,32.7117,no,no,no,n/a,no,no,no
 US,0,01003,AL,Baldwin Co,CST,,-87.722,30.76,1669,-88.0344,-87.3796,30.2211,31.3276,no,no,no,n/a,no,no,no
 US,0,01005,AL,Barbour Co,CST,,-85.394,31.879,901,-85.7434,-85.0567,31.6253,32.1555,no,no,no,n/a,no,no,no
