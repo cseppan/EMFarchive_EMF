@@ -25,7 +25,7 @@ public class LogsTableDataTest extends TestCase {
         assertEquals("Start Date", columns[2]);
         assertEquals("End Date", columns[3]);
         assertEquals("Lines Exported", columns[4]);
-        assertEquals("Time Reqrd (minute)", columns[5]);
+        assertEquals("Time Reqd. (secs)", columns[5]);
         assertEquals("Description", columns[6]);
         assertEquals("Export Location", columns[7]);
     }
