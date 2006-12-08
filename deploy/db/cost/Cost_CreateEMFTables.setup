@@ -73,6 +73,46 @@ CREATE TABLE emf.control_measure_sccs
 WITHOUT OIDS;
 -- emf.control_measure_sccs
 
+
+-- emf.control_measure_efficiencyrecords
+CREATE TABLE emf.control_measure_efficiencyrecords
+(
+  id SERIAL PRIMARY KEY,
+  control_measures_id int4 NOT NULL REFERENCES emf.control_measures(id),
+  list_index int4,
+  record_id int4,
+  pollutant_id int4 NOT NULL REFERENCES emf.pollutants(id),
+  existing_measure_abbr varchar(10),
+  existing_dev_code int4,
+  locale varchar(10),
+  efficiency real,
+  percent_reduction real,
+  cost_year int4,
+  cost_per_ton real,
+  rule_effectiveness real,
+  rule_penetration real,
+  equation_type varchar(128),
+  cap_rec_factor real,
+  discount_rate real,
+  detail varchar(128),
+  effective_date timestamp,
+  UNIQUE (control_measures_id,pollutant_id,locale,existing_measure_abbr,effective_date)
+) 
+WITHOUT OIDS;
+-- emf.control_measure_efficiencyrecords
+
+-- emf control_measurs_sectors
+CREATE TABLE emf.control_measurs_sectors
+(
+  id SERIAL PRIMARY KEY,
+  control_measure_id int4 NOT NULL REFERENCES emf.control_measures(id) ,
+  list_index int4,
+  sector_id int4 REFERENCES emf.sectors (id),
+  UNIQUE (control_measure_id,sector_id) 
+) 
+WITHOUT OIDS;
+-- emf control_measurs_sectors
+
 -- emf.strategy_types
 CREATE TABLE emf.strategy_types
 (
@@ -128,33 +168,6 @@ CREATE TABLE emf.input_datasets_control_strategies
 WITHOUT OIDS;
 -- emf.datasets_control_strategies
 
--- emf.control_measure_efficiencyrecords
-CREATE TABLE emf.control_measure_efficiencyrecords
-(
-  id SERIAL PRIMARY KEY,
-  control_measures_id int4 NOT NULL REFERENCES emf.control_measures(id),
-  list_index int4,
-  record_id int4,
-  pollutant_id int4 NOT NULL REFERENCES emf.pollutants(id),
-  existing_measure_abbr varchar(10),
-  existing_dev_code int4,
-  locale varchar(10),
-  efficiency real,
-  percent_reduction real,
-  cost_year int4,
-  cost_per_ton real,
-  rule_effectiveness real,
-  rule_penetration real,
-  equation_type varchar(128),
-  cap_rec_factor real,
-  discount_rate real,
-  detail varchar(128),
-  effective_date timestamp,
-  UNIQUE (control_measures_id,pollutant_id,locale,existing_measure_abbr,effective_date)
-) 
-WITHOUT OIDS;
--- emf.control_measure_efficiencyrecords
-
 -- emf.strategy_result_types
 CREATE TABLE emf.strategy_result_types
 (
@@ -184,17 +197,5 @@ CREATE TABLE emf.strategy_results
 ) 
 WITHOUT OIDS;
 -- emf.strategy_results
-
--- emf control_measurs_sectors
-CREATE TABLE emf.control_measurs_sectors
-(
-  id SERIAL PRIMARY KEY,
-  control_measure_id int4 NOT NULL REFERENCES emf.control_measures(id) ,
-  list_index int4,
-  sector_id int4 REFERENCES emf.sectors (id),
-  UNIQUE (control_measure_id,sector_id) 
-) 
-WITHOUT OIDS;
--- emf control_measurs_sectors
 
 --------------------------------------------------------------------------------
