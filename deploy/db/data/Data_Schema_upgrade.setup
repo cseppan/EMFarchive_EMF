@@ -1,3 +1,5 @@
+insert INTO emf.note_types VALUES (DEFAULT, 'Reference');
+
 -- Use this to upgrade your schema for export logging
 -- 1. Back up your emf.dataset_access_logs table [with options INSERT commands, plain and data only]
 -- 2. DROP TABLE emf.dataset_access_logs

@@ -107,6 +107,7 @@ insert INTO emf.note_types VALUES (DEFAULT, 'Resolution');
 insert INTO emf.note_types VALUES (DEFAULT, 'Replaced by dataset');
 insert INTO emf.note_types VALUES (DEFAULT, 'Replaces dataset ');
 insert INTO emf.note_types VALUES (DEFAULT, 'Explanation');
+insert INTO emf.note_types VALUES (DEFAULT, 'Reference');
 -- emf.note_types
 --
 -- emf.keywords
