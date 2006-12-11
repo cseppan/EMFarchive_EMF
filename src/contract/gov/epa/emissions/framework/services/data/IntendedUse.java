@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.services.data;
 
-public class IntendedUse implements Comparable {
+import java.io.Serializable;
+
+public class IntendedUse implements Comparable, Serializable {
 
     private int id;
 
