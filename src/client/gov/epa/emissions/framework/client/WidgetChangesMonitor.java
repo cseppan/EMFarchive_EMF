@@ -23,7 +23,7 @@ public class WidgetChangesMonitor {
     public boolean shouldDiscardChanges() {
         String message = "Would you like to discard the changes " + System.getProperty("line.separator")
                 + " and close the current window?";
-        String title = "Please choose one";
+        String title = "Discard changes?";
         if (list.hasChanges()) {
             YesNoDialog dialog = new YesNoDialog(window, title, message);
             return dialog.confirm();
