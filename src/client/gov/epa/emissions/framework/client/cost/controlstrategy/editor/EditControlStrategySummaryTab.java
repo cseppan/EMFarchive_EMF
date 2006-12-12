@@ -91,8 +91,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         super.setLayout(new BorderLayout());
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(getBorderedPanel(createmMainSection(), ""), BorderLayout.NORTH);
-        panel.add(createLowerSection(), BorderLayout.CENTER);
+        panel.add(getBorderedPanel(createmMainSection(), ""), BorderLayout.CENTER);
+        panel.add(createLowerSection(), BorderLayout.SOUTH);
         super.add(panel, BorderLayout.CENTER);
     }
 
@@ -154,7 +154,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
                 5, 5, // initialX, initialY
-                30, 10);// xPad, yPad
+                10, 10);// xPad, yPad
 
         return panel;
     }

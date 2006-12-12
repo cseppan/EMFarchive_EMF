@@ -88,7 +88,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
         layoutGenerator.makeCompactGrid(middlePanel, 4, 2, // rows, cols
                 5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
+                10, 20);// xPad, yPad
 
         return middlePanel;
     }

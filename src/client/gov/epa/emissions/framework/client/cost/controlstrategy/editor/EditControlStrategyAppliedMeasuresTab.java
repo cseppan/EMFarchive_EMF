@@ -34,7 +34,7 @@ public class EditControlStrategyAppliedMeasuresTab extends JPanel implements Edi
 
     private JPanel createConstraintPanel(ManageChangeables changeables) {
         JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(30,50,250,200));
+        panel.setBorder(BorderFactory.createEmptyBorder(80,80,100,80));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("             Constraints:", new JLabel(), panel);
@@ -53,11 +53,11 @@ public class EditControlStrategyAppliedMeasuresTab extends JPanel implements Edi
 
         TextField annCost = new TextField("annual cost", 10);
         changeables.addChangeable(annCost);
-        layoutGenerator.addLabelWidgetPair("Annual Cost                  <", annCost, panel);
+        layoutGenerator.addLabelWidgetPair("Annualized Cost           <", annCost, panel);
 
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 10, 10, // initialX, initialY
-                5, 5);// xPad, yPad
+                10, 20); // xPad, yPad
 
         return panel;
     }
