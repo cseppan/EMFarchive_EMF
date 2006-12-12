@@ -239,4 +239,45 @@ public class DataServiceTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldDeleteDatasets() throws EmfException {
+        User owner = userService.getUser("emf");
+        EmfDataset dataset1 = newDataset();
+        EmfDataset dataset2 = newDataset();
+        dataset1.setCreator("emf");
+        dataset2.setCreator("emf");
+        
+        try {
+            EmfDataset locked1 = service.obtainLockedDataset(owner, dataset1);
+            EmfDataset locked2 = service.obtainLockedDataset(owner, dataset2);
+            service.deleteDatasets(owner, new EmfDataset[]{locked1, locked2});
+            EmfDataset[] datasets = service.getDatasets();
+            
+            assertEquals("Deleted", datasets[0].getStatus());
+            assertEquals("Deleted", datasets[1].getStatus());
+        } catch (EmfException e) {
+            return;
+        } finally {
+            remove(dataset1);
+            remove(dataset2);
+        }
+    }
+
+    public void testShouldFailOnDeletingDatasets() throws EmfException {
+        User owner = userService.getUser("emf");
+        EmfDataset dataset1 = newDataset();
+        EmfDataset dataset2 = newDataset();
+        dataset1.setCreator("emf1");
+        dataset2.setCreator("emf2");
+        
+        try {
+            service.deleteDatasets(owner, new EmfDataset[]{dataset1, dataset2});
+        } catch (EmfException e) {
+            assertTrue("Should give error msg.", e.getMessage().startsWith("Cannot delete"));
+            return;
+        } finally {
+            remove(dataset1);
+            remove(dataset2);
+        }
+    }
+
 }

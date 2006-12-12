@@ -72,4 +72,15 @@ public class DataServiceTransport implements DataService {
     
     }
 
+    public void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("deleteDatasets");
+        call.addParam("owner", mappings.user());
+        call.addParam("datasets", mappings.datasets());
+        call.setVoidReturnType();
+        
+        call.request(new Object[] { owner, datasets });
+    }
+
 }

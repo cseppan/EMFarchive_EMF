@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data.dataset;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportView;
@@ -56,6 +57,10 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
     private DataService dataService() {
         return session.dataService();
     }
+    
+    private User getUser() {
+        return session.user();
+    }
 
     public void doDisplayPropertiesEditor(DatasetPropertiesEditorView propertiesEditorView, EmfDataset dataset)
             throws EmfException {
@@ -89,8 +94,19 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
 
     public void doDeleteDataset(EmfDataset[] datasets) throws EmfException {
         view.clearMessage();
-        if (false)
-            throw new EmfException("Under construction...");
+        
+        for (int i = 0; i < datasets.length; i++)
+            obtainDatasetLocks(datasets[i]);
+
+        dataService().deleteDatasets(getUser(), datasets);
     }
 
+    private void obtainDatasetLocks(EmfDataset dataset) throws EmfException {
+        dataset = dataService().obtainLockedDataset(getUser(), dataset);
+        if (!dataset.isLocked(getUser())) {// view mode, locked by another user
+            view.notifyLockFailure(dataset);
+            return;
+        }
+    }
+    
 }

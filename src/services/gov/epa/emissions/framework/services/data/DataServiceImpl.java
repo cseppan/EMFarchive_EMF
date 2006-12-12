@@ -91,13 +91,30 @@ public class DataServiceImpl implements DataService {
     public EmfDataset[] getDatasets(DatasetType datasetType) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            List datasets = dao.getDatasets(session,datasetType);
+            List datasets = dao.getDatasets(session, datasetType);
             session.close();
 
             return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all Datasets for dataset type "+datasetType, e);
-            throw new EmfException("Could not get all Datasets for dataset type "+datasetType);
+            LOG.error("Could not get all Datasets for dataset type " + datasetType, e);
+            throw new EmfException("Could not get all Datasets for dataset type " + datasetType);
         }
+    }
+
+    public void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException {
+        for (int i = 0; i < datasets.length; i++) {
+            if (isRemovable(datasets[i], owner)) {
+                datasets[i].setStatus("Deleted");
+                updateDataset(datasets[i]);
+            }
+        }
+    }
+
+    private boolean isRemovable(EmfDataset dataset, User owner) throws EmfException {
+        if (!dataset.getCreator().equalsIgnoreCase(owner.getUsername()))
+            throw new EmfException("Cannot delete \"" + dataset.getName()
+                    + "\". User is not the creator of this dataset.");
+
+        return true;
     }
 }

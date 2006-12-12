@@ -15,5 +15,7 @@ public interface DataService {
     EmfDataset releaseLockedDataset(EmfDataset locked) throws EmfException;
 
     EmfDataset updateDataset(EmfDataset dataset) throws EmfException;
+    
+    void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException;
 
 }

@@ -365,4 +365,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         presenter.doRefresh();
     }
 
+    public void notifyLockFailure(EmfDataset dataset) {
+        clearMessage();
+        showError("Cannot obtain a lock for dataset \"" + dataset.getName() + "\".");
+    }
 }
