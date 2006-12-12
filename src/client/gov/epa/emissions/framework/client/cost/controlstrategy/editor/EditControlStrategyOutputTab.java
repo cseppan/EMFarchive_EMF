@@ -193,7 +193,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         selectModel = new SortFilterSelectModel(model);
         JTable table = new JTable(selectModel);
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(300, 200));
+        scrollPane.setPreferredSize(new Dimension(300, 150));
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.add(scrollPane);
         return tablePanel;
