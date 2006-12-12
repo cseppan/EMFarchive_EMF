@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.ImportButton;
+import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -41,8 +42,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -132,36 +131,52 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private JPanel createLeftControlPanel() {
         JPanel panel = new JPanel();
 
-        String[] options = { "View", "Edit Properties", "Edit Data" };
-        DefaultComboBoxModel model = new DefaultComboBoxModel(options);
-        final JComboBox combo = new JComboBox(model);
-        combo.setEditable(false);
-        combo.setPreferredSize(new Dimension(125, 25));
-        combo.setToolTipText("Select one of the options and click Go to view/edit a Dataset");
-        panel.add(combo);
-        Action dataAction = new AbstractAction() {
-            public void actionPerformed(ActionEvent arg0) {
-                String selected = (String) combo.getSelectedItem();
-                selectedOption(selected);
-            }
-        };
         String message = "You have asked to open a lot of windows. Do you wish to proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
-        SelectAwareButton goButton = new SelectAwareButton("Go", dataAction, selectModel, confirmDialog);
-        panel.add(goButton);
+        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction(), selectModel, confirmDialog);
+        SelectAwareButton propButton = new SelectAwareButton("Edit Properties", editPropAction(), selectModel,
+                confirmDialog);
+        SelectAwareButton dataButton = new SelectAwareButton("Edit Data", editDataAction(), selectModel, confirmDialog);
+        Button removeButton = new RemoveButton(removeAction());
+
+        panel.add(viewButton);
+        panel.add(propButton);
+        panel.add(dataButton);
+        panel.add(removeButton);
 
         return panel;
     }
 
-    private void selectedOption(String option) {
-        if (option.equals("View"))
-            doDisplayPropertiesViewer();
+    private Action viewAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                doDisplayPropertiesViewer();
+            }
+        };
+    }
 
-        if (option.equals("Edit Properties"))
-            doDisplayPropertiesEditor();
+    private Action editPropAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                doDisplayPropertiesEditor();
+            }
+        };
+    }
 
-        if (option.equals("Edit Data"))
-            doDisplayVersionedData();
+    private Action editDataAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                doDisplayVersionedData();
+            }
+        };
+    }
+
+    private Action removeAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doRemove();
+            }
+        };
     }
 
     protected void importDataset() throws EmfException {
@@ -207,7 +222,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     protected void exportSelectedDatasets() {
-        //NOTE: get selected dataset will give you all the dataset selected in the base model of sort filter table model
+        // NOTE: get selected dataset will give you all the dataset selected in the base model of sort filter table
+        // model
         EmfDataset[] emfDatasets = getNonExternalDatasets(getSelectedDatasets());
 
         ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager);
@@ -233,7 +249,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     protected void doDisplayPropertiesViewer() {
-
+        clearMessage();
         List datasets = updateSelectedDatasets(getSelectedDatasets());
         if (datasets.isEmpty()) {
             messagePanel.setMessage("Please select one or more Datasets");
@@ -267,6 +283,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     protected void doDisplayPropertiesEditor() {
+        clearMessage();
         List datasets = getSelectedDatasets();
 
         if (datasets.isEmpty()) {
@@ -285,15 +302,33 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     protected void doDisplayVersionedData() {
+        clearMessage();
         List datasets = getSelectedDatasets();
 
         if (datasets.isEmpty()) {
             messagePanel.setMessage("Please select one or more Datasets");
             return;
         }
+        
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
             VersionedDataWindow view = new VersionedDataWindow(parentConsole, desktopManager);
             presenter.doDisplayVersionedData(view, (EmfDataset) iter.next());
+        }
+    }
+
+    private void doRemove() {
+        clearMessage();
+        List datasets = getSelectedDatasets();
+
+        if (datasets.isEmpty()) {
+            messagePanel.setMessage("Please select one or more Datasets");
+            return;
+        }
+
+        try {
+            presenter.doDeleteDataset((EmfDataset[]) datasets.toArray(new EmfDataset[0]));
+        } catch (EmfException e) {
+            messagePanel.setError("Cannot delete dataset(s): " + e.getMessage());
         }
     }
 

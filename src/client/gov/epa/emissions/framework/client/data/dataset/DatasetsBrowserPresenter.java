@@ -87,4 +87,10 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         presenter.display(versionsView);
     }
 
+    public void doDeleteDataset(EmfDataset[] datasets) throws EmfException {
+        view.clearMessage();
+        if (false)
+            throw new EmfException("Under construction...");
+    }
+
 }
