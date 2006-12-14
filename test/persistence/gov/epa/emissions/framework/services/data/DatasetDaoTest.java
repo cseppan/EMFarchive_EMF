@@ -6,6 +6,11 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
+import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
+import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
 
 import java.util.List;
 
@@ -16,12 +21,25 @@ public class DatasetDaoTest extends ServiceTestCase {
     private DataCommonsDAO dcDao;
 
     private UserDAO userDAO;
+    
+    private DataCommonsDAO dataDAO;
+    
+    private ControlStrategyDAO strategyDao;
+    
+    private CaseDAO caseDao;
+    
+    private DatasetType[] types;
 
     protected void doSetUp() throws Exception {
         deleteAllDatasets();
         dao = new DatasetDAO();
         dcDao = new DataCommonsDAO();
         userDAO = new UserDAO();
+        dataDAO = new DataCommonsDAO();
+        strategyDao = new ControlStrategyDAO();
+        caseDao = new CaseDAO();
+        types = (DatasetType[])dataDAO.getDatasetTypes(session).toArray(new DatasetType[0]);
+
     }
 
     protected void doTearDown() throws Exception {// no op
@@ -185,6 +203,132 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldGetNonDeletedDatasets() {
+        EmfDataset dataset = newDataset("dataset-dao-test");
+        EmfDataset dataset2 = newDataset("test2");
+        dataset2.setStatus("Deleted");
+        EmfDataset dataset3 = newDataset("test3");
+        dataset3.setStatus("Deleted");
+        
+        try {
+            dao.updateWithoutLocking(dataset, session);
+            dao.updateWithoutLocking(dataset2, session);
+            dao.updateWithoutLocking(dataset3, session);
+            
+            EmfDataset[] loadedFromDb = (EmfDataset[])dao.allNonDeleted(session).toArray(new EmfDataset[0]);
+            assertEquals(1, loadedFromDb.length);
+            assertEquals("dataset-dao-test", loadedFromDb[0].getName());
+        } finally {
+            remove(dataset);
+            remove(dataset2);
+            remove(dataset3);
+        }
+    }
+
+    public void testShouldGetNonDeletedDatasetsWithSpecifiedDatasettype() {
+        EmfDataset dataset = newDataset("dataset-dao-test");
+        dataset.setDatasetType(types[0]);
+        EmfDataset dataset2 = newDataset("test2");
+        dataset2.setDatasetType(types[1]);
+        EmfDataset dataset3 = newDataset("test3");
+        dataset3.setDatasetType(types[0]);
+        dataset3.setStatus("Deleted");
+        
+        try {
+            dao.updateWithoutLocking(dataset, session);
+            dao.updateWithoutLocking(dataset2, session);
+            dao.updateWithoutLocking(dataset3, session);
+            
+            EmfDataset[] loadedFromDb = (EmfDataset[])dao.getDatasets(session, types[0]).toArray(new EmfDataset[0]);
+            assertEquals(1, loadedFromDb.length);
+            assertEquals("dataset-dao-test", loadedFromDb[0].getName());
+        } finally {
+            remove(dataset);
+            remove(dataset2);
+            remove(dataset3);
+        }
+    }
+
+    public void testShouldGetNonDeletedDatasetsWithSpecifiedName() {
+        EmfDataset dataset = newDataset("dataset-dao-test");
+        EmfDataset dataset2 = newDataset("test2");
+        dataset2.setStatus("Deleted");
+        EmfDataset dataset3 = newDataset("test3");
+        dataset3.setStatus("Deleted");
+        
+        try {
+            dao.updateWithoutLocking(dataset, session);
+            dao.updateWithoutLocking(dataset2, session);
+            dao.updateWithoutLocking(dataset3, session);
+            
+            EmfDataset loadedFromDb = dao.getDataset(session, "dataset-dao-test");
+            assertEquals("dataset-dao-test", loadedFromDb.getName());
+        } finally {
+            remove(dataset);
+            remove(dataset2);
+            remove(dataset3);
+        }
+    }
+
+    public void testShouldGetNonDeletedDatasetsWithSpecifiedID() {
+        EmfDataset dataset = newDataset("dataset-dao-test");
+        EmfDataset dataset2 = newDataset("test2");
+        dataset2.setStatus("Deleted");
+        EmfDataset dataset3 = newDataset("test3");
+        dataset3.setStatus("Deleted");
+        
+        try {
+            dao.updateWithoutLocking(dataset, session);
+            dao.updateWithoutLocking(dataset2, session);
+            dao.updateWithoutLocking(dataset3, session);
+            
+            EmfDataset loadedFromDb = dao.getDataset(session, dataset.getId());
+            assertEquals("dataset-dao-test", loadedFromDb.getName());
+
+            EmfDataset loadedFromDb2 = dao.getDataset(session, dataset2.getId());
+            assertNull(loadedFromDb2);
+
+            EmfDataset loadedFromDb3 = dao.getDataset(session, dataset3.getId());
+            assertNull(loadedFromDb3);
+        } finally {
+            remove(dataset);
+            remove(dataset2);
+            remove(dataset3);
+        }
+    }
+
+    public void testShouldDetectWhetherUsedByControlStrategiesOrCases() {
+        EmfDataset dataset = newDataset("dataset-dao-test");
+        EmfDataset dataset2 = newDataset("test2");
+        EmfDataset dataset3 = newDataset("test3");
+        
+        ControlStrategy strategy = newControlStrategy();
+        strategy.setInputDatasets(new EmfDataset[]{dataset});
+        
+        CaseInput input = new CaseInput();
+        input.setDataset(dataset2);
+        Case caseObj = newCase();
+        caseObj.setCaseInputs(new CaseInput[]{input});
+        
+        
+        try {
+            assertTrue(dao.isUsedByControlStrategies(session, dataset));
+            assertFalse(dao.isUsedByControlStrategies(session, dataset2));
+            assertFalse(dao.isUsedByControlStrategies(session, dataset3));
+            
+            assertTrue(dao.isUsedByCases(session, dataset2));
+            assertFalse(dao.isUsedByCases(session, dataset));
+            assertFalse(dao.isUsedByCases(session, dataset3));
+        } finally {
+            remove(dataset);
+            remove(dataset2);
+            remove(dataset3);
+            remove(strategy);
+            remove(input);
+            remove(caseObj);
+        }
+    }
+
     private EmfDataset newDataset(String name) {
         User owner = userDAO.get("emf", session);
 
@@ -202,6 +346,19 @@ public class DatasetDaoTest extends ServiceTestCase {
         save(datasetType);
 
         return (DatasetType) load(DatasetType.class, datasetType.getName());
+    }
+    
+    private ControlStrategy newControlStrategy() {
+        ControlStrategy element = new ControlStrategy("test" + Math.random());
+        strategyDao.add(element, session);
+        return element;
+    }
+    
+    private Case newCase() {
+        Case element = new Case("test" + Math.random());
+        caseDao.add(element, session);
+
+        return element;
     }
 
 }

@@ -254,7 +254,5 @@ public class ManageMenu extends JMenu implements ManageMenuView {
             messagePanel.setError(e.getMessage());
         }
     }
-    
-    
 
 }

@@ -38,7 +38,7 @@ public class ManageMenuPresenter {
         presenter.display(view);
     }
 
-    public void doDisplayDatasetsBrowser(DatasetsBrowserView view) {
+    public void doDisplayDatasetsBrowser(DatasetsBrowserView view) throws EmfException {
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session);
         presenter.doDisplay(view);
     }

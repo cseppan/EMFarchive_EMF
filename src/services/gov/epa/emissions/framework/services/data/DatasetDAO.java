@@ -8,6 +8,9 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
@@ -15,6 +18,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -70,6 +74,12 @@ public class DatasetDAO {
         return hibernateFacade.getAll(EmfDataset.class, session);
     }
 
+    // FIXME: to be deleted after dataset removed from db
+    public List allNonDeleted(Session session) {
+        Criterion crit = Restrictions.ne("status", "Deleted");
+        return hibernateFacade.get(EmfDataset.class, crit, session);
+    }
+
     public void add(EmfDataset dataset, Session session) {
         hibernateFacade.add(dataset, session);
     }
@@ -99,29 +109,86 @@ public class DatasetDAO {
     }
 
     public List getDatasets(Session session, DatasetType datasetType) {
-        Criterion criterion = Restrictions.eq("datasetType", datasetType);
+        Criterion statusCrit = Restrictions.ne("status", "Deleted"); // FIXME: to be deleted after dataset removed
+        // from db
+        Criterion typeCrit = Restrictions.eq("datasetType", datasetType);
+        Criterion criterion = Restrictions.and(statusCrit, typeCrit);
         Order order = Order.asc("name");
         return hibernateFacade.get(EmfDataset.class, criterion, order, session);
     }
 
     public EmfDataset getDataset(Session session, String name) {
-        Criterion criterion = Restrictions.eq("name", name);
+        Criterion statusCrit = Restrictions.ne("status", "Deleted"); // FIXME: to be deleted after dataset removed
+        // from db
+        Criterion nameCrit = Restrictions.eq("name", name);
+        Criterion criterion = Restrictions.and(statusCrit, nameCrit);
         Order order = Order.asc("name");
         return (EmfDataset) hibernateFacade.get(EmfDataset.class, criterion, order, session).get(0);
     }
 
     public EmfDataset getDataset(Session session, int id) {
-        Criterion criterion = Restrictions.eq("id", new Integer(id));
+        Criterion statusCrit = Restrictions.ne("status", "Deleted"); // FIXME: to be deleted after dataset removed
+        // from db
+        Criterion idCrit = Restrictions.eq("id", new Integer(id));
+        Criterion criterion = Restrictions.and(statusCrit, idCrit);
         return (EmfDataset) hibernateFacade.load(EmfDataset.class, criterion, session);
     }
-    
-    public long getDatasetRecordsNumber(DbServer dbServer, Session session, EmfDataset dataset, Version version) throws SQLException {
+
+    public boolean isUsedByControlStrategies(Session session, EmfDataset dataset) {
+        List strategies = hibernateFacade.getAll(ControlStrategy.class, session);
+        if (strategies == null || strategies.isEmpty())
+            return false;
+
+        for (Iterator iter = strategies.iterator(); iter.hasNext();) {
+            ControlStrategy cs = (ControlStrategy) iter.next();
+            if (datasetUsed(cs, dataset))
+                return true;
+        }
+
+        return false;
+    }
+
+    public boolean isUsedByCases(Session session, EmfDataset dataset) {
+        List cases = hibernateFacade.getAll(Case.class, session);
+        if (cases == null || cases.isEmpty())
+            return false;
+
+        for (Iterator iter = cases.iterator(); iter.hasNext();) {
+            Case caseObj = (Case) iter.next();
+            CaseInput[] inputs = caseObj.getCaseInputs();
+            if (datasetUsed(inputs, dataset))
+                return true;
+        }
+
+        return false;
+    }
+
+    private boolean datasetUsed(CaseInput[] inputs, EmfDataset dataset) {
+        for (int i = 0; i < inputs.length; i++) {
+            EmfDataset caseInputDataset = inputs[i].getDataset();
+            if (caseInputDataset != null && caseInputDataset.equals(dataset))
+                return true;
+        }
+        return false;
+    }
+
+    private boolean datasetUsed(ControlStrategy cs, EmfDataset dataset) {
+        EmfDataset[] inputDatasets = cs.getInputDatasets();
+        for (int i = 0; i < inputDatasets.length; i++)
+            if (inputDatasets[i].equals(dataset))
+                return true;
+
+        return false;
+    }
+
+    public long getDatasetRecordsNumber(DbServer dbServer, Session session, EmfDataset dataset, Version version)
+            throws SQLException {
         Datasource datasource = dbServer.getEmissionsDatasource();
         InternalSource source = dataset.getInternalSources()[0];
         String qualifiedTable = datasource.getName() + "." + source.getTable();
         String countQuery = "SELECT count(*) FROM " + qualifiedTable + getWhereClause(version, session);
         long totalCount = 0;
-        
+
         try {
             Connection connection = datasource.getConnection();
             Statement statement = connection.createStatement();
@@ -131,12 +198,12 @@ public class DatasetDAO {
 
             resultSet.close();
         } catch (SQLException e) {
-            throw new SQLException("Cannot get total records number on dataset: " + dataset.getName() +
-                    " Reason: " + e.getMessage());
+            throw new SQLException("Cannot get total records number on dataset: " + dataset.getName() + " Reason: "
+                    + e.getMessage());
         } finally {
             dbServer.disconnect();
         }
-        
+
         return totalCount;
     }
 
@@ -144,9 +211,9 @@ public class DatasetDAO {
         String versions = versionsList(version, session);
         String deleteClause = createDeleteClause(versions);
 
-        String whereClause = " WHERE dataset_id = " + version.getDatasetId() + " AND version IN ("
-                + versions + ") AND " + deleteClause;
-        
+        String whereClause = " WHERE dataset_id = " + version.getDatasetId() + " AND version IN (" + versions
+                + ") AND " + deleteClause;
+
         return whereClause;
     }
 

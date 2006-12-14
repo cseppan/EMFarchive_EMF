@@ -9,6 +9,9 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.basic.UserServiceImpl;
+import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Random;
@@ -106,7 +109,7 @@ public class DataServiceTest extends ServiceTestCase {
 
         User owner = userService.getUser("emf");
 
-        dataset.setName("dataset-dao-test" + Math.abs(new Random().nextInt()));
+        dataset.setName("data-service-test" + Math.abs(new Random().nextInt()));
         dataset.setCreator(owner.getUsername());
 
         Transaction tx = null;
@@ -245,15 +248,14 @@ public class DataServiceTest extends ServiceTestCase {
         EmfDataset dataset2 = newDataset();
         dataset1.setCreator("emf");
         dataset2.setCreator("emf");
-        
+
         try {
             EmfDataset locked1 = service.obtainLockedDataset(owner, dataset1);
             EmfDataset locked2 = service.obtainLockedDataset(owner, dataset2);
-            service.deleteDatasets(owner, new EmfDataset[]{locked1, locked2});
+            service.deleteDatasets(owner, new EmfDataset[] { locked1, locked2 });
             EmfDataset[] datasets = service.getDatasets();
-            
-            assertEquals("Deleted", datasets[0].getStatus());
-            assertEquals("Deleted", datasets[1].getStatus());
+
+            assertEquals("0 datasets", 0, datasets.length);
         } catch (EmfException e) {
             return;
         } finally {
@@ -262,21 +264,129 @@ public class DataServiceTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldFailOnDeletingDatasets() throws EmfException {
+    public void testShouldFailOnDeletingDatasetsWithADifferentCreator() throws EmfException {
         User owner = userService.getUser("emf");
         EmfDataset dataset1 = newDataset();
         EmfDataset dataset2 = newDataset();
         dataset1.setCreator("emf1");
         dataset2.setCreator("emf2");
-        
+
         try {
-            service.deleteDatasets(owner, new EmfDataset[]{dataset1, dataset2});
+            service.deleteDatasets(owner, new EmfDataset[] { dataset1, dataset2 });
         } catch (EmfException e) {
             assertTrue("Should give error msg.", e.getMessage().startsWith("Cannot delete"));
             return;
         } finally {
             remove(dataset1);
             remove(dataset2);
+        }
+    }
+
+    public void testShouldFailOnDeletingDatasetsUsedByAControlStrategy() throws EmfException {
+        User owner = userService.getUser("emf");
+        EmfDataset dataset1 = newDataset();
+        EmfDataset dataset2 = newDataset();
+        ControlStrategy strategy = newControlStrategy(dataset1);
+
+        try {
+            assertEquals("data-service-test-strategy", strategy.getName());
+            service.deleteDatasets(owner, new EmfDataset[] { dataset1, dataset2 });
+        } catch (EmfException e) {
+            assertTrue("Should give error msg.", e.getMessage().startsWith("Cannot delete"));
+            return;
+        } finally {
+            remove(strategy);
+            remove(dataset1);
+            remove(dataset2);
+        }
+    }
+
+    public void testShouldFailOnDeletingDatasetsUsedByACase() throws EmfException {
+        User owner = userService.getUser("emf");
+        EmfDataset dataset1 = newDataset();
+        EmfDataset dataset2 = newDataset();
+        Case caseObj = newCase(dataset2);
+        try {
+            assertEquals("data-service-test-case", caseObj.getName());
+            service.deleteDatasets(owner, new EmfDataset[] { dataset1, dataset2 });
+        } catch (EmfException e) {
+            assertTrue("Should give error msg.", e.getMessage().startsWith("Cannot delete"));
+            return;
+        } finally {
+            remove(caseObj);
+            remove(dataset1);
+            remove(dataset2);
+        }
+    }
+
+    private ControlStrategy newControlStrategy(EmfDataset dataset) {
+        ControlStrategy strategy = new ControlStrategy("data-service-test-strategy");
+        strategy.setInputDatasets(new EmfDataset[] { dataset });
+
+        session.clear();// flush cached objects
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.save(strategy);
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+
+        return loadControlStrategy(strategy);
+    }
+
+    private ControlStrategy loadControlStrategy(ControlStrategy strategy) {
+        session.clear();// flush cached objects
+
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(ControlStrategy.class).add(
+                    Restrictions.eq("name", strategy.getName()));
+            tx.commit();
+
+            return (ControlStrategy) crit.uniqueResult();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    private Case newCase(EmfDataset dataset) {
+        CaseInput input = new CaseInput();
+        input.setDataset(dataset);
+        Case caseObj = new Case("data-service-test-case");
+        caseObj.setCaseInputs(new CaseInput[] { input });
+
+        session.clear();// flush cached objects
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.save(caseObj);
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+
+        return loadCase(caseObj);
+    }
+
+    private Case loadCase(Case caseObj) {
+        session.clear();// flush cached objects
+
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(Case.class).add(Restrictions.eq("name", caseObj.getName()));
+            tx.commit();
+
+            return (Case) crit.uniqueResult();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
         }
     }
 

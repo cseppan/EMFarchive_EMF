@@ -30,7 +30,7 @@ public class DataServiceImpl implements DataService {
     public EmfDataset[] getDatasets() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            List datasets = dao.all(session);
+            List datasets = dao.allNonDeleted(session);
             session.close();
 
             return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
@@ -102,19 +102,48 @@ public class DataServiceImpl implements DataService {
     }
 
     public void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException {
-        for (int i = 0; i < datasets.length; i++) {
-            if (isRemovable(datasets[i], owner)) {
-                datasets[i].setStatus("Deleted");
-                updateDataset(datasets[i]);
+        try {
+            if (isRemovable(datasets, owner)) {
+                for (int i = 0; i < datasets.length; i++) {
+                    datasets[i].setStatus("Deleted");
+                    updateDataset(datasets[i]);
+                }
             }
+        } catch (RuntimeException e) {
+            LOG.error("Could not delete datasets: ", e);
+            throw new EmfException("Could not delete datasets- " + e.getMessage());
         }
     }
 
-    private boolean isRemovable(EmfDataset dataset, User owner) throws EmfException {
-        if (!dataset.getCreator().equalsIgnoreCase(owner.getUsername()))
-            throw new EmfException("Cannot delete \"" + dataset.getName()
-                    + "\". User is not the creator of this dataset.");
+    private boolean isRemovable(EmfDataset[] datasets, User owner) throws EmfException {
+        for (int i = 0; i < datasets.length; i++) {
+            checkUser(datasets[i], owner);
+            checkCase(datasets[i]);
+            checkControlStrategy(datasets[i]);
+        }
 
         return true;
     }
+
+    private void checkUser(EmfDataset dataset, User owner) throws EmfException {
+        if (!dataset.getCreator().equalsIgnoreCase(owner.getUsername())) {
+            releaseLockedDataset(dataset);
+            throw new EmfException("Cannot delete \"" + dataset.getName()
+                    + "\". User is not the creator of this dataset.");
+
+        }
+    }
+
+    private void checkCase(EmfDataset dataset) throws EmfException {
+        Session session = sessionFactory.getSession();
+        if (dao.isUsedByCases(session, dataset))
+            throw new EmfException("Cannot delete \"" + dataset.getName() + "\". Used by cases.");
+    }
+
+    private void checkControlStrategy(EmfDataset dataset) throws EmfException {
+        Session session = sessionFactory.getSession();
+        if (dao.isUsedByControlStrategies(session, dataset))
+            throw new EmfException("Cannot delete \"" + dataset.getName() + "\". Used by control strategies.");
+    }
+
 }

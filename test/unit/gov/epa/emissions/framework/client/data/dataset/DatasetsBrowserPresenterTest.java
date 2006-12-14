@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.data.dataset;
 
+import java.util.Date;
+
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserPresenter;
@@ -38,11 +40,17 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
     private Mock serviceLocator;
 
     private Mock session;
+    
+    private User owner;
 
     protected void setUp() {
         view = mock(DatasetsBrowserView.class);
-
+        owner = new User("emf", "CEP", "(919)123-4567", "emf@email.com", "emf","emf12345", false, false);
+       
         dataService = mock(DataService.class);
+        EmfDataset[] datasets = new EmfDataset[0];
+        dataService.stubs().method("getDatasets").withNoArguments().will(returnValue(datasets));
+        
         Mock dataCommonsService = mock(DataCommonsService.class);
         serviceLocator = mock(ServiceLocator.class);
         serviceLocator.stubs().method("dataService").withNoArguments().will(returnValue(dataService.proxy()));
@@ -50,14 +58,19 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
                 returnValue(dataCommonsService.proxy()));
 
         session = mock(EmfSession.class);
-        session.stubs().method("user").withNoArguments().will(returnValue(new User()));
-
+        session.stubs().method("user").withNoArguments().will(returnValue(owner));
+        session.stubs().method("dataService").will(returnValue(dataService.proxy()));
+        
         presenter = new DatasetsBrowserPresenter((EmfSession) session.proxy());
 
         view.expects(once()).method("observe").with(eq(presenter));
-        view.expects(once()).method("display").withNoArguments();
+        view.expects(once()).method("display").with(eq(datasets));
 
-        presenter.doDisplay((DatasetsBrowserView) view.proxy());
+        try {
+            presenter.doDisplay((DatasetsBrowserView) view.proxy());
+        } catch (EmfException e) {
+            return;
+        }
     }
 
     public void testShouldCloseViewOnClickOfCloseButton() {
@@ -77,7 +90,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter((EmfSession) session.proxy());
         view.expects(once()).method("observe").with(eq(presenter));
-        view.expects(once()).method("display").withNoArguments();
+        view.expects(once()).method("display").with(eq(datasets));
         view.expects(once()).method("clearMessage").withNoArguments();
 
         presenter.doDisplay((DatasetsBrowserView) view.proxy());
@@ -167,6 +180,27 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         VersionedDataView viewProxy = (VersionedDataView) editorView.proxy();
 
         presenter.doDisplayVersionedData(viewProxy, dataset);
+    }
+
+    public void testShouldDeleteDatasets() {
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("name");
+        dataset.setLockOwner(owner.getUsername());
+        dataset.setLockDate(new Date());
+        EmfDataset[] datasets = new EmfDataset[]{dataset};
+        
+        view.expects(once()).method("clearMessage").withNoArguments();
+        dataService.stubs().method("obtainLockedDataset").with(eq(owner), eq(dataset)).will(returnValue(dataset));
+        dataService.stubs().method("releaseLockedDataset").withNoArguments();
+        dataService.stubs().method("deleteDatasets").with(eq(owner), eq(datasets));
+ 
+        session.stubs().method("serviceLocator").will(returnValue(serviceLocator.proxy()));
+        
+        try {
+            presenter.doDeleteDataset(datasets);
+        } catch (EmfException e) {
+            return;
+        }
     }
 
 }

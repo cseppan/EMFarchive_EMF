@@ -31,7 +31,7 @@ public class EmfDataset implements Dataset, Lockable {
 
     private String description;
 
-    private String status;
+    private String status = ""; //so the selection based on status won't fail
 
     private Region region;
 

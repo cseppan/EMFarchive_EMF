@@ -23,7 +23,6 @@ import gov.epa.emissions.framework.client.meta.DatasetPropertiesEditor;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataWindow;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfDatasetTableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
@@ -42,11 +41,14 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 public class DatasetsBrowserWindow extends ReusableInteralFrame implements DatasetsBrowserView, RefreshObserver {
 
+    private JPanel layout;
+    
     private SortFilterSelectModel selectModel;
 
     private MessagePanel messagePanel;
@@ -58,42 +60,51 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private EmfSession session;
 
     private EmfTableModel model;
+    
+    private EmfDatasetTableData tableData;
 
     private JPanel browserPanel;
 
-    public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager)
-            throws EmfException {
+    public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Manager", new Dimension(850, 450), desktopManager);
         super.setName("datasetsBrowser");
         this.session = session;
         this.parentConsole = parentConsole;
 
-        DataService services = session.dataService();
-        model = new EmfTableModel(new EmfDatasetTableData(services.getDatasets()));
-        selectModel = new SortFilterSelectModel(model);
-
-        this.getContentPane().add(createLayout(parentConsole));
+        layout = new JPanel();
+        this.getContentPane().add(layout);
+    }
+    
+    public void display(EmfDataset[] datasets) {
+        doLayout(datasets);
+        super.display();
     }
 
-    private JPanel createLayout(EmfConsole parentConsole) {
-        JPanel panel = new JPanel();
+    private void doLayout(EmfDataset[] datasets) {
+        tableData = new EmfDatasetTableData(datasets);
+        model = new EmfTableModel(tableData);
+        selectModel = new SortFilterSelectModel(model);
+
+        createLayout(layout);
+    }
+
+    private void createLayout(JPanel panel) {
+        panel.removeAll();
         panel.setLayout(new BorderLayout());
 
         panel.add(createTopPanel(), BorderLayout.NORTH);
-        panel.add(createBrowserPanel(parentConsole), BorderLayout.CENTER);
+        panel.add(createBrowserPanel(), BorderLayout.CENTER);
         panel.add(createControlPanel(), BorderLayout.SOUTH);
-
-        return panel;
     }
 
-    private JPanel createBrowserPanel(EmfConsole parentConsole) {
+    private JPanel createBrowserPanel() {
         browserPanel = new JPanel(new BorderLayout());
-        browserPanel.add(sortFilterPane(parentConsole));
+        browserPanel.add(sortFilterPane());
 
         return browserPanel;
     }
 
-    private JScrollPane sortFilterPane(EmfConsole parentConsole) {
+    private JScrollPane sortFilterPane() {
         SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
         panel.sort(sortCriteria());
         panel.getTable().setName("datasetsTable");
@@ -139,6 +150,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         SelectAwareButton dataButton = new SelectAwareButton("Edit Data", editDataAction(), selectModel, confirmDialog);
         Button removeButton = new RemoveButton(removeAction());
 
+        dataButton.setMnemonic(7);
+        
         panel.add(viewButton);
         panel.add(propButton);
         panel.add(dataButton);
@@ -325,10 +338,17 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             return;
         }
 
-        try {
-            presenter.doDeleteDataset((EmfDataset[]) datasets.toArray(new EmfDataset[0]));
-        } catch (EmfException e) {
-            messagePanel.setError("Cannot delete dataset(s): " + e.getMessage());
+        String message = "Are you sure you want to remove the selected " + datasets.size() + " dataset(s)?";
+        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (selection == JOptionPane.YES_OPTION) {
+            try {
+                presenter.doDeleteDataset((EmfDataset[]) datasets.toArray(new EmfDataset[0]));
+                messagePanel.setMessage(datasets.size() + " datasets deleted. Please Refresh to see the revised list of Datasets.");
+            } catch (EmfException e) {
+                messagePanel.setError(e.getMessage());
+            }
         }
     }
 
@@ -342,12 +362,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     public void refresh(EmfDataset[] datasets) {
-        model.refresh(new EmfDatasetTableData(datasets));
-        selectModel.refresh();
-
-        // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
-        browserPanel.removeAll();
-        browserPanel.add(sortFilterPane(parentConsole));
+        doLayout(datasets);
         super.refreshLayout();
     }
 

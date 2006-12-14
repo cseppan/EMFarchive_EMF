@@ -18,6 +18,9 @@ import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DatasetsBrowserPresenter implements RefreshObserver {
 
     private DatasetsBrowserView view;
@@ -28,11 +31,11 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         this.session = session;
     }
 
-    public void doDisplay(DatasetsBrowserView view) {
+    public void doDisplay(DatasetsBrowserView view) throws EmfException {
         this.view = view;
         view.observe(this);
 
-        view.display();
+        view.display(dataService().getDatasets());
     }
 
     public void doClose() {
@@ -94,19 +97,51 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
 
     public void doDeleteDataset(EmfDataset[] datasets) throws EmfException {
         view.clearMessage();
+        EmfDataset[] lockedDatasets = getLockedDatasets(datasets);
         
-        for (int i = 0; i < datasets.length; i++)
-            obtainDatasetLocks(datasets[i]);
-
-        dataService().deleteDatasets(getUser(), datasets);
+        if (lockedDatasets == null)
+            return;
+        
+        try {
+            dataService().deleteDatasets(getUser(), lockedDatasets);
+        } catch (EmfException e) {
+            releaseLocked(lockedDatasets);
+            throw new EmfException(e.getMessage());
+        }
+    }
+    
+    private EmfDataset[] getLockedDatasets(EmfDataset[] datasets) throws EmfException {
+        List lockedList = new ArrayList();
+        
+        for (int i = 0; i < datasets.length; i++) {
+            EmfDataset locked = obtainDatasetLocks(datasets[i]);
+            if (locked == null) {
+                releaseLocked((EmfDataset[])lockedList.toArray(new EmfDataset[0]));
+                return null;
+            }
+            
+            lockedList.add(locked);
+        }
+        
+        return (EmfDataset[])lockedList.toArray(new EmfDataset[0]);
     }
 
-    private void obtainDatasetLocks(EmfDataset dataset) throws EmfException {
-        dataset = dataService().obtainLockedDataset(getUser(), dataset);
-        if (!dataset.isLocked(getUser())) {// view mode, locked by another user
+    private EmfDataset obtainDatasetLocks(EmfDataset dataset) throws EmfException {
+        EmfDataset locked = dataService().obtainLockedDataset(getUser(), dataset);
+        if (!locked.isLocked(getUser())) {// view mode, locked by another user
             view.notifyLockFailure(dataset);
-            return;
+            return null;
         }
+        
+        return locked;
+    }
+    
+    private void releaseLocked(EmfDataset[] lockedDatasets) throws EmfException {
+        if (lockedDatasets.length == 0)
+            return;
+        
+        for(int i = 0; i < lockedDatasets.length; i++)
+            dataService().releaseLockedDataset(lockedDatasets[i]);
     }
     
 }

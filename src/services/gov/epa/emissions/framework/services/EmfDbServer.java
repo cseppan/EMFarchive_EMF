@@ -18,6 +18,8 @@ public class EmfDbServer implements DbServer {
     
     public static final String EMF_EMF_SCHEMA = "emf";
 
+    public static final String EMF_CASE_SCHEMA = "cases";
+
     private PostgresDbServer dbServer;
 
     public EmfDbServer() throws Exception {

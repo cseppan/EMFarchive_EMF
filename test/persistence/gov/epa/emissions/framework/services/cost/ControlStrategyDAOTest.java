@@ -40,7 +40,7 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
         return element;
     }
 
-public void testShouldUpdateControlStrategyOnUpdate() throws EmfException {
+    public void testShouldUpdateControlStrategyOnUpdate() throws EmfException {
         UserDAO userDAO = new UserDAO();
         User owner = userDAO.get("emf", session);
 
