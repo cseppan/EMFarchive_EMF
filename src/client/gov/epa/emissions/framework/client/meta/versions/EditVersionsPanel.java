@@ -74,7 +74,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         add(tablePanel(versions), BorderLayout.CENTER);
         add(bottomPanel(), BorderLayout.PAGE_END);
         if (dataset.getInternalSources().length == 0) {
-            displayError("Versions cannot be edited for external files.");
+            displayError("No version information is available - the dataset may be incomplete or external.");
         }
     }
 
