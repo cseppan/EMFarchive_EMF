@@ -150,7 +150,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         SelectAwareButton dataButton = new SelectAwareButton("Edit Data", editDataAction(), selectModel, confirmDialog);
         Button removeButton = new RemoveButton(removeAction());
 
-        dataButton.setMnemonic(7);
+        dataButton.setMnemonic('a');
         
         panel.add(viewButton);
         panel.add(propButton);
@@ -345,7 +345,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         if (selection == JOptionPane.YES_OPTION) {
             try {
                 presenter.doDeleteDataset((EmfDataset[]) datasets.toArray(new EmfDataset[0]));
-                messagePanel.setMessage(datasets.size() + " datasets deleted. Please Refresh to see the revised list of Datasets.");
+                messagePanel.setMessage(datasets.size() + " datasets have been removed. Please Refresh to see the revised list of Datasets.");
             } catch (EmfException e) {
                 messagePanel.setError(e.getMessage());
             }
