@@ -75,7 +75,7 @@ public class ExportTask implements Runnable {
                 return;
             // updateDataset(dataset); //Disabled because of nothing updated during exporting
             setStatus("Completed export of " + dataset.getName() + " to " + file.getAbsolutePath() +
-                      " in " + accesslog.getTimereqrd() + " minutes.");
+                      " in " + accesslog.getTimereqrd() + " seconds.");
         } catch (Exception e) {
             setErrorStatus(e, e.getMessage());
         }
@@ -83,7 +83,7 @@ public class ExportTask implements Runnable {
 
     private void printLogInfo(AccessLog log) {
         String info = "Exported dataset: " + log.getDatasetname() + "; version: " + log.getVersion() + "; start date: "
-                + log.getTimestamp() + "; end date: " + log.getEnddate() + "; time required (minute): "
+                + log.getTimestamp() + "; end date: " + log.getEnddate() + "; time required (seconds): "
                 + log.getTimereqrd() + "; user: " + log.getUsername() + "; path: " + log.getFolderPath()
                 + "; details: " + log.getDetails();
         System.out.println(info);
