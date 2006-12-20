@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.data.DataService;
-import gov.epa.emissions.framework.services.data.EmfDataset;
+//import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExImService;
 
 import org.jmock.Mock;
@@ -54,13 +54,14 @@ public class DatasetsBrowserAwareImportPresenterTest extends MockObjectTestCase 
         session.stubs().method("preferences").will(returnValue(prefs.proxy()));
     }
 
-    public void testShouldRefreshDatasetsBrowserAndCloseWindowOnDone() {
-        view.expects(once()).method("disposeView");
-
-        EmfDataset[] datasets = new EmfDataset[0];
-        dataServices.stubs().method("getDatasets").will(returnValue(datasets));
-        datasetsBrowser.expects(once()).method("refresh").with(eq(datasets));
-
-        presenter.doDone();
-    }
+// no need to test this because function was removed
+//    public void testShouldRefreshDatasetsBrowserAndCloseWindowOnDone() {
+//        view.expects(once()).method("disposeView");
+//
+//        EmfDataset[] datasets = new EmfDataset[0];
+//        dataServices.stubs().method("getDatasets").will(returnValue(datasets));
+//        datasetsBrowser.expects(once()).method("refresh").with(eq(datasets));
+//
+//        presenter.doDone();
+//    }
 }
