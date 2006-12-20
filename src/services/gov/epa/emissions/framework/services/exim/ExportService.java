@@ -51,7 +51,7 @@ public class ExportService {
 
         if (!overwrite) {
             if (file.exists() && file.isFile()) {
-                log.error("File exists and cannot be overwritten");
+                //log.error("File exists and cannot be overwritten");
                 throw new EmfException("Cannot export to existing file.  Choose overwrite option");
             }
         }
