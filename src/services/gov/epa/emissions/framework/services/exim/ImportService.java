@@ -74,7 +74,8 @@ public class ImportService {
         session.close();
 
         if (nameUsed) {
-            log.error("Dataset name " + dataset.getName() + " is already used");
+            // AME: no need to log this as an error
+            //log.error("Dataset name " + dataset.getName() + " is already used");
             throw new EmfException("Dataset name is already used");
         }
     }
