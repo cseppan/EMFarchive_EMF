@@ -4,6 +4,12 @@ insert into cases.inputnames values(DEFAULT,'Country, State, County Information'
 insert into cases.inputnames values(DEFAULT,'Inventory Table');
 -- cases.inputnames
 
+-- cases.subdirs
+--insert into cases.subdirs values(DEFAULT,'subdir/one');
+--insert into cases.subdirs values(DEFAULT,'subdir/one/two');
+--insert into cases.subdirs values(DEFAULT,'subdir/one/two/three');
+-- cases.subdirs
+
 -- cases.programs
 insert into cases.programs values(DEFAULT,'Cntlmat');
 insert into cases.programs values(DEFAULT,'Elevpoint');

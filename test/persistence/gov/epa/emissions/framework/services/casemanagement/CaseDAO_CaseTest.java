@@ -111,6 +111,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         Case element = new Case("test" + Math.random());
         Abbreviation abbreviation = new Abbreviation("test" + Math.random());
         add(abbreviation);
+        session.clear();
         element.setAbbreviation(abbreviation);
 
         dao.add(element, session);
@@ -121,6 +122,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
             assertEquals(abbreviation, ((Case) list.get(0)).getAbbreviation());
         } finally {
             remove(element);
+            remove(abbreviation);
         }
     }
 
@@ -138,6 +140,28 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
             assertEquals(aqm, ((Case) list.get(0)).getAirQualityModel());
         } finally {
             remove(element);
+            remove(aqm);
+        }
+    }
+
+    public void testShouldPersistCaseWithAnCaseInputAndASubdirOnAdd() {
+        Case element = new Case("test" + Math.random());
+        SubDir subdir = new SubDir("sub/dir" + Math.random());
+        add(subdir);
+        CaseInput input = new CaseInput();
+        input.setSubdirObj(subdir);
+        element.setCaseInputs(new CaseInput[]{input});
+        
+        dao.add(element, session);
+        
+        session.clear();
+        try {
+            List list = dao.getCases(session);
+            assertEquals(input, ((Case) list.get(0)).getCaseInputs()[0]);
+            assertEquals(1, ((Case) list.get(0)).getCaseInputs().length);
+        } finally {
+            remove(element);
+            remove(subdir);
         }
     }
 
@@ -155,6 +179,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
             assertEquals(attrib, ((Case) list.get(0)).getCaseCategory());
         } finally {
             remove(element);
+            remove(attrib);
         }
     }
 
@@ -172,6 +197,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
             assertEquals(attrib, ((Case) list.get(0)).getEmissionsYear());
         } finally {
             remove(element);
+            remove(attrib);
         }
     }
 
@@ -189,6 +215,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
             assertEquals(attrib, ((Case) list.get(0)).getGrid());
         } finally {
             remove(element);
+            remove(attrib);
         }
     }
 
@@ -206,6 +233,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
             assertEquals(attrib, ((Case) list.get(0)).getMeteorlogicalYear());
         } finally {
             remove(element);
+            remove(attrib);
         }
     }
 
@@ -223,6 +251,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
             assertEquals(attrib, ((Case) list.get(0)).getSpeciation());
         } finally {
             remove(element);
+            remove(attrib);
         }
     }
 
@@ -257,6 +286,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
             assertEquals(attrib, ((Case) list.get(0)).getProject());
         } finally {
             remove(element);
+            remove(attrib);
         }
     }
 
@@ -274,6 +304,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
             assertEquals(attrib, ((Case) list.get(0)).getControlRegion());
         } finally {
             remove(element);
+            remove(attrib);
         }
     }
 

@@ -198,6 +198,20 @@ public class CaseServiceTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldGetSubdirs() throws Exception {
+        int totalBeforeAdd = service.getSubDirs().length;
+        SubDir subdir = new SubDir("subdir name one" + Math.random());
+        add(subdir);
+        
+        try {
+            List list = Arrays.asList(service.getSubDirs());
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(subdir));
+        } finally {
+            remove(subdir);
+        }
+    }
+
     public void testShouldGetCases() throws Exception {
         int totalBeforeAdd = service.getCases().length;
         Case element = newCase();

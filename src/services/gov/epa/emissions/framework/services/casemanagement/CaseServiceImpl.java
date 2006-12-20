@@ -420,4 +420,30 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
+    public SubDir[] getSubDirs() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List results = dao.getSubDirs(session);
+            session.close();
+
+            return (SubDir[]) results.toArray(new SubDir[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all SubDirz", e);
+            throw new EmfException("Could not get all SubDirs");
+        }
+    }
+
+    public SubDir addSubDir(SubDir subdir) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(subdir, session);
+            return (SubDir) dao.load(SubDir.class, subdir.getName(), session);
+        } catch (Exception e) {
+            LOG.error("Could not add new SubDir '" + subdir.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new SubDir '" + subdir.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
 }

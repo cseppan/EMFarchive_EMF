@@ -14,6 +14,7 @@ DELETE FROM cases.programs;
 DELETE FROM cases.inputnames;
 DELETE FROM cases.input_envt_vars;
 DELETE FROM cases.cases_caseinputs;
+DELETE FROM cases.subdirs;
 
 
 

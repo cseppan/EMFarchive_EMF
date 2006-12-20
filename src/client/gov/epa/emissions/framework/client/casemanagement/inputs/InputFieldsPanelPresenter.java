@@ -10,12 +10,14 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.SubDirs;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
+import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -33,12 +35,15 @@ public class InputFieldsPanelPresenter {
     
     private Programs programs;
 
+    private SubDirs subdirs;
+
     public InputFieldsPanelPresenter(InputFieldsPanelView inputFields, EmfSession session) throws EmfException {
         this.session = session;
         this.view = inputFields;
         this.caseInputNames = new CaseInputNames(session,getInputNames());
         this.caseInputEnvtVars = new CaseInputEnvtVars(session, getEnvtVars());
         this.programs = new Programs(session, getPrograms());
+        this.subdirs = new SubDirs(session, getSubdirs());
     }
 
     public void display(CaseInput input, JComponent container) throws EmfException {
@@ -57,6 +62,10 @@ public class InputFieldsPanelPresenter {
     public Programs getCasePrograms() {
         return this.programs;
     }
+    
+    public SubDirs getSubDirs() {
+        return this.subdirs;
+    }
 
     public InputName[] getInputNames() throws EmfException {
         return caseService().getInputNames();
@@ -72,6 +81,10 @@ public class InputFieldsPanelPresenter {
 
     public CaseProgram[] getPrograms() throws EmfException {
         return caseService().getPrograms();
+    }
+
+    public SubDir[] getSubdirs() throws EmfException {
+        return caseService().getSubDirs();
     }
 
     public InputEnvtVar[] getEnvtVars() throws EmfException {
@@ -140,6 +153,10 @@ public class InputFieldsPanelPresenter {
 
     public CaseProgram getCaseProgram(Object selected) throws EmfException {
         return programs.get(selected);
+    }
+
+    public SubDir getSubDir(Object selected) throws EmfException {
+        return subdirs.get(selected);
     }
 
 }

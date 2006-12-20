@@ -30,6 +30,8 @@ public class CaseInput implements Serializable, Comparable {
     private boolean show;
     
     private String subdir;
+    
+    private SubDir subdirObj;
 
     /*
      * Default constructor needed for hibernate and axis serialization
@@ -167,6 +169,14 @@ public class CaseInput implements Serializable, Comparable {
 
     public void setRecordID(int recordID) {
         this.recordID = recordID;
+    }
+
+    public SubDir getSubdirObj() {
+        return subdirObj;
+    }
+
+    public void setSubdirObj(SubDir subdirObj) {
+        this.subdirObj = subdirObj;
     }
 
 }

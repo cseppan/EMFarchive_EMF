@@ -26,6 +26,10 @@ public class CaseDAO {
     public void add(Abbreviation object, Session session) {
         addObject(object, session);
     }
+    
+    public void add(SubDir subdir, Session session) {
+        addObject(subdir, session);
+    }
 
     public void add(AirQualityModel object, Session session) {
         addObject(object, session);
@@ -154,6 +158,10 @@ public class CaseDAO {
 
     public List getModelToRuns(Session session) {
         return hibernateFacade.getAll(ModelToRun.class, Order.asc("name"), session);
+    }
+
+    public List getSubDirs(Session session) {
+        return hibernateFacade.getAll(SubDir.class, Order.asc("name"), session);
     }
 
 }

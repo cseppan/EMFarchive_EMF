@@ -110,6 +110,15 @@ CREATE TABLE cases.model_to_runs
 WITHOUT OIDS;
 -- cases.model_to_runs
 
+-- cases.subdirs
+CREATE TABLE cases.subdirs
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- cases.subdirs
+
 -- cases.cases
 CREATE TABLE cases.cases
 (
@@ -179,6 +188,7 @@ CREATE TABLE cases.cases_caseinputs
   dataset_id int4  REFERENCES emf.datasets(id),
   version_id int4  REFERENCES emissions.versions(id),
   dataset_type_id int4  REFERENCES emf.dataset_types(id),
+  subdir_id int4  REFERENCES cases.subdirs(id),
   UNIQUE (case_id,input_name_id,sector_id,program_id) 
 ) 
 WITHOUT OIDS;

@@ -17,6 +17,7 @@ import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
+import gov.epa.emissions.framework.services.casemanagement.SubDir;
 
 public class CaseServiceTransport implements CaseService {
 
@@ -25,7 +26,6 @@ public class CaseServiceTransport implements CaseService {
     private DataMappings dataMappings;
 
     private CaseMappings caseMappings;
-
 
     public CaseServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
@@ -232,51 +232,70 @@ public class CaseServiceTransport implements CaseService {
 
     public CaseProgram addProgram(CaseProgram program) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("addProgram");
         call.addParam("program", caseMappings.program());
         call.setReturnType(caseMappings.program());
-        
+
         return (CaseProgram) call.requestResponse(new Object[] { program });
     }
 
     public InputEnvtVar addInputEnvtVar(InputEnvtVar inputEnvtVar) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("addInputEnvtVar");
         call.addParam("inputEnvtVar", caseMappings.inputEnvtVar());
         call.setReturnType(caseMappings.inputEnvtVar());
-        
+
         return (InputEnvtVar) call.requestResponse(new Object[] { inputEnvtVar });
     }
 
     public ModelToRun[] getModelToRuns() throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("getModelToRuns");
         call.setReturnType(caseMappings.modelToRuns());
-        
-        return (ModelToRun[])call.requestResponse(new Object[] {});
+
+        return (ModelToRun[]) call.requestResponse(new Object[] {});
     }
 
     public ModelToRun addModelToRun(ModelToRun model) throws EmfException {
-       EmfCall call = call();
-        
+        EmfCall call = call();
+
         call.setOperation("addModelToRun");
         call.addParam("model", caseMappings.modelToRun());
         call.setReturnType(caseMappings.modelToRun());
-        
+
         return (ModelToRun) call.requestResponse(new Object[] { model });
     }
 
     public GridResolution addGridResolution(GridResolution gridResolution) throws EmfException {
-       EmfCall call = call();
-        
+        EmfCall call = call();
+
         call.setOperation("addGridResolution");
         call.addParam("gridResolution", caseMappings.gridResolution());
         call.setReturnType(caseMappings.gridResolution());
-        
+
         return (GridResolution) call.requestResponse(new Object[] { gridResolution });
+    }
+
+    public SubDir[] getSubDirs() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getSubDirs");
+        call.setReturnType(caseMappings.subdirs());
+
+        return (SubDir[]) call.requestResponse(new Object[] {});
+    }
+
+    public SubDir addSubDir(SubDir subdir) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("addSubDir");
+        call.addParam("subdir", caseMappings.subdir());
+        call.setReturnType(caseMappings.subdir());
+
+        return (SubDir) call.requestResponse(new Object[] { subdir });
     }
 
 }

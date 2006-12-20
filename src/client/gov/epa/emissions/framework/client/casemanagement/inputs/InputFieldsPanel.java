@@ -7,13 +7,13 @@ import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
-import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
-import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
+import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -47,7 +47,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
     private JLabel qaStatus;
 
-    private TextField subDir;
+    private EditableComboBox subDir;
 
     private CheckBox required;
 
@@ -125,8 +125,14 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         qaStatus = new JLabel("");
         layoutGenerator.addLabelWidgetPair("QA Status:", qaStatus, panel);
 
-        subDir = new TextField("subdir", 30);
+//        subDir = new TextField("subdir", 30);
+//        changeablesList.addChangeable(subDir);
+//        layoutGenerator.addLabelWidgetPair("Subdirectory:", subDir, panel);
+
+        SubDir[] subdirs = presenter.getSubDirs().getAll();
+        subDir = new EditableComboBox(subdirs);
         changeablesList.addChangeable(subDir);
+        subDir.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Subdirectory:", subDir, panel);
 
         required = new CheckBox("");
@@ -160,7 +166,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         dataset.setSelectedItem(input.getDataset());
         version.setSelectedItem(input.getVersion());
         qaStatus.setText("");
-        subDir.setText(input.getSubdir());
+        subDir.setSelectedItem(input.getSubdirObj());
         required.setSelected(input.isRequired());
         show.setSelected(input.isShow());
     }
@@ -215,7 +221,8 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         input.setDatasetType((DatasetType) dsType.getSelectedItem());
         updateDataset();
         updateVersion();
-        input.setSubdir(subDir.getText());
+        updateSubdir();
+        //input.setSubdir(subDir.getText());
         input.setRequired(required.isSelected());
         input.setShow(show.isSelected());
     }
@@ -233,6 +240,16 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         }
         
         input.setProgram(presenter.getCaseProgram(selected));
+    }
+    
+    private void updateSubdir() throws EmfException {
+        Object selected = subDir.getSelectedItem();
+        if (selected == null) {
+            input.setSubdirObj(null);
+            return;
+        }
+        
+        input.setSubdirObj(presenter.getSubDir(selected));
     }
 
     private void updateEnvtVar() throws EmfException {

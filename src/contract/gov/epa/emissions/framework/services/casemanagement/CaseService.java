@@ -29,6 +29,8 @@ public interface CaseService {
 
     ModelToRun[] getModelToRuns() throws EmfException;
 
+    SubDir[] getSubDirs() throws EmfException;
+
     Case[] getCases() throws EmfException;
 
     void addCase(Case element) throws EmfException;
@@ -52,5 +54,7 @@ public interface CaseService {
     GridResolution addGridResolution(GridResolution gridResolution) throws EmfException;
 
     InputEnvtVar addInputEnvtVar(InputEnvtVar inputEnvtVar) throws EmfException;
+
+    SubDir addSubDir(SubDir subdir) throws EmfException;
 
 }

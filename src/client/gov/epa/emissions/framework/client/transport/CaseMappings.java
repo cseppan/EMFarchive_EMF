@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
+import gov.epa.emissions.framework.services.casemanagement.SubDir;
 
 import javax.xml.namespace.QName;
 
@@ -42,6 +43,7 @@ public class CaseMappings extends Mappings {
         bean(call, CaseInput.class, caseinput());
         bean(call, ModelToRun.class, modelToRun());
         bean(call, CaseProgram.class, program());
+        bean(call, SubDir.class, subdir());
         
         bean(call, Mutex.class, mutex());
     }
@@ -61,6 +63,7 @@ public class CaseMappings extends Mappings {
         array(call, CaseInput[].class, caseinputs());
         array(call, ModelToRun[].class, modelToRuns());
         array(call, CaseProgram[].class, programs());
+        array(call, SubDir[].class, subdirs());
     }
 
     public QName caseObject() {
@@ -177,6 +180,14 @@ public class CaseMappings extends Mappings {
 
     public QName programs() {
         return qname("CasePrograms");
+    }
+    
+    public QName subdir() {
+        return qname("SubDir");
+    }
+
+    public QName subdirs() {
+        return qname("SubDirs");
     }
     
 }
