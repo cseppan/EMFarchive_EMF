@@ -37,7 +37,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     private StatusPresenter presenter;
 
     private static String aboutMessage = "<html><center>Emissions Modeling Framework (EMF)<br>"
-            + "Version 1.7 - 12/12/2006<br>" + "Developed by the Carolina Environmental Program<br>"
+            + "Version 1.7 - 12/21/2006<br>" + "Developed by the Carolina Environmental Program<br>"
             + "University of North Carolina at Chapel Hill</center></html>";
 
     private DesktopManager desktopManager;
