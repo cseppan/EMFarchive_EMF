@@ -43,7 +43,8 @@ public class DataAccessorImpl implements DataAccessor {
             cache.applyConstraints(token, columnFilter, rowFilter, sortOrder, session);
             session.close();
         } catch (Exception e) {
-            LOG.error("Could not apply sort or filter constraints for Dataset: " + token.datasetId(), e);
+            // don't need to log this to file
+            //LOG.error("Could not apply sort or filter constraints for Dataset: " + token.datasetId(), e);
             throw new EmfException("Could not apply sort or filter constraints to Dataset");
         }
     }
