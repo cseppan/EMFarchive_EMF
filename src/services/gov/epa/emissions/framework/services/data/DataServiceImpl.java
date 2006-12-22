@@ -78,11 +78,14 @@ public class DataServiceImpl implements DataService {
             if (!dao.canUpdate(dataset, session))
                 throw new EmfException("The Dataset name is already in use");
 
+            if (dataset.getDatasetType().getTablePerDataset() > 1)
+                LOG.info("Renaming emission tables for dataset " + dataset.getName() + " is not allowed.");
+            
             EmfDataset released = dao.update(dataset, session);
             session.close();
 
             return released;
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             LOG.error("Could not update Dataset: " + dataset.getName(), e);
             throw new EmfException("Could not update Dataset: " + dataset.getName());
         }
@@ -105,6 +108,7 @@ public class DataServiceImpl implements DataService {
         try {
             if (isRemovable(datasets, owner)) {
                 for (int i = 0; i < datasets.length; i++) {
+                    datasets[i].setName("DEL_" + datasets[i].getName());
                     datasets[i].setStatus("Deleted");
                     updateDataset(datasets[i]);
                 }

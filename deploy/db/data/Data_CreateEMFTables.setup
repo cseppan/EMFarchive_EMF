@@ -141,7 +141,8 @@ CREATE TABLE emf.dataset_types
   importer_classname varchar(255),
   exporter_classname varchar(255),
   lock_owner varchar(255),
-  lock_date timestamp
+  lock_date timestamp,
+  table_per_dataset int4 NOT NULL DEFAULT 1
 ) 
 WITHOUT OIDS;
 -- emf.dataset_types

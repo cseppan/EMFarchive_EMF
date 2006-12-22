@@ -6,8 +6,9 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
+import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
@@ -84,7 +85,8 @@ public class DatasetDAO {
         hibernateFacade.add(dataset, session);
     }
 
-    public void updateWithoutLocking(EmfDataset dataset, Session session) {
+    public void updateWithoutLocking(EmfDataset dataset, Session session) throws Exception {
+        renameEmissionTable(dataset, session);
         hibernateFacade.update(dataset, session);
     }
 
@@ -100,7 +102,8 @@ public class DatasetDAO {
         return (EmfDataset) lockingScheme.releaseLock(current(locked, session), session);
     }
 
-    public EmfDataset update(EmfDataset locked, Session session) throws EmfException {
+    public EmfDataset update(EmfDataset locked, Session session) throws Exception {
+        renameEmissionTable(locked, session);
         return (EmfDataset) lockingScheme.releaseLockOnUpdate(locked, current(locked, session), session);
     }
 
@@ -245,6 +248,27 @@ public class DatasetDAO {
                 result.append(",");
         }
         return result.toString();
+    }
+
+    private void renameEmissionTable(EmfDataset dataset, Session session) throws Exception {
+        EmfDataset oldDataset = getDataset(session, dataset.getId());
+        if (dataset.getName().equalsIgnoreCase(oldDataset.getName()))
+            return;
+        
+        DbServer dbServer = null;
+
+        try {
+            dbServer = new EmfDbServer();
+            Datasource datasource = dbServer.getEmissionsDatasource();
+            DatasetType type = dataset.getDatasetType();
+
+            if (type.getTablePerDataset() == 1) {
+                DataTable table = new DataTable(oldDataset, datasource);
+                table.rename(dataset.getName());
+            }
+        } finally {
+            dbServer.disconnect();
+        }
     }
 
 }

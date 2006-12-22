@@ -24,12 +24,11 @@ public class InternalSourcesTableDataTest extends MockObjectTestCase {
 
     public void testShouldHaveFiveColumns() {
         String[] columns = data.columns();
-        assertEquals(5, columns.length);
+        assertEquals(4, columns.length);
         assertEquals("Table", columns[0]);
         assertEquals("Type", columns[1]);
         assertEquals("Source", columns[2]);
         assertEquals("Size", columns[3]);
-        assertEquals("Table Columns", columns[4]);
     }
 
     public void testShouldReturnStringAsColumnClassForAllOtherColumns() {
@@ -37,7 +36,6 @@ public class InternalSourcesTableDataTest extends MockObjectTestCase {
         assertEquals(String.class, data.getColumnClass(1));
         assertEquals(String.class, data.getColumnClass(2));
         assertEquals(String.class, data.getColumnClass(3));
-        assertEquals(String.class, data.getColumnClass(4));
     }
 
     public void testAllColumnsShouldBeUneditable() {
@@ -45,7 +43,6 @@ public class InternalSourcesTableDataTest extends MockObjectTestCase {
         assertFalse("All cells should be uneditable", data.isEditable(1));
         assertFalse("All cells should be uneditable", data.isEditable(2));
         assertFalse("All cells should be uneditable", data.isEditable(3));
-        assertFalse("All cells should be uneditable", data.isEditable(4));
     }
 
     public void testShouldReturnTheRowsCorrespondingToInternalSourcesCount() {
@@ -71,7 +68,6 @@ public class InternalSourcesTableDataTest extends MockObjectTestCase {
         assertEquals("type", row.getValueAt(1));
         assertEquals("source", row.getValueAt(2));
         assertEquals(new Long(2800), row.getValueAt(3));
-        assertEquals("1, 2", row.getValueAt(4));
     }
 
     public void testShouldReturnARowRepresentingAnInternalSourceEntry() {

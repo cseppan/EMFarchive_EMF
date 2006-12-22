@@ -17,7 +17,7 @@ public class InternalSourcesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Table", "Type", "Source", "Size", "Table Columns" };
+        return new String[] { "Table", "Type", "Source", "Size" };
     }
 
     public List rows() {
@@ -38,7 +38,7 @@ public class InternalSourcesTableData extends AbstractTableData {
         for (int i = 0; i < sources.length; i++) {
             InternalSource element = sources[i];
             Object[] values = { element.getTable(), element.getType(), element.getSource(),
-                    new Long(element.getSourceSize()), concat(element.getCols()) };
+                    new Long(element.getSourceSize()) };
 
             Row row = new ViewableRow(element, values);
             rows.add(row);
@@ -47,15 +47,15 @@ public class InternalSourcesTableData extends AbstractTableData {
         return rows;
     }
 
-    private String concat(String[] cols) {
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < cols.length; i++) {
-            buf.append(cols[i]);
-            if ((i + 1) < cols.length)
-                buf.append(", ");
-        }
-
-        return buf.toString();
-    }
+//    private String concat(String[] cols) {
+//        StringBuffer buf = new StringBuffer();
+//        for (int i = 0; i < cols.length; i++) {
+//            buf.append(cols[i]);
+//            if ((i + 1) < cols.length)
+//                buf.append(", ");
+//        }
+//
+//        return buf.toString();
+//    }
 
 }

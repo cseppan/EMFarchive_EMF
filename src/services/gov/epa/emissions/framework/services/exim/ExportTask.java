@@ -118,7 +118,7 @@ public class ExportTask implements Runnable {
             Session session = sessionFactory.getSession();
             dao.updateWithoutLocking(dataset, session);
             session.close();
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             log.error("Could not update Dataset - " + dataset.getName(), e);
             throw new EmfException("Could not update Dataset - " + dataset.getName());
         }

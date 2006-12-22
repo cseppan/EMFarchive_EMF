@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.services.data;
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.casemanagement.Case;
@@ -150,7 +149,7 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldUpdateDatasetAfterObtainingLock() throws EmfException {
+    public void testShouldUpdateDatasetAfterObtainingLock() throws Exception {
         UserDAO userDao = new UserDAO();
         User owner = userDao.get("emf", session);
         EmfDataset dataset = newDataset("dataset-dao-test");
@@ -203,7 +202,7 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldGetNonDeletedDatasets() {
+    public void testShouldGetNonDeletedDatasets() throws Exception {
         EmfDataset dataset = newDataset("dataset-dao-test");
         EmfDataset dataset2 = newDataset("test2");
         dataset2.setStatus("Deleted");
@@ -225,7 +224,7 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldGetNonDeletedDatasetsWithSpecifiedDatasettype() {
+    public void testShouldGetNonDeletedDatasetsWithSpecifiedDatasettype() throws Exception {
         EmfDataset dataset = newDataset("dataset-dao-test");
         dataset.setDatasetType(types[0]);
         EmfDataset dataset2 = newDataset("test2");
@@ -249,7 +248,7 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldGetNonDeletedDatasetsWithSpecifiedName() {
+    public void testShouldGetNonDeletedDatasetsWithSpecifiedName() throws Exception {
         EmfDataset dataset = newDataset("dataset-dao-test");
         EmfDataset dataset2 = newDataset("test2");
         dataset2.setStatus("Deleted");
@@ -270,7 +269,7 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldGetNonDeletedDatasetsWithSpecifiedID() {
+    public void testShouldGetNonDeletedDatasetsWithSpecifiedID() throws Exception {
         EmfDataset dataset = newDataset("dataset-dao-test");
         EmfDataset dataset2 = newDataset("test2");
         dataset2.setStatus("Deleted");

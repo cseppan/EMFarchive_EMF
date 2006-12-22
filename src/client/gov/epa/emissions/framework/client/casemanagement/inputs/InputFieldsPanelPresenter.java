@@ -99,16 +99,7 @@ public class InputFieldsPanelPresenter {
         if (type == null)
             return new EmfDataset[0];
 
-        EmfDataset[] datasets = dataService().getDatasets();
-        List list = new ArrayList();
-        int typeId = type.getId();
-
-        for (int i = 0; i < datasets.length; i++) {
-            if (datasets[i].getDatasetType().getId() == typeId)
-                list.add(datasets[i]);
-        }
-
-        return (EmfDataset[]) list.toArray(new EmfDataset[0]);
+        return dataService().getDatasets(type);
     }
 
     public Version[] getVersions(EmfDataset dataset) throws EmfException {

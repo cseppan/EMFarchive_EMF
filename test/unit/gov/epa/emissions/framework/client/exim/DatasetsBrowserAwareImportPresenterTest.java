@@ -53,6 +53,10 @@ public class DatasetsBrowserAwareImportPresenterTest extends MockObjectTestCase 
         prefs.stubs().method("inputFolder").will(returnValue("input"));
         session.stubs().method("preferences").will(returnValue(prefs.proxy()));
     }
+    
+    public void testAPlaceHolder() {
+        assertTrue(true);
+    }
 
 // no need to test this because function was removed
 //    public void testShouldRefreshDatasetsBrowserAndCloseWindowOnDone() {

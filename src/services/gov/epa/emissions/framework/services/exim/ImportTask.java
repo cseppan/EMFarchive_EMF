@@ -101,7 +101,11 @@ public class ImportTask implements Runnable {
 
     void updateDataset(EmfDataset dataset, Session session) {
         DatasetDAO dao = new DatasetDAO();
-        dao.updateWithoutLocking(dataset, session);
+        try {
+            dao.updateWithoutLocking(dataset, session);
+        } catch (Exception e) {
+            logError("Could not update Dataset - " + dataset.getName(), e);
+        }
     }
 
     void removeDataset(EmfDataset dataset) {

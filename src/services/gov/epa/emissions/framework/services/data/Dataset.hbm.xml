@@ -62,7 +62,7 @@
     <composite-element class="gov.epa.emissions.commons.data.InternalSource">
 		<property name="table"			column="table_name"						not-null="true"/>
 		<property name="type"			column="table_type"						not-null="true"/>
-		<property name="colsList"		column="table_columns"					not-null="true"/>
+		<property name="colsList"		column="table_columns"					not-null="false"/>
 		<property name="source"			column="datasource"						not-null="true"/>
 		<property name="sourceSize"		column="file_size" 		   	type="long" not-null="true"/>    
     </composite-element>
