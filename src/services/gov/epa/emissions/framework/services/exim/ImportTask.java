@@ -31,6 +31,8 @@ public class ImportTask implements Runnable {
     private HibernateSessionFactory sessionFactory;
 
     private Services services;
+    
+    private double numSeconds;
 
     public ImportTask(EmfDataset dataset, String[] files, Importer importer, User user, Services services,
             HibernateSessionFactory sessionFactory) {
@@ -46,11 +48,13 @@ public class ImportTask implements Runnable {
     public void run() {
         Session session = null;
         try {
+            long startTime = System.currentTimeMillis();
             session = sessionFactory.getSession();
             session.setFlushMode(FlushMode.NEVER);
             
             prepare(session);
             importer.run();
+            numSeconds = (System.currentTimeMillis() - startTime)/1000;
             complete(session);
         } catch (Exception e) {
             logError("Failed to import file(s) : " + filesList(), e);
@@ -117,8 +121,10 @@ public class ImportTask implements Runnable {
     }
 
     private void addCompletedStatus() {
-        setStatus("Completed import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] from "+
-                files[0]);
+        String message = "Completed import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] " 
+               + " in " + numSeconds+" seconds from "+ files[0]; //TODO: add batch size to message once available
+        setStatus(message);
+        System.out.println(message);
     }
 
     private void setStatus(String message) {
