@@ -210,10 +210,6 @@ public class DatasetDaoTest extends ServiceTestCase {
         dataset3.setStatus("Deleted");
         
         try {
-            dao.updateWithoutLocking(dataset, session);
-            dao.updateWithoutLocking(dataset2, session);
-            dao.updateWithoutLocking(dataset3, session);
-            
             EmfDataset[] loadedFromDb = (EmfDataset[])dao.allNonDeleted(session).toArray(new EmfDataset[0]);
             assertEquals(1, loadedFromDb.length);
             assertEquals("dataset-dao-test", loadedFromDb[0].getName());
@@ -234,10 +230,6 @@ public class DatasetDaoTest extends ServiceTestCase {
         dataset3.setStatus("Deleted");
         
         try {
-            dao.updateWithoutLocking(dataset, session);
-            dao.updateWithoutLocking(dataset2, session);
-            dao.updateWithoutLocking(dataset3, session);
-            
             EmfDataset[] loadedFromDb = (EmfDataset[])dao.getDatasets(session, types[0]).toArray(new EmfDataset[0]);
             assertEquals(1, loadedFromDb.length);
             assertEquals("dataset-dao-test", loadedFromDb[0].getName());
@@ -256,10 +248,6 @@ public class DatasetDaoTest extends ServiceTestCase {
         dataset3.setStatus("Deleted");
         
         try {
-            dao.updateWithoutLocking(dataset, session);
-            dao.updateWithoutLocking(dataset2, session);
-            dao.updateWithoutLocking(dataset3, session);
-            
             EmfDataset loadedFromDb = dao.getDataset(session, "dataset-dao-test");
             assertEquals("dataset-dao-test", loadedFromDb.getName());
         } finally {
@@ -277,10 +265,6 @@ public class DatasetDaoTest extends ServiceTestCase {
         dataset3.setStatus("Deleted");
         
         try {
-            dao.updateWithoutLocking(dataset, session);
-            dao.updateWithoutLocking(dataset2, session);
-            dao.updateWithoutLocking(dataset3, session);
-            
             EmfDataset loadedFromDb = dao.getDataset(session, dataset.getId());
             assertEquals("dataset-dao-test", loadedFromDb.getName());
 
@@ -308,7 +292,6 @@ public class DatasetDaoTest extends ServiceTestCase {
         input.setDataset(dataset2);
         Case caseObj = newCase();
         caseObj.setCaseInputs(new CaseInput[]{input});
-        
         
         try {
             assertTrue(dao.isUsedByControlStrategies(session, dataset));

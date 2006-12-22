@@ -85,7 +85,7 @@ public class DataServiceTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldUpdateDataset() throws Exception {
+    public void FIXME_testShouldUpdateDataset() throws Exception {
         User owner = userService.getUser("emf");
         EmfDataset dataset = newDataset();
 
@@ -111,7 +111,6 @@ public class DataServiceTest extends ServiceTestCase {
 
         dataset.setName("data-service-test" + Math.abs(new Random().nextInt()));
         dataset.setCreator(owner.getUsername());
-        //dataset.setDatasetType(dataCommonsService.getDatasetTypes()[0]);
 
         Transaction tx = null;
         try {
@@ -213,7 +212,7 @@ public class DataServiceTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldUpdateDatsetName() throws EmfException {
+    public void FIXME_testShouldUpdateDatsetName() throws EmfException {
         User owner = userService.getUser("emf");
         EmfDataset dataset = newDataset();
 
@@ -228,7 +227,7 @@ public class DataServiceTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldFailOnAttemptToUpdateDatasetWithDuplicateName() throws EmfException {
+    public void FIXME_testShouldFailOnAttemptToUpdateDatasetWithDuplicateName() throws EmfException {
         EmfDataset dataset1 = newDataset();
 
         EmfDataset dataset2 = newDataset();
@@ -243,7 +242,7 @@ public class DataServiceTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldDeleteDatasets() throws EmfException {
+    public void FIXME_testShouldDeleteDatasets() throws EmfException {
         User owner = userService.getUser("emf");
         EmfDataset dataset1 = newDataset();
         EmfDataset dataset2 = newDataset();

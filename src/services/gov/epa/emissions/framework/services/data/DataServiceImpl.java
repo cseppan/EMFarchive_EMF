@@ -87,7 +87,6 @@ public class DataServiceImpl implements DataService {
 
             return released;
         } catch (Exception e) {
-            e.printStackTrace();
             LOG.error("Could not update Dataset: " + dataset.getName(), e);
             throw new EmfException("Could not update Dataset: " + dataset.getName());
         }
