@@ -143,7 +143,9 @@ public class ExportService {
                     doExport(user, purpose, overwrite, path, dataset, version);
             }
         } catch (Exception e) {
-            log.error("Export error- start exporting a file to folder: " + dirName, e);
+            // don't need to log messages about exporting to existing file
+            if (e.getMessage().indexOf("existing file") < 0)
+               log.error("ERROR starting to export to folder: " + dirName, e);
             throw new EmfException("Export failed: " + e.getMessage());
         }
     }
