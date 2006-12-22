@@ -131,7 +131,7 @@ public class QAStepTask {
                     stepsList.add(steps[i]);
             }
         } catch (RuntimeException e) {
-            throw new EmfException("Could not check QA Steps");
+            throw new EmfException("Could not check whether QA Steps exist");
         }
 
         return (QAStep[]) stepsList.toArray(new QAStep[0]);
