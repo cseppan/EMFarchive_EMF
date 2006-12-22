@@ -1,5 +1,5 @@
 insert INTO emf.note_types VALUES (DEFAULT, 'Reference');
-
+-- 12/5/2006
 -- Use this to upgrade your schema for export logging
 -- 1. Back up your emf.dataset_access_logs table [with options INSERT commands, plain and data only]
 -- 2. DROP TABLE emf.dataset_access_logs
@@ -23,3 +23,10 @@ CREATE TABLE emf.dataset_access_logs
   details text
 ) 
 WITHOUT OIDS;
+
+-- 12/22/2006
+-- addition of table per dataset to dataset_types table
+ALTER TABLE dataset_types ADD COLUMN table_per_dataset int4 NOT NULL DEFAULT 1;
+
+-- Also, need to remove the table column data from tables
+-- Also, need to lock timeout property to 2 hours

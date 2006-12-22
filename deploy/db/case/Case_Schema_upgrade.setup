@@ -1,0 +1,19 @@
+-------------------------------------------------------------------------------
+--  CASE MANAGEMENT UPGRADES
+-------------------------------------------------------------------------------
+-- 
+-- 12/22 added subdirectories for case inputs
+
+-- cases.subdirs
+CREATE TABLE cases.subdirs
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- cases.subdirs
+
+-- need to add new column to cases.cases_caseinputs
+--  subdir_id int4  REFERENCES cases.subdirs(id),
+ALTER TABLE cases.case_inputs ADD COLUMN subdir_id int4;
+ALTER TABLE cases.case_inputs ADD CONSTRAINT case_inputs_subdir_id_fkey FOREIGN KEY (subdir_id) REFERENCES cases.subdirs (id)    ON UPDATE NO ACTION ON DELETE NO ACTION;
