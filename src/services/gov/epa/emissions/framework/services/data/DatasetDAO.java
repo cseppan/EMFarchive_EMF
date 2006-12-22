@@ -255,15 +255,16 @@ public class DatasetDAO {
         if (dataset.getName().equalsIgnoreCase(oldDataset.getName()))
             return;
         
-        DbServer dbServer = null;
+        DbServer dbServer = new EmfDbServer();
 
         try {
-            dbServer = new EmfDbServer();
             Datasource datasource = dbServer.getEmissionsDatasource();
             DatasetType type = dataset.getDatasetType();
+            InternalSource source = dataset.getInternalSources()[0];
 
             if (type.getTablePerDataset() == 1) {
                 DataTable table = new DataTable(oldDataset, datasource);
+                source.setTable(table.createName(dataset.getName()));
                 table.rename(dataset.getName());
             }
         } finally {

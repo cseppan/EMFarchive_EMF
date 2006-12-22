@@ -111,6 +111,7 @@ public class DataServiceTest extends ServiceTestCase {
 
         dataset.setName("data-service-test" + Math.abs(new Random().nextInt()));
         dataset.setCreator(owner.getUsername());
+        //dataset.setDatasetType(dataCommonsService.getDatasetTypes()[0]);
 
         Transaction tx = null;
         try {
