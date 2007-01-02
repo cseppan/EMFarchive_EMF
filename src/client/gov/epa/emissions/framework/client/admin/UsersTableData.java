@@ -24,9 +24,7 @@ public class UsersTableData extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        if (col == 0)
-            return Boolean.class;
-        if (col == 4)
+        if (col == 3)
             return Boolean.class;
         return String.class;
     }

@@ -40,11 +40,10 @@ public class UsersTableDataTest extends TestCase {
     }
 
     public void testShouldReturnBooleanAsColumnClassForSelectAndIsAdminColsAndStringForAllOtherCols() {
-        assertEquals(Boolean.class, data.getColumnClass(0));
+        assertEquals(String.class, data.getColumnClass(0));
         assertEquals(String.class, data.getColumnClass(1));
         assertEquals(String.class, data.getColumnClass(2));
-        assertEquals(String.class, data.getColumnClass(3));
-        assertEquals(Boolean.class, data.getColumnClass(4));
+        assertEquals(Boolean.class, data.getColumnClass(3));
     }
 
     public void testExceptForSelectAllOtherColumnsShouldBeUneditable() {
