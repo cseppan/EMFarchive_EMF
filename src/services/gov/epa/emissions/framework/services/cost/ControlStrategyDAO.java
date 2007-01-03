@@ -147,7 +147,7 @@ public class ControlStrategyDAO {
     }
 
     public void updateControlStrategyResults(ControlStrategyResult result, Session session) {
-        hibernateFacade.update(result, session);
+        hibernateFacade.saveOrUpdate(result, session);
     }
 
     public String controlStrategyRunStatus(int id, Session session) {

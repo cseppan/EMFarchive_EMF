@@ -63,7 +63,7 @@ public class QADAO {
     }
 
     public void updateQAStepResult(QAStepResult result, Session session) {
-        hibernateFacade.update(result, session);
+        hibernateFacade.saveOrUpdate(result, session);
     }
 
     public boolean exists(QAStep step, Session session) {

@@ -80,7 +80,8 @@ public class HibernateFacade {
         }
     }
 
-    public void update(Object object, Session session) {
+    //save- new object, updates if the objects already exist
+    public void saveOrUpdate(Object object, Session session) {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
@@ -91,10 +92,22 @@ public class HibernateFacade {
             throw e;
         }
     }
+    
+    public void updateOnly(Object object, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.update(object);
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
 
     public void update(Object[] objects, Session session) {
         for (int i = 0; i < objects.length; i++)
-            update(objects[i], session);
+            saveOrUpdate(objects[i], session);
     }
 
     public void remove(Object[] objects, Session session) {

@@ -147,13 +147,10 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     private DataAccessToken doSave(DataAccessToken token, DataAccessCache cache,
             HibernateSessionFactory hibernateSessionFactory, EmfDataset dataset) throws EmfException {
         try {
-            Session session = hibernateSessionFactory.getSession();
-            cache.save(token, session);
+            saveDataEditChanges(token, cache, hibernateSessionFactory);
 
-            DatasetDAO dao = new DatasetDAO();
-            dao.updateWithoutLocking(dataset, session);
+            updateDataset(hibernateSessionFactory, dataset);
 
-            session.close();
         } catch (Exception e) {
             LOG.error("Could not update Dataset: " + token.datasetId() + " with changes for Version: "
                     + token.getVersion() + "\t" + e.getMessage(), e);
@@ -162,6 +159,26 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         }
 
         return token;
+    }
+
+    private void saveDataEditChanges(DataAccessToken token, DataAccessCache cache,
+            HibernateSessionFactory hibernateSessionFactory) throws Exception {
+        Session session = hibernateSessionFactory.getSession();
+        try {
+            cache.save(token, session);
+        } finally {
+            session.close();
+        }
+    }
+
+    private void updateDataset(HibernateSessionFactory hibernateSessionFactory, EmfDataset dataset) throws Exception {
+        Session session = hibernateSessionFactory.getSession();
+        try {
+            DatasetDAO dao = new DatasetDAO();
+            dao.updateWithoutLocking(dataset, session);
+        } finally {
+            session.close();
+        }
     }
 
     void updateVersion(Version version) {

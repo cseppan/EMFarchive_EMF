@@ -87,7 +87,8 @@ public class DatasetDAO {
 
     public void updateWithoutLocking(EmfDataset dataset, Session session) throws Exception {
         renameEmissionTable(dataset, session);
-        hibernateFacade.update(dataset, session);
+        session.clear();
+        hibernateFacade.updateOnly(dataset, session);
     }
 
     public void remove(EmfDataset dataset, Session session) {
