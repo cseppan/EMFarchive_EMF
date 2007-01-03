@@ -21,7 +21,7 @@ public class EmfPropertiesDAOTest extends ServiceTestCase {
     
     public void testFetchTimeInterval() {
         EmfProperty timeInteval = dao.getProperty("lock.time-interval", session);
-        assertEquals(3600000, Integer.parseInt(timeInteval.getValue()));
+        assertEquals(7200000, Integer.parseInt(timeInteval.getValue()));
     }
     
     public void testFetchBatchSize() {
@@ -31,7 +31,7 @@ public class EmfPropertiesDAOTest extends ServiceTestCase {
     
     public void testFetchExportBatchSize() {
         EmfProperty timeInteval = dao.getProperty("export-batch-size", session);
-        assertEquals(10000, Integer.parseInt(timeInteval.getValue()));
+        assertEquals(150000, Integer.parseInt(timeInteval.getValue()));
     }
 
 }
