@@ -35,7 +35,7 @@ public class DesktopManagerImpl implements DesktopManager {
             newWindowOpened(manageView, name);
         } else {
             // enforces one window per object TODO: think abt a better way to do this
-            manageView=null;
+            manageView = null;
             ManagedView cachedView = (ManagedView) windowNames.get(name);
             cachedView.bringToFront();
         }
@@ -44,7 +44,7 @@ public class DesktopManagerImpl implements DesktopManager {
     private void newWindowOpened(ManagedView manageView, String name) {
         windowNames.put(name, manageView);
         windowMenu.register(manageView);
-        
+
         desktop.add(manageView);
         manageView.bringToFront();
         layout.add(manageView);
@@ -65,7 +65,7 @@ public class DesktopManagerImpl implements DesktopManager {
                 view.windowClosing();// closeWindow is called inside this method
             }
         }
-        //check for windows with unsaved changes
+        // check for windows with unsaved changes
         return checkForUnSavedWindows(windowNames);
     }
 
@@ -92,6 +92,10 @@ public class DesktopManagerImpl implements DesktopManager {
 
     public void ensurePresence(ManagedView view) {
         desktop.ensurePresence(view);
+    }
+
+    public int numberOfOpenWindows() {
+        return windowNames.size();
     }
 
 }

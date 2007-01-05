@@ -113,7 +113,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private WindowMenu createWindowMenu() {
-        WindowMenu windowMenu = new WindowMenu();
+        WindowMenu windowMenu = new WindowMenu(this);
         addClearAction(windowMenu);
 
         windowMenuPresenter = new WindowMenuPresenter(windowMenu);

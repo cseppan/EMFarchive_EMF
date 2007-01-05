@@ -7,6 +7,8 @@ public interface DesktopManager {
     public void openWindow(ManagedView manageView);
 
     public void closeWindow(ManagedView manageView);
+    
+    public int numberOfOpenWindows();
 
     public boolean closeAll();
 

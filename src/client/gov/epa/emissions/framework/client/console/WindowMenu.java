@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.client.console;
 
+import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.framework.client.ManagedView;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -22,9 +24,12 @@ public class WindowMenu extends JMenu implements WindowMenuView {
 
     private WindowMenuPresenter presenter;
 
-    public WindowMenu() {
+    private Component parent;
+
+    public WindowMenu(EmfConsole console) {
         super("Window");
         super.setName("window");
+        this.parent = console;
         menuItems = new TreeSet();
         permanentMenuItems = new ArrayList();
 
@@ -40,11 +45,21 @@ public class WindowMenu extends JMenu implements WindowMenuView {
 
     private ActionListener closeAll() {
         ActionListener listener = new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
-                presenter.closeAll();
+                if (confirmCloseAll())
+                    presenter.closeAll();
             }
         };
         return listener;
+    }
+
+    protected boolean confirmCloseAll() {
+        if (presenter.numberOfOpenWindows() == 0)
+            return false;
+        ConfirmDialog dialog = new ConfirmDialog("Do you want to close all the windows?", "Close All Confirmation",
+                parent);
+        return dialog.confirm();
     }
 
     public void addPermanently(ManagedView managedView) {

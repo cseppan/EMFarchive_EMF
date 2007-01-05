@@ -29,4 +29,8 @@ public class WindowMenuPresenter {
         desktopManager.ensurePresence(managedView);
     }
 
+    public int numberOfOpenWindows() {
+        return desktopManager.numberOfOpenWindows();
+    }
+
 }
