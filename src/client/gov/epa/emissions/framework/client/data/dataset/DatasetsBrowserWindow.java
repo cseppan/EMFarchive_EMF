@@ -263,7 +263,9 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     protected void doDisplayPropertiesViewer() {
         clearMessage();
-        List datasets = updateSelectedDatasets(getSelectedDatasets());
+        //for now, don't get updated copies of datasets - see updateSelectedDatasets
+        //List datasets = updateSelectedDatasets(getSelectedDatasets());
+        List datasets = getSelectedDatasets();  
         if (datasets.isEmpty()) {
             messagePanel.setMessage("Please select one or more Datasets");
             return;
@@ -275,25 +277,25 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         }
     }
 
-    private List updateSelectedDatasets(List selectedDatasets) {
-        // FIXME: update only datasets that user selected
-        List updatedDatasets = new ArrayList();
-        try {
-            EmfDataset[] updatedAllDatasets1 = session.dataService().getDatasets();
-            for (int i = 0; i < selectedDatasets.size(); i++) {
-                EmfDataset selDataset = (EmfDataset) selectedDatasets.get(i);
-                for (int j = 0; j < updatedAllDatasets1.length; j++) {
-                    if (selDataset.getId() == updatedAllDatasets1[j].getId()) {
-                        updatedDatasets.add(updatedAllDatasets1[j]);
-                        break;
-                    }
-                }
-            }
-        } catch (EmfException e) {
-            showError(e.getMessage());
-        }
-        return updatedDatasets;
-    }
+//    private List updateSelectedDatasets(List selectedDatasets) {
+//        // FIXME: update only datasets that user selected
+//        List updatedDatasets = new ArrayList();
+//        try {
+//            EmfDataset[] updatedAllDatasets1 = session.dataService().getDatasets();
+//            for (int i = 0; i < selectedDatasets.size(); i++) {
+//                EmfDataset selDataset = (EmfDataset) selectedDatasets.get(i);
+//                for (int j = 0; j < updatedAllDatasets1.length; j++) {
+//                    if (selDataset.getId() == updatedAllDatasets1[j].getId()) {
+//                        updatedDatasets.add(updatedAllDatasets1[j]);
+//                        break;
+//                    }
+//                }
+//            }
+//        } catch (EmfException e) {
+//            showError(e.getMessage());
+//        }
+//        return updatedDatasets;
+//    }
 
     protected void doDisplayPropertiesEditor() {
         clearMessage();
