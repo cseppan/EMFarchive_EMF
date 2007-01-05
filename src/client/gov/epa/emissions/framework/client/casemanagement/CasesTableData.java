@@ -34,7 +34,7 @@ public class CasesTableData extends AbstractTableData {
     }
 
     public boolean isEditable(int col) {
-        return true;
+        return false;
     }
     
     public void add(Case caseObj) {

@@ -31,7 +31,7 @@ public class DatasetTypesTableData extends AbstractTableData {
     }
 
     public boolean isEditable(int col) {
-        return true;
+        return false;
     }
 
     private List createRows(DatasetType[] types) {

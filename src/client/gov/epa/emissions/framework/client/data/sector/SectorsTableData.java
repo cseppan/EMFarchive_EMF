@@ -28,7 +28,7 @@ public class SectorsTableData extends AbstractTableData {
     }
 
     public boolean isEditable(int col) {
-        return true;
+        return false;
     }
 
     private List createRows(Sector[] sectors) {
