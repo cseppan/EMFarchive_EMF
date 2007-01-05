@@ -298,7 +298,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     }
 
     private void doDisplayInputDatasetsPropertiesViewer() {
-        List datasets = updateSelectedDatasets(getSelectedDatasets(getSelectedInputs()));
+        List datasets = getSelectedDatasets(getSelectedInputs());
         if (datasets.isEmpty()) {
             messagePanel.setMessage("Please select one or more inputs with datasets specified to view.");
             return;
@@ -436,26 +436,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         }
         
         return (String[])subDirList.toArray(new String[0]);
-    }
-
-    private List updateSelectedDatasets(List selectedDatasets) {
-        // FIXME: update only datasets that user selected
-        List updatedDatasets = new ArrayList();
-        try {
-            EmfDataset[] updatedAllDatasets1 = session.dataService().getDatasets();
-            for (int i = 0; i < selectedDatasets.size(); i++) {
-                EmfDataset selDataset = (EmfDataset) selectedDatasets.get(i);
-                for (int j = 0; j < updatedAllDatasets1.length; j++) {
-                    if (selDataset.getId() == updatedAllDatasets1[j].getId()) {
-                        updatedDatasets.add(updatedAllDatasets1[j]);
-                        break;
-                    }
-                }
-            }
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
-        return updatedDatasets;
     }
 
     public void addInput(CaseInput note) {
