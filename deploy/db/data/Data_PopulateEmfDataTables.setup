@@ -125,6 +125,8 @@ insert INTO emf.keywords VALUES (DEFAULT, 'REPLACED_BY_DATASET');
 -- emf.qa_programs
 insert into emf.qa_programs values(DEFAULT,'SQL','gov.epa.emissions.framework.services.qa.SQLQAProgramRunner');
 insert into emf.qa_programs values(DEFAULT,'Smkreport','');
+insert into emf.qa_programs values(DEFAULT,'Manual','');
+insert into emf.qa_programs values(DEFAULT,'Analysis Engine','');
 --
 -- the dataset type id field depends on the order of dataset type table (ORL type being first)
 -- emf.dataset_types_qa_step_templates
