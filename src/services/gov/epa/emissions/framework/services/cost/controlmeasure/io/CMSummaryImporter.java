@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
 import java.util.Date;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class CMSummaryImporter {
@@ -21,12 +22,16 @@ public class CMSummaryImporter {
     private HibernateSessionFactory sessionFactory;
 
     private User user;
-
+    
+    private ArrayList abbreviations;
+    
+    
     public CMSummaryImporter(File file, CMSummaryFileFormat fileFormat, User user,
             HibernateSessionFactory sessionFactory) {
         this.file = file;
         this.user = user;
         this.sessionFactory = sessionFactory;
+        this.abbreviations = new ArrayList();
         cmSummaryRecord = new CMSummaryRecordReader(fileFormat, user, sessionFactory);
     }
 
@@ -36,7 +41,16 @@ public class CMSummaryImporter {
         for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
             ControlMeasure cm = cmSummaryRecord.parse(record, reader.lineNumber());
             if (cm != null)
+            {
+                if (abbreviations.contains(cm.getAbbreviation()))
+                    addStatus("Error: Duplicate abbreviation: "+cm.getAbbreviation());
+                
+                if (cm.getAbbreviation().length()>10)
+                    addStatus("Error: abbreviation exceeds 10 characters: "+cm.getAbbreviation());
+                
                 controlMeasures.put(cm.getAbbreviation(), cm);
+                abbreviations.add(cm.getAbbreviation());
+            }    
         }
         addStatus("Finished reading Summary file");
     }
