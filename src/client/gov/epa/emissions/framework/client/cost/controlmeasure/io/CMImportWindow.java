@@ -26,9 +26,11 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
     private MessagePanel messagePanel;
 
     private CMImportInputPanel importInputPanel;
+    
+    private Button importButton;
 
     public CMImportWindow(DesktopManager desktopManager) {
-        super("Import Control Measures", new Dimension(650, 400), desktopManager);
+        super("Import Control Measures", new Dimension(700, 500), desktopManager);
         super.setName("importControlMeasures");
 
         this.getContentPane().add(createLayout());
@@ -57,7 +59,7 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button importButton = new ImportButton(new AbstractAction() {
+       importButton = new ImportButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doImport();
             }
@@ -83,6 +85,7 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
 
     private void doImport() {
         try {
+            importButton.setEnabled(false);
             presenter.doImport(importInputPanel.folder(), importInputPanel.files());
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());

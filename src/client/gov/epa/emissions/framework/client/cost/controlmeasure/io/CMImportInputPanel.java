@@ -50,6 +50,8 @@ public class CMImportInputPanel extends JPanel {
 
     private void initialize() {
         
+        int width = 40;
+        
         JPanel mainPanel = new JPanel();
         //mainPanel.setLayout(new SpringLayout());
         mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
@@ -57,7 +59,7 @@ public class CMImportInputPanel extends JPanel {
         //SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         JPanel chooser = new JPanel(new BorderLayout(10,10));
-        folder = new TextField("folder", 35);
+        folder = new TextField("folder", width);
         chooser.add(new JLabel("Folder     "),BorderLayout.WEST);
         chooser.add(folder);
         chooser.add(browseFileButton(), BorderLayout.EAST);
@@ -65,14 +67,14 @@ public class CMImportInputPanel extends JPanel {
         //layoutGenerator.addLabelWidgetPair("Folder   ", chooser, mainPanel);
 
         JPanel apply = new JPanel(new BorderLayout(10,10));
-        pattern = new TextField("pattern", 35);
+        pattern = new TextField("pattern", width);
         apply.add(new JLabel("Pattern   "),BorderLayout.WEST);
         apply.add(pattern);
         apply.add(applyPatternButton(), BorderLayout.EAST);
         //layoutGenerator.addLabelWidgetPair("Pattern", apply, mainPanel);
 
         JPanel fileNamesPanel = new JPanel(new BorderLayout(4,10));
-        filenames = new TextArea("filenames", "", 35, 6);
+        filenames = new TextArea("filenames", "", width, 6);
         JScrollPane fileTextAreaPane = new JScrollPane(filenames, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         fileNamesPanel.add(new JLabel("Filenames"),BorderLayout.WEST);
@@ -80,7 +82,7 @@ public class CMImportInputPanel extends JPanel {
         //layoutGenerator.addLabelWidgetPair("Filenames", fileTextAreaPane, mainPanel);
 
         JPanel statusPanel = new JPanel(new BorderLayout(10,10));
-        importStatusTextArea = new TextArea("Import Status", "", 35);
+        importStatusTextArea = new TextArea("Import Status", "", width);
         JScrollPane statusTextAreaPane = new JScrollPane(importStatusTextArea,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         
