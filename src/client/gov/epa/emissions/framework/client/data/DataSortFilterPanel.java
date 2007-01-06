@@ -107,7 +107,7 @@ public class DataSortFilterPanel extends JPanel {
             if (sortMessage.length() == 0)
                 sortMessage = "No sort";
 
-            messagePanel.setMessage("Applied Sort '" + sortMessage + "' and Filter '" + rowFilterValue + "'");
+            messagePanel.setMessage("Saved any changes and applied Sort '" + sortMessage + "' and Filter '" + rowFilterValue + "'");
         } catch (EmfException ex) {
             messagePanel.setError(ex.getMessage());
         }
