@@ -173,7 +173,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         panelOne.add(button, BorderLayout.EAST);
         
         JPanel panelTwo = new JPanel(new BorderLayout());
-        panelTwo.add(getDSTypeItem("Select a Dataset Type:", dsTypesBox), BorderLayout.CENTER);
+        panelTwo.add(getDSTypeItem("Show Datasets of Type:", dsTypesBox), BorderLayout.CENTER);
          //dsTypesBox.setPreferredSize(new Dimension(320, 30));
         
         JPanel panel = new JPanel(new GridLayout(2,1));
