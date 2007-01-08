@@ -52,13 +52,13 @@ public class DatasetTypesTableDataTest extends TestCase {
         assertEquals(String.class, data.getColumnClass(5));
     }
 
-    public void testAllColumnsShouldBeEditable() {
-        assertTrue("All cells should be uneditable", data.isEditable(0));
-        assertTrue("All cells should be uneditable", data.isEditable(1));
-        assertTrue("All cells should be uneditable", data.isEditable(2));
-        assertTrue("All cells should be uneditable", data.isEditable(3));
-        assertTrue("All cells should be uneditable", data.isEditable(4));
-        assertTrue("All cells should be uneditable", data.isEditable(5));
+    public void testAllColumnsShouldBeNotEditable() {
+        assertFalse("All cells should be uneditable", data.isEditable(0));
+        assertFalse("All cells should be uneditable", data.isEditable(1));
+        assertFalse("All cells should be uneditable", data.isEditable(2));
+        assertFalse("All cells should be uneditable", data.isEditable(3));
+        assertFalse("All cells should be uneditable", data.isEditable(4));
+        assertFalse("All cells should be uneditable", data.isEditable(5));
     }
 
     public void testShouldReturnTheRowsCorrespondingToDatasetTypesCount() {

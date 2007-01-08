@@ -106,7 +106,7 @@ public class ControlStrategiesTableDataTest extends TestCase {
     }
 
     private String format(Date date) {
-        return new SimpleDateFormat("MM/dd/yyyy HH:mm").format(date);
+        return new SimpleDateFormat("yyyy/MM/dd HH:mm").format(date);
     }
 
     public void testShouldReturnARowRepresentingAControlStrategyEntry() {

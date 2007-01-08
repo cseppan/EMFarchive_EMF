@@ -26,8 +26,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
@@ -38,8 +36,6 @@ import javax.swing.SpringLayout;
 public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTabView {
 
     protected ControlMeasure measure;
-
-    public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
 
     protected TextField name;
 
@@ -93,8 +89,6 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     private EmfConsole parentConsole;
 
-    protected static DateFormat dateReviewedFormat = new SimpleDateFormat("MM/dd/yyyy");
-
     public ControlMeasureSummaryTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel,
             ManageChangeables changeablesList, EmfConsole parentConsole) {
         super.setName("summary");
@@ -124,7 +118,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         deviceCode.setText(measure.getDeviceCode() + "");
         equipmentLife.setText(measure.getEquipmentLife() + "");
         if (modifiedTime != null)
-            lastModifiedTime.setText(DATE_FORMATTER.format(modifiedTime));
+            lastModifiedTime.setText(EmfDateFormat.format_YYYY_MM_DD_HH_MM(modifiedTime));
         abbreviation.setText(getText(measure.getAbbreviation()));
         dateReviewed.setText(formatDateReviewed());
         dataSources.setText(getText(measure.getDataSouce()));
@@ -132,8 +126,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     }
 
     private String formatDateReviewed() {
-        Date dateReviewed = measure.getDateReviewed();
-        return dateReviewed == null ? "" : dateReviewedFormat.format(dateReviewed);
+        return EmfDateFormat.format_MM_DD_YYYY(measure.getDateReviewed());
     }
 
     private String getText(String value) {
@@ -327,7 +320,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
                 measure.setDateReviewed(null);
                 return;
             }
-            measure.setDateReviewed(dateReviewedFormat.parse(date));
+            measure.setDateReviewed(EmfDateFormat.parse_MMddyyyy(date));
         } catch (Exception e) {
             throw new EmfException("Please Correct the Date Format(MM/dd/yyyy) in Date Reviewed");
         }

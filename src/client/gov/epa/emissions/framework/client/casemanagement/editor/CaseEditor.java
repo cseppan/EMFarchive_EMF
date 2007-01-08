@@ -22,8 +22,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -168,8 +166,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     }
 
     private String format(Date lockDate) {
-        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
-        return dateFormat.format(lockDate);
+        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(lockDate);
     }
 
     public void windowClosing() {

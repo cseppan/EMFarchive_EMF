@@ -5,8 +5,6 @@ import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.Row;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -79,8 +77,7 @@ public class VersionsTableDataTest extends TestCase {
         assertEquals(version0.getVersion(), ((Integer) row.getValueAt(2)).intValue());
         assertEquals(version0.getBase(), ((Long) row.getValueAt(3)).longValue());
         assertFalse(((Boolean) row.getValueAt(4)).booleanValue());
-        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
-        assertEquals(dateFormat.format(version0.getLastModifiedDate()), row.getValueAt(5));
+        assertEquals(EmfDateFormat.format_YYYY_MM_DD_HH_MM(version0.getLastModifiedDate()), row.getValueAt(5));
     }
 
     public void testShouldReturnARowRepresentingAVersionEntry() {

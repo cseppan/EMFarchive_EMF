@@ -14,7 +14,6 @@ import gov.epa.emissions.framework.services.editor.Revision;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -80,8 +79,7 @@ public class ViewRevisionWindow extends DisposableInteralFrame implements Revisi
     }
 
     private String format(Date date) {
-        SimpleDateFormat format = new SimpleDateFormat(EmfDateFormat.format());
-        return date != null ? format.format(date) : "";
+        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(date);
     }
 
     private JPanel buttonsPanel() {

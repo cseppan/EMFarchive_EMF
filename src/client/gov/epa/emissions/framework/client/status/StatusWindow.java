@@ -20,7 +20,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.ImageIcon;
@@ -37,8 +36,6 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
 
     private StatusTableModel statusTableModel;
 
-    private SimpleDateFormat dateFormat;
-
     private StatusPresenter presenter;
 
     private EmfConsole parent;
@@ -53,8 +50,6 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
 
         super.setClosable(false);
         super.setMaximizable(false);
-
-        dateFormat = new SimpleDateFormat(EmfDateFormat.format());
     }
 
     private JPanel createLayout() {
@@ -150,7 +145,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
     }
 
     public void update(Status[] statuses) {
-        messagePanel.setMessage("Last Update : " + dateFormat.format(new Date()), Color.GRAY);
+        messagePanel.setMessage("Last Update : " + EmfDateFormat.format_YYYY_MM_DD_HH_MM(new Date()), Color.GRAY);
         statusTableModel.refresh(statuses);
 
         super.revalidate();

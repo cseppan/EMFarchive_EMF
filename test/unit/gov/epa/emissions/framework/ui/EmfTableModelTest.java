@@ -79,7 +79,7 @@ public class EmfTableModelTest extends MockObjectTestCase {
     }
 
     public void testShouldReturnUserAttributesAtSpecifiedIndex() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 
         assertEquals(dataset1.getName(), model.getValueAt(0, 0));
         assertEquals(dateFormat.format(dataset1.getModifiedDateTime()), model.getValueAt(0, 1));

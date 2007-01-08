@@ -29,8 +29,6 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -49,8 +47,6 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private EmfSession session;
 
     private EditableKeywordsTab keywordsTab;
-
-    private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties Editor", new Dimension(700, 550), desktopManager);
@@ -232,7 +228,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private String format(Date lockDate) {
-        return dateFormat.format(lockDate);
+        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(lockDate);
     }
 
     public void windowClosing() {

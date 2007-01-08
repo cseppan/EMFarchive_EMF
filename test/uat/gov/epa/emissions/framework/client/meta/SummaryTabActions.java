@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.commons.gui.FormattedTextField;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -64,7 +65,7 @@ public class SummaryTabActions {
 
     private Date parseDate(String date, String widgetName) {
         try {
-            return tab.DATE_FORMATTER.parse(date);
+            return EmfDateFormat.parse_YYYY_MM_DD_HH_MM(date);
         } catch (ParseException e) {
             throw new RuntimeException("could not parse value of widget - " + widgetName + " as Date");
         }

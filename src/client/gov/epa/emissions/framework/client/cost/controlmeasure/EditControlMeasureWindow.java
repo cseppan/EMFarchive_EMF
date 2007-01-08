@@ -19,8 +19,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
@@ -37,8 +35,6 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     private EmfSession session;
 
     private EmfConsole parent;
-
-    private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public EditControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager) {
         super("Control Measure Editor", new Dimension(770, 475), desktopManager);
@@ -169,7 +165,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     public void notifyLockFailure(ControlMeasure measure) {
         String message = "Cannot edit Properties of ControlMeasure: " + measure.getName()
                 + System.getProperty("line.separator") + " as it was locked by User: " + measure.getLockOwner()
-                + "(at " + dateFormat.format(measure.getLockDate()) + ")";
+                + "(at " + EmfDateFormat.format_YYYY_MM_DD_HH_MM(measure.getLockDate()) + ")";
         InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
     }

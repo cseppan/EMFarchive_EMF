@@ -39,9 +39,9 @@ import javax.swing.SpringLayout;
 
 public class EditableSummaryTab extends JPanel implements EditableSummaryTabView {
 
+    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.PATTERN_yyyyMMddHHmm);
+    
     private EmfDataset dataset;
-
-    public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
 
     private TextField name;
 
@@ -147,7 +147,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     }
 
     private String format(Date date) {
-        return DATE_FORMATTER.format(date);
+        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(date);
     }
 
     private JPanel createTimeSpaceSection() throws EmfException {

@@ -110,9 +110,9 @@ public class CasesTableDataTest extends TestCase {
         }
     }
 
-    public void testAllColumnsShouldBeEditable() {
+    public void testAllColumnsShouldBeNotEditable() {
         for (int i = 0; i < 18; i++)
-            assertTrue("All cells should be uneditable", data.isEditable(i));
+            assertFalse("All cells should be uneditable", data.isEditable(i));
     }
 
     public void testShouldReturnTheRowsCorrespondingToCount() {
@@ -148,7 +148,7 @@ public class CasesTableDataTest extends TestCase {
     }
 
     private String format(Date date) {
-        return new SimpleDateFormat("MM/dd/yyyy HH:mm").format(date);
+        return new SimpleDateFormat("yyyy/MM/dd HH:mm").format(date);
     }
 
     public void testShouldReturnARowRepresentingACaseEntry() {

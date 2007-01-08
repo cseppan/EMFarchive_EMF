@@ -44,8 +44,7 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
 
     private SingleLineMessagePanel messagePanel;
 
-    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
-
+    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.PATTERN_yyyyMMddHHmm);
     private QASteps steps;
 
     private User user;

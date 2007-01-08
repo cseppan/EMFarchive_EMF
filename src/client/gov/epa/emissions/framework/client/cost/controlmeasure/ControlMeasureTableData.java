@@ -13,10 +13,7 @@ import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,13 +112,7 @@ public class ControlMeasureTableData extends AbstractTableData {
     }
 
     private Object getDateReviewed(ControlMeasure measure) {
-        Date datereviewed = measure.getDateReviewed();
-        if (datereviewed == null)
-            return null;
-
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-
-        return dateFormat.format(datereviewed);
+        return EmfDateFormat.format_MM_DD_YYYY(measure.getDateReviewed());
     }
 
     private Object getSourceGroup(ControlMeasure measure) {
@@ -141,9 +132,7 @@ public class ControlMeasureTableData extends AbstractTableData {
     }
 
     private Object getLastModifiedTime(ControlMeasure measure) {
-        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
-
-        return dateFormat.format(measure.getLastModifiedTime());
+        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(measure.getLastModifiedTime());
     }
 
     public boolean isEditable(int col) {

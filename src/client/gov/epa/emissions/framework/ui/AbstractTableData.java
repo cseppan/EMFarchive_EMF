@@ -2,22 +2,18 @@ package gov.epa.emissions.framework.ui;
 
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public abstract class AbstractTableData implements TableData {
 
-    private DateFormat dateFormat;
-
     public AbstractTableData() {
-        dateFormat = new SimpleDateFormat(EmfDateFormat.format());
+        //no data
     }
 
     final protected String format(Date date) {
-        return (date == null) ? "N/A" : dateFormat.format(date);
+        return (date == null) ? "N/A" : EmfDateFormat.format_YYYY_MM_DD_HH_MM(date);
     }
 
     /**

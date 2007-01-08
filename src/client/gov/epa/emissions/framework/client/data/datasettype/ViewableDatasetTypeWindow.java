@@ -23,8 +23,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -86,8 +84,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         if (!type.isLocked())
             return "";
 
-        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
-        return "Locked by User: " + type.getLockOwner() + " at " + dateFormat.format(type.getLockDate());
+        return "Locked by User: " + type.getLockOwner() + " at " + EmfDateFormat.format_YYYY_MM_DD_HH_MM(type.getLockDate());
     }
 
     private JPanel createBasicDataPanel(DatasetType type) {

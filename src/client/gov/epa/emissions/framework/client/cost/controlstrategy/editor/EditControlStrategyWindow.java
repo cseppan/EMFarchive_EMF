@@ -23,8 +23,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -49,8 +47,6 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private ControlStrategy controlStrategy;
 
     private DesktopManager desktopManager;
-
-    private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     private Button saveButton;
 
@@ -322,7 +318,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
 
     private String format(Date lockDate) {
-        return dateFormat.format(lockDate);
+        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(lockDate);
     }
 
     public void windowClosing() {

@@ -25,8 +25,6 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -57,8 +55,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private RevisionPanel revisionPanel;
 
     private ChangeAwareButton save, discard;
-
-    private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public DataEditor(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
         super("Data Editor: " + dataset.getName(), desktopManager);
@@ -294,7 +290,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     private String format(Date lockDate) {
-        return dateFormat.format(lockDate);
+        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(lockDate);
     }
 
     public void notifySaveFailure(String message) {

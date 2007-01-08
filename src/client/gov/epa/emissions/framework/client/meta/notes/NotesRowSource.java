@@ -4,19 +4,14 @@ import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.ui.RowSource;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class NotesRowSource implements RowSource {
 
     private Note note;
 
-    private DateFormat dateFormat;
-
     public NotesRowSource(Note source) {
         this.note = source;
-        dateFormat = new SimpleDateFormat(EmfDateFormat.format());
     }
 
     public Object[] values() {
@@ -26,7 +21,7 @@ public class NotesRowSource implements RowSource {
     }
 
     private Object format(Date date) {
-        return date == null ? "N/A" : dateFormat.format(date);
+        return date == null ? "N/A" : EmfDateFormat.format_YYYY_MM_DD_HH_MM(date);
     }
 
     public Object source() {

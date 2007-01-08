@@ -2,9 +2,8 @@ package gov.epa.emissions.framework.ui;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -43,9 +42,8 @@ public class EmfDatasetTableDataTest extends TestCase {
         assertEquals(1, rows.size());
 
         Row row = (Row) rows.get(0);
-        DateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
-        assertEquals(format.format(modifiedDate), row.getValueAt(1));
-        assertEquals(format.format(startDate), row.getValueAt(8));
+        assertEquals(EmfDateFormat.format_YYYY_MM_DD_HH_MM(modifiedDate), row.getValueAt(1));
+        assertEquals(EmfDateFormat.format_YYYY_MM_DD_HH_MM(startDate), row.getValueAt(8));
         
     }
 

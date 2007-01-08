@@ -1,12 +1,12 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
+
+import java.util.Date;
+
 import junit.framework.TestCase;
 
 public class NotesRowSourceTest extends TestCase {
@@ -30,8 +30,7 @@ public class NotesRowSourceTest extends TestCase {
         assertEquals(note.getVersion(), ((Long)values[3]).longValue());
         assertEquals(note.getCreator().getName(), values[4]);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
-        assertEquals(dateFormat.format(note.getDate()), values[5]);
+        assertEquals(EmfDateFormat.format_YYYY_MM_DD_HH_MM(note.getDate()), values[5]);
 
         assertEquals(note.getReferences(), values[6]);
         assertEquals(note.getDetails(), values[7]);

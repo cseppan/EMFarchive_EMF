@@ -1,16 +1,13 @@
 package gov.epa.emissions.framework.services.cost.data;
 
-import java.text.SimpleDateFormat;
-
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 
 public class ControlStrategyResultsSummary {
 
     private ControlStrategyResult[] strategyResults;
     
-    SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-
     private User user;
     
     public ControlStrategyResultsSummary(ControlStrategyResult[] strategyResults){
@@ -47,7 +44,7 @@ public class ControlStrategyResultsSummary {
             }
         }
             
-        return dateFormatter.format(strategyResults[earliestStartIndex].getStartTime());
+        return EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(strategyResults[earliestStartIndex].getStartTime());
     }
     
     public String getCompletionTime() {
@@ -62,7 +59,7 @@ public class ControlStrategyResultsSummary {
             }
         }
         
-        return dateFormatter.format(strategyResults[latestCompletionIndex].getCompletionTime());
+        return EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(strategyResults[latestCompletionIndex].getCompletionTime());
     }
     
     public void setUser(User user) {

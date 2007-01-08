@@ -32,7 +32,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
@@ -43,8 +42,6 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummaryTabView {
-
-    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
 
     private Case caseObj;
 
@@ -508,9 +505,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private String format(Date date) {
-        if (date == null)
-            return "";
-        return DATE_FORMATTER.format(date);
+        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(date);
     }
 
     private JLabel createLeftAlignedLabel(String name) {
@@ -606,7 +601,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
                 caseObj.setStartDate(null);
                 return;
             }
-            caseObj.setStartDate(DATE_FORMATTER.parse(startDate.getText()));
+            caseObj.setStartDate(EmfDateFormat.parse_YYYY_MM_DD_HH_MM(startDate.getText()));
         } catch (ParseException e) {
             throw new EmfException("Please enter the Start Date in the correct format (MM/dd/yyyy HH:mm)");
         }
@@ -619,7 +614,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
                 caseObj.setEndDate(null);
                 return;
             }
-            caseObj.setEndDate(DATE_FORMATTER.parse(endDate.getText()));
+            caseObj.setEndDate(EmfDateFormat.parse_YYYY_MM_DD_HH_MM(endDate.getText()));
         } catch (ParseException e) {
             throw new EmfException("Please enter the End Date in the correct format (MM/dd/yyyy HH:mm)");
         }

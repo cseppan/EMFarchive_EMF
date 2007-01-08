@@ -52,6 +52,8 @@ import javax.swing.SpringLayout;
 
 public class EditQAStepWindow extends DisposableInteralFrame implements EditQAStepView {
 
+    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.PATTERN_yyyyMMddHHmm);
+
     private EditableComboBox program;
 
     private TextArea programArguments;
@@ -71,8 +73,6 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private TextArea comments;
 
     private ComboBox status;
-
-    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
 
     private FormattedDateField date;
 

@@ -14,7 +14,6 @@ import gov.epa.emissions.framework.services.data.IntendedUse;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
@@ -25,8 +24,6 @@ import javax.swing.SpringLayout;
 public class SummaryTab extends JPanel implements SummaryTabView {
 
     private EmfDataset dataset;
-
-    public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
 
     public SummaryTab(EmfDataset dataset) {
         super.setName("summary");
@@ -119,7 +116,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
     }
 
     private String formatDate(Date date) {
-        return date != null ? DATE_FORMATTER.format(date) : "";
+        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(date);
     }
 
     private JPanel createOverviewSection() {

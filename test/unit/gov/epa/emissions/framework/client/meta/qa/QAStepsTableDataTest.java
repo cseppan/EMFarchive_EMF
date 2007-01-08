@@ -7,7 +7,6 @@ import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.Row;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -100,8 +99,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         assertEquals(step1.getOrder() + "", row.getValueAt(3) + "");
         assertEquals(step1.getStatus(), row.getValueAt(4));
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
-        assertEquals(dateFormat.format(step1.getDate()), row.getValueAt(5));
+        assertEquals(EmfDateFormat.format_YYYY_MM_DD_HH_MM(step1.getDate()), row.getValueAt(5));
 
         assertEquals(step1.getWho(), row.getValueAt(6));
         assertEquals(step1.getComments(), row.getValueAt(7));

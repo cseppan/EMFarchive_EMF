@@ -5,19 +5,14 @@ import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.RowSource;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class QAStepRowSource implements RowSource {
 
     private QAStep source;
 
-    private DateFormat dateFormat;
-
     public QAStepRowSource(QAStep source) {
         this.source = source;
-        dateFormat = new SimpleDateFormat(EmfDateFormat.format());
     }
 
     public Object[] values() {
@@ -35,7 +30,7 @@ public class QAStepRowSource implements RowSource {
     }
 
     private Object format(Date date) {
-        return date == null ? "N/A" : dateFormat.format(date);
+        return date == null ? "N/A" : EmfDateFormat.format_YYYY_MM_DD_HH_MM(date);
     }
 
     public Object source() {
