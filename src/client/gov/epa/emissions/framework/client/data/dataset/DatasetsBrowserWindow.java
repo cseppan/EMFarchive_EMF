@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.data.dataset;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
@@ -11,6 +13,7 @@ import gov.epa.emissions.commons.gui.buttons.ImportButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
+import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.exim.DatasetsBrowserAwareImportPresenter;
@@ -33,17 +36,23 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.SortCriteria;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
 
 public class DatasetsBrowserWindow extends ReusableInteralFrame implements DatasetsBrowserView, RefreshObserver {
 
@@ -64,6 +73,10 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private EmfDatasetTableData tableData;
 
     private JPanel browserPanel;
+    
+    private ComboBox dsTypesBox;
+
+    private DatasetType[] allDSTypes;
 
     public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Manager", new Dimension(850, 450), desktopManager);
@@ -75,11 +88,44 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         this.getContentPane().add(layout);
     }
     
-    public void display(EmfDataset[] datasets) {
+    public void display(EmfDataset[] datasets) throws EmfException {
+        getAllDSTypes();
+        createDSTypesComboBox();
         doLayout(datasets);
         super.display();
     }
 
+    private void getAllDSTypes() throws EmfException {
+        List dbDSTypes = new ArrayList();
+        dbDSTypes.add(new DatasetType("All"));
+        dbDSTypes.addAll(Arrays.asList(presenter.getDSTypes()));
+        this.allDSTypes = (DatasetType[]) dbDSTypes.toArray(new DatasetType[0]);
+    }
+    
+    private void createDSTypesComboBox() {
+        dsTypesBox = new ComboBox("Select one", allDSTypes);
+        dsTypesBox.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                DatasetType type = getSelectedDSType();
+                try {
+                    doRefresh();
+                } catch (EmfException e1) {
+                    messagePanel.setError("Could not retrieve all dataset types with -- "
+                            + type.getName());
+                }
+            }
+        });
+    }
+
+    private DatasetType getSelectedDSType() {
+        Object selected = dsTypesBox.getSelectedItem();
+        
+        if (selected == null)
+            return new DatasetType("Select one");
+        
+        return (DatasetType) selected;
+    }
+    
     private void doLayout(EmfDataset[] datasets) {
         tableData = new EmfDatasetTableData(datasets);
         model = new EmfTableModel(tableData);
@@ -119,17 +165,37 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     private JPanel createTopPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-
+        JPanel panelOne = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
-        panel.add(messagePanel, BorderLayout.CENTER);
-
+        panelOne.add(messagePanel, BorderLayout.CENTER);
         Button button = new RefreshButton(this, "Refresh Datasets", messagePanel);
-        panel.add(button, BorderLayout.EAST);
+        panelOne.add(button, BorderLayout.EAST);
+        
+        JPanel panelTwo = new JPanel(new BorderLayout());
+        panelTwo.add(getDSTypeItem("Dataset Types:", dsTypesBox), BorderLayout.CENTER);
+        panelTwo.setBorder(BorderFactory.createEmptyBorder(4,5,4,4));
+        dsTypesBox.setPreferredSize(new Dimension(320, 30));
+        
+        JPanel panel = new JPanel(new GridLayout(2,1));
+        panel.add(panelOne);
+        panel.add(panelTwo);
 
         return panel;
     }
+    
+    private Component getDSTypeItem(String label, JComboBox box) {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
+        box.setPreferredSize(new Dimension(80, 25));
+        layoutGenerator.addLabelWidgetPair(label, box, panel);
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+                1, 1, // initialX, initialY
+                5, 5);// xPad, yPad
+
+        return panel;
+    }
+    
     private JPanel createControlPanel() {
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new BorderLayout());
@@ -379,7 +445,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     public void doRefresh() throws EmfException {
-        presenter.doRefresh();
+        //presenter.doRefresh();
+        refresh(presenter.getEmfDatasets(getSelectedDSType()));
     }
 
     public void notifyLockFailure(EmfDataset dataset) {

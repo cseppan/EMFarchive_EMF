@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.data.dataset;
 
 import java.util.Date;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserPresenter;
@@ -82,20 +83,46 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
     public void testShouldRefreshViewOnClickOfRefreshButton() throws EmfException {
         EmfDataset[] datasets = new EmfDataset[0];
         dataService.stubs().method("getDatasets").withNoArguments().will(returnValue(datasets));
-
+        
         view.expects(once()).method("refresh").with(eq(datasets));
-
+        
         Mock session = mock(EmfSession.class);
         session.stubs().method("dataService").will(returnValue(dataService.proxy()));
-
+        
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter((EmfSession) session.proxy());
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(eq(datasets));
         view.expects(once()).method("clearMessage").withNoArguments();
-
+        
         presenter.doDisplay((DatasetsBrowserView) view.proxy());
-
+        
         presenter.doRefresh();
+    }
+
+    public void testShouldGetEmfDatasetsOnDatasetType() throws EmfException {
+        EmfDataset[] datasets = new EmfDataset[0];
+        DatasetType dstype = new DatasetType("");
+        
+        dataService.stubs().method("getDatasets").with(eq(dstype)).will(returnValue(datasets));
+        
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("dataService").will(returnValue(dataService.proxy()));
+        
+        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter((EmfSession) session.proxy());
+        presenter.getEmfDatasets(dstype);
+    }
+
+    public void testShouldGetAllDatasetTypes() throws EmfException {
+        DatasetType[] dstypes = new DatasetType[]{new DatasetType("")};
+        
+        Mock dataCommonsService = new Mock(DataCommonsService.class);
+        dataCommonsService.stubs().method("getDatasetTypes").withNoArguments().will(returnValue(dstypes));
+        
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("dataCommonsService").will(returnValue(dataCommonsService.proxy()));
+        
+        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter((EmfSession) session.proxy());
+        presenter.getDSTypes();
     }
 
     public void testShouldDisplayExportViewOnClickOfExportButton() {

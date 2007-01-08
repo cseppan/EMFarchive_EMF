@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data.dataset;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
@@ -35,7 +36,7 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         this.view = view;
         view.observe(this);
 
-        view.display(dataService().getDatasets());
+        view.display(new EmfDataset[0]);
     }
 
     public void doClose() {
@@ -53,8 +54,16 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
     }
 
     public void doRefresh() throws EmfException {
-        view.refresh(dataService().getDatasets());
+        view.refresh(getDatasets());
         view.clearMessage();
+    }
+    
+    public DatasetType[] getDSTypes() throws EmfException {
+        return session.dataCommonsService().getDatasetTypes();
+    }
+    
+    private EmfDataset[] getDatasets() throws EmfException {
+        return dataService().getDatasets();
     }
 
     private DataService dataService() {
@@ -142,6 +151,16 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         
         for(int i = 0; i < lockedDatasets.length; i++)
             dataService().releaseLockedDataset(lockedDatasets[i]);
+    }
+
+    public EmfDataset[] getEmfDatasets(DatasetType type) throws EmfException {
+        if (type.getName().equalsIgnoreCase("Select one"))
+            return new EmfDataset[0];
+        
+        if (type.getName().equalsIgnoreCase("All"))
+            return getDatasets();
+        
+        return dataService().getDatasets(type);
     }
     
 }
