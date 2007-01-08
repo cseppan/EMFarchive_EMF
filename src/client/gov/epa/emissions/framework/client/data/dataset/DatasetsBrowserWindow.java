@@ -13,7 +13,7 @@ import gov.epa.emissions.commons.gui.buttons.ImportButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
-import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+//import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.exim.DatasetsBrowserAwareImportPresenter;
@@ -49,10 +49,11 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SpringLayout;
+//import javax.swing.SpringLayout;
 
 public class DatasetsBrowserWindow extends ReusableInteralFrame implements DatasetsBrowserView, RefreshObserver {
 
@@ -172,9 +173,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         panelOne.add(button, BorderLayout.EAST);
         
         JPanel panelTwo = new JPanel(new BorderLayout());
-        panelTwo.add(getDSTypeItem("Dataset Types:", dsTypesBox), BorderLayout.CENTER);
-        panelTwo.setBorder(BorderFactory.createEmptyBorder(4,5,4,4));
-        dsTypesBox.setPreferredSize(new Dimension(320, 30));
+        panelTwo.add(getDSTypeItem("Select a Dataset Type:", dsTypesBox), BorderLayout.CENTER);
+         //dsTypesBox.setPreferredSize(new Dimension(320, 30));
         
         JPanel panel = new JPanel(new GridLayout(2,1));
         panel.add(panelOne);
@@ -184,18 +184,16 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
     
     private Component getDSTypeItem(String label, JComboBox box) {
-        JPanel panel = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-
-        box.setPreferredSize(new Dimension(80, 25));
-        layoutGenerator.addLabelWidgetPair(label, box, panel);
-        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-                1, 1, // initialX, initialY
-                5, 5);// xPad, yPad
-
+        JPanel panel = new JPanel(new BorderLayout(5,2));
+        JLabel jlabel = new JLabel(label);
+        jlabel.setHorizontalAlignment(JLabel.RIGHT);
+        panel.add(jlabel, BorderLayout.WEST);
+        panel.add(box,BorderLayout.CENTER);
+        panel.setBorder(BorderFactory.createEmptyBorder(3,150,5,150));
+       
         return panel;
     }
-    
+   
     private JPanel createControlPanel() {
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new BorderLayout());
