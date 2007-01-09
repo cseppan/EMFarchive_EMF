@@ -58,7 +58,7 @@ public class InputsRowSource implements RowSource {
     }
 
     private String getSubDir(CaseInput input) {
-        return (input == null) ? "" : input.getSubdirObj().toString();
+        return (input.getSubdirObj() == null) ? "" : input.getSubdirObj().toString();
     }
     
     public Object source() {
