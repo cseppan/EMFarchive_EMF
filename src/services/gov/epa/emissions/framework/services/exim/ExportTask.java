@@ -91,6 +91,12 @@ public class ExportTask implements Runnable {
     }
 
     private boolean compareDatasetRecordsNumbers(AccessLog log) throws Exception {
+        String type = dataset.getDatasetType().getName();
+        //COSTCY & A/M/PTPRO types temporarily disabled
+        if (type.equalsIgnoreCase("Country, state, and county names and data (COSTCY)") 
+                || type.equalsIgnoreCase("Temporal Profile (A/M/PTPRO)"))
+            return true;
+        
         DatasetDAO datasetDao = new DatasetDAO();
         DbServer dbServer = new EmfDbServer();
         Session session = sessionFactory.getSession();
