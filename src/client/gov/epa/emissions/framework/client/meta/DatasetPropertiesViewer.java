@@ -24,6 +24,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -134,7 +135,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
 
     private Component createQAStepsTab(DesktopManager desktopManager) {
         try {
-            QATab view = new QATab(messagePanel,parentConsole, desktopManager);
+            QATab view = new QATab(messagePanel, parentConsole, desktopManager);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
@@ -153,24 +154,56 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     }
 
     private JPanel createBottomPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(createControlPanel(), BorderLayout.LINE_END);
+        JPanel left = new JPanel();
+        Button property = new Button("Edit Properties", editPropertyAction());
+        property.setMnemonic('E');
+        Button data = new Button("Edit Data", editDataAction());
+        data.setMnemonic('a');
+        left.add(property);
+        left.add(data);
 
-        return panel;
-    }
-
-    private JPanel createControlPanel() {
-        JPanel buttonsPanel = new JPanel();
-
+        JPanel right = new JPanel();
         Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
             }
         });
+        right.add(close);
         getRootPane().setDefaultButton(close);
-        buttonsPanel.add(close);
 
-        return buttonsPanel;
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(left, BorderLayout.LINE_START);
+        panel.add(right, BorderLayout.LINE_END);
+
+        return panel;
+    }
+
+    private Action editPropertyAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                doDisplayPropertiesEditor();
+            }
+        };
+    }
+
+    private void doDisplayPropertiesEditor() {
+        try {
+            presenter.doDisplayPropertiesEditor(parentConsole, desktopManager);
+        } catch (EmfException e) {
+            showError(e.getMessage());
+        }
+    }
+
+    private Action editDataAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                doDisplayVersionedData();
+            }
+        };
+    }
+
+    protected void doDisplayVersionedData() {
+        presenter.doDisplayVersionedData(parentConsole, desktopManager);
     }
 
     public void observe(PropertiesViewPresenter presenter) {
@@ -179,6 +212,10 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
 
     public void showError(String message) {
         messagePanel.setError(message);
+    }
+
+    public void clearMessage() {
+        messagePanel.clear();
     }
 
 }

@@ -11,4 +11,6 @@ public interface PropertiesView extends ManagedView {
 
     void showError(String message);
 
+    void clearMessage();
+
 }

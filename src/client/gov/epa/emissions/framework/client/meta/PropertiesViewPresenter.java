@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.info.InfoTabPresenter;
 import gov.epa.emissions.framework.client.meta.info.InfoTabView;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTabPresenter;
@@ -9,13 +11,15 @@ import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabView;
 import gov.epa.emissions.framework.client.meta.notes.NotesTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.NotesTabView;
+import gov.epa.emissions.framework.client.meta.qa.QATabView;
 import gov.epa.emissions.framework.client.meta.qa.ViewQATabPresenter;
 import gov.epa.emissions.framework.client.meta.qa.ViewQATabPresenterImpl;
-import gov.epa.emissions.framework.client.meta.qa.QATabView;
 import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabPresenter;
 import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabView;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTabPresenter;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTabView;
+import gov.epa.emissions.framework.client.meta.versions.VersionedDataPresenter;
+import gov.epa.emissions.framework.client.meta.versions.VersionedDataWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
@@ -84,6 +88,19 @@ public class PropertiesViewPresenter {
 
     void set(ViewQATabPresenter presenter) throws EmfException {
         presenter.display();
+    }
+
+    public void doDisplayPropertiesEditor(EmfConsole parentConsole, DesktopManager desktopManager)
+            throws EmfException {
+        DatasetPropertiesEditor propertiesEditorView = new DatasetPropertiesEditor(session, parentConsole, desktopManager);
+        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, propertiesEditorView, session);
+        presenter.doDisplay();
+    }
+    
+    public void doDisplayVersionedData(EmfConsole parentConsole, DesktopManager desktopManager) {
+        VersionedDataWindow versionsView = new VersionedDataWindow(parentConsole, desktopManager);
+        VersionedDataPresenter presenter = new VersionedDataPresenter(dataset, session);
+        presenter.display(versionsView);
     }
 
 }
