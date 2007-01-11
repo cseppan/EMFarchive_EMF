@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.data.viewer;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.io.TableMetadata;
+import gov.epa.emissions.commons.util.ClipBoardCopy;
 import gov.epa.emissions.framework.client.data.DataSortFilterPanel;
 import gov.epa.emissions.framework.client.data.DoubleRenderer;
 import gov.epa.emissions.framework.client.data.PaginationPanel;
@@ -98,14 +99,21 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
         JTable viewTable = new JTable(tableModel);
         viewTableConfig(viewTable);
         table = new ScrollableTable(viewTable);
+        addCopyPasteClipBoard(viewTable);
+        System.out.println("view table column selection"+viewTable.getColumnSelectionAllowed());
         return table;
+    }
+
+    private void addCopyPasteClipBoard(JTable viewTable) {
+        ClipBoardCopy clipBoardCopy = new ClipBoardCopy(viewTable);
+        clipBoardCopy.registerCopyKeyStroke();
     }
 
     private void viewTableConfig(JTable viewTable) {
         new TableColumnHeaders(viewTable, tableMetadata).renderHeader();
         new TableColumnWidth(viewTable, tableMetadata).columnWidths();
-        viewTable.setDefaultRenderer(Double.class,new DoubleRenderer());
-        viewTable.setDefaultRenderer(Float.class,new DoubleRenderer());
+        viewTable.setDefaultRenderer(Double.class, new DoubleRenderer());
+        viewTable.setDefaultRenderer(Float.class, new DoubleRenderer());
         viewTable.repaint();
     }
 

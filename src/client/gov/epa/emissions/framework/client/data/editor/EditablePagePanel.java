@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.util.ClipBoardCopy;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
@@ -17,6 +18,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -98,7 +100,13 @@ public class EditablePagePanel extends JPanel {
         listOfChangeables.addChangeable(editableTable);
 
         table = new ScrollableTable(editableTable);
+        addCopyPasteClipBoard(editableTable);
         return table;
+    }
+    
+    private void addCopyPasteClipBoard(JTable viewTable) {
+        ClipBoardCopy clipBoardCopy = new ClipBoardCopy(viewTable);
+        clipBoardCopy.registerCopyKeyStroke();
     }
 
     private AbstractAction deleteAction(final EditablePage tableData, String nameDelete, ImageIcon iconDelete) {

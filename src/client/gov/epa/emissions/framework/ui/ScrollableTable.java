@@ -31,6 +31,7 @@ public class ScrollableTable extends JScrollPane {
         enableScrolling(table);
         table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         table.setRowSelectionAllowed(true);
+        table.setColumnSelectionAllowed(false);
     }
 
     private JTable table(EmfTableModel tableModel) {

@@ -5,10 +5,10 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.mims.analysisengine.gui.DefaultUserInteractor;
 import gov.epa.mims.analysisengine.gui.UserInteractor;
-import gov.epa.mims.analysisengine.table.FileImportGUI;
 import gov.epa.mims.analysisengine.table.SpecialTableModel;
 import gov.epa.mims.analysisengine.table.TablePanel;
 import gov.epa.mims.analysisengine.table.TextDialog;
+import gov.epa.mims.analysisengine.table.io.FileImportGUI;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
