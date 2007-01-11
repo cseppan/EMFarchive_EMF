@@ -9,7 +9,7 @@ import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
-import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
@@ -153,16 +153,13 @@ public class DatasetDAO {
     }
 
     public boolean isUsedByCases(Session session, EmfDataset dataset) {
-        List cases = hibernateFacade.getAll(Case.class, session);
-        if (cases == null || cases.isEmpty())
+        CaseDAO caseDao = new CaseDAO();
+        List caseInputs = caseDao.getAllCaseInputs(session);
+        if (caseInputs == null || caseInputs.isEmpty())
             return false;
 
-        for (Iterator iter = cases.iterator(); iter.hasNext();) {
-            Case caseObj = (Case) iter.next();
-            CaseInput[] inputs = caseObj.getCaseInputs();
-            if (datasetUsed(inputs, dataset))
-                return true;
-        }
+        if (datasetUsed((CaseInput[])caseInputs.toArray(new CaseInput[0]), dataset))
+            return true;
 
         return false;
     }
@@ -255,7 +252,7 @@ public class DatasetDAO {
         EmfDataset oldDataset = getDataset(session, dataset.getId());
         if (dataset.getName().equalsIgnoreCase(oldDataset.getName()))
             return;
-        
+
         DbServer dbServer = new EmfDbServer();
 
         try {
@@ -264,9 +261,11 @@ public class DatasetDAO {
             InternalSource source = dataset.getInternalSources()[0];
 
             if (type.getTablePerDataset() == 1) {
+                String oldTableName = oldDataset.getInternalSources()[0].getTable();
+                String newTableName = dataset.getName();
                 DataTable table = new DataTable(oldDataset, datasource);
-                source.setTable(table.createName(dataset.getName()));
-                table.rename(dataset.getName());
+                source.setTable(table.createName(newTableName));
+                table.rename(oldTableName, newTableName);
             }
         } finally {
             dbServer.disconnect();
