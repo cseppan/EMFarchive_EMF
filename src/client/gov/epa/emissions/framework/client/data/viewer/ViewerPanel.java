@@ -100,7 +100,6 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
         viewTableConfig(viewTable);
         table = new ScrollableTable(viewTable);
         addCopyPasteClipBoard(viewTable);
-        System.out.println("view table column selection"+viewTable.getColumnSelectionAllowed());
         return table;
     }
 
