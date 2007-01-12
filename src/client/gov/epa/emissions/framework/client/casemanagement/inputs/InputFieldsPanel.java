@@ -222,7 +222,6 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         updateDataset();
         updateVersion();
         updateSubdir();
-        //input.setSubdir(subDir.getText());
         input.setRequired(required.isSelected());
         input.setShow(show.isSelected());
     }

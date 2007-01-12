@@ -23,6 +23,6 @@ public interface EditInputsTabView {
 
     void clearMessage();
     
-    void notifychanges();
+//    void notifychanges();
 
 }

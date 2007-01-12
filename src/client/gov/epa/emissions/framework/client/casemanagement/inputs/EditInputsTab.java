@@ -21,9 +21,11 @@ import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -105,7 +107,9 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     }
 
     private void doRefresh(CaseInput[] inputs) {
-        inputDir.setText(caseObj.getInputFileDir());
+        String inputFileDir = caseObj.getInputFileDir();
+        if(!inputDir.getText().equalsIgnoreCase(inputFileDir))
+             inputDir.setText(inputFileDir);
 
         super.removeAll();
         super.add(createLayout(inputs, presenter, parentConsole), BorderLayout.CENTER);
@@ -123,7 +127,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     private JPanel tablePanel(CaseInput[] inputs, EmfConsole parentConsole) {
         tableData = new InputsTableData(inputs);
-        changeables.addChangeable(tableData);
+        //changeables.addChangeable(tableData);
         selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
 
         tablePanel = new JPanel(new BorderLayout());
@@ -134,17 +138,17 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
         SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        //sortFilterPanel.sort(sortCriteria());
+        sortFilterPanel.sort(sortCriteria());
         
         JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
         sortFilterPanel.setPreferredSize(new Dimension(450, 60));
         return scrollPane;
     }
     
-//    private SortCriteria sortCriteria() {
-//        String[] columnNames = { "Sector", "Program", "Input"};
-//        return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
-//    }
+    private SortCriteria sortCriteria() {
+        String[] columnNames = { "Sector", "Program", "Input"};
+        return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
+    }
 
     public JPanel createFolderPanel() {
         JPanel panel = new JPanel(new SpringLayout());
@@ -281,15 +285,15 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         if (selection == JOptionPane.YES_OPTION) {
             tableData.remove(inputs);
             refresh();
-            notifychanges();
+            //notifychanges();
             presenter.removeInputs(inputs);
         }
     }
 
-    public void notifychanges() {
-        tableData.setChanges(true);
-        tableData.notifyChanges();
-    }
+//    public void notifychanges() {
+//        tableData.setChanges(true);
+//        tableData.notifyChanges();
+//    }
 
     private void doEditInput(EditInputsTabPresenter presenter) throws EmfException {
         List inputs = getSelectedInputs();
@@ -439,9 +443,9 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
             defaultExportDir = inputDir.getText();
         
         for (int i = 0; i < list.size(); i++) {
-            String subdir = ((CaseInput) list.get(i)).getSubdir();
-            if (!subdir.equals(""))
-                subDirList.add(defaultExportDir + File.separator + subdir);
+            SubDir subdir = ((CaseInput) list.get(i)).getSubdirObj();
+            if (subdir != null)
+                subDirList.add(defaultExportDir + File.separator + subdir.getName());
             else
                 subDirList.add(defaultExportDir);
         }

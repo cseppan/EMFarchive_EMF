@@ -126,8 +126,9 @@ public class InputFieldsPanelPresenter {
         return session.dataEditorService();
     }
 
-    public void doSave() throws EmfException {
+    public void doSave(CaseInput input) throws EmfException {
         view.setFields();
+        session.caseService().updateCaseInput(input);
     }
 
     public void doValidateFields() throws EmfException {

@@ -33,24 +33,24 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
     
     private CaseInput input;
     
-    private EditInputsTabView parentView;
+//    private EditInputsTabView parentView;
     
     public EditCaseInputWindow(String title, EditInputsTabView parentView, DesktopManager desktopManager) {
         super("Edit Case Input", new Dimension(550, 520), desktopManager);
         super.setLabel(super.getTitle() + ": " + title);
-        this.parentView = parentView;
+//        this.parentView = parentView;
     }
 
     public void display(CaseInput input) throws EmfException {
         this.input = input;
-        layout = createLayout(input);
+        layout = createLayout();
         
         super.getContentPane().add(layout);
         super.display();
         super.resetChanges();
     }
 
-    private JPanel createLayout(CaseInput input) throws EmfException {
+    private JPanel createLayout() throws EmfException {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -58,17 +58,17 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
         panel.add(messagePanel);
         this.inputFieldsPanel = new InputFieldsPanel(messagePanel, this);
         presenter.doAddInputFields(panel, inputFieldsPanel);
-        panel.add(buttonsPanel(input));
+        panel.add(buttonsPanel());
 
         return panel;
     }
     
-    private JPanel buttonsPanel(final CaseInput input) {
+    private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
 
         ok = new OKButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doSave(input);
+                doSave();
             }
         });
         getRootPane().setDefaultButton(ok);
@@ -84,14 +84,14 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
         return panel;
     }
 
-    private void doSave(CaseInput input) {
+    private void doSave() {
         clearMessage();
         try {
             doValidateFields();
             doCheckDuplicate();
             presenter.doSave();
-            if (hasChanges())
-                parentView.notifychanges();
+//            if (hasChanges())
+//                parentView.notifychanges();
             disposeView();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());

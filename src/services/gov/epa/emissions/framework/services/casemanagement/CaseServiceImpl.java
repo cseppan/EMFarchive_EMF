@@ -450,6 +450,9 @@ public class CaseServiceImpl implements CaseService {
     public CaseInput addCaseInput(CaseInput input) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
+            if (dao.caseInputExists(input, session))
+                throw new EmfException("CaseInput: " + input.getName() + " is already in use.");
+            
             dao.add(input, session);
             return (CaseInput) dao.loadCaseInupt(input, session);
         } catch (Exception e) {
@@ -464,9 +467,6 @@ public class CaseServiceImpl implements CaseService {
         Session session = sessionFactory.getSession();
 
         try {
-            if (dao.caseInputExists(input, session))
-                throw new EmfException("CaseInput: " + input.getName() + " is already in use.");
-            
             dao.updateCaseInput(new CaseInput[]{ input }, session);
         } catch (RuntimeException e) {
             LOG.error("Could not update CaseInput: " + input.getName() + ".\n" + e);

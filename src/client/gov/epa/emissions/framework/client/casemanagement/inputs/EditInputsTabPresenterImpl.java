@@ -62,7 +62,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     
     private void refreshView() {
         view.refresh();
-        view.notifychanges();
+//        view.notifychanges();
     }
     
     public void removeInputs(CaseInput[] inputs) throws EmfException {
@@ -100,7 +100,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
             if (inputName.getId() != names[i].getId())
                 if (inputName.equals(names[i]))
-                    throw new EmfException("InputName: " + inputName.getName() + "has already existed.");
+                    throw new EmfException("InputName: " + inputName.getName() + " has already existed.");
         }
 
         CaseProgram[] prgs = caseService().getPrograms();
@@ -108,14 +108,14 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         for (int i = 0; i < prgs.length; i++)
             if (prg != null && prg.getId() != prgs[i].getId())
                 if (prg.equals(prgs[i]))
-                    throw new EmfException("Program: " + prg.getName() + "has already existed.");
+                    throw new EmfException("Program: " + prg.getName() + " has already existed.");
 
         InputEnvtVar[] envtVars = caseService().getInputEnvtVars();
         InputEnvtVar envtVar = input.getEnvtVars();
         for (int i = 0; i < envtVars.length; i++)
             if (envtVar != null && envtVar.getId() != envtVars[i].getId())
                 if (envtVar.equals(envtVars[i]))
-                    throw new EmfException("InputEnvtVar: " + envtVar.getName() + "has already existed.");
+                    throw new EmfException("InputEnvtVar: " + envtVar.getName() + " has already existed.");
 
     }
 

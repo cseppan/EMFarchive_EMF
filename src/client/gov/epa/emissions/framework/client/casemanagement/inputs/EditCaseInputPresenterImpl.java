@@ -39,7 +39,7 @@ public class EditCaseInputPresenterImpl implements EditInputPresenter {
     }
     
     public void doSave() throws EmfException {
-        inputFieldsPresenter.doSave();
+        inputFieldsPresenter.doSave(input);
         parentView.refresh();
     }
 

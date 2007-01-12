@@ -86,8 +86,8 @@ public class InputsTableData extends ChangeableTableData {
     private void refresh() {
         this.rows = createRows(sources());
         
-        if (this.hasChanges())
-            notifyChanges();
+//        if (this.hasChanges())
+//            notifyChanges();
     }
 
     public CaseInput[] sources() {
