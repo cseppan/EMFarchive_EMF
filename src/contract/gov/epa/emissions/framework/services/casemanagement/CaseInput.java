@@ -9,7 +9,9 @@ import java.io.Serializable;
 
 public class CaseInput implements Serializable, Comparable {
     
-    private int recordID;
+    private int id;
+
+    private int caseID;
 
     private InputName inputName;
     
@@ -48,7 +50,7 @@ public class CaseInput implements Serializable, Comparable {
         boolean bool2 = evalToEqual(((CaseInput) other).sector, this.sector);
         boolean bool3 = evalToEqual(((CaseInput) other).program, this.program);
         
-        return (bool1 && bool2 && bool3) || (this.recordID == ((CaseInput) other).getRecordID());
+        return (bool1 && bool2 && bool3) || (this.id == ((CaseInput) other).getId());
     }
     
     private boolean evalToEqual(Object obj, Object current) {
@@ -163,20 +165,28 @@ public class CaseInput implements Serializable, Comparable {
         return this.inputName.getName();
     }
 
-    public int getRecordID() {
-        return recordID;
-    }
-
-    public void setRecordID(int recordID) {
-        this.recordID = recordID;
-    }
-
     public SubDir getSubdirObj() {
         return subdirObj;
     }
 
     public void setSubdirObj(SubDir subdirObj) {
         this.subdirObj = subdirObj;
+    }
+
+    public int getCaseID() {
+        return caseID;
+    }
+
+    public void setCaseID(int caseID) {
+        this.caseID = caseID;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
 }

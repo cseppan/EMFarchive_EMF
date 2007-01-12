@@ -20,7 +20,7 @@ public interface CaseService {
     MeteorlogicalYear[] getMeteorlogicalYears() throws EmfException;
 
     Speciation[] getSpeciations() throws EmfException;
-
+    
     InputName[] getInputNames() throws EmfException;
 
     InputEnvtVar[] getInputEnvtVars() throws EmfException;
@@ -56,5 +56,13 @@ public interface CaseService {
     InputEnvtVar addInputEnvtVar(InputEnvtVar inputEnvtVar) throws EmfException;
 
     SubDir addSubDir(SubDir subdir) throws EmfException;
+
+    CaseInput addCaseInput(CaseInput input) throws EmfException;
+    
+    void updateCaseInput(CaseInput input) throws EmfException;
+    
+    void removeCaseInputs(CaseInput[] inputs) throws EmfException;
+    
+    CaseInput[] getCaseInputs(int caseId) throws EmfException;
 
 }

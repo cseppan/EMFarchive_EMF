@@ -23,4 +23,7 @@ public interface EditInputsTabPresenter extends CaseEditorTabPresenter {
 
     void doExport(EmfDataset[] datasets, Version[] versions, String[] folders, String purpose) throws EmfException;
 
+    void removeInputs(CaseInput[] inputs) throws EmfException;
+    
+    CaseInput[] getCaseInput(int caseId) throws EmfException;
 }

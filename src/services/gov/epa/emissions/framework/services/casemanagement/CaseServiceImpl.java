@@ -301,13 +301,14 @@ public class CaseServiceImpl implements CaseService {
         createExportService();
         EmfDataset[] datasets = getInputDatasets(caseToExport);
         Version[] versions = getInputDatasetVersions(caseToExport);
-        String[] subdirs = getSubdirs(caseToExport);
+        SubDir[] subdirs = getSubdirs(caseToExport);
         
         if (datasets.length == 0)
             return;
 
         for (int i = 0; i < datasets.length; i++) {
-            String exportDir = dirName + System.getProperty("file.separator") + subdirs[i];
+            String subdir = (subdirs[i] == null) ? "":subdirs[i].getName();
+            String exportDir = dirName + System.getProperty("file.separator") + subdir;
             File dir = new File(exportDir);
             if (!dir.exists())
                 dir.mkdirs();
@@ -317,8 +318,8 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
-    private Version[] getInputDatasetVersions(Case caseToExport) {
-        CaseInput[] inputs = caseToExport.getCaseInputs();
+    private Version[] getInputDatasetVersions(Case caseToExport) throws EmfException {
+        CaseInput[] inputs = getCaseInputs(caseToExport.getId());
         List list = new ArrayList();
 
         for (int i = 0; i < inputs.length; i++)
@@ -328,8 +329,8 @@ public class CaseServiceImpl implements CaseService {
         return (Version[])list.toArray(new Version[0]);
     }
 
-    private EmfDataset[] getInputDatasets(Case caseToExport) {
-        CaseInput[] inputs = caseToExport.getCaseInputs();
+    private EmfDataset[] getInputDatasets(Case caseToExport) throws EmfException {
+        CaseInput[] inputs = getCaseInputs(caseToExport.getId());
         List list = new ArrayList();
 
         for (int i = 0; i < inputs.length; i++)
@@ -345,12 +346,12 @@ public class CaseServiceImpl implements CaseService {
         return name.indexOf("External") >= 0;
     }
 
-    private String[] getSubdirs(Case caseToExport) {
-        CaseInput[] inputs = caseToExport.getCaseInputs();
-        String[] subdirs = new String[inputs.length];
+    private SubDir[] getSubdirs(Case caseToExport) throws EmfException {
+        CaseInput[] inputs = getCaseInputs(caseToExport.getId());
+        SubDir[] subdirs = new SubDir[inputs.length];
 
         for (int i = 0; i < inputs.length; i++)
-            subdirs[i] = inputs[i].getSubdir();
+            subdirs[i] = inputs[i].getSubdirObj();
 
         return subdirs;
     }
@@ -441,6 +442,63 @@ public class CaseServiceImpl implements CaseService {
         } catch (Exception e) {
             LOG.error("Could not add new SubDir '" + subdir.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new SubDir '" + subdir.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
+    public CaseInput addCaseInput(CaseInput input) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(input, session);
+            return (CaseInput) dao.loadCaseInupt(input, session);
+        } catch (Exception e) {
+            LOG.error("Could not add new CaseInput '" + input.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new CaseInput '" + input.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
+    public void updateCaseInput(CaseInput input) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            if (dao.caseInputExists(input, session))
+                throw new EmfException("CaseInput: " + input.getName() + " is already in use.");
+            
+            dao.updateCaseInput(new CaseInput[]{ input }, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not update CaseInput: " + input.getName() + ".\n" + e);
+            throw new EmfException("Could not update CaseInput: " + input.getName() + ".");
+        } finally {
+            session.close();
+        }
+    }
+
+    public void removeCaseInputs(CaseInput[] inputs) throws EmfException {
+       Session session = sessionFactory.getSession();
+        
+        try {
+            dao.removeCaseInputs(inputs, session);
+        } catch (Exception e) {
+            LOG.error("Could not remove CaseInput " + inputs[0].getName() + " etc.\n" + e.getMessage());
+            throw new EmfException("Could not remove CaseInput " + inputs[0].getName() + " etc.");
+        } finally {
+            session.close();
+        }
+    }
+
+    public CaseInput[] getCaseInputs(int caseId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            List inputs = dao.getCaseInputs(caseId, session);
+
+            return (CaseInput[]) inputs.toArray(new CaseInput[0]);
+        } catch (Exception e) {
+            LOG.error("Could not get all CaseInputs with current case (id=" + caseId + ").\n" + e.getMessage());
+            throw new EmfException("Could not get all CaseInputs with current case (id=" + caseId + ").\n");
         } finally {
             session.close();
         }

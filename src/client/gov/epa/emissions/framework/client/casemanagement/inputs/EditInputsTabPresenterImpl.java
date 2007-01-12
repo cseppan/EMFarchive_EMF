@@ -38,23 +38,35 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
     public void doSave() {
         String caseInputDir = view.getCaseInputFileDir();
-        CaseInput[] inputs = view.caseInputs();
         caseObj.setInputFileDir(caseInputDir);
-        caseObj.setCaseInputs(inputs);
         view.refresh();
     }
 
-    public void doAddInput(NewInputView dialog) {
+    public void doAddInput(NewInputView dialog) throws EmfException {
         dialog.register(this);
-        dialog.display(caseObj);
-        if (dialog.shouldCreate())
-            view.addInput(dialog.input());
+        dialog.display(caseObj.getId());
+        
+        if (dialog.shouldCreate()) {
+            CaseInput newInput = dialog.input();
+            newInput.setCaseID(caseObj.getId());
+            service().addCaseInput(newInput);
+            view.addInput(newInput);
+        }
+        
         refreshView();
     }
 
+    private CaseService service() {
+        return session.caseService();
+    }
+    
     private void refreshView() {
         view.refresh();
         view.notifychanges();
+    }
+    
+    public void removeInputs(CaseInput[] inputs) throws EmfException {
+        service().removeCaseInputs(inputs);
     }
 
     public void doEditInput(CaseInput input, EditCaseInputView inputEditor) throws EmfException {
@@ -64,7 +76,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
     public void doAddInputFields(JComponent container, InputFieldsPanelView inputFields) throws EmfException {
         CaseInput newInput = new CaseInput();
-        newInput.setRecordID(view.numberOfRecord());
+        newInput.setId(view.numberOfRecord());
         newInput.setRequired(true);
         newInput.setShow(true);
 
@@ -74,7 +86,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
     public void doCheckDuplicate(CaseInput input, CaseInput[] existingInputs) throws EmfException {
         for (int i = 0; i < existingInputs.length; i++) {
-            if (input.getRecordID() != existingInputs[i].getRecordID())
+            if (input.getId() != existingInputs[i].getId())
                 if (input.equals(existingInputs[i]))
                     throw new EmfException("The combination of 'Input Name', 'Sector', and 'Program' "
                             + "should be unique.");
@@ -144,6 +156,10 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
     private String mapToRemote(String dir) {
         return session.preferences().mapLocalOutputPathToRemote(dir);
+    }
+
+    public CaseInput[] getCaseInput(int caseId) throws EmfException {
+        return service().getCaseInputs(caseId);
     }
 
 }

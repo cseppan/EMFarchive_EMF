@@ -306,6 +306,11 @@ public class DataServiceTest extends ServiceTestCase {
         EmfDataset dataset1 = newDataset();
         EmfDataset dataset2 = newDataset();
         Case caseObj = newCase(dataset2);
+        CaseInput input = new CaseInput();
+        input.setDataset(dataset2);
+        input.setCaseID(caseObj.getId());
+        save(input);
+        
         try {
             assertEquals("data-service-test-case", caseObj.getName());
             service.deleteDatasets(owner, new EmfDataset[] { dataset1, dataset2 });
@@ -313,6 +318,7 @@ public class DataServiceTest extends ServiceTestCase {
             assertTrue("Should give error msg.", e.getMessage().startsWith("Cannot delete"));
             return;
         } finally {
+            remove(input);
             remove(caseObj);
             remove(dataset1);
             remove(dataset2);
@@ -355,10 +361,10 @@ public class DataServiceTest extends ServiceTestCase {
     }
 
     private Case newCase(EmfDataset dataset) {
-        CaseInput input = new CaseInput();
-        input.setDataset(dataset);
+        //CaseInput input = new CaseInput();
+        //input.setDataset(dataset);
         Case caseObj = new Case("data-service-test-case");
-        caseObj.setCaseInputs(new CaseInput[] { input });
+        //caseObj.setCaseInputs(new CaseInput[] { input });
 
         session.clear();// flush cached objects
         Transaction tx = null;

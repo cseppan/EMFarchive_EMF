@@ -77,7 +77,7 @@ public class Case implements Comparable, Lockable, Serializable {
     
     private List sectors;
 
-    private List caseInputs;
+    //private List caseInputs;
     
     private boolean isFinal;
     
@@ -89,7 +89,7 @@ public class Case implements Comparable, Lockable, Serializable {
     public Case() {
         lock = new Mutex();
         this.sectors = new ArrayList();
-        this.caseInputs = new ArrayList();
+        //this.caseInputs = new ArrayList();
     }
 
     public Case(String name) {
@@ -384,13 +384,13 @@ public class Case implements Comparable, Lockable, Serializable {
         this.outputFileDir = outputFileDir;
     }
 
-    public CaseInput[] getCaseInputs() {
-        return (CaseInput[])caseInputs.toArray(new CaseInput[0]);
-    }
+//    public CaseInput[] getCaseInputs() {
+//        return (CaseInput[])caseInputs.toArray(new CaseInput[0]);
+//    }
 
-    public void setCaseInputs(CaseInput[] caseInputs) {
-        this.caseInputs = Arrays.asList(caseInputs);
-    }
+//    public void setCaseInputs(CaseInput[] caseInputs) {
+//        this.caseInputs = Arrays.asList(caseInputs);
+//    }
 
     public User getCreator() {
         return creator;

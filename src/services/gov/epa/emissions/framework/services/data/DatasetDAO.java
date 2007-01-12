@@ -261,10 +261,11 @@ public class DatasetDAO {
             InternalSource source = dataset.getInternalSources()[0];
 
             if (type.getTablePerDataset() == 1) {
-                String oldTableName = oldDataset.getInternalSources()[0].getTable();
-                String newTableName = dataset.getName();
                 DataTable table = new DataTable(oldDataset, datasource);
-                source.setTable(table.createName(newTableName));
+                String oldTableName = oldDataset.getInternalSources()[0].getTable();
+                String newTableName = table.createName(dataset.getName());
+                
+                source.setTable(newTableName);
                 table.rename(oldTableName, newTableName);
             }
         } finally {

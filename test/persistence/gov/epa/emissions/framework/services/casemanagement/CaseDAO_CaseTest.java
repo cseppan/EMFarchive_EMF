@@ -46,7 +46,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         int totalBeforeAdd = dao.getCases(session).size();
 
         Case element = new Case("test" + Math.random());
-        dao.add(element, session);
+        add(element);
 
         session.clear();
         try {
@@ -60,7 +60,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
     public void testShouldRemoveCaseOnRemove() {
         int totalBeforeAdd = dao.getCases(session).size();
         Case element = new Case("test" + Math.random());
-        dao.add(element, session);
+        add(element);
 
         session.clear();
         dao.remove(element, session);
@@ -91,7 +91,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         element.setLastModifiedDate(new Date());
         element.setTemplateUsed("another dataset");
 
-        dao.add(element, session);
+        add(element);
 
         session.clear();
         try {
@@ -111,10 +111,9 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         Case element = new Case("test" + Math.random());
         Abbreviation abbreviation = new Abbreviation("test" + Math.random());
         add(abbreviation);
-        session.clear();
-        element.setAbbreviation(abbreviation);
+        element.setAbbreviation((Abbreviation)dao.getAbbreviations(session).get(0));
 
-        dao.add(element, session);
+        add(element);
 
         session.clear();
         try {
@@ -132,7 +131,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         add(aqm);
         element.setAirQualityModel(aqm);
 
-        dao.add(element, session);
+        add(element);
 
         session.clear();
         try {
@@ -150,18 +149,23 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         add(subdir);
         CaseInput input = new CaseInput();
         input.setSubdirObj(subdir);
-        element.setCaseInputs(new CaseInput[]{input});
-        
-        dao.add(element, session);
-        
+        add(element);
         session.clear();
+        
         try {
             List list = dao.getCases(session);
-            assertEquals(input, ((Case) list.get(0)).getCaseInputs()[0]);
-            assertEquals(1, ((Case) list.get(0)).getCaseInputs().length);
+            Case loadedCase = (Case)list.get(0);
+            input.setCaseID(loadedCase.getId());
+            add(input);
+            session.clear();
+            
+            List inputs = dao.getCaseInputs(loadedCase.getId(), session);
+            assertEquals(input, inputs.get(0));
+            assertEquals(1, inputs.size());
         } finally {
-            remove(element);
+            remove(input);
             remove(subdir);
+            remove(element);
         }
     }
 
@@ -171,7 +175,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         add(attrib);
         element.setCaseCategory(attrib);
 
-        dao.add(element, session);
+        add(element);
 
         session.clear();
         try {
@@ -278,7 +282,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         add(attrib);
         element.setProject(attrib);
 
-        dao.add(element, session);
+        add(element);
 
         session.clear();
         try {
@@ -604,7 +608,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         input.setEnvtVars(envtVar);
         input.setInputName(inputName);
         input.setProgram(caseProg);
-        input.setRecordID(0);
+        input.setId(0);
         input.setRequired(true);
         input.setSector(sector);
         input.setShow(true);
@@ -615,7 +619,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         toCopy.setAirQualityModel(airModel);
         toCopy.setBaseYear(1999);
         toCopy.setCaseCategory(cat);
-        toCopy.setCaseInputs(new CaseInput[] { input });
+        //toCopy.setCaseInputs(new CaseInput[] { input });
         toCopy.setCaseTemplate(true);
         toCopy.setControlRegion(contrlRegion);
         toCopy.setCreator(owner);
@@ -651,7 +655,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         Case coppied = (Case) DeepCopy.copy(toCopy);
         assertEquals("test to be copied", coppied.getName());
         assertTrue(coppied.getIsFinal());
-        assertEquals("emf123", coppied.getCaseInputs()[0].getDataset().getCreator());
+        //assertEquals("emf123", coppied.getCaseInputs()[0].getDataset().getCreator());
     }
 
     private Case newCase() {

@@ -298,4 +298,44 @@ public class CaseServiceTransport implements CaseService {
         return (SubDir) call.requestResponse(new Object[] { subdir });
     }
 
+    public CaseInput addCaseInput(CaseInput input) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("addCaseInput");
+        call.addParam("input", caseMappings.caseinput());
+        call.setReturnType(caseMappings.caseinput());
+
+        return (CaseInput) call.requestResponse(new Object[] { input });
+    }
+
+    public void updateCaseInput(CaseInput input) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("updateCaseInput");
+        call.addParam("input", caseMappings.caseinput());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { input });
+    }
+
+    public void removeCaseInputs(CaseInput[] inputs) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("removeCaseInputs");
+        call.addParam("inputs", caseMappings.caseinputs());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { inputs });
+    }
+
+    public CaseInput[] getCaseInputs(int caseId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getCaseInputs");
+        call.addIntegerParam("caseId");
+        call.setReturnType(caseMappings.caseinputs());
+
+        return (CaseInput[]) call.requestResponse(new Object[] { new Integer(caseId) });
+    }
+
 }

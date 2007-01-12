@@ -176,8 +176,6 @@ CREATE TABLE cases.cases_caseinputs
 (
   id SERIAL PRIMARY KEY,
   case_id int4 NOT NULL REFERENCES cases.cases(id) ,
-  list_index int4,
-  record_id int4,
   sub_dir varchar(255),
   required bool DEFAULT false,
   show bool DEFAULT false,

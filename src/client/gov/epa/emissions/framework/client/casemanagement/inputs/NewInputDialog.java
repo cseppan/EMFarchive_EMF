@@ -7,7 +7,6 @@ import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.ui.Dialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -36,16 +35,20 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
         super.center();
     }
 
-    public void display(Case caseObj) {
-        doDisplay(caseObj);
+    public void display(int caseId) {
+        doDisplay(caseId);
     }
 
-    private void doDisplay(Case caseObj) {
+    private void doDisplay(int caseId) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         panel.add(inputPanel());
-        panel.add(buttonsPanel(caseObj.getCaseInputs()));
+        try {
+            panel.add(buttonsPanel(presenter.getCaseInput(caseId)));
+        } catch (EmfException e) {
+            messagePanel.setError("Can't get all case inputs. " + e.getMessage());
+        }
 
         super.getContentPane().add(panel);
         super.display();

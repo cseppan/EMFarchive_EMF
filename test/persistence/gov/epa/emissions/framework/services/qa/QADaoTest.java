@@ -130,7 +130,7 @@ public class QADaoTest extends ServiceTestCase {
 
     public void testShouldGetAllDefaultQAPrograms() {
         QAProgram[] programs = dao.getQAPrograms(session);
-        assertEquals(2, programs.length);
+        assertEquals(4, programs.length);
     }
 
     public void testShouldCheckExistQAStep() {

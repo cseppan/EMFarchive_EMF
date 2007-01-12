@@ -24,7 +24,6 @@ import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
-import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -51,6 +50,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     private EditInputsTabPresenter presenter;
 
     private Case caseObj;
+    
+    private int caseId;
 
     private InputsTableData tableData;
 
@@ -86,6 +87,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         super.removeAll();
         
         this.caseObj = caseObj;
+        this.caseId = caseObj.getId();
         this.presenter = presenter;
         this.session = session;
         inputDir.setText(caseObj.getInputFileDir());
@@ -95,7 +97,11 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 //            }
 //        });
         
-        super.add(createLayout(caseObj.getCaseInputs(), presenter, parentConsole), BorderLayout.CENTER);
+        try {
+            super.add(createLayout(presenter.getCaseInput(caseId), presenter, parentConsole), BorderLayout.CENTER);
+        } catch (EmfException e) {
+            messagePanel.setError("Cannot retrieve all case inputs.");
+        }
     }
 
     private void doRefresh(CaseInput[] inputs) {
@@ -128,17 +134,17 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
         SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        sortFilterPanel.sort(sortCriteria());
+        //sortFilterPanel.sort(sortCriteria());
         
         JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
         sortFilterPanel.setPreferredSize(new Dimension(450, 60));
         return scrollPane;
     }
     
-    private SortCriteria sortCriteria() {
-        String[] columnNames = { "Sector", "Program", "Input"};
-        return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
-    }
+//    private SortCriteria sortCriteria() {
+//        String[] columnNames = { "Sector", "Program", "Input"};
+//        return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
+//    }
 
     public JPanel createFolderPanel() {
         JPanel panel = new JPanel(new SpringLayout());
@@ -195,7 +201,11 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         Button remove = new RemoveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMessage();
-                doRemove();
+                try {
+                    doRemove(presenter);
+                } catch (EmfException exc) {
+                    messagePanel.setError(exc.getMessage());
+                }
             }
         });
         remove.setMargin(insets);
@@ -255,10 +265,10 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         }
     }
 
-    protected void doRemove() {
-        List inputs = getSelectedInputs();
+    protected void doRemove(EditInputsTabPresenter presenter) throws EmfException {
+        CaseInput[] inputs = (CaseInput[]) getSelectedInputs().toArray(new CaseInput[0]);
 
-        if (inputs.size() == 0) {
+        if (inputs.length == 0) {
             messagePanel.setMessage("Please select input(s) to remove.");
             return;
         }
@@ -269,9 +279,10 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
                 JOptionPane.QUESTION_MESSAGE);
 
         if (selection == JOptionPane.YES_OPTION) {
-            tableData.remove((CaseInput[]) inputs.toArray(new CaseInput[0]));
+            tableData.remove(inputs);
             refresh();
             notifychanges();
+            presenter.removeInputs(inputs);
         }
     }
 
@@ -291,7 +302,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
         for (Iterator iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = (CaseInput) iter.next();
-            EditCaseInputView inputEditor = new EditCaseInputWindow(input.getName() + "(" + input.getRecordID() + ")("
+            EditCaseInputView inputEditor = new EditCaseInputWindow(input.getName() + "(" + input.getId() + ")("
                     + caseObj.getName() + ")", this, desktopManager);
             presenter.doEditInput(input, inputEditor);
         }
@@ -440,7 +451,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     public void addInput(CaseInput note) {
         tableData.add(note);
-        caseObj.setCaseInputs(caseInputs());
         selectModel.refresh();
 
         tablePanel.removeAll();

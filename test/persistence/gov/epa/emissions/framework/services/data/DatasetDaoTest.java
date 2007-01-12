@@ -291,7 +291,9 @@ public class DatasetDaoTest extends ServiceTestCase {
         CaseInput input = new CaseInput();
         input.setDataset(dataset2);
         Case caseObj = newCase();
-        caseObj.setCaseInputs(new CaseInput[]{input});
+        input.setCaseID(caseObj.getId());
+        caseDao.add(input, session);
+        session.clear();
         
         try {
             assertTrue(dao.isUsedByControlStrategies(session, dataset));
@@ -302,11 +304,11 @@ public class DatasetDaoTest extends ServiceTestCase {
             assertFalse(dao.isUsedByCases(session, dataset));
             assertFalse(dao.isUsedByCases(session, dataset3));
         } finally {
+            remove(strategy);
+            remove(input);
             remove(dataset);
             remove(dataset2);
             remove(dataset3);
-            remove(strategy);
-            remove(input);
             remove(caseObj);
         }
     }

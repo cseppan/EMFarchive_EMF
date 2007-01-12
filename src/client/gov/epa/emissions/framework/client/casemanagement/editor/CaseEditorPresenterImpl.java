@@ -107,7 +107,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         EditInputsTabPresenter inputPresenter = new EditInputsTabPresenterImpl(session, inputsView, caseObj);
         inputPresenter.display();
         
-        presenters.add(inputPresenter);
+        //presenters.add(inputPresenter);
     }
 
     public void set(EditOutputsTabView OutputsView) throws EmfException {

@@ -53,6 +53,7 @@
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/MeteorlogicalYear.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/Speciation.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/Case.hbm.xml"/>
+    	<mapping resource="gov/epa/emissions/framework/services/casemanagement/CaseInput.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/GridResolution.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/InputEnvtVar.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/CaseProgram.hbm.xml"/>
