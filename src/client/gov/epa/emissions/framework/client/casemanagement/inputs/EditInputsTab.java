@@ -79,9 +79,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         this.desktopManager = desktopManager;
         this.changeables = changeables;
 
-        this.inputDir = new TextField("inputdir", 30);
-        this.changeables.addChangeable(inputDir);
-
         super.setLayout(new BorderLayout());
     }
 
@@ -92,12 +89,9 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         this.caseId = caseObj.getId();
         this.presenter = presenter;
         this.session = session;
+        this.inputDir = new TextField("inputdir", 30);
         inputDir.setText(caseObj.getInputFileDir());
-//        inputDir.addKeyListener(new KeyAdapter() {
-//            public void keyTyped(KeyEvent e) {
-//                saveCaseInputFileDir();
-//            }
-//        });
+        this.changeables.addChangeable(inputDir);
         
         try {
             super.add(createLayout(presenter.getCaseInput(caseId), presenter, parentConsole), BorderLayout.CENTER);
@@ -127,7 +121,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     private JPanel tablePanel(CaseInput[] inputs, EmfConsole parentConsole) {
         tableData = new InputsTableData(inputs);
-        //changeables.addChangeable(tableData);
         selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
 
         tablePanel = new JPanel(new BorderLayout());
@@ -285,15 +278,9 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         if (selection == JOptionPane.YES_OPTION) {
             tableData.remove(inputs);
             refresh();
-            //notifychanges();
             presenter.removeInputs(inputs);
         }
     }
-
-//    public void notifychanges() {
-//        tableData.setChanges(true);
-//        tableData.notifyChanges();
-//    }
 
     private void doEditInput(EditInputsTabPresenter presenter) throws EmfException {
         List inputs = getSelectedInputs();
@@ -302,12 +289,11 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
             messagePanel.setMessage("Please select input(s) to edit.");
             return;
         }
-        
 
         for (Iterator iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = (CaseInput) iter.next();
-            EditCaseInputView inputEditor = new EditCaseInputWindow(input.getName() + "(" + input.getId() + ")("
-                    + caseObj.getName() + ")", this, desktopManager);
+            String title = input.getName() + "(" + input.getId() + ")("+ caseObj.getName() + ")";
+            EditCaseInputView inputEditor = new EditCaseInputWindow(title, desktopManager);
             presenter.doEditInput(input, inputEditor);
         }
     }
@@ -387,13 +373,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
             if (type != null && dataset != null  && type.isExternal())
                 external++;
         }
-        
-        // this causes an error if there are any external.  We only want an error if they are all external
-//        if (external > 0)
-//        {
-//            messagePanel.setMessage("Please select some inputs to export which do not use external datasets");
-//            return false;
-//        }
         
         if (count == 0) {
             messagePanel.setMessage("Please select some inputs to export (make sure they have datasets and are not all external)");

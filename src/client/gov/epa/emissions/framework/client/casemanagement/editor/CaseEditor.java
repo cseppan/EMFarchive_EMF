@@ -27,6 +27,8 @@ import java.util.Date;
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class CaseEditor extends DisposableInteralFrame implements CaseEditorView {
 
@@ -46,7 +48,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     }
 
     private JTabbedPane createTabbedPane(Case caseObj, MessagePanel messagePanel) {
-        JTabbedPane tabbedPane = new JTabbedPane();
+        final JTabbedPane tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Summary", createSummaryTab(caseObj, messagePanel));
         tabbedPane.addTab("Parameters", createParameterTab(caseObj));
@@ -56,9 +58,25 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         tabbedPane.addTab("History", new JPanel());
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
+        tabbedPane.addChangeListener(new ChangeListener(){
+            public void stateChanged(ChangeEvent e) {
+                try {
+                    loadComponents(tabbedPane);
+                } catch (EmfException exc) {
+                    showError("Could not load component: "  + tabbedPane.getSelectedComponent().getName());
+                }
+            }
+        });
+        
         return tabbedPane;
     }
     
+    protected void loadComponents(JTabbedPane tabbedPane) throws EmfException {
+        int tabIndex = tabbedPane.getSelectedIndex();
+        String tabTitle = tabbedPane.getTitleAt(tabIndex);
+        presenter.doLoad(tabTitle);
+    }
+
     private JPanel createSummaryTab(Case caseObj, MessagePanel messagePanel) {
         try {
             EditableCaseSummaryTab view = new EditableCaseSummaryTab(caseObj, session, this, parentConsole);
@@ -75,7 +93,6 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
     private Component createParameterTab(Case caseObj) {
         EditableCaseParameterTab view = new EditableCaseParameterTab(caseObj, this);
-        view.display();
         presenter.set(view);
         return view;
     }

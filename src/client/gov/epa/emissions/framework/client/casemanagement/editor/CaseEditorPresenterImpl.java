@@ -28,6 +28,20 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     private Case caseObj;
 
     private List presenters;
+    
+    private EditInputsTabPresenter inputPresenter;
+    
+    private EditOutputsTabPresenter outputPresenter;
+    
+    private EditableCaseParameterTabPresenter parameterPresenter;
+    
+    private EditableCaseSummaryTabPresenter summaryPresenter;
+    
+    private boolean inputsLoaded = false;
+    
+    private boolean outputsLoaded = false;
+    
+    private boolean parametersLoaded = false;
 
     public CaseEditorPresenterImpl(Case caseObj, EmfSession session, CaseEditorView view,
             CaseManagerPresenter managerPresenter) {
@@ -98,22 +112,17 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     }
 
     public void set(EditableCaseSummaryTabView summaryView) {
-        EditableCaseSummaryTabPresenterImpl summaryPresenter = new EditableCaseSummaryTabPresenterImpl(caseObj,
+        summaryPresenter = new EditableCaseSummaryTabPresenterImpl(caseObj,
                 summaryView);
         presenters.add(summaryPresenter);
     }
 
-    public void set(EditInputsTabView inputsView) throws EmfException {
-        EditInputsTabPresenter inputPresenter = new EditInputsTabPresenterImpl(session, inputsView, caseObj);
-        inputPresenter.display();
-        
-        //presenters.add(inputPresenter);
+    public void set(EditInputsTabView inputsView) {
+        inputPresenter = new EditInputsTabPresenterImpl(session, inputsView, caseObj);
     }
 
-    public void set(EditOutputsTabView OutputsView) throws EmfException {
-        EditOutputsTabPresenter outputPresenter = new EditOutputsTabPresenterImpl(session, OutputsView, caseObj);
-        outputPresenter.display();
-        
+    public void set(EditOutputsTabView OutputsView) {
+        outputPresenter = new EditOutputsTabPresenterImpl(session, OutputsView, caseObj);
         presenters.add(outputPresenter);
     }
 
@@ -137,8 +146,26 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     }
 
     public void set(EditableCaseParameterTab parameterview) {
-        EditableCaseParameterTabPresenterImpl parameterPresenter = new EditableCaseParameterTabPresenterImpl(caseObj,
+        parameterPresenter = new EditableCaseParameterTabPresenterImpl(caseObj,
                 parameterview);
         presenters.add(parameterPresenter);
+    }
+
+    public void doLoad(String tabTitle) throws EmfException {
+        if (!inputsLoaded && tabTitle.equalsIgnoreCase("Inputs")) {
+            inputPresenter.display();
+            inputsLoaded = true;
+        }
+
+        if (!parametersLoaded && tabTitle.equalsIgnoreCase("Parameters")) {
+            parameterPresenter.display();
+            parametersLoaded = true;
+        }
+
+        if (!outputsLoaded && tabTitle.equalsIgnoreCase("Outputs")) {
+            outputPresenter.display();
+            outputsLoaded = true;
+        }
+        
     }
 }

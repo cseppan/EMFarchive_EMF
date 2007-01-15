@@ -15,6 +15,10 @@ public class EditableCaseParameterTabPresenterImpl implements EditableCaseParame
         this.caseObj = caseObj;
         this.view = view;
     }
+    
+    public void display() {
+        view.display();
+    }
 
     public void doSave() throws EmfException {
         caseObj.setLastModifiedDate(new Date());

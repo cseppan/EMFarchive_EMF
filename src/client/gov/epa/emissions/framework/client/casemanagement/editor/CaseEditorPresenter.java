@@ -26,4 +26,6 @@ public interface CaseEditorPresenter {
 
     void set(EditableCaseParameterTab parameterview);
 
+    void doLoad(String tabTitle) throws EmfException;
+
 }

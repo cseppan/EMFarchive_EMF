@@ -40,7 +40,7 @@ public class EditableCaseParameterTab extends JPanel implements EditableCasePara
     
     
     
-    void display() {
+    public void display() {
         this.setLayout(new BorderLayout());
         this.add(topPanel(), BorderLayout.NORTH);
         this.add(new JPanel());
