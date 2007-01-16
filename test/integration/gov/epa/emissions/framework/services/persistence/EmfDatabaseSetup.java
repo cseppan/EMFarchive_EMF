@@ -74,6 +74,16 @@ public class EmfDatabaseSetup extends DatabaseSetup {
             public Connection getConnection(String arg0, String arg1) {
                 return connection;
             }
+
+            public boolean isWrapperFor(Class<?> arg0) {
+                // NOTE Auto-generated method stub
+                return false;
+            }
+
+            public <T> T unwrap(Class<T> arg0) {
+                // NOTE Auto-generated method stub
+                return null;
+            }
         };
     }
 
