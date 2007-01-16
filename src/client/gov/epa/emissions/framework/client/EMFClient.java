@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import javax.swing.JFrame;
 
 public class EMFClient {
-    private static final String DEFAULT_URL = "http://localhost:8080/emf/services";// default
+    private static final String DEFAULT_URL = "http://localhost/emf/services";// default
 
     public static void main(String[] args) throws Exception {
         if (args.length == 1 && args[0].equalsIgnoreCase("Help")) {
