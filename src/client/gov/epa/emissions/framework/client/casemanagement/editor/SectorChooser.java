@@ -88,7 +88,7 @@ public class SectorChooser extends JDialog {
 
     private void setSelectedValues() {
         Object[] values = allSectorsListwidget.getSelectedValues();
-        Sector[] selectedValues = (Sector[]) Arrays.asList(values).toArray(new Sector[0]);
+        Sector[] selectedValues = Arrays.asList(values).toArray(new Sector[0]);
         addNewSectors(selectedValues);
     }
 

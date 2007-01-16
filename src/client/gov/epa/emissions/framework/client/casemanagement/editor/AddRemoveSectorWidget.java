@@ -40,7 +40,7 @@ public class AddRemoveSectorWidget extends JPanel {
     }
 
     public Sector[] getSectors() {
-        return (Sector[]) Arrays.asList(sectorsList.getAllElements()).toArray(new Sector[0]);
+        return Arrays.asList(sectorsList.getAllElements()).toArray(new Sector[0]);
     }
 
     private void setupLayout(ManageChangeables changeables) {
