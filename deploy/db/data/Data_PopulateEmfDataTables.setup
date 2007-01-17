@@ -1,3 +1,6 @@
+-- TODO: we need to set all line based dataset types to have a default sort order of LINE_NUMBER
+-- TODO: we need to set all CSV based dataset types to set keywords EXPORT_INLINE_COMMENTS to false and
+--       export_suffix to .csv
 -- emf.users
 insert into emf.users values(DEFAULT,'admin', '1Ojm3qp7H4OB4J4+a4PjbwtoHFw=', 'EMF Administrator', 'UNC', '919-843-8593', 'admin@emf.cep.unc.edu', TRUE, FALSE);
 insert into emf.users values(DEFAULT,'emf', '7Dq/pgn1VOcABL644L59KlfI/eo=', 'EMF User', 'UNC', '919-843-8593', 'emf@emf.cep.unc.edu', FALSE, FALSE);
@@ -130,6 +133,10 @@ insert into emf.qa_programs values(DEFAULT,'Analysis Engine','');
 --
 -- the dataset type id field depends on the order of dataset type table (ORL type being first)
 -- emf.dataset_types_qa_step_templates
+-- TODO: we need to set all line based dataset types to have a default sort order of LINE_NUMBER
+-- TODO: we need to set all CSV based dataset types to set keywords EXPORT_INLINE_COMMENTS to false and
+--       export_suffix to .csv - perhaps these things and the ones below are better done with a Java class
+--       because if the dataset type numbers change, having them in this script won't work
 insert into emf.dataset_types_qa_step_templates values(DEFAULT,'1','0','Summarize by Pollutant','1','select POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by POLL order by POLL',false,'1.0','');
 insert into emf.dataset_types_qa_step_templates values(DEFAULT,'2','0','Summarize by Pollutant','1','select POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by POLL order by POLL',false,'1.0','');
 insert into emf.dataset_types_qa_step_templates values(DEFAULT,'3','0','Summarize by Pollutant','1','select POLL, sum(ann_emis) as ann_emis from $TABLE[1] group by POLL order by POLL',false,'1.0','');
