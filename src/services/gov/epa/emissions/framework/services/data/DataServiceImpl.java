@@ -107,7 +107,7 @@ public class DataServiceImpl implements DataService {
     }
 
     public void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException {
-        String prefix = "DELETED_" + EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(new Date()) + "_";
+        String prefix = "DELETED_" + EmfDateFormat.format_MMDDYYYYHHmmss(new Date()) + "_";
         
         try {
             if (isRemovable(datasets, owner)) {
