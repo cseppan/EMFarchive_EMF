@@ -39,6 +39,12 @@ public class TableColumnWidth {
         // factor(10) is selected by trial and error
         int width = header.length() * 10;
         int dbColumnSize = metaData.getSize() * 10;
+        
+        if (dbColumnSize < 0) { //for column type of String(*) -- text
+            tableColumn.setPreferredWidth(2 * MAX_WIDTH);
+            return;
+        }
+        
         dbColumnSize = (dbColumnSize < MAX_WIDTH) ? dbColumnSize : MAX_WIDTH;
         int preferedWidth = (width > dbColumnSize) ? width : dbColumnSize;
 
