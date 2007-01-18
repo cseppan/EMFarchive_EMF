@@ -1,5 +1,5 @@
 <!-- The contents of this file will be loaded for each web application -->
-<!-- Copy this file META-INF dir with file name 'context.xml' --!>
+<!-- Copy this file META-INF dir with file name context.xml --!>
 <Context>
 <Resource name="jdbc/EMFDB" auth="Container"
           type="javax.sql.DataSource"
