@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -106,10 +107,12 @@ public class DataServiceImpl implements DataService {
     }
 
     public void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException {
+        String prefix = "DELETED_" + EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(new Date()) + "_";
+        
         try {
             if (isRemovable(datasets, owner)) {
                 for (int i = 0; i < datasets.length; i++) {
-                    datasets[i].setName("DEL_" + datasets[i].getName());
+                    datasets[i].setName(prefix + datasets[i].getName());
                     datasets[i].setStatus("Deleted");
                     updateDataset(datasets[i]);
                 }
