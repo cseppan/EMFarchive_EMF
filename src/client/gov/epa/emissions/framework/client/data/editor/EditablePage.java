@@ -55,6 +55,7 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
         }
         list.add(cols[0].getName()); // record_id
         list.add(cols[2].getName()); // version
+        list.add(cols[3].getName()); // deleted versions
 
         return (String[]) list.toArray(new String[0]);
     }
@@ -66,6 +67,7 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
             ColumnMetaData data = tableMetadata.columnMetadata(columnNames[i]);
             classes.add(classType(data.getType()));
         }
+        
         return (Class[]) classes.toArray(new Class[0]);
     }
 
@@ -83,7 +85,7 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
 
     public boolean isEditable(int col) {
         int size = columnNames.length;
-        return (col < size - 2) ? true : false;
+        return (col < size - 3) ? true : false;
     }
 
     private List createRows(Page page) {

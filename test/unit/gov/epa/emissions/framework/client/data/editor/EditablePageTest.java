@@ -56,7 +56,7 @@ public class EditablePageTest extends TestCase {
         tableMetadata.addColumnMetaData(new ColumnMetaData("record_id", "java.lang.Integer", 10));
         tableMetadata.addColumnMetaData(new ColumnMetaData("dataset_id", "java.lang.Long", 10));
         tableMetadata.addColumnMetaData(new ColumnMetaData("version", "java.lang.Long", 10));
-        tableMetadata.addColumnMetaData(new ColumnMetaData("delete_version", "java.lang.String", 10));
+        tableMetadata.addColumnMetaData(new ColumnMetaData("delete_versions", "java.lang.String", 10));
 
         ColumnMetaData col0 = new ColumnMetaData(cols[0], "java.lang.String", 10);
         ColumnMetaData col1 = new ColumnMetaData(cols[1], "java.lang.Double", 10);
@@ -71,24 +71,26 @@ public class EditablePageTest extends TestCase {
 
     public void testShouldHaveThreeColumns() {
         String[] columns = data.columns();
-        assertEquals(6, columns.length);
+        assertEquals(7, columns.length);
         assertEquals("Select", columns[0]);
         assertEquals("col1", columns[1]);
         assertEquals("col2", columns[2]);
         assertEquals("col3", columns[3]);
         assertEquals("record_id", columns[4]);
         assertEquals("version", columns[5]);
+        assertEquals("delete_versions", columns[6]);
     }
 
     public void testShouldCheckColumnClasses() {
         String[] columns = data.columns();
-        assertEquals(6, columns.length);
+        assertEquals(7, columns.length);
         assertEquals(Boolean.class, data.getColumnClass(0));
         assertEquals(String.class, data.getColumnClass(1));
         assertEquals(Double.class, data.getColumnClass(2));
         assertEquals(Integer.class, data.getColumnClass(3));
         assertEquals(Integer.class, data.getColumnClass(4));
         assertEquals(Long.class, data.getColumnClass(5));
+        assertEquals(String.class, data.getColumnClass(6));
     }
 
     public void testShouldSelectAllColumnsWhenSelectAllCalled() {
@@ -111,7 +113,7 @@ public class EditablePageTest extends TestCase {
 
     public void testAllColumnsShouldBeEditableExceptLastTwo() {
         int length = data.columns().length;
-        for (int i = 0; i < length - 2; i++) {
+        for (int i = 0; i < length - 3; i++) {
             assertTrue("All cells should be editable", data.isEditable(i));
         }
         assertFalse("not editable", data.isEditable(length - 2));

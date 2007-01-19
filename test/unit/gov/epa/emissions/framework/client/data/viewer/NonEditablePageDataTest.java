@@ -39,12 +39,13 @@ public class NonEditablePageDataTest extends TestCase {
         ViewablePage data = new ViewablePage(tableMetadata(cols), new Page());
 
         String[] columns = data.columns();
-        assertEquals(5, columns.length);
+        assertEquals(6, columns.length);
         assertEquals(cols[0], columns[0]);
         assertEquals(cols[1], columns[1]);
         assertEquals(cols[2], columns[2]);
         assertEquals("record_id", columns[3]);
         assertEquals("version", columns[4]);
+        assertEquals("delete_version", columns[5]);
     }
 
     public void testShouldMarkAllColumnsAsNotEditable() {

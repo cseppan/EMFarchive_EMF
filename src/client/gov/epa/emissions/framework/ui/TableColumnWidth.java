@@ -39,8 +39,9 @@ public class TableColumnWidth {
         // factor(10) is selected by trial and error
         int width = header.length() * 10;
         int dbColumnSize = metaData.getSize() * 10;
+        String colName = metaData.getName();
         
-        if (dbColumnSize < 0) { //for column type of String(*) -- text
+        if (dbColumnSize < 0 && colName.equalsIgnoreCase("LINES")) { //for line-based tables "lines" col -- text
             tableColumn.setPreferredWidth(2 * MAX_WIDTH);
             return;
         }

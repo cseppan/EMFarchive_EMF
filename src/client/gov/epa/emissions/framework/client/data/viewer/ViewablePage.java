@@ -62,6 +62,7 @@ public class ViewablePage extends AbstractTableData {
         }
         result.add(cols[0].getName());//record_id
         result.add(cols[2].getName());//version
+        result.add(cols[3].getName());//deleted versions
         
         return (String[]) result.toArray(new String[0]);
     }
@@ -94,6 +95,7 @@ public class ViewablePage extends AbstractTableData {
         
         allTokens.add(new Integer(record.getRecordId()));
         allTokens.add(new Long(record.getVersion()));
+        allTokens.add(record.getDeleteVersions());
         
         return allTokens.toArray();
     }
