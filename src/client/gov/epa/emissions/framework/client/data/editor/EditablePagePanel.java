@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.util.ClipBoardCopy;
+import gov.epa.emissions.framework.client.data.ObserverPanel;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
@@ -34,10 +35,13 @@ public class EditablePagePanel extends JPanel {
     private ManageChangeables listOfChangeables;
 
     private DataEditorTable editableTable;
+    
+    private ObserverPanel observer;
 
-    public EditablePagePanel(EditablePage page, MessagePanel messagePanel, ManageChangeables listOfChangeables) {
+    public EditablePagePanel(EditablePage page, ObserverPanel observer, MessagePanel messagePanel, ManageChangeables listOfChangeables) {
         this.listOfChangeables = listOfChangeables;
         this.messagePanel = messagePanel;
+        this.observer = observer;
         super.setLayout(new BorderLayout());
         super.add(doLayout(page), BorderLayout.CENTER);
     }
@@ -161,6 +165,8 @@ public class EditablePagePanel extends JPanel {
         } else {
             messagePanel.setError("Please highlight a row before clicking the insert button");
         }
+        
+        this.observer.update(1);
     }
 
     private int insertRowNumber(boolean above, int selectedRow, DataEditorTable editableTable) {
@@ -178,6 +184,8 @@ public class EditablePagePanel extends JPanel {
         }
 
         tableData.removeSelected();
+        int numOfDeltd = tableData.changeset().getDeletedRecords().length;
+        this.observer.update(-numOfDeltd);
         refresh();
     }
 

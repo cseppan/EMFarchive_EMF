@@ -27,7 +27,7 @@ import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class PaginationPanel extends JPanel {
+public class PaginationPanel extends JPanel implements ObserverPanel {
 
     private NumberFormattedTextField recordInput;
 
@@ -48,6 +48,10 @@ public class PaginationPanel extends JPanel {
     private IconButton prevButton;
 
     private IconButton nextButton;
+
+    private int totalRecords;
+
+    private JLabel totalRecordsLabel;
 
     public PaginationPanel(MessagePanel messagePanel) {
         super(new BorderLayout());
@@ -81,7 +85,7 @@ public class PaginationPanel extends JPanel {
         panel.add(filteredRecords);
 
         panel.add(new JLabel("of"));
-        JLabel totalRecordsLabel = new JLabel("" + totalRecordsCount);
+        totalRecordsLabel = new JLabel("" + totalRecordsCount);
         totalRecordsLabel.setToolTipText("Total number of records in dataset");
         panel.add(totalRecordsLabel);
 
@@ -91,7 +95,7 @@ public class PaginationPanel extends JPanel {
     public void init(TablePresenter presenter) {
         this.presenter = presenter;
         try {
-            int totalRecords = presenter.totalRecords();
+            totalRecords = presenter.totalRecords();
             doLayout(totalRecords);
 
             if (totalRecords == 0)
@@ -179,6 +183,7 @@ public class PaginationPanel extends JPanel {
     }
 
     public void updateFilteredRecordsCount(int filtered) {
+        totalRecordsLabel.setText("" + totalRecords);
         filteredRecords.setText("" + filtered);
         if (filtered == 0) {
             recordInput.setText("0");
@@ -321,6 +326,14 @@ public class PaginationPanel extends JPanel {
         } catch (EmfException e) {
             messagePanel.setError("Could not display First Page." + e.getMessage());
         }
+    }
+
+    public void update(int number) {
+        this.totalRecords = totalRecords + number;
+    }
+
+    public int getPreviousNumber() {
+        return this.totalRecords;
     }
 
 }
