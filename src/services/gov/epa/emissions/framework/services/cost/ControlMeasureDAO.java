@@ -255,4 +255,8 @@ public class ControlMeasureDAO {
         }
     }
 
+    public List allCMClasses(Session session) {
+        return hibernateFacade.getAll(ControlMeasureClass.class, session);
+    }
+
 }

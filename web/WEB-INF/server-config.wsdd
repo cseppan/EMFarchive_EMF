@@ -316,6 +316,15 @@
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.controlStrategy.DoubleValue"
 		qname="ns1:DoubleValue" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasureClass"
+		qname="ns1:ControlMeasureClass" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<arrayMapping qname="ns1:ControlMeasureClasses" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasureClass[]"
+		innerType="ns1:ControlMeasureClass"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		
 	<!-- CASE MANAGEMENT -->
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Case"

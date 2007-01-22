@@ -11,3 +11,4 @@ DROP TABLE emf.control_measurs_sectors;
 DROP TABLE emf.control_technologies CASCADE;
 DROP TABLE emf.pollutants;
 DROP TABLE emf.source_groups;
+DROP TABLE emf.control_measure_classes;

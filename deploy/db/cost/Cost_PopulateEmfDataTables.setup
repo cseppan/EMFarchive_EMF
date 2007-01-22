@@ -47,3 +47,10 @@ insert into emf.source_groups values (DEFAULT, 'Prescribed Burning', 'Prescribed
 insert into emf.source_groups values (DEFAULT, 'Residential Wood Combustion', 'Residential Wood Combustion');
 insert into emf.source_groups values (DEFAULT, 'Conveyorized Charbroilers', 'Conveyorized Charbroilers');
 --emf.source_groups
+
+--emf.control_measure_classes
+insert into emf.control_measure_classes values (DEFAULT, 'Known', 'Known');
+insert into emf.control_measure_classes values (DEFAULT, 'Emerging', 'Emerging');
+insert into emf.control_measure_classes values (DEFAULT, 'Hypothetical', 'Hypothetical');
+insert into emf.control_measure_classes values (DEFAULT, 'Obselete', 'Obselete');
+--emf.control_measure_classes

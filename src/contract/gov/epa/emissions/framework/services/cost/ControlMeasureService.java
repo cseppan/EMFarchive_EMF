@@ -31,5 +31,7 @@ public interface ControlMeasureService extends EMFService {
     CostYearTable getCostYearTable(int targetYear) throws EmfException;
 
     ControlMeasure[] getMeasures(Pollutant pollutant) throws EmfException;
-    
+
+    ControlMeasureClass[] getMeasureClasses() throws EmfException;
+
 }

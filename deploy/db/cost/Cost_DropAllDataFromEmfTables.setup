@@ -16,3 +16,4 @@ DELETE FROM emf.strategy_result_types;
 DELETE FROM emf.pollutants;
 DELETE FROM emf.source_groups;
 DELETE FROM emf.control_technologies;
+DELETE FROM emf.control_measure_classes;

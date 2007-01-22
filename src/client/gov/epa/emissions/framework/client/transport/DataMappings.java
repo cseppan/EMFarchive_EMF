@@ -24,6 +24,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
@@ -110,6 +111,7 @@ public class DataMappings extends Mappings {
         bean(call, ControlStrategyResultsSummary.class, controlStrategyResultsSummary());
         bean(call, StrategyResultType.class, strategyResultType());
         bean(call, CostYearTable.class, costYearTable());
+        bean(call, ControlMeasureClass.class, controlMeasureClass());
     }
 
     private void registerArrays(Call call) {
@@ -157,6 +159,7 @@ public class DataMappings extends Mappings {
         array(call, ControlStrategyResult[].class, controlStrategyResults());
         array(call, EfficiencyRecord[].class, efficiencyRecords());
         array(call, Scc[].class, sccs());
+        array(call, ControlMeasureClass[].class, controlMeasureClasses());
     }
 
     public QName logs() {
@@ -337,6 +340,14 @@ public class DataMappings extends Mappings {
 
     public QName controlMeasures() {
         return qname("ControlMeasures");
+    }
+
+    public QName controlMeasureClass() {
+        return qname("ControlMeasureClass");
+    }
+    
+    public QName controlMeasureClasses() {
+        return qname("ControlMeasureClasses");
     }
 
     public QName controlStrategy() {

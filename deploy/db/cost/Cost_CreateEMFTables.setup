@@ -24,6 +24,16 @@ WITHOUT OIDS;
 -- emf.source_groups
 --
 
+-- emf.control_measure_classes
+CREATE TABLE emf.control_measure_classes
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(64) NOT NULL UNIQUE,
+  description varchar(255)
+) 
+WITHOUT OIDS;
+-- emf.control_measure_classes
+
 -- emf control_technologies
 CREATE TABLE emf.control_technologies
 (
