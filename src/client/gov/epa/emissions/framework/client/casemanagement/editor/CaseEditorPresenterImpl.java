@@ -39,10 +39,6 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     
     private boolean inputsLoaded = false;
     
-    private boolean outputsLoaded = false;
-    
-    private boolean parametersLoaded = false;
-
     public CaseEditorPresenterImpl(Case caseObj, EmfSession session, CaseEditorView view,
             CaseManagerPresenter managerPresenter) {
         this.caseObj = caseObj;
@@ -121,8 +117,9 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         inputPresenter = new EditInputsTabPresenterImpl(session, inputsView, caseObj);
     }
 
-    public void set(EditOutputsTabView OutputsView) {
+    public void set(EditOutputsTabView OutputsView) throws EmfException {
         outputPresenter = new EditOutputsTabPresenterImpl(session, OutputsView, caseObj);
+        outputPresenter.display();
         presenters.add(outputPresenter);
     }
 
@@ -148,6 +145,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     public void set(EditableCaseParameterTab parameterview) {
         parameterPresenter = new EditableCaseParameterTabPresenterImpl(caseObj,
                 parameterview);
+        parameterPresenter.display();
         presenters.add(parameterPresenter);
     }
 
@@ -156,16 +154,5 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
             inputPresenter.display();
             inputsLoaded = true;
         }
-
-        if (!parametersLoaded && tabTitle.equalsIgnoreCase("Parameters")) {
-            parameterPresenter.display();
-            parametersLoaded = true;
-        }
-
-        if (!outputsLoaded && tabTitle.equalsIgnoreCase("Outputs")) {
-            outputPresenter.display();
-            outputsLoaded = true;
-        }
-        
     }
 }
