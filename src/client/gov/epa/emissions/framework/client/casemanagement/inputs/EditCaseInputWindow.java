@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.casemanagement.inputs;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
-import gov.epa.emissions.commons.gui.buttons.OKButton;
+import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
@@ -63,7 +63,7 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
 
-        ok = new OKButton(new AbstractAction() {
+        ok = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doSave();
             }
