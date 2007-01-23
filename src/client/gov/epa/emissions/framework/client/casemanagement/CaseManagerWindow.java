@@ -227,6 +227,14 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     }
 
     private void removeSelectedCases() {
+        clearMsgPanel();
+        List selected = selected();
+
+        if (selected.isEmpty()) {
+            messagePanel.setMessage("Please select one or more cases to remove.");
+            return;
+        }
+        
         String title = "Warning";
         String message = "Are you sure you want to remove the selected case(s)?";
         int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
@@ -236,7 +244,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             return;
         }
         
-        for (Iterator iter = selected().iterator(); iter.hasNext();) {
+        for (Iterator iter = selected.iterator(); iter.hasNext();) {
             Case element = (Case) iter.next();
             try {
                 presenter.doRemove(element);

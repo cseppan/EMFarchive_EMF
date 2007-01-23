@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.ui.ListWidget;
@@ -17,20 +18,26 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class EditControlStrategyMeasuresTab extends JPanel implements EditControlStrategyTabView {
+public class EditControlStrategyMeasuresTab extends JPanel implements ControlStrategyMeasuresTabView {
 
     private ListWidget classesList;
     
-    private String[] classes = { "Known", "Emerging", "Hypothetical", "Obselete" };
+    private ControlMeasureClass[] classes;
+
+    private EditControlStrategyMeasuresTabPresenter presenter;
+
+    private ManageChangeables changeablesList;
     
     public EditControlStrategyMeasuresTab(ControlStrategy controlStrategy, ManageChangeables changeablesList,
-            SingleLineMessagePanel messagePanel, EmfConsole parentConsole, EmfSession session) throws EmfException {
-        setupLayout(changeablesList);
-        
-        if (false)
-            throw new EmfException("Under construction...");
+            SingleLineMessagePanel messagePanel, EmfConsole parentConsole, EmfSession session) {
+        this.changeablesList = changeablesList;
     }
 
+    public void display(ControlStrategy strategy) throws EmfException {
+        this.classes = presenter.getAllClasses();
+        setupLayout(changeablesList);
+    }
+    
     private void setupLayout(ManageChangeables changeables) {
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createEmptyBorder(50,50,0,300));
@@ -59,6 +66,10 @@ public class EditControlStrategyMeasuresTab extends JPanel implements EditContro
     public void refresh(ControlStrategyResult controlStrategyResult) {
         // NOTE Auto-generated method stub
 
+    }
+
+    public void observe(EditControlStrategyMeasuresTabPresenter presenter) {
+        this.presenter = presenter;
     }
 
 }

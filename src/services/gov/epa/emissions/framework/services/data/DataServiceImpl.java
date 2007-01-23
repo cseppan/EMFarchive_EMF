@@ -112,6 +112,8 @@ public class DataServiceImpl implements DataService {
         try {
             if (isRemovable(datasets, owner)) {
                 for (int i = 0; i < datasets.length; i++) {
+                    if(datasets[i].getStatus().equalsIgnoreCase("Deleted"))
+                        continue;
                     datasets[i].setName(prefix + datasets[i].getName());
                     datasets[i].setStatus("Deleted");
                     updateDataset(datasets[i]);

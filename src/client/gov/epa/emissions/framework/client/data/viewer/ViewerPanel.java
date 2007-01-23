@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.ui.TableColumnWidth;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -95,10 +96,11 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
     }
 
     private ScrollableTable table(Page page) {
+        Font monospacedFont = new Font("Monospaced", Font.LAYOUT_NO_LIMIT_CONTEXT, 12);
         tableModel = new EmfTableModel(new ViewablePage(tableMetadata, page));
         JTable viewTable = new JTable(tableModel);
         viewTableConfig(viewTable);
-        table = new ScrollableTable(viewTable);
+        table = new ScrollableTable(viewTable, monospacedFont);
         addCopyPasteClipBoard(viewTable);
         return table;
     }

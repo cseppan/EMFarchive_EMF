@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.ui.ScrollableTable;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 
@@ -99,11 +100,12 @@ public class EditablePagePanel extends JPanel {
     }
 
     private JScrollPane table(EditablePage tableData) {
+        Font monospacedFont = new Font("Monospaced", Font.LAYOUT_NO_LIMIT_CONTEXT, 12);
         tableModel = new EditableEmfTableModel(tableData);
         editableTable = new DataEditorTable(tableModel, tableData.getTableMetadata(), messagePanel);
         listOfChangeables.addChangeable(editableTable);
 
-        table = new ScrollableTable(editableTable);
+        table = new ScrollableTable(editableTable, monospacedFont);
         addCopyPasteClipBoard(editableTable);
         return table;
     }

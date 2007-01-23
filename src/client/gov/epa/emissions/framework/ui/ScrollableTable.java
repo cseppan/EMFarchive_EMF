@@ -12,19 +12,21 @@ import javax.swing.table.TableColumnModel;
 public class ScrollableTable extends JScrollPane {
 
     private JTable table;
-    
-    private Font tableCellFont = new Font("Monospaced",Font.LAYOUT_NO_LIMIT_CONTEXT,12);
 
-    public ScrollableTable(EmfTableModel tableModel) {
+    private Font tableCellFont;
+
+    public ScrollableTable(EmfTableModel tableModel, Font font) {
         super(VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
+        this.tableCellFont = font;
         table = table(tableModel);
         super.setViewportView(table);
     }
 
-    public ScrollableTable(JTable table) {
+    public ScrollableTable(JTable table, Font font) {
         super(VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.table = table;
+        this.tableCellFont = font;
         table(table);
         super.setViewportView(table);
     }
@@ -32,7 +34,9 @@ public class ScrollableTable extends JScrollPane {
     private void table(JTable table) {
         table.setRowHeight(18);
 
-        table.setFont(this.tableCellFont);
+        if (tableCellFont != null)
+            table.setFont(this.tableCellFont);
+       
         enableScrolling(table);
         table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         table.setRowSelectionAllowed(true);
@@ -84,7 +88,7 @@ public class ScrollableTable extends JScrollPane {
         int total = table.getModel().getRowCount();
         table.setRowSelectionInterval(total - 1, total - 1);
     }
-    
+
     public void resetTextFont(Font font) {
         table.setFont(font);
     }

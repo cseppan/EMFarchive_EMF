@@ -24,8 +24,8 @@ public class RetrieveSCCTest extends ServiceTestCase {
         cm.setAbbreviation("12345678");
         Scc scc0 = new Scc("0ABBBBBB", "");
         Scc scc1 = new Scc("10100101", "");
-        Scc scc2 = new Scc("10100226", "");
-        Scc scc3 = new Scc("10100225", "");
+        Scc scc2 = new Scc("10100225", "");
+        Scc scc3 = new Scc("10100226", "");
         Scc scc4 = new Scc("4BBBBBBB", "");
 
         // These scc numbers have to exist in the reference.scc table

@@ -250,6 +250,9 @@ public class DatasetDAO {
 
     private void renameEmissionTable(EmfDataset dataset, Session session) throws Exception {
         EmfDataset oldDataset = getDataset(session, dataset.getId());
+        if (oldDataset == null)
+            return;
+        
         if (dataset.getName().equalsIgnoreCase(oldDataset.getName()))
             return;
 
@@ -258,14 +261,17 @@ public class DatasetDAO {
         try {
             Datasource datasource = dbServer.getEmissionsDatasource();
             DatasetType type = dataset.getDatasetType();
-            InternalSource source = dataset.getInternalSources()[0];
+            InternalSource[] sources = dataset.getInternalSources();
+            if(sources == null || sources.length == 0) {
+                return;
+            }
 
             if (type.getTablePerDataset() == 1) {
                 DataTable table = new DataTable(oldDataset, datasource);
                 String oldTableName = oldDataset.getInternalSources()[0].getTable();
                 String newTableName = table.createName(dataset.getName());
                 
-                source.setTable(newTableName);
+                sources[0].setTable(newTableName);
                 table.rename(oldTableName, newTableName);
             }
         } finally {

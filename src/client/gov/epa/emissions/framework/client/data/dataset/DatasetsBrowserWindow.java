@@ -429,6 +429,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     public void refresh(EmfDataset[] datasets) {
+        clearMessage();
         recreateBrowserPanel(datasets);
         super.refreshLayout();
     }
@@ -440,7 +441,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     public void clearMessage() {
         messagePanel.clear();
-        super.refreshLayout();
+        //super.refreshLayout();
     }
 
     public void doRefresh() throws EmfException {

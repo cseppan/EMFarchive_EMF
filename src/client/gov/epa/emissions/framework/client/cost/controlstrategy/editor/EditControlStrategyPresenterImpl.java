@@ -149,4 +149,10 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         }
     }
 
+    public void set(ControlStrategyMeasuresTabView view) throws EmfException {
+        EditControlStrategyMeasuresTabPresenter presenter = new EditControlStrategyMeasuresTabPresenter(view,
+                controlStrategy, session);
+        presenter.doDisplay();
+    }
+
 }

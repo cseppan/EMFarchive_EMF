@@ -148,13 +148,14 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
 
     private JPanel createMeasuresTab(ControlStrategy controlStrategy) {
-        EditControlStrategyTabView view = null;
+        ControlStrategyMeasuresTabView view = null;
         try {
             view = new EditControlStrategyMeasuresTab(controlStrategy, this,  messagePanel, parentConsole, session);
+            this.presenter.set(view);
         } catch (EmfException e) {
             showError("Could not create Inventory tab.");
         }
-        this.presenter.set(view);
+        
         return (JPanel) view;
     }
     

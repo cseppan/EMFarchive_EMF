@@ -196,6 +196,8 @@ public class CaseServiceImpl implements CaseService {
     public void removeCase(Case element) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
+            List inputs = dao.getCaseInputs(element.getId(), session);
+            dao.removeCaseInputs((CaseInput[])inputs.toArray(new CaseInput[0]), session);
             dao.remove(element, session);
             session.close();
         } catch (RuntimeException e) {

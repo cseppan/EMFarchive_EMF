@@ -463,6 +463,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     public void refresh(ControlMeasure[] measures) {
+        clearMessage();
         try {
             setupTableModel(measures);
             panelRefresh();
