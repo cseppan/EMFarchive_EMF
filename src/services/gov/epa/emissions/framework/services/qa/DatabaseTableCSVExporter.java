@@ -3,14 +3,14 @@ package gov.epa.emissions.framework.services.qa;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.OptimizedQuery;
 import gov.epa.emissions.commons.io.ColumnMetaData;
+import gov.epa.emissions.commons.io.CustomCharSetOutputStreamWriter;
 import gov.epa.emissions.commons.io.ExportStatement;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.io.SimpleExportStatement;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
@@ -43,7 +43,8 @@ public class DatabaseTableCSVExporter implements Exporter {
     private PrintWriter printWriter(File file) throws ExporterException {
         PrintWriter writer = null;
         try {
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            //writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            writer = new PrintWriter(new CustomCharSetOutputStreamWriter(new FileOutputStream(file)));
         } catch (IOException e) {
             throw new ExporterException("Could not open file - " + file + " for writing");
         }

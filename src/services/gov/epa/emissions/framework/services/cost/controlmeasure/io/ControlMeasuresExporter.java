@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
+import gov.epa.emissions.commons.io.CustomCharSetOutputStreamWriter;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.security.User;
@@ -13,9 +14,8 @@ import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
@@ -64,7 +64,8 @@ public class ControlMeasuresExporter implements Exporter {
     private PrintWriter openExportFile(String fileName) throws IOException {
         File file = new File(folder, prefix + fileName);
         
-        return new PrintWriter(new BufferedWriter(new FileWriter(file)));
+//        return new PrintWriter(new BufferedWriter(new FileWriter(file)));
+        return new PrintWriter(new CustomCharSetOutputStreamWriter(new FileOutputStream(file)));
     }
     
     private void writeExportFiles() throws IOException {
