@@ -141,7 +141,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         try {
             view = new EditControlStrategyAppliedMeasuresTab(controlStrategy, this,  messagePanel, parentConsole, session);
         } catch (EmfException e) {
-            showError("Could not create Inventory tab.");
+            showError("Could not create Applied Measures tab.");
         }
         this.presenter.set(view);
         return (JPanel) view;
@@ -153,7 +153,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
             view = new EditControlStrategyMeasuresTab(controlStrategy, this,  messagePanel, parentConsole, session);
             this.presenter.set(view);
         } catch (EmfException e) {
-            showError("Could not create Inventory tab.");
+            showError("Could not create Measures tab.");
         }
         
         return (JPanel) view;
