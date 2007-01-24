@@ -23,17 +23,21 @@ insert into emf.control_technologies values (DEFAULT, 'ESP for Commercial Cookin
 
 
 --emf.pollutants
-insert into emf.pollutants values (DEFAULT, 'NOx', 'NOx');
-insert into emf.pollutants values (DEFAULT, 'PM10', 'PM10');
-insert into emf.pollutants values (DEFAULT, 'PM2.5', 'PM2.5');
-insert into emf.pollutants values (DEFAULT, 'SO2', 'SO2');
-insert into emf.pollutants values (DEFAULT, 'VOC', 'VOC');
-insert into emf.pollutants values (DEFAULT, 'CO', 'CO');
-insert into emf.pollutants values (DEFAULT, 'CO2', 'CO2');
-insert into emf.pollutants values (DEFAULT, 'EC', 'EC');
-insert into emf.pollutants values (DEFAULT, 'OC', 'OC');
-insert into emf.pollutants values (DEFAULT, 'NH3', 'NH3');
-insert into emf.pollutants values (DEFAULT, 'Hg', 'Hg');
+insert into emf.pollutants values (DEFAULT, 'NOx', 'Nitrogen Oxides');
+insert into emf.pollutants values (DEFAULT, 'PM10', 'Particulate Matter < 10 um');
+insert into emf.pollutants values (DEFAULT, 'PM2.5', 'Particular Mater < 2.5 um');
+insert into emf.pollutants values (DEFAULT, 'SO2', 'Sulfur Dioxide');
+insert into emf.pollutants values (DEFAULT, 'VOC', 'Volatile Organic Compounds');
+insert into emf.pollutants values (DEFAULT, 'CO', 'Carbon Monoxide');
+insert into emf.pollutants values (DEFAULT, 'CO2', 'Carbon Dioxide');
+insert into emf.pollutants values (DEFAULT, 'EC', 'Elemental Carbon');
+insert into emf.pollutants values (DEFAULT, 'OC', 'Organic Carbon');
+insert into emf.pollutants values (DEFAULT, 'NH3', 'Ammonia');
+insert into emf.pollutants values (DEFAULT, 'Hg', 'Mercury');
+insert into emf.pollutants values (DEFAULT, 'HFC', 'Hydrofluorocarbons');
+insert into emf.pollutants values (DEFAULT, 'PFC', 'PFC');
+insert into emf.pollutants values (DEFAULT, 'SF6', 'Sulfur Hexafluoride');
+insert into emf.pollutants values (DEFAULT, 'N20', 'Dinitrogen Oxide');
 --emf.pollutants
 
 --emf.source_groups
