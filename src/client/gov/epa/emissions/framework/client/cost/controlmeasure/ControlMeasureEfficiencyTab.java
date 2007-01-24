@@ -208,7 +208,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     }
 
     private EfficiencyRecord[] getSelectedRecords() {
-        return (EfficiencyRecord[]) selectModel.selected().toArray(new EfficiencyRecord[0]);
+        return selectModel.selected().toArray(new EfficiencyRecord[0]);
     }
 
     public void refreshData() {
