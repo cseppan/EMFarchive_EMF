@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.Changeable;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
-import gov.epa.emissions.commons.gui.buttons.OKButton;
+import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
@@ -73,7 +73,7 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
 
     private JPanel buttonsPanel(final CaseInput[] inputs) {
         JPanel panel = new JPanel();
-        Button ok = new OKButton(new AbstractAction() {
+        Button ok = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     doNew(inputs);

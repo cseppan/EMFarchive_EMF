@@ -21,6 +21,9 @@ public class CaseInputNames {
     }
 
     public InputName get(Object selected) throws EmfException {
+        if (selected == null)
+            throw new EmfException("Input name field can not be empty");
+        
         if (selected instanceof String) {
             return editInputNameType(selected);
 
