@@ -21,6 +21,8 @@ public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
 
     private SortCriteria sortCriteria;
 
+    private SortFilterSelectionPanel sortFilterSelectionpanel;
+
     public SelectableSortFilterWrapper(EmfConsole parentConsole, TableData tableData, SortCriteria criteria) {
         this.setLayout(new BorderLayout());
         this.parentConsole = parentConsole;
@@ -37,11 +39,11 @@ public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
     }
 
     private JScrollPane sortFilterPane(EmfConsole parentConsole, SortFilterSelectModel selectModel) {
-        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        panel.sort(sortCriteria);
-        panel.setPreferredSize(new Dimension(450, 120));
+        sortFilterSelectionpanel = new SortFilterSelectionPanel(parentConsole, selectModel);
+        sortFilterSelectionpanel.sort(sortCriteria);
+        sortFilterSelectionpanel.setPreferredSize(new Dimension(450, 120));
 
-        return new JScrollPane(panel);
+        return new JScrollPane(sortFilterSelectionpanel);
     }
 
     public void refresh(TableData tableData) {
@@ -51,11 +53,17 @@ public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
     }
 
     public List<?> selected() {
-        return selectModel.selected();
+        int[] selectedIndexes = topModelSelectedIndexes();
+        return selectModel.selected(selectedIndexes);
+    }
+
+    private int[] topModelSelectedIndexes() {
+        int[] selectedIndexes = sortFilterSelectionpanel.getSelectedIndexes();
+        return selectedIndexes;
     }
 
     public int getSelectedCount() {
-        return selectModel.getSelectedCount();
+        return selectModel.getSelectedCount(topModelSelectedIndexes());
     }
 
 }
