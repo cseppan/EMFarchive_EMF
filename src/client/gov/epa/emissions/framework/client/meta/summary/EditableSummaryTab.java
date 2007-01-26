@@ -103,21 +103,6 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     }
 
     private JPanel createLowerRightSection(Version[] versions) throws EmfException {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-
-        panel.add(createStatusDatesAndIntendedUsePanel(), BorderLayout.PAGE_START);
-        panel.add(createDefaultVersionPanel(versions), BorderLayout.CENTER);
-
-        return panel;
-    }
-
-    private JPanel createDefaultVersionPanel(Version[] versions) {
-        defaultVersionPanel = new DefaultVersionPanel(dataset, versions, changeablesList);
-        return defaultVersionPanel;
-    }
-
-    private JPanel createStatusDatesAndIntendedUsePanel() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -131,8 +116,9 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
         setupIntendedUseCombo();
         layoutGenerator.addLabelWidgetPair("Intended Use: ", intendedUseCombo, panel);
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+        defaultVersionPanel = new DefaultVersionPanel(dataset, versions, changeablesList, messagePanel);
+        layoutGenerator.addLabelWidgetPair("Default Version:", defaultVersionPanel, panel);
+        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
         return panel;
@@ -282,7 +268,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         dataset.setCountry((Country) countriesCombo.getSelectedItem());
         dataset.setSectors(new Sector[] { (Sector) sectorsCombo.getSelectedItem() });
         updateIntendedUse();
-        defaultVersionPanel.updateDataset();
+        dataset.setDefaultVersion(defaultVersionPanel.getSelectedDefaultVersionNum());
     }
 
     private void updateProject() {
