@@ -32,6 +32,7 @@ public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
 
     private JScrollPane setLayout(EmfConsole parentConsole, TableData tableData) {
         EmfTableModel model = new EmfTableModel(tableData);
+        //get the old sort & filter criteria before creating new SortFilterSelectionPanel
         SortFilterSelectModel selectModel = new SortFilterSelectModel(model);
         this.selectModel = selectModel;
         selectModel.refresh();
@@ -65,5 +66,20 @@ public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
     public int getSelectedCount() {
         return selectModel.getSelectedCount(topModelSelectedIndexes());
     }
+    
+    //update()
+    
+    //add()
+    
+    //remove();
+    
+    //notes
+    
+    //1. Before recreates the new model, get the sort criteria and filter criteria from the overall table model
+        //SortFilterSelctionPanel extends SortFilterPanel
+        //SortFilterPanel has OverallTableModel
+        //OverallTableModel has SortTableModel and FilterTableModel
+     //2 Recreates the new SortFilterSelectionPanel and then set the old sort and filter 
+        //criteria to the new model
 
 }
