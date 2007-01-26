@@ -32,6 +32,16 @@ public class VersionsSet {
         return (Integer[]) list.toArray(new Integer[0]);
     }
 
+    public Version[] finalVersionObjects() {
+        List list = new ArrayList();
+        for (int i = 0; i < versions.length; i++) {
+            if (versions[i].isFinalVersion())
+                list.add(versions[i]);
+        }
+
+        return (Version[]) list.toArray(new Version[0]);
+    }
+    
     public String[] namesOfFinalVersions() {
         List list = new ArrayList();
         for (int i = 0; i < versions.length; i++) {
