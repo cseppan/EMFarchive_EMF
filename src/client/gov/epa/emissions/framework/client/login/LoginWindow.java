@@ -46,7 +46,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
     private ServiceLocator serviceLocator;
 
     public LoginWindow(ServiceLocator serviceLocator) {
-        super("Login", "Login to the Emissions Modeling Framework [v1.8 - 1/23/2007]");
+        super("Login", "Login to the Emissions Modeling Framework [v1.8 - 1/25/2007]");
         this.serviceLocator = serviceLocator;
 
         JPanel layoutPanel = createLayout();
