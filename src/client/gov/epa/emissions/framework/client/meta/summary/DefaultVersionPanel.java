@@ -5,12 +5,8 @@ import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.ui.MessagePanel;
 
-import java.awt.Dimension;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class DefaultVersionPanel extends JPanel {
@@ -18,58 +14,56 @@ public class DefaultVersionPanel extends JPanel {
     private EmfDataset dataset;
 
     private Version[] versions;
+    
+    private ComboBox versionCombo; 
+    
+    private MessagePanel messagePanel;
 
-    protected String selected;
-
-    public DefaultVersionPanel(EmfDataset dataset, Version[] versions, ManageChangeables changeables) {
+    public DefaultVersionPanel(EmfDataset dataset, Version[] versions, ManageChangeables changeables,
+       MessagePanel messagePanel) {
         this.dataset = dataset;
         this.versions = versions;
+        this.messagePanel = messagePanel;
 
         createLayout(changeables);
     }
 
     private void createLayout(ManageChangeables changeables) {
-        super.add(new JLabel("Default Version:"));
+        //super.add(new JLabel("Default Version:"));
 
-        ComboBox combo = comboBox(changeables);
-        combo.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                selected = e.getItem().toString();
-            }
-        });
-
-        super.add(combo);
-    }
-
-    private ComboBox comboBox(ManageChangeables changeables) {
+        int defaultVersionNum = dataset.getDefaultVersion();
         VersionsSet versionsSet = new VersionsSet(versions);
-        selected = getDefaultVersion(versionsSet);
-
-        ComboBox combo = new ComboBox(selected, labels(versionsSet));
-        combo.setName("defaultVersions");
-        combo.setPreferredSize(new Dimension(175, 20));
-
-        combo.setSelectedItem(selected);
-        changeables.addChangeable(combo);
-
-        return combo;
-    }
-
-    private String[] labels(VersionsSet versionsSet) {
-        return versionsSet.nameAndNumbers();
-    }
-
-    private String getDefaultVersion(VersionsSet versionsSet) {
-        int ver = dataset.getDefaultVersion();
-        return versionsSet.getVersionName(ver) + " (" + ver + ")";
-    }
-
-    public void updateDataset() {
-        int forPerenth = selected.indexOf('(');
-        int backPerenth = selected.indexOf(')');
+        Version [] finalVersions = versionsSet.finalVersionObjects();
+        versionCombo = new ComboBox(finalVersions);
+        versionCombo.setSelectedIndex(getIndexOfDefaultVersion(defaultVersionNum, finalVersions));
         
-        int version = Integer.parseInt(selected.substring(forPerenth+1, backPerenth));
-        dataset.setDefaultVersion(version);
+        versionCombo.setName("defaultVersions");
+
+        changeables.addChangeable(versionCombo);
+
+        super.add(versionCombo);
+    }
+
+    private int getIndexOfDefaultVersion(int defaultVersionNum, Version[] finalVersions) {
+        int i = 0;
+        while ((finalVersions[i].getVersion() != defaultVersionNum) && (i < finalVersions.length)) 
+        {
+            i++;
+        }    
+        // if in a previous version, the user had set the default version to a nonfinal version,
+        // set the default version back to 0
+        if (i == finalVersions.length) 
+        {
+          i = 0;
+          messagePanel.setMessage("Resetting default version back to zero from non-final version");
+        }
+        return i;
+    }
+    
+
+    public int getSelectedDefaultVersionNum()
+    {
+        return ((Version)versionCombo.getSelectedItem()).getVersion();
     }
 
 }
