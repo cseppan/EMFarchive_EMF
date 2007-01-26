@@ -28,19 +28,19 @@
    					name="program" 
         			class="gov.epa.emissions.framework.services.casemanagement.CaseProgram"
         			column="program_id"
-        			update="false" insert="true"/>  
+        			insert="true"/>  
 
     			<many-to-one
    					name="subdirObj" 
         			class="gov.epa.emissions.framework.services.casemanagement.SubDir"
         			column="subdir_id"
-        			update="false" insert="true"/>  
+        			insert="true"/>  
         			
     			<many-to-one
    					name="envtVars" 
         			class="gov.epa.emissions.framework.services.casemanagement.InputEnvtVar"
         			column="envt_vars_id"
-        			update="false" insert="true"/>  
+        			insert="true"/>  
  
     			<many-to-one
    					name="dataset" 
