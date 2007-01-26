@@ -17,6 +17,7 @@ import gov.epa.emissions.framework.client.data.ControlTechnologies;
 import gov.epa.emissions.framework.client.data.SourceGroups;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -73,7 +74,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     protected EmfSession session;
 
-    private String[] classes = { "Known", "Emerging", "Hypothetical", "Obselete" };
+    private ControlMeasureClass[] allClasses;
 
     protected int deviceId, year;
 
@@ -113,7 +114,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         majorPollutant.setSelectedItem(measure.getMajorPollutant());
         sourceGroup.setSelectedItem(measure.getSourceGroup());
         controlTechnology.setSelectedItem(measure.getControlTechnology());
-        cmClass.setSelectedItem(getText(measure.getCmClass()));
+        cmClass.setSelectedItem(measure.getCmClass());
+//        cmClass.setSelectedItem(getText(measure.getCmClass()));
         // costYear.setText(measure.getCostYear() + "");
         deviceCode.setText(measure.getDeviceCode() + "");
         equipmentLife.setText(measure.getEquipmentLife() + "");
@@ -245,7 +247,12 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        cmClass = new ComboBox("Choose a class", classes);
+        try {
+            allClasses = session.controlMeasureService().getMeasureClasses();
+            cmClass = new ComboBox("Choose a class", allClasses);
+        } catch (EmfException e1) {
+            messagePanel.setError("Could not retrieve control measure classes");
+        }
         changeablesList.addChangeable(cmClass);
         layoutGenerator.addLabelWidgetPair("Class:", cmClass, panel);
 
@@ -305,7 +312,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         updateControlTechnology();
         updateSourceGroup();
         updateDateReviewed(measure);
-        measure.setCmClass(selectedClass(cmClass.getSelectedItem()));
+        updateClass();
+//        measure.setCmClass(selectedClass(cmClass.getSelectedItem()));
         measure.setLastModifiedTime(new Date());
         measure.setAbbreviation(abbreviation.getText());
         measure.setDataSouce(dataSources.getText());
@@ -326,9 +334,9 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         }
     }
 
-    private String selectedClass(Object selectedItem) {
-        return selectedItem == null ? "" : selectedItem + "";
-    }
+//    private String selectedClass(Object selectedItem) {
+//        return selectedItem == null ? "" : selectedItem + "";
+//    }
 
     private void updateControlTechnology() {
         Object selected = controlTechnology.getSelectedItem();
@@ -374,6 +382,11 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     private void updatePollutant() {
         Object selected = majorPollutant.getSelectedItem();
         measure.setMajorPollutant((Pollutant) selected);
+    }
+
+    private void updateClass() {
+        Object selected = cmClass.getSelectedItem();
+        measure.setCmClass((ControlMeasureClass) selected);
     }
 
     private void validateFields() throws EmfException {

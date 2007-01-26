@@ -267,4 +267,16 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
+    public ControlMeasureClass[] getControlMeasureClasses(int controlStrategyId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            List all = dao.getControlMeasureClasses(controlStrategyId, session);
+            return (ControlMeasureClass[]) all.toArray(new ControlMeasureClass[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve control measure classes.", e);
+            throw new EmfException("Could not retrieve control measure classes.");
+        } finally {
+            session.close();
+        }
+    }
 }

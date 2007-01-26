@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.services.cost.StrategyType;
@@ -155,6 +156,16 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.setReturnType(mappings.string());
 
         return (String) call.requestResponse(new Object[] { new Integer(id) });
+    }
+
+    public ControlMeasureClass[] getControlMeasureClasses(int controlStrategyId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getControlMeasureClasses");
+        call.addIntParam();
+        call.setReturnType(mappings.controlMeasureClasses());
+
+        return (ControlMeasureClass[]) call.requestResponse(new Object[] { new Integer(controlStrategyId) });
     }
 
 }

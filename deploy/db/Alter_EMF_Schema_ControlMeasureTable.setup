@@ -1,0 +1,12 @@
+-- Add new control measure class id to table..
+ALTER TABLE emf.control_measures ADD COLUMN cm_class_id int4 REFERENCES emf.control_measure_classes(id);
+
+-- update new cm_class_id based on current cm_class string setting...
+update emf.control_measures
+set cm_class_id = emf.control_measure_classes.id
+from emf.control_measure_classes
+where emf.control_measure_classes.name = emf.control_measures.cm_class;
+
+-- get rid of cm_class column...
+ALTER TABLE emf.control_measures DROP COLUMN cm_class
+

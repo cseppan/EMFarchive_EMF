@@ -19,12 +19,16 @@ public class EditControlStrategyMeasuresTabPresenter {
         this.view = view;
     }
     
-    public void doDisplay() throws EmfException {
+    public void doDisplay() throws EmfException  {
         view.observe(this);
         view.display(this.strategy);
     }
-    
+
     public ControlMeasureClass[] getAllClasses() throws EmfException {
         return session.controlMeasureService().getMeasureClasses();
+    }
+
+    public ControlMeasureClass[] getControlMeasureClasses(int controlStrategyId) throws EmfException {
+        return session.controlStrategyService().getControlMeasureClasses(controlStrategyId);
     }
 }

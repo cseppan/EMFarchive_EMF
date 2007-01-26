@@ -28,6 +28,10 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     private EditControlStrategySummaryTabPresenter summaryTabPresenter;
 
+    private EditControlStrategyMeasuresTabPresenter measuresTabPresenter;
+    
+    private boolean inputsLoaded = false;
+    
     public EditControlStrategyPresenterImpl(ControlStrategy controlStrategy, EmfSession session,
             EditControlStrategyView view, ControlStrategiesManagerPresenter controlStrategiesManagerPresenter) {
         this.controlStrategy = controlStrategy;
@@ -149,10 +153,17 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         }
     }
 
-    public void set(ControlStrategyMeasuresTabView view) throws EmfException {
-        EditControlStrategyMeasuresTabPresenter presenter = new EditControlStrategyMeasuresTabPresenter(view,
+    public void set(ControlStrategyMeasuresTabView view) {
+        measuresTabPresenter = new EditControlStrategyMeasuresTabPresenter(view,
                 controlStrategy, session);
-        presenter.doDisplay();
+//        measuresTabPresenter.doDisplay();
+        presenters.add(measuresTabPresenter);
     }
 
+    public void doLoad(String tabTitle) throws EmfException {
+        if (!inputsLoaded && tabTitle.equalsIgnoreCase("Measures")) {
+            measuresTabPresenter.doDisplay();
+            inputsLoaded = true;
+        }
+    }
 }

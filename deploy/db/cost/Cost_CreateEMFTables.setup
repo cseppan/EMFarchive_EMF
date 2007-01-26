@@ -52,7 +52,7 @@ CREATE TABLE emf.control_measures
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE,
   abbreviation varchar(10) NOT NULL UNIQUE,
-  cm_class varchar(64),
+  cm_class_id int4 REFERENCES emf.control_measure_classes(id),
   description text,
   device_code int4,
   equipment_life real,
@@ -166,6 +166,18 @@ CREATE TABLE emf.control_strategies
 ) 
 WITHOUT OIDS;
 -- emf.control_strategies
+
+-- emf.control_strategy_classes
+CREATE TABLE emf.control_strategy_classes
+(
+  id SERIAL PRIMARY KEY,
+  control_strategy_id int4 NOT NULL REFERENCES emf.control_strategies(id) ,
+  control_measure_class_id int4 REFERENCES emf.control_measure_classes (id),
+  list_index int4,
+  UNIQUE (control_strategy_id,control_measure_class_id) 
+) 
+WITHOUT OIDS;
+-- emf.control_strategy_classes
 
 -- emf.input_datasets_control_strategies
 CREATE TABLE emf.input_datasets_control_strategies

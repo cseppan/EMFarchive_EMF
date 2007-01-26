@@ -32,5 +32,7 @@ public interface ControlStrategyService extends EMFService {
     ControlStrategyResult controlStrategyResults(ControlStrategy controlStrategy) throws EmfException;
     
     String controlStrategyRunStatus(int id) throws EmfException;
-    
+
+    public ControlMeasureClass[] getControlMeasureClasses(int controlStrategyId) throws EmfException;
+
 }

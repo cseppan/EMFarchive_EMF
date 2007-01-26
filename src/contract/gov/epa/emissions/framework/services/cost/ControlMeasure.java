@@ -36,7 +36,7 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private float annualizedCost;
 
-    private String cmClass;
+    private ControlMeasureClass cmClass;
 
     private String abbreviation;
 
@@ -184,11 +184,11 @@ public class ControlMeasure implements Lockable, Serializable {
         this.abbreviation = abbreviation;
     }
 
-    public String getCmClass() {
+    public ControlMeasureClass getCmClass() {
         return cmClass;
     }
 
-    public void setCmClass(String cmClass) {
+    public void setCmClass(ControlMeasureClass cmClass) {
         this.cmClass = cmClass;
     }
 

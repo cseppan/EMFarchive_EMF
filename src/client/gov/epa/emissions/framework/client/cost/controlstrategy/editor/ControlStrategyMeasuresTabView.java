@@ -7,5 +7,5 @@ public interface ControlStrategyMeasuresTabView extends EditControlStrategyTabVi
  //type holder now
     void observe(EditControlStrategyMeasuresTabPresenter presenter);
 
-    void display(ControlStrategy strategy) throws EmfException;
+    void display(ControlStrategy strategy) throws EmfException ;
 }

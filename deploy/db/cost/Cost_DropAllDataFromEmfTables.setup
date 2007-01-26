@@ -8,6 +8,7 @@ DELETE FROM emf.control_measures;
 DELETE FROM emf.strategy_results;
 DELETE FROM emf.input_datasets_control_strategies;
 DELETE FROM emf.control_strategies;
+DELETE FROM emf.control_strategy_classes;
 
 
 

@@ -12,7 +12,6 @@
         <property name="name" column="name" type="java.lang.String" not-null="true"/>
         <property name="description" column="description" type="java.lang.String" not-null="false"/>
         <property name="abbreviation" column="abbreviation" type="java.lang.String" not-null="false"/>
-        <property name="cmClass" column="cm_class" type="java.lang.String" not-null="false"/>
         <property name="dataSouce" column="data_souce" type="java.lang.String" not-null="false"/>
         <property name="deviceCode" column="device_code" type="integer" not-null="false"/>
         <property name="costYear" column="cost_year" type="integer" not-null="false"/>
@@ -42,6 +41,11 @@
             class="gov.epa.emissions.framework.services.cost.data.ControlTechnology"
             column="control_technology"/> 
             
+  		<many-to-one 
+            name="cmClass" 
+            class="gov.epa.emissions.framework.services.cost.ControlMeasureClass"
+            column="cm_class_id"/> 
+  
        <array name="efficiencyRecords" table="control_measure_efficiencyrecords" cascade="save-update">
       		<key column="control_measures_id" not-null="true"/>
       		<list-index column="list_index"/>

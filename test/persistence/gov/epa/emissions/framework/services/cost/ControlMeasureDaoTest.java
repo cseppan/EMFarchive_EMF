@@ -232,7 +232,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
-        cm.setCmClass("Experiment");
+//        cm.setCmClass("Experiment");
         User emfUser = emfUser();
         cm.setCreator(emfUser);
 
@@ -245,7 +245,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         Scc[] sccs2 = sccs("10231");
         addCMFromImporter(cm, emfUser, sccs1);
 
-        cm.setCmClass("Theory");
+//        cm.setCmClass("Theory");
+        
         cm.setEfficiencyRecords(records2);
         addCMFromImporter(cm, emfUser, sccs2);
 
@@ -267,7 +268,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
-        cm.setCmClass("Experiment");
+//       cm.setCmClass("Experiment");
         User emfUser = emfUser();
         cm.setCreator(emfUser);
 
@@ -282,7 +283,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         addCMFromImporter(cm, emfUser, sccs1);
 
         cm.setAbbreviation("UNCCEP");
-        cm.setCmClass("Theory");
+//        cm.setCmClass("Theory");
         cm.setEfficiencyRecords(records2);
         addCMFromImporter(cm, emfUser, sccs2);
 
@@ -305,7 +306,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
-        cm.setCmClass("Experiment");
+//        cm.setCmClass("Experiment");
         User emfUser = emfUser();
         cm.setCreator(emfUser);
 
@@ -319,7 +320,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         try {
             addCMFromImporter(cm, emfUser, sccs1);
             cm.setName("cm two");
-            cm.setCmClass("Theory");
+//            cm.setCmClass("Theory");
             cm.setEfficiencyRecords(records2);
             addCMFromImporter(cm, emfUser, sccs2);
             assertFalse("Should have throw an exception: abbrev exist", true);

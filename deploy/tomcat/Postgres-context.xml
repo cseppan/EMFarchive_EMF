@@ -4,7 +4,7 @@
  <Resource name="jdbc/EMFDB" auth="Container"
           type="javax.sql.DataSource"
           driverClassName="org.postgresql.Driver"
-          url="jdbc:postgresql://localhost:5432/EMF?autoReconnect=true"
+          url="jdbc:postgresql://localhost:5432/EMF-Test?autoReconnect=true"
           username="emf"
           password="emf"
           maxActive="100"

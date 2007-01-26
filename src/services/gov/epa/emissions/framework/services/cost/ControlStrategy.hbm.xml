@@ -59,5 +59,11 @@
     	<many-to-many class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id"/>
 	</array>
 	
+	<array name="controlMeasureClasses" table="control_strategy_classes" cascade="save-update">
+    	<key column="control_strategy_id" not-null="true"/>
+    	<list-index column="list_index"/>
+    	<many-to-many class="gov.epa.emissions.framework.services.cost.ControlMeasureClass" column="control_measure_class_id"/>
+	</array>
+
   </class> 
 </hibernate-mapping>  

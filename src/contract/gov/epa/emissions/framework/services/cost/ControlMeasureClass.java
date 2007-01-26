@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.cost;
 
 import java.io.Serializable;
 
-public class ControlMeasureClass implements Serializable{
+public class ControlMeasureClass implements Serializable {
     private int id;
 
     private String name;
@@ -11,6 +11,10 @@ public class ControlMeasureClass implements Serializable{
     
     public ControlMeasureClass() {
         //
+    }
+
+    public ControlMeasureClass(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -44,7 +48,7 @@ public class ControlMeasureClass implements Serializable{
 
         ControlMeasureClass other = (ControlMeasureClass) obj;
 
-        return (id == other.getId() || name.equals(other.getName()));
+        return (id == other.getId() || name.toUpperCase().equals(other.getName().toUpperCase()));
     }
 
     public int hashCode() {

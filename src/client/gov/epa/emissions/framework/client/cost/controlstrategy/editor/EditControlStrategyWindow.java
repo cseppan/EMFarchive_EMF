@@ -94,7 +94,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
 
     private JTabbedPane createTabbedPane(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
-        JTabbedPane tabbedPane = new JTabbedPane();
+        final JTabbedPane tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Summary", createSummaryTab(controlStrategy, controlStrategyResults));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -103,13 +103,32 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         tabbedPane.addTab("Measures", createMeasuresTab(controlStrategy));
         tabbedPane.addTab("Applied Measures", createAppliedMeasuresTab(controlStrategy));
         tabbedPane.addTab("Outputs", outputPanel(controlStrategyResults));
-        tabbedPane.addChangeListener(new ChangeListener() {
+
+        tabbedPane.addChangeListener(new ChangeListener(){
             public void stateChanged(ChangeEvent e) {
                 messagePanel.clear();
+                try {
+                    loadComponents(tabbedPane);
+                } catch (EmfException exc) {
+                    showError("Could not load component: "  + tabbedPane.getSelectedComponent().getName());
+                }
             }
         });
+        
+//DCD 1/26/07 -- see above for new listener code
+//        tabbedPane.addChangeListener(new ChangeListener() {
+//            public void stateChanged(ChangeEvent e) {
+//                messagePanel.clear();
+//            }
+//        });
 
         return tabbedPane;
+    }
+
+    protected void loadComponents(JTabbedPane tabbedPane) throws EmfException {
+        int tabIndex = tabbedPane.getSelectedIndex();
+        String tabTitle = tabbedPane.getTitleAt(tabIndex);
+        presenter.doLoad(tabTitle);
     }
 
     private JPanel createSummaryTab(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {

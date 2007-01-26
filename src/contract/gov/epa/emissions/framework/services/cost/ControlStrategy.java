@@ -55,6 +55,8 @@ public class ControlStrategy implements Lockable, Serializable {
     
     private String filter;
 
+    private ControlMeasureClass[] controlMeasureClasses;
+
     private Mutex lock;
 
     public ControlStrategy() {
@@ -258,6 +260,14 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public void setFilter(String filter) {
         this.filter = filter;
+    }
+
+    public void setControlMeasureClasses(ControlMeasureClass[] controlMeasureClasses) {
+        this.controlMeasureClasses = controlMeasureClasses;
+    }
+
+    public ControlMeasureClass[] getControlMeasureClasses() {
+        return controlMeasureClasses;
     }
 
 }

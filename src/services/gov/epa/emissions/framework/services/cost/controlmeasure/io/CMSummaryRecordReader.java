@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -28,6 +29,8 @@ public class CMSummaryRecordReader {
 
     private Sectors sectors;
 
+    private ControlMeasureClasses controlMeasureClasses;
+
     private List namesList;
 
     private List abbrevList;
@@ -41,6 +44,7 @@ public class CMSummaryRecordReader {
         controlTechnologies = new ControlTechnologies(sessionFactory);
         sourceGroups = new SourceGroups(sessionFactory);
         sectors = new Sectors(sessionFactory);
+        controlMeasureClasses = new ControlMeasureClasses(sessionFactory);
         this.namesList = new ArrayList();
         this.abbrevList = new ArrayList();
     }
@@ -59,24 +63,29 @@ public class CMSummaryRecordReader {
     private ControlMeasure measure(String[] tokens, int lineNo) {
         StringBuffer sb = new StringBuffer();
 
-        ControlMeasure cm = null;
-        if (constraintCheck(tokens, sb)) {
-            cm = new ControlMeasure();
-            name(cm, tokens[0]);
-            abbrev(cm, tokens[1]);
-            majorPollutant(cm, tokens[2], sb);
-            controlTechnology(cm, tokens[3], sb);
-            sourceGroup(cm, tokens[4], sb);
-            sector(cm, tokens[5], sb);
-            cmClass(cm, tokens[6], sb);
-            equipLife(cm, tokens[7], sb);
-            deviceCode(cm, tokens[8], sb);
-            dateReviewed(cm, tokens[9], sb);
-            datasource(cm, tokens[10]);
-            description(cm, tokens[11]);
+        try {
+            ControlMeasure cm = null;
+            if (constraintCheck(tokens, sb)) {
+                cm = new ControlMeasure();
+                name(cm, tokens[0]);
+                abbrev(cm, tokens[1]);
+                majorPollutant(cm, tokens[2], sb);
+                controlTechnology(cm, tokens[3], sb);
+                sourceGroup(cm, tokens[4], sb);
+                sector(cm, tokens[5], sb);
+                cmClass(cm, tokens[6], sb);
+                equipLife(cm, tokens[7], sb);
+                deviceCode(cm, tokens[8], sb);
+                dateReviewed(cm, tokens[9], sb);
+                datasource(cm, tokens[10]);
+                description(cm, tokens[11]);
+            }
+            cmAddImportStatus.addStatus(lineNo, sb);
+            return cm;
+        } catch (CMImporterException e) {
+            cmAddImportStatus.addStatus(lineNo, sb);
+            return null;
         }
-        cmAddImportStatus.addStatus(lineNo, sb);
-        return cm;
     }
 
     private boolean constraintCheck(String[] tokens, StringBuffer sb) {
@@ -192,12 +201,18 @@ public class CMSummaryRecordReader {
         }
     }
 
-    private void cmClass(ControlMeasure cm, String clazz, StringBuffer sb) {
+    private void cmClass(ControlMeasure cm, String clazz, StringBuffer sb) throws CMImporterException {
         if (clazz.length() == 0) {
             sb.append(format("class should not be empty"));
             return;
         }
-        cm.setCmClass(clazz);
+        try {
+            ControlMeasureClass cmClass = controlMeasureClasses.getControlMeasureClass(clazz);
+            cm.setCmClass(cmClass);
+        } catch (CMImporterException e) {
+            sb.append(format(e.getMessage()));
+            throw e;
+        }
     }
 
     private void deviceCode(ControlMeasure cm, String code, StringBuffer sb) {
