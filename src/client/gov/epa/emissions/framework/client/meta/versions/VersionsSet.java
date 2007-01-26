@@ -22,6 +22,7 @@ public class VersionsSet {
         return (Integer[]) list.toArray(new Integer[0]);
     }
 
+    // TODO: remove - use objects version instead
     public Integer[] finalVersions() {
         List list = new ArrayList();
         for (int i = 0; i < versions.length; i++) {
@@ -32,6 +33,7 @@ public class VersionsSet {
         return (Integer[]) list.toArray(new Integer[0]);
     }
 
+    // keep this
     public Version[] finalVersionObjects() {
         List list = new ArrayList();
         for (int i = 0; i < versions.length; i++) {
@@ -42,6 +44,7 @@ public class VersionsSet {
         return (Version[]) list.toArray(new Version[0]);
     }
     
+    // TODO: remove
     public String[] namesOfFinalVersions() {
         List list = new ArrayList();
         for (int i = 0; i < versions.length; i++) {
@@ -52,7 +55,8 @@ public class VersionsSet {
         return (String[]) list.toArray(new String[0]);
     }
 
-    public String[] nameAndNumbersOfFinalVersions() {
+    // TODO: remove - use toString instead
+   public String[] nameAndNumbersOfFinalVersions() {
         List list = new ArrayList();
         for (int i = 0; i < versions.length; i++) {
             if (versions[i].isFinalVersion())
@@ -62,7 +66,8 @@ public class VersionsSet {
         return (String[]) list.toArray(new String[0]);
     }
 
-    public String[] names() {
+   // TODO: remove - use finalVersionObjects instead
+   public String[] names() {
         List list = new ArrayList();
         for (int i = 0; i < versions.length; i++) {
             list.add(versions[i].getName());
@@ -71,7 +76,8 @@ public class VersionsSet {
         return (String[]) list.toArray(new String[0]);
     }
     
-    public String[] nameAndNumbers() {
+   // TODO: remove - use toString instead
+   public String[] nameAndNumbers() {
         List list = new ArrayList();
         for (int i = 0; i < versions.length; i++) {
             list.add(versions[i].getName() + " (" + versions[i].getVersion() + ")");
@@ -80,7 +86,8 @@ public class VersionsSet {
         return (String[]) list.toArray(new String[0]);
     }
 
-    public String name(int version) {
+   // TODO: probably shouldn't need - ask object instead
+   public String name(int version) {
         String[] names = names();
         Integer[] versions = versions();
         for (int i = 0; i < versions.length; i++) {
@@ -91,7 +98,8 @@ public class VersionsSet {
         return null;
     }
 
-    public String getVersionName(int version) {
+   // TODO: probably shouldn't need - ask object instead
+   public String getVersionName(int version) {
         Integer[] versions = versions();
         for (int i = 0; i < versions.length; i++) {
             int val = versions[i].intValue();
@@ -102,7 +110,8 @@ public class VersionsSet {
         return null;
     }
 
-    public Version version(String name) {
+   // TODO: probably shouldn't need - ask object instead
+   public Version version(String name) {
         for (int i = 0; i < versions.length; i++) {
             if (versions[i].getName().equals(name))
                 return versions[i];
@@ -111,6 +120,7 @@ public class VersionsSet {
         return null;
     }
 
+   // TODO: probably shouldn't need - ask object instead
     public Version getVersionFromNameAndNumber(String nameAndNumber) {
         int ver = getVersionNumber(nameAndNumber);
         
@@ -122,6 +132,7 @@ public class VersionsSet {
         return null;
     }
 
+    // TODO: remove - breaks if you have a (word) in your name
     private int getVersionNumber(String nameAndNumber) {
         int forPerenth = nameAndNumber.indexOf('(');
         int backPerenth = nameAndNumber.indexOf(')');
@@ -129,6 +140,7 @@ public class VersionsSet {
         return Integer.parseInt(nameAndNumber.substring(forPerenth+1, backPerenth));
     }
 
+    // TODO: instead of the name, perhaps return Version object
     public String getDefaultVersionName(EmfDataset dataset) {
         return getVersionName(dataset.getDefaultVersion());
     }
