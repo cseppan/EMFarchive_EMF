@@ -110,13 +110,22 @@ public class NewVersionDialog extends Dialog {
     protected boolean verifyInput() {
         String newName = name().trim();
         if (newName.length() == 0) {
-            JOptionPane.showMessageDialog(super.getParent(), "Please enter Name", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(super.getParent(), 
+                    "Please enter a name", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        if (newName.contains("(") || newName.contains(")"))
+        {
+            JOptionPane.showMessageDialog(super.getParent(), 
+                   "Please enter a name that does not contain parentheses", 
+                  "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
         if (isDuplicate(newName)) {
-            JOptionPane.showMessageDialog(super.getParent(), "Please enter a unique 'name'", "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(super.getParent(), 
+                    "Please enter a unique 'name'", "Error",JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
