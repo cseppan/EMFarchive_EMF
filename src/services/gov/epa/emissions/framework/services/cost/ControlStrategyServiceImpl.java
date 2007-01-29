@@ -271,6 +271,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         Session session = sessionFactory.getSession();
         try {
             List all = dao.getControlMeasureClasses(controlStrategyId, session);
+LOG.error("List.length = " + all.size());
             return (ControlMeasureClass[]) all.toArray(new ControlMeasureClass[0]);
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve control measure classes.", e);

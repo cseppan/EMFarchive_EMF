@@ -12,6 +12,8 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -48,8 +50,8 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
     
     private JPanel createClassesPanel(ManageChangeables changeables) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        JLabel classToInclude = new JLabel("Classes to Include [:" + classes.length + "]");
-        this.classesList = new ListWidget(allClasses);//, classes
+        JLabel classToInclude = new JLabel("Classes to Include:");
+        this.classesList = new ListWidget(allClasses, classes);//
         changeables.addChangeable(classesList);
         JScrollPane pane = new JScrollPane(classesList);
         pane.setPreferredSize(new Dimension(20, 80));
@@ -59,11 +61,15 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         return panel;
     }
 
-    public void save(ControlStrategy controlStrategy) throws EmfException {
-        // NOTE Auto-generated method stub
-        if (false)
-            throw new EmfException("Cannot save measures filter fields.");
+    public void save(ControlStrategy controlStrategy) {
+        controlStrategy.setControlMeasureClasses(getControlMeasureClasses());
     }
+
+    private ControlMeasureClass[] getControlMeasureClasses() {
+        List selectedValues = Arrays.asList(classesList.getSelectedValues());
+        return (ControlMeasureClass[]) selectedValues.toArray(new ControlMeasureClass[0]);
+    }
+
 
     public void refresh(ControlStrategyResult controlStrategyResult) {
         // NOTE Auto-generated method stub

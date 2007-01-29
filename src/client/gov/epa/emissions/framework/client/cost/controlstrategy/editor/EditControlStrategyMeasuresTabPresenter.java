@@ -4,8 +4,9 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 
-public class EditControlStrategyMeasuresTabPresenter {
+public class EditControlStrategyMeasuresTabPresenter  implements EditControlStrategyTabPresenter {
     private ControlStrategyMeasuresTabView view;
     
     private EmfSession session;
@@ -30,5 +31,14 @@ public class EditControlStrategyMeasuresTabPresenter {
 
     public ControlMeasureClass[] getControlMeasureClasses(int controlStrategyId) throws EmfException {
         return session.controlStrategyService().getControlMeasureClasses(controlStrategyId);
+    }
+
+    public void doRefresh(ControlStrategyResult result) {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    public void doSave() throws EmfException {
+        view.save(strategy);
     }
 }
