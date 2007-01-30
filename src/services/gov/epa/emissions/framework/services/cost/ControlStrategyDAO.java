@@ -163,9 +163,4 @@ public class ControlStrategyDAO {
             hibernateFacade.delete(result,session);
         }
     }
-
-    public List getControlMeasureClasses(int controlStrategyId, Session session) {
-        Criterion c = Restrictions.eq("id", new Integer(controlStrategyId));
-        return hibernateFacade.get(ControlMeasureClass.class, c, session);
-    }
 }

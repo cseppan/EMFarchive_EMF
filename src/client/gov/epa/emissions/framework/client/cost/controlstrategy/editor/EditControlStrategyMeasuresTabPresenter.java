@@ -29,8 +29,8 @@ public class EditControlStrategyMeasuresTabPresenter  implements EditControlStra
         return session.controlMeasureService().getMeasureClasses();
     }
 
-    public ControlMeasureClass[] getControlMeasureClasses(int controlStrategyId) throws EmfException {
-        return session.controlStrategyService().getControlMeasureClasses(controlStrategyId);
+    public ControlMeasureClass[] getControlMeasureClasses() {
+        return strategy.getControlMeasureClasses();
     }
 
     public void doRefresh(ControlStrategyResult result) {

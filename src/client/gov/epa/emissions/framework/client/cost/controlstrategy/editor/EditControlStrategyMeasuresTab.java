@@ -38,7 +38,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
     public void display(ControlStrategy strategy) throws EmfException {
         this.allClasses = presenter.getAllClasses();
-        this.classes = presenter.getControlMeasureClasses(strategy.getId());
+        this.classes = presenter.getControlMeasureClasses();
         setupLayout(changeablesList);
     }
     
@@ -51,7 +51,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
     private JPanel createClassesPanel(ManageChangeables changeables) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         JLabel classToInclude = new JLabel("Classes to Include:");
-        this.classesList = new ListWidget(allClasses, classes);//
+        this.classesList = new ListWidget(allClasses, classes);
         changeables.addChangeable(classesList);
         JScrollPane pane = new JScrollPane(classesList);
         pane.setPreferredSize(new Dimension(20, 80));
@@ -66,8 +66,12 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
     }
 
     private ControlMeasureClass[] getControlMeasureClasses() {
-        List selectedValues = Arrays.asList(classesList.getSelectedValues());
-        return (ControlMeasureClass[]) selectedValues.toArray(new ControlMeasureClass[0]);
+        ControlMeasureClass[] controlMeasureClasses = null;
+        if (classesList.getSelectedValues() != null) {
+            List selectedValues = Arrays.asList(classesList.getSelectedValues());
+            controlMeasureClasses = (ControlMeasureClass[]) selectedValues.toArray(new ControlMeasureClass[0]);
+        }
+        return controlMeasureClasses;
     }
 
 
