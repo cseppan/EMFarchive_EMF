@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -81,9 +82,21 @@ public class GenerateSccControlMeasuresMap {
     }
 
     private String query(String qualifiedEmissionTableName) {
+        //add additional class filter, if necessary, when selecting control measure for the calculations...
+        String classFilterIds = "";
+        ControlMeasureClass[] classes = controlStrategy.getControlMeasureClasses();
+
+        if (classes != null) 
+            for (int i = 0; i < classes.length; i++)
+                classFilterIds += (classFilterIds.length() != 0 ? "," + classes[i].getId() : classes[i].getId());
+        
         return "SELECT DISTINCT a.scc,b.control_measures_id FROM " + qualifiedEmissionTableName + " AS a, "
-                + qualifiedName("control_measure_sccs", emfDatasource) + " AS b WHERE a.poll='"
-                + controlStrategy.getTargetPollutant() + "' AND a.scc=b.name";
+                + qualifiedName("control_measure_sccs", emfDatasource) + " AS b, "
+                + qualifiedName("control_measures", emfDatasource) + " AS c"
+                + " WHERE b.name=a.scc"
+                + " AND c.id=b.control_measures_id"
+                + " AND a.poll='" + controlStrategy.getTargetPollutant() + "'"
+                + (classFilterIds.length() == 0 ? "" : " AND c.cm_class_id in (" + classFilterIds + ")");
     }
 
     private String qualifiedName(String tableName, Datasource datasource) {
