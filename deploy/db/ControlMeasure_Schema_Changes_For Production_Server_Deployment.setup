@@ -1,0 +1,43 @@
+-- emf.control_measure_classes
+CREATE TABLE emf.control_measure_classes
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(64) NOT NULL UNIQUE,
+  description varchar(255)
+) 
+WITHOUT OIDS;
+-- emf.control_measure_classes
+
+--Populate emf.control_measure_classes
+insert into emf.control_measure_classes values (DEFAULT, 'Known', 'Known');
+insert into emf.control_measure_classes values (DEFAULT, 'Emerging', 'Emerging');
+insert into emf.control_measure_classes values (DEFAULT, 'Hypothetical', 'Hypothetical');
+insert into emf.control_measure_classes values (DEFAULT, 'Obselete', 'Obselete');
+--Populate emf.control_measure_classes
+
+-- Add new control measure class id to control_measures table..
+ALTER TABLE emf.control_measures ADD COLUMN cm_class_id int4 REFERENCES emf.control_measure_classes(id);
+-- Add new control measure class id to control_measures table..
+
+-- update new cm_class_id based on current cm_class string setting...
+update emf.control_measures
+set cm_class_id = emf.control_measure_classes.id
+from emf.control_measure_classes
+where emf.control_measure_classes.name = emf.control_measures.cm_class;
+-- update new cm_class_id based on current cm_class string setting...
+
+-- get rid of cm_class column on control_measures...
+ALTER TABLE emf.control_measures DROP COLUMN cm_class
+-- get rid of cm_class column on control_measures...
+
+-- Create new emf.control_strategy_classes table...
+CREATE TABLE emf.control_strategy_classes
+(
+  id SERIAL PRIMARY KEY,
+  control_strategy_id int4 NOT NULL REFERENCES emf.control_strategies(id) ,
+  control_measure_class_id int4 REFERENCES emf.control_measure_classes (id),
+  list_index int4,
+  UNIQUE (control_strategy_id,control_measure_class_id) 
+) 
+WITHOUT OIDS;
+-- Create new emf.control_strategy_classes table...
