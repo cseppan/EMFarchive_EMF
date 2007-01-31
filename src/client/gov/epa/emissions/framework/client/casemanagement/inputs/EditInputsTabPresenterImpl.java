@@ -49,8 +49,8 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         if (dialog.shouldCreate()) {
             CaseInput newInput = dialog.input();
             newInput.setCaseID(caseObj.getId());
-            service().addCaseInput(newInput);
-            view.addInput(newInput);
+            CaseInput loaded = service().addCaseInput(newInput);
+            view.addInput(loaded);
         }
         
         refreshView();
