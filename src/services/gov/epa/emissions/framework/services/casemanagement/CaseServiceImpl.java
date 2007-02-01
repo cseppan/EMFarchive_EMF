@@ -179,8 +179,8 @@ public class CaseServiceImpl implements CaseService {
 
             return (MeteorlogicalYear[]) results.toArray(new MeteorlogicalYear[0]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all Meteorlogical Years", e);
-            throw new EmfException("Could not get all Meteorlogical Years");
+            LOG.error("Could not get all Meteorological Years", e);
+            throw new EmfException("Could not get all Meteorological Years");
         }
     }
 
@@ -242,8 +242,8 @@ public class CaseServiceImpl implements CaseService {
 
             return released;
         } catch (RuntimeException e) {
-            LOG.error("Could not release lock for Case: " + locked + " by owner: " + locked.getLockOwner(), e);
-            throw new EmfException("Could not release lock for Case: " + locked + " by owner: " + locked.getLockOwner());
+            LOG.error("Could not release lock by "+locked.getLockOwner(), e);
+            throw new EmfException("Could not release lock by " + locked.getLockOwner+" for Case: " + locked);
         }
     }
 
@@ -256,7 +256,7 @@ public class CaseServiceImpl implements CaseService {
 
             return released;
         } catch (RuntimeException e) {
-            LOG.error("Could not update Case: " + element, e);
+            LOG.error("Could not update Case", e);
             throw new EmfException("Could not update Case: " + element);
         }
     }
@@ -269,8 +269,8 @@ public class CaseServiceImpl implements CaseService {
 
             return (InputName[]) results.toArray(new InputName[0]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all InputNames", e);
-            throw new EmfException("Could not get all InputNames");
+            LOG.error("Could not get all Input Names", e);
+            throw new EmfException("Could not get all Input Names");
         }
     }
 
@@ -282,8 +282,8 @@ public class CaseServiceImpl implements CaseService {
 
             return (InputEnvtVar[]) results.toArray(new InputEnvtVar[0]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all InputEnvtVars", e);
-            throw new EmfException("Could not get all InputEnvtVars");
+            LOG.error("Could not get all Input Environment Variables", e);
+            throw new EmfException("Could not get all Input Environment Variables");
         }
     }
 
@@ -308,8 +308,8 @@ public class CaseServiceImpl implements CaseService {
 
             return (ModelToRun[]) results.toArray(new ModelToRun[0]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all ModelToRuns", e);
-            throw new EmfException("Could not get all ModelToRuns");
+            LOG.error("Could not get all Models To Run", e);
+            throw new EmfException("Could not get all Models To Run");
         }
     }
 
@@ -405,8 +405,8 @@ public class CaseServiceImpl implements CaseService {
             dao.add(inputEnvtVar, session);
             return (InputEnvtVar) dao.load(InputEnvtVar.class, inputEnvtVar.getName(), session);
         } catch (Exception e) {
-            LOG.error("Could not add new InputEnvtVar '" + inputEnvtVar.getName() + "'\n" + e.getMessage());
-            throw new EmfException("Could not add new InputEnvtVar '" + inputEnvtVar.getName() + "'");
+            LOG.error("Could not add new input environment variable '" + inputEnvtVar.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new input environment variable '" + inputEnvtVar.getName() + "'");
         } finally {
             session.close();
         }
@@ -418,8 +418,8 @@ public class CaseServiceImpl implements CaseService {
             dao.add(model, session);
             return (ModelToRun) dao.load(ModelToRun.class, model.getName(), session);
         } catch (Exception e) {
-            LOG.error("Could not add new ModelToRun '" + model.getName() + "'\n" + e.getMessage());
-            throw new EmfException("Could not add new ModelToRun '" + model.getName() + "'");
+            LOG.error("Could not add new model to run '" + model.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new model to run '" + model.getName() + "'");
         } finally {
             session.close();
         }
@@ -431,8 +431,8 @@ public class CaseServiceImpl implements CaseService {
             dao.add(gridResolution, session);
             return (GridResolution) dao.load(GridResolution.class, gridResolution.getName(), session);
         } catch (Exception e) {
-            LOG.error("Could not add new GridResolution '" + gridResolution.getName() + "'\n" + e.getMessage());
-            throw new EmfException("Could not add new GridResolution '" + gridResolution.getName() + "'");
+            LOG.error("Could not add new Grid Resolution '" + gridResolution.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new Grid Resolution '" + gridResolution.getName() + "'");
         } finally {
             session.close();
         }
@@ -446,8 +446,8 @@ public class CaseServiceImpl implements CaseService {
 
             return (SubDir[]) results.toArray(new SubDir[0]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all SubDirz", e);
-            throw new EmfException("Could not get all SubDirs");
+            LOG.error("Could not get all subdirectories", e);
+            throw new EmfException("Could not get all subdirectories");
         }
     }
 
@@ -457,8 +457,8 @@ public class CaseServiceImpl implements CaseService {
             dao.add(subdir, session);
             return (SubDir) dao.load(SubDir.class, subdir.getName(), session);
         } catch (Exception e) {
-            LOG.error("Could not add new SubDir '" + subdir.getName() + "'\n" + e.getMessage());
-            throw new EmfException("Could not add new SubDir '" + subdir.getName() + "'");
+            LOG.error("Could not add new subdirectory '" + subdir.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new subdirectory '" + subdir.getName() + "'");
         } finally {
             session.close();
         }
@@ -475,8 +475,8 @@ public class CaseServiceImpl implements CaseService {
             dao.add(input, session);
             return (CaseInput) dao.loadCaseInupt(input, session);
         } catch (Exception e) {
-            LOG.error("Could not add new CaseInput '" + input.getName() + "'\n" + e.getMessage());
-            throw new EmfException("Could not add new CaseInput '" + input.getName() + "'");
+            LOG.error("Could not add new case input '" + input.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new case input '" + input.getName() + "'");
         } finally {
             session.close();
         }
@@ -489,13 +489,14 @@ public class CaseServiceImpl implements CaseService {
             CaseInput loaded = (CaseInput) dao.loadCaseInupt(input, session);
             
             if (loaded != null && loaded.getId() != input.getId())
-                throw new EmfException("CaseInput uniqueness check failed.");
+                throw new EmfException("Case input uniqueness check failed ("+
+                        loaded.getId()+","+input.getId()+")");
             
             session.clear();
             dao.updateCaseInput(input, session);
         } catch (RuntimeException e) {
-            LOG.error("Could not update CaseInput: " + input.getName() + ".\n" + e);
-            throw new EmfException("Could not update CaseInput: " + input.getName() + ".");
+            LOG.error("Could not update case input: " + input.getName() + ".\n" + e);
+            throw new EmfException("Could not update case input: " + input.getName() + ".");
         } finally {
             session.close();
         }
@@ -507,8 +508,8 @@ public class CaseServiceImpl implements CaseService {
         try {
             dao.removeCaseInputs(inputs, session);
         } catch (Exception e) {
-            LOG.error("Could not remove CaseInput " + inputs[0].getName() + " etc.\n" + e.getMessage());
-            throw new EmfException("Could not remove CaseInput " + inputs[0].getName() + " etc.");
+            LOG.error("Could not remove case input " + inputs[0].getName() + " etc.\n" + e.getMessage());
+            throw new EmfException("Could not remove case input " + inputs[0].getName() + " etc.");
         } finally {
             session.close();
         }
@@ -522,8 +523,8 @@ public class CaseServiceImpl implements CaseService {
 
             return inputs.toArray(new CaseInput[0]);
         } catch (Exception e) {
-            LOG.error("Could not get all CaseInputs with current case (id=" + caseId + ").\n" + e.getMessage());
-            throw new EmfException("Could not get all CaseInputs with current case (id=" + caseId + ").\n");
+            LOG.error("Could not get all inputs for case (id=" + caseId + ").\n" + e.getMessage());
+            throw new EmfException("Could not get all inputs for case (id=" + caseId + ").\n");
         } finally {
             session.close();
         }
@@ -537,8 +538,8 @@ public class CaseServiceImpl implements CaseService {
             try {
                 copiedList.add(copySingleCaseObj(caseToCopy));
             } catch (Exception e) {
-                LOG.error("Could not copy " + caseToCopy.getName() + ".", e);
-                throw new EmfException("Could not copy " + caseToCopy.getName() + ". " + e.getMessage());
+                LOG.error("Could not copy case " + caseToCopy.getName() + ".", e);
+                throw new EmfException("Could not copy case " + caseToCopy.getName() + ". " + e.getMessage());
             }
         }
         
@@ -575,8 +576,8 @@ public class CaseServiceImpl implements CaseService {
             dao.add(element, session);
             return (Case)dao.load(Case.class, element.getName(), session);
         } catch (RuntimeException e) {
-            LOG.error("Could not add Case: " + element, e);
-            throw new EmfException("Could not add Case: " + element);
+            LOG.error("Could not add case " + element, e);
+            throw new EmfException("Could not add case " + element);
         }  finally {
             session.close();
         }
