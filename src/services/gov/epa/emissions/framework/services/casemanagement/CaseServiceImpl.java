@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -546,7 +547,7 @@ public class CaseServiceImpl implements CaseService {
 
     private Case copySingleCaseObj(Case toCopy) throws Exception {
         Case copied = (Case)DeepCopy.copy(toCopy);
-        copied.setName("Copy of " + toCopy.getName());
+        copied.setName("Copy of " + toCopy.getName() + " " + new Date().getTime());
         Case loaded = addCopiedCase(copied);
         copyCaseInputs(toCopy.getId(), loaded.getId());
         
