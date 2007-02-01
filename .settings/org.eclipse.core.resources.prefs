@@ -1,3 +1,4 @@
-#Wed Jan 24 15:05:53 EST 2007
+#Wed Jan 31 16:32:51 EST 2007
 eclipse.preferences.version=1
 encoding//deploy/db/Alter_EMF_Schema_ControlMeasureTable.setup=ASCII
+encoding//deploy/db/cost/ControlMeasure_Schema_Changes_For\ Production_Server_Deployment.setup=ASCII
