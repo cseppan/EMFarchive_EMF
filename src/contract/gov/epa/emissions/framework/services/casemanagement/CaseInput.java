@@ -162,7 +162,7 @@ public class CaseInput implements Serializable, Comparable {
     }
 
     public String getName() {
-        return this.inputName.getName();
+        return inputName == null ? null : inputName.getName();
     }
 
     public SubDir getSubdirObj() {

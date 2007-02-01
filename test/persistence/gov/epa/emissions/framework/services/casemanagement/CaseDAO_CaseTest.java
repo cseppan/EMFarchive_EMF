@@ -161,10 +161,51 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
             
             List inputs = dao.getCaseInputs(loadedCase.getId(), session);
             assertEquals(input, inputs.get(0));
+            assertEquals(subdir, ((CaseInput)inputs.get(0)).getSubdirObj());
             assertEquals(1, inputs.size());
         } finally {
             remove(input);
             remove(subdir);
+            remove(element);
+        }
+    }
+
+    public void testShouldThrowExceptionWhenAnCaseInputHasSameSectorProgramInputname() {
+        Case element = new Case("test" + Math.random());
+        InputName inputname = new InputName("test input name");
+        CaseProgram program = new CaseProgram("test case program" );
+        Sector sector = new Sector("" , "test sector");
+        CaseInput inputOne = new CaseInput();
+        CaseInput inputTwo = new CaseInput();
+        
+        add(inputname);
+        add(program);
+        add(sector);
+        add(element);
+        inputOne.setInputName(inputname);
+        inputOne.setProgram(program);
+        inputOne.setSector(sector);
+        inputTwo.setInputName(inputname);
+        inputTwo.setProgram(program);
+        inputTwo.setSector(sector);
+        
+        session.clear();
+        
+        try {
+            List list = dao.getCases(session);
+            Case loadedCase = (Case)list.get(0);
+            inputOne.setCaseID(loadedCase.getId());
+            inputTwo.setCaseID(loadedCase.getId());
+            add(inputOne);
+            add(inputTwo);
+        } catch (Exception e) {
+            String exceptionMsg = "could not insert:";
+            assertTrue("Should throw exception", e.getMessage().startsWith(exceptionMsg));
+        } finally {
+            remove(inputOne);
+            remove(inputname);
+            remove(program);
+            remove(sector);
             remove(element);
         }
     }
@@ -476,7 +517,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         crit.setId(0);
         crit.setType("new type");
 
-        List criteriaList = new ArrayList();
+        List<SectorCriteria> criteriaList = new ArrayList<SectorCriteria>();
         criteriaList.add(crit);
 
         SectorCriteria[] criteriaArray = new SectorCriteria[] { crit };
@@ -618,7 +659,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         toCopy.setAirQualityModel(airModel);
         toCopy.setBaseYear(1999);
         toCopy.setCaseCategory(cat);
-        //toCopy.setCaseInputs(new CaseInput[] { input });
         toCopy.setCaseTemplate(true);
         toCopy.setControlRegion(contrlRegion);
         toCopy.setCreator(owner);
