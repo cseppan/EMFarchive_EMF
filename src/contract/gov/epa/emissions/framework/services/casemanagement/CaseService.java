@@ -64,5 +64,7 @@ public interface CaseService {
     void removeCaseInputs(CaseInput[] inputs) throws EmfException;
     
     CaseInput[] getCaseInputs(int caseId) throws EmfException;
+    
+    Case[] copyCaseObject(int[] toCopy) throws EmfException;
 
 }

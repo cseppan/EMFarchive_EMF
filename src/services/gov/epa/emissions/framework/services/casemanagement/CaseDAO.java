@@ -124,6 +124,11 @@ public class CaseDAO {
     public List getCases(Session session) {
         return hibernateFacade.getAll(Case.class, Order.asc("name"), session);
     }
+    
+    public Case getCase(int caseId, Session session) {
+        Criterion criterion = Restrictions.eq("id", new Integer(caseId));
+        return (Case)hibernateFacade.get(Case.class, criterion, session).get(0);
+    }
 
     public List getPrograms(Session session) {
         return hibernateFacade.getAll(CaseProgram.class, Order.asc("name"), session);

@@ -612,7 +612,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         input.setRequired(true);
         input.setSector(sector);
         input.setShow(true);
-        input.setSubdir("sub dir");
         input.setVersion(version);
 
         toCopy.setAbbreviation(abbr);

@@ -213,7 +213,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         return 0;
     }
 
-    public void setFields() throws EmfException {
+    public CaseInput setFields() throws EmfException {
         updateInputName();
         updateProgram();
         updateEnvtVar();
@@ -224,6 +224,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         updateSubdir();
         input.setRequired(required.isSelected());
         input.setShow(show.isSelected());
+        return input;
     }
 
     private void updateInputName() throws EmfException {

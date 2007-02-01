@@ -338,4 +338,14 @@ public class CaseServiceTransport implements CaseService {
         return (CaseInput[]) call.requestResponse(new Object[] { new Integer(caseId) });
     }
 
+    public Case[] copyCaseObject(int[] toCopy) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("copyCaseObject");
+        call.addIntArrayParam();
+        call.setReturnType(caseMappings.cases());
+        
+        return (Case[]) call.requestResponse(new Object[] {toCopy});
+    }
+
 }

@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.casemanagement;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
@@ -72,6 +73,19 @@ public class CaseServiceImpl implements CaseService {
             session.close();
 
             return (Case[]) cases.toArray(new Case[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Cases", e);
+            throw new EmfException("Could not get all Cases");
+        }
+    }
+    
+    private Case getCase(int caseId) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            Case caseObj = dao.getCase(caseId, session);
+            session.close();
+            
+            return caseObj;
         } catch (RuntimeException e) {
             LOG.error("Could not get all Cases", e);
             throw new EmfException("Could not get all Cases");
@@ -322,24 +336,24 @@ public class CaseServiceImpl implements CaseService {
 
     private Version[] getInputDatasetVersions(Case caseToExport) throws EmfException {
         CaseInput[] inputs = getCaseInputs(caseToExport.getId());
-        List list = new ArrayList();
+        List<Version> list = new ArrayList<Version>();
 
         for (int i = 0; i < inputs.length; i++)
             if (inputs[i].getDataset() != null && !checkExternalDSType(inputs[i].getDatasetType()))
                 list.add(inputs[i].getVersion());
         
-        return (Version[])list.toArray(new Version[0]);
+        return list.toArray(new Version[0]);
     }
 
     private EmfDataset[] getInputDatasets(Case caseToExport) throws EmfException {
         CaseInput[] inputs = getCaseInputs(caseToExport.getId());
-        List list = new ArrayList();
+        List<EmfDataset> list = new ArrayList<EmfDataset>();
 
         for (int i = 0; i < inputs.length; i++)
             if (inputs[i].getDataset() != null && !checkExternalDSType(inputs[i].getDatasetType()))
                 list.add(inputs[i].getDataset());
 
-        return (EmfDataset[])list.toArray(new EmfDataset[0]);
+        return list.toArray(new EmfDataset[0]);
     }
     
     private boolean checkExternalDSType(DatasetType type) {
@@ -495,13 +509,66 @@ public class CaseServiceImpl implements CaseService {
         Session session = sessionFactory.getSession();
         
         try {
-            List inputs = dao.getCaseInputs(caseId, session);
+            List<CaseInput> inputs = dao.getCaseInputs(caseId, session);
 
-            return (CaseInput[]) inputs.toArray(new CaseInput[0]);
+            return inputs.toArray(new CaseInput[0]);
         } catch (Exception e) {
             LOG.error("Could not get all CaseInputs with current case (id=" + caseId + ").\n" + e.getMessage());
             throw new EmfException("Could not get all CaseInputs with current case (id=" + caseId + ").\n");
         } finally {
+            session.close();
+        }
+    }
+
+    public Case[] copyCaseObject(int[] toCopy) throws EmfException {
+        List<Case> copiedList = new ArrayList<Case>();
+        
+        for (int i = 0; i < toCopy.length; i++) {
+            Case caseToCopy = getCase(toCopy[i]);
+            try {
+                copiedList.add(copySingleCaseObj(caseToCopy));
+            } catch (Exception e) {
+                LOG.error("Could not copy " + caseToCopy.getName() + ".", e);
+                throw new EmfException("Could not copy " + caseToCopy.getName() + ". " + e.getMessage());
+            }
+        }
+        
+        return copiedList.toArray(new Case[0]);
+    }
+
+    private Case copySingleCaseObj(Case toCopy) throws Exception {
+        Case copied = (Case)DeepCopy.copy(toCopy);
+        copied.setName("Copy of " + toCopy.getName());
+        Case loaded = addCopiedCase(copied);
+        copyCaseInputs(toCopy.getId(), loaded.getId());
+        
+        return loaded;
+    }
+    
+    private void copyCaseInputs(int origCaseId, int copiedCaseId) throws Exception {
+        CaseInput[] tocopy = getCaseInputs(origCaseId);
+        
+        for(int i = 0; i < tocopy.length; i++)
+            copySingleInput(tocopy[i], copiedCaseId);
+    }
+
+    private CaseInput copySingleInput(CaseInput input, int copiedCaseId) throws Exception {
+        CaseInput copied = (CaseInput)DeepCopy.copy(input);
+        copied.setCaseID(copiedCaseId);
+        
+        return addCaseInput(copied);
+    }
+
+    private Case addCopiedCase(Case element) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            dao.add(element, session);
+            return (Case)dao.load(Case.class, element.getName(), session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not add Case: " + element, e);
+            throw new EmfException("Could not add Case: " + element);
+        }  finally {
             session.close();
         }
     }

@@ -78,4 +78,8 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
     void displayEditor(CaseEditorPresenter presenter) throws EmfException {
         presenter.doDisplay();
     }
+
+    public void doCopyCases(int[] caseIds) throws EmfException {
+        service().copyCaseObject(caseIds);
+    }
 }

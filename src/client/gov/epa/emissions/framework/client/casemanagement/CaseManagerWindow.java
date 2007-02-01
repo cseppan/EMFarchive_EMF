@@ -9,7 +9,6 @@ import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
-import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditor;
@@ -43,7 +42,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private SortFilterSelectModel selectModel;
 
     private EmfTableModel model;
-    
+
     private CasesTableData tableData;
 
     private JPanel layout;
@@ -234,7 +233,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             messagePanel.setMessage("Please select one or more cases to remove.");
             return;
         }
-        
+
         String title = "Warning";
         String message = "Are you sure you want to remove the selected case(s)?";
         int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
@@ -243,7 +242,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         if (selection == JOptionPane.NO_OPTION) {
             return;
         }
-        
+
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
             Case element = (Case) iter.next();
             try {
@@ -254,27 +253,26 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             }
         }
     }
-    
+
     private void copySelectedCases() {
         cases = selected();
+        
         if (cases.isEmpty()) {
             messagePanel.setMessage("Please select one or more Cases");
             return;
         }
-        
-        for (Iterator iter = selected().iterator(); iter.hasNext();) {
-            Case element = (Case) iter.next();
-            
-            try {
-                Case coppied = (Case)DeepCopy.copy(element);
-                coppied.setName("Copy of " + element.getName());
-                presenter.doSaveCopiedCase(coppied, element.getName());
-                doRefresh();
-            } catch (Exception e) {
-                showError("Could not copy " + element + ". " + e.getMessage());
-            }
+
+        int[] caseIds = new int[cases.size()];
+
+        for (int i = 0; i < caseIds.length; i++)
+            caseIds[i] = ((Case) cases.get(i)).getId();
+
+        try {
+            presenter.doCopyCases(caseIds);
+            doRefresh();
+        } catch (Exception e) {
+            showError("Could not copy cases." + e.getMessage());
         }
-        
     }
 
     private void showError(String message) {
@@ -288,7 +286,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     public EmfConsole getParentConsole() {
         return parentConsole;
     }
-    
+
     private void clearMsgPanel() {
         messagePanel.clear();
     }

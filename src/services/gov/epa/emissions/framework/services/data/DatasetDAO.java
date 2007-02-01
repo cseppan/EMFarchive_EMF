@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.importer.DataTable;
+import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
@@ -23,12 +24,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 public class DatasetDAO {
+
+    private static Log LOG = LogFactory.getLog(DatasetDAO.class);
 
     private LockingScheme lockingScheme;
 
@@ -86,9 +91,14 @@ public class DatasetDAO {
     }
 
     public void updateWithoutLocking(EmfDataset dataset, Session session) throws Exception {
-        renameEmissionTable(dataset, session);
-        session.clear();
-        hibernateFacade.updateOnly(dataset, session);
+        try {
+            renameEmissionTable(dataset, session);
+        } catch (Exception e) {
+            LOG.info("Can not rename emission table: " + dataset.getInternalSources()[0].getTable());
+        } finally {
+            session.clear();
+            hibernateFacade.updateOnly(dataset, session);
+        }
     }
 
     public void remove(EmfDataset dataset, Session session) {
@@ -104,8 +114,16 @@ public class DatasetDAO {
     }
 
     public EmfDataset update(EmfDataset locked, Session session) throws Exception {
-        renameEmissionTable(locked, session);
-        return (EmfDataset) lockingScheme.releaseLockOnUpdate(locked, current(locked, session), session);
+        EmfDataset toReturn = null;
+        try {
+            renameEmissionTable(locked, session);
+        } catch (Exception e) {
+            LOG.error("Can not rename emission table: " + locked.getInternalSources()[0].getTable(), e);
+        } finally { // to ignore if the rename fails
+            toReturn = (EmfDataset) lockingScheme.releaseLockOnUpdate(locked, current(locked, session), session);
+        }
+
+        return toReturn;
     }
 
     private EmfDataset current(EmfDataset dataset, Session session) {
@@ -158,7 +176,7 @@ public class DatasetDAO {
         if (caseInputs == null || caseInputs.isEmpty())
             return false;
 
-        if (datasetUsed((CaseInput[])caseInputs.toArray(new CaseInput[0]), dataset))
+        if (datasetUsed((CaseInput[]) caseInputs.toArray(new CaseInput[0]), dataset))
             return true;
 
         return false;
@@ -250,33 +268,45 @@ public class DatasetDAO {
 
     private void renameEmissionTable(EmfDataset dataset, Session session) throws Exception {
         EmfDataset oldDataset = getDataset(session, dataset.getId());
-        if (oldDataset == null)
-            return;
         
-        if (dataset.getName().equalsIgnoreCase(oldDataset.getName()))
+        if (!continueToRename(dataset, oldDataset))
             return;
 
         DbServer dbServer = new EmfDbServer();
-
+        
         try {
-            Datasource datasource = dbServer.getEmissionsDatasource();
-            DatasetType type = dataset.getDatasetType();
-            InternalSource[] sources = dataset.getInternalSources();
-            if(sources == null || sources.length == 0) {
-                return;
-            }
-
-            if (type.getTablePerDataset() == 1) {
-                DataTable table = new DataTable(oldDataset, datasource);
-                String oldTableName = oldDataset.getInternalSources()[0].getTable();
-                String newTableName = table.createName(dataset.getName());
-                
-                sources[0].setTable(newTableName);
-                table.rename(oldTableName, newTableName);
-            }
+            renameTable(dataset, oldDataset, dbServer);
         } finally {
             dbServer.disconnect();
         }
+    }
+
+    private boolean continueToRename(EmfDataset dataset, EmfDataset oldDataset) {
+        DatasetType type = dataset.getDatasetType();
+        InternalSource[] sources = dataset.getInternalSources();
+        
+        if (oldDataset == null)
+            return false;
+
+        if (dataset.getName().equalsIgnoreCase(oldDataset.getName()))
+            return false;
+
+        if (sources == null || sources.length == 0 || type.getTablePerDataset() != 1)
+            return false;
+        
+        return true;
+    }
+
+    private void renameTable(EmfDataset dataset, EmfDataset oldDataset, DbServer dbServer)
+            throws ImporterException {
+        Datasource datasource = dbServer.getEmissionsDatasource();
+        InternalSource[] sources = dataset.getInternalSources();
+        DataTable table = new DataTable(oldDataset, datasource);
+        String oldTableName = oldDataset.getInternalSources()[0].getTable();
+        String newTableName = table.createName(dataset.getName());
+
+        sources[0].setTable(newTableName);
+        table.rename(oldTableName, newTableName);
     }
 
 }

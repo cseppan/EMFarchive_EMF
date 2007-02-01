@@ -11,7 +11,7 @@ public interface InputFieldsPanelView {
 
     void display(CaseInput input, JComponent container) throws EmfException;
 
-    void setFields() throws EmfException;
+    CaseInput setFields() throws EmfException;
     
     CaseInput getInput();
     

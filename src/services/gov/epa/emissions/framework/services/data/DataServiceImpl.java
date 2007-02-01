@@ -107,7 +107,7 @@ public class DataServiceImpl implements DataService {
     }
 
     public void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException {
-        String prefix = "DELETED_" + EmfDateFormat.format_MMDDYYYYHHmmss(new Date()) + "_";
+        String prefix = "DELETED_" + new Date().getTime() + "_";
         
         try {
             if (isRemovable(datasets, owner)) {
@@ -136,7 +136,7 @@ public class DataServiceImpl implements DataService {
     }
 
     private void checkUser(EmfDataset dataset, User owner) throws EmfException {
-        if (!dataset.getCreator().equalsIgnoreCase(owner.getUsername())) {
+        if (!owner.isAdmin() && !dataset.getCreator().equalsIgnoreCase(owner.getUsername())) {
             releaseLockedDataset(dataset);
             throw new EmfException("Cannot delete \"" + dataset.getName()
                     + "\". User is not the creator of this dataset.");
