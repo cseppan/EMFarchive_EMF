@@ -70,7 +70,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     private EmfSession session;
     
     private ManageChangeables changeables;
-
+    
     public EditInputsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager) {
         super.setName("editInputsTab");
@@ -449,11 +449,14 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     }
 
     public String getCaseInputFileDir() {
+        if (inputDir == null) return null;
         return inputDir.getText();
     }
 
     public void refresh() {
-        doRefresh(tableData.sources());
+        // note that this will get called when the case is save
+        if (tableData != null) // it's still null if you've never displayed this tab
+           doRefresh(tableData.sources());
     }
 
     public int numberOfRecord() {
