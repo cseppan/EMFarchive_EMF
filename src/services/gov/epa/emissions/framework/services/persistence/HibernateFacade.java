@@ -236,5 +236,22 @@ public class HibernateFacade {
             throw e;
         }
     }
+    
+    public Object load(Class clazz, Criterion[] criterions, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria criteria = session.createCriteria(clazz);
+            for (int i = 0; i < criterions.length; i++)
+                criteria.add(criterions[i]);
+
+            tx.commit();
+
+            return criteria.uniqueResult();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
 
 }

@@ -11,11 +11,13 @@ public interface EditInputsTabPresenter extends CaseEditorTabPresenter {
 
     void display() throws EmfException;
 
-    void doAddInput(NewInputView view) throws EmfException;
+    void addNewInputDialog(NewInputView view) throws EmfException;
+    
+    void addNewInput(CaseInput input) throws EmfException;
 
     void doEditInput(CaseInput input, EditCaseInputView inputEditor) throws EmfException;
 
-    void doCheckDuplicate(CaseInput input, CaseInput[] existingInputs) throws EmfException;
+   // void doCheckDuplicate(CaseInput input, CaseInput[] existingInputs) throws EmfException;
 
     void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset);
     

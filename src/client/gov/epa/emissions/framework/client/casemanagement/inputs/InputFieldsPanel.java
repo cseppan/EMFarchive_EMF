@@ -308,7 +308,13 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     }
 
     public void validateFields() throws EmfException {
-        presenter.doValidateFields();
+        if (inputName.getSelectedItem() == null)
+            throw new EmfException("Please select an input name.");
+        
+        if (program.getSelectedItem() == null)
+            throw new EmfException("Please select a case program.");
+        
+        setFields();
     }
 
 }

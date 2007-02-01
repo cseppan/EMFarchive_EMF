@@ -36,19 +36,15 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
     }
 
     public void display(int caseId) {
-        doDisplay(caseId);
+        doDisplay();
     }
 
-    private void doDisplay(int caseId) {
+    private void doDisplay() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         panel.add(inputPanel());
-        try {
-            panel.add(buttonsPanel(presenter.getCaseInput(caseId)));
-        } catch (EmfException e) {
-            messagePanel.setError("Can't get all case inputs. " + e.getMessage());
-        }
+        panel.add(buttonsPanel());
 
         super.getContentPane().add(panel);
         super.display();
@@ -71,12 +67,12 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
         return panel;
     }
 
-    private JPanel buttonsPanel(final CaseInput[] inputs) {
+    private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
         Button ok = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    doNew(inputs);
+                    addNewInput();
                 } catch (EmfException exc) {
                     messagePanel.setError(exc.getMessage());
                 }
@@ -96,10 +92,10 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
         return panel;
     }
 
-    private void doNew(CaseInput[] inputs) throws EmfException {
+    private void addNewInput() throws EmfException {
         doValidateFields();
-        doCheckDuplicate(inputs);
         shouldCreate = true;
+        presenter.addNewInput(input());
         close();
     }
 
@@ -125,10 +121,6 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
         inputFieldsPanel.validateFields();
     }
     
-    private void doCheckDuplicate(CaseInput[] existingInputs) throws EmfException {
-        presenter.doCheckDuplicate(input(), existingInputs);
-    }
-
     public void addChangeable(Changeable changeable) {
         // NOTE Auto-generated method stub
     }

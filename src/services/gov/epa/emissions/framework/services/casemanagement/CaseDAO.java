@@ -1,13 +1,12 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -167,19 +166,23 @@ public class CaseDAO {
     }
 
     public boolean caseInputExists(CaseInput input, Session session) {
-        Criterion[] criterions = caseInputDuplicateChecks(input);
+        Criterion[] criterions = uniqueCaseInputCriteria(input);
         
         return hibernateFacade.exists(CaseInput.class, criterions, session);
     }
 
-    private Criterion[] caseInputDuplicateChecks(CaseInput input) {
-        Criterion c1 = Restrictions.eq("caseID", new Integer(input.getCaseID()));
-        Criterion c2 = Restrictions.eq("inputName", input.getInputName());
-        Criterion c3 = Restrictions.eq("sector", input.getSector());
-        Criterion c4 = Restrictions.eq("program", input.getProgram());
-        Criterion[] criterions = { c1, c2, c3, c4 };
+    private Criterion[] uniqueCaseInputCriteria(CaseInput input) {
+        Integer caseId = new Integer(input.getCaseID());
+        InputName inputname = input.getInputName();
+        Sector sector = input.getSector();
+        CaseProgram program = input.getProgram();
+        
+        Criterion c1 = Restrictions.eq("caseID", caseId);
+        Criterion c2 = (inputname == null) ? Restrictions.isNull("inputName") : Restrictions.eq("inputName", inputname);
+        Criterion c3 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
+        Criterion c4 = (program == null) ? Restrictions.isNull("program") : Restrictions.eq("program", program);
 
-        return criterions;
+        return new Criterion[]{ c1, c2, c3, c4 };
     }
 
     public Object load(Class clazz, String name, Session session) {
@@ -188,14 +191,9 @@ public class CaseDAO {
     }
 
     public Object loadCaseInupt(CaseInput input, Session session) {
-        Map map = new HashMap();
-        map.put("caseID", new Integer(input.getCaseID()));
-        map.put("inputName", input.getInputName());
-        map.put("sector", input.getSector());
-        map.put("program", input.getProgram());
-        Criterion criterion = Restrictions.allEq(map);
-
-        return hibernateFacade.load(CaseInput.class, criterion, session);
+        Criterion[] criterions = uniqueCaseInputCriteria(input);
+        
+        return hibernateFacade.load(CaseInput.class, criterions, session);
     }
 
     public List getCaseInputs(int caseId, Session session) {
@@ -208,8 +206,8 @@ public class CaseDAO {
         return hibernateFacade.getAll(CaseInput.class, Order.asc("id"), session);
     }
 
-    public void updateCaseInput(CaseInput[] inputs, Session session) {
-        hibernateFacade.update(inputs, session);
+    public void updateCaseInput(CaseInput input, Session session) {
+        hibernateFacade.updateOnly(input, session);
     }
 
     public List getModelToRuns(Session session) {

@@ -7,10 +7,7 @@ import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
-import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
-import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
-import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExImService;
 
@@ -42,29 +39,26 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         view.refresh();
     }
 
-    public void doAddInput(NewInputView dialog) throws EmfException {
+    public void addNewInputDialog(NewInputView dialog) {
         dialog.register(this);
         dialog.display(caseObj.getId());
-        
-        if (dialog.shouldCreate()) {
-            CaseInput newInput = dialog.input();
-            newInput.setCaseID(caseObj.getId());
-            CaseInput loaded = service().addCaseInput(newInput);
-            view.addInput(loaded);
-        }
-        
+    }
+
+    public void addNewInput(CaseInput input) throws EmfException {
+        input.setCaseID(caseObj.getId());
+        view.addInput(service().addCaseInput(input));
         refreshView();
     }
 
     private CaseService service() {
         return session.caseService();
     }
-    
+
     private void refreshView() {
         view.refresh();
-//        view.notifychanges();
+        // view.notifychanges();
     }
-    
+
     public void removeInputs(CaseInput[] inputs) throws EmfException {
         service().removeCaseInputs(inputs);
     }
@@ -82,45 +76,6 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
         InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(inputFields, session);
         inputFieldsPresenter.display(newInput, container);
-    }
-
-    public void doCheckDuplicate(CaseInput input, CaseInput[] existingInputs) throws EmfException {
-        for (int i = 0; i < existingInputs.length; i++) {
-            if (input.getId() != existingInputs[i].getId())
-                if (input.equals(existingInputs[i]))
-                    throw new EmfException("The combination of 'Input Name', 'Sector', and 'Program' "
-                            + "should be unique.");
-        }
-
-        InputName[] names = caseService().getInputNames();
-        InputName inputName = input.getInputName();
-        for (int i = 0; i < names.length; i++) {
-            if (inputName == null)
-                throw new EmfException("InputName cannot be null.");
-
-            if (inputName.getId() != names[i].getId())
-                if (inputName.equals(names[i]))
-                    throw new EmfException("InputName: " + inputName.getName() + " has already existed.");
-        }
-
-        CaseProgram[] prgs = caseService().getPrograms();
-        CaseProgram prg = input.getProgram();
-        for (int i = 0; i < prgs.length; i++)
-            if (prg != null && prg.getId() != prgs[i].getId())
-                if (prg.equals(prgs[i]))
-                    throw new EmfException("Program: " + prg.getName() + " has already existed.");
-
-        InputEnvtVar[] envtVars = caseService().getInputEnvtVars();
-        InputEnvtVar envtVar = input.getEnvtVars();
-        for (int i = 0; i < envtVars.length; i++)
-            if (envtVar != null && envtVar.getId() != envtVars[i].getId())
-                if (envtVar.equals(envtVars[i]))
-                    throw new EmfException("InputEnvtVar: " + envtVar.getName() + " has already existed.");
-
-    }
-
-    private CaseService caseService() {
-        return this.session.caseService();
     }
 
     public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) {
@@ -148,9 +103,11 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
             datasets[i].setAccessedDateTime(new Date());
 
             if (overwrite)
-                services.exportDatasetsWithOverwrite(session.user(), new EmfDataset[]{datasets[i]}, new Version[]{versions[i]}, mapToRemote(folders[i]), purpose);
+                services.exportDatasetsWithOverwrite(session.user(), new EmfDataset[] { datasets[i] },
+                        new Version[] { versions[i] }, mapToRemote(folders[i]), purpose);
             else
-                services.exportDatasets(session.user(), new EmfDataset[]{datasets[i]}, new Version[]{versions[i]}, mapToRemote(folders[i]), purpose);
+                services.exportDatasets(session.user(), new EmfDataset[] { datasets[i] },
+                        new Version[] { versions[i] }, mapToRemote(folders[i]), purpose);
         }
     }
 

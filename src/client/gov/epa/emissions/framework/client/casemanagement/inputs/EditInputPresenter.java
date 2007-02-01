@@ -8,6 +8,4 @@ public interface EditInputPresenter {
     void display(CaseInput input) throws EmfException;
     
     void doSave() throws EmfException;
-    
-    void doCheckDuplicate(CaseInput input) throws EmfException;
 }

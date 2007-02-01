@@ -465,10 +465,12 @@ public class CaseServiceImpl implements CaseService {
 
     public CaseInput addCaseInput(CaseInput input) throws EmfException {
         Session session = sessionFactory.getSession();
+        
+        if (dao.caseInputExists(input, session))
+            throw new EmfException("The combination of 'Input Name', 'Sector', and 'Program' "
+                    + "should be unique.");
+        
         try {
-            if (dao.caseInputExists(input, session))
-                throw new EmfException("CaseInput: " + input.getName() + " is already in use.");
-            
             dao.add(input, session);
             return (CaseInput) dao.loadCaseInupt(input, session);
         } catch (Exception e) {
@@ -483,7 +485,13 @@ public class CaseServiceImpl implements CaseService {
         Session session = sessionFactory.getSession();
 
         try {
-            dao.updateCaseInput(new CaseInput[]{ input }, session);
+            CaseInput loaded = (CaseInput) dao.loadCaseInupt(input, session);
+            
+            if (loaded != null && loaded.getId() != input.getId())
+                throw new EmfException("CaseInput uniqueness check failed.");
+            
+            session.clear();
+            dao.updateCaseInput(input, session);
         } catch (RuntimeException e) {
             LOG.error("Could not update CaseInput: " + input.getName() + ".\n" + e);
             throw new EmfException("Could not update CaseInput: " + input.getName() + ".");

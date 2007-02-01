@@ -256,7 +256,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     protected void doNewInput(EditInputsTabPresenter presenter) {
         NewInputDialog view = new NewInputDialog(parentConsole);
         try {
-            presenter.doAddInput(view);
+            presenter.addNewInputDialog(view);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -454,10 +454,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     public void refresh() {
         doRefresh(tableData.sources());
-    }
-
-    public void checkDuplicate(CaseInput input) throws EmfException {
-        presenter.doCheckDuplicate(input, tableData.sources());
     }
 
     public int numberOfRecord() {
