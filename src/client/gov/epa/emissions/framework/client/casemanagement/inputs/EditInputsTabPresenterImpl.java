@@ -35,7 +35,8 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
     public void doSave() {
         String caseInputDir = view.getCaseInputFileDir();
-        caseObj.setInputFileDir(caseInputDir);
+        if (caseInputDir != null)
+           caseObj.setInputFileDir(caseInputDir);
         view.refresh();
     }
 
