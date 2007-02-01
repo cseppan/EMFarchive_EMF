@@ -139,7 +139,7 @@ public class DataServiceImpl implements DataService {
         if (!owner.isAdmin() && !dataset.getCreator().equalsIgnoreCase(owner.getUsername())) {
             releaseLockedDataset(dataset);
             throw new EmfException("Cannot delete \"" + dataset.getName()
-                    + "\". User is not the creator of this dataset.");
+                    + "\" - you are not the creator of this dataset.");
 
         }
     }
@@ -147,13 +147,13 @@ public class DataServiceImpl implements DataService {
     private void checkCase(EmfDataset dataset) throws EmfException {
         Session session = sessionFactory.getSession();
         if (dao.isUsedByCases(session, dataset))
-            throw new EmfException("Cannot delete \"" + dataset.getName() + "\". Used by cases.");
+            throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is used by a case.");
     }
 
     private void checkControlStrategy(EmfDataset dataset) throws EmfException {
         Session session = sessionFactory.getSession();
         if (dao.isUsedByControlStrategies(session, dataset))
-            throw new EmfException("Cannot delete \"" + dataset.getName() + "\". Used by control strategies.");
+            throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is use by a control strategy.");
     }
 
 }
