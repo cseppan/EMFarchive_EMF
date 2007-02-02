@@ -34,6 +34,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -90,7 +91,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private Button saveButton;
 
-    public EditQAStepWindow(DesktopManager desktopManager) {
+   private JCheckBox currentTable;
+    
+   public EditQAStepWindow(DesktopManager desktopManager) {
         super("Edit QA Step", new Dimension(650, 625), desktopManager);
     }
 
@@ -164,6 +167,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         table = (table == null) ? "" : table;
         TextField tableName = new TextField("tableName", table, 20);
         tableName.setEditable(false);
+        tableName.setToolTipText("The name of the output of the step (e.g. name of a table in the database");
         layoutGenerator.addLabelWidgetPair("Ouput Name:", tableName, panel);
 
         JLabel creationStatusLabel = new JLabel();
@@ -178,9 +182,11 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         creationDateLabel.setText(creationDate);
         layoutGenerator.addLabelWidgetPair("Run Date:", creationDateLabel, panel);
 
-        JCheckBox currentTable = new JCheckBox();
+        currentTable = new JCheckBox();
         currentTable.setEnabled(false);
         currentTable.setSelected(stepResult.isCurrentTable());
+        currentTable.setToolTipText(
+                "True when the source data and QA step have not been modified since the step was run");
         layoutGenerator.addLabelWidgetPair("Current Output?", currentTable, panel);
 
         // Lay out the panel.
@@ -196,16 +202,18 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         config = new TextField("config", step.getConfiguration(), 40);
         addChangeable(config);
-        config.setToolTipText("Enter the name of the Dataset that is the configuration "
-                + "file (e.g., a REPCONFIG file)");
+        config.setToolTipText("The name of the Dataset that is the configuration "
+                + "file for the step (e.g., a REPCONFIG file)");
         layoutGenerator.addLabelWidgetPair("Configuration:", config, panel);
 
         comments = new TextArea("Comments", step.getComments(), 40, 2);
         addChangeable(comments);
         ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(comments);
         layoutGenerator.addLabelWidgetPair("Comments:", scrollableComment, panel);
+        comments.setToolTipText(
+                "Enter any notes of interest that you found when performing the step");
 
-        layoutGenerator.addLabelWidgetPair("Folder:", exportFolderPanel(step), panel);
+        layoutGenerator.addLabelWidgetPair("Export Folder:", exportFolderPanel(step), panel);
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
@@ -217,6 +225,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private JPanel exportFolderPanel(QAStep step) {
         exportFolder = new JTextField(40);
+        exportFolder.setToolTipText("The folder (directory) to which the step results will be exported");
         exportFolder.setName("folder");
         String outputFolder = step.getOutputFolder();
         exportFolder.setText(outputFolder != null ? outputFolder : "");
@@ -255,10 +264,11 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         status = status(step);
         addChangeable(status);
         layoutGenerator.addLabelWidgetPair("QA Status:", status, panel);
+        status.setToolTipText("Choosing a new status will automatically set the user and date");
 
         who = new TextField("who", step.getWho(), 10);
         addChangeable(who);
-        layoutGenerator.addLabelWidgetPair("User:", who, panel);
+        layoutGenerator.addLabelWidgetPair("QA User:", who, panel);
 
         date = new FormattedDateField("Date", step.getDate(), DATE_FORMATTER, messagePanel);
         addChangeable(date);
@@ -307,11 +317,22 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             program.setSelectedItem(null);
         addChangeable(program);
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
-
+        program.addActionListener(new AbstractAction()
+          {
+            public void actionPerformed(ActionEvent e) {
+                currentTable.setSelected(false);
+            }
+        });
+ 
         programArguments = new TextArea("", step.getProgramArguments(), 40, 3);
         addChangeable(programArguments);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programArguments);
         layoutGenerator.addLabelWidgetPair("Arguments:", scrollableDetails, panel);
+        programArguments.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) {
+                currentTable.setSelected(false);
+            }
+        });
 
         order = new NumberFormattedTextField(5, orderAction());
         order.setText(step.getOrder() + "");
@@ -423,7 +444,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             date.setValue(new Date());
             who.setText(presenter.userName());
 
-            presenter.doRun();
+            presenter.run();
 
             saveButton.setEnabled(false);// to prevent user from entering and click save after started running a qa
                                             // step
@@ -437,7 +458,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         try {
             messagePanel.setMessage("Started Export. Please monitor the Status window "
                     + "to track your export request.");
-            presenter.doExport(step, qaStepResult, exportFolder.getText());
+            presenter.export(step, qaStepResult, exportFolder.getText());
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -448,7 +469,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             public void actionPerformed(ActionEvent e) {
                 try {
                     clear();
-                    presenter.doSave();
+                    presenter.save();
                 } catch (EmfException e1) {
                     messagePanel.setError(e1.getMessage());
                 }
@@ -469,7 +490,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     protected void doClose() {
         if (super.shouldDiscardChanges())
-            presenter.doClose();
+            presenter.close();
     }
 
     public QAStep save() throws EmfException {
@@ -490,7 +511,6 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         step.setWho(who.getText());
         step.setDate(date.value());
         step.setConfiguration(config.getText());
-
         return step;
     }
 
