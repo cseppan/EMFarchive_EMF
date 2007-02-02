@@ -39,18 +39,18 @@ public class EditQAStepPresenter {
         view.setMostRecentUsedFolder(getFolder());
     }
 
-    public void doClose() {
+    public void close() {
         view.disposeView();
     }
 
-    public void doSave() throws EmfException {
+    public void save() throws EmfException {
         QAStep step = view.save();
         session.qaService().updateWitoutCheckingConstraints(new QAStep[] { step });
         tabView.refresh();
-        doClose();
+        close();
     }
 
-    public void doRun() throws EmfException {
+    public void run() throws EmfException {
         QAStep step = view.save();
         step.setStatus("In Progress");
         step.setDate(new Date());
@@ -60,13 +60,13 @@ public class EditQAStepPresenter {
         session.qaService().runQAStep(step, session.user());
     }
 
-    public void doExport(QAStep qaStep, QAStepResult stepResult, String dirName) throws EmfException {
+    public void export(QAStep qaStep, QAStepResult stepResult, String dirName) throws EmfException {
         File dir = new File(dirName);
         if (dir.isDirectory())
             lastFolder = dirName;
 
         if (stepResult == null || stepResult.getTable() == null)
-            throw new EmfException("You have to run the QA step successfully before exporting ");
+            throw new EmfException("You must have run the QA step successfully before exporting ");
 
         session.qaService().exportQAStep(qaStep, session.user(), mapToRemote(dirName));
 
