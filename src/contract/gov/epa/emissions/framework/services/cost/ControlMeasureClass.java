@@ -48,7 +48,7 @@ public class ControlMeasureClass implements Serializable {
 
         ControlMeasureClass other = (ControlMeasureClass) obj;
 
-        return (id == other.getId() || name.toUpperCase().equals(other.getName().toUpperCase()));
+        return (id == other.getId() || name.equalsIgnoreCase(other.getName()));
     }
 
     public int hashCode() {
