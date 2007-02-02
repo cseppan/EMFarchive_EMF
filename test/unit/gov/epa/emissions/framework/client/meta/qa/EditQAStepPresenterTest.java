@@ -33,7 +33,7 @@ public class EditQAStepPresenterTest extends EmfMockObjectTestCase {
 
         EditQAStepPresenter presenter = new EditQAStepPresenter((EditQAStepView) view.proxy(), null,
                 (EditableQATabView) tabView.proxy(), (EmfSession) session.proxy());
-        presenter.doSave();
+        presenter.save();
     }
 
     public void testShouldCloseViewOnClose() {
@@ -41,7 +41,7 @@ public class EditQAStepPresenterTest extends EmfMockObjectTestCase {
         expects(view, "disposeView");
 
         EditQAStepPresenter presenter = new EditQAStepPresenter((EditQAStepView) view.proxy(), null, null, null);
-        presenter.doClose();
+        presenter.close();
     }
 
     public void testShouldObserverAndDisplayViewOnDisplay() throws EmfException {
