@@ -243,7 +243,7 @@ public class CaseServiceImpl implements CaseService {
             return released;
         } catch (RuntimeException e) {
             LOG.error("Could not release lock by "+locked.getLockOwner(), e);
-            throw new EmfException("Could not release lock by " + locked.getLockOwner+" for Case: " + locked);
+            throw new EmfException("Could not release lock by " + locked.getLockOwner()+" for Case: " + locked);
         }
     }
 
