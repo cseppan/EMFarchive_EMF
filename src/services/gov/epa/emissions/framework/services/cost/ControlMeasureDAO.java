@@ -18,6 +18,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 public class ControlMeasureDAO {
@@ -256,7 +257,7 @@ public class ControlMeasureDAO {
     }
 
     public List allCMClasses(Session session) {
-        return hibernateFacade.getAll(ControlMeasureClass.class, session);
+        return hibernateFacade.getAll(ControlMeasureClass.class, Order.asc("name"), session);
     }
 
 }
