@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
     private EditControlStrategyMeasuresTabPresenter presenter;
 
     private ManageChangeables changeablesList;
+    private ControlMeasureClass defaultClass = new ControlMeasureClass("All");
     
     public EditControlStrategyMeasuresTab(ControlStrategy controlStrategy, ManageChangeables changeablesList,
             SingleLineMessagePanel messagePanel, EmfConsole parentConsole, EmfSession session) {
@@ -51,13 +53,22 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
     private JPanel createClassesPanel(ManageChangeables changeables) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         JLabel classToInclude = new JLabel("Classes to Include:");
+
+        List allClassesList = new ArrayList(Arrays.asList(allClasses));
+        allClassesList.add(0, defaultClass);
+        allClasses = (ControlMeasureClass[]) allClassesList.toArray(new ControlMeasureClass[0]);
+        if (classes.length == 0) {
+            List selClassesList = new ArrayList();
+            selClassesList.add(defaultClass);
+            classes = (ControlMeasureClass[]) selClassesList.toArray(new ControlMeasureClass[0]);
+        }
         this.classesList = new ListWidget(allClasses, classes);
         changeables.addChangeable(classesList);
         JScrollPane pane = new JScrollPane(classesList);
-        pane.setPreferredSize(new Dimension(20, 80));
+        pane.setPreferredSize(new Dimension(20, 100));
         panel.add(classToInclude, BorderLayout.NORTH);
         panel.add(pane, BorderLayout.CENTER);
-        
+
         return panel;
     }
 
@@ -67,9 +78,18 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
     private ControlMeasureClass[] getControlMeasureClasses() {
         ControlMeasureClass[] controlMeasureClasses = null;
-        if (classesList.getSelectedValues() != null) {
-            List selectedValues = Arrays.asList(classesList.getSelectedValues());
-            controlMeasureClasses = (ControlMeasureClass[]) selectedValues.toArray(new ControlMeasureClass[0]);
+        ControlMeasureClass[] selClasses = Arrays.asList(classesList.getSelectedValues()).toArray(new ControlMeasureClass[0]);
+
+        //make sure we don't include the All class, its just for display purposes,
+        //its not stored in the database
+        if (selClasses.length != 0 
+                && !(selClasses.length == 1 && selClasses[0].equals(defaultClass))) {
+            List selClassesList = new ArrayList();
+            for (int i = 0; i < selClasses.length; i++)
+                if (!selClasses[i].equals(defaultClass)) 
+                    selClassesList.add(selClasses[i]);
+
+            controlMeasureClasses = (ControlMeasureClass[]) selClassesList.toArray(new ControlMeasureClass[0]);
         }
         return controlMeasureClasses;
     }
