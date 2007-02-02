@@ -18,7 +18,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     private EditControlStrategyView view;
 
-    private ControlStrategiesManagerPresenter managerPresenter;
+//    private ControlStrategiesManagerPresenter managerPresenter;
 
     private ControlStrategy controlStrategy;
 
@@ -37,7 +37,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         this.controlStrategy = controlStrategy;
         this.session = session;
         this.view = view;
-        this.managerPresenter = controlStrategiesManagerPresenter;
+//        this.managerPresenter = controlStrategiesManagerPresenter;
         this.presenters = new ArrayList();
     }
 
@@ -70,12 +70,10 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     public void doSave() throws EmfException {
         saveTabs();
         validateName(controlStrategy);
-
         controlStrategy.setCreator(session.user());
         controlStrategy.setLastModifiedDate(new Date());
-
         service().updateControlStrategyWithLock(controlStrategy);
-        managerPresenter.doRefresh();
+//        managerPresenter.doRefresh();
     }
 
     private void saveTabs() throws EmfException {
