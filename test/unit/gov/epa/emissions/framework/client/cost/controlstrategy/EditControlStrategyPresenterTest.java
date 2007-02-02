@@ -73,7 +73,8 @@ public class EditControlStrategyPresenterTest extends EmfMockObjectTestCase {
         stub(session, "user", new User());
 
         Mock managerPresenter = mock(ControlStrategiesManagerPresenter.class);
-        expects(managerPresenter, 1, "doRefresh");
+        //DCD 2/2/07 we don't want to refresh the manager anymore...
+        //        expects(managerPresenter, 1, "doRefresh");
 
         EditControlStrategyPresenter p = new EditControlStrategyPresenterImpl(comtrolStrategy, (EmfSession) session
                 .proxy(), (EditControlStrategyView) view.proxy(), (ControlStrategiesManagerPresenter) managerPresenter

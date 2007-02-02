@@ -34,4 +34,6 @@ public interface ControlMeasureService extends EMFService {
 
     ControlMeasureClass[] getMeasureClasses() throws EmfException;
 
+    ControlMeasureClass getMeasureClass(String name) throws EmfException;
+
 }

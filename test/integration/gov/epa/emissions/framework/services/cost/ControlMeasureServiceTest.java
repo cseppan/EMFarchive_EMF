@@ -80,6 +80,13 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldGetAllControlMeasuresClasses() throws Exception {
+        
+        ControlMeasureClass[] cmcs = service.getMeasureClasses();
+        
+        assertTrue(cmcs.length > 0);
+    }
+
     public void testShouldAddOneControlMeasure() throws Exception {
 
         ControlMeasure cm = new ControlMeasure();
@@ -105,11 +112,15 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
     public void testShouldUpdateControlMeasure() throws Exception {
         User owner = userService.getUser("emf");
         ControlMeasure cm = new ControlMeasure();
+        ControlMeasureClass cmc = service.getMeasureClass("Known");
+        cm.setCmClass(cmc);
         String name = "cm test one" + Math.random();
         cm.setEquipmentLife(12);
         cm.setName(name);
         cm.setAbbreviation("12345688");
         Scc scc1 = new Scc("123232", "");
+
+
         service.addMeasure(cm, new Scc[] { scc1 });
 
         ControlMeasure cmModified = service.obtainLockedMeasure(owner, cm);
@@ -119,6 +130,8 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
 
         try {
             assertEquals("cm updated", cm2.getName());
+//            assertEquals(1, cm2.getSccs().length);
+            assertEquals("Known", cm2.getCmClass().getName());
             assertEquals(new Float(120), new Float(cm2.getEquipmentLife()));
         } finally {
             remove(scc1);
@@ -132,6 +145,8 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         cm.setName("xxxx" + Math.random());
         cm.setAbbreviation("yyyyyyyy");
         Scc scc1 = new Scc("123232", "");
+        ControlMeasureClass cmc = service.getMeasureClass("Emerging");
+        cm.setCmClass(cmc);
         service.addMeasure(cm, new Scc[] { scc1 });
 
         try {
@@ -140,6 +155,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
 
             ControlMeasure loadedFromDb = load(cm);
             assertTrue("Should have released lock", loadedFromDb.isLocked());
+            assertEquals("Emerging", loadedFromDb.getCmClass().getName());
         } finally {
             remove(scc1);
             remove(cm);
@@ -171,6 +187,8 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
 
         ControlMeasure cm = new ControlMeasure();
         String name = "cm test one" + Math.random();
+        ControlMeasureClass cmc = service.getMeasureClass("Emerging");
+        cm.setCmClass(cmc);
         cm.setEquipmentLife(12);
         cm.setName(name);
         cm.setAbbreviation("12345678");

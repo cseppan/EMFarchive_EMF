@@ -19,6 +19,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
     private ControlStrategyService service;
 
     private UserServiceImpl userService;
+    private ControlMeasureService cmService;
 
     private HibernateSessionFactory sessionFactory;
 
@@ -26,6 +27,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         sessionFactory = sessionFactory(configFile());
         service = new ControlStrategyServiceImpl(sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
+        cmService = new ControlMeasureServiceImpl(sessionFactory);
     }
 
     protected void doTearDown() throws Exception {// no op
@@ -68,6 +70,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         int totalBeforeAdd = service.getControlStrategies().length;
         ControlStrategy element = new ControlStrategy("test" + Math.random());
         element.setCreator(owner);
+        element.setControlMeasureClasses(cmService.getMeasureClasses());
         service.addControlStrategy(element);
         
         try {
@@ -146,13 +149,18 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
             ControlStrategy locked = service.obtainLocked(owner, element);
 
             session.clear();
+            ControlMeasureClass[] cmcs = cmService.getMeasureClasses();
+            int cmcLength = cmcs.length;
+
             locked.setName("TEST");
             locked.setDescription("TEST control strategy");
+            locked.setControlMeasureClasses(cmcs);
 
             released = service.updateControlStrategy(locked);
             assertEquals("TEST", released.getName());
             assertEquals("TEST control strategy", released.getDescription());
             assertEquals(released.getLockOwner(), null);
+            assertEquals(cmcLength, released.getControlMeasureClasses().length);
             assertFalse("Lock should be released on update", released.isLocked());
         } finally {
             remove(element);

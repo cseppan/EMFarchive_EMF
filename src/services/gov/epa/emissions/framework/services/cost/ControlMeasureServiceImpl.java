@@ -212,4 +212,15 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
+    public ControlMeasureClass getMeasureClass(String name) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getCMClass(session, name);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve control measure class.", e);
+            throw new EmfException("Could not retrieve control measure class.");
+        } finally {
+            session.close();
+        }
+    }
 }

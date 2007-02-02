@@ -260,4 +260,8 @@ public class ControlMeasureDAO {
         return hibernateFacade.getAll(ControlMeasureClass.class, Order.asc("name"), session);
     }
 
+    public ControlMeasureClass getCMClass(Session session, String name) {
+        return (ControlMeasureClass)hibernateFacade.load(ControlMeasureClass.class, Restrictions.eq("name", name), session);
+    }
+
 }

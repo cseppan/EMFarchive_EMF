@@ -230,9 +230,10 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
 
     public void testShouldOverwriteCM_WhenImport_WithSameNameAndSameAbbrev() throws HibernateException, Exception {
         ControlMeasure cm = new ControlMeasure();
+        ControlMeasureClass cmc = dao.getCMClass(session, "Known");
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
-//        cm.setCmClass("Experiment");
+        cm.setCmClass(cmc);
         User emfUser = emfUser();
         cm.setCreator(emfUser);
 
@@ -245,13 +246,14 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         Scc[] sccs2 = sccs("10231");
         addCMFromImporter(cm, emfUser, sccs1);
 
-//        cm.setCmClass("Theory");
+        cmc = dao.getCMClass(session, "Emerging");
+        cm.setCmClass(cmc);
         
         cm.setEfficiencyRecords(records2);
         addCMFromImporter(cm, emfUser, sccs2);
 
         ControlMeasure controlMeasure = (ControlMeasure) load(ControlMeasure.class, "cm one");
-        assertEquals("Theory", controlMeasure.getCmClass());
+        assertEquals("Emerging", controlMeasure.getCmClass().getName());
 
         EfficiencyRecord[] efficiencyRecords = controlMeasure.getEfficiencyRecords();
         assertEquals(1, efficiencyRecords.length);
@@ -266,9 +268,10 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
 
     public void testShouldOverwriteCM_WhenImport_WithSameNameAndDifferenAbbrev() throws EmfException, Exception {
         ControlMeasure cm = new ControlMeasure();
+        ControlMeasureClass cmc = dao.getCMClass(session, "Hypothetical");
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
-//       cm.setCmClass("Experiment");
+        cm.setCmClass(cmc);
         User emfUser = emfUser();
         cm.setCreator(emfUser);
 
@@ -283,13 +286,14 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         addCMFromImporter(cm, emfUser, sccs1);
 
         cm.setAbbreviation("UNCCEP");
-//        cm.setCmClass("Theory");
+        cmc = dao.getCMClass(session, "Obselete");
+        cm.setCmClass(cmc);
         cm.setEfficiencyRecords(records2);
         addCMFromImporter(cm, emfUser, sccs2);
 
         ControlMeasure controlMeasure = (ControlMeasure) load(ControlMeasure.class, "cm one");
         assertEquals("UNCCEP", controlMeasure.getAbbreviation());
-        assertEquals("Theory", controlMeasure.getCmClass());
+        assertEquals("Obselete", controlMeasure.getCmClass().getName());
 
         EfficiencyRecord[] efficiencyRecords = controlMeasure.getEfficiencyRecords();
         assertEquals(1, efficiencyRecords.length);
@@ -304,9 +308,10 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
 
     public void testShouldOverwriteCM_WhenImport_WithDifferentNameAndSameAbbrev() throws Exception {
         ControlMeasure cm = new ControlMeasure();
+        ControlMeasureClass cmc = dao.getCMClass(session, "Hypothetical");
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
-//        cm.setCmClass("Experiment");
+        cm.setCmClass(cmc);
         User emfUser = emfUser();
         cm.setCreator(emfUser);
 
@@ -320,7 +325,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         try {
             addCMFromImporter(cm, emfUser, sccs1);
             cm.setName("cm two");
-//            cm.setCmClass("Theory");
+            cmc = dao.getCMClass(session, "Emerging");
+            cm.setCmClass(cmc);
             cm.setEfficiencyRecords(records2);
             addCMFromImporter(cm, emfUser, sccs2);
             assertFalse("Should have throw an exception: abbrev exist", true);

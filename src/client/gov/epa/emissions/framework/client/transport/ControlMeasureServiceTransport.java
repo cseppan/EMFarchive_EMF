@@ -152,5 +152,15 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (ControlMeasureClass[]) call.requestResponse(new Object[] { });
     }
 
+    public ControlMeasureClass getMeasureClass(String name) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getMeasureClass");
+        call.addIntegerParam("name");
+        call.setReturnType(mappings.controlMeasureClass());
+
+        return (ControlMeasureClass) call.requestResponse(new Object[] { name });
+    }
+
 
 }
