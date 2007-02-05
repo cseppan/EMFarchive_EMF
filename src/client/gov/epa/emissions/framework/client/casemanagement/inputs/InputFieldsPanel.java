@@ -308,10 +308,11 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     }
 
     public void validateFields() throws EmfException {
+        Object selectedProg = program.getSelectedItem();
         if (inputName.getSelectedItem() == null)
             throw new EmfException("Please specify an input name.");
         
-        if (program.getSelectedItem() == null)
+        if (selectedProg == null || selectedProg.toString().trim().equals(""))
             throw new EmfException("Please specify a program.");
         
         setFields();
