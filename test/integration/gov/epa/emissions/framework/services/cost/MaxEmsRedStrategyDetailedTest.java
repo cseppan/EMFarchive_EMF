@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.data.Pollutant;
 //import gov.epa.emissions.commons.db.Datasource;
 //import gov.epa.emissions.commons.db.TableReader;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.analysis.maxreduction.MaxEmsRedStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
@@ -25,7 +26,7 @@ import java.sql.Statement;
 
 public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailedCase {
 
-    public void FIXME_testShouldRunMaxEmsRedStrategyWithOneControlMeasureAndNonpointData() throws Exception {
+    public void testShouldRunMaxEmsRedStrategyWithOneControlMeasureAndNonpointData() throws Exception {
         ControlStrategy strategy = null;
         EmfDataset inputDataset = setInputDataset("ORL nonpoint");
         
@@ -55,25 +56,25 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
                     ResultSet.CONCUR_READ_ONLY);
             //make sure nothing shows up, assigned different pollutant for same SCC...
-            rs = stmt.executeQuery("SELECT * FROM " + tableName
-                    + "where scc = '2104008000' and fips = '37029' and poll ='VOC'");
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName
+                    + " where scc = '2104008000' and fips = '37029' and poll ='VOC'");
             assertTrue("assigned different pollutant for same SCC", !rs.first());
 
             //make sure nothing shows up, assigned different pollutant for same SCC...
-            rs = stmt.executeQuery("SELECT * FROM " + tableName 
-                    + "where scc = '2104008000' and fips = '37019' and poll ='PM2.5'");
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
+                    + " where scc = '2104008000' and fips = '37019' and poll ='PM2.5'");
             assertTrue("assigned different pollutant for same SCC", !rs.first());
 
-            rs = stmt.executeQuery("SELECT * FROM " + tableName
-                    + "where scc = '2104008000' and fips = '37019' and poll ='PM2.5'");
-
-            while (rs.next()) {
-                // retrieve and print the values for the current row
-                int i = rs.getInt("a");
-                String s = rs.getString("b");
-                float f = rs.getFloat("c");
-                System.out.println("ROW = " + i + " " + s + " " + f);
-            }
+//            rs = stmt.executeQuery("SELECT * FROM " + tableName
+//                    + "where scc = '2104008000' and fips = '37019' and poll ='PM2.5'");
+//
+//            while (rs.next()) {
+//                // retrieve and print the values for the current row
+//                int i = rs.getInt("a");
+//                String s = rs.getString("b");
+//                float f = rs.getFloat("c");
+//                System.out.println("ROW = " + i + " " + s + " " + f);
+//            }
             
             // rs will be scrollable, will not show changes made by others,
             // and will be updatable
