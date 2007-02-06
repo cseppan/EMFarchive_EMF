@@ -26,7 +26,7 @@ import java.sql.Statement;
 
 public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailedCase {
 
-    public void testShouldRunMaxEmsRedStrategyWithOneControlMeasureAndNonpointData() throws Exception {
+    public void testShouldRunMaxEmsRedStrategyWithNonpointDataAndFilterOnAllMeasureClasses() throws Exception {
         ControlStrategy strategy = null;
         EmfDataset inputDataset = setInputDataset("ORL nonpoint");
         
@@ -55,15 +55,25 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             Statement stmt = cn.createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
                     ResultSet.CONCUR_READ_ONLY);
-            //make sure nothing shows up, assigned different pollutant for same SCC...
-            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName
-                    + " where scc = '2104008000' and fips = '37029' and poll ='VOC'");
-            assertTrue("assigned different pollutant for same SCC", !rs.first());
 
-            //make sure nothing shows up, assigned different pollutant for same SCC...
+            //make sure 15 records come back...
+            rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName);
+            rs.next();
+            assertTrue("make sure there are 15 records in the summary results.", rs.getInt(1) == 15);
+
+            //make sure nothing shows up, assigned different pollutant (PM2.5) for same SCC...
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2104008000' and fips = '37019' and poll ='PM2.5'");
             assertTrue("assigned different pollutant for same SCC", !rs.first());
+
+            //make sure inv entry has the right numbers, there are NO locale specific measures for this entry...
+            //check SCC = 2104008000 FIPS = 37029 inv entry
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
+                    + " where scc = '2104008000' and fips = '37029'");
+            rs.next();
+            assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2) < 1e-6);
+            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 70034226.09", Math.abs(rs.getDouble("annual_cost") - 70034226.09) < 1e-6);
+            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 22932.0007562637", Math.abs(rs.getDouble("emis_rediction") - 22932.0007562637) < 1e-6);
 
 //            rs = stmt.executeQuery("SELECT * FROM " + tableName
 //                    + "where scc = '2104008000' and fips = '37019' and poll ='PM2.5'");
@@ -75,7 +85,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 //                float f = rs.getFloat("c");
 //                System.out.println("ROW = " + i + " " + s + " " + f);
 //            }
-            
+
             // rs will be scrollable, will not show changes made by others,
             // and will be updatable
 
@@ -90,11 +100,11 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
     }
 
     private void dropTables(ControlStrategy strategy, EmfDataset inputDataset) throws Exception {
-        if (strategy != null)
-            dropTable(detailResultDatasetTableName(strategy), dbServer().getEmissionsDatasource());
+//        if (strategy != null)
+//            dropTable(detailResultDatasetTableName(strategy), dbServer().getEmissionsDatasource());
         dropQASummaryTables(inputDataset);
-        ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, session);
-        dropQASummaryTables((EmfDataset) result.getDetailedResultDataset());
+//        ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, session);
+//        dropQASummaryTables((EmfDataset) result.getDetailedResultDataset());
 
     }
 
