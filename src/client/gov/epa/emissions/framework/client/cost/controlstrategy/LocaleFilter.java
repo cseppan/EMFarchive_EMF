@@ -11,14 +11,15 @@ public class LocaleFilter {
         if (locale.length() > fips.length())
             return false;
 
-        String pattern = pattern(locale, fips.length());
-        return fips.matches(pattern);
+        return fips.regionMatches(fips.length() - locale.length(), locale, 0, locale.length());
+//        String pattern = pattern(locale, fips.length());
+//        return fips.matches(pattern);
     }
 
-    private String pattern(String locale, int length) {
-        int localeLength = locale.length();
-        return locale + "\\d{" + (length - localeLength) + "}";
-    }
+//    private String pattern(String locale, int length) {
+//        int localeLength = locale.length();
+//        return locale + "\\d{" + (length - localeLength) + "}";
+//    }
 
     public EfficiencyRecord[] closestRecords(List records) {
         if (records.isEmpty())
