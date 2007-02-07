@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
-//import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
@@ -14,10 +14,12 @@ import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.controlmeasure.io.CMImportTask;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
@@ -36,6 +38,8 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     protected void doSetUp() throws Exception {
         dbServer = dbServer();
         sqlDataTypes = dbServer.getSqlDataTypes();
+        //import control measures to use...
+        importControlMeasures();
     }
 
     protected EmfDataset setInputDataset(String type) throws Exception {
@@ -65,10 +69,10 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     }
 
     protected void doTearDown() throws Exception {
-//        dropTable(tableName, dbServer.getEmissionsDatasource());
-//        dropAll(Version.class);
-//        dropAll(InternalSource.class);
-//        dropAll(EmfDataset.class);
+        dropTable(tableName, dbServer.getEmissionsDatasource());
+        dropAll(Version.class);
+        dropAll(InternalSource.class);
+        dropAll(EmfDataset.class);
     }
 
     protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant, ControlMeasureClass[] classes) {
@@ -162,4 +166,10 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         }
     }
 
+    private void importControlMeasures() throws EmfException, Exception {
+        File folder = new File("test/data/cost/controlMeasure");
+        String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
+        CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory());
+        task.run();
+    }
 }
