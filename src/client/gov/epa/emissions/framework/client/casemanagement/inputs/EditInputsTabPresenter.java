@@ -10,7 +10,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 public interface EditInputsTabPresenter extends CaseEditorTabPresenter {
 
     void display() throws EmfException;
-
+    
     void addNewInputDialog(NewInputView view) throws EmfException;
     
     void addNewInput(CaseInput input) throws EmfException;

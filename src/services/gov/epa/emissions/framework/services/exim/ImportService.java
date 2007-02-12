@@ -101,7 +101,8 @@ public class ImportService {
         showMultipleDatasets(user, filenames);
 
         for (int i = 0; i < filenames.length; i++) {
-            String datasetName = filenames[i] + "_" + DATE_FORMATTER.format(new Date());
+//            String datasetName = filenames[i] + "_" + DATE_FORMATTER.format(new Date());
+            String datasetName = filenames[i];
             EmfDataset dataset = createDataset(datasetName, user, datasetType);
             try {
                 importSingleDataset(user, folderPath, new String[] { filenames[i] }, dataset);

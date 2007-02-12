@@ -28,6 +28,7 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -45,14 +46,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-public class EditInputsTab extends JPanel implements EditInputsTabView {
+public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable {
 
     private EmfConsole parentConsole;
 
     private EditInputsTabPresenter presenter;
 
     private Case caseObj;
-    
+
     private int caseId;
 
     private InputsTableData tableData;
@@ -68,9 +69,11 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     private TextField inputDir;
 
     private EmfSession session;
-    
+
     private ManageChangeables changeables;
     
+    private volatile Thread populateThread;
+
     public EditInputsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager) {
         super.setName("editInputsTab");
@@ -78,13 +81,14 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;
         this.changeables = changeables;
+        this.populateThread = new Thread(this);
 
         super.setLayout(new BorderLayout());
     }
 
     public void display(EmfSession session, Case caseObj, EditInputsTabPresenter presenter) {
         super.removeAll();
-        
+
         this.caseObj = caseObj;
         this.caseId = caseObj.getId();
         this.presenter = presenter;
@@ -92,25 +96,39 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         this.inputDir = new TextField("inputdir", 30);
         inputDir.setText(caseObj.getInputFileDir());
         this.changeables.addChangeable(inputDir);
-        
+
         try {
-            super.add(createLayout(presenter.getCaseInput(caseId), presenter, parentConsole), BorderLayout.CENTER);
-        } catch (EmfException e) {
+            super.add(createLayout(new CaseInput[0], presenter, parentConsole), BorderLayout.CENTER);
+        } catch (Exception e) {
+            messagePanel.setError("Cannot retrieve all case inputs.");
+        }
+
+        populateThread.start();
+    }
+    
+    public void run() {
+        try {
+            messagePanel.setMessage("Please wait while retrieving all case inputs...");
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            doRefresh(presenter.getCaseInput(caseId));
+            messagePanel.clear();
+            setCursor(Cursor.getDefaultCursor());
+        } catch (Exception e) {
             messagePanel.setError("Cannot retrieve all case inputs.");
         }
     }
 
-    private void doRefresh(CaseInput[] inputs) {
+    private void doRefresh(CaseInput[] inputs) throws Exception {
         String inputFileDir = caseObj.getInputFileDir();
-        if(!inputDir.getText().equalsIgnoreCase(inputFileDir))
-             inputDir.setText(inputFileDir);
-
+        if (!inputDir.getText().equalsIgnoreCase(inputFileDir))
+            inputDir.setText(inputFileDir);
         super.removeAll();
         super.add(createLayout(inputs, presenter, parentConsole), BorderLayout.CENTER);
     }
 
-    private JPanel createLayout(CaseInput[] inputs, EditInputsTabPresenter presenter, EmfConsole parentConsole) {
-        JPanel layout = new JPanel(new BorderLayout());
+    private JPanel createLayout(CaseInput[] inputs, EditInputsTabPresenter presenter, EmfConsole parentConsole)
+            throws Exception {
+        final JPanel layout = new JPanel(new BorderLayout());
 
         layout.add(createFolderPanel(), BorderLayout.NORTH);
         layout.add(tablePanel(inputs, parentConsole), BorderLayout.CENTER);
@@ -132,14 +150,14 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
         SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         sortFilterPanel.sort(sortCriteria());
-        
+
         JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
         sortFilterPanel.setPreferredSize(new Dimension(450, 60));
         return scrollPane;
     }
-    
+
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Sector", "Program", "Input"};
+        String[] columnNames = { "Sector", "Program", "Input" };
         return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
     }
 
@@ -182,8 +200,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     }
 
     private JPanel controlPanel(final EditInputsTabPresenter presenter) {
-        Insets insets = new Insets(1,2,1,2);
-        
+        Insets insets = new Insets(1, 2, 1, 2);
+
         JPanel container = new JPanel();
 
         Button add = new AddButton(new AbstractAction() {
@@ -238,7 +256,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         });
         showAll.setEnabled(false);
         container.add(showAll);
-        
+
         Button export = new ExportButton("Export Inputs", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doExportInputDatasets(getSelectedInputs());
@@ -292,7 +310,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
         for (Iterator iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = (CaseInput) iter.next();
-            String title = input.getName() + "(" + input.getId() + ")("+ caseObj.getName() + ")";
+            String title = input.getName() + "(" + input.getId() + ")(" + caseObj.getName() + ")";
             EditCaseInputView inputEditor = new EditCaseInputWindow(title, desktopManager);
             presenter.doEditInput(input, inputEditor);
         }
@@ -310,75 +328,77 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
             presenter.doDisplayPropertiesView(view, dataset);
         }
     }
-    
+
     private void doExportInputDatasets(List inputlist) {
         if (inputlist.size() == 0) {
             messagePanel.setMessage("Please select input(s) to export.");
             return;
         }
-        
+
         int numberToExport = checkToWriteStartMessage(inputlist);
         if (!checkExportDir(inputDir.getText()) || !checkDatasets(inputlist) || numberToExport < 1)
             return;
-        
-        EmfDataset[] datasets = (EmfDataset[])getSelectedDatasets(inputlist).toArray(new EmfDataset[0]);
+
+        EmfDataset[] datasets = (EmfDataset[]) getSelectedDatasets(inputlist).toArray(new EmfDataset[0]);
         int ok = checkOverWrite();
-        
+        String purpose = "Used by case: " + this.caseObj.getName() + ".";
+
         try {
             if (ok != JOptionPane.YES_OPTION)
-                presenter.doExport(datasets, getSelectedDatasetVersions(), getSelectedInputSubdirs(), "");
+                presenter.doExport(datasets, getSelectedDatasetVersions(), getSelectedInputSubdirs(), purpose);
             else
-                presenter.doExportWithOverwrite(datasets, getSelectedDatasetVersions(), getSelectedInputSubdirs(), "");
+                presenter.doExportWithOverwrite(datasets, getSelectedDatasetVersions(), getSelectedInputSubdirs(), purpose);
 
-            messagePanel.setMessage("Started export of "+numberToExport+
-                    " input datasets.  Please see the Status Window for additional information.");
+            messagePanel.setMessage("Started export of " + numberToExport
+                    + " input datasets.  Please see the Status Window for additional information.");
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
     }
-    
+
     private boolean checkExportDir(String exportDir) {
         if (exportDir == null || exportDir.equals("")) {
             messagePanel.setMessage("Please specify the input folder before export.");
             return false;
         }
-        
+
         return true;
     }
 
     private boolean checkDatasets(List inputList) {
-        CaseInput[] inputs = (CaseInput[])inputList.toArray(new CaseInput[0]);
-        
+        CaseInput[] inputs = (CaseInput[]) inputList.toArray(new CaseInput[0]);
+
         for (int i = 0; i < inputs.length; i++)
             if (inputs[i].isRequired() && inputs[i].getDataset() == null) {
                 messagePanel.setMessage("Please specify a dataset for required input \"" + inputs[i].getName() + "\".");
                 return false;
             }
-        
+
         return true;
     }
-    
+
     // returns the number of datasets that will actually be exported
     private int checkToWriteStartMessage(List inputList) {
-        CaseInput[] inputs = (CaseInput[])inputList.toArray(new CaseInput[0]);
+        CaseInput[] inputs = (CaseInput[]) inputList.toArray(new CaseInput[0]);
         int count = 0;
         int external = 0;
-        
+
         for (int i = 0; i < inputs.length; i++) {
             DatasetType type = inputs[i].getDatasetType();
             EmfDataset dataset = inputs[i].getDataset();
-            if (type != null && dataset != null  && !type.isExternal())
+            if (type != null && dataset != null && !type.isExternal())
                 count++;
-            
-            if (type != null && dataset != null  && type.isExternal())
+
+            if (type != null && dataset != null && type.isExternal())
                 external++;
         }
-        
+
         if (count == 0) {
-            messagePanel.setMessage("Please select some inputs to export (make sure they have datasets and are not all external)");
+            messagePanel
+                    .setMessage("Please select some inputs to export (make sure they have datasets and are not all external)");
             return count;
         }
-        
+
         return count;
     }
 
@@ -404,14 +424,14 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     private Version[] getSelectedDatasetVersions() {
         List list = getSelectedInputs();
         List versionList = new ArrayList();
-        
+
         for (int i = 0; i < list.size(); i++) {
             Version version = ((CaseInput) list.get(i)).getVersion();
             if (version != null)
                 versionList.add(version);
         }
-        
-        return (Version[])versionList.toArray(new Version[0]);
+
+        return (Version[]) versionList.toArray(new Version[0]);
     }
 
     private String[] getSelectedInputSubdirs() {
@@ -420,7 +440,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         String defaultExportDir = session.preferences().outputFolder();
         if (!inputDir.getText().equals(""))
             defaultExportDir = inputDir.getText();
-        
+
         for (int i = 0; i < list.size(); i++) {
             SubDir subdir = ((CaseInput) list.get(i)).getSubdirObj();
             if (subdir != null)
@@ -428,8 +448,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
             else
                 subDirList.add(defaultExportDir);
         }
-        
-        return (String[])subDirList.toArray(new String[0]);
+
+        return (String[]) subDirList.toArray(new String[0]);
     }
 
     public void addInput(CaseInput note) {
@@ -439,7 +459,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         tablePanel.removeAll();
         tablePanel.add(createSortFilterPanel(parentConsole));
     }
-    
+
     private List getSelectedInputs() {
         return selectModel.selected();
     }
@@ -449,14 +469,19 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     }
 
     public String getCaseInputFileDir() {
-        if (inputDir == null) return null;
+        if (inputDir == null)
+            return null;
         return inputDir.getText();
     }
 
     public void refresh() {
         // note that this will get called when the case is save
-        if (tableData != null) // it's still null if you've never displayed this tab
-           doRefresh(tableData.sources());
+        try {
+            if (tableData != null) // it's still null if you've never displayed this tab
+                doRefresh(tableData.sources());
+        } catch (Exception e) {
+            messagePanel.setError("Cannot refresh current tab. " + e.getMessage());
+        }
     }
 
     public int numberOfRecord() {
