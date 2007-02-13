@@ -34,6 +34,13 @@ public class DefaultVersionPanel extends JPanel {
         int defaultVersionNum = dataset.getDefaultVersion();
         VersionsSet versionsSet = new VersionsSet(versions);
         Version [] finalVersions = versionsSet.finalVersionObjects();
+        if (finalVersions.length < 1)
+        {   
+            messagePanel.setError(
+                    "There is a problem with your dataset because there are no final versions available");
+            return;
+        }    
+        
         versionCombo = new ComboBox(finalVersions);
         versionCombo.setSelectedIndex(getIndexOfDefaultVersion(defaultVersionNum, finalVersions));
         
@@ -46,7 +53,7 @@ public class DefaultVersionPanel extends JPanel {
 
     private int getIndexOfDefaultVersion(int defaultVersionNum, Version[] finalVersions) {
         int i = 0;
-        while ((finalVersions[i].getVersion() != defaultVersionNum) && (i < finalVersions.length)) 
+        while ((i < finalVersions.length) && (finalVersions[i].getVersion() != defaultVersionNum)) 
         {
             i++;
         }    
