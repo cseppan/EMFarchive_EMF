@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
+import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.File;
@@ -20,18 +21,21 @@ import org.apache.commons.logging.LogFactory;
 public class ImporterFactory {
     private static Log log = LogFactory.getLog(ImporterFactory.class);
 
-    private DbServer dbServer;
+    //private DbServer dbServer;
+    
+    private DbServer newDBInstance;
 
     private SqlDataTypes sqlDataTypes;
 
     public ImporterFactory(DbServer dbServer, SqlDataTypes sqlDataTypes) {
-        this.dbServer = dbServer;
+       //this.dbServer = dbServer;
         this.sqlDataTypes = sqlDataTypes;
     }
 
-    public Importer createVersioned(EmfDataset dataset, File folder, String[] fileNames) throws ImporterException {
+    public Importer createVersioned(EmfDataset dataset, File folder, String[] fileNames) throws Exception {
+        newDBInstance = new EmfDbServer();
         Importer importer = create(dataset, folder, fileNames);
-        return new VersionedImporter(importer, dataset, dbServer, lastModifiedDate(folder, fileNames));
+        return new VersionedImporter(importer, dataset, newDBInstance, lastModifiedDate(folder, fileNames));
     }
 
     private Date lastModifiedDate(File folder, String[] fileNames) {
@@ -59,7 +63,7 @@ public class ImporterFactory {
 
         Class[] classParams = new Class[] { File.class, String[].class, Dataset.class, DbServer.class,
                 SqlDataTypes.class, DataFormatFactory.class };
-        Object[] params = new Object[] { folder, fileNames, dataset, dbServer, sqlDataTypes,
+        Object[] params = new Object[] { folder, fileNames, dataset, newDBInstance, sqlDataTypes,
                 new VersionedDataFormatFactory(null, dataset) };
 
         Constructor importerConstructor = importerClass.getDeclaredConstructor(classParams);

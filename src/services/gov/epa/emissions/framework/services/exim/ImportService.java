@@ -93,6 +93,8 @@ public class ImportService {
             // no need to log errors about dataset name already being used
             if (e.getMessage().indexOf("already used") < 0)
                log.error("Exception attempting to start import of file: " + fileNames[0], e);
+            
+            log.error("Exception while import single dataset: " + e.getMessage());
             throw new EmfException("Import failed: " + e.getMessage());
         }
     }

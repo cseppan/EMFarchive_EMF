@@ -8,7 +8,6 @@ import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.DataFormatFactory;
 import gov.epa.emissions.commons.io.importer.Importer;
-import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
@@ -63,15 +62,15 @@ public class DataEditorService_DataTest_two extends ServiceTestCase {
         token = service.openSession(user, token, 5);
     }
 
-    private void doImport(EmfDataset dataset) throws ImporterException {
+    private void doImport(EmfDataset dataset) throws Exception {
         Version version = new Version();
         version.setVersion(0);
 
         File file = new File("test/data/orl/nc", "onroad-15records.txt");
         DataFormatFactory formatFactory = new VersionedDataFormatFactory(version, dataset);
         Importer importer = new ORLOnRoadImporter(file.getParentFile(), new String[] { file.getName() }, dataset,
-                dbServer(), sqlDataTypes(), formatFactory);
-        new VersionedImporter(importer, dataset, dbServer(), lastModifiedDate(file.getParentFile(),file.getName())).run();
+                getDbServerInstance(), sqlDataTypes(), formatFactory);
+        new VersionedImporter(importer, dataset, getDbServerInstance(), lastModifiedDate(file.getParentFile(),file.getName())).run();
     }
 
     private void setTestValues(EmfDataset dataset) {

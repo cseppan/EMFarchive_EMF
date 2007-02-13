@@ -7,7 +7,6 @@ import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.DataFormatFactory;
-import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
@@ -60,15 +59,15 @@ public class DataEditorService_VersionsTest extends ServiceTestCase {
         return new UserDAO().get("emf", session);
     }
 
-    private void doImport() throws ImporterException {
+    private void doImport() throws Exception {
         Version version = new Version();
         version.setVersion(0);
 
         File file = new File("test/data/orl/nc", "very-small-nonpoint.txt");
         DataFormatFactory formatFactory = new VersionedDataFormatFactory(version, dataset);
         ORLNonPointImporter importer = new ORLNonPointImporter(file.getParentFile(), new String[] { file.getName() },
-                dataset, dbServer(), sqlDataTypes(), formatFactory);
-        new VersionedImporter(importer, dataset, dbServer(), lastModifiedDate(file.getParentFile(), file.getName()))
+                dataset, getDbServerInstance(), sqlDataTypes(), formatFactory);
+        new VersionedImporter(importer, dataset, getDbServerInstance(), lastModifiedDate(file.getParentFile(), file.getName()))
                 .run();
     }
 

@@ -12,7 +12,7 @@
   <property name="creator"				column="creator"				type="java.lang.String"		not-null="true"/>
   <property name="status"				column="status"					type="java.lang.String"		not-null="false"/>
 
-  <many-to-one cascade="save-update"
+  <many-to-one
             name="datasetType" 
             class="gov.epa.emissions.commons.data.DatasetType"
             column="dataset_type"/> 
@@ -81,7 +81,8 @@
       <list-index column="list_index"/>
       <composite-element class="gov.epa.emissions.commons.data.KeyVal">
 	    <property name="value" column="value" not-null="true"/>	
-	    <many-to-one  name="keyword" column="keyword_id" class="gov.epa.emissions.commons.data.Keyword" cascade="save-update"/>
+	    <many-to-one  name="keyword" column="keyword_id" 
+	     class="gov.epa.emissions.commons.data.Keyword" cascade="save-update"/>
       </composite-element>
  	</array>
 

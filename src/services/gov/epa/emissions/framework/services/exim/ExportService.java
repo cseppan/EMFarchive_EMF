@@ -144,7 +144,7 @@ public class ExportService {
             }
         } catch (Exception e) {
             // don't need to log messages about exporting to existing file
-            if (e.getMessage().indexOf("existing file") < 0)
+            if (e.getMessage() != null && e.getMessage().indexOf("existing file") < 0)
                log.error("ERROR starting to export to folder: " + dirName, e);
             throw new EmfException("Export failed: " + e.getMessage());
         }

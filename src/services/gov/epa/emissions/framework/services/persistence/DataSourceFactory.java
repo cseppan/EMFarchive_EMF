@@ -14,6 +14,7 @@ public class DataSourceFactory {
             Context ctx = new InitialContext();
             ds = (DataSource) ctx.lookup("java:/comp/env/jdbc/EMFDB");
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new InfrastructureException("Unable to lookup Datasource using JNDI");
         }
 

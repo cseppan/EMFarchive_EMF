@@ -33,7 +33,7 @@ import org.hibernate.criterion.Restrictions;
 
 public abstract class ServiceTestCase extends TestCase {
 
-    private EmfDatabaseSetup dbSetup;
+    protected EmfDatabaseSetup dbSetup;
 
     protected Session session;
 
@@ -85,6 +85,10 @@ public abstract class ServiceTestCase extends TestCase {
 
     protected DbServer dbServer() {
         return dbSetup.getDbServer();
+    }
+    
+    protected DbServer getDbServerInstance() throws Exception {
+        return dbSetup.getNewPostgresDbServerInstance();
     }
 
     protected SqlDataTypes sqlDataTypes() {
