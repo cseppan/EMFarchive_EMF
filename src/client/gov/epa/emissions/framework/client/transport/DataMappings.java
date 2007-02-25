@@ -26,6 +26,7 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
@@ -102,6 +103,7 @@ public class DataMappings extends Mappings {
 
     private void controlBeans(Call call) {
         bean(call, ControlMeasure.class, controlMeasure());
+        bean(call, LightControlMeasure.class, lightControlMeasure());
         bean(call, ControlTechnology.class, controlTechnology());
         bean(call, ControlStrategy.class, controlStrategy());
         bean(call, StrategyType.class, strategyType());
@@ -153,6 +155,7 @@ public class DataMappings extends Mappings {
         array(call, QAProgram[].class, programs());
 
         array(call, ControlMeasure[].class, controlMeasures());
+        array(call, LightControlMeasure[].class, lightControlMeasures());
         array(call, ControlTechnology[].class, controlTechnologies());
         array(call, ControlStrategy[].class, controlStrategies());
         array(call, StrategyType[].class, strategyTypes());
@@ -338,8 +341,16 @@ public class DataMappings extends Mappings {
         return qname("ControlMeasure");
     }
 
+    public QName lightControlMeasure() {
+        return qname("LightControlMeasure");
+    }
+
     public QName controlMeasures() {
         return qname("ControlMeasures");
+    }
+
+    public QName lightControlMeasures() {
+        return qname("LightControlMeasures");
     }
 
     public QName controlMeasureClass() {

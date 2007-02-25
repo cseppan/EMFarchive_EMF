@@ -4,14 +4,38 @@ import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LocaleFilter {
 
     public boolean acceptLocale(String locale, String fips) {
+        //shouln't happen, locale should always be shorter
         if (locale.length() > fips.length())
             return false;
 
-        return fips.regionMatches(fips.length() - locale.length(), locale, 0, locale.length());
+        //non-locale specific...
+        if (locale.length() == 0)
+            return true;
+
+        //see if locale includes country and region/state and no county info...
+        if (locale.length() == 3 || locale.length() == 2) {
+            Pattern pat = 
+                Pattern.compile("^" + locale + "*");
+            Matcher matcher = pat.matcher(fips);
+            return matcher.find();//fips.matches(pattern);
+        }
+
+        //see if locale includes country and region/state and county info...
+        if (locale.length() > 4) {
+            return fips.equals(locale);
+        }
+
+        return false;
+
+//        return locale + "\\d{" + (length - localeLength) + "}";
+//        return fips.regionMatches(fips.length() - locale.length(), locale, 0, locale.length());
+
 //        String pattern = pattern(locale, fips.length());
 //        return fips.matches(pattern);
     }

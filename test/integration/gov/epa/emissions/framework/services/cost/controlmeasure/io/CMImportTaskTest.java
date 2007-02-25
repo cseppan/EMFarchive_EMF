@@ -36,7 +36,7 @@ public class CMImportTaskTest extends ServiceTestCase {
             ControlMeasure[] measures = measures();
             assertEquals(32, measures.length);
             assertEquals(1132, noOfRecords(measures));
-            assertEquals(124, noOfScc());
+            assertEquals(126, noOfScc());
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
@@ -55,14 +55,14 @@ public class CMImportTaskTest extends ServiceTestCase {
             ControlMeasure[] measures = measures();
             assertEquals(32, measures.length);
             assertEquals(1132, noOfRecords(measures));
-            assertEquals(124, noOfScc());
+            assertEquals(126, noOfScc());
             
             task.run();
             
             measures = measures();
             assertEquals(32, measures.length);
             assertEquals(1132, noOfRecords(measures));
-            assertEquals(124, noOfScc());
+            assertEquals(126, noOfScc());
         } catch (Exception e) {
             e.printStackTrace();
         }finally {

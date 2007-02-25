@@ -13,7 +13,9 @@ public interface ControlStrategyService extends EMFService {
     
     void addControlStrategy(ControlStrategy element) throws EmfException;
     
-    void removeControlStrategies(ControlStrategy[] elements, User user) throws EmfException;
+//    void removeControlStrategies(ControlStrategy[] elements, User user) throws EmfException;
+
+    void removeControlStrategies(int[] ids, User user) throws EmfException;
 
     ControlStrategy obtainLocked(User owner, ControlStrategy element) throws EmfException;
 
@@ -33,4 +35,9 @@ public interface ControlStrategyService extends EMFService {
     
     String controlStrategyRunStatus(int id) throws EmfException;
 
+    int isDuplicateName(String name) throws EmfException;
+
+    int copyControlStrategy(int id, User creator) throws EmfException;
+
+    ControlStrategy getById(int id) throws EmfException;
 }

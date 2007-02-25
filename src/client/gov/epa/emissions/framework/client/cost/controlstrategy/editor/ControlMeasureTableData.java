@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
-import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -13,11 +13,11 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     private List rows;
 
-    public ControlMeasureTableData(ControlMeasure[] cms) {
+    public ControlMeasureTableData(LightControlMeasure[] cms) {
         rows = createRows(cms);
     }
 
-    private List createRows(ControlMeasure[] cms) {
+    private List createRows(LightControlMeasure[] cms) {
         List rows = new ArrayList();
         for (int i = 0; i < cms.length; i++) {
             Row row = row(cms[i]);
@@ -26,7 +26,7 @@ public class ControlMeasureTableData extends AbstractTableData {
         return rows;
     }
 
-    private Row row(ControlMeasure cm) {
+    private Row row(LightControlMeasure cm) {
         String[] values = { cm.getAbbreviation(), cm.getName() };
         return new ViewableRow(cm, values);
     }
@@ -47,7 +47,7 @@ public class ControlMeasureTableData extends AbstractTableData {
         return false;
     }
 
-    public void add(ControlMeasure[] cms) {
+    public void add(LightControlMeasure[] cms) {
         for (int i = 0; i < cms.length; i++) {
             Row row = row(cms[i]);
             if (!rows.contains(row))
@@ -60,9 +60,9 @@ public class ControlMeasureTableData extends AbstractTableData {
         this.rows = createRows(sources());
     }
 
-    public ControlMeasure[] sources() {
+    public LightControlMeasure[] sources() {
         List sources = sourcesList();
-        return (ControlMeasure[]) sources.toArray(new ControlMeasure[0]);
+        return (LightControlMeasure[]) sources.toArray(new LightControlMeasure[0]);
     }
 
     private List sourcesList() {
@@ -75,10 +75,10 @@ public class ControlMeasureTableData extends AbstractTableData {
         return sources;
     }
 
-    private void remove(ControlMeasure record) {
+    private void remove(LightControlMeasure record) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             ViewableRow row = (ViewableRow) iter.next();
-            ControlMeasure source = (ControlMeasure) row.source();
+            LightControlMeasure source = (LightControlMeasure) row.source();
             if (source == record) {
                 rows.remove(row);
                 return;
@@ -86,7 +86,7 @@ public class ControlMeasureTableData extends AbstractTableData {
         }
     }
 
-    public void remove(ControlMeasure[] records) {
+    public void remove(LightControlMeasure[] records) {
         for (int i = 0; i < records.length; i++)
             remove(records[i]);
 

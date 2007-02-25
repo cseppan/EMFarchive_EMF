@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
@@ -10,6 +11,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -150,18 +152,39 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public void removeControlStrategies(ControlStrategy[] elements, User user) throws EmfException {
+//    public void removeControlStrategies(ControlStrategy[] elements, User user) throws EmfException {
+//        try {
+//            for (int i = 0; i < elements.length; i++) {
+//                if (!user.equals(elements[i].getCreator()))
+//                    throw new EmfException("Only the creator of " + elements[i].getName()
+//                            + " can remove it from the database.");
+//                remove(elements[i]);
+//            }
+//
+//        } catch (RuntimeException e) {
+//            LOG.error("Could not update Control Strategy: " + elements, e);
+//            throw new EmfException("Could not update ControlStrategy: " + elements);
+//        }
+//    }
+
+    public void removeControlStrategies(int[] ids, User user) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
         try {
-            for (int i = 0; i < elements.length; i++) {
-                if (!user.equals(elements[i].getCreator()))
-                    throw new EmfException("Only the creator of " + elements[i].getName()
+            for (int i = 0; i < ids.length; i++) {
+                ControlStrategy cs = dao.getById(ids[i], session);
+                session.clear();
+                if (!user.equals(cs.getCreator()))
+                    throw new EmfException("Only the creator of " + cs.getName()
                             + " can remove it from the database.");
-                remove(elements[i]);
+                remove(cs);
             }
 
         } catch (RuntimeException e) {
-            LOG.error("Could not update Control Strategy: " + elements, e);
-            throw new EmfException("Could not update ControlStrategy: " + elements);
+            LOG.error("Could not remove Control Strategy", e);
+            throw new EmfException("Could not remove ControlStrategy");
+        } finally {
+            session.close();
         }
     }
 
@@ -266,4 +289,70 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             session.close();
         }
     }
+
+    //returns control strategy Id for the given name
+    public int isDuplicateName(String name) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            ControlStrategy cs = dao.getByName(name, session);
+            return cs == null ? 0 : cs.getId();
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve if ControlStrategy name is already used", e);
+            throw new EmfException("Could not retrieve if ControlStrategy name is already used");
+        } finally {
+            session.close();
+        }
+    }
+
+    public int copyControlStrategy(int id, User creator) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            //get cs to copy
+            ControlStrategy cs = dao.getById(id, session);
+            session.clear();// clear to flush current
+
+            String name = "Copy of " + cs.getName();
+            //make sure this won't cause duplicate issues...
+            if (isDuplicate(name))
+                throw new EmfException("A control strategy named '" + name + "' already exists.");
+
+            //do a deep copy
+            ControlStrategy coppied = (ControlStrategy)DeepCopy.copy(cs);
+            //change to applicable values
+            coppied.setName(name);
+            coppied.setCreator(creator);
+            coppied.setLastModifiedDate(new Date());
+
+            dao.add(coppied, session);
+            return coppied.getId();
+        } catch (EmfException e) {
+            LOG.error(e.getMessage());
+            throw e;
+        } catch (RuntimeException e) {
+            LOG.error("Could not copy control strategy", e);
+            throw new EmfException("Could not copy control strategy");
+        } catch (Exception e) {
+            LOG.error("Could not copy control strategy", e);
+            throw new EmfException("Could not copy control strategy");
+        } finally {
+            session.close();
+        }
+    }
+
+    private boolean isDuplicate(String name) throws EmfException {
+        return (isDuplicateName(name) != 0);
+    }
+
+    public ControlStrategy getById(int id) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getById(id, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get control strategy", e);
+            throw new EmfException("Could not get control strategy");
+        } finally {
+            session.close();
+        }
+    }
+
 }

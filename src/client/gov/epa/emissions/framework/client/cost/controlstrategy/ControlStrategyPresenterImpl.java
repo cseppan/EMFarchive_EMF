@@ -57,12 +57,14 @@ public class ControlStrategyPresenterImpl implements ControlStrategyPresenter {
     }
 
     private boolean isDuplicate(String name) throws EmfException {
-        ControlStrategy[] controlStrategies = service().getControlStrategies();
-        for (int i = 0; i < controlStrategies.length; i++) {
-            if (controlStrategies[i].getName().equals(name))
-                return true;
-        }
-        return false;
+        int id = service().isDuplicateName(name);
+        return (id != 0);
+//        ControlStrategy[] controlStrategies = service().getControlStrategies();
+//        for (int i = 0; i < controlStrategies.length; i++) {
+//            if (controlStrategies[i].getName().equals(name))
+//                return true;
+//        }
+//        return false;
     }
 
     private ControlStrategyService service() {

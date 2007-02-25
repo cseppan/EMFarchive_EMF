@@ -12,4 +12,7 @@ public interface EditControlStrategyView extends ManagedView {
     
     void notifyLockFailure(ControlStrategy controlStrategy);
 
+    public void startControlMeasuresRefresh();
+
+    public void endControlMeasuresRefresh();
 }

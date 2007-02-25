@@ -28,22 +28,22 @@ public class ControlStrategiesManagerPresenterTest extends EmfMockObjectTestCase
         presenter.display();
     }
 
-    public void testShouldRefreshBrowserOnRefresh() throws EmfException {
-        Mock browser = mock(ControlStrategyManagerView.class);
-        ControlStrategy[] controlStrategies = new ControlStrategy[0];
-        expects(browser, 1, "refresh", eq(controlStrategies));
-
-        Mock service = mock(ControlStrategyService.class);
-        stub(service, "getControlStrategies", controlStrategies);
-
-        Mock session = mock(EmfSession.class);
-        stub(session, "controlStrategyService", service.proxy());
-
-        ControlStrategiesManagerPresenter presenter = new ControlStrategiesManagerPresenterImpl((EmfSession) session.proxy(),
-                (ControlStrategyManagerView) browser.proxy());
-
-        presenter.doRefresh();
-    }
+//    public void testShouldRefreshBrowserOnRefresh() throws EmfException {
+//        Mock browser = mock(ControlStrategyManagerView.class);
+//        ControlStrategy[] controlStrategies = new ControlStrategy[0];
+//        expects(browser, 1, "refresh", eq(controlStrategies));
+//
+//        Mock service = mock(ControlStrategyService.class);
+//        stub(service, "getControlStrategies", controlStrategies);
+//
+//        Mock session = mock(EmfSession.class);
+//        stub(session, "controlStrategyService", service.proxy());
+//
+//        ControlStrategiesManagerPresenter presenter = new ControlStrategiesManagerPresenterImpl((EmfSession) session.proxy(),
+//                (ControlStrategyManagerView) browser.proxy());
+//
+//        presenter.doRefresh();
+//    }
 
     public void testShouldCloseViewOnClose() {
         Mock browser = mock(ControlStrategyManagerView.class);

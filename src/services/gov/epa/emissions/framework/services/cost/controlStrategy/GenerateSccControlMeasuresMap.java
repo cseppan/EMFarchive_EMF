@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 public class GenerateSccControlMeasuresMap {
@@ -84,19 +85,26 @@ public class GenerateSccControlMeasuresMap {
     private String query(String qualifiedEmissionTableName) {
         //add additional class filter, if necessary, when selecting control measure for the calculations...
         String classFilterIds = "";
+        String controlMeasureFilterIds = "";
         ControlMeasureClass[] classes = controlStrategy.getControlMeasureClasses();
+        LightControlMeasure[] controlMeasures = controlStrategy.getControlMeasures();
 
         if (classes != null) 
             for (int i = 0; i < classes.length; i++)
                 classFilterIds += (classFilterIds.length() != 0 ? "," + classes[i].getId() : classes[i].getId());
-        
+
+        if (controlMeasures != null) 
+            for (int i = 0; i < controlMeasures.length; i++)
+                controlMeasureFilterIds += (controlMeasureFilterIds.length() != 0 ? "," + controlMeasures[i].getId() : controlMeasures[i].getId());
+
         return "SELECT DISTINCT a.scc,b.control_measures_id FROM " + qualifiedEmissionTableName + " AS a, "
                 + qualifiedName("control_measure_sccs", emfDatasource) + " AS b, "
                 + qualifiedName("control_measures", emfDatasource) + " AS c"
                 + " WHERE b.name=a.scc"
                 + " AND c.id=b.control_measures_id"
                 + " AND a.poll='" + controlStrategy.getTargetPollutant() + "'"
-                + (classFilterIds.length() == 0 ? "" : " AND c.cm_class_id in (" + classFilterIds + ")");
+                + (controlMeasureFilterIds.length() == 0 ? (classFilterIds.length() == 0 ? "" : " AND c.cm_class_id in (" + classFilterIds + ")") : "")
+                + (controlMeasureFilterIds.length() == 0 ? "" : " AND b.control_measures_id in (" + controlMeasureFilterIds + ")");
     }
 
     private String qualifiedName(String tableName, Datasource datasource) {

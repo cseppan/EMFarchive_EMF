@@ -18,7 +18,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     private EditControlStrategyView view;
 
-//    private ControlStrategiesManagerPresenter managerPresenter;
+    private ControlStrategiesManagerPresenter managerPresenter;
 
     private ControlStrategy controlStrategy;
 
@@ -29,15 +29,15 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     private EditControlStrategySummaryTabPresenter summaryTabPresenter;
 
     private EditControlStrategyMeasuresTabPresenter measuresTabPresenter;
-    
+
     private boolean inputsLoaded = false;
     
-    public EditControlStrategyPresenterImpl(ControlStrategy controlStrategy, EmfSession session,
+    public EditControlStrategyPresenterImpl(ControlStrategy controlStrategy, EmfSession session, 
             EditControlStrategyView view, ControlStrategiesManagerPresenter controlStrategiesManagerPresenter) {
         this.controlStrategy = controlStrategy;
         this.session = session;
         this.view = view;
-//        this.managerPresenter = controlStrategiesManagerPresenter;
+        this.managerPresenter = controlStrategiesManagerPresenter;
         this.presenters = new ArrayList();
     }
 
@@ -94,15 +94,17 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
 
     private boolean isDuplicate(ControlStrategy controlStrategy) throws EmfException {
-        String name = controlStrategy.getName();
-        ControlStrategy[] controlStrategies = service().getControlStrategies();
-
-        for (int i = 0; i < controlStrategies.length; i++) {
-
-            if (controlStrategies[i].getName().equals(name) && controlStrategies[i].getId() != controlStrategy.getId())
-                return true;
-        }
-        return false;
+        int id = service().isDuplicateName(controlStrategy.getName());
+        return (id != 0 && controlStrategy.getId() != id);
+//        String name = controlStrategy.getName();
+//        ControlStrategy[] controlStrategies = service().getControlStrategies();
+//
+//        for (int i = 0; i < controlStrategies.length; i++) {
+//
+//            if (controlStrategies[i].getName().equals(name) && controlStrategies[i].getId() != controlStrategy.getId())
+//                return true;
+//        }
+//        return false;
     }
 
     private ControlStrategyService service() {
@@ -153,7 +155,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     public void set(ControlStrategyMeasuresTabView view) {
         measuresTabPresenter = new EditControlStrategyMeasuresTabPresenter(view,
-                controlStrategy, session);
+                controlStrategy, session, 
+                managerPresenter);
 //        measuresTabPresenter.doDisplay();
         presenters.add(measuresTabPresenter);
     }

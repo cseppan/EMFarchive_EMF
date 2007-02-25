@@ -223,4 +223,18 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             session.close();
         }
     }
+
+    public LightControlMeasure[] getLightControlMeasures() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            List all = dao.getLightControlMeasures(session);
+            return (LightControlMeasure[]) all.toArray(new LightControlMeasure[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve light control measures.", e);
+            throw new EmfException("Could not retrieve light control measures.");
+        } finally {
+            session.close();
+        }
+    }
+
 }

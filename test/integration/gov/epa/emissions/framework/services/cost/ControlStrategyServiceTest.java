@@ -78,7 +78,8 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
             assertEquals(totalBeforeAdd + 1, list.size());
             assertTrue(list.contains(element));
 
-            service.removeControlStrategies(new ControlStrategy[]{element}, owner);
+//            service.removeControlStrategies(new ControlStrategy[]{element}, owner);
+            service.removeControlStrategies(new int[]{element.getId()}, owner);
             List newlist = Arrays.asList(service.getControlStrategies());
             assertEquals(totalBeforeAdd, newlist.size());
             assertFalse(newlist.contains(element));
@@ -100,7 +101,8 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
             assertEquals(totalBeforeAdd + 1, list.size());
             assertTrue(list.contains(element));
             
-            service.removeControlStrategies(new ControlStrategy[]{element}, user);
+//            service.removeControlStrategies(new ControlStrategy[]{element}, user);
+            service.removeControlStrategies(new int[]{element.getId()}, user);
         } catch (Exception e) {
             remove(element);
             return;
@@ -152,15 +154,22 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
             ControlMeasureClass[] cmcs = cmService.getMeasureClasses();
             int cmcLength = cmcs.length;
 
+            //add control measures to include to strategy, check no of stratgies for test...
+            LightControlMeasure[] cms = cmService.getLightControlMeasures();
+            int cmLength = cms.length;
+
+
             locked.setName("TEST");
             locked.setDescription("TEST control strategy");
             locked.setControlMeasureClasses(cmcs);
+            locked.setControlMeasures(cms);
 
             released = service.updateControlStrategy(locked);
             assertEquals("TEST", released.getName());
             assertEquals("TEST control strategy", released.getDescription());
             assertEquals(released.getLockOwner(), null);
             assertEquals(cmcLength, released.getControlMeasureClasses().length);
+            assertEquals(cmLength, released.getControlMeasures().length);
             assertFalse("Lock should be released on update", released.isLocked());
         } finally {
             remove(element);
@@ -203,6 +212,38 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
             service.stopRunStrategy();
         } catch (Exception e) {
             throw e;
+        }
+    }
+
+    public void testShouldCopyControlStrategy() throws Exception {
+        User owner = userService.getUser("emf");
+        ControlStrategy element = controlStrategy();
+        ControlStrategy released = null;
+        ControlStrategy copied = null;
+        try {
+            ControlStrategy locked = service.obtainLocked(owner, element);
+
+            session.clear();
+            ControlMeasureClass[] cmcs = cmService.getMeasureClasses();
+
+            //add control measures to include to strategy, check no of stratgies for test...
+            LightControlMeasure[] cms = cmService.getLightControlMeasures();
+
+            locked.setControlMeasureClasses(cmcs);
+            locked.setControlMeasures(cms);
+
+            released = service.updateControlStrategy(locked);
+
+            //now create a copy of this cs...
+            int newId = service.copyControlStrategy(released.getId(), owner);
+            copied =  service.getById(newId);
+            assertEquals(copied.getName(), "Copy of " + released.getName());
+            assertEquals(copied.getDescription(), released.getDescription());
+            assertEquals(copied.getControlMeasureClasses().length, released.getControlMeasureClasses().length);
+            assertEquals(copied.getControlMeasures().length, released.getControlMeasures().length);
+        } finally {
+            remove(element);
+            remove(copied);
         }
     }
 

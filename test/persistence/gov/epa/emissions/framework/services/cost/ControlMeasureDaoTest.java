@@ -36,6 +36,11 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         assertEquals(0, all.size());
     }
 
+    public void testShouldGetAllLightCM() {
+        List all = dao.getLightControlMeasures(session);
+        assertEquals(0, all.size());
+    }
+
     public void testShouldAddControlMeasureToDatabaseOnAdd() throws Exception {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");

@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
-import gov.epa.emissions.commons.data.InternalSource;
+//import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
@@ -22,6 +22,8 @@ import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.controlmeasure.io.CMImportTask;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+//import gov.epa.emissions.framework.services.data.QAStep;
+//import gov.epa.emissions.framework.services.data.QAStepResult;
 
 import java.io.File;
 
@@ -70,9 +72,12 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
 
     protected void doTearDown() throws Exception {
         dropTable(tableName, dbServer.getEmissionsDatasource());
-        dropAll(Version.class);
-        dropAll(InternalSource.class);
-        dropAll(EmfDataset.class);
+//        dropAll(Version.class);
+//        dropAll(InternalSource.class);
+//        dropAll(QAStepResult.class);
+//        dropAll(QAStep.class);
+//        dropAll(EmfDataset.class);
+
     }
 
     protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant, ControlMeasureClass[] classes) {
@@ -86,6 +91,21 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         strategy.setTargetPollutant(pollutant);
         strategy.setStrategyType(maxEmisRedStrategyType());
         strategy.setControlMeasureClasses(classes);
+        add(strategy);
+        return strategy;
+    }
+
+    protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant, LightControlMeasure[] measures) {
+        ControlStrategy strategy = new ControlStrategy();
+        strategy.setName(name);
+        strategy.setInputDatasets(new EmfDataset[] { inputDataset });
+        strategy.setDatasetType(inputDataset.getDatasetType());
+        strategy.setDatasetVersion(0);// initial version
+        strategy.setInventoryYear(2000);
+        strategy.setCostYear(2000);
+        strategy.setTargetPollutant(pollutant);
+        strategy.setStrategyType(maxEmisRedStrategyType());
+        strategy.setControlMeasures(measures);
         add(strategy);
         return strategy;
     }

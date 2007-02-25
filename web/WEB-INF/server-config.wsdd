@@ -325,6 +325,15 @@
 		innerType="ns1:ControlMeasureClass"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 		
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.LightControlMeasure"
+		qname="ns1:LightControlMeasure" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<arrayMapping qname="ns1:LightControlMeasures" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.LightControlMeasure[]"
+		innerType="ns1:LightControlMeasure"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		
 	<!-- CASE MANAGEMENT -->
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Case"

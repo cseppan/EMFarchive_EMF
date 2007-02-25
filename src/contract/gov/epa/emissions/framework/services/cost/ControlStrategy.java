@@ -55,13 +55,17 @@ public class ControlStrategy implements Lockable, Serializable {
     
     private String filter;
 
-    private ControlMeasureClass[] controlMeasureClasses;
+    private List controlMeasureClasses;
+
+    private List controlMeasures;
 
     private Mutex lock;
 
     public ControlStrategy() {
         this.lock = new Mutex();
         this.datasetsList = new ArrayList();
+        this.controlMeasureClasses = new ArrayList();
+        this.controlMeasures = new ArrayList();
     }
 
     public ControlStrategy(String name) {
@@ -263,11 +267,19 @@ public class ControlStrategy implements Lockable, Serializable {
     }
 
     public void setControlMeasureClasses(ControlMeasureClass[] controlMeasureClasses) {
-        this.controlMeasureClasses = controlMeasureClasses;
+        this.controlMeasureClasses =  (controlMeasureClasses != null) ? Arrays.asList(controlMeasureClasses) : new ArrayList();
     }
 
     public ControlMeasureClass[] getControlMeasureClasses() {
-        return controlMeasureClasses;
+        return (ControlMeasureClass[])controlMeasureClasses.toArray(new ControlMeasureClass[0]);
+    }
+
+    public void setControlMeasures(LightControlMeasure[] controlMeasures) {
+        this.controlMeasures =  (controlMeasures != null) ? Arrays.asList(controlMeasures) : new ArrayList();
+    }
+
+    public LightControlMeasure[] getControlMeasures() {
+        return (LightControlMeasure[])controlMeasures.toArray(new LightControlMeasure[0]);
     }
 
 }

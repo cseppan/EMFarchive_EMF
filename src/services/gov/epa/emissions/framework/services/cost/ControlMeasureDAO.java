@@ -264,4 +264,8 @@ public class ControlMeasureDAO {
         return (ControlMeasureClass)hibernateFacade.load(ControlMeasureClass.class, Restrictions.eq("name", name), session);
     }
 
+    public List getLightControlMeasures(Session session) {
+        return hibernateFacade.getAll(LightControlMeasure.class, Order.asc("name"), session);
+    }
+
 }

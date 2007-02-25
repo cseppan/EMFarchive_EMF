@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.TrackableSortFilterSelectModel;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
@@ -49,7 +49,7 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
 
         setTitle("Select Control Measures");
         this.pack();
-        this.setSize(900,600);
+        this.setSize(700,600);
         this.setLocation(ScreenUtils.getPointToCenter(parent));
         this.setVisible(true);
     }
@@ -83,7 +83,7 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
 
     private void add() {
         List selected = selectModel.selected();
-        ControlMeasure[] cms = (ControlMeasure[]) selected.toArray(new ControlMeasure[0]);
+        LightControlMeasure[] cms = (LightControlMeasure[]) selected.toArray(new LightControlMeasure[0]);
         presenter.doAdd(cms);
 
     }

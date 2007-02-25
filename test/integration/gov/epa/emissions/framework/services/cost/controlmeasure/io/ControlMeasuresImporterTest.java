@@ -29,7 +29,7 @@ public class ControlMeasuresImporterTest extends ServiceTestCase {
         ControlMeasure[] measures = importer.controlMeasures();
         assertEquals(32, measures.length);
         assertEquals(1132, noOfRecords(measures));
-        assertEquals(124, noOfScc(measures));
+        assertEquals(126, noOfScc(measures));
     }
 
     private User emfUser() {

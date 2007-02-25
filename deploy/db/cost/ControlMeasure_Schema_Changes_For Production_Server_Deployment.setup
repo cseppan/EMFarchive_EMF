@@ -41,3 +41,16 @@ CREATE TABLE emf.control_strategy_classes
 ) 
 WITHOUT OIDS;
 -- Create new emf.control_strategy_classes table...
+
+-- Create new emf.control_strategy_measures
+CREATE TABLE emf.control_strategy_measures
+(
+  id SERIAL PRIMARY KEY,
+  control_strategy_id int4 NOT NULL REFERENCES emf.control_strategies(id) ,
+  control_measure_id int4 NOT NULL REFERENCES emf.control_measures (id),
+  list_index int4 NOT NULL,
+  include bool NOT NULL DEFAULT true,
+  UNIQUE (control_strategy_id,control_measure_id) 
+) 
+WITHOUT OIDS;
+-- Create new emf.control_strategy_measures

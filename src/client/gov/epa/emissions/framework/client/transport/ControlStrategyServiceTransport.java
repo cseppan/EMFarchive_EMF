@@ -9,7 +9,6 @@ import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 
 public class ControlStrategyServiceTransport implements ControlStrategyService {
-
     private CallFactory callFactory;
 
     private DataMappings mappings;
@@ -84,15 +83,26 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (ControlStrategy) call.requestResponse(new Object[] { element });
     }
 
-    public void removeControlStrategies(ControlStrategy[] elements, User user) throws EmfException {
+//    public void removeControlStrategies(ControlStrategy[] elements, User user) throws EmfException {
+//        EmfCall call = call();
+//
+//        call.setOperation("removeControlStrategies");
+//        call.addParam("elements", mappings.controlStrategies());
+//        call.addParam("user", mappings.user());
+//        call.setVoidReturnType();
+//
+//        call.request(new Object[] { elements, user });
+//    }
+
+    public void removeControlStrategies(int[] ids, User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("removeControlStrategies");
-        call.addParam("elements", mappings.controlStrategies());
+        call.addIntArrayParam();
         call.addParam("user", mappings.user());
         call.setVoidReturnType();
 
-        call.request(new Object[] { elements, user });
+        call.request(new Object[] { ids, user });
     }
 
     public void runStrategy(User user, ControlStrategy strategy) throws EmfException {
@@ -166,6 +176,34 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.setReturnType(mappings.controlMeasureClasses());
 
         return (ControlMeasureClass[]) call.requestResponse(new Object[] { new Integer(controlStrategyId) });
+    }
+
+    public int isDuplicateName(String name) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("isDuplicateName");
+        call.addStringParam("name");
+        call.setIntegerReturnType();
+        return (Integer) call.requestResponse(new Object[] { new String(name) });
+    }
+
+    public int copyControlStrategy(int id, User creator) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("copyControlStrategy");
+        call.addIntegerParam("id");
+        call.addParam("creator", mappings.user());
+        call.setIntegerReturnType();
+        return (Integer) call.requestResponse(new Object[] { new Integer(id), creator });
+    }
+
+    public ControlStrategy getById(int id) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getById");
+        call.addIntegerParam("id");
+        call.setReturnType(mappings.controlStrategy());
+        return (ControlStrategy) call.requestResponse(new Object[] { new Integer(id) });
     }
 
 }

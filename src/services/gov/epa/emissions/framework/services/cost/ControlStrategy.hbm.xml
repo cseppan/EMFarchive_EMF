@@ -65,5 +65,11 @@
     	<many-to-many class="gov.epa.emissions.framework.services.cost.ControlMeasureClass" column="control_measure_class_id"/>
 	</array>
 
+	<array name="controlMeasures" table="control_strategy_measures">
+    	<key column="control_strategy_id" not-null="true"/>
+    	<list-index column="list_index"/>
+    	<many-to-many class="gov.epa.emissions.framework.services.cost.LightControlMeasure" column="control_measure_id"/>
+	</array>
+
   </class> 
 </hibernate-mapping>  

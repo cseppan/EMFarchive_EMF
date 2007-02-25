@@ -51,6 +51,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private Button saveButton;
 
     private Button runButton;
+    
+    private EditControlStrategyMeasuresTab measuresTabView;
 
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
         super("Edit Control Strategy", new Dimension(500, 300), desktopManager);
@@ -167,15 +169,14 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
 
     private JPanel createMeasuresTab(ControlStrategy controlStrategy) {
-        ControlStrategyMeasuresTabView view = null;
         try {
-            view = new EditControlStrategyMeasuresTab(controlStrategy, this,  messagePanel, parentConsole, session);
-            this.presenter.set(view);
+            measuresTabView = new EditControlStrategyMeasuresTab(controlStrategy, this,  messagePanel, parentConsole, session);
+            this.presenter.set(measuresTabView);
         } catch (EmfException e) {
             showError("Could not create Measures tab.");
         }
         
-        return (JPanel) view;
+        return measuresTabView;
     }
     
     private JPanel outputPanel(ControlStrategyResult controlStrategyResults) {
@@ -185,7 +186,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         return (JPanel) view;
     }
 
-    private JPanel createErrorTab(String message) {// TODO
+    private JPanel createErrorTab(String message) {
         JPanel panel = new JPanel(false);
         JLabel label = new JLabel(message);
         label.setForeground(Color.RED);
@@ -356,4 +357,11 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         super.signalChanges();
     }
 
+    public void startControlMeasuresRefresh() {
+        measuresTabView.startControlMeasuresRefresh();
+    }
+
+    public void endControlMeasuresRefresh() {
+        measuresTabView.endControlMeasuresRefresh();
+    }
 }

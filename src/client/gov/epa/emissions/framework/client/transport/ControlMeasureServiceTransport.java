@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
+import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
@@ -162,5 +163,13 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (ControlMeasureClass) call.requestResponse(new Object[] { name });
     }
 
+    public LightControlMeasure[] getLightControlMeasures() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getLightControlMeasures");
+        call.setReturnType(mappings.lightControlMeasures());
+
+        return (LightControlMeasure[]) call.requestResponse(new Object[] { });
+    }
 
 }

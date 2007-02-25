@@ -17,7 +17,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 public class ControlStrategyDAO {
-
     private LockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
@@ -87,7 +86,7 @@ public class ControlStrategyDAO {
         return !nameUsed(controlStrategy.getName(), ControlStrategy.class, session);
     }
 
-    private boolean nameUsed(String name, Class clazz, Session session) {
+    public boolean nameUsed(String name, Class clazz, Session session) {
         return hibernateFacade.nameUsed(name, clazz, session);
     }
 
@@ -162,5 +161,15 @@ public class ControlStrategyDAO {
             ControlStrategyResult result = (ControlStrategyResult) list.get(i);
             hibernateFacade.delete(result,session);
         }
+    }
+
+    public ControlStrategy getByName(String name, Session session) {
+        ControlStrategy cs = (ControlStrategy) hibernateFacade.load(ControlStrategy.class, Restrictions.eq("name", new String(name)), session);
+        return cs;
+    }
+
+    public ControlStrategy getById(int id, Session session) {
+        ControlStrategy cs = (ControlStrategy) hibernateFacade.load(ControlStrategy.class, Restrictions.eq("id", new Integer(id)), session);
+        return cs;
     }
 }

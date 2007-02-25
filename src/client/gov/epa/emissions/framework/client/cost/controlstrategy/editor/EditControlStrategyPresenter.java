@@ -28,5 +28,4 @@ public interface EditControlStrategyPresenter {
     void doRefresh() throws EmfException;
 
     void doLoad(String tabTitle) throws EmfException;
-
 }
