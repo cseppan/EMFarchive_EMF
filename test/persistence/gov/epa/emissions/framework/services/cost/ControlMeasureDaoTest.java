@@ -198,8 +198,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         add(cm);
 
         ControlMeasure locked = dao.obtainLocked(owner, cm, session);
-        ControlMeasure released = dao.releaseLocked(locked, session);
-        assertFalse("Should have released lock", released.isLocked());
+        dao.releaseLocked(locked.getId(), session);
 
         ControlMeasure loadedFromDb = load(cm);
         assertFalse("Should have released lock", loadedFromDb.isLocked());

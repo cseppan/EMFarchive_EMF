@@ -53,14 +53,24 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
 
     }
 
-    public void releaseLocked(ControlStrategy locked) throws EmfException {
+//    public void releaseLocked(ControlStrategy locked) throws EmfException {
+//        EmfCall call = call();
+//
+//        call.setOperation("releaseLocked");
+//        call.addParam("element", mappings.controlStrategy());
+//        call.setReturnType(mappings.controlStrategy());
+//
+//        call.request(new Object[] { locked });
+//    }
+
+    public void releaseLocked(int id) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("releaseLocked");
-        call.addParam("element", mappings.controlStrategy());
+        call.addIntegerParam("id");
         call.setReturnType(mappings.controlStrategy());
 
-        call.request(new Object[] { locked });
+        call.request(new Object[] { new Integer(id) });
     }
 
     public ControlStrategy updateControlStrategy(ControlStrategy element) throws EmfException {

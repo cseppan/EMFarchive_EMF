@@ -59,7 +59,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
 
     public void doClose() throws EmfException {
-        service().releaseLocked(controlStrategy);
+        service().releaseLocked(controlStrategy.getId());
         closeView();
     }
 

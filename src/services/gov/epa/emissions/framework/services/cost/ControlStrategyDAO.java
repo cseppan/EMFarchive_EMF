@@ -52,8 +52,15 @@ public class ControlStrategyDAO {
         return (ControlStrategy) lockingScheme.getLocked(owner, current(element, session), session);
     }
 
-    public void releaseLocked(ControlStrategy locked, Session session) {
-        ControlStrategy current = current(locked, session);
+//    public void releaseLocked(ControlStrategy locked, Session session) {
+//        ControlStrategy current = current(locked, session);
+//        String runStatus = current.getRunStatus();
+//        if (runStatus == null || !runStatus.equalsIgnoreCase("Running"))
+//            lockingScheme.releaseLock(current, session);
+//    }
+
+    public void releaseLocked(int id, Session session) {
+        ControlStrategy current = getById(id, session);
         String runStatus = current.getRunStatus();
         if (runStatus == null || !runStatus.equalsIgnoreCase("Running"))
             lockingScheme.releaseLock(current, session);

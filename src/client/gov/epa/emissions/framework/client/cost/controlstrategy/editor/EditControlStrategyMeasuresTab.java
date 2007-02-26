@@ -61,11 +61,14 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
     private EmfSession session;
 
     private Button addButton = new AddButton(addAction());
+    
+    private ControlStrategy controlStrategy;
 
     // private JPanel sortFilterPanelContainer = new JPanel();
 
     public EditControlStrategyMeasuresTab(ControlStrategy controlStrategy, ManageChangeables changeablesList,
             SingleLineMessagePanel messagePanel, EmfConsole parentConsole, EmfSession session) {
+        this.controlStrategy = controlStrategy;
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
         this.parent = parentConsole;
@@ -226,17 +229,27 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
     public void save(ControlStrategy controlStrategy) {
         controlStrategy.setControlMeasureClasses(getControlMeasureClasses());
-        LightControlMeasure[] cms = new LightControlMeasure[tableData.rows().size()];
-        for (int i = 0; i < tableData.rows().size(); i++) {
-            cms[i] = (LightControlMeasure)tableData.element(i);
+        LightControlMeasure[] cms = {};
+        if (tableData != null) {
+            cms = new LightControlMeasure[tableData.rows().size()];
+            for (int i = 0; i < tableData.rows().size(); i++) {
+                cms[i] = (LightControlMeasure)tableData.element(i);
+            }
+        } else {
+            cms = controlStrategy.getControlMeasures();
         }
         controlStrategy.setControlMeasures(cms);
     }
 
     private ControlMeasureClass[] getControlMeasureClasses() {
         ControlMeasureClass[] controlMeasureClasses = {};
-        ControlMeasureClass[] selClasses = Arrays.asList(classesList.getSelectedValues()).toArray(
-                new ControlMeasureClass[0]);
+        ControlMeasureClass[] selClasses = {};
+        if (classesList != null){
+            selClasses = Arrays.asList(classesList.getSelectedValues()).toArray(
+                    new ControlMeasureClass[0]);
+        } else {
+            selClasses = controlStrategy.getControlMeasureClasses();
+        }
 
         // make sure we don't include the All class, its just for display purposes,
         // its not stored in the database

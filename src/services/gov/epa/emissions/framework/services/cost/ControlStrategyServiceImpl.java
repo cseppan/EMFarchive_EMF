@@ -103,16 +103,31 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public void releaseLocked(ControlStrategy locked) throws EmfException {
+//FIXME
+//    public void releaseLocked(ControlStrategy locked) throws EmfException {
+//        Session session = sessionFactory.getSession();
+//        try {
+//            dao.releaseLocked(locked, session);
+//        } catch (RuntimeException e) {
+//            LOG.error(
+//                    "Could not release lock for Control Strategy : " + locked + " by owner: " + locked.getLockOwner(),
+//                    e);
+//            throw new EmfException("Could not release lock for Control Strategy: " + locked + " by owner: "
+//                    + locked.getLockOwner());
+//        } finally {
+//            session.close();
+//        }
+//    }
+
+    public void releaseLocked(int id) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            dao.releaseLocked(locked, session);
+            dao.releaseLocked(id, session);
         } catch (RuntimeException e) {
             LOG.error(
-                    "Could not release lock for Control Strategy : " + locked + " by owner: " + locked.getLockOwner(),
+                    "Could not release lock for Control Strategy id: " + id,
                     e);
-            throw new EmfException("Could not release lock for Control Strategy: " + locked + " by owner: "
-                    + locked.getLockOwner());
+            throw new EmfException("Could not release lock for Control Strategy id: " + id);
         } finally {
             session.close();
         }

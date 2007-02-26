@@ -114,8 +114,9 @@ public class ControlMeasureDAO {
         return current(measure.getId(), ControlMeasure.class, session);
     }
 
-    public ControlMeasure releaseLocked(ControlMeasure locked, Session session) {
-        return (ControlMeasure) lockingScheme.releaseLock(current(locked, session), session);
+    public void releaseLocked(int id, Session session) {
+        ControlMeasure cm = current(id, ControlMeasure.class, session);
+        lockingScheme.releaseLock(cm, session);
     }
 
     public ControlMeasure update(ControlMeasure locked, Scc[] sccs, Session session) throws EmfException {

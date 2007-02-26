@@ -77,14 +77,24 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (ControlMeasure) call.requestResponse(new Object[] { owner, measure });
     }
 
-    public ControlMeasure releaseLockedControlMeasure(ControlMeasure locked) throws EmfException {
+//    public ControlMeasure releaseLockedControlMeasure(ControlMeasure locked) throws EmfException {
+//        EmfCall call = call();
+//
+//        call.setOperation("releaseLockedControlMeasure");
+//        call.addParam("locked", mappings.controlMeasure());
+//        call.setReturnType(mappings.controlMeasure());
+//
+//        return (ControlMeasure) call.requestResponse(new Object[] { locked });
+//    }
+
+    public void releaseLockedControlMeasure(int id) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("releaseLockedControlMeasure");
-        call.addParam("locked", mappings.controlMeasure());
-        call.setReturnType(mappings.controlMeasure());
+        call.addIntegerParam("id");
+        call.setVoidReturnType();
 
-        return (ControlMeasure) call.requestResponse(new Object[] { locked });
+        call.requestResponse(new Object[] { new Integer(id) });
     }
 
     public ControlMeasure updateMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {

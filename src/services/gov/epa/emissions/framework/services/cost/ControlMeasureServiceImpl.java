@@ -109,16 +109,28 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public ControlMeasure releaseLockedControlMeasure(ControlMeasure locked) throws EmfException {
+//    public ControlMeasure releaseLockedControlMeasure(ControlMeasure locked) throws EmfException {
+//        Session session = sessionFactory.getSession();
+//        try {
+//            ControlMeasure released = dao.releaseLocked(locked, session);
+//            return released;
+//        } catch (RuntimeException e) {
+//            LOG.error("Could not release lock for ControlMeasure: " + locked.getName() + " by owner: "
+//                    + locked.getLockOwner(), e);
+//            throw new EmfException("Could not release lock for ControlMeasure: " + locked.getName() + " by owner: "
+//                    + locked.getLockOwner());
+//        } finally {
+//            session.close();
+//        }
+//    }
+
+    public void releaseLockedControlMeasure(int id) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            ControlMeasure released = dao.releaseLocked(locked, session);
-            return released;
+            dao.releaseLocked(id, session);
         } catch (RuntimeException e) {
-            LOG.error("Could not release lock for ControlMeasure: " + locked.getName() + " by owner: "
-                    + locked.getLockOwner(), e);
-            throw new EmfException("Could not release lock for ControlMeasure: " + locked.getName() + " by owner: "
-                    + locked.getLockOwner());
+            LOG.error("Could not release lock for control measure id: " + id, e);
+            throw new EmfException("Could not release lock for control measure id: " + id);
         } finally {
             session.close();
         }

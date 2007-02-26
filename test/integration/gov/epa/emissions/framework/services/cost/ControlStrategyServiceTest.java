@@ -132,7 +132,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
 
         try {
             ControlStrategy locked = service.obtainLocked(owner, element);
-            service.releaseLocked(locked);
+            service.releaseLocked(locked.getId());
             ControlStrategy released = (ControlStrategy) load(ControlStrategy.class,locked.getName());
             assertFalse("Should have released lock", released.isLocked());
 
