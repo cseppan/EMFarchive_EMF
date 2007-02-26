@@ -289,7 +289,6 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
     }
 
     public void endControlMeasuresRefresh() {
-        messagePanel.setError(presenter.getAllControlMeasures().length + "");
         addButton.setEnabled(true);
     }
 }

@@ -110,6 +110,20 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         return strategy;
     }
 
+    protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant) {
+        ControlStrategy strategy = new ControlStrategy();
+        strategy.setName(name);
+        strategy.setInputDatasets(new EmfDataset[] { inputDataset });
+        strategy.setDatasetType(inputDataset.getDatasetType());
+        strategy.setDatasetVersion(0);// initial version
+        strategy.setInventoryYear(2000);
+        strategy.setCostYear(2000);
+        strategy.setTargetPollutant(pollutant);
+        strategy.setStrategyType(maxEmisRedStrategyType());
+        add(strategy);
+        return strategy;
+    }
+
     protected User emfUser() {
         return new UserDAO().get("emf", session);
     }

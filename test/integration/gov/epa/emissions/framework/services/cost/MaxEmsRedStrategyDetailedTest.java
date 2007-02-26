@@ -342,6 +342,64 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         }
     }
 
+    public void testShouldRunMaxEmsRedStrategyWithOnRoadData() throws Exception {
+        ControlStrategy strategy = null;
+        EmfDataset inputDataset = setInputDataset("ORL nonroad");
+        
+        ResultSet rs = null;
+        Connection cn = null;
+        try {
+            strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant());
+            User user = emfUser();
+            strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
+
+            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServer(),
+                    new Integer(500), sessionFactory());
+            maxEmfEmsRedStrategy.run();
+
+            //get detailed result dataset
+            ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory().getSession());
+            Dataset detailedResultDataset = result.getDetailedResultDataset();
+            String tableName = detailedResultDataset.getInternalSources()[0].getTable();
+
+            cn = dbServer().getEmissionsDatasource().getConnection();
+            Statement stmt = cn.createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY);
+
+            //make sure 15 records come back...
+            rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName);
+            rs.next();
+            assertTrue("make sure there are 4 records in the summary results.", rs.getInt(1) == 4);
+
+            //make sure inv entry has the right numbers...
+            //check SCC = 2302002100 FIPS = 37013 inv entry
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
+                    + " where scc = '2302002100' and fips = '37005'");
+            rs.next();
+            assertTrue("SCC = 2302002100 FIPS = 37005 reduction = 18.5", Math.abs(rs.getDouble("percent_reduction") - 18.5)/18.5 < tolerance);
+            assertTrue("SCC = 2302002100 FIPS = 37005 annual cost = 10282803.04", Math.abs(rs.getDouble("annual_cost") - 10282803.04)/10282803.04 < tolerance);
+            assertTrue("SCC = 2302002100 FIPS = 37005 emis reduction = 1480", Math.abs(rs.getDouble("emis_reduction") - 1480)/1480 < tolerance);
+
+            //make sure inv entry has the right numbers...
+            //check SCC = 2801500000 FIPS = 37029 inv entry
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
+                    + " where scc = '2801500000' and fips = '37015'");
+            rs.next();
+            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 61.8", Math.abs(rs.getDouble("percent_reduction") - 61.8)/61.8 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 38445061.95", Math.abs(rs.getDouble("annual_cost") - 38445061.95)/38445061.95 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8652", Math.abs(rs.getDouble("emis_reduction") - 8652)/8652 < tolerance);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) rs.close();
+            if (cn != null) cn.close();
+            dropTables(strategy, inputDataset);
+            removeData();
+        }
+    }
+
     private void dropTables(ControlStrategy strategy, EmfDataset inputDataset) throws Exception {
         if (strategy != null)
             dropTable(detailResultDatasetTableName(strategy), dbServer().getEmissionsDatasource());
