@@ -35,7 +35,7 @@ public class EditQAStepPresenter {
         QAService qaService = session.qaService();
         QAProgram[] programs = qaService.getQAPrograms();
         QAStepResult result = qaService.getQAStepResult(step);
-        view.display(step, result, programs, dataset, session.user(), versionName);
+        view.display(step, result, programs, dataset, versionName, session);
         view.setMostRecentUsedFolder(getFolder());
     }
 

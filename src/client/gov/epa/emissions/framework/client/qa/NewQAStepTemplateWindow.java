@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -26,7 +27,7 @@ public class NewQAStepTemplateWindow extends DisposableInteralFrame implements N
     private QAStepTemplatePanel templatePanel;
 
     private NewQAStepTemplatePresenter presenter;
-
+    
     public NewQAStepTemplateWindow(DesktopManager desktopManager) {
         super("New QA Step Template", new Dimension(550, 480), desktopManager);
     }
@@ -81,7 +82,11 @@ public class NewQAStepTemplateWindow extends DisposableInteralFrame implements N
         JPanel panel = new JPanel();
         Button ok = new OKButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doNew(type);
+                try {
+                    doNew(type);
+                } catch (EmfException exc) {
+                    messagePanel.setError("Could not add new QA Step Template: " + exc.getMessage());
+                }
             }
         });
         getRootPane().setDefaultButton(ok);
@@ -97,14 +102,14 @@ public class NewQAStepTemplateWindow extends DisposableInteralFrame implements N
         return panel;
     }
 
-    private void doNew(DatasetType type) {
+    private void doNew(DatasetType type) throws EmfException {
         if (verifyInput(type)) {
             presenter.addNew(template());
             disposeView();
         }
     }
 
-    public QAStepTemplate template() {
+    public QAStepTemplate template() throws EmfException {
         QAStepTemplate template = new QAStepTemplate();
         template.setName(templatePanel.getTemplateName().trim());
         template.setProgram(templatePanel.getProgram());

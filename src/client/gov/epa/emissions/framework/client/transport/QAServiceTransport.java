@@ -99,4 +99,14 @@ public class QAServiceTransport implements QAService {
 
     }
 
+    public QAProgram addQAProgram(QAProgram program) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("addQAProgram");
+        call.addParam("program", mappings.program());
+        call.setReturnType(mappings.program());
+        
+        return (QAProgram) call.requestResponse(new Object[] { program });
+    }
+
 }

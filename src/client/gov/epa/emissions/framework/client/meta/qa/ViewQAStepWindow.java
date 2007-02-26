@@ -94,7 +94,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         this.step = step;
         this.qaStepResult = qaStepResult;
         this.user = user;
-        this.qaPrograms = new QAPrograms(programs);
+        this.qaPrograms = new QAPrograms(null, programs);
         super.setLabel(super.getTitle() + ": " + step.getName() + " - " + dataset.getName() + " (v" + step.getVersion()
                 + ")");
 

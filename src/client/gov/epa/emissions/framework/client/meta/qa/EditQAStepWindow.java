@@ -15,6 +15,7 @@ import gov.epa.emissions.commons.gui.buttons.RunButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -97,12 +98,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         super("Edit QA Step", new Dimension(650, 625), desktopManager);
     }
 
-    public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset, User user,
-            String versionName) {
+    public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset, String versionName,
+            EmfSession session) {
         this.step = step;
         this.qaStepResult = qaStepResult;
-        this.user = user;
-        this.qaPrograms = new QAPrograms(programs);
+        this.user = session.user();
+        this.qaPrograms = new QAPrograms(session, programs);
         super.setLabel(super.getTitle() + ": " + step.getName() + " - " + dataset.getName() + " (v" + step.getVersion()
                 + ")");
 
@@ -308,7 +309,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         layoutGenerator.addLabelWidgetPair("Version:", new Label(versionName + " (" + step.getVersion() + ")"), panel);
 
         program = new EditableComboBox(qaPrograms.names());
-        program.setEditable(false);
+        //program.setEditable(false);
         program.setPrototypeDisplayValue("To make the combobox a bit wider");
         QAProgram qaProgram = step.getProgram();
         if (qaProgram != null)
@@ -500,7 +501,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             throw new EmfException("Order should be a floating point number");
         }
 
-        step.setProgram(qaPrograms.get((String) program.getSelectedItem()));
+        step.setProgram(qaPrograms.get(program.getSelectedItem()));
         step.setProgramArguments(programArguments.getText());
         step.setOrder(Float.parseFloat(order.getText()));
         step.setDescription(description.getText().trim());

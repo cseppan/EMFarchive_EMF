@@ -137,7 +137,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         this.presenter = presenter;
     }
 
-    public void loadTemplate() {
+    public void loadTemplate() throws EmfException {
         template.setName(templatePanel.getTemplateName().trim());
         template.setProgram(templatePanel.getProgram());
         template.setProgramArguments(templatePanel.getProgramArgs());

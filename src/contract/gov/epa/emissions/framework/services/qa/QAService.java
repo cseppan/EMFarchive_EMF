@@ -23,4 +23,6 @@ public interface QAService {
 
     QAStepResult getQAStepResult(QAStep step) throws EmfException;
 
+    QAProgram addQAProgram(QAProgram program) throws EmfException;
+
 }

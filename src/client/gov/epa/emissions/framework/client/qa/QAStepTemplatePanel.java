@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.data.QAPrograms;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.NumberFormattedTextField;
 
@@ -46,7 +47,7 @@ public class QAStepTemplatePanel extends JPanel {
     public QAStepTemplatePanel(QAProgram[] programs, MessagePanel messagePanel, ManageChangeables changeablesList) {
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
-        this.qaPrograms = new QAPrograms(programs);
+        this.qaPrograms = new QAPrograms(null, programs);
         layout = inputPanel();
         add(layout);
     }
@@ -140,8 +141,8 @@ public class QAStepTemplatePanel extends JPanel {
         return name.getText();
     }
 
-    public QAProgram getProgram() {
-        return qaPrograms.get((String) program.getSelectedItem());
+    public QAProgram getProgram() throws EmfException {
+        return qaPrograms.get(program.getSelectedItem());
     }
 
     public String getProgramArgs() {

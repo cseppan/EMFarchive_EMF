@@ -30,7 +30,7 @@ public class NewCustomQAStepPresenter {
 
     public void display() throws EmfException {
         QAProgram[] programs = session.qaService().getQAPrograms();
-        stepView.display(dataset, programs, versions, parentView);
+        stepView.display(dataset, programs, versions, parentView, session);
     }
 
     public void doSave() throws EmfException {

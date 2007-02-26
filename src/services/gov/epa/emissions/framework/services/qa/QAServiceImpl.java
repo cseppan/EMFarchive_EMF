@@ -191,4 +191,16 @@ public class QAServiceImpl implements QAService {
 
     }
 
+    public QAProgram addQAProgram(QAProgram program) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.addQAProgram(program, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not add QA Program " + program.getName() + ". ", e);
+            throw new EmfException("Could not add QA Program " + program.getName() + ".");
+        } finally {
+            session.close();
+        }
+    }
+
 }

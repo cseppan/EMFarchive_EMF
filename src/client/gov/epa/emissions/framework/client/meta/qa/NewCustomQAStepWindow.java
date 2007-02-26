@@ -11,6 +11,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.data.QAPrograms;
@@ -62,12 +63,12 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         super("Add Custom QA Step", new Dimension(550, 450), desktopManager);
     }
 
-    public void display(EmfDataset dataset, QAProgram[] programs, Version[] versions, EditableQATabView tabView) {
+    public void display(EmfDataset dataset, QAProgram[] programs, Version[] versions, EditableQATabView tabView,EmfSession session) {
         super.setTitle(super.getTitle() + ": " + dataset.getName());
 
         this.dataset = dataset;
         this.versionsSet = new VersionsSet(versions);
-        this.qaPrograms = new QAPrograms(programs);
+        this.qaPrograms = new QAPrograms(session, programs);
         JPanel layout = createLayout();
         super.getContentPane().add(layout);
         super.display();
@@ -94,7 +95,6 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         program = new EditableComboBox(qaPrograms.names());
-        program.setEditable(false);
         program.setSelectedItem("");
         program.setPrototypeDisplayValue("To make the combobox a bit wider");
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
@@ -212,9 +212,8 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         step.setVersion(selectedVersion().getVersion());
         step.setRequired(required.isSelected());
 
-        
         step.setName(stepName);
-        step.setProgram(qaPrograms.get((String) program.getSelectedItem()));
+        step.setProgram(qaPrograms.get(program.getSelectedItem()));
         step.setProgramArguments(arguments.getText());
         step.setOrder(Float.parseFloat(order.getText()));
         step.setDescription(description.getText().trim());

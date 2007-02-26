@@ -79,4 +79,15 @@ public class QADAO {
         return criterions;
     }
 
+    public QAProgram addQAProgram(QAProgram program, Session session) {
+        hibernateFacade.add(program, session);
+        
+        return (QAProgram)load(QAProgram.class, program.getName(), session);
+    }
+    
+    private Object load(Class clazz, String name, Session session) {
+        Criterion criterion = Restrictions.eq("name", name);
+        return hibernateFacade.load(clazz, criterion, session);
+    }
+
 }

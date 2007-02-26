@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.data.QAProgram;
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.services.EmfException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,24 +12,46 @@ import java.util.List;
 public class QAPrograms {
 
     private List list;
+    
+    private EmfSession session;
 
-    public QAPrograms(QAProgram[] programs) {
+    public QAPrograms(EmfSession session, QAProgram[] programs) {
+        this.session = session;
         this.list = new ArrayList(Arrays.asList(programs));
     }
 
-    public QAProgram get(String name) {
-        if (name == null || name.trim().length() == 0)
-            return null;
-
-        name = name.trim();
-        for (int i = 0; i < list.size(); i++) {
-            QAProgram item = ((QAProgram) list.get(i));
-            if (item.getName().equalsIgnoreCase(name))
-                return item;
+    public QAProgram get(Object selected) throws EmfException {
+        if (selected instanceof String) {
+            return editProgram(selected);
         }
-        QAProgram p = new QAProgram();
-        p.setName(name);
-        return p;
+        
+        if (selected == null)
+            return null;
+        
+        int index = list.indexOf(selected);
+        return (QAProgram) list.get(index);
+    }
+    
+    private QAProgram editProgram(Object selected) throws EmfException {
+        String newProgram = ((String) selected).trim();
+        if (newProgram.length() == 0)
+            throw new EmfException("QA Program name cannot be an empty string.");
+
+        QAProgram program = new QAProgram(newProgram);
+        int index = list.indexOf(program);
+        if (index == -1) {// new input name
+            QAProgram persistName = persistName(program);
+            list.add(persistName);
+            return persistName;
+        }
+        return (QAProgram) list.get(index);
+    }
+    
+    private QAProgram persistName(QAProgram program) throws EmfException {
+        if (session == null)
+            return program;
+        
+        return session.qaService().addQAProgram(program);
     }
 
     public String[] names() {
