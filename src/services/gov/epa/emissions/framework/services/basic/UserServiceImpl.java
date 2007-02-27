@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.services.basic;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.List;
@@ -134,6 +136,20 @@ public class UserServiceImpl implements UserService {
             LOG.error("Could not release lock for user: " + object.getUsername() + " by owner: "
                     + object.getLockOwner(), e);
             throw new EmfException("Unable to release lock on user due to data access failure");
+        }
+    }
+
+    public String getEmfVersion() throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            EmfProperty property = new EmfPropertiesDAO().getProperty("EMF-version", session);
+            return property == null ? null : property.getValue();
+        } catch (Exception e) {
+            LOG.error("Could not get EMF version info.", e);
+            throw new EmfException("Could not get EMF version info.");
+        } finally {
+            session.close();
         }
     }
 

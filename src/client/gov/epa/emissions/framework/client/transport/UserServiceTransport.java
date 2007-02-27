@@ -101,4 +101,13 @@ public class UserServiceTransport implements UserService {
         return (User) call.requestResponse(new Object[] { object });
     }
 
+    public String getEmfVersion() throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getEmfVersion");
+        call.setStringReturnType();
+        
+        return (String) call.requestResponse(new Object[] { });
+    }
+
 }

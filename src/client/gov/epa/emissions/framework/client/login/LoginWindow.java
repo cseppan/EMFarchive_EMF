@@ -27,6 +27,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
@@ -45,8 +46,10 @@ public class LoginWindow extends EmfFrame implements LoginView {
 
     private ServiceLocator serviceLocator;
 
+    private final static String EMF_VERSION = "v1.8 - 2/12/2007";
+
     public LoginWindow(ServiceLocator serviceLocator) {
-        super("Login", "Login to the Emissions Modeling Framework [v1.8 - 2/12/2007]");
+        super("Login", "Login to the Emissions Modeling Framework [" + EMF_VERSION + "]");
         this.serviceLocator = serviceLocator;
 
         JPanel layoutPanel = createLayout();
@@ -69,6 +72,25 @@ public class LoginWindow extends EmfFrame implements LoginView {
         panel.add(createLoginOptionsPanel());
 
         return panel;
+    }
+
+    public void display() {
+        try {
+            if (!presenter.checkEmfVersion(EMF_VERSION) && toUpdate() == JOptionPane.YES_OPTION)
+                disposeView();
+            else
+                super.display();
+        } catch (Exception e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
+    private int toUpdate() {
+        String message = "A different version of EMF exists (" + presenter.getUpdatedEmfVersion() + ").\n"
+                + "Would you like to exit login and update?";
+
+        return JOptionPane.showConfirmDialog(this, message, "Warning", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
     }
 
     private JPanel createButtonsPanel() {
