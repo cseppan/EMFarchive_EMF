@@ -1,0 +1,60 @@
+ALTER TABLE reference.countries ADD CONSTRAINT countries_pk PRIMARY KEY (country_code);
+ALTER TABLE reference.pollutant_codes ADD CONSTRAINT pollutant_codes_pkey PRIMARY KEY (pollutant_code);
+ALTER TABLE reference.states ADD CONSTRAINT states_pkey PRIMARY KEY (country_code, state_abbr);
+
+CREATE INDEX countries_abbr
+  ON reference.countries
+  USING btree
+  (country_code, country_abbr);
+
+CREATE INDEX fips_co_st
+  ON reference.fips
+  USING btree
+  (country_code, state_county_fips);
+
+-- Index: reference.fips_pk
+
+-- DROP INDEX reference.fips_pk;
+
+CREATE INDEX fips_pk
+  ON reference.fips
+  USING btree
+  (country_num, state_county_fips);
+
+CREATE INDEX mact_codes_pk
+  ON reference.mact_codes
+  USING btree
+  (mact_code);
+  
+CREATE INDEX naics_codes_pk
+  ON reference.naics_codes
+  USING btree
+  (naics_code);
+  
+CREATE INDEX pollutant_codes_pk
+  ON reference.pollutant_codes
+  USING btree
+  (pollutant_code);
+
+CREATE INDEX pollutant_codes_tonames
+  ON reference.pollutant_codes
+  USING btree
+  (pollutant_code, pollutant_code_desc);
+
+CREATE INDEX scc_pk
+  ON reference.scc
+  USING btree
+  (scc);
+
+CREATE INDEX scc_codes_pk
+  ON reference.scc_codes
+  USING btree
+  (scc);
+
+CREATE INDEX sic_codes_pk
+  ON reference.sic_codes
+  USING btree
+  (sic);
+
+-- some day, merge SCC and SCC-codes
+-- also, merge FIPS with state_county_fips_codes
