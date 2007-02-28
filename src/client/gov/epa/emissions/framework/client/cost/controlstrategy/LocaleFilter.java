@@ -4,8 +4,8 @@ import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+//import java.util.regex.Matcher;
+//import java.util.regex.Pattern;
 
 public class LocaleFilter {
 
@@ -20,10 +20,12 @@ public class LocaleFilter {
 
         //see if locale includes country and region/state and no county info...
         if (locale.length() == 3 || locale.length() == 2) {
-            Pattern pat = 
-                Pattern.compile("^" + locale + "*");
-            Matcher matcher = pat.matcher(fips);
-            return matcher.find();//fips.matches(pattern);
+//            Pattern pat = 
+//                Pattern.compile("^" + locale + "*");
+//            Matcher matcher = pat.matcher(fips);
+//            return matcher.find();//fips.matches(pattern);
+            boolean foo = fips.substring(0, locale.length()).equals(locale);
+            return foo;//fips.substring(0, locale.length()).equals(locale);
         }
 
         //see if locale includes country and region/state and county info...

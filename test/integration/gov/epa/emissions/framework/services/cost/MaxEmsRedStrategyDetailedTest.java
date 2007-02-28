@@ -79,9 +79,9 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2801500000' and fips = '37015'");
             rs.next();
-            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 61.8", Math.abs(rs.getDouble("percent_reduction") - 61.8)/61.8 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 38445061.95", Math.abs(rs.getDouble("annual_cost") - 38445061.95)/38445061.95 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8652", Math.abs(rs.getDouble("emis_reduction") - 8652)/8652 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < tolerance);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -148,9 +148,9 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2801500000' and fips = '37015'");
             rs.next();
-            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 61.8", Math.abs(rs.getDouble("percent_reduction") - 61.8)/61.8 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 38445061.95", Math.abs(rs.getDouble("annual_cost") - 38445061.95)/38445061.95 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8652", Math.abs(rs.getDouble("emis_reduction") - 8652)/8652 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < tolerance);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -218,9 +218,9 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2801500000' and fips = '37015'");
             rs.next();
-            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 61.8", Math.abs(rs.getDouble("percent_reduction") - 61.8)/61.8 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 38445061.95", Math.abs(rs.getDouble("annual_cost") - 38445061.95)/38445061.95 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8652", Math.abs(rs.getDouble("emis_reduction") - 8652)/8652 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < tolerance);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -328,9 +328,9 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2801500000' and fips = '37015'");
             rs.next();
-            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 61.8", Math.abs(rs.getDouble("percent_reduction") - 61.8)/61.8 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 38445061.95", Math.abs(rs.getDouble("annual_cost") - 38445061.95)/38445061.95 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8652", Math.abs(rs.getDouble("emis_reduction") - 8652)/8652 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < tolerance);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -342,7 +342,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         }
     }
 
-    public void testShouldRunMaxEmsRedStrategyWithOnRoadData() throws Exception {
+    public void testShouldRunMaxEmsRedStrategyWithNonRoadData() throws Exception {
         ControlStrategy strategy = null;
         EmfDataset inputDataset = setInputDataset("ORL nonroad");
         
@@ -370,25 +370,83 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             //make sure 15 records come back...
             rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName);
             rs.next();
-            assertTrue("make sure there are 4 records in the summary results.", rs.getInt(1) == 4);
+            assertTrue("make sure there are 3 records in the summary results." + rs.getInt(1), rs.getInt(1) == 3);
 
             //make sure inv entry has the right numbers...
             //check SCC = 2302002100 FIPS = 37013 inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
-                    + " where scc = '2302002100' and fips = '37005'");
+                    + " where scc = '2294000270' and fips = '37001'");
             rs.next();
-            assertTrue("SCC = 2302002100 FIPS = 37005 reduction = 18.5", Math.abs(rs.getDouble("percent_reduction") - 18.5)/18.5 < tolerance);
-            assertTrue("SCC = 2302002100 FIPS = 37005 annual cost = 10282803.04", Math.abs(rs.getDouble("annual_cost") - 10282803.04)/10282803.04 < tolerance);
-            assertTrue("SCC = 2302002100 FIPS = 37005 emis reduction = 1480", Math.abs(rs.getDouble("emis_reduction") - 1480)/1480 < tolerance);
+            assertTrue("SCC = 2294000270 FIPS = 37001 reduction = 71.1" + rs.getDouble("percent_reduction"), Math.abs(rs.getDouble("percent_reduction") - 71.1)/71.1 < tolerance);
+            assertTrue("SCC = 2294000270 FIPS = 37001 annual cost = 7.02655E-07 " + rs.getDouble("annual_cost"), Math.abs(rs.getDouble("annual_cost") - 7.02655E-07)/7.02655E-07 < tolerance);
+            assertTrue("SCC = 2294000270 FIPS = 37001 emis reduction = 2.37705E-09", Math.abs(rs.getDouble("emis_reduction") - 2.37705E-09)/2.37705E-09 < tolerance);
 
             //make sure inv entry has the right numbers...
             //check SCC = 2801500000 FIPS = 37029 inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
-                    + " where scc = '2801500000' and fips = '37015'");
+                    + " where scc = '2801500130' and fips = '37001'");
             rs.next();
-            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 61.8", Math.abs(rs.getDouble("percent_reduction") - 61.8)/61.8 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 38445061.95", Math.abs(rs.getDouble("annual_cost") - 38445061.95)/38445061.95 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8652", Math.abs(rs.getDouble("emis_reduction") - 8652)/8652 < tolerance);
+            assertTrue("SCC = 2801500130 FIPS = 37001 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
+            assertTrue("SCC = 2801500130 FIPS = 37001 annual cost = 4.927410E-04", Math.abs(rs.getDouble("annual_cost") - 4.927410E-04)/4.927410E-04 < tolerance);
+            assertTrue("SCC = 2801500130 FIPS = 37001 emis reduction = 1.15727E-07", Math.abs(rs.getDouble("emis_reduction") - 1.15727E-07)/1.15727E-07 < tolerance);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) rs.close();
+            if (cn != null) cn.close();
+            dropTables(strategy, inputDataset);
+            removeData();
+        }
+    }
+
+    public void testShouldRunMaxEmsRedStrategyWithOnRoadData() throws Exception {
+        ControlStrategy strategy = null;
+        EmfDataset inputDataset = setInputDataset("ORL onroad");
+        
+        ResultSet rs = null;
+        Connection cn = null;
+        try {
+            strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant());
+            User user = emfUser();
+            strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
+
+            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServer(),
+                    new Integer(500), sessionFactory());
+            maxEmfEmsRedStrategy.run();
+
+            //get detailed result dataset
+            ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory().getSession());
+            Dataset detailedResultDataset = result.getDetailedResultDataset();
+            String tableName = detailedResultDataset.getInternalSources()[0].getTable();
+
+            cn = dbServer().getEmissionsDatasource().getConnection();
+            Statement stmt = cn.createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY);
+
+            //make sure 15 records come back...
+            rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName);
+            rs.next();
+            assertTrue("make sure there are 3 records in the summary results." + rs.getInt(1), rs.getInt(1) == 3);
+
+            //make sure inv entry has the right numbers...
+            //check SCC = 2302002100 FIPS = 37013 inv entry
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
+                    + " where scc = '2311010000' and fips = '37013'");
+            rs.next();
+            assertTrue("SCC = 2311010000 FIPS = 37013 reduction = 63" + rs.getDouble("percent_reduction"), Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
+            assertTrue("SCC = 2311010000 FIPS = 37013 annual cost = 8.608595E-01" + rs.getDouble("annual_cost"), Math.abs(rs.getDouble("annual_cost") - 8.608595E-01)/8.608595E-01 < tolerance);
+            assertTrue("SCC = 2311010000 FIPS = 37013 emis reduction = 1.732500E-04", Math.abs(rs.getDouble("emis_reduction") - 1.732500E-04)/1.732500E-04 < tolerance);
+
+            //make sure inv entry has the right numbers...
+            //check SCC = 2801500000 FIPS = 37029 inv entry
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
+                    + " where scc = '2296000000' and fips = '37006'");
+            rs.next();
+            assertTrue("SCC = 2296000000 FIPS = 37006 reduction = 68", Math.abs(rs.getDouble("percent_reduction") - 68)/68 < tolerance);
+            assertTrue("SCC = 2296000000 FIPS = 37006 annual cost = 4.959112E+02", Math.abs(rs.getDouble("annual_cost") - 4.959112E+02)/4.959112E+02 < tolerance);
+            assertTrue("SCC = 2296000000 FIPS = 37006 emis reduction = 6.690724E-01", Math.abs(rs.getDouble("emis_reduction") - 6.690724E-01)/6.690724E-01 < tolerance);
 
         } catch (Exception e) {
             e.printStackTrace();

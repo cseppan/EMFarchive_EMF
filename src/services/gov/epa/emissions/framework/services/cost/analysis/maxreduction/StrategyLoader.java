@@ -103,6 +103,9 @@ public class StrategyLoader {
         if (type.getName().equalsIgnoreCase("ORL Onroad Inventory (MBINV)"))
             return new OnroadRecordGenerator(result);
 
+        if (type.getName().equalsIgnoreCase("ORL Nonroad Inventory (ARINV)"))
+            return new NonroadRecordGenerator(result);
+
         return null;
     }
 

@@ -12,6 +12,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
+import gov.epa.emissions.commons.io.orl.ORLNonRoadImporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
@@ -55,6 +56,9 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         
         if (type.equalsIgnoreCase("ORL onroad"))
             inputDataset = addORLOnroadDataset(inputDataset);
+        
+        if (type.equalsIgnoreCase("ORL Nonroad"))
+            inputDataset = addORLNonroadDataset(inputDataset);
         
         addVersionZeroEntryToVersionsTable(inputDataset, dbServer.getEmissionsDatasource());
         return inputDataset;
@@ -155,6 +159,21 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         File folder = new File("test/data/orl/nc");
         String[] fileNames = { "orl_onroad_with_poll_name_txt_17aug2006.txt" };
         ORLOnRoadImporter importer = new ORLOnRoadImporter(folder, fileNames, inputDataset, dbServer, sqlDataTypes,
+                new VersionedDataFormatFactory(version, inputDataset));
+        importer.run();
+        add(inputDataset);
+        session.flush();
+        return (EmfDataset) load(EmfDataset.class, tableName);
+    }
+
+    private EmfDataset addORLNonroadDataset(EmfDataset inputDataset) throws ImporterException {
+        Version version = new Version();
+        version.setVersion(0);
+        version.setDatasetId(inputDataset.getId());
+
+        File folder = new File("test/data/orl/nc");
+        String[] fileNames = { "arinv.nonroad.nti99d_NC-with-matching_values.txt" };
+        ORLNonRoadImporter importer = new ORLNonRoadImporter(folder, fileNames, inputDataset, dbServer, sqlDataTypes,
                 new VersionedDataFormatFactory(version, inputDataset));
         importer.run();
         add(inputDataset);
