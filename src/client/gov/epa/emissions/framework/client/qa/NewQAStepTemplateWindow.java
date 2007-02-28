@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -28,11 +29,14 @@ public class NewQAStepTemplateWindow extends DisposableInteralFrame implements N
 
     private NewQAStepTemplatePresenter presenter;
     
+    private EmfSession session;
+    
     public NewQAStepTemplateWindow(DesktopManager desktopManager) {
         super("New QA Step Template", new Dimension(550, 480), desktopManager);
     }
 
-    public void display(DatasetType type, QAProgram[] programs) {
+    public void display(EmfSession session, DatasetType type, QAProgram[] programs) {
+        this.session = session;
         super.setLabel(super.getTitle() + ": " + type.getName());
         JPanel layout = createLayout(type,programs);
         super.getContentPane().add(layout);
@@ -45,7 +49,7 @@ public class NewQAStepTemplateWindow extends DisposableInteralFrame implements N
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.templatePanel = new QAStepTemplatePanel(programs,messagePanel,  this);
+        this.templatePanel = new QAStepTemplatePanel(session, programs, messagePanel,  this);
         panel.add(templatePanel);
         panel.add(buttonsPanel(type));
 
@@ -55,7 +59,7 @@ public class NewQAStepTemplateWindow extends DisposableInteralFrame implements N
     protected boolean verifyInput(DatasetType type) {
         String templatename = templatePanel.getTemplateName().trim();
         if (templatename.length() == 0) {
-            JOptionPane.showMessageDialog(super.getParent(), "Please enter Name", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(super.getParent(), "Please enter a Name.", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
 

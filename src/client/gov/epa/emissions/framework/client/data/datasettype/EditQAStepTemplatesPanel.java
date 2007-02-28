@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.qa.EditQAStepTemplateWindow;
@@ -58,13 +59,16 @@ public class EditQAStepTemplatesPanel extends JPanel implements QAStepTemplatesP
     private EmfConsole parent;
 
     private QAProgram[] programs;
+    
+    private EmfSession session;
 
     private SingleLineMessagePanel messagePanel;
 
-    public EditQAStepTemplatesPanel(DatasetType type, QAProgram[] programs, ManageChangeables changeablesList,
+    public EditQAStepTemplatesPanel(EmfSession session, DatasetType type, QAProgram[] programs, ManageChangeables changeablesList,
             DesktopManager desktopManager, EmfConsole parent, SingleLineMessagePanel messagePanel) {
         this.changeablesList = changeablesList;
         this.type = type;
+        this.session = session;
         this.parent = parent;
         this.programs = programs;
         this.messagePanel = messagePanel;
@@ -212,7 +216,7 @@ public class EditQAStepTemplatesPanel extends JPanel implements QAStepTemplatesP
     private void doAdd() {
         NewQAStepTemplateView view = new NewQAStepTemplateWindow(desktopManager);
         NewQAStepTemplatePresenter newTemplatePresenter = new NewQAStepTemplatePresenter(this, view);
-        newTemplatePresenter.display(type, programs);
+        newTemplatePresenter.display(type, programs, session);
     }
 
     public void add(QAStepTemplate template) {

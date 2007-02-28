@@ -24,7 +24,7 @@ public class QAStepTemplatesPanelPresenter {
     }
 
     public void doEdit(EditQAStepTemplateView view, QAStepTemplate template) throws EmfException {
-        EditQAStepTemplatesPresenter presenter = new EditQAStepTemplatesPresenterImpl(view, this.view);
+        EditQAStepTemplatesPresenter presenter = new EditQAStepTemplatesPresenterImpl(view, this.view, session);
         presenter.display(type, session.qaService().getQAPrograms(), template);
     }
 

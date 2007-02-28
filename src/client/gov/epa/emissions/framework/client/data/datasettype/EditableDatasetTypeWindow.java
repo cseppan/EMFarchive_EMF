@@ -128,7 +128,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     }
 
     private JPanel createQAStepTemplatesPanel(DatasetType type, QAProgram[] programs) {
-        qaStepTemplatesPanel = new EditQAStepTemplatesPanel(type, programs, this, desktopManager, parent,messagePanel);
+        qaStepTemplatesPanel = new EditQAStepTemplatesPanel(session, type, programs, this, desktopManager, parent,messagePanel);
         QAStepTemplatesPanelPresenter presenter = new QAStepTemplatesPanelPresenter(session,type, qaStepTemplatesPanel);
         presenter.display();
 

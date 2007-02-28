@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -35,14 +36,17 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     private Button ok;
 
     private QAStepTemplatePanel templatePanel;
+    
+    private EmfSession session;
 
     public EditQAStepTemplateWindow(String title, DesktopManager desktopManager) {
         super("Edit QA Step Template", new Dimension(550, 480), desktopManager);
         super.setLabel(super.getTitle() + ": " + title);
     }
 
-    public void display(DatasetType type, QAProgram[] programs, QAStepTemplate template) {
+    public void display(DatasetType type, QAProgram[] programs, QAStepTemplate template, EmfSession session) {
         this.template = template;
+        this.session = session;
         layout = createLayout(type, programs);
         super.getContentPane().add(layout);
         super.display();
@@ -54,7 +58,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.templatePanel = new QAStepTemplatePanel(programs,messagePanel, this);
+        this.templatePanel = new QAStepTemplatePanel(session, programs,messagePanel, this);
         panel.add(templatePanel);
         panel.add(buttonsPanel(type));
 
@@ -66,7 +70,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     private boolean verifyInput(DatasetType type) {
         String templatename = templatePanel.getTemplateName().trim();
         if (templatename.length() == 0) {
-            JOptionPane.showMessageDialog(super.getParent(), "Please enter Name", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(super.getParent(), "Please enter a Name.", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
@@ -95,7 +99,6 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         ok = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doEdit(type);
-                disposeView();
             }
         });
         getRootPane().setDefaultButton(ok);
@@ -116,6 +119,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         verifyInput(type);
         try {
             presenter.doEdit();
+            disposeView();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

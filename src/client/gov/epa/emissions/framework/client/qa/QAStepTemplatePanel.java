@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.data.QAPrograms;
 import gov.epa.emissions.framework.services.EmfException;
@@ -44,10 +45,10 @@ public class QAStepTemplatePanel extends JPanel {
 
     private QAPrograms qaPrograms;
 
-    public QAStepTemplatePanel(QAProgram[] programs, MessagePanel messagePanel, ManageChangeables changeablesList) {
+    public QAStepTemplatePanel(EmfSession session, QAProgram[] programs, MessagePanel messagePanel, ManageChangeables changeablesList) {
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
-        this.qaPrograms = new QAPrograms(null, programs);
+        this.qaPrograms = new QAPrograms(session, programs);
         layout = inputPanel();
         add(layout);
     }
@@ -61,7 +62,6 @@ public class QAStepTemplatePanel extends JPanel {
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         program = new EditableComboBox(qaPrograms.names());
-        program.setEditable(false);
         changeablesList.addChangeable(program);
         program.setPrototypeDisplayValue("To make the combobox a bit wider");
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);

@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.qa;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
+import gov.epa.emissions.framework.client.EmfSession;
 
 public class NewQAStepTemplatePresenter {
 
@@ -15,9 +16,9 @@ public class NewQAStepTemplatePresenter {
         this.parentView = parentView;
     }
     
-    public void display(DatasetType type, QAProgram[] programs) {
+    public void display(DatasetType type, QAProgram[] programs, EmfSession session) {
         view.observe(this);
-        view.display(type, programs);
+        view.display(session, type, programs);
     }
     
     public void addNew(QAStepTemplate template) {
