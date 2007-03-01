@@ -206,6 +206,7 @@ public class ControlStrategyInventoryOutput {
     // FIXME: orl specfic column
     // TODO device code
     private String updateQuery(String outputTable, String detailResultTable, Datasource datasource) {
+//        controlStrategy.getDatasetType().equals
         return "UPDATE " + qualifiedTable(outputTable, datasource) + " SET " + "ann_emis=b.final_emissions,"
                 + "ceff=b.control_eff," + "reff=b.rule_eff," + "rpen=b.rule_pen" + " FROM (SELECT "
                 + "final_emissions, control_eff, rule_eff, rule_pen, source_id" + " FROM "

@@ -9,27 +9,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NonpointRecordGenerator implements RecordGenerator {
-
+public class PointRecordGenerator implements RecordGenerator {
     private ControlStrategyResult strategyResult;
-
-    private String comment;
-
+    private String comment = "";
     private double reducedEmission;
-
     private double invenControlEfficiency;
-
     private double invenRulePenetration;
-
     private double invenRuleEffectiveness;
-
     private double originalEmissions;
-
     private double finalEmissions;
 
-    public NonpointRecordGenerator(ControlStrategyResult result) {
+    public PointRecordGenerator(ControlStrategyResult result) {
         this.strategyResult = result;
-        comment = "";
     }
 
     public Record getRecord(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException {
@@ -37,6 +28,10 @@ public class NonpointRecordGenerator implements RecordGenerator {
         record.add(tokens(resultSet, maxCM));
 
         return record;
+    }
+
+    public double reducedEmission() {
+        return reducedEmission;
     }
 
     public List tokens(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException {
@@ -55,31 +50,15 @@ public class NonpointRecordGenerator implements RecordGenerator {
         tokens.add(resultSet.getString("scc"));
         tokens.add(resultSet.getString("fips"));
 
-        try {
-            tokens.add(resultSet.getString("PLANTID"));
-        } catch (SQLException e) {
-            tokens.add("");
-        }
-        try {
-            tokens.add(resultSet.getString("POINTID"));
-        } catch (SQLException e) {
-            tokens.add("");
-        }
-        try {
-            tokens.add(resultSet.getString("STACKID"));
-        } catch (SQLException e) {
-            tokens.add("");
-        }
-        try {
-            tokens.add(resultSet.getString("SEGMENT"));
-        } catch (SQLException e) {
-            tokens.add("");
-        }
+        tokens.add(resultSet.getString("PLANTID"));
+        tokens.add(resultSet.getString("POINTID"));
+        tokens.add(resultSet.getString("STACKID"));
+        tokens.add(resultSet.getString("SEGMENT"));
         
         tokens.add("" + maxCM.adjustedCostPerTon() * reducedEmission);
         tokens.add("" + maxCM.adjustedCostPerTon());
         tokens.add("" + maxCM.controlEfficiency());
-        tokens.add("" + maxCM.rulePenetration());
+        tokens.add("" + 100);
         tokens.add("" + maxCM.ruleEffectiveness());
         tokens.add("" + maxCM.effectiveReduction() * 100);
 
@@ -98,10 +77,10 @@ public class NonpointRecordGenerator implements RecordGenerator {
 
         return tokens;
     }
-
+    
     public void calculateEmissionReduction(ResultSet resultSet, MaxControlEffControlMeasure maxMeasure) throws SQLException {
         invenControlEfficiency = resultSet.getFloat("CEFF");
-        invenRulePenetration = resultSet.getFloat("RPEN");
+        invenRulePenetration = 100;
         invenRuleEffectiveness = resultSet.getFloat("REFF");
         originalEmissions = resultSet.getFloat("ANN_EMIS");
 
@@ -129,10 +108,6 @@ public class NonpointRecordGenerator implements RecordGenerator {
         originalEmissions = originalEmissions / invenControlEfficiency;
         reducedEmission = originalEmissions * invenEffectiveReduction;
         finalEmissions = originalEmissions - reducedEmission;
-    }
-
-    public double reducedEmission() {
-        return reducedEmission;
     }
 
 }

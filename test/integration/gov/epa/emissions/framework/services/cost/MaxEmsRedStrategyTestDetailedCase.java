@@ -13,6 +13,7 @@ import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.commons.io.orl.ORLNonRoadImporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
+import gov.epa.emissions.commons.io.orl.ORLPointImporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
@@ -49,23 +50,29 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         inputDataset.setCreator(emfUser().getUsername());
         inputDataset.setDatasetType(getDatasetType(type));//orlNonpointDatasetType());
 
+        add(inputDataset);
+        session.flush();
+        inputDataset = (EmfDataset) load(EmfDataset.class, tableName);
+
         if (type.equalsIgnoreCase("ORL nonpoint"))
             inputDataset = addORLNonpointDataset(inputDataset);
-        
-        if (type.equalsIgnoreCase("ORL onroad"))
+        else if (type.equalsIgnoreCase("ORL point"))
+            inputDataset = addORLPointDataset(inputDataset);
+        else if (type.equalsIgnoreCase("ORL onroad"))
             inputDataset = addORLOnroadDataset(inputDataset);
-        
-        if (type.equalsIgnoreCase("ORL Nonroad"))
+        else if (type.equalsIgnoreCase("ORL Nonroad"))
             inputDataset = addORLNonroadDataset(inputDataset);
         
         addVersionZeroEntryToVersionsTable(inputDataset, dbServer.getEmissionsDatasource());
-        return inputDataset;
+        return (EmfDataset) load(EmfDataset.class, tableName);
     }
 
     private DatasetType getDatasetType(String type) {
         DatasetType ds = null;
         if (type.equalsIgnoreCase("ORL nonpoint")) 
             ds = (DatasetType) load(DatasetType.class, "ORL Nonpoint Inventory (ARINV)");
+        else if (type.equalsIgnoreCase("ORL point"))
+            ds = (DatasetType) load(DatasetType.class, "ORL Point Inventory (PTINV)");
         else if (type.equalsIgnoreCase("ORL onroad"))
             ds = (DatasetType) load(DatasetType.class, "ORL Onroad Inventory (MBINV)");
         else if (type.equalsIgnoreCase("ORL Nonroad"))
@@ -84,7 +91,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     }
 
     protected void doTearDown() throws Exception {
-//        dropTable(tableName, dbServer.getEmissionsDatasource());
+        dropTable(tableName, dbServer.getEmissionsDatasource());
 //        dropAll(Version.class);
 //        dropAll(InternalSource.class);
 //        dropAll(QAStepResult.class);
@@ -143,6 +150,21 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
 
     private StrategyType maxEmisRedStrategyType() {
         return (StrategyType) load(StrategyType.class, "Max Emissions Reduction");
+    }
+
+    private EmfDataset addORLPointDataset(EmfDataset inputDataset) throws ImporterException {
+        Version version = new Version();
+        version.setVersion(0);
+        version.setDatasetId(inputDataset.getId());
+
+        File folder = new File("test/data/orl/nc");
+        String[] fileNames = { "ptinv.nti99_NC-with-matching_values.txt" };
+        ORLPointImporter importer = new ORLPointImporter(folder, fileNames, inputDataset, dbServer, sqlDataTypes,
+                new VersionedDataFormatFactory(version, inputDataset));
+        importer.run();
+        add(inputDataset);
+        session.flush();
+        return (EmfDataset) load(EmfDataset.class, tableName);
     }
 
     private EmfDataset addORLNonpointDataset(EmfDataset inputDataset) throws ImporterException {

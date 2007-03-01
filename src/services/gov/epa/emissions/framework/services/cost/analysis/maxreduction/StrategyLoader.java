@@ -99,11 +99,11 @@ public class StrategyLoader {
 
         if (type.getName().equalsIgnoreCase("ORL Nonpoint Inventory (ARINV)"))
             return new NonpointRecordGenerator(result);
-
-        if (type.getName().equalsIgnoreCase("ORL Onroad Inventory (MBINV)"))
+        else if (type.getName().equalsIgnoreCase("ORL Point Inventory (PTINV)"))
+            return new PointRecordGenerator(result);
+        else if (type.getName().equalsIgnoreCase("ORL Onroad Inventory (MBINV)"))
             return new OnroadRecordGenerator(result);
-
-        if (type.getName().equalsIgnoreCase("ORL Nonroad Inventory (ARINV)"))
+        else if (type.getName().equalsIgnoreCase("ORL Nonroad Inventory (ARINV)"))
             return new NonroadRecordGenerator(result);
 
         return null;

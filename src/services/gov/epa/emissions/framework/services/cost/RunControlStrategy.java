@@ -62,9 +62,10 @@ public class RunControlStrategy {
         
         DatasetType datasetType = controlStrategy.getDatasetType();
         int indexOfNonpoint = datasetType.getName().indexOf("Nonpoint");
+        int indexOfPoint = datasetType.getName().indexOf("Point");
         int indexOfOnroad = datasetType.getName().indexOf("Onroad");
         int indexOfNonroad = datasetType.getName().indexOf("Nonroad");
-        if (indexOfNonpoint == -1 && indexOfOnroad == -1 && indexOfNonroad == -1)
+        if (indexOfNonpoint == -1 && indexOfOnroad == -1 && indexOfNonroad == -1 && indexOfPoint == -1)
             throw new EmfException("The dataset type '" + datasetType.getName() + "' is not supported yet.");
 
     }

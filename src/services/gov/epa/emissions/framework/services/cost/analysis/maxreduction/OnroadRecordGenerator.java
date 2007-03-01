@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 public class OnroadRecordGenerator implements RecordGenerator {
     private NonpointRecordGenerator delegate;
@@ -22,4 +23,11 @@ public class OnroadRecordGenerator implements RecordGenerator {
         return delegate.reducedEmission();
     }
 
+    public void calculateEmissionReduction(ResultSet resultSet, MaxControlEffControlMeasure maxMeasure) throws SQLException {
+        delegate.calculateEmissionReduction(resultSet, maxMeasure);
+    }
+
+    public List tokens(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException {
+        return delegate.tokens(resultSet, maxCM);
+    }
 }

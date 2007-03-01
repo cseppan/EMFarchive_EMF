@@ -5,10 +5,15 @@ import gov.epa.emissions.framework.services.EmfException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 public interface RecordGenerator {
 
     Record getRecord(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException;
     
     double reducedEmission();
+    
+    void calculateEmissionReduction(ResultSet resultSet, MaxControlEffControlMeasure maxMeasure) throws SQLException;
+    
+    List tokens(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException;
 }
