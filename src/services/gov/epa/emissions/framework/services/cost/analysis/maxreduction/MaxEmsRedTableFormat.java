@@ -66,6 +66,13 @@ public class MaxEmsRedTableFormat implements TableFormat {
         Column pollutant = new Column("Poll", types.stringType(20), new StringFormatter(20));
         Column scc = new Column("SCC", types.stringType(10), new StringFormatter(10));
         Column fips = new Column("FIPS", types.stringType(6), new StringFormatter(6)); //after fips will add 4 more cols plantid, etc.
+
+        //new columns for point sources...
+        Column plantId = new Column("PLANTID", types.stringType(15), 15, new StringFormatter(15));
+        Column pointId = new Column("POINTID", types.stringType(15), 15, new StringFormatter(15));
+        Column stackId = new Column("STACKID", types.stringType(15), 15, new StringFormatter(15));
+        Column segment = new Column("SEGMENT", types.stringType(15), 15, new StringFormatter(15));
+
         Column annualCost = new Column("Annual_Cost", types.realType(), new RealFormatter());
         Column annualCostPerTon = new Column("Ann_Cost_per_Ton", types.realType(), new RealFormatter());
         Column controlEfficiency = new Column("Control_Eff", types.realType(), new RealFormatter());
@@ -85,10 +92,11 @@ public class MaxEmsRedTableFormat implements TableFormat {
         Column controlMeasureId = new Column("CM_Id", types.intType(), new IntegerFormatter());
         Column comment = new Column("Comment", types.stringType(128), new StringFormatter(128));
         
-        return new Column[] { disable, controlMeasureAbbr, pollutant, scc, fips, annualCost, annualCostPerTon, controlEfficiency, 
-                rulePenetration, ruleEffectiveness, percentReduction, inventoryControlEfficiency, inventoryRulePenetration,
-                inventoryRuleEffectiveness, finalEmissions, emissionsReduction, inventoryEmissions, sourceId, inputDatasetId, 
-                controlStrategyId, controlMeasureId, comment };
+        return new Column[] { disable, controlMeasureAbbr, pollutant, scc, fips, plantId, pointId, stackId, segment, 
+                annualCost, annualCostPerTon, controlEfficiency, rulePenetration, ruleEffectiveness, percentReduction, 
+                inventoryControlEfficiency, inventoryRulePenetration, inventoryRuleEffectiveness, finalEmissions, 
+                emissionsReduction, inventoryEmissions, sourceId, inputDatasetId, controlStrategyId, controlMeasureId, 
+                comment };
     }
 
 }

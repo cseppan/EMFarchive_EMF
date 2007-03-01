@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.controlStrategy;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.orl.ORLNonPointFileFormat;
@@ -13,13 +14,20 @@ import gov.epa.emissions.framework.services.EmfDbServer;
 public class FileFormatFactory {
 
     private SqlDataTypes types;
+    private DbServer dbServer;
 
     public FileFormatFactory() throws Exception {
         sqlTypes();
     }
 
+    public FileFormatFactory(DbServer dbServer) throws Exception {
+        this.dbServer = dbServer;
+        this.types = dbServer.getSqlDataTypes();
+    }
+
     private void sqlTypes() throws Exception {
-        EmfDbServer dbServer = new EmfDbServer();
+//        EmfDbServer dbServer = new EmfDbServer();
+        dbServer = new EmfDbServer();
         dbServer.disconnect();
         this.types = dbServer.getSqlDataTypes();
     }

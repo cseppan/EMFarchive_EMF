@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
-//import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
@@ -23,9 +22,6 @@ import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.controlmeasure.io.CMImportTask;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-//import gov.epa.emissions.framework.services.data.QAStep;
-//import gov.epa.emissions.framework.services.data.QAStepResult;
-
 import java.io.File;
 
 import org.hibernate.Session;
@@ -35,6 +31,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     private DbServer dbServer;
 
     private SqlDataTypes sqlDataTypes;
+//    protected ControlStrategyService service;
 
     protected String tableName = "test" + Math.round(Math.random() * 1000) % 1000;
 
@@ -43,13 +40,14 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         sqlDataTypes = dbServer.getSqlDataTypes();
         //import control measures to use...
         importControlMeasures();
+//        service = new ControlStrategyServiceImpl(sessionFactory());
     }
 
     protected EmfDataset setInputDataset(String type) throws Exception {
         EmfDataset inputDataset = new EmfDataset();
         inputDataset.setName(tableName);
         inputDataset.setCreator(emfUser().getUsername());
-        inputDataset.setDatasetType(orlNonpointDatasetType());
+        inputDataset.setDatasetType(getDatasetType(type));//orlNonpointDatasetType());
 
         if (type.equalsIgnoreCase("ORL nonpoint"))
             inputDataset = addORLNonpointDataset(inputDataset);
@@ -64,9 +62,20 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         return inputDataset;
     }
 
-    private DatasetType orlNonpointDatasetType() {
-        return (DatasetType) load(DatasetType.class, "ORL Nonpoint Inventory (ARINV)");
+    private DatasetType getDatasetType(String type) {
+        DatasetType ds = null;
+        if (type.equalsIgnoreCase("ORL nonpoint")) 
+            ds = (DatasetType) load(DatasetType.class, "ORL Nonpoint Inventory (ARINV)");
+        else if (type.equalsIgnoreCase("ORL onroad"))
+            ds = (DatasetType) load(DatasetType.class, "ORL Onroad Inventory (MBINV)");
+        else if (type.equalsIgnoreCase("ORL Nonroad"))
+            ds = (DatasetType) load(DatasetType.class, "ORL Nonroad Inventory (ARINV)");
+        return ds;
     }
+
+//    private DatasetType orlNonpointDatasetType() {
+//        return (DatasetType) load(DatasetType.class, "ORL Nonpoint Inventory (ARINV)");
+//    }
 
     private void addVersionZeroEntryToVersionsTable(Dataset dataset, Datasource datasource) throws Exception {
         TableModifier modifier = new TableModifier(datasource, "versions");
@@ -75,7 +84,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     }
 
     protected void doTearDown() throws Exception {
-        dropTable(tableName, dbServer.getEmissionsDatasource());
+//        dropTable(tableName, dbServer.getEmissionsDatasource());
 //        dropAll(Version.class);
 //        dropAll(InternalSource.class);
 //        dropAll(QAStepResult.class);

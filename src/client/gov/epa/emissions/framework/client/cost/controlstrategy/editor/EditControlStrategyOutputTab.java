@@ -255,13 +255,14 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         File[] files = chooser.choose();
         if (files == null)
             return;
-
-        if (files[0].isDirectory()) {
-            folder.setText(files[0].getAbsolutePath());
-        }
-
-        if (files[0].isFile()) {
-            folder.setText(files[0].getParent());
+        if (files.length > 0) {
+            if (files[0].isDirectory()) {
+                folder.setText(files[0].getAbsolutePath());
+            }
+        
+            if (files[0].isFile()) {
+                folder.setText(files[0].getParent());
+            }
         }
     }
 
