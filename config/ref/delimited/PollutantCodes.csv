@@ -587,6 +587,7 @@ PM10,Particulate Matter Less Than or Equal To 10 Micrometers,,,,N,9/19/2002 0:00
 PM10-FIL,"Primary PM10, Filterable Portion Only",PM,,,Y,9/19/2002 11:29,Y,Y,,0,0,,,,0,0,CAP,1
 PM10-PRI,Primary PM10 (Includes Filterables + Condensibles),PM,,,Y,9/19/2002 11:29,Y,Y,,0,0,,,,0,0,CAP,1
 PM25,Particulate Matter Less Than Or Equal To 2.5 Micrometers,,,,N,9/19/2002 0:00,N,N,,0,0,,,,0,0,,
+PM2_5,Particulate Matter Less Than Or Equal To 2.5 Micrometers,,,,N,9/19/2002 0:00,N,N,,0,0,,,,0,0,,
 PM25-FIL,"Primary PM2.5, Filterable Portion Only",PM,,,Y,9/19/2002 11:29,Y,Y,,0,0,,,,0,0,CAP,1
 PM25-PRI,Primary PM2.5 (Includes Filterables + Condensibles),PM,,,Y,9/19/2002 11:29,Y,Y,,0,0,,,,0,0,CAP,1
 PM-CON,Primary PM Condensible Portion Only (All Less Than 1 Micron),PM,,,Y,9/19/2002 11:29,Y,Y,,0,0,,,,0,0,CAP,1
