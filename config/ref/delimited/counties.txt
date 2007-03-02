@@ -78,22 +78,22 @@ US,0,02090,AK,Fairbanks North Star,YST,x,,8,733,,,,,,,,,,,
 US,0,02100,AK,Haines Borough,YST,x,,,281,,,,,,,,,,,
 US,0,02110,AK,Juneau City + Boroug,YST,x,,3,282,,,,,,,,,,,
 US,0,02122,AK,Kenai Peninsula,YST,x,,4,550,,,,,,,,,,,
-US,0,02130,AK,Ketchikan Gateway,YST,x,,1,941
-US,0,02140,AK,Kobuk CA,YST,x,,,
-US,0,02150,AK,Kodiak Island Boroug,YST,x,,1,256
-US,0,02164,AK,Lake and Peninsula,YST,x,,,754
-US,0,02170,AK,Matanuska-Susitna,YST,x,,5,949
-US,0,02180,AK,Nome CA,YST,x,,,897
-US,0,02185,AK,North Slope Borough,YST,x,,,137
-US,0,02188,AK,Northwest Arctic,YST,x,,,758
-US,0,02201,AK,Pr of Wales-Out Ketc,YST,x,,,632
-US,0,02220,AK,Sitka Borough,YST,x,,,87
-US,0,02231,AK,Skagway-Yakutat-Ango,YST,x,,,150
-US,0,02232,AK,Skagway-Hoonah-Angoo,YST,x,,,
-US,0,02240,AK,Southeast Fairbanks,YST,x,,,797
-US,0,02261,AK,Valdez-Cordova CA,YST,x,,1,220
-US,0,02270,AK,Wade Hampton CA,YST,x,,,67
-US,0,02280,AK,Wrangell-Petersburg,YST,x,,,776
+US,0,02130,AK,Ketchikan Gateway,YST,x,,1,941,,,,,,,,,,
+US,0,02140,AK,Kobuk CA,YST,x,,,,,,,,,,,,,
+US,0,02150,AK,Kodiak Island Boroug,YST,x,,1,256,,,,,,,,,,
+US,0,02164,AK,Lake and Peninsula,YST,x,,,754,,,,,,,,,,
+US,0,02170,AK,Matanuska-Susitna,YST,x,,5,949,,,,,,,,,,
+US,0,02180,AK,Nome CA,YST,x,,,897,,,,,,,,,,
+US,0,02185,AK,North Slope Borough,YST,x,,,137,,,,,,,,,,
+US,0,02188,AK,Northwest Arctic,YST,x,,,758,,,,,,,,,,
+US,0,02201,AK,Pr of Wales-Out Ketc,YST,x,,,632,,,,,,,,,,
+US,0,02220,AK,Sitka Borough,YST,x,,,87,,,,,,,,,,
+US,0,02231,AK,Skagway-Yakutat-Ango,YST,x,,,150,,,,,,,,,,
+US,0,02232,AK,Skagway-Hoonah-Angoo,YST,x,,,,,,,,,,,,,
+US,0,02240,AK,Southeast Fairbanks,YST,x,,,797,,,,,,,,,,
+US,0,02261,AK,Valdez-Cordova CA,YST,x,,1,220,,,,,,,,,,
+US,0,02270,AK,Wade Hampton CA,YST,x,,,67,,,,,,,,,,
+US,0,02280,AK,Wrangell-Petersburg,YST,x,,,776,,,,,,,,,,
 US,0,02282,AK,UNKNOWN,YST,,,,,,,,,,,,,,,
 US,0,02290,AK,Yukon-Koyukuk CA,YST,x,,,983,,,,,,,,,,,
 US,0,02993,AK,UNKNOWN,YST,,,,,,,,,,,,,,,
