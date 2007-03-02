@@ -23,12 +23,9 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import java.sql.SQLException;
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 
 public class ControlStrategyInventoryOutput {
-    private static Log LOG = LogFactory.getLog(ControlStrategyInventoryOutput.class);
 
     private ControlStrategy controlStrategy;
 
@@ -200,15 +197,12 @@ public class ControlStrategyInventoryOutput {
         try {
             emissionsDatasource.query().execute(query);
         } catch (SQLException e) {
-            LOG.error(e.getMessage());
             throw new EmfException("Could not update inventory table '" + outputTable + "' using detail result table '"
                     + detailResultTable + "'");
         }
 
     }
 
-    // FIXME: orl specfic column
-    // TODO device code
     private String updateQuery(String outputTable, String detailResultTable, Datasource datasource) {
         String sql = "";
         if (!controlStrategy.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)"))
@@ -223,7 +217,6 @@ public class ControlStrategyInventoryOutput {
             + "final_emissions, control_eff, rule_eff, source_id" + " FROM "
             + qualifiedTable(detailResultTable, datasource) + ") as b " + " WHERE "
             + qualifiedTable(outputTable, datasource) + ".record_id=b.source_id";
-        LOG.error(sql);
         return sql;
     }
 
@@ -239,7 +232,6 @@ public class ControlStrategyInventoryOutput {
         try {
             emissionsDatasource.query().execute(query);
         } catch (SQLException e) {
-            LOG.error(query);
             throw new EmfException("Error occured when copying data from " + inputTable + " to "
                     + outputInventoryTableName + "\n" + e.getMessage());
         }
@@ -260,9 +252,7 @@ public class ControlStrategyInventoryOutput {
     private void createTable(String outputInventoryTableName, TableCreator creator) throws EmfException {
         try {
             creator.create(outputInventoryTableName, tableFormat);
-            LOG.error(outputInventoryTableName);
         } catch (Exception e) {
-            LOG.error(e.getMessage());
             throw new EmfException("Could not create table: " + outputInventoryTableName + "\n" + e.getMessage());
         }
     }

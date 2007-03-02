@@ -400,8 +400,8 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
-            removeData();
+//            dropTables(strategy, inputDataset);
+//            removeData();
         }
     }
 
@@ -535,12 +535,6 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < tolerance);
             assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < tolerance);
 
-//            service.createInventory(user, strategy);
-
-//            ControlStrategyInventoryOutputTask task= new ControlStrategyInventoryOutputTask(user, strategy, sessionFactory(), dbServer());
-//            if(task.shouldProceed())
-//                task.run();
-
             //create the controlled inventory for this strategy run....
             ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, strategy,
                     sessionFactory(), getDbServerInstance());
@@ -557,9 +551,39 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 
             rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName2);
             rs.next();
-            assertTrue("make sure there are 15 records in the summary results. " + rs.getInt(1), rs.getInt(1) == 15);
+            assertTrue("make sure there are 31 records in the controlled inventory results. ", rs.getInt(1) == 31);
 
-            //            strategy
+
+                //make sure nothing shows up, this would not be the best control measure for this scc/fips...
+                rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName2 
+                        + " where scc = '2302002100' and cm_abbrev='PCHRBESP'");
+                assertTrue("SCC = 2302002100 and CM = PCHRBESP, don't use this cm, not the max reduction cm...", !rs.first());
+            
+                //make sure nothing shows up, assigned different pollutant (PM2.5) for same SCC...
+                rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName2 
+                        + " where scc = '2104008000' and fips = '37019' and poll ='PM2.5'");
+                assertTrue("assigned different pollutant for same SCC", !rs.first());
+            
+                //make sure inv entry has the right numbers, there are NO locale specific measures for this entry...
+                //check SCC = 2104008000 FIPS = 37029 inv entry
+                rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName2 
+                        + " where scc = '2104008000' and fips = '37029'");
+                rs.next();
+                assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < tolerance);
+                assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 70034226.09", Math.abs(rs.getDouble("annual_cost") - 70034226.09)/70034226.09 < tolerance);
+                assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 35280", Math.abs(rs.getDouble("emis_reduction") - 35280)/35280 < tolerance);
+            
+                //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
+                //check SCC = 2104008000 FIPS = 37029 inv entry
+                rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName2 
+                        + " where scc = '2801500000' and fips = '37015'");
+                rs.next();
+                assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
+                assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < tolerance);
+                assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < tolerance);
+            
+            
+            
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -600,36 +624,39 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             //make sure 15 records come back...
             rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName);
             rs.next();
-            assertTrue("make sure there are 3 records in the summary results. ", rs.getInt(1) == 3);
+            assertTrue("make sure there are 8 records in the summary results. ", rs.getInt(1) == 8);
 
-//            //make sure nothing shows up, this would not be the best control measure for this scc/fips...
-//            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
-//                    + " where scc = '2302002100' and cm_abbrev='PCHRBESP'");
-//            assertTrue("SCC = 2302002100 and CM = PCHRBESP, don't use this cm, not the max reduction cm...", !rs.first());
-//
-//            //make sure nothing shows up, assigned different pollutant (PM2.5) for same SCC...
-//            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
-//                    + " where scc = '2104008000' and fips = '37019' and poll ='PM2.5'");
-//            assertTrue("assigned different pollutant for same SCC", !rs.first());
-//
-//            //make sure inv entry has the right numbers, there are NO locale specific measures for this entry...
-//            //check SCC = 2104008000 FIPS = 37029 inv entry
-//            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
-//                    + " where scc = '2104008000' and fips = '37029'");
-//            rs.next();
-//            assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < tolerance);
-//            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 70034226.09", Math.abs(rs.getDouble("annual_cost") - 70034226.09)/70034226.09 < tolerance);
-//            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 35280", Math.abs(rs.getDouble("emis_reduction") - 35280)/35280 < tolerance);
-//
-//            //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
-//            //check SCC = 2104008000 FIPS = 37029 inv entry
-//            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
-//                    + " where scc = '2801500000' and fips = '37015'");
-//            rs.next();
-//            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
-//            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < tolerance);
-//            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < tolerance);
-//
+            //make sure inv entry has the right numbers, there are NO locale specific measures for this entry...
+            //check SCC = 2801500000 FIPS = 37119 inv entry
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
+                    + " where scc = '2801500000' and fips = '37119' and plantid = '0001' and pointid='0001' and stackid='1' and segment='1'");
+            rs.next();
+            assertTrue("SCC = 2801500000 FIPS = 37119 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37119 annual cost = 2.603046E+04", Math.abs(rs.getDouble("annual_cost") - 2.603046E+04)/2.603046E+04 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37119 emis reduction = 6.113609E+00", Math.abs(rs.getDouble("emis_reduction") - 6.113609E+00)/6.113609E+00 < tolerance);
+
+            //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
+            //check SCC = 2104008010 FIPS = 37067 inv entry
+            //also make sure the right control eff was used, this point already had a cm eff...
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
+                    + " where scc = '2104008010' and fips = '37067' and plantid = '00466' and pointid='001' and stackid='1' and segment='1'");
+            rs.next();
+            assertTrue("SCC = 2104008010 FIPS = 37067 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < tolerance);
+            assertTrue("SCC = 2104008010 FIPS = 37067 annual cost = 3.699558E+04 ", Math.abs(rs.getDouble("annual_cost") - 3.699558E+04)/3.699558E+04 < tolerance);
+            assertTrue("SCC = 2104008010 FIPS = 37067 emis reduction = 1.863666E+01", Math.abs(rs.getDouble("emis_reduction") - 1.863666E+01)/1.863666E+01 < tolerance);
+
+            //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
+            //check SCC = 2104008010 FIPS = 37111 inv entry
+            //also make sure the right control eff was used, this point already had a more eff cm ...
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
+                    + " where scc = '2104008010' and fips = '37111' and plantid = '00778' and pointid='001' and stackid='2' and segment='1'");//00778 001 1 1 
+            rs.next();
+            assertTrue("SCC = 2104008010 FIPS = 37111 reduction = 99 " + rs.getDouble("percent_reduction"), Math.abs(rs.getDouble("percent_reduction") - 99)/99 < tolerance);
+            assertTrue("SCC = 2104008010 FIPS = 37111 annual cost = 8.093505E+01", Math.abs(rs.getDouble("annual_cost") - 8.093505E+01)/8.093505E+01 < tolerance);
+            assertTrue("SCC = 2104008010 FIPS = 37111 emis reduction = 4.576374E-02", Math.abs(rs.getDouble("emis_reduction") - 4.576374E-02)/4.576374E-02 < tolerance);
+
+            
+
             //create the controlled inventory for this strategy run....
             ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, strategy,
                     sessionFactory(), getDbServerInstance());
@@ -644,11 +671,17 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
                     ResultSet.CONCUR_READ_ONLY);
 
+            //make sure there are the corect amount of controlled inv records...
             rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName2);
             rs.next();
-            assertTrue("make sure there are 15 records in the summary results. " + rs.getInt(1), rs.getInt(1) == 15);
+            assertTrue("make sure there are 205 records in the summary results. ", rs.getInt(1) == 205);
 
-         } catch (Exception e) {
+            //make sure no inv info has been updated...
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName2 
+                    + " where scc = '2294000270' and fips = '37067' and poll ='PM2.5'");
+            assertTrue("assigned different pollutant for same SCC", rs.getDouble("reff") == 0 && rs.getDouble("reff") == 0);
+
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (rs != null) rs.close();

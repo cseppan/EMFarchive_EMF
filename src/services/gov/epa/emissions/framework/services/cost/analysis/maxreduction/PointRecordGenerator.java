@@ -81,7 +81,7 @@ public class PointRecordGenerator implements RecordGenerator {
     public void calculateEmissionReduction(ResultSet resultSet, MaxControlEffControlMeasure maxMeasure) throws SQLException {
         invenControlEfficiency = resultSet.getFloat("CEFF");
         invenRulePenetration = 100;
-        invenRuleEffectiveness = resultSet.getFloat("REFF");
+        invenRuleEffectiveness = resultSet.getFloat("CEFF") > 0 && resultSet.getFloat("REFF") == 0 ? 100 : resultSet.getFloat("REFF");
         originalEmissions = resultSet.getFloat("ANN_EMIS");
 
         double invenEffectiveReduction = invenControlEfficiency * invenRulePenetration * invenRuleEffectiveness
