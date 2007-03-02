@@ -76,12 +76,29 @@ public class LoginWindow extends EmfFrame implements LoginView {
 
     public void display() {
         try {
+            System.out.println("Verifying version");
             if (!presenter.checkEmfVersion(EMF_VERSION) && toUpdate() == JOptionPane.YES_OPTION)
                 disposeView();
             else
+            {
+                System.out.println("Showing Login Window");
                 super.display();
+            }
         } catch (Exception e) {
-            messagePanel.setError(e.getMessage());
+            // need to print this because message panel may not exist yet
+            String message = "The EMF client was not able to contact the server due to this error: \n\n";
+            if (e.getMessage().contains("UserService"))
+                 message = message + "The EMF application is not properly deployed in Tomcat\n";
+            else if (e.getMessage().contains("Services are unavailable"))
+                 message = message +"The EMF services are unavailable through Tomcat on the specified server";
+            else
+                 message = message + e.getMessage();
+            JOptionPane.showMessageDialog(this, message, "Error Starting the EMF Client",  
+                    JOptionPane.ERROR_MESSAGE);
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            if (messagePanel != null)
+               messagePanel.setError(e.getMessage());
         }
     }
 
@@ -90,6 +107,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
                   presenter.getUpdatedEmfVersion() + ").\n"
                 + "Would you like to stop logging in so that you can update \nyour client using the Installer?";
 
+        System.out.println("Showing confirm dialog");
         return JOptionPane.showConfirmDialog(this, message, "Warning", JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
     }
