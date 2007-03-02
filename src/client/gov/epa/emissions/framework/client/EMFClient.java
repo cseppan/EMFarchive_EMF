@@ -30,17 +30,29 @@ public class EMFClient {
     }
 
     private static void run(String[] args) throws Exception {
+      try
+      {
         String url = DEFAULT_URL;
         if (args.length == 1)
             url = args[0];
 
+        System.out.println("Starting EMF Client");
         ServiceLocator serviceLocator = new RemoteServiceLocator(url);
 
+        System.out.println("Creating Login Window");
         LoginWindow view = new LoginWindow(serviceLocator);
         view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         LoginPresenter presenter = new LoginPresenter(serviceLocator.userService());
+        System.out.println("Displaying Login Window");
         presenter.display(view);
+      }
+      catch (Exception exc)
+      {
+          System.out.println("Exception starting client: "+exc.getMessage());
+          exc.printStackTrace();
+          throw exc;
+      }
     }
 
 }
