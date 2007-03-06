@@ -17,6 +17,7 @@ import gov.epa.emissions.framework.ui.TrackableSortFilterSelectModel;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
@@ -25,7 +26,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView, CMSCCTab {
+public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView, CMSCCTab, Runnable {
 
     private SCCTableData tableData;
 
@@ -43,7 +44,9 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
 
     private ManageChangeables changeables;
 
-    private Scc[] sccs;
+    private Scc[] sccs = {};
+    private volatile Thread populateThread;
+    private ControlMeasure measure;
 
     public EditableCMSCCTab(ControlMeasure measure, EmfSession session, ManageChangeables changeables,
             MessagePanel messagePanel, EmfConsole parent) {
@@ -51,15 +54,36 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
         this.messagePanel = messagePanel;
         this.session = session;
         this.parent = parent;
+        this.measure = measure;
+        this.changeables = changeables;
         mainPanel = new JPanel(new BorderLayout());
         doLayout(measure, changeables);
-        sccs = new Scc[] {};
+        this.populateThread = new Thread(this);
+        populateThread.start();
+    }
+
+    public void run() {
+        try {
+            messagePanel.setMessage("Please wait while retrieving all SCCs...");
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            try {
+                sccs = getSCCs(measure.getId());
+            } catch (Exception e) {
+                messagePanel.setError(e.getMessage());
+            }        
+            doLayout(measure, changeables);
+            messagePanel.clear();
+            setCursor(Cursor.getDefaultCursor());
+        } catch (Exception e) {
+            messagePanel.setError("Cannot retrieve all SCCs.");
+        }
+        this.populateThread = null;
     }
 
     private void doLayout(ControlMeasure measure, ManageChangeables changeables) {
         this.changeables = changeables;
         try {
-            Scc[] sccObjs = createSccs(measure.getId());
+            Scc[] sccObjs = getSCCs(measure.getId());
             tableData = new SCCTableData(sccObjs);
             SortFilterSelectionPanel sortFilterSelectionPanel = sortFilterPanel();
             mainPanel.removeAll();
@@ -147,7 +171,7 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
         }
     }
 
-    private Scc[] createSccs(int controlMeasureId) throws EmfException {
+    private Scc[] getSCCs(int controlMeasureId) throws EmfException {
         ControlMeasureService service = session.controlMeasureService();
         Scc[] sccs = service.getSccsWithDescriptions(controlMeasureId);
 

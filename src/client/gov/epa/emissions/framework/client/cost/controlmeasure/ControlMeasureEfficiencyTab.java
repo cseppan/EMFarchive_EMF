@@ -20,6 +20,7 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.List;
@@ -30,7 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasureEfficiencyTabView {
+public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasureEfficiencyTabView, Runnable {
 
     private SortFilterSelectModel selectModel;
 
@@ -51,6 +52,9 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     private MessagePanel messagePanel;
 
     private EmfSession session;
+    
+    private EfficiencyRecord[] efficiencyRecords = {};
+    private volatile Thread populateThread;
 
     public ControlMeasureEfficiencyTab(ControlMeasure measure, ManageChangeables changeablesList, EmfConsole parent,
             EmfSession session, DesktopManager desktopManager, MessagePanel messagePanel) {
@@ -60,18 +64,33 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         this.desktopManager = desktopManager;
         this.session = session;
         this.messagePanel = messagePanel;
+        this.measure = measure;
         doLayout(measure);
+        this.populateThread = new Thread(this);
+        populateThread.start();
+    }
+
+    public void run() {
+        try {
+            messagePanel.setMessage("Please wait while retrieving all efficiency records...");
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            try {
+                efficiencyRecords = getEfficiencyRecords(measure.getId());
+            } catch (Exception e) {
+                messagePanel.setError(e.getMessage());
+            }        
+            doLayout(measure);
+//            doRefresh(presenter.getCaseInput(caseId));
+            messagePanel.clear();
+            setCursor(Cursor.getDefaultCursor());
+        } catch (Exception e) {
+            messagePanel.setError("Cannot retrieve all efficiency records.");
+        }
+        this.populateThread = null;
     }
 
     private void doLayout(ControlMeasure measure) {
-        this.measure = measure;
-        EfficiencyRecord[] records = {};
-        try {
-            records = getEfficiencyRecords(measure.getId());
-        } catch (Exception e) {
-            messagePanel.setError(e.getMessage());
-        }        
-        updateMainPanel(records);
+        updateMainPanel(efficiencyRecords);
 
         setLayout(new BorderLayout());
         add(mainPanel, BorderLayout.CENTER);

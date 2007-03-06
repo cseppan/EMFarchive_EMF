@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.TableModifier;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.TableFormat;
+import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
@@ -93,10 +94,9 @@ public class DatasetCreator {
 
     private String getResultDatasetName(String name) {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("MMddyyyy_HHmmss");
-        name = name.replace(' ', '_');
         String timestamp = dateFormatter.format(new Date());
 
-        return name + "_" + timestamp;
+        return DataTable.encodeTableName(name + "_" + timestamp);
     }
     
     private void add(EmfDataset dataset) throws EmfException {
