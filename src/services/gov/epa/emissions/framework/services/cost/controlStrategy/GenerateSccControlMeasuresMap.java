@@ -76,7 +76,7 @@ public class GenerateSccControlMeasuresMap {
         Session session = sessionFactory.getSession();
         try {
             ControlMeasureDAO dao = new ControlMeasureDAO();
-            return dao.current(id, ControlMeasure.class, session);
+            return dao.current(id, session);
         } finally {
             session.close();
         }

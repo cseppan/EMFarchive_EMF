@@ -36,7 +36,7 @@ public class RetrieveSCCTest extends ServiceTestCase {
         try {
             dao = new ControlMeasureDAO();
             addMeasure(cm, dao);
-            RetrieveSCC retreiveSCC = new RetrieveSCC(cm, dbServer());
+            RetrieveSCC retreiveSCC = new RetrieveSCC(cm.getId(), dbServer());
             sccs = retreiveSCC.sccs();
         } finally {
             dropAll(Scc.class);
@@ -73,7 +73,7 @@ public class RetrieveSCCTest extends ServiceTestCase {
     private void removeMeasure(ControlMeasure measure, ControlMeasureDAO dao) throws HibernateException, Exception {
         Session session = sessionFactory().getSession();
         try {
-            dao.remove(measure, session);
+            dao.remove(measure.getId(), session);
         } finally {
             session.close();
         }

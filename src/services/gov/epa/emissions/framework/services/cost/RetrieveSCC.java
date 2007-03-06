@@ -14,10 +14,6 @@ public class RetrieveSCC {
 
     private DbServer dbServer;
 
-    public RetrieveSCC(ControlMeasure measure, DbServer dbServer) throws Exception {
-        this(measure.getId(), dbServer);
-    }
-
     public RetrieveSCC(int measureId, DbServer dbServer) throws Exception {
         this.controlMeasureId = measureId;
         this.dbServer = dbServer;

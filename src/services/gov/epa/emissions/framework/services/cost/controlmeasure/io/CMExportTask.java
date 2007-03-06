@@ -67,7 +67,7 @@ public class CMExportTask implements Runnable {
         int size = ids.length;
         
         for (int i = 0; i < size; i++)
-            cmList.add(controlMeasureDao.current(ids[i], ControlMeasure.class, session));
+            cmList.add(controlMeasureDao.current(ids[i], session));
         
         return (ControlMeasure[])cmList.toArray(new ControlMeasure[0]);
     }

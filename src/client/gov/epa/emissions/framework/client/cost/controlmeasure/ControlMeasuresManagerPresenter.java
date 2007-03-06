@@ -86,7 +86,7 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
 
         coppied.setCreator(session.user());
         coppied.setLastModifiedTime(new Date());
-        service().addMeasure(coppied, getSCCs(original));
+        service().addMeasure(coppied, getSCCs(original.getId()));
     }
 
     private String getRandomString() {
@@ -114,8 +114,8 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         return (String[])abbrevs.toArray(new String[0]);
     }
     
-    public Scc[] getSCCs(ControlMeasure cm) throws EmfException {
-        return service().getSccs(cm);
+    public Scc[] getSCCs(int controlMeasureId) throws EmfException {
+        return service().getSccs(controlMeasureId);
     }
 
     public ControlMeasure[] getControlMeasures(Pollutant pollutant) throws EmfException {

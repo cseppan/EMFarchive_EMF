@@ -79,7 +79,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         scc2.setCode("scc2");
         Scc[] sccs = { scc1, scc2 };
 
-        ControlMeasure locked = dao.obtainLocked(user, cm, session);
+        ControlMeasure locked = dao.obtainLocked(user, cm.getId(), session);
 
         locked.setName("updated-name");
         locked.setDescription("updated-description");
@@ -91,7 +91,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         assertEquals(1, updated.length);
         assertEquals("updated-name", updated[0].getName());
         assertEquals("updated-description", updated[0].getDescription());
-        Scc[] updatedSccs = dao.getSccs(updated[0], session);
+        Scc[] updatedSccs = dao.getSccs(updated[0].getId(), session);
         assertEquals(2, updatedSccs.length);
         assertEquals("scc1", updatedSccs[0].getCode());
         assertEquals("scc2", updatedSccs[1].getCode());
@@ -107,11 +107,11 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         Scc scc4 = new Scc();
         scc4.setCode("scc4");
         Scc[] newSccs = { scc1,scc3, scc4 };
-        locked = dao.obtainLocked(user, cm, session);
+        locked = dao.obtainLocked(user, cm.getId(), session);
         dao.update(locked, newSccs, session);
         
         ControlMeasure[] newUpdated = (ControlMeasure[]) dao.all(session).toArray(new ControlMeasure[0]);
-        updatedSccs = dao.getSccs(newUpdated[0], session);
+        updatedSccs = dao.getSccs(newUpdated[0].getId(), session);
         assertEquals(3, updatedSccs.length);
         assertEquals("scc1", updatedSccs[0].getCode());
         assertEquals("scc3", updatedSccs[1].getCode());
@@ -144,7 +144,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
 
         add(cm);
 
-        dao.remove(cm, session);
+        dao.remove(cm.getId(), session);
         ControlMeasure result = load(cm);
 
         assertNull("Should be removed from the database on 'remove'", result);
@@ -167,7 +167,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         cm.setAbbreviation("12345678");
         add(cm);
 
-        ControlMeasure locked = dao.obtainLocked(owner, cm, session);
+        ControlMeasure locked = dao.obtainLocked(owner, cm.getId(), session);
         assertEquals(locked.getLockOwner(), owner.getUsername());
 
         ControlMeasure loadedFromDb = load(cm);
@@ -181,11 +181,11 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         cm.setAbbreviation("12345678");
         add(cm);
 
-        dao.obtainLocked(owner, cm, session);
+        dao.obtainLocked(owner, cm.getId(), session);
 
         UserDAO userDao = new UserDAO();
         User user = userDao.get("admin", session);
-        ControlMeasure result = dao.obtainLocked(user, cm, session);
+        ControlMeasure result = dao.obtainLocked(user, cm.getId(), session);
 
         assertFalse("Should have failed to obtain lock as it's already locked by another user", result.isLocked(user));// failed
     }
@@ -197,7 +197,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         cm.setAbbreviation("12345678");
         add(cm);
 
-        ControlMeasure locked = dao.obtainLocked(owner, cm, session);
+        ControlMeasure locked = dao.obtainLocked(owner, cm.getId(), session);
         dao.releaseLocked(locked.getId(), session);
 
         ControlMeasure loadedFromDb = load(cm);
@@ -218,7 +218,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         cm.setCreator(emfUser);
 
         dao.add(cm, cm.getSccs(), session);
-        cm = dao.obtainLocked(emfUser, cm, session);
+        cm = dao.obtainLocked(emfUser, cm.getId(), session);
         EfficiencyRecord record1 = efficiencyRecord(pm10Pollutant(), "22");
         EfficiencyRecord record2 = efficiencyRecord(pm10Pollutant(), "22");
         cm.setEfficiencyRecords(new EfficiencyRecord[] { record1, record2 });

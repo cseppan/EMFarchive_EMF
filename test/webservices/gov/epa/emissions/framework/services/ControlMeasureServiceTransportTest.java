@@ -62,7 +62,7 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
         assertEquals(target.length, 1);
         assertEquals(name, target[0].getName());
         
-        service.removeMeasure(target[0]);
+        service.removeMeasure(target[0].getId());
     }
 
 
@@ -77,7 +77,7 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
         assertEquals(all.length, 1);
         assertEquals("cm test added", all[0].getName());
         
-        service.removeMeasure(all[0]);
+        service.removeMeasure(all[0].getId());
         assertEquals(all.length - 1, service.getMeasures().length);
     }
 
@@ -89,7 +89,7 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
         cm.setAbbreviation("12345678");
         service.addMeasure(cm, new Scc[]{});
         
-        ControlMeasure cmModified = service.obtainLockedMeasure(owner, service.getMeasures()[0]);
+        ControlMeasure cmModified = service.obtainLockedMeasure(owner, service.getMeasures()[0].getId());
         cmModified.setEquipmentLife(120);
         cmModified.setName("cm updated");
         ControlMeasure cm2 = service.updateMeasure(cmModified, new Scc[]{});
@@ -98,7 +98,7 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
             assertEquals("cm updated", cm2.getName());
             assertEquals(new Float(120), new Float(cm2.getEquipmentLife()));
         } finally {
-            service.removeMeasure(cmModified);
+            service.removeMeasure(cmModified.getId());
         }
     }
     
@@ -112,7 +112,7 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
         ControlMeasure released = null;
 
         try {
-            ControlMeasure locked = service.obtainLockedMeasure(owner, service.getMeasures()[0]);
+            ControlMeasure locked = service.obtainLockedMeasure(owner, service.getMeasures()[0].getId());
             assertTrue("Should have lock cm", locked.isLocked());
 
 //FIXME
@@ -120,7 +120,7 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
 //            assertFalse("Should have released lock", released.isLocked());
 
         } finally {
-            service.removeMeasure(released);
+            service.removeMeasure(released.getId());
         }
     }
 
@@ -135,8 +135,8 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
         service.addMeasure(cm, new Scc[]{});
         int measuresAfterAddOne = service.getMeasures().length;
         
-        Scc[] sccs = service.getSccsWithDescriptions(cm);
-        service.removeMeasure(cm);
+        Scc[] sccs = service.getSccsWithDescriptions(cm.getId());
+        service.removeMeasure(cm.getId());
         
 
         assertEquals(3, sccs.length);

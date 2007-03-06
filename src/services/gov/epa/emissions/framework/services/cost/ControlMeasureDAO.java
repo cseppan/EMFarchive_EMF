@@ -40,8 +40,8 @@ public class ControlMeasureDAO {
         return hibernateFacade.exists(clazz, criterions, session);
     }
 
-    public ControlMeasure current(int id, Class clazz, Session session) {
-        return (ControlMeasure) hibernateFacade.current(id, clazz, session);
+    public ControlMeasure current(int id, Session session) {
+        return (ControlMeasure) hibernateFacade.current(id, ControlMeasure.class, session);
     }
 
     public boolean canUpdate(ControlMeasure measure, Session session) {
@@ -49,7 +49,7 @@ public class ControlMeasureDAO {
             return false;
         }
 
-        ControlMeasure current = current(measure.getId(), ControlMeasure.class, session);
+        ControlMeasure current = current(measure.getId(), session);
         session.clear();// clear to flush current
         if (current.getName().equals(measure.getName()))
             return true;
@@ -94,43 +94,43 @@ public class ControlMeasureDAO {
         }
     }
 
-    public void remove(ControlMeasure measure, Session session) {
-        removeSccs(measure, session);
-        hibernateFacade.remove(measure, session);
+    public void remove(int controlMeasureId, Session session) {
+        removeSccs(controlMeasureId, session);
+        hibernateFacade.remove(current(controlMeasureId, session), session);
     }
 
-    private void removeSccs(ControlMeasure measure, Session session) {
-        Scc[] sccs = getSccs(measure, session);
+    private void removeSccs(int controlMeasureId, Session session) {
+        Scc[] sccs = getSccs(controlMeasureId, session);
         for (int i = 0; i < sccs.length; i++) {
             hibernateFacade.remove(sccs[i], session);
         }
     }
 
-    public ControlMeasure obtainLocked(User user, ControlMeasure measure, Session session) {
-        return (ControlMeasure) lockingScheme.getLocked(user, current(measure, session), session);
+    public ControlMeasure obtainLocked(User user, int controlMeasureId, Session session) {
+        return (ControlMeasure) lockingScheme.getLocked(user, current(controlMeasureId, session), session);
     }
 
-    private ControlMeasure current(ControlMeasure measure, Session session) {
-        return current(measure.getId(), ControlMeasure.class, session);
-    }
+//    private ControlMeasure current(ControlMeasure measure, Session session) {
+//        return current(measure.getId(), ControlMeasure.class, session);
+//    }
 
-    public void releaseLocked(int id, Session session) {
-        ControlMeasure cm = current(id, ControlMeasure.class, session);
+    public void releaseLocked(int controlMeasureId, Session session) {
+        ControlMeasure cm = current(controlMeasureId, session);
         lockingScheme.releaseLock(cm, session);
     }
 
     public ControlMeasure update(ControlMeasure locked, Scc[] sccs, Session session) throws EmfException {
         checkForConstraints(locked, session);
 
-        ControlMeasure releaseLockOnUpdate = (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, current(locked,
+        ControlMeasure releaseLockOnUpdate = (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, current(locked.getId(),
                 session), session);
-        updateSccs(sccs, locked, session);
+        updateSccs(sccs, locked.getId(), session);
         return releaseLockOnUpdate;
     }
 
-    private void updateSccs(Scc[] sccs, ControlMeasure controlMeasure, Session session) {
-        updateSccsControlMeasureIds(sccs, controlMeasure);
-        Scc[] existingSccs = getSccs(controlMeasure, session);
+    private void updateSccs(Scc[] sccs, int controlMeasureId, Session session) {
+        updateSccsControlMeasureIds(sccs, controlMeasureId);
+        Scc[] existingSccs = getSccs(controlMeasureId, session);
         List removeList = new ArrayList(Arrays.asList(existingSccs));
         List newSccList = new ArrayList();
         processSccsList(sccs, newSccList, removeList);
@@ -152,23 +152,23 @@ public class ControlMeasureDAO {
         }
     }
 
-    private void updateSccsControlMeasureIds(Scc[] sccs, ControlMeasure controlMeasure) {
+    private void updateSccsControlMeasureIds(Scc[] sccs, int controlMeasureId) {
         for (int i = 0; i < sccs.length; i++) {
-            sccs[i].setControlMeasureId(controlMeasure.getId());
+            sccs[i].setControlMeasureId(controlMeasureId);
         }
     }
 
-    public Scc[] getSccsWithDescriptions(ControlMeasure measure) throws EmfException {
+    public Scc[] getSccsWithDescriptions(int controlMeasureId) throws EmfException {
         try {
-            RetrieveSCC retrieveSCC = new RetrieveSCC(measure, new EmfDbServer());
+            RetrieveSCC retrieveSCC = new RetrieveSCC(controlMeasureId, new EmfDbServer());
             return retrieveSCC.sccs();
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
     }
 
-    public Scc[] getSccs(ControlMeasure measure, Session session) {
-        Criterion id = Restrictions.eq("controlMeasureId", new Integer(measure.getId()));
+    public Scc[] getSccs(int controlMeasureId, Session session) {
+        Criterion id = Restrictions.eq("controlMeasureId", new Integer(controlMeasureId));
         List list = hibernateFacade.get(Scc.class, new Criterion[] { id }, session);
         return (Scc[]) list.toArray(new Scc[0]);
     }
@@ -217,12 +217,12 @@ public class ControlMeasureDAO {
         if (nameExist) {// overwrite if name exist regard less of abbrev
             int id = controlMeasureId(measure, session);
             measure.setId(id);
-            ControlMeasure obtainLocked = obtainLocked(user, measure, session);
+            ControlMeasure obtainLocked = obtainLocked(user, measure.getId(), session);
             measure.setLockDate(obtainLocked.getLockDate());
             measure.setLockOwner(obtainLocked.getLockOwner());
             if (obtainLocked == null)
                 throw new EmfException("Could not obtain the lock to update: " + measure.getName());
-            removeSccs(measure, session);
+            removeSccs(measure.getId(), session);
             removeEfficiencyRecord(measure, session);
             update(measure, sccs, session);
         } else if (abbrExist) {
@@ -269,4 +269,21 @@ public class ControlMeasureDAO {
         return hibernateFacade.getAll(LightControlMeasure.class, Order.asc("name"), session);
     }
 
+    public List getEfficiencyRecords(int controlMeasureId, Session session) {
+        Criterion c = Restrictions.eq("controlMeasureId", new Integer(controlMeasureId));
+        return hibernateFacade.get(EfficiencyRecord.class, c, session);
+    }
+
+    public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord, Session session) {
+        hibernateFacade.add(efficiencyRecord, session);
+        return efficiencyRecord.getId();
+    }
+
+    public void removeEfficiencyRecord(int efficiencyRecordId, Session session) {
+        hibernateFacade.remove(hibernateFacade.current(efficiencyRecordId, EfficiencyRecord.class, session), session);
+    }
+
+    public void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord, Session session) {
+        hibernateFacade.saveOrUpdate(efficiencyRecord, session);
+    }
 }

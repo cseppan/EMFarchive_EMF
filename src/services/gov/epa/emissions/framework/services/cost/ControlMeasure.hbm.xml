@@ -46,7 +46,7 @@
             class="gov.epa.emissions.framework.services.cost.ControlMeasureClass"
             column="cm_class_id"/> 
   
-       <array name="efficiencyRecords" table="control_measure_efficiencyrecords" cascade="save-update">
+<!--       <array name="efficiencyRecords" table="control_measure_efficiencyrecords" cascade="save-update">
       		<key column="control_measures_id" not-null="true"/>
       		<list-index column="list_index"/>
 		    <composite-element class="gov.epa.emissions.framework.services.cost.data.EfficiencyRecord">
@@ -69,7 +69,7 @@
                 <property name="detail" column="detail" type="java.lang.String" not-null="false"/>
                 <property name="effectiveDate" column="effective_date" type="java.util.Date" not-null="false" length="4"/>
       		</composite-element>
- 	   </array>
+ 	   </array>-->
  	   
  	   <array name="sectors" table="control_measurs_sectors" cascade="save-update">
     		<key column="control_measure_id" not-null="true"/>

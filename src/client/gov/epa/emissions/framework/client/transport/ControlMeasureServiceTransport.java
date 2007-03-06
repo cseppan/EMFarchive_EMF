@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
+import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 public class ControlMeasureServiceTransport implements ControlMeasureService {
 
@@ -56,25 +57,25 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         call.request(new Object[] { measure, sccs });
     }
 
-    public void removeMeasure(ControlMeasure measure) throws EmfException {
+    public void removeMeasure(int controlMeasureId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("removeMeasure");
-        call.addParam("measure", mappings.controlMeasure());
+        call.addIntegerParam("controlMeasureId");
         call.setVoidReturnType();
 
-        call.request(new Object[] { measure });
+        call.request(new Object[] { new Integer(controlMeasureId) });
     }
 
-    public ControlMeasure obtainLockedMeasure(User owner, ControlMeasure measure) throws EmfException {
+    public ControlMeasure obtainLockedMeasure(User owner, int controlMeasureId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("obtainLockedMeasure");
         call.addParam("owner", mappings.user());
-        call.addParam("measure", mappings.controlMeasure());
+        call.addIntegerParam("controlMeasureId");
         call.setReturnType(mappings.controlMeasure());
 
-        return (ControlMeasure) call.requestResponse(new Object[] { owner, measure });
+        return (ControlMeasure) call.requestResponse(new Object[] { owner, new Integer(controlMeasureId) });
     }
 
 //    public ControlMeasure releaseLockedControlMeasure(ControlMeasure locked) throws EmfException {
@@ -87,14 +88,14 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
 //        return (ControlMeasure) call.requestResponse(new Object[] { locked });
 //    }
 
-    public void releaseLockedControlMeasure(int id) throws EmfException {
+    public void releaseLockedControlMeasure(int controlMeasureId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("releaseLockedControlMeasure");
-        call.addIntegerParam("id");
+        call.addIntegerParam("controlMeasureId");
         call.setVoidReturnType();
 
-        call.requestResponse(new Object[] { new Integer(id) });
+        call.requestResponse(new Object[] { new Integer(controlMeasureId) });
     }
 
     public ControlMeasure updateMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
@@ -108,26 +109,26 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (ControlMeasure) call.requestResponse(new Object[] { measure, sccs });
     }
 
-    public Scc[] getSccsWithDescriptions(ControlMeasure measure) throws EmfException {
+    public Scc[] getSccsWithDescriptions(int controlMeasureId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getSccsWithDescriptions");
-        call.addParam("measure", mappings.controlMeasure());
+        call.addIntegerParam("controlMeasureId");
         call.setReturnType(mappings.sccs());
 
-        Scc[] sccs = (Scc[]) call.requestResponse(new Object[] { measure });
+        Scc[] sccs = (Scc[]) call.requestResponse(new Object[] { new Integer(controlMeasureId) });
 
         return sccs;
     }
 
-    public Scc[] getSccs(ControlMeasure measure) throws EmfException {
+    public Scc[] getSccs(int controlMeasureId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getSccs");
-        call.addParam("measure", mappings.controlMeasure());
+        call.addIntegerParam("controlMeasureId");
         call.setReturnType(mappings.sccs());
 
-        Scc[] sccs = (Scc[]) call.requestResponse(new Object[] { measure });
+        Scc[] sccs = (Scc[]) call.requestResponse(new Object[] { new Integer(controlMeasureId) });
 
         return sccs;
     }
@@ -180,6 +181,16 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         call.setReturnType(mappings.lightControlMeasures());
 
         return (LightControlMeasure[]) call.requestResponse(new Object[] { });
+    }
+
+    public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getEfficiencyRecords");
+        call.addIntegerParam("controlMeasureId");
+        call.setReturnType(mappings.efficiencyRecords());
+
+        return (EfficiencyRecord[]) call.requestResponse(new Object[] { new Integer(controlMeasureId) });
     }
 
 }

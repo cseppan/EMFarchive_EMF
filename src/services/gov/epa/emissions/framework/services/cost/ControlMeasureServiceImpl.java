@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
+import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.SQLException;
@@ -80,28 +81,28 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public void removeMeasure(ControlMeasure measure) throws EmfException {
+    public void removeMeasure(int controlMeasureId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            dao.remove(measure, session);
+            dao.remove(controlMeasureId, session);
         } catch (RuntimeException e) {
-            LOG.error("Could not remove control measure: " + measure.getName(), e);
-            throw new EmfException("Could not remove control measure: " + measure.getName());
+            LOG.error("Could not remove control measure Id: " + controlMeasureId, e);
+            throw new EmfException("Could not remove control measure Id: " + controlMeasureId);
         } finally {
             session.close();
         }
     }
 
-    public ControlMeasure obtainLockedMeasure(User owner, ControlMeasure measure) throws EmfException {
+    public ControlMeasure obtainLockedMeasure(User owner, int controlMeasureId) throws EmfException {
         Session session = null;
         try {
             session = sessionFactory.getSession();
-            ControlMeasure locked = dao.obtainLocked(owner, measure, session);
+            ControlMeasure locked = dao.obtainLocked(owner, controlMeasureId, session);
             return locked;
         } catch (RuntimeException e) {
-            LOG.error("Could not obtain lock for ControlMeasure: " + measure.getName() + " by owner: "
+            LOG.error("Could not obtain lock for ControlMeasure Id: " + controlMeasureId + " by owner: "
                     + owner.getUsername(), e);
-            throw new EmfException("Could not obtain lock for ControlMeasure: " + measure.getName() + " by owner: "
+            throw new EmfException("Could not obtain lock for ControlMeasure Id: " + controlMeasureId + " by owner: "
                     + owner.getUsername());
         } finally {
             if (session != null)
@@ -149,24 +150,24 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public Scc[] getSccsWithDescriptions(ControlMeasure measure) throws EmfException {
+    public Scc[] getSccsWithDescriptions(int controlMeasureId) throws EmfException {
         try {
-            Scc[] sccs = dao.getSccsWithDescriptions(measure);
+            Scc[] sccs = dao.getSccsWithDescriptions(controlMeasureId);
             return sccs;
         } catch (RuntimeException e) {
-            LOG.error("Could not get SCCs for ControlMeasure: " + measure.getName(), e);
-            throw new EmfException("Could not get SCCs for ControlMeasure: " + measure.getName());
+            LOG.error("Could not get SCCs for ControlMeasure Id: " + controlMeasureId, e);
+            throw new EmfException("Could not get SCCs for ControlMeasure Id: " + controlMeasureId);
         }
     }
 
-    public Scc[] getSccs(ControlMeasure measure) throws EmfException {
+    public Scc[] getSccs(int controlMeasureId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            Scc[] sccs = dao.getSccs(measure, session);
+            Scc[] sccs = dao.getSccs(controlMeasureId, session);
             return sccs;
         } catch (RuntimeException e) {
-            LOG.error("Could not get SCCs for ControlMeasure: " + measure.getName(), e);
-            throw new EmfException("Could not get SCCs for ControlMeasure: " + measure.getName());
+            LOG.error("Could not get SCCs for ControlMeasure Id: " + controlMeasureId, e);
+            throw new EmfException("Could not get SCCs for ControlMeasure Id: " + controlMeasureId);
         } finally {
             session.close();
         }
@@ -249,4 +250,52 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
+    public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            List all = dao.getEfficiencyRecords(controlMeasureId, session);
+            return (EfficiencyRecord[]) all.toArray(new EfficiencyRecord[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve control measure efficiency records.", e);
+            throw new EmfException("Could not retrieve control measures efficiency records.");
+        } finally {
+            session.close();
+        }
+    }
+
+    public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.addEfficiencyRecord(efficiencyRecord, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not add control measure efficiency record", e);
+            throw new EmfException("Could not add control measure efficiency record");
+        } finally {
+            session.close();
+        }
+    }
+
+    public void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.updateEfficiencyRecord(efficiencyRecord, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not update for control measure efficiency record Id: " + efficiencyRecord.getId(), e);
+            throw new EmfException("Could not update for control measure efficiency record Id: " + efficiencyRecord.getId());
+        } finally {
+            session.close();
+        }
+    }
+
+    public void removeEfficiencyRecord(int efficiencyRecordId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.removeEfficiencyRecord(efficiencyRecordId, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not remove control measure efficiency record Id: " + efficiencyRecordId, e);
+            throw new EmfException("Could not remove control measure efficiency record Id: " + efficiencyRecordId);
+        } finally {
+            session.close();
+        }
+    }
 }

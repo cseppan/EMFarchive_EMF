@@ -11,7 +11,9 @@ import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -63,7 +65,12 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
 
     private void doLayout(ControlMeasure measure) {
         this.measure = measure;
-        EfficiencyRecord[] records = measure.getEfficiencyRecords();
+        EfficiencyRecord[] records = {};
+        try {
+            records = getEfficiencyRecords(measure.getId());
+        } catch (Exception e) {
+            messagePanel.setError(e.getMessage());
+        }        
         updateMainPanel(records);
 
         setLayout(new BorderLayout());
@@ -239,4 +246,8 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         
     }
 
+    private EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException {
+        ControlMeasureService service = session.controlMeasureService();
+        return service.getEfficiencyRecords(controlMeasureId);
+    }
 }

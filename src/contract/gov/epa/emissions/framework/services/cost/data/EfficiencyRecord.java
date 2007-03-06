@@ -37,6 +37,10 @@ public class EfficiencyRecord implements Serializable {
 
     private int recordId;
 
+    private int id;
+
+    private int controlMeasureId;
+
     public float getCapRecFactor() {
         return capRecFactor;
     }
@@ -177,6 +181,22 @@ public class EfficiencyRecord implements Serializable {
 
     public int getRecordId() {
         return recordId;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public void setControlMeasureId(int controlMeasureId) {
+        this.controlMeasureId = controlMeasureId;
+    }
+
+    public int getControlMeasureId() {
+        return controlMeasureId;
     }
 
 }

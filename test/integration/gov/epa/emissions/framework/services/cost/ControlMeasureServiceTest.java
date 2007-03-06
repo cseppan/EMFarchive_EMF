@@ -123,7 +123,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
 
         service.addMeasure(cm, new Scc[] { scc1 });
 
-        ControlMeasure cmModified = service.obtainLockedMeasure(owner, cm);
+        ControlMeasure cmModified = service.obtainLockedMeasure(owner, cm.getId());
         cmModified.setEquipmentLife(120);
         cmModified.setName("cm updated");
         ControlMeasure cm2 = service.updateMeasure(cmModified, new Scc[] {});
@@ -150,7 +150,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         service.addMeasure(cm, new Scc[] { scc1 });
 
         try {
-            ControlMeasure locked = service.obtainLockedMeasure(owner, cm);
+            ControlMeasure locked = service.obtainLockedMeasure(owner, cm.getId());
             assertTrue("Should have released lock", locked.isLocked());
 
             ControlMeasure loadedFromDb = load(cm);
@@ -171,7 +171,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         service.addMeasure(cm, new Scc[] { scc1 });
 
         try {
-            ControlMeasure locked = service.obtainLockedMeasure(owner, cm);
+            ControlMeasure locked = service.obtainLockedMeasure(owner, cm.getId());
 //            ControlMeasure released = service.releaseLockedControlMeasure(locked.getId());
             service.releaseLockedControlMeasure(locked.getId());
 //            assertFalse("Should have released lock", released.isLocked());
@@ -202,7 +202,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         assertEquals(name, cms[0].getName());
         assertEquals(new Float(12), new Float(cms[0].getEquipmentLife()));
 
-        service.removeMeasure(cm);
+        service.removeMeasure(cm.getId());
         assertEquals(0, service.getMeasures().length);
         assertEquals(0,load(Scc.class).size());
     }

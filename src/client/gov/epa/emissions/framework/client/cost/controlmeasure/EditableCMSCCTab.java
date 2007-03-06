@@ -59,7 +59,7 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
     private void doLayout(ControlMeasure measure, ManageChangeables changeables) {
         this.changeables = changeables;
         try {
-            Scc[] sccObjs = createSccs(measure);
+            Scc[] sccObjs = createSccs(measure.getId());
             tableData = new SCCTableData(sccObjs);
             SortFilterSelectionPanel sortFilterSelectionPanel = sortFilterPanel();
             mainPanel.removeAll();
@@ -147,9 +147,9 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
         }
     }
 
-    private Scc[] createSccs(ControlMeasure measure) throws EmfException {
+    private Scc[] createSccs(int controlMeasureId) throws EmfException {
         ControlMeasureService service = session.controlMeasureService();
-        Scc[] sccs = service.getSccsWithDescriptions(measure);
+        Scc[] sccs = service.getSccsWithDescriptions(controlMeasureId);
 
         return sccs;
     }

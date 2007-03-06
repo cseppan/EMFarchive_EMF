@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
+import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 public interface ControlMeasureService extends EMFService {
 
@@ -18,15 +19,23 @@ public interface ControlMeasureService extends EMFService {
 
 //    ControlMeasure releaseLockedControlMeasure(ControlMeasure locked) throws EmfException;
 
-    void releaseLockedControlMeasure(int id) throws EmfException;
+    void releaseLockedControlMeasure(int controlMeasureId) throws EmfException;
 
-    void removeMeasure(ControlMeasure measure) throws EmfException;
+//    void removeMeasure(ControlMeasure measure) throws EmfException;
 
-    ControlMeasure obtainLockedMeasure(User user, ControlMeasure measure) throws EmfException;
+    void removeMeasure(int controlMeasureId) throws EmfException;
 
-    Scc[] getSccsWithDescriptions(ControlMeasure measure) throws EmfException;
+//    ControlMeasure obtainLockedMeasure(User user, ControlMeasure measure) throws EmfException;
+
+    ControlMeasure obtainLockedMeasure(User user, int controlMeasureId) throws EmfException;
+
+//    Scc[] getSccsWithDescriptions(ControlMeasure measure) throws EmfException;
     
-    Scc[] getSccs(ControlMeasure measure) throws EmfException;
+    Scc[] getSccsWithDescriptions(int controlMeasureId) throws EmfException;
+    
+//    Scc[] getSccs(ControlMeasure measure) throws EmfException;
+
+    Scc[] getSccs(int controlMeasureId) throws EmfException;
 
     ControlTechnology[] getControlTechnologies() throws EmfException;
     
@@ -40,4 +49,5 @@ public interface ControlMeasureService extends EMFService {
 
     LightControlMeasure[] getLightControlMeasures() throws EmfException;
 
+    public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException;
 }
