@@ -85,4 +85,8 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
         presenters.add(sccPresenter);
     }
 
+    public void doRefresh(ControlMeasure controlMeasure) {
+        this.measure = controlMeasure;
+    }
+
 }

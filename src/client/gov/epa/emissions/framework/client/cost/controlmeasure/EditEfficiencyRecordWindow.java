@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 
 public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implements EditEfficiencyRecordView {
 
@@ -36,6 +37,8 @@ public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implement
         effectiveDate.setText(formatEffectiveDate());
         measureAbbreviation.setText(record.getExistingMeasureAbbr());
         existingdevCode.setText(record.getExistingDevCode() + "");
+        lastModifiedBy.setText(record.getLastModifiedBy() + "");
+        lastModifiedTime.setText(EmfDateFormat.format_MM_DD_YYYY(record.getLastModifiedTime()));
     }
 
     public void save() {
@@ -43,6 +46,7 @@ public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implement
             messagePanel.clear();
             doSave();
             updateControlMeasureEfficiencyTab(record);
+            presenter.update(record);
             presenter.refresh();
             disposeView();
         } catch (EmfException e) {

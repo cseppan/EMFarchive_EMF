@@ -35,6 +35,8 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     private EmfSession session;
 
     private EmfConsole parent;
+    
+    private EditableCMSummaryTab editableCMSummaryTabView;
 
     public EditControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager) {
         super("Control Measure Editor", new Dimension(770, 475), desktopManager);
@@ -83,19 +85,23 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
 
     private Component createEfficiencyTab(ControlMeasure measure, MessagePanel messagePanel) {
         ControlMeasureEfficiencyTab view = new ControlMeasureEfficiencyTab(measure, this, parent, session,
-                desktopManager, messagePanel);
+                desktopManager, messagePanel, this, presenter);
         presenter.set(view);
 
         return view;
     }
 
     private JPanel createSummaryTab(ControlMeasure measure, MessagePanel messagePanel) {
-        EditableCMSummaryTab view = new EditableCMSummaryTab(measure, session, messagePanel, this, parent);
-        view.populateValues();
-        presenter.set(view);
-        return view;
+        editableCMSummaryTabView = new EditableCMSummaryTab(measure, session, messagePanel, this, parent);
+        editableCMSummaryTabView.populateValues();
+        presenter.set(editableCMSummaryTabView);
+        return editableCMSummaryTabView;
     }
 
+    public void notifyModifed(ControlMeasure controlMeasure) {
+        editableCMSummaryTabView.populateLastModifiedFields();
+    }
+    
     private void setWindowTitle(ControlMeasure measure) {
         super.setTitle("Edit Control Measure: " + measure.getName());
         super.setName("editControlMeasure" + measure.getId());
@@ -156,6 +162,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     private void doSave() {
         try {
             presenter.doSave();
+            disposeView();
             resetChanges();
         } catch (EmfException e) {
             showError(e.getMessage());

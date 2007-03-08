@@ -60,7 +60,9 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     protected TextField abbreviation;
 
-    protected JLabel lastModifiedTime;
+    protected TextField lastModifiedTime;
+
+    protected TextField lastModifiedBy;
 
     protected ComboBox cmClass;
 
@@ -121,10 +123,16 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         equipmentLife.setText(measure.getEquipmentLife() + "");
         if (modifiedTime != null)
             lastModifiedTime.setText(EmfDateFormat.format_YYYY_MM_DD_HH_MM(modifiedTime));
+        lastModifiedBy.setText(measure.getLastModifiedBy() + "");
         abbreviation.setText(getText(measure.getAbbreviation()));
         dateReviewed.setText(formatDateReviewed());
         dataSources.setText(getText(measure.getDataSouce()));
         sectorsWidget.setSectors(measure.getSectors());
+    }
+
+    protected void populateLastModifiedFields() {
+        lastModifiedTime.setText(EmfDateFormat.format_YYYY_MM_DD_HH_MM(measure.getLastModifiedTime()));
+        lastModifiedBy.setText(measure.getLastModifiedBy() + "");
     }
 
     private String formatDateReviewed() {
@@ -210,8 +218,21 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        lastModifiedTime = new JLabel("");
+        lastModifiedTime = new TextField("Last Modified Time", 15);
+        changeablesList.addChangeable(lastModifiedTime);
+        lastModifiedTime.setEnabled(false);
+        lastModifiedTime.setOpaque(false);
+        lastModifiedTime.setDisabledTextColor(Color.BLACK);
+        lastModifiedTime.setBorder(BorderFactory.createEmptyBorder());
         layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
+
+        lastModifiedBy = new TextField("Last Modified By", 15);
+        changeablesList.addChangeable(lastModifiedBy);
+        lastModifiedBy.setEnabled(false);
+        lastModifiedBy.setOpaque(false);
+        lastModifiedBy.setDisabledTextColor(Color.BLACK);
+        lastModifiedBy.setBorder(BorderFactory.createEmptyBorder());
+        layoutGenerator.addLabelWidgetPair("Last Modified By:", lastModifiedBy, panel);
 
         try {
             allPollutants = session.dataCommonsService().getPollutants();
@@ -315,10 +336,10 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         updateClass();
 //        measure.setCmClass(selectedClass(cmClass.getSelectedItem()));
         measure.setLastModifiedTime(new Date());
+        measure.setLastModifiedBy(session.user().getName());
         measure.setAbbreviation(abbreviation.getText());
         measure.setDataSouce(dataSources.getText());
         measure.setSectors(sectorsWidget.getSectors());
-
     }
 
     private void updateDateReviewed(ControlMeasure measure) throws EmfException {
@@ -420,6 +441,10 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
             messagePanel.setError("Could not get all the sectors");
         }
         return null;
+    }
+
+    public void refresh(ControlMeasure measure) {
+        this.measure = measure;
     }
 
 }

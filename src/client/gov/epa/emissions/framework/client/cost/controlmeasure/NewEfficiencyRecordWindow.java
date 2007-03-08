@@ -43,7 +43,7 @@ public class NewEfficiencyRecordWindow extends EfficiencyRecordWindow implements
             messagePanel.clear();
             doSave();
             updateControlMeasureEfficiencyTab(record);
-            presenter.addNew(record);
+            presenter.add(record);
             disposeView();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());

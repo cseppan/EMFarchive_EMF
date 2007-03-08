@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import java.sql.ResultSet;
@@ -21,7 +22,7 @@ public class RetrieveEfficiencyRecord {
     public EfficiencyRecord[] getEfficiencyRecords() throws SQLException {
         EfficiencyRecord[] efficiencyRecords;
         try {
-            ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(query(controlMeasureId));
+            ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(query(controlMeasureId, ""));
             efficiencyRecords = values(set);
         } catch (SQLException e) {
             throw e;
@@ -37,6 +38,17 @@ public class RetrieveEfficiencyRecord {
         try {
             while (rs.next()) {
                 EfficiencyRecord effRec = new EfficiencyRecord();
+                effRec.setId(rs.getInt(1));
+                effRec.setControlMeasureId(rs.getInt(2));
+                effRec.setRecordId(rs.getInt(3));
+                effRec.setPollutant(new Pollutant(rs.getInt(4), rs.getString(5)));
+                effRec.setExistingMeasureAbbr(rs.getString(1));
+                effRec.setId(rs.getInt(1));
+                effRec.setId(rs.getInt(1));
+                effRec.setId(rs.getInt(1));
+                effRec.setId(rs.getInt(1));
+                effRec.setId(rs.getInt(1));
+                effRec.setId(rs.getInt(1));
                 effRec.setId(rs.getInt(1));
                 effRec.setId(rs.getInt(1));
 
@@ -69,9 +81,9 @@ public class RetrieveEfficiencyRecord {
         return (EfficiencyRecord[]) effRecs.toArray(new EfficiencyRecord[0]);
     }
 
-    private String query(int controlMeasureId) {
+    private String query(int controlMeasureId, String filter) {
         String query = "SELECT e.name,r.scc_description FROM emf.control_measure_sccs AS e LEFT OUTER JOIN reference.scc AS r "
-                + "ON (e.name=r.scc) WHERE e.control_measures_id=" + controlMeasureId;
+                + "ON (e.name=r.scc) WHERE e.control_measures_id=" + controlMeasureId + " LIMIT 100";
         return query;
     }
 }

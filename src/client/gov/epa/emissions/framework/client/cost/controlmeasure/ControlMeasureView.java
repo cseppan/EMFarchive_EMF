@@ -12,5 +12,7 @@ public interface ControlMeasureView extends ManagedView {
     void showError(String message);
 
     void notifyLockFailure(ControlMeasure measure);
+    
+    void notifyModifed(ControlMeasure measure);
 
 }

@@ -15,4 +15,8 @@ public class EditableCMEfficiencyTabPresenterImpl implements ControlMeasureTabPr
         view.save(measure);
     }
 
+    public void doRefresh(ControlMeasure measure) {
+        view.refresh(measure);
+    }
+
 }

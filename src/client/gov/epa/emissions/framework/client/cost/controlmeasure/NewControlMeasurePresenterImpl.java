@@ -53,8 +53,16 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
             element.doSave(measure);
         }
 
-        service.addMeasure(measure, sccView.sccs());
-        view.disposeView();
+        if (measure.getId() == 0) {
+            int cmId = service.addMeasure(measure, sccView.sccs());
+            measure = service.obtainLockedMeasure(session.user(), cmId);
+            this.measure = measure;
+        } else {
+            service.updateMeasure(measure, sccView.sccs());
+        }
+        
+        doRefresh(measure);
+//        view.disposeView();
         //parent.doRefresh();
     }
 
@@ -70,6 +78,13 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
 
     public void set(ControlMeasureSccTabView sccTabView) {
         this.sccView = sccTabView;
+    }
+
+    public void doRefresh(ControlMeasure controlMeasure) {
+        for (Iterator iter = presenters.iterator(); iter.hasNext();) {
+            ControlMeasureTabPresenter element = (ControlMeasureTabPresenter) iter.next();
+            element.doRefresh(measure);
+        }
     }
 
 }

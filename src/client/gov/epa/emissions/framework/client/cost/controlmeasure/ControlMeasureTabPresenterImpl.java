@@ -15,4 +15,8 @@ public class ControlMeasureTabPresenterImpl implements ControlMeasureTabPresente
         view.save(measure);
     }
 
+    public void doRefresh(ControlMeasure measure) {
+        view.refresh(measure);
+    }
+
 }

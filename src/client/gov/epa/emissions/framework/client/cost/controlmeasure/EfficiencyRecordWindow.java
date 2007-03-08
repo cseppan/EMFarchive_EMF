@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.Changeable;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
@@ -22,12 +23,14 @@ import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -60,7 +63,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     protected TextField discountRate;
 
-    protected TextField detail;
+    protected TextArea detail;
 
     protected TextField effectiveDate;
 
@@ -78,9 +81,13 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     private String[] equationTypes = { "cpton" };
 
+    protected TextField lastModifiedTime;
+
+    protected TextField lastModifiedBy;
+
     public EfficiencyRecordWindow(String title, ManageChangeables changeablesList, DesktopManager desktopManager,
             EmfSession session) {
-        super(title, new Dimension(650, 350), desktopManager);
+        super(title, new Dimension(650, 400), desktopManager);
         this.changeablesList = changeablesList;
         this.session = session;
         this.verifier = new NumberFieldVerifier("");
@@ -164,7 +171,23 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         this.addChangeable(costperTon);
         layoutGenerator.addLabelWidgetPair("Cost Per Ton Reduced:*", costperTon, panel);
 
-        widgetLayout(7, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        lastModifiedTime = new TextField("Last Modified Time", 10);
+        changeablesList.addChangeable(lastModifiedTime);
+        lastModifiedTime.setEnabled(false);
+        lastModifiedTime.setOpaque(false);
+        lastModifiedTime.setDisabledTextColor(Color.BLACK);
+        lastModifiedTime.setBorder(BorderFactory.createEmptyBorder());
+        layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
+
+        lastModifiedBy = new TextField("Last Modified By", 10);
+        changeablesList.addChangeable(lastModifiedBy);
+        lastModifiedBy.setEnabled(false);
+        lastModifiedBy.setOpaque(false);
+        lastModifiedBy.setDisabledTextColor(Color.BLACK);
+        lastModifiedBy.setBorder(BorderFactory.createEmptyBorder());
+        layoutGenerator.addLabelWidgetPair("Last Modified By:", lastModifiedBy, panel);
+
+        widgetLayout(9, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
@@ -200,7 +223,8 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         this.addChangeable(discountRate);
         layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate, panel);
 
-        detail = new TextField("Details", 10);
+        detail = new TextArea("Details", "", 1, 4);
+        detail.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));//createMatteBorder(1, 1, 1, 1, Color.BLUE));//createLineBorder(Color.BLACK, 1));
         this.addChangeable(detail);
         layoutGenerator.addLabelWidgetPair("Details:", detail, panel);
 
@@ -253,6 +277,8 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         record.setDetail(detail.getText().trim());
         saveEffectiveDate();
         record.setExistingMeasureAbbr(measureAbbreviation.getText().trim());
+        record.setLastModifiedBy(session.user().getName());
+        record.setLastModifiedTime(new Date());
         saveExistingDevCode();
     }
 

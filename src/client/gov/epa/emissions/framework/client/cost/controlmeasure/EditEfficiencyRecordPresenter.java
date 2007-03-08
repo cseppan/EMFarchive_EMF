@@ -1,17 +1,27 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import java.util.Date;
+
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 public class EditEfficiencyRecordPresenter extends EfficiencyRecordPresenter {
 
     private EditEfficiencyRecordView view;
+    private ControlMeasureService cmService;
+    private ControlMeasure measure;
+    private EmfSession session;
 
-    public EditEfficiencyRecordPresenter(ControlMeasureEfficiencyTabView parentView, EditEfficiencyRecordView view) {
+    public EditEfficiencyRecordPresenter(ControlMeasureEfficiencyTabView parentView, EditEfficiencyRecordView view, 
+            EmfSession session, ControlMeasure measure) {
         super(parentView);
         this.view = view;
-        
+        this.measure = measure;
+        this.session = session;
+        cmService = session.controlMeasureService();
     }
 
     public void display(ControlMeasure measure, EfficiencyRecord record) {
@@ -27,4 +37,10 @@ public class EditEfficiencyRecordPresenter extends EfficiencyRecordPresenter {
         parentView.refresh();
     }
 
+    public void update(EfficiencyRecord record) throws EmfException {
+        cmService.updateEfficiencyRecord(record);
+        measure.setLastModifiedTime(new Date());
+        measure.setLastModifiedBy(session.user().getName());
+        parentView.update(record);
+    }
 }

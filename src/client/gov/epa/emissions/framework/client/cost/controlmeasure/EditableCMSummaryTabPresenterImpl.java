@@ -15,4 +15,8 @@ public class EditableCMSummaryTabPresenterImpl implements ControlMeasureTabPrese
         view.save(measure);
     }
 
+    public void doRefresh(ControlMeasure measure) {
+        view.refresh(measure);
+    }
+
 }

@@ -63,19 +63,21 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
     }
 
     public void run() {
-        try {
-            messagePanel.setMessage("Please wait while retrieving all SCCs...");
-            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        if (measure.getId() != 0) {
             try {
-                sccs = getSCCs(measure.getId());
+                messagePanel.setMessage("Please wait while retrieving all SCCs...");
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                try {
+                    sccs = getSCCs(measure.getId());
+                } catch (Exception e) {
+                    messagePanel.setError(e.getMessage());
+                }        
+                doLayout(measure, changeables);
+                messagePanel.clear();
+                setCursor(Cursor.getDefaultCursor());
             } catch (Exception e) {
-                messagePanel.setError(e.getMessage());
-            }        
-            doLayout(measure, changeables);
-            messagePanel.clear();
-            setCursor(Cursor.getDefaultCursor());
-        } catch (Exception e) {
-            messagePanel.setError("Cannot retrieve all SCCs.");
+                messagePanel.setError("Cannot retrieve all SCCs.");
+            }
         }
         this.populateThread = null;
     }
@@ -83,8 +85,7 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
     private void doLayout(ControlMeasure measure, ManageChangeables changeables) {
         this.changeables = changeables;
         try {
-            Scc[] sccObjs = getSCCs(measure.getId());
-            tableData = new SCCTableData(sccObjs);
+            tableData = new SCCTableData(sccs);
             SortFilterSelectionPanel sortFilterSelectionPanel = sortFilterPanel();
             mainPanel.removeAll();
             mainPanel.add(sortFilterSelectionPanel);
@@ -200,6 +201,10 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
 
     public Scc[] sccs() {
         return sccs;
+    }
+
+    public void refresh(ControlMeasure measure) {
+        this.measure = measure;
     }
 
 }

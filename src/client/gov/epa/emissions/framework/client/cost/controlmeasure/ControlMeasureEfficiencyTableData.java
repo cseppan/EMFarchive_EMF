@@ -26,7 +26,7 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     public String[] columns() {
         return new String[] { "Pollutant", "Locale", "Effective Date", "Existing Measure", "Existing NEI Dev",
                 "Cost Year", "Cost Per Ton", "Control Efficiency", "Rule Effectiveness", "Rule Penetration",
-                "Equation Type", "Capital Rec Fac", "Discount Rate", "Details", };
+                "Equation Type", "Capital Rec Fac", "Discount Rate", "Details", "Last Modifed By", "Last Modifed Date"};
     }
 
     public List rows() {
@@ -44,7 +44,7 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
                 new Double(record.getCostPerTon()), new Double(record.getEfficiency()),
                 new Double(record.getRuleEffectiveness()), new Double(record.getRulePenetration()),
                 record.getEquationType(), new Double(record.getCapRecFactor()), new Double(record.getDiscountRate()),
-                record.getDetail() };
+                record.getDetail(), record.getLastModifiedBy(), EmfDateFormat.format_MM_DD_YYYY_HH_mm(record.getLastModifiedTime())};
 
         return new ViewableRow(record, values);
     }

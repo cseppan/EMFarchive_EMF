@@ -13,7 +13,7 @@ public interface ControlMeasureService extends EMFService {
 
     ControlMeasure[] getMeasures() throws EmfException;
 
-    void addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException;
+    int addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException;
 
     ControlMeasure updateMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException;
 
@@ -49,5 +49,11 @@ public interface ControlMeasureService extends EMFService {
 
     LightControlMeasure[] getLightControlMeasures() throws EmfException;
 
-    public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException;
+    EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException;
+
+    int addEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException;
+
+    void removeEfficiencyRecord(int efficiencyRecordId) throws EmfException;
+
+    void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException;
 }

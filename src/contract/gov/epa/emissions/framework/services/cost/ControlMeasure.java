@@ -57,6 +57,7 @@ public class ControlMeasure implements Lockable, Serializable {
     private List efficiencyRecords;
 
     private List sectors;
+    private String lastModifiedBy;
 
     public ControlMeasure() {
         this.lock = new Mutex();
@@ -270,6 +271,14 @@ public class ControlMeasure implements Lockable, Serializable {
 
     public void addScc(Scc scc) {
         this.sccs.add(scc);
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
     }
 
 }

@@ -20,7 +20,8 @@
         <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
         <property name="lastModifiedTime" column="last_modified_time" type="java.util.Date" not-null="false" length="4"/>
         <property name="dateReviewed" column="date_reviewed" type="java.util.Date" not-null="false" length="4"/>
-        
+        <property name="lastModifiedBy" column="last_modified_by" type="java.lang.String" not-null="true"/>
+
         <many-to-one cascade="save-update"
             name="creator" 
             class="gov.epa.emissions.commons.security.User"

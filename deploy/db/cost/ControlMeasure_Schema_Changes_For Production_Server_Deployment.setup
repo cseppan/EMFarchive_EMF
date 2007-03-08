@@ -54,3 +54,11 @@ CREATE TABLE emf.control_strategy_measures
 ) 
 WITHOUT OIDS;
 -- Create new emf.control_strategy_measures
+
+-- add new columns to the efficiencyrecords table...
+ALTER TABLE emf.control_measure_efficiencyrecords ADD COLUMN last_modified_by varchar(255) NOT NULL DEFAULT '',
+  ADD COLUMN last_modified_time timestamp NOT NULL DEFAULT now();
+  
+  
+-- add new columns to the controlmeasures table...
+ALTER TABLE emf.control_measures ADD COLUMN last_modified_by varchar(255) NOT NULL DEFAULT '';

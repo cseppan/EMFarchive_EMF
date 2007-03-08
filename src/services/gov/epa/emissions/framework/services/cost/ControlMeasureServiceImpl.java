@@ -69,10 +69,10 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public void addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
+    public int addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            dao.add(measure, sccs, session);
+            return dao.add(measure, sccs, session);
         } catch (RuntimeException e) {
             LOG.error("Could not add control measure: " + measure.getName(), e);
             throw new EmfException("Could not add control measure: " + measure.getName());

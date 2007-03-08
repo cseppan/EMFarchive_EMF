@@ -41,6 +41,9 @@ public class EfficiencyRecord implements Serializable {
 
     private int controlMeasureId;
 
+    private String lastModifiedBy;
+    private Date lastModifiedTime;
+
     public float getCapRecFactor() {
         return capRecFactor;
     }
@@ -197,6 +200,22 @@ public class EfficiencyRecord implements Serializable {
 
     public int getControlMeasureId() {
         return controlMeasureId;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedTime(Date lastModifiedTime) {
+        this.lastModifiedTime = lastModifiedTime;
+    }
+
+    public Date getLastModifiedTime() {
+        return lastModifiedTime;
     }
 
 }

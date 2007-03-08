@@ -34,6 +34,7 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
     
     private static int count = 0;
 
+    private NewCMSummaryTab cMSummaryTabView;
     //private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public NewControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager) {
@@ -81,17 +82,20 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
     }
 
     private Component createEfficiencyTab(ControlMeasure measure, MessagePanel messagePanel) {
-        ControlMeasureEfficiencyTab view = new ControlMeasureEfficiencyTab(measure, this, parent, session, desktopManager, messagePanel);
+        ControlMeasureEfficiencyTab view = new ControlMeasureEfficiencyTab(measure, this, 
+                parent, session, 
+                desktopManager, messagePanel, 
+                this, presenter);
         presenter.set(view);
         
         return view;
     }
 
     private JPanel createSummaryTab(ControlMeasure measure, MessagePanel messagePanel) {
-        NewCMSummaryTab view = new NewCMSummaryTab(measure, session, messagePanel, this);
-        view.populateValues();
-        presenter.set(view);
-        return view;
+        cMSummaryTabView = new NewCMSummaryTab(measure, session, messagePanel, this);
+        cMSummaryTabView.populateValues();
+        presenter.set(cMSummaryTabView);
+        return cMSummaryTabView;
     }
     
     private void setWindowTitle() {
@@ -152,6 +156,7 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
     private void doSave() {
         try {
             presenter.doSave();
+            disposeView();
             resetChanges();
         } catch (EmfException e) {
             showError(e.getMessage());
@@ -160,6 +165,10 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
 
     public void notifyLockFailure(ControlMeasure measure) {
         // NOTE Auto-generated method stub
+    }
+
+    public void notifyModifed(ControlMeasure measure) {
+        cMSummaryTabView.populateLastModifiedFields();
     }
     
 }

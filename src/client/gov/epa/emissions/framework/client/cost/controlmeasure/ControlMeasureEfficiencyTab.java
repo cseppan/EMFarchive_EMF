@@ -23,13 +23,13 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasureEfficiencyTabView, Runnable {
 
@@ -55,9 +55,14 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     
     private EfficiencyRecord[] efficiencyRecords = {};
     private volatile Thread populateThread;
+    private ControlMeasureService cmService;
+    private ControlMeasureView controlMeasureView;
 
+    private ControlMeasurePresenter controlMeasurePresenter;
+    
     public ControlMeasureEfficiencyTab(ControlMeasure measure, ManageChangeables changeablesList, EmfConsole parent,
-            EmfSession session, DesktopManager desktopManager, MessagePanel messagePanel) {
+            EmfSession session, DesktopManager desktopManager, MessagePanel messagePanel, ControlMeasureView editControlMeasureWindowView,
+            ControlMeasurePresenter controlMeasurePresenter) {
         this.mainPanel = new JPanel(new BorderLayout());
         this.parentConsole = parent;
         this.changeablesList = changeablesList;
@@ -65,26 +70,30 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         this.session = session;
         this.messagePanel = messagePanel;
         this.measure = measure;
+        this.controlMeasureView = editControlMeasureWindowView;
+        this.controlMeasurePresenter = controlMeasurePresenter;
         doLayout(measure);
+        cmService = session.controlMeasureService();
         this.populateThread = new Thread(this);
         populateThread.start();
     }
 
     public void run() {
-        try {
-            messagePanel.setMessage("Please wait while retrieving all efficiency records...");
-            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        if (measure.getId() != 0) {
             try {
-                efficiencyRecords = getEfficiencyRecords(measure.getId());
+                messagePanel.setMessage("Please wait while retrieving all efficiency records...");
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                try {
+                    efficiencyRecords = getEfficiencyRecords(measure.getId());
+                } catch (Exception e) {
+                    messagePanel.setError(e.getMessage());
+                }        
+                doLayout(measure);
+                messagePanel.clear();
+                setCursor(Cursor.getDefaultCursor());
             } catch (Exception e) {
-                messagePanel.setError(e.getMessage());
-            }        
-            doLayout(measure);
-//            doRefresh(presenter.getCaseInput(caseId));
-            messagePanel.clear();
-            setCursor(Cursor.getDefaultCursor());
-        } catch (Exception e) {
-            messagePanel.setError("Cannot retrieve all efficiency records.");
+                messagePanel.setError("Cannot retrieve all efficiency records.");
+            }
         }
         this.populateThread = null;
     }
@@ -100,8 +109,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     private void updateMainPanel(EfficiencyRecord[] records) {
         mainPanel.removeAll();
         initModel(records);
-        JScrollPane pane = sortFilterPane(parentConsole);
-        mainPanel.add(pane);
+        mainPanel.add(sortFilterPane(parentConsole));
         mainPanel.validate();
     }
 
@@ -111,15 +119,24 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         selectModel = new SortFilterSelectModel(model);
     }
 
-    private JScrollPane sortFilterPane(EmfConsole parentConsole) {
+    private SortFilterSelectionPanel sortFilterPane(EmfConsole parentConsole) {
         SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        panel.getTable().setName("controlMeasureSccTable");
+        panel.getTable().setName("controlMeasureEfficiencyTable");
         panel.sort(sortCriteria());
         panel.setPreferredSize(new Dimension(450, 120));
 
-        return new JScrollPane(panel);
+        return panel;
     }
 
+//    private JScrollPane sortFilterPane(EmfConsole parentConsole) {
+//        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
+//        panel.getTable().setName("controlMeasureEfficiencyTable");
+//        panel.sort(sortCriteria());
+//        panel.setPreferredSize(new Dimension(450, 120));
+//
+//        return new JScrollPane(panel);
+//    }
+//
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Pollutant", "Control Efficiency" };
         return new SortCriteria(columnNames, new boolean[] { true, true }, new boolean[] { true, true });
@@ -167,6 +184,17 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     private Action addAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                //if this is a new measure, make sure we save it before we proceed.
+                //the efficiency editor needs to have a measure in the db first!
+                if (measure.getId() == 0) {
+                    try {
+                        controlMeasurePresenter.doSave();
+                    } catch (EmfException e1) {
+                        messagePanel.setError("Cannot save control measure: " + e1.getMessage());
+                        return;
+                    }
+                }
+
                 doAdd();
             }
         };
@@ -208,6 +236,16 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
                 JOptionPane.QUESTION_MESSAGE);
 
         if (selection == JOptionPane.YES_OPTION) {
+            for (int i = 0; i < records.length; i++) {
+                try {
+                    cmService.removeEfficiencyRecord(records[i].getId());
+                } catch (EmfException e) {
+                    messagePanel.setMessage("Could not remove efficiency records: " + e.getMessage());
+                }
+            }
+            measure.setLastModifiedTime(new Date());
+            measure.setLastModifiedBy(session.user().getName());
+            controlMeasureView.notifyModifed(measure);
             tableData.remove(records);
             refreshPanel();
         }
@@ -216,7 +254,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     protected void doAdd() {
         messagePanel.clear();
         NewEfficiencyRecordView view = new NewEfficiencyRecordWindow(changeablesList, desktopManager, session);
-        NewEfficiencyRecordPresenter presenter = new NewEfficiencyRecordPresenter(this, view);
+        NewEfficiencyRecordPresenter presenter = new NewEfficiencyRecordPresenter(this, view, session, measure);
         
         presenter.display(measure);
     }
@@ -229,7 +267,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     private void doEdit(EfficiencyRecord record) {
         messagePanel.clear();
         EditEfficiencyRecordView view = new EditEfficiencyRecordWindow(changeablesList, desktopManager, session);
-        EditEfficiencyRecordPresenter presenter = new EditEfficiencyRecordPresenter(this, view);
+        EditEfficiencyRecordPresenter presenter = new EditEfficiencyRecordPresenter(this, view, session, measure);
         presenter.display(measure, record);
     }
 
@@ -254,6 +292,13 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     public void add(EfficiencyRecord record) {
         tableData.add(record);
         refreshPanel();
+        measure.setLastModifiedTime(record.getLastModifiedTime());
+        measure.setLastModifiedBy(record.getLastModifiedBy());
+        controlMeasureView.notifyModifed(measure);
+    }
+
+    public void update(EfficiencyRecord record) {
+        //Not needed right now...
     }
 
     public void refresh() {
@@ -266,7 +311,10 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     }
 
     private EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException {
-        ControlMeasureService service = session.controlMeasureService();
-        return service.getEfficiencyRecords(controlMeasureId);
+        return cmService.getEfficiencyRecords(controlMeasureId);
+    }
+
+    public void refresh(ControlMeasure measure) {
+        this.measure = measure;
     }
 }

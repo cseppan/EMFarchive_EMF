@@ -78,20 +78,22 @@ public class ControlMeasureDAO {
     }
 
     // NOTE: it't not happening in one transaction. modify?
-    public void add(ControlMeasure measure, Scc[] sccs, Session session) throws EmfException {
+    public int add(ControlMeasure measure, Scc[] sccs, Session session) throws EmfException {
         checkForConstraints(measure, session);
         hibernateFacade.add(measure, session);
-        controlMeasureIds(measure, sccs, session);
+        int cmId = controlMeasureIds(measure, sccs, session);
         hibernateFacade.add(sccs, session);
+        return cmId;
     }
 
-    private void controlMeasureIds(ControlMeasure measure, Scc[] sccs, Session session) {
+    private int controlMeasureIds(ControlMeasure measure, Scc[] sccs, Session session) {
         ControlMeasure cm = (ControlMeasure) hibernateFacade.load(ControlMeasure.class, Restrictions.eq("name", measure
                 .getName()), session);
         int cmId = cm.getId();
         for (int i = 0; i < sccs.length; i++) {
             sccs[i].setControlMeasureId(cmId);
         }
+        return cmId;
     }
 
     public void remove(int controlMeasureId, Session session) {

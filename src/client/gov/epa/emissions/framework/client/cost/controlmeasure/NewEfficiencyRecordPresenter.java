@@ -1,15 +1,27 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import java.util.Date;
+
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 public class NewEfficiencyRecordPresenter extends EfficiencyRecordPresenter {
 
     private NewEfficiencyRecordView view;
+    private ControlMeasureService cmService;
+    private ControlMeasure measure;
+    private EmfSession session;
 
-    public NewEfficiencyRecordPresenter(ControlMeasureEfficiencyTabView parentView, NewEfficiencyRecordView view) {
+    public NewEfficiencyRecordPresenter(ControlMeasureEfficiencyTabView parentView, NewEfficiencyRecordView view, 
+            EmfSession session, ControlMeasure measure) {
         super(parentView);
         this.view = view;
+        this.measure = measure;
+        this.session = session;
+        cmService = session.controlMeasureService();
     }
 
     public void display(ControlMeasure measure) {
@@ -20,6 +32,9 @@ public class NewEfficiencyRecordPresenter extends EfficiencyRecordPresenter {
     private EfficiencyRecord newRecord() {
         EfficiencyRecord efficiencyRecord = new EfficiencyRecord();
         efficiencyRecord.setRecordId(newRecordId());
+        efficiencyRecord.setControlMeasureId(measure.getId());
+        efficiencyRecord.setLastModifiedTime(new Date());
+        efficiencyRecord.setLastModifiedBy(session.user().getName());
         return efficiencyRecord;
     }
 
@@ -38,8 +53,10 @@ public class NewEfficiencyRecordPresenter extends EfficiencyRecordPresenter {
         return id;
     }
 
-    public void addNew(EfficiencyRecord record) {
+    public void add(EfficiencyRecord record) throws EmfException {
+        cmService.addEfficiencyRecord(record);
+        measure.setLastModifiedTime(new Date());
+        measure.setLastModifiedBy(session.user().getName());
         parentView.add(record);
     }
-
 }

@@ -46,15 +46,15 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (ControlMeasure[]) call.requestResponse(new Object[] { pollutant });
     }
 
-    public void addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
+    public int addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("addMeasure");
         call.addParam("measure", mappings.controlMeasure());
         call.addParam("sccs", mappings.sccs());
-        call.setVoidReturnType();
+        call.setIntegerReturnType();
 
-        call.request(new Object[] { measure, sccs });
+        return (Integer)call.requestResponse(new Object[] { measure, sccs });
     }
 
     public void removeMeasure(int controlMeasureId) throws EmfException {
@@ -193,4 +193,33 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (EfficiencyRecord[]) call.requestResponse(new Object[] { new Integer(controlMeasureId) });
     }
 
+    public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("addEfficiencyRecord");
+        call.addParam("efficiencyRecord", mappings.efficiencyRecord());
+        call.setIntegerReturnType();
+
+        return (Integer) call.requestResponse(new Object[] { efficiencyRecord });
+    }
+
+    public void removeEfficiencyRecord(int efficiencyRecordId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("removeEfficiencyRecord");
+        call.addIntegerParam("efficiencyRecordId");
+        call.setVoidReturnType();
+
+        call.requestResponse(new Object[] { new Integer(efficiencyRecordId) });
+    }
+
+    public void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("updateEfficiencyRecord");
+        call.addParam("efficiencyRecord", mappings.efficiencyRecord());
+        call.setVoidReturnType();
+
+        call.requestResponse(new Object[] { efficiencyRecord });
+    }
 }

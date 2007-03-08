@@ -15,4 +15,8 @@ public class EditableCMSCCTabPresenterImpl implements ControlMeasureTabPresenter
         view.save(measure);
     }
 
+    public void doRefresh(ControlMeasure measure) {
+        view.refresh(measure);
+    }
+
 }

@@ -65,7 +65,8 @@ CREATE TABLE emf.control_measures
   last_modified_time timestamp,
   lock_owner varchar(64),
   lock_date timestamp,
-  date_reviewed timestamp
+  date_reviewed timestamp,
+  last_modified_by varchar(255) NOT NULL
 ) 
 WITHOUT OIDS;
 -- emf.control_measures
@@ -106,6 +107,8 @@ CREATE TABLE emf.control_measure_efficiencyrecords
   discount_rate real,
   detail varchar(128),
   effective_date timestamp,
+  last_modified_by varchar(255) NOT NULL,
+  last_modified_time timestamp NOT NULL,
   UNIQUE (control_measures_id,pollutant_id,locale,existing_measure_abbr,effective_date)
 ) 
 WITHOUT OIDS;
