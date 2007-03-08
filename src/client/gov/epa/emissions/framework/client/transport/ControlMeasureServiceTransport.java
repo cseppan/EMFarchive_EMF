@@ -193,6 +193,18 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (EfficiencyRecord[]) call.requestResponse(new Object[] { new Integer(controlMeasureId) });
     }
 
+    public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getEfficiencyRecords");
+        call.addIntegerParam("controlMeasureId");
+        call.addIntegerParam("recordLimit");
+        call.addStringParam("filter");
+        call.setReturnType(mappings.efficiencyRecords());
+
+        return (EfficiencyRecord[]) call.requestResponse(new Object[] { new Integer(controlMeasureId), new Integer(recordLimit), filter });
+    }
+
     public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
         EmfCall call = call();
 

@@ -276,6 +276,15 @@ public class ControlMeasureDAO {
         return hibernateFacade.get(EfficiencyRecord.class, c, session);
     }
 
+    public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter, EmfDbServer DbServer) throws EmfException {
+        try {
+            RetrieveEfficiencyRecord retrieveEfficiencyRecord = new RetrieveEfficiencyRecord(controlMeasureId, DbServer);
+            return retrieveEfficiencyRecord.getEfficiencyRecords();
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+    }
+
     public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord, Session session) {
         hibernateFacade.add(efficiencyRecord, session);
         return efficiencyRecord.getId();

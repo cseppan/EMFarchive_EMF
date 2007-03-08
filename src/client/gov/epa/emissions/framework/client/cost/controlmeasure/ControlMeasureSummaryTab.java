@@ -166,11 +166,10 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         description = new TextArea("description", measure.getDescription());
         changeablesList.addChangeable(description);
         ScrollableComponent descPane = new ScrollableComponent(description);
-        descPane.setPreferredSize(new Dimension(300, 50));
+        descPane.setPreferredSize(new Dimension(300, 65));//50));
         layoutGenerator.addLabelWidgetPair("Description:", descPane, panel);
 
         widgetLayout(2, 2, 5, 5, 10, 10, layoutGenerator, panel);
-
         return panel;
     }
 
@@ -188,35 +187,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         // AME: Moved temporarily to improve symmetry
         // lastModifiedTime = new JLabel("");
         // layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
-        JPanel tempPanel = tempPanel(50, 20);
-        layoutGenerator.addLabelWidgetPair("", tempPanel, panel);
-
-        widgetLayout(3, 2, 5, 5, 10, 10, layoutGenerator, panel);
-
-        return panel;
-    }
-
-    private JPanel tempPanel(int width, int height) {
-        JPanel tempPanel = new JPanel();
-        tempPanel.setPreferredSize(new Dimension(width, height));
-        return tempPanel;
-    }
-
-    private JPanel createAttributeSection() {
-        JPanel panel = new JPanel(new BorderLayout());
-
-        JPanel container = new JPanel();
-        container.add(createLeftPanel());
-        container.add(createRightPanel());
-
-        panel.add(container);
-
-        return panel;
-    }
-
-    private JPanel createLeftPanel() {
-        JPanel panel = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+//        JPanel tempPanel = tempPanel(50, 20);
+//        layoutGenerator.addLabelWidgetPair("", tempPanel, panel);
 
         lastModifiedTime = new TextField("Last Modified Time", 15);
         changeablesList.addChangeable(lastModifiedTime);
@@ -233,6 +205,31 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         lastModifiedBy.setDisabledTextColor(Color.BLACK);
         lastModifiedBy.setBorder(BorderFactory.createEmptyBorder());
         layoutGenerator.addLabelWidgetPair("Last Modified By:", lastModifiedBy, panel);
+
+        widgetLayout(4, 2, 5, 5, 10, 10, layoutGenerator, panel);
+
+        return panel;
+    }
+
+    private JPanel tempPanel(int width, int height) {
+        JPanel tempPanel = new JPanel();
+        tempPanel.setPreferredSize(new Dimension(width, height));
+        return tempPanel;
+    }
+
+    private JPanel createAttributeSection() {
+
+        JPanel container = new JPanel(new BorderLayout());
+        container.add(createLeftPanel(), BorderLayout.WEST);
+        container.add(createRightPanel(), BorderLayout.EAST);
+
+        return container;
+    }
+
+    private JPanel createLeftPanel() {
+        JPanel container = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         try {
             allPollutants = session.dataCommonsService().getPollutants();
@@ -259,12 +256,13 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         layoutGenerator.addLabelWidgetPair("Data Sources:", dataSources, panel);
 
         layoutGenerator.addLabelWidgetPair("", tempPanel(20, 20), panel);
-        widgetLayout(7, 2, 5, 5, 10, 10, layoutGenerator, panel);
-
-        return panel;
+        widgetLayout(5, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        container.add(panel, BorderLayout.NORTH);
+        return container;
     }
 
     private Component createRightPanel() {
+        JPanel container = new JPanel(new BorderLayout());
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -302,7 +300,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
         widgetLayout(4, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
-        return panel;
+        container.add(panel, BorderLayout.NORTH);
+        return container;
     }
 
     private JPanel sectors() {

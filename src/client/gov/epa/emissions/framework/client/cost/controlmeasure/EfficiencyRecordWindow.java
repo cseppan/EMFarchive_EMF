@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.Changeable;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
@@ -87,7 +88,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     public EfficiencyRecordWindow(String title, ManageChangeables changeablesList, DesktopManager desktopManager,
             EmfSession session) {
-        super(title, new Dimension(650, 400), desktopManager);
+        super(title, new Dimension(650, 425), desktopManager);
         this.changeablesList = changeablesList;
         this.session = session;
         this.verifier = new NumberFieldVerifier("");
@@ -125,16 +126,8 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         JPanel panel = new JPanel(new BorderLayout());
 
         JPanel container = new JPanel();
-        container.add(LeftRecordPanel());
-        container.add(RightRecordPanel());
-
-        panel.add(container, BorderLayout.LINE_START);
-
-        return panel;
-    }
-
-    private Component LeftRecordPanel() {
-        JPanel panel = new JPanel(new SpringLayout());
+        JPanel pollutantContainer = new JPanel(new SpringLayout());
+        JPanel pollutantCenterPanel = new JPanel();
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         try {
@@ -145,7 +138,46 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
             messagePanel.setError("Could not retrieve Pollutants");
         }
         this.addChangeable(pollutant);
-        layoutGenerator.addLabelWidgetPair("Pollutant:*", pollutant, panel);
+        layoutGenerator.addLabelWidgetPair("Pollutant:*", pollutant, pollutantContainer);
+
+        widgetLayout(1, 2, 5, 5, 10, 10, layoutGenerator, pollutantContainer);
+
+        container.add(LeftRecordPanel());
+        container.add(RightRecordPanel());
+        pollutantCenterPanel.add(pollutantContainer, BorderLayout.CENTER);
+        panel.add(pollutantCenterPanel, BorderLayout.NORTH);
+        panel.add(container, BorderLayout.CENTER);//LINE_START);
+
+        JPanel detailContainer = new JPanel(new SpringLayout());
+        layoutGenerator = new SpringLayoutGenerator();
+        detail = new TextArea("Details", "");
+        ScrollableComponent detailPane = new ScrollableComponent(detail);
+        detailPane.setPreferredSize(new Dimension(540, 50));
+        this.addChangeable(detail);
+        layoutGenerator.addLabelWidgetPair("Details:", detailPane, detailContainer);
+        
+        widgetLayout(1, 2, 5, 5, 10, 10, layoutGenerator, detailContainer);
+
+        JPanel detailCenterPanel = new JPanel();
+        detailCenterPanel.add(detailContainer, BorderLayout.CENTER);
+        panel.add(detailCenterPanel, BorderLayout.SOUTH);
+        
+        return panel;
+    }
+
+    private Component LeftRecordPanel() {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+//        try {
+//            allPollutants = session.dataCommonsService().getPollutants();
+//            pollutant = new ComboBox("Select One", allPollutants);
+//            pollutant.setPreferredSize(new Dimension(113, 20));
+//        } catch (EmfException e) {
+//            messagePanel.setError("Could not retrieve Pollutants");
+//        }
+//        this.addChangeable(pollutant);
+//        layoutGenerator.addLabelWidgetPair("Pollutant:*", pollutant, panel);
 
         locale = new TextField("Locale", 10);
         this.addChangeable(locale);
@@ -179,15 +211,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         lastModifiedTime.setBorder(BorderFactory.createEmptyBorder());
         layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
 
-        lastModifiedBy = new TextField("Last Modified By", 10);
-        changeablesList.addChangeable(lastModifiedBy);
-        lastModifiedBy.setEnabled(false);
-        lastModifiedBy.setOpaque(false);
-        lastModifiedBy.setDisabledTextColor(Color.BLACK);
-        lastModifiedBy.setBorder(BorderFactory.createEmptyBorder());
-        layoutGenerator.addLabelWidgetPair("Last Modified By:", lastModifiedBy, panel);
-
-        widgetLayout(9, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(7, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
@@ -223,10 +247,13 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         this.addChangeable(discountRate);
         layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate, panel);
 
-        detail = new TextArea("Details", "", 1, 4);
-        detail.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));//createMatteBorder(1, 1, 1, 1, Color.BLUE));//createLineBorder(Color.BLACK, 1));
-        this.addChangeable(detail);
-        layoutGenerator.addLabelWidgetPair("Details:", detail, panel);
+        lastModifiedBy = new TextField("Last Modified By", 10);
+        changeablesList.addChangeable(lastModifiedBy);
+        lastModifiedBy.setEnabled(false);
+        lastModifiedBy.setOpaque(false);
+        lastModifiedBy.setDisabledTextColor(Color.BLACK);
+        lastModifiedBy.setBorder(BorderFactory.createEmptyBorder());
+        layoutGenerator.addLabelWidgetPair("Last Modified By:", lastModifiedBy, panel);
 
         widgetLayout(7, 2, 5, 5, 10, 10, layoutGenerator, panel);
 

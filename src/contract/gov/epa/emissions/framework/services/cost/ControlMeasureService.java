@@ -51,6 +51,8 @@ public interface ControlMeasureService extends EMFService {
 
     EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException;
 
+    EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String Filter) throws EmfException;
+
     int addEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException;
 
     void removeEfficiencyRecord(int efficiencyRecordId) throws EmfException;

@@ -162,7 +162,6 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     private void doSave() {
         try {
             presenter.doSave();
-            disposeView();
             resetChanges();
         } catch (EmfException e) {
             showError(e.getMessage());

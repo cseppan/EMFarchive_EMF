@@ -311,7 +311,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     }
 
     private EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException {
-        return cmService.getEfficiencyRecords(controlMeasureId);
+        return cmService.getEfficiencyRecords(controlMeasureId, 100, "");
     }
 
     public void refresh(ControlMeasure measure) {

@@ -263,6 +263,20 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
+    public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter) throws EmfException {
+        try {
+//            List all = dao.getEfficiencyRecords(controlMeasureId, 100, "", new EmfDbServer());
+//            return (EfficiencyRecord[]) all.toArray(new EfficiencyRecord[0]);
+            return dao.getEfficiencyRecords(controlMeasureId, 100, "", new EmfDbServer());
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve control measure efficiency records.", e);
+            throw new EmfException("Could not retrieve control measures efficiency records.");
+        } catch (Exception e) {
+            LOG.error("Could not retrieve control measure efficiency records.", e);
+            throw new EmfException("Could not retrieve control measures efficiency records.");
+        } 
+    }
+
     public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
