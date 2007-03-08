@@ -117,7 +117,8 @@ public class DataEditorService_MetaDataTest extends ServiceTestCase {
 
         assertEquals("column name should match", cmd[3].getName(), "delete_versions");
         assertEquals("column name should match", cmd[3].getType(), "java.lang.String");
-        assertEquals("column name should match", cmd[3].getSize(), -1);
+//        assertEquals("column name should match", cmd[3].getSize(), -1);
+        assertEquals("column name should match", cmd[3].getSize(), 2147483647);
 
     }
     

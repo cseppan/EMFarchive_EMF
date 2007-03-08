@@ -89,7 +89,7 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
                 .proxy(), dataset, versions, tabViewProxy, (EmfSession) session.proxy());
         expects(newQAStepview, 1, "observe", new Constraint[] { same(cutomViewPresenter) });
         expects(newQAStepview, 1, "display", new Constraint[] { same(dataset), same(programs), eq(versions),
-                same(tabViewProxy) });
+                same(tabViewProxy), same(session.proxy()) });
 
         EditableQATabPresenterImpl presenter = new EditableQATabPresenterImpl(dataset, (EmfSession) session.proxy(),
                 tabViewProxy);
@@ -103,12 +103,6 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         User user = new User();
         QAProgram[] programs = {};
         QAStepResult result = new QAStepResult();
-        Mock view = mock(EditQAStepView.class);
-        expectsOnce(view, "display", new Constraint[] { same(step), same(result), same(programs), same(dataset),
-                same(user), same("") });
-        expects(view, "observe");
-        expectsOnce(view, "setMostRecentUsedFolder", "");
-
         Mock qaService = mock(QAService.class);
         expects(qaService, 1, "getQAPrograms", programs);
         qaService.expects(once()).method("getQAStepResult").with(same(step)).will(returnValue(result));
@@ -117,6 +111,11 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
 
         stub(session, "user", user);
         setPreferences(session);
+        Mock view = mock(EditQAStepView.class);
+        expectsOnce(view, "display", new Constraint[] { same(step), same(result), same(programs), same(dataset),
+                same(""), same(session.proxy()) });
+        expects(view, "observe");
+        expectsOnce(view, "setMostRecentUsedFolder", "");
 
         EditableQATabPresenterImpl presenter = new EditableQATabPresenterImpl(dataset, (EmfSession) session.proxy(),
                 null);

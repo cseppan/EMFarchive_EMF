@@ -40,9 +40,8 @@ public class QAStepTemplatesPanelPresenterTest extends EmfMockObjectTestCase {
 
         QAStepTemplate template = new QAStepTemplate();
         Mock editor = mock(EditQAStepTemplateView.class);
-
         expects(editor, 1, "observe", new IsInstanceOf(EditQAStepTemplatesPresenter.class));
-        expects(editor, 1, "display", new Constraint[] { same(type), same(programs), same(template) });
+        expects(editor, 1, "display", new Constraint[] { same(type), same(programs), same(template), same(session.proxy()) });
 
         presenter.doEdit((EditQAStepTemplateView) editor.proxy(), template);
     }

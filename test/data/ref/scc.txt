@@ -3,4 +3,4 @@ SCC,SCC_Description
 10100102,External Combustion Boilers;Electric Generation;Anthracite Coal;Traveling Grate (Overfeed) Stoker
 10100201,External Combustion Boilers;Electric Generation;Bituminous/Subbituminous Coal;Pulverized Coal: Wet Bottom (Bituminous Coal)
 10100202,"External Combustion Boilers;Electric ,,Generation;Bituminous/Subbituminous Coal;Pulverized Coal: Dry Bottom (Bituminous Coal)"
-10100203
+10100203,

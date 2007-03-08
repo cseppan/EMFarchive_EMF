@@ -114,7 +114,7 @@ public class LoggingServiceTest extends ServiceTestCase {
             logService.setAccessLog(alog2);
 
             String folderName = logService.getLastExportedFileName(datasetFromDB.getId());
-            assertEquals("folderPath2", folderName);
+            assertEquals("folderPath1", folderName);
         } finally {
             remove(alog1);
             remove(alog2);
