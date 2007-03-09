@@ -549,6 +549,7 @@ public class CaseServiceImpl implements CaseService {
     private Case copySingleCaseObj(Case toCopy) throws Exception {
         Case copied = (Case)DeepCopy.copy(toCopy);
         copied.setName("Copy of " + toCopy.getName() + " " + new Date().getTime());
+        copied.setTemplateUsed(toCopy.getName());
         Case loaded = addCopiedCase(copied);
         copyCaseInputs(toCopy.getId(), loaded.getId());
         

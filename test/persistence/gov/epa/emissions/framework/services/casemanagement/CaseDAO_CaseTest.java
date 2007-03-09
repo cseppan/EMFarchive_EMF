@@ -14,13 +14,14 @@ import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SectorCriteria;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
+import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUse;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,8 +36,15 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
 
     private CaseDAO dao;
 
+    private UserServiceImpl userService;
+
+    private CaseService service;
+
     protected void doSetUp() throws Exception {
+        HibernateSessionFactory sessionFactory = sessionFactory(configFile());
         dao = new CaseDAO();
+        service = new CaseServiceImpl(sessionFactory);
+        userService = new UserServiceImpl(sessionFactory);
     }
 
     protected void doTearDown() {// no op
@@ -111,14 +119,15 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         Case element = new Case("test" + Math.random());
         Abbreviation abbreviation = new Abbreviation("test" + Math.random());
         add(abbreviation);
-        element.setAbbreviation((Abbreviation)dao.getAbbreviations(session).get(0));
+        List abbrs = dao.getAbbreviations(session);
+        element.setAbbreviation((Abbreviation) abbrs.get(abbrs.size() - 1));
 
         add(element);
 
         session.clear();
         try {
             List list = dao.getCases(session);
-            assertEquals(abbreviation, ((Case) list.get(0)).getAbbreviation());
+            assertEquals(abbreviation, ((Case) list.get(list.size()-1)).getAbbreviation());
         } finally {
             remove(element);
             remove(abbreviation);
@@ -151,17 +160,17 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         input.setSubdirObj(subdir);
         add(element);
         session.clear();
-        
+
         try {
             List list = dao.getCases(session);
-            Case loadedCase = (Case)list.get(0);
+            Case loadedCase = (Case) list.get(list.size() - 1);
             input.setCaseID(loadedCase.getId());
             add(input);
             session.clear();
-            
+
             List inputs = dao.getCaseInputs(loadedCase.getId(), session);
-            assertEquals(input, inputs.get(0));
-            assertEquals(subdir, ((CaseInput)inputs.get(0)).getSubdirObj());
+            assertEquals(input, inputs.get(inputs.size() - 1));
+            assertEquals(subdir, ((CaseInput) inputs.get(inputs.size() - 1)).getSubdirObj());
             assertEquals(1, inputs.size());
         } finally {
             remove(input);
@@ -173,11 +182,11 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
     public void testShouldThrowExceptionWhenAnCaseInputHasSameSectorProgramInputname() {
         Case element = new Case("test" + Math.random());
         InputName inputname = new InputName("test input name");
-        CaseProgram program = new CaseProgram("test case program" );
-        Sector sector = new Sector("" , "test sector");
+        CaseProgram program = new CaseProgram("test case program");
+        Sector sector = new Sector("", "test sector");
         CaseInput inputOne = new CaseInput();
         CaseInput inputTwo = new CaseInput();
-        
+
         add(inputname);
         add(program);
         add(sector);
@@ -188,12 +197,12 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         inputTwo.setInputName(inputname);
         inputTwo.setProgram(program);
         inputTwo.setSector(sector);
-        
+
         session.clear();
-        
+
         try {
             List list = dao.getCases(session);
-            Case loadedCase = (Case)list.get(0);
+            Case loadedCase = (Case) list.get(0);
             inputOne.setCaseID(loadedCase.getId());
             inputTwo.setCaseID(loadedCase.getId());
             add(inputOne);
@@ -431,90 +440,65 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
     }
 
     public void testShouldDeepCopyACaseWithAllAttributesFilled() throws Exception {
-        Case toCopy = new Case("test" + Math.random());
+        String caseToCopyName = "test" + Math.random();
+        Case toCopy = new Case(caseToCopyName);
+
         Abbreviation abbr = new Abbreviation();
-        abbr.setId(0);
         abbr.setName("test" + Math.random());
+        add(abbr);
 
         ModelToRun model2Run = new ModelToRun();
-        model2Run.setId(0);
         model2Run.setName("test" + Math.random());
+        add(model2Run);
 
         AirQualityModel airModel = new AirQualityModel();
-        airModel.setId(0);
         airModel.setName("test" + Math.random());
+        add(airModel);
 
         CaseCategory cat = new CaseCategory();
-        cat.setId(0);
         cat.setName("test" + Math.random());
+        add(cat);
 
         EmissionsYear emisYear = new EmissionsYear();
-        emisYear.setId(0);
         emisYear.setName("test" + Math.random());
+        add(emisYear);
 
         Grid grid = new Grid();
-        grid.setId(0);
         grid.setName("test" + Math.random());
+        add(grid);
 
         MeteorlogicalYear metYear = new MeteorlogicalYear();
-        metYear.setId(0);
         metYear.setName("test" + Math.random());
+        add(metYear);
 
         Speciation spec = new Speciation();
-        spec.setId(0);
         spec.setName("test" + Math.random());
+        add(spec);
 
         Project proj = new Project();
-        proj.setId(0);
         proj.setName("test" + Math.random());
+        add(proj);
 
         Mutex lock = new Mutex();
         lock.setLockDate(new Date());
         lock.setLockOwner("emf");
 
         Region modRegion = new Region();
-        modRegion.setId(0);
         modRegion.setName("test" + Math.random());
+        add(modRegion);
 
         Region contrlRegion = new Region();
-        contrlRegion.setId(0);
         contrlRegion.setName("test" + Math.random());
+        add(contrlRegion);
 
-        User owner = new User();
-        owner.setAccountDisabled(false);
-        owner.setAdmin(true);
-        owner.setAffiliation("test");
-        owner.setEmail("abc@test.com");
-        owner.setEncryptedPassword("ja;sdfklj12");
-        owner.setId(0);
-        owner.setLockDate(new Date());
-        owner.setLockOwner("emf");
-        owner.setName("emf");
-        owner.setPassword("sadfasdf12");
-        owner.setPhone("999-123-4567");
-        owner.setUsername("emf");
-
-        User modBy = new User();
-        modBy.setAccountDisabled(false);
-        modBy.setAdmin(true);
-        modBy.setAffiliation("test");
-        modBy.setEmail("abc@test.com");
-        modBy.setEncryptedPassword("ja;sdfklj12");
-        modBy.setId(0);
-        modBy.setLockDate(new Date());
-        modBy.setLockOwner("emf");
-        modBy.setName("emf");
-        modBy.setPassword("sadfasdf12");
-        modBy.setPhone("999-123-4567");
-        modBy.setUsername("emf");
+        User owner = userService.getUser("emf");
 
         GridResolution gridResltn = new GridResolution();
-        gridResltn.setId(0);
         gridResltn.setName("test" + Math.random());
+        add(gridResltn);
 
         SectorCriteria crit = new SectorCriteria();
         crit.setCriteria("new rule");
-        crit.setId(0);
         crit.setType("new type");
 
         List<SectorCriteria> criteriaList = new ArrayList<SectorCriteria>();
@@ -522,37 +506,45 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
 
         SectorCriteria[] criteriaArray = new SectorCriteria[] { crit };
 
-        Sector sector = new Sector();
-        sector.setDescription("description");
-        sector.setId(0);
-        sector.setLockDate(new Date());
-        sector.setLockOwner("emf");
-        sector.setName("test" + Math.random());
-        sector.setSectorCriteria(criteriaList);
-        sector.setSectorCriteria(criteriaArray);
+        Sector dssector = new Sector();
+        dssector.setDescription("description");
+        dssector.setLockDate(new Date());
+        dssector.setLockOwner("emf");
+        dssector.setName("test" + Math.random());
+        dssector.setSectorCriteria(criteriaList);
+        dssector.setSectorCriteria(criteriaArray);
+        add(dssector);
+
+        Sector casesector = new Sector();
+        casesector.setDescription("description");
+        casesector.setLockDate(new Date());
+        casesector.setLockOwner("emf");
+        casesector.setName("test" + Math.random());
+        casesector.setSectorCriteria(criteriaList);
+        casesector.setSectorCriteria(criteriaArray);
+        add(casesector);
 
         IntendedUse use = new IntendedUse();
-        use.setId(0);
         use.setName("test" + Math.random());
+        add(use);
 
         Country country = new Country();
-        country.setId(0);
         country.setName("test" + Math.random());
+        add(country);
 
         Keyword keyword = new Keyword();
-        keyword.setId(0);
         keyword.setName("test" + Math.random());
+        add(keyword);
 
         KeyVal keyval = new KeyVal();
-        keyval.setId(1);
         keyval.setKeyword(keyword);
         keyval.setListindex(0);
         keyval.setValue("test string");
 
         QAProgram qaprog = new QAProgram();
-        qaprog.setId(0);
         qaprog.setName("test" + Math.random());
         qaprog.setRunClassName("run class name");
+        add(qaprog);
 
         QAStepTemplate qatemplate = new QAStepTemplate();
         qatemplate.setDescription("description");
@@ -568,7 +560,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         dstype.setDescription("description");
         dstype.setExporterClassName("sdf.sadf.name");
         dstype.setExternal(false);
-        dstype.setId(0);
         dstype.setImporterClassName("importer.class.name");
         dstype.setKeyVals(new KeyVal[] { keyval });
         dstype.setLockDate(new Date());
@@ -577,6 +568,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         dstype.setMinFiles(1);
         dstype.setName("test type");
         dstype.setQaStepTemplates(new QAStepTemplate[] { qatemplate });
+        add(dstype);
 
         InternalSource internalSrc = new InternalSource();
         internalSrc.setCols(new String[] { "col one" });
@@ -595,12 +587,11 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         dataset.setAccessedDateTime(new Date());
         dataset.setCountry(country);
         dataset.setCreatedDateTime(new Date());
-        dataset.setCreator("emf123");
+        dataset.setCreator("emf");
         dataset.setDatasetType(dstype);
         dataset.setDefaultVersion(0);
         dataset.setDescription("description");
         dataset.setExternalSources(new ExternalSource[] { externalSrc });
-        dataset.setId(0);
         dataset.setIntendedUse(use);
         dataset.setInternalSources(new InternalSource[] { internalSrc });
         dataset.setKeyVals(new KeyVal[] { keyval });
@@ -610,7 +601,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         dataset.setName("test" + Math.random());
         dataset.setProject(proj);
         dataset.setRegion(modRegion);
-        dataset.setSectors(new Sector[] { sector });
+        dataset.setSectors(new Sector[] { dssector });
         dataset.setStartDateTime(new Date());
         dataset.setStatus("copied");
         dataset.setStopDateTime(new Date());
@@ -618,42 +609,31 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         dataset.setTemporalResolution("resolutation");
         dataset.setUnits("unit ton");
         dataset.setYear(1999);
+        add(dataset);
 
         InputEnvtVar envtVar = new InputEnvtVar();
-        envtVar.setId(0);
         envtVar.setName("test" + Math.random());
+        add(envtVar);
 
         Version version = new Version();
         version.setCreator(owner);
         version.setDatasetId(0);
         version.setFinalVersion(true);
-        version.setId(0);
         version.setLastModifiedDate(new Date());
         version.setLockDate(new Date());
         version.setLockOwner("emf");
         version.setName("test" + Math.random());
         version.setPath("path|path|path");
         version.setVersion(0);
+        add(version);
 
         InputName inputName = new InputName();
-        inputName.setId(0);
         inputName.setName("test" + Math.random());
+        add(inputName);
 
         CaseProgram caseProg = new CaseProgram();
-        caseProg.setId(0);
         caseProg.setName("test" + Math.random());
-
-        CaseInput input = new CaseInput();
-        input.setDataset(dataset);
-        input.setDatasetType(dstype);
-        input.setEnvtVars(envtVar);
-        input.setInputName(inputName);
-        input.setProgram(caseProg);
-        input.setId(0);
-        input.setRequired(true);
-        input.setSector(sector);
-        input.setShow(true);
-        input.setVersion(version);
+        add(caseProg);
 
         toCopy.setAbbreviation(abbr);
         toCopy.setAirQualityModel(airModel);
@@ -669,7 +649,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         toCopy.setGrid(grid);
         toCopy.setGridDescription("grid description");
         toCopy.setGridResolution(gridResltn);
-        toCopy.setId(0);
         toCopy.setInputFileDir("input/file/dir");
         toCopy.setIsFinal(true);
         toCopy.setLastModifiedBy(owner);
@@ -680,21 +659,74 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         toCopy.setMeteorlogicalYear(metYear);
         toCopy.setModel(model2Run);
         toCopy.setModelingRegion(modRegion);
-        toCopy.setName("test to be copied");
         toCopy.setNumEmissionsLayers(1);
         toCopy.setNumMetLayers(1);
         toCopy.setOutputFileDir("output/file/dir");
         toCopy.setProject(proj);
         toCopy.setRunStatus("copy");
-        toCopy.setSectors(new Sector[] { sector });
+        toCopy.setSectors(new Sector[] { casesector });
         toCopy.setSpeciation(spec);
         toCopy.setStartDate(new Date());
         toCopy.setTemplateUsed("orig");
+        add(toCopy);
 
-        Case coppied = (Case) DeepCopy.copy(toCopy);
-        assertEquals("test to be copied", coppied.getName());
-        assertTrue(coppied.getIsFinal());
-        //assertEquals("emf123", coppied.getCaseInputs()[0].getDataset().getCreator());
+        CaseInput input = new CaseInput();
+        input.setDataset(dataset);
+        input.setDatasetType(dstype);
+        input.setEnvtVars(envtVar);
+        input.setInputName(inputName);
+        input.setProgram(caseProg);
+        input.setRequired(true);
+        input.setSector(casesector);
+        input.setShow(true);
+        input.setVersion(version);
+        input.setCaseID(toCopy.getId());
+        add(input);
+
+        Case loaded = load(toCopy);
+
+        Case coppied = null;
+
+        try {
+            coppied = service.copyCaseObject(new int[] { loaded.getId() })[0];
+            assertTrue(coppied.getName().startsWith("Copy of " + caseToCopyName));
+            assertTrue(coppied.getIsFinal());
+        } finally {
+            CaseInput[] cpInputs = service.getCaseInputs(coppied.getId());
+            remove(input);
+            remove(cpInputs[cpInputs.length - 1]);
+            remove(toCopy);
+            if (coppied != null)
+                remove(coppied);
+            remove(casesector);
+            remove(abbr);
+            remove(model2Run);
+            remove(airModel);
+            remove(cat);
+            remove(emisYear);
+            remove(grid);
+            remove(metYear);
+            remove(spec);
+            remove(gridResltn);
+            remove(internalSrc);
+            remove(externalSrc);
+            remove(keyval);
+            remove(qatemplate);
+            remove(dataset);
+            remove(country);
+            remove(dssector);
+            remove(modRegion);
+            remove(contrlRegion);
+            remove(use);
+            remove(proj);
+            remove(dstype);
+            remove(qaprog);
+            remove(keyword);
+            remove(envtVar);
+            remove(version);
+            remove(inputName);
+            remove(caseProg);
+        }
     }
 
     private Case newCase() {
