@@ -489,7 +489,6 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             
             return files2Return.toArray(new String[0]);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             LOG.error("Could not list files.", e);
             throw new EmfException("Could not list files. " + e.getMessage());
         }
