@@ -477,7 +477,6 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             if (dir == null || dir.trim().length() == 0)
                 dir = System.getProperty("user.dir");
             
-            System.out.println("dir: " + dir);
             File dirFile = new File(dir);
             
             if (!dirFile.isDirectory())
