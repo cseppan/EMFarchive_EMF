@@ -34,7 +34,7 @@ public class ImportPresenter {
     void importDatasets(String directory, String[] files, DatasetType type, ImportView view) throws EmfException {
         importRules.validate(directory, files, type);
         startImportMessage(view);
-        service.importDatasets(user, mapToRemote(directory), files, type);
+        service.importDatasets(user, directory, files, type);
     }
 
     private void startImportMessage(ImportView view) {
@@ -66,20 +66,20 @@ public class ImportPresenter {
         return folder;
     }
 
-    private String mapToRemote(String dir) {
-        return session.preferences().mapLocalInputPathToRemote(dir);
-    }
+//    private String mapToRemote(String dir) {
+//        return session.preferences().mapLocalInputPathToRemote(dir);
+//    }
 
     public void importDataset(String directory, String[] files, DatasetType type, String datasetName, ImportView view)
             throws EmfException {
         importRules.validate(directory, files, type, datasetName);
         startImportMessage(view);
-        service.importDataset(user, mapToRemote(directory), files, type, datasetName);
+        service.importDataset(user, directory, files, type, datasetName);
 
     }
 
     public String[] getFilesFromPatten(String folder, String pattern) throws EmfException {
-        return service.getFilenamesFromPattern(mapToRemote(folder), pattern);
+        return service.getFilenamesFromPattern(folder, pattern);
     }
 
 }

@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.transport;
 
+import java.io.File;
+
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
@@ -83,12 +85,33 @@ public class Mappings {
         call.addParameter("int",qname("int"),cls,ParameterMode.IN);
     }
 
+    public void addFileParam(Call call) {
+        Class cls = File.class;
+        call.addParameter("File",qname("File"),cls,ParameterMode.IN);
+    }
+
     public QName strings() {
         return qname("strings");
     }
 
     public void setReturnType(Call call, QName name) {
         call.setReturnType(name);
+    }
+
+    public void setStringArrayReturnType(Call call) {
+        setReturnType(call, strings());
+    }
+    
+    public void setFileArrayReturnType(Call call) {
+        call.setReturnType(qname("Files"));
+    }
+
+    public void setFileReturnType(Call call) {
+        call.setReturnType(qname("File"));
+    }
+
+    public void setFileSystemViewReturnType(Call call) {
+        call.setReturnType(qname("EmfFileSystemView"));
     }
 
     public void addLongParam(Call call, String id) {

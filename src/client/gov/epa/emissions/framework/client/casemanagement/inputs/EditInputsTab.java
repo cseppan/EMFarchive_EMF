@@ -19,11 +19,13 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
@@ -188,14 +190,21 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
     }
 
     private void selectFolder(JTextField dir, String title) {
-        JFileChooser chooser = new JFileChooser(new File(dir.getText()));
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setDialogTitle("Please select the " + title);
+        String lastFolder = dir.getText();
+        FileChooser chooser = new FileChooser("Select Folder", new EmfFileSystemView(session.dataCommonsService()), this);
+        chooser.setTitle("Please select the " + title);
+        chooser.resetSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        
+        if (dir.getText() != null)
+            chooser.setCurrentDir(lastFolder.trim());
+        
+        File[] file = chooser.choose();
+        if (file == null || file.length == 0)
+            return;
 
-        int option = chooser.showDialog(this, "Select");
-        if (option == JFileChooser.APPROVE_OPTION) {
-            caseObj.setInputFileDir("" + chooser.getSelectedFile());
-            dir.setText("" + chooser.getSelectedFile());
+        if (file[0].isDirectory()) {
+            caseObj.setInputFileDir(file[0].getAbsolutePath());
+            dir.setText(file[0].getAbsolutePath());
         }
     }
 

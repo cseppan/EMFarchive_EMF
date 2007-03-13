@@ -61,14 +61,14 @@ public class ExportPresenterImpl implements ExportPresenter {
             lastFolder = folder;
 
         if (overwrite)
-            services.exportDatasetsWithOverwrite(session.user(), datasets, versions, mapToRemote(folder), purpose);
+            services.exportDatasetsWithOverwrite(session.user(), datasets, versions, folder, purpose);
         else
-            services.exportDatasets(session.user(), datasets, versions, mapToRemote(folder), purpose);
+            services.exportDatasets(session.user(), datasets, versions, folder, purpose);
     }
 
-    private String mapToRemote(String dir) {
-        return session.preferences().mapLocalOutputPathToRemote(dir);
-    }
+//    private String mapToRemote(String dir) {
+//        return session.preferences().mapLocalOutputPathToRemote(dir);
+//    }
 
     private String getDefaultFolder() {
         String folder = session.preferences().outputFolder();

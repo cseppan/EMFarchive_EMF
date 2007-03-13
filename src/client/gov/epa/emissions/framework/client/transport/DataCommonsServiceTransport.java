@@ -314,4 +314,24 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { sourcegrp });
     }
 
+    public String[] getFiles(String dir) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getFiles");
+        call.addStringParam("dir");
+        call.setStringArrayReturnType();
+
+        return (String[])call.requestResponse(new Object[] { dir });
+    }
+
+    public String createNewFolder(String folder) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("createNewFolder");
+        call.addStringParam("folder");
+        call.setStringReturnType();
+
+        return (String)call.requestResponse(new Object[] { folder });
+    }
+
 }

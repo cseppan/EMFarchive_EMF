@@ -10,12 +10,15 @@ import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
@@ -47,6 +50,8 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
     private ManageChangeables changeables;
 
     private TextField outputDir;
+    
+    private EmfSession session;
 
     public EditOutputsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager) {
@@ -60,12 +65,13 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
         super.setLayout(new BorderLayout());
     }
 
-    public void display(Case caseObj, EditOutputsTabPresenter presenter) {
+    public void display(Case caseObj, EditOutputsTabPresenter presenter, EmfSession session) {
         super.removeAll();
         outputDir.setText(caseObj.getOutputFileDir());
         super.add(createLayout(new CaseInput[0], presenter, parentConsole), BorderLayout.CENTER);
         this.caseObj = caseObj;
         this.presenter = presenter;
+        this.session = session;
     }
 
     private void doRefresh(CaseInput[] inputs) {
@@ -130,14 +136,21 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
     }
 
     private void selectFolder(JTextField dir, String title) {
-        JFileChooser chooser = new JFileChooser(new File(dir.getText()));
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setDialogTitle("Please select the " + title);
+        String lastFolder = dir.getText();
+        FileChooser chooser = new FileChooser("Select Folder", new EmfFileSystemView(session.dataCommonsService()), this);
+        chooser.resetSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setTitle("Please select the " + title);
+        
+        if (dir.getText() != null)
+            chooser.setCurrentDir(lastFolder.trim());
+        
+        File[] file = chooser.choose();
+        if (file == null || file.length == 0)
+            return;
 
-        int option = chooser.showDialog(this, "Select");
-        if (option == JFileChooser.APPROVE_OPTION) {
-            caseObj.setOutputFileDir("" + chooser.getSelectedFile());
-            dir.setText("" + chooser.getSelectedFile());
+        if (file[0].isDirectory()) {
+            caseObj.setOutputFileDir(file[0].getAbsolutePath());
+            dir.setText(file[0].getAbsolutePath());
         }
     }
 

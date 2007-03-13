@@ -506,6 +506,13 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldReturnAnArrayOfFiles() throws EmfException {
+        String[] files = service.getFiles("C:\\");
+//        for (int i = 0; i < files.length; i++)
+//            System.out.println("Files from C:[" + i + "] " + files[i].getAbsolutePath());
+        assertTrue(files.length > 0);
+    }
+
     private EmfDataset newDataset() {
         Random rando = new Random();
         long id = Math.abs(rando.nextInt());

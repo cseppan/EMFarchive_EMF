@@ -105,16 +105,16 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
             if (overwrite)
                 services.exportDatasetsWithOverwrite(session.user(), new EmfDataset[] { datasets[i] },
-                        new Version[] { versions[i] }, mapToRemote(folders[i]), purpose);
+                        new Version[] { versions[i] }, folders[i], purpose);
             else
                 services.exportDatasets(session.user(), new EmfDataset[] { datasets[i] },
-                        new Version[] { versions[i] }, mapToRemote(folders[i]), purpose);
+                        new Version[] { versions[i] }, folders[i], purpose);
         }
     }
 
-    private String mapToRemote(String dir) {
-        return session.preferences().mapLocalOutputPathToRemote(dir);
-    }
+//    private String mapToRemote(String dir) {
+//        return session.preferences().mapLocalOutputPathToRemote(dir);
+//    }
 
     public CaseInput[] getCaseInput(int caseId) throws EmfException {
         return service().getCaseInputs(caseId);

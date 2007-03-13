@@ -270,7 +270,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         // model
         EmfDataset[] emfDatasets = getNonExternalDatasets(getSelectedDatasets());
 
-        ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager);
+        ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager, session);
         getDesktopPane().add(exportView);
 
         ExportPresenter exportPresenter = new ExportPresenterImpl(session);

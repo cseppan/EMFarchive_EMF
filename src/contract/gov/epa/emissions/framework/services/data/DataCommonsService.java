@@ -80,4 +80,8 @@ public interface DataCommonsService {
     SourceGroup[] getSourceGroups() throws EmfException;
     void addSourceGroup(SourceGroup sourcegrp) throws EmfException;
     
+    String[] getFiles(String dir) throws EmfException;
+    
+    String createNewFolder(String folder) throws EmfException;
+    
 }

@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
@@ -181,9 +182,11 @@ public class ImportInputPanel extends JPanel {
     }
 
     private void selectFile() {
-        FileChooser chooser = new FileChooser("Select File", new File(folder.getText()), ImportInputPanel.this);
+        FileChooser chooser = new FileChooser("Select File", new EmfFileSystemView(service), ImportInputPanel.this);
         chooser.setTitle("Select a " + datasetTypesModel.getSelectedItem().toString() + " File");
+        chooser.setCurrentDir(folder.getText().trim());
         File[] files = chooser.choose();
+        
         if (files.length == 0)
             return;
 
@@ -236,7 +239,7 @@ public class ImportInputPanel extends JPanel {
     }
 
     public String[] files() {
-        List names = new ArrayList();
+        List<String> names = new ArrayList<String>();
         int lines = filenames.getLineCount();
         try {
             for (int i = 0; i < lines; i++) {
@@ -249,11 +252,11 @@ public class ImportInputPanel extends JPanel {
         } catch (Exception e) {
             messagePanel.setError(e.getMessage());
         }
-        return (String[]) names.toArray(new String[0]);
+        return names.toArray(new String[0]);
     }
 
-    private List removeEmptyFileNams(List files) {
-        List nonEmptyList = new ArrayList();
+    private List<String> removeEmptyFileNams(List files) {
+        List<String> nonEmptyList = new ArrayList<String>();
         for (int i = 0; i < files.size(); i++) {
             String file = (String) files.get(i);
             if (file.trim().length() != 0) {
@@ -274,6 +277,10 @@ public class ImportInputPanel extends JPanel {
 
     public void setMessage(String message) {
         messagePanel.setMessage(message);
+    }
+
+    public void setErrorMessage(String message) {
+        messagePanel.setError(message);
     }
 
     private void clear() {

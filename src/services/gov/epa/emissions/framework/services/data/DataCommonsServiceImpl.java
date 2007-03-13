@@ -14,6 +14,8 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -465,6 +467,43 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         } catch (RuntimeException e) {
             LOG.error("Could not add new source group.", e);
             throw new EmfException("Source group name already in use");
+        }
+    }
+
+    public String[] getFiles(String dir) throws EmfException {
+        try {
+            List<String> files2Return = new ArrayList<String>();
+            
+            if (dir == null || dir.trim().length() == 0)
+                dir = System.getProperty("user.dir");
+            
+            System.out.println("dir: " + dir);
+            File dirFile = new File(dir);
+            
+            if (!dirFile.isDirectory())
+                return new String[] {dir};
+            
+            File[] files = dirFile.listFiles();
+            
+            for (int i = 0; i < files.length; i++)
+                files2Return.add(files[i].getAbsolutePath());
+            
+            return files2Return.toArray(new String[0]);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            LOG.error("Could not list files.", e);
+            throw new EmfException("Could not list files. " + e.getMessage());
+        }
+    }
+
+    public String createNewFolder(String folder) throws EmfException {
+        try {
+            File dir = new File(folder);
+            dir.mkdirs();
+            return dir.getCanonicalFile().getAbsolutePath();
+        } catch (Exception e) {
+            LOG.error("Could not create new folder " + folder + ". ", e);
+            throw new EmfException("Could not create new folder " + folder + " " + e.getMessage());
         }
     }
 

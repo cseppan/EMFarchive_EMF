@@ -6,9 +6,12 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -40,14 +43,17 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private JCheckBox overwrite;
 
     private TextArea purpose;
-    
+
     private JButton exportButton;
 
-    public ExportWindow(EmfDataset[] datasets, DesktopManager desktopManager) {
+    private DataCommonsService service;
+
+    public ExportWindow(EmfDataset[] datasets, DesktopManager desktopManager, EmfSession session) {
         super(title(datasets), desktopManager);
         super.setName("exportWindow:" + hashCode());
 
         this.datasets = datasets;
+        this.service = session.dataCommonsService();
 
         this.getContentPane().add(createLayout());
         this.pack();
@@ -183,7 +189,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");
-            
+
             exportButton.setEnabled(false);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
@@ -201,9 +207,13 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     }
 
     private void selectFolder() {
-        FileChooser chooser = new FileChooser("Select Folder", new File(folder.getText()), ExportWindow.this);
-
+        String lastFolder = folder.getText();
+        FileChooser chooser = new FileChooser("Select Folder", new EmfFileSystemView(service), ExportWindow.this);
         chooser.setTitle("Select a folder");
+        
+        if (folder.getText() != null)
+            chooser.setCurrentDir(lastFolder.trim());
+
         File[] file = chooser.choose();
         if (file == null || file.length == 0)
             return;
