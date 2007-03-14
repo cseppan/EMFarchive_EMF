@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
@@ -279,7 +280,7 @@ public class ControlMeasureDAO {
     public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter, EmfDbServer DbServer) throws EmfException {
         try {
             RetrieveEfficiencyRecord retrieveEfficiencyRecord = new RetrieveEfficiencyRecord(controlMeasureId, DbServer);
-            return retrieveEfficiencyRecord.getEfficiencyRecords();
+            return retrieveEfficiencyRecord.getEfficiencyRecords(recordLimit, filter);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
@@ -296,5 +297,23 @@ public class ControlMeasureDAO {
 
     public void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord, Session session) {
         hibernateFacade.saveOrUpdate(efficiencyRecord, session);
+    }
+
+    public ControlMeasure[] getSummaryControlMeasures(DbServer DbServer) throws EmfException {
+        try {
+            RetrieveControlMeasure retrieveControlMeasure = new RetrieveControlMeasure(DbServer);
+            return retrieveControlMeasure.getControlMeasures();
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+    }
+
+    public ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, DbServer DbServer) throws EmfException {
+        try {
+            RetrieveControlMeasure retrieveControlMeasure = new RetrieveControlMeasure(DbServer);
+            return retrieveControlMeasure.getControlMeasures(majorPollutantId);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
     }
 }

@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -36,12 +37,14 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
 
     private NewCMSummaryTab cMSummaryTabView;
     //private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
+    private CostYearTable costYearTable;
 
-    public NewControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager) {
+    public NewControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager, CostYearTable costYearTable) {
         super("New Control Measure", new Dimension(770, 475), desktopManager);
         this.desktopManager = desktopManager;
         this.session = session;
         this.parent = parent;
+        this.costYearTable = costYearTable;
     }
 
     public void display(ControlMeasure measure) {
@@ -76,7 +79,9 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
     }
 
     private JPanel createSCCTab(ControlMeasure measure, MessagePanel messagePanel) {
-        ControlMeasureSccTabView view = new EditableCMSCCTab(measure, session,this, messagePanel, parent);
+        ControlMeasureSccTabView view = new EditableCMSCCTab(measure, session,
+                this, messagePanel, 
+                parent, presenter);
         presenter.set(view);
         return (JPanel) view;
     }
@@ -85,7 +90,7 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
         ControlMeasureEfficiencyTab view = new ControlMeasureEfficiencyTab(measure, this, 
                 parent, session, 
                 desktopManager, messagePanel, 
-                this, presenter);
+                this, presenter, costYearTable);
         presenter.set(view);
         
         return view;
@@ -167,8 +172,8 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
         // NOTE Auto-generated method stub
     }
 
-    public void notifyModifed(ControlMeasure measure) {
-        cMSummaryTabView.populateLastModifiedFields();
+    public void notifyModified() {
+        presenter.doModify();
     }
     
 }

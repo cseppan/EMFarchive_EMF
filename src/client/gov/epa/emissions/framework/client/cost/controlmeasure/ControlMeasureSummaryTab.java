@@ -25,7 +25,6 @@ import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.util.Date;
 
@@ -128,11 +127,6 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         dateReviewed.setText(formatDateReviewed());
         dataSources.setText(getText(measure.getDataSouce()));
         sectorsWidget.setSectors(measure.getSectors());
-    }
-
-    protected void populateLastModifiedFields() {
-        lastModifiedTime.setText(EmfDateFormat.format_YYYY_MM_DD_HH_MM(measure.getLastModifiedTime()));
-        lastModifiedBy.setText(measure.getLastModifiedBy() + "");
     }
 
     private String formatDateReviewed() {
@@ -261,7 +255,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         return container;
     }
 
-    private Component createRightPanel() {
+    private JPanel createRightPanel() {
         JPanel container = new JPanel(new BorderLayout());
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -446,4 +440,12 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         this.measure = measure;
     }
 
+    public void modify() {
+        populateLastModifiedFields();
+    }
+
+    private void populateLastModifiedFields() {
+        lastModifiedTime.setText(EmfDateFormat.format_YYYY_MM_DD_HH_MM(new Date()));
+        lastModifiedBy.setText(session.user().getName());
+    }
 }

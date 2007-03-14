@@ -5,14 +5,15 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 public class NewEfficiencyRecordWindow extends EfficiencyRecordWindow implements NewEfficiencyRecordView {
 
     private NewEfficiencyRecordPresenter presenter;
 
-    public NewEfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager, EmfSession session) {
-        super("Add Efficiency Record", changeablesList, desktopManager,session);
+    public NewEfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager, EmfSession session, CostYearTable costYearTable) {
+        super("Add Efficiency Record", changeablesList, desktopManager,session, costYearTable);
     }
 
     public void display(ControlMeasure measure, EfficiencyRecord record) {

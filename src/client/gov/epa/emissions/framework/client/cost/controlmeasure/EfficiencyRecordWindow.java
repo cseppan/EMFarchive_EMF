@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
@@ -28,11 +29,15 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.text.DecimalFormat;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
@@ -86,12 +91,19 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     protected TextField lastModifiedBy;
 
+    protected CostYearTable costYearTable;
+    
+    protected JLabel refYrCostPerTon;
+
+    protected final int refYear = 2000;
+
     public EfficiencyRecordWindow(String title, ManageChangeables changeablesList, DesktopManager desktopManager,
-            EmfSession session) {
+            EmfSession session, CostYearTable costYearTable) {
         super(title, new Dimension(650, 425), desktopManager);
         this.changeablesList = changeablesList;
         this.session = session;
         this.verifier = new NumberFieldVerifier("");
+        this.costYearTable = costYearTable;
     }
 
     public abstract void save();
@@ -126,26 +138,28 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         JPanel panel = new JPanel(new BorderLayout());
 
         JPanel container = new JPanel();
-        JPanel pollutantContainer = new JPanel(new SpringLayout());
-        JPanel pollutantCenterPanel = new JPanel();
+//        JPanel pollutantContainer = new JPanel(new SpringLayout());
+//        JPanel pollutantCenterPanel = new JPanel();
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        try {
-            allPollutants = session.dataCommonsService().getPollutants();
-            pollutant = new ComboBox("Select One", allPollutants);
-            pollutant.setPreferredSize(new Dimension(113, 20));
-        } catch (EmfException e) {
-            messagePanel.setError("Could not retrieve Pollutants");
-        }
-        this.addChangeable(pollutant);
-        layoutGenerator.addLabelWidgetPair("Pollutant:*", pollutant, pollutantContainer);
-
-        widgetLayout(1, 2, 5, 5, 10, 10, layoutGenerator, pollutantContainer);
-
+//        try {
+//            allPollutants = session.dataCommonsService().getPollutants();
+//            pollutant = new ComboBox("Select One", allPollutants);
+//            pollutant.setPreferredSize(new Dimension(113, 20));
+//        } catch (EmfException e) {
+//            messagePanel.setError("Could not retrieve Pollutants");
+//        }
+//        this.addChangeable(pollutant);
+//        layoutGenerator.addLabelWidgetPair("Pollutant:*", pollutant, pollutantContainer);
+//
+//        widgetLayout(1, 2, 5, 5, 10, 10, layoutGenerator, pollutantContainer);
+//
         container.add(LeftRecordPanel());
         container.add(RightRecordPanel());
-        pollutantCenterPanel.add(pollutantContainer, BorderLayout.CENTER);
-        panel.add(pollutantCenterPanel, BorderLayout.NORTH);
+//        container.add(LeftRecordPanel(), BorderLayout.WEST);
+//        container.add(RightRecordPanel(), BorderLayout.EAST);
+//        pollutantCenterPanel.add(pollutantContainer, BorderLayout.CENTER);
+//        panel.add(pollutantCenterPanel, BorderLayout.NORTH);
         panel.add(container, BorderLayout.CENTER);//LINE_START);
 
         JPanel detailContainer = new JPanel(new SpringLayout());
@@ -179,6 +193,16 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 //        this.addChangeable(pollutant);
 //        layoutGenerator.addLabelWidgetPair("Pollutant:*", pollutant, panel);
 
+        try {
+            allPollutants = session.dataCommonsService().getPollutants();
+            pollutant = new ComboBox("Select One", allPollutants);
+            pollutant.setPreferredSize(new Dimension(113, 20));
+        } catch (EmfException e) {
+            messagePanel.setError("Could not retrieve Pollutants");
+        }
+        this.addChangeable(pollutant);
+        layoutGenerator.addLabelWidgetPair("Pollutant:*", pollutant, panel);
+
         locale = new TextField("Locale", 10);
         this.addChangeable(locale);
         layoutGenerator.addLabelWidgetPair("Locale:", locale, panel);
@@ -196,24 +220,48 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         layoutGenerator.addLabelWidgetPair("Existing NEI Device Code:", existingdevCode, panel);
 
         costYear = new TextField("Cost Year", 10);
+//        editor.addFocusListener(new FocusAdapter() {
+//            public void focusLost(FocusEvent e) {
+        costYear.addFocusListener(new FocusAdapter() {
+            public void focusLost(FocusEvent e) {
+                try {
+                    refreshRefYrCostPerTon();
+                } catch (EmfException e1) {
+                    messagePanel.setError("Could not update reference year cost per ton");
+                }
+            }
+        });
         this.addChangeable(costYear);
         layoutGenerator.addLabelWidgetPair("Cost Year:*", costYear, panel);
 
         costperTon = new TextField("Cost Per Ton Reduced", 10);
+        costperTon.addFocusListener(new FocusAdapter() {
+            public void focusLost(FocusEvent e) {
+                try {
+                    refreshRefYrCostPerTon();
+                } catch (EmfException e1) {
+                    messagePanel.setError("Could not update reference year cost per ton");
+                }
+            }
+        });
         this.addChangeable(costperTon);
         layoutGenerator.addLabelWidgetPair("Cost Per Ton Reduced:*", costperTon, panel);
 
-        lastModifiedTime = new TextField("Last Modified Time", 10);
-        changeablesList.addChangeable(lastModifiedTime);
-        lastModifiedTime.setEnabled(false);
-        lastModifiedTime.setOpaque(false);
-        lastModifiedTime.setDisabledTextColor(Color.BLACK);
-        lastModifiedTime.setBorder(BorderFactory.createEmptyBorder());
-        layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
+        refYrCostPerTon = new JLabel("");
+        layoutGenerator.addLabelWidgetPair("Ref Yr Cost Per Ton Reduced:", refYrCostPerTon, panel);
 
-        widgetLayout(7, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(8, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
+    }
+
+
+    private void refreshRefYrCostPerTon() throws EmfException {
+        int costYearValue = verifier.parseInteger(costYear);
+        float costPerTonValue = verifier.parseFloat(costperTon);
+        costYearTable.setTargetYear(refYear);
+        DecimalFormat currency = new DecimalFormat("#0.00"); 
+        refYrCostPerTon.setText(currency.format(costPerTonValue * costYearTable.factor(costYearValue)));
     }
 
     private Component RightRecordPanel() {
@@ -255,7 +303,15 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         lastModifiedBy.setBorder(BorderFactory.createEmptyBorder());
         layoutGenerator.addLabelWidgetPair("Last Modified By:", lastModifiedBy, panel);
 
-        widgetLayout(7, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        lastModifiedTime = new TextField("Last Modified Time", 10);
+        changeablesList.addChangeable(lastModifiedTime);
+        lastModifiedTime.setEnabled(false);
+        lastModifiedTime.setOpaque(false);
+        lastModifiedTime.setDisabledTextColor(Color.BLACK);
+        lastModifiedTime.setBorder(BorderFactory.createEmptyBorder());
+        layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
+
+        widgetLayout(8, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
@@ -296,6 +352,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         saveEfficiency(efficiency);
         saveCostYear();
         saveCostPerTon();
+        record.setRefYrCostPerTon(new Float(refYrCostPerTon.getText()));
         saveLocale();
         saveRuleEffectiveness();
         saveRulePenetration();

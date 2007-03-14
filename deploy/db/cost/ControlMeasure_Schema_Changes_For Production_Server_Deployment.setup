@@ -59,6 +59,14 @@ WITHOUT OIDS;
 ALTER TABLE emf.control_measure_efficiencyrecords ADD COLUMN last_modified_by varchar(255) NOT NULL DEFAULT '',
   ADD COLUMN last_modified_time timestamp NOT NULL DEFAULT now();
   
-  
 -- add new columns to the controlmeasures table...
 ALTER TABLE emf.control_measures ADD COLUMN last_modified_by varchar(255) NOT NULL DEFAULT '';
+
+-- add new columns to the efficiencyrecords table...
+ALTER TABLE emf.control_measure_efficiencyrecords ADD COLUMN ref_yr_cost_per_ton float4 DEFAULT 0;
+
+-- update the ref_yr_cost_per_ton based on the year 2000
+update emf.control_measure_efficiencyrecords 
+set ref_yr_cost_per_ton = cost_per_ton * 9817.0 / CAST(chained_gdp as float)
+from reference.gdplev
+where control_measure_efficiencyrecords.cost_year = gdplev.annual;

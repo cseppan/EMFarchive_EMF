@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.data.AggregatedPollutantEfficiencyRecord;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
@@ -55,6 +56,7 @@ public class ControlMeasure implements Lockable, Serializable {
     private List sccs;
 
     private List efficiencyRecords;
+    private List aggregatedPollutantEfficiencyRecords;
 
     private List sectors;
     private String lastModifiedBy;
@@ -63,6 +65,7 @@ public class ControlMeasure implements Lockable, Serializable {
         this.lock = new Mutex();
         this.sccs = new ArrayList();
         this.efficiencyRecords = new ArrayList();
+        this.aggregatedPollutantEfficiencyRecords = new ArrayList();
         this.sectors = new ArrayList();
     }
 
@@ -279,6 +282,22 @@ public class ControlMeasure implements Lockable, Serializable {
 
     public String getLastModifiedBy() {
         return lastModifiedBy;
+    }
+
+    public AggregatedPollutantEfficiencyRecord[] getAggregatedPollutantEfficiencyRecords() {
+        return (AggregatedPollutantEfficiencyRecord[]) aggregatedPollutantEfficiencyRecords.toArray(new AggregatedPollutantEfficiencyRecord[0]);
+    }
+
+    public void setAggregatedPollutantEfficiencyRecords(AggregatedPollutantEfficiencyRecord[] aggregatedPollutantEfficiencyRecords) {
+        this.aggregatedPollutantEfficiencyRecords = Arrays.asList(aggregatedPollutantEfficiencyRecords);
+    }
+
+    public void addAggregatedPollutantEfficiencyRecord(AggregatedPollutantEfficiencyRecord aggregatedPollutantEfficiencyRecord) {
+        aggregatedPollutantEfficiencyRecords.add(aggregatedPollutantEfficiencyRecord);
+    }
+
+    public void addSector(Sector sector) {
+        sectors.add(sector);
     }
 
 }

@@ -44,6 +44,8 @@ public class EfficiencyRecord implements Serializable {
     private String lastModifiedBy;
     private Date lastModifiedTime;
 
+    private float refYrCostPerTon;
+
     public float getCapRecFactor() {
         return capRecFactor;
     }
@@ -216,6 +218,14 @@ public class EfficiencyRecord implements Serializable {
 
     public Date getLastModifiedTime() {
         return lastModifiedTime;
+    }
+
+    public void setRefYrCostPerTon(float refYrCostPerTon) {
+        this.refYrCostPerTon = refYrCostPerTon;
+    }
+
+    public float getRefYrCostPerTon() {
+        return refYrCostPerTon;
     }
 
 }

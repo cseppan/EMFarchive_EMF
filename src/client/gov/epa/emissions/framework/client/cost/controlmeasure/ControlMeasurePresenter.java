@@ -11,6 +11,8 @@ public interface ControlMeasurePresenter {
 
     void doSave() throws EmfException;
 
+    void doModify();
+
     void doRefresh(ControlMeasure controlMeasure);
 
     void set(ControlMeasureTabView effTabView);

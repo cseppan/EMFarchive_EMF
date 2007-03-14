@@ -234,4 +234,21 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
 
         call.requestResponse(new Object[] { efficiencyRecord });
     }
+
+    public ControlMeasure[] getSummaryControlMeasures() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getSummaryControlMeasures");
+        call.setReturnType(mappings.controlMeasures());
+        return (ControlMeasure[]) call.requestResponse(new Object[] { });
+    }
+
+    public ControlMeasure[] getSummaryControlMeasures(int majorPollutantId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getSummaryControlMeasures");
+        call.addIntegerParam("majorPollutantId");
+        call.setReturnType(mappings.controlMeasures());
+        return (ControlMeasure[]) call.requestResponse(new Object[] { new Integer(majorPollutantId) });
+    }
 }

@@ -54,9 +54,7 @@ public class NewEfficiencyRecordPresenter extends EfficiencyRecordPresenter {
     }
 
     public void add(EfficiencyRecord record) throws EmfException {
-        cmService.addEfficiencyRecord(record);
-        measure.setLastModifiedTime(new Date());
-        measure.setLastModifiedBy(session.user().getName());
+        record.setId(cmService.addEfficiencyRecord(record));
         parentView.add(record);
     }
 }

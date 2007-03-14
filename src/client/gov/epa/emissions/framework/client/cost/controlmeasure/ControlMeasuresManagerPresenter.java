@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.client.cost.controlmeasure.io.CMExportWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
@@ -22,9 +23,15 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
     private ControlMeasuresManagerView view;
 
     private EmfSession session;
+    private CostYearTable costYearTable;
 
     public ControlMeasuresManagerPresenter(EmfSession session) {
         this.session = session;
+        try {
+            this.costYearTable = populateCostYearTable();
+        } catch (EmfException e) {
+            //
+        }
     }
 
     public void doDisplay(ControlMeasuresManagerView view) throws EmfException {
@@ -40,7 +47,7 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
 
     public void doRefresh() throws EmfException {
         view.clearMessage();
-        view.refresh(service().getMeasures());
+        view.refresh(service().getSummaryControlMeasures());
     }
 
     private ControlMeasureService service() {
@@ -49,14 +56,14 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
 
     public void doEdit(EmfConsole parent, ControlMeasure measure, DesktopManager desktopManager) throws EmfException {
         
-        ControlMeasureView editor = new EditControlMeasureWindow(parent, session, desktopManager);
+        ControlMeasureView editor = new EditControlMeasureWindow(parent, session, desktopManager, costYearTable);
         ControlMeasurePresenter presenter = new EditorControlMeasurePresenterImpl(
                 measure, editor, session, this);
         presenter.doDisplay();
     }
 
     public void doCreateNew(EmfConsole parent, ControlMeasure measure, DesktopManager desktopManager) throws EmfException {
-        ControlMeasureView window = new NewControlMeasureWindow(parent, session, desktopManager);
+        ControlMeasureView window = new NewControlMeasureWindow(parent, session, desktopManager, costYearTable);
         ControlMeasurePresenter presenter = new NewControlMeasurePresenterImpl(
                 measure, window, session, this);
         presenter.doDisplay();
@@ -121,11 +128,18 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
     public ControlMeasure[] getControlMeasures(Pollutant pollutant) throws EmfException {
         if (pollutant.getName().equalsIgnoreCase("Select one"))
             return new ControlMeasure[0];
-        
+
         if (pollutant.getName().equals("ALL"))
-            return service().getMeasures();
-        
-        return service().getMeasures(pollutant);
+            return service().getSummaryControlMeasures();
+
+        return service().getSummaryControlMeasures(pollutant.getId());
     }
 
+    public CostYearTable getCostYearTable() {
+        return costYearTable;
+    }
+
+    private CostYearTable populateCostYearTable() throws EmfException {
+        return session.controlMeasureService().getCostYearTable(1999);
+    }
 }

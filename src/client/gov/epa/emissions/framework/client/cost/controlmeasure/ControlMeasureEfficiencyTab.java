@@ -2,18 +2,23 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -22,14 +27,18 @@ import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 
 public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasureEfficiencyTabView, Runnable {
 
@@ -56,13 +65,19 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     private EfficiencyRecord[] efficiencyRecords = {};
     private volatile Thread populateThread;
     private ControlMeasureService cmService;
-    private ControlMeasureView controlMeasureView;
-
     private ControlMeasurePresenter controlMeasurePresenter;
+
+//    private TextArea sortOrder; 
+    private TextArea rowFilter; 
+    private TextField recordLimit; 
+
+    private CostYearTable costYearTable;
+    int _recordLimit = 100;
+    String _rowFilter = "";
     
     public ControlMeasureEfficiencyTab(ControlMeasure measure, ManageChangeables changeablesList, EmfConsole parent,
             EmfSession session, DesktopManager desktopManager, MessagePanel messagePanel, ControlMeasureView editControlMeasureWindowView,
-            ControlMeasurePresenter controlMeasurePresenter) {
+            ControlMeasurePresenter controlMeasurePresenter, CostYearTable costYearTable) {
         this.mainPanel = new JPanel(new BorderLayout());
         this.parentConsole = parent;
         this.changeablesList = changeablesList;
@@ -70,8 +85,8 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         this.session = session;
         this.messagePanel = messagePanel;
         this.measure = measure;
-        this.controlMeasureView = editControlMeasureWindowView;
         this.controlMeasurePresenter = controlMeasurePresenter;
+        this.costYearTable = costYearTable;
         doLayout(measure);
         cmService = session.controlMeasureService();
         this.populateThread = new Thread(this);
@@ -79,29 +94,28 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     }
 
     public void run() {
-        if (measure.getId() != 0) {
-            try {
+        try {
+            if (measure.getId() != 0) {
                 messagePanel.setMessage("Please wait while retrieving all efficiency records...");
                 setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                try {
-                    efficiencyRecords = getEfficiencyRecords(measure.getId());
-                } catch (Exception e) {
-                    messagePanel.setError(e.getMessage());
-                }        
-                doLayout(measure);
+                efficiencyRecords = getEfficiencyRecords(measure.getId());
+//                doLayout(measure);
+                updateMainPanel(efficiencyRecords);                
                 messagePanel.clear();
-                setCursor(Cursor.getDefaultCursor());
-            } catch (Exception e) {
-                messagePanel.setError("Cannot retrieve all efficiency records.");
             }
+        } catch (Exception e) {
+            messagePanel.setError("Cannot retrieve all efficiency records.  " + e.getMessage());
+        } finally  {
+            setCursor(Cursor.getDefaultCursor());
+            this.populateThread = null;
         }
-        this.populateThread = null;
     }
 
     private void doLayout(ControlMeasure measure) {
         updateMainPanel(efficiencyRecords);
 
         setLayout(new BorderLayout());
+        add(sortFilterPanel(), BorderLayout.NORTH);
         add(mainPanel, BorderLayout.CENTER);
         add(controlPanel(), BorderLayout.SOUTH);
     }
@@ -113,8 +127,8 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         mainPanel.validate();
     }
 
-    private void initModel(EfficiencyRecord[] costRecords) {
-        tableData = new ControlMeasureEfficiencyTableData(costRecords);
+    private void initModel(EfficiencyRecord[] records) {
+        tableData = new ControlMeasureEfficiencyTableData(records);
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
     }
@@ -243,9 +257,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
                     messagePanel.setMessage("Could not remove efficiency records: " + e.getMessage());
                 }
             }
-            measure.setLastModifiedTime(new Date());
-            measure.setLastModifiedBy(session.user().getName());
-            controlMeasureView.notifyModifed(measure);
+            modify();
             tableData.remove(records);
             refreshPanel();
         }
@@ -253,7 +265,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
 
     protected void doAdd() {
         messagePanel.clear();
-        NewEfficiencyRecordView view = new NewEfficiencyRecordWindow(changeablesList, desktopManager, session);
+        NewEfficiencyRecordView view = new NewEfficiencyRecordWindow(changeablesList, desktopManager, session, costYearTable);
         NewEfficiencyRecordPresenter presenter = new NewEfficiencyRecordPresenter(this, view, session, measure);
         
         presenter.display(measure);
@@ -266,7 +278,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
 
     private void doEdit(EfficiencyRecord record) {
         messagePanel.clear();
-        EditEfficiencyRecordView view = new EditEfficiencyRecordWindow(changeablesList, desktopManager, session);
+        EditEfficiencyRecordView view = new EditEfficiencyRecordWindow(changeablesList, desktopManager, session, costYearTable);
         EditEfficiencyRecordPresenter presenter = new EditEfficiencyRecordPresenter(this, view, session, measure);
         presenter.display(measure, record);
     }
@@ -286,19 +298,18 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
 
     public void save(ControlMeasure measure) {
         messagePanel.clear();
-        measure.setEfficiencyRecords(tableData.sources());
+//        measure.setEfficiencyRecords(tableData.sources());
     }
 
     public void add(EfficiencyRecord record) {
         tableData.add(record);
         refreshPanel();
-        measure.setLastModifiedTime(record.getLastModifiedTime());
-        measure.setLastModifiedBy(record.getLastModifiedBy());
-        controlMeasureView.notifyModifed(measure);
+        modify();
     }
 
     public void update(EfficiencyRecord record) {
-        //Not needed right now...
+        refreshPanel();
+        modify();
     }
 
     public void refresh() {
@@ -311,10 +322,148 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     }
 
     private EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException {
-        return cmService.getEfficiencyRecords(controlMeasureId, 100, "");
+        return cmService.getEfficiencyRecords(controlMeasureId, _recordLimit, _rowFilter);
     }
 
     public void refresh(ControlMeasure measure) {
         this.measure = measure;
+    }
+
+    public void modify() {
+        controlMeasurePresenter.doModify();
+    }
+    
+
+    private JPanel sortFilterPanel() {
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setLayout(new BorderLayout(5, 5));
+
+        JPanel container = new JPanel(new BorderLayout(5, 5));
+//        container.setLayout(new GridLayout(2, 1, 5, 5));
+
+        container.add(recordLimitPanel(), BorderLayout.NORTH);
+        container.add(rowFilterPanel(), BorderLayout.CENTER);
+
+        panel.add(container, BorderLayout.CENTER);
+//        panel.add(sortFilterPanel(), BorderLayout.CENTER);
+        panel.add(sortFilterControlPanel(), BorderLayout.EAST);
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        return panel;
+    }
+
+    private JPanel sortFilterControlPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        JPanel actionPanel = new JPanel(new GridLayout(3, 1));
+        init(actionPanel);
+        panel.add(actionPanel);
+
+        return panel;
+    }
+
+    private JPanel recordLimitPanel() {
+        JPanel container = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        recordLimit = new TextField("recordLimit", 10);
+        recordLimit.setToolTipText(_recordLimit + "");
+        recordLimit.setText(_recordLimit + "");
+        layoutGenerator.addLabelWidgetPair("Row Limit ", recordLimit, panel);
+
+        widgetLayout(1, 2, 5, 5, 4, 4, layoutGenerator, panel);
+        container.add(panel, BorderLayout.NORTH);
+        return container;
+    }
+
+    private JPanel rowFilterPanel() {
+        JPanel container = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        rowFilter = new TextArea("rowFilter", "", 25, 2);
+        rowFilter.setToolTipText(_rowFilter);
+        ScrollableComponent scrollPane = new ScrollableComponent(rowFilter);
+        scrollPane.setPreferredSize(new Dimension(550, 55));
+        layoutGenerator.addLabelWidgetPair("Row Filter ", scrollPane, panel);
+
+        widgetLayout(1, 2, 5, 5, 4, 4, layoutGenerator, panel);
+        container.add(panel, BorderLayout.NORTH);
+        return container;
+    }
+
+//    private JPanel sortOrderPanel() {
+//        JPanel panel = new JPanel(new BorderLayout());
+//
+//        panel.add(new Label("Sort Order "), BorderLayout.WEST);
+//        sortOrder = new TextArea("sortOrder", "", 25, 2);
+//        sortOrder.setToolTipText(sortOrder.getText());
+//        panel.add(ScrollableComponent.createWithVerticalScrollBar(sortOrder), BorderLayout.CENTER);
+//
+//        return panel;
+//    }
+
+//    private JPanel rowFilterPanel() {
+//        JPanel panel = new JPanel(new BorderLayout());
+//
+//        panel.add(new Label("Row Filter  "), BorderLayout.WEST);
+//        rowFilter = new TextArea("rowFilter", "", 25, 2);
+//        rowFilter.setToolTipText(rowFilter.getText());
+//        panel.add(ScrollableComponent.createWithVerticalScrollBar(rowFilter), BorderLayout.CENTER);
+//
+//        return panel;
+//    }
+
+    public void init(JPanel actionPanel) {
+        Button apply = new Button("Apply", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                applySortFilter();
+            }
+        });
+        apply.setToolTipText("Apply the Row Filter constraints to the table");
+        actionPanel.add(new JLabel(""));
+        actionPanel.add(apply);
+        actionPanel.add(new JLabel(""));
+    }
+
+//    private void doApplyConstraints(final TablePresenter presenter) {
+//        try {
+//            String rowFilterValue = rowFilter.getText().trim();
+//            String sortOrderValue = sortOrder.getText().trim();
+//            presenter.doApplyConstraints(rowFilterValue, sortOrderValue);
+//
+//            if (rowFilterValue.length() == 0)
+//                rowFilterValue = "No filter";
+//            String sortMessage = sortOrderValue;
+//            if (sortMessage.length() == 0)
+//                sortMessage = "No sort";
+//
+//            messagePanel.setMessage("Saved any changes and applied Sort '" + sortMessage + "' and Filter '" + rowFilterValue + "'");
+//        } catch (EmfException ex) {
+//            messagePanel.setError(ex.getMessage());
+//        }
+//    }
+
+    private void applySortFilter() {
+        //validate the record limit field...
+        try {
+            _recordLimit = Math.abs(new Integer(recordLimit.getText()));
+        } catch (NumberFormatException ex) {
+            messagePanel.setMessage("The row limit must be a number and must be a positive whole number");
+            return;
+        }
+        _rowFilter = rowFilter.getText();
+        updateMainPanel(new EfficiencyRecord[] {});
+        this.populateThread = new Thread(this);
+        populateThread.start();
+    }
+
+    private void widgetLayout(int rows, int cols, int initX, int initY, int xPad, int yPad,
+            SpringLayoutGenerator layoutGenerator, JPanel panel) {
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(panel, rows, cols, // rows, cols
+                initX, initY, // initialX, initialY
+                xPad, yPad);// xPad, yPad
     }
 }

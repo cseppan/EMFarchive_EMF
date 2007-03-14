@@ -9,4 +9,6 @@ public interface ControlMeasureTabView {
     void save(ControlMeasure measure) throws EmfException;
     
     void refresh(ControlMeasure measure);
+    
+    void modify();
 }

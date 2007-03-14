@@ -25,7 +25,6 @@ import gov.epa.emissions.framework.client.cost.controlmeasure.io.CMImportView;
 import gov.epa.emissions.framework.client.cost.controlmeasure.io.CMImportWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.ui.EmfTableModel;
@@ -83,7 +82,15 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private Pollutant[] pollsFromDB;
 
-    private String[] years = { "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006" };
+    ///////
+    ///////
+    ///////
+    ///////
+    ///////
+    ///////
+    ///////
+//    private String[] years = { "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006" };
+    private String[] years = { "1999", "2000", "2001", "2002", "2003", "2004", "2005" };
 
     private CostYearTable costYearTable;
 
@@ -103,8 +110,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         createPollutantComboBox();
         createAllPollutantsComboBox();
         createYearsComboBox();
-        ControlMeasureService service = session.controlMeasureService();
-        costYearTable = service.getCostYearTable(1999);
+        costYearTable = presenter.getCostYearTable();
         yearValidation = new YearValidation("Cost Year");
 
         doLayout(this.parentConsole, measures);
@@ -500,8 +506,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         return (String)costYear.getSelectedItem();
     }
 
-    private String selectedPollutant() {
-        return ((Pollutant) pollutant.getSelectedItem()).getName();
+    private Pollutant selectedPollutant() {
+        return (Pollutant) pollutant.getSelectedItem();
     }
 
 

@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -28,6 +29,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
 
     protected void doTearDown() throws Exception {// no op
         dropAll(Scc.class);
+        dropAll(EfficiencyRecord.class);
         dropAll(ControlMeasure.class);
     }
 
@@ -63,6 +65,34 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
 
         assertEquals(1, cms.size());
         assertEquals("cm one", ((ControlMeasure) cms.get(0)).getName());
+    }
+
+    public void testShouldGetSummaryControlMeasures() throws Exception {
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
+        cm.setAbbreviation("12345678");
+        cm.setLastModifiedTime(new Date());
+        cm.setLastModifiedBy("Emf User");
+        cm.setMajorPollutant(pm10Pollutant());
+        Scc[] sccs = { new Scc("100232", "") };
+        int cmId = dao.add(cm, sccs, session);
+        System.out.print(cmId);
+        session.flush();
+        EfficiencyRecord record1 = efficiencyRecord(pm10Pollutant(), "22");
+        record1.setControlMeasureId(cmId);
+        record1.setLastModifiedBy("emf");
+        record1.setLastModifiedTime(new Date());
+        dao.addEfficiencyRecord(record1, session);
+        session.flush();
+        EfficiencyRecord record2 = efficiencyRecord(pm10Pollutant(), "22");
+        record2.setControlMeasureId(cmId);
+        record2.setLastModifiedBy("emf");
+        record2.setLastModifiedTime(new Date());
+        dao.addEfficiencyRecord(record2, session);
+
+        ControlMeasure[] cms = dao.getSummaryControlMeasures(dbServer());
+        assertEquals(1, cms.length);
+        assertEquals(1, cms[0].getAggregatedPollutantEfficiencyRecords().length);
     }
 
     public void testShouldUpdateControlMeasure() throws Exception {

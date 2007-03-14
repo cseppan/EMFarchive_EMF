@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,6 +24,8 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
     // private RefreshObserver parent;
 
     private ControlMeasureSccTabView sccTabView;
+    
+    private ControlMeasureTabView summaryTabView;
 
     public EditorControlMeasurePresenterImpl(ControlMeasure measure, ControlMeasureView view, EmfSession session,
             RefreshObserver parent) {
@@ -70,6 +73,7 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
     }
 
     public void set(ControlMeasureTabView summary) {
+        this.summaryTabView = summary;
         ControlMeasureTabPresenterImpl tabPresenter = new ControlMeasureTabPresenterImpl(summary);
         presenters.add(tabPresenter);
     }
@@ -87,6 +91,12 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
 
     public void doRefresh(ControlMeasure controlMeasure) {
         this.measure = controlMeasure;
+    }
+
+    public void doModify() {
+        measure.setLastModifiedBy(session.user().getName());
+        measure.setLastModifiedTime(new Date());
+        summaryTabView.modify();
     }
 
 }

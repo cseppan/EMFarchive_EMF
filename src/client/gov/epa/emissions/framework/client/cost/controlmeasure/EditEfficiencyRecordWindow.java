@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 
@@ -13,8 +14,8 @@ public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implement
     private EditEfficiencyRecordPresenter presenter;
 
     public EditEfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager,
-            EmfSession session) {
-        super("Edit Efficiency Record", changeablesList, desktopManager, session);
+            EmfSession session, CostYearTable costYearTable) {
+        super("Edit Efficiency Record", changeablesList, desktopManager, session, costYearTable);
     }
 
     public void display(ControlMeasure measure, EfficiencyRecord record) {
@@ -28,6 +29,7 @@ public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implement
         efficiency.setText(record.getEfficiency() + "");
         costYear.setText(record.getCostYear() + "");
         costperTon.setText(record.getCostPerTon() + "");
+        refYrCostPerTon.setText(record.getRefYrCostPerTon() + "");
         locale.setText(record.getLocale());
         ruleEffectiveness.setText(record.getRuleEffectiveness() + "");
         rulePenetration.setText(record.getRulePenetration() + "");
@@ -38,7 +40,7 @@ public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implement
         measureAbbreviation.setText(record.getExistingMeasureAbbr());
         existingdevCode.setText(record.getExistingDevCode() + "");
         lastModifiedBy.setText(record.getLastModifiedBy() + "");
-        lastModifiedTime.setText(EmfDateFormat.format_MM_DD_YYYY(record.getLastModifiedTime()));
+        lastModifiedTime.setText(EmfDateFormat.format_MM_DD_YYYY_HH_mm(record.getLastModifiedTime()));
     }
 
     public void save() {

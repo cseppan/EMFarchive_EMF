@@ -207,6 +207,19 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         assertEquals(0,load(Scc.class).size());
     }
 
+    public void testShouldGetSummaryControlMeasures() throws Exception {
+        ControlMeasure[] cms = service.getSummaryControlMeasures();
+
+        try {
+            assertTrue(cms.length == 1);
+//            assertEquals(1, cm2.getSccs().length);
+//            assertEquals("Known", cm2.getCmClass().getName());
+//            assertEquals(new Float(120), new Float(cm2.getEquipmentLife()));
+        } finally {
+//            remove(cm);
+        }
+    }
+
     private List load(Class clazz) {
         session.clear();// flush cached objects
 

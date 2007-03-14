@@ -47,15 +47,18 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
     private Scc[] sccs = {};
     private volatile Thread populateThread;
     private ControlMeasure measure;
+    private ControlMeasurePresenter controlMeasurePresenter;
 
     public EditableCMSCCTab(ControlMeasure measure, EmfSession session, ManageChangeables changeables,
-            MessagePanel messagePanel, EmfConsole parent) {
+            MessagePanel messagePanel, EmfConsole parent,
+            ControlMeasurePresenter controlMeasurePresenter) {
         this.parent = parent;
         this.messagePanel = messagePanel;
         this.session = session;
         this.parent = parent;
         this.measure = measure;
         this.changeables = changeables;
+        this.controlMeasurePresenter = controlMeasurePresenter;
         mainPanel = new JPanel(new BorderLayout());
         doLayout(measure, changeables);
         this.populateThread = new Thread(this);
@@ -169,6 +172,7 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
             SortFilterSelectionPanel panel = sortFilterPanel();
             mainPanel.removeAll();
             mainPanel.add(panel);
+            modify();
         }
     }
 
@@ -197,14 +201,26 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
         SortFilterSelectionPanel panel = sortFilterPanel();
         mainPanel.removeAll();
         mainPanel.add(panel);
+        modify();
     }
 
     public Scc[] sccs() {
+        List sccsList = tableData.rows();
+        sccs = new Scc[sccsList.size()];
+        for (int i = 0; i < sccsList.size(); i++) {
+            ViewableRow row = (ViewableRow) sccsList.get(i);
+            Scc scc = (Scc) row.source();
+            sccs[i] = new Scc(scc.getCode(), "");
+        }
         return sccs;
     }
 
     public void refresh(ControlMeasure measure) {
         this.measure = measure;
+    }
+
+    public void modify() {
+        controlMeasurePresenter.doModify();
     }
 
 }
