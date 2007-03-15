@@ -10,11 +10,15 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileInfo;
+import gov.epa.emissions.framework.services.basic.EmfFileSerializer;
+import gov.epa.emissions.framework.services.basic.EmfServerFileSystemView;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -494,14 +498,64 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public String createNewFolder(String folder) throws EmfException {
+    public EmfFileInfo createNewFolder(String folder) throws EmfException {
         try {
-            File dir = new File(folder);
-            dir.mkdirs();
-            return dir.getCanonicalFile().getAbsolutePath();
+            EmfServerFileSystemView fsv = new EmfServerFileSystemView();
+            File newfolder = fsv.createNewFolder(new File(folder));
+            
+            return EmfFileSerializer.convert(newfolder);
         } catch (Exception e) {
             LOG.error("Could not create new folder " + folder + ". ", e);
             throw new EmfException("Could not create new folder " + folder + " " + e.getMessage());
+        }
+    }
+
+    public EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir) throws EmfException {
+        try {
+            if (dir == null) {
+                EmfServerFileSystemView fsv = new EmfServerFileSystemView();
+                return getFileInfosList(fsv.getHomeDirectory());
+            }
+            
+            File dirFile = EmfFileSerializer.convert(dir);
+            
+            if (!dirFile.isDirectory())
+                return new EmfFileInfo[] {dir};
+            
+            return getFileInfosList(dirFile);
+        } catch (Exception e) {
+            LOG.error("Could not list files.", e);
+            throw new EmfException("Could not list files. " + e.getMessage());
+        }
+    }
+
+    private EmfFileInfo[] getFileInfosList(File dirFile) throws IOException {
+        List<EmfFileInfo> files2Return = new ArrayList<EmfFileInfo>();
+        File[] files = dirFile.listFiles();
+        
+        for (int i = 0; i < files.length; i++)
+            files2Return.add(EmfFileSerializer.convert(files[i]));
+        
+        return files2Return.toArray(new EmfFileInfo[0]);
+    }
+
+    public EmfFileInfo getDefaultDir() throws EmfException {
+        try {
+            EmfServerFileSystemView fsv = new EmfServerFileSystemView();
+            return EmfFileSerializer.convert(fsv.getDefaultDirectory());
+        } catch (IOException e) {
+            LOG.error("Could not get default directory.", e);
+            throw new EmfException("Could not get get default directory.");
+        }
+    }
+
+    public EmfFileInfo getHomeDir() throws EmfException {
+        try {
+            EmfServerFileSystemView fsv = new EmfServerFileSystemView();
+            return EmfFileSerializer.convert(fsv.getHomeDirectory());
+        } catch (IOException e) {
+            LOG.error("Could not get home directory.", e);
+            throw new EmfException("Could not get home directory.");
         }
     }
 

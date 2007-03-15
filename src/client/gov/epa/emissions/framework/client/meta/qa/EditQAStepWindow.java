@@ -21,6 +21,7 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.data.QAPrograms;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -47,6 +48,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -92,14 +94,17 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private Button saveButton;
 
-   private JCheckBox currentTable;
+    private JCheckBox currentTable;
     
-   public EditQAStepWindow(DesktopManager desktopManager) {
+    private EmfSession session;
+   
+    public EditQAStepWindow(DesktopManager desktopManager) {
         super("Edit QA Step", new Dimension(650, 625), desktopManager);
     }
 
     public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset, String versionName,
             EmfSession session) {
+        this.session = session;
         this.step = step;
         this.qaStepResult = qaStepResult;
         this.user = session.user();
@@ -235,26 +240,27 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 selectFolder();
             }
         });
-        JPanel folderPanel = new JPanel(new BorderLayout(10, 10));
-        folderPanel.add(exportFolder);
-        folderPanel.add(button, BorderLayout.EAST);
+        JPanel folderPanel = new JPanel(new BorderLayout(2, 10));
+        folderPanel.add(exportFolder, BorderLayout.LINE_START);
+        folderPanel.add(button, BorderLayout.LINE_END);
         return folderPanel;
     }
 
     private void selectFolder() {
-        FileChooser chooser = new FileChooser("Select Folder", new File(exportFolder.getText()), this);
-
-        chooser.setTitle("Select a folder");
+        String lastFolder = exportFolder.getText();
+        FileChooser chooser = new FileChooser("Select Folder", new EmfFileSystemView(session.dataCommonsService()), this);
+        chooser.setTitle("Please select the export folder");
+        chooser.resetSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        
+        if (lastFolder != null && !lastFolder.trim().isEmpty())
+            chooser.setCurrentDir(lastFolder.trim());
+        
         File[] file = chooser.choose();
         if (file == null || file.length == 0)
             return;
 
         if (file[0].isDirectory()) {
             exportFolder.setText(file[0].getAbsolutePath());
-        }
-
-        if (file[0].isFile()) {
-            exportFolder.setText(file[0].getParent());
         }
     }
 

@@ -11,29 +11,59 @@ import javax.swing.filechooser.FileSystemView;
 
 public class EmfFileSystemView extends FileSystemView implements Serializable {
     private DataCommonsService service;
-    
-    public EmfFileSystemView (DataCommonsService service) {
+
+    public EmfFileSystemView(DataCommonsService service) {
         super();
         this.service = service;
     }
 
     public File[] getFiles(File dir, boolean useFileHiding) {
         try {
-            String[] files = service.getFiles(dir.getAbsolutePath());
-            File[] files2Return = new File[files.length];
+
+            EmfFileInfo fileInfo = null;
+
+            if (dir != null)
+                fileInfo = EmfFileSerializer.convert(dir);
+
+            EmfFileInfo[] fileInfos = service.getEmfFileInfos(fileInfo);
             
-            for (int i = 0; i < files.length; i++)
-                files2Return[i] = new File(files[i]);
-            
-            return files2Return;
-        } catch (EmfException e) {
+            return getEmfFiles(fileInfos);
+        } catch (Exception e) {
             return new File[0];
         }
     }
-    
+
+    private File[] getEmfFiles(EmfFileInfo[] fileInfos) {
+        File[] files = new File[fileInfos.length];
+
+        for (int i = 0; i < files.length; i++)
+            files[i] = EmfFileSerializer.convert(fileInfos[i]);
+        return files;
+    }
+
     public File createNewFolder(File folder) throws IOException {
-        String newFolder = service.createNewFolder(folder.getAbsolutePath());
-        return new File(newFolder);
+        EmfFileInfo newFolder = service.createNewFolder(folder.getAbsolutePath());
+        return EmfFileSerializer.convert(newFolder);
+    }
+
+    public File getDefaultDirectory() {
+        try {
+            EmfFileInfo defaultDir = service.getDefaultDir();
+
+            return EmfFileSerializer.convert(defaultDir);
+        } catch (EmfException e) {
+            return null;
+        }
+    }
+
+    public File getHomeDirectory() {
+        try {
+            EmfFileInfo homeDir = service.getHomeDir();
+            
+            return EmfFileSerializer.convert(homeDir);
+        } catch (EmfException e) {
+            return null;
+        }
     }
 
 }

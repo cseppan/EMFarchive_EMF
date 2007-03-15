@@ -151,6 +151,10 @@
 	
 	<!-- Structs (Java Beans-style)-->
 	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.basic.EmfFileSystemView"
+		qname="ns1:EmfFileSystemView" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.commons.io.ColumnMetaData"
 		qname="ns1:ColumnMetaData" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
@@ -336,6 +340,15 @@
 	<arrayMapping qname="ns1:LightControlMeasures" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.LightControlMeasure[]"
 		innerType="ns1:LightControlMeasure"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.basic.EmfFileInfo"
+		qname="ns1:EmfFileInfo" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<arrayMapping qname="ns1:EmfFileInfos" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.basic.EmfFileInfo[]"
+		innerType="ns1:EmfFileInfo"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 		
 	<!-- CASE MANAGEMENT -->

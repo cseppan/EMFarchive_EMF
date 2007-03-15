@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.editor.Revision;
 
@@ -82,6 +83,12 @@ public interface DataCommonsService {
     
     String[] getFiles(String dir) throws EmfException;
     
-    String createNewFolder(String folder) throws EmfException;
+    EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir) throws EmfException;
+    
+    EmfFileInfo createNewFolder(String folder) throws EmfException;
+
+    EmfFileInfo getDefaultDir() throws EmfException;
+    
+    EmfFileInfo getHomeDir() throws EmfException;
     
 }

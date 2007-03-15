@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.IntendedUse;
@@ -324,14 +325,42 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (String[])call.requestResponse(new Object[] { dir });
     }
 
-    public String createNewFolder(String folder) throws EmfException {
+    public EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getEmfFileInfos");
+        call.addParam("dir", mappings.emfFileInfo());
+        call.setReturnType(mappings.emfFileInfos());
+        
+        return (EmfFileInfo[])call.requestResponse(new Object[] { dir });
+    }
+
+    public EmfFileInfo createNewFolder(String folder) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("createNewFolder");
         call.addStringParam("folder");
-        call.setStringReturnType();
+        call.setReturnType(mappings.emfFileInfo());
 
-        return (String)call.requestResponse(new Object[] { folder });
+        return (EmfFileInfo)call.requestResponse(new Object[] { folder });
+    }
+
+    public EmfFileInfo getDefaultDir() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getDefaultDir");
+        call.setReturnType(mappings.emfFileInfo());
+
+        return (EmfFileInfo)call.requestResponse(new Object[] {});
+    }
+
+    public EmfFileInfo getHomeDir() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getHomeDir");
+        call.setReturnType(mappings.emfFileInfo());
+
+        return (EmfFileInfo)call.requestResponse(new Object[] {});
     }
 
 }

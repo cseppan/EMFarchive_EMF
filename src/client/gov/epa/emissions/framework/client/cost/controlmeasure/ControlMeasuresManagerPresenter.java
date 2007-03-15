@@ -80,7 +80,7 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
     }
 
     public void doExport(ControlMeasure[] measures, DesktopManager desktopManager, int totalMeasuers) {
-        CMExportView exportView = new CMExportWindow(measures, desktopManager, totalMeasuers);
+        CMExportView exportView = new CMExportWindow(measures, desktopManager, totalMeasuers, session);
         CMExportPresenter exportPresenter = new CMExportPresenter(session);
         exportPresenter.display(exportView);
     }

@@ -40,12 +40,12 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         for (int i = 0; i < datasets.length; i++) {
             versions[i] = service.getVersion(datasets[i], datasets[i].getDefaultVersion());
         }
-        service.exportDatasetsWithOverwrite(session.user(), datasets, versions, mapToRemote(folder), "Exporting datasets");
+        service.exportDatasetsWithOverwrite(session.user(), datasets, versions, folder, "Exporting datasets");
     }
 
-    private String mapToRemote(String dir) {
-        return session.preferences().mapLocalOutputPathToRemote(dir);
-    }
+//    private String mapToRemote(String dir) {
+//        return session.preferences().mapLocalOutputPathToRemote(dir);
+//    }
 
     public void doAnalyze(String controlStrategyName, EmfDataset[] datasets) throws EmfException {
         if(datasets.length==0){

@@ -65,13 +65,13 @@ public class ImportInputPanel extends JPanel {
         JComboBox datasetTypesComboBox = typesComboBox();
         layoutGenerator.addLabelWidgetPair("Dataset Type", datasetTypesComboBox, this);
 
-        JPanel chooser = new JPanel(new BorderLayout(6,0));
+        JPanel chooser = new JPanel(new BorderLayout(2,0));
         folder = new TextField("folder", 35);
         chooser.add(folder, BorderLayout.LINE_START);
         chooser.add(importFileButton(), BorderLayout.LINE_END);
         layoutGenerator.addLabelWidgetPair("Folder", chooser, this);
 
-        JPanel apply = new JPanel(new BorderLayout(6,0));
+        JPanel apply = new JPanel(new BorderLayout(2,0));
         pattern = new TextField("pattern", 35);
         apply.add(pattern, BorderLayout.LINE_START);
         apply.add(applyPatternButton(), BorderLayout.LINE_END);

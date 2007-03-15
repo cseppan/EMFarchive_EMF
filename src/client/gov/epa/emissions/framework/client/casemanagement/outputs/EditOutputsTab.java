@@ -128,9 +128,9 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
                 selectFolder(dir, title);
             }
         });
-        JPanel folderPanel = new JPanel(new BorderLayout());
-        folderPanel.add(dir);
-        folderPanel.add(browseButton, BorderLayout.EAST);
+        JPanel folderPanel = new JPanel(new BorderLayout(2,0));
+        folderPanel.add(dir,BorderLayout.LINE_START);
+        folderPanel.add(browseButton, BorderLayout.LINE_END);
 
         return folderPanel;
     }
@@ -141,7 +141,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
         chooser.resetSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setTitle("Please select the " + title);
         
-        if (dir.getText() != null)
+        if (lastFolder != null && !lastFolder.trim().isEmpty())
             chooser.setCurrentDir(lastFolder.trim());
         
         File[] file = chooser.choose();

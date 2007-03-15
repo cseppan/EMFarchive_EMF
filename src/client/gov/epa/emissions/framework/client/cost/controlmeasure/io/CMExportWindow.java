@@ -4,11 +4,14 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.ui.FileChooser;
+import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -18,8 +21,10 @@ import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -39,12 +44,15 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
     private JTextField prefix;
     
     private JButton exportButton;
+    
+    private EmfSession session;
 
-    public CMExportWindow(ControlMeasure[] controlMeasures, DesktopManager desktopManager, int totalMeasuers) {
+    public CMExportWindow(ControlMeasure[] controlMeasures, DesktopManager desktopManager, int totalMeasuers, EmfSession session) {
         super(title(controlMeasures, totalMeasuers), desktopManager);
         super.setName("cmExportWindow:" + hashCode());
 
         this.controlMeasures = controlMeasures;
+        this.session = session;
 
         this.getContentPane().add(createLayout());
         this.pack();
@@ -85,9 +93,12 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
                 selectFolder();
             }
         });
-        JPanel folderPanel = new JPanel(new BorderLayout());
-        folderPanel.add(folder);
-        folderPanel.add(button, BorderLayout.EAST);
+        Icon icon = new ImageResources().open("Export a Control Measure");
+        button.setIcon(icon);
+        
+        JPanel folderPanel = new JPanel(new BorderLayout(2,0));
+        folderPanel.add(folder, BorderLayout.LINE_START);
+        folderPanel.add(button, BorderLayout.LINE_END);
         layoutGenerator.addLabelWidgetPair("Folder", folderPanel, panel);
 
         // purpose
@@ -183,20 +194,20 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
     }
 
     private void selectFolder() {
-        FileChooser chooser = new FileChooser("Select Folder", new File(folder.getText()), CMExportWindow.this);
-
-        chooser.setTitle("Select a folder");
-        File[] file = chooser.choose();
-        if (file == null || file.length == 0)
+        String lastFolder = folder.getText();
+        FileChooser chooser = new FileChooser("Select Folder", new EmfFileSystemView(session.dataCommonsService()), this);
+        chooser.resetSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setTitle("Select a folder for export control measures");
+        
+        if (lastFolder != null && !lastFolder.trim().isEmpty())
+            chooser.setCurrentDir(lastFolder.trim());
+        
+        File[] files = chooser.choose();
+        if (files == null || files.length == 0)
             return;
 
-        if (file[0].isDirectory()) {
-            folder.setText(file[0].getAbsolutePath());
-        }
-
-        if (file[0].isFile()) {
-            folder.setText(file[0].getParent());
+        if (files[0].isDirectory()) {
+            folder.setText(files[0].getAbsolutePath());
         }
     }
-
 }

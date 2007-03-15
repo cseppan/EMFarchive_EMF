@@ -7,11 +7,13 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -28,6 +30,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -52,10 +55,13 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private CheckBox inventoryCheckBox;
 
     private Button createButton;
+    
+    private EmfSession session;
 
     public EditControlStrategyOutputTab(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults,
-            MessagePanel messagePanel, DesktopManager desktopManager, EmfConsole parentConsole) {
+            MessagePanel messagePanel, DesktopManager desktopManager, EmfConsole parentConsole, EmfSession session) {
         super.setName("output");
+        this.session = session;
         this.controlStrategy = controlStrategy;
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;
@@ -248,13 +254,18 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     private void selectFolder() {
-        FileChooser chooser = new FileChooser("Select Folder", new File(folder.getText()),
-                EditControlStrategyOutputTab.this);
-
-        chooser.setTitle("Select a folder");
+        String lastFolder = folder.getText();
+        FileChooser chooser = new FileChooser("Select Folder", new EmfFileSystemView(session.dataCommonsService()), this);
+        chooser.resetSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setTitle("Select a folder for export");
+        
+        if (lastFolder != null && !lastFolder.trim().isEmpty())
+            chooser.setCurrentDir(lastFolder.trim());
+        
         File[] files = chooser.choose();
-        if (files == null)
+        if (files == null || files.length == 0)
             return;
+
         if (files.length > 0) {
             if (files[0].isDirectory()) {
                 folder.setText(files[0].getAbsolutePath());

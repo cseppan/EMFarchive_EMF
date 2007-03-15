@@ -4,7 +4,9 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -39,11 +41,14 @@ public class CMImportInputPanel extends JPanel {
     private TextArea filenames;
 
     private TextArea importStatusTextArea;
+    
+    private EmfSession session;
 
     private static File lastFolder = null;
 
-    public CMImportInputPanel(MessagePanel messagePanel) {
+    public CMImportInputPanel(MessagePanel messagePanel, EmfSession session) {
         this.messagePanel = messagePanel;
+        this.session = session;
 
         initialize();
     }
@@ -156,10 +161,15 @@ public class CMImportInputPanel extends JPanel {
     }
 
     private void selectFile() {
-        FileChooser chooser = new FileChooser("Select File", new File(folder.getText()), CMImportInputPanel.this);
+        String lastFolder = folder.getText();
+        FileChooser chooser = new FileChooser("Select Folder", new EmfFileSystemView(session.dataCommonsService()), this);
         chooser.setTitle("Select files for control measures import");
+        
+        if (lastFolder != null && !lastFolder.trim().isEmpty())
+            chooser.setCurrentDir(lastFolder.trim());
+        
         File[] files = chooser.choose();
-        if (files.length == 0)
+        if (files == null || files.length == 0)
             return;
 
         if (files.length > 1) {

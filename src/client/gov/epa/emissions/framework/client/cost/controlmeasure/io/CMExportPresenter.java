@@ -52,14 +52,14 @@ public class CMExportPresenter {
             lastFolder = folder;
 
         if (overwrite)
-            service.exportControlMeasuresWithOverwrite(mapToRemote(folder), prefix, controlMeasureIds, session.user());
+            service.exportControlMeasuresWithOverwrite(folder, prefix, controlMeasureIds, session.user());
         else
-            service.exportControlMeasures(mapToRemote(folder), prefix, controlMeasureIds, session.user());
+            service.exportControlMeasures(folder, prefix, controlMeasureIds, session.user());
     }
 
-    private String mapToRemote(String dir) {
-        return session.preferences().mapLocalOutputPathToRemote(dir);
-    }
+//    private String mapToRemote(String dir) {
+//        return session.preferences().mapLocalOutputPathToRemote(dir);
+//    }
 
     private String getDefaultFolder() {
         String folder = session.preferences().outputFolder();

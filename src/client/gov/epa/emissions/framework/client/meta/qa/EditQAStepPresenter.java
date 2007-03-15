@@ -68,8 +68,7 @@ public class EditQAStepPresenter {
         if (stepResult == null || stepResult.getTable() == null)
             throw new EmfException("You must have run the QA step successfully before exporting ");
 
-        session.qaService().exportQAStep(qaStep, session.user(), mapToRemote(dirName));
-
+        session.qaService().exportQAStep(qaStep, session.user(), dirName);
     }
 
     private String getFolder() {
@@ -84,11 +83,11 @@ public class EditQAStepPresenter {
         return folder;
     }
 
-    private String mapToRemote(String dir) throws EmfException {
-        if (dir == null || dir.trim().length() == 0)
-            throw new EmfException("Please select a directory before export");
-        return session.preferences().mapLocalOutputPathToRemote(dir);
-    }
+//    private String mapToRemote(String dir) throws EmfException {
+//        if (dir == null || dir.trim().length() == 0)
+//            throw new EmfException("Please select a directory before export");
+//        return session.preferences().mapLocalOutputPathToRemote(dir);
+//    }
 
     public String userName() {
         return session.user().getUsername();

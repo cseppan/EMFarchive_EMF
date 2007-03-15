@@ -26,7 +26,7 @@ public class CMImportPresenter {
     void importControlMeasures(String directory, String[] files) throws EmfException {
         importRules.validate(directory, files);
         startImportMessage(view);
-        session.controlMeasureImportService().importControlMeasures(mapToRemote(directory), files, session.user());
+        session.controlMeasureImportService().importControlMeasures(directory, files, session.user());
     }
 
     private void startImportMessage(CMImportView view) {
@@ -54,13 +54,13 @@ public class CMImportPresenter {
         return folder;
     }
 
-    private String mapToRemote(String dir) {
-        return session.preferences().mapLocalInputPathToRemote(dir);
-    }
+//    private String mapToRemote(String dir) {
+//        return session.preferences().mapLocalInputPathToRemote(dir);
+//    }
 
     // TODO: move the getFileNamesFromPattern () to a common service
     public String[] getFilesFromPatten(String folder, String pattern) throws EmfException {
-        return session.eximService().getFilenamesFromPattern(mapToRemote(folder), pattern);
+        return session.eximService().getFilenamesFromPattern(folder, pattern);
     }
 
     public Status[] getImportStatus() throws EmfException {

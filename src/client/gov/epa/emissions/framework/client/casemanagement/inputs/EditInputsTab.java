@@ -182,9 +182,9 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
                 selectFolder(dir, title);
             }
         });
-        JPanel folderPanel = new JPanel(new BorderLayout());
-        folderPanel.add(dir);
-        folderPanel.add(browseButton, BorderLayout.EAST);
+        JPanel folderPanel = new JPanel(new BorderLayout(2,0));
+        folderPanel.add(dir, BorderLayout.LINE_START);
+        folderPanel.add(browseButton, BorderLayout.LINE_END);
 
         return folderPanel;
     }
@@ -195,7 +195,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
         chooser.setTitle("Please select the " + title);
         chooser.resetSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         
-        if (dir.getText() != null)
+        if (lastFolder != null && !lastFolder.trim().isEmpty())
             chooser.setCurrentDir(lastFolder.trim());
         
         File[] file = chooser.choose();
