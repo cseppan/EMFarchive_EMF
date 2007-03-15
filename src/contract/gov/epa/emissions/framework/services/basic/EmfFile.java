@@ -3,12 +3,27 @@ package gov.epa.emissions.framework.services.basic;
 import java.io.File;
 
 public class EmfFile extends File {
+    @SuppressWarnings("hiding")
+    public static String pathSeparator = File.pathSeparator;
+   
+    @SuppressWarnings("hiding")
+    public static char pathSeparatorChar = File.pathSeparatorChar;
+
+    @SuppressWarnings("hiding")
+    public static String separator = File.separator;
+
+    @SuppressWarnings("hiding")
+    public static char separatorChar = File.separatorChar; 
 
     private EmfFileInfo fileInfo;
 
     public EmfFile(EmfFileInfo fileInfo) {
         super(fileInfo.getAbsolutePath());
         this.fileInfo = fileInfo;
+        this.pathSeparator = fileInfo.getPathSeparator();
+        this.pathSeparatorChar = (char)fileInfo.getPathSeparatorChar();
+        this.separator = fileInfo.getSeparator();
+        this.separatorChar = (char)fileInfo.getSeparatorChar();
     }
     
     public String getName() {

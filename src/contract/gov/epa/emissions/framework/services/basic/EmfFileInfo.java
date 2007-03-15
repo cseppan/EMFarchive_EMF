@@ -44,6 +44,14 @@ public class EmfFileInfo implements Serializable {
     
     private String internalString;
     
+    private String pathSeparator;
+
+    private int pathSeparatorChar;
+
+    private String separator;
+
+    private int separatorChar; 
+    
     public EmfFileInfo() {
         //
     }
@@ -214,6 +222,38 @@ public class EmfFileInfo implements Serializable {
 
     public void setInternalString(String internalString) {
         this.internalString = internalString;
+    }
+
+    public String getPathSeparator() {
+        return pathSeparator;
+    }
+
+    public void setPathSeparator(String pathSeparator) {
+        this.pathSeparator = pathSeparator;
+    }
+
+    public int getPathSeparatorChar() {
+        return pathSeparatorChar;
+    }
+
+    public void setPathSeparatorChar(char pathSeparatorChar) {
+        this.pathSeparatorChar = pathSeparatorChar;
+    }
+
+    public String getSeparator() {
+        return separator;
+    }
+
+    public void setSeparator(String separator) {
+        this.separator = separator;
+    }
+
+    public int getSeparatorChar() {
+        return separatorChar;
+    }
+
+    public void setSeparatorChar(char separatorChar) {
+        this.separatorChar = separatorChar;
     }
 
 }

@@ -12,6 +12,10 @@ public class EmfFileSerializer {
     public static EmfFileInfo convert(File file) throws IOException {
         EmfFileInfo fileInfo = new EmfFileInfo();
         
+        fileInfo.setPathSeparator(File.pathSeparator);
+        fileInfo.setPathSeparatorChar(File.pathSeparatorChar);
+        fileInfo.setSeparator(File.separator);
+        fileInfo.setSeparatorChar(File.separatorChar);
         fileInfo.setAbsolute(file.isAbsolute());
         fileInfo.setAbsolutePath(file.getAbsolutePath());
         fileInfo.setCanExecute(file.canExecute());

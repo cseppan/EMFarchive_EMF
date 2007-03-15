@@ -500,6 +500,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     public EmfFileInfo createNewFolder(String folder) throws EmfException {
         try {
+            if (folder == null || folder.trim().isEmpty())
+                return null;
+            
             EmfServerFileSystemView fsv = new EmfServerFileSystemView();
             File newfolder = fsv.createNewFolder(new File(folder));
             

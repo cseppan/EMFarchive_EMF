@@ -42,8 +42,14 @@ public class EmfFileSystemView extends FileSystemView implements Serializable {
     }
 
     public File createNewFolder(File folder) throws IOException {
-        EmfFileInfo newFolder = service.createNewFolder(folder.getAbsolutePath());
-        return EmfFileSerializer.convert(newFolder);
+        try {
+            EmfFileInfo newFolder = service.createNewFolder(folder.getAbsolutePath());
+            return EmfFileSerializer.convert(newFolder);
+        } catch (Exception e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+            throw new IOException("cann't create new folder.");
+        }
     }
 
     public File getDefaultDirectory() {
