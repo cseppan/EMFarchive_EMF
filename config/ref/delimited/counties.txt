@@ -3300,7 +3300,7 @@ US,0,70227,PW,The state of Ngernml,EST,x,,,,,,,,,,,,,,
 US,0,70228,PW,"The state of Ngiwal,",EST,x,,,,,,,,,,,,,,
 US,0,70350,PW,The state of Peleliu,EST,x,,,,,,,,,,,,,,
 US,0,70370,PW,The state of Sonsoro,EST,x,,,,,,,,,,,,,,
-US,0,72001,RQ,Puerto Rico,EST,x,-66.5036,18.2357,5600,-67.8326,-65.3361,17.9058,18.4768,no,no,no,n/a,no,no,no
+US,0,72001,PR,Puerto Rico,EST,x,-66.5036,18.2357,5600,-67.8326,-65.3361,17.9058,18.4768,no,no,no,n/a,no,no,no
 US,0,72003,PR,The municipio of Agu,EST,x,,,,,,,,,,,,,,
 US,0,72005,PR,The municipio of Agu,EST,x,,,,,,,,,,,,,,
 US,0,72007,PR,The municipio of Agu,EST,x,,,,,,,,,,,,,,
