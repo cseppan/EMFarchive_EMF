@@ -8247,7 +8247,6 @@ SCC,SCC_Description
 30900302,Industrial Processes;Fabricated Metal Products;Abrasive Cleaning of Metal Parts;Tumble Cleaning
 30900303,Industrial Processes;Fabricated Metal Products;Abrasive Cleaning of Metal Parts;Polishing
 30900304,Industrial Processes;Fabricated Metal Products;Abrasive Cleaning of Metal Parts;Buffing
-30900500,Industrial Processes;Fabricated Metal Products;Welding;undefined
 30900500,Industrial Processes;Fabricated Metal Products;Welding;General
 30900501,Industrial Processes;Fabricated Metal Products;Welding;Arc Welding: General ** (See 3-09-050)
 30900502,Industrial Processes;Fabricated Metal Products;Welding;Oxyfuel Welding: General ** (See 3-09-044)
@@ -8322,9 +8321,7 @@ SCC,SCC_Description
 30904020,Industrial Processes;Fabricated Metal Products;Metal Deposition Processes;Plasma Arc Spraying of Powdered Metal
 30904030,Industrial Processes;Fabricated Metal Products;Metal Deposition Processes;Tinning: Batch Process
 30904100,Industrial Processes;Fabricated Metal Products;Resistance Welding;General
-30904200,Industrial Processes;Fabricated Metal Products;Brazing;undefined
 30904200,Industrial Processes;Fabricated Metal Products;Brazing;General
-30904300,Industrial Processes;Fabricated Metal Products;Soldering;undefined
 30904300,Industrial Processes;Fabricated Metal Products;Soldering;General
 30904400,Industrial Processes;Fabricated Metal Products;Oxyfuel Welding;General
 30904500,Industrial Processes;Fabricated Metal Products;Thermal Spraying;General
@@ -8372,7 +8369,6 @@ SCC,SCC_Description
 30905500,Industrial Processes;Fabricated Metal Products;Electrogas Welding (EGW);General
 30905600,Industrial Processes;Fabricated Metal Products;Electrostag Welding (ESW);General
 30905800,Industrial Processes;Fabricated Metal Products;Gas Tungsten Arc Welding (GTAW);General
-30905900,Industrial Processes;Fabricated Metal Products;Plasma Arc Welding (PAW);undefined
 30905900,Industrial Processes;Fabricated Metal Products;Plasma Arc Welding (PAW);General
 30906001,Industrial Processes;Fabricated Metal Products;Porcelain Enamel/Ceramic Glaze Spraying;Spray Booth
 30906002,Industrial Processes;Fabricated Metal Products;Porcelain Enamel/Ceramic Glaze Spraying;Ceramic Glaze: Material Handling
