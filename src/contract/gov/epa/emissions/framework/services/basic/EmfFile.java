@@ -26,12 +26,50 @@ public class EmfFile extends File {
         this.separatorChar = (char)fileInfo.getSeparatorChar();
     }
     
+    public EmfFile(String filePath, EmfFileInfo fileInfo) {
+//        C:\dir1\dir2\file
+//        parent= C:\dir1\dir2; parent of this, is C:\dir1        
+        super(fileInfo.getAbsolutePath());
+        String newPath = filePath;
+        // trim any trailing slashes
+        // separatorChar was coming back as 0, and shouldn't be...
+        if  ((filePath.lastIndexOf('\\')==filePath.length()-1) && (filePath.length()>3))
+            newPath=filePath.substring(0,filePath.length()-1);
+        
+        this.fileInfo = fileInfo;
+        this.fileInfo.setAbsolutePath(newPath);
+        System.out.println("newPath ="+newPath+",sep char="+fileInfo.getSeparatorChar());
+        String parentString=filePath.substring(0,newPath.lastIndexOf('\\')+1);
+        if (parentString.equals(newPath)) parentString=null;
+        this.fileInfo.setParent(parentString);
+        System.out.println("parent of "+newPath+"="+fileInfo.getParent());
+        if (this.fileInfo.getParent() != null) 
+        {
+            if (this.fileInfo.getParent().equals(filePath))
+               this.fileInfo.setParent(null);
+        }
+        System.out.println("new parent of "+filePath+"="+fileInfo.getParent());
+        this.pathSeparator = fileInfo.getPathSeparator();
+        this.pathSeparatorChar = (char)fileInfo.getPathSeparatorChar();
+        this.separator = fileInfo.getSeparator();
+        this.separatorChar = (char)fileInfo.getSeparatorChar();
+    }
+
+    
     public String getName() {
         return fileInfo.getName();
     }
     
     public String getParent() {
         return fileInfo.getParent();
+    }
+
+    public File getParentFile() {
+        if (fileInfo.getParent()== null)
+            return null;
+        System.out.println("parent file of "+this.getAbsolutePath()+
+                ", val=" + fileInfo.getParent());
+       return new EmfFile(fileInfo.getParent(), fileInfo);
     }
     
     public String getPath() {
@@ -43,7 +81,7 @@ public class EmfFile extends File {
     }
     
     public File getAbsoluteFile() {
-        return new File(fileInfo.getAbsolutePath());
+        return new EmfFile(fileInfo.getAbsolutePath(), fileInfo);
     }
     
     public String getCanonicalPath() {
@@ -51,7 +89,7 @@ public class EmfFile extends File {
     }
     
     public File getCanonicalFile() {
-        return new File(fileInfo.getCanonicalPath());
+        return new EmfFile(fileInfo.getCanonicalPath(), fileInfo);
     }
     
     public long getFreeSpace() {

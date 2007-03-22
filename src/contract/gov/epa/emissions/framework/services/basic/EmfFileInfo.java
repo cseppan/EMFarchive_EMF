@@ -181,7 +181,7 @@ public class EmfFileInfo implements Serializable {
     }
     
     public String toString() {
-        return this.internalString;
+        return this.name;
     }
 
     public boolean canExecute() {

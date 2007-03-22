@@ -9,11 +9,13 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.ui.FileChooser;
+import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -21,7 +23,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -48,13 +49,17 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private JButton exportButton;
 
+    private EmfConsole parentConsole;
+
     private DataCommonsService service;
 
-    public ExportWindow(EmfDataset[] datasets, DesktopManager desktopManager, EmfSession session) {
+    public ExportWindow(EmfDataset[] datasets, DesktopManager desktopManager, EmfConsole parentConsole,
+            EmfSession session) {
         super(title(datasets), desktopManager);
         super.setName("exportWindow:" + hashCode());
 
         this.datasets = datasets;
+        this.parentConsole = parentConsole;
         this.service = session.dataCommonsService();
 
         this.getContentPane().add(createLayout());
@@ -111,8 +116,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         });
         Icon icon = new ImageResources().open("Export a Dataset");
         button.setIcon(icon);
-        
-        JPanel folderPanel = new JPanel(new BorderLayout(2,0));
+
+        JPanel folderPanel = new JPanel(new BorderLayout(2, 0));
         folderPanel.add(folder, BorderLayout.LINE_START);
         folderPanel.add(button, BorderLayout.LINE_END);
         layoutGenerator.addLabelWidgetPair("Folder", folderPanel, panel);
@@ -213,22 +218,27 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private void selectFolder() {
         String lastFolder = folder.getText();
-        FileChooser chooser = new FileChooser("Select Folder", new EmfFileSystemView(service), ExportWindow.this);
-        chooser.setTitle("Select a folder");
-        
-        if (folder.getText() != null)
-            chooser.setCurrentDir(lastFolder.trim());
+        EmfFileInfo initDir = new EmfFileInfo();
+        initDir.setAbsolute(true);
 
-        File[] file = chooser.choose();
-        if (file == null || file.length == 0)
+        if (lastFolder != null || !lastFolder.isEmpty())
+            initDir.setAbsolutePath(lastFolder);
+        else
+            initDir.setAbsolutePath("/");
+
+        EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(service));
+        int option = chooser.showDialog(parentConsole, "Select a folder");
+
+        EmfFileInfo file = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;
+        if (file == null)
             return;
 
-        if (file[0].isDirectory()) {
-            folder.setText(file[0].getAbsolutePath());
+        if (file.isDirectory()) {
+            folder.setText(file.getAbsolutePath());
         }
 
-        if (file[0].isFile()) {
-            folder.setText(file[0].getParent());
+        if (file.isFile()) {
+            folder.setText(file.getParent());
         }
     }
 

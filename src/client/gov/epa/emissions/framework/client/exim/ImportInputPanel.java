@@ -9,7 +9,6 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
-import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -26,6 +25,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
@@ -182,12 +182,9 @@ public class ImportInputPanel extends JPanel {
     }
 
     private void selectFile() {
-        FileChooser chooser = new FileChooser("Select File", new EmfFileSystemView(service), ImportInputPanel.this);
-        chooser.setTitle("Select a " + datasetTypesModel.getSelectedItem().toString() + " File");
-        chooser.setCurrentDir(folder.getText().trim());
-        File[] files = chooser.choose();
+        File[] files = getSelectedFiles();
         
-        if (files.length == 0)
+        if (files == null || files.length == 0)
             return;
 
         if (files.length > 1) {
@@ -200,6 +197,22 @@ public class ImportInputPanel extends JPanel {
         } else {
             singleFile(files[0]);
         }
+    }
+    
+    private File[] getSelectedFiles() {
+        JFileChooser chooser = new JFileChooser(new EmfFileSystemView(service));
+        chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        chooser.setMultiSelectionEnabled(true);
+        chooser.setDialogTitle("Select a " + datasetTypesModel.getSelectedItem().toString() + " File");
+        chooser.setCurrentDirectory(new File(folder.getText().trim()));
+        File[] files = null;
+        
+        int result = chooser.showDialog(this, "Select File");
+        if (result == JFileChooser.APPROVE_OPTION) {
+            files = chooser.getSelectedFiles();
+        }
+        
+        return files;
     }
 
     private void singleFile(File file) {

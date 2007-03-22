@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.data;
 
+import java.io.File;
+
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Keyword;
@@ -81,7 +83,7 @@ public interface DataCommonsService {
     SourceGroup[] getSourceGroups() throws EmfException;
     void addSourceGroup(SourceGroup sourcegrp) throws EmfException;
     
-    String[] getFiles(String dir) throws EmfException;
+    File[] getFiles(File[] dir) throws EmfException;
     
     EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir) throws EmfException;
     
@@ -91,4 +93,15 @@ public interface DataCommonsService {
     
     EmfFileInfo getHomeDir() throws EmfException;
     
+    EmfFileInfo[] getRoots() throws EmfException;
+
+    EmfFileInfo[] getSubdirs(EmfFileInfo dir) throws EmfException;
+    
+    boolean isRoot(EmfFileInfo fileInfo) throws EmfException;
+    
+    boolean isFileSystemRoot(EmfFileInfo fileInfo) throws EmfException;
+    
+    EmfFileInfo getChild(EmfFileInfo file, String child) throws EmfException;
+
+    EmfFileInfo getParentDirectory(EmfFileInfo file) throws EmfException;
 }

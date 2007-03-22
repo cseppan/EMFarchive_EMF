@@ -29,8 +29,8 @@ import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.cost.StrategyType;
-import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.AggregatedPollutantEfficiencyRecord;
@@ -472,6 +472,5 @@ public class DataMappings extends Mappings {
     public QName emfFileInfos() {
         return qname("EmfFileInfos");
     }
-
-
+    
 }

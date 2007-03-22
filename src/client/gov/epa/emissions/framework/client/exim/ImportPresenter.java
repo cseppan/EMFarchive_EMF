@@ -6,8 +6,6 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.exim.ExImService;
 
-import java.io.File;
-
 public class ImportPresenter {
 
     private ImportView view;
@@ -60,8 +58,8 @@ public class ImportPresenter {
 
     private String getDefaultBaseFolder() {
         String folder = session.preferences().inputFolder();
-        if (!new File(folder).isDirectory())
-            folder = "";// default, if unspecified
+//        if (!new File(folder).isDirectory())
+//            folder = "";// default, if unspecified
 
         return folder;
     }

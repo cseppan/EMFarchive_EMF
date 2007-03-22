@@ -97,22 +97,18 @@ public class EmfCall {
         mappings.setIntegerReturnType(call);
     }
     
-    public void addFileParam() {
-        mappings.addFileParam(call);
+    public void addFileArrayParam() {
+        mappings.addFileArrayParam(call);
     }
     
-    public void setFileArrayReturnType() {
-        mappings.setFileArrayReturnType(call);
-    }
-
     public void setStringArrayReturnType() {
         mappings.setStringArrayReturnType(call);
     }
 
-    public void setFileReturnType() {
-        mappings.setFileReturnType(call);
+    public void setFileArrayReturnType() {
+        mappings.setFileArrayReturnType(call);
     }
-    
+
     public void setFileSystemViewReturnType() {
         mappings.setFileSystemViewReturnType(call);
     }

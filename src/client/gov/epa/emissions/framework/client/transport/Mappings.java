@@ -85,13 +85,12 @@ public class Mappings {
         call.addParameter("int",qname("int"),cls,ParameterMode.IN);
     }
 
-    public void addFileParam(Call call) {
-        Class cls = File.class;
-        call.addParameter("File",qname("File"),cls,ParameterMode.IN);
-    }
-
     public QName strings() {
         return qname("strings");
+    }
+
+    public QName files() {
+        return qname("Files");
     }
 
     public void setReturnType(Call call, QName name) {
@@ -102,14 +101,6 @@ public class Mappings {
         setReturnType(call, strings());
     }
     
-    public void setFileArrayReturnType(Call call) {
-        call.setReturnType(qname("Files"));
-    }
-
-    public void setFileReturnType(Call call) {
-        call.setReturnType(qname("File"));
-    }
-
     public void setFileSystemViewReturnType(Call call) {
         call.setReturnType(qname("EmfFileSystemView"));
     }
@@ -123,6 +114,15 @@ public class Mappings {
         call.addParameter("intArray",qname("intArray"),cls,ParameterMode.IN);
     }
 
+    public void addFileArrayParam(Call call){
+        Class cls = File[].class;
+        call.addParameter("Files", files(), cls, ParameterMode.IN);
+    }
+
+    public void setFileArrayReturnType(Call call) {
+        call.setReturnType(files());
+    }
+    
     public void setIntegerReturnType(Call call) {
         call.setReturnType(Constants.XSD_INT);
     }

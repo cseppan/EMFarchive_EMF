@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.transport;
 
+import java.io.File;
+
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Keyword;
@@ -315,14 +317,14 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { sourcegrp });
     }
 
-    public String[] getFiles(String dir) throws EmfException {
+    public File[] getFiles(File[] dir) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getFiles");
-        call.addStringParam("dir");
-        call.setStringArrayReturnType();
+        call.addFileArrayParam();
+        call.setFileArrayReturnType();
 
-        return (String[])call.requestResponse(new Object[] { dir });
+        return (File[])call.requestResponse(new Object[] { dir });
     }
 
     public EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir) throws EmfException {
@@ -361,6 +363,66 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.setReturnType(mappings.emfFileInfo());
 
         return (EmfFileInfo)call.requestResponse(new Object[] {});
+    }
+
+    public EmfFileInfo[] getRoots() throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getRoots");
+        call.setReturnType(mappings.emfFileInfos());
+        
+        return (EmfFileInfo[])call.requestResponse(new Object[] {});
+    }
+
+    public boolean isFileSystemRoot(EmfFileInfo fileInfo) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("isFileSystemRoot");
+        call.addBooleanParameter("fileInfo");
+        call.setBooleanReturnType();
+        
+        return (Boolean)call.requestResponse(new Object[] { fileInfo });
+    }
+
+    public boolean isRoot(EmfFileInfo fileInfo) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("isRoot");
+        call.addBooleanParameter("fileInfo");
+        call.setBooleanReturnType();
+        
+        return (Boolean)call.requestResponse(new Object[] { fileInfo });
+    }
+
+    public EmfFileInfo getChild(EmfFileInfo file, String child) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getChild");
+        call.addParam("file", mappings.emfFileInfo());
+        call.addStringParam("child");
+        call.setReturnType(mappings.emfFileInfo());
+        
+        return (EmfFileInfo)call.requestResponse(new Object[] { file, child });
+    }
+
+    public EmfFileInfo getParentDirectory(EmfFileInfo file) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getParent");
+        call.addParam("file", mappings.emfFileInfo());
+        call.setReturnType(mappings.emfFileInfo());
+        
+        return (EmfFileInfo)call.requestResponse(new Object[] { file });
+    }
+
+    public EmfFileInfo[] getSubdirs(EmfFileInfo dir) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getSubdirs");
+        call.addParam("dir", mappings.emfFileInfo());
+        call.setReturnType(mappings.emfFileInfos());
+        
+        return (EmfFileInfo[])call.requestResponse(new Object[] { dir });
     }
 
 }
