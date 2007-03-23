@@ -1729,6 +1729,7 @@ SCC,SCC_Description
 2260006020,"Mobile Sources;Off-highway Vehicle Gasoline, 2-Stroke;Commercial Equipment;Gas Compressors"
 2260006025,"Mobile Sources;Off-highway Vehicle Gasoline, 2-Stroke;Commercial Equipment;Welders"
 2260006030,"Mobile Sources;Off-highway Vehicle Gasoline, 2-Stroke;Commercial Equipment;Pressure Washers"
+2260006035,"Mobile Sources;Off-highway Vehicle Gasoline, 2-Stroke;Commercial Equipment;Hydro-power Units"
 2260007000,"Mobile Sources;Off-highway Vehicle Gasoline, 2-Stroke;Logging Equipment;Total"
 2260007005,"Mobile Sources;Off-highway Vehicle Gasoline, 2-Stroke;Logging Equipment;Chain Saws > 6 HP"
 2260007010,"Mobile Sources;Off-highway Vehicle Gasoline, 2-Stroke;Logging Equipment;Shredders > 6 HP"
@@ -1833,6 +1834,7 @@ SCC,SCC_Description
 2265006020,"Mobile Sources;Off-highway Vehicle Gasoline, 4-Stroke;Commercial Equipment;Gas Compressors"
 2265006025,"Mobile Sources;Off-highway Vehicle Gasoline, 4-Stroke;Commercial Equipment;Welders"
 2265006030,"Mobile Sources;Off-highway Vehicle Gasoline, 4-Stroke;Commercial Equipment;Pressure Washers"
+2265006035,"Mobile Sources;Off-highway Vehicle Gasoline, 4-Stroke;Commercial Equipment;Hydro-power Units"
 2265007000,"Mobile Sources;Off-highway Vehicle Gasoline, 4-Stroke;Logging Equipment;Total"
 2265007005,"Mobile Sources;Off-highway Vehicle Gasoline, 4-Stroke;Logging Equipment;Chain Saws > 6 HP"
 2265007010,"Mobile Sources;Off-highway Vehicle Gasoline, 4-Stroke;Logging Equipment;Shredders > 6 HP"
@@ -1935,6 +1937,7 @@ SCC,SCC_Description
 2267006020,Mobile Sources;LPG;Commercial Equipment;Gas Compressors
 2267006025,Mobile Sources;LPG;Commercial Equipment;Welders
 2267006030,Mobile Sources;LPG;Commercial Equipment;Pressure Washers
+2267006035,Mobile Sources;LPG;Commercial Equipment;Hydro-power Units
 2267007000,Mobile Sources;LPG;Logging Equipment;All
 2267007005,Mobile Sources;LPG;Logging Equipment;Chain Saws > 6 HP
 2267007010,Mobile Sources;LPG;Logging Equipment;Shredders > 6 HP
@@ -2035,6 +2038,7 @@ SCC,SCC_Description
 2268006020,Mobile Sources;CNG;Commercial Equipment;Gas Compressors
 2268006025,Mobile Sources;CNG;Commercial Equipment;Welders
 2268006030,Mobile Sources;CNG;Commercial Equipment;Pressure Washers
+2268006035,Mobile Sources;CNG;Commercial Equipment;Hydro-Power Units
 2268007000,Mobile Sources;CNG;Logging Equipment;All
 2268007005,Mobile Sources;CNG;Logging Equipment;Chain Saws > 6 HP
 2268007010,Mobile Sources;CNG;Logging Equipment;Shredders > 6 HP
@@ -2137,6 +2141,7 @@ SCC,SCC_Description
 2270006020,Mobile Sources;Off-highway Vehicle Diesel;Commercial Equipment;Gas Compressors
 2270006025,Mobile Sources;Off-highway Vehicle Diesel;Commercial Equipment;Welders
 2270006030,Mobile Sources;Off-highway Vehicle Diesel;Commercial Equipment;Pressure Washers
+2270006035,Mobile Sources;Off-highway Vehicle Diesel;Commercial Equipment;Hydro-power Units
 2270007000,Mobile Sources;Off-highway Vehicle Diesel;Logging Equipment;Total
 2270007005,Mobile Sources;Off-highway Vehicle Diesel;Logging Equipment;Chain Saws > 6 HP
 2270007010,Mobile Sources;Off-highway Vehicle Diesel;Logging Equipment;Shredders > 6 HP
