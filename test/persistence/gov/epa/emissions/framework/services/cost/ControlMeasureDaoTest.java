@@ -47,6 +47,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(emfUser().getName());
+        cm.setLastModifiedTime(new Date());
         Scc[] sccs = { new Scc("100232", "") };
         dao.add(cm, sccs, session);
         ControlMeasure result = load(cm);
@@ -59,6 +61,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(emfUser().getName());
+        cm.setLastModifiedTime(new Date());
         add(cm);
 
         List cms = dao.all(session);
@@ -71,8 +75,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(emfUser().getName());
         cm.setLastModifiedTime(new Date());
-        cm.setLastModifiedBy("Emf User");
         cm.setMajorPollutant(pm10Pollutant());
         Scc[] sccs = { new Scc("100232", "") };
         int cmId = dao.add(cm, sccs, session);
@@ -84,7 +88,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         record1.setLastModifiedTime(new Date());
         dao.addEfficiencyRecord(record1, session);
         session.flush();
-        EfficiencyRecord record2 = efficiencyRecord(pm10Pollutant(), "22");
+        EfficiencyRecord record2 = efficiencyRecord(pm10Pollutant(), "23");
         record2.setControlMeasureId(cmId);
         record2.setLastModifiedBy("emf");
         record2.setLastModifiedTime(new Date());
@@ -101,6 +105,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         cm.setAbbreviation("12345678");
         User user = emfUser();
         cm.setCreator(user);
+        cm.setLastModifiedBy(user.getName());
+        cm.setLastModifiedTime(new Date());
         add(cm);
         Scc scc1 = new Scc();
         scc1.setCode("scc1");
@@ -157,6 +163,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(emfUser().getName());
+        cm.setLastModifiedTime(new Date());
 
         dao.add(cm, new Scc[] {}, session);
         session.clear();
@@ -171,6 +179,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(emfUser().getName());
+        cm.setLastModifiedTime(new Date());
 
         add(cm);
 
@@ -184,6 +194,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(emfUser().getName());
+        cm.setLastModifiedTime(new Date());
         add(cm);
 
         assertTrue("Should be able to confirm existence of dataset", dao.exists(cm.getName(), session));
@@ -195,6 +207,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(emfUser().getName());
+        cm.setLastModifiedTime(new Date());
         add(cm);
 
         ControlMeasure locked = dao.obtainLocked(owner, cm.getId(), session);
@@ -209,6 +223,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(emfUser().getName());
+        cm.setLastModifiedTime(new Date());
         add(cm);
 
         dao.obtainLocked(owner, cm.getId(), session);
@@ -225,6 +241,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
         cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(emfUser().getName());
+        cm.setLastModifiedTime(new Date());
         add(cm);
 
         ControlMeasure locked = dao.obtainLocked(owner, cm.getId(), session);
@@ -246,14 +264,23 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         cm.setAbbreviation("12345678");
         User emfUser = emfUser();
         cm.setCreator(emfUser);
+        cm.setLastModifiedBy(emfUser.getName());
+        cm.setLastModifiedTime(new Date());
 
-        dao.add(cm, cm.getSccs(), session);
+        Scc scc1 = new Scc();
+        scc1.setCode("scc1");
+
+        Scc scc2 = new Scc();
+        scc2.setCode("scc2");
+        Scc[] sccs = { scc1, scc2 };
+
+        dao.add(cm, sccs, session);
         cm = dao.obtainLocked(emfUser, cm.getId(), session);
         EfficiencyRecord record1 = efficiencyRecord(pm10Pollutant(), "22");
-        EfficiencyRecord record2 = efficiencyRecord(pm10Pollutant(), "22");
+        EfficiencyRecord record2 = efficiencyRecord(pm10Pollutant(), "23");
         cm.setEfficiencyRecords(new EfficiencyRecord[] { record1, record2 });
         dao.update(cm, cm.getSccs(), session);
-        ControlMeasure newMeasure = load(cm);
+        ControlMeasure newMeasure = (ControlMeasure) load(ControlMeasure.class, cm.getName());
         EfficiencyRecord[] efficiencyRecords = newMeasure.getEfficiencyRecords();
         assertEquals(2, efficiencyRecords.length);
         assertEquals(record1.getPollutant(), efficiencyRecords[0].getPollutant());
@@ -270,6 +297,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         cm.setCmClass(cmc);
         User emfUser = emfUser();
         cm.setCreator(emfUser);
+        cm.setLastModifiedBy(emfUser.getName());
+        cm.setLastModifiedTime(new Date());
 
         EfficiencyRecord[] records1 = { efficiencyRecord(pm10Pollutant(), "01"),
                 efficiencyRecord(pm10Pollutant(), "23") };
@@ -288,8 +317,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
 
         ControlMeasure controlMeasure = (ControlMeasure) load(ControlMeasure.class, "cm one");
         assertEquals("Emerging", controlMeasure.getCmClass().getName());
-
-        EfficiencyRecord[] efficiencyRecords = controlMeasure.getEfficiencyRecords();
+        
+        EfficiencyRecord[] efficiencyRecords = (EfficiencyRecord[]) dao.getEfficiencyRecords(controlMeasure.getId(), session).toArray(new EfficiencyRecord[0]);
         assertEquals(1, efficiencyRecords.length);
         assertEquals("32", efficiencyRecords[0].getLocale());
 
@@ -308,6 +337,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         cm.setCmClass(cmc);
         User emfUser = emfUser();
         cm.setCreator(emfUser);
+        cm.setLastModifiedBy(emfUser.getName());
+        cm.setLastModifiedTime(new Date());
 
         EfficiencyRecord[] records1 = { efficiencyRecord(pm10Pollutant(), "01"),
                 efficiencyRecord(pm10Pollutant(), "23") };
@@ -386,7 +417,12 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     private void addCMFromImporter(ControlMeasure cm, User emfUser, Scc[] sccs) throws Exception, EmfException {
         Session session = sessionFactory().getSession();
         try {
-            dao.addFromImporter(cm, sccs, emfUser, session);
+            int cmId = dao.addFromImporter(cm, sccs, emfUser, session);
+            EfficiencyRecord[] ers = cm.getEfficiencyRecords(); 
+            for (int i = 0; i < ers.length; i++) {
+                ers[i].setControlMeasureId(cmId);
+                dao.addEfficiencyRecord(ers[i], session);
+            }
         } finally {
             session.close();
         }
@@ -401,6 +437,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         EfficiencyRecord record = new EfficiencyRecord();
         record.setPollutant(pollutant);
         record.setLocale(locale);
+        record.setLastModifiedBy(emfUser().getName());
+        record.setLastModifiedTime(new Date());
         return record;
     }
 

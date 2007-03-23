@@ -184,7 +184,8 @@ public abstract class ServiceTestCase extends TestCase {
             tx = session.beginTransaction();
             Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("name", name));
             tx.commit();
-            return crit.uniqueResult();
+            Object obj = crit.uniqueResult();
+            return obj;
         } catch (HibernateException e) {
             tx.rollback();
             throw e;
@@ -198,4 +199,3 @@ public abstract class ServiceTestCase extends TestCase {
     }
 
 }
-
