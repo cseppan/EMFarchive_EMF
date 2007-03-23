@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
@@ -75,7 +76,8 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
                 } catch (Exception e) {
                     messagePanel.setError(e.getMessage());
                 }        
-                doLayout(measure, changeables);
+                updateMainPanel(sccs);                
+//                doLayout(measure, changeables);
                 messagePanel.clear();
                 setCursor(Cursor.getDefaultCursor());
             } catch (Exception e) {
@@ -86,26 +88,65 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
     }
 
     private void doLayout(ControlMeasure measure, ManageChangeables changeables) {
-        this.changeables = changeables;
-        try {
-            tableData = new SCCTableData(sccs);
-            SortFilterSelectionPanel sortFilterSelectionPanel = sortFilterPanel();
-            mainPanel.removeAll();
-            mainPanel.add(sortFilterSelectionPanel);
-        } catch (Exception e) {
-            messagePanel.setError(e.getMessage());
-        }
+        updateMainPanel(sccs);
 
         setLayout(new BorderLayout());
         add(mainPanel, BorderLayout.CENTER);
         add(buttonPanel(), BorderLayout.SOUTH);
+//        this.changeables = changeables;
+//        try {
+//            tableData = new SCCTableData(sccs);
+//            SortFilterSelectionPanel sortFilterSelectionPanel = sortFilterPanel();
+//            mainPanel.removeAll();
+//            mainPanel.add(sortFilterSelectionPanel);
+//            mainPanel.validate();
+//        } catch (Exception e) {
+//            messagePanel.setError(e.getMessage());
+//        }
+//
+//        setLayout(new BorderLayout());
+//        JPanel container = new JPanel(new BorderLayout());
+//        container.add(mainPanel);
+//        add(container, BorderLayout.CENTER);
+//        add(buttonPanel(), BorderLayout.SOUTH);
+    }
+
+
+//    JPanel panel = new JPanel(new BorderLayout(5, 5));
+//    panel.setLayout(new BorderLayout(5, 5));
+//
+//    JPanel container = new JPanel(new BorderLayout(5, 5));
+////    container.setLayout(new GridLayout(2, 1, 5, 5));
+//
+//    container.add(recordLimitPanel(), BorderLayout.NORTH);
+//    container.add(rowFilterPanel(), BorderLayout.CENTER);
+//
+//    panel.add(container, BorderLayout.CENTER);
+////    panel.add(sortFilterPanel(), BorderLayout.CENTER);
+//    panel.add(sortFilterControlPanel(), BorderLayout.EAST);
+//    panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+//    return panel;
+
+    private void updateMainPanel(Scc[] sccs) {
+        mainPanel.removeAll();
+        initModel(sccs);
+        mainPanel.add(sortFilterPanel());
+        mainPanel.validate();
+    }
+
+    private void initModel(Scc[] sccs) {
+        tableData = new SCCTableData(sccs);
+        tableModel = new EmfTableModel(tableData);
+//        selectModel = new SortFilterSelectModel(model);
+        sortFilterSelectModel = new TrackableSortFilterSelectModel(tableModel);
+        changeables.addChangeable(sortFilterSelectModel);
     }
 
     private SortFilterSelectionPanel sortFilterPanel() {
-        tableModel = new EmfTableModel(tableData);
-        sortFilterSelectModel = new TrackableSortFilterSelectModel(tableModel);
-        changeables.addChangeable(sortFilterSelectModel);
+//        tableModel = new EmfTableModel(tableData);
+//        changeables.addChangeable(sortFilterSelectModel);
         SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parent, sortFilterSelectModel);
+        sortFilterSelectionPanel.setPreferredSize(new Dimension(450, 120));
         return sortFilterSelectionPanel;
     }
 
@@ -168,12 +209,19 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
                 JOptionPane.QUESTION_MESSAGE);
 
         if (selection == JOptionPane.YES_OPTION) {
-            tableData.remove(records);
-            SortFilterSelectionPanel panel = sortFilterPanel();
-            mainPanel.removeAll();
-            mainPanel.add(panel);
             modify();
+            tableData.remove(records);
+            refreshPanel();
         }
+    }
+
+    public void refreshData() {
+        tableData.refresh();
+    }
+
+    public void refreshPanel() {
+        refreshData();
+        updateMainPanel(tableData.sources());
     }
 
     private Scc[] getSCCs(int controlMeasureId) throws EmfException {
@@ -197,10 +245,7 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
         for (int i = 0; i < sccs.length; i++) {
             tableData.add(sccs);
         }
-
-        SortFilterSelectionPanel panel = sortFilterPanel();
-        mainPanel.removeAll();
-        mainPanel.add(panel);
+        refreshPanel();
         modify();
     }
 

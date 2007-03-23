@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.StatelessSession;
 import org.hibernate.cfg.Configuration;
 
 public class HibernateSessionFactory {
@@ -40,6 +41,10 @@ public class HibernateSessionFactory {
 
     public Session getSession() throws HibernateException {
         return sessionFactory.openSession();
+    }
+
+    public StatelessSession getStatelessSession() throws HibernateException {
+        return sessionFactory.openStatelessSession();
     }
 
 }

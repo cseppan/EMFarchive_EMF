@@ -12,6 +12,7 @@ import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -335,14 +336,23 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     
 
     private JPanel sortFilterPanel() {
+        JPanel container2 = new JPanel(new BorderLayout());
+        JPanel panel2 = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        layoutGenerator.addWidgetPair(recordLimitPanel(), rowFilterPanel(), panel2);
+
+        widgetLayout(1, 2, 5, 5, 4, 4, layoutGenerator, panel2);
+        container2.add(panel2, BorderLayout.NORTH);
+
+        
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.setLayout(new BorderLayout(5, 5));
 
         JPanel container = new JPanel(new BorderLayout(5, 5));
 //        container.setLayout(new GridLayout(2, 1, 5, 5));
 
-        container.add(recordLimitPanel(), BorderLayout.NORTH);
-        container.add(rowFilterPanel(), BorderLayout.CENTER);
+        container.add(container2, BorderLayout.NORTH);
 
         panel.add(container, BorderLayout.CENTER);
 //        panel.add(sortFilterPanel(), BorderLayout.CENTER);
@@ -351,6 +361,23 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         return panel;
     }
 
+//    private JPanel sortFilterPanel() {
+//        JPanel panel = new JPanel(new BorderLayout(5, 5));
+//        panel.setLayout(new BorderLayout(5, 5));
+//
+//        JPanel container = new JPanel(new BorderLayout(5, 5));
+////        container.setLayout(new GridLayout(2, 1, 5, 5));
+//
+//        container.add(recordLimitPanel(), BorderLayout.NORTH);
+//        container.add(rowFilterPanel(), BorderLayout.CENTER);
+//
+//        panel.add(container, BorderLayout.CENTER);
+////        panel.add(sortFilterPanel(), BorderLayout.CENTER);
+//        panel.add(sortFilterControlPanel(), BorderLayout.EAST);
+//        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+//        return panel;
+//    }
+//
     private JPanel sortFilterControlPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -363,36 +390,70 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     }
 
     private JPanel recordLimitPanel() {
+        JPanel labelContainer = new JPanel(new BorderLayout());
+        JPanel textFieldContainer = new JPanel(new BorderLayout());
         JPanel container = new JPanel(new BorderLayout());
-        JPanel panel = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         recordLimit = new TextField("recordLimit", 10);
         recordLimit.setToolTipText(_recordLimit + "");
         recordLimit.setText(_recordLimit + "");
-        layoutGenerator.addLabelWidgetPair("Row Limit ", recordLimit, panel);
 
-        widgetLayout(1, 2, 5, 5, 4, 4, layoutGenerator, panel);
-        container.add(panel, BorderLayout.NORTH);
+        Label label = new Label("Row Limit ");
+
+        labelContainer.add(label, BorderLayout.NORTH);
+        container.add(labelContainer, BorderLayout.WEST);
+        textFieldContainer.add(recordLimit, BorderLayout.NORTH);
+        container.add(textFieldContainer, BorderLayout.EAST);
         return container;
     }
 
+//    private JPanel recordLimitPanel() {
+//        JPanel container = new JPanel(new BorderLayout());
+//        JPanel panel = new JPanel(new SpringLayout());
+//        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+//
+//        recordLimit = new TextField("recordLimit", 10);
+//        recordLimit.setToolTipText(_recordLimit + "");
+//        recordLimit.setText(_recordLimit + "");
+//        layoutGenerator.addLabelWidgetPair("Row Limit ", recordLimit, panel);
+//
+//        widgetLayout(1, 2, 5, 5, 4, 4, layoutGenerator, panel);
+//        container.add(panel, BorderLayout.NORTH);
+//        return container;
+//    }
+//
     private JPanel rowFilterPanel() {
+        JPanel labelContainer = new JPanel(new BorderLayout());
         JPanel container = new JPanel(new BorderLayout());
-        JPanel panel = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         rowFilter = new TextArea("rowFilter", "", 25, 2);
         rowFilter.setToolTipText(_rowFilter);
         ScrollableComponent scrollPane = new ScrollableComponent(rowFilter);
-        scrollPane.setPreferredSize(new Dimension(550, 55));
-        layoutGenerator.addLabelWidgetPair("Row Filter ", scrollPane, panel);
+        scrollPane.setPreferredSize(new Dimension(400, 55));
+        Label label = new Label("Row Filter ");
 
-        widgetLayout(1, 2, 5, 5, 4, 4, layoutGenerator, panel);
-        container.add(panel, BorderLayout.NORTH);
+        labelContainer.add(label, BorderLayout.NORTH);
+        container.add(labelContainer, BorderLayout.WEST);
+        container.add(scrollPane, BorderLayout.EAST);
         return container;
     }
 
+//    private JPanel rowFilterPanel() {
+//        JPanel container = new JPanel(new BorderLayout());
+//        JPanel panel = new JPanel(new SpringLayout());
+//        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+//
+//        rowFilter = new TextArea("rowFilter", "", 25, 2);
+//        rowFilter.setToolTipText(_rowFilter);
+//        ScrollableComponent scrollPane = new ScrollableComponent(rowFilter);
+//        scrollPane.setPreferredSize(new Dimension(400, 55));
+//        layoutGenerator.addLabelWidgetPair("Row Filter ", scrollPane, panel);
+//
+//        widgetLayout(1, 2, 5, 5, 4, 4, layoutGenerator, panel);
+//        container.add(panel, BorderLayout.NORTH);
+//        return container;
+//    }
+//
 //    private JPanel sortOrderPanel() {
 //        JPanel panel = new JPanel(new BorderLayout());
 //

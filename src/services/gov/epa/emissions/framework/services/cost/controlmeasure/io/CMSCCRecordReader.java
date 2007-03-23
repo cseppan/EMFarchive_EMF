@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
 import gov.epa.emissions.commons.Record;
+import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
@@ -14,12 +15,16 @@ public class CMSCCRecordReader {
 
     private CMAddImportStatus status;
 
+    private int errorCount = 0;
+
+    private int errorLimit = 100;
+
     public CMSCCRecordReader(CMSCCsFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) {
         this.fileFormat = fileFormat;
         this.status = new CMAddImportStatus(user, sessionFactory);
     }
 
-    public void parse(Map controlMeasures, Record record, int lineNo) {
+    public void parse(Map controlMeasures, Record record, int lineNo) throws ImporterException {
         StringBuffer sb = new StringBuffer();
         String[] tokens = modify(record, sb, lineNo);
         ControlMeasure cm = controlMeasure(tokens[0], controlMeasures, sb, lineNo);
@@ -30,20 +35,23 @@ public class CMSCCRecordReader {
         scc.setCode(tokens[1]);
         scc.setStatus(tokens[2]);
 
+        if (sb.length() > 0) {
+            errorCount++;
+            status.addStatus(lineNo, sb);
+        }
+        if (errorCount >= errorLimit) throw new ImporterException("The maximum allowable error limit (" + errorLimit + ") has been reached while parsing the control measure SCC records.");
         cm.addScc(scc);
-
     }
 
     private ControlMeasure controlMeasure(String token, Map controlMeasures, StringBuffer sb, int lineNo) {
         ControlMeasure cm = (ControlMeasure) controlMeasures.get(token);
         if (cm == null) {
             sb.append(format("abbreviation '" + token + "' is not in the control measure summary file"));
-            status.addStatus(lineNo, sb);
         }
         return cm;
     }
 
-    private String[] modify(Record record, StringBuffer sb, int lineNo) {
+    private String[] modify(Record record, StringBuffer sb, int lineNo) throws ImporterException {
         int sizeDiff = fileFormat.cols().length - record.getTokens().length;
         if (sizeDiff == 0)
             return record.getTokens();
@@ -55,13 +63,14 @@ public class CMSCCRecordReader {
             return record.getTokens();
         }
 
-        sb.append(format("The new record has extra tokens"));
-        status.addStatus(lineNo, sb);
-        return null;
+        throw new ImporterException("The new record has extra tokens");
     }
 
     private String format(String text) {
         return status.format(text);
     }
 
+    public int getErrorCount() {
+        return errorCount;
+    }
 }

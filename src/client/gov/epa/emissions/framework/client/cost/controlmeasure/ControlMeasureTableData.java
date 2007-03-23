@@ -40,7 +40,7 @@ public class ControlMeasureTableData extends AbstractTableData {
         this.costYearTable = costYearTable;
         this.pollutant = pollutant;
 //        filter(pollutant, year);
-        this.targetYear = new Integer(year);
+        this.targetYear = (year != null) ? new Integer(year) : 2000;
         this.rows = createRows(measures);
     }
 
@@ -81,7 +81,7 @@ public class ControlMeasureTableData extends AbstractTableData {
                 for (int j = 0; j < apers.length; j++) {
                     AggregatedPollutantEfficiencyRecord aper = apers[j];
                     if (pollutant.getName().equalsIgnoreCase("major")) {
-                        Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(aper),
+                        Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(measure),
                                 new Double(aper.getMaxEfficiency()), new Double(aper.getMinEfficiency()), new Double(aper.getAvgEfficiency()), 
                                 getCostPerTon(aper.getMaxCostPerTon()), getCostPerTon(aper.getMinCostPerTon()), getCostPerTon(aper.getAvgCostPerTon()), 
                                 new Double(aper.getAvgRuleEffectiveness()), new Double(aper.getAvgRulePenetration()), getControlTechnology(measure), 
@@ -93,7 +93,7 @@ public class ControlMeasureTableData extends AbstractTableData {
                         rows.add(row);
                     } else {
                         if (!pollutant.equals(aper.getPollutant())) aper = null;
-                        Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(aper),
+                        Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(measure),
                                 new Double(aper != null ? aper.getMaxEfficiency() : NAN_VALUE), new Double(aper != null ? aper.getMinEfficiency() : NAN_VALUE), new Double(aper != null ? aper.getAvgEfficiency() : NAN_VALUE), 
                                 getCostPerTon(aper != null ? aper.getMaxCostPerTon() : Float.NaN), getCostPerTon(aper != null ? aper.getMinCostPerTon() : Float.NaN), getCostPerTon(aper != null ? aper.getAvgCostPerTon() : Float.NaN), 
                                 new Double(aper != null ? aper.getAvgRuleEffectiveness() : NAN_VALUE), new Double(aper != null ? aper.getAvgRulePenetration() : NAN_VALUE), getControlTechnology(measure), 
@@ -106,7 +106,7 @@ public class ControlMeasureTableData extends AbstractTableData {
                     }
                 }
             } else {
-                Object[] values = { measure.getName(), measure.getAbbreviation(), "",
+                Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(measure),
                         NAN_VALUE, NAN_VALUE, NAN_VALUE, 
                         NAN_VALUE, NAN_VALUE, NAN_VALUE, 
                         NAN_VALUE, NAN_VALUE, getControlTechnology(measure), 
@@ -122,12 +122,12 @@ public class ControlMeasureTableData extends AbstractTableData {
         return rows;
     }
 
-    private String pollutant(AggregatedPollutantEfficiencyRecord record) {
-        if (record == null)
+    private String pollutant(ControlMeasure measure) {
+        if (measure == null)
             return "";
-        if (record.getPollutant() == null)
+        if (measure.getMajorPollutant() == null)
             return "";
-        return record.getPollutant().getName();
+        return measure.getMajorPollutant().getName();
     }
 
     private String measureClass(ControlMeasureClass cmClass) {

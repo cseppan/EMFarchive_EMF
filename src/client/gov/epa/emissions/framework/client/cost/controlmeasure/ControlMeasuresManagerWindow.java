@@ -36,6 +36,7 @@ import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
 public class ControlMeasuresManagerWindow extends ReusableInteralFrame implements ControlMeasuresManagerView,
-        RefreshObserver {
+        RefreshObserver, Runnable {
 
     private SortFilterSelectModel selectModel;
 
@@ -96,6 +97,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private YearValidation yearValidation;
 
+    private volatile Thread populateThread;
+
     public ControlMeasuresManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Control Measure Manager", new Dimension(825, 350), desktopManager);
         super.setName("controlMeasures");
@@ -103,6 +106,28 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         this.session = session;
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
+//        try {
+//            display(new ControlMeasure[0]);
+//        } catch (EmfException e) {
+//            // NOTE Auto-generated catch block
+//        }
+//        this.populateThread = new Thread(this);
+//        populateThread.start();
+    }
+
+    public void run() {
+        try {
+            messagePanel.setMessage("Please wait while retrieving control measures...");
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            refresh(new ControlMeasure[0]);
+            refresh(presenter.getControlMeasures(getSelectedMajorPollutant()));
+            messagePanel.clear();
+        } catch (Exception e) {
+            messagePanel.setError("Cannot retrieve control measures.  " + e.getMessage());
+        } finally  {
+            setCursor(Cursor.getDefaultCursor());
+            this.populateThread = null;
+        }
     }
 
     public void display(ControlMeasure[] measures) throws EmfException {
@@ -199,13 +224,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         majorPollutant = new ComboBox("Select one", pollsFromDB);
         majorPollutant.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                Pollutant pol = getSelectedMajorPollutant();
-                try {
-                    doRefresh();
-                } catch (EmfException e1) {
-                    messagePanel.setError("Could not retrieve all control measures with major pollutant -- "
-                            + pol.getName());
-                }
+                doRefresh();
             }
         });
     }
@@ -320,7 +339,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     protected void controlMeasureImport() {
-        CMImportView view = new CMImportWindow(desktopManager, session);
+        CMImportView view = new CMImportWindow(desktopManager);
         CMImportPresenter presenter = new CMImportPresenter(session);
         presenter.display(view);
 
@@ -385,6 +404,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
                 ControlMeasure coppied = (ControlMeasure) DeepCopy.copy(element);
                 coppied.setName("Copy of " + element.getName());
                 presenter.doSaveCopiedControlMeasure(coppied, element);
+            } catch (EmfException e) {
+                throw e;
             } catch (Exception e) {
                 messagePanel.setError(e.getMessage());
             }
@@ -464,12 +485,13 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         super.refreshLayout();
     }
 
-    public void doRefresh() throws EmfException {
-        refresh(presenter.getControlMeasures(getSelectedMajorPollutant()));
+    public void doRefresh() {
+        this.populateThread = new Thread(this);
+        populateThread.start();
     }
 
     public void refresh(ControlMeasure[] measures) {
-        clearMessage();
+//        clearMessage();
         try {
             setupTableModel(measures);
             panelRefresh();
@@ -501,12 +523,14 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
     
     private String selectedCostYear() throws EmfException {
+//        if (costYear == null) return null;
         String year = ((String) costYear.getSelectedItem()).trim();
         yearValidation.value(year);
         return (String)costYear.getSelectedItem();
     }
 
     private Pollutant selectedPollutant() {
+//        if (pollutant == null) return null;
         return (Pollutant) pollutant.getSelectedItem();
     }
 

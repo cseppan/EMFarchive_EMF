@@ -234,41 +234,6 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         changeablesList.addChangeable(majorPollutant);
         layoutGenerator.addLabelWidgetPair("Major Pollutant:", majorPollutant, panel);
 
-        deviceCode = new TextField("NEI Device code", 15);
-        changeablesList.addChangeable(deviceCode);
-        layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
-
-        equipmentLife = new TextField("Equipment life", 15);
-        changeablesList.addChangeable(equipmentLife);
-        layoutGenerator.addLabelWidgetPair("Equipment life (yrs):", equipmentLife, panel);
-
-        dateReviewed = new TextField("Date Reviewed", 15);
-        changeablesList.addChangeable(dateReviewed);
-        layoutGenerator.addLabelWidgetPair("Date Reviewed:", dateReviewed, panel);
-
-        dataSources = new TextField("Data Sources:", 15);
-        layoutGenerator.addLabelWidgetPair("Data Sources:", dataSources, panel);
-
-        layoutGenerator.addLabelWidgetPair("", tempPanel(20, 20), panel);
-        widgetLayout(5, 2, 5, 5, 10, 10, layoutGenerator, panel);
-        container.add(panel, BorderLayout.NORTH);
-        return container;
-    }
-
-    private JPanel createRightPanel() {
-        JPanel container = new JPanel(new BorderLayout());
-        JPanel panel = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-
-        try {
-            allClasses = session.controlMeasureService().getMeasureClasses();
-            cmClass = new ComboBox("Choose a class", allClasses);
-        } catch (EmfException e1) {
-            messagePanel.setError("Could not retrieve control measure classes");
-        }
-        changeablesList.addChangeable(cmClass);
-        layoutGenerator.addLabelWidgetPair("Class:", cmClass, panel);
-
         try {
             allControlTechnologies = session.controlMeasureService().getControlTechnologies();
             controlTechnology = new EditableComboBox(allControlTechnologies);
@@ -292,7 +257,80 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
         layoutGenerator.addLabelWidgetPair("Sectors:", sectors(), panel);
 
-        widgetLayout(4, 2, 5, 5, 10, 10, layoutGenerator, panel);
+//        deviceCode = new TextField("NEI Device code", 15);
+//        changeablesList.addChangeable(deviceCode);
+//        layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
+//
+//        equipmentLife = new TextField("Equipment life", 15);
+//        changeablesList.addChangeable(equipmentLife);
+//        layoutGenerator.addLabelWidgetPair("Equipment life (yrs):", equipmentLife, panel);
+//
+//        dateReviewed = new TextField("Date Reviewed", 15);
+//        changeablesList.addChangeable(dateReviewed);
+//        layoutGenerator.addLabelWidgetPair("Date Reviewed:", dateReviewed, panel);
+//
+//        dataSources = new TextField("Data Sources:", 15);
+//        layoutGenerator.addLabelWidgetPair("Data Sources:", dataSources, panel);
+
+        layoutGenerator.addLabelWidgetPair("", tempPanel(20, 20), panel);
+        widgetLayout(5, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        container.add(panel, BorderLayout.NORTH);
+        return container;
+    }
+
+    private JPanel createRightPanel() {
+        JPanel container = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        try {
+            allClasses = session.controlMeasureService().getMeasureClasses();
+            cmClass = new ComboBox("Choose a class", allClasses);
+        } catch (EmfException e1) {
+            messagePanel.setError("Could not retrieve control measure classes");
+        }
+        changeablesList.addChangeable(cmClass);
+        layoutGenerator.addLabelWidgetPair("Class:", cmClass, panel);
+
+        deviceCode = new TextField("NEI Device code", 15);
+        changeablesList.addChangeable(deviceCode);
+        layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
+
+        equipmentLife = new TextField("Equipment life", 15);
+        changeablesList.addChangeable(equipmentLife);
+        layoutGenerator.addLabelWidgetPair("Equipment life (yrs):", equipmentLife, panel);
+
+        dateReviewed = new TextField("Date Reviewed", 15);
+        changeablesList.addChangeable(dateReviewed);
+        layoutGenerator.addLabelWidgetPair("Date Reviewed:", dateReviewed, panel);
+
+        dataSources = new TextField("Data Sources:", 15);
+        layoutGenerator.addLabelWidgetPair("Data Sources:", dataSources, panel);
+
+//        try {
+//            allControlTechnologies = session.controlMeasureService().getControlTechnologies();
+//            controlTechnology = new EditableComboBox(allControlTechnologies);
+//            controlTechnology.setPreferredSize(new Dimension(250, 25));
+//        } catch (EmfException e) {
+//            messagePanel.setError("Could not retrieve all Control Technologies");
+//        }
+//        changeablesList.addChangeable(controlTechnology);
+//        layoutGenerator.addLabelWidgetPair("Control Technology:", controlTechnology, panel);
+//
+//        try {
+//            allSourceGroups = session.dataCommonsService().getSourceGroups();
+//            sourceGroup = new EditableComboBox(allSourceGroups);
+//            sourceGroup.setPreferredSize(new Dimension(250, 25));
+//        } catch (EmfException e) {
+//            messagePanel.setError("Could not retrieve Source Groups");
+//        }
+//
+//        changeablesList.addChangeable(sourceGroup);
+//        layoutGenerator.addLabelWidgetPair("Source Group:", sourceGroup, panel);
+//
+//        layoutGenerator.addLabelWidgetPair("Sectors:", sectors(), panel);
+
+        widgetLayout(5, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         container.add(panel, BorderLayout.NORTH);
         return container;

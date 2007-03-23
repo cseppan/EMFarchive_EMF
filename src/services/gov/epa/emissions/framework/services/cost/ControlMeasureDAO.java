@@ -17,12 +17,14 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 public class ControlMeasureDAO {
+//    private static Log LOG = LogFactory.getLog(ControlMeasureDAO.class);
 
     private LockingScheme lockingScheme;
 
@@ -38,6 +40,10 @@ public class ControlMeasureDAO {
     }
 
     public boolean exists(Class clazz, Criterion[] criterions, Session session) {
+        return hibernateFacade.exists(clazz, criterions, session);
+    }
+
+    private boolean exists(Class clazz, Criterion[] criterions, StatelessSession session) {
         return hibernateFacade.exists(clazz, criterions, session);
     }
 
@@ -103,10 +109,14 @@ public class ControlMeasureDAO {
     }
 
     private void removeSccs(int controlMeasureId, Session session) {
-        Scc[] sccs = getSccs(controlMeasureId, session);
-        for (int i = 0; i < sccs.length; i++) {
-            hibernateFacade.remove(sccs[i], session);
-        }
+        String hqlDelete = "delete Scc scc where scc.controlMeasureId = :controlMeasureId";
+        session.createQuery( hqlDelete )
+             .setInteger("controlMeasureId", controlMeasureId)
+             .executeUpdate();
+//        Scc[] sccs = getSccs(controlMeasureId, session);
+//        for (int i = 0; i < sccs.length; i++) {
+//            hibernateFacade.remove(sccs[i], session);
+//        }
     }
 
     public ControlMeasure obtainLocked(User user, int controlMeasureId, Session session) {
@@ -211,30 +221,66 @@ public class ControlMeasureDAO {
                 session);
     }
 
-    public void addFromImporter(ControlMeasure measure, Scc[] sccs, User user, Session session) throws EmfException {
+    public int addFromImporter(ControlMeasure measure, Scc[] sccs, User user, Session session) throws EmfException {
+        int cmId = 0;
         Criterion name = Restrictions.eq("name", measure.getName());
         Criterion abbrev = Restrictions.eq("abbreviation", measure.getAbbreviation());
         boolean abbrExist = abbrExist(new Criterion[] { abbrev }, session);
         boolean nameExist = nameExist(new Criterion[] { name }, session);
 
         if (nameExist) {// overwrite if name exist regard less of abbrev
-            int id = controlMeasureId(measure, session);
-            measure.setId(id);
-            ControlMeasure obtainLocked = obtainLocked(user, measure.getId(), session);
-            measure.setLockDate(obtainLocked.getLockDate());
-            measure.setLockOwner(obtainLocked.getLockOwner());
+            cmId = controlMeasureId(measure, session);
+            measure.setId(cmId);
+            ControlMeasure obtainLocked = obtainLocked(user, cmId, session);
             if (obtainLocked == null)
                 throw new EmfException("Could not obtain the lock to update: " + measure.getName());
-            removeSccs(measure.getId(), session);
-            removeEfficiencyRecord(measure, session);
+            measure.setLockDate(obtainLocked.getLockDate());
+            measure.setLockOwner(obtainLocked.getLockOwner());
+            removeSccs(cmId, session);
+            removeEfficiencyRecords(cmId, session);
             update(measure, sccs, session);
         } else if (abbrExist) {
             throw new EmfException("The Control Measure Abbreviation already in use: " + measure.getAbbreviation());
         } else {
-            add(measure, sccs, session);
+            cmId = add(measure, sccs, session);
         }
+        return cmId;
     }
 
+    public int addFromImporter(ControlMeasure measure, User user, Session session) throws EmfException {
+        int cmId = 0;
+        Criterion name = Restrictions.eq("name", measure.getName());
+        Criterion abbrev = Restrictions.eq("abbreviation", measure.getAbbreviation());
+
+        Criteria criteria = session.createCriteria(ControlMeasure.class);
+        criteria.add(abbrev);
+        boolean abbrExist = criteria.uniqueResult() != null;
+        criteria = session.createCriteria(ControlMeasure.class);
+        criteria.add(name);
+        boolean nameExist = criteria.uniqueResult() != null;
+        
+        if (nameExist) {// overwrite if name exist regard less of abbrev
+            ControlMeasure existing = (ControlMeasure) criteria.uniqueResult();
+            if (existing.isLocked()) {
+                if (!existing.isLocked(user))
+                    throw new EmfException("Could not obtain the lock to update: " + measure.getName());
+            }
+            cmId = existing.getId();
+            measure.setId(cmId);
+            removeSccs(cmId, session);
+            removeEfficiencyRecords(cmId, session);
+
+            update(measure, measure.getSccs(), session);
+        } else if (abbrExist) {
+            throw new EmfException("The Control Measure Abbreviation already in use: " + measure.getAbbreviation());
+        } else {
+            cmId = add(measure, measure.getSccs(), session);
+        }
+        return cmId;
+    }
+
+    
+    
     // use only after confirming measure is exist
     private int controlMeasureId(ControlMeasure measure, Session session) {
         Criterion criterion = Restrictions.eq("name", measure.getName());
@@ -252,12 +298,16 @@ public class ControlMeasureDAO {
         }
     }
 
-    private void removeEfficiencyRecord(ControlMeasure measure, Session session) {
-        Criterion c = Restrictions.eq("controlMeasureId", new Integer(measure.getId()));
-        List list = hibernateFacade.get(EfficiencyRecord.class, c, session);
-        for (int i = 0; i < list.size(); i++) {
-            hibernateFacade.remove(list.get(i), session);
-        }
+    private void removeEfficiencyRecords(int controlMeasureId, Session session) {
+        String hqlDelete = "delete EfficiencyRecord er where er.controlMeasureId = :controlMeasureId";
+        session.createQuery( hqlDelete )
+             .setInteger("controlMeasureId", controlMeasureId)
+             .executeUpdate();
+//        Criterion c = Restrictions.eq("controlMeasureId", new Integer(controlMeasureId));
+//        List list = hibernateFacade.get(EfficiencyRecord.class, c, session);
+//        for (int i = 0; i < list.size(); i++) {
+//            hibernateFacade.remove(list.get(i), session);
+//        }
     }
 
     public List allCMClasses(Session session) {
@@ -286,16 +336,57 @@ public class ControlMeasureDAO {
         }
     }
 
-    public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord, Session session) {
+    public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord, Session session) throws EmfException {
+        checkForDuplicateEfficiencyRecord(efficiencyRecord, session);
         hibernateFacade.add(efficiencyRecord, session);
         return efficiencyRecord.getId();
+    }
+
+    public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord, StatelessSession session) throws EmfException {
+        checkForDuplicateEfficiencyRecord(efficiencyRecord, session);
+        session.insert(efficiencyRecord);
+//        hibernateFacade.add(efficiencyRecord, session);
+        return efficiencyRecord.getId();
+    }
+
+    public void checkForDuplicateEfficiencyRecord(EfficiencyRecord record, Session session) throws EmfException {
+        Criterion id = Restrictions.ne("id", new Integer(record.getId()));
+        Criterion measureId = Restrictions.eq("controlMeasureId", new Integer(record.getControlMeasureId()));
+        Criterion locale = Restrictions.eq("locale", record.getLocale());
+        Criterion pollutant = Restrictions.eq("pollutant", record.getPollutant());
+        Criterion existingMeasureAbbr = record.getExistingMeasureAbbr() == null ? Restrictions.isNull("existingMeasureAbbr") : Restrictions.eq("existingMeasureAbbr", record.getExistingMeasureAbbr());
+        Criterion effectiveDate = record.getEffectiveDate() == null ? Restrictions.isNull("effectiveDate") : Restrictions.eq("effectiveDate", record.getEffectiveDate());
+
+        if (exists(EfficiencyRecord.class, new Criterion[] {id, measureId, locale, pollutant, existingMeasureAbbr, effectiveDate}, session)) {
+            throw new EmfException("Duplicate Record: The combination of 'Pollutant', 'Locale', 'Effective Date' and 'Existing Measure' should be unique - Locale = " + record.getLocale()
+                + " Pollutant = " + record.getPollutant().getName()
+                + " ExistingMeasureAbbr = " + record.getExistingMeasureAbbr()
+                + " EffectiveDate = " + (record.getEffectiveDate() == null ? "" : record.getEffectiveDate()));
+        }
+    }
+
+    public void checkForDuplicateEfficiencyRecord(EfficiencyRecord record, StatelessSession session) throws EmfException {
+        Criterion id = Restrictions.ne("id", new Integer(record.getId()));
+        Criterion measureId = Restrictions.eq("controlMeasureId", new Integer(record.getControlMeasureId()));
+        Criterion locale = Restrictions.eq("locale", record.getLocale());
+        Criterion pollutant = Restrictions.eq("pollutant", record.getPollutant());
+        Criterion existingMeasureAbbr = record.getExistingMeasureAbbr() == null ? Restrictions.isNull("existingMeasureAbbr") : Restrictions.eq("existingMeasureAbbr", record.getExistingMeasureAbbr());
+        Criterion effectiveDate = record.getEffectiveDate() == null ? Restrictions.isNull("effectiveDate") : Restrictions.eq("effectiveDate", record.getEffectiveDate());
+
+        if (exists(EfficiencyRecord.class, new Criterion[] {id, measureId, locale, pollutant, existingMeasureAbbr, effectiveDate}, session)) {
+            throw new EmfException("Duplicate Record: The combination of 'Pollutant', 'Locale', 'Effective Date' and 'Existing Measure' should be unique - Locale = " + record.getLocale()
+                + " Pollutant = " + record.getPollutant().getName()
+                + " ExistingMeasureAbbr = " + record.getExistingMeasureAbbr()
+                + " EffectiveDate = " + (record.getEffectiveDate() == null ? "" : record.getEffectiveDate()));
+        }
     }
 
     public void removeEfficiencyRecord(int efficiencyRecordId, Session session) {
         hibernateFacade.remove(hibernateFacade.current(efficiencyRecordId, EfficiencyRecord.class, session), session);
     }
 
-    public void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord, Session session) {
+    public void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord, Session session) throws EmfException {
+        checkForDuplicateEfficiencyRecord(efficiencyRecord, session);
         hibernateFacade.saveOrUpdate(efficiencyRecord, session);
     }
 

@@ -52,6 +52,11 @@ public class CMSummaryImporter {
                 abbreviations.add(cm.getAbbreviation());
             }    
         }
+
+        if (cmSummaryRecord.getErrorCount() > 0) {
+            addStatus("Failed to import control measure records, " + cmSummaryRecord.getErrorCount() + " errors were found.");
+            throw new ImporterException("Failed to import control measure records, " + cmSummaryRecord.getErrorCount() + " errors were found.");
+        }
         addStatus("Finished reading Summary file");
     }
 

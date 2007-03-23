@@ -31,7 +31,7 @@ public class CMImportTaskTest extends ServiceTestCase {
         try {
             File folder = new File("test/data/cost/controlMeasure");
             String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
-            CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory());
+            CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory(), dbServer());
             task.run();
             ControlMeasure[] measures = measures();
             assertEquals(32, measures.length);
@@ -50,7 +50,7 @@ public class CMImportTaskTest extends ServiceTestCase {
         try {
             File folder = new File("test/data/cost/controlMeasure");
             String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
-            CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory());
+            CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory(), dbServer());
             task.run();
             ControlMeasure[] measures = measures();
             assertEquals(32, measures.length);

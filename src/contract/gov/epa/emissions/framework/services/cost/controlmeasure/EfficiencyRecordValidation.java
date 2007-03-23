@@ -77,6 +77,7 @@ public class EfficiencyRecordValidation {
     }
 
     public float costPerTon(String costperTon) throws EmfException {
+        if (costperTon.trim().length() == 0) return Float.MIN_VALUE;
         float value = parseFloat("cost per ton", costperTon);
         // This is not actually the case per Greg Stella - some controls have cost benefits
         //if (value < 0)

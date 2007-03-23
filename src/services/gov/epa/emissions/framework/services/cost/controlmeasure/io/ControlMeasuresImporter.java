@@ -1,37 +1,117 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
+import gov.epa.emissions.commons.Record;
+import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.OptimizedTableModifier;
+import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.importer.FileVerifier;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
+import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
+import org.hibernate.StatelessSession;
+import org.hibernate.Transaction;
+
 public class ControlMeasuresImporter implements Importer {
+
+    private static Log log = LogFactory.getLog(ControlMeasuresImporter.class);
 
     private CMImporters cmImporters;
 
     private Map controlMeasures;
+    
+    private CMEfficiencyImporter efficiency;
 
-    public ControlMeasuresImporter(File folder, String[] fileNames, User user, HibernateSessionFactory factory)
+    private StatusDAO statusDao;
+
+    private User user;
+
+    private ControlMeasureDAO controlMeasuresDao;
+
+    private TableFormat effRecTableFormat;
+
+    private Datasource datasource;
+
+    private OptimizedTableModifier modifier;
+
+    private HibernateSessionFactory sessionFactory;
+
+    public ControlMeasuresImporter(File folder, String[] fileNames, User user, HibernateSessionFactory factory, DbServer dbServer)
             throws EmfException, ImporterException {
         File[] files = fileNames(folder, fileNames);
+        this.user = user;
+        this.sessionFactory = factory;
+        this.statusDao = new StatusDAO(factory);
         ControlMeasuresImportIdentifier types = new ControlMeasuresImportIdentifier(files, user, factory);
-        cmImporters = types.cmImporters();
-        controlMeasures = new HashMap();
+        this.cmImporters = types.cmImporters();
+        this.efficiency = cmImporters.efficiencyImporter();
+        this.controlMeasures = new HashMap();
+        this.controlMeasuresDao = new ControlMeasureDAO();
+        this.effRecTableFormat = new EfficiencyRecordTableFormat(dbServer.getSqlDataTypes());
+        this.datasource = dbServer.getEmfDatasource();
+        this.modifier = dataModifier("control_measure_efficiencyrecords", datasource);
     }
 
     public void run() throws ImporterException {
-        runSummary(controlMeasures);
-        runEfficiencyRecords(controlMeasures);
-        runSCC(controlMeasures);
-        //TODO: read reference file
+        setStatus("Started importing control measures");
+        setDetailStatus("Started importing control measures\n");
+        ControlMeasure[] measures;
+        EfficiencyRecord[] efficiencyRecords;
+
+        try {
+            runSummary(controlMeasures);
+            runSCC(controlMeasures);
+            measures = controlMeasures();
+            saveMeasureAndSCCs(measures, user);
+            //this is needed so we know what the Ids are for the saved measures
+            updateControlMeasuresMap(measures);
+            setStatus("Started reading efficiency record file");
+            modifier.start();
+            while (!isLastEfficiencyRecord()) {
+                efficiencyRecords = runEfficiencyRecords();
+                saveEfficiencyRecords(efficiencyRecords);
+                setStatus("Processed " + efficiencyRecords.length + " efficiency records");
+                efficiencyRecords = null;
+                System.gc();
+            }
+            setStatus("Finished reading efficiency record file");
+            
+        } catch (Exception e) {
+            logError("Failed to import all control measures", e); // FIXME: report generation
+            setStatus("Failed to import all control measures, see the import control measures status field for more detailed information on the failure: " + e.getMessage());
+            throw new ImporterException("Failed to import all control measures: " + e.getMessage());
+        } finally {
+            try {
+                modifier.finish();
+                modifier.close();
+            } catch (SQLException e) {
+                // NOTE Auto-generated catch block
+            } finally {
+                //
+            }
+        }
+        setStatus("Finished importing control measures");
+        setDetailStatus("Finished importing control measures\n");
     }
 
     public ControlMeasure[] controlMeasures() {
@@ -44,20 +124,150 @@ public class ControlMeasuresImporter implements Importer {
         return measures;
     }
 
-    private void runSummary(Map controlMeasures) throws ImporterException {
-        CMSummaryImporter summary = cmImporters.summaryImporter();
-        summary.run(controlMeasures);
+    private void updateControlMeasuresMap(ControlMeasure[] measures) {
+        controlMeasures = new HashMap();
+        for (int i = 0; i < measures.length; i++) {
+            controlMeasures.put(measures[i].getAbbreviation(), measures[i]);
+        }
     }
 
-    private void runEfficiencyRecords(Map controlMeasures) throws ImporterException {
-        CMEfficiencyImporter efficiency = cmImporters.efficiencyImporter();
-        efficiency.run(controlMeasures);
+    private void runSummary(Map controlMeasures) throws ImporterException {
+        setStatus("Started reading summary file");
+        CMSummaryImporter summary = cmImporters.summaryImporter();
+        summary.run(controlMeasures);
+        setStatus("Finished reading summary file");
+    }
+
+    private EfficiencyRecord[] runEfficiencyRecords() throws ImporterException {
+        return efficiency.parseEfficiencyRecords(controlMeasures);
+    }
+
+    private boolean isLastEfficiencyRecord() {
+        return efficiency.isEnd();
 
     }
 
     private void runSCC(Map controlMeasures) throws ImporterException {
+        setStatus("Started reading SCC file");
         CMSCCImporter sccImporter = cmImporters.sccImporter();
         sccImporter.run(controlMeasures);
+        setStatus("Finished reading SCC file");
+    }
+
+    private OptimizedTableModifier dataModifier(String table, Datasource datasource) throws EmfException {
+        try {
+            return new OptimizedTableModifier(datasource, table);
+        } catch (SQLException e) {
+            throw new EmfException(e.getMessage());
+        }
+    }
+
+    private void insertRecord(Record record, OptimizedTableModifier dataModifier) throws EmfException {
+        try {
+            int colsSize = effRecTableFormat.cols().length;
+            if (record.size() < colsSize)
+                throw new EmfException("The number of tokens in the record are " + record.size()
+                        + ", It's less than the number of columns expected(" + colsSize + ")");
+
+            dataModifier.insert((String[]) record.tokens().toArray(new String[0]));
+        } catch (Exception e) {
+            throw new EmfException("Error processing insert query: " + e.getMessage());
+        }
+    }
+
+    private void doBatchInsert(EfficiencyRecord[] efficiencyRecords) throws EmfException {
+        for (int i = 0; i < efficiencyRecords.length; i++) {
+            EfficiencyRecordGenerator generator = new EfficiencyRecordGenerator();
+            Record record = generator.getRecord(efficiencyRecords[i]);
+//            log.error(efficiencyRecords[i].getCostPerTon());
+            insertRecord(record, modifier);
+        }
+    }
+
+    private void saveMeasureAndSCCs(ControlMeasure[] measures, User user) throws ImporterException {
+        Date date = new Date();
+        List messages = new ArrayList(); 
+        int cmId = 0;
+        int count = 0;
+        for (int i = 0; i < measures.length; i++) {
+            Session session = sessionFactory.getSession();
+            measures[i].setCreator(user);
+            measures[i].setLastModifiedTime(date);
+            measures[i].setLastModifiedBy(user.getName());
+            try {
+                cmId = controlMeasuresDao.addFromImporter(measures[i],measures[i].getSccs(), user, session);
+                measures[i].setId(cmId);
+            } catch (EmfException e) {
+                messages.add(e.getMessage() + "\n");
+//                throw new EmfException(e.getMessage() + " " + e.getMessage() + " " + measures[i].getName() + " " + measures[i].getAbbreviation());
+            } finally {
+                count++;
+            }
+//            if ( i % 20 == 0 ) { //20, same as the JDBC batch size
+//                //flush a batch of inserts and release memory:
+//                session.flush();
+//                session.clear();
+//            }
+            session.flush();
+            session.clear();
+            session.close();
+       }
+        if (messages.size() > 0) {
+            setDetailStatus(messages);
+            throw new ImporterException("error(s) were encountered reading the summary or SCC file.");
+        }
+        addCompletedStatus(count, "control measures");
+    }
+
+    public void saveEfficiencyRecordsViaHibernateStatelessSession(EfficiencyRecord[] efficiencyRecords) {
+        List messages = new ArrayList(); 
+        int id = 0;
+        int count = 0;
+        StatelessSession session = sessionFactory.getStatelessSession();
+        Transaction tx = session.beginTransaction();
+        for (int i = 0; i < efficiencyRecords.length; i++) {
+            try {
+                id = controlMeasuresDao.addEfficiencyRecord(efficiencyRecords[i], session);
+                efficiencyRecords[i].setId(id);
+                count++;
+            } catch (EmfException e) {
+                messages.add(e.getMessage());
+            }
+        }
+        tx.commit();
+        session.close();
+        if (messages.size() > 0) setStatus(messages);
+        addCompletedStatus(count, "efficiency records");
+    }
+    
+    public void saveEfficiencyRecordsViaHibernateSession(EfficiencyRecord[] efficiencyRecords) {
+        List messages = new ArrayList(); 
+        int id = 0;
+        int count = 0;
+        Session session = sessionFactory.getSession();
+        for (int i = 0; i < efficiencyRecords.length; i++) {
+            try {
+                id = controlMeasuresDao.addEfficiencyRecord(efficiencyRecords[i], session);
+                efficiencyRecords[i].setId(id);
+                count++;
+            } catch (EmfException e) {
+                messages.add(e.getMessage());
+            }
+            if ( i % 20 == 0 ) { //20, same as the JDBC batch size
+                //flush a batch of inserts and release memory:
+                session.flush();
+                session.clear();
+            }
+        }
+        session.flush();
+        session.clear();
+        session.close();
+        if (messages.size() > 0) setStatus(messages);
+        addCompletedStatus(count, "efficiency records");
+    }
+
+    public void saveEfficiencyRecords(EfficiencyRecord[] efficiencyRecords) throws EmfException {
+        doBatchInsert(efficiencyRecords);
     }
 
     private File[] fileNames(File folder, String[] fileNames) throws ImporterException {
@@ -74,6 +284,46 @@ public class ControlMeasuresImporter implements Importer {
             verifier.shouldExist(files[i]);
 
         return files;
+    }
+
+    private void setDetailStatus(String message) {
+        Status endStatus = new Status();
+        endStatus.setUsername(user.getUsername());
+        endStatus.setType("CMImportDetailMsg");
+        endStatus.setMessage(message);
+        endStatus.setTimestamp(new Date());
+
+        statusDao.add(endStatus);
+    }
+
+    private void setDetailStatus(List messages) {
+        for (int i = 0; i < messages.size(); i++) {
+            setDetailStatus((String)messages.get(i));
+        }
+    }
+
+    private void setStatus(String message) {
+        Status endStatus = new Status();
+        endStatus.setUsername(user.getUsername());
+        endStatus.setType("CMImport");
+        endStatus.setMessage(message);
+        endStatus.setTimestamp(new Date());
+
+        statusDao.add(endStatus);
+    }
+
+    private void setStatus(List messages) {
+        for (int i = 0; i < messages.size(); i++) {
+            setStatus((String)messages.get(i));
+        }
+    }
+
+    private void addCompletedStatus(int noOfMeasures, String what) {
+        setStatus("Completed importing " + noOfMeasures + " " + what);
+    }
+
+    private void logError(String messge, Exception e) {
+        log.error(messge, e);
     }
 
 }

@@ -1,10 +1,5 @@
 package gov.epa.emissions.framework.services.cost.controlStrategy;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import org.hibernate.Session;
-
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.framework.services.EmfException;
@@ -13,9 +8,19 @@ import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.LightControlMeasure;
+import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
+
 public class GenerateSccControlMeasuresMap {
+
+    private static Log log = LogFactory.getLog(GenerateSccControlMeasuresMap.class);
 
     private Datasource emissionDatasource;
 
@@ -75,8 +80,13 @@ public class GenerateSccControlMeasuresMap {
     private ControlMeasure controlMeasure(int id) {
         Session session = sessionFactory.getSession();
         try {
+            ControlMeasure measure;
             ControlMeasureDAO dao = new ControlMeasureDAO();
-            return dao.current(id, session);
+            measure = dao.current(id, session);
+            EfficiencyRecord[] ers = (EfficiencyRecord[]) dao.getEfficiencyRecords(measure.getId(), session).toArray(new EfficiencyRecord[0]);
+            log.error("Measure = " + measure.getName() + " EfficiencyRecord length = " + ers.length);
+            measure.setEfficiencyRecords(ers);
+            return measure;
         } finally {
             session.close();
         }

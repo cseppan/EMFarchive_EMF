@@ -117,6 +117,11 @@ public class DataCommonsDAO {
         return getStatus(username, new Criterion[] { criterion1, criterion2 }, session);
     }
 
+    public void removeStatuses(String username, String type, Session session) {
+        String hqlDelete = "delete Status s where s.username = :username and s.type = :type";
+        session.createQuery(hqlDelete).setString("username", username).setString("type", type).executeUpdate();
+    }
+
     public List getStatuses(String username, Session session) {
         Criterion criterion1 = Restrictions.eq("username", username);
         Criterion criterion2 = Restrictions.ne("type", "CMImportDetailMsg");
@@ -130,7 +135,7 @@ public class DataCommonsDAO {
         try {
             tx = session.beginTransaction();
             // Criteria crit = session.createCriteria(Status.class).add();
-            Criteria crit = session.createCriteria(Status.class);
+            Criteria crit = session.createCriteria(Status.class).addOrder(Order.desc("timestamp"));
 
             for (int i = 0; i < criterions.length; i++) {// add restrictions
                 crit = crit.add(criterions[i]);

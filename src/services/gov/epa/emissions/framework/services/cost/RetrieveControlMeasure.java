@@ -16,7 +16,7 @@ import java.util.List;
 public class RetrieveControlMeasure {
 
     private DbServer dbServer;
-
+    
     public RetrieveControlMeasure(DbServer dbServer) throws Exception {
         this.dbServer = dbServer;
     }
@@ -184,9 +184,6 @@ public class RetrieveControlMeasure {
                 "avgruleff, avgrulpen, " +
                 "cm.equipment_life, cm.data_souce " +
                 "from control_measures cm " +
-                "left outer join ( " +
-                "select cms.control_measure_id, s.name || '...' as SCCNameList " +
-                "from control_measurs_sectors cms, cms.sector_id " +
                 "left outer join control_measurs_sectors cms " +
                 "on cms.control_measure_id = cm.id " +
                 "left outer join sectors s " +

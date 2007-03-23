@@ -5,10 +5,12 @@ import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.EfficiencyRecordValidation;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.util.Date;
 import java.util.Map;
 
 public class CMEfficiencyRecordReader {
@@ -20,12 +22,23 @@ public class CMEfficiencyRecordReader {
     private CMAddImportStatus status;
 
     private EfficiencyRecordValidation validation;
+    
+    private User user;
 
-    public CMEfficiencyRecordReader(CMEfficiencyFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) {
+    private CostYearTable costYearTable;
+    
+    private int errorCount = 0;
+
+    private int errorLimit = 100;
+
+    public CMEfficiencyRecordReader(CMEfficiencyFileFormat fileFormat, User user, 
+            HibernateSessionFactory sessionFactory, CostYearTable costYearTable) {
         this.fileFormat = fileFormat;
         this.status = new CMAddImportStatus(user, sessionFactory);
+        this.user = user;
         pollutants = new Pollutants(sessionFactory);
         validation = new EfficiencyRecordValidation();
+        this.costYearTable = costYearTable;
     }
 
     public void parse(Map controlMeasures, Record record, int lineNo) {
@@ -38,6 +51,8 @@ public class CMEfficiencyRecordReader {
 
         try {
             EfficiencyRecord efficiencyRecord = new EfficiencyRecord();
+            efficiencyRecord.setLastModifiedTime(new Date());
+            efficiencyRecord.setLastModifiedBy(user.getName());
             pollutant(efficiencyRecord, tokens[1], sb);
             locale(efficiencyRecord, tokens[2], sb);
             effectiveDate(efficiencyRecord, tokens[3], sb);
@@ -57,6 +72,50 @@ public class CMEfficiencyRecordReader {
             // don't add the efficiency record if the validation fails
         }
         status.addStatus(lineNo, sb);
+    }
+
+    public EfficiencyRecord parseEfficiencyRecord(Map controlMeasures, Record record, int lineNo) throws EmfException {
+        StringBuffer sb = new StringBuffer();
+        String[] tokens = modify(record, sb, lineNo);
+        EfficiencyRecord efficiencyRecord = null;
+        
+        ControlMeasure cm = controlMeasure(tokens[0], controlMeasures, sb, lineNo);
+        if (tokens == null || cm == null || !checkForConstraints(tokens, sb, lineNo)) {
+            errorCount++;
+            return null;
+        }
+
+        try {
+            efficiencyRecord = new EfficiencyRecord();
+            efficiencyRecord.setControlMeasureId(cm.getId());
+            efficiencyRecord.setLastModifiedTime(new Date());
+            efficiencyRecord.setLastModifiedBy(user.getName());
+            pollutant(efficiencyRecord, tokens[1], sb);
+            locale(efficiencyRecord, tokens[2], sb);
+            effectiveDate(efficiencyRecord, tokens[3], sb);
+            existingMeasureAbbrev(efficiencyRecord, tokens[4]);
+            controlEfficiency(efficiencyRecord, tokens[6], sb);
+            costYear(efficiencyRecord, tokens[7], sb);
+            costPerTon(efficiencyRecord, tokens[8], sb);
+            refYrCostPerTon(efficiencyRecord, tokens[7], tokens[8]);
+            ruleEffectiveness(efficiencyRecord, tokens[9], sb);
+            rulePenetration(efficiencyRecord, tokens[10], sb);
+            equationType(efficiencyRecord, tokens[11]);
+            capitalRecoveryFactor(efficiencyRecord, tokens[12], sb);
+            discountFactor(efficiencyRecord, tokens[13], sb);
+            details(efficiencyRecord, tokens[14]);
+
+        } catch (EmfException e) {
+            // don't add the efficiency record if the validation fails
+            efficiencyRecord = null;
+        }
+        if (sb.length() > 0) {
+            errorCount++;
+            status.addStatus(lineNo, sb);
+        }
+        
+        if (errorCount >= errorLimit) throw new EmfException("The maximum allowable error limit (" + errorLimit + ") has been reached while parsing the control measure efficiency records.");
+        return efficiencyRecord;
     }
 
     private ControlMeasure controlMeasure(String token, Map controlMeasures, StringBuffer sb, int lineNo) {
@@ -178,6 +237,14 @@ public class CMEfficiencyRecordReader {
         efficiencyRecord.setDetail(details);
     }
 
+    private void refYrCostPerTon(EfficiencyRecord efficiencyRecord, String year, String costValue) {
+        try {
+            efficiencyRecord.setRefYrCostPerTon(validation.costPerTon(costValue) * new Float(costYearTable.factor(validation.costYear(year))));
+        } catch (EmfException e) {
+            //don't propagate exception, these would have been taken care of from the cost per ton and cost year validation
+        }
+    }
+
     private String[] modify(Record record, StringBuffer sb, int lineNo) {
         int sizeDiff = fileFormat.cols().length - record.getTokens().length;
         if (sizeDiff == 0)
@@ -191,7 +258,7 @@ public class CMEfficiencyRecordReader {
         }
 
         sb.append(format("The new record has extra tokens"));
-        status.addStatus(lineNo, sb);
+//        status.addStatus(lineNo, sb);
         return null;
     }
 
@@ -199,4 +266,7 @@ public class CMEfficiencyRecordReader {
         return status.format(text);
     }
 
+    public int getErrorCount() {
+        return errorCount;
+    }
 }

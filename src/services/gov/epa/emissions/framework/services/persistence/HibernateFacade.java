@@ -5,6 +5,7 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -56,6 +57,18 @@ public class HibernateFacade {
             return criteria.uniqueResult() != null;
         } catch (HibernateException e) {
             tx.rollback();
+            throw e;
+        }
+    }
+
+    public boolean exists(Class clazz, Criterion[] criterions, StatelessSession session) {
+        try {
+            Criteria criteria = session.createCriteria(clazz);
+            for (int i = 0; i < criterions.length; i++)
+                criteria.add(criterions[i]);
+
+            return criteria.uniqueResult() != null;
+        } catch (HibernateException e) {
             throw e;
         }
     }

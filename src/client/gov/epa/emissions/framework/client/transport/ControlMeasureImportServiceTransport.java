@@ -43,4 +43,15 @@ public class ControlMeasureImportServiceTransport implements ControlMeasureImpor
 
         return (Status[]) call.requestResponse(new Object[] { user });
     }
+
+    public void removeImportStatuses(User user) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("removeImportStatuses");
+        call.addParam("user", mappings.user());
+
+        call.setVoidReturnType();
+
+        call.requestResponse(new Object[] { user });
+    }
 }

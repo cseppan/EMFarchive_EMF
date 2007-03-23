@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
+import java.sql.SQLException;
 
 public class CMImporters {
 
@@ -69,7 +70,11 @@ public class CMImporters {
         String[] cols = fileFormat.cols();
         for (int i = 0; i < records.length; i++) {
             if (matches(cols, records[i].getTokens())) {
-                return new CMEfficiencyImporter(files[i], fileFormat,user, sessionFactory);
+                try {
+                    return new CMEfficiencyImporter(files[i], fileFormat,user, sessionFactory);
+                } catch (SQLException e) {
+                    throw new EmfException(e.getMessage());
+                }
             }
         }
 
@@ -86,7 +91,7 @@ public class CMImporters {
             }
         }
 
-        throw new EmfException("Control Measure Efficiency file is required");
+        throw new EmfException("Control Measure SCC file is required");
 
     }
 

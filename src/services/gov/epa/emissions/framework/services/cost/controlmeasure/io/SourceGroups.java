@@ -68,6 +68,7 @@ public class SourceGroups {
         Session session = sessionFactory.getSession();
         try {
             return (SourceGroup) facade.load(SourceGroup.class, Restrictions.eq("name", name), session);
+
         } finally {
             session.close();
         }

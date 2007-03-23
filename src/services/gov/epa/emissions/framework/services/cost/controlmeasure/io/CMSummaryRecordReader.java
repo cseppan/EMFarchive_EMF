@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
+import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
@@ -37,6 +38,10 @@ public class CMSummaryRecordReader {
 
     private CMAddImportStatus cmAddImportStatus;
 
+    private int errorCount = 0;
+
+    private int errorLimit = 100;
+
     public CMSummaryRecordReader(CMSummaryFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) {
         this.fileFormat = fileFormat;
         this.cmAddImportStatus = new CMAddImportStatus(user, sessionFactory);
@@ -49,43 +54,43 @@ public class CMSummaryRecordReader {
         this.abbrevList = new ArrayList();
     }
 
-    public ControlMeasure parse(Record record, int lineNo) {
+    public ControlMeasure parse(Record record, int lineNo) throws ImporterException {
         String[] tokens = null;
         try {
             tokens = modify(record);
             return measure(tokens, lineNo);
-        } catch (CMImporterException e) {
+        } catch (ImporterException e) {
             cmAddImportStatus.addStatus(lineNo, new StringBuffer(format(e.getMessage())));
-            return null;
+            throw e;
+//            return null;
         }
     }
 
-    private ControlMeasure measure(String[] tokens, int lineNo) {
+    private ControlMeasure measure(String[] tokens, int lineNo) throws ImporterException {
         StringBuffer sb = new StringBuffer();
 
-        try {
-            ControlMeasure cm = null;
-            if (constraintCheck(tokens, sb)) {
-                cm = new ControlMeasure();
-                name(cm, tokens[0]);
-                abbrev(cm, tokens[1]);
-                majorPollutant(cm, tokens[2], sb);
-                controlTechnology(cm, tokens[3], sb);
-                sourceGroup(cm, tokens[4], sb);
-                sector(cm, tokens[5], sb);
-                cmClass(cm, tokens[6], sb);
-                equipLife(cm, tokens[7], sb);
-                deviceCode(cm, tokens[8], sb);
-                dateReviewed(cm, tokens[9], sb);
-                datasource(cm, tokens[10]);
-                description(cm, tokens[11]);
-            }
-            cmAddImportStatus.addStatus(lineNo, sb);
-            return cm;
-        } catch (CMImporterException e) {
-            cmAddImportStatus.addStatus(lineNo, sb);
-            return null;
+        ControlMeasure cm = null;
+        if (constraintCheck(tokens, sb)) {
+            cm = new ControlMeasure();
+            name(cm, tokens[0]);
+            abbrev(cm, tokens[1]);
+            majorPollutant(cm, tokens[2], sb);
+            controlTechnology(cm, tokens[3], sb);
+            sourceGroup(cm, tokens[4], sb);
+            sector(cm, tokens[5], sb);
+            cmClass(cm, tokens[6], sb);
+            equipLife(cm, tokens[7], sb);
+            deviceCode(cm, tokens[8], sb);
+            dateReviewed(cm, tokens[9], sb);
+            datasource(cm, tokens[10]);
+            description(cm, tokens[11]);
         }
+        if (sb.length() > 0) {
+            errorCount++;
+            cmAddImportStatus.addStatus(lineNo, sb);
+        }
+        if (errorCount >= errorLimit) throw new ImporterException("The maximum allowable error limit (" + errorLimit + ") has been reached while parsing the control measure summary records.");
+        return cm;
     }
 
     private boolean constraintCheck(String[] tokens, StringBuffer sb) {
@@ -201,7 +206,7 @@ public class CMSummaryRecordReader {
         }
     }
 
-    private void cmClass(ControlMeasure cm, String clazz, StringBuffer sb) throws CMImporterException {
+    private void cmClass(ControlMeasure cm, String clazz, StringBuffer sb) {
         if (clazz.length() == 0) {
             sb.append(format("class should not be empty"));
             return;
@@ -211,7 +216,6 @@ public class CMSummaryRecordReader {
             cm.setCmClass(cmClass);
         } catch (CMImporterException e) {
             sb.append(format(e.getMessage()));
-            throw e;
         }
     }
 
@@ -251,7 +255,7 @@ public class CMSummaryRecordReader {
         cm.setDescription(description);
     }
 
-    private String[] modify(Record record) throws CMImporterException {
+    private String[] modify(Record record) throws ImporterException {
         int sizeDiff = fileFormat.cols().length - record.getTokens().length;
         if (sizeDiff == 0)
             return record.getTokens();
@@ -263,11 +267,14 @@ public class CMSummaryRecordReader {
             return record.getTokens();
         }
 
-        throw new CMImporterException("The new record has extra tokens");
+        throw new ImporterException("The new record has extra tokens");
     }
 
     private String format(String text) {
         return cmAddImportStatus.format(text);
     }
 
+    public int getErrorCount() {
+        return errorCount;
+    }
 }

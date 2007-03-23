@@ -1,14 +1,23 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
 import gov.epa.emissions.commons.Record;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfDbServer;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
+import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public class CMEfficiencyImporter {
@@ -21,23 +30,69 @@ public class CMEfficiencyImporter {
 
     private HibernateSessionFactory sessionFactory;
 
+    private CMCSVFileReader reader;
+    
+    private boolean end;
+    
     public CMEfficiencyImporter(File file, CMEfficiencyFileFormat fileFormat, User user,
-            HibernateSessionFactory sessionFactory) {
+            HibernateSessionFactory sessionFactory) throws EmfException, SQLException {
         this.file = file;
         this.user = user;
         this.sessionFactory = sessionFactory;
-        this.cmEfficiencyReader = new CMEfficiencyRecordReader(fileFormat, user, sessionFactory);
+        DbServer dbServer = null;
+        CostYearTable costYearTable = null;
+        try {
+            dbServer = new EmfDbServer();
+            CostYearTableReader reader = new CostYearTableReader(dbServer, 1999);
+            costYearTable = reader.costYearTable();
+            costYearTable.setTargetYear(1999);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            if (dbServer != null)
+                dbServer.disconnect();
+        }
+        this.cmEfficiencyReader = new CMEfficiencyRecordReader(fileFormat, user, sessionFactory, costYearTable);
     }
 
     public void run(Map controlMeasures) throws ImporterException {
-        addStatus("Finished reading Efficiency file");
-        CMCSVFileReader reader = new CMCSVFileReader(file);
+        addStatus("Start reading Efficiency file");
+        if (reader == null ) reader = new CMCSVFileReader(file);
         for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
             cmEfficiencyReader.parse(controlMeasures, record, reader.lineNumber());
         }
         addStatus("Finished reading Efficiency file");
     }
 
+    public EfficiencyRecord[] parseEfficiencyRecords(Map controlMeasures) throws ImporterException {
+        int recordCount = 0;
+        List effRecs = new ArrayList();
+        addStatus("Start reading Efficiency file");
+        if (reader == null ) reader = new CMCSVFileReader(file);
+        for (Record record = reader.read(); !(end = record.isEnd()) && recordCount <= 19999; record = reader.read()) {
+            EfficiencyRecord efficiencyRecord;
+            try {
+                efficiencyRecord = cmEfficiencyReader.parseEfficiencyRecord(controlMeasures, record, reader.lineNumber());
+            } catch (EmfException e) {
+                throw new ImporterException(e.getMessage());
+            }
+            if (efficiencyRecord != null) {
+                effRecs.add(efficiencyRecord);
+                recordCount++;
+            }
+        }
+        if (cmEfficiencyReader.getErrorCount() > 0) {
+            addStatus("Failed to import control measure efficiency records, " + cmEfficiencyReader.getErrorCount() + " errors were found.");
+            throw new ImporterException("Failed to import control measure efficiency records, " + cmEfficiencyReader.getErrorCount() + " errors were found.");
+        }
+        addStatus("Finished reading segment of Efficiency file - " + recordCount + " lines read");
+        return (EfficiencyRecord[]) effRecs.toArray(new EfficiencyRecord[0]);
+    }
+
+    public boolean isEnd() {
+        return end;
+    }
+    
     private void addStatus(String message) {
         setStatus(message);
     }

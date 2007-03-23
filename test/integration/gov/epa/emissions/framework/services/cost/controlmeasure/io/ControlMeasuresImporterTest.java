@@ -23,7 +23,7 @@ public class ControlMeasuresImporterTest extends ServiceTestCase {
     public void testShouldImportControlMeasureFiles() throws EmfException, Exception {
         File folder = new File("test/data/cost/controlMeasure");
         String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
-        ControlMeasuresImporter importer = new ControlMeasuresImporter(folder, fileNames, emfUser(), sessionFactory());
+        ControlMeasuresImporter importer = new ControlMeasuresImporter(folder, fileNames, emfUser(), sessionFactory(), dbServer());
         importer.run();
 
         ControlMeasure[] measures = importer.controlMeasures();

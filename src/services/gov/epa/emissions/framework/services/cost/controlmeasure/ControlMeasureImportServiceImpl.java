@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure;
 
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.basic.Status;
@@ -39,7 +40,7 @@ public class ControlMeasureImportServiceImpl implements ControlMeasureImportServ
 
     public void importControlMeasures(String folderPath, String[] fileNames, User user) throws EmfException {
         try {
-            CMImportTask importTask = new CMImportTask(new File(folderPath), fileNames, user, sessionFactory);
+            CMImportTask importTask = new CMImportTask(new File(folderPath), fileNames, user, sessionFactory, new EmfDbServer());
             threadPool.execute(new GCEnforcerTask("Import control measures from files: " + fileNames[0] + ", etc.", importTask));
         } catch (Exception e) {
             LOG.error("Could not import control measures.", e);
@@ -56,6 +57,18 @@ public class ControlMeasureImportServiceImpl implements ControlMeasureImportServ
         } catch (RuntimeException e) {
             LOG.error("Could not get detail import status messages.", e);
             throw new EmfException("Could not get detail import status messages. " + e.getMessage());
+        } finally {
+            session.clear();
+        }
+    }
+    
+    public void removeImportStatuses(User user) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dataCommonsDAO.removeStatuses(user.getUsername(), "CMImportDetailMsg", session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not remove detail import status messages.", e);
+            throw new EmfException("Could not remove detail import status messages. " + e.getMessage());
         } finally {
             session.clear();
         }

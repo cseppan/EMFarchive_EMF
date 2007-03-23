@@ -11,4 +11,5 @@ public interface ControlMeasureImportService extends EMFService {
 
     Status[] getImportStatus(User user) throws EmfException;
 
+    void removeImportStatuses(User user) throws EmfException;
 }

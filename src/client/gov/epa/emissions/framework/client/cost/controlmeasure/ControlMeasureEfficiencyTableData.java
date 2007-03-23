@@ -25,7 +25,7 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
 
     public String[] columns() {
         return new String[] { "Pollutant", "Locale", "Effective Date", "Existing Measure", "Existing NEI Dev",
-                "Cost Year", "Cost Per Ton", "Control Efficiency", "Rule Effectiveness", "Rule Penetration",
+                "Cost Year", "Cost Per Ton", "Ref Yr Cost Per Ton", "Control Efficiency", "Rule Effectiveness", "Rule Penetration",
                 "Equation Type", "Capital Rec Fac", "Discount Rate", "Last Modifed By", "Last Modifed Date", "Details"};
     }
 
@@ -41,7 +41,7 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
         Object[] values = { record.getPollutant().getName(), record.getLocale(),
                 effectiveDate(record.getEffectiveDate()), record.getExistingMeasureAbbr(),
                 new Integer(record.getExistingDevCode()), new Integer(record.getCostYear()),
-                new Double(record.getCostPerTon()), new Double(record.getEfficiency()),
+                new Double(record.getCostPerTon()), new Double(record.getRefYrCostPerTon()), new Double(record.getEfficiency()),
                 new Double(record.getRuleEffectiveness()), new Double(record.getRulePenetration()),
                 record.getEquationType(), new Double(record.getCapRecFactor()), new Double(record.getDiscountRate()),
                 record.getLastModifiedBy(), EmfDateFormat.format_MM_DD_YYYY_HH_mm(record.getLastModifiedTime()), record.getDetail()};
@@ -68,7 +68,7 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
         if (col == 4 || col == 5)
             return Integer.class;
 
-        if (col == 6 || col == 7 || col == 8 || col == 9 || col == 11 || col == 12)
+        if (col == 6 || col == 7 || col == 8 || col == 9 || col == 10 || col == 12 || col == 13)
             return Double.class;
 
         return String.class;

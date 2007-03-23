@@ -34,8 +34,11 @@ public class CMSCCImporter{
         for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
             sccReader.parse(controlMeasures,record, reader.lineNumber());
         }
+        if (sccReader.getErrorCount() > 0) {
+            addStatus("Failed to import control measure SCC records, " + sccReader.getErrorCount() + " errors were found.");
+            throw new ImporterException("Failed to import control measure SCC records, " + sccReader.getErrorCount() + " errors were found.");
+        }
         addStatus("Finished reading SCC file");
-
     }
     
     private void addStatus(String message) {

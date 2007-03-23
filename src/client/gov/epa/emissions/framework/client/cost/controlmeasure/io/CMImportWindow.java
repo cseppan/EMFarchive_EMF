@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.cost.controlmeasure.io;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.ImportButton;
-import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
@@ -11,6 +10,7 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.emissions.framework.ui.YesNoDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -29,14 +29,14 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
     private CMImportInputPanel importInputPanel;
     
     private Button importButton;
-    
-    private EmfSession session;
 
-    public CMImportWindow(DesktopManager desktopManager, EmfSession session) {
+    private boolean importing;
+    
+    public CMImportWindow(DesktopManager desktopManager) {
+//    public CMImportWindow(DesktopManager desktopManager, EmfSession session) {
         super("Import Control Measures", new Dimension(700, 500), desktopManager);
         super.setName("importControlMeasures");
 
-        this.session = session;
         this.getContentPane().add(createLayout());
     }
 
@@ -45,7 +45,7 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
         // panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
-        importInputPanel = new CMImportInputPanel(messagePanel, session);
+        importInputPanel = new CMImportInputPanel(messagePanel);
 
         panel.add(messagePanel, BorderLayout.NORTH);
         panel.add(importInputPanel);
@@ -78,7 +78,7 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
 
         Button done = new Button("Done", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                presenter.doDone();
+                doDone();
             }
         });
         container.add(done);
@@ -91,9 +91,17 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
         try {
             importButton.setEnabled(false);
             presenter.doImport(importInputPanel.folder(), importInputPanel.files());
+            importing = true;
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
+    }
+
+    private void doDone() {
+        if (confirmImport()) {
+            presenter.doDone();
+        } /*else
+            presenter.doDone();*/            
     }
 
     public void register(CMImportPresenter presenter) {
@@ -117,9 +125,26 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
     protected void doImportStatus() throws EmfException {
         Status[] importStatus = presenter.getImportStatus();
         StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < importStatus.length; i++) {
+        for (int i = importStatus.length - 1; i >= 0 && importStatus.length > 0; i--) {
             sb.append(importStatus[i].getMessage());
         }
         importInputPanel.addStatusMessage(sb.toString());
+    }
+
+    public void windowClosing() {
+        if (confirmImport()) {
+            super.windowClosing();
+        }
+    }
+
+    private boolean confirmImport() {
+        if (importing) {
+            String message = "Control measures are being imported, you will lose status messages by closing this window." + System.getProperty("line.separator")
+            + "Click the Import Status button to get the status of the import process.  Click yes, if you to don't care to see the messages for the import process.";
+            String title = "Ignore import status messages?";
+            YesNoDialog dialog = new YesNoDialog(this, title, message);
+            return dialog.confirm();
+        }
+        return true;
     }
 }

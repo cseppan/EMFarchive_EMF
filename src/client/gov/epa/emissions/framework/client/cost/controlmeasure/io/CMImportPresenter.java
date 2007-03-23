@@ -26,6 +26,8 @@ public class CMImportPresenter {
     void importControlMeasures(String directory, String[] files) throws EmfException {
         importRules.validate(directory, files);
         startImportMessage(view);
+//        importing = true;
+//        session.controlMeasureImportService().importControlMeasures(mapToRemote(directory), files, session.user());
         session.controlMeasureImportService().importControlMeasures(directory, files, session.user());
     }
 
@@ -35,10 +37,24 @@ public class CMImportPresenter {
     }
 
     public void doDone() {
+//        if (importing) {
+//            String message = "Control measures are being imported, you will lose status messages by closing this window." + System.getProperty("line.separator")
+//            + " Click the Import Status button to ge the status of the import porcess.  Click no, if you to don't care to see the messages for the import process.";
+//            String title = "Ignore import status messages?";
+//            YesNoDialog dialog = new YesNoDialog(view, title, message);
+//            if (dialog.confirm()) {
+//                view.disposeView();
+//            }
+//        }
         view.disposeView();
     }
 
     public void display(CMImportView view) {
+        try {
+            removeImportStatuses();
+        } catch (EmfException e) {
+            //
+        }
         this.view = view;
         view.register(this);
         view.setDefaultBaseFolder(getDefaultBaseFolder());
@@ -54,17 +70,21 @@ public class CMImportPresenter {
         return folder;
     }
 
-//    private String mapToRemote(String dir) {
-//        return session.preferences().mapLocalInputPathToRemote(dir);
-//    }
+    private String mapToRemote(String dir) {
+        return session.preferences().mapLocalInputPathToRemote(dir);
+    }
 
     // TODO: move the getFileNamesFromPattern () to a common service
     public String[] getFilesFromPatten(String folder, String pattern) throws EmfException {
-        return session.eximService().getFilenamesFromPattern(folder, pattern);
+        return session.eximService().getFilenamesFromPattern(mapToRemote(folder), pattern);
     }
 
     public Status[] getImportStatus() throws EmfException {
         return session.controlMeasureImportService().getImportStatus(session.user());
+    }
+
+    public void removeImportStatuses() throws EmfException {
+        session.controlMeasureImportService().removeImportStatuses(session.user());
     }
 
 }
