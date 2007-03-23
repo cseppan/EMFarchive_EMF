@@ -8,6 +8,9 @@ import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -19,8 +22,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 public class EmfFileChooserPanel extends JPanel {
 
@@ -32,27 +33,29 @@ public class EmfFileChooserPanel extends JPanel {
 
     private JTextField folder;
 
-    private JTextField filter;
-
     private JList filesList;
 
     private JList subdirsList;
 
     private boolean dirOnly;
+    
+    private SingleLineMessagePanel messagePanel;
 
     public EmfFileChooserPanel(EmfFileSystemView fsv, EmfFileInfo initialFile, boolean dirOnly) {
         this.fsv = fsv;
         this.currentDir = initialFile;
         this.dirOnly = dirOnly;
+        this.messagePanel = new SingleLineMessagePanel();
         display();
     }
 
     public void display() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        add(this.messagePanel);
         add(upperPanel());
         add(fileListPanels());
-        setPreferredSize(new Dimension(415, 240));
-        setBorder(BorderFactory.createEmptyBorder(20, 5, 5, 5));
+        setPreferredSize(new Dimension(418, 300));
+        setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
     }
 
     private JPanel fileListPanels() {
@@ -77,14 +80,21 @@ public class EmfFileChooserPanel extends JPanel {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        folder = new JTextField(currentDir.getAbsolutePath(), 30);
-        layoutGenerator.addLabelWidgetPair("Directory:     ", folder, panel);
+        folder = new JTextField(currentDir.getAbsolutePath(), 32);
+        folder.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                String newvalue = ((JTextField)evt.getSource()).getText();
+                EmfFileInfo fileInfo = new EmfFileInfo();
+                fileInfo.setAbsolute(true);
+                fileInfo.setAbsolutePath(newvalue);
+                fileInfo.setDirectory(true);
+                updateDirSelections(fileInfo);
+            }
+         
+        });
+        layoutGenerator.addLabelWidgetPair("Folder:     ", folder, panel);
 
-        filter = new JTextField("*.*", 30);
-        layoutGenerator.addLabelWidgetPair("File Filter:     ", filter, panel);
-
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
                 0, 10, // initialX, initialY
                 0, 10);// xPad, yPad
 
@@ -93,9 +103,9 @@ public class EmfFileChooserPanel extends JPanel {
 
     private JPanel subdirPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-
-        panel.add(new JLabel("Sub Directory:"), BorderLayout.NORTH);
-        panel.add(listWedgit(fsv.getSubdirs(currentDir), true));
+        EmfFileInfo[] dirs = getAllDirs();
+        panel.add(new JLabel("Subfolders:"), BorderLayout.NORTH);
+        panel.add(listWedgit(dirs, true));
 
         return panel;
     }
@@ -120,15 +130,39 @@ public class EmfFileChooserPanel extends JPanel {
 
         if (isSubdir) {
             subdirsList = new JList(files);
-            subdirsList.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    if (!e.getValueIsAdjusting()) {
+            subdirsList.addMouseListener(new MouseListener(){
+
+                public void mouseClicked(MouseEvent e) {
+                    if ( e.getClickCount() == 2) {
                         Object source = e.getSource();
                         EmfFileInfo fileInfo = (EmfFileInfo) ((JList) source).getSelectedValue();
                         updateDirSelections(fileInfo);
                     }
+                    
                 }
+
+                public void mouseEntered(MouseEvent e) {
+                    // NOTE Auto-generated method stub
+                    
+                }
+
+                public void mouseExited(MouseEvent e) {
+                    // NOTE Auto-generated method stub
+                    
+                }
+
+                public void mousePressed(MouseEvent e) {
+                    // NOTE Auto-generated method stub
+                    
+                }
+
+                public void mouseReleased(MouseEvent e) {
+                    // NOTE Auto-generated method stub
+                    
+                }
+                
             });
+
             scrollPane = new JScrollPane(subdirsList);
         } else {
             filesList = new JList(files);
@@ -146,8 +180,20 @@ public class EmfFileChooserPanel extends JPanel {
             return;
 
         currentDir = fileInfo;
-        folder.setText(currentDir.getAbsolutePath());
-        subdirsList.setListData(fsv.getSubdirs(currentDir));
+        subdirsList.setListData(getAllDirs());
+    }
+
+    private EmfFileInfo[] getAllDirs() {
+        EmfFileInfo[] dirs = fsv.getSubdirs(currentDir);
+        
+        if (dirs == null) {
+            this.messagePanel.setError("Please check if the EMF service is running.");
+        }
+        
+        folder.setText(dirs[0].getAbsolutePath());
+        if (!dirs[0].getAbsolutePath().equals(currentDir.getAbsolutePath()))
+            currentDir = dirs[0];
+        return dirs;
     }
 
     private Action getFilesAction() {
@@ -169,7 +215,7 @@ public class EmfFileChooserPanel extends JPanel {
     public EmfFileInfo[] selectedFiles() {
         return this.selectedFile;
     }
-    
+
     public EmfFileInfo selectedDirectory() {
         return this.currentDir;
     }

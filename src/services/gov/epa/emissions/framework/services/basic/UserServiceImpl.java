@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -30,6 +31,7 @@ public class UserServiceImpl implements UserService {
 
     public void authenticate(String username, String password) throws EmfException {
         try {
+            LOG.warn("User " + username + " tried to login to the EMF service. " + new Date());
             User user = getUser(username);
             if (user == null)
                 throw new AuthenticationException("User " + username + " does not exist");

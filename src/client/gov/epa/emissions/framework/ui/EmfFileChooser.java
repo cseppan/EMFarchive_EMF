@@ -28,7 +28,7 @@ public class EmfFileChooser extends JComponent {
 
     private String approveButtonText = "Select";
 
-    private String title = "EMF File Chooser";
+    private String title = "EMF Folder Chooser";
 
     private int returnValue = ERROR_OPTION;
 
@@ -59,10 +59,14 @@ public class EmfFileChooser extends JComponent {
     public static final String CANCEL_SELECTION = "CancelSelection";
 
     public static final String APPROVE_SELECTION = "ApproveSelection";
+    
+    private boolean dirOnly = true;
 
     public EmfFileChooser(EmfFileInfo dir, EmfFileSystemView fsv) {
         this.current = dir;
-        this.chooserPanel = new EmfFileChooserPanel(fsv, current, true);
+        if (dir == null)
+            System.out.println("Dir object is null");
+        this.chooserPanel = new EmfFileChooserPanel(fsv, current, dirOnly);
     }
 
     public EmfFileChooser(EmfFileSystemView fsv) {
@@ -157,7 +161,7 @@ public class EmfFileChooser extends JComponent {
         panel.add(new CancelButton(cancelAction()));
 
         JPanel container = new JPanel(new BorderLayout(0, 20));
-        container.add(panel, BorderLayout.LINE_END);
+        container.add(panel, BorderLayout.CENTER);
 
         return container;
     }
