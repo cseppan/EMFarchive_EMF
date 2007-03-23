@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -73,7 +74,7 @@ public class EmfFileChooserPanel extends JPanel {
         if (dirOnly)
             setPreferredSize(new Dimension(418, 300));
         else
-            setPreferredSize(new Dimension(418, 400));
+            setPreferredSize(new Dimension(650, 400));
         
         setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
     }
@@ -123,7 +124,8 @@ public class EmfFileChooserPanel extends JPanel {
         JPanel panel = new JPanel(new BorderLayout());
         EmfFileInfo[] dirs = getAllDirs();
         panel.add(new JLabel("Subfolders:"), BorderLayout.NORTH);
-        panel.add(subdirListWedgit(dirs));
+        panel.add(subdirListWidgit(dirs));
+        panel.setPreferredSize(new Dimension(100,250));
 
         return panel;
     }
@@ -135,8 +137,9 @@ public class EmfFileChooserPanel extends JPanel {
         filePanel.add(new JLabel("Files:"), BorderLayout.NORTH);
 
         Button getFiles = new Button("Get Files", getFilesAction());
-        JPanel getFilesPanel = new JPanel(new BorderLayout());
-        getFilesPanel.add(getFiles, BorderLayout.LINE_END);
+        getFiles.setMnemonic('G');
+        JPanel getFilesPanel = new JPanel(new FlowLayout());
+        getFilesPanel.add(getFiles);
         JPanel middlePanel = new JPanel(new BorderLayout(2, 5));
         middlePanel.add(createFilePanel(files), BorderLayout.CENTER);
         middlePanel.add(getFilesPanel, BorderLayout.SOUTH);
@@ -154,7 +157,7 @@ public class EmfFileChooserPanel extends JPanel {
         return new SortFilterSelectionPanel(parent, selectModel);
     }
 
-    private JScrollPane subdirListWedgit(EmfFileInfo[] files) {
+    private JScrollPane subdirListWidgit(EmfFileInfo[] files) {
         subdirsList = new JList(files);
         subdirsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         subdirsList.addMouseListener(new MouseListener() {
