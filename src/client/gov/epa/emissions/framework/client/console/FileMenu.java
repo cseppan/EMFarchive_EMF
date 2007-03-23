@@ -24,7 +24,7 @@ public class FileMenu extends JMenu {
         super("File");
         super.setName("file");
 
-        super.add(createImport(session, messagePanel));
+        super.add(createImport(session, messagePanel, parent));
         super.addSeparator();
         super.add(createLogout(session, parent));
         super.add(createExit(parent));
@@ -67,13 +67,13 @@ public class FileMenu extends JMenu {
 
     }
 
-    private JMenuItem createImport(final EmfSession session, final MessagePanel messagePanel) {
+    private JMenuItem createImport(final EmfSession session, final MessagePanel messagePanel, final EmfConsole parent) {
         JMenuItem importMenu = new JMenuItem("Import");
         importMenu.setName("import");
         importMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    displayImport(session);
+                    displayImport(session, parent);
                 } catch (Exception e) {
                     messagePanel.setError(e.getMessage());
                 }
@@ -82,8 +82,8 @@ public class FileMenu extends JMenu {
         return importMenu;
     }
 
-    protected void displayImport(EmfSession session) throws EmfException, Exception {
-        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktopManager);
+    protected void displayImport(EmfSession session, EmfConsole parent) throws EmfException, Exception {
+        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktopManager, parent);
         ImportPresenter presenter = new ImportPresenter(session, session.user(), session.eximService());
         presenter.display(importView);
     }

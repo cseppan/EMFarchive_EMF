@@ -339,7 +339,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     protected void controlMeasureImport() {
-        CMImportView view = new CMImportWindow(desktopManager);
+        CMImportView view = new CMImportWindow(desktopManager, session);
         CMImportPresenter presenter = new CMImportPresenter(session);
         presenter.display(view);
 

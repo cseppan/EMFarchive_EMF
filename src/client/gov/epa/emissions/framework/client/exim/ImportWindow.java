@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.ImportButton;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -29,21 +30,21 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
     private ImportInputPanel importInputPanel;
 
-    public ImportWindow(DataCommonsService service, DesktopManager desktopManager) throws EmfException {
+    public ImportWindow(DataCommonsService service, DesktopManager desktopManager, EmfConsole parent) throws EmfException {
         super("Import Dataset", new Dimension(650, 400), desktopManager);
         super.setName("importDatasets");
 
         this.service = service;
 
-        this.getContentPane().add(createLayout());
+        this.getContentPane().add(createLayout(parent));
     }
 
-    private JPanel createLayout() throws EmfException {
+    private JPanel createLayout(EmfConsole parent) throws EmfException {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
-        importInputPanel = new ImportInputPanel(service, messagePanel);
+        importInputPanel = new ImportInputPanel(service, messagePanel, parent);
         panel.add(messagePanel);
         panel.add(importInputPanel);
         panel.add(createButtonsPanel());

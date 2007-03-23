@@ -34,6 +34,12 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     private DataCommonsDAO dao;
 
+    private EmfFileInfo[] files;
+
+    private EmfFileInfo[] subdirs;
+
+    private EmfFileInfo currentDirectory;
+
     public DataCommonsServiceImpl() {
         this(HibernateSessionFactory.get());
     }
@@ -507,35 +513,25 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     public EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir) throws EmfException {
         try {
-            if (dir == null) {
-                EmfServerFileSystemView fsv = new EmfServerFileSystemView();
-                return getFileInfosList(fsv.getHomeDirectory());
+            EmfFileInfo gooddir = correctEmptyDir(dir);
+            if (currentDirectory != null && gooddir.getAbsolutePath().equals(currentDirectory.getAbsolutePath())) {
+                return this.files == null ? new EmfFileInfo[0] : this.files;
             }
 
-            File dirFile = EmfFileSerializer.convert(dir);
+            currentDirectory = gooddir;
+            File currentdirFile = new File(currentDirectory.getAbsolutePath());
+            listDirsAndFiles(currentdirFile.listFiles(), currentdirFile);
 
-            if (!dirFile.isDirectory())
-                return new EmfFileInfo[] { dir };
-            System.out.println("server side getEmfFileInfos called: " + dir.getAbsolutePath());
-            return getFileInfosList(dirFile);
+            return this.files != null ? this.files : new EmfFileInfo[0];
         } catch (Exception e) {
             LOG.error("Could not list files.", e);
             throw new EmfException("Could not list files. " + e.getMessage());
         }
     }
 
-    private EmfFileInfo[] getFileInfosList(File dirFile) throws IOException {
-        List<EmfFileInfo> files2Return = new ArrayList<EmfFileInfo>();
-        File[] files = dirFile.listFiles();
-
-        for (int i = 0; i < files.length; i++)
-            files2Return.add(EmfFileSerializer.convert(files[i]));
-
-        return files2Return.toArray(new EmfFileInfo[0]);
-    }
-
     public EmfFileInfo getDefaultDir() throws EmfException {
         try {
+            //NOTE: FileSystemView doesn't work well on Linux platform
             EmfServerFileSystemView fsv = new EmfServerFileSystemView();
             return EmfFileSerializer.convert(fsv.getDefaultDirectory());
         } catch (IOException e) {
@@ -620,51 +616,62 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     public EmfFileInfo[] getSubdirs(EmfFileInfo dir) throws EmfException {
         try {
-            boolean resetPath = false;
+            EmfFileInfo gooddir = correctEmptyDir(dir);
+            if (currentDirectory != null && gooddir.getAbsolutePath().equals(currentDirectory.getAbsolutePath())) {
+                return this.subdirs != null ? this.subdirs : new EmfFileInfo[0];
+            }
             
-            if (dir == null || dir.getAbsolutePath() == null || dir.getAbsolutePath().trim().equals(""))
-                resetPath = true;
-            else {
-                File f = new File(dir.getAbsolutePath());
-                if (!f.exists())
-                    resetPath = true;
-            }
+            currentDirectory = gooddir;
+            File currentdirFile = new File(currentDirectory.getAbsolutePath());
+            listDirsAndFiles(currentdirFile.listFiles(), currentdirFile);
 
-            if (resetPath) {
-                if (File.separatorChar == '/') {
-                    dir.setAbsolutePath("/");
-                    dir.setName("/");
-                } else {
-                    dir.setAbsolutePath("C:\\");
-                    dir.setName("C:\\");
-                }
-            }
-
-            File currentdir = new File(dir.getAbsolutePath());
-            File[] files = currentdir.listFiles();
-
-            return getdirs(files, currentdir);
+            return this.subdirs != null ? this.subdirs : new EmfFileInfo[0];
         } catch (Exception e) {
             LOG.warn("Could not get subdirectories of  " + dir.getAbsolutePath() + ": " + e.getMessage());
             throw new EmfException("Could not get subdirectories of  " + dir.getAbsolutePath() + ": " + e.getMessage());
         }
     }
 
-    private EmfFileInfo[] getdirs(File[] files, File cur) throws IOException {
-        List<EmfFileInfo> subdirs = new ArrayList<EmfFileInfo>();
+    private EmfFileInfo correctEmptyDir(EmfFileInfo dir) {
+        boolean resetPath = false;
+
+        if (dir == null || dir.getAbsolutePath() == null || dir.getAbsolutePath().trim().equals(""))
+            resetPath = true;
+        else {
+            File f = new File(dir.getAbsolutePath());
+            if (!f.exists())
+                resetPath = true;
+        }
+
+        if (resetPath) {
+            if (File.separatorChar == '/') {
+                dir.setAbsolutePath("/");
+                dir.setName("/");
+            } else {
+                dir.setAbsolutePath("C:\\");
+                dir.setName("C:\\");
+            }
+        }
+
+        return dir;
+    }
+
+    private void listDirsAndFiles(File[] files, File cur) throws IOException {
+        List<EmfFileInfo> subdirsOfCurDir = new ArrayList<EmfFileInfo>();
+        List<EmfFileInfo> filesOfCurDir = new ArrayList<EmfFileInfo>();
         EmfFileInfo curInfo = EmfFileSerializer.convert(cur);
         curInfo.setName(".");
-        subdirs.add(0, curInfo);
+        subdirsOfCurDir.add(0, curInfo);
 
         EmfFileInfo parentdir = EmfFileSerializer.convert(cur);
         parentdir.setName("..");
         boolean isRoot = false;
-        
+
         // if it's the root, you don't have ..
         if (File.separatorChar == '/') {
             if (cur.getAbsolutePath().equals("/"))
                 isRoot = true;
-        } else  { // Windows
+        } else { // Windows
             if (cur.getAbsolutePath().length() == 3)
                 isRoot = true;
         }
@@ -672,16 +679,19 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         if (!isRoot) {
             parentdir = EmfFileSerializer.convert(cur.getParentFile());
             parentdir.setName("..");
-            subdirs.add(1, parentdir);
+            subdirsOfCurDir.add(1, parentdir);
         }
 
         for (int i = 0; i < files.length; i++) {
             if (files[i].isDirectory()) {
-                subdirs.add(EmfFileSerializer.convert(files[i]));
+                subdirsOfCurDir.add(EmfFileSerializer.convert(files[i]));
+            } else {
+                filesOfCurDir.add(EmfFileSerializer.convert(files[i]));
             }
         }
 
-        return subdirs.toArray(new EmfFileInfo[0]);
+        this.files = filesOfCurDir.toArray(new EmfFileInfo[0]);
+        this.subdirs = subdirsOfCurDir.toArray(new EmfFileInfo[0]);
     }
 
 }

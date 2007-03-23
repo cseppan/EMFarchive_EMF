@@ -56,9 +56,25 @@ public class EmfFileInfo implements Serializable {
         //
     }
     
+    public EmfFileInfo(String path, boolean isAbsolute) {
+        this.isAbsolute = isAbsolute;
+        if (isAbsolute)
+            this.absolutePath = path;
+        else
+            this.path = path;
+    }
+
+    public EmfFileInfo(String path, boolean isAbsolute, boolean isDirectory) {
+        this(path, isAbsolute);
+        this.isDirectory = isDirectory;
+        this.isFile = !isDirectory;
+    }
+    
+    
     public String getAbsolutePath() {
         return absolutePath;
     }
+    
 
     public void setAbsolutePath(String absolutePath) {
         this.absolutePath = absolutePath;

@@ -6,16 +6,18 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +27,6 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
@@ -49,11 +50,14 @@ public class ImportInputPanel extends JPanel {
 
     private JCheckBox isMultipleDatasets;
 
-    private static File lastFolder = null;
+    private static String lastFolder = null;
+    
+    private EmfConsole parent;
 
-    public ImportInputPanel(DataCommonsService service, MessagePanel messagePanel) throws EmfException {
+    public ImportInputPanel(DataCommonsService service, MessagePanel messagePanel, EmfConsole parent) throws EmfException {
         this.messagePanel = messagePanel;
         this.service = service;
+        this.parent = parent;
         
         initialize();
     }
@@ -182,13 +186,12 @@ public class ImportInputPanel extends JPanel {
     }
 
     private void selectFile() {
-        File[] files = getSelectedFiles();
+        EmfFileInfo[] files = getSelectedFiles();
         
         if (files == null || files.length == 0)
             return;
 
         if (files.length > 1) {
-            setFolder(files);
             String[] fileNames = new String[files.length];
             for (int i = 0; i < fileNames.length; i++) {
                 fileNames[i] = files[i].getName();
@@ -199,48 +202,42 @@ public class ImportInputPanel extends JPanel {
         }
     }
     
-    private File[] getSelectedFiles() {
-        JFileChooser chooser = new JFileChooser(new EmfFileSystemView(service));
-        chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        chooser.setMultiSelectionEnabled(true);
-        chooser.setDialogTitle("Select a " + datasetTypesModel.getSelectedItem().toString() + " File");
-        chooser.setCurrentDirectory(new File(folder.getText().trim()));
-        File[] files = null;
+    private EmfFileInfo[] getSelectedFiles() {
+        EmfFileInfo initDir = new EmfFileInfo(folder.getText(), true, true);
         
-        int result = chooser.showDialog(this, "Select File");
-        if (result == JFileChooser.APPROVE_OPTION) {
-            files = chooser.getSelectedFiles();
+        EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(service));
+        chooser.setTitle("EMF File Chooser");
+        chooser.setDirectoryAndFileMode();
+        
+        int option = chooser.showDialog(parent, "Select a file");
+
+        EmfFileInfo[] files = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedFiles() : null;
+        EmfFileInfo dir = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;
+        
+        if (dir != null && !dir.getAbsolutePath().equals(lastFolder)) {
+            folder.setText(dir.getAbsolutePath());
+            lastFolder = dir.getAbsolutePath();
+            clearfilenames();
         }
         
-        return files;
+        return files != null ? files : null;
     }
 
-    private void singleFile(File file) {
-        if (file.isDirectory()) {
-            folder.setText(file.getAbsolutePath());
-            filenames.setText("");
-            name.setText("");
-            lastFolder = file;
-            return;
-        }
-        folder.setText(file.getParent());
+    private void clearfilenames() {
+        filenames.setText("");
+        name.setText("");
+    }
+
+    private void singleFile(EmfFileInfo file) {
         filenames.setText(file.getName());
         name.setText(file.getName());
-        lastFolder = file.getParentFile();
-    }
-
-    private void setFolder(File[] files) {
-        if (files.length > 0) {
-            folder.setText(files[0].getParentFile().toString());
-            lastFolder = files[0].getParentFile();
-        }
     }
 
     public void setDefaultBaseFolder(String folder) {
         if (lastFolder == null)
             this.folder.setText(folder);
         else
-            this.folder.setText(lastFolder.getAbsolutePath());
+            this.folder.setText(lastFolder);
     }
 
     public boolean isCreateMutlipleDatasets() {

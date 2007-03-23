@@ -24,20 +24,6 @@ import javax.swing.UIManager;
 
 public class EmfFileChooser extends JComponent {
 
-    private EmfFileInfo current;
-
-    private String approveButtonText = "Select";
-
-    private String title = "EMF Folder Chooser";
-
-    private int returnValue = ERROR_OPTION;
-
-    private int dialogType = OPEN_DIALOG;
-
-    private JDialog dialog = null;
-    
-    private EmfFileChooserPanel chooserPanel;
-
     public static final int OPEN_DIALOG = 0;
 
     public static final int SAVE_DIALOG = 1;
@@ -59,21 +45,46 @@ public class EmfFileChooser extends JComponent {
     public static final String CANCEL_SELECTION = "CancelSelection";
 
     public static final String APPROVE_SELECTION = "ApproveSelection";
-    
+
+    private EmfFileInfo current;
+
+    private String approveButtonText = "Select";
+
+    private String title = "EMF Folder Chooser";
+
+    private int returnValue = ERROR_OPTION;
+
+    private int dialogType = OPEN_DIALOG;
+
+    private JDialog dialog = null;
+
+    private EmfFileChooserPanel chooserPanel;
+
     private boolean dirOnly = true;
+
+    private EmfFileSystemView fsv;
 
     public EmfFileChooser(EmfFileInfo dir, EmfFileSystemView fsv) {
         this.current = dir;
-        if (dir == null)
-            System.out.println("Dir object is null");
-        this.chooserPanel = new EmfFileChooserPanel(fsv, current, dirOnly);
+        this.fsv = fsv;
     }
 
     public EmfFileChooser(EmfFileSystemView fsv) {
         this(fsv.getDefaultDir(), fsv);
     }
 
+    public void setDirectoryOnlyMode() {
+        this.dirOnly = true;
+    }
+
+    public void setDirectoryAndFileMode() {
+        this.dirOnly = false;
+    }
+
     public EmfFileInfo getSelectedDir() {
+        if (this.chooserPanel == null)
+            return null;
+        
         return this.chooserPanel.selectedDirectory();
     }
 
@@ -106,7 +117,7 @@ public class EmfFileChooser extends JComponent {
 
         dialog.setVisible(true);
         firePropertyChange("EmfFileChooserDialogIsClosingProperty", dialog, null);
-        
+
         return returnValue;
     }
 
@@ -114,11 +125,12 @@ public class EmfFileChooser extends JComponent {
         JDialog dialog = new JDialog((Frame) parent, title, true);
         dialog.setComponentOrientation(this.getComponentOrientation());
 
+        this.chooserPanel = new EmfFileChooserPanel(parent, fsv, current, dirOnly);
         Container contentPane = dialog.getContentPane();
         contentPane.setLayout(new BorderLayout());
         contentPane.add(this.chooserPanel, BorderLayout.CENTER);
         contentPane.add(buttonsPanel(), BorderLayout.SOUTH);
-        
+
         if (JDialog.isDefaultLookAndFeelDecorated()) {
             boolean supportsWindowDecorations = UIManager.getLookAndFeel().getSupportsWindowDecorations();
             if (supportsWindowDecorations) {
@@ -127,7 +139,7 @@ public class EmfFileChooser extends JComponent {
         }
         dialog.pack();
         dialog.setLocationRelativeTo(parent);
-        
+
         return dialog;
     }
 
@@ -151,12 +163,18 @@ public class EmfFileChooser extends JComponent {
             return;
 
         String oldValue = this.title;
-        dialog.setTitle(newTitle);
+        this.title = newTitle;
+        
+        if (dialog != null)
+            dialog.setTitle(newTitle);
+        
         firePropertyChange("DialogTitleChangedProperty", oldValue, newTitle);
     }
-    
+
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
+        // this.approveButton = new Button("OK", selectAction());
+        // panel.add(approveButton);
         panel.add(new OKButton(selectAction()));
         panel.add(new CancelButton(cancelAction()));
 
@@ -183,7 +201,7 @@ public class EmfFileChooser extends JComponent {
             }
         };
     }
-    
+
     private void closeDialog() {
         dialog.setVisible(false);
         dialog.dispose();
