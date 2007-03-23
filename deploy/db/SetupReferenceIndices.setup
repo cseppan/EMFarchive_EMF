@@ -1,4 +1,6 @@
-ALTER TABLE reference.fips ADD CONSTRAINT fips_pkey PRIMARY KEY (state_county_fips, country_num);
+DROP TABLE reference.pollutants;
+
+ALTER TABLE reference.fips ADD CONSTRAINT fips_pkey PRIMARY KEY (costcy_fips);
 ALTER TABLE reference.mact_codes ADD CONSTRAINT mact_pkey PRIMARY KEY (mact_code);
 ALTER TABLE reference.naics_codes ADD CONSTRAINT naics_pkey PRIMARY KEY (naics_code);
 ALTER TABLE reference.countries ADD CONSTRAINT countries_pk PRIMARY KEY (country_code);
@@ -18,7 +20,12 @@ CREATE INDEX fips_co_st
   ON reference.fips
   USING btree
   (country_code, state_county_fips);
-  
+
+CREATE INDEX fips_conum_st
+  ON reference.fips
+  USING btree
+  (country_num, state_county_fips);
+   
 -- DROP INDEX reference.fips_pk;
     
 CREATE INDEX pollutant_codes_tonames
