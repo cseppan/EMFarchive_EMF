@@ -206,7 +206,7 @@ public class EmfFileChooserPanel extends JPanel {
 
         currentDir = fileInfo;
         subdirsList.setListData(getAllDirs());
-        if (this.model.getRowCount() != 0) 
+        if (this.model == null || this.model.getRowCount() != 0) 
             refreshFiles(new EmfFileInfo[0]);
     }
 
