@@ -70,11 +70,3 @@ update emf.control_measure_efficiencyrecords
 set ref_yr_cost_per_ton = cost_per_ton * 9470.3 / CAST(chained_gdp as float)
 from reference.gdplev
 where control_measure_efficiencyrecords.cost_year = gdplev.annual;
-
--- add new SCC codes...
-insert into reference.scc (scc, scc_description)
-select '2260006035', 'Mobile Sources; Off-highway Vehicle Gasoline, 2-Stroke; Agricultural Equipment; Hydro-power Units'
-union select '2265006035', 'Mobile Sources; Off-highway Vehicle Gasoline, 4-Stroke; Agricultural Equipment; Hydro-power Units';
-insert into reference.scc_codes (sector, active, mapto, scc, scc_l1, scc_l2, scc_l3, scc_l4, created, revised, rev_what, "comment")
-select 'NONROAD', '', '', '2260006035', 'Mobile Sources', 'Off-highway Vehicle Gasoline, 2-Stroke', 'Agricultural Equipment', 'Hydro-power Units', '', '', '', ''
-union select 'NONROAD', '', '', '2265006035', 'Mobile Sources', 'Off-highway Vehicle Gasoline, 4-Stroke', 'Agricultural Equipment', 'Hydro-power Units', '', '', '', '';
