@@ -482,8 +482,6 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     public File[] getFiles(File[] dir) throws EmfException {
         try {
-            System.out.println("server side getFiles called.");
-            System.out.println("dir: " + dir[0] + " dir path: " + dir[0].getAbsolutePath());
             if (dir[0] == null) {
                 EmfServerFileSystemView fsv = new EmfServerFileSystemView();
                 return fsv.getDefaultDirectory().listFiles();
@@ -552,14 +550,8 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     public EmfFileInfo[] getRoots() throws EmfException {
         try {
-            System.out.println("server side getRoots called.");
             EmfServerFileSystemView fsv = new EmfServerFileSystemView();
             File[] roots = fsv.getRoots();
-            for (int i = 0; i < roots.length; i++)
-                System.out.println("Roots[" + i + "]: " + roots[i].getAbsolutePath());
-
-            System.out.println("Value returned of getParent: " + roots[0].getParent() + " parentFile: "
-                    + roots[0].getParentFile());
             return getFileInfos(roots);
         } catch (IOException e) {
             LOG.error("Could not get file system roots.", e);

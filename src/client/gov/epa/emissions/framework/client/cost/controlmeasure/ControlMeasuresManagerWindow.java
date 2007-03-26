@@ -339,7 +339,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     protected void controlMeasureImport() {
-        CMImportView view = new CMImportWindow(desktopManager, session);
+        CMImportView view = new CMImportWindow(parentConsole, desktopManager, session);
         CMImportPresenter presenter = new CMImportPresenter(session);
         presenter.display(view);
 
@@ -355,7 +355,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         }
 
         presenter.doExport((ControlMeasure[]) cmList.toArray(new ControlMeasure[0]), desktopManager, selectModel
-                .getRowCount());
+                .getRowCount(), parentConsole);
     }
 
     private Component getItem(String label, JComboBox box) {

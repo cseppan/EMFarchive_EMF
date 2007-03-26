@@ -19,13 +19,14 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.EmfTableModel;
-import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
@@ -41,7 +42,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -190,21 +190,19 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
     }
 
     private void selectFolder(JTextField dir, String title) {
-        String lastFolder = dir.getText();
-        FileChooser chooser = new FileChooser("Select Folder", new EmfFileSystemView(session.dataCommonsService()), this);
-        chooser.setTitle("Please select the " + title);
-        chooser.resetSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        
-        if (lastFolder != null && !lastFolder.trim().isEmpty())
-            chooser.setCurrentDir(lastFolder.trim());
-        
-        File[] file = chooser.choose();
-        if (file == null || file.length == 0)
+        EmfFileInfo initDir = new EmfFileInfo(dir.getText(), true, true);
+
+        EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
+        chooser.setTitle(title);
+        int option = chooser.showDialog(parentConsole, "Select a folder");
+
+        EmfFileInfo file = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;
+        if (file == null)
             return;
 
-        if (file[0].isDirectory()) {
-            caseObj.setInputFileDir(file[0].getAbsolutePath());
-            dir.setText(file[0].getAbsolutePath());
+        if (file.isDirectory()) {
+            caseObj.setInputFileDir(file.getAbsolutePath());
+            dir.setText(file.getAbsolutePath());
         }
     }
 

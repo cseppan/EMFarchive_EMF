@@ -156,7 +156,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
             QAStep step = (QAStep) iter.next();
-            EditQAStepWindow view = new EditQAStepWindow(desktop);
+            EditQAStepWindow view = new EditQAStepWindow(desktop, parentConsole);
             try {
                 presenter.doEdit(step, view, versions.name(step.getVersion()));
             } catch (EmfException e) {

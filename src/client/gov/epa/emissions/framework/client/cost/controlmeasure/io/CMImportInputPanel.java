@@ -5,15 +5,16 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
-import gov.epa.emissions.framework.ui.FileChooser;
+import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,12 +44,15 @@ public class CMImportInputPanel extends JPanel {
     private TextArea importStatusTextArea;
     
     private EmfSession session;
+    
+    private EmfConsole parentConsole;
 
-    private static File lastFolder = null;
+    private static String lastFolder = null;
 
-    public CMImportInputPanel(MessagePanel messagePanel, EmfSession session) {
+    public CMImportInputPanel(EmfConsole parentConsole, MessagePanel messagePanel, EmfSession session) {
         this.messagePanel = messagePanel;
         this.session = session;
+        this.parentConsole = parentConsole;
 
         initialize();
     }
@@ -161,19 +165,27 @@ public class CMImportInputPanel extends JPanel {
     }
 
     private void selectFile() {
-        String lastFolder = folder.getText();
-        FileChooser chooser = new FileChooser("Select Folder", new EmfFileSystemView(session.dataCommonsService()), this);
+        EmfFileInfo initDir = new EmfFileInfo(folder.getText(), true, true);
+        
+        EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
         chooser.setTitle("Select files for control measures import");
+        chooser.setDirectoryAndFileMode();
         
-        if (lastFolder != null && !lastFolder.trim().isEmpty())
-            chooser.setCurrentDir(lastFolder.trim());
+        int option = chooser.showDialog(parentConsole, "Select a file");
+
+        EmfFileInfo[] files = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedFiles() : null;
+        EmfFileInfo dir = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;
         
-        File[] files = chooser.choose();
+        if (dir != null && !dir.getAbsolutePath().equals(lastFolder)) {
+            folder.setText(dir.getAbsolutePath());
+            lastFolder = dir.getAbsolutePath();
+            clearfilenames();
+        }
+        
         if (files == null || files.length == 0)
             return;
 
         if (files.length > 1) {
-            setFolder(files);
             String[] fileNames = new String[files.length];
             for (int i = 0; i < fileNames.length; i++) {
                 fileNames[i] = files[i].getName();
@@ -184,30 +196,19 @@ public class CMImportInputPanel extends JPanel {
         }
     }
 
-    private void singleFile(File file) {
-        if (file.isDirectory()) {
-            folder.setText(file.getAbsolutePath());
-            filenames.setText("");
-            lastFolder = file;
-            return;
-        }
-        folder.setText(file.getParent());
-        filenames.setText(file.getName());
-        lastFolder = file.getParentFile();
+    private void clearfilenames() {
+        filenames.setText("");
     }
-
-    private void setFolder(File[] files) {
-        if (files.length > 0) {
-            folder.setText(files[0].getParentFile().toString());
-            lastFolder = files[0].getParentFile();
-        }
+    
+    private void singleFile(EmfFileInfo file) {
+        filenames.setText(file.getName());
     }
 
     public void setDefaultBaseFolder(String folder) {
         if (lastFolder == null)
             this.folder.setText(folder);
         else
-            this.folder.setText(lastFolder.getAbsolutePath());
+            this.folder.setText(lastFolder);
     }
 
     public String folder() {

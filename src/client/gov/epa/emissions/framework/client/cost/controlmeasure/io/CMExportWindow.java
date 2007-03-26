@@ -7,24 +7,24 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.ui.FileChooser;
+import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -46,13 +46,16 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
     private JButton exportButton;
     
     private EmfSession session;
+    
+    private EmfConsole parentConsole;
 
-    public CMExportWindow(ControlMeasure[] controlMeasures, DesktopManager desktopManager, int totalMeasuers, EmfSession session) {
+    public CMExportWindow(ControlMeasure[] controlMeasures, DesktopManager desktopManager, int totalMeasuers, EmfSession session, EmfConsole parentConsole) {
         super(title(controlMeasures, totalMeasuers), desktopManager);
         super.setName("cmExportWindow:" + hashCode());
 
         this.controlMeasures = controlMeasures;
         this.session = session;
+        this.parentConsole = parentConsole;
 
         this.getContentPane().add(createLayout());
         this.pack();
@@ -194,20 +197,18 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
     }
 
     private void selectFolder() {
-        String lastFolder = folder.getText();
-        FileChooser chooser = new FileChooser("Select Folder", new EmfFileSystemView(session.dataCommonsService()), this);
-        chooser.resetSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        EmfFileInfo initDir = new EmfFileInfo(folder.getText(), true, true);
+        
+        EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
         chooser.setTitle("Select a folder for export control measures");
-        
-        if (lastFolder != null && !lastFolder.trim().isEmpty())
-            chooser.setCurrentDir(lastFolder.trim());
-        
-        File[] files = chooser.choose();
-        if (files == null || files.length == 0)
+        int option = chooser.showDialog(parentConsole, "Select a folder");
+
+        EmfFileInfo file = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;
+        if (file == null)
             return;
 
-        if (files[0].isDirectory()) {
-            folder.setText(files[0].getAbsolutePath());
+        if (file.isDirectory()) {
+            folder.setText(file.getAbsolutePath());
         }
     }
 }

@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.buttons.ImportButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -35,11 +36,14 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
 
     private EmfSession session;
     
-    public CMImportWindow(DesktopManager desktopManager, EmfSession session) {
+    private EmfConsole parentConsole;
+    
+    public CMImportWindow(EmfConsole parentConsole, DesktopManager desktopManager, EmfSession session) {
 //    public CMImportWindow(DesktopManager desktopManager, EmfSession session) {
         super("Import Control Measures", new Dimension(700, 500), desktopManager);
         super.setName("importControlMeasures");
 
+        this.parentConsole = parentConsole;
         this.session = session;
         this.getContentPane().add(createLayout());
     }
@@ -49,7 +53,7 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
         // panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
-        importInputPanel = new CMImportInputPanel(messagePanel, session);
+        importInputPanel = new CMImportInputPanel(parentConsole, messagePanel, session);
 
         panel.add(messagePanel, BorderLayout.NORTH);
         panel.add(importInputPanel);

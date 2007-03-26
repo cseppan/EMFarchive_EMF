@@ -79,8 +79,8 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         return null;
     }
 
-    public void doExport(ControlMeasure[] measures, DesktopManager desktopManager, int totalMeasuers) {
-        CMExportView exportView = new CMExportWindow(measures, desktopManager, totalMeasuers, session);
+    public void doExport(ControlMeasure[] measures, DesktopManager desktopManager, int totalMeasuers, EmfConsole parentConsole) {
+        CMExportView exportView = new CMExportWindow(measures, desktopManager, totalMeasuers, session, parentConsole);
         CMExportPresenter exportPresenter = new CMExportPresenter(session);
         exportPresenter.display(exportView);
     }

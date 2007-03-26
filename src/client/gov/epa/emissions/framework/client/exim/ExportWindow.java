@@ -217,13 +217,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     }
 
     private void selectFolder() {
-        String lastFolder = folder.getText();
-        EmfFileInfo initDir = new EmfFileInfo();
-        initDir.setAbsolute(true);
-        initDir.setDirectory(true);
-
-        if (lastFolder != null || !lastFolder.trim().equals(""))
-            initDir.setAbsolutePath(lastFolder);
+        EmfFileInfo initDir = new EmfFileInfo(folder.getText(), true, true);
         
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(service));
         int option = chooser.showDialog(parentConsole, "Select a folder");

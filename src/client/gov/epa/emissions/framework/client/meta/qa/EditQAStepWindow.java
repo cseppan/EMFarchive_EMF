@@ -19,14 +19,16 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.QAPrograms;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
-import gov.epa.emissions.framework.ui.FileChooser;
+import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.NumberFormattedTextField;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -39,7 +41,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -48,7 +49,6 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -97,9 +97,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private JCheckBox currentTable;
     
     private EmfSession session;
+
+    private EmfConsole parentConsole;
    
-    public EditQAStepWindow(DesktopManager desktopManager) {
+    public EditQAStepWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
         super("Edit QA Step", new Dimension(650, 625), desktopManager);
+        this.parentConsole = parentConsole;
     }
 
     public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset, String versionName,
@@ -247,20 +250,17 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     private void selectFolder() {
-        String lastFolder = exportFolder.getText();
-        FileChooser chooser = new FileChooser("Select Folder", new EmfFileSystemView(session.dataCommonsService()), this);
-        chooser.setTitle("Please select the export folder");
-        chooser.resetSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        EmfFileInfo initDir = new EmfFileInfo(exportFolder.getText(), true, true);
         
-        if (lastFolder != null && !lastFolder.trim().isEmpty())
-            chooser.setCurrentDir(lastFolder.trim());
-        
-        File[] file = chooser.choose();
-        if (file == null || file.length == 0)
+        EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
+        int option = chooser.showDialog(parentConsole, "Select a folder");
+
+        EmfFileInfo file = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;
+        if (file == null)
             return;
 
-        if (file[0].isDirectory()) {
-            exportFolder.setText(file[0].getAbsolutePath());
+        if (file.isDirectory()) {
+            exportFolder.setText(file.getAbsolutePath());
         }
     }
 

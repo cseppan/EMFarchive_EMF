@@ -13,24 +13,23 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.EmfTableModel;
-import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -254,26 +253,18 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     private void selectFolder() {
-        String lastFolder = folder.getText();
-        FileChooser chooser = new FileChooser("Select Folder", new EmfFileSystemView(session.dataCommonsService()), this);
-        chooser.resetSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        EmfFileInfo initDir = new EmfFileInfo(folder.getText(), true, true);
+        
+        EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
         chooser.setTitle("Select a folder for export");
-        
-        if (lastFolder != null && !lastFolder.trim().isEmpty())
-            chooser.setCurrentDir(lastFolder.trim());
-        
-        File[] files = chooser.choose();
-        if (files == null || files.length == 0)
+        int option = chooser.showDialog(parentConsole, "Select a folder");
+
+        EmfFileInfo file = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;
+        if (file == null)
             return;
 
-        if (files.length > 0) {
-            if (files[0].isDirectory()) {
-                folder.setText(files[0].getAbsolutePath());
-            }
-        
-            if (files[0].isFile()) {
-                folder.setText(files[0].getParent());
-            }
+        if (file.isDirectory()) {
+            folder.setText(file.getAbsolutePath());
         }
     }
 
