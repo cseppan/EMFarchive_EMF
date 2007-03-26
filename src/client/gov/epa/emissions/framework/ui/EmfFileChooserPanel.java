@@ -70,12 +70,12 @@ public class EmfFileChooserPanel extends JPanel {
         add(this.messagePanel);
         add(upperPanel());
         add(fileListPanels(files));
-        
+
         if (dirOnly)
             setPreferredSize(new Dimension(418, 300));
         else
             setPreferredSize(new Dimension(650, 400));
-        
+
         setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
     }
 
@@ -125,7 +125,7 @@ public class EmfFileChooserPanel extends JPanel {
         EmfFileInfo[] dirs = getAllDirs();
         panel.add(new JLabel("Subfolders:"), BorderLayout.NORTH);
         panel.add(subdirListWidgit(dirs));
-        panel.setPreferredSize(new Dimension(100,250));
+        panel.setPreferredSize(new Dimension(100, 250));
 
         return panel;
     }
@@ -206,7 +206,8 @@ public class EmfFileChooserPanel extends JPanel {
 
         currentDir = fileInfo;
         subdirsList.setListData(getAllDirs());
-        refreshFiles(new EmfFileInfo[0]);
+        if (this.model.getRowCount() != 0) 
+            refreshFiles(new EmfFileInfo[0]);
     }
 
     private EmfFileInfo[] getAllDirs() {
@@ -234,7 +235,7 @@ public class EmfFileChooserPanel extends JPanel {
         this.selectedFile = fsv.getFiles(this.currentDir, true);
         refreshFiles(selectedFile);
     }
-    
+
     private void refreshFiles(EmfFileInfo[] files) {
         display(files);
         this.validate();
