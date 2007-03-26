@@ -30,3 +30,9 @@ ALTER TABLE dataset_types ADD COLUMN table_per_dataset int4 NOT NULL DEFAULT 1;
 
 -- Also, need to remove the table column data from tables
 -- Also, need to lock timeout property to 2 hours
+
+-- 3/26/2007
+-- added new default QA step to run during a control strategy run
+update emf.properties
+set value = value || '|Summarize by US State and Pollutant'
+where name = 'defaultQASummaries'
