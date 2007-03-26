@@ -167,7 +167,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Input Folder:", getFolderChooserPanel(inputDir, "input folder"), panel);
+        layoutGenerator.addLabelWidgetPair("Input Folder:", getFolderChooserPanel(inputDir, "Select the base Input Folder for the Case"), panel);
         layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
@@ -365,7 +365,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
 
     private boolean checkExportDir(String exportDir) {
         if (exportDir == null || exportDir.equals("")) {
-            messagePanel.setMessage("Please specify the input folder before export.");
+            messagePanel.setMessage("Please specify the input folder before exporting the case inputs.");
             return false;
         }
 
@@ -377,7 +377,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
 
         for (int i = 0; i < inputs.length; i++)
             if (inputs[i].isRequired() && inputs[i].getDataset() == null) {
-                messagePanel.setMessage("Please specify a dataset for required input \"" + inputs[i].getName() + "\".");
+                messagePanel.setMessage("Please specify a dataset for the required input \"" + inputs[i].getName() + "\".");
                 return false;
             }
 

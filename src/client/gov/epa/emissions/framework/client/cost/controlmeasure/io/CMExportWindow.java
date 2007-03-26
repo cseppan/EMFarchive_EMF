@@ -200,7 +200,7 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
         EmfFileInfo initDir = new EmfFileInfo(folder.getText(), true, true);
         
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
-        chooser.setTitle("Select a folder for export control measures");
+        chooser.setTitle("Select a folder to hold the exported control measure files");
         int option = chooser.showDialog(parentConsole, "Select a folder");
 
         EmfFileInfo file = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;

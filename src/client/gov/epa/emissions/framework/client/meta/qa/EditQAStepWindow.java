@@ -253,6 +253,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         EmfFileInfo initDir = new EmfFileInfo(exportFolder.getText(), true, true);
         
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
+        chooser.setTitle("Select a folder to contain the exported QA step results");
         int option = chooser.showDialog(parentConsole, "Select a folder");
 
         EmfFileInfo file = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;

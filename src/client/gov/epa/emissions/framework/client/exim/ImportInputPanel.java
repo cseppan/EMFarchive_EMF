@@ -206,7 +206,7 @@ public class ImportInputPanel extends JPanel {
         EmfFileInfo initDir = new EmfFileInfo(folder.getText(), true, true);
         
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(service));
-        chooser.setTitle("EMF File Chooser");
+        chooser.setTitle("Select the files to import into Datasets");
         chooser.setDirectoryAndFileMode();
         
         int option = chooser.showDialog(parent, "Select a file");

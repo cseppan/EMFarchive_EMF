@@ -161,7 +161,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     private JPanel folderPanel() {
-        JLabel folderLabel = new JLabel("Folder: ");
+        JLabel folderLabel = new JLabel("Export Folder: ");
         folder = new TextField("folderName", 30);
 
         Button browseButton = new BrowseButton(browseAction());
@@ -256,7 +256,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         EmfFileInfo initDir = new EmfFileInfo(folder.getText(), true, true);
         
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
-        chooser.setTitle("Select a folder for export");
+        chooser.setTitle("Select a folder to contain the exported strategy results");
         int option = chooser.showDialog(parentConsole, "Select a folder");
 
         EmfFileInfo file = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;

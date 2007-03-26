@@ -58,7 +58,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
         this.parentConsole = parentConsole;
         this.changeables = changeables;
 
-        this.outputDir = new TextField("outputdir", 20);
+        this.outputDir = new TextField("outputdir", 30);
         this.changeables.addChangeable(outputDir);
         
         super.setLayout(new BorderLayout());
@@ -113,7 +113,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Output Folder:", getFolderChooserPanel(outputDir, "output folder"), panel);
+        layoutGenerator.addLabelWidgetPair("Output Folder:", getFolderChooserPanel(outputDir, "Select the base Output Folder for the Case"), panel);
         layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
