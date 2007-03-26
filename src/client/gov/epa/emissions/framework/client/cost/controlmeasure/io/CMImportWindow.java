@@ -147,8 +147,9 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
 
     private boolean confirmImport() {
         if (importing) {
-            String message = "Control measures are being imported, you will lose status messages by closing this window." + System.getProperty("line.separator")
-            + "Click the Import Status button to get the status of the import process.  Click yes, if you to don't care to see the messages for the import process.";
+            String message = "Control measures are being imported, and you will lose status messages if you close this window." + System.getProperty("line.separator")
+            + "Click the Import Status button to get the status of the import process.\n"+
+            "Click yes, if you to don't care to see the messages for the import process.";
             String title = "Ignore import status messages?";
             YesNoDialog dialog = new YesNoDialog(this, title, message);
             return dialog.confirm();
