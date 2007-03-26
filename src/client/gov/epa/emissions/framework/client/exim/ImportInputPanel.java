@@ -52,6 +52,8 @@ public class ImportInputPanel extends JPanel {
 
     private static String lastFolder = null;
     
+    JComboBox datasetTypesComboBox = null;
+    
     private EmfConsole parent;
 
     public ImportInputPanel(DataCommonsService service, MessagePanel messagePanel, EmfConsole parent) throws EmfException {
@@ -66,7 +68,7 @@ public class ImportInputPanel extends JPanel {
         setLayout(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        JComboBox datasetTypesComboBox = typesComboBox();
+        datasetTypesComboBox = typesComboBox();
         layoutGenerator.addLabelWidgetPair("Dataset Type", datasetTypesComboBox, this);
 
         JPanel chooser = new JPanel(new BorderLayout(2,0));
@@ -206,7 +208,7 @@ public class ImportInputPanel extends JPanel {
         EmfFileInfo initDir = new EmfFileInfo(folder.getText(), true, true);
         
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(service));
-        chooser.setTitle("Select the files to import into Datasets");
+        chooser.setTitle("Select the "+datasetTypesComboBox.getSelectedItem()+" files to import into Datasets");
         chooser.setDirectoryAndFileMode();
         
         int option = chooser.showDialog(parent, "Select a file");
