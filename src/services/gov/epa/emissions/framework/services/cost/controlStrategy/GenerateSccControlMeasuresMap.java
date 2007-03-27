@@ -14,13 +14,11 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 
 public class GenerateSccControlMeasuresMap {
 
-    private static Log log = LogFactory.getLog(GenerateSccControlMeasuresMap.class);
+//    private static Log log = LogFactory.getLog(GenerateSccControlMeasuresMap.class);
 
     private Datasource emissionDatasource;
 
@@ -84,7 +82,7 @@ public class GenerateSccControlMeasuresMap {
             ControlMeasureDAO dao = new ControlMeasureDAO();
             measure = dao.current(id, session);
             EfficiencyRecord[] ers = (EfficiencyRecord[]) dao.getEfficiencyRecords(measure.getId(), session).toArray(new EfficiencyRecord[0]);
-            log.error("Measure = " + measure.getName() + " EfficiencyRecord length = " + ers.length);
+//            log.error("Measure = " + measure.getName() + " EfficiencyRecord length = " + ers.length);
             measure.setEfficiencyRecords(ers);
             return measure;
         } finally {

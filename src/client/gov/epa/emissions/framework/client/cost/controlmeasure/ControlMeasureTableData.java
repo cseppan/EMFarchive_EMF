@@ -73,6 +73,62 @@ public class ControlMeasureTableData extends AbstractTableData {
     private List createRows(ControlMeasure[] measures) throws EmfException {
         List rows = new ArrayList();
         int year = targetYear;
+        boolean found = false;
+        targetYear = year;
+        boolean majorPollutant = pollutant.getName().equalsIgnoreCase("major");
+        for (int i = 0; i < measures.length; i++) {
+            ControlMeasure measure = measures[i];
+            AggregatedPollutantEfficiencyRecord[] apers = measure.getAggregatedPollutantEfficiencyRecords();
+            found = false;
+            for (int j = 0; j < apers.length; j++) {
+                AggregatedPollutantEfficiencyRecord aper = apers[j];
+                if (majorPollutant && measure.getMajorPollutant().equals(measure.getMajorPollutant())) {
+                    Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(measure),
+                            new Double(aper.getMaxEfficiency()), new Double(aper.getMinEfficiency()), new Double(aper.getAvgEfficiency()), 
+                            getCostPerTon(aper.getMaxCostPerTon()), getCostPerTon(aper.getMinCostPerTon()), getCostPerTon(aper.getAvgCostPerTon()), 
+                            new Double(aper.getAvgRuleEffectiveness()), new Double(aper.getAvgRulePenetration()), getControlTechnology(measure), 
+                            getSourceGroup(measure), new Double(measure.getEquipmentLife()), "" + measure.getDeviceCode(), 
+                            getSectors(measure), measureClass(measure.getCmClass()), getLastModifiedTime(measure), 
+                            measure.getLastModifiedBy(), getDateReviewed(measure), measure.getCreator().getName(), 
+                            measure.getDataSouce(), measure.getDescription() };
+                    Row row = new ViewableRow(measure, values);
+                    rows.add(row);
+                    found = true;
+                    break;
+                } else if (pollutant.equals(aper.getPollutant())) {
+                    Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(aper.getPollutant()),
+                            new Double(aper.getMaxEfficiency()), new Double(aper.getMinEfficiency()), new Double(aper.getAvgEfficiency()), 
+                            getCostPerTon(aper.getMaxCostPerTon()), getCostPerTon(aper.getMinCostPerTon()), getCostPerTon(aper.getAvgCostPerTon()), 
+                            new Double(aper.getAvgRuleEffectiveness()), new Double(aper.getAvgRulePenetration()), getControlTechnology(measure), 
+                            getSourceGroup(measure), new Double(measure.getEquipmentLife()), "" + measure.getDeviceCode(), 
+                            getSectors(measure), measureClass(measure.getCmClass()), getLastModifiedTime(measure), 
+                            measure.getLastModifiedBy(), getDateReviewed(measure), measure.getCreator().getName(), 
+                            measure.getDataSouce(), measure.getDescription() };
+                    Row row = new ViewableRow(measure, values);
+                    rows.add(row);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(measure),
+                        NAN_VALUE, NAN_VALUE, NAN_VALUE, 
+                        NAN_VALUE, NAN_VALUE, NAN_VALUE, 
+                        NAN_VALUE, NAN_VALUE, getControlTechnology(measure), 
+                        getSourceGroup(measure), new Double(measure.getEquipmentLife()), "" + measure.getDeviceCode(), 
+                        getSectors(measure), measureClass(measure.getCmClass()), getLastModifiedTime(measure), 
+                        measure.getLastModifiedBy(), getDateReviewed(measure), measure.getCreator().getName(), 
+                        measure.getDataSouce(), measure.getDescription() };
+                Row row = new ViewableRow(measure, values);
+                rows.add(row);
+            }
+        }
+        return rows;
+    }
+
+    protected List createRows_v1(ControlMeasure[] measures) throws EmfException {
+        List rows = new ArrayList();
+        int year = targetYear;
         targetYear = year;
         for (int i = 0; i < measures.length; i++) {
             ControlMeasure measure = measures[i];
@@ -122,12 +178,19 @@ public class ControlMeasureTableData extends AbstractTableData {
         return rows;
     }
 
+
     private String pollutant(ControlMeasure measure) {
         if (measure == null)
             return "";
         if (measure.getMajorPollutant() == null)
             return "";
         return measure.getMajorPollutant().getName();
+    }
+
+    private String pollutant(Pollutant pollutant) {
+        if (pollutant == null)
+            return "";
+        return pollutant.getName();
     }
 
     private String measureClass(ControlMeasureClass cmClass) {
