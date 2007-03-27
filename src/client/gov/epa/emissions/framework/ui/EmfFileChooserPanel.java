@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.ui;
 
-import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.EditableComboBox;
+import gov.epa.emissions.commons.gui.EmptyStrings;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -8,17 +9,16 @@ import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -35,11 +35,13 @@ public class EmfFileChooserPanel extends JPanel {
 
     private EmfFileInfo currentDir;
 
-    private EmfFileInfo[] selectedFile;
+    // private EmfFileInfo[] selectedFile;
 
     private JPanel filePanel;
 
     private JTextField folder;
+
+    private EditableComboBox filePattern;
 
     private JList subdirsList;
 
@@ -55,13 +57,25 @@ public class EmfFileChooserPanel extends JPanel {
 
     private SortFilterSelectModel selectModel;
 
+    private String lastFilter = "*.*";
+
+    private List<String> curFilterList;
+
+    private final String[] filters = { "*.*", "*.txt", "*.ncf" };
+
     public EmfFileChooserPanel(Component parent, EmfFileSystemView fsv, EmfFileInfo initialFile, boolean dirOnly) {
         this.fsv = fsv;
         this.currentDir = initialFile;
         this.dirOnly = dirOnly;
         this.messagePanel = new SingleLineMessagePanel();
         this.parent = parent;
-        display(new EmfFileInfo[0]);
+        this.curFilterList = new ArrayList<String>();
+        this.curFilterList.addAll(Arrays.asList(filters));
+        if (!dirOnly)
+            this.curFilterList.add(EmptyStrings.create(178));
+        else
+            this.curFilterList.add(EmptyStrings.create(100));
+        display(null);
     }
 
     public void display(EmfFileInfo[] files) {
@@ -72,9 +86,9 @@ public class EmfFileChooserPanel extends JPanel {
         add(fileListPanels(files));
 
         if (dirOnly)
-            setPreferredSize(new Dimension(418, 300));
+            setPreferredSize(new Dimension(419, 300));
         else
-            setPreferredSize(new Dimension(650, 400));
+            setPreferredSize(new Dimension(652, 400));
 
         setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
     }
@@ -99,25 +113,52 @@ public class EmfFileChooserPanel extends JPanel {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        folder = new JTextField(currentDir.getAbsolutePath(), 32);
+        if (!dirOnly)
+            folder = new JTextField(currentDir.getAbsolutePath(), 51);
+        else
+            folder = new JTextField(currentDir.getAbsolutePath(), 30);
+        
         folder.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 String newvalue = ((JTextField) evt.getSource()).getText();
-                EmfFileInfo fileInfo = new EmfFileInfo();
-                fileInfo.setAbsolute(true);
-                fileInfo.setAbsolutePath(newvalue);
-                fileInfo.setDirectory(true);
+                EmfFileInfo fileInfo = new EmfFileInfo(newvalue, true, true);
                 updateDirSelections(fileInfo);
             }
 
         });
         layoutGenerator.addLabelWidgetPair("Folder:     ", folder, panel);
 
-        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+        filePattern = new EditableComboBox(curFilterList.toArray());
+        filePattern.setSelectedIndex(getFilterIndex(lastFilter));
+        filePattern.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Object pat = ((EditableComboBox) e.getSource()).getSelectedItem();
+                String cur = pat.toString();
+                if (!dirOnly && !cur.equalsIgnoreCase(lastFilter)) {
+                    lastFilter = cur;
+
+                    if (!contains(pat))
+                        curFilterList.add(0, pat.toString());
+
+                    updateDirSelections(currentDir);
+                }
+            }
+
+        });
+        layoutGenerator.addLabelWidgetPair("File Pattern:   ", filePattern, panel);
+        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 0, 10, // initialX, initialY
                 0, 10);// xPad, yPad
 
         return panel;
+    }
+
+    private int getFilterIndex(String pat) {
+        return curFilterList.indexOf(pat);
+    }
+
+    private boolean contains(Object pat) {
+        return curFilterList.contains(pat);
     }
 
     private JPanel subdirPanel() {
@@ -136,13 +177,13 @@ public class EmfFileChooserPanel extends JPanel {
         filePanel.setLayout(new BorderLayout());
         filePanel.add(new JLabel("Files:"), BorderLayout.NORTH);
 
-        Button getFiles = new Button("Get Files", getFilesAction());
-        getFiles.setMnemonic('G');
-        JPanel getFilesPanel = new JPanel(new FlowLayout());
-        getFilesPanel.add(getFiles);
+        // Button getFiles = new Button("Get Files", getFilesAction());
+        // getFiles.setMnemonic('G');
+        // JPanel getFilesPanel = new JPanel(new FlowLayout());
+        // getFilesPanel.add(getFiles);
         JPanel middlePanel = new JPanel(new BorderLayout(2, 5));
         middlePanel.add(createFilePanel(files), BorderLayout.CENTER);
-        middlePanel.add(getFilesPanel, BorderLayout.SOUTH);
+        // middlePanel.add(getFilesPanel, BorderLayout.SOUTH);
         middlePanel.setBorder(BorderFactory.createEtchedBorder());
 
         filePanel.add(middlePanel, BorderLayout.CENTER);
@@ -151,7 +192,8 @@ public class EmfFileChooserPanel extends JPanel {
     }
 
     private JPanel createFilePanel(EmfFileInfo[] files) {
-        tableData = new EmfFileTableData(files);
+        EmfFileInfo[] infos = (files != null) ? files : fsv.getFiles(currentDir, lastFilter);
+        tableData = new EmfFileTableData(infos);
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
         return new SortFilterSelectionPanel(parent, selectModel);
@@ -201,13 +243,15 @@ public class EmfFileChooserPanel extends JPanel {
     }
 
     protected void updateDirSelections(EmfFileInfo fileInfo) {
-        if (fileInfo == null || fileInfo.getAbsolutePath().equals(currentDir.getAbsolutePath()))
-            return;
-
         currentDir = fileInfo;
         subdirsList.setListData(getAllDirs());
-        if (this.model == null || this.model.getRowCount() != 0) 
-            refreshFiles(new EmfFileInfo[0]);
+
+        if (!dirOnly && model != null) {
+            if (lastFilter.trim().isEmpty())
+                refreshFiles(new EmfFileInfo[0]);
+            else
+                refreshFiles(fsv.getFiles(currentDir, lastFilter));
+        }
     }
 
     private EmfFileInfo[] getAllDirs() {
@@ -223,18 +267,18 @@ public class EmfFileChooserPanel extends JPanel {
         return dirs;
     }
 
-    private Action getFilesAction() {
-        return new AbstractAction() {
-            public void actionPerformed(ActionEvent arg0) {
-                getFiles();
-            }
-        };
-    }
+    // private Action getFilesAction() {
+    // return new AbstractAction() {
+    // public void actionPerformed(ActionEvent arg0) {
+    // getFiles();
+    // }
+    // };
+    // }
 
-    private void getFiles() {
-        this.selectedFile = fsv.getFiles(this.currentDir, true);
-        refreshFiles(selectedFile);
-    }
+    // private void getFiles() {
+    // this.selectedFile = fsv.getFiles(this.currentDir, true);
+    // refreshFiles(selectedFile);
+    // }
 
     private void refreshFiles(EmfFileInfo[] files) {
         display(files);

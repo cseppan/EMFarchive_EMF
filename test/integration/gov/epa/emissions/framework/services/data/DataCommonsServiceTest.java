@@ -14,7 +14,6 @@ import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -505,13 +504,6 @@ public class DataCommonsServiceTest extends ServiceTestCase {
             remove(note2);
             remove(dataset);
         }
-    }
-
-    public void testShouldReturnAnArrayOfFiles() throws EmfException {
-        File[] files = service.getFiles(new File[]{new File("C:\\")});
-//        for (int i = 0; i < files.length; i++)
-//            System.out.println("Files from C:[" + i + "] " + files[i].getAbsolutePath());
-        assertTrue(files.length > 0);
     }
 
     private EmfDataset newDataset() {

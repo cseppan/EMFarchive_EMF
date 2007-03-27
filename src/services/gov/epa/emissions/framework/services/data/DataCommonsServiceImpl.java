@@ -509,24 +509,6 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir) throws EmfException {
-        try {
-            EmfFileInfo gooddir = correctEmptyDir(dir);
-            if (currentDirectory != null && gooddir.getAbsolutePath().equals(currentDirectory.getAbsolutePath())) {
-                return this.files == null ? new EmfFileInfo[0] : this.files;
-            }
-
-            currentDirectory = gooddir;
-            File currentdirFile = new File(currentDirectory.getAbsolutePath());
-            listDirsAndFiles(currentdirFile.listFiles(), currentdirFile);
-
-            return this.files != null ? this.files : new EmfFileInfo[0];
-        } catch (Exception e) {
-            LOG.error("Could not list files.", e);
-            throw new EmfException("Could not list files. " + e.getMessage());
-        }
-    }
-
     public EmfFileInfo getDefaultDir() throws EmfException {
         try {
             //NOTE: FileSystemView doesn't work well on Linux platform
@@ -615,7 +597,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             
             currentDirectory = gooddir;
             File currentdirFile = new File(currentDirectory.getAbsolutePath());
-            listDirsAndFiles(currentdirFile.listFiles(), currentdirFile);
+            listDirsAndFiles(currentdirFile.listFiles(), currentdirFile, "*.*");
 
             return this.subdirs != null ? this.subdirs : new EmfFileInfo[0];
         } catch (Exception e) {
@@ -648,7 +630,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         return dir;
     }
 
-    private void listDirsAndFiles(File[] files, File cur) throws IOException {
+    private void listDirsAndFiles(File[] files, File cur, String filter) throws IOException {
         List<EmfFileInfo> subdirsOfCurDir = new ArrayList<EmfFileInfo>();
         List<EmfFileInfo> filesOfCurDir = new ArrayList<EmfFileInfo>();
         EmfFileInfo curInfo = EmfFileSerializer.convert(cur);
@@ -682,8 +664,52 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             }
         }
 
-        this.files = filesOfCurDir.toArray(new EmfFileInfo[0]);
+        this.files = getFileinfosFromPattern(filesOfCurDir.toArray(new EmfFileInfo[0]), filter);
         this.subdirs = subdirsOfCurDir.toArray(new EmfFileInfo[0]);
+    }
+
+    public EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir, String filter) throws EmfException {
+        try {
+            EmfFileInfo gooddir = correctEmptyDir(dir);
+            if (currentDirectory != null && gooddir.getAbsolutePath().equals(currentDirectory.getAbsolutePath())) {
+                return this.files == null ? new EmfFileInfo[0] : this.files;
+            }
+
+            currentDirectory = gooddir;
+            File currentdirFile = new File(currentDirectory.getAbsolutePath());
+            listDirsAndFiles(currentdirFile.listFiles(), currentdirFile, filter);
+
+            return this.files != null ? this.files : new EmfFileInfo[0];
+        } catch (Exception e) {
+            LOG.error("Could not list files.", e);
+            throw new EmfException("Could not list files. " + e.getMessage());
+        }
+    }
+    
+    private EmfFileInfo[] getFileinfosFromPattern(EmfFileInfo[] fileInfos, String pattern) throws EmfException {
+        try {
+            String pat = pattern.trim();
+            if (!pat.isEmpty())
+                pat = pat.substring(1);  // NOTE: assume pattern always begin with "*.".
+            
+            if (pat.isEmpty() || pat.equals(".*"))
+                return fileInfos;
+                
+            List<EmfFileInfo> list = new ArrayList<EmfFileInfo>();
+            int len = pat.length();
+            int size = fileInfos.length;
+            String temp = "";
+            
+            for (int i = 0; i < size; i++) {
+                temp = fileInfos[i].getName();
+                if (temp.lastIndexOf(pat) == (temp.length() - len))
+                    list.add(fileInfos[i]);
+            }
+
+            return list.toArray(new EmfFileInfo[0]);
+        } catch (Exception e) {
+            throw new EmfException("Cannot apply pattern.");
+        }
     }
 
 }

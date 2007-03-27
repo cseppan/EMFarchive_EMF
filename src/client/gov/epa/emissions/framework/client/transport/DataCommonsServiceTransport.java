@@ -327,16 +327,6 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (File[])call.requestResponse(new Object[] { dir });
     }
 
-    public EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir) throws EmfException {
-        EmfCall call = call();
-        
-        call.setOperation("getEmfFileInfos");
-        call.addParam("dir", mappings.emfFileInfo());
-        call.setReturnType(mappings.emfFileInfos());
-        
-        return (EmfFileInfo[])call.requestResponse(new Object[] { dir });
-    }
-
     public EmfFileInfo createNewFolder(String folder) throws EmfException {
         EmfCall call = call();
 
@@ -423,6 +413,17 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.setReturnType(mappings.emfFileInfos());
         
         return (EmfFileInfo[])call.requestResponse(new Object[] { dir });
+    }
+
+    public EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir, String filter) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getEmfFileInfos");
+        call.addParam("dir", mappings.emfFileInfo());
+        call.addStringParam("filter");
+        call.setReturnType(mappings.emfFileInfos());
+        
+        return (EmfFileInfo[])call.requestResponse(new Object[] { dir, filter });
     }
 
 }
