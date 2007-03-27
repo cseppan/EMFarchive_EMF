@@ -79,7 +79,7 @@ public class EmfFileTableData extends AbstractTableData {
     }
 
     private Object getDate(EmfFileInfo info) {
-        return EmfDateFormat.format_MM_DD_YYYY_HH_mm(new Date(info.getLastModified()));
+        return EmfDateFormat.format_YYYY_MM_DD_HH_MM((new Date(info.getLastModified())));
     }
 
     private Object getType(EmfFileInfo info) {
