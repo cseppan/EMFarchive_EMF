@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client.transport;
 
-import java.io.File;
-
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Keyword;
@@ -317,24 +315,15 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { sourcegrp });
     }
 
-    public File[] getFiles(File[] dir) throws EmfException {
-        EmfCall call = call();
-
-        call.setOperation("getFiles");
-        call.addFileArrayParam();
-        call.setFileArrayReturnType();
-
-        return (File[])call.requestResponse(new Object[] { dir });
-    }
-
-    public EmfFileInfo createNewFolder(String folder) throws EmfException {
+    public EmfFileInfo createNewFolder(String folder, String subfolder) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("createNewFolder");
         call.addStringParam("folder");
+        call.addStringParam("subfolder");
         call.setReturnType(mappings.emfFileInfo());
 
-        return (EmfFileInfo)call.requestResponse(new Object[] { folder });
+        return (EmfFileInfo)call.requestResponse(new Object[] { folder, subfolder });
     }
 
     public EmfFileInfo getDefaultDir() throws EmfException {

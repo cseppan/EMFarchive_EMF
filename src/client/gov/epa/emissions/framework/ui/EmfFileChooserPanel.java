@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.ui;
 
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.EmptyStrings;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
@@ -15,10 +16,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -40,6 +44,8 @@ public class EmfFileChooserPanel extends JPanel {
     private JPanel filePanel;
 
     private JTextField folder;
+
+    private JTextField subfolder;
 
     private EditableComboBox filePattern;
 
@@ -73,8 +79,7 @@ public class EmfFileChooserPanel extends JPanel {
         this.curFilterList.addAll(Arrays.asList(filters));
         if (!dirOnly)
             this.curFilterList.add(EmptyStrings.create(178));
-        else
-            this.curFilterList.add(EmptyStrings.create(100));
+
         display(null);
     }
 
@@ -86,7 +91,7 @@ public class EmfFileChooserPanel extends JPanel {
         add(fileListPanels(files));
 
         if (dirOnly)
-            setPreferredSize(new Dimension(419, 300));
+            setPreferredSize(new Dimension(424, 300));
         else
             setPreferredSize(new Dimension(652, 400));
 
@@ -113,11 +118,30 @@ public class EmfFileChooserPanel extends JPanel {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        if (!dirOnly)
-            folder = new JTextField(currentDir.getAbsolutePath(), 51);
+        createDirField();
+        layoutGenerator.addLabelWidgetPair("Folder:     ", folder, panel);
+
+        if (!dirOnly) {
+            createPatternBox();
+            layoutGenerator.addLabelWidgetPair("File Pattern:   ", filePattern, panel);
+        }
+
+        if (dirOnly)
+            layoutGenerator.addLabelWidgetPair("Create Subfolder:     ", createNewSubfolderField(), panel);
+
+        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+                0, 10, // initialX, initialY
+                0, 10);// xPad, yPad
+
+        return panel;
+    }
+
+    private void createDirField() {
+        if (dirOnly)
+            folder = new JTextField(currentDir.getAbsolutePath(), 27);
         else
-            folder = new JTextField(currentDir.getAbsolutePath(), 30);
-        
+            folder = new JTextField(currentDir.getAbsolutePath(), 51);
+
         folder.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 String newvalue = ((JTextField) evt.getSource()).getText();
@@ -126,8 +150,64 @@ public class EmfFileChooserPanel extends JPanel {
             }
 
         });
-        layoutGenerator.addLabelWidgetPair("Folder:     ", folder, panel);
+    }
 
+    private JPanel createNewSubfolderField() {
+        JPanel panel = new JPanel();
+
+        subfolder = new JTextField("<double click mouse & add a name>", 19);
+
+        subfolder.addMouseListener(new MouseListener() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2)
+                    subfolder.setText("");
+            }
+
+            public void mouseEntered(MouseEvent e) {
+                // NOTE Auto-generated method stub
+
+            }
+
+            public void mouseExited(MouseEvent e) {
+                // NOTE Auto-generated method stub
+
+            }
+
+            public void mousePressed(MouseEvent e) {
+                // NOTE Auto-generated method stub
+
+            }
+
+            public void mouseReleased(MouseEvent e) {
+                // NOTE Auto-generated method stub
+
+            }
+        });
+
+        Button create = new Button("Create", createSubdir());
+        create.setMnemonic('C');
+        panel.add(subfolder);
+        panel.add(create);
+
+        return panel;
+    }
+
+    private Action createSubdir() {
+        return new AbstractAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    fsv.createNewFolder(currentDir.getAbsolutePath(), subfolder.getText());
+                    updateDirSelections(currentDir);
+                } catch (IOException exc) {
+                    messagePanel.setError("Could not create new subfolder - " + exc.getMessage());
+                }
+            }
+
+        };
+    }
+
+    private void createPatternBox() {
         filePattern = new EditableComboBox(curFilterList.toArray());
         filePattern.setSelectedIndex(getFilterIndex(lastFilter));
         filePattern.addActionListener(new ActionListener() {
@@ -145,12 +225,6 @@ public class EmfFileChooserPanel extends JPanel {
             }
 
         });
-        layoutGenerator.addLabelWidgetPair("File Pattern:   ", filePattern, panel);
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
-                0, 10, // initialX, initialY
-                0, 10);// xPad, yPad
-
-        return panel;
     }
 
     private int getFilterIndex(String pat) {

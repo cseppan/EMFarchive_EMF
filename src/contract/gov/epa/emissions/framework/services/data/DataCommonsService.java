@@ -83,7 +83,7 @@ public interface DataCommonsService {
     
     EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir, String filter) throws EmfException;
     
-    EmfFileInfo createNewFolder(String folder) throws EmfException;
+    EmfFileInfo createNewFolder(String folder, String subfolder) throws EmfException;
 
     EmfFileInfo getDefaultDir() throws EmfException;
     

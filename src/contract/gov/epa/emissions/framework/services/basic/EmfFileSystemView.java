@@ -24,9 +24,9 @@ public class EmfFileSystemView implements Serializable {
         }
     }
 
-    public EmfFileInfo createNewFolder(EmfFileInfo folder) throws IOException {
+    public EmfFileInfo createNewFolder(String folder, String subfolder) throws IOException {
         try {
-            return service.createNewFolder(folder.getAbsolutePath());
+            return service.createNewFolder(folder, subfolder);
         } catch (Exception e) {
             throw new IOException("cann't create new folder.");
         }

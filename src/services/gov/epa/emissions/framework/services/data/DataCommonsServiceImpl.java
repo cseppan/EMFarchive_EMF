@@ -494,18 +494,23 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public EmfFileInfo createNewFolder(String folder) throws EmfException {
+    public EmfFileInfo createNewFolder(String folder, String subfolder) throws EmfException {
         try {
             if (folder == null || folder.trim().isEmpty())
                 return null;
 
-            EmfServerFileSystemView fsv = new EmfServerFileSystemView();
-            File newfolder = fsv.createNewFolder(new File(folder));
+            if (subfolder == null || subfolder.trim().isEmpty())
+                return null;
 
-            return EmfFileSerializer.convert(newfolder);
+            File subdir = new File(folder, subfolder);
+            
+            if (subdir.mkdirs())
+                return EmfFileSerializer.convert(subdir);
+
+            throw new EmfException("Could not create new folder " + folder + File.separator + subfolder);
         } catch (Exception e) {
-            LOG.error("Could not create new folder " + folder + ". ", e);
-            throw new EmfException("Could not create new folder " + folder + " " + e.getMessage());
+            LOG.error("Could not create new folder " + folder + File.separator + subfolder + ". ", e);
+            throw new EmfException("Could not create new folder " + folder + File.separator + subfolder + " " + e.getMessage());
         }
     }
 
