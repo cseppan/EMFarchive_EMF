@@ -35,7 +35,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -443,20 +442,29 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
 
     private String[] getSelectedInputSubdirs() {
         List list = getSelectedInputs();
-        List subDirList = new ArrayList();
+        List<String> subDirList = new ArrayList<String>();
         String defaultExportDir = session.preferences().outputFolder();
         if (!inputDir.getText().equals(""))
             defaultExportDir = inputDir.getText();
+        
+        String separator = getFileSeparator(defaultExportDir);
 
         for (int i = 0; i < list.size(); i++) {
             SubDir subdir = ((CaseInput) list.get(i)).getSubdirObj();
             if (subdir != null)
-                subDirList.add(defaultExportDir + File.separator + subdir.getName());
+                subDirList.add(defaultExportDir + separator + subdir.getName());
             else
                 subDirList.add(defaultExportDir);
         }
 
-        return (String[]) subDirList.toArray(new String[0]);
+        return subDirList.toArray(new String[0]);
+    }
+    
+    private String getFileSeparator(String folder) {
+        if (folder.trim().charAt(0) == '/')
+            return "/";
+
+        return "\\";
     }
 
     public void addInput(CaseInput note) {
