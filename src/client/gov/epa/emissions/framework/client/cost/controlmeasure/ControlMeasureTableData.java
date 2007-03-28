@@ -83,7 +83,7 @@ public class ControlMeasureTableData extends AbstractTableData {
             for (int j = 0; j < apers.length; j++) {
                 AggregatedPollutantEfficiencyRecord aper = apers[j];
                 if (majorPollutant && measure.getMajorPollutant().equals(measure.getMajorPollutant())) {
-                    Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(measure),
+                    Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(measure),
                             new Double(aper.getMaxEfficiency()), new Double(aper.getMinEfficiency()), new Double(aper.getAvgEfficiency()), 
                             getCostPerTon(aper.getMaxCostPerTon()), getCostPerTon(aper.getMinCostPerTon()), getCostPerTon(aper.getAvgCostPerTon()), 
                             new Double(aper.getAvgRuleEffectiveness()), new Double(aper.getAvgRulePenetration()), getControlTechnology(measure), 
@@ -96,7 +96,7 @@ public class ControlMeasureTableData extends AbstractTableData {
                     found = true;
                     break;
                 } else if (pollutant.equals(aper.getPollutant())) {
-                    Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(aper.getPollutant()),
+                    Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(aper.getPollutant()),
                             new Double(aper.getMaxEfficiency()), new Double(aper.getMinEfficiency()), new Double(aper.getAvgEfficiency()), 
                             getCostPerTon(aper.getMaxCostPerTon()), getCostPerTon(aper.getMinCostPerTon()), getCostPerTon(aper.getAvgCostPerTon()), 
                             new Double(aper.getAvgRuleEffectiveness()), new Double(aper.getAvgRulePenetration()), getControlTechnology(measure), 
@@ -111,7 +111,7 @@ public class ControlMeasureTableData extends AbstractTableData {
                 }
             }
             if (!found) {
-                Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(measure),
+                Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(pollutant),
                         NAN_VALUE, NAN_VALUE, NAN_VALUE, 
                         NAN_VALUE, NAN_VALUE, NAN_VALUE, 
                         NAN_VALUE, NAN_VALUE, getControlTechnology(measure), 
@@ -126,60 +126,7 @@ public class ControlMeasureTableData extends AbstractTableData {
         return rows;
     }
 
-    protected List createRows_v1(ControlMeasure[] measures) throws EmfException {
-        List rows = new ArrayList();
-        int year = targetYear;
-        targetYear = year;
-        for (int i = 0; i < measures.length; i++) {
-            ControlMeasure measure = measures[i];
-            AggregatedPollutantEfficiencyRecord[] apers = measure.getAggregatedPollutantEfficiencyRecords();
-            if (apers.length > 0) {
-                for (int j = 0; j < apers.length; j++) {
-                    AggregatedPollutantEfficiencyRecord aper = apers[j];
-                    if (pollutant.getName().equalsIgnoreCase("major")) {
-                        Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(measure),
-                                new Double(aper.getMaxEfficiency()), new Double(aper.getMinEfficiency()), new Double(aper.getAvgEfficiency()), 
-                                getCostPerTon(aper.getMaxCostPerTon()), getCostPerTon(aper.getMinCostPerTon()), getCostPerTon(aper.getAvgCostPerTon()), 
-                                new Double(aper.getAvgRuleEffectiveness()), new Double(aper.getAvgRulePenetration()), getControlTechnology(measure), 
-                                getSourceGroup(measure), new Double(measure.getEquipmentLife()), "" + measure.getDeviceCode(), 
-                                getSectors(measure), measureClass(measure.getCmClass()), getLastModifiedTime(measure), 
-                                measure.getLastModifiedBy(), getDateReviewed(measure), measure.getCreator().getName(), 
-                                measure.getDataSouce(), measure.getDescription() };
-                        Row row = new ViewableRow(measure, values);
-                        rows.add(row);
-                    } else {
-                        if (!pollutant.equals(aper.getPollutant())) aper = null;
-                        Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(measure),
-                                new Double(aper != null ? aper.getMaxEfficiency() : NAN_VALUE), new Double(aper != null ? aper.getMinEfficiency() : NAN_VALUE), new Double(aper != null ? aper.getAvgEfficiency() : NAN_VALUE), 
-                                getCostPerTon(aper != null ? aper.getMaxCostPerTon() : Float.NaN), getCostPerTon(aper != null ? aper.getMinCostPerTon() : Float.NaN), getCostPerTon(aper != null ? aper.getAvgCostPerTon() : Float.NaN), 
-                                new Double(aper != null ? aper.getAvgRuleEffectiveness() : NAN_VALUE), new Double(aper != null ? aper.getAvgRulePenetration() : NAN_VALUE), getControlTechnology(measure), 
-                                getSourceGroup(measure), new Double(measure.getEquipmentLife()), "" + measure.getDeviceCode(), 
-                                getSectors(measure), measureClass(measure.getCmClass()), getLastModifiedTime(measure), 
-                                measure.getLastModifiedBy(), getDateReviewed(measure), measure.getCreator().getName(), 
-                                measure.getDataSouce(), measure.getDescription() };
-                        Row row = new ViewableRow(measure, values);
-                        rows.add(row);
-                    }
-                }
-            } else {
-                Object[] values = { measure.getName(), measure.getAbbreviation(), pollutant(measure),
-                        NAN_VALUE, NAN_VALUE, NAN_VALUE, 
-                        NAN_VALUE, NAN_VALUE, NAN_VALUE, 
-                        NAN_VALUE, NAN_VALUE, getControlTechnology(measure), 
-                        getSourceGroup(measure), new Double(measure.getEquipmentLife()), "" + measure.getDeviceCode(), 
-                        getSectors(measure), measureClass(measure.getCmClass()), getLastModifiedTime(measure), 
-                        measure.getLastModifiedBy(), getDateReviewed(measure), measure.getCreator().getName(), 
-                        measure.getDataSouce(), measure.getDescription() };
-                Row row = new ViewableRow(measure, values);
-                rows.add(row);
-            }
-        }
-
-        return rows;
-    }
-
-
-    private String pollutant(ControlMeasure measure) {
+    private String getPollutantName(ControlMeasure measure) {
         if (measure == null)
             return "";
         if (measure.getMajorPollutant() == null)
@@ -187,7 +134,7 @@ public class ControlMeasureTableData extends AbstractTableData {
         return measure.getMajorPollutant().getName();
     }
 
-    private String pollutant(Pollutant pollutant) {
+    private String getPollutantName(Pollutant pollutant) {
         if (pollutant == null)
             return "";
         return pollutant.getName();

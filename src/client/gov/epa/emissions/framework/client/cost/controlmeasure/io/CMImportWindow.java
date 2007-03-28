@@ -39,7 +39,6 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
     private EmfConsole parentConsole;
     
     public CMImportWindow(EmfConsole parentConsole, DesktopManager desktopManager, EmfSession session) {
-//    public CMImportWindow(DesktopManager desktopManager, EmfSession session) {
         super("Import Control Measures", new Dimension(700, 500), desktopManager);
         super.setName("importControlMeasures");
 

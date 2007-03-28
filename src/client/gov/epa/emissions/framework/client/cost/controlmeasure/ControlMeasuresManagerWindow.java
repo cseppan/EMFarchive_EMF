@@ -83,14 +83,6 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private Pollutant[] pollsFromDB;
 
-    ///////
-    ///////
-    ///////
-    ///////
-    ///////
-    ///////
-    ///////
-//    private String[] years = { "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006" };
     private String[] years = { "1999", "2000", "2001", "2002", "2003", "2004", "2005" };
 
     private CostYearTable costYearTable;
@@ -106,13 +98,6 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         this.session = session;
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
-//        try {
-//            display(new ControlMeasure[0]);
-//        } catch (EmfException e) {
-//            // NOTE Auto-generated catch block
-//        }
-//        this.populateThread = new Thread(this);
-//        populateThread.start();
     }
 
     public void run() {

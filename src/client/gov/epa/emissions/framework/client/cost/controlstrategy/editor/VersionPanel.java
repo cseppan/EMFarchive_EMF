@@ -10,7 +10,6 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -77,7 +76,7 @@ public class VersionPanel extends JPanel {
 
     protected ComboBox comboBox() {
         ComboBox comboBox = new ComboBox();
-        comboBox.setPreferredSize(new Dimension(150, 20));
+        //comboBox.setPreferredSize(new Dimension(150, 20));
         comboBox.setName("versions");
         return comboBox;
     }

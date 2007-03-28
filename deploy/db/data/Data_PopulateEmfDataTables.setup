@@ -33,7 +33,7 @@ insert into emf.properties values(DEFAULT, 'lock.time-interval', '7200000');
 insert into emf.properties values(DEFAULT, 'page-size', '100');
 insert into emf.properties values(DEFAULT, 'batch-size', '10000');
 insert into emf.properties values(DEFAULT, 'export-batch-size', '150000');
-insert into emf.properties values(DEFAULT, 'defaultQASummaries', 'Summarize by Pollutant|Summarize by SCC and Pollutant|Summarize by County and Pollutant');
+insert into emf.properties values(DEFAULT, 'defaultQASummaries', 'Summarize by Pollutant|Summarize by SCC and Pollutant|Summarize by County and Pollutant|Summarize by US State and Pollutant');
 insert into emf.properties values(DEFAULT, 'PM10-PRI-alias', 'PM10');
 insert into emf.properties values(DEFAULT, 'PM2_5-PRI-alias', 'PM2_5');
 --update version each time EMF gets updated!

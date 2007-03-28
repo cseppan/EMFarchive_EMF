@@ -184,6 +184,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             throw new EmfException("Filter Tab: The length of the sql filter should not exceed 255 characters.");
 
         controlStrategy.setDatasetType(selectedDatasetType());
+        controlStrategy.setDatasetVersion(versionPanel.datasetVersion());
         controlStrategy.setFilter(value);
     }
 
