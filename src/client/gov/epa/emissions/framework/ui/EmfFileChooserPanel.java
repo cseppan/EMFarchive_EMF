@@ -16,15 +16,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -199,8 +200,8 @@ public class EmfFileChooserPanel extends JPanel {
                 try {
                     fsv.createNewFolder(currentDir.getAbsolutePath(), subfolder.getText());
                     updateDirSelections(currentDir);
-                } catch (IOException exc) {
-                    messagePanel.setError("Could not create new subfolder - " + exc.getMessage());
+                } catch (Exception exc) {
+                    messagePanel.setError(exc.getMessage());
                 }
             }
 
@@ -274,7 +275,13 @@ public class EmfFileChooserPanel extends JPanel {
     }
 
     private JScrollPane subdirListWidgit(EmfFileInfo[] files) {
-        subdirsList = new JList(files);
+        List<EmfFileInfo> filesList = new ArrayList<EmfFileInfo>();
+        filesList.addAll(Arrays.asList(files));
+        Collections.sort(filesList);
+        DefaultComboBoxModel model = new DefaultComboBoxModel(filesList.toArray());
+        
+        subdirsList = new JList();
+        subdirsList.setModel(model);
         subdirsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         subdirsList.addMouseListener(new MouseListener() {
 
@@ -317,6 +324,7 @@ public class EmfFileChooserPanel extends JPanel {
     }
 
     protected void updateDirSelections(EmfFileInfo fileInfo) {
+        clearMsg();
         currentDir = fileInfo;
         subdirsList.setListData(getAllDirs());
 
@@ -357,6 +365,10 @@ public class EmfFileChooserPanel extends JPanel {
     private void refreshFiles(EmfFileInfo[] files) {
         display(files);
         this.validate();
+    }
+
+    protected void clearMsg() {
+        this.messagePanel.clear();
     }
 
     public EmfFileInfo[] selectedFiles() {

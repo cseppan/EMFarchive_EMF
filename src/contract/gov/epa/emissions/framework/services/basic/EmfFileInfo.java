@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.basic;
 
 import java.io.Serializable;
 
-public class EmfFileInfo implements Serializable {
+public class EmfFileInfo implements Serializable, Comparable<EmfFileInfo> {
     
     private String absolutePath; 
 
@@ -270,6 +270,11 @@ public class EmfFileInfo implements Serializable {
 
     public void setSeparatorChar(char separatorChar) {
         this.separatorChar = separatorChar;
+    }
+    
+
+    public int compareTo(EmfFileInfo info) {
+        return this.name.compareTo(info.getName());
     }
 
 }

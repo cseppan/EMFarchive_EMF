@@ -504,13 +504,16 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             File subdir = new File(folder, subfolder);
             
+            if (subdir.exists())
+                throw new EmfException("Subfolder " + subfolder + " already existed.");
+            
             if (subdir.mkdirs())
                 return EmfFileSerializer.convert(subdir);
 
-            throw new EmfException("Could not create new folder " + folder + File.separator + subfolder);
+            return null;
         } catch (Exception e) {
             LOG.error("Could not create new folder " + folder + File.separator + subfolder + ". ", e);
-            throw new EmfException("Could not create new folder " + folder + File.separator + subfolder + " " + e.getMessage());
+            throw new EmfException(e.getMessage());
         }
     }
 

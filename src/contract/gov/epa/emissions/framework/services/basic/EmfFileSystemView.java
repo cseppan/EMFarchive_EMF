@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.services.basic;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 public class EmfFileSystemView implements Serializable {
@@ -11,7 +10,7 @@ public class EmfFileSystemView implements Serializable {
     private DataCommonsService service;
 
     private EmfFileInfo[] emfRoots;
-    
+
     public EmfFileSystemView(DataCommonsService service) {
         this.service = service;
     }
@@ -24,12 +23,8 @@ public class EmfFileSystemView implements Serializable {
         }
     }
 
-    public EmfFileInfo createNewFolder(String folder, String subfolder) throws IOException {
-        try {
-            return service.createNewFolder(folder, subfolder);
-        } catch (Exception e) {
-            throw new IOException("cann't create new folder.");
-        }
+    public EmfFileInfo createNewFolder(String folder, String subfolder) throws Exception {
+        return service.createNewFolder(folder, subfolder);
     }
 
     public EmfFileInfo getDefaultDir() {
@@ -54,7 +49,7 @@ public class EmfFileSystemView implements Serializable {
         try {
             if (emfRoots == null)
                 this.emfRoots = service.getRoots();
-            
+
             return emfRoots;
         } catch (Exception e) {
             return null;
@@ -65,13 +60,13 @@ public class EmfFileSystemView implements Serializable {
         try {
             boolean retVal;
             if (emfRoots == null)
-                retVal= service.isRoot(file);
-            
-            retVal= contains(file, emfRoots);
-            
-            if (file.getAbsolutePath().equals("/")) 
+                retVal = service.isRoot(file);
+
+            retVal = contains(file, emfRoots);
+
+            if (file.getAbsolutePath().equals("/"))
                 retVal = true;
-           
+
             return retVal;
         } catch (Exception e) {
             return false;
@@ -81,8 +76,8 @@ public class EmfFileSystemView implements Serializable {
     public boolean isFileSystemRoot(EmfFileInfo file) {
         try {
             boolean retVal;
-            retVal= file.getAbsolutePath().equals("/") || 
-               ((file.getAbsolutePath().length()==3) && (file.getAbsolutePath().charAt(1)==':'));
+            retVal = file.getAbsolutePath().equals("/")
+                    || ((file.getAbsolutePath().length() == 3) && (file.getAbsolutePath().charAt(1) == ':'));
             return retVal;
         } catch (Exception e) {
             return false;
@@ -96,14 +91,14 @@ public class EmfFileSystemView implements Serializable {
     private boolean contains(EmfFileInfo file, EmfFileInfo[] files) {
         boolean result = false;
         String filepath = file.getAbsolutePath();
-        
+
         for (int i = 0; i < files.length; i++)
             if (filepath.equals(files[i].getAbsolutePath()))
                 result = true;
-        
+
         return result;
     }
-    
+
     public EmfFileInfo getChild(EmfFileInfo file, String child) {
         try {
             EmfFileInfo fileInfo = service.getChild(file, child);
