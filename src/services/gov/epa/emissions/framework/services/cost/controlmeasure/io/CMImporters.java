@@ -62,7 +62,7 @@ public class CMImporters {
             }
         }
 
-        throw new EmfException("Control Measure Summary file is required");
+        throw new EmfException("Control Measure Summary file is required, the file is missing or has the wrong format, expected header format: " + getHeaderFormat(cols));
     }
 
     private CMEfficiencyImporter createEfficiencyImporter() throws EmfException {
@@ -78,7 +78,7 @@ public class CMImporters {
             }
         }
 
-        throw new EmfException("Control Measure Efficiency file is required");
+        throw new EmfException("Control Measure Efficiency file is required, the file is missing or has the wrong format, expected header format: " + getHeaderFormat(cols));
 
     }
 
@@ -91,7 +91,7 @@ public class CMImporters {
             }
         }
 
-        throw new EmfException("Control Measure SCC file is required");
+        throw new EmfException("Control Measure SCC file is required, the file is missing or has the wrong format, expected header format: " + getHeaderFormat(cols));
 
     }
 
@@ -107,6 +107,14 @@ public class CMImporters {
         return null;
     }
 
+    private String getHeaderFormat(String[] cols) {
+        String header = cols[0];
+        for (int i = 1; i < cols.length; i++) {
+            header += "," + cols[i];
+        }
+        return header;
+    }
+    
     private boolean matches(String[] cols, String[] tokens) {
         if (cols.length != tokens.length)
             return false;

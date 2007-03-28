@@ -77,7 +77,7 @@ public class ControlMeasuresImporter implements Importer {
         setDetailStatus("Started importing control measures\n");
         ControlMeasure[] measures;
         EfficiencyRecord[] efficiencyRecords;
-
+        int efficiencyRecordCount = 0;
         try {
             runSummary(controlMeasures);
             runSCC(controlMeasures);
@@ -90,7 +90,8 @@ public class ControlMeasuresImporter implements Importer {
             while (!isLastEfficiencyRecord()) {
                 efficiencyRecords = runEfficiencyRecords();
                 saveEfficiencyRecords(efficiencyRecords);
-                setStatus("Processed " + efficiencyRecords.length + " efficiency records");
+                efficiencyRecordCount += efficiencyRecords.length;
+                setStatus("Processed " + efficiencyRecordCount + " efficiency records");
                 efficiencyRecords = null;
                 System.gc();
             }
@@ -99,6 +100,7 @@ public class ControlMeasuresImporter implements Importer {
         } catch (Exception e) {
             logError("Failed to import all control measures", e); // FIXME: report generation
             setStatus("Failed to import all control measures, see the import control measures status field for more detailed information on the failure: " + e.getMessage());
+            setDetailStatus("Failed to import all control measures, see the import control measures status field for more detailed information on the failure: " + e.getMessage());
             throw new ImporterException("Failed to import all control measures: " + e.getMessage());
         } finally {
             try {

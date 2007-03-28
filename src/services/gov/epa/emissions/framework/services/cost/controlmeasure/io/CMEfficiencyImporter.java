@@ -34,6 +34,8 @@ public class CMEfficiencyImporter {
     
     private boolean end;
     
+    private int recordParseCount;
+
     public CMEfficiencyImporter(File file, CMEfficiencyFileFormat fileFormat, User user,
             HibernateSessionFactory sessionFactory) throws EmfException, SQLException {
         this.file = file;
@@ -55,19 +57,19 @@ public class CMEfficiencyImporter {
         this.cmEfficiencyReader = new CMEfficiencyRecordReader(fileFormat, user, sessionFactory, costYearTable);
     }
 
-    public void run(Map controlMeasures) throws ImporterException {
-        addStatus("Start reading Efficiency file");
-        if (reader == null ) reader = new CMCSVFileReader(file);
-        for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
-            cmEfficiencyReader.parse(controlMeasures, record, reader.lineNumber());
-        }
-        addStatus("Finished reading Efficiency file");
-    }
+//    public void run(Map controlMeasures) throws ImporterException {
+//        addStatus("Start reading Efficiency file");
+//        if (reader == null ) reader = new CMCSVFileReader(file);
+//        for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
+//            cmEfficiencyReader.parse(controlMeasures, record, reader.lineNumber());
+//        }
+//        addStatus("Finished reading Efficiency file");
+//    }
 
     public EfficiencyRecord[] parseEfficiencyRecords(Map controlMeasures) throws ImporterException {
         int recordCount = 0;
         List effRecs = new ArrayList();
-        addStatus("Start reading Efficiency file");
+        if (recordParseCount == 0) addStatus("Start reading Efficiency file");
         if (reader == null ) reader = new CMCSVFileReader(file);
         for (Record record = reader.read(); !(end = record.isEnd()) && recordCount <= 19999; record = reader.read()) {
             EfficiencyRecord efficiencyRecord;
@@ -78,6 +80,7 @@ public class CMEfficiencyImporter {
             }
             if (efficiencyRecord != null) {
                 effRecs.add(efficiencyRecord);
+                recordParseCount++;
                 recordCount++;
             }
         }
@@ -85,7 +88,7 @@ public class CMEfficiencyImporter {
             addStatus("Failed to import control measure efficiency records, " + cmEfficiencyReader.getErrorCount() + " errors were found.");
             throw new ImporterException("Failed to import control measure efficiency records, " + cmEfficiencyReader.getErrorCount() + " errors were found.");
         }
-        addStatus("Finished reading segment of Efficiency file - " + recordCount + " lines read");
+        addStatus("Finished reading segment of Efficiency file - " + recordParseCount + " lines read");
         return (EfficiencyRecord[]) effRecs.toArray(new EfficiencyRecord[0]);
     }
 

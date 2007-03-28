@@ -127,6 +127,7 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
     }
 
     public void doRefresh() throws EmfException {
+        importing = false;
         doImportStatus();
     }
 
