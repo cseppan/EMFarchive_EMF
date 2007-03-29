@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.persistence;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -93,7 +94,30 @@ public class HibernateFacade {
         }
     }
 
-    //save- new object, updates if the objects already exist
+    public boolean iNameUsed(String name, Class clazz, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            List names = session.createCriteria(clazz).list();
+            tx.commit();
+            
+            boolean result = false;
+            
+            for(Iterator iter = names.iterator(); iter.hasNext(); ) {
+                if (iter.next().toString().equalsIgnoreCase(name.trim())) {
+                    result = true;
+                    break;
+                }
+            }
+
+            return result;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    // save- new object, updates if the objects already exist
     public void saveOrUpdate(Object object, Session session) {
         Transaction tx = null;
         try {
@@ -105,7 +129,7 @@ public class HibernateFacade {
             throw e;
         }
     }
-    
+
     public void updateOnly(Object object, Session session) {
         Transaction tx = null;
         try {
@@ -249,7 +273,7 @@ public class HibernateFacade {
             throw e;
         }
     }
-    
+
     public Object load(Class clazz, Criterion[] criterions, Session session) {
         Transaction tx = null;
         try {

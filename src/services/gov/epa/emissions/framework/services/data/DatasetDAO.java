@@ -52,7 +52,7 @@ public class DatasetDAO {
      * Return true if the name is already used
      */
     public boolean nameUsed(String name, Class clazz, Session session) {
-        return hibernateFacade.nameUsed(name, clazz, session);
+        return hibernateFacade.iNameUsed(name, clazz, session); // case insensitive comparison
     }
 
     public EmfDataset current(int id, Class clazz, Session session) {
