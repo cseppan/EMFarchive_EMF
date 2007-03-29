@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,7 +35,9 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 
-public class EmfFileChooserPanel extends JPanel {
+public class EmfFileChooserPanel extends JPanel implements Runnable {
+
+    private volatile Thread getFilesThread;
 
     private EmfFileSystemView fsv;
 
@@ -81,15 +84,18 @@ public class EmfFileChooserPanel extends JPanel {
         if (!dirOnly)
             this.curFilterList.add(EmptyStrings.create(178));
 
-        display(null);
+        this.getFilesThread = new Thread(this);
+
+        display(new EmfFileInfo[0], new EmfFileInfo[0]);
+        getFilesThread.start();
     }
 
-    public void display(EmfFileInfo[] files) {
+    public void display(EmfFileInfo[] subdirs, EmfFileInfo[] files) {
         removeAll();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(this.messagePanel);
         add(upperPanel());
-        add(fileListPanels(files));
+        add(fileListPanels(subdirs, files));
 
         if (dirOnly)
             setPreferredSize(new Dimension(424, 300));
@@ -99,15 +105,15 @@ public class EmfFileChooserPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
     }
 
-    private JPanel fileListPanels(EmfFileInfo[] files) {
+    private JPanel fileListPanels(EmfFileInfo[] subdirs, EmfFileInfo[] files) {
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.X_AXIS));
-        JPanel subdirs = subdirPanel();
+        JPanel subdirsPanel = subdirPanel(subdirs);
 
         if (dirOnly) {
-            container.add(subdirs);
+            container.add(subdirsPanel);
         } else {
-            container.add(subdirs);
+            container.add(subdirsPanel);
             container.add(new JLabel("  ")); // to fill out some space in between
             container.add(filesPanel(files));
         }
@@ -236,9 +242,8 @@ public class EmfFileChooserPanel extends JPanel {
         return curFilterList.contains(pat);
     }
 
-    private JPanel subdirPanel() {
+    private JPanel subdirPanel(EmfFileInfo[] dirs) {
         JPanel panel = new JPanel(new BorderLayout());
-        EmfFileInfo[] dirs = getAllDirs();
         panel.add(new JLabel("Subfolders:"), BorderLayout.NORTH);
         panel.add(subdirListWidgit(dirs));
         panel.setPreferredSize(new Dimension(100, 250));
@@ -279,7 +284,7 @@ public class EmfFileChooserPanel extends JPanel {
         filesList.addAll(Arrays.asList(files));
         Collections.sort(filesList);
         DefaultComboBoxModel model = new DefaultComboBoxModel(filesList.toArray());
-        
+
         subdirsList = new JList();
         subdirsList.setModel(model);
         subdirsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -326,18 +331,27 @@ public class EmfFileChooserPanel extends JPanel {
     protected void updateDirSelections(EmfFileInfo fileInfo) {
         clearMsg();
         currentDir = fileInfo;
-        subdirsList.setListData(getAllDirs());
 
-        if (!dirOnly && model != null) {
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+        if (dirOnly) {
+            messagePanel.setMessage("Please wait while retrieving all subfolders ...");
+            subdirsList.setListData(getAllDirs(currentDir));
+            messagePanel.setMessage("Retrieving subfolders done.");
+        } else {
+            messagePanel.setMessage("Please wait while retrieving all subfolders and files ...");
             if (lastFilter.trim().isEmpty())
-                refreshFiles(new EmfFileInfo[0]);
+                refreshFiles(getAllDirs(currentDir), new EmfFileInfo[0]);
             else
-                refreshFiles(fsv.getFiles(currentDir, lastFilter));
+                refreshFiles(getAllDirs(currentDir), fsv.getFiles(currentDir, lastFilter));
+            messagePanel.setMessage("Retrieving subfolders & files done.");
         }
+
+        setCursor(Cursor.getDefaultCursor());
     }
 
-    private EmfFileInfo[] getAllDirs() {
-        EmfFileInfo[] dirs = fsv.getSubdirs(currentDir);
+    private EmfFileInfo[] getAllDirs(EmfFileInfo dir) {
+        EmfFileInfo[] dirs = fsv.getSubdirs(dir);
 
         if (dirs == null) {
             this.messagePanel.setError("Please check if the EMF service is running.");
@@ -362,8 +376,8 @@ public class EmfFileChooserPanel extends JPanel {
     // refreshFiles(selectedFile);
     // }
 
-    private void refreshFiles(EmfFileInfo[] files) {
-        display(files);
+    private void refreshFiles(EmfFileInfo[] subdirs, EmfFileInfo[] files) {
+        display(subdirs, files);
         this.validate();
     }
 
@@ -379,6 +393,14 @@ public class EmfFileChooserPanel extends JPanel {
 
     public EmfFileInfo selectedDirectory() {
         return this.currentDir;
+    }
+
+    public void run() {
+        try {
+            updateDirSelections(this.currentDir);
+        } catch (Exception e) {
+            messagePanel.setError("Cannot retrieve all subfolders/files.");
+        }
     }
 
 }
