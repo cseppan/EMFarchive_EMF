@@ -82,7 +82,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         this.curFilterList = new ArrayList<String>();
         this.curFilterList.addAll(Arrays.asList(filters));
         if (!dirOnly)
-            this.curFilterList.add(EmptyStrings.create(20));
+            this.curFilterList.add(EmptyStrings.create(40));
 
         this.getFilesThread = new Thread(this);
 
