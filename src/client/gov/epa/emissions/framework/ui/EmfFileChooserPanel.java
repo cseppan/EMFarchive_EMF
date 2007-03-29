@@ -82,7 +82,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         this.curFilterList = new ArrayList<String>();
         this.curFilterList.addAll(Arrays.asList(filters));
         if (!dirOnly)
-            this.curFilterList.add(EmptyStrings.create(178));
+            this.curFilterList.add(EmptyStrings.create(20));
 
         this.getFilesThread = new Thread(this);
 
@@ -126,15 +126,15 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         createDirField();
-        layoutGenerator.addLabelWidgetPair("Folder:     ", folder, panel);
+        layoutGenerator.addLabelWidgetPair("Folder:             ", folder, panel);
 
         if (!dirOnly) {
             createPatternBox();
-            layoutGenerator.addLabelWidgetPair("File Pattern:   ", filePattern, panel);
+            layoutGenerator.addLabelWidgetPair("File Pattern: ", filePattern, panel);
         }
 
         if (dirOnly)
-            layoutGenerator.addLabelWidgetPair("Create Subfolder:     ", createNewSubfolderField(), panel);
+            layoutGenerator.addLabelWidgetPair("New Subfolder:", createNewSubfolderField(), panel);
 
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 0, 10, // initialX, initialY
@@ -162,7 +162,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
     private JPanel createNewSubfolderField() {
         JPanel panel = new JPanel();
 
-        subfolder = new JTextField("<double click mouse & add a name>", 19);
+        subfolder = new JTextField("", 19);
 
         subfolder.addMouseListener(new MouseListener() {
             public void mouseClicked(MouseEvent e) {
@@ -337,14 +337,14 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         if (dirOnly) {
             messagePanel.setMessage("Please wait while retrieving all subfolders ...");
             subdirsList.setListData(getAllDirs(currentDir));
-            messagePanel.setMessage("Retrieving subfolders done.");
+            messagePanel.setMessage("Finished retrieving subfolders.");
         } else {
             messagePanel.setMessage("Please wait while retrieving all subfolders and files ...");
             if (lastFilter.trim().isEmpty())
                 refreshFiles(getAllDirs(currentDir), new EmfFileInfo[0]);
             else
                 refreshFiles(getAllDirs(currentDir), fsv.getFiles(currentDir, lastFilter));
-            messagePanel.setMessage("Retrieving subfolders & files done.");
+            messagePanel.setMessage("Finished retrieving subfolders and files.");
         }
 
         setCursor(Cursor.getDefaultCursor());
@@ -354,7 +354,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         EmfFileInfo[] dirs = fsv.getSubdirs(dir);
 
         if (dirs == null) {
-            this.messagePanel.setError("Please check if the EMF service is running.");
+            this.messagePanel.setError("Connection to server timed out.");
         }
 
         folder.setText(dirs[0].getAbsolutePath());
@@ -399,7 +399,8 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         try {
             updateDirSelections(this.currentDir);
         } catch (Exception e) {
-            messagePanel.setError("Cannot retrieve all subfolders/files.");
+            setCursor(Cursor.getDefaultCursor());
+            messagePanel.setError("Connection to server timed out: " + ((e.getMessage() == null) ? "" : e.getMessage()));
         }
     }
 
