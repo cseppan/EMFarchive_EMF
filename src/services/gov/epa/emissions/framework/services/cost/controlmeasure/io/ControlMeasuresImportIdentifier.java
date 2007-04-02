@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
 import gov.epa.emissions.commons.Record;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
@@ -16,11 +17,13 @@ public class ControlMeasuresImportIdentifier {
     private HibernateSessionFactory sessionFactory;
 
     private User user;
+    private DbServer dbServer;
 
-    public ControlMeasuresImportIdentifier(File[] files, User user, HibernateSessionFactory sessionFactory) {
+    public ControlMeasuresImportIdentifier(File[] files, User user, HibernateSessionFactory sessionFactory, DbServer dbServer) {
         this.files = files;
         this.user = user;
         this.sessionFactory = sessionFactory;
+        this.dbServer = dbServer;
     }
 
     public CMImporters cmImporters() throws EmfException {
@@ -28,7 +31,7 @@ public class ControlMeasuresImportIdentifier {
         for (int i = 0; i < files.length; i++) {
             records[i] = firstRecord(files[i]);
         }
-        return new CMImporters(files, records, user, sessionFactory);
+        return new CMImporters(files, records, user, sessionFactory, dbServer);
 
     }
 

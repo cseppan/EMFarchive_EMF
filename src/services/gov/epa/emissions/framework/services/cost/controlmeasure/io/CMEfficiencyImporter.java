@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
@@ -14,7 +13,6 @@ import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,23 +35,18 @@ public class CMEfficiencyImporter {
     private int recordParseCount;
 
     public CMEfficiencyImporter(File file, CMEfficiencyFileFormat fileFormat, User user,
-            HibernateSessionFactory sessionFactory) throws EmfException, SQLException {
+            HibernateSessionFactory sessionFactory, DbServer dbServer) throws EmfException {
         this.file = file;
         this.user = user;
         this.sessionFactory = sessionFactory;
-        DbServer dbServer = null;
         CostYearTable costYearTable = null;
         try {
-            dbServer = new EmfDbServer();
             CostYearTableReader reader = new CostYearTableReader(dbServer, 1999);
             costYearTable = reader.costYearTable();
             costYearTable.setTargetYear(1999);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
-        } finally {
-            if (dbServer != null)
-                dbServer.disconnect();
-        }
+        } 
         this.cmEfficiencyReader = new CMEfficiencyRecordReader(fileFormat, user, sessionFactory, costYearTable);
     }
 

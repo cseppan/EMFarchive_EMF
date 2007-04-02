@@ -22,6 +22,7 @@ import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.File;
+import java.util.Date;
 
 import org.hibernate.Session;
 
@@ -127,6 +128,8 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         ControlMeasure measure = new ControlMeasure();
         measure.setName(name);
         measure.setAbbreviation(abbr);
+        measure.setLastModifiedBy(emfUser().getName());
+        measure.setLastModifiedTime(new Date());
         measure.setEfficiencyRecords(records);
         measure.setSccs(sccs);
         add(measure);
@@ -134,6 +137,12 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         for (int i = 0; i < sccs.length; i++) {
             sccs[i].setControlMeasureId(load.getId());
             add(sccs[i]);
+        }
+        for (int i = 0; i < records.length; i++) {
+            records[i].setControlMeasureId(load.getId());
+            records[i].setLastModifiedBy(emfUser().getName());
+            records[i].setLastModifiedTime(new Date());
+            add(records[i]);
         }
         return load;
     }

@@ -27,7 +27,7 @@ public class ControlMeasuresImportIdentifierTest extends ServiceTestCase{
             files[i] = new File(folder, fileNames[i]);
         }
 
-        ControlMeasuresImportIdentifier identifier = new ControlMeasuresImportIdentifier(files,emfUser(), sessionFactory());
+        ControlMeasuresImportIdentifier identifier = new ControlMeasuresImportIdentifier(files,emfUser(), sessionFactory(), dbServer());
         CMImporters cmImporters = identifier.cmImporters();
         assertNotNull(cmImporters.summaryImporter());
         assertNotNull(cmImporters.efficiencyImporter());

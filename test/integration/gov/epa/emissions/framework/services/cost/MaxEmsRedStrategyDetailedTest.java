@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.cost.analysis.maxreduction.MaxEmsRed
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
@@ -717,6 +718,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         dropAll(EmfDataset.class);
         dropAll(Dataset.class);
         new PostgresDbUpdate().deleteAll("emf.control_strategy_measures");
+        dropAll(EfficiencyRecord.class);
         dropAll(ControlMeasure.class);
         dropAll(ControlStrategy.class);
     }

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost;
 
+import java.util.Date;
 import java.util.List;
 
 import gov.epa.emissions.commons.data.Pollutant;
@@ -8,6 +9,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -44,6 +46,8 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         cm.setEquipmentLife(12);
         cm.setName(name);
         cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(userService.getUser("emf").getName());
+        cm.setLastModifiedTime(new Date());
         add(cm);
 
         try {
@@ -65,6 +69,8 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         cm.setEquipmentLife(12);
         cm.setName(name);
         cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(userService.getUser("emf").getName());
+        cm.setLastModifiedTime(new Date());
         cm.setMajorPollutant(dataService.getPollutants()[0]);
         add(cm);
         
@@ -94,6 +100,8 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         cm.setEquipmentLife(12);
         cm.setName(name);
         cm.setAbbreviation("12345679");
+        cm.setLastModifiedBy(userService.getUser("emf").getName());
+        cm.setLastModifiedTime(new Date());
         Scc scc1 = new Scc("1023232", "");
         service.addMeasure(cm, new Scc[] { scc1 });
 
@@ -118,6 +126,8 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         cm.setEquipmentLife(12);
         cm.setName(name);
         cm.setAbbreviation("12345688");
+        cm.setLastModifiedBy(owner.getName());
+        cm.setLastModifiedTime(new Date());
         Scc scc1 = new Scc("123232", "");
 
 
@@ -144,6 +154,8 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("xxxx" + Math.random());
         cm.setAbbreviation("yyyyyyyy");
+        cm.setLastModifiedBy(owner.getName());
+        cm.setLastModifiedTime(new Date());
         Scc scc1 = new Scc("123232", "");
         ControlMeasureClass cmc = service.getMeasureClass("Emerging");
         cm.setCmClass(cmc);
@@ -167,6 +179,8 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("xxxx" + Math.random());
         cm.setAbbreviation("yyyyyyyy");
+        cm.setLastModifiedBy(owner.getName());
+        cm.setLastModifiedTime(new Date());
         Scc scc1 = new Scc("123232", "");
         service.addMeasure(cm, new Scc[] { scc1 });
 
@@ -193,6 +207,8 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         cm.setEquipmentLife(12);
         cm.setName(name);
         cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(userService.getUser("emf").getName());
+        cm.setLastModifiedTime(new Date());
         Scc scc1 = new Scc("123232", "");
         service.addMeasure(cm, new Scc[] { scc1 });
 
@@ -207,16 +223,103 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         assertEquals(0,load(Scc.class).size());
     }
 
-    public void testShouldGetSummaryControlMeasures() throws Exception {
-        ControlMeasure[] cms = service.getSummaryControlMeasures();
+    public void testShouldAddControlMeasureEfficiencyRecords() throws Exception {
+
+        ControlMeasure cm = new ControlMeasure();
+        String name = "cm test one" + Math.random();
+        cm.setEquipmentLife(12);
+        cm.setName(name);
+        cm.setAbbreviation("12345679");
+        cm.setLastModifiedBy(userService.getUser("emf").getName());
+        cm.setLastModifiedTime(new Date());
+        Scc scc1 = new Scc("1023232", "");
+        int cmId = service.addMeasure(cm, new Scc[] { scc1 });
+        EfficiencyRecord records1 = efficiencyRecord(COPollutant(), "23");
+        records1.setControlMeasureId(cmId);
+        service.addEfficiencyRecord(records1);
+        EfficiencyRecord records2 = efficiencyRecord(pm10Pollutant(), "37");
+        records2.setControlMeasureId(cmId);
+        service.addEfficiencyRecord(records2);
 
         try {
-            assertTrue(cms.length == 1);
-//            assertEquals(1, cm2.getSccs().length);
-//            assertEquals("Known", cm2.getCmClass().getName());
-//            assertEquals(new Float(120), new Float(cm2.getEquipmentLife()));
+            EfficiencyRecord[] ers = service.getEfficiencyRecords(cmId);
+
+            assertEquals(2, ers.length);
+            assertEquals("23", ers[0].getLocale());
+            assertEquals("37", ers[1].getLocale());
         } finally {
-//            remove(cm);
+            remove(records1);
+            remove(records2);
+            remove(scc1);
+            remove(cm);
+        }
+    }
+
+    public void testShouldUpdateControlMeasureEfficiencyRecord() throws Exception {
+
+        ControlMeasure cm = new ControlMeasure();
+        String name = "cm test one" + Math.random();
+        cm.setEquipmentLife(12);
+        cm.setName(name);
+        cm.setAbbreviation("12345679");
+        cm.setLastModifiedBy(userService.getUser("emf").getName());
+        cm.setLastModifiedTime(new Date());
+        Scc scc1 = new Scc("1023232", "");
+        int cmId = service.addMeasure(cm, new Scc[] { scc1 });
+        EfficiencyRecord records1 = efficiencyRecord(COPollutant(), "23");
+        records1.setControlMeasureId(cmId);
+        service.addEfficiencyRecord(records1);
+
+        try {
+            EfficiencyRecord[] ers = service.getEfficiencyRecords(cmId);
+
+            assertEquals(1, ers.length);
+            assertEquals("23", ers[0].getLocale());
+
+            ers[0].setLocale("37");
+            ers[0].setPollutant(pm10Pollutant());
+            service.updateEfficiencyRecord(ers[0]);
+            
+            records1 = service.getEfficiencyRecords(cmId)[0];
+            assertEquals("37", records1.getLocale());
+            assertEquals(pm10Pollutant(), records1.getPollutant());
+        } finally {
+            remove(records1);
+            remove(scc1);
+            remove(cm);
+        }
+    }
+
+    public void testShouldRemoveControlMeasureEfficiencyRecord() throws Exception {
+
+        ControlMeasure cm = new ControlMeasure();
+        String name = "cm test one" + Math.random();
+        cm.setEquipmentLife(12);
+        cm.setName(name);
+        cm.setAbbreviation("12345679");
+        cm.setLastModifiedBy(userService.getUser("emf").getName());
+        cm.setLastModifiedTime(new Date());
+        Scc scc1 = new Scc("1023232", "");
+        int cmId = service.addMeasure(cm, new Scc[] { scc1 });
+        EfficiencyRecord records1 = efficiencyRecord(COPollutant(), "23");
+        records1.setControlMeasureId(cmId);
+        int erId = service.addEfficiencyRecord(records1);
+
+        try {
+            EfficiencyRecord[] ers = service.getEfficiencyRecords(cmId);
+
+            assertEquals(1, ers.length);
+            assertEquals("23", ers[0].getLocale());
+
+            service.removeEfficiencyRecord(erId);
+            
+            ers = service.getEfficiencyRecords(cmId);
+
+            assertEquals(0, ers.length);
+        } finally {
+            remove(records1);
+            remove(scc1);
+            remove(cm);
         }
     }
 
@@ -233,7 +336,6 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
             tx.rollback();
             throw e;
         }
-
     }
 
     private ControlMeasure load(ControlMeasure cm) {
@@ -250,6 +352,23 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
             tx.rollback();
             throw e;
         }
+    }
+
+    private EfficiencyRecord efficiencyRecord(Pollutant pollutant, String locale) {
+        EfficiencyRecord record = new EfficiencyRecord();
+        record.setPollutant(pollutant);
+        record.setLocale(locale);
+        record.setLastModifiedBy("emf");
+        record.setLastModifiedTime(new Date());
+        return record;
+    }
+
+    private Pollutant pm10Pollutant() {
+        return (Pollutant) load(Pollutant.class, "PM10");
+    }
+
+    private Pollutant COPollutant() {
+        return (Pollutant) load(Pollutant.class, "CO");
     }
 
 }

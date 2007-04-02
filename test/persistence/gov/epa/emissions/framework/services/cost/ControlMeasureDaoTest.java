@@ -277,11 +277,12 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         dao.add(cm, sccs, session);
         cm = dao.obtainLocked(emfUser, cm.getId(), session);
         EfficiencyRecord record1 = efficiencyRecord(pm10Pollutant(), "22");
+        record1.setControlMeasureId(cm.getId());
+        dao.addEfficiencyRecord(record1, session);
         EfficiencyRecord record2 = efficiencyRecord(pm10Pollutant(), "23");
-        cm.setEfficiencyRecords(new EfficiencyRecord[] { record1, record2 });
-        dao.update(cm, cm.getSccs(), session);
-        ControlMeasure newMeasure = (ControlMeasure) load(ControlMeasure.class, cm.getName());
-        EfficiencyRecord[] efficiencyRecords = newMeasure.getEfficiencyRecords();
+        record2.setControlMeasureId(cm.getId());
+        dao.addEfficiencyRecord(record2, session);
+        EfficiencyRecord[] efficiencyRecords =(EfficiencyRecord[]) dao.getEfficiencyRecords(cm.getId(), session).toArray(new EfficiencyRecord[0]); 
         assertEquals(2, efficiencyRecords.length);
         assertEquals(record1.getPollutant(), efficiencyRecords[0].getPollutant());
         assertEquals(record1.getLocale(), efficiencyRecords[0].getLocale());
@@ -340,29 +341,31 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         cm.setLastModifiedBy(emfUser.getName());
         cm.setLastModifiedTime(new Date());
 
-        EfficiencyRecord[] records1 = { efficiencyRecord(pm10Pollutant(), "01"),
-                efficiencyRecord(pm10Pollutant(), "23") };
+        EfficiencyRecord records1 = efficiencyRecord(pm10Pollutant(), "01");
+        EfficiencyRecord records2 = efficiencyRecord(pm10Pollutant(), "23");
+        
         Scc[] sccs1 = sccs("10031");
-        cm.setEfficiencyRecords(records1);
-
-        EfficiencyRecord[] records2 = { efficiencyRecord(COPollutant(), "32") };
-        Scc[] sccs2 = sccs("10231");
 
         addCMFromImporter(cm, emfUser, sccs1);
+
+        Scc[] sccs2 = sccs("10231");
 
         cm.setAbbreviation("UNCCEP");
         cmc = dao.getCMClass(session, "Obselete");
         cm.setCmClass(cmc);
-        cm.setEfficiencyRecords(records2);
+
         addCMFromImporter(cm, emfUser, sccs2);
 
         ControlMeasure controlMeasure = (ControlMeasure) load(ControlMeasure.class, "cm one");
+        records1.setControlMeasureId(controlMeasure.getId());
+        records2.setControlMeasureId(controlMeasure.getId());
         assertEquals("UNCCEP", controlMeasure.getAbbreviation());
         assertEquals("Obselete", controlMeasure.getCmClass().getName());
-
-        EfficiencyRecord[] efficiencyRecords = controlMeasure.getEfficiencyRecords();
-        assertEquals(1, efficiencyRecords.length);
-        assertEquals("32", efficiencyRecords[0].getLocale());
+        dao.addEfficiencyRecord(records1, session);
+        dao.addEfficiencyRecord(records2, session);
+        EfficiencyRecord[] efficiencyRecords = (EfficiencyRecord[]) dao.getEfficiencyRecords(controlMeasure.getId(), session).toArray(new EfficiencyRecord[0]);
+        assertEquals(2, efficiencyRecords.length);
+        assertEquals("01", efficiencyRecords[0].getLocale());
 
         Scc[] sccs = loadSccs(controlMeasure);
 
@@ -379,27 +382,104 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         cm.setCmClass(cmc);
         User emfUser = emfUser();
         cm.setCreator(emfUser);
+        cm.setLastModifiedBy(emfUser.getName());
+        cm.setLastModifiedTime(new Date());
 
-        EfficiencyRecord[] records1 = { efficiencyRecord(pm10Pollutant(), "01"),
-                efficiencyRecord(pm10Pollutant(), "23") };
+        EfficiencyRecord records1 = efficiencyRecord(pm10Pollutant(), "01");
+        EfficiencyRecord records2 = efficiencyRecord(COPollutant(), "23");
+
         Scc[] sccs1 = sccs("10031");
-        cm.setEfficiencyRecords(records1);
-
-        EfficiencyRecord[] records2 = { efficiencyRecord(COPollutant(), "32") };
         Scc[] sccs2 = sccs("10231");
         try {
-            addCMFromImporter(cm, emfUser, sccs1);
+            int cmId = addCMFromImporter(cm, emfUser, sccs1);
+            records1.setControlMeasureId(cmId);
+            records2.setControlMeasureId(cmId);
+            dao.addEfficiencyRecord(records1, session);
+            dao.addEfficiencyRecord(records2, session);
             cm.setName("cm two");
             cmc = dao.getCMClass(session, "Emerging");
             cm.setCmClass(cmc);
-            cm.setEfficiencyRecords(records2);
-            addCMFromImporter(cm, emfUser, sccs2);
+
+            cmId = addCMFromImporter(cm, emfUser, sccs2);
             assertFalse("Should have throw an exception: abbrev exist", true);
         } catch (Exception e) {
             assertEquals("The Control Measure Abbreviation already in use: 12345678", e.getMessage());
             assertTrue("The exception is thrown: abbrev exist", true);
         }
 
+    }
+
+    public void testShouldAddControlMeasureEfficiencyRecord() throws Exception {
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
+        cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(emfUser().getName());
+        cm.setLastModifiedTime(new Date());
+        Scc[] sccs = { new Scc("100232", "") };
+        int cmId = dao.add(cm, sccs, session);
+        EfficiencyRecord records1 = efficiencyRecord(COPollutant(), "23");
+        records1.setControlMeasureId(cmId);
+        int erId = dao.addEfficiencyRecord(records1, session);
+        EfficiencyRecord records2 = (EfficiencyRecord)load(EfficiencyRecord.class, erId);
+        assertEquals(cm.getId(), cmId);
+        assertEquals(records1.getLocale(), records2.getLocale());
+    }
+
+    public void testShouldUpdateControlMeasureEfficiencyRecord() throws Exception {
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
+        cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(emfUser().getName());
+        cm.setLastModifiedTime(new Date());
+        Scc[] sccs = { new Scc("100232", "") };
+        int cmId = dao.add(cm, sccs, session);
+        EfficiencyRecord records1 = efficiencyRecord(COPollutant(), "23");
+        records1.setControlMeasureId(cmId);
+        int erId = dao.addEfficiencyRecord(records1, session);
+        records1.setId(erId);
+
+        //change local and pollutant
+        records1.setLocale("01");
+        records1.setPollutant(pm10Pollutant());
+
+        dao.updateEfficiencyRecord(records1, session);
+        
+        records1 = ((EfficiencyRecord[]) dao.getEfficiencyRecords(cmId, session).toArray(new EfficiencyRecord[0]))[0];
+        assertEquals(records1.getLocale(), "01");
+        assertEquals(records1.getPollutant(), pm10Pollutant());
+    }
+
+    public void testRemoveControlMeasureEfficiencyRecord() throws Exception {
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
+        cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy(emfUser().getName());
+        cm.setLastModifiedTime(new Date());
+        Scc[] sccs = { new Scc("100232", "") };
+        int cmId = dao.add(cm, sccs, session);
+        EfficiencyRecord records1 = efficiencyRecord(COPollutant(), "23");
+        records1.setControlMeasureId(cmId);
+        int erId = dao.addEfficiencyRecord(records1, session);
+        records1.setId(erId);
+        EfficiencyRecord records2 = efficiencyRecord(pm10Pollutant(), "01");
+        records2.setControlMeasureId(cmId);
+        erId = dao.addEfficiencyRecord(records2, session);
+        records2.setId(erId);
+        EfficiencyRecord records3 = efficiencyRecord(COPollutant(), "37");
+        records3.setControlMeasureId(cmId);
+        erId = dao.addEfficiencyRecord(records3, session);
+        records3.setId(erId);
+
+        EfficiencyRecord[] efficiencyRecords = (EfficiencyRecord[]) dao.getEfficiencyRecords(cmId, session).toArray(new EfficiencyRecord[0]);
+
+        assertEquals(3, efficiencyRecords.length);
+
+        //remove eff rec
+        dao.removeEfficiencyRecord(erId, session);
+        
+        efficiencyRecords = (EfficiencyRecord[]) dao.getEfficiencyRecords(cmId, session).toArray(new EfficiencyRecord[0]);
+
+        assertEquals(2, efficiencyRecords.length);
     }
 
     private Scc[] loadSccs(ControlMeasure controlMeasure) throws HibernateException, Exception {
@@ -414,10 +494,11 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         }
     }
 
-    private void addCMFromImporter(ControlMeasure cm, User emfUser, Scc[] sccs) throws Exception, EmfException {
+    private int addCMFromImporter(ControlMeasure cm, User emfUser, Scc[] sccs) throws Exception, EmfException {
         Session session = sessionFactory().getSession();
+        int cmId = 0;
         try {
-            int cmId = dao.addFromImporter(cm, sccs, emfUser, session);
+            cmId = dao.addFromImporter(cm, sccs, emfUser, session);
             EfficiencyRecord[] ers = cm.getEfficiencyRecords(); 
             for (int i = 0; i < ers.length; i++) {
                 ers[i].setControlMeasureId(cmId);
@@ -426,6 +507,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         } finally {
             session.close();
         }
+        return cmId;
     }
 
     private Scc[] sccs(String name) {

@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.cost;
 
+import java.util.Date;
+
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 
@@ -22,6 +24,8 @@ public class RetrieveSCCTest extends ServiceTestCase {
         cm.setEquipmentLife(12);
         cm.setName("cm test added" + Math.random());
         cm.setAbbreviation("12345678");
+        cm.setLastModifiedBy("emf");
+        cm.setLastModifiedTime(new Date());
         Scc scc0 = new Scc("0ABBBBBB", "");
         Scc scc1 = new Scc("10100101", "");
         Scc scc2 = new Scc("10100225", "");

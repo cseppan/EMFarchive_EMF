@@ -1,12 +1,12 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
 import gov.epa.emissions.commons.Record;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
-import java.sql.SQLException;
 
 public class CMImporters {
 
@@ -25,12 +25,15 @@ public class CMImporters {
     private HibernateSessionFactory sessionFactory;
 
     private User user;
+    
+    private DbServer dbServer;
 
-    public CMImporters(File[] files, Record[] records, User user, HibernateSessionFactory sessionFactory) throws EmfException {
+    public CMImporters(File[] files, Record[] records, User user, HibernateSessionFactory sessionFactory, DbServer dbServer) throws EmfException {
         this.files = files;
         this.records = records;
         this.user = user;
         this.sessionFactory = sessionFactory;
+        this.dbServer = dbServer;
         summaryImporter = createSummaryImporter();
         efficiencyImporter = createEfficiencyImporter();
         sccImporter = createSCCImporter();
@@ -70,11 +73,7 @@ public class CMImporters {
         String[] cols = fileFormat.cols();
         for (int i = 0; i < records.length; i++) {
             if (matches(cols, records[i].getTokens())) {
-                try {
-                    return new CMEfficiencyImporter(files[i], fileFormat,user, sessionFactory);
-                } catch (SQLException e) {
-                    throw new EmfException(e.getMessage());
-                }
+                return new CMEfficiencyImporter(files[i], fileFormat, user, sessionFactory, dbServer);
             }
         }
 

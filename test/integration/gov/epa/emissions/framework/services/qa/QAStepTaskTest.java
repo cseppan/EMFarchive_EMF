@@ -60,10 +60,11 @@ public class QAStepTaskTest extends ServiceTestCase {
         QAStepTask qaTask = new QAStepTask(dataset, 0, user, sessionFactory(), dbServer());
         String[] summaryQANames = qaTask.getDefaultSummaryQANames();
 
-        assertEquals(3, summaryQANames.length);
+        assertEquals(4, summaryQANames.length);
         assertEquals("Summarize by Pollutant", summaryQANames[0]);
         assertEquals("Summarize by SCC and Pollutant", summaryQANames[1]);
         assertEquals("Summarize by County and Pollutant", summaryQANames[2]);
+        assertEquals("Summarize by US State and Pollutant", summaryQANames[3]);
     }
 
     public void testShouldCheckAndRunSummaryQASteps() throws Exception {

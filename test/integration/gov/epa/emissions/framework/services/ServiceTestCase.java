@@ -192,6 +192,20 @@ public abstract class ServiceTestCase extends TestCase {
         }
     }
     
+    protected Object load(Class clazz, int id) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("id", id));
+            tx.commit();
+            Object obj = crit.uniqueResult();
+            return obj;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+    
     protected int countRecords(String tableName) {
         Datasource datasource = dbServer().getEmissionsDatasource();
         TableReader tableReader = dbSetup.tableReader(datasource);

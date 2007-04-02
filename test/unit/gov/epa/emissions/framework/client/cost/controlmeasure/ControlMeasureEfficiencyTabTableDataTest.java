@@ -9,10 +9,10 @@ public class ControlMeasureEfficiencyTabTableDataTest extends TestCase {
         EfficiencyRecord[] records = {};
         ControlMeasureEfficiencyTableData data = new ControlMeasureEfficiencyTableData(records);
 
-        for (int i = 0; i < data.columns().length; i++) {
+      for (int i = 0; i < data.columns().length; i++) {
             if (i == 4 || i == 5)
                 assertEquals(Integer.class, data.getColumnClass(i));
-            else if (i == 6 || i == 7 || i == 8 || i == 9 || i == 11 || i == 12)
+            else if (i == 6 || i == 7 || i == 8 || i == 9 || i == 10 || i == 12 || i == 13)
                 assertEquals(Double.class, data.getColumnClass(i));
             else
                 assertEquals(String.class, data.getColumnClass(i));

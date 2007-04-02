@@ -62,7 +62,7 @@ public class ControlMeasuresImporter implements Importer {
         this.user = user;
         this.sessionFactory = factory;
         this.statusDao = new StatusDAO(factory);
-        ControlMeasuresImportIdentifier types = new ControlMeasuresImportIdentifier(files, user, factory);
+        ControlMeasuresImportIdentifier types = new ControlMeasuresImportIdentifier(files, user, factory, dbServer);
         this.cmImporters = types.cmImporters();
         this.efficiency = cmImporters.efficiencyImporter();
         this.controlMeasures = new HashMap();

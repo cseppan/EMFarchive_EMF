@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 
 import java.io.File;
@@ -41,6 +42,7 @@ public class CMImportTaskTest extends ServiceTestCase {
             e.printStackTrace();
         }finally {
             dropAll(Scc.class);
+            dropAll(EfficiencyRecord.class);
             dropAll(ControlMeasure.class);
             dropAll(Status.class);
         }
@@ -67,6 +69,7 @@ public class CMImportTaskTest extends ServiceTestCase {
             e.printStackTrace();
         }finally {
             dropAll(Scc.class);
+            dropAll(EfficiencyRecord.class);
             dropAll(ControlMeasure.class);
             dropAll(Status.class);
         }
@@ -88,7 +91,7 @@ public class CMImportTaskTest extends ServiceTestCase {
     private int noOfRecords(ControlMeasure[] measures) {
         int count = 0;
         for (int i = 0; i < measures.length; i++) {
-            count += measures[i].getEfficiencyRecords().length;
+            count += dao.getEfficiencyRecords(measures[i].getId(), session).size();
         }
         return count;
     }

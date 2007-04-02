@@ -83,6 +83,7 @@ public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
 
     private void removeData() {
         dropAll(Scc.class);
+        dropAll(EfficiencyRecord.class);
         dropAll(ControlMeasure.class);
         dropAll(ControlStrategyResult.class);
         dropAll(ControlStrategy.class);
