@@ -1,0 +1,18 @@
+<!-- The contents of this file will be loaded for each web application -->
+<Context>
+ <Manager pathname="" />
+ <Resource name="jdbc/EMFDB" auth="Container"
+          type="javax.sql.DataSource"
+          driverClassName="org.postgresql.Driver"
+          url="jdbc:postgresql://localhost:5432/EMF?autoReconnect=true"
+          username="emf"
+          password="emf"
+          maxActive="100"
+          maxIdle="30"
+          maxWait="10000"
+          removeAbandoned="true"
+          removeAbandonedTimeout="60"
+          logAbandoned="true"
+          />
+</Context>
+	
