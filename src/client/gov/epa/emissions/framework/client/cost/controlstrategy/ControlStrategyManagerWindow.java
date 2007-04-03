@@ -182,7 +182,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
 
         Button newButton = new NewButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                createNewCase();
+                createNewStrategy();
             }
         });
         crudPanel.add(newButton);
@@ -312,7 +312,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         return selectModel.selected();
     }
 
-    private void createNewCase() {
+    private void createNewStrategy() {
         ControlStrategyView view = new ControlStrategyWindow(desktopManager);
         presenter.doNew(view);
     }

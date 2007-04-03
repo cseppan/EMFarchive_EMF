@@ -30,6 +30,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     private EditControlStrategyMeasuresTabPresenter measuresTabPresenter;
 
+    private EditControlStrategyPollutantsTabPresenter pollutantsTabPresenter;
+
     private boolean inputsLoaded = false;
     
     public EditControlStrategyPresenterImpl(ControlStrategy controlStrategy, EmfSession session, 
@@ -157,8 +159,14 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         measuresTabPresenter = new EditControlStrategyMeasuresTabPresenter(view,
                 controlStrategy, session, 
                 managerPresenter);
-//        measuresTabPresenter.doDisplay();
         presenters.add(measuresTabPresenter);
+    }
+
+    public void set(ControlStrategyPollutantsTabView view) {
+        pollutantsTabPresenter = new EditControlStrategyPollutantsTabPresenter(view,
+                controlStrategy, session);
+        pollutantsTabPresenter.doDisplay();
+        presenters.add(pollutantsTabPresenter);
     }
 
     public void doLoad(String tabTitle) throws EmfException {
