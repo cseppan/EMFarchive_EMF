@@ -1,7 +1,25 @@
-CreateEmfSchemas
-data/Data_CreateEMFTables.setup
-data/Data_PopulateEmfDataTables.setup
-case/Case_CreateEMFTables.setup
-case/Case_PopulateEmfDataTables.setup
-cost/Cost_CreateEMFTables.setup
-cost/Cost_PopulateEmfDataTables.setup
+#!/bin/bash
+
+## Populates the initial EMF database 
+##
+## Should be run from the same directory as this file 
+##
+## postgres user must already be created -- see the postgresql
+## installation for details
+##------------------------------------------------------------##
+
+## create emf user and the 'EMF' database
+createuser -U postgres -s -P emf
+createdb -U emf -E UTF8 EMF
+
+## setup the initial schemas and tables
+psql -d EMF -U emf < CreateEmfSchemas
+psql -d EMF -U emf < data/Data_CreateEMFTables.setup
+psql -d EMF -U emf < data/Data_PopulateEmfDataTables.setup
+psql -d EMF -U emf < case/Case_CreateEMFTables.setup
+psql -d EMF -U emf < case/Case_PopulateEmfDataTables.setup
+psql -d EMF -U emf < cost/Cost_CreateEMFTables.setup
+psql -d EMF -U emf < cost/Cost_PopulateEmfDataTables.setup
+
+## populate the reference database
+pg_restore -d EMF -U emf emf_reference.backup
