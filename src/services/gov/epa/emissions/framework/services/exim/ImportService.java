@@ -22,7 +22,6 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Session;
 
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
@@ -66,16 +65,13 @@ public class ImportService {
         return file;
     }
 
-    private void isUnique(EmfDataset dataset) throws EmfException {
-        Session session = sessionFactory.getSession();
+    private void isNameUnique(String name) throws Exception {
         DatasetDAO dao = new DatasetDAO();
-        boolean nameUsed = dao.nameUsed(dataset.getName(), EmfDataset.class, session);
-        session.flush();
-        session.close();
+        boolean nameUsed = dao.datasetNameUsed(name);
 
         if (nameUsed) {
             // AME: no need to log this as an error
-            //log.error("Dataset name " + dataset.getName() + " is already used");
+            // log.error("Dataset name " + dataset.getName() + " is already used");
             throw new EmfException("Dataset name is already used");
         }
     }
@@ -84,7 +80,7 @@ public class ImportService {
         try {
             File path = validatePath(folderPath);
 
-            isUnique(dataset);
+            isNameUnique(dataset.getName());
             Importer importer = importerFactory.createVersioned(dataset, path, fileNames);
             ImportTask eximTask = new ImportTask(dataset, fileNames, importer, user, services, sessionFactory);
 
@@ -92,8 +88,8 @@ public class ImportService {
         } catch (Exception e) {
             // no need to log errors about dataset name already being used
             if (e.getMessage().indexOf("already used") < 0)
-               log.error("Exception attempting to start import of file: " + fileNames[0], e);
-            
+                log.error("Exception attempting to start import of file: " + fileNames[0], e);
+
             log.error("Exception while import single dataset: " + e.getMessage());
             throw new EmfException("Import failed: " + e.getMessage());
         }
@@ -103,7 +99,7 @@ public class ImportService {
         showMultipleDatasets(user, filenames);
 
         for (int i = 0; i < filenames.length; i++) {
-//            String datasetName = filenames[i] + "_" + DATE_FORMATTER.format(new Date());
+            // String datasetName = filenames[i] + "_" + DATE_FORMATTER.format(new Date());
             String datasetName = filenames[i];
             EmfDataset dataset = createDataset(datasetName, user, datasetType);
             try {

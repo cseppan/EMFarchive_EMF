@@ -52,14 +52,14 @@ public class DatasetDAO {
      * Return true if the name is already used
      */
     public boolean nameUsed(String name, Class clazz, Session session) {
-        return hibernateFacade.iNameUsed(name, clazz, session); // case insensitive comparison
+        return hibernateFacade.nameUsed(name, clazz, session); // case insensitive comparison
     }
 
     public EmfDataset current(int id, Class clazz, Session session) {
         return (EmfDataset) hibernateFacade.current(id, clazz, session);
     }
 
-    public boolean canUpdate(EmfDataset dataset, Session session) {
+    public boolean canUpdate(EmfDataset dataset, Session session) throws Exception {
         if (!exists(dataset.getId(), EmfDataset.class, session)) {
             return false;
         }
@@ -69,7 +69,7 @@ public class DatasetDAO {
         if (current.getName().equals(dataset.getName()))
             return true;
 
-        return !nameUsed(dataset.getName(), EmfDataset.class, session);
+        return !datasetNameUsed(dataset.getName());
     }
 
     public boolean exists(String name, Session session) {
@@ -268,12 +268,12 @@ public class DatasetDAO {
 
     private void renameEmissionTable(EmfDataset dataset, Session session) throws Exception {
         EmfDataset oldDataset = getDataset(session, dataset.getId());
-        
+
         if (!continueToRename(dataset, oldDataset))
             return;
 
         DbServer dbServer = new EmfDbServer();
-        
+
         try {
             renameTable(dataset, oldDataset, dbServer);
         } finally {
@@ -284,7 +284,7 @@ public class DatasetDAO {
     private boolean continueToRename(EmfDataset dataset, EmfDataset oldDataset) {
         DatasetType type = dataset.getDatasetType();
         InternalSource[] sources = dataset.getInternalSources();
-        
+
         if (oldDataset == null)
             return false;
 
@@ -293,12 +293,11 @@ public class DatasetDAO {
 
         if (sources == null || sources.length == 0 || type.getTablePerDataset() != 1)
             return false;
-        
+
         return true;
     }
 
-    private void renameTable(EmfDataset dataset, EmfDataset oldDataset, DbServer dbServer)
-            throws ImporterException {
+    private void renameTable(EmfDataset dataset, EmfDataset oldDataset, DbServer dbServer) throws ImporterException {
         Datasource datasource = dbServer.getEmissionsDatasource();
         InternalSource[] sources = dataset.getInternalSources();
         DataTable table = new DataTable(oldDataset, datasource);
@@ -307,6 +306,32 @@ public class DatasetDAO {
 
         sources[0].setTable(newTableName);
         table.rename(oldTableName, newTableName);
+    }
+
+    public boolean datasetNameUsed(String name) throws Exception {
+        String getDSNamesQuery = "SELECT name FROM emf.datasets";
+        boolean nameexists = false;
+        DbServer dbServer = null;
+
+        try {
+            dbServer = new EmfDbServer();
+            Datasource datasource = dbServer.getEmfDatasource();
+            Connection connection = datasource.getConnection();
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(getDSNamesQuery);
+
+            while (resultSet.next())
+                if (resultSet.getString(1).trim().equalsIgnoreCase(name.trim())) {
+                    LOG.warn("dataset name: " + name + " already existed.");
+                    nameexists = true;
+                    break;
+                }
+        } finally {
+            if (dbServer != null)
+                dbServer.disconnect();
+        }
+
+        return nameexists;
     }
 
 }

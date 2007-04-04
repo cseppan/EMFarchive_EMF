@@ -103,11 +103,11 @@ public class DatasetCreator {
         Session session = sessionFactory.getSession();
         try {
             DatasetDAO dao = new DatasetDAO();
-            if (dao.nameUsed(dataset.getName(), EmfDataset.class, session))
+            if (dao.datasetNameUsed(dataset.getName()))
                 throw new EmfException("The selected dataset name is already in use.");
 
             dao.add(dataset, session);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             throw new EmfException("Could not add dataset: " + dataset.getName());
         } finally {
             session.close();

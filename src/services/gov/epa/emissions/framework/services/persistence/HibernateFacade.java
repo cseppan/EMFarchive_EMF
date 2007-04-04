@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.persistence;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -86,29 +85,6 @@ public class HibernateFacade {
             Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("name", name));
             boolean result = crit.uniqueResult() != null;
             tx.commit();
-
-            return result;
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
-    }
-
-    public boolean iNameUsed(String name, Class clazz, Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            List names = session.createCriteria(clazz).list();
-            tx.commit();
-            
-            boolean result = false;
-            
-            for(Iterator iter = names.iterator(); iter.hasNext(); ) {
-                if (iter.next().toString().equalsIgnoreCase(name.trim())) {
-                    result = true;
-                    break;
-                }
-            }
 
             return result;
         } catch (HibernateException e) {
