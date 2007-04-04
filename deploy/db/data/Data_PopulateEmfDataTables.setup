@@ -37,7 +37,7 @@ insert into emf.properties values(DEFAULT, 'defaultQASummaries', 'Summarize by P
 insert into emf.properties values(DEFAULT, 'PM10-PRI-alias', 'PM10');
 insert into emf.properties values(DEFAULT, 'PM2_5-PRI-alias', 'PM2_5');
 --update version each time EMF gets updated!
-insert into emf.properties values(DEFAULT, 'EMF-version', 'v1.9 - 3/27/2007');
+insert into emf.properties values(DEFAULT, 'EMF-version', 'v1.9 - 4/4/2007');
 
 --emf.properties
 -- DO NOT CHANGE THE ORDER OF THE DATASET TYPE
