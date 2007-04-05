@@ -102,7 +102,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         // These are just added to illustrate what is coming later
         tabbedPane.addTab("Inventory", createInventoryFilterTab(controlStrategy));
-        tabbedPane.addTab("Pollutants", createPollutantsTab(controlStrategy));
+//        tabbedPane.addTab("Pollutants", createPollutantsTab(controlStrategy));
         tabbedPane.addTab("Measures", createMeasuresTab(controlStrategy));
         tabbedPane.addTab("Applied Measures", createAppliedMeasuresTab(controlStrategy));
         tabbedPane.addTab("Outputs", outputPanel(controlStrategyResults));
@@ -180,17 +180,17 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         return measuresTabView;
     }
     
-    private JPanel createPollutantsTab(ControlStrategy controlStrategy) {
-        EditControlStrategyPollutantsTab pollutantsTabView = null;
-        try {
-            pollutantsTabView = new EditControlStrategyPollutantsTab(controlStrategy, this,  messagePanel, parentConsole, session);
-            this.presenter.set(pollutantsTabView);
-        } catch (EmfException e) {
-            showError("Could not create Pollutants tab.");
-        }
-        
-        return pollutantsTabView;
-    }
+//    private JPanel createPollutantsTab(ControlStrategy controlStrategy) {
+//        EditControlStrategyPollutantsTab pollutantsTabView = null;
+//        try {
+//            pollutantsTabView = new EditControlStrategyPollutantsTab(controlStrategy, this,  messagePanel, parentConsole, session);
+//            this.presenter.set(pollutantsTabView);
+//        } catch (EmfException e) {
+//            showError("Could not create Pollutants tab.");
+//        }
+//        
+//        return pollutantsTabView;
+//    }
     
     private JPanel outputPanel(ControlStrategyResult controlStrategyResults) {
         EditControlStrategyOutputTabView view = new EditControlStrategyOutputTab(controlStrategy,

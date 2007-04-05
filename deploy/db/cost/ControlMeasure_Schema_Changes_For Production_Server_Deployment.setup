@@ -70,3 +70,62 @@ update emf.control_measure_efficiencyrecords
 set ref_yr_cost_per_ton = cost_per_ton * 9470.3 / CAST(chained_gdp as float)
 from reference.gdplev
 where control_measure_efficiencyrecords.cost_year = gdplev.annual;
+
+-- add indexes to various emf tables...
+CREATE INDEX er_measureid
+  ON emf.control_measure_efficiencyrecords
+  USING btree
+  (control_measures_id);
+CREATE INDEX er_pollutantid
+  ON emf.control_measure_efficiencyrecords
+  USING btree
+  (pollutant_id);
+CREATE INDEX measure_id
+  ON emf.control_measures
+  USING btree
+  (id);
+CREATE INDEX pollutant_id
+  ON emf.pollutants
+  USING btree
+  (id);
+
+
+
+CREATE TABLE emf.aggregrated_efficiencyrecords
+(
+  control_measures_id integer NOT NULL,
+  pollutant_id integer NOT NULL,
+  max_efficiency real,
+  min_efficiency real,
+  avg_efficiency real,
+  max_cost_per_ton real,
+  min_cost_per_ton real,
+  avg_cost_per_ton real,
+  avg_rule_effectiveness real,
+  avg_rule_penetration real,
+  CONSTRAINT aggregrated_efficiencyrecords_pkey PRIMARY KEY (control_measures_id,pollutant_id),
+  CONSTRAINT aggregrated_efficiencyrecords_control_measures_id_fkey FOREIGN KEY (control_measures_id)
+      REFERENCES emf.control_measures (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT aggregrated_efficiencyrecords_pollutant_id_fkey FOREIGN KEY (pollutant_id)
+      REFERENCES emf.pollutants (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+ 
+insert into emf.aggregrated_efficiencyrecords (
+  control_measures_id,
+  pollutant_id,
+  max_efficiency,
+  min_efficiency,
+  avg_efficiency,
+  max_cost_per_ton,
+  min_cost_per_ton,
+  avg_cost_per_ton,
+  avg_rule_effectiveness,
+  avg_rule_penetration)
+select  control_measures_id, pollutant_id, max(efficiency) as maxefficiency, min(efficiency) as minefficiency, 
+	avg(efficiency) as avgefficiency, max(cost_per_ton) as maxcpt, 
+	min(cost_per_ton) as mincpt, avg(cost_per_ton) as avgcpt, 
+	avg(rule_effectiveness) as avgruleff, avg(rule_penetration) as avgrulpen 
+from emf.control_measure_efficiencyrecords 
+group by control_measures_id, pollutant_id;
