@@ -2,6 +2,9 @@ package gov.epa.emissions.framework.services.casemanagement;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 
 public interface CaseService {
 
@@ -66,5 +69,20 @@ public interface CaseService {
     CaseInput[] getCaseInputs(int caseId) throws EmfException;
     
     Case[] copyCaseObject(int[] toCopy) throws EmfException;
+    
+    CaseJob addCaseJob(CaseJob job) throws EmfException;
+    
+    CaseJob[] getCaseJobs(int caseId) throws EmfException;
 
+    CaseRunStatus addCaseRunStatus(CaseRunStatus status) throws EmfException;
+    
+    CaseRunStatus[] getCaseRunStatus(int casejobId) throws EmfException;
+    
+    Executable addExecutable(Executable exe) throws EmfException;
+    
+    Executable[] getExecutables(int casejobId) throws EmfException;
+
+    void removeCaseJobs(CaseJob[] jobs) throws EmfException;
+
+    void updateCaseJob(CaseJob job) throws EmfException;
 }

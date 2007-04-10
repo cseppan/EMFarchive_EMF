@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false"> 
+  <class name="gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob" table="cases_casejobs" schema="cases"> 
+ 	    <id name="id" type="integer" column="id">
+	         <generator class="identity"/>
+ 	    </id>
+ 	    
+ 	    <property name="name" column="name" type="java.lang.String" not-null="true"/>
+    	<property name="caseId" column="case_id" type="integer" not-null="true"/>
+    	<property name="description" column="description" type="java.lang.String" not-null="false"/>
+		<property name="args" column="arguments" type="java.lang.String" not-null="false"/>
+		<property name="order" column="exec_order" type="integer" not-null="false"/>
+		<property name="version" column="version" type="integer" not-null="false"/>
+		<property name="runStartDate" column="start_date" type="java.util.Date" not-null="false"/>
+		<property name="runCompletionDate" column="complete_date" type="java.util.Date" not-null="false"/>
+		<property name="runNotes" column="run_notes" type="java.lang.String" not-null="false"/>
+		<property name="runLog" column="run_log" type="java.lang.String" not-null="false"/>
+		<property name="queOptions" column="que_option" type="java.lang.String" not-null="false"/>
+		<property name="path" column="path" type="java.lang.String" not-null="false"/>
+		
+		<many-to-one
+         	name="sector" 
+        	class="gov.epa.emissions.commons.data.Sector"
+        	column="sector_id"/> 
+
+		<many-to-one
+         	name="executable" 
+        	class="gov.epa.emissions.framework.services.casemanagement.jobs.Executable"
+        	column="executable_id"/> 
+
+		<many-to-one
+         	name="runstatus" 
+        	class="gov.epa.emissions.framework.services.casemanagement.jobs.CaseRunStatus"
+        	column="runstatus_id"/> 
+
+		<many-to-one
+         	name="host" 
+        	class="gov.epa.emissions.framework.services.casemanagement.jobs.Host"
+        	column="host_id"/> 
+
+		<many-to-one
+         	name="user" 
+        	class="gov.epa.emissions.commons.security.User"
+        	column="user_id"/> 
+		
+  </class> 
+</hibernate-mapping>   

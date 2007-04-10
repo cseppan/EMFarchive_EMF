@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.casemanagement;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
@@ -218,4 +219,14 @@ public class CaseDAO {
         return hibernateFacade.getAll(SubDir.class, Order.asc("name"), session);
     }
 
+    public void add(CaseJob job, Session session) {
+        addObject(job, session);
+    }
+
+
+    public List<CaseJob> getCaseJobs(int caseId, Session session) {
+        Criterion crit = Restrictions.eq("caseId", new Integer(caseId));
+
+        return hibernateFacade.get(CaseJob.class, crit, session);
+    }
 }

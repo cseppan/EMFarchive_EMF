@@ -1,19 +1,59 @@
--------------------------------------------------------------------------------
---  CASE MANAGEMENT UPGRADES
--------------------------------------------------------------------------------
--- 
--- 12/22 added subdirectories for case inputs
+--
+-- 4/4/07 Added new tables to cases on case jobs
+--
 
--- cases.subdirs
-CREATE TABLE cases.subdirs
+-- cases.executables
+CREATE TABLE cases.executables
 (
   id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE
-) 
+  name varchar(255) NOT NULL UNIQUE,
+  description text NULL DEFAULT ''
+)
 WITHOUT OIDS;
--- cases.subdirs
+-- cases.executables
 
--- need to add new column to cases.cases_caseinputs
---  subdir_id int4  REFERENCES cases.subdirs(id),
-ALTER TABLE cases.case_inputs ADD COLUMN subdir_id int4;
-ALTER TABLE cases.case_inputs ADD CONSTRAINT case_inputs_subdir_id_fkey FOREIGN KEY (subdir_id) REFERENCES cases.subdirs (id)    ON UPDATE NO ACTION ON DELETE NO ACTION;
+-- cases.case_runstatus
+CREATE TABLE cases.case_runstatus
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(64) NOT NULL UNIQUE,
+  description text
+)
+WITHOUT OIDS;
+-- cases.case_runstatus
+
+-- cases.hosts
+CREATE TABLE cases.hosts
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(64) NOT NULL UNIQUE,
+  ip_address varchar(32)
+)
+WITHOUT OIDS;
+-- cases.hosts
+
+-- cases.cases_casejobs
+CREATE TABLE cases.cases_casejobs
+(
+  id SERIAL PRIMARY KEY,
+  case_id int4 NOT NULL REFERENCES cases.cases(id) ,
+  name varchar(255) NOT NULL,
+  description text,
+  sector_id int4 REFERENCES emf.sectors(id),
+  executable_id int4 REFERENCES cases.executables(id),
+  arguments text,
+  exec_order int4,
+  version int4,
+  runstatus_id int4 REFERENCES cases.case_runstatus(id),
+  start_date timestamp,
+  complete_date timestamp,
+  user_id int4 REFERENCES emf.users(id), 
+  run_notes text,
+  run_log text,
+  host_id int4 REFERENCES cases.hosts(id),
+  que_option varchar(255),
+  path varchar(255),
+  UNIQUE (case_id, name, executable_id, arguments)
+)
+WITHOUT OIDS;
+-- cases.cases_casejobs

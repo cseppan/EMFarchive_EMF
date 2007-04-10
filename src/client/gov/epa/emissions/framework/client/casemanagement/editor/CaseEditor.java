@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTab;
+import gov.epa.emissions.framework.client.casemanagement.jobs.EditJobsTab;
 import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTab;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -53,7 +54,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         tabbedPane.addTab("Summary", createSummaryTab(caseObj, messagePanel));
         tabbedPane.addTab("Parameters", createParameterTab(caseObj));
         tabbedPane.addTab("Inputs", createInputTab());
-        tabbedPane.addTab("Programs", new JPanel());
+        tabbedPane.addTab("Jobs", createJobsTab());
         tabbedPane.addTab("Outputs", createOutputTab());
         tabbedPane.addTab("History", new JPanel());
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -108,6 +109,17 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         }
     }
 
+    private Component createJobsTab() {
+        try {
+            EditJobsTab view = new EditJobsTab(parentConsole, this, messagePanel, desktopManager);
+            presenter.set(view);
+            return view;
+        } catch (EmfException e) {
+            showError("Could not load CaseJob Tab." + e.getMessage());
+            return createErrorTab("Could not load CaseJob Tab." + e.getMessage());
+        }
+    }
+    
     private JPanel createOutputTab() {
         try {
             EditOutputsTab view = new EditOutputsTab(parentConsole, this, messagePanel, desktopManager);

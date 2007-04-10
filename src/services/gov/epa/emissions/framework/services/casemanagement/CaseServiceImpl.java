@@ -6,6 +6,9 @@ import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExportService;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -582,6 +585,73 @@ public class CaseServiceImpl implements CaseService {
         }  finally {
             session.close();
         }
+    }
+
+    public CaseJob addCaseJob(CaseJob job) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(job, session);
+            return (CaseJob) dao.load(CaseJob.class, job.getName(), session);
+        } catch (Exception e) {
+            LOG.error("Could not add new case job '" + job.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new case job '" + job.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+    
+
+    public CaseRunStatus addCaseRunStatus(CaseRunStatus status) throws EmfException {
+        // NOTE Auto-generated method stub
+        if(true)
+            throw new EmfException("");
+        return null;
+    }
+
+    public Executable addExecutable(Executable exe) throws EmfException {
+        // NOTE Auto-generated method stub
+        if(true)
+            throw new EmfException("");
+        return null;
+    }
+
+    public CaseJob[] getCaseJobs(int caseId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            List<CaseJob> jobs = dao.getCaseJobs(caseId, session);
+
+            return jobs.toArray(new CaseJob[0]);
+        } catch (Exception e) {
+            LOG.error("Could not get all jobs for case (id=" + caseId + ").\n" + e.getMessage());
+            throw new EmfException("Could not get all jobs for case (id=" + caseId + ").\n");
+        } finally {
+            session.close();
+        }
+    }
+
+    public CaseRunStatus[] getCaseRunStatus(int casejobId) throws EmfException {
+        // NOTE Auto-generated method stub
+        if(true)
+            throw new EmfException("");
+        return null;
+    }
+
+    public Executable[] getExecutables(int casejobId) throws EmfException {
+        // NOTE Auto-generated method stub
+        if(true)
+            throw new EmfException("");
+        return null;
+    }
+
+    public void removeCaseJobs(CaseJob[] jobs) throws EmfException {
+        // NOTE Auto-generated method stub
+        throw new EmfException("under construction...");
+    }
+
+    public void updateCaseJob(CaseJob job) throws EmfException {
+        // NOTE Auto-generated method stub
+        throw new EmfException("under construction...");
     }
 
 }

@@ -6,6 +6,9 @@ import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenter;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabPresenter;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabPresenterImpl;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabView;
+import gov.epa.emissions.framework.client.casemanagement.jobs.EditJobsTabPresenter;
+import gov.epa.emissions.framework.client.casemanagement.jobs.EditJobsTabPresenterImpl;
+import gov.epa.emissions.framework.client.casemanagement.jobs.EditJobsTabView;
 import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTabPresenter;
 import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTabPresenterImpl;
 import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTabView;
@@ -30,6 +33,8 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     private List presenters;
     
     private EditInputsTabPresenter inputPresenter;
+
+    private EditJobsTabPresenter jobsPresenter;
     
     private EditOutputsTabPresenter outputPresenter;
     
@@ -38,6 +43,8 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     private EditableCaseSummaryTabPresenter summaryPresenter;
     
     private boolean inputsLoaded = false;
+
+    private boolean jobsLoaded = false;
     
     public CaseEditorPresenterImpl(Case caseObj, EmfSession session, CaseEditorView view,
             CaseManagerPresenter managerPresenter) {
@@ -118,6 +125,11 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         presenters.add(inputPresenter);
    }
 
+    public void set(EditJobsTabView jobsView) {
+        jobsPresenter = new EditJobsTabPresenterImpl(session, jobsView, caseObj);
+        presenters.add(jobsPresenter);
+    }
+    
     public void set(EditOutputsTabView OutputsView) throws EmfException {
         outputPresenter = new EditOutputsTabPresenterImpl(session, OutputsView, caseObj);
         outputPresenter.display();
@@ -154,6 +166,11 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         if (!inputsLoaded && tabTitle.equalsIgnoreCase("Inputs")) {
             inputPresenter.display();
             inputsLoaded = true;
+        }
+
+        if (!jobsLoaded && tabTitle.equalsIgnoreCase("Jobs")) {
+            jobsPresenter.display();
+            jobsLoaded = true;
         }
     }
 }

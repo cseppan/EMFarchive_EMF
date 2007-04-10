@@ -18,6 +18,9 @@ import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 
 public class CaseServiceTransport implements CaseService {
 
@@ -346,6 +349,64 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.cases());
         
         return (Case[]) call.requestResponse(new Object[] {toCopy});
+    }
+
+    public CaseJob addCaseJob(CaseJob job) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("addCaseJob");
+        call.addParam("job", caseMappings.casejob());
+        call.setReturnType(caseMappings.casejob());
+        
+        return (CaseJob) call.requestResponse(new Object[]{job});
+    }
+
+    public CaseRunStatus addCaseRunStatus(CaseRunStatus status) throws EmfException {
+        // NOTE Auto-generated method stub
+        if(true)
+            throw new EmfException("");
+        return null;
+    }
+
+    public Executable addExecutable(Executable exe) throws EmfException {
+        // NOTE Auto-generated method stub
+        if(true)
+        throw new EmfException("");
+        return null;
+    }
+
+    public CaseJob[] getCaseJobs(int caseId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getCaseJobs");
+        call.addIntegerParam("caseId");
+        call.setReturnType(caseMappings.casejobs());
+
+        return (CaseJob[]) call.requestResponse(new Object[] { new Integer(caseId) });
+    }
+
+    public CaseRunStatus[] getCaseRunStatus(int casejobId) throws EmfException {
+        // NOTE Auto-generated method stub
+        if(true)
+            throw new EmfException("");
+        return null;
+    }
+
+    public Executable[] getExecutables(int casejobId) throws EmfException {
+        // NOTE Auto-generated method stub
+        if(true)
+            throw new EmfException("");
+        return null;
+    }
+
+    public void removeCaseJobs(CaseJob[] jobs) throws EmfException {
+        // NOTE Auto-generated method stub
+        throw new EmfException("Under construction...");
+    }
+
+    public void updateCaseJob(CaseJob job) throws EmfException {
+        // NOTE Auto-generated method stub
+        throw new EmfException("under construction...");
     }
 
 }

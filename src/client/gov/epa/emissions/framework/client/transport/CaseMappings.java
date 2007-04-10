@@ -16,6 +16,10 @@ import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 
 import javax.xml.namespace.QName;
 
@@ -44,6 +48,10 @@ public class CaseMappings extends Mappings {
         bean(call, ModelToRun.class, modelToRun());
         bean(call, CaseProgram.class, program());
         bean(call, SubDir.class, subdir());
+        bean(call, CaseJob.class, casejob());
+        bean(call, CaseRunStatus.class, caseRunStatus());
+        bean(call, Executable.class, executable());
+        bean(call, Host.class, host());
         
         bean(call, Mutex.class, mutex());
     }
@@ -64,6 +72,10 @@ public class CaseMappings extends Mappings {
         array(call, ModelToRun[].class, modelToRuns());
         array(call, CaseProgram[].class, programs());
         array(call, SubDir[].class, subdirs());
+        array(call, CaseJob[].class, casejobs());
+        array(call, CaseRunStatus[].class, caseRunStatuses());
+        array(call, Executable[].class, executables());
+        array(call, Host[].class, hosts());
     }
 
     public QName caseObject() {
@@ -190,4 +202,35 @@ public class CaseMappings extends Mappings {
         return qname("SubDirs");
     }
     
+    public QName casejob() {
+        return qname("CaseJob");
+    }
+    
+    public QName caseRunStatus(){
+        return qname("CaseRunStatus");
+    }
+    
+    public QName executable(){
+        return qname("Executable");
+    }
+
+    public QName casejobs() {
+        return qname("CaseJobs");
+    }
+    
+    public QName caseRunStatuses(){
+        return qname("CaseRunStatuses");
+    }
+    
+    public QName executables(){
+        return qname("Executables");
+    }
+    
+    public QName host(){
+        return qname("Host");
+    }
+    
+    public QName hosts(){
+        return qname("Hosts");
+    }
 }

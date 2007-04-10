@@ -486,6 +486,42 @@
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.SubDir[]"
 		innerType="ns1:SubDir"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob"
+		qname="ns1:CaseJob" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:CaseJobs" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob[]"
+		innerType="ns1:CaseJob"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.Executable"
+		qname="ns1:Executable" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:Executables" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.Executable[]"
+		innerType="ns1:Executable"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.CaseRunStatus"
+		qname="ns1:CaseRunStatus" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:CaseRunStatuses" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.CaseRunStatus[]"
+		innerType="ns1:CaseRunStatus"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.Host"
+		qname="ns1:Host" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:Hosts" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.Host[]"
+		innerType="ns1:Host"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
 	<!-- ================================================================= -->
 	
