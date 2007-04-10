@@ -20,14 +20,20 @@ public class CaseServiceTest extends ServiceTestCase {
     private CaseService service;
 
     private UserServiceImpl userService;
-
+    
+    private HibernateSessionFactory sessionFactory;
+    
     protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = sessionFactory(configFile());
+        sessionFactory = sessionFactory(configFile());
         service = new CaseServiceImpl(sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
     }
 
-    protected void doTearDown() throws Exception {// no op
+    protected void doTearDown() throws Exception {
+       service = null;
+       userService = null;
+       sessionFactory = null;
+       System.gc();
     }
 
     public void testShouldGetAbbreviations() throws Exception {
@@ -344,215 +350,6 @@ public class CaseServiceTest extends ServiceTestCase {
             remove(sector2);
             remove(element);
             remove(copied);
-        }
-    }
-    
-    public void testShouldPersistACaseInputWhenAddCaseInputWithAllFieldsFilled() throws Exception {
-        // has been tested with the testShouldCopyACaseWithCaseInputs() case.
-    }
-
-    public void testShouldPersistACaseInputWhenAddCaseInputWithSomeFieldsAreNull() throws Exception {
-        Case element = newCase();
-        InputName inputname = new InputName("test input name");
-        CaseProgram program = new CaseProgram("test case program");
-        Sector sector = new Sector("" , "test sector one");
-        CaseInput inputOne = new CaseInput();
-        CaseInput inputTwo = new CaseInput();
-        CaseInput inputThree = new CaseInput();
-        SubDir subdir = new SubDir("test subdir name one");
-        
-        add(inputname);
-        add(program);
-        add(sector);
-        add(subdir);
-        inputOne.setInputName(null);
-        inputOne.setProgram(program);
-        inputOne.setSector(sector);
-        inputOne.setSubdirObj(null);
-        inputTwo.setInputName(inputname);
-        inputTwo.setProgram(null);
-        inputTwo.setSector(sector);
-        inputTwo.setSubdirObj(subdir);
-        inputThree.setInputName(inputname);
-        inputThree.setProgram(null);
-        inputThree.setSector(null);
-        inputThree.setSubdirObj(subdir);
-        
-        try {
-            int caseId = load(element).getId();
-            inputOne.setCaseID(caseId);
-            inputTwo.setCaseID(caseId);
-            inputThree.setCaseID(caseId);
-            CaseInput returnedInput1 = service.addCaseInput(inputOne);
-            CaseInput returnedInput2 = service.addCaseInput(inputTwo);
-            CaseInput returnedInput3 = service.addCaseInput(inputThree);
-            
-            CaseInput[] loadedInputs = service.getCaseInputs(caseId);
-            assertEquals(3, loadedInputs.length);
-            assertEquals(returnedInput2, loadedInputs[0]);
-            assertEquals(returnedInput3, loadedInputs[1]);
-            assertEquals(returnedInput1, loadedInputs[2]);
-            assertEquals("test input name", loadedInputs[0].getName());
-            assertEquals(null, loadedInputs[0].getProgram());
-            assertEquals(null, loadedInputs[0].getEnvtVars());
-            assertEquals("test sector one", loadedInputs[0].getSector().getName());
-            assertEquals("test subdir name one", loadedInputs[0].getSubdirObj().getName());
-            assertEquals("test input name", loadedInputs[1].getInputName().getName());
-            assertEquals(null, loadedInputs[1].getProgram());
-            assertEquals(null, loadedInputs[1].getEnvtVars());
-            assertEquals(null, loadedInputs[1].getSector());
-            assertEquals("test subdir name one", loadedInputs[1].getSubdirObj().getName());
-            assertEquals(null, loadedInputs[2].getInputName());
-            assertEquals("test case program", loadedInputs[2].getProgram().getName());
-            assertEquals(null, loadedInputs[2].getEnvtVars());
-            assertEquals("test sector one", loadedInputs[2].getSector().getName());
-            assertEquals(null, loadedInputs[2].getSubdirObj());
-        } finally {
-            remove(inputOne);
-            remove(inputTwo);
-            remove(inputThree);
-            remove(inputname);
-            remove(program);
-            remove(sector);
-            remove(subdir);
-            remove(element);
-        }
-    }
-    
-    public void testShouldUpdateCaseInput() throws Exception {
-        Case element = newCase();
-        InputName inputname = new InputName("test input name");
-        CaseProgram program = new CaseProgram("test case program");
-        Sector sector = new Sector("" , "test sector one");
-        InputEnvtVar envtVars = new InputEnvtVar("test envt vars");
-        CaseInput inputOne = new CaseInput();
-        CaseInput inputTwo = new CaseInput();
-        CaseInput inputThree = new CaseInput();
-        SubDir subdir = new SubDir("test subdir name one");
-        
-        add(inputname);
-        add(program);
-        add(sector);
-        add(envtVars);
-        add(subdir);
-        inputOne.setInputName(null);
-        inputOne.setProgram(program);
-        inputOne.setSector(sector);
-        inputOne.setSubdirObj(null);
-        inputTwo.setInputName(inputname);
-        inputTwo.setProgram(null);
-        inputTwo.setSector(sector);
-        inputTwo.setSubdirObj(subdir);
-        inputThree.setInputName(inputname);
-        inputThree.setProgram(null);
-        inputThree.setSector(null);
-        inputThree.setSubdirObj(subdir);
-        
-        try {
-            int caseId = load(element).getId();
-            inputOne.setCaseID(caseId);
-            inputTwo.setCaseID(caseId);
-            inputThree.setCaseID(caseId);
-            CaseInput returnedInput1 = service.addCaseInput(inputOne);
-            CaseInput returnedInput2 = service.addCaseInput(inputTwo);
-            CaseInput returnedInput3 = service.addCaseInput(inputThree);
-            returnedInput1.setEnvtVars(envtVars);
-            returnedInput2.setEnvtVars(envtVars);
-            returnedInput3.setEnvtVars(envtVars);
-            
-            service.updateCaseInput(returnedInput1);
-            service.updateCaseInput(returnedInput2);
-            service.updateCaseInput(returnedInput3);
-            
-            CaseInput[] loadedInputs = service.getCaseInputs(caseId);
-            assertEquals(3, loadedInputs.length);
-            assertEquals("test input name", loadedInputs[0].getName());
-            assertEquals(null, loadedInputs[0].getProgram());
-            assertEquals("test envt vars", loadedInputs[0].getEnvtVars().getName());
-            assertEquals("test sector one", loadedInputs[0].getSector().getName());
-            assertEquals("test subdir name one", loadedInputs[0].getSubdirObj().getName());
-            assertEquals("test input name", loadedInputs[1].getInputName().getName());
-            assertEquals(null, loadedInputs[1].getProgram());
-            assertEquals("test envt vars", loadedInputs[1].getEnvtVars().getName());
-            assertEquals(null, loadedInputs[1].getSector());
-            assertEquals("test subdir name one", loadedInputs[1].getSubdirObj().getName());
-            assertEquals(null, loadedInputs[2].getInputName());
-            assertEquals("test case program", loadedInputs[2].getProgram().getName());
-            assertEquals("test envt vars", loadedInputs[2].getEnvtVars().getName());
-            assertEquals("test sector one", loadedInputs[2].getSector().getName());
-            assertEquals(null, loadedInputs[2].getSubdirObj());
-        } finally {
-            remove(inputOne);
-            remove(inputTwo);
-            remove(inputThree);
-            remove(inputname);
-            remove(program);
-            remove(sector);
-            remove(envtVars);
-            remove(subdir);
-            remove(element);
-        }
-    }
-    
-    public void testShouldRemoveCaseinputs() throws Exception {
-        Case element = newCase();
-        InputName inputname = new InputName("test input name");
-        CaseProgram program = new CaseProgram("test case program");
-        Sector sector = new Sector("" , "test sector one");
-        InputEnvtVar envtVars = new InputEnvtVar("test envt vars");
-        CaseInput inputOne = new CaseInput();
-        CaseInput inputTwo = new CaseInput();
-        CaseInput inputThree = new CaseInput();
-        SubDir subdir = new SubDir("test subdir name one");
-        
-        add(inputname);
-        add(program);
-        add(sector);
-        add(envtVars);
-        add(subdir);
-        inputOne.setInputName(null);
-        inputOne.setProgram(program);
-        inputOne.setSector(sector);
-        inputOne.setSubdirObj(null);
-        inputTwo.setInputName(inputname);
-        inputTwo.setProgram(null);
-        inputTwo.setSector(sector);
-        inputTwo.setSubdirObj(subdir);
-        inputThree.setInputName(inputname);
-        inputThree.setProgram(null);
-        inputThree.setSector(null);
-        inputThree.setSubdirObj(subdir);
-        
-        try {
-            int caseId = load(element).getId();
-            inputOne.setCaseID(caseId);
-            inputTwo.setCaseID(caseId);
-            inputThree.setCaseID(caseId);
-            CaseInput returnedInput1 = service.addCaseInput(inputOne);
-            CaseInput returnedInput2 = service.addCaseInput(inputTwo);
-            CaseInput returnedInput3 = service.addCaseInput(inputThree);
-            returnedInput1.setEnvtVars(envtVars);
-            returnedInput2.setEnvtVars(envtVars);
-            returnedInput3.setEnvtVars(envtVars);
-            
-            service.updateCaseInput(returnedInput1);
-            service.updateCaseInput(returnedInput2);
-            service.updateCaseInput(returnedInput3);
-            
-            CaseInput[] loadedInputs = service.getCaseInputs(caseId);
-            service.removeCaseInputs(loadedInputs);
-            
-            CaseInput[] loadedInputsAfterDeletion = service.getCaseInputs(caseId);
-            
-            assertEquals(3, loadedInputs.length);
-            assertEquals(0, loadedInputsAfterDeletion.length);
-        } finally {
-            remove(inputname);
-            remove(program);
-            remove(sector);
-            remove(envtVars);
-            remove(subdir);
-            remove(element);
         }
     }
     
