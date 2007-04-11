@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
+import gov.epa.emissions.commons.gui.buttons.RunButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -54,7 +55,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
 
     public EditJobsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager) {
-        super.setName("editInputsTab");
+        super.setName("editJobsTab");
         this.parentConsole = parentConsole;
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;
@@ -139,7 +140,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
         Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMessage();
-                doNewJob(presenter);
+                addNewJob(presenter);
             }
         });
         add.setMargin(insets);
@@ -149,7 +150,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
             public void actionPerformed(ActionEvent e) {
                 clearMessage();
                 try {
-                    doRemove(presenter);
+                    removeJobs(presenter);
                 } catch (EmfException exc) {
                     messagePanel.setError(exc.getMessage());
                 }
@@ -162,7 +163,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
             public void actionPerformed(ActionEvent e) {
                 try {
                     clearMessage();
-                    doEditJob(presenter);
+                    editJobs(presenter);
                 } catch (EmfException ex) {
                     messagePanel.setError(ex.getMessage());
                 }
@@ -171,13 +172,27 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
         edit.setMargin(insets);
         container.add(edit);
 
+        Button run = new RunButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    clearMessage();
+                    runJobs(presenter);
+                } catch (EmfException ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        });
+        run.setMargin(insets);
+        container.add(run);
+
+        
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
 
         return panel;
     }
 
-    protected void doNewJob(EditJobsTabPresenter presenter) {
+    private void addNewJob(EditJobsTabPresenter presenter) {
         NewJobDialog view = new NewJobDialog(parentConsole);
         try {
             presenter.addNewJobDialog(view);
@@ -186,16 +201,16 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
         }
     }
 
-    protected void doRemove(EditJobsTabPresenter presenter) throws EmfException {
+    private void removeJobs(EditJobsTabPresenter presenter) throws EmfException {
         CaseJob[] jobs = (CaseJob[]) getSelectedJobs().toArray(new CaseJob[0]);
 
         if (jobs.length == 0) {
-            messagePanel.setMessage("Please select input(s) to remove.");
+            messagePanel.setMessage("Please select job(s) to remove.");
             return;
         }
 
         String title = "Warning";
-        String message = "Are you sure you want to remove the selected input(s)?";
+        String message = "Are you sure you want to remove the selected job(s)?";
         int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
@@ -206,11 +221,11 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
         }
     }
 
-    private void doEditJob(EditJobsTabPresenter presenter) throws EmfException {
+    private void editJobs(EditJobsTabPresenter presenter) throws EmfException {
         List jobs = getSelectedJobs();
 
         if (jobs.size() == 0) {
-            messagePanel.setMessage("Please select input(s) to edit.");
+            messagePanel.setMessage("Please select job(s) to edit.");
             return;
         }
 
@@ -222,6 +237,17 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
         }
     }
 
+    private void runJobs(EditJobsTabPresenter presenter) throws EmfException {
+        CaseJob[] jobs = (CaseJob[]) getSelectedJobs().toArray(new CaseJob[0]);
+
+        if (jobs.length == 0) {
+            messagePanel.setMessage("Please select job(s) to run.");
+            return;
+        }
+        
+        throw new EmfException("Under construction...");
+    }
+    
     private List getSelectedJobs() {
         return selectModel.selected();
     }
