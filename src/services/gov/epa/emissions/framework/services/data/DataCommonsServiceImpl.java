@@ -614,13 +614,17 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    private EmfFileInfo correctEmptyDir(EmfFileInfo dir) {
+    private EmfFileInfo correctEmptyDir(EmfFileInfo dir) throws IOException {
         boolean resetPath = false;
 
         if (dir == null || dir.getAbsolutePath() == null || dir.getAbsolutePath().trim().equals(""))
             resetPath = true;
         else {
             File f = new File(dir.getAbsolutePath());
+
+            if (f.isFile())
+                return EmfFileSerializer.convert(f.getParentFile());
+            
             if (!f.exists())
                 resetPath = true;
         }

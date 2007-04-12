@@ -2,14 +2,22 @@ package gov.epa.emissions.framework.services.casemanagement.jobs;
 
 import java.io.Serializable;
 
-public class CaseRunStatus implements Serializable {
+public class JobRunStatus implements Serializable {
 
     private int id;
     
     private String name;
     
     private String description;
+    
+    public JobRunStatus() {
+        //
+    }
 
+    public JobRunStatus(String status) {
+        this.name = status;
+    }
+    
     public String getDescription() {
         return description;
     }
@@ -32,6 +40,10 @@ public class CaseRunStatus implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public String toString() {
+        return this.name;
     }
     
 }

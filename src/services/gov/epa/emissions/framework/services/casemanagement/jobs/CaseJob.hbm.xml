@@ -11,7 +11,8 @@
  	    
  	    <property name="name" column="name" type="java.lang.String" not-null="true"/>
     	<property name="caseId" column="case_id" type="integer" not-null="true"/>
-    	<property name="description" column="description" type="java.lang.String" not-null="false"/>
+    	<property name="purpose" column="purpose" type="java.lang.String" not-null="false"/>
+    	<property name="jobNo" column ="job_num" type="float" not-null="false"/>
 		<property name="args" column="arguments" type="java.lang.String" not-null="false"/>
 		<property name="order" column="exec_order" type="integer" not-null="false"/>
 		<property name="version" column="version" type="integer" not-null="false"/>
@@ -34,7 +35,7 @@
 
 		<many-to-one
          	name="runstatus" 
-        	class="gov.epa.emissions.framework.services.casemanagement.jobs.CaseRunStatus"
+        	class="gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus"
         	column="runstatus_id"/> 
 
 		<many-to-one

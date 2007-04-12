@@ -19,7 +19,8 @@ import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
-import gov.epa.emissions.framework.services.casemanagement.jobs.CaseRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 
 public class CaseServiceTransport implements CaseService {
@@ -361,7 +362,7 @@ public class CaseServiceTransport implements CaseService {
         return (CaseJob) call.requestResponse(new Object[]{job});
     }
 
-    public CaseRunStatus addCaseRunStatus(CaseRunStatus status) throws EmfException {
+    public JobRunStatus addCaseRunStatus(JobRunStatus status) throws EmfException {
         // NOTE Auto-generated method stub
         if(true)
             throw new EmfException("");
@@ -385,18 +386,22 @@ public class CaseServiceTransport implements CaseService {
         return (CaseJob[]) call.requestResponse(new Object[] { new Integer(caseId) });
     }
 
-    public CaseRunStatus[] getCaseRunStatus(int casejobId) throws EmfException {
-        // NOTE Auto-generated method stub
-        if(true)
-            throw new EmfException("");
-        return null;
+    public JobRunStatus[] getJobRunStatuses() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getJobRunStatuses");
+        call.setReturnType(caseMappings.jobRunStatuses());
+
+        return (JobRunStatus[]) call.requestResponse(new Object[] { });
     }
 
     public Executable[] getExecutables(int casejobId) throws EmfException {
-        // NOTE Auto-generated method stub
-        if(true)
-            throw new EmfException("");
-        return null;
+        EmfCall call = call();
+
+        call.setOperation("getExecutables");
+        call.setReturnType(caseMappings.executables());
+
+        return (Executable[]) call.requestResponse(new Object[] { });
     }
 
     public void removeCaseJobs(CaseJob[] jobs) throws EmfException {
@@ -407,6 +412,15 @@ public class CaseServiceTransport implements CaseService {
     public void updateCaseJob(CaseJob job) throws EmfException {
         // NOTE Auto-generated method stub
         throw new EmfException("under construction...");
+    }
+
+    public Host[] getHosts() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getHosts");
+        call.setReturnType(caseMappings.hosts());
+
+        return (Host[]) call.requestResponse(new Object[] { });
     }
 
 }

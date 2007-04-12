@@ -7,7 +7,8 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
-import gov.epa.emissions.framework.services.casemanagement.jobs.CaseRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExportService;
@@ -601,7 +602,7 @@ public class CaseServiceImpl implements CaseService {
     }
     
 
-    public CaseRunStatus addCaseRunStatus(CaseRunStatus status) throws EmfException {
+    public JobRunStatus addCaseRunStatus(JobRunStatus status) throws EmfException {
         // NOTE Auto-generated method stub
         if(true)
             throw new EmfException("");
@@ -630,18 +631,34 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
-    public CaseRunStatus[] getCaseRunStatus(int casejobId) throws EmfException {
-        // NOTE Auto-generated method stub
-        if(true)
-            throw new EmfException("");
-        return null;
+    public JobRunStatus[] getJobRunStatuses() throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            List<JobRunStatus> runstatuses = dao.getJobRunStatuses(session);
+
+            return runstatuses.toArray(new JobRunStatus[0]);
+        } catch (Exception e) {
+            LOG.error("Could not get all job run statuses.\n" + e.getMessage());
+            throw new EmfException("Could not get all job run statuses.\n");
+        } finally {
+            session.close();
+        }
     }
 
     public Executable[] getExecutables(int casejobId) throws EmfException {
-        // NOTE Auto-generated method stub
-        if(true)
-            throw new EmfException("");
-        return null;
+        Session session = sessionFactory.getSession();
+        
+        try {
+            List<Executable> runstatuses = dao.getExecutables(session);
+
+            return runstatuses.toArray(new Executable[0]);
+        } catch (Exception e) {
+            LOG.error("Could not get all executables.\n" + e.getMessage());
+            throw new EmfException("Could not get all executables.\n");
+        } finally {
+            session.close();
+        }
     }
 
     public void removeCaseJobs(CaseJob[] jobs) throws EmfException {
@@ -652,6 +669,21 @@ public class CaseServiceImpl implements CaseService {
     public void updateCaseJob(CaseJob job) throws EmfException {
         // NOTE Auto-generated method stub
         throw new EmfException("under construction...");
+    }
+
+    public Host[] getHosts() throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            List<Host> hosts = dao.getHosts(session);
+
+            return hosts.toArray(new Host[0]);
+        } catch (Exception e) {
+            LOG.error("Could not get all hosts.\n" + e.getMessage());
+            throw new EmfException("Could not get all hosts.\n");
+        } finally {
+            session.close();
+        }
     }
 
 }

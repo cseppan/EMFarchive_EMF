@@ -9,6 +9,14 @@ public class Host implements Serializable {
     private String name;
     
     private String ipAddress;
+    
+    public Host() {
+        //
+    }
+    
+    public Host(String name) {
+        this.name = name;
+    }
 
     public int getId() {
         return id;

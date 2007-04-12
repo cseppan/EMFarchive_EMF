@@ -50,7 +50,7 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.jobFieldsPanel = new JobFieldsPanel(messagePanel, this);
+        this.jobFieldsPanel = new JobFieldsPanel(true, messagePanel, this, null, null);
         presenter.doAddJobFields(panel, jobFieldsPanel);
         panel.add(buttonsPanel());
 

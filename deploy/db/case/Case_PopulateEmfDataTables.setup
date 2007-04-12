@@ -35,3 +35,15 @@ insert into cases.input_envt_vars values(DEFAULT,'COSTCY');
 insert into cases.input_envt_vars values(DEFAULT,'INVTABLE');
 -- cases.input_envt_vars
 
+-- cases.case_jobrunstatus
+insert into cases.case_jobrunstatus values(DEFAULT, 'Not Started', 'Not Started');
+insert into cases.case_jobrunstatus values(DEFAULT, 'Succeeded', 'Succeeded');
+insert into cases.case_jobrunstatus values(DEFAULT, 'Quality Assured', 'Quality Assured');
+insert into cases.case_jobrunstatus values(DEFAULT, 'Failed', 'Failed');
+insert into cases.case_jobrunstatus values(DEFAULT, 'Running', 'Running');
+insert into cases.case_jobrunstatus values(DEFAULT, 'Submitted', 'Submitted');
+-- cases.case_jobrunstatus
+
+-- cases.hosts
+insert into cases.hosts values(DEFAULT, 'localhost', '127.0.0.1');
+-- cases.hosts 

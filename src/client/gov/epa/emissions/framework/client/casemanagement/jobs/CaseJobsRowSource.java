@@ -13,15 +13,20 @@ public class CaseJobsRowSource implements RowSource {
     }
 
     public Object[] values() {
-        return new Object[] { getJobName(job), getSectorName(job), getExecutableName(job),
+        return new Object[] { getJobName(job), getJobNum(job), 
+                getSectorName(job), getExecutableName(job),
                 getVersion(job), getArgs(job), getOrder(job),
-                getRunStatus(job), getPath(job), getStartDate(job),
-                getCompleteDate(job), getUser(job), getRunNotes(job),
-                getHost(job), getDescription(job) };
+                getRunStatus(job), getPath(job), getQOpt(job),
+                getIDInQ(job), getStartDate(job), getCompleteDate(job),
+                getUser(job), getRunLog(job), getHost(job), getPurpose(job) };
     }
     
     private String getJobName(CaseJob job) {
         return (job.getName() == null) ? "" : job.getName();
+    }
+    
+    private Float getJobNum(CaseJob job) {
+        return new Float(job.getJobNo());
     }
     
     private String getSectorName(CaseJob job) {
@@ -52,6 +57,14 @@ public class CaseJobsRowSource implements RowSource {
         return job.getPath();
     }
     
+    private Integer getIDInQ(CaseJob job) {
+        return new Integer(job.getIdInQueue());
+    }
+
+    private String getQOpt(CaseJob job) {
+        return job.getQueOptions();
+    }
+    
     private String getStartDate(CaseJob job) {
         return (job.getRunStartDate() == null) ? "" : EmfDateFormat.format_YYYY_MM_DD_HH_MM(job.getRunStartDate());
     }
@@ -60,16 +73,16 @@ public class CaseJobsRowSource implements RowSource {
         return (job.getRunCompletionDate() == null) ? "" : EmfDateFormat.format_YYYY_MM_DD_HH_MM(job.getRunCompletionDate());
     }
     
-    private String getDescription(CaseJob job) {
-        return job.getDescription();
+    private String getPurpose(CaseJob job) {
+        return job.getPurpose();
     }
 
     private String getHost(CaseJob job) {
         return (job.getHost() == null) ? "" : job.getHost().getName();
     }
 
-    private String getRunNotes(CaseJob job) {
-        return job.getRunNotes();
+    private String getRunLog(CaseJob job) {
+        return job.getRunLog();
     }
 
     private String getUser(CaseJob job) {

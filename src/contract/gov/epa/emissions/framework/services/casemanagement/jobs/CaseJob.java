@@ -12,7 +12,11 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     
     private String name;
     
-    private String description;
+    private String purpose;
+    
+    private float jobNo;
+    
+    private int idInQueue;
     
     private Sector sector;
     
@@ -24,7 +28,7 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     
     private int version;
     
-    private CaseRunStatus runstatus;
+    private JobRunStatus runstatus;
     
     private int caseId;
     
@@ -60,12 +64,28 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
         this.args = args;
     }
 
-    public String getDescription() {
-        return description;
+    public int getIdInQueue() {
+        return idInQueue;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setIdInQueue(int idInQueue) {
+        this.idInQueue = idInQueue;
+    }
+
+    public float getJobNo() {
+        return jobNo;
+    }
+
+    public void setJobNo(float jobNo) {
+        this.jobNo = jobNo;
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
     }
 
     public int getId() {
@@ -174,11 +194,11 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
         this.runStartDate = runStartDate;
     }
 
-    public CaseRunStatus getRunstatus() {
+    public JobRunStatus getRunstatus() {
         return runstatus;
     }
 
-    public void setRunstatus(CaseRunStatus runstatus) {
+    public void setRunstatus(JobRunStatus runstatus) {
         this.runstatus = runstatus;
     }
 

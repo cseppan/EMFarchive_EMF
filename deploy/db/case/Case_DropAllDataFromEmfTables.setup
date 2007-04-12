@@ -16,7 +16,7 @@ DELETE FROM cases.input_envt_vars;
 DELETE FROM cases.cases_caseinputs;
 DELETE FROM cases.subdirs;
 DELETE FROM cases.hosts;
-DELETE FROM cases.case_runstatus;
+DELETE FROM cases.case_jobrunstatus;
 DELETE FROM cases.cases_casejobs;
 DELETE FROM cases.executables;
 

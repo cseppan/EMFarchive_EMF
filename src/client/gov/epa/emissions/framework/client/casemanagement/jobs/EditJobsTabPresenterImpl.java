@@ -1,12 +1,12 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
-import javax.swing.JPanel;
-
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+
+import javax.swing.JComponent;
 
 public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
@@ -32,7 +32,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
     public void addNewJobDialog(NewJobView dialog) {
         dialog.register(this);
-        dialog.display(caseObj.getId());
+        dialog.display();
     }
 
     public void addNewJob(CaseJob job) throws EmfException {
@@ -62,9 +62,9 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         return service().getCaseJobs(caseId);
     }
 
-    public void doAddJobFields(JPanel panel, JobFieldsPanel inputFieldsPanel) {
-        // NOTE Auto-generated method stub
-        
+    public void addJobFields(CaseJob job, JComponent container, JobFieldsPanel jobFieldsPanel) throws EmfException {
+        JobFieldsPanelPresenter jobFieldsPresenter = new JobFieldsPanelPresenter(jobFieldsPanel, session);
+        jobFieldsPresenter.display(job, container);
     }
 
 

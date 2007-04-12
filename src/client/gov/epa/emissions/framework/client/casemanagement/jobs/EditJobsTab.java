@@ -48,17 +48,20 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
     private JPanel tablePanel;
 
     private MessagePanel messagePanel;
+    
+    private EmfSession session;
 
     private DesktopManager desktopManager;
 
     private volatile Thread populateThread;
 
     public EditJobsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
-            DesktopManager desktopManager) {
+            DesktopManager desktopManager, EmfSession session) {
         super.setName("editJobsTab");
         this.parentConsole = parentConsole;
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;
+        this.session = session;
         this.populateThread = new Thread(this);
 
         super.setLayout(new BorderLayout());
@@ -193,7 +196,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
     }
 
     private void addNewJob(EditJobsTabPresenter presenter) {
-        NewJobDialog view = new NewJobDialog(parentConsole);
+        NewJobDialog view = new NewJobDialog(parentConsole, caseObj, session);
         try {
             presenter.addNewJobDialog(view);
         } catch (EmfException e) {

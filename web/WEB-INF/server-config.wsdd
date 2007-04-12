@@ -506,12 +506,12 @@
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<beanMapping
-		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.CaseRunStatus"
-		qname="ns1:CaseRunStatus" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus"
+		qname="ns1:JobRunStatus" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
 		
-	<arrayMapping qname="ns1:CaseRunStatuses" xmlns:ns1="urn:gov.epa.services.EmfService"
-		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.CaseRunStatus[]"
-		innerType="ns1:CaseRunStatus"
+	<arrayMapping qname="ns1:JobRunStatuses" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus[]"
+		innerType="ns1:JobRunStatus"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<beanMapping

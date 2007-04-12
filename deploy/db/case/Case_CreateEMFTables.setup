@@ -202,15 +202,15 @@ CREATE TABLE cases.executables
 WITHOUT OIDS;
 -- cases.executables
 
--- cases.case_runstatus
-CREATE TABLE cases.case_runstatus
+-- cases.case_jobrunstatus
+CREATE TABLE cases.case_jobrunstatus
 (
   id SERIAL PRIMARY KEY,
   name varchar(64) NOT NULL UNIQUE,
   description text
 )
 WITHOUT OIDS;
--- cases.case_runstatus
+-- cases.case_jobrunstatus
 
 -- cases.hosts
 CREATE TABLE cases.hosts
@@ -228,13 +228,14 @@ CREATE TABLE cases.cases_casejobs
   id SERIAL PRIMARY KEY,
   case_id int4 NOT NULL REFERENCES cases.cases(id) ,
   name varchar(255) NOT NULL,
-  description text,
+  purpose text,
+  job_num float,
   sector_id int4 REFERENCES emf.sectors(id),
   executable_id int4 REFERENCES cases.executables(id),
   arguments text,
   exec_order int4,
   version int4,
-  runstatus_id int4 REFERENCES cases.case_runstatus(id),
+  runstatus_id int4 REFERENCES cases.case_jobrunstatus(id),
   start_date timestamp,
   complete_date timestamp,
   user_id int4 REFERENCES emf.users(id), 
@@ -243,7 +244,7 @@ CREATE TABLE cases.cases_casejobs
   host_id int4 REFERENCES cases.hosts(id),
   que_option varchar(255),
   path varchar(255),
-  UNIQUE (case_id, name, executable_id, arguments)
+  UNIQUE (case_id, name)
 )
 WITHOUT OIDS;
 -- cases.cases_casejobs

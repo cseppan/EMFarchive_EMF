@@ -17,7 +17,7 @@ import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
-import gov.epa.emissions.framework.services.casemanagement.jobs.CaseRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 
@@ -49,7 +49,7 @@ public class CaseMappings extends Mappings {
         bean(call, CaseProgram.class, program());
         bean(call, SubDir.class, subdir());
         bean(call, CaseJob.class, casejob());
-        bean(call, CaseRunStatus.class, caseRunStatus());
+        bean(call, JobRunStatus.class, jobRunStatus());
         bean(call, Executable.class, executable());
         bean(call, Host.class, host());
         
@@ -73,7 +73,7 @@ public class CaseMappings extends Mappings {
         array(call, CaseProgram[].class, programs());
         array(call, SubDir[].class, subdirs());
         array(call, CaseJob[].class, casejobs());
-        array(call, CaseRunStatus[].class, caseRunStatuses());
+        array(call, JobRunStatus[].class, jobRunStatuses());
         array(call, Executable[].class, executables());
         array(call, Host[].class, hosts());
     }
@@ -206,8 +206,8 @@ public class CaseMappings extends Mappings {
         return qname("CaseJob");
     }
     
-    public QName caseRunStatus(){
-        return qname("CaseRunStatus");
+    public QName jobRunStatus(){
+        return qname("JobRunStatus");
     }
     
     public QName executable(){
@@ -218,8 +218,8 @@ public class CaseMappings extends Mappings {
         return qname("CaseJobs");
     }
     
-    public QName caseRunStatuses(){
-        return qname("CaseRunStatuses");
+    public QName jobRunStatuses(){
+        return qname("JobRunStatuses");
     }
     
     public QName executables(){

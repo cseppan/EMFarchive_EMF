@@ -10,6 +10,14 @@ public class Executable implements Serializable {
     
     private String description;
 
+    public Executable() {
+        //
+    }
+    
+    public Executable(String name) {
+        this.name = name;
+    }
+    
     public String getDescription() {
         return description;
     }
@@ -32,6 +40,10 @@ public class Executable implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public String toString() {
+        return this.name;
     }
     
 }

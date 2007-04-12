@@ -5,8 +5,10 @@ import gov.epa.emissions.commons.gui.Changeable;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.ui.Dialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -26,20 +28,25 @@ public class NewJobDialog extends Dialog implements NewJobView, ManageChangeable
     protected EditJobsTabPresenterImpl presenter;
 
     private MessagePanel messagePanel;
-
-//    private JobFieldsPanel jobFieldsPanel;
     
-    public NewJobDialog(EmfConsole parent) {
-        super("Create new CaseJob", parent);
-        super.setSize(new Dimension(550, 520));
+    private JobFieldsPanel jobFieldsPanel;
+    
+    private EmfConsole parent;
+    
+    private EmfSession session;
+    
+    private CaseJob newjob;
+    
+    public NewJobDialog(EmfConsole parent, Case caseObj, EmfSession session) {
+        super("Add a Job to " + caseObj.getName(), parent);
+        super.setSize(new Dimension(550, 400));
         super.center();
+        this.parent = parent;
+        this.session = session;
+        this.newjob = new CaseJob();
     }
 
-    public void display(int caseId) {
-        doDisplay();
-    }
-
-    private void doDisplay() {
+    public void display() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -53,10 +60,17 @@ public class NewJobDialog extends Dialog implements NewJobView, ManageChangeable
     private JPanel inputPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
+        
+        jobFieldsPanel = new JobFieldsPanel(false, messagePanel, this, parent, session);
 
+        try {
+            presenter.addJobFields(newjob, panel, jobFieldsPanel);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+        
         return panel;
     }
 
@@ -88,20 +102,12 @@ public class NewJobDialog extends Dialog implements NewJobView, ManageChangeable
     private void addNewJob() throws EmfException {
         //doValidateFields();
         shouldCreate = true;
-        presenter.addNewJob(job());
+        presenter.addNewJob(jobFieldsPanel.setFields());
         close();
     }
 
     public boolean shouldCreate() {
         return shouldCreate;
-    }
-
-    public CaseJob job() {
-        //jobFieldsPanel.setFields();
-
-        CaseJob newJob = new CaseJob();
-        newJob.setName("a new job");
-        return newJob;
     }
 
     public void register(Object presenter) {

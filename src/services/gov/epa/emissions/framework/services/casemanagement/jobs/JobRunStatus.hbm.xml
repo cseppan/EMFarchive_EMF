@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false"> 
-  <class name="gov.epa.emissions.framework.services.casemanagement.jobs.CaseRunStatus" table="case_runstatus" schema="cases"> 
+  <class name="gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus" table="case_jobrunstatus" schema="cases"> 
  	<id name="id" type="integer" column="id">
 	  <generator class="identity"/>
  	</id>

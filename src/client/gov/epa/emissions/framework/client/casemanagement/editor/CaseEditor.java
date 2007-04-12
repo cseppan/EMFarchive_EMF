@@ -111,7 +111,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
     private Component createJobsTab() {
         try {
-            EditJobsTab view = new EditJobsTab(parentConsole, this, messagePanel, desktopManager);
+            EditJobsTab view = new EditJobsTab(parentConsole, this, messagePanel, desktopManager, session);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
