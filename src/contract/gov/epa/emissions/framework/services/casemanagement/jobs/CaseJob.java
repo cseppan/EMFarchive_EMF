@@ -4,7 +4,10 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class CaseJob implements Serializable, Comparable<CaseJob> {
 
@@ -20,7 +23,7 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     
     private Sector sector;
     
-    private Executable executable;
+    private List<Executable> executable;
     
     private String args;
     
@@ -48,6 +51,15 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     
     private String path;
 
+    public CaseJob() {
+        executable = new ArrayList<Executable>();
+    }
+    
+    public CaseJob(String name) {
+        this();
+        this.name = name;
+    }
+    
     public String getPath() {
         return path;
     }
@@ -104,14 +116,13 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
         if (this.id == other.getId())
             return 0;
         
-        String thisJob = this.name + this.executable.getName() + this.args;
-        String otherJob = other.getName() + other.getExecutable().getName() + other.getArgs();
+        String thisJob = this.name;
+        String otherJob = other.getName();
         return thisJob.compareTo(otherJob);
     }
     
     public int hashCode() {
-        String unique = this.name + this.executable.getName() + this.args;
-        return unique.hashCode();
+        return this.name.hashCode();
     }
 
     public int getCaseId() {
@@ -122,12 +133,12 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
         this.caseId = caseId;
     }
 
-    public Executable getExecutable() {
-        return executable;
+    public Executable[] getExecutable() {
+        return executable.toArray(new Executable[0]);
     }
 
-    public void setExecutable(Executable executable) {
-        this.executable = executable;
+    public void setExecutable(Executable[] executables) {
+        this.executable = Arrays.asList(executables);
     }
 
     public Host getHost() {

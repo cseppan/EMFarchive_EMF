@@ -100,7 +100,12 @@ public class NewJobDialog extends Dialog implements NewJobView, ManageChangeable
     }
 
     private void addNewJob() throws EmfException {
-        //doValidateFields();
+        try {
+            jobFieldsPanel.validateFields();
+        } catch (RuntimeException e) {
+            messagePanel.setError(e.getMessage());
+        }
+        
         shouldCreate = true;
         presenter.addNewJob(jobFieldsPanel.setFields());
         close();
@@ -113,10 +118,6 @@ public class NewJobDialog extends Dialog implements NewJobView, ManageChangeable
     public void register(Object presenter) {
         this.presenter = (EditJobsTabPresenterImpl) presenter;
     }
-    
-//    private void doValidateFields() {
-//        jobFieldsPanel.validateFields();
-//    }
     
     public void addChangeable(Changeable changeable) {
         // NOTE Auto-generated method stub

@@ -91,7 +91,11 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
     }
     
     private void doValidateFields() {
-        jobFieldsPanel.validateFields();
+        try {
+            jobFieldsPanel.validateFields();
+        } catch (EmfException e) {
+            e.printStackTrace();
+        }
     }
     
     private void clearMessage() {

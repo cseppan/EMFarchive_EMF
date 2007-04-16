@@ -20,10 +20,13 @@ public class JobFieldsPanelPresenter {
     private EmfSession session;
 
     private JobFieldsPanelView view;
+    
+    private Hosts hosts;
 
-    public JobFieldsPanelPresenter(JobFieldsPanelView jobFields, EmfSession session) {
+    public JobFieldsPanelPresenter(JobFieldsPanelView jobFields, EmfSession session) throws EmfException {
         this.session = session;
         this.view = jobFields;
+        this.hosts = new Hosts(session, getHosts());
     }
 
     public void display(CaseJob job, JComponent container) throws EmfException {
@@ -39,11 +42,19 @@ public class JobFieldsPanelPresenter {
         return list.toArray(new Sector[0]);
     }
     
-    public Host[] getHosts() throws EmfException {
+    private Host[] getHosts() throws EmfException {
         List<Host> list = new ArrayList<Host>();
         list.addAll(Arrays.asList(caseService().getHosts()));
         
         return list.toArray(new Host[0]);
+    }
+
+    public Hosts getHostsObject() {
+        return this.hosts;
+    }
+    
+    public Host getHost(Object host) throws EmfException {
+        return hosts.get(host);
     }
     
     public JobRunStatus[] getRunStatuses() throws EmfException {
@@ -79,8 +90,9 @@ public class JobFieldsPanelPresenter {
     }
     
     public void doSave() throws EmfException {
-        //view.setFields();
-        caseService().updateCaseJob(view.setFields());
+        view.validateFields();
+        view.setFields();
+        //caseService().updateCaseJob(view.setFields());
     }
 
     public void doValidateFields() throws EmfException {

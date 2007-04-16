@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
@@ -69,7 +70,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     private ComboBox status;
 
     private ComboBox sector;
-
+    
     public JobFieldsPanel(boolean edit, MessagePanel messagePanel, ManageChangeables changeablesList, EmfConsole parent, EmfSession session) {
         this.edit = edit;
         this.changeablesList = changeablesList;
@@ -143,7 +144,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         return panel;
     }
 
-    private JPanel leftSetupPanel() throws EmfException {
+    private JPanel leftSetupPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         
@@ -154,9 +155,9 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         jobNo = new TextField("jobNo", job.getJobNo()+"", 12);
         jobNo.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(jobNo);
-        layoutGenerator.addLabelWidgetPair("Job#:", jobNo, panel);
+        layoutGenerator.addLabelWidgetPair("Job Number:", jobNo, panel);
         
-        Host[] hosts = presenter.getHosts();
+        Host[] hosts = presenter.getHostsObject().getAll();
         host = new EditableComboBox(hosts);
         host.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(host);
@@ -247,14 +248,14 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     }
 
 
-    public CaseJob setFields() {
+    public CaseJob setFields() throws EmfException {
         job.setName(name.getText().trim());
         job.setPurpose(purpose.getText().trim());
         job.setJobNo(Float.parseFloat(jobNo.getText().trim()));
         job.setArgs(args.getText().trim());
-        //job.setExecutable(new Executable(path.getText().trim()));
-        job.setHost((Host)host.getSelectedItem());
-        job.setSector((Sector)sector.getSelectedItem());
+        setPathNExecutable();
+        setHost();
+        updateSector();
         job.setRunstatus((JobRunStatus)status.getSelectedItem());
         job.setVersion(Integer.parseInt(version.getText().trim()));
         job.setQueOptions(qoption.getText().trim());
@@ -262,12 +263,68 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         return job;
     }
 
+    private void setPathNExecutable() {
+        String absolute = path.getText().trim();
+        int index = 0;
+        
+        if (absolute.charAt(index) == '/')
+            index = absolute.lastIndexOf('/');
+        else
+            index = absolute.lastIndexOf('\\');
+        
+        job.setPath(absolute.substring(0, index));
+        job.setExecutable(new Executable[]{new Executable(absolute.substring(++index))});
+    }
+
+    private void updateSector() {
+        Sector selected = (Sector) sector.getSelectedItem();
+
+        if (selected.getName().equalsIgnoreCase("All sectors")) {
+            job.setSector(null);
+            return;
+        }
+
+        job.setSector(selected);
+    }
+    
+    private void setHost() throws EmfException {
+        job.setHost(presenter.getHost(host.getSelectedItem()));
+    }
+    
     public void observe(JobFieldsPanelPresenter presenter) {
         this.presenter = presenter;
     }
 
-    public void validateFields() {
-        setFields();
+    public void validateFields() throws EmfException {
+        String temp = name.getText().trim();
+        
+        if (temp.trim().length() == 0)
+            throw new EmfException("Please give a name to case job.");
+        
+        String absolute = path.getText();
+        
+        if (absolute == null || absolute.trim().equals(""))
+            throw new EmfException("Please select an executable file.");
+        
+        try {
+            Float.parseFloat(jobNo.getText().trim());
+        } catch (NumberFormatException e) {
+            throw new EmfException("Please input a float number to Job # field.");
+        }
+        
+        Object selected =  host.getSelectedItem();
+        
+        if (selected == null || selected.toString().trim().equals(""))
+            throw new EmfException("Please give a valid host name.");
+        
+        if (absolute == null || absolute.trim().equals(""))
+            throw new EmfException("Please select an executable file.");
+        
+        try {
+            Integer.parseInt(version.getText().trim());
+        } catch (NumberFormatException e) {
+            throw new EmfException("Please input an integer to Version field.");
+        }
     }
 
     public CaseJob getJob() throws EmfException {

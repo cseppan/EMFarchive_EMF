@@ -88,6 +88,10 @@ public class CaseDAO {
         addObject(object, session);
     }
 
+    public void add(Host object, Session session) {
+        addObject(object, session);
+    }
+
     private void addObject(Object obj, Session session) {
         hibernateFacade.add(obj, session);
     }
@@ -225,7 +229,6 @@ public class CaseDAO {
     public void add(CaseJob job, Session session) {
         addObject(job, session);
     }
-
 
     public List<CaseJob> getCaseJobs(int caseId, Session session) {
         Criterion crit = Restrictions.eq("caseId", new Integer(caseId));

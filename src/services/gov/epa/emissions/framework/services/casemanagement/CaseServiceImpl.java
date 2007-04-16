@@ -600,21 +600,6 @@ public class CaseServiceImpl implements CaseService {
             session.close();
         }
     }
-    
-
-    public JobRunStatus addCaseRunStatus(JobRunStatus status) throws EmfException {
-        // NOTE Auto-generated method stub
-        if(true)
-            throw new EmfException("");
-        return null;
-    }
-
-    public Executable addExecutable(Executable exe) throws EmfException {
-        // NOTE Auto-generated method stub
-        if(true)
-            throw new EmfException("");
-        return null;
-    }
 
     public CaseJob[] getCaseJobs(int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
@@ -681,6 +666,19 @@ public class CaseServiceImpl implements CaseService {
         } catch (Exception e) {
             LOG.error("Could not get all hosts.\n" + e.getMessage());
             throw new EmfException("Could not get all hosts.\n");
+        } finally {
+            session.close();
+        }
+    }
+
+    public Host addHost(Host host) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(host, session);
+            return (Host) dao.load(Host.class, host.getName(), session);
+        } catch (Exception e) {
+            LOG.error("Could not add new host '" + host.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new host '" + host.getName() + "'");
         } finally {
             session.close();
         }

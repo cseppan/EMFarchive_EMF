@@ -63,7 +63,6 @@
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/ModelToRun.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/SubDir.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/jobs/CaseJob.hbm.xml"/>
-    	<mapping resource="gov/epa/emissions/framework/services/casemanagement/jobs/Executable.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/jobs/JobRunStatus.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/jobs/Host.hbm.xml"/>
 

@@ -52,7 +52,7 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
         measure.setLockOwner(owner.getUsername());
         measure.setLockDate(new Date());
         
-        controlMeasureService.stubs().method("obtainLockedMeasure").with(eq(owner), eq(measure)).will(returnValue(measure));
+        controlMeasureService.stubs().method("obtainLockedMeasure").with(eq(owner), eq(measure.getId())).will(returnValue(measure));
 
         session.stubs().method("user").withNoArguments().will(returnValue(owner));
 

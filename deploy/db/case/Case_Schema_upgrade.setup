@@ -8,16 +8,6 @@ DROP TABLE IF EXISTS cases.case_runstatus CASCADE;
 DROP TABLE IF EXISTS cases.executables CASCADE;
 DROP TABLE IF EXISTS cases.cases_casejobs CASCADE;
 
--- cases.executables
-CREATE TABLE cases.executables
-(
-  id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE,
-  description text NULL DEFAULT ''
-)
-WITHOUT OIDS;
--- cases.executables
-
 -- cases.case_jobrunstatus
 CREATE TABLE cases.case_jobrunstatus
 (
@@ -47,7 +37,6 @@ CREATE TABLE cases.cases_casejobs
   purpose text,
   job_num float,
   sector_id int4 REFERENCES emf.sectors(id),
-  executable_id int4 REFERENCES cases.executables(id),
   arguments text,
   exec_order int4,
   version int4,
@@ -64,6 +53,18 @@ CREATE TABLE cases.cases_casejobs
 )
 WITHOUT OIDS;
 -- cases.cases_casejobs
+
+-- cases.executables
+CREATE TABLE cases.executables
+(
+  id SERIAL PRIMARY KEY,
+  job_id int4 NOT NULL REFERENCES cases.cases_casejobs(id),
+  list_index int4,
+  name varchar(255) NOT NULL,
+  UNIQUE (job_id, name)
+)
+WITHOUT OIDS;
+-- cases.executables
 
 -- cases.case_jobrunstatus
 insert into cases.case_jobrunstatus values(DEFAULT, 'Not Started', 'Not Started');

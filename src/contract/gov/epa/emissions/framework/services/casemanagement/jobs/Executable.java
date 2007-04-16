@@ -8,8 +8,6 @@ public class Executable implements Serializable {
     
     private String name;
     
-    private String description;
-
     public Executable() {
         //
     }
@@ -18,14 +16,6 @@ public class Executable implements Serializable {
         this.name = name;
     }
     
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public int getId() {
         return id;
     }

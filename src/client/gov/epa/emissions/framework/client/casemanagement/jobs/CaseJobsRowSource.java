@@ -34,7 +34,7 @@ public class CaseJobsRowSource implements RowSource {
     }
     
     private String getExecutableName(CaseJob job) {
-        return (job.getExecutable() == null) ? "" : job.getExecutable().getName();
+        return (job.getExecutable() == null) ? "" : job.getExecutable()[0].getName();
     }
     
     private Integer getVersion(CaseJob job) {
