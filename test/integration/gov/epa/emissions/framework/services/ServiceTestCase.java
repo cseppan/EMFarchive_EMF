@@ -35,10 +35,13 @@ public abstract class ServiceTestCase extends TestCase {
 
     protected EmfDatabaseSetup dbSetup;
 
+    protected DbServerFactory dbServerFactory;
+
     protected Session session;
 
     final protected void setUp() throws Exception {
         dbSetup = new EmfDatabaseSetup(config());
+        dbServerFactory = new DbServerFactory(dbSetup);
         session = sessionFactory(configFile()).getSession();
 
         doSetUp();
@@ -89,6 +92,10 @@ public abstract class ServiceTestCase extends TestCase {
     
     protected DbServer getDbServerInstance() throws Exception {
         return dbSetup.getNewPostgresDbServerInstance();
+    }
+
+    protected DbServerFactory dbServerFactory() throws Exception {
+        return dbServerFactory;
     }
 
     protected SqlDataTypes sqlDataTypes() {

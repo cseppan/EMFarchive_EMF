@@ -41,7 +41,6 @@ public class EmfDbServer implements DbServer {
         return dbServer.getEmfDatasource();
     }
 
-
     public SqlDataTypes getSqlDataTypes() {
         return dbServer.getSqlDataTypes();
     }
@@ -53,6 +52,4 @@ public class EmfDbServer implements DbServer {
     public void disconnect() throws SQLException {
         dbServer.disconnect();
     }
-
-
 }
