@@ -43,19 +43,19 @@ public class StrategyTask implements Runnable {
             setStatus("Failed to run strategy: " + "Reason: " + e.getMessage());
         } finally {
             complete(completeStatus);
-            closeConnection();
+//            closeConnection();
         }
     }
 
-    private void closeConnection() {
-        try {
-            strategy.close();
-        } catch (EmfException e) {
-            logError("Failed to close connection : ", e);
-            setStatus("Failed to close connection " + "Reason: " + e.getMessage());
-        }
-    }
-
+//    private void closeConnection() {
+//        try {
+//            strategy.close();
+//        } catch (EmfException e) {
+//            logError("Failed to close connection : ", e);
+//            setStatus("Failed to close connection " + "Reason: " + e.getMessage());
+//        }
+//    }
+//
     private void prepare() throws EmfException {
         strategy.getControlStrategy().setRunStatus("Running");
         csService.updateControlStrategyWithLock(strategy.getControlStrategy());

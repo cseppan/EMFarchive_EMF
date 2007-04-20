@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
@@ -29,19 +30,29 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
 
     private ControlTechnologiesDAO controlTechnologiesDAO;
 
+    private DbServerFactory dbServerFactory;
+    
     public ControlMeasureServiceImpl() throws Exception {
-        this(HibernateSessionFactory.get());
+        this(HibernateSessionFactory.get(), DbServerFactory.get());
     }
 
-    public ControlMeasureServiceImpl(HibernateSessionFactory sessionFactory) throws Exception {
-        init(sessionFactory);
-    }
+//    public ControlMeasureServiceImpl(HibernateSessionFactory sessionFactory) throws Exception {
+//        init(sessionFactory);
+//    }
+//
 
-    private void init(HibernateSessionFactory sessionFactory) {
+    public ControlMeasureServiceImpl(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) throws Exception {
+//        this(sessionFactory);
         this.sessionFactory = sessionFactory;
+        this.dbServerFactory = dbServerFactory;
+        init();
+    }
+
+    private void init() {
         dao = new ControlMeasureDAO();
         controlTechnologiesDAO = new ControlTechnologiesDAO();
     }
+
 
     public ControlMeasure[] getMeasures() throws EmfException {
         Session session = sessionFactory.getSession();
@@ -53,6 +64,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             throw new EmfException("Could not retrieve control measures.");
         } finally {
             session.close();
+            
         }
     }
     
@@ -151,12 +163,15 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public Scc[] getSccsWithDescriptions(int controlMeasureId) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            Scc[] sccs = dao.getSccsWithDescriptions(controlMeasureId);
+            Scc[] sccs = dao.getSccsWithDescriptions(controlMeasureId, dbServer);
             return sccs;
         } catch (RuntimeException e) {
             LOG.error("Could not get SCCs for ControlMeasure Id: " + controlMeasureId, e);
             throw new EmfException("Could not get SCCs for ControlMeasure Id: " + controlMeasureId);
+        } finally {
+            close(dbServer);
         }
     }
 
@@ -188,9 +203,8 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public CostYearTable getCostYearTable(int targetYear) throws EmfException {
-        DbServer dbServer = null;
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            dbServer = new EmfDbServer();
             CostYearTableReader reader = new CostYearTableReader(dbServer, targetYear);
             return reader.costYearTable();
         } catch (Exception e) {
@@ -277,61 +291,73 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
 
     public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
         Session session = sessionFactory.getSession();
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            return dao.addEfficiencyRecord(efficiencyRecord, session);
+            return dao.addEfficiencyRecord(efficiencyRecord, session, dbServer);
         } catch (RuntimeException e) {
             LOG.error("Could not add control measure efficiency record", e);
             throw new EmfException("Could not add control measure efficiency record");
         } finally {
             session.close();
+            close(dbServer);
         }
     }
 
     public void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
         Session session = sessionFactory.getSession();
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            dao.updateEfficiencyRecord(efficiencyRecord, session);
+            dao.updateEfficiencyRecord(efficiencyRecord, session, dbServer);
         } catch (RuntimeException e) {
             LOG.error("Could not update for control measure efficiency record Id: " + efficiencyRecord.getId(), e);
             throw new EmfException("Could not update for control measure efficiency record Id: " + efficiencyRecord.getId());
         } finally {
             session.close();
+            close(dbServer);
         }
     }
 
     public void removeEfficiencyRecord(int efficiencyRecordId) throws EmfException {
         Session session = sessionFactory.getSession();
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            dao.removeEfficiencyRecord(efficiencyRecordId, session);
+            dao.removeEfficiencyRecord(efficiencyRecordId, session, dbServer);
         } catch (RuntimeException e) {
             LOG.error("Could not remove control measure efficiency record Id: " + efficiencyRecordId, e);
             throw new EmfException("Could not remove control measure efficiency record Id: " + efficiencyRecordId);
         } finally {
             session.close();
+            close(dbServer);
         }
     }
 
     public ControlMeasure[] getSummaryControlMeasures() throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            return dao.getSummaryControlMeasures(new EmfDbServer());
+            return dao.getSummaryControlMeasures(dbServer);
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve control measure efficiency records.", e);
             throw new EmfException("Could not retrieve control measures efficiency records.");
         } catch (Exception e) {
             LOG.error("Could not retrieve control measure efficiency records.", e);
             throw new EmfException(e.getMessage());
-        } 
+        } finally {
+            close(dbServer);
+        }
     }
 
     public ControlMeasure[] getSummaryControlMeasures(int majorPollutantId) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            return dao.getSummaryControlMeasures(majorPollutantId, new EmfDbServer());
+            return dao.getSummaryControlMeasures(majorPollutantId, dbServer);
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve control measure efficiency records.", e);
             throw new EmfException("Could not retrieve control measures efficiency records.");
         } catch (Exception e) {
             LOG.error("Could not retrieve control measure efficiency records.", e);
             throw new EmfException(e.getMessage());
-        } 
+        } finally {
+            close(dbServer);
+        }
     }
 }

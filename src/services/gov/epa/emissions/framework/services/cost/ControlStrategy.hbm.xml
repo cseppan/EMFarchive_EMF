@@ -22,7 +22,12 @@
 	
 	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
   	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
-		
+	<property name="countyFile" column="county_file" type="java.lang.String" not-null="false"/>
+
+	<one-to-one cascade="save-update" 
+		name="constraint" 
+		class="gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint"/>
+
 	<many-to-one cascade="save-update"
             name="region" 
             class="gov.epa.emissions.commons.data.Region"

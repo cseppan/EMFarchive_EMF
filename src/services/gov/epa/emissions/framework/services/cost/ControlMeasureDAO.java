@@ -29,11 +29,19 @@ public class ControlMeasureDAO {
     private LockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
-
+    
+//    private DbServer dbServer;
+    
     public ControlMeasureDAO() {
         lockingScheme = new LockingScheme();
         hibernateFacade = new HibernateFacade();
     }
+
+//    public ControlMeasureDAO(DbServer dbServer) {
+//        lockingScheme = new LockingScheme();
+//        hibernateFacade = new HibernateFacade();
+//        this.dbServer = dbServer;
+//    }
 
     public boolean exists(int id, Class clazz, Session session) {
         return hibernateFacade.exists(id, clazz, session);
@@ -171,9 +179,9 @@ public class ControlMeasureDAO {
         }
     }
 
-    public Scc[] getSccsWithDescriptions(int controlMeasureId) throws EmfException {
+    public Scc[] getSccsWithDescriptions(int controlMeasureId, DbServer dbServer) throws EmfException {
         try {
-            RetrieveSCC retrieveSCC = new RetrieveSCC(controlMeasureId, new EmfDbServer());
+            RetrieveSCC retrieveSCC = new RetrieveSCC(controlMeasureId, dbServer);
             return retrieveSCC.sccs();
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
@@ -186,9 +194,9 @@ public class ControlMeasureDAO {
         return (Scc[]) list.toArray(new Scc[0]);
     }
 
-    public String[] getCMAbbrevAndSccs(int measureId) throws EmfException {
+    public String[] getCMAbbrevAndSccs(int measureId, DbServer dbServer) throws EmfException {
         try {
-            RetrieveSCC retrieveSCC = new RetrieveSCC(measureId, new EmfDbServer());
+            RetrieveSCC retrieveSCC = new RetrieveSCC(measureId, dbServer);
             return retrieveSCC.cmAbbrevAndSccs();
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
@@ -221,7 +229,7 @@ public class ControlMeasureDAO {
                 session);
     }
 
-    public int addFromImporter(ControlMeasure measure, Scc[] sccs, User user, Session session) throws EmfException {
+    public int addFromImporter(ControlMeasure measure, Scc[] sccs, User user, Session session, DbServer dbServer) throws EmfException {
         int cmId = 0;
         Criterion name = Restrictions.eq("name", measure.getName());
         Criterion abbrev = Restrictions.eq("abbreviation", measure.getAbbreviation());
@@ -238,6 +246,8 @@ public class ControlMeasureDAO {
             measure.setLockOwner(obtainLocked.getLockOwner());
             removeSccs(cmId, session);
             removeEfficiencyRecords(cmId, session);
+            AggregateEfficiencyRecordDAO aerDAO = new AggregateEfficiencyRecordDAO();
+            aerDAO.removeAggregateEfficiencyRecords(cmId, dbServer);
             update(measure, sccs, session);
         } else if (abbrExist) {
             throw new EmfException("The Control Measure Abbreviation already in use: " + measure.getAbbreviation());
@@ -247,39 +257,6 @@ public class ControlMeasureDAO {
         return cmId;
     }
 
-    public int addFromImporter(ControlMeasure measure, User user, Session session) throws EmfException {
-        int cmId = 0;
-        Criterion name = Restrictions.eq("name", measure.getName());
-        Criterion abbrev = Restrictions.eq("abbreviation", measure.getAbbreviation());
-
-        Criteria criteria = session.createCriteria(ControlMeasure.class);
-        criteria.add(abbrev);
-        boolean abbrExist = criteria.uniqueResult() != null;
-        criteria = session.createCriteria(ControlMeasure.class);
-        criteria.add(name);
-        boolean nameExist = criteria.uniqueResult() != null;
-        
-        if (nameExist) {// overwrite if name exist regard less of abbrev
-            ControlMeasure existing = (ControlMeasure) criteria.uniqueResult();
-            if (existing.isLocked()) {
-                if (!existing.isLocked(user))
-                    throw new EmfException("Could not obtain the lock to update: " + measure.getName());
-            }
-            cmId = existing.getId();
-            measure.setId(cmId);
-            removeSccs(cmId, session);
-            removeEfficiencyRecords(cmId, session);
-
-            update(measure, measure.getSccs(), session);
-        } else if (abbrExist) {
-            throw new EmfException("The Control Measure Abbreviation already in use: " + measure.getAbbreviation());
-        } else {
-            cmId = add(measure, measure.getSccs(), session);
-        }
-        return cmId;
-    }
-
-    
     
     // use only after confirming measure is exist
     private int controlMeasureId(ControlMeasure measure, Session session) {
@@ -336,9 +313,10 @@ public class ControlMeasureDAO {
         }
     }
 
-    public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord, Session session) throws EmfException {
+    public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord, Session session, DbServer dbServer) throws EmfException {
         checkForDuplicateEfficiencyRecord(efficiencyRecord, session);
         hibernateFacade.add(efficiencyRecord, session);
+        updateAggregateEfficiencyRecords(efficiencyRecord.getControlMeasureId(), dbServer);
         return efficiencyRecord.getId();
     }
 
@@ -381,28 +359,52 @@ public class ControlMeasureDAO {
         }
     }
 
-    public void removeEfficiencyRecord(int efficiencyRecordId, Session session) {
+    public void removeEfficiencyRecord(int efficiencyRecordId, Session session, DbServer dbServer) throws EmfException {
+        EfficiencyRecord er = (EfficiencyRecord)hibernateFacade.current(efficiencyRecordId, EfficiencyRecord.class, session);
+        int cmId = er.getControlMeasureId();
         hibernateFacade.remove(hibernateFacade.current(efficiencyRecordId, EfficiencyRecord.class, session), session);
+        updateAggregateEfficiencyRecords(cmId, dbServer);
     }
 
-    public void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord, Session session) throws EmfException {
+    public void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord, Session session, DbServer dbServer) throws EmfException {
         checkForDuplicateEfficiencyRecord(efficiencyRecord, session);
         hibernateFacade.saveOrUpdate(efficiencyRecord, session);
+        updateAggregateEfficiencyRecords(efficiencyRecord.getControlMeasureId(), dbServer);
     }
 
-    public ControlMeasure[] getSummaryControlMeasures(DbServer DbServer) throws EmfException {
+    public ControlMeasure[] getSummaryControlMeasures(DbServer dbServer) throws EmfException {
         try {
-            RetrieveControlMeasure retrieveControlMeasure = new RetrieveControlMeasure(DbServer);
+            RetrieveControlMeasure retrieveControlMeasure = new RetrieveControlMeasure(dbServer);
             return retrieveControlMeasure.getControlMeasures();
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
     }
 
-    public ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, DbServer DbServer) throws EmfException {
+    public ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, DbServer dbServer) throws EmfException {
         try {
-            RetrieveControlMeasure retrieveControlMeasure = new RetrieveControlMeasure(DbServer);
+            RetrieveControlMeasure retrieveControlMeasure = new RetrieveControlMeasure(dbServer);
             return retrieveControlMeasure.getControlMeasures(majorPollutantId);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+    }
+
+    private void updateAggregateEfficiencyRecords(int controlMeasureId, DbServer dbServer) throws EmfException {
+        try {
+            AggregateEfficiencyRecordDAO aerDAO = new AggregateEfficiencyRecordDAO();
+            aerDAO.updateAggregateEfficiencyRecords(controlMeasureId, dbServer);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+    }
+
+    public void updateAggregateEfficiencyRecords(ControlMeasure[] measures, DbServer dbServer) throws EmfException {
+        try {
+            AggregateEfficiencyRecordDAO aerDAO = new AggregateEfficiencyRecordDAO();
+            for (int i = 0; i < measures.length; i++) {
+                aerDAO.updateAggregateEfficiencyRecords(measures[i].getId(), dbServer);
+            }
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }

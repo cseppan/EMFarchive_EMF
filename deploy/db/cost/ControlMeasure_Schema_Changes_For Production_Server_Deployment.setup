@@ -112,6 +112,15 @@ CREATE TABLE emf.aggregrated_efficiencyrecords
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
  
+CREATE INDEX aggeffrec_measureid
+  ON emf.aggregrated_efficiencyrecords
+  USING btree
+  (control_measures_id);
+CREATE INDEX aggeffrec_pollid
+  ON emf.aggregrated_efficiencyrecords
+  USING btree
+  (pollutant_id);
+
 insert into emf.aggregrated_efficiencyrecords (
   control_measures_id,
   pollutant_id,
@@ -129,3 +138,12 @@ select  control_measures_id, pollutant_id, max(efficiency) as maxefficiency, min
 	avg(rule_effectiveness) as avgruleff, avg(rule_penetration) as avgrulpen 
 from emf.control_measure_efficiencyrecords 
 group by control_measures_id, pollutant_id;
+
+-- add new columns to the control_strategies table...
+ALTER TABLE emf.control_strategies ADD COLUMN county_file character varying,
+  ADD COLUMN emis_reduction_constraint real,
+  ADD COLUMN control_efficiency_constraint real,
+  ADD COLUMN cost_per_ton_constraint character varying,
+  ADD COLUMN annualized_cost_constraint character varying;
+
+

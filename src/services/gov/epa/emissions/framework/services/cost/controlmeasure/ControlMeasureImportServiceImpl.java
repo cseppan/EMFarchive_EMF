@@ -1,21 +1,18 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfDbServer;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.controlmeasure.io.CMImportTask;
 import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
-
 import java.io.File;
 import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
-
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
 public class ControlMeasureImportServiceImpl implements ControlMeasureImportService {
@@ -27,20 +24,23 @@ public class ControlMeasureImportServiceImpl implements ControlMeasureImportServ
     private DataCommonsDAO dataCommonsDAO;
     
     private PooledExecutor threadPool;
+    
+    private DbServerFactory dbServerFactory;
 
     public ControlMeasureImportServiceImpl() throws Exception {
-        this(HibernateSessionFactory.get());
+        this(HibernateSessionFactory.get(), DbServerFactory.get());
     }
 
-    public ControlMeasureImportServiceImpl(HibernateSessionFactory sessionFactory) throws Exception {
+    public ControlMeasureImportServiceImpl(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) throws Exception {
         this.sessionFactory = sessionFactory;
         this.dataCommonsDAO = new DataCommonsDAO();
         this.threadPool = createThreadPool();
+        this.dbServerFactory = dbServerFactory;
     }
 
     public void importControlMeasures(String folderPath, String[] fileNames, User user) throws EmfException {
         try {
-            CMImportTask importTask = new CMImportTask(new File(folderPath), fileNames, user, sessionFactory, new EmfDbServer());
+            CMImportTask importTask = new CMImportTask(new File(folderPath), fileNames, user, sessionFactory, dbServerFactory);
             threadPool.execute(new GCEnforcerTask("Import control measures from files: " + fileNames[0] + ", etc.", importTask));
         } catch (Exception e) {
             LOG.error("Could not import control measures.", e);

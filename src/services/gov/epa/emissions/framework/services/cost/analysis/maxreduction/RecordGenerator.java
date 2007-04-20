@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface RecordGenerator {
 
-    Record getRecord(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException;
+    Record getRecord(ResultSet resultSet, MaxEmsRedControlMeasure maxCM) throws SQLException, EmfException;
     
     double reducedEmission();
     
-    void calculateEmissionReduction(ResultSet resultSet, MaxControlEffControlMeasure maxMeasure) throws SQLException;
+    void calculateEmissionReduction(ResultSet resultSet, MaxEmsRedControlMeasure maxMeasure) throws SQLException;
     
-    List tokens(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException;
+    List tokens(ResultSet resultSet, MaxEmsRedControlMeasure maxCM) throws SQLException, EmfException;
 }

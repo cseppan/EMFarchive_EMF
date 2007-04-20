@@ -27,7 +27,7 @@ public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
             User user = emfUser();
             strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServer(),
+            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
                     new Integer(500), sessionFactory());
             maxEmfEmsRedStrategy.run();
             assertEquals("No of rows in the detail result table is 15", 15,
@@ -51,7 +51,7 @@ public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
             User user = emfUser();
             strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
             
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServer(),
+            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
                     new Integer(500), sessionFactory());
             maxEmfEmsRedStrategy.run();
             assertEquals("No of rows in the detail result table is 3", 3,

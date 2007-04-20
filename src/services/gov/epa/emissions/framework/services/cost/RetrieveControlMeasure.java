@@ -13,11 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-//import org.apache.commons.logging.Log;
-//import org.apache.commons.logging.LogFactory;
-
 public class RetrieveControlMeasure {
-//    private static Log log = LogFactory.getLog(RetrieveControlMeasure.class);
 
     private DbServer dbServer;
     
@@ -29,15 +25,10 @@ public class RetrieveControlMeasure {
         ControlMeasure[] controlMeasures = {};
         try {
             String sql = query();
-//            log.error("start db - " + sql);
-            ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(sql);
-//            log.error("end db, build measures");
+            ResultSet set = dbServer.getEmfDatasource().query().executeQuery(sql);
             controlMeasures = values(set);
-//            log.error("end measures");
         } catch (SQLException e) {
             throw e;
-        } finally {
-            dbServer.disconnect();
         }
 
         return controlMeasures;
@@ -47,15 +38,10 @@ public class RetrieveControlMeasure {
         ControlMeasure[] controlMeasures = {};
         try {
             String sql = query(majorPollutantId);
-//            log.error("start db - " + sql);
-            ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(sql);
-//            log.error("end db, build measures");
+            ResultSet set = dbServer.getEmfDatasource().query().executeQuery(sql);
             controlMeasures = values(set);
-//            log.error("end measures");
         } catch (SQLException e) {
             throw e;
-        } finally {
-            dbServer.disconnect();
         }
 
         return controlMeasures;

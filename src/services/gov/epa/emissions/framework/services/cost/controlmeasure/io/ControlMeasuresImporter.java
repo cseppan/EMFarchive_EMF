@@ -9,9 +9,11 @@ import gov.epa.emissions.commons.io.importer.FileVerifier;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
+import gov.epa.emissions.framework.services.cost.AggregateEfficiencyRecordDAO;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
@@ -29,8 +31,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
-import org.hibernate.StatelessSession;
-import org.hibernate.Transaction;
 
 public class ControlMeasuresImporter implements Importer {
 
@@ -56,17 +56,23 @@ public class ControlMeasuresImporter implements Importer {
 
     private HibernateSessionFactory sessionFactory;
 
-    public ControlMeasuresImporter(File folder, String[] fileNames, User user, HibernateSessionFactory factory, DbServer dbServer)
+    private DbServer dbServer;
+    
+    private AggregateEfficiencyRecordDAO aerDAO;
+
+    public ControlMeasuresImporter(File folder, String[] fileNames, User user, HibernateSessionFactory factory, DbServerFactory dbServerFactory)
             throws EmfException, ImporterException {
         File[] files = fileNames(folder, fileNames);
         this.user = user;
         this.sessionFactory = factory;
+        this.dbServer = dbServerFactory.getDbServer();
         this.statusDao = new StatusDAO(factory);
         ControlMeasuresImportIdentifier types = new ControlMeasuresImportIdentifier(files, user, factory, dbServer);
         this.cmImporters = types.cmImporters();
         this.efficiency = cmImporters.efficiencyImporter();
         this.controlMeasures = new HashMap();
         this.controlMeasuresDao = new ControlMeasureDAO();
+        this.aerDAO = new AggregateEfficiencyRecordDAO();
         this.effRecTableFormat = new EfficiencyRecordTableFormat(dbServer.getSqlDataTypes());
         this.datasource = dbServer.getEmfDatasource();
         this.modifier = dataModifier("control_measure_efficiencyrecords", datasource);
@@ -95,6 +101,7 @@ public class ControlMeasuresImporter implements Importer {
                 efficiencyRecords = null;
                 System.gc();
             }
+            aerDAO.updateAggregateEfficiencyRecords(measures, dbServer);
             setStatus("Finished reading efficiency record file");
             
         } catch (Exception e) {
@@ -106,6 +113,7 @@ public class ControlMeasuresImporter implements Importer {
             try {
                 modifier.finish();
                 modifier.close();
+                dbServer.disconnect();
             } catch (SQLException e) {
                 // NOTE Auto-generated catch block
             } finally {
@@ -197,11 +205,14 @@ public class ControlMeasuresImporter implements Importer {
             measures[i].setLastModifiedTime(date);
             measures[i].setLastModifiedBy(user.getName());
             try {
-                cmId = controlMeasuresDao.addFromImporter(measures[i],measures[i].getSccs(), user, session);
+                cmId = controlMeasuresDao.addFromImporter(measures[i],measures[i].getSccs(), user, session, dbServer);
                 measures[i].setId(cmId);
             } catch (EmfException e) {
                 messages.add(e.getMessage() + "\n");
 //                throw new EmfException(e.getMessage() + " " + e.getMessage() + " " + measures[i].getName() + " " + measures[i].getAbbreviation());
+            } catch (Exception e) {
+                messages.add(e.getMessage() + "\n");
+//              throw new EmfException(e.getMessage() + " " + e.getMessage() + " " + measures[i].getName() + " " + measures[i].getAbbreviation());
             } finally {
                 count++;
             }
@@ -221,52 +232,52 @@ public class ControlMeasuresImporter implements Importer {
         addCompletedStatus(count, "control measures");
     }
 
-    public void saveEfficiencyRecordsViaHibernateStatelessSession(EfficiencyRecord[] efficiencyRecords) {
-        List messages = new ArrayList(); 
-        int id = 0;
-        int count = 0;
-        StatelessSession session = sessionFactory.getStatelessSession();
-        Transaction tx = session.beginTransaction();
-        for (int i = 0; i < efficiencyRecords.length; i++) {
-            try {
-                id = controlMeasuresDao.addEfficiencyRecord(efficiencyRecords[i], session);
-                efficiencyRecords[i].setId(id);
-                count++;
-            } catch (EmfException e) {
-                messages.add(e.getMessage());
-            }
-        }
-        tx.commit();
-        session.close();
-        if (messages.size() > 0) setStatus(messages);
-        addCompletedStatus(count, "efficiency records");
-    }
-    
-    public void saveEfficiencyRecordsViaHibernateSession(EfficiencyRecord[] efficiencyRecords) {
-        List messages = new ArrayList(); 
-        int id = 0;
-        int count = 0;
-        Session session = sessionFactory.getSession();
-        for (int i = 0; i < efficiencyRecords.length; i++) {
-            try {
-                id = controlMeasuresDao.addEfficiencyRecord(efficiencyRecords[i], session);
-                efficiencyRecords[i].setId(id);
-                count++;
-            } catch (EmfException e) {
-                messages.add(e.getMessage());
-            }
-            if ( i % 20 == 0 ) { //20, same as the JDBC batch size
-                //flush a batch of inserts and release memory:
-                session.flush();
-                session.clear();
-            }
-        }
-        session.flush();
-        session.clear();
-        session.close();
-        if (messages.size() > 0) setStatus(messages);
-        addCompletedStatus(count, "efficiency records");
-    }
+//    public void saveEfficiencyRecordsViaHibernateStatelessSession(EfficiencyRecord[] efficiencyRecords) {
+//        List messages = new ArrayList(); 
+//        int id = 0;
+//        int count = 0;
+//        StatelessSession session = sessionFactory.getStatelessSession();
+//        Transaction tx = session.beginTransaction();
+//        for (int i = 0; i < efficiencyRecords.length; i++) {
+//            try {
+//                id = controlMeasuresDao.addEfficiencyRecord(efficiencyRecords[i], session);
+//                efficiencyRecords[i].setId(id);
+//                count++;
+//            } catch (EmfException e) {
+//                messages.add(e.getMessage());
+//            }
+//        }
+//        tx.commit();
+//        session.close();
+//        if (messages.size() > 0) setStatus(messages);
+//        addCompletedStatus(count, "efficiency records");
+//    }
+//    
+//    public void saveEfficiencyRecordsViaHibernateSession(EfficiencyRecord[] efficiencyRecords) {
+//        List messages = new ArrayList(); 
+//        int id = 0;
+//        int count = 0;
+//        Session session = sessionFactory.getSession();
+//        for (int i = 0; i < efficiencyRecords.length; i++) {
+//            try {
+//                id = controlMeasuresDao.addEfficiencyRecord(efficiencyRecords[i], session);
+//                efficiencyRecords[i].setId(id);
+//                count++;
+//            } catch (EmfException e) {
+//                messages.add(e.getMessage());
+//            }
+//            if ( i % 20 == 0 ) { //20, same as the JDBC batch size
+//                //flush a batch of inserts and release memory:
+//                session.flush();
+//                session.clear();
+//            }
+//        }
+//        session.flush();
+//        session.clear();
+//        session.close();
+//        if (messages.size() > 0) setStatus(messages);
+//        addCompletedStatus(count, "efficiency records");
+//    }
 
     public void saveEfficiencyRecords(EfficiencyRecord[] efficiencyRecords) throws EmfException {
         doBatchInsert(efficiencyRecords);
@@ -314,11 +325,11 @@ public class ControlMeasuresImporter implements Importer {
         statusDao.add(endStatus);
     }
 
-    private void setStatus(List messages) {
-        for (int i = 0; i < messages.size(); i++) {
-            setStatus((String)messages.get(i));
-        }
-    }
+//    private void setStatus(List messages) {
+//        for (int i = 0; i < messages.size(); i++) {
+//            setStatus((String)messages.get(i));
+//        }
+//    }
 
     private void addCompletedStatus(int noOfMeasures, String what) {
         setStatus("Completed importing " + noOfMeasures + " " + what);

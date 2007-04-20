@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false"> 
+  <class name="gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint" table="control_strategy_constraints" schema="emf"> 
+    <id name="controlStrategyId" column="control_strategy_id" />
+	<property name="maxEmisReduction" column="max_emis_reduction" type="double"  not-null="false" />
+	<property name="maxControlEfficiency" column="max_control_efficiency" type="double"  not-null="false" />
+	<property name="minCostPerTon" column="min_cost_per_ton" type="double"  not-null="false" />
+	<property name="minAnnCost" column="min_ann_cost" type="double"  not-null="false" />
+  </class> 
+</hibernate-mapping>  

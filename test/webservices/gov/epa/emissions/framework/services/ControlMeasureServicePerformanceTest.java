@@ -15,18 +15,20 @@ public class ControlMeasureServicePerformanceTest extends WebServicesTestCase {
 
     private ControlMeasureService transport = null;
 
-    private ControlMeasureService server;
-
+    private ControlMeasureService cmService;
+    
+    private HibernateSessionFactory sessionFactory;
+    
     protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = sessionFactory(new File("test/webservices.conf"));
-        server = new ControlMeasureServiceImpl(sessionFactory);
+        sessionFactory = sessionFactory(new File("test/webservices.conf"));
         RemoteServiceLocator rl = new RemoteServiceLocator(DEFAULT_URL);
         transport = rl.controlMeasureService();
+        cmService = new ControlMeasureServiceImpl(sessionFactory, dbServerFactory());
     }
 
-    public void testShouldGetAllControlMeasures_AtServerSide() throws EmfException {
+    public void testShouldGetAllControlMeasures_AtServerSide() throws Exception {
         dumpMemory();
-        ControlMeasure[] all = server.getMeasures();
+        ControlMeasure[] all = cmService.getMeasures();
         dumpMemory();
         assertEquals(32,all.length);
     }

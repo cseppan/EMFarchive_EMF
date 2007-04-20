@@ -15,7 +15,7 @@ public class NonroadRecordGenerator implements RecordGenerator {
         this.delegate = new NonpointRecordGenerator(result);
     }
 
-    public Record getRecord(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException {
+    public Record getRecord(ResultSet resultSet, MaxEmsRedControlMeasure maxCM) throws SQLException, EmfException {
         return delegate.getRecord(resultSet, maxCM);
     }
 
@@ -23,11 +23,11 @@ public class NonroadRecordGenerator implements RecordGenerator {
         return delegate.reducedEmission();
     }
 
-    public void calculateEmissionReduction(ResultSet resultSet, MaxControlEffControlMeasure maxMeasure) throws SQLException {
+    public void calculateEmissionReduction(ResultSet resultSet, MaxEmsRedControlMeasure maxMeasure) throws SQLException {
         delegate.calculateEmissionReduction(resultSet, maxMeasure);
     }
 
-    public List tokens(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException {
+    public List tokens(ResultSet resultSet, MaxEmsRedControlMeasure maxCM) throws SQLException, EmfException {
         return delegate.tokens(resultSet, maxCM);
     }
 

@@ -104,7 +104,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         tabbedPane.addTab("Inventory", createInventoryFilterTab(controlStrategy));
 //        tabbedPane.addTab("Pollutants", createPollutantsTab(controlStrategy));
         tabbedPane.addTab("Measures", createMeasuresTab(controlStrategy));
-        tabbedPane.addTab("Applied Measures", createAppliedMeasuresTab(controlStrategy));
+        tabbedPane.addTab("Constraints", createAppliedMeasuresTab(controlStrategy));
         tabbedPane.addTab("Outputs", outputPanel(controlStrategyResults));
 
         tabbedPane.addChangeListener(new ChangeListener(){
@@ -159,12 +159,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
 
     private JPanel createAppliedMeasuresTab(ControlStrategy controlStrategy) {
-        EditControlStrategyTabView view = null;
-        try {
-            view = new EditControlStrategyAppliedMeasuresTab(controlStrategy, this,  messagePanel, parentConsole, session);
-        } catch (EmfException e) {
-            showError("Could not create Applied Measures tab.");
-        }
+        ControlStrategyConstraintsTabView view = null;
+        view = new EditControlStrategyConstraintsTab(controlStrategy, this,  messagePanel, parentConsole, session);
         this.presenter.set(view);
         return (JPanel) view;
     }

@@ -8,7 +8,9 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.OptimizedQuery;
 import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.io.TableFormat;
+import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.QAStepTask;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
@@ -19,10 +21,13 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.DatasetCreator;
 import gov.epa.emissions.framework.services.cost.controlStrategy.GenerateSccControlMeasuresMap;
 import gov.epa.emissions.framework.services.cost.controlStrategy.SccControlMeasuresMap;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
+import gov.epa.emissions.framework.services.cost.controlStrategy.io.CSCountyFileFormat;
+import gov.epa.emissions.framework.services.cost.controlStrategy.io.CSCountyImporter;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -48,10 +53,10 @@ public class MaxEmsRedStrategy implements Strategy {
 
     private User user;
 
-    public MaxEmsRedStrategy(ControlStrategy strategy, User user, DbServer dbServer, Integer batchSize,
+    public MaxEmsRedStrategy(ControlStrategy strategy, User user, DbServerFactory dbServerFactory, Integer batchSize,
             HibernateSessionFactory sessionFactory) {
         this.controlStrategy = strategy;
-        this.dbServer = dbServer;
+        this.dbServer = dbServerFactory.getDbServer();
         this.datasource = dbServer.getEmissionsDatasource();
         this.batchSize = batchSize.intValue();
         this.sessionFactory = sessionFactory;
@@ -73,7 +78,7 @@ public class MaxEmsRedStrategy implements Strategy {
         ControlStrategyResult result = strategyResult(controlStrategy, resultDataset);
         String status = "";
         try {
-            StrategyLoader loader = new StrategyLoader(creator.outputTableName(), tableFormat, dbServer, result, map,
+            StrategyLoader loader = new StrategyLoader(creator.outputTableName(), tableFormat, sessionFactory, dbServer, result, map,
                     controlStrategy);
             loader.load(optimizedQuery);
             status = "Completed. Input dataset: " + inputDataset.getName() + ".";
@@ -86,6 +91,11 @@ public class MaxEmsRedStrategy implements Strategy {
             result.setCompletionTime(new Date());
             result.setRunStatus(status);
             saveResults(result);
+            try {
+                dbServer.disconnect();
+            } catch (SQLException e) {
+                throw new EmfException("Could not disconnect DbServer -" + e.getMessage());
+            }
         }
     }
 
@@ -152,7 +162,8 @@ public class MaxEmsRedStrategy implements Strategy {
     }
 
     private OptimizedQuery sourceQuery(EmfDataset dataset, ControlStrategy controlStrategy) throws EmfException {
-        String query = "SELECT * FROM " + emissionTableName(dataset) + conditionForQuery(controlStrategy);
+        String query = "SELECT *, case when poll = '" + controlStrategy.getTargetPollutant().getName() + "' then 1 else 0 end as sort FROM " + emissionTableName(dataset) + conditionForQuery(controlStrategy)
+            + " order by scc, fips" + (controlStrategy.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)") ? ", plantid, pointid, stackid, segment" : "" ) + ", sort desc";
         try {
             return datasource.optimizedQuery(query, batchSize);
         } catch (SQLException e) {
@@ -162,23 +173,47 @@ public class MaxEmsRedStrategy implements Strategy {
 
     }
 
-    private String conditionForQuery(ControlStrategy controlStrategy) {
+    private String conditionForQuery(ControlStrategy controlStrategy) throws EmfException {
+        String sqlFilter = "";
         String filter = controlStrategy.getFilter();
+        String countyFile = controlStrategy.getCountyFile();
 
-        String pollutantCondition = "poll=" + "\'" + controlStrategy.getTargetPollutant() + "\'";
-        if (filter == null || filter.length() == 0)
-            return " WHERE " + pollutantCondition;
+        //get and build strategy filter...
+        if (filter == null || filter.trim().length() == 0)
+            sqlFilter = "";
+        else 
+            sqlFilter = " where " + filter; 
 
-        String condition = whereTag(filter);
-        return condition + filter + " AND " + pollutantCondition;
+        //get and build county filter...
+        if (countyFile != null && countyFile.trim().length() > 0) {
+            CSCountyImporter countyImporter = new CSCountyImporter(new File(countyFile), 
+                    new CSCountyFileFormat());
+            String[] fips;
+            try {
+                fips = countyImporter.run();
+            } catch (ImporterException e) {
+                throw new EmfException(e.getMessage());
+            }
+            if (fips.length > 0) 
+                sqlFilter += (sqlFilter.length() == 0 ? " where " : " and ") 
+                    + " fips in (";
+            for (int i = 0; i < fips.length; i++) {
+                sqlFilter += (i > 0 ? "," : "") + "'" 
+                    + fips[i] + "'";
+            }
+            if (fips.length > 0) 
+                sqlFilter += ")";
+        }
+
+        return sqlFilter;
     }
 
-    private String whereTag(String filter) {
-        String condition = " ";
-        if (filter.toUpperCase().indexOf("WHERE") == -1)
-            condition = " WHERE ";
-        return condition;
-    }
+//    private String whereTag(String filter) {
+//        String condition = " ";
+//        if (filter.toUpperCase().indexOf("WHERE") == -1)
+//            condition = " WHERE ";
+//        return condition;
+//    }
 
     private void createTable(String tableName) throws EmfException {
         TableCreator creator = new TableCreator(datasource);

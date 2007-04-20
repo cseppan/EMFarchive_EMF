@@ -11,6 +11,7 @@ import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.VersionedDatasetQuery;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.QAStepTask;
 import gov.epa.emissions.framework.services.basic.Status;
@@ -42,15 +43,13 @@ public class ControlStrategyInventoryOutput {
     private DbServer dbServer;
 
     public ControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
-            HibernateSessionFactory sessionFactory, DbServer dbServer) throws Exception {
+            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) throws Exception {
         this.controlStrategy = controlStrategy;
         this.user = user;
-        this.sessionFactory = sessionFactory == null ? HibernateSessionFactory.get() : sessionFactory;
-        this.dbServer = dbServer;
+        this.sessionFactory = sessionFactory;
+        this.dbServer = dbServerFactory.getDbServer();
         creator = new DatasetCreator("ControlledInventory_", "CSINVEN_", controlStrategy, user, sessionFactory);
-//      this.tableFormat = new FileFormatFactory().tableFormat(datasetType(controlStrategy));
         this.tableFormat = new FileFormatFactory(dbServer).tableFormat(datasetType(controlStrategy));
-//      this.statusServices = new StatusDAO();
         this.statusServices = new StatusDAO(sessionFactory);
     }
 
@@ -62,17 +61,14 @@ public class ControlStrategyInventoryOutput {
     }
 
     public void create() throws Exception {
-//        EmfDbServer server = new EmfDbServer();
-//        Datasource datasource = server.getEmissionsDatasource();
         Datasource datasource = dbServer.getEmissionsDatasource();
         TableCreator tableCreator = new TableCreator(datasource);
         EmfDataset inputDataset = controlStrategy.getInputDatasets()[0];
         String inputTable = inputTable(inputDataset);
-//        doCreateInventory(server, datasource, tableCreator, inputDataset, inputTable);
         doCreateInventory(dbServer, datasource, tableCreator, inputDataset, inputTable);
+        dbServer.disconnect();
     }
 
-//    private void doCreateInventory(EmfDbServer server, Datasource datasource, TableCreator tableCreator,
     private void doCreateInventory(DbServer server, Datasource datasource, TableCreator tableCreator,
             EmfDataset inputDataset, String inputTable) throws EmfException, Exception, SQLException {
         String outputInventoryTableName = creator.outputTableName();
@@ -86,7 +82,6 @@ public class ControlStrategyInventoryOutput {
             throw e;
         } finally {
             setandRunQASteps();
-            server.disconnect();
         }
         endStatus(statusServices);
     }

@@ -1,17 +1,10 @@
 package gov.epa.emissions.framework.services.cost.analysis.maxreduction;
 
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-public class CalMaxEmsRedEfficiencyRecord {
-
-    private Map map;
+public class RetrieveMaxEmsRedEfficiencyRecord {
 
     private EfficiencyRecordUtil efficiencyRecordUtil;
 
@@ -19,36 +12,39 @@ public class CalMaxEmsRedEfficiencyRecord {
 
     private CostYearTable costYearTable;
 
-    public CalMaxEmsRedEfficiencyRecord(CostYearTable costYearTable) {
+    public RetrieveMaxEmsRedEfficiencyRecord(CostYearTable costYearTable) {
         this.costYearTable = costYearTable;
-        this.map = new HashMap();
         this.efficiencyRecordUtil = new EfficiencyRecordUtil();
         this.tollerance = 1e-5;
     }
 
-    public void add(ControlMeasure measure, EfficiencyRecord record) {
-        map.put(record, measure);
-    }
+    public EfficiencyRecord findBestEfficiencyRecord(EfficiencyRecord[] ers) throws EmfException {
+        if (ers.length == 0)
+            return null;
 
-    public MaxControlEffControlMeasure maxEmsReductionMeasure() throws EmfException {
-        if (map.size() == 0)
-            return null;// FIXME: do we have to warn or error
+        if (ers.length == 1)
+            return ers[0];
 
-        Iterator iterator = map.keySet().iterator();
-        EfficiencyRecord maxRecord = (EfficiencyRecord) iterator.next();
+        EfficiencyRecord maxRecord = ers[0];
 
-        while (iterator.hasNext()) {
-            EfficiencyRecord record = (EfficiencyRecord) iterator.next();
-            maxRecord = findMax(record, maxRecord);
+        for (int i = 1; i < ers.length; i++) {
+            maxRecord = findBestEfficiencyRecord(ers[i], maxRecord);
         }
 
-        ControlMeasure controlMeasure = (ControlMeasure) map.get(maxRecord);
-        MaxControlEffControlMeasure maxMeasure = new MaxControlEffControlMeasure(controlMeasure, maxRecord, costYearTable);
-        return maxMeasure;
+        return maxRecord;
 
     }
 
-    private EfficiencyRecord findMax(EfficiencyRecord record, EfficiencyRecord maxRecord) throws EmfException {
+    public EfficiencyRecord findBestEfficiencyRecord(EfficiencyRecord record, EfficiencyRecord maxRecord) throws EmfException {
+        if (record == null && maxRecord == null) 
+            return null;
+        
+        if (maxRecord == null) 
+            return record;
+        
+        if (record == null) 
+            return maxRecord;
+        
         double diff = efficiencyRecordUtil.effectiveReduction(record)
                 - efficiencyRecordUtil.effectiveReduction(maxRecord);
         if (diff > tollerance) {

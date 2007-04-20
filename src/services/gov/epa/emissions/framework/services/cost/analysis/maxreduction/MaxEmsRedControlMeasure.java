@@ -5,7 +5,9 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
-public class MaxControlEffControlMeasure {
+// This class represents the best measure which was picked based on the target pollutant and also
+// contains the best efficiency record for that pollutant (which could be the target or cobenefit pollutant)
+public class MaxEmsRedControlMeasure {
 
     private ControlMeasure controlMeasure;
 
@@ -15,7 +17,7 @@ public class MaxControlEffControlMeasure {
 
     private EfficiencyRecordUtil efficiencyRecordUtil;
 
-    public MaxControlEffControlMeasure(ControlMeasure controlMeasure, EfficiencyRecord record, CostYearTable table) {
+    public MaxEmsRedControlMeasure(ControlMeasure controlMeasure, EfficiencyRecord record, CostYearTable table) {
         this.controlMeasure = controlMeasure;
         this.maxRecord = record;
         this.table = table;

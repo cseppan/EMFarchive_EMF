@@ -41,7 +41,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         sqlDataTypes = dbServer.getSqlDataTypes();
         //import control measures to use...
         importControlMeasures();
-//        service = new ControlStrategyServiceImpl(sessionFactory());
+//        service = new ControlStrategyServiceImpl(sessionFactory);
     }
 
     protected EmfDataset setInputDataset(String type) throws Exception {
@@ -112,6 +112,8 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         strategy.setTargetPollutant(pollutant);
         strategy.setStrategyType(maxEmisRedStrategyType());
         strategy.setControlMeasureClasses(classes);
+//        strategy.setCountyFile("c:\\cep\\EMF\\test\\data\\cost\\controlStrategy\\070 Run Counties_OTC and West States Statewide.csv");
+//        strategy.setFilter("srctype = 2");
         add(strategy);
         return strategy;
     }
@@ -241,7 +243,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     }
 
     protected String detailResultDatasetTableName(ControlStrategy strategy) throws Exception {
-        Session session = sessionFactory().getSession();
+        Session session = sessionFactory.getSession();
         try {
             ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, session);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
@@ -254,7 +256,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     private void importControlMeasures() throws EmfException, Exception {
         File folder = new File("test/data/cost/controlMeasure");
         String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
-        CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory(), dbServer);
+        CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory, dbServerFactory());
         task.run();
     }
 }

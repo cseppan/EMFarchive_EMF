@@ -19,15 +19,16 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
     private ControlStrategyService service;
 
     private UserServiceImpl userService;
-    private ControlMeasureService cmService;
 
+    private ControlMeasureService cmService;
+    
     private HibernateSessionFactory sessionFactory;
 
     protected void doSetUp() throws Exception {
         sessionFactory = sessionFactory(configFile());
-        service = new ControlStrategyServiceImpl(sessionFactory);
+        service = new ControlStrategyServiceImpl(sessionFactory, dbServerFactory());
         userService = new UserServiceImpl(sessionFactory);
-        cmService = new ControlMeasureServiceImpl(sessionFactory);
+        cmService = new ControlMeasureServiceImpl(sessionFactory, dbServerFactory());
     }
 
     protected void doTearDown() throws Exception {// no op

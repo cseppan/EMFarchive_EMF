@@ -20,26 +20,28 @@ public class ControlMeasureServiceTransportTest extends ServiceTestCase {
     
     private DataCommonsService dataService = null;
 
-    private ControlMeasureService help;
-    
     private UserService userService;
     
+    private ControlMeasureService cmService;
+    
+    private HibernateSessionFactory sessionFactory;
+    
     protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = sessionFactory();
-        help = new ControlMeasureServiceImpl(sessionFactory);
+        sessionFactory = sessionFactory();
 
         RemoteServiceLocator rl = new RemoteServiceLocator(DEFAULT_URL);
         service = rl.controlMeasureService();
         dataService = rl.dataCommonsService();
         userService = rl.userService();
-    }
+        cmService = new ControlMeasureServiceImpl(sessionFactory, dbServerFactory());
+   }
 
     private String getRandomString() {
         return Math.round(Math.random() * 100) % 100 + "";
     }
 
-    public void testServiceActive() throws EmfException {
-        assertEquals("Service works", help.getMeasures().length, 0);
+    public void testServiceActive() throws Exception {
+        assertEquals("Service works", cmService.getMeasures().length, 0);
     }
 
     public void testShouldGetAllControlMeasures() throws EmfException {

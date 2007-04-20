@@ -32,7 +32,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
     public void doSetUp() throws Exception {
         sessionFactory = sessionFactory(configFile());
         userService = new UserServiceImpl(sessionFactory);
-        service = new ControlMeasureServiceImpl(sessionFactory);
+        service = new ControlMeasureServiceImpl(sessionFactory, dbServerFactory);
         dataService = new DataCommonsServiceImpl(sessionFactory);
     }
 

@@ -9,28 +9,20 @@ import gov.epa.emissions.commons.io.orl.ORLNonRoadFileFormat;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadFileFormat;
 import gov.epa.emissions.commons.io.orl.ORLPointFileFormat;
 import gov.epa.emissions.commons.io.temporal.VersionedTableFormat;
-import gov.epa.emissions.framework.services.EmfDbServer;
 
 public class FileFormatFactory {
 
     private SqlDataTypes types;
-    private DbServer dbServer;
-
-    public FileFormatFactory() throws Exception {
-        sqlTypes();
-    }
-
     public FileFormatFactory(DbServer dbServer) throws Exception {
-        this.dbServer = dbServer;
         this.types = dbServer.getSqlDataTypes();
     }
 
-    private void sqlTypes() throws Exception {
-//        EmfDbServer dbServer = new EmfDbServer();
-        dbServer = new EmfDbServer();
-        dbServer.disconnect();
-        this.types = dbServer.getSqlDataTypes();
-    }
+//    private void sqlTypes() throws Exception {
+//////        EmfDbServer dbServer = new EmfDbServer();
+////        dbServer = new EmfDbServer();
+////        dbServer.disconnect();
+//        this.types = dbServer.getSqlDataTypes();
+//    }
 
     public TableFormat tableFormat(DatasetType type) throws Exception {
         if (type.getName().startsWith("ORL Nonpoint"))

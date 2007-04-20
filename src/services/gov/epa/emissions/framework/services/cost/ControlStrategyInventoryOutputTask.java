@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
@@ -22,25 +23,23 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
 
     private HibernateSessionFactory sessionFactory;
 
-    private DbServer dbServer;
+    private DbServerFactory dbServerFactory;
 
     public ControlStrategyInventoryOutputTask(User user, ControlStrategy controlStrategy,
-            HibernateSessionFactory sessionFactory, DbServer dbServer) {
+            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
         this.user = user;
         this.controlStrategy = controlStrategy;
         this.sessionFactory = sessionFactory;
-        this.dbServer = dbServer;
+        this.dbServerFactory = dbServerFactory;
     }
 
     public void run() {
         try {
             ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,
-                    sessionFactory, dbServer);
+                    sessionFactory, dbServerFactory);
             output.create();
         } catch (Exception e) {
             LOG.error("Could not create inventory output. " + e.getMessage());
-        } finally {
-            close(dbServer);
         }
     }
 
@@ -55,6 +54,7 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
 
     public boolean shouldProceed() throws EmfException {
         Session session = sessionFactory.getSession();
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
             ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(controlStrategy, session);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
@@ -70,6 +70,7 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
             throw new EmfException(e.getMessage());
         } finally {
             session.close();
+            close(dbServer);
         }
         return true;
     }

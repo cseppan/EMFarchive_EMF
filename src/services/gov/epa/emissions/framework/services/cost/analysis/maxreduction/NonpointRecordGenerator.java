@@ -32,14 +32,14 @@ public class NonpointRecordGenerator implements RecordGenerator {
         comment = "";
     }
 
-    public Record getRecord(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException {
+    public Record getRecord(ResultSet resultSet, MaxEmsRedControlMeasure maxCM) throws SQLException, EmfException {
         Record record = new Record();
         record.add(tokens(resultSet, maxCM));
 
         return record;
     }
 
-    public List tokens(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException {
+    public List tokens(ResultSet resultSet, MaxEmsRedControlMeasure maxCM) throws SQLException, EmfException {
         List tokens = new ArrayList();
         
         calculateEmissionReduction(resultSet,maxCM);
@@ -55,26 +55,26 @@ public class NonpointRecordGenerator implements RecordGenerator {
         tokens.add(resultSet.getString("scc"));
         tokens.add(resultSet.getString("fips"));
 
-        try {
-            tokens.add(resultSet.getString("PLANTID"));
-        } catch (SQLException e) {
+//        try {
+//            tokens.add(resultSet.getString("PLANTID"));
+//        } catch (SQLException e) {
             tokens.add("");
-        }
-        try {
-            tokens.add(resultSet.getString("POINTID"));
-        } catch (SQLException e) {
+//        }
+//        try {
+//            tokens.add(resultSet.getString("POINTID"));
+//        } catch (SQLException e) {
             tokens.add("");
-        }
-        try {
-            tokens.add(resultSet.getString("STACKID"));
-        } catch (SQLException e) {
+//        }
+//        try {
+//            tokens.add(resultSet.getString("STACKID"));
+//        } catch (SQLException e) {
             tokens.add("");
-        }
-        try {
-            tokens.add(resultSet.getString("SEGMENT"));
-        } catch (SQLException e) {
+//        }
+//        try {
+//            tokens.add(resultSet.getString("SEGMENT"));
+//        } catch (SQLException e) {
             tokens.add("");
-        }
+//        }
         
         tokens.add("" + maxCM.adjustedCostPerTon() * reducedEmission);
         tokens.add("" + maxCM.adjustedCostPerTon());
@@ -99,11 +99,11 @@ public class NonpointRecordGenerator implements RecordGenerator {
         return tokens;
     }
 
-    public void calculateEmissionReduction(ResultSet resultSet, MaxControlEffControlMeasure maxMeasure) throws SQLException {
-        invenControlEfficiency = resultSet.getFloat("CEFF");
-        invenRulePenetration = resultSet.getFloat("RPEN");
-        invenRuleEffectiveness = resultSet.getFloat("REFF");
-        originalEmissions = resultSet.getFloat("ANN_EMIS");
+    public void calculateEmissionReduction(ResultSet resultSet, MaxEmsRedControlMeasure maxMeasure) throws SQLException {
+        invenControlEfficiency = resultSet.getDouble("CEFF");
+        invenRulePenetration = resultSet.getDouble("RPEN");
+        invenRuleEffectiveness = resultSet.getDouble("REFF");
+        originalEmissions = resultSet.getDouble("ANN_EMIS");
 
         double invenEffectiveReduction = invenControlEfficiency * invenRulePenetration * invenRuleEffectiveness
                 / (100 * 100 * 100);

@@ -23,7 +23,7 @@ public class PointRecordGenerator implements RecordGenerator {
         this.strategyResult = result;
     }
 
-    public Record getRecord(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException {
+    public Record getRecord(ResultSet resultSet, MaxEmsRedControlMeasure maxCM) throws SQLException, EmfException {
         Record record = new Record();
         record.add(tokens(resultSet, maxCM));
 
@@ -34,7 +34,7 @@ public class PointRecordGenerator implements RecordGenerator {
         return reducedEmission;
     }
 
-    public List tokens(ResultSet resultSet, MaxControlEffControlMeasure maxCM) throws SQLException, EmfException {
+    public List tokens(ResultSet resultSet, MaxEmsRedControlMeasure maxCM) throws SQLException, EmfException {
         List tokens = new ArrayList();
         
         calculateEmissionReduction(resultSet,maxCM);
@@ -78,7 +78,7 @@ public class PointRecordGenerator implements RecordGenerator {
         return tokens;
     }
     
-    public void calculateEmissionReduction(ResultSet resultSet, MaxControlEffControlMeasure maxMeasure) throws SQLException {
+    public void calculateEmissionReduction(ResultSet resultSet, MaxEmsRedControlMeasure maxMeasure) throws SQLException {
         invenControlEfficiency = resultSet.getFloat("CEFF");
         invenRulePenetration = 100;
         invenRuleEffectiveness = resultSet.getFloat("CEFF") > 0 && resultSet.getFloat("REFF") == 0 ? 100 : resultSet.getFloat("REFF");

@@ -308,6 +308,10 @@
 		qname="ns1:ControlStrategyResult" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint"
+		qname="ns1:ControlStrategyConstraint" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType"
 		qname="ns1:StrategyResultType" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 		

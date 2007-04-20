@@ -114,4 +114,12 @@ public class EfficiencyRecordValidation {
         }
     }
 
+    public double parseDouble(String msgPrefix, String value) throws EmfException {
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            throw new EmfException(msgPrefix + " should be a double, value = " + value);
+        }
+    }
+
 }

@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.Serializable;
@@ -59,7 +60,11 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private List controlMeasures;
 
+    private String countyFile;
+
     private Mutex lock;
+
+    private ControlStrategyConstraint constraint;
 
     public ControlStrategy() {
         this.lock = new Mutex();
@@ -280,6 +285,22 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public LightControlMeasure[] getControlMeasures() {
         return (LightControlMeasure[])controlMeasures.toArray(new LightControlMeasure[0]);
+    }
+
+    public void setCountyFile(String countyFile) {
+        this.countyFile = countyFile;
+    }
+
+    public String getCountyFile() {
+        return countyFile;
+    }
+
+    public void setConstraint(ControlStrategyConstraint constraint) {
+        this.constraint = constraint;
+    }
+
+    public ControlStrategyConstraint getConstraint() {
+        return constraint;
     }
 
 }

@@ -26,8 +26,6 @@ public class RetrieveSCC {
             sccs = values(set);
         } catch (SQLException e) {
             throw e;
-        } finally {
-            dbServer.disconnect();
         }
 
         return sccs;
@@ -41,8 +39,6 @@ public class RetrieveSCC {
             cmAbbrevAndSccs = getAbbrevAndSccStrings(set);
         } catch (SQLException e) {
             throw e;
-        } finally {
-            dbServer.disconnect();
         }
 
         return cmAbbrevAndSccs;

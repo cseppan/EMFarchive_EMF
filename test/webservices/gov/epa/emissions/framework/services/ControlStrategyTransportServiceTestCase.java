@@ -15,7 +15,7 @@ public class ControlStrategyTransportServiceTestCase extends WebServicesTestCase
 
     protected void doSetUp() throws Exception {
         HibernateSessionFactory sessionFactory = sessionFactory(configFile());
-        service = new ControlStrategyServiceImpl(sessionFactory);
+        service = new ControlStrategyServiceImpl(sessionFactory, dbServerFactory());
 
         ServiceLocator rl = serviceLocator();
         css = rl.controlStrategyService();

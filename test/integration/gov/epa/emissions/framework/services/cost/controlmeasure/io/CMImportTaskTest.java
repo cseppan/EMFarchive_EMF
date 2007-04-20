@@ -32,11 +32,11 @@ public class CMImportTaskTest extends ServiceTestCase {
         try {
             File folder = new File("test/data/cost/controlMeasure");
             String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
-            CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory(), dbServer());
+            CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory, dbServerFactory());
             task.run();
             ControlMeasure[] measures = measures();
             assertEquals(32, measures.length);
-            assertEquals(1132, noOfRecords(measures));
+            assertEquals(1135, noOfRecords(measures));
             assertEquals(126, noOfScc());
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,18 +52,18 @@ public class CMImportTaskTest extends ServiceTestCase {
         try {
             File folder = new File("test/data/cost/controlMeasure");
             String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
-            CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory(), dbServer());
+            CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory, dbServerFactory());
             task.run();
             ControlMeasure[] measures = measures();
             assertEquals(32, measures.length);
-            assertEquals(1132, noOfRecords(measures));
+            assertEquals(1135, noOfRecords(measures));
             assertEquals(126, noOfScc());
             
             task.run();
             
             measures = measures();
             assertEquals(32, measures.length);
-            assertEquals(1132, noOfRecords(measures));
+            assertEquals(1135, noOfRecords(measures));
             assertEquals(126, noOfScc());
         } catch (Exception e) {
             e.printStackTrace();

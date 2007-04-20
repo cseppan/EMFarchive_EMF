@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure;
 
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.basic.Status;
@@ -27,14 +28,17 @@ public class ControlMeasureExportServiceImpl implements ControlMeasureExportServ
 
     private PooledExecutor threadPool;
 
+    private DbServerFactory dbServerFactory;
+    
     public ControlMeasureExportServiceImpl() throws Exception {
-        this(HibernateSessionFactory.get());
+        this(HibernateSessionFactory.get(), DbServerFactory.get());
     }
 
-    public ControlMeasureExportServiceImpl(HibernateSessionFactory sessionFactory) throws Exception {
+    public ControlMeasureExportServiceImpl(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) throws Exception {
         this.sessionFactory = sessionFactory;
         this.dataCommonsDAO = new DataCommonsDAO();
         this.threadPool = createThreadPool();
+        this.dbServerFactory = dbServerFactory;
     }
 
     public void finalize() throws Throwable {
@@ -66,7 +70,7 @@ public class ControlMeasureExportServiceImpl implements ControlMeasureExportServ
         try {
             validateExportFile(new File(folderPath), prefix, overwrite);
             CMExportTask exportTask = new CMExportTask(new File(folderPath), prefix, controlMeasureIds, user,
-                    sessionFactory);
+                    sessionFactory, dbServerFactory);
             threadPool.execute(new GCEnforcerTask(
                     "Export control measures (id): " + controlMeasureIds[0] + ", etc.", exportTask));
         } catch (Exception e) {

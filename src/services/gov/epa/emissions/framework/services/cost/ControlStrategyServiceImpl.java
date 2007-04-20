@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfDbServer;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -29,18 +30,21 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 
     private HibernateSessionFactory sessionFactory;
 
+    private DbServerFactory dbServerFactory;
+
     private ControlStrategyDAO dao;
 
     public ControlStrategyServiceImpl() throws Exception {
-        init(HibernateSessionFactory.get());
+        init(HibernateSessionFactory.get(), DbServerFactory.get());
     }
 
-    public ControlStrategyServiceImpl(HibernateSessionFactory sessionFactory) throws Exception {
-        init(sessionFactory);
+    public ControlStrategyServiceImpl(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) throws Exception {
+        init(sessionFactory, dbServerFactory);
     }
 
-    private void init(HibernateSessionFactory sessionFactory) {
+    private void init(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
         this.sessionFactory = sessionFactory;
+        this.dbServerFactory = dbServerFactory;
         dao = new ControlStrategyDAO();
         threadPool = createThreadPool();
 
@@ -224,15 +228,15 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 
     public void runStrategy(User user, ControlStrategy strategy) throws EmfException {
         StrategyFactory factory = new StrategyFactory(batchSize());
-        DbServer dbServer = null;
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            dbServer = dbServer();
+            RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, dbServer, threadPool);
+            runStrategy.run(user, strategy, this);
         } catch (Exception e) {
-            LOG.error("Could not get the db connection.", e);
-            throw new EmfException("Could not get the db connection." + e.getMessage());
+            //
+        } finally {
+            close(dbServer);
         }
-        RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, dbServer, threadPool);
-        runStrategy.run(user, strategy, this);
     }
 
     public void stopRunStrategy() {
@@ -260,9 +264,8 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     }
 
     public void createInventory(User user, ControlStrategy controlStrategy) throws EmfException {
-        DbServer dbServer = dbServer();//the connection is closed at the end of the thread
         try {
-            ControlStrategyInventoryOutputTask task= new ControlStrategyInventoryOutputTask(user, controlStrategy,sessionFactory, dbServer);
+            ControlStrategyInventoryOutputTask task= new ControlStrategyInventoryOutputTask(user, controlStrategy, sessionFactory, dbServerFactory);
             if(task.shouldProceed())
                 threadPool.execute(new GCEnforcerTask("Create Inventory: " + controlStrategy.getName(), task));
         } catch (Exception e) {
@@ -271,14 +274,14 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    private DbServer dbServer() throws EmfException {
-        try {
-            return new EmfDbServer();
-        } catch (Exception e) {
-            LOG.error("Could not get database connection: " + e.getMessage());
-            throw new EmfException("Could not get database connection: " +e.getMessage());
-        }
-    }
+//    private DbServer dbServer() throws EmfException {
+//        try {
+//            return new EmfDbServer();
+//        } catch (Exception e) {
+//            LOG.error("Could not get database connection: " + e.getMessage());
+//            throw new EmfException("Could not get database connection: " +e.getMessage());
+//        }
+//    }
 
     public ControlStrategyResult controlStrategyResults(ControlStrategy controlStrategy) throws EmfException {
         Session session = sessionFactory.getSession();
@@ -367,6 +370,17 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             throw new EmfException("Could not get control strategy");
         } finally {
             session.close();
+        }
+    }
+
+    private void close(DbServer dbServer) throws EmfException {
+        try {
+            if (dbServer != null)
+                dbServer.disconnect();
+
+        } catch (SQLException e) {
+            LOG.error("Could not close database server", e);
+            throw new EmfException("Could not close database server");
         }
     }
 

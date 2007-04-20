@@ -1,12 +1,15 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,12 +37,15 @@ public class CMExportTask implements Runnable {
 
     private ControlMeasureDAO controlMeasureDao;
     
-    public CMExportTask(File folder, String prefix, int[] controlMeasureIds, User user, HibernateSessionFactory sessionFactory) {
+    private DbServerFactory dbServerFactory;
+    
+    public CMExportTask(File folder, String prefix, int[] controlMeasureIds, User user, HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
         this.folder = folder;
         this.prefix = prefix;
         this.user = user;
         this.controlMeasureIds = controlMeasureIds;
         this.sessionFactory = sessionFactory;
+        this.dbServerFactory = dbServerFactory;
         this.controlMeasureDao = new ControlMeasureDAO();
 //        this.statusDao = new StatusDAO(sessionFactory);
     }
@@ -49,7 +55,7 @@ public class CMExportTask implements Runnable {
         try {
             session.setFlushMode(FlushMode.NEVER);
 //            prepare();
-            String[] selectedAbbrevAndSCCs = getSelectedAbbrevAndSCCs(controlMeasureIds, controlMeasureDao);
+            String[] selectedAbbrevAndSCCs = getSelectedAbbrevAndSCCs(controlMeasureIds);
             ControlMeasuresExporter exporter = new ControlMeasuresExporter(folder, prefix, getControlMeasures(controlMeasureIds, session), selectedAbbrevAndSCCs, user, sessionFactory);
             exporter.run();
         } catch (Exception e) {
@@ -72,12 +78,16 @@ public class CMExportTask implements Runnable {
         return (ControlMeasure[])cmList.toArray(new ControlMeasure[0]);
     }
 
-    private String[] getSelectedAbbrevAndSCCs(int[] measureIds, ControlMeasureDAO dao) throws EmfException {
+    private String[] getSelectedAbbrevAndSCCs(int[] measureIds) throws EmfException {
         List selectedSccs = new ArrayList();
-        
+        DbServer dbServer = dbServerFactory.getDbServer();
         for (int i = 0; i < measureIds.length; i++)
-            selectedSccs.addAll(Arrays.asList(dao.getCMAbbrevAndSccs(measureIds[i])));
-        
+            selectedSccs.addAll(Arrays.asList(controlMeasureDao.getCMAbbrevAndSccs(measureIds[i], dbServer)));
+            try {
+                dbServer.disconnect();
+            } catch (SQLException e) {
+                throw new EmfException(e.getMessage());
+            }
         return (String[])selectedSccs.toArray(new String[0]);
     }
 

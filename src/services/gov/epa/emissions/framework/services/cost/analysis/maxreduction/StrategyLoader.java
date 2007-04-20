@@ -13,9 +13,12 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
 import gov.epa.emissions.framework.services.cost.controlStrategy.SccControlMeasuresMap;
+import gov.epa.emissions.framework.services.cost.controlmeasure.io.Pollutants;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 public class StrategyLoader {
 
@@ -25,22 +28,47 @@ public class StrategyLoader {
 
     private ControlStrategyResult result;
 
-    private CalMaxEmsRedControlMeasure maxEmsReduction;
+    private RetrieveMaxEmsRedControlMeasure retrieveMeasure;
 
     private ControlStrategy controlStrategy;
 
     private double totalCost;
 
     private double totalReduction;
+    
+    private DatasetType type;
+    
+    private boolean pointDatasetType;
+    
+    private String sourceScc = "";
+    
+    private String sourceFips = "";
 
-    public StrategyLoader(String tableName, TableFormat tableFormat, DbServer dbServer, ControlStrategyResult result,
+    private String sourcePlantId = "";
+    
+    private String sourcePointId = "";
+
+    private String sourceStackId = "";
+    
+    private String sourceSegment = "";
+
+    private boolean newSource;
+
+    private MaxEmsRedControlMeasure maxCM;
+    
+    private Pollutants pollutants;
+
+    public StrategyLoader(String tableName, TableFormat tableFormat, HibernateSessionFactory sessionFactory, DbServer dbServer, ControlStrategyResult result,
             SccControlMeasuresMap map, ControlStrategy controlStrategy) throws EmfException {
         this.tableFormat = tableFormat;
         this.result = result;
         this.controlStrategy = controlStrategy;
+        this.type = this.controlStrategy.getDatasetType();
+        this.pointDatasetType = this.type.getName().equalsIgnoreCase("ORL Point Inventory (PTINV)");
+        this.pollutants = new Pollutants(sessionFactory);
         modifier = dataModifier(tableName, dbServer.getEmissionsDatasource());
         CostYearTable costYearTable = new CostYearTableReader(dbServer, controlStrategy.getCostYear()).costYearTable();
-        maxEmsReduction = new CalMaxEmsRedControlMeasure(map, costYearTable, controlStrategy);
+        retrieveMeasure = new RetrieveMaxEmsRedControlMeasure(map, costYearTable, controlStrategy);
         start();
         totalCost = 0.0;
         totalReduction = 0.0;
@@ -70,13 +98,63 @@ public class StrategyLoader {
 
     private void doBatchInsert(ResultSet resultSet) throws SQLException, Exception {
         int sourceCount = 0;
+        String scc = "";
+        String fips = "";
+        String plantId = "";
+        String pointId = "";
+        String stackId = "";
+        String segment = "";
         try {
             while (resultSet.next()) {
+                
+                scc = resultSet.getString("scc");
+                fips = resultSet.getString("fips");
+                if (pointDatasetType) {
+                    plantId = resultSet.getString("plantid");
+                    pointId = resultSet.getString("pointid");
+                    stackId = resultSet.getString("stackid");
+                    segment = resultSet.getString("segment");
+                }
+                //default first record to beginning values or reset values to new source...
+                if (sourceScc.length() == 0 || 
+                        !(
+                                sourceScc.equals(scc)
+                                && sourceFips.equals(fips)
+                                && sourcePlantId.equals(plantId)
+                                && sourcePointId.equals(pointId)
+                                && sourceStackId.equals(stackId)
+                                && sourceSegment.equals(segment)
+                         )
+                    ) {
+                    sourceScc = scc;
+                    sourceFips = fips;
+                    if (pointDatasetType) {
+                        sourcePlantId = plantId;
+                        sourcePointId = pointId;
+                        sourceStackId = stackId;
+                        sourceSegment = segment;
+                    }
+                    newSource = true;
+                } else {
+                    newSource = false;
+                }
                 sourceCount = resultSet.getInt("Record_Id");
-                String scc = resultSet.getString("scc");
-                String fips = resultSet.getString("fips");
-
-                MaxControlEffControlMeasure maxCM = maxEmsReduction.getControlMeasure(scc, fips);
+                
+                //find best measure for source (based on target pollutant)...
+                if (newSource) {
+                    if (!pointDatasetType) {
+                        maxCM = retrieveMeasure.findBestMaxEmsRedMeasure(scc, fips, pollutants.getPollutant(resultSet.getString("poll")),
+                                resultSet.getDouble("CEFF"), resultSet.getDouble("RPEN"), 
+                                resultSet.getDouble("REFF"), resultSet.getDouble("ANN_EMIS"));
+                    } else {
+                        maxCM = retrieveMeasure.findBestMaxEmsRedMeasureForTargetPollutant(scc, fips, 
+                                resultSet.getDouble("CEFF"), 100, 
+                                resultSet.getFloat("CEFF") > 0 && resultSet.getFloat("REFF") == 0 ? 100 : resultSet.getFloat("REFF"), resultSet.getDouble("ANN_EMIS"));
+                    }
+                //find best efficiency record for source and cobenefit pollutant, measure was already determined above...
+                } else {
+                    maxCM = retrieveMeasure.getMaxEmsRedMeasureForCobenefitPollutant(pollutants.getPollutant(resultSet.getString("poll")));
+                }
                 if (maxCM == null)
                     continue; // LOG???
                 try {
@@ -95,7 +173,6 @@ public class StrategyLoader {
     }
 
     private RecordGenerator getRecordGenerator() {
-        DatasetType type = this.controlStrategy.getDatasetType();
 
         if (type.getName().equalsIgnoreCase("ORL Nonpoint Inventory (ARINV)"))
             return new NonpointRecordGenerator(result);

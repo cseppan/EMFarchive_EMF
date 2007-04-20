@@ -17,4 +17,19 @@ public class EfficiencyRecordUtil {
         return factor * record.getCostPerTon();
     }
 
+    public double calculateEmissionReduction(EfficiencyRecord record, double invenControlEfficiency, double invenRulePenetration, double invenRuleEffectiveness, double invenAnnualEmissions) {
+        double invenEffectiveReduction = invenControlEfficiency * invenRulePenetration * invenRuleEffectiveness
+                / (100 * 100 * 100);
+        double effectiveReduction = effectiveReduction(record);
+
+        if (invenEffectiveReduction == 0.0) {
+            return invenAnnualEmissions * effectiveReduction;
+        }
+
+        if (invenEffectiveReduction < effectiveReduction) {
+            return  invenAnnualEmissions / invenEffectiveReduction * effectiveReduction;
+        }
+
+        return invenAnnualEmissions / invenControlEfficiency * invenEffectiveReduction;
+    }
 }
