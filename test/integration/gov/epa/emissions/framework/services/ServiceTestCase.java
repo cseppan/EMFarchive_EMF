@@ -37,13 +37,15 @@ public abstract class ServiceTestCase extends TestCase {
 
     protected DbServerFactory dbServerFactory;
 
+    protected HibernateSessionFactory sessionFactory;
+
     protected Session session;
 
     final protected void setUp() throws Exception {
         dbSetup = new EmfDatabaseSetup(config());
         dbServerFactory = new DbServerFactory(dbSetup);
-        session = sessionFactory(configFile()).getSession();
-
+        this.sessionFactory = sessionFactory();
+        this.session = this.sessionFactory.getSession();
         doSetUp();
     }
 
@@ -141,6 +143,21 @@ public abstract class ServiceTestCase extends TestCase {
             tx.rollback();
             throw e;
         }catch(Throwable e){
+            e.printStackTrace();
+        } finally {
+            session.clear();
+        }
+    }
+
+    protected void dropAll(String clazz) {
+        try {
+          String hqlDelete = "delete " + clazz;
+          session.createQuery( hqlDelete )
+               .executeUpdate();
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            throw e;
+        } catch(Throwable e){
             e.printStackTrace();
         }
     }
