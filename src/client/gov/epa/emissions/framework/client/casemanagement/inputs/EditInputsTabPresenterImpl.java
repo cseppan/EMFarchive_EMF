@@ -65,7 +65,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     }
 
     public void doEditInput(CaseInput input, EditCaseInputView inputEditor) throws EmfException {
-        EditInputPresenter editInputPresenter = new EditCaseInputPresenterImpl(inputEditor, view, session);
+        EditInputPresenter editInputPresenter = new EditCaseInputPresenterImpl(caseObj.getId(), inputEditor, view, session);
         editInputPresenter.display(input);
     }
 
@@ -75,7 +75,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         newInput.setRequired(true);
         newInput.setShow(true);
 
-        InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(inputFields, session);
+        InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj.getId(), inputFields, session);
         inputFieldsPresenter.display(newInput, container);
     }
 

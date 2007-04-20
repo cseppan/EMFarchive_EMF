@@ -17,12 +17,15 @@ public class EditCaseJobPresenterImpl implements EditJobPresenter {
     private JobFieldsPanelPresenter jobFieldsPresenter;
     
     private CaseJob job;
+    
+    private EditJobsTabPresenter parentPresenter;
 
     public EditCaseJobPresenterImpl(EditCaseJobView view, 
-            EditJobsTabView parentView, EmfSession session) {
+            EditJobsTabView parentView, EditJobsTabPresenter parentPresenter, EmfSession session) {
         this.view = view;
         this.parentView = parentView;
         this.session = session;
+        this.parentPresenter = parentPresenter;
     }
     
     public void display(CaseJob job) throws EmfException {
@@ -34,12 +37,12 @@ public class EditCaseJobPresenterImpl implements EditJobPresenter {
     
     public void doAddJobFields(JComponent container, 
             JobFieldsPanelView inputFields) throws EmfException {
-        jobFieldsPresenter = new JobFieldsPanelPresenter(inputFields, session);
+        jobFieldsPresenter = new JobFieldsPanelPresenter(inputFields, session, parentPresenter);
         jobFieldsPresenter.display(job, container);
     }
     
     public void doSave() throws EmfException {
-        jobFieldsPresenter.doSave();
+        jobFieldsPresenter.doSave(job);
         parentView.refresh();
     }
 

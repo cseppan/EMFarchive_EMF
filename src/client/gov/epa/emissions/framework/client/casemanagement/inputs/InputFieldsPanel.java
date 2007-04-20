@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -60,6 +61,8 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     private InputFieldsPanelPresenter presenter;
 
     private CaseInput input;
+
+    private ComboBox jobs;
 
     public InputFieldsPanel(MessagePanel messagePanel, ManageChangeables changeablesList) {
         this.changeablesList = changeablesList;
@@ -122,12 +125,17 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         version.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Version:", version, panel);
 
+        jobs = new ComboBox(presenter.getCaseJobs());
+        changeablesList.addChangeable(jobs);
+        jobs.setPrototypeDisplayValue(width);
+        layoutGenerator.addLabelWidgetPair("Job:", jobs, panel);
+
         qaStatus = new JLabel("");
         layoutGenerator.addLabelWidgetPair("QA Status:", qaStatus, panel);
 
-//        subDir = new TextField("subdir", 30);
-//        changeablesList.addChangeable(subDir);
-//        layoutGenerator.addLabelWidgetPair("Subdirectory:", subDir, panel);
+        // subDir = new TextField("subdir", 30);
+        // changeablesList.addChangeable(subDir);
+        // layoutGenerator.addLabelWidgetPair("Subdirectory:", subDir, panel);
 
         SubDir[] subdirs = presenter.getSubDirs().getAll();
         subDir = new EditableComboBox(subdirs);
@@ -144,7 +152,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("Show?", show, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 11, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 12, 2, // rows, cols
                 10, 10, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -157,9 +165,8 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         program.setSelectedItem(input.getProgram());
 
         Sector sct = input.getSector();
-        sector.setSelectedItem(input.getSector());
-        if (sct == null)
-            sector.setSelectedItem(presenter.getSectors()[0]);
+        if (sct != null)
+            sector.setSelectedItem(sct);
 
         envtVar.setSelectedItem(input.getEnvtVars());
         dsType.setSelectedItem(input.getDatasetType());
@@ -169,6 +176,10 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         subDir.setSelectedItem(input.getSubdirObj());
         required.setSelected(input.isRequired());
         show.setSelected(input.isShow());
+
+        int selected = presenter.getJobIndex(input.getCaseJobID());
+        if (selected > 0)
+            jobs.setSelectedIndex(selected);
     }
 
     private void fillDatasets(DatasetType type) {
@@ -178,8 +189,8 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             blank.setName("Not selected");
             list.add(blank);
             list.addAll(Arrays.asList(presenter.getDatasets(type)));
-            EmfDataset[] datasets = (EmfDataset[])list.toArray(new EmfDataset[0]);
-            
+            EmfDataset[] datasets = (EmfDataset[]) list.toArray(new EmfDataset[0]);
+
             dataset.removeAllItems();
             dataset.setModel(new DefaultComboBoxModel(datasets));
             dataset.revalidate();
@@ -205,11 +216,11 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
     private int getDefaultVersionIndex(Version[] versions, EmfDataset dataset) {
         int defaultversion = dataset.getDefaultVersion();
-        
+
         for (int i = 0; i < versions.length; i++)
             if (defaultversion == versions[i].getVersion())
                 return i;
-        
+
         return 0;
     }
 
@@ -224,7 +235,15 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         updateSubdir();
         input.setRequired(required.isSelected());
         input.setShow(show.isSelected());
+        updateJob();
         return input;
+    }
+
+    private void updateJob() {
+        Object job = jobs.getSelectedItem();
+
+        if (job != null)
+            input.setCaseJobID(((CaseJob) job).getId());
     }
 
     private void updateInputName() throws EmfException {
@@ -238,17 +257,17 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             input.setProgram(null);
             return;
         }
-        
+
         input.setProgram(presenter.getCaseProgram(selected));
     }
-    
+
     private void updateSubdir() throws EmfException {
         Object selected = subDir.getSelectedItem();
         if (selected == null) {
             input.setSubdirObj(null);
             return;
         }
-        
+
         input.setSubdirObj(presenter.getSubDir(selected));
     }
 
@@ -258,7 +277,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             input.setEnvtVars(null);
             return;
         }
-        
+
         input.setEnvtVars(presenter.getInputEnvtVar(selected));
     }
 
@@ -279,19 +298,19 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             input.setDataset(null);
             return;
         }
-        
+
         input.setDataset(selected);
     }
 
     private void updateVersion() throws EmfException {
         EmfDataset ds = (EmfDataset) dataset.getSelectedItem();
         Version ver = (Version) version.getSelectedItem();
-        
+
         if (ds == null || ds.getName().equalsIgnoreCase("Not selected")) {
             input.setVersion(null);
             return;
         }
-        
+
         String type = ds.getDatasetType().getName();
         if (ds.getName() != null && ver == null && type.indexOf("External") < 0)
             throw new EmfException("Please select a dataset version.");
@@ -311,10 +330,10 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         Object selectedProg = program.getSelectedItem();
         if (inputName.getSelectedItem() == null)
             throw new EmfException("Please specify an input name.");
-        
+
         if (selectedProg == null || selectedProg.toString().trim().equals(""))
             throw new EmfException("Please specify a program.");
-        
+
         setFields();
     }
 

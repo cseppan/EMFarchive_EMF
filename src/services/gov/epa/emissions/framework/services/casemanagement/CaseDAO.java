@@ -28,8 +28,8 @@ public class CaseDAO {
         lockingScheme = new LockingScheme();
     }
 
-    public void add(Abbreviation object, Session session) {
-        addObject(object, session);
+    public void add(Executable exe, Session session) {
+        addObject(exe, session);
     }
 
     public void add(SubDir subdir, Session session) {
@@ -236,6 +236,12 @@ public class CaseDAO {
         return hibernateFacade.get(CaseJob.class, crit, session);
     }
 
+    public CaseJob getCaseJob(int jobId, Session session) {
+        Criterion crit = Restrictions.eq("id", new Integer(jobId));
+        
+        return (CaseJob)hibernateFacade.load(CaseJob.class, crit, session);
+    }
+
     public List<JobRunStatus> getJobRunStatuses(Session session) {
         return hibernateFacade.getAll(JobRunStatus.class, Order.asc("name"), session);
     }
@@ -246,5 +252,13 @@ public class CaseDAO {
 
     public List<Executable> getExecutables(Session session) {
         return hibernateFacade.getAll(Executable.class, Order.asc("name"), session);
+    }
+    
+    public boolean exeutableExists(Session session, Executable exe) {
+        return hibernateFacade.exists(exe.getName(), Executable.class, session);
+    }
+
+    public void add(Abbreviation element, Session session) {
+        addObject(element, session);
     }
 }

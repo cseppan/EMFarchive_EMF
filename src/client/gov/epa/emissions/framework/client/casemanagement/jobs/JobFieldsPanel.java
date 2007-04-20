@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
+import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
@@ -31,6 +32,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -260,6 +262,9 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         job.setVersion(Integer.parseInt(version.getText().trim()));
         job.setQueOptions(qoption.getText().trim());
         
+        if (presenter.checkDuplication(job))
+            showRemind();
+        
         return job;
     }
 
@@ -273,7 +278,18 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             index = absolute.lastIndexOf('\\');
         
         job.setPath(absolute.substring(0, index));
-        job.setExecutable(new Executable[]{new Executable(absolute.substring(++index))});
+        Executable exe = new Executable(absolute.substring(++index));
+        job.setExecutable(getExecutable(exe));
+    }
+
+    private Executable getExecutable(Executable exe) {
+        CaseService service = session.caseService();
+        try {
+            return service.addExecutable(exe);
+        } catch (EmfException e) {
+            setError("Couldnot add new executable object.");
+            return null;
+        }
     }
 
     private void updateSector() {
@@ -324,6 +340,17 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             Integer.parseInt(version.getText().trim());
         } catch (NumberFormatException e) {
             throw new EmfException("Please input an integer to Version field.");
+        }
+    }
+
+    private void showRemind() throws EmfException {
+        String title = "Warning";
+        String message = "Same job settings existed. Are you sure to add this one?";
+        int selection = JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (selection != JOptionPane.YES_OPTION) {
+            throw new EmfException("Please cancel or modify your job settings.");
         }
     }
 

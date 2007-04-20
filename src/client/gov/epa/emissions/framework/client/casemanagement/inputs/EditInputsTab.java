@@ -115,6 +115,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
             messagePanel.clear();
             setCursor(Cursor.getDefaultCursor());
         } catch (Exception e) {
+            e.printStackTrace();
             messagePanel.setError("Cannot retrieve all case inputs.");
         }
     }
@@ -139,7 +140,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
     }
 
     private JPanel tablePanel(CaseInput[] inputs, EmfConsole parentConsole) {
-        tableData = new InputsTableData(inputs);
+        tableData = new InputsTableData(inputs, session);
         selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
 
         tablePanel = new JPanel(new BorderLayout());
@@ -190,7 +191,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
 
     private void selectFolder(JTextField dir, String title) {
         EmfFileInfo initDir = new EmfFileInfo(dir.getText(), true, true);
-
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
         chooser.setTitle(title);
         int option = chooser.showDialog(parentConsole, "Select a folder");

@@ -17,12 +17,15 @@ public class EditCaseInputPresenterImpl implements EditInputPresenter {
     private InputFieldsPanelPresenter inputFieldsPresenter;
     
     private CaseInput input;
+    
+    private int caseid;
 
-    public EditCaseInputPresenterImpl(EditCaseInputView view, 
+    public EditCaseInputPresenterImpl(int caseid, EditCaseInputView view, 
             EditInputsTabView parentView, EmfSession session) {
         this.view = view;
         this.parentView = parentView;
         this.session = session;
+        this.caseid = caseid;
     }
     
     public void display(CaseInput input) throws EmfException {
@@ -34,7 +37,7 @@ public class EditCaseInputPresenterImpl implements EditInputPresenter {
     
     public void doAddInputFields(JComponent container, 
             InputFieldsPanelView inputFields) throws EmfException {
-        inputFieldsPresenter = new InputFieldsPanelPresenter(inputFields, session);
+        inputFieldsPresenter = new InputFieldsPanelPresenter(caseid, inputFields, session);
         inputFieldsPresenter.display(input, container);
     }
     

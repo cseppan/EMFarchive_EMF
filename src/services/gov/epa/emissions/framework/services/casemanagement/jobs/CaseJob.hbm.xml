@@ -28,14 +28,12 @@
         	class="gov.epa.emissions.commons.data.Sector"
         	column="sector_id"/> 
 
-       	<array name="executable" table="executables" schema="cases" cascade="save-update">
-      		<key column="job_id"/>
-      		<list-index column="list_index"/>
-		    <composite-element class="gov.epa.emissions.framework.services.casemanagement.jobs.Executable">
-	        	<property name="name" column="name" not-null="true"/>	
-      		</composite-element>
- 		</array>
- 		
+		<many-to-one
+         	name="executable" 
+        	class="gov.epa.emissions.framework.services.casemanagement.jobs.Executable"
+        	column="exe_id"
+        	insert="true"/>   
+
 		<many-to-one
          	name="runstatus" 
         	class="gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus"

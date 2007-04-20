@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.ui.ChangeableTableData;
 import gov.epa.emissions.framework.ui.Row;
@@ -16,14 +17,18 @@ public class InputsTableData extends ChangeableTableData {
     private CaseInput[] values;
     
     private boolean changes = false;
+    
+    private EmfSession session;
 
-    public InputsTableData(CaseInput[] values) {
+    public InputsTableData(CaseInput[] values, EmfSession session) {
+        this.session = session;
         this.values = values;
+        //session has to be set before this
         this.rows = createRows(values);
     }
 
     public String[] columns() {
-        return new String[] { "Input", "Sector", "Program", "Envt. Var", "Dataset", "Version", "QA Status", "DS Type",
+        return new String[] { "Input", "Sector", "Program", "Envt. Var", "Dataset", "Version", "Job", "QA Status", "DS Type",
                 "Reqd?", "Show?", "Sub Dir" };
     }
 
@@ -51,7 +56,7 @@ public class InputsTableData extends ChangeableTableData {
     }
 
     private Row row(CaseInput input) {
-        return new ViewableRow(new InputsRowSource(input));
+        return new ViewableRow(new InputsRowSource(input, session));
     }
 
     public boolean isEditable(int col) {

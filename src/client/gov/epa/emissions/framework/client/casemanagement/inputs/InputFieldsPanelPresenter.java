@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -36,10 +37,13 @@ public class InputFieldsPanelPresenter {
     private Programs programs;
 
     private SubDirs subdirs;
+    
+    private int caseId;
 
-    public InputFieldsPanelPresenter(InputFieldsPanelView inputFields, EmfSession session) throws EmfException {
+    public InputFieldsPanelPresenter(int caseId, InputFieldsPanelView inputFields, EmfSession session) throws EmfException {
         this.session = session;
         this.view = inputFields;
+        this.caseId = caseId;
         this.caseInputNames = new CaseInputNames(session,getInputNames());
         this.caseInputEnvtVars = new CaseInputEnvtVars(session, getEnvtVars());
         this.programs = new Programs(session, getPrograms());
@@ -91,6 +95,10 @@ public class InputFieldsPanelPresenter {
         return caseService().getInputEnvtVars();
     }
 
+    public CaseJob[] getCaseJobs() throws EmfException {
+        return caseService().getCaseJobs(caseId);
+    }
+    
     public DatasetType[] getDSTypes() throws EmfException {
         return dataCommonsService().getDatasetTypes();
     }
@@ -149,6 +157,20 @@ public class InputFieldsPanelPresenter {
 
     public SubDir getSubDir(Object selected) throws EmfException {
         return subdirs.get(selected);
+    }
+
+    public CaseJob getJob(int caseJobID) throws EmfException {
+        return session.caseService().getCaseJob(caseJobID);
+    }
+
+    public int getJobIndex(int caseJobID) throws EmfException {
+        CaseJob[] jobs = session.caseService().getCaseJobs(caseId);
+        
+        for (int i = 0; i < jobs.length; i++)
+            if (jobs[i].getId() == caseJobID)
+                return i;
+        
+        return 0;
     }
 
 }

@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.casemanagement;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 
@@ -83,5 +84,9 @@ public interface CaseService {
     Host[] getHosts() throws EmfException;
 
     Host addHost(Host host) throws EmfException;
+    
+    CaseJob getCaseJob(int jobId) throws EmfException;
+
+    Executable addExecutable(Executable exe) throws EmfException;
     
 }

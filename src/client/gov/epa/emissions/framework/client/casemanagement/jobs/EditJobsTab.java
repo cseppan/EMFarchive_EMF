@@ -39,8 +39,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
 
     private Case caseObj;
 
-    private int caseId;
-
     private CaseJobsTableData tableData;
 
     private SortFilterSelectModel selectModel;
@@ -71,7 +69,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
         super.removeAll();
 
         this.caseObj = caseObj;
-        this.caseId = caseObj.getId();
         this.presenter = presenter;
 
         try {
@@ -87,7 +84,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
         try {
             messagePanel.setMessage("Please wait while retrieving all case jobs...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            doRefresh(presenter.getCaseJobs(caseId));
+            doRefresh(presenter.getCaseJobs());
             messagePanel.clear();
             setCursor(Cursor.getDefaultCursor());
         } catch (Exception e) {

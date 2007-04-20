@@ -83,13 +83,13 @@ public class CaseServiceImpl implements CaseService {
             throw new EmfException("Could not get all Cases");
         }
     }
-    
+
     private Case getCase(int caseId) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             Case caseObj = dao.getCase(caseId, session);
             session.close();
-            
+
             return caseObj;
         } catch (RuntimeException e) {
             LOG.error("Could not get all Cases", e);
@@ -216,7 +216,7 @@ public class CaseServiceImpl implements CaseService {
         try {
             Session session = sessionFactory.getSession();
             List inputs = dao.getCaseInputs(element.getId(), session);
-            dao.removeCaseInputs((CaseInput[])inputs.toArray(new CaseInput[0]), session);
+            dao.removeCaseInputs((CaseInput[]) inputs.toArray(new CaseInput[0]), session);
             dao.remove(element, session);
             session.close();
         } catch (RuntimeException e) {
@@ -246,8 +246,8 @@ public class CaseServiceImpl implements CaseService {
 
             return released;
         } catch (RuntimeException e) {
-            LOG.error("Could not release lock by "+locked.getLockOwner(), e);
-            throw new EmfException("Could not release lock by " + locked.getLockOwner()+" for Case: " + locked);
+            LOG.error("Could not release lock by " + locked.getLockOwner(), e);
+            throw new EmfException("Could not release lock by " + locked.getLockOwner() + " for Case: " + locked);
         }
     }
 
@@ -303,7 +303,7 @@ public class CaseServiceImpl implements CaseService {
             throw new EmfException("Could not get all Programs");
         }
     }
-    
+
     public ModelToRun[] getModelToRuns() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
@@ -323,12 +323,12 @@ public class CaseServiceImpl implements CaseService {
         EmfDataset[] datasets = getInputDatasets(caseToExport);
         Version[] versions = getInputDatasetVersions(caseToExport);
         SubDir[] subdirs = getSubdirs(caseToExport);
-        
+
         if (datasets.length == 0)
             return;
 
         for (int i = 0; i < datasets.length; i++) {
-            String subdir = (subdirs[i] == null) ? "":subdirs[i].getName();
+            String subdir = (subdirs[i] == null) ? "" : subdirs[i].getName();
             String exportDir = dirName + System.getProperty("file.separator") + subdir;
             File dir = new File(exportDir);
             if (!dir.exists())
@@ -346,7 +346,7 @@ public class CaseServiceImpl implements CaseService {
         for (int i = 0; i < inputs.length; i++)
             if (inputs[i].getDataset() != null && !checkExternalDSType(inputs[i].getDatasetType()))
                 list.add(inputs[i].getVersion());
-        
+
         return list.toArray(new Version[0]);
     }
 
@@ -360,10 +360,10 @@ public class CaseServiceImpl implements CaseService {
 
         return list.toArray(new EmfDataset[0]);
     }
-    
+
     private boolean checkExternalDSType(DatasetType type) {
         String name = type.getName();
-        
+
         return name.indexOf("External") >= 0;
     }
 
@@ -409,7 +409,8 @@ public class CaseServiceImpl implements CaseService {
             dao.add(inputEnvtVar, session);
             return (InputEnvtVar) dao.load(InputEnvtVar.class, inputEnvtVar.getName(), session);
         } catch (Exception e) {
-            LOG.error("Could not add new input environment variable '" + inputEnvtVar.getName() + "'\n" + e.getMessage());
+            LOG.error("Could not add new input environment variable '" + inputEnvtVar.getName() + "'\n"
+                    + e.getMessage());
             throw new EmfException("Could not add new input environment variable '" + inputEnvtVar.getName() + "'");
         } finally {
             session.close();
@@ -470,11 +471,10 @@ public class CaseServiceImpl implements CaseService {
 
     public CaseInput addCaseInput(CaseInput input) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         if (dao.caseInputExists(input, session))
-            throw new EmfException("The combination of 'Input Name', 'Sector', and 'Program' "
-                    + "should be unique.");
-        
+            throw new EmfException("The combination of 'Input Name', 'Sector', and 'Program' " + "should be unique.");
+
         try {
             dao.add(input, session);
             return (CaseInput) dao.loadCaseInupt(input, session);
@@ -491,11 +491,11 @@ public class CaseServiceImpl implements CaseService {
 
         try {
             CaseInput loaded = (CaseInput) dao.loadCaseInupt(input, session);
-            
+
             if (loaded != null && loaded.getId() != input.getId())
-                throw new EmfException("Case input uniqueness check failed ("+
-                        loaded.getId()+","+input.getId()+")");
-            
+                throw new EmfException("Case input uniqueness check failed (" + loaded.getId() + "," + input.getId()
+                        + ")");
+
             session.clear();
             dao.updateCaseInput(input, session);
         } catch (RuntimeException e) {
@@ -507,8 +507,8 @@ public class CaseServiceImpl implements CaseService {
     }
 
     public void removeCaseInputs(CaseInput[] inputs) throws EmfException {
-       Session session = sessionFactory.getSession();
-        
+        Session session = sessionFactory.getSession();
+
         try {
             dao.removeCaseInputs(inputs, session);
         } catch (Exception e) {
@@ -521,7 +521,7 @@ public class CaseServiceImpl implements CaseService {
 
     public CaseInput[] getCaseInputs(int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             List<CaseInput> inputs = dao.getCaseInputs(caseId, session);
 
@@ -536,7 +536,7 @@ public class CaseServiceImpl implements CaseService {
 
     public Case[] copyCaseObject(int[] toCopy) throws EmfException {
         List<Case> copiedList = new ArrayList<Case>();
-        
+
         for (int i = 0; i < toCopy.length; i++) {
             Case caseToCopy = getCase(toCopy[i]);
             try {
@@ -546,44 +546,44 @@ public class CaseServiceImpl implements CaseService {
                 throw new EmfException("Could not copy case " + caseToCopy.getName() + ". " + e.getMessage());
             }
         }
-        
+
         return copiedList.toArray(new Case[0]);
     }
 
     private Case copySingleCaseObj(Case toCopy) throws Exception {
-        Case copied = (Case)DeepCopy.copy(toCopy);
+        Case copied = (Case) DeepCopy.copy(toCopy);
         copied.setName("Copy of " + toCopy.getName() + " " + new Date().getTime());
         copied.setTemplateUsed(toCopy.getName());
         Case loaded = addCopiedCase(copied);
         copyCaseInputs(toCopy.getId(), loaded.getId());
-        
+
         return loaded;
     }
-    
+
     private void copyCaseInputs(int origCaseId, int copiedCaseId) throws Exception {
         CaseInput[] tocopy = getCaseInputs(origCaseId);
-        
-        for(int i = 0; i < tocopy.length; i++)
+
+        for (int i = 0; i < tocopy.length; i++)
             copySingleInput(tocopy[i], copiedCaseId);
     }
 
     private CaseInput copySingleInput(CaseInput input, int copiedCaseId) throws Exception {
-        CaseInput copied = (CaseInput)DeepCopy.copy(input);
+        CaseInput copied = (CaseInput) DeepCopy.copy(input);
         copied.setCaseID(copiedCaseId);
-        
+
         return addCaseInput(copied);
     }
 
     private Case addCopiedCase(Case element) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             dao.add(element, session);
-            return (Case)dao.load(Case.class, element.getName(), session);
+            return (Case) dao.load(Case.class, element.getName(), session);
         } catch (RuntimeException e) {
             LOG.error("Could not add case " + element, e);
             throw new EmfException("Could not add case " + element);
-        }  finally {
+        } finally {
             session.close();
         }
     }
@@ -603,7 +603,7 @@ public class CaseServiceImpl implements CaseService {
 
     public CaseJob[] getCaseJobs(int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             List<CaseJob> jobs = dao.getCaseJobs(caseId, session);
 
@@ -616,9 +616,22 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
+    public CaseJob getCaseJob(int jobId) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            return dao.getCaseJob(jobId, session);
+        } catch (Exception e) {
+            LOG.error("Could not get job for job id " + jobId + ".\n" + e.getMessage());
+            throw new EmfException("Could not get job for job id " + jobId + ".\n");
+        } finally {
+            session.close();
+        }
+    }
+
     public JobRunStatus[] getJobRunStatuses() throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             List<JobRunStatus> runstatuses = dao.getJobRunStatuses(session);
 
@@ -633,7 +646,7 @@ public class CaseServiceImpl implements CaseService {
 
     public Executable[] getExecutables(int casejobId) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             List<Executable> runstatuses = dao.getExecutables(session);
 
@@ -658,7 +671,7 @@ public class CaseServiceImpl implements CaseService {
 
     public Host[] getHosts() throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             List<Host> hosts = dao.getHosts(session);
 
@@ -684,4 +697,18 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
+    public Executable addExecutable(Executable exe) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            if (!dao.exeutableExists(session, exe))
+                dao.add(exe, session);
+            
+            return (Executable) dao.load(Executable.class, exe.getName(), session);
+        } catch (Exception e) {
+            LOG.error("Could not add new executable '" + exe.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new executable '" + exe.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
 }

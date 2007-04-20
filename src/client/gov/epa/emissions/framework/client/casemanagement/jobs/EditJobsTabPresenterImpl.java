@@ -58,13 +58,17 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         throw new EmfException("underconstruction...");
     }
 
-    public CaseJob[] getCaseJobs(int caseId) throws EmfException {
-        return service().getCaseJobs(caseId);
+    public CaseJob[] getCaseJobs() throws EmfException {
+        return service().getCaseJobs(caseObj.getId());
     }
 
     public void addJobFields(CaseJob job, JComponent container, JobFieldsPanel jobFieldsPanel) throws EmfException {
-        JobFieldsPanelPresenter jobFieldsPresenter = new JobFieldsPanelPresenter(jobFieldsPanel, session);
+        JobFieldsPanelPresenter jobFieldsPresenter = new JobFieldsPanelPresenter(jobFieldsPanel, session, this);
         jobFieldsPresenter.display(job, container);
+    }
+
+    public Case getCaseObj() {
+        return this.caseObj;
     }
 
 

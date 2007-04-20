@@ -79,6 +79,7 @@ public class NewJobDialog extends Dialog implements NewJobView, ManageChangeable
         Button ok = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
+                    cleareMsg();
                     addNewJob();
                 } catch (EmfException exc) {
                     messagePanel.setError(exc.getMessage());
@@ -123,6 +124,8 @@ public class NewJobDialog extends Dialog implements NewJobView, ManageChangeable
         // NOTE Auto-generated method stub
     }
 
-
+    private void cleareMsg() {
+        this.messagePanel.clear();
+    }
 
 }

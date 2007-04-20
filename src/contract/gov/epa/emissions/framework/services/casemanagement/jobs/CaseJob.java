@@ -4,10 +4,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 public class CaseJob implements Serializable, Comparable<CaseJob> {
 
@@ -23,7 +20,7 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     
     private Sector sector;
     
-    private List<Executable> executable;
+    private Executable executable;
     
     private String args;
     
@@ -52,11 +49,10 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     private String path;
 
     public CaseJob() {
-        executable = new ArrayList<Executable>();
+        //
     }
     
     public CaseJob(String name) {
-        this();
         this.name = name;
     }
     
@@ -133,12 +129,12 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
         this.caseId = caseId;
     }
 
-    public Executable[] getExecutable() {
-        return executable.toArray(new Executable[0]);
+    public Executable getExecutable() {
+        return this.executable;
     }
 
-    public void setExecutable(Executable[] executables) {
-        this.executable = Arrays.asList(executables);
+    public void setExecutable(Executable executable) {
+        this.executable = executable;
     }
 
     public Host getHost() {

@@ -372,6 +372,16 @@ public class CaseServiceTransport implements CaseService {
         return (CaseJob[]) call.requestResponse(new Object[] { new Integer(caseId) });
     }
 
+    public CaseJob getCaseJob(int jobId) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getCaseJob");
+        call.addIntegerParam("jobId");
+        call.setReturnType(caseMappings.casejob());
+        
+        return (CaseJob) call.requestResponse(new Object[] { new Integer(jobId) });
+    }
+
     public JobRunStatus[] getJobRunStatuses() throws EmfException {
         EmfCall call = call();
 
@@ -417,6 +427,16 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.host());
         
         return (Host) call.requestResponse(new Object[] {host});
+    }
+
+    public Executable addExecutable(Executable exe) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("addExecutable");
+        call.addParam("exe", caseMappings.executable());
+        call.setReturnType(caseMappings.executable());
+        
+        return (Executable) call.requestResponse(new Object[] {exe});
     }
 
 }

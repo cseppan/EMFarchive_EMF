@@ -1,20 +1,27 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.ui.RowSource;
 
 public class InputsRowSource implements RowSource {
 
     private CaseInput input;
+    
+    private EmfSession session;
 
-    public InputsRowSource(CaseInput source) {
+    public InputsRowSource(CaseInput source, EmfSession session) {
         this.input = source;
+        this.session = session;
     }
 
     public Object[] values() {
         return new Object[] { getInputName(input), getSectorName(input), getProgramName(input),
-                getEnvtVarName(input), getDatasetName(input), getVersion(input), getQAStatus(input),
-                getDSType(input), isRequired(input), isShow(input), getSubDir(input) };
+                getEnvtVarName(input), getDatasetName(input), getVersion(input),getJob(input),
+                getQAStatus(input), getDSType(input), isRequired(input), isShow(input), 
+                getSubDir(input) };
     }
     
     private String getInputName(CaseInput input) {
@@ -59,6 +66,15 @@ public class InputsRowSource implements RowSource {
 
     private String getSubDir(CaseInput input) {
         return (input.getSubdirObj() == null) ? "" : input.getSubdirObj().toString();
+    }
+    
+    private String getJob(CaseInput input) {
+        try {
+            CaseJob job = session.caseService().getCaseJob(input.getCaseJobID());
+            return (job == null) ? null : job.getName();
+        } catch (EmfException e) {
+            return null;
+        }
     }
     
     public Object source() {

@@ -36,4 +36,11 @@ public class Executable implements Serializable {
         return this.name;
     }
     
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof Executable))
+            return false;
+        Executable exec = (Executable) other;
+        return (id == exec.getId()) || name.equals(exec.getName());
+    }
+    
 }

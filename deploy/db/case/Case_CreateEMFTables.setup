@@ -171,27 +171,6 @@ CREATE TABLE cases.case_sectors
 WITHOUT OIDS;
 -- cases.case_sectors
 
--- cases.cases_caseinputs
-CREATE TABLE cases.cases_caseinputs
-(
-  id SERIAL PRIMARY KEY,
-  case_id int4 NOT NULL REFERENCES cases.cases(id) ,
-  sub_dir varchar(255),
-  required bool DEFAULT false,
-  show bool DEFAULT false,
-  sector_id int4  REFERENCES emf.sectors(id),
-  program_id int4  REFERENCES cases.programs(id),
-  envt_vars_id int4  REFERENCES cases.input_envt_vars(id),
-  input_name_id int4  REFERENCES cases.inputnames(id),
-  dataset_id int4  REFERENCES emf.datasets(id),
-  version_id int4  REFERENCES emissions.versions(id),
-  dataset_type_id int4  REFERENCES emf.dataset_types(id),
-  subdir_id int4  REFERENCES cases.subdirs(id),
-  UNIQUE (case_id,input_name_id,sector_id,program_id) 
-) 
-WITHOUT OIDS;
--- cases.cases_caseinputs
-
 -- cases.case_jobrunstatus
 CREATE TABLE cases.case_jobrunstatus
 (
@@ -212,6 +191,15 @@ CREATE TABLE cases.hosts
 WITHOUT OIDS;
 -- cases.hosts
 
+-- cases.executables
+CREATE TABLE cases.executables
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(512) NOT NULL UNIQUE
+)
+WITHOUT OIDS;
+-- cases.executables
+
 -- cases.cases_casejobs
 CREATE TABLE cases.cases_casejobs
 (
@@ -231,6 +219,7 @@ CREATE TABLE cases.cases_casejobs
   run_notes text,
   run_log text,
   host_id int4 REFERENCES cases.hosts(id),
+  exe_id int4 REFERENCES cases.executables(id),
   que_option varchar(255),
   path varchar(255),
   UNIQUE (case_id, name)
@@ -238,14 +227,26 @@ CREATE TABLE cases.cases_casejobs
 WITHOUT OIDS;
 -- cases.cases_casejobs
 
--- cases.executables
-CREATE TABLE cases.executables
+-- cases.cases_caseinputs
+CREATE TABLE cases.cases_caseinputs
 (
   id SERIAL PRIMARY KEY,
-  job_id int4 NOT NULL REFERENCES cases.cases_casejobs(id),
-  list_index int4,
-  name varchar(255) NOT NULL,
-  UNIQUE (job_id, name)
-)
+  case_id int4 NOT NULL REFERENCES cases.cases(id),
+  case_job_id int4,
+  sub_dir varchar(255),
+  required bool DEFAULT false,
+  show bool DEFAULT false,
+  sector_id int4  REFERENCES emf.sectors(id),
+  program_id int4  REFERENCES cases.programs(id),
+  envt_vars_id int4  REFERENCES cases.input_envt_vars(id),
+  input_name_id int4  REFERENCES cases.inputnames(id),
+  dataset_id int4  REFERENCES emf.datasets(id),
+  version_id int4  REFERENCES emissions.versions(id),
+  dataset_type_id int4  REFERENCES emf.dataset_types(id),
+  subdir_id int4  REFERENCES cases.subdirs(id),
+  UNIQUE (case_id,input_name_id,sector_id,program_id) 
+) 
 WITHOUT OIDS;
--- cases.executables
+-- cases.cases_caseinputs
+
+

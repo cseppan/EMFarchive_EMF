@@ -28,6 +28,15 @@ CREATE TABLE cases.hosts
 WITHOUT OIDS;
 -- cases.hosts
 
+-- cases.executables
+CREATE TABLE cases.executables
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(512) NOT NULL UNIQUE
+)
+WITHOUT OIDS;
+-- cases.executables
+
 -- cases.cases_casejobs
 CREATE TABLE cases.cases_casejobs
 (
@@ -47,24 +56,13 @@ CREATE TABLE cases.cases_casejobs
   run_notes text,
   run_log text,
   host_id int4 REFERENCES cases.hosts(id),
+  exe_id int4 REFERENCES cases.executables(id),
   que_option varchar(255),
   path varchar(255),
   UNIQUE (case_id, name)
 )
 WITHOUT OIDS;
 -- cases.cases_casejobs
-
--- cases.executables
-CREATE TABLE cases.executables
-(
-  id SERIAL PRIMARY KEY,
-  job_id int4 NOT NULL REFERENCES cases.cases_casejobs(id),
-  list_index int4,
-  name varchar(255) NOT NULL,
-  UNIQUE (job_id, name)
-)
-WITHOUT OIDS;
--- cases.executables
 
 -- cases.case_jobrunstatus
 insert into cases.case_jobrunstatus values(DEFAULT, 'Not Started', 'Not Started');
@@ -78,3 +76,6 @@ insert into cases.case_jobrunstatus values(DEFAULT, 'Submitted', 'Submitted');
 -- cases.hosts
 insert into cases.hosts values(DEFAULT, 'localhost', '127.0.0.1');
 -- cases.hosts 
+
+-- add one more column to caseinput table
+ALTER TABLE cases.cases_caseinputs ADD COLUMN case_job_id int4;

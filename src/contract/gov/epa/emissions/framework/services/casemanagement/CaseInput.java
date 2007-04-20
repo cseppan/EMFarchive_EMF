@@ -13,6 +13,8 @@ public class CaseInput implements Serializable, Comparable {
 
     private int caseID;
 
+    private int caseJobID;
+    
     private InputName inputName;
     
     private Sector sector;
@@ -187,6 +189,14 @@ public class CaseInput implements Serializable, Comparable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getCaseJobID() {
+        return caseJobID;
+    }
+
+    public void setCaseJobID(int caseJobID) {
+        this.caseJobID = caseJobID;
     }
 
 }
