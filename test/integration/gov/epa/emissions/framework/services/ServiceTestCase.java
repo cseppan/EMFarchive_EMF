@@ -115,7 +115,9 @@ public abstract class ServiceTestCase extends TestCase {
     }
 
     protected HibernateSessionFactory sessionFactory() throws Exception {
-        return sessionFactory(configFile());
+        if (this.sessionFactory == null) 
+            sessionFactory = sessionFactory(configFile());
+        return this.sessionFactory;
     }
 
     protected HibernateSessionFactory sessionFactory(File configFile) throws Exception {
