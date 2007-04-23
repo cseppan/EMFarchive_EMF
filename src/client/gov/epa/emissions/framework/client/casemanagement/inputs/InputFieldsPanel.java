@@ -242,8 +242,15 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     private void updateJob() {
         Object job = jobs.getSelectedItem();
 
-        if (job != null)
-            input.setCaseJobID(((CaseJob) job).getId());
+        if (job == null)
+            return;
+        
+        if (((CaseJob) job).getName().equalsIgnoreCase("All jobs")) {
+            input.setCaseJobID(0);
+            return;
+        }
+
+        input.setCaseJobID(((CaseJob) job).getId());
     }
 
     private void updateInputName() throws EmfException {

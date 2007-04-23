@@ -71,7 +71,7 @@ public class InputsRowSource implements RowSource {
     private String getJob(CaseInput input) {
         try {
             CaseJob job = session.caseService().getCaseJob(input.getCaseJobID());
-            return (job == null) ? null : job.getName();
+            return (job == null) ? "All jobs" : job.getName();
         } catch (EmfException e) {
             return null;
         }

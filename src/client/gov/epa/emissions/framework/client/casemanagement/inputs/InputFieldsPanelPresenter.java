@@ -96,7 +96,11 @@ public class InputFieldsPanelPresenter {
     }
 
     public CaseJob[] getCaseJobs() throws EmfException {
-        return caseService().getCaseJobs(caseId);
+        List<CaseJob> jobs = new ArrayList<CaseJob>();
+        jobs.add(new CaseJob("All jobs"));
+        jobs.addAll(Arrays.asList(caseService().getCaseJobs(caseId)));
+        
+        return jobs.toArray(new CaseJob[0]);
     }
     
     public DatasetType[] getDSTypes() throws EmfException {
@@ -168,7 +172,7 @@ public class InputFieldsPanelPresenter {
         
         for (int i = 0; i < jobs.length; i++)
             if (jobs[i].getId() == caseJobID)
-                return i;
+                return i + 1; // because of the default "All jobs" job is not in db
         
         return 0;
     }
