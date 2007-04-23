@@ -78,4 +78,4 @@ insert into cases.hosts values(DEFAULT, 'localhost', '127.0.0.1');
 -- cases.hosts 
 
 -- add one more column to caseinput table
-ALTER TABLE cases.cases_caseinputs ADD COLUMN case_job_id int4;
+ALTER TABLE cases.cases_caseinputs ADD COLUMN case_job_id int4 DEFAULT 0;
