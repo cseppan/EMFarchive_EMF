@@ -8,6 +8,8 @@ public class EmfDateFormat {
 
     public static final String PATTERN_yyyyMMddHHmm = "yyyy/MM/dd HH:mm";
     
+    public static final String PATTERN_MMddYYYY_HHmm = "MM/dd/yyyy HH:mm";
+
     private static SimpleDateFormat dateFormatter = new SimpleDateFormat();
     
 
@@ -22,7 +24,7 @@ public class EmfDateFormat {
     }
 
     public static String format_MM_DD_YYYY_HH_mm(Date date) {
-        dateFormatter.applyPattern("MM/dd/yyyy HH:mm");
+        dateFormatter.applyPattern(PATTERN_MMddYYYY_HHmm);
         return date == null ? "" : dateFormatter.format(date);
     }
     
