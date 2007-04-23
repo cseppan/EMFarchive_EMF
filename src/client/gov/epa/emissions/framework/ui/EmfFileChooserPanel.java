@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -354,7 +355,12 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         EmfFileInfo[] dirs = fsv.getSubdirs(dir);
 
         if (dirs == null) {
-            this.messagePanel.setError("Connection to server timed out.");
+            if ((dir.getAbsolutePath().length() == 2) && (dir.getAbsolutePath().charAt(1) == ':'))
+                this.messagePanel.setError("Please enter a '\\' after the drive letter (e.g., 'D:\\')");          
+            else if (!(new File(dir.getAbsolutePath())).exists())
+                this.messagePanel.setError("Directory "+dir+" does not exist on the server");
+            else
+                this.messagePanel.setError("Connection to server timed out.");
         }
 
         folder.setText(dirs[0].getAbsolutePath());
