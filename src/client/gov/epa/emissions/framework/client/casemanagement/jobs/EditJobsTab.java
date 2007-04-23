@@ -170,6 +170,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
             }
         });
         edit.setMargin(insets);
+        edit.setEnabled(false);
         container.add(edit);
 
         Button run = new RunButton(new AbstractAction() {
@@ -182,6 +183,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
                 }
             }
         });
+        run.setEnabled(false);
         run.setMargin(insets);
         container.add(run);
 
