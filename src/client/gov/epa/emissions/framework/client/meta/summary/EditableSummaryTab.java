@@ -39,7 +39,8 @@ import javax.swing.SpringLayout;
 
 public class EditableSummaryTab extends JPanel implements EditableSummaryTabView {
 
-    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.PATTERN_yyyyMMddHHmm);
+    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(
+            EmfDateFormat.PATTERN_MMddYYYY_HHmm);
     
     private EmfDataset dataset;
 
@@ -133,7 +134,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     }
 
     private String format(Date date) {
-        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(date);
+        return EmfDateFormat.format_MM_DD_YYYY_HH_mm(date);
     }
 
     private JPanel createTimeSpaceSection() throws EmfException {
@@ -149,6 +150,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         changeablesList.addChangeable(endDateTime);
         layoutGenerator.addLabelWidgetPair("Time Period Start:", startDateTime, panel);
         layoutGenerator.addLabelWidgetPair("Time Period End:", endDateTime, panel);
+        startDateTime.setToolTipText("Enter a date with the format MM/dd/yyyy HH:mm");
+        endDateTime.setToolTipText("Enter a date with the format MM/dd/yyyy HH:mm");
 
         // temporal resolution
         temporalResolutionsCombo = temporalResolutionCombo();

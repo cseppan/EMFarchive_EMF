@@ -116,7 +116,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
     }
 
     private String formatDate(Date date) {
-        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(date);
+        return EmfDateFormat.format_MM_DD_YYYY_HH_mm(date);
     }
 
     private JPanel createOverviewSection() {
