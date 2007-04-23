@@ -55,7 +55,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     }
 
     public void doEditJob(CaseJob job, EditCaseJobView jobEditor) throws EmfException {
-        throw new EmfException("underconstruction...");
+        throw new EmfException("Under construction...");
     }
 
     public CaseJob[] getCaseJobs() throws EmfException {
