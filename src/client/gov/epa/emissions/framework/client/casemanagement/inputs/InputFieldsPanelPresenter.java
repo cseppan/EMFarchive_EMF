@@ -39,6 +39,8 @@ public class InputFieldsPanelPresenter {
     private SubDirs subdirs;
     
     private int caseId;
+    
+    public static final String ALL_FOR_SECTOR = "All for sector";
 
     public InputFieldsPanelPresenter(int caseId, InputFieldsPanelView inputFields, EmfSession session) throws EmfException {
         this.session = session;
@@ -97,7 +99,7 @@ public class InputFieldsPanelPresenter {
 
     public CaseJob[] getCaseJobs() throws EmfException {
         List<CaseJob> jobs = new ArrayList<CaseJob>();
-        jobs.add(new CaseJob("All jobs"));
+        jobs.add(new CaseJob(ALL_FOR_SECTOR));
         jobs.addAll(Arrays.asList(caseService().getCaseJobs(caseId)));
         
         return jobs.toArray(new CaseJob[0]);

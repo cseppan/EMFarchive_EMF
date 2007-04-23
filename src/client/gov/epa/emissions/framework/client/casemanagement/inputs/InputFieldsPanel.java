@@ -245,7 +245,8 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         if (job == null)
             return;
         
-        if (((CaseJob) job).getName().equalsIgnoreCase("All jobs")) {
+        if (((CaseJob) job).getName().equalsIgnoreCase(
+                InputFieldsPanelPresenter.ALL_FOR_SECTOR)) {
             input.setCaseJobID(0);
             return;
         }
