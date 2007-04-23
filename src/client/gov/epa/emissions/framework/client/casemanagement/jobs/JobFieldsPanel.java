@@ -86,10 +86,10 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         try {
             container.add(nameNPurposPanel());
-            container.add(pathNbrowserPanel());
+            //container.add(pathNbrowserPanel());
             container.add(setupPanel());
         } catch (EmfException e) {
-            setError("Could not retrieve all job related info.");
+            setError("Could not retrieve all job related fields.");
         }
         
         if (edit)
@@ -112,8 +112,14 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         changeablesList.addChangeable(purpose);
         layoutGenerator.addLabelWidgetPair("Purpose:", new ScrollableComponent(purpose), panel);
 
+        path = new TextField("path", job.getPath(), 32);
+        path.setPreferredSize(new Dimension(300, 15));
+        changeablesList.addChangeable(path);
+        layoutGenerator.addLabelWidgetPair("Executable:", 
+                getFolderChooserPanel(path, "Select the Executable File"), panel);
+        
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -129,22 +135,22 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         return panel;
     }
     
-    private JPanel pathNbrowserPanel() {
-        JPanel panel = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-
-        path = new TextField("path", job.getPath(), 31);
-        path.setMaximumSize(new Dimension(300, 15));
-        changeablesList.addChangeable(path);
-        layoutGenerator.addLabelWidgetPair("Executable:", getFolderChooserPanel(path, "Select the Executable File"), panel);
-        
-//      Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
-        
-        return panel;
-    }
+//    private JPanel pathNbrowserPanel() {
+//        JPanel panel = new JPanel(new SpringLayout());
+//        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+//
+//        path = new TextField("path", job.getPath(), 31);
+//        path.setMaximumSize(new Dimension(300, 15));
+//        changeablesList.addChangeable(path);
+//        layoutGenerator.addLabelWidgetPair("Executable:", getFolderChooserPanel(path, "Select the Executable File"), panel);
+//        
+////      Lay out the panel.
+//        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+//                5, 5, // initialX, initialY
+//                10, 10);// xPad, yPad
+//        
+//        return panel;
+//    }
 
     private JPanel leftSetupPanel() {
         JPanel panel = new JPanel(new SpringLayout());
@@ -158,6 +164,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         jobNo.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(jobNo);
         layoutGenerator.addLabelWidgetPair("Job Number:", jobNo, panel);
+        jobNo.setToolTipText("A number that makes this job unique for the given case (used to specify dependencies between jobs)");
         
         Host[] hosts = presenter.getHostsObject().getAll();
         host = new EditableComboBox(hosts);
@@ -231,14 +238,14 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
         chooser.setTitle(title);
         chooser.setDirectoryAndFileMode();
-        int option = chooser.showDialog(parent, "Select a file");
+        int option = chooser.showDialog(parent, "Select a file that contains the executable");
 
         EmfFileInfo[] files = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedFiles() : null;
         if (files == null || files.length == 0)
             return;
 
         if (files.length > 1) {
-            setError("Only one file is selected as executable.");
+            setError("Please select a single file for the executable.");
         }
             
         dir.setText(files[0].getAbsolutePath());
@@ -287,7 +294,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         try {
             return service.addExecutable(exe);
         } catch (EmfException e) {
-            setError("Couldnot add new executable object.");
+            setError("Could not add the new executable "+exe.getName());
             return null;
         }
     }
@@ -315,7 +322,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         String temp = name.getText().trim();
         
         if (temp.trim().length() == 0)
-            throw new EmfException("Please give a name to case job.");
+            throw new EmfException("Please enter a name for the job.");
         
         String absolute = path.getText();
         
@@ -325,13 +332,13 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         try {
             Float.parseFloat(jobNo.getText().trim());
         } catch (NumberFormatException e) {
-            throw new EmfException("Please input a float number to Job # field.");
+            throw new EmfException("Please input a floating point number into the Job Number field.");
         }
         
         Object selected =  host.getSelectedItem();
         
         if (selected == null || selected.toString().trim().equals(""))
-            throw new EmfException("Please give a valid host name.");
+            throw new EmfException("Please enter a valid host name.");
         
         if (absolute == null || absolute.trim().equals(""))
             throw new EmfException("Please select an executable file.");
@@ -339,13 +346,13 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         try {
             Integer.parseInt(version.getText().trim());
         } catch (NumberFormatException e) {
-            throw new EmfException("Please input an integer to Version field.");
+            throw new EmfException("Please enter an integer that is the version of the executable.");
         }
     }
 
     private void showRemind() throws EmfException {
         String title = "Warning";
-        String message = "Same job settings existed. Are you sure to add this one?";
+        String message = "A similar job already existed for this case. Are you sure want to add another one?";
         int selection = JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
