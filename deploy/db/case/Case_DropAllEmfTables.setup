@@ -19,4 +19,8 @@ DROP TABLE cases.hosts CASCADE;
 DROP TABLE cases.case_jobrunstatus CASCADE;
 DROP TABLE cases.executables CASCADE;
 DROP TABLE cases.cases_casejobs CASCADE;
+DROP TABLE cases.parameter_env_vars CASCADE;
+DROP TABLE cases.value_types CASCADE;
+DROP TABLE cases.parameter_names CASCADE;
+DROP TABLE cases.cases_parameters CASCADE;
 

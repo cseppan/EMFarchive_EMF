@@ -6,6 +6,10 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 
 public interface CaseService {
 
@@ -89,4 +93,19 @@ public interface CaseService {
 
     Executable addExecutable(Executable exe) throws EmfException;
     
+    ParameterEnvVar addParameterEnvVar(ParameterEnvVar envVar) throws EmfException;
+    
+    ParameterEnvVar[] getParameterEnvVars() throws EmfException;
+
+    ValueType addValueType(ValueType type) throws EmfException;
+    
+    ValueType[] getValueTypes() throws EmfException;
+
+    ParameterName addParameterName(ParameterName name) throws EmfException;
+    
+    ParameterName[] getParameterNames() throws EmfException;
+    
+    CaseParameter addCaseParameter(CaseParameter param) throws EmfException;
+    
+    CaseParameter[] getCaseParameters(int caseId) throws EmfException;
 }

@@ -19,6 +19,10 @@ DELETE FROM cases.hosts;
 DELETE FROM cases.case_jobrunstatus;
 DELETE FROM cases.cases_casejobs;
 DELETE FROM cases.executables;
+DELETE FROM cases.parameter_env_vars;
+DELETE FROM cases.value_types;
+DELETE FROM cases.parameter_names;
+DELETE FROM cases.cases_parameters;
 
 
 

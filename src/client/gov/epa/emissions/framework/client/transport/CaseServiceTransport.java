@@ -19,9 +19,13 @@ import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
-import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
+import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 
 public class CaseServiceTransport implements CaseService {
 
@@ -437,6 +441,83 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.executable());
         
         return (Executable) call.requestResponse(new Object[] {exe});
+    }
+
+    public ParameterEnvVar addParameterEnvVar(ParameterEnvVar envVar) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("addParameterEnvVar");
+        call.addParam("envVar", caseMappings.parameterEnvVar());
+        call.setReturnType(caseMappings.parameterEnvVar());
+        
+        return (ParameterEnvVar)call.requestResponse(new Object[]{envVar});
+    }
+
+    public ParameterEnvVar[] getParameterEnvVars() throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getParameterEnvVars");
+        call.setReturnType(caseMappings.parameterEnvVars());
+        
+        return (ParameterEnvVar[])call.requestResponse(new Object[]{});
+    }
+
+    public ValueType addValueType(ValueType type) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("addValueType");
+        call.addParam("type", caseMappings.valueType());
+        call.setReturnType(caseMappings.valueType());
+        
+        return (ValueType)call.requestResponse(new Object[]{type});
+    }
+
+    public ValueType[] getValueTypes() throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getValueTypes");
+        call.setReturnType(caseMappings.valueTypes());
+        
+        return (ValueType[])call.requestResponse(new Object[]{});
+    }
+
+    public ParameterName addParameterName(ParameterName name) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("addParameterName");
+        call.addParam("name", caseMappings.parameterName());
+        call.setReturnType(caseMappings.parameterName());
+        
+        return (ParameterName)call.requestResponse(new Object[]{name});
+    }
+
+    public ParameterName[] getParameterNames() throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getParameterNames");
+        call.setReturnType(caseMappings.parameterNames());
+        
+        return (ParameterName[])call.requestResponse(new Object[]{});
+    }
+
+    public CaseParameter addCaseParameter(CaseParameter param) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("addCaseParameter");
+        call.addParam("param", caseMappings.caseParameter());
+        call.setReturnType(caseMappings.caseParameter());
+        
+        return (CaseParameter)call.requestResponse(new Object[]{param});
+    }
+
+    public CaseParameter[] getCaseParameters(int caseId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getCaseParameters");
+        call.addIntegerParam("caseId");
+        call.setReturnType(caseMappings.caseParameters());
+
+        return (CaseParameter[]) call.requestResponse(new Object[] { new Integer(caseId) });
     }
 
 }

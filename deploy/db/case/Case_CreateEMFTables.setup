@@ -232,7 +232,7 @@ CREATE TABLE cases.cases_caseinputs
 (
   id SERIAL PRIMARY KEY,
   case_id int4 NOT NULL REFERENCES cases.cases(id),
-  case_job_id int4,
+  case_job_id int4 DEFAULT 0,
   sub_dir varchar(255),
   required bool DEFAULT false,
   show bool DEFAULT false,
@@ -249,4 +249,51 @@ CREATE TABLE cases.cases_caseinputs
 WITHOUT OIDS;
 -- cases.cases_caseinputs
 
+-- cases.parameter_env_vars
+CREATE TABLE cases.parameter_env_vars
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+)
+WITHOUT OIDS;
+-- cases.parameter_env_vars
 
+-- cases.value-types
+CREATE TABLE cases.value_types
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(32) NOT NULL UNIQUE
+)
+WITHOUT OIDS;
+-- cases.value-types
+
+-- cases.parameter_names
+CREATE TABLE cases.parameter_names
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(32) NOT NULL UNIQUE
+)
+WITHOUT OIDS;
+-- cases.parameter_names
+
+-- cases.cases_parameters
+CREATE TABLE cases.cases_parameters
+(
+  id SERIAL PRIMARY KEY,
+  case_id int4 NOT NULL REFERENCES cases.cases(id),
+  case_job_id int4 DEFAULT 0,
+  param_name_id int4  REFERENCES cases.parameter_names(id),
+  required bool DEFAULT false,
+  show bool DEFAULT false,
+  sector_id int4  REFERENCES emf.sectors(id),
+  program_id int4  REFERENCES cases.programs(id),
+  env_vars_id int4  REFERENCES cases.parameter_env_vars(id),
+  val_type_id int4  REFERENCES cases.value_types(id),
+  exec_order float,
+  value varchar(255),
+  purpose varchar(255),
+  notes text,
+  UNIQUE (case_id,param_name_id,sector_id,program_id,case_job_id) 
+) 
+WITHOUT OIDS;
+-- cases.cases_parameters

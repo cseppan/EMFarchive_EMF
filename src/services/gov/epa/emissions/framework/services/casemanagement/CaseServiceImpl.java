@@ -7,9 +7,13 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
-import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
+import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExportService;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -473,7 +477,7 @@ public class CaseServiceImpl implements CaseService {
         Session session = sessionFactory.getSession();
 
         if (dao.caseInputExists(input, session))
-            throw new EmfException("The combination of 'Input Name', 'Sector', and 'Program' " + "should be unique.");
+            throw new EmfException("The combination of 'Input Name', 'Sector', 'Program', and 'Job' should be unique.");
 
         try {
             dao.add(input, session);
@@ -707,6 +711,122 @@ public class CaseServiceImpl implements CaseService {
         } catch (Exception e) {
             LOG.error("Could not add new executable '" + exe.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new executable '" + exe.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
+    public ParameterEnvVar addParameterEnvVar(ParameterEnvVar envVar) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(envVar, session);
+            return (ParameterEnvVar) dao.load(ParameterEnvVar.class, envVar.getName(), session);
+        } catch (Exception e) {
+            LOG.error("Could not add new parameter env variable '" + envVar.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new parameter env variable '" + envVar.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
+    public ParameterEnvVar[] getParameterEnvVars() throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            List<ParameterEnvVar> envvar = dao.getParameterEnvVars(session);
+
+            return envvar.toArray(new ParameterEnvVar[0]);
+        } catch (Exception e) {
+            LOG.error("Could not get all parameter env variables.\n" + e.getMessage());
+            throw new EmfException("Could not get all parameter env variables.\n");
+        } finally {
+            session.close();
+        }
+    }
+
+    public ValueType addValueType(ValueType type) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.addValueType(type, session);
+            return (ValueType) dao.load(ValueType.class, type.getName(), session);
+        } catch (Exception e) {
+            LOG.error("Could not add new value type '" + type.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new value type '" + type.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
+    public ValueType[] getValueTypes() throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            List<ValueType> type = dao.getValueTypes(session);
+
+            return type.toArray(new ValueType[0]);
+        } catch (Exception e) {
+            LOG.error("Could not get all value types.\n" + e.getMessage());
+            throw new EmfException("Could not get all value types.\n");
+        } finally {
+            session.close();
+        }
+    }
+
+    public ParameterName addParameterName(ParameterName name) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.addParameterName(name, session);
+            return (ParameterName) dao.load(ParameterName.class, name.getName(), session);
+        } catch (Exception e) {
+            LOG.error("Could not add new parameter name '" + name.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new parameter name '" + name.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
+    public ParameterName[] getParameterNames() throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            List<ParameterName> type = dao.getParameterNames(session);
+
+            return type.toArray(new ParameterName[0]);
+        } catch (Exception e) {
+            LOG.error("Could not get all parameter names.\n" + e.getMessage());
+            throw new EmfException("Could not get all parameter names.\n");
+        } finally {
+            session.close();
+        }
+    }
+
+    public CaseParameter addCaseParameter(CaseParameter param) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        if (dao.caseParameterExists(param, session))
+            throw new EmfException("The combination of 'Parameter Name', 'Sector', 'Program', and 'Job' should be unique.");
+
+        try {
+            dao.addParameter(param, session);
+            return (CaseParameter)dao.loadCaseParameter(param, session);
+        } catch (Exception e) {
+            LOG.error("Could not add new case parameter '" + param.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new case parameter '" + param.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
+    public CaseParameter[] getCaseParameters(int caseId) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            List<CaseParameter> params = dao.getCaseParameters(caseId, session);
+
+            return params.toArray(new CaseParameter[0]);
+        } catch (Exception e) {
+            LOG.error("Could not get all parameters for case (id=" + caseId + ").\n" + e.getMessage());
+            throw new EmfException("Could not get all parameters for case (id=" + caseId + ").\n");
         } finally {
             session.close();
         }

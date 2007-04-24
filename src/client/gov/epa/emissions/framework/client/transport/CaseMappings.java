@@ -17,9 +17,12 @@ import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
-import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 
 import javax.xml.namespace.QName;
 
@@ -52,6 +55,9 @@ public class CaseMappings extends Mappings {
         bean(call, JobRunStatus.class, jobRunStatus());
         bean(call, Executable.class, executable());
         bean(call, Host.class, host());
+        bean(call, ParameterEnvVar.class, parameterEnvVar());
+        bean(call, ValueType.class, valueType());
+        bean(call, CaseParameter.class, caseParameter());
         
         bean(call, Mutex.class, mutex());
     }
@@ -76,6 +82,9 @@ public class CaseMappings extends Mappings {
         array(call, JobRunStatus[].class, jobRunStatuses());
         array(call, Executable[].class, executables());
         array(call, Host[].class, hosts());
+        array(call, ParameterEnvVar[].class, parameterEnvVars());
+        array(call, ValueType[].class, valueTypes());
+        array(call, CaseParameter[].class, caseParameters());
     }
 
     public QName caseObject() {
@@ -232,5 +241,37 @@ public class CaseMappings extends Mappings {
     
     public QName hosts(){
         return qname("Hosts");
+    }
+
+    public QName parameterEnvVar() {
+        return qname("ParameterEnvVar");
+    }
+
+    public QName parameterEnvVars() {
+        return qname("ParameterEnvVars");
+    }
+    
+    public QName valueType() {
+        return qname("ValueType");
+    }
+    
+    public QName valueTypes() {
+        return qname("ValueTypes");
+    }
+
+    public QName parameterName() {
+        return qname("ParameterName");
+    }
+
+    public QName parameterNames() {
+        return qname("ParameterNames");
+    }
+    
+    public QName caseParameter() {
+        return qname("CaseParameter");
+    }
+    
+    public QName caseParameters() {
+        return qname("CaseParameters");
     }
 }

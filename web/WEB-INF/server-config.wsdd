@@ -526,6 +526,42 @@
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.Host[]"
 		innerType="ns1:Host"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar"
+		qname="ns1:ParameterEnvVar" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:ParameterEnvVars" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar[]"
+		innerType="ns1:ParameterEnvVar"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.parameters.ValueType"
+		qname="ns1:ValueType" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:ValueTypes" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.parameters.ValueType[]"
+		innerType="ns1:ValueType"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName"
+		qname="ns1:ParameterName" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:ParameterNames" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName[]"
+		innerType="ns1:ParameterName"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter"
+		qname="ns1:CaseParameter" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:CaseParameters" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter[]"
+		innerType="ns1:CaseParameter"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
 	<!-- ================================================================= -->
 	

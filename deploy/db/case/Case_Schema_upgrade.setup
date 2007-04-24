@@ -1,81 +1,96 @@
 --
--- 4/4/07 Added new tables to cases on case jobs
+-- 4/24/07 Added new tables to cases on case jobs
 --
 
-DROP TABLE IF EXISTS cases.hosts CASCADE;
-DROP TABLE IF EXISTS cases.case_jobrunstatus CASCADE;
-DROP TABLE IF EXISTS cases.case_runstatus CASCADE;
-DROP TABLE IF EXISTS cases.executables CASCADE;
-DROP TABLE IF EXISTS cases.cases_casejobs CASCADE;
-
--- cases.case_jobrunstatus
-CREATE TABLE cases.case_jobrunstatus
+-- cases.parameter_env_vars
+CREATE TABLE cases.parameter_env_vars
 (
   id SERIAL PRIMARY KEY,
-  name varchar(64) NOT NULL UNIQUE,
-  description text
+  name varchar(255) NOT NULL UNIQUE
 )
 WITHOUT OIDS;
--- cases.case_jobrunstatus
+-- cases.parameter_env_vars
 
--- cases.hosts
-CREATE TABLE cases.hosts
+-- populate table cases.parameter_env_vars
+insert into cases.parameter_env_vars values (DEFAULT, 'SMK_RUNTYPE');
+insert into cases.parameter_env_vars values (DEFAULT, 'SECTOR');
+insert into cases.parameter_env_vars values (DEFAULT, 'CASE');
+insert into cases.parameter_env_vars values (DEFAULT, 'GRID');
+insert into cases.parameter_env_vars values (DEFAULT, 'IOAPI_GRIDNAME_1');
+insert into cases.parameter_env_vars values (DEFAULT, 'SPC');
+insert into cases.parameter_env_vars values (DEFAULT, 'YEAR');
+insert into cases.parameter_env_vars values (DEFAULT, 'IOAPI_ISPH');
+insert into cases.parameter_env_vars values (DEFAULT, 'SPINUP_DURATION');
+insert into cases.parameter_env_vars values (DEFAULT, 'PROMPTFLAG');
+insert into cases.parameter_env_vars values (DEFAULT, 'AUTO_DELETE');
+insert into cases.parameter_env_vars values (DEFAULT, 'AUTO_DELETE_LOG');
+insert into cases.parameter_env_vars values (DEFAULT, 'DEBUGMODE');
+insert into cases.parameter_env_vars values (DEFAULT, 'DEBUG_EXE');
+insert into cases.parameter_env_vars values (DEFAULT, 'INSTALL');
+insert into cases.parameter_env_vars values (DEFAULT, 'WORK');
+insert into cases.parameter_env_vars values (DEFAULT, 'PLATFORM');
+insert into cases.parameter_env_vars values (DEFAULT, 'SMK_HOME');
+insert into cases.parameter_env_vars values (DEFAULT, 'SMK_SUBSYS');
+insert into cases.parameter_env_vars values (DEFAULT, 'DAT_ROOT');
+insert into cases.parameter_env_vars values (DEFAULT, 'MET_ROOT');
+insert into cases.parameter_env_vars values (DEFAULT, 'IMD_ROOT');
+insert into cases.parameter_env_vars values (DEFAULT, 'OUT_ROOT');
+-- end of populate table cases.parameter_env_vars
+
+-- cases.value-types
+CREATE TABLE cases.value_types
 (
   id SERIAL PRIMARY KEY,
-  name varchar(64) NOT NULL UNIQUE,
-  ip_address varchar(32)
+  name varchar(32) NOT NULL UNIQUE
 )
 WITHOUT OIDS;
--- cases.hosts
+-- cases.value-types
 
--- cases.executables
-CREATE TABLE cases.executables
+-- populate cases.value_types
+insert into cases.value_types values (DEFAULT, 'String');
+insert into cases.value_types values (DEFAULT, 'Char');
+insert into cases.value_types values (DEFAULT, 'Integer');
+insert into cases.value_types values (DEFAULT, 'Float');
+insert into cases.value_types values (DEFAULT, 'Boolean');
+insert into cases.value_types values (DEFAULT, 'Date');
+-- end of populating cases.value_types
+
+-- cases.parameter_names
+CREATE TABLE cases.parameter_names
 (
   id SERIAL PRIMARY KEY,
-  name varchar(512) NOT NULL UNIQUE
+  name varchar(32) NOT NULL UNIQUE
 )
 WITHOUT OIDS;
--- cases.executables
+-- cases.parameter_names
 
--- cases.cases_casejobs
-CREATE TABLE cases.cases_casejobs
+-- populate cases.parameter_names
+insert into cases.parameter_names values (DEFAULT, 'SMOKE run type');
+insert into cases.parameter_names values (DEFAULT, 'Sector name');
+insert into cases.parameter_names values (DEFAULT, 'Grid abbreviation');
+insert into cases.parameter_names values (DEFAULT, 'IOAPI grid name');
+insert into cases.parameter_names values (DEFAULT, 'Chemical mechanism abbreviation');
+insert into cases.parameter_names values (DEFAULT, 'Year being modeled');
+-- end of populating cases.parameter_names
+
+-- cases.cases_parameters
+CREATE TABLE cases.cases_parameters
 (
   id SERIAL PRIMARY KEY,
-  case_id int4 NOT NULL REFERENCES cases.cases(id) ,
-  name varchar(255) NOT NULL,
-  purpose text,
-  job_num float,
-  sector_id int4 REFERENCES emf.sectors(id),
-  arguments text,
-  exec_order int4,
-  version int4,
-  runstatus_id int4 REFERENCES cases.case_jobrunstatus(id),
-  start_date timestamp,
-  complete_date timestamp,
-  user_id int4 REFERENCES emf.users(id), 
-  run_notes text,
-  run_log text,
-  host_id int4 REFERENCES cases.hosts(id),
-  exe_id int4 REFERENCES cases.executables(id),
-  que_option varchar(255),
-  path varchar(255),
-  UNIQUE (case_id, name)
-)
+  case_id int4 NOT NULL REFERENCES cases.cases(id),
+  case_job_id int4 DEFAULT 0,
+  param_name_id int4  REFERENCES cases.parameter_names(id),
+  required bool DEFAULT false,
+  show bool DEFAULT false,
+  sector_id int4  REFERENCES emf.sectors(id),
+  program_id int4  REFERENCES cases.programs(id),
+  env_vars_id int4  REFERENCES cases.parameter_env_vars(id),
+  val_type_id int4  REFERENCES cases.value_types(id),
+  exec_order float,
+  value varchar(255),
+  purpose varchar(255),
+  notes text,
+  UNIQUE (case_id,param_name_id,sector_id,program_id,case_job_id) 
+) 
 WITHOUT OIDS;
--- cases.cases_casejobs
-
--- cases.case_jobrunstatus
-insert into cases.case_jobrunstatus values(DEFAULT, 'Not Started', 'Not Started');
-insert into cases.case_jobrunstatus values(DEFAULT, 'Succeeded', 'Succeeded');
-insert into cases.case_jobrunstatus values(DEFAULT, 'Quality Assured', 'Quality Assured');
-insert into cases.case_jobrunstatus values(DEFAULT, 'Failed', 'Failed');
-insert into cases.case_jobrunstatus values(DEFAULT, 'Running', 'Running');
-insert into cases.case_jobrunstatus values(DEFAULT, 'Submitted', 'Submitted');
--- cases.case_jobrunstatus
-
--- cases.hosts
-insert into cases.hosts values(DEFAULT, 'localhost', '127.0.0.1');
--- cases.hosts 
-
--- add one more column to caseinput table
-ALTER TABLE cases.cases_caseinputs ADD COLUMN case_job_id int4 DEFAULT 0;
+-- cases.cases_parameters
