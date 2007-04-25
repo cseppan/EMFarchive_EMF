@@ -40,7 +40,7 @@ public class InputFieldsPanelPresenter {
     
     private int caseId;
     
-    public static final String ALL_FOR_SECTOR = "All for sector";
+    public static final String ALL_FOR_SECTOR = "All jobs for sector";
 
     public InputFieldsPanelPresenter(int caseId, InputFieldsPanelView inputFields, EmfSession session) throws EmfException {
         this.session = session;
