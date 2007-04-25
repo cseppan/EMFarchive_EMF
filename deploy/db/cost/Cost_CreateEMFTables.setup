@@ -9,6 +9,10 @@ CREATE TABLE emf.pollutants
   lock_date timestamp
 ) 
 WITHOUT OIDS;
+CREATE INDEX pollutant_id
+  ON emf.pollutants
+  USING btree
+  (id);
 -- emf.pollutants
 --
 -- emf.source_groups
@@ -69,6 +73,10 @@ CREATE TABLE emf.control_measures
   last_modified_by varchar(255) NOT NULL
 ) 
 WITHOUT OIDS;
+CREATE INDEX measure_id
+  ON emf.control_measures
+  USING btree
+  (id);
 -- emf.control_measures
 
 
@@ -82,8 +90,15 @@ CREATE TABLE emf.control_measure_sccs
    UNIQUE(control_measures_id,name)
 )
 WITHOUT OIDS;
+CREATE INDEX measure_scc_measure_id
+  ON emf.control_measure_sccs
+  USING btree
+  (control_measures_id);
+CREATE INDEX measure_scc_scc
+  ON emf.control_measure_sccs
+  USING btree
+  (name);
 -- emf.control_measure_sccs
-
 
 -- emf.control_measure_efficiencyrecords
 CREATE TABLE emf.control_measure_efficiencyrecords
@@ -113,6 +128,15 @@ CREATE TABLE emf.control_measure_efficiencyrecords
   UNIQUE (control_measures_id,pollutant_id,locale,existing_measure_abbr,effective_date)
 ) 
 WITHOUT OIDS;
+CREATE INDEX er_measureid
+  ON emf.control_measure_efficiencyrecords
+  USING btree
+  (control_measures_id);
+CREATE INDEX er_pollutantid
+  ON emf.control_measure_efficiencyrecords
+  USING btree
+  (pollutant_id);
+  
 -- emf.control_measure_efficiencyrecords
 
 -- emf control_measurs_sectors
@@ -167,11 +191,7 @@ CREATE TABLE emf.control_strategies
   filter varchar(255),
   lock_owner varchar(255),
   lock_date timestamp,
-  county_file character varying,
-  emis_reduction_constraint real,
-  control_efficiency_constraint real,
-  cost_per_ton_constraint character varying,
-  annualized_cost_constraint character varying
+  county_file character varying
 ) 
 WITHOUT OIDS;
 -- emf.control_strategies
@@ -264,24 +284,6 @@ CREATE TABLE emf.aggregrated_efficiencyrecords
       ON UPDATE NO ACTION ON DELETE NO ACTION
 ) 
 WITHOUT OIDS;
-
--- add indexes to various emf tables...
-CREATE INDEX er_measureid
-  ON emf.control_measure_efficiencyrecords
-  USING btree
-  (control_measures_id);
-CREATE INDEX er_pollutantid
-  ON emf.control_measure_efficiencyrecords
-  USING btree
-  (pollutant_id);
-CREATE INDEX measure_id
-  ON emf.control_measures
-  USING btree
-  (id);
-CREATE INDEX pollutant_id
-  ON emf.pollutants
-  USING btree
-  (id);
 CREATE INDEX aggeffrec_measureid
   ON emf.aggregrated_efficiencyrecords
   USING btree
@@ -290,3 +292,25 @@ CREATE INDEX aggeffrec_pollid
   ON emf.aggregrated_efficiencyrecords
   USING btree
   (pollutant_id);
+
+-- add new table control_strategy_constraints...
+CREATE TABLE emf.control_strategy_constraints
+(
+  control_strategy_id integer NOT NULL,
+  max_emis_reduction real,
+  max_control_efficiency real,
+  min_cost_per_ton real,
+  min_ann_cost real,
+  CONSTRAINT control_strategy_constraints_pkey PRIMARY KEY (control_strategy_id),
+  CONSTRAINT control_strategy_constraints_control_strategy_id_fkey FOREIGN KEY (control_strategy_id)
+      REFERENCES emf.control_strategies (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.control_strategy_constraints OWNER TO postgres;
+
+CREATE INDEX constraint_strategy_id
+  ON emf.control_strategy_constraints
+  USING btree
+  (control_strategy_id);
+  
