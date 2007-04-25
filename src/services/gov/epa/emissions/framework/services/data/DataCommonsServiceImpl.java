@@ -606,7 +606,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             
             currentDirectory = gooddir;
             File currentdirFile = new File(currentDirectory.getAbsolutePath());
-            listDirsAndFiles(currentdirFile.listFiles(), currentdirFile, "*.*");
+            listDirsAndFiles(currentdirFile.listFiles(), currentdirFile, "*");
 
             return this.subdirs != null ? this.subdirs : new EmfFileInfo[0];
         } catch (Exception e) {
@@ -701,7 +701,13 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     
     private EmfFileInfo[] getFileinfosFromPattern(EmfFileInfo[] fileInfos, String pattern) throws EmfException {
         try {
+            if (pattern == null || fileInfos.length == 0)
+                return fileInfos;
+                
             String pat = pattern.trim();
+            
+            if (pat.length() == 0)
+                return fileInfos;
             
             File directory = new File(fileInfos[0].getParent());
             EmfFilePatternMatcher fpm = new EmfFilePatternMatcher(directory, pat);
