@@ -307,10 +307,8 @@ CREATE TABLE emf.control_strategy_constraints
       ON UPDATE NO ACTION ON DELETE NO ACTION
 ) 
 WITHOUT OIDS;
-ALTER TABLE emf.control_strategy_constraints OWNER TO postgres;
 
 CREATE INDEX constraint_strategy_id
   ON emf.control_strategy_constraints
   USING btree
   (control_strategy_id);
-  
