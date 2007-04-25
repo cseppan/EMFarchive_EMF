@@ -244,7 +244,6 @@ public class CaseDAO {
 
     public CaseJob getCaseJob(int jobId, Session session) {
         Criterion crit = Restrictions.eq("id", new Integer(jobId));
-        System.out.println("session in getCaseJob: " + session);
         return (CaseJob)hibernateFacade.load(CaseJob.class, crit, session);
     }
 

@@ -71,5 +71,9 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         return this.caseObj;
     }
 
+    public void runJobs(CaseJob[] jobs) throws EmfException {
+        service().runJobs(jobs, session.user());
+    }
+
 
 }

@@ -108,4 +108,8 @@ public interface CaseService {
     CaseParameter addCaseParameter(CaseParameter param) throws EmfException;
     
     CaseParameter[] getCaseParameters(int caseId) throws EmfException;
+
+    void updateCaseParameter(CaseParameter parameter) throws EmfException;
+
+    void runJobs(CaseJob[] jobs, User user) throws EmfException;
 }

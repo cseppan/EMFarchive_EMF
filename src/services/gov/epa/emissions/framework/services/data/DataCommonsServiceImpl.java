@@ -11,6 +11,7 @@ import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
+import gov.epa.emissions.framework.services.basic.EmfFilePatternMatcher;
 import gov.epa.emissions.framework.services.basic.EmfFileSerializer;
 import gov.epa.emissions.framework.services.basic.EmfServerFileSystemView;
 import gov.epa.emissions.framework.services.basic.Status;
@@ -701,24 +702,14 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     private EmfFileInfo[] getFileinfosFromPattern(EmfFileInfo[] fileInfos, String pattern) throws EmfException {
         try {
             String pat = pattern.trim();
-            if (!pat.isEmpty())
-                pat = pat.substring(1);  // NOTE: assume pattern always begin with "*.".
             
-            if (pat.isEmpty() || pat.equals(".*"))
-                return fileInfos;
-                
-            List<EmfFileInfo> list = new ArrayList<EmfFileInfo>();
-            int len = pat.length();
-            int size = fileInfos.length;
-            String temp = "";
-            
-            for (int i = 0; i < size; i++) {
-                temp = fileInfos[i].getName();
-                if (temp.lastIndexOf(pat) == (temp.length() - len))
-                    list.add(fileInfos[i]);
-            }
+            File directory = new File(fileInfos[0].getParent());
+            EmfFilePatternMatcher fpm = new EmfFilePatternMatcher(directory, pat);
+            EmfFileInfo[] matchedNames = fpm.getMatched(fileInfos);
+            if (matchedNames.length == 0)
+                throw new EmfException("No files found for pattern '" + pattern + "'");
 
-            return list.toArray(new EmfFileInfo[0]);
+            return matchedNames;
         } catch (Exception e) {
             throw new EmfException("Cannot apply pattern.");
         }

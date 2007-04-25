@@ -520,4 +520,20 @@ public class CaseServiceTransport implements CaseService {
         return (CaseParameter[]) call.requestResponse(new Object[] { new Integer(caseId) });
     }
 
+    public void updateCaseParameter(CaseParameter parameter) throws EmfException {
+        throw new EmfException("Under construction...");
+        
+    }
+
+    public void runJobs(CaseJob[] jobs, User user) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("runJobs");
+        call.addParam("jobs", caseMappings.casejobs());
+        call.addParam("user", dataMappings.user());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { jobs, user });
+    }
+
 }

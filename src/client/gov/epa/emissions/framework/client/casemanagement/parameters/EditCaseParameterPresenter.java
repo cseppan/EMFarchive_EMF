@@ -1,0 +1,11 @@
+package gov.epa.emissions.framework.client.casemanagement.parameters;
+
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+
+public interface EditCaseParameterPresenter {
+    
+    void display(CaseParameter param) throws EmfException;
+    
+    void doSave() throws EmfException;
+}

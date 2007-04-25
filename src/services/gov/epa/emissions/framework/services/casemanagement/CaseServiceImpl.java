@@ -810,6 +810,7 @@ public class CaseServiceImpl implements CaseService {
             dao.addParameter(param, session);
             return (CaseParameter)dao.loadCaseParameter(param, session);
         } catch (Exception e) {
+            e.printStackTrace();
             LOG.error("Could not add new case parameter '" + param.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new case parameter '" + param.getName() + "'");
         } finally {
@@ -830,5 +831,23 @@ public class CaseServiceImpl implements CaseService {
         } finally {
             session.close();
         }
+    }
+
+    public void updateCaseParameter(CaseParameter parameter) throws EmfException {
+        // NOTE Auto-generated method stub
+        throw new EmfException("Under construction...");
+    }
+
+    public void runJobs(CaseJob[] jobs, User user) throws EmfException {
+        try {
+            threadPool.execute(new Runnable() {
+                public void run() {
+                    //
+                }
+            });
+        } catch(Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+        
     }
 }
