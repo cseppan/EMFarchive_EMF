@@ -18,8 +18,8 @@ public class InputsRowSource implements RowSource {
     }
 
     public Object[] values() {
-        return new Object[] { getInputName(input), getSectorName(input), getProgramName(input),
-                getEnvtVarName(input), getDatasetName(input), getVersion(input),getJob(input),
+        return new Object[] { getInputName(input), getEnvtVarName(input), getSectorName(input), 
+                getJob(input), getProgramName(input), getDatasetName(input), getVersion(input),
                 getQAStatus(input), getDSType(input), isRequired(input), isShow(input), 
                 getSubDir(input) };
     }

@@ -28,7 +28,7 @@ public class InputsTableData extends ChangeableTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Input", "Sector", "Program", "Envt. Var", "Dataset", "Version", "Job", "QA Status", "DS Type",
+        return new String[] { "Input", "Envt. Var.", "Sector", "Job", "Program", "Dataset", "Version", "QA Status", "DS Type",
                 "Reqd?", "Show?", "Sub Dir" };
     }
 

@@ -24,6 +24,7 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -153,12 +154,15 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
 
     private JPanel controlPanel(final EditOutputsTabPresenter presenter) {
         JPanel container = new JPanel();
+        Insets insets = new Insets(1, 2, 1, 2);
 
         Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 //
             }
         });
+        add.setMargin(insets);
+        add.setEnabled(false);
         container.add(add);
 
         Button remove = new RemoveButton(new AbstractAction() {
@@ -166,6 +170,8 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
                 //
             }
         });
+        remove.setMargin(insets);
+        remove.setEnabled(false);
         container.add(remove);
 
         Button defaultButton = new Button("Defaults", new AbstractAction() {
@@ -173,6 +179,8 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
                 //
             }
         });
+        defaultButton.setMargin(insets);
+        defaultButton.setEnabled(false);
         container.add(defaultButton);
 
         Button edit = new EditButton(new AbstractAction() {
@@ -180,6 +188,8 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
                 //
             }
         });
+        edit.setMargin(insets);
+        edit.setEnabled(false);
         container.add(edit);
 
         Button view = new ViewButton("View Dataset", new AbstractAction() {
@@ -187,6 +197,8 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
                 //
             }
         });
+        view.setMargin(insets);
+        view.setEnabled(false);
         container.add(view);
 
         JPanel panel = new JPanel(new BorderLayout());

@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.commons.gui.buttons.RunButton;
@@ -128,7 +129,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
     }
 
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Name", "Sector", "Executable" };
+        String[] columnNames = { "Sector", "Name", "Executable" };
         return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
     }
 
@@ -170,8 +171,16 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
             }
         });
         edit.setMargin(insets);
-        edit.setEnabled(false);
         container.add(edit);
+
+        Button copy = new CopyButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                //
+            }
+        });
+        copy.setMargin(insets);
+        copy.setEnabled(false);
+        container.add(copy);
 
         Button run = new RunButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {

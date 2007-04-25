@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTab;
 import gov.epa.emissions.framework.client.casemanagement.jobs.EditJobsTab;
 import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTab;
+import gov.epa.emissions.framework.client.casemanagement.parameters.EditParametersTab;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -52,9 +53,9 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         final JTabbedPane tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Summary", createSummaryTab(caseObj, messagePanel));
-        tabbedPane.addTab("Parameters", createParameterTab(caseObj));
-        tabbedPane.addTab("Inputs", createInputTab());
         tabbedPane.addTab("Jobs", createJobsTab());
+        tabbedPane.addTab("Inputs", createInputTab());
+        tabbedPane.addTab("Parameters", createParameterTab(messagePanel));
         tabbedPane.addTab("Outputs", createOutputTab());
         tabbedPane.addTab("History", new JPanel());
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -92,8 +93,8 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         }
     }
 
-    private Component createParameterTab(Case caseObj) {
-        EditableCaseParameterTab view = new EditableCaseParameterTab(caseObj, this);
+    private Component createParameterTab(MessagePanel messagePanel) {
+        EditParametersTab view = new EditParametersTab(parentConsole, messagePanel, desktopManager);
         presenter.set(view);
         return view;
     }
@@ -104,8 +105,8 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
             presenter.set(view);
             return view;
         } catch (EmfException e) {
-            showError("Could not load Input Tab." + e.getMessage());
-            return createErrorTab("Could not load Input Tab." + e.getMessage());
+            showError("Could not load Parameter Tab." + e.getMessage());
+            return createErrorTab("Could not load Parameter Tab." + e.getMessage());
         }
     }
 

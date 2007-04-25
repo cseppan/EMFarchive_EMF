@@ -14,8 +14,8 @@ public class CaseJobsRowSource implements RowSource {
 
     public Object[] values() {
         return new Object[] { getJobName(job), getJobNum(job), 
-                getSectorName(job), getExecutableName(job),
-                getVersion(job), getArgs(job), getOrder(job),
+                getSectorName(job), getExecutableName(job), getArgs(job), 
+                getVersion(job), getOrder(job),
                 getRunStatus(job), getPath(job), getQOpt(job),
                 getIDInQ(job), getStartDate(job), getCompleteDate(job),
                 getUser(job), getRunLog(job), getHost(job), getPurpose(job) };

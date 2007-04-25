@@ -12,6 +12,9 @@ import gov.epa.emissions.framework.client.casemanagement.jobs.EditJobsTabView;
 import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTabPresenter;
 import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTabPresenterImpl;
 import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTabView;
+import gov.epa.emissions.framework.client.casemanagement.parameters.EditCaseParametersTabView;
+import gov.epa.emissions.framework.client.casemanagement.parameters.EditParametersTabPresenter;
+import gov.epa.emissions.framework.client.casemanagement.parameters.EditParametersTabPresenterImpl;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
@@ -35,16 +38,18 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     private EditInputsTabPresenter inputPresenter;
 
     private EditJobsTabPresenter jobsPresenter;
+
+    private EditParametersTabPresenter parametersPresenter;
     
     private EditOutputsTabPresenter outputPresenter;
-    
-    private EditableCaseParameterTabPresenter parameterPresenter;
     
     private EditableCaseSummaryTabPresenter summaryPresenter;
     
     private boolean inputsLoaded = false;
 
     private boolean jobsLoaded = false;
+
+    private boolean parameterLoaded = false;
     
     public CaseEditorPresenterImpl(Case caseObj, EmfSession session, CaseEditorView view,
             CaseManagerPresenter managerPresenter) {
@@ -155,11 +160,9 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         }
     }
 
-    public void set(EditableCaseParameterTab parameterview) {
-        parameterPresenter = new EditableCaseParameterTabPresenterImpl(caseObj,
-                parameterview);
-        parameterPresenter.display();
-        presenters.add(parameterPresenter);
+    public void set(EditCaseParametersTabView parameterview) {
+        parametersPresenter = new EditParametersTabPresenterImpl(session, parameterview, caseObj);
+        presenters.add(parametersPresenter);
     }
 
     public void doLoad(String tabTitle) throws EmfException {
@@ -172,5 +175,11 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
             jobsPresenter.display();
             jobsLoaded = true;
         }
+
+        if (!parameterLoaded && tabTitle.equalsIgnoreCase("Parameters")) {
+            parametersPresenter.display();
+            parameterLoaded = true;
+        }
     }
+
 }
