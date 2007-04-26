@@ -53,7 +53,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
 
     private TextField envValue;
 
-    private TextField purpose;
+    private TextArea purpose;
 
     private TextField order;
 
@@ -106,11 +106,12 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         jobs.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Job:", jobs, panel);
         
-        purpose = new TextField("purpose", param.getPurpose(), 20);
-        purpose.setPreferredSize(preferredSize);
+        purpose = new TextArea("purpose", param.getPurpose());
         changeablesList.addChangeable(purpose);
-        layoutGenerator.addLabelWidgetPair("Purpose:", purpose, panel);
-        
+        ScrollableComponent scrolpane = new ScrollableComponent(purpose);
+        scrolpane.setPreferredSize(new Dimension(220, 80));
+        layoutGenerator.addLabelWidgetPair("Purpose:", scrolpane, panel);
+       
         order = new TextField("order", param.getOrder()+"", 20);
         order.setPreferredSize(preferredSize);
         changeablesList.addChangeable(order);
@@ -122,13 +123,14 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
 
         show = new CheckBox("");
         changeablesList.addChangeable(show);
+        show.setEnabled(true);
         layoutGenerator.addLabelWidgetPair("Show?", show, panel);
         
-        notes = new TextArea("notes", param.getPurpose());
+        notes = new TextArea("notes", param.getNotes());
         changeablesList.addChangeable(notes);
-        ScrollableComponent scrolpane = new ScrollableComponent(notes);
-        scrolpane.setPreferredSize(new Dimension(230, 120));
-        layoutGenerator.addLabelWidgetPair("Notes:", scrolpane, panel);
+        ScrollableComponent notes_scrollpane = new ScrollableComponent(notes);
+        notes_scrollpane.setPreferredSize(new Dimension(220, 80));
+        layoutGenerator.addLabelWidgetPair("Notes:", notes_scrollpane, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 12, 2, // rows, cols
