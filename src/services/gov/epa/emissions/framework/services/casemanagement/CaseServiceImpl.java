@@ -669,8 +669,23 @@ public class CaseServiceImpl implements CaseService {
     }
 
     public void updateCaseJob(CaseJob job) throws EmfException {
-        // NOTE Auto-generated method stub
-        throw new EmfException("under construction...");
+        Session session = sessionFactory.getSession();
+
+        try {
+            CaseJob loaded = (CaseJob) dao.load(CaseJob.class, job.getName(), session);
+
+            if (loaded != null && loaded.getId() != job.getId())
+                throw new EmfException("Case job uniqueness check failed (" + loaded.getId() + "," + job.getId()
+                        + ")");
+
+            session.clear();
+            dao.updateCaseJob(job, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not update case job: " + job.getName() + ".\n" + e);
+            throw new EmfException("Could not update case job: " + job.getName() + ".");
+        } finally {
+            session.close();
+        }
     }
 
     public Host[] getHosts() throws EmfException {
@@ -833,8 +848,23 @@ public class CaseServiceImpl implements CaseService {
     }
 
     public void updateCaseParameter(CaseParameter parameter) throws EmfException {
-        // NOTE Auto-generated method stub
-        throw new EmfException("Under construction...");
+        Session session = sessionFactory.getSession();
+
+        try {
+            CaseParameter loaded = (CaseParameter) dao.loadCaseParameter(parameter, session);
+
+            if (loaded != null && loaded.getId() != parameter.getId())
+                throw new EmfException("Case parameter uniqueness check failed (" + loaded.getId() + "," + parameter.getId()
+                        + ")");
+
+            session.clear();
+            dao.updateCaseParameter(parameter, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not update case parameter: " + parameter.getName() + ".\n" + e);
+            throw new EmfException("Could not update case parameter: " + parameter.getName() + ".");
+        } finally {
+            session.close();
+        }
     }
 
     public void runJobs(CaseJob[] jobs, User user) throws EmfException {

@@ -410,8 +410,13 @@ public class CaseServiceTransport implements CaseService {
     }
 
     public void updateCaseJob(CaseJob job) throws EmfException {
-        // NOTE Auto-generated method stub
-        throw new EmfException("under construction...");
+        EmfCall call = call();
+
+        call.setOperation("updateCaseJob");
+        call.addParam("job", caseMappings.casejob());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { job });
     }
 
     public Host[] getHosts() throws EmfException {
@@ -521,8 +526,13 @@ public class CaseServiceTransport implements CaseService {
     }
 
     public void updateCaseParameter(CaseParameter parameter) throws EmfException {
-        throw new EmfException("Under construction...");
-        
+        EmfCall call = call();
+
+        call.setOperation("updateCaseParameter");
+        call.addParam("parameter", caseMappings.caseParameter());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { parameter });
     }
 
     public void runJobs(CaseJob[] jobs, User user) throws EmfException {

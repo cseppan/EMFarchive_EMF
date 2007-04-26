@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client.casemanagement.parameters;
 
-import java.awt.Dimension;
-
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ComboBox;
@@ -21,7 +19,10 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterN
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
+import java.awt.Dimension;
+
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
@@ -109,7 +110,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         purpose = new TextArea("purpose", param.getPurpose());
         changeablesList.addChangeable(purpose);
         ScrollableComponent scrolpane = new ScrollableComponent(purpose);
-        scrolpane.setPreferredSize(new Dimension(220, 80));
+        scrolpane.setPreferredSize(new Dimension(224, 80));
         layoutGenerator.addLabelWidgetPair("Purpose:", scrolpane, panel);
        
         order = new TextField("order", param.getOrder()+"", 20);
@@ -117,23 +118,32 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         changeablesList.addChangeable(order);
         layoutGenerator.addLabelWidgetPair("Order:", order, panel);
         
-        required = new CheckBox("");
-        changeablesList.addChangeable(required);
-        layoutGenerator.addLabelWidgetPair("Required?", required, panel);
-
         show = new CheckBox("");
         changeablesList.addChangeable(show);
-        show.setEnabled(true);
-        layoutGenerator.addLabelWidgetPair("Show?", show, panel);
         
+        required = new CheckBox("");
+        changeablesList.addChangeable(required);
+        
+        JPanel checkBoxPanel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layout = new SpringLayoutGenerator();
+        JPanel showPanel = new JPanel();
+        showPanel.add(new JLabel(EmptyStrings.create(20)));
+        showPanel.add(new JLabel("Show?"));
+        showPanel.add(new JLabel(EmptyStrings.create(20)));
+        showPanel.add(show);
+        layout.addWidgetPair(required, showPanel, checkBoxPanel);
+        layout.makeCompactGrid(checkBoxPanel, 1, 2, 0, 0, 0, 0);
+        layoutGenerator.addLabelWidgetPair("Required?", checkBoxPanel, panel);
+        
+        notes = new TextArea("notes", param.getPurpose());
         notes = new TextArea("notes", param.getNotes());
         changeablesList.addChangeable(notes);
         ScrollableComponent notes_scrollpane = new ScrollableComponent(notes);
-        notes_scrollpane.setPreferredSize(new Dimension(220, 80));
+        notes_scrollpane.setPreferredSize(new Dimension(224, 80));
         layoutGenerator.addLabelWidgetPair("Notes:", notes_scrollpane, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 12, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 11, 2, // rows, cols
                 10, 10, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -212,7 +222,6 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
             return;
         }
 
-        System.out.println("selected var:" + selected);
         parameter.setEnvVar(presenter.getParameterEnvtVar(selected));
     }
 

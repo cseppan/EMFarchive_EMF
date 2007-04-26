@@ -246,6 +246,10 @@ public class CaseDAO {
         Criterion crit = Restrictions.eq("id", new Integer(jobId));
         return (CaseJob)hibernateFacade.load(CaseJob.class, crit, session);
     }
+    
+    public void updateCaseJob(CaseJob job, Session session) {
+        hibernateFacade.updateOnly(job, session);
+    }
 
     public List<JobRunStatus> getJobRunStatuses(Session session) {
         return hibernateFacade.getAll(JobRunStatus.class, Order.asc("name"), session);
@@ -327,5 +331,9 @@ public class CaseDAO {
         Criterion[] criterions = uniqueCaseParameterCriteria(param);
         
         return hibernateFacade.exists(CaseParameter.class, criterions, session);
+    }
+    
+    public void updateCaseParameter(CaseParameter parameter, Session session) {
+        hibernateFacade.updateOnly(parameter, session);
     }
 }

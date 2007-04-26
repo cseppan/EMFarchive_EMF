@@ -34,6 +34,7 @@ public class NewCaseParameterDialog extends Dialog implements NewCaseParameterVi
     public NewCaseParameterDialog(EmfConsole parent) {
         super("Add parameter to case ", parent);
         super.setSize(new Dimension(450, 550));
+        super.setSize(new Dimension(450, 550));
         super.center();
         this.newParameter = new CaseParameter();
         newParameter.setShow(true);
