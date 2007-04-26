@@ -30,7 +30,7 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
     private InputFieldsPanel inputFieldsPanel;
     
     public NewInputDialog(EmfConsole parent) {
-        super("Create new Input", parent);
+        super("Add input to case", parent);
         super.setSize(new Dimension(550, 520));
         super.center();
     }
