@@ -32,7 +32,7 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
     private ParameterFieldsPanel inputFieldsPanel;
     
     public EditCaseParameterWindow(String title, DesktopManager desktopManager) {
-        super("Edit Case Input", new Dimension(550, 520), desktopManager);
+        super("Edit Parameter", new Dimension(450, 550), desktopManager);
         super.setLabel(super.getTitle() + ": " + title);
     }
 
