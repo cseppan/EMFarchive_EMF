@@ -33,9 +33,6 @@ public class ParametersTableData extends ChangeableTableData {
     }
 
     public Class getColumnClass(int col) {
-        if (col == 7 || col == 8)
-            return Boolean.class;
-        
         if (col == 9)
             return Float.class;
         

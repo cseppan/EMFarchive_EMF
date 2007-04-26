@@ -36,5 +36,15 @@ public class ParameterEnvVar implements Serializable {
         return name;
     }
     
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof ParameterEnvVar))
+            return false;
+
+        return (id == ((ParameterEnvVar)other).id) || ((ParameterEnvVar) other).name.equals(this.name);
+    }
+
+    public int hashCode() {
+        return name.hashCode();
+    }
 
 }

@@ -185,5 +185,9 @@ public class CaseParameter implements Serializable, Comparable {
     public void setShow(boolean show) {
         this.show = show;
     }
+    
+    public String toString() {
+        return getName();
+    }
 
 }

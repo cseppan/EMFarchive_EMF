@@ -21,9 +21,11 @@ import javax.swing.JPanel;
 
 public class NewCaseParameterDialog extends Dialog implements NewCaseParameterView, ManageChangeables {
 
-    protected boolean shouldCreate;
+    private boolean shouldCreate;
+    
+    private CaseParameter newParameter;
 
-    protected EditParametersTabPresenterImpl presenter;
+    private EditParametersTabPresenterImpl presenter;
 
     private MessagePanel messagePanel;
 
@@ -31,15 +33,12 @@ public class NewCaseParameterDialog extends Dialog implements NewCaseParameterVi
     
     public NewCaseParameterDialog(EmfConsole parent) {
         super("Create new parameter", parent);
-        super.setSize(new Dimension(550, 520));
+        super.setSize(new Dimension(480, 520));
         super.center();
+        this.newParameter = new CaseParameter();
     }
 
     public void display(int caseId) {
-        doDisplay();
-    }
-
-    private void doDisplay() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -59,7 +58,7 @@ public class NewCaseParameterDialog extends Dialog implements NewCaseParameterVi
         this.parameterFieldsPanel = new ParameterFieldsPanel(messagePanel, this);
 
         try {
-            presenter.doAddParameterFields(panel, parameterFieldsPanel);
+            presenter.addParameterFields(newParameter, panel, parameterFieldsPanel);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

@@ -55,12 +55,7 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
         editInputPresenter.display(param);
     }
 
-    public void doAddParameterFields(JComponent container, ParameterFieldsPanelView parameterFields) throws EmfException {
-        CaseParameter newParameter = new CaseParameter();
-        //newParameter.setId(view.numberOfRecord());
-        newParameter.setRequired(true);
-        newParameter.setShow(true);
-
+    public void addParameterFields(CaseParameter newParameter, JComponent container, ParameterFieldsPanelView parameterFields) throws EmfException {
         ParameterFieldsPanelPresenter parameterFieldsPresenter = new ParameterFieldsPanelPresenter(caseObj.getId(), parameterFields, session);
         parameterFieldsPresenter.display(newParameter, container);
     }

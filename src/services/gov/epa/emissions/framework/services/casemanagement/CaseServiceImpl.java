@@ -802,7 +802,7 @@ public class CaseServiceImpl implements CaseService {
 
     public CaseParameter addCaseParameter(CaseParameter param) throws EmfException {
         Session session = sessionFactory.getSession();
-
+        
         if (dao.caseParameterExists(param, session))
             throw new EmfException("The combination of 'Parameter Name', 'Sector', 'Program', and 'Job' should be unique.");
 
@@ -810,7 +810,6 @@ public class CaseServiceImpl implements CaseService {
             dao.addParameter(param, session);
             return (CaseParameter)dao.loadCaseParameter(param, session);
         } catch (Exception e) {
-            e.printStackTrace();
             LOG.error("Could not add new case parameter '" + param.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new case parameter '" + param.getName() + "'");
         } finally {

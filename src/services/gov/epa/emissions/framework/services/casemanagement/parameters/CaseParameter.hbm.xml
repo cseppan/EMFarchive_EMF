@@ -3,7 +3,7 @@
         "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
-<hibernate-mapping default-lazy="false"> 
+<hibernate-mapping default-lazy="false">
   <class name="gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter" table="cases_parameters" schema="cases"> 
  	            <id name="id" type="integer" column="id">
 	                <generator class="identity"/>
@@ -11,12 +11,12 @@
 
     			<property name="caseID" column="case_id" type="integer" not-null="true"/>
     			<property name="jobId" column="case_job_id" type="integer" not-null="false"/>
-    			<property name="value"	column="value"	type="java.lang.String"	not-null="false"/>
+    			<property name="value"	column="env_value"	type="java.lang.String"	not-null="false"/>
       			<property name="notes"	column="notes"	type="java.lang.String"	not-null="false"/>
       			<property name="purpose"	column="purpose"	type="java.lang.String"	not-null="false"/>
 				<property name="required"	column="required"	type="boolean"	not-null="false"/>
-				<property name="show"	column="show"	type="boolean"	not-null="false"/>
-				<property name="order" column="exec_order" type="integer" not-null="false"/>
+				<property name="show"	column="is_show"	type="boolean"	not-null="false"/>
+				<property name="order" column="exec_order" type="float" not-null="false"/>
   
     			<many-to-one 
    					name="parameterName"

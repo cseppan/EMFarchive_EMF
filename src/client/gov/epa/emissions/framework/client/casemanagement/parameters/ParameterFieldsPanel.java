@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import javax.swing.JComponent;
@@ -126,7 +127,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         notes = new TextArea("notes", param.getPurpose());
         changeablesList.addChangeable(notes);
         ScrollableComponent scrolpane = new ScrollableComponent(notes);
-        scrolpane.setPreferredSize(new Dimension(240, 120));
+        scrolpane.setPreferredSize(new Dimension(230, 120));
         layoutGenerator.addLabelWidgetPair("Notes:", scrolpane, panel);
 
         // Lay out the panel.
@@ -163,6 +164,11 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         parameter.setRequired(required.isSelected());
         parameter.setShow(show.isSelected());
         updateJob();
+        parameter.setType((ValueType)varTypes.getSelectedItem());
+        parameter.setValue(envValue.getText() == null ? "" : envValue.getText().trim());
+        parameter.setPurpose(purpose.getText());
+        parameter.setNotes(notes.getText());
+        parameter.setOrder(Float.parseFloat(order.getText()));
         
         return parameter;
     }
@@ -204,6 +210,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
             return;
         }
 
+        System.out.println("selected var:" + selected);
         parameter.setEnvVar(presenter.getParameterEnvtVar(selected));
     }
 
@@ -229,8 +236,12 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
 
         if (selectedProg == null || selectedProg.toString().trim().equals(""))
             throw new EmfException("Please specify a program.");
-
-        setFields();
+        
+        try {
+            Float.parseFloat(order.getText());
+        } catch (NumberFormatException e) {
+            throw new EmfException("Please put a float number in Order field.");
+        }
     }
 
     public CaseParameter getParameter() {
