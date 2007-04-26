@@ -39,7 +39,7 @@ public class ParameterFieldsPanelPresenter {
 
     private int caseId;
     
-    public static final String ALL_FOR_SECTOR = "All for sector";
+    public static final String ALL_FOR_SECTOR = "All jobs for sector";
 
     public ParameterFieldsPanelPresenter(int caseId, ParameterFieldsPanelView inputFields, EmfSession session) throws EmfException {
         this.session = session;
