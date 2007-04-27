@@ -22,6 +22,7 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -330,8 +331,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         
         this.userLabel.setText(user == null ? "" : user.getName());
         this.queID.setText(job.getIdInQueue() + "");
-        this.start.setText(startDate == null ? "" : startDate.toString());
-        this.complete.setText(completeDate == null ? "" : completeDate.toString());
+        this.start.setText(startDate == null ? "" : EmfDateFormat.format_YYYY_MM_DD_HH_MM(startDate));
+        this.complete.setText(completeDate == null ? "" : EmfDateFormat.format_YYYY_MM_DD_HH_MM(completeDate));
         this.runNote.setText(job.getRunNotes());
         this.runLog.setText(job.getRunLog());
     }

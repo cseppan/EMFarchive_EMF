@@ -1,10 +1,15 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 
 import javax.swing.JComponent;
 
@@ -73,6 +78,15 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     }
 
     public void runJobs(CaseJob[] jobs) throws EmfException {
+        List<JobRunStatus> statuses = Arrays.asList(service().getJobRunStatuses());
+        int runningIndex = statuses.indexOf(new JobRunStatus("Submitted"));
+        
+        for (CaseJob job : jobs) {
+            job.setRunStartDate(new Date());
+            job.setRunstatus(statuses.get(runningIndex));
+            service().updateCaseJob(job);
+        }
+            
         service().runJobs(jobs, session.user());
     }
 
