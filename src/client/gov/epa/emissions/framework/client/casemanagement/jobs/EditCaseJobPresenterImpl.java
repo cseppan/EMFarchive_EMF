@@ -41,8 +41,8 @@ public class EditCaseJobPresenterImpl implements EditJobPresenter {
         jobFieldsPresenter.display(job, container);
     }
     
-    public void doSave() throws EmfException {
-        jobFieldsPresenter.doSave(job);
+    public void saveJob() throws EmfException {
+        jobFieldsPresenter.doSave();
         parentView.refresh();
     }
 

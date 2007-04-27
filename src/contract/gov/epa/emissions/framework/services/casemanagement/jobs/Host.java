@@ -46,4 +46,15 @@ public class Host implements Serializable {
         return this.name;
     }
     
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof Host))
+            return false;
+
+        return ((Host) other).name.equals(this.name) || ((Host)other).id == id;
+    }
+
+    public int hashCode() {
+        return name.hashCode();
+    }
+    
 }

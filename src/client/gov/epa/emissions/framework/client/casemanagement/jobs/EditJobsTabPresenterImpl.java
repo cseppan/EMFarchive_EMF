@@ -54,8 +54,9 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         service().removeCaseJobs(jobs);
     }
 
-    public void doEditJob(CaseJob job, EditCaseJobView jobEditor) throws EmfException {
-        throw new EmfException("Under construction...");
+    public void editJob(CaseJob job, EditCaseJobView jobEditor) throws EmfException {
+        EditJobPresenter presenter = new EditCaseJobPresenterImpl(jobEditor, view, this, session);
+        presenter.display(job);
     }
 
     public CaseJob[] getCaseJobs() throws EmfException {

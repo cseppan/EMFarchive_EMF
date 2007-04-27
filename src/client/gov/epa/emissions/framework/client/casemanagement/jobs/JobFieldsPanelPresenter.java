@@ -93,10 +93,8 @@ public class JobFieldsPanelPresenter {
         return session.caseService();
     }
 
-    public void doSave(CaseJob job) throws EmfException {
-        view.validateFields();
-        view.setFields();
-        // caseService().updateCaseJob(view.setFields());
+    public void doSave() throws EmfException {
+        caseService().updateCaseJob(view.setFields());
     }
 
     public boolean checkDuplication(CaseJob job) throws EmfException {

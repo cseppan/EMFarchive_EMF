@@ -4,7 +4,9 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -14,6 +16,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
@@ -28,12 +31,18 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
     private MessagePanel messagePanel;
 
     private Button ok;
+    
+    private EmfConsole parent;
+    
+    private EmfSession session;
 
     private JobFieldsPanel jobFieldsPanel;
     
-    public EditCaseJobWindow(String title, DesktopManager desktopManager) {
-        super("Edit Case Job", new Dimension(550, 520), desktopManager);
+    public EditCaseJobWindow(String title, DesktopManager desktopManager, EmfConsole parent, EmfSession session) {
+        super("Edit Case Job", new Dimension(550, 560), desktopManager);
         super.setLabel(super.getTitle() + ": " + title);
+        this.parent = parent;
+        this.session = session;
     }
 
     public void display(CaseJob job) throws EmfException {
@@ -50,7 +59,7 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.jobFieldsPanel = new JobFieldsPanel(true, messagePanel, this, null, null);
+        this.jobFieldsPanel = new JobFieldsPanel(true, messagePanel, this, parent, session);
         presenter.doAddJobFields(panel, jobFieldsPanel);
         panel.add(buttonsPanel());
 
@@ -75,31 +84,36 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
         });
         panel.add(cancel);
 
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 0, 10, 0));
+        
         return panel;
     }
 
     private void doSave() {
         clearMessage();
         try {
-            doValidateFields();
-            //doCheckDuplicate();
-            presenter.doSave();
+            validateFields();
+            presenter.saveJob();
             disposeView();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
     }
     
-    private void doValidateFields() {
+    private void validateFields() {
         try {
             jobFieldsPanel.validateFields();
         } catch (EmfException e) {
-            e.printStackTrace();
+            setError(e.getMessage());
         }
     }
     
     private void clearMessage() {
         messagePanel.clear();
+    }
+
+    private void setError(String msg) {
+        messagePanel.setError(msg);
     }
 
     public void windowClosing() {

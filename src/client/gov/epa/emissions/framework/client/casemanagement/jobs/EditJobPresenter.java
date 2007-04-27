@@ -7,5 +7,5 @@ public interface EditJobPresenter {
     
     void display(CaseJob job) throws EmfException;
     
-    void doSave() throws EmfException;
+    void saveJob() throws EmfException;
 }

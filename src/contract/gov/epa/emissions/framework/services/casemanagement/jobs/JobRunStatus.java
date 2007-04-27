@@ -46,4 +46,14 @@ public class JobRunStatus implements Serializable {
         return this.name;
     }
     
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof JobRunStatus))
+            return false;
+
+        return ((JobRunStatus) other).name.equals(this.name) || ((JobRunStatus)other).id == id;
+    }
+
+    public int hashCode() {
+        return name.hashCode();
+    }
 }

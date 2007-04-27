@@ -18,6 +18,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
@@ -39,7 +40,7 @@ public class NewJobDialog extends Dialog implements NewJobView, ManageChangeable
     
     public NewJobDialog(EmfConsole parent, Case caseObj, EmfSession session) {
         super("Add a Job to " + caseObj.getName(), parent);
-        super.setSize(new Dimension(550, 400));
+        super.setSize(new Dimension(544, 420));
         super.center();
         this.parent = parent;
         this.session = session;
@@ -96,6 +97,8 @@ public class NewJobDialog extends Dialog implements NewJobView, ManageChangeable
             }
         });
         panel.add(cancel);
+        
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 0, 10, 0));
 
         return panel;
     }
