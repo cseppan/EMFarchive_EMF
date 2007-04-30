@@ -21,7 +21,7 @@ public class ViewQATabPresenterImpl implements ViewQATabPresenter {
 
     public void display() throws EmfException {
         view.observe(this);
-        view.display(session.qaService().getQASteps(dataset));
+        view.display(session.qaService().getQASteps(dataset), session);
     }
 
     public void doView(QAStep step, QAStepView view) throws EmfException {

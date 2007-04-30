@@ -13,16 +13,20 @@ import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.QAPrograms;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileInfo;
+import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
-import gov.epa.emissions.framework.ui.FileChooser;
+import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.NumberFormattedTextField;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -34,7 +38,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -85,8 +88,14 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
 
     private QAStepResult qaStepResult;
 
-    public ViewQAStepWindow(DesktopManager desktopManager) {
+    private EmfConsole parentConsole;
+
+    private EmfSession session;
+
+    public ViewQAStepWindow(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
         super("View QA Step", new Dimension(650, 625), desktopManager);
+        this.parentConsole = parentConsole;
+        this.session = session;
     }
 
     public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset, User user,
@@ -226,20 +235,36 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         return folderPanel;
     }
 
+//    private void selectFolder() {
+//        FileChooser chooser = new FileChooser("Select Folder", new File(exportFolder.getText()), this);
+//
+//        chooser.setTitle("Select a folder");
+//        File[] file = chooser.choose();
+//        if (file == null || file.length == 0)
+//            return;
+//
+//        if (file[0].isDirectory()) {
+//            exportFolder.setText(file[0].getAbsolutePath());
+//        }
+//
+//        if (file[0].isFile()) {
+//            exportFolder.setText(file[0].getParent());
+//        }
+//    }
+    
     private void selectFolder() {
-        FileChooser chooser = new FileChooser("Select Folder", new File(exportFolder.getText()), this);
+        EmfFileInfo initDir = new EmfFileInfo(exportFolder.getText(), true, true);
+        
+        EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
+        chooser.setTitle("Select a folder to contain the exported QA step results");
+        int option = chooser.showDialog(parentConsole, "Select a folder");
 
-        chooser.setTitle("Select a folder");
-        File[] file = chooser.choose();
-        if (file == null || file.length == 0)
+        EmfFileInfo file = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;
+        if (file == null)
             return;
 
-        if (file[0].isDirectory()) {
-            exportFolder.setText(file[0].getAbsolutePath());
-        }
-
-        if (file[0].isFile()) {
-            exportFolder.setText(file[0].getParent());
+        if (file.isDirectory()) {
+            exportFolder.setText(file.getAbsolutePath());
         }
     }
 

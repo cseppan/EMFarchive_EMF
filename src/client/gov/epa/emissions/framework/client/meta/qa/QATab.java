@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -32,6 +33,8 @@ public class QATab extends JPanel implements QATabView {
 
     private MessagePanel messagePanel;
 
+    private EmfSession session;
+
     public QATab(MessagePanel messagePanel, EmfConsole parentConsole, DesktopManager desktopManager) {
         super.setName("aqsteps");
         this.messagePanel = messagePanel;
@@ -39,6 +42,13 @@ public class QATab extends JPanel implements QATabView {
         this.desktopManager = desktopManager;
     }
 
+    public void display(QAStep[] steps, EmfSession session) {
+        this.session = session;
+        super.setLayout(new BorderLayout());
+        super.add(tablePanel(steps), BorderLayout.CENTER);
+        super.add(createButtonsSection(), BorderLayout.PAGE_END);
+    }
+    
     public void display(QAStep[] steps) {
         super.setLayout(new BorderLayout());
         super.add(tablePanel(steps), BorderLayout.CENTER);
@@ -86,7 +96,7 @@ public class QATab extends JPanel implements QATabView {
         List steps = selectModel.selected();
         for (Iterator iter = steps.iterator(); iter.hasNext();) {
             QAStep step = (QAStep) iter.next();
-            ViewQAStepWindow view = new ViewQAStepWindow(desktopManager);
+            ViewQAStepWindow view = new ViewQAStepWindow(parentConsole, session, desktopManager);
             try {
                 presenter.doView(step, view);
             } catch (EmfException e) {
