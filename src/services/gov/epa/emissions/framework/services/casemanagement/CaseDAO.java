@@ -336,4 +336,20 @@ public class CaseDAO {
     public void updateCaseParameter(CaseParameter parameter, Session session) {
         hibernateFacade.updateOnly(parameter, session);
     }
+
+    public Object loadCaseJob(CaseJob job, Session session) {
+        Criterion c1 = Restrictions.eq("caseId", new Integer(job.getCaseId()));
+        Criterion c2 = Restrictions.eq("name", job.getName());
+        Criterion[] criterions = {c1, c2};
+        
+        return hibernateFacade.load(CaseJob.class, criterions, session);
+    }
+    
+    public void removeCaseJobs(CaseJob[] jobs, Session session) {
+        hibernateFacade.remove(jobs, session);
+    }
+
+    public void removeCaseParameters(CaseParameter[] params, Session session) {
+        hibernateFacade.remove(params, session);
+    }
 }

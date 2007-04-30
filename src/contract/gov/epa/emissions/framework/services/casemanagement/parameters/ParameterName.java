@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.services.casemanagement.parameters;
 
+import java.io.Serializable;
 
-public class ParameterName {
+
+public class ParameterName implements Serializable {
 
     private int id;
     

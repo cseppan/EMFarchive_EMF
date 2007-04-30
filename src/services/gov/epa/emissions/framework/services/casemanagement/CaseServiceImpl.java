@@ -216,16 +216,23 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
-    public void removeCase(Case element) throws EmfException {
+    public void removeCase(Case caseObj) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            List inputs = dao.getCaseInputs(element.getId(), session);
-            dao.removeCaseInputs((CaseInput[]) inputs.toArray(new CaseInput[0]), session);
-            dao.remove(element, session);
+            List<CaseInput> inputs = dao.getCaseInputs(caseObj.getId(), session);
+            dao.removeCaseInputs(inputs.toArray(new CaseInput[0]), session);
+            
+            List<CaseJob> jobs = dao.getCaseJobs(caseObj.getId(), session);
+            dao.removeCaseJobs(jobs.toArray(new CaseJob[0]), session);
+            
+            List<CaseParameter> parameters = dao.getCaseParameters(caseObj.getId(), session);
+            dao.removeCaseParameters(parameters.toArray(new CaseParameter[0]), session);
+            
+            dao.remove(caseObj, session);
             session.close();
         } catch (RuntimeException e) {
-            LOG.error("Could not remove Case: " + element, e);
-            throw new EmfException("Could not remove Case: " + element);
+            LOG.error("Could not remove Case: " + caseObj, e);
+            throw new EmfException("Could not remove Case: " + caseObj);
         }
     }
 
@@ -560,6 +567,8 @@ public class CaseServiceImpl implements CaseService {
         copied.setTemplateUsed(toCopy.getName());
         Case loaded = addCopiedCase(copied);
         copyCaseInputs(toCopy.getId(), loaded.getId());
+        copyCaseJobs(toCopy.getId(), loaded.getId());
+        copyCaseParameters(toCopy.getId(), loaded.getId());
 
         return loaded;
     }
@@ -591,12 +600,41 @@ public class CaseServiceImpl implements CaseService {
             session.close();
         }
     }
+    
+    private void copyCaseJobs(int toCopyCaseId, int copiedCaseId) throws Exception {
+        CaseJob[] tocopy = getCaseJobs(toCopyCaseId);
+
+        for (int i = 0; i < tocopy.length; i++)
+            copySingleJob(tocopy[i], copiedCaseId);
+    }
+    
+    private CaseJob copySingleJob(CaseJob job, int copiedCaseId) throws Exception {
+        CaseJob copied = (CaseJob) DeepCopy.copy(job);
+        copied.setCaseId(copiedCaseId);
+
+        return addCaseJob(copied);
+    }
+
+    private void copyCaseParameters(int toCopyCaseId, int copiedCaseId) throws Exception {
+        CaseParameter[] tocopy = getCaseParameters(toCopyCaseId);
+
+        for (int i = 0; i < tocopy.length; i++)
+            copySingleParameter(tocopy[i], copiedCaseId);
+    }
+
+
+    private CaseParameter copySingleParameter(CaseParameter parameter, int copiedCaseId) throws Exception {
+        CaseParameter copied = (CaseParameter) DeepCopy.copy(parameter);
+        copied.setCaseID(copiedCaseId);
+
+        return addCaseParameter(copied);
+    }
 
     public CaseJob addCaseJob(CaseJob job) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(job, session);
-            return (CaseJob) dao.load(CaseJob.class, job.getName(), session);
+            return (CaseJob) dao.loadCaseJob(job, session);
         } catch (Exception e) {
             LOG.error("Could not add new case job '" + job.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new case job '" + job.getName() + "'");
@@ -664,8 +702,16 @@ public class CaseServiceImpl implements CaseService {
     }
 
     public void removeCaseJobs(CaseJob[] jobs) throws EmfException {
-        // NOTE Auto-generated method stub
-        throw new EmfException("under construction...");
+        Session session = sessionFactory.getSession();
+
+        try {
+            dao.removeCaseJobs(jobs, session);
+        } catch (Exception e) {
+            LOG.error("Could not remove case job " + jobs[0].getName() + " etc.\n" + e.getMessage());
+            throw new EmfException("Could not remove case job " + jobs[0].getName() + " etc.");
+        } finally {
+            session.close();
+        }
     }
 
     public void updateCaseJob(CaseJob job) throws EmfException {
@@ -842,6 +888,19 @@ public class CaseServiceImpl implements CaseService {
         } catch (Exception e) {
             LOG.error("Could not get all parameters for case (id=" + caseId + ").\n" + e.getMessage());
             throw new EmfException("Could not get all parameters for case (id=" + caseId + ").\n");
+        } finally {
+            session.close();
+        }
+    }
+    
+    public void removeCaseParameters(CaseParameter[] params) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            dao.removeCaseParameters(params, session);
+        } catch (Exception e) {
+            LOG.error("Could not remove case parameter " + params[0].getName() + " etc.\n" + e.getMessage());
+            throw new EmfException("Could not remove case parameter " + params[0].getName() + " etc.");
         } finally {
             session.close();
         }

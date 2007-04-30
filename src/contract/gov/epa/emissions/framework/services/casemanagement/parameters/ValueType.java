@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.services.casemanagement.parameters;
 
-public class ValueType {
+import java.io.Serializable;
+
+public class ValueType implements Serializable {
 
     private int id;
     
