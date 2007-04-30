@@ -209,7 +209,7 @@ public class CaseDAO {
         
         return hibernateFacade.load(CaseInput.class, criterions, session);
     }
-
+    
     public List getCaseInputs(int caseId, Session session) {
         Criterion crit = Restrictions.eq("caseID", new Integer(caseId));
 
@@ -245,6 +245,13 @@ public class CaseDAO {
     public CaseJob getCaseJob(int jobId, Session session) {
         Criterion crit = Restrictions.eq("id", new Integer(jobId));
         return (CaseJob)hibernateFacade.load(CaseJob.class, crit, session);
+    }
+
+    public CaseJob getCaseJob(int caseId, CaseJob job, Session session) {
+        Criterion crit1 = Restrictions.eq("caseId", new Integer(caseId));
+        Criterion crit2 = Restrictions.eq("name", job.getName());
+        
+        return (CaseJob)hibernateFacade.load(CaseJob.class, new Criterion[]{crit1, crit2}, session);
     }
     
     public void updateCaseJob(CaseJob job, Session session) {

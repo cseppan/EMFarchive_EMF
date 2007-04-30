@@ -92,7 +92,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         varTypes.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Type:", varTypes, panel);
         
-        envValue = new TextField("value", "", 20);
+        envValue = new TextField("value", param.getValue(), 20);
         envValue.setPreferredSize(preferredSize);
         changeablesList.addChangeable(envValue);
         layoutGenerator.addLabelWidgetPair("Value:", envValue, panel);
@@ -135,7 +135,6 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         layout.makeCompactGrid(checkBoxPanel, 1, 2, 0, 0, 0, 0);
         layoutGenerator.addLabelWidgetPair("Required?", checkBoxPanel, panel);
         
-        notes = new TextArea("notes", param.getPurpose());
         notes = new TextArea("notes", param.getNotes());
         changeablesList.addChangeable(notes);
         ScrollableComponent notes_scrollpane = new ScrollableComponent(notes);
@@ -160,10 +159,12 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
             sector.setSelectedItem(sct);
 
         envtVar.setSelectedItem(param.getEnvVar());
+        varTypes.setSelectedItem(param.getType());
         required.setSelected(param.isRequired());
         show.setSelected(param.isShow());
-
+        
         int selected = presenter.getJobIndex(param.getJobId());
+        System.out.println("job id: " + param.getJobId() + " index: " + selected);
         if (selected > 0)
             jobs.setSelectedIndex(selected);
     }

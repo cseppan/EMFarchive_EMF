@@ -566,8 +566,8 @@ public class CaseServiceImpl implements CaseService {
         copied.setName("Copy of " + toCopy.getName() + " " + new Date().getTime());
         copied.setTemplateUsed(toCopy.getName());
         Case loaded = addCopiedCase(copied);
+        copyCaseJobs(toCopy.getId(), loaded.getId()); // copy job first for references in input and parameter
         copyCaseInputs(toCopy.getId(), loaded.getId());
-        copyCaseJobs(toCopy.getId(), loaded.getId());
         copyCaseParameters(toCopy.getId(), loaded.getId());
 
         return loaded;
@@ -583,6 +583,16 @@ public class CaseServiceImpl implements CaseService {
     private CaseInput copySingleInput(CaseInput input, int copiedCaseId) throws Exception {
         CaseInput copied = (CaseInput) DeepCopy.copy(input);
         copied.setCaseID(copiedCaseId);
+
+        Session session = sessionFactory.getSession();
+        try {
+            CaseJob job = dao.getCaseJob(input.getCaseJobID(), session);
+            CaseJob copiedJob = dao.getCaseJob(copiedCaseId, job, session);
+            
+            copied.setCaseJobID(copiedJob.getId());
+        } finally {
+            session.close();
+        }
 
         return addCaseInput(copied);
     }
@@ -626,6 +636,16 @@ public class CaseServiceImpl implements CaseService {
     private CaseParameter copySingleParameter(CaseParameter parameter, int copiedCaseId) throws Exception {
         CaseParameter copied = (CaseParameter) DeepCopy.copy(parameter);
         copied.setCaseID(copiedCaseId);
+        
+        Session session = sessionFactory.getSession();
+        try {
+            CaseJob job = dao.getCaseJob(parameter.getJobId(), session);
+            CaseJob copiedJob = dao.getCaseJob(copiedCaseId, job, session);
+            
+            copied.setJobId(copiedJob.getId());
+        } finally {
+            session.close();
+        }
 
         return addCaseParameter(copied);
     }
