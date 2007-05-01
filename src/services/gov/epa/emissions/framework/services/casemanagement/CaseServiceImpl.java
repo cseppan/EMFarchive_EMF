@@ -221,13 +221,13 @@ public class CaseServiceImpl implements CaseService {
             Session session = sessionFactory.getSession();
             List<CaseInput> inputs = dao.getCaseInputs(caseObj.getId(), session);
             dao.removeCaseInputs(inputs.toArray(new CaseInput[0]), session);
-            
+
             List<CaseJob> jobs = dao.getCaseJobs(caseObj.getId(), session);
             dao.removeCaseJobs(jobs.toArray(new CaseJob[0]), session);
-            
+
             List<CaseParameter> parameters = dao.getCaseParameters(caseObj.getId(), session);
             dao.removeCaseParameters(parameters.toArray(new CaseParameter[0]), session);
-            
+
             dao.remove(caseObj, session);
             session.close();
         } catch (RuntimeException e) {
@@ -570,6 +570,15 @@ public class CaseServiceImpl implements CaseService {
         copyCaseInputs(toCopy.getId(), loaded.getId());
         copyCaseParameters(toCopy.getId(), loaded.getId());
 
+        Session session = sessionFactory.getSession();
+
+        try {
+            if (loaded.isLocked())
+                dao.releaseLocked(loaded, session);
+        } finally {
+            session.close();
+        }
+
         return loaded;
     }
 
@@ -587,9 +596,11 @@ public class CaseServiceImpl implements CaseService {
         Session session = sessionFactory.getSession();
         try {
             CaseJob job = dao.getCaseJob(input.getCaseJobID(), session);
-            CaseJob copiedJob = dao.getCaseJob(copiedCaseId, job, session);
-            
-            copied.setCaseJobID(copiedJob.getId());
+
+            if (job != null) {
+                CaseJob copiedJob = dao.getCaseJob(copiedCaseId, job, session);
+                copied.setCaseJobID(copiedJob.getId());
+            }
         } finally {
             session.close();
         }
@@ -610,14 +621,14 @@ public class CaseServiceImpl implements CaseService {
             session.close();
         }
     }
-    
+
     private void copyCaseJobs(int toCopyCaseId, int copiedCaseId) throws Exception {
         CaseJob[] tocopy = getCaseJobs(toCopyCaseId);
 
         for (int i = 0; i < tocopy.length; i++)
             copySingleJob(tocopy[i], copiedCaseId);
     }
-    
+
     private CaseJob copySingleJob(CaseJob job, int copiedCaseId) throws Exception {
         CaseJob copied = (CaseJob) DeepCopy.copy(job);
         copied.setCaseId(copiedCaseId);
@@ -632,17 +643,18 @@ public class CaseServiceImpl implements CaseService {
             copySingleParameter(tocopy[i], copiedCaseId);
     }
 
-
     private CaseParameter copySingleParameter(CaseParameter parameter, int copiedCaseId) throws Exception {
         CaseParameter copied = (CaseParameter) DeepCopy.copy(parameter);
         copied.setCaseID(copiedCaseId);
-        
+
         Session session = sessionFactory.getSession();
         try {
             CaseJob job = dao.getCaseJob(parameter.getJobId(), session);
-            CaseJob copiedJob = dao.getCaseJob(copiedCaseId, job, session);
-            
-            copied.setJobId(copiedJob.getId());
+
+            if (job != null) {
+                CaseJob copiedJob = dao.getCaseJob(copiedCaseId, job, session);
+                copied.setJobId(copiedJob.getId());
+            }
         } finally {
             session.close();
         }
@@ -723,7 +735,7 @@ public class CaseServiceImpl implements CaseService {
 
     public void removeCaseJobs(CaseJob[] jobs) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         resetRelatedJobsField(jobs);
 
         try {
@@ -738,21 +750,21 @@ public class CaseServiceImpl implements CaseService {
 
     private void resetRelatedJobsField(CaseJob[] jobs) throws EmfException {
         int jobslen = jobs.length;
-        
+
         if (jobslen == 0)
             return;
-        
+
         Session session = sessionFactory.getSession();
-        
+
         try {
             int caseId = jobs[0].getCaseId();
-            CaseInput[] inputs = (CaseInput[])dao.getCaseInputs(caseId, session).toArray(new CaseInput[0]);
+            CaseInput[] inputs = (CaseInput[]) dao.getCaseInputs(caseId, session).toArray(new CaseInput[0]);
             CaseParameter[] params = dao.getCaseParameters(caseId, session).toArray(new CaseParameter[0]);
-            
+
             for (int i = 0; i < jobslen; i++) {
                 for (int j = 0; j < inputs.length; j++)
                     if (inputs[j].getCaseJobID() == jobs[i].getId())
-                            inputs[j].setCaseJobID(0);
+                        inputs[j].setCaseJobID(0);
 
                 for (int k = 0; k < params.length; k++)
                     if (params[k].getJobId() == jobs[i].getId())
@@ -764,7 +776,7 @@ public class CaseServiceImpl implements CaseService {
         } finally {
             session.close();
         }
-        
+
     }
 
     public void updateCaseJob(CaseJob job) throws EmfException {
@@ -774,8 +786,7 @@ public class CaseServiceImpl implements CaseService {
             CaseJob loaded = (CaseJob) dao.load(CaseJob.class, job.getName(), session);
 
             if (loaded != null && loaded.getId() != job.getId())
-                throw new EmfException("Case job uniqueness check failed (" + loaded.getId() + "," + job.getId()
-                        + ")");
+                throw new EmfException("Case job uniqueness check failed (" + loaded.getId() + "," + job.getId() + ")");
 
             session.clear();
             dao.updateCaseJob(job, session);
@@ -820,7 +831,7 @@ public class CaseServiceImpl implements CaseService {
         try {
             if (!dao.exeutableExists(session, exe))
                 dao.add(exe, session);
-            
+
             return (Executable) dao.load(Executable.class, exe.getName(), session);
         } catch (Exception e) {
             LOG.error("Could not add new executable '" + exe.getName() + "'\n" + e.getMessage());
@@ -916,13 +927,14 @@ public class CaseServiceImpl implements CaseService {
 
     public CaseParameter addCaseParameter(CaseParameter param) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         if (dao.caseParameterExists(param, session))
-            throw new EmfException("The combination of 'Parameter Name', 'Sector', 'Program', and 'Job' should be unique.");
+            throw new EmfException(
+                    "The combination of 'Parameter Name', 'Sector', 'Program', and 'Job' should be unique.");
 
         try {
             dao.addParameter(param, session);
-            return (CaseParameter)dao.loadCaseParameter(param, session);
+            return (CaseParameter) dao.loadCaseParameter(param, session);
         } catch (Exception e) {
             LOG.error("Could not add new case parameter '" + param.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new case parameter '" + param.getName() + "'");
@@ -945,7 +957,7 @@ public class CaseServiceImpl implements CaseService {
             session.close();
         }
     }
-    
+
     public void removeCaseParameters(CaseParameter[] params) throws EmfException {
         Session session = sessionFactory.getSession();
 
@@ -966,8 +978,8 @@ public class CaseServiceImpl implements CaseService {
             CaseParameter loaded = (CaseParameter) dao.loadCaseParameter(parameter, session);
 
             if (loaded != null && loaded.getId() != parameter.getId())
-                throw new EmfException("Case parameter uniqueness check failed (" + loaded.getId() + "," + parameter.getId()
-                        + ")");
+                throw new EmfException("Case parameter uniqueness check failed (" + loaded.getId() + ","
+                        + parameter.getId() + ")");
 
             session.clear();
             dao.updateCaseParameter(parameter, session);
@@ -986,9 +998,9 @@ public class CaseServiceImpl implements CaseService {
                     //
                 }
             });
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
-        
+
     }
 }
