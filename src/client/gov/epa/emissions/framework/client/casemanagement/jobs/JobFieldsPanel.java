@@ -339,8 +339,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         
         this.userLabel.setText(user == null ? "" : user.getName());
         this.queID.setText(job.getIdInQueue() + "");
-        this.start.setText(startDate == null ? "" : EmfDateFormat.format_YYYY_MM_DD_HH_MM(startDate));
-        this.complete.setText(completeDate == null ? "" : EmfDateFormat.format_YYYY_MM_DD_HH_MM(completeDate));
+        this.start.setText(startDate == null ? "" : EmfDateFormat.format_MM_DD_YYYY_HH_mm(startDate));
+        this.complete.setText(completeDate == null ? "" : EmfDateFormat.format_MM_DD_YYYY_HH_mm(completeDate));
         this.runNote.setText(job.getRunNotes());
         this.runLog.setText(job.getRunLog());
     }
@@ -361,8 +361,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             job.setRunLog(runLog.getText());
             job.setRunNotes(runNote.getText());
             job.setUser(session.user());
-        }     
-        
+        }
+
         if (presenter.checkDuplication(job))
             showRemind();
 
@@ -429,7 +429,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             throw new EmfException("Please select an executable file.");
 
         if (!absolute.contains("\\") && !absolute.contains("/"))
-            throw new EmfException("Please specify an absolute path for the executable file.");
+            throw new EmfException("Please specify an absolute path for executable file.");
 
         try {
             Float.parseFloat(jobNo.getText().trim());

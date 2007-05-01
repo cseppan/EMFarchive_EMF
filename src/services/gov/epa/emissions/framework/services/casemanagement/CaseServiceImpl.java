@@ -783,7 +783,7 @@ public class CaseServiceImpl implements CaseService {
         Session session = sessionFactory.getSession();
 
         try {
-            CaseJob loaded = (CaseJob) dao.load(CaseJob.class, job.getName(), session);
+            CaseJob loaded = (CaseJob) dao.loadCaseJob(job, session);
 
             if (loaded != null && loaded.getId() != job.getId())
                 throw new EmfException("Case job uniqueness check failed (" + loaded.getId() + "," + job.getId() + ")");

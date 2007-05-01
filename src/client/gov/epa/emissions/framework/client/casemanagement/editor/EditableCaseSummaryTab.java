@@ -505,7 +505,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private String format(Date date) {
-        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(date);
+        return EmfDateFormat.format_MM_DD_YYYY_HH_mm(date);
     }
 
     private JLabel createLeftAlignedLabel(String name) {
