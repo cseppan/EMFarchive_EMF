@@ -22,4 +22,6 @@ public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
     Case getCaseObj();
 
     void runJobs(CaseJob[] jobs) throws EmfException;
+    
+    boolean jobsUsed(CaseJob[] jobs) throws EmfException;
 }

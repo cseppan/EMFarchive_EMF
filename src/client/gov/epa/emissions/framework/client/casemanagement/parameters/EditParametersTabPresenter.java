@@ -18,5 +18,5 @@ public interface EditParametersTabPresenter extends CaseEditorTabPresenter {
 
     CaseParameter[] getCaseParameters(int caseId) throws EmfException;
 
-    void removeParameters(CaseParameter[] params);
+    void removeParameters(CaseParameter[] params) throws EmfException;
 }

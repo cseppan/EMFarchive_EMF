@@ -152,7 +152,11 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         Button remove = new RemoveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMessage();
-                removeParameter(presenter);
+                try {
+                    removeParameter(presenter);
+                } catch (EmfException exc) {
+                    setMessage(exc.getMessage());
+                }
             }
         });
         remove.setMargin(insets);
@@ -164,7 +168,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
                     clearMessage();
                     editParameter(presenter);
                 } catch (EmfException ex) {
-                    messagePanel.setError(ex.getMessage());
+                    setMessage(ex.getMessage());
                 }
             }
         });
@@ -205,7 +209,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         }
     }
 
-    protected void removeParameter(EditParametersTabPresenter presenter) {
+    protected void removeParameter(EditParametersTabPresenter presenter) throws EmfException {
         CaseParameter[] params = (CaseParameter[]) getSelectedParameters().toArray(new CaseParameter[0]);
 
         if (params.length == 0) {
@@ -273,6 +277,10 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
     public void clearMessage() {
         messagePanel.clear();
+    }
+
+    private void setMessage(String msg) {
+        messagePanel.setError(msg);
     }
 
 }

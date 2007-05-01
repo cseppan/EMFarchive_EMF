@@ -405,8 +405,13 @@ public class CaseServiceTransport implements CaseService {
     }
 
     public void removeCaseJobs(CaseJob[] jobs) throws EmfException {
-        // NOTE Auto-generated method stub
-        throw new EmfException("Under construction...");
+        EmfCall call = call();
+        
+        call.setOperation("removeCaseJobs");
+        call.addParam("jobs", caseMappings.casejobs());
+        call.setVoidReturnType();
+        
+        call.request(new Object[]{jobs});
     }
 
     public void updateCaseJob(CaseJob job) throws EmfException {
@@ -523,6 +528,16 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.caseParameters());
 
         return (CaseParameter[]) call.requestResponse(new Object[] { new Integer(caseId) });
+    }
+    
+    public void removeCaseParameters(CaseParameter[] params) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("removeCaseParameters");
+        call.addParam("params", caseMappings.caseParameters());
+        call.setVoidReturnType();
+        
+        call.request(new Object[]{params});
     }
 
     public void updateCaseParameter(CaseParameter parameter) throws EmfException {

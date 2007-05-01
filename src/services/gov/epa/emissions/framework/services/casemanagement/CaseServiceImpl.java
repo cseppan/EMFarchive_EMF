@@ -723,6 +723,8 @@ public class CaseServiceImpl implements CaseService {
 
     public void removeCaseJobs(CaseJob[] jobs) throws EmfException {
         Session session = sessionFactory.getSession();
+        
+        resetRelatedJobsField(jobs);
 
         try {
             dao.removeCaseJobs(jobs, session);
@@ -732,6 +734,37 @@ public class CaseServiceImpl implements CaseService {
         } finally {
             session.close();
         }
+    }
+
+    private void resetRelatedJobsField(CaseJob[] jobs) throws EmfException {
+        int jobslen = jobs.length;
+        
+        if (jobslen == 0)
+            return;
+        
+        Session session = sessionFactory.getSession();
+        
+        try {
+            int caseId = jobs[0].getCaseId();
+            CaseInput[] inputs = (CaseInput[])dao.getCaseInputs(caseId, session).toArray(new CaseInput[0]);
+            CaseParameter[] params = dao.getCaseParameters(caseId, session).toArray(new CaseParameter[0]);
+            
+            for (int i = 0; i < jobslen; i++) {
+                for (int j = 0; j < inputs.length; j++)
+                    if (inputs[j].getCaseJobID() == jobs[i].getId())
+                            inputs[j].setCaseJobID(0);
+
+                for (int k = 0; k < params.length; k++)
+                    if (params[k].getJobId() == jobs[i].getId())
+                        params[k].setJobId(0);
+            }
+        } catch (RuntimeException e) {
+            LOG.error("Could not reset case job.\n" + e.getMessage());
+            throw new EmfException("Could not reset case job ");
+        } finally {
+            session.close();
+        }
+        
     }
 
     public void updateCaseJob(CaseJob job) throws EmfException {

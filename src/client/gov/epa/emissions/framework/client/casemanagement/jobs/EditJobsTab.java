@@ -47,7 +47,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
     private JPanel tablePanel;
 
     private MessagePanel messagePanel;
-    
+
     private EmfSession session;
 
     private DesktopManager desktopManager;
@@ -80,7 +80,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
 
         populateThread.start();
     }
-    
+
     public void run() {
         try {
             messagePanel.setMessage("Please wait while retrieving all case jobs...");
@@ -99,8 +99,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
         super.add(createLayout(jobs, parentConsole), BorderLayout.CENTER);
     }
 
-    private JPanel createLayout(CaseJob[] jobs, EmfConsole parentConsole)
-            throws Exception {
+    private JPanel createLayout(CaseJob[] jobs, EmfConsole parentConsole) throws Exception {
         final JPanel layout = new JPanel(new BorderLayout());
 
         layout.add(tablePanel(jobs, parentConsole), BorderLayout.CENTER);
@@ -195,7 +194,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
         run.setMargin(insets);
         container.add(run);
 
-        
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
 
@@ -212,7 +210,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
     }
 
     private void removeJobs() throws EmfException {
-        CaseJob[] jobs = (CaseJob[]) getSelectedJobs().toArray(new CaseJob[0]);
+        CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
 
         if (jobs.length == 0) {
             messagePanel.setMessage("Please select job(s) to remove.");
@@ -220,15 +218,32 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
         }
 
         String title = "Warning";
-        String message = "Are you sure you want to remove the selected job(s)?";
-        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+        
+        if (presenter.jobsUsed(jobs)) {
+            String message1 = "Selected job(s) used by case inputs or parameters.\n Are you sure you want to remove the selected job(s)?";
+            int selection1 = JOptionPane.showConfirmDialog(parentConsole, message1, title, JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+            
+            if (selection1 != JOptionPane.YES_OPTION)
+                return;
+            
+            removeSelectedJobs(jobs);
+            return;
+        }
+
+        String message2 = "Are you sure you want to remove the selected job(s)?";
+        int selection2 = JOptionPane.showConfirmDialog(parentConsole, message2, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
-        if (selection == JOptionPane.YES_OPTION) {
-            tableData.remove(jobs);
-            refresh();
-            presenter.removeJobs(jobs);
+        if (selection2 == JOptionPane.YES_OPTION) {
+            removeSelectedJobs(jobs);
         }
+    }
+
+    private void removeSelectedJobs(CaseJob[] jobs) throws EmfException {
+        tableData.remove(jobs);
+        refresh();
+        presenter.removeJobs(jobs);
     }
 
     private void editJobs() throws EmfException {
@@ -248,18 +263,18 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
     }
 
     private void runJobs() throws EmfException {
-        CaseJob[] jobs = (CaseJob[]) getSelectedJobs().toArray(new CaseJob[0]);
+        CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
 
         if (jobs.length == 0) {
             messagePanel.setMessage("Please select job(s) to run.");
             return;
         }
-        
+
         presenter.runJobs(jobs);
     }
-    
-    private List getSelectedJobs() {
-        return selectModel.selected();
+
+    private List<CaseJob> getSelectedJobs() {
+        return (List<CaseJob>) selectModel.selected();
     }
 
     public void refresh() {
@@ -279,7 +294,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
     public void clearMessage() {
         messagePanel.clear();
     }
-    
 
     public void addJob(CaseJob job) {
         tableData.add(job);
@@ -288,11 +302,9 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
         tablePanel.removeAll();
         tablePanel.add(createSortFilterPanel(parentConsole));
     }
-    
 
     public CaseJob[] caseJobs() {
         return tableData.sources();
     }
-
 
 }

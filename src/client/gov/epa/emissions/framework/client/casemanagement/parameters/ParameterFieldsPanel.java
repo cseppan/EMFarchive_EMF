@@ -164,7 +164,6 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         show.setSelected(param.isShow());
         
         int selected = presenter.getJobIndex(param.getJobId());
-        System.out.println("job id: " + param.getJobId() + " index: " + selected);
         if (selected > 0)
             jobs.setSelectedIndex(selected);
     }

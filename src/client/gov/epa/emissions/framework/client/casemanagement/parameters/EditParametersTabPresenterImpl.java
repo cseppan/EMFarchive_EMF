@@ -64,9 +64,8 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
         return service().getCaseParameters(caseId);
     }
 
-    public void removeParameters(CaseParameter[] params) {
-        // NOTE Auto-generated method stub
-        
+    public void removeParameters(CaseParameter[] params) throws EmfException {
+        service().removeCaseParameters(params);
     }
 
 }

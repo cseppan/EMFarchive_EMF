@@ -7,9 +7,11 @@ import java.util.List;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 
 import javax.swing.JComponent;
 
@@ -55,6 +57,27 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         // view.notifychanges();
     }
 
+    public boolean jobsUsed(CaseJob[] jobs) throws EmfException {
+        if (jobs.length == 0)
+            return false;
+        
+        int caseId = jobs[0].getCaseId();
+        CaseInput[] inputs = service().getCaseInputs(caseId);
+        CaseParameter[] params = service().getCaseParameters(caseId);
+        
+        for (int i = 0; i < jobs.length; i++) {
+            for (int j = 0; j < inputs.length; j++)
+                if (inputs[j].getCaseJobID() == jobs[i].getId())
+                    return true;
+            
+            for (int k = 0; k < params.length; k++)
+                if (params[k].getJobId() == jobs[i].getId())
+                    return true;
+        }
+        
+        return false;
+    }
+    
     public void removeJobs(CaseJob[] jobs) throws EmfException {
         service().removeCaseJobs(jobs);
     }

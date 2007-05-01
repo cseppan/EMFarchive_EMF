@@ -107,6 +107,8 @@ public interface CaseService {
     
     CaseParameter addCaseParameter(CaseParameter param) throws EmfException;
     
+    void removeCaseParameters(CaseParameter[] params) throws EmfException;
+    
     CaseParameter[] getCaseParameters(int caseId) throws EmfException;
 
     void updateCaseParameter(CaseParameter parameter) throws EmfException;
