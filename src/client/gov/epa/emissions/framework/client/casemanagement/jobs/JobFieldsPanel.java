@@ -322,13 +322,14 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         host.setSelectedItem(job.getHost());
         this.qoption.setText(job.getQueOptions());
         this.version.setText(job.getVersion() + "");
-        this.sector.setSelectedItem(job.getSector() == null ? new Sector("All sectors", "All sectors") : job.getSector());
+        this.sector.setSelectedItem(job.getSector() == null ? new Sector("All sectors", "All sectors") : job
+                .getSector());
         this.status.setSelectedItem(job.getRunstatus());
-        
+
         User user = job.getUser();
         Date startDate = job.getRunStartDate();
         Date completeDate = job.getRunCompletionDate();
-        
+
         this.userLabel.setText(user == null ? "" : user.getName());
         this.queID.setText(job.getIdInQueue() + "");
         this.start.setText(startDate == null ? "" : EmfDateFormat.format_YYYY_MM_DD_HH_MM(startDate));
@@ -353,8 +354,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             job.setRunLog(runLog.getText());
             job.setRunNotes(runNote.getText());
             job.setUser(session.user());
-        }     
-        
+        }
+
         if (presenter.checkDuplication(job))
             showRemind();
 
@@ -366,7 +367,9 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         char separator = getFileSeparator(absolute);
         int index = absolute.lastIndexOf(separator);
 
-        job.setPath(absolute.substring(0, index));
+        if (index >= 0)
+            job.setPath(absolute.substring(0, index));
+        
         Executable exe = new Executable(absolute.substring(++index));
         job.setExecutable(getExecutable(exe));
     }
@@ -417,6 +420,9 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
         if (absolute == null || absolute.trim().equals(""))
             throw new EmfException("Please select an executable file.");
+
+        if (!absolute.contains("\\") && !absolute.contains("/"))
+            throw new EmfException("Please specify an absolute path for executable file.");
 
         try {
             Float.parseFloat(jobNo.getText().trim());
