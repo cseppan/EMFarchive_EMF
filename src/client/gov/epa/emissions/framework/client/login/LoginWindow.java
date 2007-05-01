@@ -46,7 +46,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
 
     private ServiceLocator serviceLocator;
 
-    public final static String EMF_VERSION = "v1.9 - 4/25/2007";
+    public final static String EMF_VERSION = "v1.9 - 5/1/2007";
 
     public LoginWindow(ServiceLocator serviceLocator) {
         super("Login", "Login to the Emissions Modeling Framework [" + EMF_VERSION + "]");
