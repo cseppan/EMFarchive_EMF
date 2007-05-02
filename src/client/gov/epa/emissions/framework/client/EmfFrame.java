@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.framework.client.meta.EmfImageTool;
 import gov.epa.emissions.framework.ui.Position;
 
 import java.awt.Point;
@@ -17,9 +18,9 @@ public abstract class EmfFrame extends JFrame implements EmfView {
         super.setName(name);
         super.setUndecorated(true);
         super.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
-
         super.setResizable(false);
-
+        super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
+        
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent event) {
                 EmfFrame.this.windowClosing();
@@ -64,5 +65,5 @@ public abstract class EmfFrame extends JFrame implements EmfView {
     protected void setDefaultButton(Button button) {
         getRootPane().setDefaultButton(button);
     }
-
+    
 }

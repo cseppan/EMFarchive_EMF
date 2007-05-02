@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.EmfImageTool;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
@@ -32,6 +33,8 @@ public class DatasetChooserDialog extends JDialog {
     DatasetChooserDialog(DatasetType datasetType, EmfSession session, EmfConsole console, JComponent parent)
             throws EmfException {
         super(console);
+        super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
+        
         JPanel panel = datasetsPanel(datasetType, session);
         JPanel buttonPanel = buttonPanel();
 

@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.EmfImageTool;
 import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
@@ -28,6 +29,8 @@ public class SectorChooser extends JDialog {
 
     public SectorChooser(Sector[] allSectors, ListWidget sectorsListWidget, EmfConsole parentConsole) {
         super(parentConsole);
+        super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
+        
         setTitle("Select Sectors");
         this.allSectors = allSectors;
         this.sectorsListWidget = sectorsListWidget;

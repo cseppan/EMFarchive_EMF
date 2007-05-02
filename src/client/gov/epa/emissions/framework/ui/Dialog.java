@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.ui;
 
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.EmfImageTool;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import javax.swing.JDialog;
@@ -14,6 +15,7 @@ public class Dialog extends JDialog {
         super.setTitle(title);
         super.setModal(true);
         super.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
         
         applyDecorations();
     }

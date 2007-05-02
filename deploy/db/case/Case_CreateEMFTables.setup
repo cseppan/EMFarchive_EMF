@@ -262,7 +262,7 @@ WITHOUT OIDS;
 CREATE TABLE cases.value_types
 (
   id SERIAL PRIMARY KEY,
-  name varchar(32) NOT NULL UNIQUE
+  name varchar(255) NOT NULL UNIQUE
 )
 WITHOUT OIDS;
 -- cases.value-types
@@ -271,7 +271,7 @@ WITHOUT OIDS;
 CREATE TABLE cases.parameter_names
 (
   id SERIAL PRIMARY KEY,
-  name varchar(32) NOT NULL UNIQUE
+  name varchar(255) NOT NULL UNIQUE
 )
 WITHOUT OIDS;
 -- cases.parameter_names

@@ -65,7 +65,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         super("Create new Note", parent);
         super.setSize(new Dimension(550, 300));
         super.center();
-
+        
         this.parent = parent;
         selectedReferences = new Note[0];
     }

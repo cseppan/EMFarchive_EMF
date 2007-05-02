@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.EmfImageTool;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.TrackableSortFilterSelectModel;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
@@ -32,6 +33,8 @@ public class PollutantSelectionDialog extends JDialog implements PollutantSelect
 
     public PollutantSelectionDialog(EmfConsole parent, ManageChangeables changeables) {
         super(parent);
+        super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
+        
         this.parent = parent;
         this.changeables = changeables;
     }

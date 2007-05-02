@@ -36,6 +36,7 @@ public class NewCaseParameterDialog extends Dialog implements NewCaseParameterVi
         super.setSize(new Dimension(450, 550));
         super.setSize(new Dimension(450, 550));
         super.center();
+        
         this.newParameter = new CaseParameter();
         newParameter.setShow(true);
         newParameter.setRequired(true);

@@ -42,6 +42,7 @@ public class NewJobDialog extends Dialog implements NewJobView, ManageChangeable
         super("Add a Job to " + caseObj.getName(), parent);
         super.setSize(new Dimension(544, 420));
         super.center();
+        
         this.parent = parent;
         this.session = session;
         this.newjob = new CaseJob();

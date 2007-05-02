@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.gui.Changeables;
 import gov.epa.emissions.commons.gui.DefaultChangeables;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.meta.EmfImageTool;
 import gov.epa.emissions.framework.ui.Position;
 
 import java.awt.Dimension;
@@ -32,6 +33,8 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
                 true, // closable
                 true, // maximizable
                 true);// iconifiable
+        super.setFrameIcon(EmfImageTool.createImageIcon("/logo.JPG"));
+        
         setLabel(title);
         this.desktopManager = desktopManager;
         changeables = new DefaultChangeables(this);
@@ -142,4 +145,5 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     protected void setDefaultButton(Button button) {
         getRootPane().setDefaultButton(button);
     }
+    
 }

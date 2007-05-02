@@ -155,5 +155,5 @@ public class NewVersionDialog extends Dialog {
     public String name() {
         return name.getText();
     }
-
+    
 }
