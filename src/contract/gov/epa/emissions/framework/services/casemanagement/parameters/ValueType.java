@@ -35,4 +35,15 @@ public class ValueType implements Serializable {
     public String toString() {
         return this.name;
     }
+    
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof ValueType))
+            return false;
+
+        return ((ValueType) other).name.equals(this.name) || ((ValueType)other).id == id;
+    }
+
+    public int hashCode() {
+        return name.hashCode();
+    }
 }
