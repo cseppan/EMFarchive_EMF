@@ -1,4 +1,30 @@
---
+-- cases.parameter_env_vars
+CREATE TABLE cases.parameter_env_vars
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+)
+WITHOUT OIDS;
+-- cases.parameter_env_vars
+
+-- cases.value-types
+CREATE TABLE cases.value_types
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(32) NOT NULL UNIQUE
+)
+WITHOUT OIDS;
+-- cases.value-types
+
+-- cases.parameter_names
+CREATE TABLE cases.parameter_names
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(32) NOT NULL UNIQUE
+)
+WITHOUT OIDS;
+
+-- cases.parameter_names--
 -- 4/26/07 Added new tables to cases on case jobs
 --
 
