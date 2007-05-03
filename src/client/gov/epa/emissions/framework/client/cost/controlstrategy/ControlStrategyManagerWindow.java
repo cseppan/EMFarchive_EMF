@@ -232,6 +232,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         };
 
         SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, selectModel, confirmDialog);
+        viewButton.setEnabled(false);
         return viewButton;
     }
 

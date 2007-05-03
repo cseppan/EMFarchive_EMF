@@ -139,11 +139,23 @@ select  control_measures_id, pollutant_id, max(efficiency) as maxefficiency, min
 from emf.control_measure_efficiencyrecords 
 group by control_measures_id, pollutant_id;
 
--- add new columns to the control_strategies table...
-ALTER TABLE emf.control_strategies ADD COLUMN county_file character varying,
-  ADD COLUMN emis_reduction_constraint real,
-  ADD COLUMN control_efficiency_constraint real,
-  ADD COLUMN cost_per_ton_constraint character varying,
-  ADD COLUMN annualized_cost_constraint character varying;
+-- add new table control_strategy_constraints...
+CREATE TABLE emf.control_strategy_constraints
+(
+  control_strategy_id integer NOT NULL,
+  max_emis_reduction real,
+  max_control_efficiency real,
+  min_cost_per_ton real,
+  min_ann_cost real,
+  CONSTRAINT control_strategy_constraints_pkey PRIMARY KEY (control_strategy_id),
+  CONSTRAINT control_strategy_constraints_control_strategy_id_fkey FOREIGN KEY (control_strategy_id)
+      REFERENCES emf.control_strategies (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.control_strategy_constraints OWNER TO postgres;
 
-
+CREATE INDEX constraint_strategy_id
+  ON emf.control_strategy_constraints
+  USING btree
+  (control_strategy_id);

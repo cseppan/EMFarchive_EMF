@@ -106,6 +106,7 @@ public class ControlStrategyDAO {
     }
 
     public void remove(ControlStrategy strategy, Session session) {
+        hibernateFacade.remove(strategy.getConstraint(), session);
         hibernateFacade.remove(strategy, session);
     }
 

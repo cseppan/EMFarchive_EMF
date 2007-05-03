@@ -51,22 +51,22 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         emisReduction = new TextField("emission reduction", 10);
         emisReduction.setText(constraint != null ? (constraint.getMaxEmisReduction() != null ? constraint.getMaxEmisReduction() + "" : "") : "");
         changeables.addChangeable(emisReduction);
-        layoutGenerator.addLabelWidgetPair("Maximum Emissions Reduction (tons)", emisReduction, panel);
+        layoutGenerator.addLabelWidgetPair("Minimum Emissions Reduction (tons)", emisReduction, panel);
 
         contrlEff = new TextField("control efficiency", 10);
         contrlEff.setText(constraint != null ? (constraint.getMaxControlEfficiency() != null ? constraint.getMaxControlEfficiency() + "" : "") : "");
         changeables.addChangeable(contrlEff);
-        layoutGenerator.addLabelWidgetPair("Maximum Control Efficiency (%)", contrlEff, panel);
+        layoutGenerator.addLabelWidgetPair("Minimum Control Efficiency (%)", contrlEff, panel);
 
         costPerTon = new TextField("cost per ton", 10);
         costPerTon.setText(constraint != null ? (constraint.getMinCostPerTon() != null ? constraint.getMinCostPerTon() + "" : "") : "");
         changeables.addChangeable(costPerTon);
-        layoutGenerator.addLabelWidgetPair("Minimum 1999 Cost per Ton ($/ton)", costPerTon, panel);
+        layoutGenerator.addLabelWidgetPair("Maximum 1999 Cost per Ton ($/ton)", costPerTon, panel);
 
         annCost = new TextField("annual cost", 10);
         annCost.setText(constraint != null ? (constraint.getMinAnnCost() != null ? constraint.getMinAnnCost() + "" : "") : "");
         changeables.addChangeable(annCost);
-        layoutGenerator.addLabelWidgetPair("Minimum 1999 Annualized Cost ($/yr)", annCost, panel);
+        layoutGenerator.addLabelWidgetPair("Maximum 1999 Annualized Cost ($/yr)", annCost, panel);
 
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 10, 10, // initialX, initialY

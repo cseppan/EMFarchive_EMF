@@ -19,7 +19,7 @@
 		<property name="locale" column="locale" type="java.lang.String" not-null="false"/>
 		<property name="efficiency" column="efficiency" type="float" not-null="false"/>
 		<property name="costYear" column="cost_year" type="integer" not-null="false"/>
-		<property name="costPerTon" column="cost_per_ton" type="float" not-null="false"/>
+		<property name="costPerTon" column="cost_per_ton" type="double" not-null="false"/>
 	    <property name="ruleEffectiveness" column="rule_effectiveness" type="float" not-null="false"/>
         <property name="rulePenetration" column="rule_penetration" type="float" not-null="false"/>
         <property name="equationType" column="equation_type" type="java.lang.String" not-null="false"/>
@@ -29,7 +29,7 @@
         <property name="effectiveDate" column="effective_date" type="java.util.Date" not-null="false" length="4"/>
         <property name="lastModifiedBy" column="last_modified_by" type="java.lang.String" not-null="true"/>
         <property name="lastModifiedTime" column="last_modified_time" type="java.util.Date" not-null="true" length="4"/>
-		<property name="refYrCostPerTon" column="ref_yr_cost_per_ton" type="float" not-null="false"/>
+		<property name="refYrCostPerTon" column="ref_yr_cost_per_ton" type="double" not-null="false"/>
     </class>
 </hibernate-mapping>  
 

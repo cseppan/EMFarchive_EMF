@@ -230,7 +230,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         return load;
     }
 
-    protected EfficiencyRecord record(Pollutant pollutant, String locale, float efficiency, float cost, int costYear) {
+    protected EfficiencyRecord record(Pollutant pollutant, String locale, float efficiency, double cost, int costYear) {
         EfficiencyRecord record = new EfficiencyRecord();
         record.setPollutant(pollutant);
         record.setLocale(locale);

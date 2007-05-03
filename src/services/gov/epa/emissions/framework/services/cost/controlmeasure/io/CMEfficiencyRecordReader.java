@@ -239,7 +239,9 @@ public class CMEfficiencyRecordReader {
 
     private void refYrCostPerTon(EfficiencyRecord efficiencyRecord, String year, String costValue) {
         try {
-            efficiencyRecord.setRefYrCostPerTon(validation.costPerTon(costValue) * new Float(costYearTable.factor(validation.costYear(year))));
+            Double costPerTon = validation.costPerTon(costValue);
+            if (costPerTon != null)
+                efficiencyRecord.setRefYrCostPerTon(costPerTon * new Float(costYearTable.factor(validation.costYear(year))));
         } catch (EmfException e) {
             //don't propagate exception, these would have been taken care of from the cost per ton and cost year validation
         }

@@ -76,9 +76,9 @@ public class EfficiencyRecordValidation {
         throw new EmfException("locale must be a two, five, or six digit integer, value = " + locale);
     }
 
-    public float costPerTon(String costperTon) throws EmfException {
-        if (costperTon.trim().length() == 0) return Float.MIN_VALUE;
-        float value = parseFloat("cost per ton", costperTon);
+    public Double costPerTon(String costperTon) throws EmfException {
+        if (costperTon.trim().length() == 0) return null;
+        double value = parseDouble("cost per ton", costperTon);
         // This is not actually the case per Greg Stella - some controls have cost benefits
         //if (value < 0)
         //    throw new EmfException("cost per ton should be >= 0, value = " + costperTon);

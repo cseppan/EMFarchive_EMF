@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.DatasetType;
-import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.Services;
@@ -30,20 +30,20 @@ public class RunControlStrategy {
 
     private Services services;
 
-    private DbServer dbServer;
+    private DbServerFactory dbServerFactory;
 
-    public RunControlStrategy(StrategyFactory factory, HibernateSessionFactory sessionFactory, DbServer dbServer, PooledExecutor threadPool) {
+    public RunControlStrategy(StrategyFactory factory, HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory, PooledExecutor threadPool) {
         this.factory = factory;
         this.sessionFactory = sessionFactory;
         this.threadPool = threadPool;
-        this.dbServer = dbServer;
+        this.dbServerFactory = dbServerFactory;
         this.services = services();
     }
 
     public void run(User user, ControlStrategy controlStrategy, ControlStrategyService service) throws EmfException {
         currentLimitations(controlStrategy);
         try {
-            Strategy strategy = factory.create(controlStrategy, user, sessionFactory, dbServer);
+            Strategy strategy = factory.create(controlStrategy, user, sessionFactory, dbServerFactory);
             StrategyTask task = new StrategyTask(strategy, user, services, service);
             threadPool.execute(new GCEnforcerTask("Run Strategy: " + controlStrategy.getName(), task));
         } catch (Exception e) {

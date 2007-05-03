@@ -21,7 +21,7 @@ public class EfficiencyRecord implements Serializable {
 
     private int costYear;
 
-    private float costPerTon;
+    private Double costPerTon;
 
     private float ruleEffectiveness;
 
@@ -44,7 +44,7 @@ public class EfficiencyRecord implements Serializable {
     private String lastModifiedBy;
     private Date lastModifiedTime;
 
-    private float refYrCostPerTon;
+    private Double refYrCostPerTon;
 
     public float getCapRecFactor() {
         return capRecFactor;
@@ -54,11 +54,11 @@ public class EfficiencyRecord implements Serializable {
         this.capRecFactor = capRecFactor;
     }
 
-    public float getCostPerTon() {
+    public Double getCostPerTon() {
         return costPerTon;
     }
 
-    public void setCostPerTon(float costPerTon) {
+    public void setCostPerTon(Double costPerTon) {
         this.costPerTon = costPerTon;
     }
 
@@ -220,11 +220,11 @@ public class EfficiencyRecord implements Serializable {
         return lastModifiedTime;
     }
 
-    public void setRefYrCostPerTon(float refYrCostPerTon) {
+    public void setRefYrCostPerTon(Double refYrCostPerTon) {
         this.refYrCostPerTon = refYrCostPerTon;
     }
 
-    public float getRefYrCostPerTon() {
+    public Double getRefYrCostPerTon() {
         return refYrCostPerTon;
     }
 

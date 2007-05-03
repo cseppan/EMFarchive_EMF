@@ -15,6 +15,8 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
 
     private List rows;
 
+    private final static Double NAN_VALUE = new Double(Double.NaN);
+    
     public ControlMeasureEfficiencyTableData(EfficiencyRecord[] records) {
         this.rows = createRows(records);
     }
@@ -24,9 +26,9 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Pollutant", "Locale", "Effective Date", "Existing Measure", "Existing NEI Dev",
+        return new String[] { "Pollutant", "Locale", "Effective Date",
                 "Cost Year", "Cost Per Ton", "Ref Yr Cost Per Ton", "Control Efficiency", "Rule Effectiveness", "Rule Penetration",
-                "Equation Type", "Capital Rec Fac", "Discount Rate", "Last Modifed By", "Last Modifed Date", "Details"};
+                "Equation Type", "Capital Rec Fac", "Discount Rate", "Last Modifed By", "Last Modifed Date", "Details", "Existing Measure", "Existing NEI Dev"};
     }
 
     public List rows() {
@@ -38,13 +40,17 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     private Row row(EfficiencyRecord record) {
-        Object[] values = { record.getPollutant().getName(), record.getLocale(),
-                effectiveDate(record.getEffectiveDate()), record.getExistingMeasureAbbr(),
-                new Integer(record.getExistingDevCode()), new Integer(record.getCostYear()),
-                new Double(record.getCostPerTon()), new Double(record.getRefYrCostPerTon()), new Double(record.getEfficiency()),
-                new Double(record.getRuleEffectiveness()), new Double(record.getRulePenetration()),
-                record.getEquationType(), new Double(record.getCapRecFactor()), new Double(record.getDiscountRate()),
-                record.getLastModifiedBy(), EmfDateFormat.format_MM_DD_YYYY_HH_mm(record.getLastModifiedTime()), record.getDetail()};
+        Object[] values = {
+                record.getPollutant().getName(), record.getLocale(),
+                effectiveDate(record.getEffectiveDate()), new Integer(record.getCostYear()),
+                record.getCostPerTon() != null ? record.getCostPerTon() : NAN_VALUE, record.getRefYrCostPerTon() != null ? record.getRefYrCostPerTon() : NAN_VALUE, 
+                new Double(record.getEfficiency()), new Double(record.getRuleEffectiveness()), 
+                new Double(record.getRulePenetration()), record.getEquationType(), 
+                new Double(record.getCapRecFactor()), new Double(record.getDiscountRate()),
+                record.getLastModifiedBy(), EmfDateFormat.format_MM_DD_YYYY_HH_mm(record.getLastModifiedTime()), 
+                record.getDetail(), record.getExistingMeasureAbbr(),
+                new Integer(record.getExistingDevCode())
+        };
 
         return new ViewableRow(record, values);
     }
@@ -65,10 +71,10 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        if (col == 4 || col == 5)
+        if (col == 3 || col == 16)
             return Integer.class;
 
-        if (col == 6 || col == 7 || col == 8 || col == 9 || col == 10 || col == 12 || col == 13)
+        if (col == 4 || col == 5 || col == 6 || col == 7 || col == 8 || col == 10 || col == 11)
             return Double.class;
 
         return String.class;

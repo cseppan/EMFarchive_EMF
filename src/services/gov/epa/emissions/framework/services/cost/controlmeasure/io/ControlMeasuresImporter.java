@@ -97,22 +97,30 @@ public class ControlMeasuresImporter implements Importer {
                 efficiencyRecords = runEfficiencyRecords();
                 saveEfficiencyRecords(efficiencyRecords);
                 efficiencyRecordCount += efficiencyRecords.length;
-                setStatus("Processed " + efficiencyRecordCount + " efficiency records");
+                //setStatus("Processed " + efficiencyRecordCount + " efficiency records");
                 efficiencyRecords = null;
                 System.gc();
+            }
+            //make sure you finish the modifier here, make sure all eff records are inserted
+            //before creating the agg records...
+            try {
+                modifier.finish();
+                modifier.close();
+            } catch (SQLException e) {
+                // NOTE Auto-generated catch block
+            } finally {
+                //
             }
             aerDAO.updateAggregateEfficiencyRecords(measures, dbServer);
             setStatus("Finished reading efficiency record file");
             
         } catch (Exception e) {
-            logError("Failed to import all control measures", e); // FIXME: report generation
+            logError("Failed to import all control measures", e);
             setStatus("Failed to import all control measures, see the import control measures status field for more detailed information on the failure: " + e.getMessage());
             setDetailStatus("Failed to import all control measures, see the import control measures status field for more detailed information on the failure: " + e.getMessage());
             throw new ImporterException("Failed to import all control measures: " + e.getMessage());
         } finally {
             try {
-                modifier.finish();
-                modifier.close();
                 dbServer.disconnect();
             } catch (SQLException e) {
                 // NOTE Auto-generated catch block

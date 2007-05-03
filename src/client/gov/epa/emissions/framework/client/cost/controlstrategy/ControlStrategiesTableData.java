@@ -21,18 +21,32 @@ public class ControlStrategiesTableData extends AbstractTableData {
 
     private List rows;
 
+    private final static Double NAN_VALUE = new Double(Double.NaN);
+    
     public ControlStrategiesTableData(ControlStrategy[] controlStrategies, EmfSession session) throws EmfException {
         this.rows = createRows(controlStrategies, session);
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Last Modified", "Region", "Project", "Strategy Type", "Inv. Dataset", "Version",
-                "Inventory Type", "Target Pollutant", "Cost Year", "Inv. Year", "Total Cost", "Reduction",
-                "Run Status", "Completion Date", "Creator" };
-
+        return new String[] { "Name", "Last Modified", "Region", 
+                "Target Pollutant", "Total Cost", "Reduction", 
+                "Project", "Strategy Type", "Inv. Dataset", 
+                "Version", "Inventory Type", "Cost Year", 
+                "Inv. Year", "Run Status", "Completion Date", 
+                "Creator" };
+//        return new String[] { "Name", "Last Modified", "Region", "Project", "Strategy Type", "Inv. Dataset", "Version",
+//                "Inventory Type", "Target Pollutant", "Cost Year", "Inv. Year", "Total Cost", "Reduction",
+//                "Run Status", "Completion Date", "Creator" };
     }
 
     public Class getColumnClass(int col) {
+//        return String.class;
+//        if (col == 11 || col == 12)
+//            return Integer.class;
+//
+        if (col == 4 || col == 5)
+            return Double.class;
+
         return String.class;
     }
 
@@ -49,10 +63,11 @@ public class ControlStrategiesTableData extends AbstractTableData {
         for (int i = 0; i < controlStrategies.length; i++) {
             ControlStrategy element = controlStrategies[i];
             Object[] values = { element.getName(), format(element.getLastModifiedDate()), region(element),
-                    project(element), analysisType(element), dataset(element), version(element), datasetType(element),
-                    element.getTargetPollutant(), costYear(element), "" + element.getInventoryYear(),
-                    "" + getTotalCost(element, session), "" + getReduction(element, session), element.getRunStatus(),
-                    format(element.getCompletionDate()), element.getCreator().getName() };
+                    element.getTargetPollutant(), getTotalCost(element, session), getReduction(element, session), 
+                    project(element), analysisType(element), dataset(element), 
+                    version(element), datasetType(element), costYear(element), 
+                    "" + (element.getInventoryYear() != 0 ? element.getInventoryYear() : ""), element.getRunStatus(), format(element.getCompletionDate()), 
+                    element.getCreator().getName() };
             Row row = new ViewableRow(element, values);
             rows.add(row);
         }
@@ -60,18 +75,18 @@ public class ControlStrategiesTableData extends AbstractTableData {
         return rows;
     }
 
-    private double getReduction(ControlStrategy element, EmfSession session) throws EmfException {
+    private Double getReduction(ControlStrategy element, EmfSession session) throws EmfException {
         if (getResultSummary(element, session) == null)
-            return 0;
+            return NAN_VALUE;
         
-        return getResultSummary(element, session).getStrategyTotalReduction();
+        return new Double(getResultSummary(element, session).getStrategyTotalReduction());
     }
 
-    private double getTotalCost(ControlStrategy element, EmfSession session) throws EmfException {
+    private Double getTotalCost(ControlStrategy element, EmfSession session) throws EmfException {
         if (getResultSummary(element, session) == null)
-            return 0;
+            return NAN_VALUE;
 
-        return getResultSummary(element, session).getStrategyTotalCost();
+        return new Double(getResultSummary(element, session).getStrategyTotalCost());
     }
 
     private ControlStrategyResultsSummary getResultSummary(ControlStrategy element, EmfSession session) throws EmfException {
@@ -89,6 +104,9 @@ public class ControlStrategiesTableData extends AbstractTableData {
     }
 
     private String version(ControlStrategy element) {
+        Dataset[] datasets = element.getInputDatasets();
+        if (datasets.length == 0)
+            return "";
         return "" + element.getDatasetVersion();
     }
 
@@ -128,7 +146,7 @@ public class ControlStrategiesTableData extends AbstractTableData {
     // }
 
     private String costYear(ControlStrategy element) {
-        return "" + element.getCostYear();
+        return "" + (element.getCostYear() != 0 ? element.getCostYear() : "");
     }
 
     public ControlStrategy[] sources() {

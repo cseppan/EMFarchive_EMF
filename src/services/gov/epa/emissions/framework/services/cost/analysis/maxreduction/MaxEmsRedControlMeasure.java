@@ -28,7 +28,7 @@ public class MaxEmsRedControlMeasure {
         return controlMeasure;
     }
 
-    public double adjustedCostPerTon() throws EmfException {
+    public Double adjustedCostPerTon() throws EmfException {
         return efficiencyRecordUtil.adjustedCostPerTon(maxRecord, table);
     }
 

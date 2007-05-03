@@ -28,8 +28,8 @@ public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implement
         equationType.setSelectedItem(record.getEquationType());
         efficiency.setText(record.getEfficiency() + "");
         costYear.setText(record.getCostYear() + "");
-        costperTon.setText(record.getCostPerTon() + "");
-        refYrCostPerTon.setText(record.getRefYrCostPerTon() + "");
+        costperTon.setText((record.getCostPerTon() != null ? record.getCostPerTon() : "") + "");
+        refYrCostPerTon.setText((record.getRefYrCostPerTon() != null ? record.getRefYrCostPerTon() : "")  + "");
         locale.setText(record.getLocale());
         ruleEffectiveness.setText(record.getRuleEffectiveness() + "");
         rulePenetration.setText(record.getRulePenetration() + "");

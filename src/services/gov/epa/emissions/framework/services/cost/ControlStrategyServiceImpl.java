@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.cost;
 
-import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -11,7 +10,6 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -226,16 +224,13 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public void runStrategy(User user, ControlStrategy strategy) throws EmfException {
+    public void runStrategy(User user, ControlStrategy strategy) {
         StrategyFactory factory = new StrategyFactory(batchSize());
-        DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, dbServer, threadPool);
+            RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, dbServerFactory, threadPool);
             runStrategy.run(user, strategy, this);
         } catch (Exception e) {
             //
-        } finally {
-            close(dbServer);
         }
     }
 
@@ -370,17 +365,6 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             throw new EmfException("Could not get control strategy");
         } finally {
             session.close();
-        }
-    }
-
-    private void close(DbServer dbServer) throws EmfException {
-        try {
-            if (dbServer != null)
-                dbServer.disconnect();
-
-        } catch (SQLException e) {
-            LOG.error("Could not close database server", e);
-            throw new EmfException("Could not close database server");
         }
     }
 

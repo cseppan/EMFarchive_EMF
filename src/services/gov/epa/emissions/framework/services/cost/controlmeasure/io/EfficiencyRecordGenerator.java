@@ -56,7 +56,8 @@ public class EfficiencyRecordGenerator {
         tokens.add("" + efficiencyRecord.getEfficiency());
         tokens.add("" + 0);
         tokens.add("" + efficiencyRecord.getCostYear());
-        tokens.add("" + (efficiencyRecord.getCostPerTon() != Float.MIN_VALUE ? efficiencyRecord.getCostPerTon() : ""));
+        tokens.add("" + (efficiencyRecord.getCostPerTon() != null ? efficiencyRecord.getCostPerTon() : ""));
+//        tokens.add("" + (efficiencyRecord.getCostPerTon() != Float.MIN_VALUE ? efficiencyRecord.getCostPerTon() : ""));
         tokens.add("" + efficiencyRecord.getRuleEffectiveness());
         tokens.add("" + efficiencyRecord.getRulePenetration());
         tokens.add("" + efficiencyRecord.getEquationType());
@@ -66,7 +67,7 @@ public class EfficiencyRecordGenerator {
         tokens.add("" + (efficiencyRecord.getEffectiveDate() == null ? "" : efficiencyRecord.getEffectiveDate()));
         tokens.add("" + efficiencyRecord.getLastModifiedBy());
         tokens.add("" + efficiencyRecord.getLastModifiedTime());
-        tokens.add("" + (efficiencyRecord.getRefYrCostPerTon() != Float.MIN_VALUE ? efficiencyRecord.getRefYrCostPerTon() : ""));
+        tokens.add("" + (efficiencyRecord.getRefYrCostPerTon() != null ? efficiencyRecord.getRefYrCostPerTon() : ""));
 
 
         return tokens;

@@ -3,13 +3,13 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -121,6 +121,7 @@ public class ControlMeasureDAO {
         session.createQuery( hqlDelete )
              .setInteger("controlMeasureId", controlMeasureId)
              .executeUpdate();
+        session.flush();
 //        Scc[] sccs = getSccs(controlMeasureId, session);
 //        for (int i = 0; i < sccs.length; i++) {
 //            hibernateFacade.remove(sccs[i], session);
@@ -244,10 +245,15 @@ public class ControlMeasureDAO {
                 throw new EmfException("Could not obtain the lock to update: " + measure.getName());
             measure.setLockDate(obtainLocked.getLockDate());
             measure.setLockOwner(obtainLocked.getLockOwner());
+//            LOG.error("remove Sccs");
             removeSccs(cmId, session);
-            removeEfficiencyRecords(cmId, session);
+//            LOG.error("remove EfficiencyRecords");
+            //removeEfficiencyRecords(cmId, session);
+            removeEfficiencyRecords(cmId, dbServer);
+//            LOG.error("remove AggregateEfficiencyRecords");
             AggregateEfficiencyRecordDAO aerDAO = new AggregateEfficiencyRecordDAO();
             aerDAO.removeAggregateEfficiencyRecords(cmId, dbServer);
+//            LOG.error("update measure and sccs");
             update(measure, sccs, session);
         } else if (abbrExist) {
             throw new EmfException("The Control Measure Abbreviation already in use: " + measure.getAbbreviation());
@@ -275,16 +281,26 @@ public class ControlMeasureDAO {
         }
     }
 
-    private void removeEfficiencyRecords(int controlMeasureId, Session session) {
+    public void removeEfficiencyRecords(int controlMeasureId, Session session) {
         String hqlDelete = "delete EfficiencyRecord er where er.controlMeasureId = :controlMeasureId";
         session.createQuery( hqlDelete )
              .setInteger("controlMeasureId", controlMeasureId)
              .executeUpdate();
+        session.flush();
 //        Criterion c = Restrictions.eq("controlMeasureId", new Integer(controlMeasureId));
 //        List list = hibernateFacade.get(EfficiencyRecord.class, c, session);
 //        for (int i = 0; i < list.size(); i++) {
 //            hibernateFacade.remove(list.get(i), session);
 //        }
+    }
+
+    public void removeEfficiencyRecords(int controlMeasureId, DbServer dbServer) throws EmfException {
+        try {
+            dbServer.getEmfDatasource().query().execute("delete from emf.control_measure_efficiencyrecords " +
+                    "where control_measures_id = " + controlMeasureId + ";");
+            } catch (SQLException e) {
+                throw new EmfException(e.getMessage());
+            }
     }
 
     public List allCMClasses(Session session) {
@@ -304,9 +320,9 @@ public class ControlMeasureDAO {
         return hibernateFacade.get(EfficiencyRecord.class, c, session);
     }
 
-    public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter, EmfDbServer DbServer) throws EmfException {
+    public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter, DbServer dbServer) throws EmfException {
         try {
-            RetrieveEfficiencyRecord retrieveEfficiencyRecord = new RetrieveEfficiencyRecord(controlMeasureId, DbServer);
+            RetrieveEfficiencyRecord retrieveEfficiencyRecord = new RetrieveEfficiencyRecord(controlMeasureId, dbServer);
             return retrieveEfficiencyRecord.getEfficiencyRecords(recordLimit, filter);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());

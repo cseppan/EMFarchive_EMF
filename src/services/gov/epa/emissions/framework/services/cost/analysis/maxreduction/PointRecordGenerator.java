@@ -84,30 +84,36 @@ public class PointRecordGenerator implements RecordGenerator {
         invenRuleEffectiveness = resultSet.getFloat("CEFF") > 0 && resultSet.getFloat("REFF") == 0 ? 100 : resultSet.getFloat("REFF");
         originalEmissions = resultSet.getFloat("ANN_EMIS");
 
-        double invenEffectiveReduction = invenControlEfficiency * invenRulePenetration * invenRuleEffectiveness
-                / (100 * 100 * 100);
+//        double invenEffectiveReduction = invenControlEfficiency * invenRulePenetration * invenRuleEffectiveness
+//                / (100 * 100 * 100);
         double effectiveReduction = maxMeasure.effectiveReduction();
 
         reducedEmission = 0.0;
         finalEmissions = 0.0;
-        if (invenEffectiveReduction == 0.0) {
-            reducedEmission = originalEmissions * effectiveReduction;
-            finalEmissions = originalEmissions - reducedEmission;
-            return;
-        }
 
-        if (invenEffectiveReduction < effectiveReduction) {
-            this.comment += "Existing control measure replaced; ";
-            originalEmissions = originalEmissions / invenEffectiveReduction;
-            reducedEmission = originalEmissions * effectiveReduction;
-            finalEmissions = originalEmissions - reducedEmission;
-            return;
-        }
-
-        this.comment += "Controlled with existing control measure; ";
-        originalEmissions = originalEmissions / invenControlEfficiency;
-        reducedEmission = originalEmissions * invenEffectiveReduction;
+        //FIXME -- TEMPORARY - Ignore if inv item has an exisiting measure, just replace for now...
+        reducedEmission = originalEmissions * effectiveReduction;
         finalEmissions = originalEmissions - reducedEmission;
+        return;
+
+//        if (invenEffectiveReduction == 0.0) {
+//            reducedEmission = originalEmissions * effectiveReduction;
+//            finalEmissions = originalEmissions - reducedEmission;
+//            return;
+//        }
+//
+//        if (invenEffectiveReduction < effectiveReduction) {
+//            this.comment += "Existing control measure replaced; ";
+//            originalEmissions = originalEmissions / invenEffectiveReduction;
+//            reducedEmission = originalEmissions * effectiveReduction;
+//            finalEmissions = originalEmissions - reducedEmission;
+//            return;
+//        }
+//
+//        this.comment += "Controlled with existing control measure; ";
+//        originalEmissions = originalEmissions / invenControlEfficiency;
+//        reducedEmission = originalEmissions * invenEffectiveReduction;
+//        finalEmissions = originalEmissions - reducedEmission;
     }
 
 }

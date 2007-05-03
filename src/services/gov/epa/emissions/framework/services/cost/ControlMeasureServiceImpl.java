@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
-import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
@@ -278,15 +277,18 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            return dao.getEfficiencyRecords(controlMeasureId, recordLimit, filter, new EmfDbServer());
+            return dao.getEfficiencyRecords(controlMeasureId, recordLimit, filter, dbServer);
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve control measure efficiency records.", e);
             throw new EmfException("Could not retrieve control measures efficiency records.");
         } catch (Exception e) {
             LOG.error("Could not retrieve control measure efficiency records.", e);
             throw new EmfException(e.getMessage());
-        } 
+        } finally {
+            close(dbServer);
+        }
     }
 
     public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
@@ -332,6 +334,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public ControlMeasure[] getSummaryControlMeasures() throws EmfException {
+        LOG.error("start getSummaryControlMeasures");
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
             return dao.getSummaryControlMeasures(dbServer);
@@ -343,10 +346,12 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             throw new EmfException(e.getMessage());
         } finally {
             close(dbServer);
+            LOG.error("end getSummaryControlMeasures");
         }
     }
 
     public ControlMeasure[] getSummaryControlMeasures(int majorPollutantId) throws EmfException {
+        LOG.error("start getSummaryControlMeasures");
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
             return dao.getSummaryControlMeasures(majorPollutantId, dbServer);
@@ -358,6 +363,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             throw new EmfException(e.getMessage());
         } finally {
             close(dbServer);
+            LOG.error("end getSummaryControlMeasures");
         }
     }
 }

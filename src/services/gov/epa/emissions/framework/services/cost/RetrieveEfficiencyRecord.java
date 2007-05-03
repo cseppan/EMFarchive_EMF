@@ -61,8 +61,6 @@ public class RetrieveEfficiencyRecord {
             efficiencyRecords = values(set);
         } catch (SQLException e) {
             throw e;
-        } finally {
-            dbServer.disconnect();
         }
 
         return efficiencyRecords;
@@ -70,6 +68,7 @@ public class RetrieveEfficiencyRecord {
 
     private EfficiencyRecord[] values(ResultSet rs) throws SQLException {
         List effRecs = new ArrayList();
+        double costPerTon = 0;
         try {
             while (rs.next()) {
                 EfficiencyRecord effRec = new EfficiencyRecord();
@@ -82,7 +81,9 @@ public class RetrieveEfficiencyRecord {
                 effRec.setLocale(rs.getString(8));
                 effRec.setEfficiency(rs.getFloat(9));
                 effRec.setCostYear(rs.getInt(10));
-                effRec.setCostPerTon(rs.getFloat(11));
+//                effRec.setCostPerTon(rs.getDouble(11));
+                costPerTon = rs.getDouble(11);
+                effRec.setCostPerTon(!rs.wasNull() ? costPerTon : null);
                 effRec.setRuleEffectiveness(rs.getFloat(12));
                 effRec.setRulePenetration(rs.getFloat(13));
                 effRec.setEquationType(rs.getString(14));
@@ -92,7 +93,8 @@ public class RetrieveEfficiencyRecord {
                 effRec.setEffectiveDate(rs.getTimestamp(18));
                 effRec.setLastModifiedBy(rs.getString(19));
                 effRec.setLastModifiedTime(rs.getTimestamp(20));
-                effRec.setRefYrCostPerTon(rs.getFloat(21));
+                costPerTon = rs.getDouble(21);
+                effRec.setRefYrCostPerTon(!rs.wasNull() ? costPerTon : null);
 
 //                id serial NOT NULL,
 //                control_measures_id int4 NOT NULL,

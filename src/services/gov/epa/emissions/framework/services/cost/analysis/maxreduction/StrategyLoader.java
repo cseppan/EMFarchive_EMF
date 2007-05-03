@@ -147,7 +147,7 @@ public class StrategyLoader {
                                 resultSet.getDouble("CEFF"), resultSet.getDouble("RPEN"), 
                                 resultSet.getDouble("REFF"), resultSet.getDouble("ANN_EMIS"));
                     } else {
-                        maxCM = retrieveMeasure.findBestMaxEmsRedMeasureForTargetPollutant(scc, fips, 
+                        maxCM = retrieveMeasure.findBestMaxEmsRedMeasure(scc, fips, pollutants.getPollutant(resultSet.getString("poll")),
                                 resultSet.getDouble("CEFF"), 100, 
                                 resultSet.getFloat("CEFF") > 0 && resultSet.getFloat("REFF") == 0 ? 100 : resultSet.getFloat("REFF"), resultSet.getDouble("ANN_EMIS"));
                     }

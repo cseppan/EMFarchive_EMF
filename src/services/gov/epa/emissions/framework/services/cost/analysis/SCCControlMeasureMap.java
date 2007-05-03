@@ -90,7 +90,7 @@ public class SCCControlMeasureMap {
         return getCostPerTon(previous) <= getCostPerTon(next) ? previous : next;
     }
     
-    private float getCostPerTon(ControlMeasure measure) {
+    private double getCostPerTon(ControlMeasure measure) {
         EfficiencyRecord [] records = measure.getEfficiencyRecords();
         
         for (int i = 0; i < records.length; i++) {

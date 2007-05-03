@@ -112,7 +112,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         String name = measure.getName();
         if (name == null)
             name = "New Control Measure";
-        super.setLabel(super.getTitle() + " " + record.getRecordId() + " for Control Measure: " + name);
+        super.setLabel(super.getTitle() + " for Control Measure: " + name);
         JPanel layout = createLayout();
         super.getContentPane().add(layout);
         super.display();
@@ -352,7 +352,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         saveEfficiency(efficiency);
         saveCostYear();
         saveCostPerTon();
-        record.setRefYrCostPerTon(new Float(refYrCostPerTon.getText()));
+        record.setRefYrCostPerTon(new Double(refYrCostPerTon.getText()));
         saveLocale();
         saveRuleEffectiveness();
         saveRulePenetration();
@@ -436,7 +436,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         if (costperTon.getText().trim().length() == 0)
             throw new EmfException("Please set the Cost Per Ton");
 
-        float value = verifier.parseFloat(costperTon);
+        double value = verifier.parseDouble(costperTon);
         record.setCostPerTon(value);
     }
 

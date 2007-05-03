@@ -1,5 +1,8 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -20,6 +23,13 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab{
         super.populateFields();
     }
 
+    public void setTextFieldCaretPosition() {
+        name.setCaretPosition(0);
+        ((JTextField)((JComboBox)sourceGroup).getEditor().getEditorComponent()).setCaretPosition(0);
+        ((JTextField)((JComboBox)controlTechnology).getEditor().getEditorComponent()).setCaretPosition(0);
+        dataSources.setCaretPosition(0);
+    }
+    
     public void save(ControlMeasure measure) throws EmfException {
         super.save(measure);
     }

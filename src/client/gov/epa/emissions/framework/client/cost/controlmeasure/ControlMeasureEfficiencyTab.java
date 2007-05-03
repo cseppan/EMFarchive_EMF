@@ -23,7 +23,6 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
-import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -137,7 +136,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     private SortFilterSelectionPanel sortFilterPane(EmfConsole parentConsole) {
         SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
         panel.getTable().setName("controlMeasureEfficiencyTable");
-        panel.sort(sortCriteria());
+//        panel.sort(sortCriteria());
         panel.setPreferredSize(new Dimension(450, 120));
 
         return panel;
@@ -152,10 +151,10 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
 //        return new JScrollPane(panel);
 //    }
 //
-    private SortCriteria sortCriteria() {
-        String[] columnNames = { "Pollutant", "Control Efficiency" };
-        return new SortCriteria(columnNames, new boolean[] { true, true }, new boolean[] { true, true });
-    }
+//    private SortCriteria sortCriteria() {
+//        String[] columnNames = { "Pollutant", "Control Efficiency" };
+//        return new SortCriteria(columnNames, new boolean[] { true, true }, new boolean[] { true, true });
+//    }
 
     private JPanel controlPanel() {
         Button addButton = new AddButton(addAction());

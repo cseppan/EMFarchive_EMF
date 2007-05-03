@@ -236,19 +236,29 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
     }
 
     public ControlMeasure[] getSummaryControlMeasures() throws EmfException {
-        EmfCall call = call();
+//        System.out.println(new Date().toString() + " start transport.getSummaryControlMeasures");
+        try {
+            EmfCall call = call();
 
-        call.setOperation("getSummaryControlMeasures");
-        call.setReturnType(mappings.controlMeasures());
-        return (ControlMeasure[]) call.requestResponse(new Object[] { });
+            call.setOperation("getSummaryControlMeasures");
+            call.setReturnType(mappings.controlMeasures());
+            return (ControlMeasure[]) call.requestResponse(new Object[] { });
+        } finally {
+//            System.out.println(new Date().toString() + " end transport.getSummaryControlMeasures");
+        }
     }
 
     public ControlMeasure[] getSummaryControlMeasures(int majorPollutantId) throws EmfException {
-        EmfCall call = call();
+//        System.out.println(new Date().toString() + " start transport.getSummaryControlMeasures");
+        try {
+            EmfCall call = call();
 
-        call.setOperation("getSummaryControlMeasures");
-        call.addIntegerParam("majorPollutantId");
-        call.setReturnType(mappings.controlMeasures());
-        return (ControlMeasure[]) call.requestResponse(new Object[] { new Integer(majorPollutantId) });
+            call.setOperation("getSummaryControlMeasures");
+            call.addIntegerParam("majorPollutantId");
+            call.setReturnType(mappings.controlMeasures());
+            return (ControlMeasure[]) call.requestResponse(new Object[] { new Integer(majorPollutantId) });
+        } finally {
+//            System.out.println(new Date().toString() + " end transport.getSummaryControlMeasures");
+        }
     }
 }

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RetrieveControlMeasure {
+//    private static Log log = LogFactory.getLog(RetrieveControlMeasure.class);
 
     private DbServer dbServer;
     
@@ -25,8 +26,11 @@ public class RetrieveControlMeasure {
         ControlMeasure[] controlMeasures = {};
         try {
             String sql = query();
+//            log.error("exec query");
             ResultSet set = dbServer.getEmfDatasource().query().executeQuery(sql);
+//            log.error("populate measures from query");
             controlMeasures = values(set);
+//            log.error("done populate measures from query");
         } catch (SQLException e) {
             throw e;
         }
@@ -38,8 +42,11 @@ public class RetrieveControlMeasure {
         ControlMeasure[] controlMeasures = {};
         try {
             String sql = query(majorPollutantId);
+//            log.error("exec query");
             ResultSet set = dbServer.getEmfDatasource().query().executeQuery(sql);
+//            log.error("populate measures from query");
             controlMeasures = values(set);
+//            log.error("done populate measures from query");
         } catch (SQLException e) {
             throw e;
         }
@@ -212,7 +219,7 @@ public class RetrieveControlMeasure {
                 "left outer join emf.pollutants mp " +
                 "on mp.id = cm.major_pollutant " +
                 "order by cm.name, cm.id, p.name";
-
+//        log.error(query);
         return query;
     }
 
@@ -323,6 +330,7 @@ public class RetrieveControlMeasure {
         "on mp.id = cm.major_pollutant " +
         "where cm.major_pollutant = " + majorPollutantId + " " +
         "order by cm.name, cm.id, p.name";
+//        log.error(query);
 
         return query;
     }
