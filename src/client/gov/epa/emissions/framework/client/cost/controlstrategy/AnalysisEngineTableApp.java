@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.EmfImageTool;
 import gov.epa.mims.analysisengine.gui.DefaultUserInteractor;
 import gov.epa.mims.analysisengine.gui.UserInteractor;
 import gov.epa.mims.analysisengine.table.SpecialTableModel;
@@ -29,7 +30,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
     private static int counter=0;
 
     public AnalysisEngineTableApp(String controlStrategyName, DesktopManager desktopManager, EmfConsole parentConsole) {
-        super("Analyze Control Strategy: "+controlStrategyName+counter++, desktopManager);
+        super(controlStrategyName+counter++, desktopManager);
         this.parentConsole = parentConsole;
     }
 
@@ -103,6 +104,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
                 importFileStatus.add("Success: " + fileNames[i]);
             } // try
             catch (Exception e) {
+                e.printStackTrace();
                 allSuccessful = false;
                 if (e.getMessage() == null) {
                     importFileStatus.add("FAILURE: " + fileNames[i] + "\n");
@@ -111,7 +113,6 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
                     importFileStatus.add("FAILURE: " + fileNames[i] + ":\n" + e.getMessage());
                     importFileStatus.add(get50Lines(fileNames[i]));
                 }
-                System.out.println("Error reading the file " + e.getMessage());
             }// catch
         }
         importStatus(allSuccessful, importFileStatus, warningWindow);
@@ -122,6 +123,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
             if (warningWindow.size() != 0) {
                 TextDialog dialog = new TextDialog(this, "WARNING", "", false);
                 dialog.setTextFromList("Warnings from the Table Loader", warningWindow);
+                dialog.setIconImage(EmfImageTool.createImage("/logo.JPG"));
                 dialog.setModal(true);
                 dialog.setVisible(true);
                 warningWindow.clear();
@@ -130,6 +132,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
             {
                 TextDialog dialog = new TextDialog(this, "Import File Status", "", false);
                 dialog.setTextFromList("The status of the import process is as follows:", importFileStatus);
+                dialog.setIconImage(EmfImageTool.createImage("/logo.JPG"));
 
                 dialog.setSize(800, 400);
 
@@ -175,6 +178,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
             }
             reader.close();
         } catch (IOException ie) {
+            ie.printStackTrace();
             lines.append("Error reading file " + ie.getMessage());
         }
         return lines.toString();

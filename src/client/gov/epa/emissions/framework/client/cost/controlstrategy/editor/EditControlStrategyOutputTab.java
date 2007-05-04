@@ -274,7 +274,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     public void displayAnalyzeTable(String controlStrategyName, String[] fileNames) {
-        AnalysisEngineTableApp app = new AnalysisEngineTableApp(controlStrategyName, desktopManager, parentConsole);
+        AnalysisEngineTableApp app = new AnalysisEngineTableApp("Analyze Control Strategy: " + controlStrategyName, desktopManager, parentConsole);
         app.display(fileNames);
     }
 

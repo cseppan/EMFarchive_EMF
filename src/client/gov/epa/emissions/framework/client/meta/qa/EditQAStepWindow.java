@@ -20,6 +20,7 @@ import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
 import gov.epa.emissions.framework.client.data.QAPrograms;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
@@ -95,18 +96,18 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private Button saveButton;
 
     private JCheckBox currentTable;
-    
+
     private EmfSession session;
 
     private EmfConsole parentConsole;
-   
+
     public EditQAStepWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
         super("Edit QA Step", new Dimension(650, 625), desktopManager);
         this.parentConsole = parentConsole;
     }
 
-    public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset, String versionName,
-            EmfSession session) {
+    public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset,
+            String versionName, EmfSession session) {
         this.session = session;
         this.step = step;
         this.qaStepResult = qaStepResult;
@@ -194,8 +195,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         currentTable = new JCheckBox();
         currentTable.setEnabled(false);
         currentTable.setSelected(stepResult.isCurrentTable());
-        currentTable.setToolTipText(
-                "True when the source data and QA step have not been modified since the step was run");
+        currentTable
+                .setToolTipText("True when the source data and QA step have not been modified since the step was run");
         layoutGenerator.addLabelWidgetPair("Current Output?", currentTable, panel);
 
         // Lay out the panel.
@@ -219,8 +220,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         addChangeable(comments);
         ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(comments);
         layoutGenerator.addLabelWidgetPair("Comments:", scrollableComment, panel);
-        comments.setToolTipText(
-                "Enter any notes of interest that you found when performing the step");
+        comments.setToolTipText("Enter any notes of interest that you found when performing the step");
 
         layoutGenerator.addLabelWidgetPair("Export Folder:", exportFolderPanel(step), panel);
         // Lay out the panel.
@@ -251,7 +251,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private void selectFolder() {
         EmfFileInfo initDir = new EmfFileInfo(exportFolder.getText(), true, true);
-        
+
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
         chooser.setTitle("Select a folder to contain the exported QA step results");
         int option = chooser.showDialog(parentConsole, "Select a folder");
@@ -324,13 +324,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             program.setSelectedItem(null);
         addChangeable(program);
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
-        program.addActionListener(new AbstractAction()
-          {
+        program.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 currentTable.setSelected(false);
             }
         });
- 
+
         programArguments = new TextArea("", step.getProgramArguments(), 40, 3);
         addChangeable(programArguments);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programArguments);
@@ -415,13 +414,25 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         Button run = runButton();
         panel.add(run);
 
-        Button viewResults = new Button("View Results", null);
-        viewResults.setEnabled(false);
+        Button viewResults = viewResultsButton();
         panel.add(viewResults);
 
         Button export = exportButton();
         panel.add(export);
         return panel;
+    }
+
+    private Button viewResultsButton() {
+        return new Button("View Results", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                clear();
+                try {
+                    viewResults();
+                } catch (EmfException exc) {
+                    messagePanel.setError(exc.getMessage());
+                }
+            }
+        });
     }
 
     private Button runButton() {
@@ -454,7 +465,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             presenter.run();
 
             saveButton.setEnabled(false);// to prevent user from entering and click save after started running a qa
-                                            // step
+            // step
             resetChanges();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
@@ -469,6 +480,15 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
+    }
+
+    private void viewResults() throws EmfException {
+        String exportDir = exportFolder.getText();
+
+        if (exportDir == null || exportDir.trim().isEmpty())
+            throw new EmfException("Please specify an export directory.");
+
+        presenter.viewResults(step, qaStepResult, exportFolder.getText());
     }
 
     private Button saveButton() {
@@ -528,5 +548,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private void clear() {
         messagePanel.clear();
+    }
+
+    public void displayResultsTable(String qaStepName, String exportedFileName) {
+        AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QAStep \"" + qaStepName + "\" results ", desktopManager, parentConsole);
+        app.display(new String[] { exportedFileName });
     }
 }
