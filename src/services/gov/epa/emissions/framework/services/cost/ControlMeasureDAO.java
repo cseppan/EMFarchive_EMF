@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -116,6 +117,46 @@ public class ControlMeasureDAO {
         hibernateFacade.remove(current(controlMeasureId, session), session);
     }
 
+    public int copy(int controlMeasureId, User creator, Session session) throws EmfException {
+        ControlMeasure cm = current(controlMeasureId, session);
+        session.clear();//must do this
+        
+        //set the name and give a random abbrev...
+        cm.setName("Copy of " + cm.getName());
+        cm.setAbbreviation(Math.round(Math.random() * 1000000000) % 1000000000 + "");
+        
+        //make sure the name and abbrev are unique
+        Criterion name = Restrictions.eq("name", cm.getName());
+        Criterion abbrev = Restrictions.eq("abbreviation", cm.getAbbreviation());
+        boolean abbrExist = abbrExist(new Criterion[] { abbrev }, session);
+        boolean nameExist = nameExist(new Criterion[] { name }, session);
+
+        if (abbrExist || nameExist)
+            throw new EmfException("A control measure with the same name or abbreviation already exists.");
+
+        //default appropriate values
+        cm.setCreator(creator);
+        cm.setLastModifiedTime(new Date());
+        cm.setLastModifiedBy(creator.getName());
+
+        //create new measure, get its id
+        int cmId = (Integer)hibernateFacade.add(cm, session);
+
+        //copy measure SCCs
+        Scc[] sccs = getSccs(controlMeasureId, session);
+        session.clear();//must do this
+        updateSccsControlMeasureIds(sccs, cmId);
+        hibernateFacade.add(sccs, session);
+        
+        //copy measure Efficiecny Records
+        EfficiencyRecord[] records = (EfficiencyRecord[]) getEfficiencyRecords(controlMeasureId, session).toArray(new EfficiencyRecord[0]);
+        session.clear();//must do this
+        updateEfficiencyRecordControlMeasureIds(records, cmId);
+        hibernateFacade.add(records, session);
+        
+        return cmId;
+    }
+
     private void removeSccs(int controlMeasureId, Session session) {
         String hqlDelete = "delete Scc scc where scc.controlMeasureId = :controlMeasureId";
         session.createQuery( hqlDelete )
@@ -177,6 +218,12 @@ public class ControlMeasureDAO {
     private void updateSccsControlMeasureIds(Scc[] sccs, int controlMeasureId) {
         for (int i = 0; i < sccs.length; i++) {
             sccs[i].setControlMeasureId(controlMeasureId);
+        }
+    }
+
+    private void updateEfficiencyRecordControlMeasureIds(EfficiencyRecord[] records, int controlMeasureId) {
+        for (int i = 0; i < records.length; i++) {
+            records[i].setControlMeasureId(controlMeasureId);
         }
     }
 

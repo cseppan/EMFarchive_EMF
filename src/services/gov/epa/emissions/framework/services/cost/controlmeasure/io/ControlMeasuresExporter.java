@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -19,6 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
+
+import org.hibernate.Session;
 
 public class ControlMeasuresExporter implements Exporter {
 
@@ -139,6 +142,8 @@ public class ControlMeasuresExporter implements Exporter {
         PrintWriter efficienciesWriter = openExportFile("_efficiencies.csv");
         CMEfficiencyFileFormat fileFormat = new CMEfficiencyFileFormat();
         String[] colNames = fileFormat.cols();
+        ControlMeasureDAO dao = new ControlMeasureDAO();
+        Session session = factory.getSession();
         
         for (int i = 0; i < colNames.length; i++) {
             if (i == colNames.length - 1) {
@@ -150,12 +155,15 @@ public class ControlMeasuresExporter implements Exporter {
         }
         
         efficienciesWriter.write(System.getProperty("line.separator"));
-        
-        for (int j = 0; j < controlMeasures.length; j++) {
-            EfficiencyRecord[] records = controlMeasures[j].getEfficiencyRecords();
-            writeEfficiencyRecords(efficienciesWriter, controlMeasures[j].getAbbreviation(), records);
+        try {
+            for (int j = 0; j < controlMeasures.length; j++) {
+                EfficiencyRecord[] records = (EfficiencyRecord[]) dao.getEfficiencyRecords(controlMeasures[j].getId(), session).toArray(new EfficiencyRecord[0]);
+                writeEfficiencyRecords(efficienciesWriter, controlMeasures[j].getAbbreviation(), records);
+            }
+            session.clear();
+        } finally {
+            session.close();
         }
-        
         efficienciesWriter.close();
     }
     
@@ -177,7 +185,7 @@ public class ControlMeasuresExporter implements Exporter {
         efficiencyRecord += record.getExistingDevCode() + delimiter;
         efficiencyRecord += record.getEfficiency() + delimiter;
         efficiencyRecord += record.getCostYear() + delimiter;
-        efficiencyRecord += record.getCostPerTon() + delimiter;
+        efficiencyRecord += (record.getCostPerTon() == null ? "" : record.getCostPerTon()) + delimiter;
         efficiencyRecord += record.getRuleEffectiveness() + delimiter;
         efficiencyRecord += record.getRulePenetration() + delimiter;
         efficiencyRecord += record.getEquationType() + delimiter;

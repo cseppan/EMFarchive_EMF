@@ -14,7 +14,6 @@ import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.ImportButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
-import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -386,9 +385,9 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
             ControlMeasure element = (ControlMeasure) iter.next();
 
             try {
-                ControlMeasure coppied = (ControlMeasure) DeepCopy.copy(element);
-                coppied.setName("Copy of " + element.getName());
-                presenter.doSaveCopiedControlMeasure(coppied, element);
+//                ControlMeasure coppied = (ControlMeasure) DeepCopy.copy(element);
+//                coppied.setName("Copy of " + element.getName());
+                presenter.doSaveCopiedControlMeasure(element.getId());
             } catch (EmfException e) {
                 throw e;
             } catch (Exception e) {

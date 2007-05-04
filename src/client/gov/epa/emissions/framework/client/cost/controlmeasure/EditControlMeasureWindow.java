@@ -135,7 +135,6 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
                 doClose();
             }
         });
-        getRootPane().setDefaultButton(close);
         buttonsPanel.add(close);
 
         return buttonsPanel;

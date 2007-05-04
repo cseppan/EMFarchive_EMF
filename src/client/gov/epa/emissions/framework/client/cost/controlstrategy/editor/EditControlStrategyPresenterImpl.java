@@ -76,7 +76,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         validateName(controlStrategy);
         controlStrategy.setCreator(session.user());
         controlStrategy.setLastModifiedDate(new Date());
-        service().updateControlStrategyWithLock(controlStrategy);
+        controlStrategy = service().updateControlStrategyWithLock(controlStrategy);
 //        managerPresenter.doRefresh();
     }
 

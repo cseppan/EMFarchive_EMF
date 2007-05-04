@@ -96,6 +96,10 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         service().addMeasure(coppied, getSCCs(original.getId()));
     }
 
+    public void doSaveCopiedControlMeasure(int controlMeasureId) throws EmfException {
+        service().copyMeasure(controlMeasureId, session.user());
+    }
+
     private String getRandomString() {
         return Math.round(Math.random() * 1000000000) % 1000000000 + "";
     }

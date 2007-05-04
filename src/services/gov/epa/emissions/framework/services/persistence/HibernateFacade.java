@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.persistence;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -13,16 +14,30 @@ import org.hibernate.criterion.Restrictions;
 
 public class HibernateFacade {
 
-    public void add(Object obj, Session session) {
+//    public void add(Object obj, Session session) {
+//        Transaction tx = null;
+//        try {
+//            tx = session.beginTransaction();
+//            session.save(obj);
+//            tx.commit();
+//        } catch (HibernateException e) {
+//            tx.rollback();
+//            throw e;
+//        }
+//    }
+
+    public Serializable add(Object obj, Session session) {
         Transaction tx = null;
+        Serializable id;
         try {
             tx = session.beginTransaction();
-            session.save(obj);
+            id = session.save(obj);
             tx.commit();
         } catch (HibernateException e) {
             tx.rollback();
             throw e;
         }
+        return id;
     }
 
     public void add(Object[] objects, Session session) {

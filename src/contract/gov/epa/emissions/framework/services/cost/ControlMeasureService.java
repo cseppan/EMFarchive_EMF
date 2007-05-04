@@ -25,6 +25,8 @@ public interface ControlMeasureService extends EMFService {
 
     void removeMeasure(int controlMeasureId) throws EmfException;
 
+    public int copyMeasure(int controlMeasureId, User creator) throws EmfException;
+
 //    ControlMeasure obtainLockedMeasure(User user, ControlMeasure measure) throws EmfException;
 
     ControlMeasure obtainLockedMeasure(User user, int controlMeasureId) throws EmfException;

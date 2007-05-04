@@ -161,6 +161,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             ControlStrategy csWithLock = dao.updateWithLock(element, session);
 
             return csWithLock;
+//            return dao.getById(csWithLock.getId(), session);
         } catch (RuntimeException e) {
             LOG.error("Could not update Control Strategy: " + element, e);
             throw new EmfException("Could not update ControlStrategy: " + element);

@@ -104,6 +104,18 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
+    public int copyMeasure(int controlMeasureId, User creator) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.copy(controlMeasureId, creator, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not remove control measure Id: " + controlMeasureId, e);
+            throw new EmfException("Could not remove control measure Id: " + controlMeasureId);
+        } finally {
+            session.close();
+        }
+    }
+
     public ControlMeasure obtainLockedMeasure(User owner, int controlMeasureId) throws EmfException {
         Session session = null;
         try {

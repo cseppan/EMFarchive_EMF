@@ -67,6 +67,17 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         call.request(new Object[] { new Integer(controlMeasureId) });
     }
 
+    public int copyMeasure(int controlMeasureId, User creator) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("copyMeasure");
+        call.addIntegerParam("controlMeasureId");
+        call.addParam("creator", mappings.user());
+        call.setIntegerReturnType();
+
+        return (Integer)call.requestResponse(new Object[] { new Integer(controlMeasureId), creator });
+    }
+
     public ControlMeasure obtainLockedMeasure(User owner, int controlMeasureId) throws EmfException {
         EmfCall call = call();
 

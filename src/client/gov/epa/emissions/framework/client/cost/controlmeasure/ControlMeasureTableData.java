@@ -28,7 +28,7 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     private int targetYear;
 
-    private final static int refYear = 2000;
+    private final static int refYear = 1999;
 
     private final static Double NAN_VALUE = new Double(Double.NaN);
     
@@ -47,7 +47,7 @@ public class ControlMeasureTableData extends AbstractTableData {
     public String[] columns() {
         return new String[] { "Name", "Abbreviation", "Pollutant", 
                 "Max CE", "Min CE", "Avg CE", 
-                "Max Cost per Ton", "Min Cost per Ton", "Avg Cost per Ton", 
+                "Max CPT", "Min CPT", "Avg CPT", 
                 "Avg Rule Eff.", "Avg Rule Pen.", "Control Technology", 
                 "Source Group", "Equipment Life", "NEI Device Code", 
                 "Sectors", "Class", "Last Modified Time", 
