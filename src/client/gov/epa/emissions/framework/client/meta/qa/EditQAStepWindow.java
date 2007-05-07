@@ -551,7 +551,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     public void displayResultsTable(String qaStepName, String exportedFileName) {
-        AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QAStep \"" + qaStepName + "\" results ", desktopManager, parentConsole);
+        AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QAStep \"" + qaStepName + "\" results ", new Dimension(500, 500), desktopManager, parentConsole);
         app.display(new String[] { exportedFileName });
     }
 }

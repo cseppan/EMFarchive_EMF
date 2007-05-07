@@ -458,7 +458,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     }
 
     public void displayResultsTable(String qaStepName, String exportedFileName) {
-        AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QAStep \"" + qaStepName + "\" results ", desktopManager, parentConsole);
+        AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QAStep \"" + qaStepName + "\" results ", new Dimension(500, 500), desktopManager, parentConsole);
         app.display(new String[] { exportedFileName });
     }
 

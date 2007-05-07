@@ -13,6 +13,7 @@ import gov.epa.mims.analysisengine.table.io.FileImportGUI;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -26,11 +27,14 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
     private JTabbedPane mainTabbedPane;
 
     private EmfConsole parentConsole;
-
+    
+    private Dimension dimension;
+    
     private static int counter=0;
 
-    public AnalysisEngineTableApp(String controlStrategyName, DesktopManager desktopManager, EmfConsole parentConsole) {
-        super(controlStrategyName+counter++, desktopManager);
+    public AnalysisEngineTableApp(String controlStrategyName, Dimension dimension, DesktopManager desktopManager, EmfConsole parentConsole) {
+        super(controlStrategyName+counter++, dimension, desktopManager);
+        this.dimension = dimension;
         this.parentConsole = parentConsole;
     }
 
@@ -157,6 +161,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
 
         mainTabbedPane.addTab(tabName, null, panel, fileName);
         mainTabbedPane.setSelectedIndex(mainTabbedPane.getTabCount() - 1);
+        mainTabbedPane.setPreferredSize(dimension);
     }
 
     public static String get50Lines(String fileName) {
