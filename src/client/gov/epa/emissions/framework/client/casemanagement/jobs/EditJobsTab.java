@@ -185,7 +185,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
                 try {
                     clearMessage();
                     runJobs();
-                } catch (EmfException ex) {
+                } catch (Exception ex) {
                     messagePanel.setError(ex.getMessage());
                 }
             }
@@ -261,7 +261,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
         }
     }
 
-    private void runJobs() throws EmfException {
+    private void runJobs() throws Exception {
         CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
 
         if (jobs.length == 0) {
@@ -269,7 +269,13 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
             return;
         }
 
+        setMessage("Please wait while submitting all case jobs...");
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        
         presenter.runJobs(jobs);
+        doRefresh(presenter.getCaseJobs());
+        setMessage("Finished summitting jobs to run.");
+        setCursor(Cursor.getDefaultCursor());
     }
 
     private List<CaseJob> getSelectedJobs() {
@@ -294,6 +300,10 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
         messagePanel.clear();
     }
 
+    private void setMessage(String msg) {
+        messagePanel.setMessage(msg);
+    }
+    
     public void addJob(CaseJob job) {
         tableData.add(job);
         selectModel.refresh();

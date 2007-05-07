@@ -239,7 +239,7 @@ public class CaseServiceImpl implements CaseService {
             throw new EmfException("Could not remove Case: " + caseObj);
         }
     }
-    
+
     private void setStatus(User user, String message, String type) {
         Status status = new Status();
         status.setUsername(user.getUsername());
@@ -1006,14 +1006,24 @@ public class CaseServiceImpl implements CaseService {
     }
 
     public void runJobs(CaseJob[] jobs, User user) throws EmfException {
+        final CaseJob[] locals = jobs;
+        final User localUser = user;
+        final Session session = sessionFactory.getSession();
+        
         try {
+            final String caseName = dao.getCase(jobs[0].getCaseId(), session).getName();
+            
             threadPool.execute(new Runnable() {
                 public void run() {
-                    //
+                    for (CaseJob job : locals) {
+                        setStatus(localUser, "Job " + job.getName() + " submitted for case " + caseName + ".", "Run Job");
+                    }
                 }
             });
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
         }
 
     }
