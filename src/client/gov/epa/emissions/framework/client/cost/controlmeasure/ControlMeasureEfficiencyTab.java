@@ -105,6 +105,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
             }
         } catch (Exception e) {
             messagePanel.setError("Cannot retrieve all efficiency records.  " + e.getMessage());
+            e.printStackTrace();
         } finally  {
             setCursor(Cursor.getDefaultCursor());
             this.populateThread = null;
