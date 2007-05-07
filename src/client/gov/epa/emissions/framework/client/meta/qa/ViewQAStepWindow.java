@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
+import gov.epa.emissions.commons.gui.EmptyStrings;
 import gov.epa.emissions.commons.gui.FormattedDateField;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
@@ -94,7 +95,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     private EmfSession session;
 
     public ViewQAStepWindow(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
-        super("View QA Step", new Dimension(650, 625), desktopManager);
+        super("View QA Step", new Dimension(650, 580), desktopManager);
         this.parentConsole = parentConsole;
         this.session = session;
     }
@@ -299,34 +300,48 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Name:", new Label(step.getName()), panel);
-        layoutGenerator.addLabelWidgetPair("Version:", new Label(versionName + " (" + step.getVersion() + ")"), panel);
 
         program = new EditableComboBox(qaPrograms.names());
         program.setEditable(false);
-        program.setPrototypeDisplayValue("To make the combobox a bit wider");
+        program.setPrototypeDisplayValue(EmptyStrings.create(20));
         QAProgram qaProgram = step.getProgram();
         if (qaProgram != null)
             program.setSelectedItem(qaProgram.getName());
         else
             program.setSelectedItem(null);
         addChangeable(program);
-        layoutGenerator.addLabelWidgetPair("Program:", program, panel);
+        
+        JPanel prgpanel = new JPanel();
+        prgpanel.add(new Label(versionName + " (" + step.getVersion() + ")"));
+        prgpanel.add(new JLabel(EmptyStrings.create(20)));
+        prgpanel.add(new JLabel("Program:  "));
+        prgpanel.add(program);
+        layoutGenerator.addLabelWidgetPair("Version:", prgpanel, panel);
 
         programArguments = new TextArea("", step.getProgramArguments(), 40, 3);
         addChangeable(programArguments);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programArguments);
         layoutGenerator.addLabelWidgetPair("Arguments:", scrollableDetails, panel);
 
+        required = new CheckBox("", step.isRequired());
+        if (step.isRequired())
+            required.setEnabled(false);
+        
         order = new NumberFormattedTextField(5, orderAction());
         order.setText(step.getOrder() + "");
         order.addKeyListener(keyListener());
         addChangeable(order);
-        layoutGenerator.addLabelWidgetPair("Order:", order, panel);
-
-        required = new CheckBox("", step.isRequired());
-        if (step.isRequired())
-            required.setEnabled(false);
-        layoutGenerator.addLabelWidgetPair("Required?", required, panel);
+        
+        JPanel checkBoxPanel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layout = new SpringLayoutGenerator();
+        JPanel reqirepanel = new JPanel();
+        reqirepanel.add(new JLabel(EmptyStrings.create(20)));
+        reqirepanel.add(new JLabel("Required?"));
+        reqirepanel.add(new JLabel(EmptyStrings.create(20)));
+        reqirepanel.add(required);
+        layout.addWidgetPair(order, reqirepanel, checkBoxPanel);
+        layout.makeCompactGrid(checkBoxPanel, 1, 2, 0, 0, 0, 0);
+        layoutGenerator.addLabelWidgetPair("Order:", checkBoxPanel, panel);
 
         description = new TextArea("", step.getDescription(), 40, 3);
         addChangeable(description);
@@ -334,7 +349,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         layoutGenerator.addLabelWidgetPair("Description:", scrollableDesc, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
