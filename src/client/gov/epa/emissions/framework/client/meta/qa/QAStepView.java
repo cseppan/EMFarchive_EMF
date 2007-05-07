@@ -15,4 +15,6 @@ public interface QAStepView extends ManagedView {
     
     void setMostRecentUsedFolder(String mostRecentUsedFolder);
 
+    void displayResultsTable(String name, String absolutePath);
+
 }

@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.QAProgram;
+import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ComboBox;
@@ -18,6 +19,7 @@ import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
 import gov.epa.emissions.framework.client.data.QAPrograms;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
@@ -234,23 +236,6 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         folderPanel.add(button, BorderLayout.EAST);
         return folderPanel;
     }
-
-//    private void selectFolder() {
-//        FileChooser chooser = new FileChooser("Select Folder", new File(exportFolder.getText()), this);
-//
-//        chooser.setTitle("Select a folder");
-//        File[] file = chooser.choose();
-//        if (file == null || file.length == 0)
-//            return;
-//
-//        if (file[0].isDirectory()) {
-//            exportFolder.setText(file[0].getAbsolutePath());
-//        }
-//
-//        if (file[0].isFile()) {
-//            exportFolder.setText(file[0].getParent());
-//        }
-//    }
     
     private void selectFolder() {
         EmfFileInfo initDir = new EmfFileInfo(exportFolder.getText(), true, true);
@@ -399,8 +384,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         Button cancel = closeButton();
         panel.add(cancel);
 
-        Button viewResults = new Button("View Results", null);
-        viewResults.setEnabled(false);
+        Button viewResults = viewResultsButton();
         panel.add(viewResults);
 
         Button export = exportButton();
@@ -428,6 +412,28 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         }
     }
 
+    private Button viewResultsButton() {
+        return new BorderlessButton("View Results", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                clear();
+                try {
+                    viewResults();
+                } catch (EmfException exc) {
+                    messagePanel.setError(exc.getMessage());
+                }
+            }
+        });
+    }
+    
+    private void viewResults() throws EmfException {
+        String exportDir = exportFolder.getText();
+
+        if (exportDir == null || exportDir.trim().isEmpty())
+            throw new EmfException("Please specify an export directory.");
+
+        presenter.viewResults(step, qaStepResult, exportFolder.getText());
+    }
+    
     private Button closeButton() {
         Button cancel = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -450,6 +456,11 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
 
     private void clear() {
         messagePanel.clear();
+    }
+
+    public void displayResultsTable(String qaStepName, String exportedFileName) {
+        AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QAStep \"" + qaStepName + "\" results ", desktopManager, parentConsole);
+        app.display(new String[] { exportedFileName });
     }
 
 }
