@@ -89,7 +89,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
             messagePanel.clear();
             setCursor(Cursor.getDefaultCursor());
         } catch (Exception e) {
-            e.printStackTrace();
             messagePanel.setError("Cannot retrieve all case jobs.");
         }
     }

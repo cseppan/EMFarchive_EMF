@@ -6,6 +6,8 @@ import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
@@ -219,6 +221,7 @@ public class CaseServiceImpl implements CaseService {
     public void removeCase(Case caseObj) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
+            setStatus(caseObj.getLastModifiedBy(), "Start removing case " + caseObj.getName() + ".", "Remove Case");
             List<CaseInput> inputs = dao.getCaseInputs(caseObj.getId(), session);
             dao.removeCaseInputs(inputs.toArray(new CaseInput[0]), session);
 
@@ -229,11 +232,22 @@ public class CaseServiceImpl implements CaseService {
             dao.removeCaseParameters(parameters.toArray(new CaseParameter[0]), session);
 
             dao.remove(caseObj, session);
+            setStatus(caseObj.getLastModifiedBy(), "Finished removing case " + caseObj.getName() + ".", "Remove Case");
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not remove Case: " + caseObj, e);
             throw new EmfException("Could not remove Case: " + caseObj);
         }
+    }
+    
+    private void setStatus(User user, String message, String type) {
+        Status status = new Status();
+        status.setUsername(user.getUsername());
+        status.setType(type);
+        status.setMessage(message);
+        status.setTimestamp(new Date());
+        StatusDAO statusDao = new StatusDAO(sessionFactory);
+        statusDao.add(status);
     }
 
     public Case obtainLocked(User owner, Case element) throws EmfException {

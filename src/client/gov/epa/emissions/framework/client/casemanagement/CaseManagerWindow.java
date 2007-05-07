@@ -23,6 +23,7 @@ import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -243,6 +244,9 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             return;
         }
 
+        messagePanel.setMessage("Please wait while removing cases...");
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
             Case element = (Case) iter.next();
             try {
@@ -252,6 +256,10 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
                 showError("Could not remove " + element + "." + e.getMessage());
             }
         }
+        
+        clearMsgPanel();
+        setCursor(Cursor.getDefaultCursor());
+        messagePanel.setMessage("Finished removing cases.");
     }
 
     private void copySelectedCases() {
@@ -262,6 +270,8 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             return;
         }
 
+        messagePanel.setMessage("Please wait while copying cases...");
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         int[] caseIds = new int[cases.size()];
 
         for (int i = 0; i < caseIds.length; i++)
@@ -270,6 +280,9 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         try {
             presenter.doCopyCases(caseIds);
             doRefresh();
+            clearMsgPanel();
+            setCursor(Cursor.getDefaultCursor());
+            messagePanel.setMessage("Finished copying cases.");
         } catch (Exception e) {
             showError("Could not copy cases." + e.getMessage());
         }
