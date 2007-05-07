@@ -46,8 +46,8 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     public String[] columns() {
         return new String[] { "Name", "Abbreviation", "Pollutant", 
-                "Max CE", "Min CE", "Avg CE", 
-                "Max CPT", "Min CPT", "Avg CPT", 
+                "Avg CPT", "Avg CE", "Min CE", 
+                "Max CE", "Min CPT", "Max CPT", 
                 "Avg Rule Eff.", "Avg Rule Pen.", "Control Technology", 
                 "Source Group", "Equipment Life", "NEI Device Code", 
                 "Sectors", "Class", "Last Modified Time", 
@@ -84,8 +84,8 @@ public class ControlMeasureTableData extends AbstractTableData {
                 AggregatedPollutantEfficiencyRecord aper = apers[j];
                 if (majorPollutant && measure.getMajorPollutant().equals(measure.getMajorPollutant())) {
                     Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(measure),
-                            new Double(aper.getMaxEfficiency()), new Double(aper.getMinEfficiency()), new Double(aper.getAvgEfficiency()), 
-                            getCostPerTon(aper.getMaxCostPerTon()), getCostPerTon(aper.getMinCostPerTon()), getCostPerTon(aper.getAvgCostPerTon()), 
+                            getCostPerTon(aper.getAvgCostPerTon()), new Double(aper.getAvgEfficiency()), new Double(aper.getMinEfficiency()), 
+                            new Double(aper.getMaxEfficiency()), getCostPerTon(aper.getMinCostPerTon()), getCostPerTon(aper.getMaxCostPerTon()), 
                             new Double(aper.getAvgRuleEffectiveness()), new Double(aper.getAvgRulePenetration()), getControlTechnology(measure), 
                             getSourceGroup(measure), new Double(measure.getEquipmentLife()), "" + measure.getDeviceCode(), 
                             getSectors(measure), measureClass(measure.getCmClass()), getLastModifiedTime(measure), 
@@ -97,8 +97,8 @@ public class ControlMeasureTableData extends AbstractTableData {
                     break;
                 } else if (pollutant.equals(aper.getPollutant())) {
                     Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(aper.getPollutant()),
-                            new Double(aper.getMaxEfficiency()), new Double(aper.getMinEfficiency()), new Double(aper.getAvgEfficiency()), 
-                            getCostPerTon(aper.getMaxCostPerTon()), getCostPerTon(aper.getMinCostPerTon()), getCostPerTon(aper.getAvgCostPerTon()), 
+                            getCostPerTon(aper.getAvgCostPerTon()), new Double(aper.getAvgEfficiency()), new Double(aper.getMinEfficiency()), 
+                            new Double(aper.getMaxEfficiency()), getCostPerTon(aper.getMinCostPerTon()), getCostPerTon(aper.getMaxCostPerTon()), 
                             new Double(aper.getAvgRuleEffectiveness()), new Double(aper.getAvgRulePenetration()), getControlTechnology(measure), 
                             getSourceGroup(measure), new Double(measure.getEquipmentLife()), "" + measure.getDeviceCode(), 
                             getSectors(measure), measureClass(measure.getCmClass()), getLastModifiedTime(measure), 
