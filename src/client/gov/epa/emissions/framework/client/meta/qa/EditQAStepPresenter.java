@@ -92,7 +92,7 @@ public class EditQAStepPresenter {
         File exported = new File(exportDir, exportedQAStepFileName(qaStep));
         
         if (!exported.exists())
-            throw new EmfException("Please export run results before view them.");
+            throw new EmfException("Please export the QA Step results before viewing them.");
         
         view.displayResultsTable(qaStep.getName(), exported.getAbsolutePath());
     }
