@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost.analysis.maxreduction;
 
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.OptimizedQuery;
@@ -104,6 +105,7 @@ public class StrategyLoader {
         String pointId = "";
         String stackId = "";
         String segment = "";
+        Pollutant poll = null;
         try {
             while (resultSet.next()) {
                 
@@ -139,21 +141,22 @@ public class StrategyLoader {
                     newSource = false;
                 }
                 sourceCount = resultSet.getInt("Record_Id");
+                poll = pollutants.getPollutant(resultSet.getString("poll"));
                 
                 //find best measure for source (based on target pollutant)...
                 if (newSource) {
                     if (!pointDatasetType) {
-                        maxCM = retrieveMeasure.findBestMaxEmsRedMeasure(scc, fips, pollutants.getPollutant(resultSet.getString("poll")),
+                        maxCM = retrieveMeasure.findBestMaxEmsRedMeasure(scc, fips, poll,
                                 resultSet.getDouble("CEFF"), resultSet.getDouble("RPEN"), 
                                 resultSet.getDouble("REFF"), resultSet.getDouble("ANN_EMIS"));
                     } else {
-                        maxCM = retrieveMeasure.findBestMaxEmsRedMeasure(scc, fips, pollutants.getPollutant(resultSet.getString("poll")),
+                        maxCM = retrieveMeasure.findBestMaxEmsRedMeasure(scc, fips, poll,
                                 resultSet.getDouble("CEFF"), 100, 
                                 resultSet.getFloat("CEFF") > 0 && resultSet.getFloat("REFF") == 0 ? 100 : resultSet.getFloat("REFF"), resultSet.getDouble("ANN_EMIS"));
                     }
                 //find best efficiency record for source and cobenefit pollutant, measure was already determined above...
                 } else {
-                    maxCM = retrieveMeasure.getMaxEmsRedMeasureForCobenefitPollutant(pollutants.getPollutant(resultSet.getString("poll")));
+                    maxCM = retrieveMeasure.getMaxEmsRedMeasureForCobenefitPollutant(poll);
                 }
                 if (maxCM == null)
                     continue; // LOG???
@@ -161,7 +164,8 @@ public class StrategyLoader {
                     RecordGenerator generator = getRecordGenerator();
                     Record record = generator.getRecord(resultSet, maxCM);
                     totalCost += generator.reducedEmission() * maxCM.adjustedCostPerTon();
-                    totalReduction += generator.reducedEmission();
+                    if (poll.equals(controlStrategy.getTargetPollutant()))
+                        totalReduction += generator.reducedEmission();
                     insertRecord(record, modifier);
                 } catch (SQLException e) {
                     result.setRunStatus("Failed. Error in processing record for source record: " + sourceCount + ".");
