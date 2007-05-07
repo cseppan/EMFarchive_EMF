@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.QAProgram;
-import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ComboBox;
@@ -424,7 +423,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     private Button viewResultsButton() {
-        return new BorderlessButton("View Results", new AbstractAction() {
+        return new Button("View Results", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clear();
                 try {

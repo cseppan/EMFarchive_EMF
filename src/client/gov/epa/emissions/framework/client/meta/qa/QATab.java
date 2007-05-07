@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -78,8 +79,7 @@ public class QATab extends JPanel implements QATabView {
     private JPanel createButtonsSection() {
         JPanel container = new JPanel();
 
-        JButton view = new JButton("View");
-        view.addActionListener(new AbstractAction() {
+        JButton view = new BorderlessButton("View", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doView();
             }
