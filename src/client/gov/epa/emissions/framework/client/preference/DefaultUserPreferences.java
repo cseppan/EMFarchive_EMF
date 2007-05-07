@@ -23,6 +23,10 @@ public class DefaultUserPreferences implements UserPreference {
 
     private static final String LOCAL_INPUT_DRIVE = "local.input.drive";
 
+    private static final String DEFAULT_USER_NAME = "user.name";
+    
+    private static final String DEFAULT_USER_PASSWORD = "user.password";
+
     private static Log log = LogFactory.getLog(DefaultUserPreferences.class);
 
     public static final String EMF_PREFERENCE = "USER_PREFERENCES";
@@ -92,5 +96,13 @@ public class DefaultUserPreferences implements UserPreference {
         
         String path = local + remotePath.substring(remote.length());
         return path.replace('/', '\\');
+    }
+
+    public String userName() {
+        return property(DEFAULT_USER_NAME);
+    }
+
+    public String userPassword() {
+        return property(DEFAULT_USER_PASSWORD);
     }
 }

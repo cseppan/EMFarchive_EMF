@@ -82,6 +82,8 @@ public class LoginWindow extends EmfFrame implements LoginView {
             else
             {
                 System.out.println("Showing Login Window");
+                username.setText(presenter.userName());
+                password.setText(presenter.userPassword());
                 super.display();
             }
         } catch (Exception e) {

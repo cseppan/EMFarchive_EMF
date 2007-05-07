@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.login;
 import gov.epa.emissions.commons.CommonsException;
 import gov.epa.emissions.commons.security.PasswordGenerator;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
+import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.UserService;
 
@@ -11,8 +13,10 @@ public class LoginPresenter {
     private UserService userAdmin;
 
     private LoginView view;
-    
+
     private String update;
+
+    private UserPreference preferences;
 
     public LoginPresenter(UserService model) {
         this.userAdmin = model;
@@ -30,16 +34,16 @@ public class LoginPresenter {
     public boolean checkEmfVersion(String current) throws EmfException {
         try {
             update = userAdmin.getEmfVersion();
-            
+
             if (update == null)
                 return true;
-            
+
             return update.trim().equalsIgnoreCase(current);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
     }
-    
+
     public String getUpdatedEmfVersion() {
         return update;
     }
@@ -53,6 +57,20 @@ public class LoginPresenter {
         view.observe(this);
 
         view.display();
+    }
+
+    public String userName() throws EmfException {
+        if (this.preferences == null)
+            this.preferences = new DefaultUserPreferences();
+        
+        return preferences.userName();
+    }
+
+    public String userPassword() throws EmfException {
+        if (this.preferences == null)
+            this.preferences = new DefaultUserPreferences();
+        
+        return preferences.userPassword();
     }
 
 }

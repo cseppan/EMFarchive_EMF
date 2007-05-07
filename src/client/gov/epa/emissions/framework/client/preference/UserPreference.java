@@ -12,6 +12,9 @@ public interface UserPreference {
 
     String mapLocalOutputPathToRemote(String localPath);
     
-    String mapRemoteOutputPathToLocal(String remotePath); 
-
+    String mapRemoteOutputPathToLocal(String remotePath);
+    
+    String userName();
+    
+    String userPassword();
 }

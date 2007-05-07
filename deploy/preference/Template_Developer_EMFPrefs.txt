@@ -8,6 +8,9 @@ remote.output.drive=C:/
 default.input.folder=
 default.output.folder=
 
+user.name=emf
+user.password=emf12345
+
 #Format#
 format.double.decimal_places=2
 format.double.option=Standard_Notation
