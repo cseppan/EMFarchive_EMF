@@ -111,4 +111,8 @@ public class EditQAStepPresenter {
         return result.trim().replaceAll(" ", "_") + ".csv";
     }
 
+    public QAStepResult getStepResult(QAStep step) throws EmfException {
+        return session.qaService().getQAStepResult(step);
+    }
+
 }

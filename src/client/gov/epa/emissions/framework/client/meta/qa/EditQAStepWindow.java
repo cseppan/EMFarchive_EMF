@@ -36,6 +36,7 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -56,7 +57,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-public class EditQAStepWindow extends DisposableInteralFrame implements EditQAStepView {
+public class EditQAStepWindow extends DisposableInteralFrame implements EditQAStepView, Runnable {
 
     private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.PATTERN_yyyyMMddHHmm);
 
@@ -101,10 +102,19 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private EmfSession session;
 
     private EmfConsole parentConsole;
+    
+    private volatile Thread runThread;
+
+    private TextField tableName;
+
+    private JLabel creationStatusLabel;
+
+    private JLabel creationDateLabel;
 
     public EditQAStepWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
         super("Edit QA Step", new Dimension(650, 580), desktopManager);
         this.parentConsole = parentConsole;
+        this.runThread = new Thread(this);
     }
 
     public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset,
@@ -120,6 +130,39 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         JPanel layout = createLayout(step, qaStepResult, versionName);
         super.getContentPane().add(layout);
         super.display();
+    }
+    
+    public void run() {
+        try {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            doRun();
+            Thread.sleep(5000);
+            int factor = 1;
+            qaStepResult = presenter.getStepResult(step);
+            
+            while ( qaStepResult == null || qaStepResult.getTable() == null) {
+                Thread.sleep(5000 + factor * 5000);
+                qaStepResult = presenter.getStepResult(step);
+                ++factor;
+            }
+            
+            resetRunStatus(qaStepResult);
+            setCursor(Cursor.getDefaultCursor());
+        } catch (Exception e) {
+            messagePanel.setError(e.getMessage());
+        }
+        
+        saveButton.setEnabled(true);
+    }
+
+    private void resetRunStatus(QAStepResult result) {
+        who.setText(step.getWho());
+        date.setText(DATE_FORMATTER.format(step.getDate()));
+        status.setSelectedItem(step.getStatus());
+        tableName.setText(result.getTable());
+        creationStatusLabel.setText(result.getTableCreationStatus());
+        creationDateLabel.setText(EmfDateFormat.format_MM_DD_YYYY_HH_mm(result.getTableCreationDate()));
+        currentTable.setSelected(result.isCurrentTable());
     }
 
     public void windowClosing() {
@@ -176,17 +219,17 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         String table = stepResult.getTable();
         table = (table == null) ? "" : table;
-        TextField tableName = new TextField("tableName", table, 20);
+        tableName = new TextField("tableName", table, 20);
         tableName.setEditable(false);
         tableName.setToolTipText("The name of the output of the step (e.g. name of a table in the database");
         layoutGenerator.addLabelWidgetPair("Ouput Name:", tableName, panel);
 
-        JLabel creationStatusLabel = new JLabel();
+        creationStatusLabel = new JLabel();
         String tableCreationStatus = stepResult.getTableCreationStatus();
         creationStatusLabel.setText((tableCreationStatus != null) ? tableCreationStatus : "");
         layoutGenerator.addLabelWidgetPair("Run Status:", creationStatusLabel, panel);
 
-        JLabel creationDateLabel = new JLabel();
+        creationDateLabel = new JLabel();
         Date tableCreationDate = stepResult.getTableCreationDate();
         String creationDate = (tableCreationDate != null) ? EmfDateFormat.format_MM_DD_YYYY_HH_mm(tableCreationDate)
                 : "";
@@ -454,7 +497,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         Button run = new RunButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clear();
-                doRun();
+                runThread.start();
             }
         });
         return run;

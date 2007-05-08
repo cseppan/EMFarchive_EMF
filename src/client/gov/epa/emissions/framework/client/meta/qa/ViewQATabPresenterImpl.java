@@ -1,9 +1,12 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.editor.DataEditorService;
 
 public class ViewQATabPresenterImpl implements ViewQATabPresenter {
 
@@ -31,7 +34,13 @@ public class ViewQATabPresenterImpl implements ViewQATabPresenter {
 
     void view(QAStep step, QAStepView view, ViewQAStepPresenter presenter) throws EmfException {
         view.observe(presenter);
-        presenter.display(step, step.getVersion()+"");
+        VersionsSet versions = new VersionsSet(getVersions());
+        presenter.display(step, versions.name(step.getVersion()));
+    }
+
+    public Version[] getVersions() throws EmfException {
+        DataEditorService service = session.dataEditorService();
+        return service.getVersions(dataset.getId());
     }
 
 }

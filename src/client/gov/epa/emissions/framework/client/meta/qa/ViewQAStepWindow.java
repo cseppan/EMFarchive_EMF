@@ -201,13 +201,13 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         config = new TextField("config", step.getConfiguration(), 40);
-        addChangeable(config);
+        //addChangeable(config);
         config.setToolTipText("Enter the name of the Dataset that is the configuration "
                 + "file (e.g., a REPCONFIG file)");
         layoutGenerator.addLabelWidgetPair("Configuration:", config, panel);
 
         comments = new TextArea("Comments", step.getComments(), 40, 2);
-        addChangeable(comments);
+        //addChangeable(comments);
         ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(comments);
         layoutGenerator.addLabelWidgetPair("Comments:", scrollableComment, panel);
 
@@ -258,15 +258,15 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         status = status(step);
-        addChangeable(status);
+        //addChangeable(status);
         layoutGenerator.addLabelWidgetPair("QA Status:", status, panel);
 
         who = new TextField("who", step.getWho(), 10);
-        addChangeable(who);
+        //addChangeable(who);
         layoutGenerator.addLabelWidgetPair("User:", who, panel);
 
         date = new FormattedDateField("Date", step.getDate(), DATE_FORMATTER, messagePanel);
-        addChangeable(date);
+        //addChangeable(date);
         layoutGenerator.addLabelWidgetPair("QA Date:", date, panel);
 
         // Lay out the panel.
@@ -309,7 +309,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
             program.setSelectedItem(qaProgram.getName());
         else
             program.setSelectedItem(null);
-        addChangeable(program);
+        //addChangeable(program);
         
         JPanel prgpanel = new JPanel();
         prgpanel.add(new Label(versionName + " (" + step.getVersion() + ")"));
@@ -319,7 +319,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         layoutGenerator.addLabelWidgetPair("Version:", prgpanel, panel);
 
         programArguments = new TextArea("", step.getProgramArguments(), 40, 3);
-        addChangeable(programArguments);
+        //addChangeable(programArguments);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programArguments);
         layoutGenerator.addLabelWidgetPair("Arguments:", scrollableDetails, panel);
 
@@ -330,7 +330,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         order = new NumberFormattedTextField(5, orderAction());
         order.setText(step.getOrder() + "");
         order.addKeyListener(keyListener());
-        addChangeable(order);
+        //addChangeable(order);
         
         JPanel checkBoxPanel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layout = new SpringLayoutGenerator();
@@ -344,7 +344,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         layoutGenerator.addLabelWidgetPair("Order:", checkBoxPanel, panel);
 
         description = new TextArea("", step.getDescription(), 40, 3);
-        addChangeable(description);
+        //addChangeable(description);
         ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
         layoutGenerator.addLabelWidgetPair("Description:", scrollableDesc, panel);
 
