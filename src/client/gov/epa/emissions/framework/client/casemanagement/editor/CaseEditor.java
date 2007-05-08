@@ -168,6 +168,8 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
             }
         });
         buttonsPanel.add(save);
+        save.setToolTipText(
+                "Saves only the information on the Summary tab and the input and output folders.");
 
         Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {

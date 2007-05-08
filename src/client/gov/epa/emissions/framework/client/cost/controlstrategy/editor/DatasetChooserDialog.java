@@ -76,7 +76,7 @@ public class DatasetChooserDialog extends JDialog {
 
         JScrollPane scrollPane = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setPreferredSize(new Dimension(300, 300));
+        scrollPane.setPreferredSize(new Dimension(500, 300));
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.add(scrollPane);
         return panel;

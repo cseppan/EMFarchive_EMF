@@ -61,7 +61,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     private volatile Thread populateThread;
 
     public ControlStrategyManagerWindow(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
-        super("Control Strategy Manager", new Dimension(700, 400), desktopManager);
+        super("Control Strategy Manager", new Dimension(850, 400), desktopManager);
         
         this.session = session;
         this.parentConsole = parentConsole;
