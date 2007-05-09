@@ -192,7 +192,7 @@ public class ControlMeasureTableData extends AbstractTableData {
     }
 
     private void filter(Pollutant pollutant, String year) throws EmfException {
-        this.targetYear = new YearValidation("Cost Year").value(year);
+        this.targetYear = new YearValidation("Cost Year").value(year, costYearTable.getStartYear(), costYearTable.getEndYear());
         this.pollutant = pollutant;
 //        if (pollutant.equalsIgnoreCase("major"))
 //            measures(allMeasures);
