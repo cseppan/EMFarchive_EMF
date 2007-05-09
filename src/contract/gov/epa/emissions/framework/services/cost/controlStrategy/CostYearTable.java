@@ -1,17 +1,21 @@
 package gov.epa.emissions.framework.services.cost.controlStrategy;
 
+import gov.epa.emissions.framework.services.EmfException;
+
+import java.io.Serializable;
+
 import org.apache.commons.collections.primitives.ArrayDoubleList;
 import org.apache.commons.collections.primitives.DoubleList;
 
-import gov.epa.emissions.framework.services.EmfException;
-
-public class CostYearTable {
+public class CostYearTable implements Serializable {
 
     private int targetYear;
 
     private DoubleList gdpValues;
 
     private int startYear;
+    
+    private int endYear;
 
     public CostYearTable() {
         gdpValues = new ArrayDoubleList();
@@ -28,10 +32,12 @@ public class CostYearTable {
 
     public void addFirst(int startYear, double gdp) {
         this.startYear = startYear;
+        this.endYear = startYear;
         gdpValues.add(gdp);
     }
 
-    public void add(double gdp) {
+    public void add(int year, double gdp) {
+        this.endYear = year;
         gdpValues.add(gdp);
     }
 
@@ -43,9 +49,10 @@ public class CostYearTable {
     }
 
     private double gdpValue(int year) throws EmfException {
-        int index = year - startYear;
-        if (index > size() - 1) {
-            throw new EmfException("The cost year conversion is available between 1929 to 2005");
+        int index = year - this.startYear;
+        if (index > size() - 1 || index < 0) {
+//            throw new EmfException("The cost year conversion is available between 1929 to 2005");
+            throw new EmfException("The cost year conversion is available between " + this.startYear + " to " + this.endYear);
         }
         return gdpValues.get(index);
     }
@@ -55,7 +62,7 @@ public class CostYearTable {
     }
 
     public int getTargetYear() {
-        return targetYear;
+        return this.targetYear;
     }
 
     public DoubleValue[] getGdpValues() {
@@ -75,11 +82,19 @@ public class CostYearTable {
     }
 
     public int getStartYear() {
-        return startYear;
+        return this.startYear;
     }
 
     public void setStartYear(int startYear) {
         this.startYear = startYear;
+    }
+
+    public void setEndYear(int endYear) {
+        this.endYear = endYear;
+    }
+
+    public int getEndYear() {
+        return this.endYear;
     }
 
 }

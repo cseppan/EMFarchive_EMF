@@ -30,7 +30,8 @@ public class CostYearTableReader {
                 table.addFirst(rs.getInt(1), rs.getDouble(3));
             while (rs.next()) {
                 double gdp = rs.getDouble(3);
-                table.add(gdp);
+                int year = rs.getInt(1);
+                table.add(year, gdp);
             }
         } catch (Exception e) {
             throw new EmfException("Could not get records from " + qualifiedTableName());
