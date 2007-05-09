@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
-import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
@@ -52,11 +51,9 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
             throw new EmfException("Please select one or more result datasets");
         }
         String[]  fileNames = new String[datasets.length];
-        UserPreference preference = session.preferences();
         for (int i = 0; i < datasets.length; i++) {
             int datasetId = datasets[i].getId();
-            String fileNameOnServer = session.loggingService().getLastExportedFileName(datasetId);
-            fileNames[i] = preference.mapRemoteOutputPathToLocal(fileNameOnServer);
+            fileNames[i] = session.loggingService().getLastExportedFileName(datasetId);
         }
         view.displayAnalyzeTable(controlStrategyName,fileNames);
     }
