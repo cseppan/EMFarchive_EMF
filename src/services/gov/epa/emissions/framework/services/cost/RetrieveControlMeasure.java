@@ -167,6 +167,7 @@ public class RetrieveControlMeasure {
                 "on mp.id = cm.major_pollutant " +
                 "order by cm.name, cm.id/*, p.name*/";
 
+        //Keep the sort order, this dictates how the list is built for the measure mgr!!!
         query = "select cm.id, cm.name, " +
                 "cm.abbreviation, cm.description, " +
                 "cm.device_code, cm.major_pollutant, mp.name, " +
@@ -218,7 +219,7 @@ public class RetrieveControlMeasure {
                 "on p.id = aer.pollutant_id " +
                 "left outer join emf.pollutants mp " +
                 "on mp.id = cm.major_pollutant " +
-                "order by cm.name, cm.id, p.name";
+                "order by cm.name, cm.id, s.name, p.name";
 //        log.error(query);
         return query;
     }
@@ -277,6 +278,7 @@ public class RetrieveControlMeasure {
                 "where cm.major_pollutant = " + majorPollutantId + " " +
                 "order by cm.name, cm.id/*, p.name*/";
 
+        //Keep the sort order, this dictates how the list is built for the measure mgr!!!
         query = "select cm.id, cm.name, " +
         "cm.abbreviation, cm.description, " +
         "cm.device_code, cm.major_pollutant, mp.name, " +
@@ -329,7 +331,7 @@ public class RetrieveControlMeasure {
         "left outer join emf.pollutants mp " +
         "on mp.id = cm.major_pollutant " +
         "where cm.major_pollutant = " + majorPollutantId + " " +
-        "order by cm.name, cm.id, p.name";
+        "order by cm.name, cm.id, s.name, p.name";
 //        log.error(query);
 
         return query;
