@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -27,6 +28,10 @@ public class ControlStrategyDAO {
     }
 
     public void add(ControlStrategy element, Session session) {
+        addObject(element, session);
+    }
+
+    public void add(ControlStrategyConstraint element, Session session) {
         addObject(element, session);
     }
 
@@ -106,7 +111,7 @@ public class ControlStrategyDAO {
     }
 
     public void remove(ControlStrategy strategy, Session session) {
-        hibernateFacade.remove(strategy.getConstraint(), session);
+        if (strategy.getConstraint() != null) hibernateFacade.remove(strategy.getConstraint(), session);
         hibernateFacade.remove(strategy, session);
     }
 

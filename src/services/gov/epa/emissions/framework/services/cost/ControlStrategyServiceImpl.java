@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -222,6 +223,8 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         } catch (RuntimeException e) {
             LOG.error("Could not remove control strategy: " + element, e);
             throw new EmfException("Could not remove control strategy: " + element.getName());
+        } finally {
+            session.close();
         }
     }
 
@@ -240,12 +243,15 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     }
 
     public StrategyType[] getStrategyTypes() throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            List st = dao.getAllStrategyTypes(sessionFactory.getSession());
+            List st = dao.getAllStrategyTypes(session);
             return (StrategyType[]) st.toArray(new StrategyType[0]);
         } catch (HibernateException e) {
             LOG.error("could not retrieve all control strategy types. " + e.getMessage());
             throw new EmfException("could not retrieve all control strategy types. " + e.getMessage());
+        } finally {
+            session.close();
         }
     }
 
@@ -323,6 +329,9 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         try {
             //get cs to copy
             ControlStrategy cs = dao.getById(id, session);
+            
+            ControlStrategyConstraint constraint = cs.getConstraint();
+            
             session.clear();// clear to flush current
 
             String name = "Copy of " + cs.getName();
@@ -338,7 +347,13 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             coppied.setLastModifiedDate(new Date());
 
             dao.add(coppied, session);
-            return coppied.getId();
+            int csId = coppied.getId();
+//FIXME:  something is not right with the hibernate mapping, constraint should be added automatically.
+            if (constraint != null) {
+                constraint.setControlStrategyId(csId);
+                dao.add(constraint, session);
+            }
+            return csId;
         } catch (EmfException e) {
             LOG.error(e.getMessage());
             throw e;
