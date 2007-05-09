@@ -27,7 +27,6 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
@@ -105,7 +104,6 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
             }
         } catch (Exception e) {
             messagePanel.setError("Cannot retrieve all efficiency records.  " + e.getMessage());
-            e.printStackTrace();
         } finally  {
             setCursor(Cursor.getDefaultCursor());
             this.populateThread = null;
@@ -381,8 +379,9 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     private JPanel sortFilterControlPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        JPanel actionPanel = new JPanel(new GridLayout(3, 1));
+        JPanel actionPanel = new JPanel();
         init(actionPanel);
         panel.add(actionPanel);
 
@@ -429,7 +428,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         rowFilter = new TextArea("rowFilter", "", 25, 2);
         rowFilter.setToolTipText(_rowFilter);
         ScrollableComponent scrollPane = new ScrollableComponent(rowFilter);
-        scrollPane.setPreferredSize(new Dimension(400, 55));
+        scrollPane.setPreferredSize(new Dimension(400, 35));
         Label label = new Label("Row Filter ");
 
         labelContainer.add(label, BorderLayout.NORTH);
