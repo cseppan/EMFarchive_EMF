@@ -96,10 +96,12 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     protected JLabel refYrCostPerTon;
 
     protected final int refYear = 1999;
+    
+    static int counter = 0;
 
     public EfficiencyRecordWindow(String title, ManageChangeables changeablesList, DesktopManager desktopManager,
             EmfSession session, CostYearTable costYearTable) {
-        super(title, new Dimension(650, 425), desktopManager);
+        super(title, new Dimension(675, 425), desktopManager);
         this.changeablesList = changeablesList;
         this.session = session;
         this.verifier = new NumberFieldVerifier("");
@@ -112,7 +114,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         String name = measure.getName();
         if (name == null)
             name = "New Control Measure";
-        super.setLabel(super.getTitle() + " for Control Measure: " + name);
+        super.setLabel(super.getTitle() + " " + (counter++) + " for " + name);
         JPanel layout = createLayout();
         super.getContentPane().add(layout);
         super.display();
@@ -227,7 +229,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
                 try {
                     refreshRefYrCostPerTon();
                 } catch (EmfException e1) {
-                    messagePanel.setError("Could not update reference year cost per ton");
+                    messagePanel.setError("Could not update reference year cost per ton: " + e1.getMessage());
                 }
             }
         });
@@ -240,7 +242,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
                 try {
                     refreshRefYrCostPerTon();
                 } catch (EmfException e1) {
-                    messagePanel.setError("Could not update reference year cost per ton");
+                    messagePanel.setError("Could not update reference year cost per ton: " + e1.getMessage());
                 }
             }
         });
@@ -257,6 +259,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
 
     private void refreshRefYrCostPerTon() throws EmfException {
+        messagePanel.clear();
         int costYearValue = verifier.parseInteger(costYear);
         float costPerTonValue = verifier.parseFloat(costperTon);
         costYearTable.setTargetYear(refYear);
@@ -352,7 +355,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         saveEfficiency(efficiency);
         saveCostYear();
         saveCostPerTon();
-        record.setRefYrCostPerTon(new Double(refYrCostPerTon.getText()));
+        saveRefYrCostPerTon();
         saveLocale();
         saveRuleEffectiveness();
         saveRulePenetration();
@@ -433,16 +436,29 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     }
 
     private void saveCostPerTon() throws EmfException {
-        if (costperTon.getText().trim().length() == 0)
-            throw new EmfException("Please set the Cost Per Ton");
+//      if (costperTon.getText().trim().length() == 0)
+//      throw new EmfException("Please set the Cost Per Ton");
+        if (costperTon.getText().trim().length() > 0) {
+            double value = verifier.parseDouble(costperTon);
+            record.setCostPerTon(value);
+        } else {
+            record.setCostPerTon(null);
+        }
+    }
 
-        double value = verifier.parseDouble(costperTon);
-        record.setCostPerTon(value);
+    private void saveRefYrCostPerTon() {
+//      if (costperTon.getText().trim().length() == 0)
+//          throw new EmfException("Please set the Cost Per Ton");
+        if (costperTon.getText().trim().length() > 0) {
+            record.setRefYrCostPerTon(new Double(refYrCostPerTon.getText()));
+        } else {
+            record.setRefYrCostPerTon(null);
+        }
     }
 
     private void saveCostYear() throws EmfException {
         YearValidation validation = new YearValidation("Cost Year");
-        record.setCostYear(validation.value(costYear.getText()));
+        record.setCostYear(validation.value(costYear.getText(), costYearTable.getStartYear(), costYearTable.getEndYear()));
     }
 
     private void saveEfficiency(TextField efficiency) throws EmfException {
@@ -450,6 +466,14 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
             throw new EmfException("Enter the Control Efficiency as a percentage (e.g., 90%, or -10% for a disbenefit)");
 
         float value = verifier.parseFloat(efficiency);
+
+        //make sure the number makes sense...
+        if (value > 100)
+            throw new EmfException("The Control Efficiency can't be more than 100%.");
+
+        if (value < -100)
+            throw new EmfException("The Control Efficiency can't be less than -100%.");
+
         record.setEfficiency(value);
     }
 
