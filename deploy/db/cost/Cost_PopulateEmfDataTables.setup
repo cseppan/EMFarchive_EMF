@@ -25,7 +25,7 @@ insert into emf.control_technologies values (DEFAULT, 'ESP for Commercial Cookin
 --emf.pollutants
 insert into emf.pollutants values (DEFAULT, 'NOx', 'Nitrogen Oxides');
 insert into emf.pollutants values (DEFAULT, 'PM10', 'Particulate Matter < 10 um');
-insert into emf.pollutants values (DEFAULT, 'PM2.5', 'Particular Mater < 2.5 um');
+insert into emf.pollutants values (DEFAULT, 'PM2_5', 'Particular Mater < 2.5 um');
 insert into emf.pollutants values (DEFAULT, 'SO2', 'Sulfur Dioxide');
 insert into emf.pollutants values (DEFAULT, 'VOC', 'Volatile Organic Compounds');
 insert into emf.pollutants values (DEFAULT, 'CO', 'Carbon Monoxide');
@@ -34,10 +34,10 @@ insert into emf.pollutants values (DEFAULT, 'EC', 'Elemental Carbon');
 insert into emf.pollutants values (DEFAULT, 'OC', 'Organic Carbon');
 insert into emf.pollutants values (DEFAULT, 'NH3', 'Ammonia');
 insert into emf.pollutants values (DEFAULT, 'Hg', 'Mercury');
-insert into emf.pollutants values (DEFAULT, 'HFC', 'Hydrofluorocarbons');
-insert into emf.pollutants values (DEFAULT, 'PFC', 'PFC');
-insert into emf.pollutants values (DEFAULT, 'SF6', 'Sulfur Hexafluoride');
-insert into emf.pollutants values (DEFAULT, 'N20', 'Dinitrogen Oxide');
+--insert into emf.pollutants values (DEFAULT, 'HFC', 'Hydrofluorocarbons');
+--insert into emf.pollutants values (DEFAULT, 'PFC', 'PFC');
+--insert into emf.pollutants values (DEFAULT, 'SF6', 'Sulfur Hexafluoride');
+--insert into emf.pollutants values (DEFAULT, 'N20', 'Dinitrogen Oxide');
 --emf.pollutants
 
 --emf.source_groups
@@ -56,5 +56,5 @@ insert into emf.source_groups values (DEFAULT, 'Conveyorized Charbroilers', 'Con
 insert into emf.control_measure_classes values (DEFAULT, 'Known', 'Known');
 insert into emf.control_measure_classes values (DEFAULT, 'Emerging', 'Emerging');
 insert into emf.control_measure_classes values (DEFAULT, 'Hypothetical', 'Hypothetical');
-insert into emf.control_measure_classes values (DEFAULT, 'Obselete', 'Obselete');
+insert into emf.control_measure_classes values (DEFAULT, 'Obsolete', 'Obsolete');
 --emf.control_measure_classes
