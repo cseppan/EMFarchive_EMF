@@ -91,7 +91,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private volatile Thread populateThread;
 
     public ControlMeasuresManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Control Measure Manager", new Dimension(825, 350), desktopManager);
+        super("Control Measure Manager", new Dimension(855, 350), desktopManager);
         super.setName("controlMeasures");
         super.setMinimumSize(new Dimension(10, 10));
         this.session = session;
@@ -115,12 +115,12 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     public void display(ControlMeasure[] measures) throws EmfException {
+        yearValidation = new YearValidation("Cost Year");
+        costYearTable = presenter.getCostYearTable();
         getAllPollutants(this.session);
         createPollutantComboBox();
         createAllPollutantsComboBox();
         createYearsComboBox();
-        costYearTable = presenter.getCostYearTable();
-        yearValidation = new YearValidation("Cost Year");
 
         doLayout(this.parentConsole, measures);
         this.messagePanel.setMessage("Please select a major pollutant to retrieve related control measures.");
@@ -509,7 +509,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private String selectedCostYear() throws EmfException {
 //        if (costYear == null) return null;
         String year = ((String) costYear.getSelectedItem()).trim();
-        yearValidation.value(year);
+
+        yearValidation.value(year, costYearTable.getStartYear(), costYearTable.getEndYear());
         return (String)costYear.getSelectedItem();
     }
 
