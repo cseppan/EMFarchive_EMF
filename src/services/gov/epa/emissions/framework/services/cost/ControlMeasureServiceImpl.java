@@ -106,13 +106,15 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
 
     public int copyMeasure(int controlMeasureId, User creator) throws EmfException {
         Session session = sessionFactory.getSession();
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            return dao.copy(controlMeasureId, creator, session);
+            return dao.copy(controlMeasureId, creator, session, dbServer);
         } catch (RuntimeException e) {
             LOG.error("Could not remove control measure Id: " + controlMeasureId, e);
             throw new EmfException("Could not remove control measure Id: " + controlMeasureId);
         } finally {
             session.close();
+            close(dbServer);
         }
     }
 
@@ -346,7 +348,6 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public ControlMeasure[] getSummaryControlMeasures() throws EmfException {
-        LOG.error("start getSummaryControlMeasures");
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
             return dao.getSummaryControlMeasures(dbServer);
@@ -358,12 +359,10 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             throw new EmfException(e.getMessage());
         } finally {
             close(dbServer);
-            LOG.error("end getSummaryControlMeasures");
         }
     }
 
     public ControlMeasure[] getSummaryControlMeasures(int majorPollutantId) throws EmfException {
-        LOG.error("start getSummaryControlMeasures");
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
             return dao.getSummaryControlMeasures(majorPollutantId, dbServer);
@@ -375,7 +374,6 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             throw new EmfException(e.getMessage());
         } finally {
             close(dbServer);
-            LOG.error("end getSummaryControlMeasures");
         }
     }
 }

@@ -117,7 +117,7 @@ public class ControlMeasureDAO {
         hibernateFacade.remove(current(controlMeasureId, session), session);
     }
 
-    public int copy(int controlMeasureId, User creator, Session session) throws EmfException {
+    public int copy(int controlMeasureId, User creator, Session session, DbServer dbServer) throws EmfException {
         ControlMeasure cm = current(controlMeasureId, session);
         session.clear();//must do this
         
@@ -154,6 +154,9 @@ public class ControlMeasureDAO {
         updateEfficiencyRecordControlMeasureIds(records, cmId);
         hibernateFacade.add(records, session);
         
+        //populate aggregate Efficiecny Records
+        updateAggregateEfficiencyRecords(cmId, dbServer);
+
         return cmId;
     }
 
