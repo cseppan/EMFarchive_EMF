@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
@@ -109,16 +110,18 @@ public class JobFieldsPanelPresenter {
     private boolean contains(CaseJob job, CaseJob[] existedJobs) {
         String newArgs = job.getArgs();
         Sector newSector = job.getSector();
+        Executable newExec = job.getExecutable();
 
         for (int i = 0; i < existedJobs.length; i++) {
             String existedArgs = existedJobs[i].getArgs();
             Sector existedSector = existedJobs[i].getSector();
+            Executable existedExec = existedJobs[i].getExecutable();
 
             if (job.getId() != existedJobs[i].getId()
                     && job.getVersion() == existedJobs[i].getVersion()
                     && ((newArgs == null && existedArgs == null) || (newArgs != null && newArgs
                             .equalsIgnoreCase(existedArgs)))
-                    && job.getExecutable().equals(existedJobs[i].getExecutable())
+                    && ((newExec == null && existedExec == null) || (newExec != null) && newExec.equals(existedExec))
                     && ((newSector == null && existedSector == null) || (newSector != null && newSector
                             .equals(existedSector)))) {
                 return true;

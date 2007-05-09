@@ -316,14 +316,15 @@ public class CaseServiceTransport implements CaseService {
         return (CaseInput) call.requestResponse(new Object[] { input });
     }
 
-    public void updateCaseInput(CaseInput input) throws EmfException {
+    public void updateCaseInput(User user, CaseInput input) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateCaseInput");
+        call.addParam("user", dataMappings.user());
         call.addParam("input", caseMappings.caseinput());
         call.setVoidReturnType();
 
-        call.request(new Object[] { input });
+        call.request(new Object[] { user, input });
     }
 
     public void removeCaseInputs(CaseInput[] inputs) throws EmfException {
@@ -540,14 +541,15 @@ public class CaseServiceTransport implements CaseService {
         call.request(new Object[]{params});
     }
 
-    public void updateCaseParameter(CaseParameter parameter) throws EmfException {
+    public void updateCaseParameter(User user, CaseParameter parameter) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateCaseParameter");
+        call.addParam("user", dataMappings.user());
         call.addParam("parameter", caseMappings.caseParameter());
         call.setVoidReturnType();
 
-        call.request(new Object[] { parameter });
+        call.request(new Object[] { user, parameter });
     }
 
     public void runJobs(CaseJob[] jobs, User user) throws EmfException {

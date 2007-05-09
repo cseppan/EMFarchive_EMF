@@ -28,12 +28,9 @@ import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
-//import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-//import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -97,7 +94,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     private JLabel userLabel;
 
     private Case caseObj;
-    
+
     private static String lastPath = "";
 
     public JobFieldsPanel(boolean edit, MessagePanel messagePanel, ManageChangeables changeablesList,
@@ -112,11 +109,10 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     public void display(Case caseObj, CaseJob job, JComponent container) {
         this.job = job;
         this.caseObj = caseObj;
-        
+
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         try {
             container.add(nameNPurposPanel());
-            // container.add(pathNbrowserPanel());
             container.add(setupPanel());
         } catch (EmfException e) {
             setError("Could not retrieve all job related fields.");
@@ -146,9 +142,10 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("Purpose:", scrolpane, panel);
 
         String execPath = job.getPath();
+        String caseInputPath = this.caseObj.getInputFileDir();
         if (execPath == null || execPath.trim().isEmpty())
-            execPath = this.caseObj.getInputFileDir();
-        
+            execPath = caseInputPath + getFileSeparator(caseInputPath);
+
         path = new TextField("path", execPath, 32);
         path.setPreferredSize(new Dimension(300, 15));
         changeablesList.addChangeable(path);
@@ -170,9 +167,9 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         panel.add(rightSetupPanel(), BorderLayout.LINE_END);
 
         if (edit)
-//            panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.gray), "Job Setup",
-//                    1, 1, Font.getFont(Font.SANS_SERIF), Color.blue));
-        panel.setBorder(BorderFactory.createTitledBorder("Setup"));
+            // panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.gray), "Job Setup",
+            // 1, 1, Font.getFont(Font.SANS_SERIF), Color.blue));
+            panel.setBorder(BorderFactory.createTitledBorder("Setup"));
 
         return panel;
     }
@@ -260,8 +257,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
     protected void selectFolder(JTextField dir, String title) {
         EmfFileInfo initDir = new EmfFileInfo(dir.getText(), true, false);
-        if ((initDir.getAbsolutePath() == null) || (initDir.getAbsolutePath().length() == 0))
-        {
+        if ((initDir.getAbsolutePath() == null) || (initDir.getAbsolutePath().length() == 0)) {
             initDir = new EmfFileInfo(lastPath, true, false);
         }
 
@@ -324,8 +320,9 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
         panel.add(leftpanel, BorderLayout.LINE_START);
         panel.add(rightpanel, BorderLayout.LINE_END);
-//        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.gray), "Job Run Results",
-//                1, 1, Font.getFont(Font.SANS_SERIF), Color.blue));
+        // panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.gray), "Job Run
+        // Results",
+        // 1, 1, Font.getFont(Font.SANS_SERIF), Color.blue));
         panel.setBorder(BorderFactory.createTitledBorder("Run Results"));
 
         return panel;
@@ -334,19 +331,25 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     private void populateFields() {
         name.setText(job.getName());
         purpose.setText(job.getPurpose());
-        path.setText(job.getPath() + getFileSeparator(job.getPath()) + job.getExecutable());
+        String jobPath = job.getPath();
+        Executable exec = job.getExecutable();
+
+        if (jobPath != null && !path.isEmpty())
+            path.setText(jobPath + getFileSeparator(jobPath) + ((exec == null) ? "" : exec.getName()));
+        
         args.setText(job.getArgs());
         jobNo.setText(job.getJobNo() + "");
         host.setSelectedItem(job.getHost());
         this.qoption.setText(job.getQueOptions());
         this.version.setText(job.getVersion() + "");
-        this.sector.setSelectedItem(job.getSector() == null ? new Sector("All sectors", "All sectors") : job.getSector());
+        this.sector.setSelectedItem(job.getSector() == null ? new Sector("All sectors", "All sectors") : job
+                .getSector());
         this.status.setSelectedItem(job.getRunstatus());
-        
+
         User user = job.getUser();
         Date startDate = job.getRunStartDate();
         Date completeDate = job.getRunCompletionDate();
-        
+
         this.userLabel.setText(user == null ? "" : user.getName());
         this.queID.setText(job.getIdInQueue() + "");
         this.start.setText(startDate == null ? "" : EmfDateFormat.format_MM_DD_YYYY_HH_mm(startDate));
@@ -380,19 +383,26 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     }
 
     private void setPathNExecutable() {
-        String absolute = path.getText().trim();
+        String absolute = (path.getText() == null) ? null : path.getText().trim();
+
+        if (absolute == null || absolute.isEmpty())
+            return;
+
         char separator = getFileSeparator(absolute);
         int index = absolute.lastIndexOf(separator);
         if (index >= 0)
             job.setPath(absolute.substring(0, index));
 
         lastPath = job.getPath();
-        Executable exe = new Executable(absolute.substring(++index));
-        job.setExecutable(getExecutable(exe));
+
+        if (++index < absolute.length()) {
+            Executable exe = new Executable(absolute.substring(index));
+            job.setExecutable(getExecutable(exe));
+        }
     }
 
     private char getFileSeparator(String path) {
-        if ((path == null) || (path.length() == 0) || (path.charAt(0) == '/'))
+        if (path.charAt(0) == '/')
             return '/';
 
         return '\\';
@@ -434,7 +444,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             throw new EmfException("Please enter a name for the job.");
 
         String absolute = path.getText();
-        File execFile = new File(absolute);
+        // File execFile = new File(absolute);
 
         if (absolute == null || absolute.trim().equals(""))
             throw new EmfException("Please select an executable file.");
@@ -453,8 +463,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         if (selected == null || selected.toString().trim().equals(""))
             throw new EmfException("Please enter a valid host name.");
 
-        if (absolute == null || absolute.trim().equals("") || !execFile.isFile())
-            throw new EmfException("Please select an executable file.");
+        // if (absolute == null || absolute.trim().equals("") || !execFile.isFile())
+        // throw new EmfException("Please select an executable file.");
 
         try {
             Integer.parseInt(version.getText().trim());

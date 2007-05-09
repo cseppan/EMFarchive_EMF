@@ -136,7 +136,7 @@ public class ParameterFieldsPanelPresenter {
 
     public void doSave() throws EmfException {
         //view.setFields();
-        session.caseService().updateCaseParameter(view.setFields());
+        session.caseService().updateCaseParameter(session.user(), view.setFields());
     }
 
     public void doValidateFields() throws EmfException {

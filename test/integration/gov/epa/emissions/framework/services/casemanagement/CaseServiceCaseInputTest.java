@@ -1,7 +1,10 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
+import gov.epa.emissions.framework.services.basic.UserService;
+import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import org.hibernate.Criteria;
@@ -98,6 +101,7 @@ public class CaseServiceCaseInputTest extends ServiceTestCase {
     public void testShouldUpdateCaseInput() throws Exception {
         HibernateSessionFactory sessionFactory = sessionFactory(configFile());
         CaseService service = new CaseServiceImpl(sessionFactory);
+        UserService usersvc = new UserServiceImpl(sessionFactory);
         
         Case element = newCase();
         InputName inputname = new InputName("test input name");
@@ -139,9 +143,10 @@ public class CaseServiceCaseInputTest extends ServiceTestCase {
             returnedInput2.setEnvtVars(envtVars);
             returnedInput3.setEnvtVars(envtVars);
             
-            service.updateCaseInput(returnedInput1);
-            service.updateCaseInput(returnedInput2);
-            service.updateCaseInput(returnedInput3);
+            User user = usersvc.getUser("emf");
+            service.updateCaseInput(user, returnedInput1);
+            service.updateCaseInput(user, returnedInput2);
+            service.updateCaseInput(user, returnedInput3);
             
             CaseInput[] loadedInputs = service.getCaseInputs(caseId);
             assertEquals(3, loadedInputs.length);
@@ -176,6 +181,7 @@ public class CaseServiceCaseInputTest extends ServiceTestCase {
     public void testShouldRemoveCaseinputs() throws Exception {
         HibernateSessionFactory sessionFactory = sessionFactory(configFile());
         CaseService service = new CaseServiceImpl(sessionFactory);
+        UserService usersvc = new UserServiceImpl(sessionFactory);
         
         Case element = newCase();
         InputName inputname = new InputName("test input name");
@@ -217,9 +223,10 @@ public class CaseServiceCaseInputTest extends ServiceTestCase {
             returnedInput2.setEnvtVars(envtVars);
             returnedInput3.setEnvtVars(envtVars);
             
-            service.updateCaseInput(returnedInput1);
-            service.updateCaseInput(returnedInput2);
-            service.updateCaseInput(returnedInput3);
+            User user = usersvc.getUser("emf");
+            service.updateCaseInput(user, returnedInput1);
+            service.updateCaseInput(user, returnedInput2);
+            service.updateCaseInput(user, returnedInput3);
             
             CaseInput[] loadedInputs = service.getCaseInputs(caseId);
             service.removeCaseInputs(loadedInputs);

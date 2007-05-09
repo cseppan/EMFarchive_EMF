@@ -142,7 +142,7 @@ public class InputFieldsPanelPresenter {
 
     public void doSave() throws EmfException {
         //view.setFields();
-        session.caseService().updateCaseInput(view.setFields());
+        session.caseService().updateCaseInput(session.user(), view.setFields());
     }
 
     public void doValidateFields() throws EmfException {

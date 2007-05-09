@@ -511,7 +511,7 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
-    public void updateCaseInput(CaseInput input) throws EmfException {
+    public void updateCaseInput(User user, CaseInput input) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -523,6 +523,7 @@ public class CaseServiceImpl implements CaseService {
 
             session.clear();
             dao.updateCaseInput(input, session);
+            setStatus(user, "Saved input " + input.getName() + " to database.", "Save Input");
         } catch (RuntimeException e) {
             LOG.error("Could not update case input: " + input.getName() + ".\n" + e);
             throw new EmfException("Could not update case input: " + input.getName() + ".");
@@ -804,6 +805,7 @@ public class CaseServiceImpl implements CaseService {
 
             session.clear();
             dao.updateCaseJob(job, session);
+            setStatus(job.getUser(), "Saved job " + job.getName() + " to database.", "Save Job");
         } catch (RuntimeException e) {
             LOG.error("Could not update case job: " + job.getName() + ".\n" + e);
             throw new EmfException("Could not update case job: " + job.getName() + ".");
@@ -985,7 +987,7 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
-    public void updateCaseParameter(CaseParameter parameter) throws EmfException {
+    public void updateCaseParameter(User user, CaseParameter parameter) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -997,6 +999,7 @@ public class CaseServiceImpl implements CaseService {
 
             session.clear();
             dao.updateCaseParameter(parameter, session);
+            setStatus(user, "Saved parameter " + parameter.getName() + " to database.", "Save Parameter");
         } catch (RuntimeException e) {
             LOG.error("Could not update case parameter: " + parameter.getName() + ".\n" + e);
             throw new EmfException("Could not update case parameter: " + parameter.getName() + ".");
