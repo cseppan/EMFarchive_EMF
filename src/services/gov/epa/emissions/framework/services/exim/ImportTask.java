@@ -75,7 +75,7 @@ public class ImportTask implements Runnable {
 
     private void complete(Session session) {
         dataset.setStatus("Imported");
-        dataset.setModifiedDateTime(new Date());
+        //dataset.setModifiedDateTime(new Date()); //last mod time has been set when creted
 
         updateDataset(dataset, session);
         addCompletedStatus();

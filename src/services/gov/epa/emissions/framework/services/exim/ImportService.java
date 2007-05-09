@@ -101,7 +101,7 @@ public class ImportService {
         for (int i = 0; i < filenames.length; i++) {
             // String datasetName = filenames[i] + "_" + DATE_FORMATTER.format(new Date());
             String datasetName = filenames[i];
-            EmfDataset dataset = createDataset(datasetName, user, datasetType);
+            EmfDataset dataset = createDataset(folderPath, filenames[i], datasetName, user, datasetType);
             try {
                 importSingleDataset(user, folderPath, new String[] { filenames[i] }, dataset);
             } catch (EmfException e) {
@@ -120,22 +120,24 @@ public class ImportService {
         services.getStatus().add(endStatus);
     }
 
-    private EmfDataset createDataset(String datasetName, User user, DatasetType datasetType) {
+    private EmfDataset createDataset(String folder, String filename, String datasetName, User user, DatasetType datasetType) {
         EmfDataset dataset = new EmfDataset();
+        File file = new File(folder, filename);
 
         dataset.setName(datasetName);
         dataset.setCreator(user.getUsername());
         dataset.setDatasetType(datasetType);
         dataset.setCreatedDateTime(new Date());
-        dataset.setModifiedDateTime(new Date());
+        //dataset.setModifiedDateTime(new Date());
+        dataset.setModifiedDateTime(file.exists() ? new Date(file.lastModified()) : new Date());
         dataset.setAccessedDateTime(new Date());
-
+ 
         return dataset;
     }
 
     public void importDataset(User user, String folderPath, String[] filenames, DatasetType datasetType,
             String datasetName) throws EmfException {
-        EmfDataset dataset = createDataset(datasetName, user, datasetType);
+        EmfDataset dataset = createDataset(folderPath, filenames[0], datasetName, user, datasetType);
         importSingleDataset(user, folderPath, filenames, dataset);
     }
 
