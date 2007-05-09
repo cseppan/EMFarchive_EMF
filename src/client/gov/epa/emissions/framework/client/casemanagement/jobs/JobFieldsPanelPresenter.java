@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.casemanagement.jobs;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
@@ -25,17 +26,20 @@ public class JobFieldsPanelPresenter {
 
     private EditJobsTabPresenter parentPresenter;
 
+    private Case caseObj;
+
     public JobFieldsPanelPresenter(JobFieldsPanelView jobFields, EmfSession session,
-            EditJobsTabPresenter parentPresenter) throws EmfException {
+            EditJobsTabPresenter parentPresenter, Case caseObj) throws EmfException {
         this.session = session;
         this.view = jobFields;
         this.hosts = new Hosts(session, getHosts());
         this.parentPresenter = parentPresenter;
+        this.caseObj = caseObj;
     }
 
     public void display(CaseJob job, JComponent container) throws EmfException {
         view.observe(this);
-        view.display(job, container);
+        view.display(caseObj, job, container);
     }
 
     public Sector[] getSectors() throws EmfException {

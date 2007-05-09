@@ -37,7 +37,7 @@ public class EditCaseJobPresenterImpl implements EditJobPresenter {
     
     public void doAddJobFields(JComponent container, 
             JobFieldsPanelView inputFields) throws EmfException {
-        jobFieldsPresenter = new JobFieldsPanelPresenter(inputFields, session, parentPresenter);
+        jobFieldsPresenter = new JobFieldsPanelPresenter(inputFields, session, parentPresenter, parentPresenter.getCaseObj());
         jobFieldsPresenter.display(job, container);
     }
     

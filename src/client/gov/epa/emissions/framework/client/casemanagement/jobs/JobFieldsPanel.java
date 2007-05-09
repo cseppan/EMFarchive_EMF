@@ -17,6 +17,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
+import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
@@ -32,6 +33,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 //import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -93,6 +95,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     private TextArea runLog;
 
     private JLabel userLabel;
+
+    private Case caseObj;
     
     private static String lastPath = "";
 
@@ -105,8 +109,10 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         this.messagePanel = messagePanel;
     }
 
-    public void display(CaseJob job, JComponent container) {
+    public void display(Case caseObj, CaseJob job, JComponent container) {
         this.job = job;
+        this.caseObj = caseObj;
+        
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         try {
             container.add(nameNPurposPanel());
@@ -139,7 +145,11 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         scrolpane.setPreferredSize(new Dimension(444, 80));
         layoutGenerator.addLabelWidgetPair("Purpose:", scrolpane, panel);
 
-        path = new TextField("path", job.getPath(), 32);
+        String execPath = job.getPath();
+        if (execPath == null || execPath.trim().isEmpty())
+            execPath = this.caseObj.getInputFileDir();
+        
+        path = new TextField("path", execPath, 32);
         path.setPreferredSize(new Dimension(300, 15));
         changeablesList.addChangeable(path);
         layoutGenerator.addLabelWidgetPair("Executable:", getFolderChooserPanel(path, "Select the Executable File"),
@@ -424,6 +434,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             throw new EmfException("Please enter a name for the job.");
 
         String absolute = path.getText();
+        File execFile = new File(absolute);
 
         if (absolute == null || absolute.trim().equals(""))
             throw new EmfException("Please select an executable file.");
@@ -442,7 +453,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         if (selected == null || selected.toString().trim().equals(""))
             throw new EmfException("Please enter a valid host name.");
 
-        if (absolute == null || absolute.trim().equals(""))
+        if (absolute == null || absolute.trim().equals("") || !execFile.isFile())
             throw new EmfException("Please select an executable file.");
 
         try {

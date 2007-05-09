@@ -92,7 +92,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     }
 
     public void addJobFields(CaseJob job, JComponent container, JobFieldsPanel jobFieldsPanel) throws EmfException {
-        JobFieldsPanelPresenter jobFieldsPresenter = new JobFieldsPanelPresenter(jobFieldsPanel, session, this);
+        JobFieldsPanelPresenter jobFieldsPresenter = new JobFieldsPanelPresenter(jobFieldsPanel, session, this, caseObj);
         jobFieldsPresenter.display(job, container);
     }
 
@@ -112,6 +112,5 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
             
         service().runJobs(jobs, session.user());
     }
-
 
 }
