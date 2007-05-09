@@ -168,7 +168,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     }
 
     private void selectFile() {
-        EmfFileInfo initDir = new EmfFileInfo("", true, true);
+        EmfFileInfo initDir = new EmfFileInfo(session.preferences().inputFolder(), true, true);
         
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
         chooser.setTitle("Select files containing counties to include in strategy");
