@@ -95,6 +95,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
     private Case caseObj;
 
+    private TextField jobOrder;
+
     private static String lastPath = "";
 
     public JobFieldsPanel(boolean edit, MessagePanel messagePanel, ManageChangeables changeablesList,
@@ -186,9 +188,14 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         jobNo.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(jobNo);
         layoutGenerator.addLabelWidgetPair("Job Number:", jobNo, panel);
-        jobNo
-                .setToolTipText("A number that makes this job unique for the given case (used to specify dependencies between jobs)");
+        jobNo.setToolTipText("A number that makes this job unique for the " +
+                "given case (used to specify dependencies between jobs)");
 
+        jobOrder = new TextField("jobOrder", job.getOrder() + "", 12);
+        jobOrder.setMaximumSize(new Dimension(300, 15));
+        changeablesList.addChangeable(jobOrder);
+        layoutGenerator.addLabelWidgetPair("Job Order:", jobOrder, panel);
+        
         Host[] hosts = presenter.getHostsObject().getAll();
         host = new EditableComboBox(hosts);
         host.setPrototypeDisplayValue(comboWidth);
@@ -201,7 +208,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("Queue Options:", qoption, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -339,6 +346,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         
         args.setText(job.getArgs());
         jobNo.setText(job.getJobNo() + "");
+        jobOrder.setText(job.getOrder() + "");
         host.setSelectedItem(job.getHost());
         this.qoption.setText(job.getQueOptions());
         this.version.setText(job.getVersion() + "");
@@ -362,6 +370,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         job.setName(name.getText().trim());
         job.setPurpose(purpose.getText().trim());
         job.setJobNo(Float.parseFloat(jobNo.getText().trim()));
+        job.setOrder(Integer.parseInt(jobOrder.getText().trim()));
         job.setArgs(args.getText().trim());
         setPathNExecutable();
         setHost();
@@ -369,7 +378,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         job.setRunstatus((JobRunStatus) status.getSelectedItem());
         job.setVersion(Integer.parseInt(version.getText().trim()));
         job.setQueOptions(qoption.getText().trim());
-
+        
         if (edit) {
             job.setRunLog(runLog.getText());
             job.setRunNotes(runNote.getText());

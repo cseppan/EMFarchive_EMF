@@ -40,12 +40,13 @@ public class NewJobDialog extends Dialog implements NewJobView, ManageChangeable
     
     public NewJobDialog(EmfConsole parent, Case caseObj, EmfSession session) {
         super("Add a Job to " + caseObj.getName(), parent);
-        super.setSize(new Dimension(544, 420));
+        super.setSize(new Dimension(564, 420));
         super.center();
         
         this.parent = parent;
         this.session = session;
         this.newjob = new CaseJob();
+        newjob.setUser(session.user());
     }
 
     public void display() {
