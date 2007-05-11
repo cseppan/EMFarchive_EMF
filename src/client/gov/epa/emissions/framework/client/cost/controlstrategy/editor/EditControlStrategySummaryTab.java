@@ -29,6 +29,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -73,6 +74,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private ControlStrategyResult controlStrategyResult;
 
+    private DecimalFormat decFormat;
+    
     public EditControlStrategySummaryTab(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResult,
             EmfSession session, ManageChangeables changeablesList, MessagePanel messagePanel, EmfConsole parentConsole)
             throws EmfException {
@@ -83,6 +86,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
         this.parentConsole = parentConsole;
+        this.decFormat = new DecimalFormat("0.###E0");
 
         setLayout();
     }
@@ -376,8 +380,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private void updateSummaryPanelValuesExceptStartDate(String closeDate, String cost, String emisReduction) {
         completionDate.setText(closeDate);
-        costValue.setText(cost);
-        emissionReductionValue.setText(emisReduction);
+        costValue.setText(cost.length() == 0 ? "" : decFormat.format(new Double(cost)));
+        emissionReductionValue.setText(emisReduction.length() == 0 ? "" : decFormat.format(new Double(emisReduction)));
     }
 
 }
