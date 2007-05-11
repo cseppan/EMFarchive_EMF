@@ -6,13 +6,14 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class OnroadRecordGenerator implements RecordGenerator {
     private NonpointRecordGenerator delegate;
 
-    public OnroadRecordGenerator(ControlStrategyResult result) {
-        this.delegate = new NonpointRecordGenerator(result);
+    public OnroadRecordGenerator(ControlStrategyResult result, DecimalFormat decFormat) {
+        this.delegate = new NonpointRecordGenerator(result, decFormat);
     }
 
     public Record getRecord(ResultSet resultSet, MaxEmsRedControlMeasure maxCM) throws SQLException, EmfException {

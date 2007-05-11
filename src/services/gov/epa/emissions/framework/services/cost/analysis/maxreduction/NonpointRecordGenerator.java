@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +28,12 @@ public class NonpointRecordGenerator implements RecordGenerator {
 
     private double finalEmissions;
 
-    public NonpointRecordGenerator(ControlStrategyResult result) {
+    private DecimalFormat decFormat;
+
+    public NonpointRecordGenerator(ControlStrategyResult result, DecimalFormat decFormat) {
         this.strategyResult = result;
-        comment = "";
+        this.comment = "";
+        this.decFormat = decFormat;
     }
 
     public Record getRecord(ResultSet resultSet, MaxEmsRedControlMeasure maxCM) throws SQLException, EmfException {
@@ -75,19 +79,19 @@ public class NonpointRecordGenerator implements RecordGenerator {
 //        } catch (SQLException e) {
             tokens.add("");
 //        }
-        
-        tokens.add("" + maxCM.adjustedCostPerTon() * reducedEmission);
-        tokens.add("" + maxCM.adjustedCostPerTon());
-        tokens.add("" + maxCM.controlEfficiency());
+
+        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon() * reducedEmission));
+        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon()));
+        tokens.add("" + decFormat.format(maxCM.controlEfficiency()));
         tokens.add("" + maxCM.rulePenetration());
         tokens.add("" + maxCM.ruleEffectiveness());
-        tokens.add("" + maxCM.effectiveReduction() * 100);
+        tokens.add("" + decFormat.format(maxCM.effectiveReduction() * 100));
 
         tokens.add("" + invenControlEfficiency);
         tokens.add("" + invenRulePenetration);
         tokens.add("" + invenRuleEffectiveness);
-        tokens.add("" + finalEmissions);
-        tokens.add("" + reducedEmission);
+        tokens.add("" + decFormat.format(finalEmissions));
+        tokens.add("" + decFormat.format(reducedEmission));
         tokens.add("" + originalEmissions);
 
         tokens.add("" + resultSet.getInt("Record_Id"));

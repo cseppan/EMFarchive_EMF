@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.services.cost.controlmeasure.io.Pollutants;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -59,6 +60,8 @@ public class StrategyLoader {
     
     private Pollutants pollutants;
 
+    private DecimalFormat decFormat;
+
     public StrategyLoader(String tableName, TableFormat tableFormat, HibernateSessionFactory sessionFactory, DbServer dbServer, ControlStrategyResult result,
             SccControlMeasuresMap map, ControlStrategy controlStrategy) throws EmfException {
         this.tableFormat = tableFormat;
@@ -67,6 +70,7 @@ public class StrategyLoader {
         this.type = this.controlStrategy.getDatasetType();
         this.pointDatasetType = this.type.getName().equalsIgnoreCase("ORL Point Inventory (PTINV)");
         this.pollutants = new Pollutants(sessionFactory);
+        this.decFormat = new DecimalFormat("0.###E0");
         modifier = dataModifier(tableName, dbServer.getEmissionsDatasource());
         CostYearTable costYearTable = new CostYearTableReader(dbServer, controlStrategy.getCostYear()).costYearTable();
         retrieveMeasure = new RetrieveMaxEmsRedControlMeasure(map, costYearTable, controlStrategy);
@@ -179,13 +183,13 @@ public class StrategyLoader {
     private RecordGenerator getRecordGenerator() {
 
         if (type.getName().equalsIgnoreCase("ORL Nonpoint Inventory (ARINV)"))
-            return new NonpointRecordGenerator(result);
+            return new NonpointRecordGenerator(result, decFormat);
         else if (type.getName().equalsIgnoreCase("ORL Point Inventory (PTINV)"))
-            return new PointRecordGenerator(result);
+            return new PointRecordGenerator(result, decFormat);
         else if (type.getName().equalsIgnoreCase("ORL Onroad Inventory (MBINV)"))
-            return new OnroadRecordGenerator(result);
+            return new OnroadRecordGenerator(result, decFormat);
         else if (type.getName().equalsIgnoreCase("ORL Nonroad Inventory (ARINV)"))
-            return new NonroadRecordGenerator(result);
+            return new NonroadRecordGenerator(result, decFormat);
 
         return null;
     }
