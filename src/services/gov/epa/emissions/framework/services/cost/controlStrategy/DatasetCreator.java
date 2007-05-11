@@ -95,8 +95,11 @@ public class DatasetCreator {
     private String getResultDatasetName(String name) {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("MMddyyyy_HHmmss");
         String timestamp = dateFormatter.format(new Date());
-
-        return DataTable.encodeTableName(name + "_" + timestamp);
+        return DataTable.encodeTableName(
+                ((prefix + name + "_" + timestamp).length() <= 63 
+                    ? name
+                    : name.substring(0, 63 - (prefix + "_" + timestamp).length())) 
+                        + "_" + timestamp);
     }
     
     private void add(EmfDataset dataset) throws EmfException {
