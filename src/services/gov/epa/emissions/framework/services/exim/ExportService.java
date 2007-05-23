@@ -98,7 +98,7 @@ public class ExportService {
         return true;
     }
 
-    private String getCleanDatasetName(EmfDataset dataset, Version version) {
+    public String getCleanDatasetName(EmfDataset dataset, Version version) {
         String name = dataset.getName();
         String prefix = "", suffix = "";
         KeyVal[] keyvals = dataset.getKeyVals();

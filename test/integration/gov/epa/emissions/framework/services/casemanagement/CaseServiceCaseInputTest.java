@@ -29,7 +29,7 @@ public class CaseServiceCaseInputTest extends ServiceTestCase {
 
     public void testShouldPersistACaseInputWhenAddCaseInputWithSomeFieldsAreNull() throws Exception {
         HibernateSessionFactory sessionFactory = sessionFactory(configFile());
-        CaseService service = new CaseServiceImpl(sessionFactory);
+        CaseService service = new CaseServiceImpl(sessionFactory, dbServerFactory);
         
         Case element = newCase();
         InputName inputname = new InputName("test input name");
@@ -100,7 +100,7 @@ public class CaseServiceCaseInputTest extends ServiceTestCase {
     
     public void testShouldUpdateCaseInput() throws Exception {
         HibernateSessionFactory sessionFactory = sessionFactory(configFile());
-        CaseService service = new CaseServiceImpl(sessionFactory);
+        CaseService service = new CaseServiceImpl(sessionFactory, dbServerFactory);
         UserService usersvc = new UserServiceImpl(sessionFactory);
         
         Case element = newCase();
@@ -180,7 +180,7 @@ public class CaseServiceCaseInputTest extends ServiceTestCase {
     
     public void testShouldRemoveCaseinputs() throws Exception {
         HibernateSessionFactory sessionFactory = sessionFactory(configFile());
-        CaseService service = new CaseServiceImpl(sessionFactory);
+        CaseService service = new CaseServiceImpl(sessionFactory, dbServerFactory);
         UserService usersvc = new UserServiceImpl(sessionFactory);
         
         Case element = newCase();

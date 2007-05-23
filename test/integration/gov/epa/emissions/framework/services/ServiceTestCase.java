@@ -177,6 +177,8 @@ public abstract class ServiceTestCase extends TestCase {
             tx.commit();
         }catch (Exception e) {
             tx.rollback();
+            e.printStackTrace();
+            //throw e;
         }
     }
 

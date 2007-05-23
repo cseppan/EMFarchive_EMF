@@ -204,7 +204,8 @@ public class CaseDAO {
         return hibernateFacade.load(clazz, criterion, session);
     }
 
-    public Object loadCaseInupt(CaseInput input, Session session) {
+     
+    public Object loadCaseInput(CaseInput input, Session session) {
         Criterion[] criterions = uniqueCaseInputCriteria(input);
         
         return hibernateFacade.load(CaseInput.class, criterions, session);
@@ -214,6 +215,47 @@ public class CaseDAO {
         Criterion crit = Restrictions.eq("caseID", new Integer(caseId));
 
         return hibernateFacade.get(CaseInput.class, crit, session);
+    }
+    
+    public List getJobInputs(int caseId, int jobId, Sector sector, Session session){
+        /**
+         * Gets inputs for a job.  Selects on the following 3 criteria:
+         *      caseId, jobId, sectorId
+         */
+        Integer caseID = new Integer(caseId);
+        Integer jobID = new Integer(jobId);
+       
+        // setup the 3 criteria
+        Criterion c1 = Restrictions.eq("caseID", caseID);
+        Criterion c2 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
+        Criterion c3 = Restrictions.eq("caseJobID", jobID);
+        Criterion[] criterions = { c1, c2, c3 };
+
+        // query the db using hibernate for the inputs that
+        // match the criterias 
+        // what is the difference b/w hibernate get and getAll
+        return hibernateFacade.get(CaseInput.class, criterions, session);
+        
+    }
+
+    public List getJobParameters(int caseId, int jobId, Sector sector, Session session){
+        /**
+         * Gets parameters for a job.  Selects on the following 3 criteria:
+         *      caseId, jobId, sectorId
+         */
+        Integer caseID = new Integer(caseId);
+        Integer jobID = new Integer(jobId);
+       
+        // setup the 3 criteria
+        Criterion c1 = Restrictions.eq("caseID", caseID);
+        Criterion c2 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
+        Criterion c3 = Restrictions.eq("jobId", jobID);
+        Criterion[] criterions = { c1, c2, c3 };
+
+        // query the db using hibernate for the parameters that
+        // match the criterias 
+        return hibernateFacade.get(CaseParameter.class, criterions, session);
+        
     }
 
     public List getAllCaseInputs(Session session) {

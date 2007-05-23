@@ -43,7 +43,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
     protected void doSetUp() throws Exception {
         HibernateSessionFactory sessionFactory = sessionFactory(configFile());
         dao = new CaseDAO();
-        service = new CaseServiceImpl(sessionFactory);
+        service = new CaseServiceImpl(sessionFactory, dbServerFactory);
         userService = new UserServiceImpl(sessionFactory);
     }
 

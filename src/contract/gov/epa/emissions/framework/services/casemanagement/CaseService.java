@@ -88,7 +88,7 @@ public interface CaseService {
     Host[] getHosts() throws EmfException;
 
     Host addHost(Host host) throws EmfException;
-    
+        
     CaseJob getCaseJob(int jobId) throws EmfException;
 
     Executable addExecutable(Executable exe) throws EmfException;
@@ -114,4 +114,5 @@ public interface CaseService {
     void updateCaseParameter(User user, CaseParameter parameter) throws EmfException;
 
     void runJobs(CaseJob[] jobs, User user) throws EmfException;
-}
+
+ }
