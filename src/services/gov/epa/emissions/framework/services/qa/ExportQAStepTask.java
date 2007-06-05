@@ -97,7 +97,7 @@ public class ExportQAStepTask implements Runnable {
     }
 
     private String suffix() {
-        return "' for Version '" + versionName() + "' of Dataset '" + datasetName() + "' to "+
+        return " for Version '" + versionName() + "' of Dataset '" + datasetName() + "' to "+
         file.getAbsolutePath();
     }
 
