@@ -186,7 +186,6 @@ public class ControlMeasuresImporter implements Importer {
             if (record.size() < colsSize)
                 throw new EmfException("The number of tokens in the record are " + record.size()
                         + ", It's less than the number of columns expected(" + colsSize + ")");
-
             dataModifier.insert((String[]) record.tokens().toArray(new String[0]));
         } catch (Exception e) {
             throw new EmfException("Error processing insert query: " + e.getMessage());

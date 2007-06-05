@@ -90,6 +90,12 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private volatile Thread populateThread;
 
+    private String threadAction;
+    
+    private Button copyButton;
+    
+    private Button refreshButton;
+    
     public ControlMeasuresManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Control Measure Manager", new Dimension(855, 350), desktopManager);
         super.setName("controlMeasures");
@@ -100,17 +106,41 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     public void run() {
-        try {
-            messagePanel.setMessage("Please wait while retrieving control measures...");
-            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            refresh(new ControlMeasure[0]);
-            refresh(presenter.getControlMeasures(getSelectedMajorPollutant()));
-            messagePanel.clear();
-        } catch (Exception e) {
-            messagePanel.setError("Cannot retrieve control measures.  " + e.getMessage());
-        } finally  {
-            setCursor(Cursor.getDefaultCursor());
-            this.populateThread = null;
+        if (this.threadAction == "refresh") {
+            try {
+                copyButton.setEnabled(false);
+                refreshButton.setEnabled(false);
+                messagePanel.setMessage("Please wait while retrieving control measures...");
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                refresh(new ControlMeasure[0]);
+                refresh(presenter.getControlMeasures(getSelectedMajorPollutant()));
+                messagePanel.clear();
+            } catch (Exception e) {
+                messagePanel.setError("Cannot retrieve control measures.  " + e.getMessage());
+            } finally  {
+                copyButton.setEnabled(true);
+                refreshButton.setEnabled(true);
+                setCursor(Cursor.getDefaultCursor());
+                this.populateThread = null;
+            }
+        } else if (this.threadAction == "copy") {
+            try {
+                copyButton.setEnabled(false);
+                refreshButton.setEnabled(false);
+                messagePanel.setMessage("Please wait while copying control measures...");
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                copySelectedControlMeasures();
+                this.populateThread = null;
+                doRefresh();
+                messagePanel.clear();
+            } catch (Exception e) {
+                messagePanel.setError("Cannot copy control measures.  " + e.getMessage());
+            } finally  {
+                copyButton.setEnabled(true);
+                refreshButton.setEnabled(true);
+                setCursor(Cursor.getDefaultCursor());
+                this.populateThread = null;
+            }
         }
     }
 
@@ -198,8 +228,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.CENTER);
 
-        Button button = new RefreshButton(this, "Refresh Control Measures", messagePanel);
-        panel.add(button, BorderLayout.EAST);
+        refreshButton = new RefreshButton(this, "Refresh Control Measures", messagePanel);
+        panel.add(refreshButton, BorderLayout.EAST);
 
         return panel;
     }
@@ -247,16 +277,12 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         SelectAwareButton edit = new SelectAwareButton("Edit", editAction(), selectModel, confirmDialog);
         panel.add(edit);
 
-        Button copy = new CopyButton(new AbstractAction() {
+        copyButton = new CopyButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    copySelectedControlMeasures();
-                } catch (EmfException exp) {
-                    messagePanel.setError("Error in copying control measures: " + exp.getMessage());
-                }
+                doCopy();
             }
         });
-        panel.add(copy);
+        panel.add(copyButton);
 
         Button newControlMeasure = new NewButton(newControlMeasureAction());
         panel.add(newControlMeasure);
@@ -268,6 +294,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         JPanel panel = new JPanel();
         panel.add(getItem("Pollutant:", pollutant));
         panel.add(getItem("Cost Year:", costYear));
+        pollutant.setPreferredSize(new Dimension(100, 30));
 
         Button importButton = new ImportButton(importAction());
         panel.add(importButton);
@@ -394,7 +421,6 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
                 messagePanel.setError(e.getMessage());
             }
         }
-        doRefresh();
     }
 
     private Action newControlMeasureAction() {
@@ -470,8 +496,15 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     public void doRefresh() {
+        this.threadAction = "refresh";
         this.populateThread = new Thread(this);
-        populateThread.start();
+        this.populateThread.start();
+    }
+
+    public void doCopy() {
+        this.threadAction = "copy";
+        this.populateThread = new Thread(this);
+        this.populateThread.start();
     }
 
     public void refresh(ControlMeasure[] measures) {

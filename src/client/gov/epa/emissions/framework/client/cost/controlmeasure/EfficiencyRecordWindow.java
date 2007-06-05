@@ -51,6 +51,10 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     protected TextField efficiency;
 
+    protected TextField minEmis;
+
+    protected TextField maxEmis;
+
     protected TextField costYear;
 
     protected TextField costperTon;
@@ -101,11 +105,12 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     public EfficiencyRecordWindow(String title, ManageChangeables changeablesList, DesktopManager desktopManager,
             EmfSession session, CostYearTable costYearTable) {
-        super(title, new Dimension(675, 425), desktopManager);
+        super(title, new Dimension(675, 445), desktopManager);
         this.changeablesList = changeablesList;
         this.session = session;
         this.verifier = new NumberFieldVerifier("");
         this.costYearTable = costYearTable;
+        this.costYearTable.setTargetYear(refYear);
     }
 
     public abstract void save();
@@ -140,28 +145,10 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         JPanel panel = new JPanel(new BorderLayout());
 
         JPanel container = new JPanel();
-//        JPanel pollutantContainer = new JPanel(new SpringLayout());
-//        JPanel pollutantCenterPanel = new JPanel();
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-//        try {
-//            allPollutants = session.dataCommonsService().getPollutants();
-//            pollutant = new ComboBox("Select One", allPollutants);
-//            pollutant.setPreferredSize(new Dimension(113, 20));
-//        } catch (EmfException e) {
-//            messagePanel.setError("Could not retrieve Pollutants");
-//        }
-//        this.addChangeable(pollutant);
-//        layoutGenerator.addLabelWidgetPair("Pollutant:*", pollutant, pollutantContainer);
-//
-//        widgetLayout(1, 2, 5, 5, 10, 10, layoutGenerator, pollutantContainer);
-//
         container.add(LeftRecordPanel());
         container.add(RightRecordPanel());
-//        container.add(LeftRecordPanel(), BorderLayout.WEST);
-//        container.add(RightRecordPanel(), BorderLayout.EAST);
-//        pollutantCenterPanel.add(pollutantContainer, BorderLayout.CENTER);
-//        panel.add(pollutantCenterPanel, BorderLayout.NORTH);
         panel.add(container, BorderLayout.CENTER);//LINE_START);
 
         JPanel detailContainer = new JPanel(new SpringLayout());
@@ -184,16 +171,6 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     private Component LeftRecordPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-
-//        try {
-//            allPollutants = session.dataCommonsService().getPollutants();
-//            pollutant = new ComboBox("Select One", allPollutants);
-//            pollutant.setPreferredSize(new Dimension(113, 20));
-//        } catch (EmfException e) {
-//            messagePanel.setError("Could not retrieve Pollutants");
-//        }
-//        this.addChangeable(pollutant);
-//        layoutGenerator.addLabelWidgetPair("Pollutant:*", pollutant, panel);
 
         try {
             allPollutants = session.dataCommonsService().getPollutants();
@@ -222,13 +199,12 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         layoutGenerator.addLabelWidgetPair("Existing NEI Device Code:", existingdevCode, panel);
 
         costYear = new TextField("Cost Year", 10);
-//        editor.addFocusListener(new FocusAdapter() {
-//            public void focusLost(FocusEvent e) {
         costYear.addFocusListener(new FocusAdapter() {
             public void focusLost(FocusEvent e) {
                 try {
                     refreshRefYrCostPerTon();
                 } catch (EmfException e1) {
+                    refYrCostPerTon.setText("");
                     messagePanel.setError("Could not update reference year cost per ton: " + e1.getMessage());
                 }
             }
@@ -242,6 +218,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
                 try {
                     refreshRefYrCostPerTon();
                 } catch (EmfException e1) {
+                    refYrCostPerTon.setText("");
                     messagePanel.setError("Could not update reference year cost per ton: " + e1.getMessage());
                 }
             }
@@ -252,36 +229,78 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         refYrCostPerTon = new JLabel("");
         layoutGenerator.addLabelWidgetPair("Ref Yr Cost Per Ton Reduced:", refYrCostPerTon, panel);
 
-        widgetLayout(8, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        efficiency = new TextField("", 10);
+        efficiency.setName("Control Efficiency");
+        efficiency.addFocusListener(new FocusAdapter() {
+            public void focusLost(FocusEvent e) {
+                checkPercentageValue(efficiency);
+            }
+        });
+        this.addChangeable(efficiency);
+        efficiency.setToolTipText("Enter the Control Efficiency as a percentage (e.g., 90%, or -10% for a disbenefit)");
+        layoutGenerator.addLabelWidgetPair("Control Efficiency (% Red):*", efficiency, panel);
+
+        widgetLayout(9, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
 
-
     private void refreshRefYrCostPerTon() throws EmfException {
         messagePanel.clear();
+        if (costperTon.getText().trim().length() == 0) {
+            refYrCostPerTon.setText("");
+            return;
+        }
         int costYearValue = verifier.parseInteger(costYear);
         float costPerTonValue = verifier.parseFloat(costperTon);
-        costYearTable.setTargetYear(refYear);
         DecimalFormat currency = new DecimalFormat("#0.00"); 
         refYrCostPerTon.setText(currency.format(costPerTonValue * costYearTable.factor(costYearValue)));
+    }
+
+    //see if percentage is between 0 and 1, display message that it should be XXX% format, not a decimal fomat
+    private void checkPercentageValue(TextField field) {
+        messagePanel.clear();
+        if (field.getText().trim().length() == 0)
+            return;
+        float value = 0;
+        try {
+            value = verifier.parseFloat(field);
+        } catch (EmfException e) {
+            //suppress error message, were just looking at if % is btw 0 and 1
+            //let the save process, display an error for not being a number
+            return;
+        }
+        if (value > 0 && value <= 1) messagePanel.setError("Enter the " + field.getName() + " as a percentage (e.g., 90%).");
+
     }
 
     private Component RightRecordPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        efficiency = new TextField("", 10);
-        efficiency.setName("Control Efficiency");
-        this.addChangeable(efficiency);
-        layoutGenerator.addLabelWidgetPair("Control Efficiency (% Red):*", efficiency, panel);
-        efficiency.setToolTipText("Enter the Control Efficiency as a percentage (e.g., 90%, or -10% for a disbenefit)");
+        minEmis = new TextField("Minimum Emissions", 10);
+        this.addChangeable(minEmis);
+        layoutGenerator.addLabelWidgetPair("Minimum Emissions:", minEmis, panel);
+
+        maxEmis = new TextField("Maximum Emissions", 10);
+        this.addChangeable(maxEmis);
+        layoutGenerator.addLabelWidgetPair("Maximum Emissions:", maxEmis, panel);
 
         ruleEffectiveness = new TextField("Rule Effectiveness", 10);
+        ruleEffectiveness.addFocusListener(new FocusAdapter() {
+            public void focusLost(FocusEvent e) {
+                checkPercentageValue(ruleEffectiveness);
+            }
+        });
         this.addChangeable(ruleEffectiveness);
         layoutGenerator.addLabelWidgetPair("Rule Effectiveness (%):", ruleEffectiveness, panel);
 
         rulePenetration = new TextField("Rule Penetration", 10);
+        rulePenetration.addFocusListener(new FocusAdapter() {
+            public void focusLost(FocusEvent e) {
+                checkPercentageValue(rulePenetration);
+            }
+        });
         this.addChangeable(rulePenetration);
         layoutGenerator.addLabelWidgetPair("Rule Penetration (%):", rulePenetration, panel);
 
@@ -314,7 +333,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         lastModifiedTime.setBorder(BorderFactory.createEmptyBorder());
         layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
 
-        widgetLayout(8, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(9, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
@@ -353,6 +372,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         savePollutant();
         record.setEquationType(equationType.getSelectedItem() + "");
         saveEfficiency(efficiency);
+        saveMinMaxEmis();
         saveCostYear();
         saveCostPerTon();
         saveRefYrCostPerTon();
@@ -436,10 +456,10 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     }
 
     private void saveCostPerTon() throws EmfException {
-//      if (costperTon.getText().trim().length() == 0)
-//      throw new EmfException("Please set the Cost Per Ton");
         if (costperTon.getText().trim().length() > 0) {
             double value = verifier.parseDouble(costperTon);
+            if (costYear.getText().trim().length() == 0) 
+                throw new EmfException("A cost year is required when a cost per ton is specified");
             record.setCostPerTon(value);
         } else {
             record.setCostPerTon(null);
@@ -447,8 +467,6 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     }
 
     private void saveRefYrCostPerTon() {
-//      if (costperTon.getText().trim().length() == 0)
-//          throw new EmfException("Please set the Cost Per Ton");
         if (costperTon.getText().trim().length() > 0) {
             record.setRefYrCostPerTon(new Double(refYrCostPerTon.getText()));
         } else {
@@ -457,8 +475,12 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     }
 
     private void saveCostYear() throws EmfException {
-        YearValidation validation = new YearValidation("Cost Year");
-        record.setCostYear(validation.value(costYear.getText(), costYearTable.getStartYear(), costYearTable.getEndYear()));
+        if (costYear.getText().trim().length() > 0) {
+            YearValidation validation = new YearValidation("Cost Year");
+            record.setCostYear(validation.value(costYear.getText(), costYearTable.getStartYear(), costYearTable.getEndYear()));
+        } else {
+            record.setCostYear(null);
+        }
     }
 
     private void saveEfficiency(TextField efficiency) throws EmfException {
@@ -475,6 +497,27 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
             throw new EmfException("The Control Efficiency can't be less than -100%.");
 
         record.setEfficiency(value);
+    }
+
+    private void saveMinMaxEmis() throws EmfException {
+        double minEmisValue = 0;
+        double maxEmisValue = Double.NaN;
+        if (minEmis.getText().trim().length() > 0) {
+            minEmisValue = verifier.parseDouble(minEmis);
+            record.setMinEmis(minEmisValue);
+        } else {
+            record.setMinEmis(null);
+        }
+        if (maxEmis.getText().trim().length() > 0) {
+            maxEmisValue = verifier.parseDouble(maxEmis);
+            record.setMaxEmis(maxEmisValue);
+        } else {
+            record.setMaxEmis(null);
+        }
+        if (minEmisValue != Double.NaN 
+                && maxEmisValue != Double.NaN
+                && minEmisValue >= maxEmisValue)
+            throw new EmfException("The minimum emission must be be less than maximum emission.");
     }
 
     private void widgetLayout(int rows, int cols, int initX, int initY, int xPad, int yPad,

@@ -165,13 +165,15 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private IntTextField costYearTextField() {
         costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 10);
-        costYear.setValue(controlStrategy.getCostYear());
+        if (controlStrategy.getCostYear() != 0) 
+            costYear.setValue(controlStrategy.getCostYear());
         return costYear;
     }
 
     private IntTextField inventoryYearTextField() {
         inventoryYear = new IntTextField("Inventory year", 0, Integer.MAX_VALUE, 10);
-        inventoryYear.setValue(controlStrategy.getInventoryYear());
+        if (controlStrategy.getInventoryYear() != 0) 
+            inventoryYear.setValue(controlStrategy.getInventoryYear());
         return inventoryYear;
     }
 
@@ -280,7 +282,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         updateProject();
 
         isDatasetSelected(controlStrategy);
-        controlStrategy.setCostYear(new YearValidation("Cost Year").value((costYear.getText())));
+        controlStrategy.setCostYear(new YearValidation("Cost Year").value(costYear.getText()));
         controlStrategy.setInventoryYear(new YearValidation("Inventory Year").value(inventoryYear.getText()));
         updateRegion();
         controlStrategy.setTargetPollutant(majorPollutant());

@@ -401,11 +401,16 @@ public class ControlMeasureDAO {
         Criterion existingMeasureAbbr = record.getExistingMeasureAbbr() == null ? Restrictions.isNull("existingMeasureAbbr") : Restrictions.eq("existingMeasureAbbr", record.getExistingMeasureAbbr());
         Criterion effectiveDate = record.getEffectiveDate() == null ? Restrictions.isNull("effectiveDate") : Restrictions.eq("effectiveDate", record.getEffectiveDate());
 
-        if (exists(EfficiencyRecord.class, new Criterion[] {id, measureId, locale, pollutant, existingMeasureAbbr, effectiveDate}, session)) {
-            throw new EmfException("Duplicate Record: The combination of 'Pollutant', 'Locale', 'Effective Date' and 'Existing Measure' should be unique - Locale = " + record.getLocale()
+        Criterion minEmis = record.getMinEmis() == null ? Restrictions.isNull("minEmis") : Restrictions.eq("minEmis", record.getMinEmis());
+        Criterion maxEmis = record.getMaxEmis() == null ? Restrictions.isNull("maxEmis") : Restrictions.eq("maxEmis", record.getMaxEmis());
+
+        if (exists(EfficiencyRecord.class, new Criterion[] {id, measureId, locale, pollutant, existingMeasureAbbr, effectiveDate, minEmis, maxEmis}, session)) {
+            throw new EmfException("Duplicate Record: The combination of 'Pollutant', 'Locale', 'Effective Date', 'Existing Measure', 'Minimum Emission' and 'Maximum Emission' should be unique - Locale = " + record.getLocale()
                 + " Pollutant = " + record.getPollutant().getName()
                 + " ExistingMeasureAbbr = " + record.getExistingMeasureAbbr()
-                + " EffectiveDate = " + (record.getEffectiveDate() == null ? "" : record.getEffectiveDate()));
+                + " EffectiveDate = " + (record.getEffectiveDate() == null ? "" : record.getEffectiveDate())
+                + " MinEmis = " + (record.getMinEmis() == null ? "" : record.getMinEmis())
+                + " MaxEmis = " + (record.getMaxEmis() == null ? "" : record.getMaxEmis()));
         }
     }
 

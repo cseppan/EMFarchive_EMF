@@ -92,7 +92,7 @@ public class RetrieveMaxEmsRedControlMeasure {
         ControlMeasure controlMeasure = maxMeasure.measure();
 
         reduction = new MaxEmsRedControlMeasureMap(costYearTable);
-        EfficiencyRecord record = findBestEfficiencyRecord(controlMeasure, fips, pollutant, controlStrategy.getInventoryYear());
+        EfficiencyRecord record = findBestEfficiencyRecord(controlMeasure, fips, pollutant, controlStrategy.getInventoryYear(), invenAnnualEmissions);
         if (record != null) {
             reduction.add(controlMeasure, record);
         }
@@ -100,11 +100,11 @@ public class RetrieveMaxEmsRedControlMeasure {
         return maxMeasure = reduction.findBestMeasure();
     }
 
-    public MaxEmsRedControlMeasure getMaxEmsRedMeasureForCobenefitPollutant(Pollutant pollutant) throws EmfException {
+    public MaxEmsRedControlMeasure getMaxEmsRedMeasureForCobenefitPollutant(Pollutant pollutant, double invenAnnualEmission) throws EmfException {
         if (maxMeasure == null) return null;
         ControlMeasure controlMeasure = maxMeasure.measure();
         MaxEmsRedControlMeasureMap reduction = new MaxEmsRedControlMeasureMap(costYearTable);
-        EfficiencyRecord record = findBestEfficiencyRecord(controlMeasure, fips, pollutant, controlStrategy.getInventoryYear());
+        EfficiencyRecord record = findBestEfficiencyRecord(controlMeasure, fips, pollutant, controlStrategy.getInventoryYear(), invenAnnualEmission);
         if (record != null) {
             reduction.add(controlMeasure, record);
         }
@@ -117,6 +117,7 @@ public class RetrieveMaxEmsRedControlMeasure {
             double invenRulePenetration, double invenRuleEffectiveness, 
             double invenAnnualEmissions) throws EmfException {
         EfficiencyRecord[] efficiencyRecords = pollutantFilter(measure, controlStrategy.getTargetPollutant());
+        efficiencyRecords = minMaxEmisFilter(efficiencyRecords, invenAnnualEmissions);
         efficiencyRecords = localeFilter(efficiencyRecords, fips);
         efficiencyRecords = effectiveDateFilter(efficiencyRecords, inventoryYear);
         //apply this additional filter ONLY for TARGET POLLUTANTS...
@@ -127,8 +128,11 @@ public class RetrieveMaxEmsRedControlMeasure {
         return retrieveEfficiencyRecord.findBestEfficiencyRecord(efficiencyRecords);
     }
 
-    private EfficiencyRecord findBestEfficiencyRecord(ControlMeasure measure, String fips, Pollutant pollutant, int inventoryYear) throws EmfException {
+    private EfficiencyRecord findBestEfficiencyRecord(ControlMeasure measure, String fips, 
+            Pollutant pollutant, int inventoryYear,
+            double invenAnnualEmission) throws EmfException {
         EfficiencyRecord[] efficiencyRecords = pollutantFilter(measure, pollutant);
+        efficiencyRecords = minMaxEmisFilter(efficiencyRecords, invenAnnualEmission);
         efficiencyRecords = localeFilter(efficiencyRecords, fips);
         efficiencyRecords = effectiveDateFilter(efficiencyRecords, inventoryYear);
 
@@ -145,6 +149,32 @@ public class RetrieveMaxEmsRedControlMeasure {
         for (int i = 0; i < efficiencyRecords.length; i++) {
             if (efficiencyRecords[i].getPollutant().equals(pollutant))
                 records.add(efficiencyRecords[i]);
+        }
+        return (EfficiencyRecord[]) records.toArray(new EfficiencyRecord[0]);
+    }
+
+    private EfficiencyRecord[] minMaxEmisFilter(EfficiencyRecord[] efficiencyRecords, double invenAnnualEmission) {
+        List records = new ArrayList();
+        Double minEmis;
+        Double maxEmis;
+        for (int i = 0; i < efficiencyRecords.length; i++) {
+            minEmis = efficiencyRecords[i].getMinEmis();
+            maxEmis = efficiencyRecords[i].getMinEmis();
+            //if no min or max is specified, then include it in the arraylist...
+            if (minEmis == null && maxEmis == null) {
+                records.add(efficiencyRecords[i]);
+            //assume minEmis is zero in this case...
+            } else if (minEmis == null && maxEmis != null)  {
+                if (invenAnnualEmission >= 0 && invenAnnualEmission <= maxEmis)
+                    records.add(efficiencyRecords[i]);
+            } else if (minEmis != null && maxEmis != null)  {
+                if (invenAnnualEmission >= minEmis && invenAnnualEmission <= maxEmis)
+                    records.add(efficiencyRecords[i]);
+            //assume maxEmis is infinitely big in this case...
+            } else if (minEmis != null && maxEmis == null)  {
+                if (invenAnnualEmission >= minEmis)
+                    records.add(efficiencyRecords[i]);
+            }
         }
         return (EfficiencyRecord[]) records.toArray(new EfficiencyRecord[0]);
     }

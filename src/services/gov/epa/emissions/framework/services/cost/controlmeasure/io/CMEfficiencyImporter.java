@@ -34,7 +34,7 @@ public class CMEfficiencyImporter {
     
     private int recordParseCount;
 
-    public CMEfficiencyImporter(File file, CMEfficiencyFileFormat fileFormat, User user,
+    public CMEfficiencyImporter(File file, CMFileFormat fileFormat, User user,
             HibernateSessionFactory sessionFactory, DbServer dbServer) throws EmfException {
         this.file = file;
         this.user = user;

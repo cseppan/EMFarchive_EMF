@@ -64,6 +64,7 @@ ALTER TABLE emf.control_measures ADD COLUMN last_modified_by varchar(255) NOT NU
 
 -- add new columns to the efficiencyrecords table...
 ALTER TABLE emf.control_measure_efficiencyrecords ADD COLUMN ref_yr_cost_per_ton float4 DEFAULT 0;
+ALTER TABLE emf.control_measure_efficiencyrecords ALTER COLUMN ref_yr_cost_per_ton DROP DEFAULT;
 
 -- update the ref_yr_cost_per_ton based on the year 1999
 update emf.control_measure_efficiencyrecords 
@@ -159,3 +160,16 @@ CREATE INDEX constraint_strategy_id
   ON emf.control_strategy_constraints
   USING btree
   (control_strategy_id);
+  
+-- Added 6/1/12007 NEW MIN MAX Emis constraints for eff recs.
+-- add new columns, min and max emis to the efficiencyrecords table...
+ALTER TABLE emf.control_measure_efficiencyrecords 
+	ADD COLUMN min_emis double precision,
+	ADD COLUMN max_emis double precision;
+
+ -- modify constraint to include min and max emis columns...
+ALTER TABLE emf.control_measure_efficiencyrecords DROP CONSTRAINT control_measure_efficiencyrecords_control_measures_id_key;
+ALTER TABLE emf.control_measure_efficiencyrecords ADD CONSTRAINT control_measure_efficiencyrecords_control_measures_id_key 
+UNIQUE (control_measures_id, pollutant_id, locale, existing_measure_abbr, effective_date, min_emis, max_emis);
+
+  

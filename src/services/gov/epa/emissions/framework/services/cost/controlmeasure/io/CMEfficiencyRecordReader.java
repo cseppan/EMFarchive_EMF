@@ -15,8 +15,10 @@ import java.util.Map;
 
 public class CMEfficiencyRecordReader {
 
-    private CMEfficiencyFileFormat fileFormat;
+    private CMFileFormat fileFormat;
 
+    private int colCount;
+    
     private Pollutants pollutants;
 
     private CMAddImportStatus status;
@@ -31,53 +33,57 @@ public class CMEfficiencyRecordReader {
 
     private int errorLimit = 100;
 
-    public CMEfficiencyRecordReader(CMEfficiencyFileFormat fileFormat, User user, 
+    private boolean warning = false;
+    
+    public CMEfficiencyRecordReader(CMFileFormat fileFormat, User user, 
             HibernateSessionFactory sessionFactory, CostYearTable costYearTable) {
         this.fileFormat = fileFormat;
+        this.colCount = fileFormat.cols().length;
         this.status = new CMAddImportStatus(user, sessionFactory);
         this.user = user;
-        pollutants = new Pollutants(sessionFactory);
-        validation = new EfficiencyRecordValidation();
+        this.pollutants = new Pollutants(sessionFactory);
+        this.validation = new EfficiencyRecordValidation();
         this.costYearTable = costYearTable;
     }
 
-    public void parse(Map controlMeasures, Record record, int lineNo) {
-        StringBuffer sb = new StringBuffer();
-        String[] tokens = modify(record, sb, lineNo);
-
-        ControlMeasure cm = controlMeasure(tokens[0], controlMeasures, sb, lineNo);
-        if (tokens == null || cm == null || !checkForConstraints(tokens, sb, lineNo))
-            return;
-
-        try {
-            EfficiencyRecord efficiencyRecord = new EfficiencyRecord();
-            efficiencyRecord.setLastModifiedTime(new Date());
-            efficiencyRecord.setLastModifiedBy(user.getName());
-            pollutant(efficiencyRecord, tokens[1], sb);
-            locale(efficiencyRecord, tokens[2], sb);
-            effectiveDate(efficiencyRecord, tokens[3], sb);
-            existingMeasureAbbrev(efficiencyRecord, tokens[4]);
-            controlEfficiency(efficiencyRecord, tokens[6], sb);
-            costYear(efficiencyRecord, tokens[7], sb);
-            costPerTon(efficiencyRecord, tokens[8], sb);
-            ruleEffectiveness(efficiencyRecord, tokens[9], sb);
-            rulePenetration(efficiencyRecord, tokens[10], sb);
-            equationType(efficiencyRecord, tokens[11]);
-            capitalRecoveryFactor(efficiencyRecord, tokens[12], sb);
-            discountFactor(efficiencyRecord, tokens[13], sb);
-            details(efficiencyRecord, tokens[14]);
-
-            cm.addEfficiencyRecord(efficiencyRecord);
-        } catch (EmfException e) {
-            // don't add the efficiency record if the validation fails
-        }
-        status.addStatus(lineNo, sb);
-    }
+//    public void parse(Map controlMeasures, Record record, int lineNo) {
+//        StringBuffer sb = new StringBuffer();
+//        String[] tokens = modify(record, sb, lineNo);
+//
+//        ControlMeasure cm = controlMeasure(tokens[0], controlMeasures, sb, lineNo);
+//        if (tokens == null || cm == null || !checkForConstraints(tokens, sb, lineNo))
+//            return;
+//
+//        try {
+//            EfficiencyRecord efficiencyRecord = new EfficiencyRecord();
+//            efficiencyRecord.setLastModifiedTime(new Date());
+//            efficiencyRecord.setLastModifiedBy(user.getName());
+//            pollutant(efficiencyRecord, tokens[1], sb);
+//            locale(efficiencyRecord, tokens[2], sb);
+//            effectiveDate(efficiencyRecord, tokens[3], sb);
+//            existingMeasureAbbrev(efficiencyRecord, tokens[4]);
+//            controlEfficiency(efficiencyRecord, tokens[6], sb);
+//            costYear(efficiencyRecord, tokens[7], sb);
+//            costPerTon(efficiencyRecord, tokens[8], sb);
+//            ruleEffectiveness(efficiencyRecord, tokens[9], sb);
+//            rulePenetration(efficiencyRecord, tokens[10], sb);
+//            equationType(efficiencyRecord, tokens[11]);
+//            capitalRecoveryFactor(efficiencyRecord, tokens[12], sb);
+//            discountFactor(efficiencyRecord, tokens[13], sb);
+//            details(efficiencyRecord, tokens[14]);
+//
+//            cm.addEfficiencyRecord(efficiencyRecord);
+//        } catch (EmfException e) {
+//            // don't add the efficiency record if the validation fails
+//        }
+//        status.addStatus(lineNo, sb);
+//    }
 
     public EfficiencyRecord parseEfficiencyRecord(Map controlMeasures, Record record, int lineNo) throws EmfException {
         StringBuffer sb = new StringBuffer();
         String[] tokens = modify(record, sb, lineNo);
         EfficiencyRecord efficiencyRecord = null;
+        warning = false;
         
         ControlMeasure cm = controlMeasure(tokens[0], controlMeasures, sb, lineNo);
         if (tokens == null || cm == null || !checkForConstraints(tokens, sb, lineNo)) {
@@ -94,26 +100,43 @@ public class CMEfficiencyRecordReader {
             locale(efficiencyRecord, tokens[2], sb);
             effectiveDate(efficiencyRecord, tokens[3], sb);
             existingMeasureAbbrev(efficiencyRecord, tokens[4]);
-            controlEfficiency(efficiencyRecord, tokens[6], sb);
-            costYear(efficiencyRecord, tokens[7], sb);
-            costPerTon(efficiencyRecord, tokens[8], sb);
-            refYrCostPerTon(efficiencyRecord, tokens[7], tokens[8]);
-            ruleEffectiveness(efficiencyRecord, tokens[9], sb);
-            rulePenetration(efficiencyRecord, tokens[10], sb);
-            equationType(efficiencyRecord, tokens[11]);
-            capitalRecoveryFactor(efficiencyRecord, tokens[12], sb);
-            discountFactor(efficiencyRecord, tokens[13], sb);
-            details(efficiencyRecord, tokens[14]);
+            if (this.colCount == 15) {
+                controlEfficiency(efficiencyRecord, tokens[6], sb);
+                costYear(efficiencyRecord, tokens[7], sb);
+                costPerTon(efficiencyRecord, tokens[8], tokens[7], sb);
+//                costYear(efficiencyRecord, tokens[7], sb);
+//                costPerTon(efficiencyRecord, tokens[8], sb);
+                refYrCostPerTon(efficiencyRecord, tokens[7], tokens[8]);
+                ruleEffectiveness(efficiencyRecord, tokens[9], sb);
+                rulePenetration(efficiencyRecord, tokens[10], sb);
+                equationType(efficiencyRecord, tokens[11]);
+                capitalRecoveryFactor(efficiencyRecord, tokens[12], sb);
+                discountFactor(efficiencyRecord, tokens[13], sb);
+                details(efficiencyRecord, tokens[14]);
+            } else if (this.colCount == 17) {
+                minEmis(efficiencyRecord, tokens[6], sb);
+                maxEmis(efficiencyRecord, tokens[7], sb);
+                controlEfficiency(efficiencyRecord, tokens[8], sb);
+                costYear(efficiencyRecord, tokens[9], sb);
+                costPerTon(efficiencyRecord, tokens[10], tokens[9], sb);
+                refYrCostPerTon(efficiencyRecord, tokens[9], tokens[10]);
+                ruleEffectiveness(efficiencyRecord, tokens[11], sb);
+                rulePenetration(efficiencyRecord, tokens[12], sb);
+                equationType(efficiencyRecord, tokens[13]);
+                capitalRecoveryFactor(efficiencyRecord, tokens[14], sb);
+                discountFactor(efficiencyRecord, tokens[15], sb);
+                details(efficiencyRecord, tokens[16]);
+            }
 
         } catch (EmfException e) {
             // don't add the efficiency record if the validation fails
             efficiencyRecord = null;
         }
         if (sb.length() > 0) {
-            errorCount++;
+            if (!warning) errorCount++;
             status.addStatus(lineNo, sb);
         }
-        
+
         if (errorCount >= errorLimit) throw new EmfException("The maximum allowable error limit (" + errorLimit + ") has been reached while parsing the control measure efficiency records.");
         return efficiencyRecord;
     }
@@ -170,7 +193,13 @@ public class CMEfficiencyRecordReader {
         String efficiency = (ce.indexOf('%') != -1) ? ce.split("%")[0] : ce;
 
         try {
-            efficiencyRecord.setEfficiency(validation.efficiency(efficiency));
+            float value = validation.efficiency(efficiency);
+            if (value == 0) {
+                warning = true;
+                sb.append(format("The Control Efficiency is zero, 0%, this efficiency record will be dropped."));
+                throw new EmfException("The Control Efficiency is zero, 0%, this efficiency record will be dropped.");            
+            }
+            efficiencyRecord.setEfficiency(value);
         } catch (EmfException e) {
             sb.append(format(e.getMessage()));
             // If control Efficiency is not valid, we want the validation process to stop
@@ -188,9 +217,25 @@ public class CMEfficiencyRecordReader {
 
     }
 
-    private void costPerTon(EfficiencyRecord efficiencyRecord, String costValue, StringBuffer sb) {
+    private void costPerTon(EfficiencyRecord efficiencyRecord, String costValue, String year, StringBuffer sb) {
         try {
-            efficiencyRecord.setCostPerTon(validation.costPerTon(costValue));
+            efficiencyRecord.setCostPerTon(validation.costPerTon(costValue, year));
+        } catch (EmfException e) {
+            sb.append(format(e.getMessage()));
+        }
+    }
+
+    private void minEmis(EfficiencyRecord efficiencyRecord, String minEmisValue, StringBuffer sb) {
+        try {
+            efficiencyRecord.setMinEmis(validation.minEmis(minEmisValue));
+        } catch (EmfException e) {
+            sb.append(format(e.getMessage()));
+        }
+    }
+
+    private void maxEmis(EfficiencyRecord efficiencyRecord, String maxEmisValue, StringBuffer sb) {
+        try {
+            efficiencyRecord.setMaxEmis(validation.maxEmis(maxEmisValue));
         } catch (EmfException e) {
             sb.append(format(e.getMessage()));
         }
@@ -239,9 +284,11 @@ public class CMEfficiencyRecordReader {
 
     private void refYrCostPerTon(EfficiencyRecord efficiencyRecord, String year, String costValue) {
         try {
-            Double costPerTon = validation.costPerTon(costValue);
+            Double costPerTon = validation.costPerTon(costValue, year);
             if (costPerTon != null)
                 efficiencyRecord.setRefYrCostPerTon(costPerTon * new Float(costYearTable.factor(validation.costYear(year))));
+            else
+                efficiencyRecord.setRefYrCostPerTon(null);
         } catch (EmfException e) {
             //don't propagate exception, these would have been taken care of from the cost per ton and cost year validation
         }

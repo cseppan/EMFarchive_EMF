@@ -43,15 +43,6 @@ public class RetrieveEfficiencyRecord {
         effRecColumnMap.put("Last Modifed By", "er.last_modified_by");
         effRecColumnMap.put("Last Modifed Date", "er.last_modified_time");
         effRecColumnMap.put("Details", "er.detail");
-//        "Pollutant", "Locale", "Effective Date", "Existing Measure", "Existing NEI Dev",
-//        "Cost Year", "Cost Per Ton", "Control Efficiency", "Rule Effectiveness", "Rule Penetration",
-//        "Equation Type", "Capital Rec Fac", "Discount Rate", "Last Modifed By", "Last Modifed Date", "Details"
-//        
-//        String query = "select er.id, er.control_measures_id"
-//            + ", er.record_id, er.pollutant_id , p.name, er.existing_measure_abbr, er.existing_dev_code, er.locale"
-//            + ", er.efficiency, er.cost_year, er.cost_per_ton, er.rule_effectiveness, er.rule_penetration"
-//            + ", er.equation_type, er.cap_rec_factor, er.discount_rate, er.detail, er.effective_date, er.last_modified_by, er.last_modified_time "
-
     }
 
     public EfficiencyRecord[] getEfficiencyRecords(int recordLimit, String filter) throws SQLException, EmfException {
@@ -67,8 +58,11 @@ public class RetrieveEfficiencyRecord {
     }
 
     private EfficiencyRecord[] values(ResultSet rs) throws SQLException {
-        List effRecs = new ArrayList();
+        List effRecs = new ArrayList<EfficiencyRecord>();
+        int costYear = 0;
         double costPerTon = 0;
+        double minEmis = 0;
+        double maxEmis = 0;
         try {
             while (rs.next()) {
                 EfficiencyRecord effRec = new EfficiencyRecord();
@@ -80,8 +74,8 @@ public class RetrieveEfficiencyRecord {
                 effRec.setExistingDevCode(rs.getInt(7));
                 effRec.setLocale(rs.getString(8));
                 effRec.setEfficiency(rs.getFloat(9));
-                effRec.setCostYear(rs.getInt(10));
-//                effRec.setCostPerTon(rs.getDouble(11));
+                costYear = rs.getInt(10);
+                effRec.setCostYear(!rs.wasNull() ? costYear : null);
                 costPerTon = rs.getDouble(11);
                 effRec.setCostPerTon(!rs.wasNull() ? costPerTon : null);
                 effRec.setRuleEffectiveness(rs.getFloat(12));
@@ -95,28 +89,10 @@ public class RetrieveEfficiencyRecord {
                 effRec.setLastModifiedTime(rs.getTimestamp(20));
                 costPerTon = rs.getDouble(21);
                 effRec.setRefYrCostPerTon(!rs.wasNull() ? costPerTon : null);
-
-//                id serial NOT NULL,
-//                control_measures_id int4 NOT NULL,
-//                record_id int4,
-//              pollutant_id int4 NOT NULL,
-//              pollutant_NAME string,
-//                existing_measure_abbr varchar(10),
-//                existing_dev_code int4,
-//                locale varchar(10),
-//                efficiency float4,
-//                percent_reduction float4,
-//                cost_year int4,
-//                cost_per_ton float4,
-//                rule_effectiveness float4,
-//                rule_penetration float4,
-//                equation_type varchar(128),
-//                cap_rec_factor float4,
-//                discount_rate float4,
-//                detail varchar(128),
-//                effective_date timestamp,
-//                last_modified_by varchar(255) NOT NULL DEFAULT ''::character varying,
-//                last_modified_time timestamp NOT NULL DEFAULT now(),
+                minEmis = rs.getDouble(22);
+                effRec.setMinEmis(!rs.wasNull() ? minEmis : null);
+                maxEmis = rs.getDouble(23);
+                effRec.setMaxEmis(!rs.wasNull() ? maxEmis : null);
 
                 effRecs.add(effRec);
             }
@@ -134,7 +110,7 @@ public class RetrieveEfficiencyRecord {
         String query = "select er.id, er.control_measures_id"
             + ", er.record_id, er.pollutant_id , p.name, er.existing_measure_abbr, er.existing_dev_code, er.locale"
             + ", er.efficiency, er.cost_year, er.cost_per_ton, er.rule_effectiveness, er.rule_penetration"
-            + ", er.equation_type, er.cap_rec_factor, er.discount_rate, er.detail, er.effective_date, er.last_modified_by, er.last_modified_time, er.ref_yr_cost_per_ton "
+            + ", er.equation_type, er.cap_rec_factor, er.discount_rate, er.detail, er.effective_date, er.last_modified_by, er.last_modified_time, er.ref_yr_cost_per_ton, er.min_emis, er.max_emis "
             + "from emf.control_measure_efficiencyrecords er "
             + "inner join emf.pollutants p "
             + "on p.id = er.pollutant_id "
@@ -149,6 +125,8 @@ public class RetrieveEfficiencyRecord {
     private String translateFilter(String filter) throws EmfException {
         if (filter.trim().length() == 0) return "";
         filter = filter.trim().toUpperCase();
+        //don't allow between, tell client to use <= and >= instead, maybe a future item to fix...
+        if (filter.indexOf(" BETWEEN ") > 0) throw new EmfException("The filter doesn't support the BETWEEN statement, use Field >= LowerLimit and Field <= UpperLimit instead.");
         // Parse a line with and's and or's
         String patternStr = "(AND|OR)";//"\\+(AND|OR)*";
         String[] fields = filter.split(patternStr, -1);

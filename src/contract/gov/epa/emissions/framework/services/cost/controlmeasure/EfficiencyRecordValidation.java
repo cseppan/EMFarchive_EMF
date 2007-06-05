@@ -76,24 +76,44 @@ public class EfficiencyRecordValidation {
         throw new EmfException("locale must be a two, five, or six digit integer, value = " + locale);
     }
 
-    public Double costPerTon(String costperTon) throws EmfException {
+    public Double costPerTon(String costperTon, String year) throws EmfException {
+        Integer costYear = costYear(year);
+        
         if (costperTon.trim().length() == 0) return null;
         double value = parseDouble("cost per ton", costperTon);
+        if (costYear == null) throw new EmfException("A cost year is required when a cost per ton is specified");
         // This is not actually the case per Greg Stella - some controls have cost benefits
         //if (value < 0)
         //    throw new EmfException("cost per ton should be >= 0, value = " + costperTon);
         return value;
     }
 
-    public int costYear(String costYear) throws EmfException {
+    public Double minEmis(String minEmisValue) throws EmfException {
+        if (minEmisValue.trim().length() == 0) return null;
+        double value = parseDouble("minimum emission", minEmisValue);
+        return value;
+    }
+
+    public Double maxEmis(String maxEmisValue) throws EmfException {
+        if (maxEmisValue.trim().length() == 0) return null;
+        double value = parseDouble("maximum emission", maxEmisValue);
+        return value;
+    }
+
+    public Integer costYear(String costYear) throws EmfException {
+        if (costYear.trim().length() == 0) return null;
         YearValidation validation = new YearValidation("Cost Year");
         return validation.value(costYear);
     }
 
     public float efficiency(String efficiency) throws EmfException {
         float value = parseFloat("control efficiency", efficiency);
-        if (value <= 0)
-            throw new EmfException("control efficiency should be a percentage (e.g., 90%, or -10% for a disbenefit), value = "
+        if (value > 100)
+            throw new EmfException("The Control Efficiency can't be more than 100%, value = "
+                    + efficiency);
+
+        if (value < -100)
+            throw new EmfException("The Control Efficiency can't be less than -100%, value = "
                     + efficiency);
         return value;
     }

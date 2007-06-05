@@ -158,12 +158,12 @@ public class StrategyLoader {
                                 resultSet.getDouble("CEFF"), 100, 
                                 resultSet.getFloat("CEFF") > 0 && resultSet.getFloat("REFF") == 0 ? 100 : resultSet.getFloat("REFF"), resultSet.getDouble("ANN_EMIS"));
                     }
-                //find best efficiency record for source and cobenefit pollutant, measure was already determined above...
+                //find best efficiency record for source and cobenefit pollutant, measure was already determined above from the first pass...
                 } else {
-                    maxCM = retrieveMeasure.getMaxEmsRedMeasureForCobenefitPollutant(poll);
+                    maxCM = retrieveMeasure.getMaxEmsRedMeasureForCobenefitPollutant(poll, resultSet.getDouble("ANN_EMIS"));
                 }
                 if (maxCM == null)
-                    continue; // LOG???
+                    continue;
                 try {
                     RecordGenerator generator = getRecordGenerator();
                     Record record = generator.getRecord(resultSet, maxCM);

@@ -25,13 +25,14 @@ public class EfficiencyRecordPresenter {
     }
 
     private String duplicateRecordMsg() {
-        return "The combination of 'Pollutant', 'Locale', 'Effective Date' and 'Existing Measure' should be unique";
+        return "The combination of 'Pollutant', 'Locale', 'Effective Date', 'Existing Measure', 'Min Emission' and 'Max Emission' should be unique";
     }
 
     private boolean same(EfficiencyRecord record1, EfficiencyRecord record2) {
         return record1.getPollutant().equals(record2.getPollutant()) && record1.getLocale().equals(record2.getLocale())
                 && sameEffectiveDate(record1, record2)
-                && record1.getExistingMeasureAbbr().equals(record2.getExistingMeasureAbbr());
+                && record1.getExistingMeasureAbbr().equals(record2.getExistingMeasureAbbr())
+                && sameMinMaxEmission(record1, record2);
     
     }
 
@@ -46,6 +47,23 @@ public class EfficiencyRecordPresenter {
             return false;
     
         return effectiveDate1.equals(effectiveDate2);
+    }
+
+    private boolean sameMinMaxEmission(EfficiencyRecord record1, EfficiencyRecord record2) {
+        Double minEmis1 = record1.getMinEmis();
+        Double minEmis2 = record2.getMinEmis();
+        Double maxEmis1 = record1.getMaxEmis();
+        Double maxEmis2 = record2.getMaxEmis();
+        if (minEmis1 == null && minEmis2 == null
+                && maxEmis1 == null && maxEmis2 == null)
+            return true;
+        if (minEmis1 != null && minEmis2 != null && minEmis1.equals(minEmis2) 
+                && maxEmis1 != null && maxEmis2 != null && maxEmis1.equals(maxEmis2))
+            return true;
+        if (minEmis1 != null && minEmis2 != null && minEmis1.equals(minEmis2) 
+                && maxEmis1 == null && maxEmis2 == null)
+            return true;
+        return false;
     }
 
 }

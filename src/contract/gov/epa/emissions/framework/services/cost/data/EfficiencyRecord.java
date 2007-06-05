@@ -19,7 +19,7 @@ public class EfficiencyRecord implements Serializable {
 
     private String detail;
 
-    private int costYear;
+    private Integer costYear;
 
     private Double costPerTon;
 
@@ -46,6 +46,11 @@ public class EfficiencyRecord implements Serializable {
 
     private Double refYrCostPerTon;
 
+    private Double minEmis;
+
+    private Double maxEmis;
+
+
     public float getCapRecFactor() {
         return capRecFactor;
     }
@@ -62,11 +67,11 @@ public class EfficiencyRecord implements Serializable {
         this.costPerTon = costPerTon;
     }
 
-    public int getCostYear() {
+    public Integer getCostYear() {
         return costYear;
     }
 
-    public void setCostYear(int costYear) {
+    public void setCostYear(Integer costYear) {
         this.costYear = costYear;
     }
 
@@ -228,4 +233,19 @@ public class EfficiencyRecord implements Serializable {
         return refYrCostPerTon;
     }
 
+    public void setMinEmis(Double minEmis) {
+        this.minEmis = minEmis;
+    }
+
+    public Double getMinEmis() {
+        return minEmis;
+    }
+
+    public void setMaxEmis(Double maxEmis) {
+        this.maxEmis = maxEmis;
+    }
+
+    public Double getMaxEmis() {
+        return maxEmis;
+    }
 }

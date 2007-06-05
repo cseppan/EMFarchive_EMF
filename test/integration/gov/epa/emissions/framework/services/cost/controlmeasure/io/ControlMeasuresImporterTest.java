@@ -39,6 +39,22 @@ public class ControlMeasuresImporterTest extends ServiceTestCase {
         dropAll(ControlMeasure.class);
     }
 
+    public void testShouldImportControlMeasureFiles2() throws EmfException, Exception {
+        File folder = new File("D:/CEP");
+        String[] fileNames = { "Summary.csv", "SCCs.csv", "Efficiencies.csv"};
+        ControlMeasuresImporter importer = new ControlMeasuresImporter(folder, fileNames, emfUser(), sessionFactory(), dbServerFactory());
+        importer.run();
+
+        ControlMeasure[] measures = importer.controlMeasures();
+        assertEquals(32, measures.length);
+        assertEquals(1132, noOfRecords(measures));
+        assertEquals(126, noOfScc(measures));
+        
+        dropAll(EfficiencyRecord.class);
+        dropAll(Scc.class);
+        dropAll(ControlMeasure.class);
+    }
+
     private User emfUser() {
         return new UserDAO().get("emf",session);
     }

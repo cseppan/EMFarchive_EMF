@@ -125,6 +125,8 @@ CREATE TABLE emf.control_measure_efficiencyrecords
   last_modified_by varchar(255) NOT NULL,
   last_modified_time timestamp NOT NULL,
   ref_yr_cost_per_ton float4,
+  min_emis double precision,
+  max_emis double precision,
   UNIQUE (control_measures_id,pollutant_id,locale,existing_measure_abbr,effective_date)
 ) 
 WITHOUT OIDS;

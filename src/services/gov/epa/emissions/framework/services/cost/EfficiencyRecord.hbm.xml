@@ -30,6 +30,8 @@
         <property name="lastModifiedBy" column="last_modified_by" type="java.lang.String" not-null="true"/>
         <property name="lastModifiedTime" column="last_modified_time" type="java.util.Date" not-null="true" length="4"/>
 		<property name="refYrCostPerTon" column="ref_yr_cost_per_ton" type="double" not-null="false"/>
+        <property name="minEmis" column="min_emis" type="double" not-null="false"/>
+		<property name="maxEmis" column="max_emis" type="double" not-null="false"/>
     </class>
 </hibernate-mapping>  
 

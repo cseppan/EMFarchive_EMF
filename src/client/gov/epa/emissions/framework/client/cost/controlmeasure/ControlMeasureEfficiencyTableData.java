@@ -26,9 +26,16 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Pollutant", "Locale", "Effective Date",
-                "Cost Year", "CPT", "Ref Yr CPT", "Control Efficiency", "Rule Effectiveness", "Rule Penetration",
-                "Equation Type", "Capital Rec Fac", "Discount Rate", "Last Modifed By", "Last Modifed Date", "Details", "Existing Measure", "Existing NEI Dev"};
+        return new String[] { "Pollutant", "Locale", 
+                "Effective Date", "Cost Year",
+                "CPT", "Ref Yr CPT", 
+                "Control Efficiency", "Min Emis", 
+                "Max Emis", "Rule Effectiveness", 
+                "Rule Penetration", "Equation Type", 
+                "Capital Rec Fac", "Discount Rate", 
+                "Last Modifed By", "Last Modifed Date", 
+                "Details", "Existing Measure", 
+                "Existing NEI Dev"};
     }
 
     public List rows() {
@@ -42,9 +49,10 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     private Row row(EfficiencyRecord record) {
         Object[] values = {
                 record.getPollutant().getName(), record.getLocale(),
-                effectiveDate(record.getEffectiveDate()), new Integer(record.getCostYear()),
+                effectiveDate(record.getEffectiveDate()), record.getCostYear() != null ? record.getCostYear() : "",
                 record.getCostPerTon() != null ? record.getCostPerTon() : NAN_VALUE, record.getRefYrCostPerTon() != null ? record.getRefYrCostPerTon() : NAN_VALUE, 
-                new Double(record.getEfficiency()), new Double(record.getRuleEffectiveness()), 
+                new Double(record.getEfficiency()), record.getMinEmis() != null ? record.getMinEmis() : NAN_VALUE, 
+                record.getMaxEmis() != null ? record.getMaxEmis() : NAN_VALUE, new Double(record.getRuleEffectiveness()), 
                 new Double(record.getRulePenetration()), record.getEquationType(), 
                 new Double(record.getCapRecFactor()), new Double(record.getDiscountRate()),
                 record.getLastModifiedBy(), EmfDateFormat.format_MM_DD_YYYY_HH_mm(record.getLastModifiedTime()), 
@@ -71,10 +79,10 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        if (col == 3 || col == 16)
+        if (col == 18)
             return Integer.class;
 
-        if (col == 4 || col == 5 || col == 6 || col == 7 || col == 8 || col == 10 || col == 11)
+        if (col == 4 || col == 5 || col == 6 || col == 7 || col == 8 || col == 9 || col == 10 || col == 12 || col == 13)
             return Double.class;
 
         return String.class;

@@ -65,19 +65,23 @@ public class CMImporters {
             }
         }
 
-        throw new EmfException("Control Measure Summary file is required, the file is missing or has the wrong format, expected header format: " + getHeaderFormat(cols));
+        throw new EmfException("Failed to import control measures: Control Measure Summary file is required, the file is missing or has the wrong format, expected header format: " + getHeaderFormat(cols));
     }
 
     private CMEfficiencyImporter createEfficiencyImporter() throws EmfException {
         CMEfficiencyFileFormat fileFormat = new CMEfficiencyFileFormat();
+        CMEfficiencyFileFormatv2 fileFormatv2 = new CMEfficiencyFileFormatv2();
         String[] cols = fileFormat.cols();
+        String[] colsv2 = fileFormatv2.cols();
         for (int i = 0; i < records.length; i++) {
             if (matches(cols, records[i].getTokens())) {
                 return new CMEfficiencyImporter(files[i], fileFormat, user, sessionFactory, dbServer);
+            } else if (matches(colsv2, records[i].getTokens())) {
+                return new CMEfficiencyImporter(files[i], fileFormatv2, user, sessionFactory, dbServer);
             }
         }
 
-        throw new EmfException("Control Measure Efficiency file is required, the file is missing or has the wrong format, expected header format: " + getHeaderFormat(cols));
+        throw new EmfException("Failed to import control measures: Control Measure Efficiency file is required, the file is missing or has the wrong format, expected header format: " + getHeaderFormat(cols));
 
     }
 
@@ -90,7 +94,7 @@ public class CMImporters {
             }
         }
 
-        throw new EmfException("Control Measure SCC file is required, the file is missing or has the wrong format, expected header format: " + getHeaderFormat(cols));
+        throw new EmfException("Failed to import control measures: Control Measure SCC file is required, the file is missing or has the wrong format, expected header format: " + getHeaderFormat(cols));
 
     }
 

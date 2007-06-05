@@ -140,7 +140,7 @@ public class ControlMeasuresExporter implements Exporter {
 
     private void writeEfficiencyFile() throws IOException {
         PrintWriter efficienciesWriter = openExportFile("_efficiencies.csv");
-        CMEfficiencyFileFormat fileFormat = new CMEfficiencyFileFormat();
+        CMEfficiencyFileFormatv2 fileFormat = new CMEfficiencyFileFormatv2();
         String[] colNames = fileFormat.cols();
         ControlMeasureDAO dao = new ControlMeasureDAO();
         Session session = factory.getSession();
@@ -183,6 +183,10 @@ public class ControlMeasuresExporter implements Exporter {
         efficiencyRecord += (effectiveDate == null ? "" : effectiveDate.toString()) + delimiter;
         efficiencyRecord += record.getExistingMeasureAbbr() + delimiter;
         efficiencyRecord += record.getExistingDevCode() + delimiter;
+        Double minEmis = record.getMinEmis();
+        efficiencyRecord += (minEmis == null ? "" : minEmis.toString()) + delimiter;
+        Double maxEmis = record.getMaxEmis();
+        efficiencyRecord += (maxEmis == null ? "" : maxEmis.toString()) + delimiter;
         efficiencyRecord += record.getEfficiency() + delimiter;
         efficiencyRecord += record.getCostYear() + delimiter;
         efficiencyRecord += (record.getCostPerTon() == null ? "" : record.getCostPerTon()) + delimiter;
