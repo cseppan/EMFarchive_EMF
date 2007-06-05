@@ -399,7 +399,7 @@
         </copy>
         <copy todir="${client.dist.ref}">
             <fileset dir="config/ref/delimited">
-                <include name="scc.txt" />
+                <include name="**" />
             </fileset>
         </copy>
 
@@ -537,7 +537,8 @@
 
     <target name="tomcat-start">
         <echo message="Starting with: ${tomcat.start}" />
-        <exec executable="${jdk.home}/bin/java.exe"
+		<!-- Note Linux executable -->
+        <exec executable="${jdk.home}/bin/java"
               dir="${build.home}"
               output="${build.home}/tomcat-start.txt"
               error="${build.home}/tomcat-start-error.txt"
@@ -548,7 +549,7 @@
     </target>
 
     <target name="tomcat-stop">
-        <exec executable="${jdk.home}/bin/java.exe"
+        <exec executable="${jdk.home}/bin/java"
               dir="${build.home}"
               output="${build.home}/tomcat-stop.txt"
               error="${build.home}/tomcat-stop-error.txt"
