@@ -120,7 +120,7 @@ CREATE TABLE emf.control_measure_efficiencyrecords
   equation_type varchar(128),
   cap_rec_factor real,
   discount_rate real,
-  detail varchar(128),
+  detail text,
   effective_date timestamp,
   last_modified_by varchar(255) NOT NULL,
   last_modified_time timestamp NOT NULL,

@@ -172,4 +172,7 @@ ALTER TABLE emf.control_measure_efficiencyrecords DROP CONSTRAINT control_measur
 ALTER TABLE emf.control_measure_efficiencyrecords ADD CONSTRAINT control_measure_efficiencyrecords_control_measures_id_key 
 UNIQUE (control_measures_id, pollutant_id, locale, existing_measure_abbr, effective_date, min_emis, max_emis);
 
+ -- modify details data type to be a text field instead of varchar(128)...
+ALTER TABLE emf.control_measure_efficiencyrecords ALTER detail TYPE text;
+
   
