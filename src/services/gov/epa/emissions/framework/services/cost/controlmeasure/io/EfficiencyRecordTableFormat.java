@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.IntegerFormatter;
+import gov.epa.emissions.commons.io.NullFormatter;
 import gov.epa.emissions.commons.io.RealFormatter;
 import gov.epa.emissions.commons.io.StringFormatter;
 import gov.epa.emissions.commons.io.TableFormat;
@@ -58,7 +59,7 @@ public class EfficiencyRecordTableFormat implements TableFormat {
         Column equation_type = new Column("equation_type", types.stringType(128), 128, new StringFormatter(128));
         Column cap_rec_factor = new Column("cap_rec_factor", types.realType(), new RealFormatter());
         Column discount_rate = new Column("discount_rate", types.realType(), new RealFormatter());
-        Column detail = new Column("detail", types.stringType(128), 128, new StringFormatter(128), "DEFAULT ''");
+        Column detail = new Column("detail", types.text(), new NullFormatter(), "DEFAULT ''::text");
         Column effective_date = new Column("effective_date", types.timestamp());
         Column last_modified_by = new Column("last_modified_by", types.stringType(255), 255, new StringFormatter(255), "DEFAULT ''");
         Column last_modified_time = new Column("last_modified_time", types.timestamp());
