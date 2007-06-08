@@ -19,6 +19,8 @@ public class EditQAStepPresenter {
     private EmfDataset dataset;
 
     private EditableQATabView tabView;
+    
+    private QAStep qastep;
 
     private EmfSession session;
 
@@ -38,6 +40,7 @@ public class EditQAStepPresenter {
         QAStepResult result = qaService.getQAStepResult(step);
         view.display(step, result, programs, dataset, versionName, session);
         view.setMostRecentUsedFolder(getFolder());
+        this.qastep = step;
     }
 
     public void close() {
@@ -77,7 +80,8 @@ public class EditQAStepPresenter {
     }
 
     private String getDefaultFolder() {
-        String folder = session.preferences().outputFolder();
+        //String folder = session.preferences().outputFolder();
+        String folder = qastep.getOutputFolder();
         if (!new File(folder).isDirectory())
             folder = "";// default, if unspecified
 

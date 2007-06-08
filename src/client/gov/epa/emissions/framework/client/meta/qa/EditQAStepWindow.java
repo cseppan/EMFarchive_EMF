@@ -102,7 +102,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private EmfSession session;
 
     private EmfConsole parentConsole;
-    
+
     private volatile Thread runThread;
 
     private TextField tableName;
@@ -131,7 +131,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         super.getContentPane().add(layout);
         super.display();
     }
-    
+
     public void run() {
         try {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -139,19 +139,19 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             Thread.sleep(5000);
             int factor = 1;
             qaStepResult = presenter.getStepResult(step);
-            
-            while ( qaStepResult == null || qaStepResult.getTable() == null) {
+
+            while (qaStepResult == null || qaStepResult.getTable() == null) {
                 Thread.sleep(5000 + factor * 5000);
                 qaStepResult = presenter.getStepResult(step);
                 ++factor;
             }
-            
+
             resetRunStatus(qaStepResult);
             setCursor(Cursor.getDefaultCursor());
         } catch (Exception e) {
             messagePanel.setError(e.getMessage());
         }
-        
+
         saveButton.setEnabled(true);
     }
 
@@ -371,7 +371,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 currentTable.setSelected(false);
             }
         });
-        
+
         JPanel prgpanel = new JPanel();
         prgpanel.add(new Label(versionName + " (" + step.getVersion() + ")"));
         prgpanel.add(new JLabel(EmptyStrings.create(20)));
@@ -392,12 +392,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         required = new CheckBox("", step.isRequired());
         if (step.isRequired())
             required.setEnabled(false);
-        
+
         order = new NumberFormattedTextField(5, orderAction());
         order.setText(step.getOrder() + "");
         order.addKeyListener(keyListener());
         addChangeable(order);
-        
+
         JPanel checkBoxPanel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layout = new SpringLayoutGenerator();
         JPanel reqirepanel = new JPanel();
@@ -596,6 +596,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         step.setWho(who.getText());
         step.setDate(date.value());
         step.setConfiguration(config.getText());
+        if (exportFolder.getText() != null)
+            step.setOutputFolder(exportFolder.getText().trim());
         return step;
     }
 
@@ -609,7 +611,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     public void displayResultsTable(String qaStepName, String exportedFileName) {
-        AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QAStep \"" + qaStepName + "\" results ", new Dimension(500, 500), desktopManager, parentConsole);
+        AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QAStep \"" + qaStepName + "\" results ",
+                new Dimension(500, 500), desktopManager, parentConsole);
         app.display(new String[] { exportedFileName });
     }
 }
