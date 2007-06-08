@@ -120,6 +120,10 @@ public class VersionsSet {
         return null;
     }
 
+   public String versionString(int ver) {
+       return getVersionName(ver) + " (" + ver + ")";
+   }
+
    // TODO: probably shouldn't need - ask object instead
     public Version getVersionFromNameAndNumber(String nameAndNumber) {
         int ver = getVersionNumber(nameAndNumber);
