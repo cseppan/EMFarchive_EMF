@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
@@ -15,8 +16,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -25,16 +25,21 @@ public class NewVersionDialog extends Dialog {
 
     private TextField name;
 
-    private DefaultComboBoxModel versionsModel;
-
     protected boolean shouldCreate;
 
     private VersionsSet versionsSet;
+    
+    private ComboBox versionsCombo;
+    
+    private EmfDataset dataset;
 
+    private JLabel defaultVersion;
+    
     public NewVersionDialog(EmfDataset dataset, Version[] versions, EmfConsole parent) {
         super("Create a new Version of " + dataset.getName(), parent);
+        this.dataset = dataset;
         versionsSet = new VersionsSet(versions);
-        super.setSize(new Dimension(450, 150));
+        super.setSize(new Dimension(450, 200));
 
         super.getContentPane().add(createLayout(versions));
         super.center();
@@ -57,12 +62,16 @@ public class NewVersionDialog extends Dialog {
         name = new TextField("", 30);
         layoutGenerator.addLabelWidgetPair("Name", name, panel);
 
-        versionsModel = new DefaultComboBoxModel(versionNames(versions));
-        JComboBox versionsCombo = createVersionsCombo(versionsModel);
+       // versionsModel = new DefaultComboBoxModel(versionNames(versions));
+        versionsCombo = createVersionsCombo(versionNames(versions));
         layoutGenerator.addLabelWidgetPair("Base Version", versionsCombo, panel);
 
+        String dvObject = versionsSet.versionString(dataset.getDefaultVersion());
+        defaultVersion = new JLabel(dvObject);
+        layoutGenerator.addLabelWidgetPair("Default Version", defaultVersion, panel);
+        
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -74,8 +83,9 @@ public class NewVersionDialog extends Dialog {
         return set.nameAndNumbersOfFinalVersions();
     }
 
-    private JComboBox createVersionsCombo(DefaultComboBoxModel model) {
-        JComboBox combo = new JComboBox(model);
+    private ComboBox createVersionsCombo(String[] names) {
+        //JComboBox combo = new JComboBox(model);
+        ComboBox combo = new ComboBox("Select one", names);
         combo.setName("Versions");
         combo.setEditable(false);
         combo.setPreferredSize(new Dimension(300, 20));
@@ -128,6 +138,13 @@ public class NewVersionDialog extends Dialog {
                     "Please enter a unique 'name'", "Error",JOptionPane.ERROR_MESSAGE);
             return false;
         }
+        
+        String correctVersion = (String) versionsCombo.getSelectedItem();
+        if (correctVersion == null || correctVersion.equalsIgnoreCase("Select One")) {
+        JOptionPane.showMessageDialog(super.getParent(), 
+                "Please select a valid version", "Error", JOptionPane.ERROR_MESSAGE);
+        return false;
+    }
 
         return true;
     }
@@ -149,7 +166,7 @@ public class NewVersionDialog extends Dialog {
     }
 
     public Version version() {
-        return versionsSet.getVersionFromNameAndNumber((String) versionsModel.getSelectedItem());
+        return versionsSet.getVersionFromNameAndNumber((String) versionsCombo.getSelectedItem());
     }
 
     public String name() {
