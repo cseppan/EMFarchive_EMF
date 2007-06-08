@@ -108,7 +108,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
         JTable table = new JTable(statusTableModel);
         table.setName("statusMessages");
         // FIXME: code put in for the demo
-        table.setRowHeight(36);
+        table.setRowHeight(50);
         table.setDefaultRenderer(Object.class, new TextAreaTableCellRenderer());
 
         setColumnWidths(table.getColumnModel());
