@@ -225,8 +225,14 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
         // description
         description = new TextArea("description", dataset.getDescription());
+
         changeablesList.addChangeable(description);
-        layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description), panel);
+        ScrollableComponent viewableTextArea = new ScrollableComponent(description);
+        viewableTextArea.setPreferredSize(new Dimension(575,100));
+        layoutGenerator.addLabelWidgetPair("Description:", viewableTextArea, panel);
+        
+        //old version vefore changes
+        //layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description), panel);
 
         allProjects = service.getProjects();
         projectsCombo = new EditableComboBox(allProjects);

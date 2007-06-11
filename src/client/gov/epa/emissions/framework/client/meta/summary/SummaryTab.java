@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.services.data.IntendedUse;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.Date;
+import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -130,7 +131,12 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         // description
         TextArea description = new TextArea("description", dataset.getDescription());
         description.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description), panel);
+        ScrollableComponent viewableTextArea = new ScrollableComponent(description);
+        viewableTextArea.setPreferredSize(new Dimension(575,100));
+        layoutGenerator.addLabelWidgetPair("Description:", viewableTextArea, panel);
+        
+        //old version of command before changes
+        //layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description), panel);
 
         Project project = dataset.getProject();
         String projectName = (project != null) ? project.getName() : "";
