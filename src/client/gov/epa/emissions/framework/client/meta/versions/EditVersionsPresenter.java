@@ -82,5 +82,7 @@ public class EditVersionsPresenter {
         Version[] updatedVersions = editorService().getVersions(dataset.getId());
         view.reload(updatedVersions);
     }
-
+    public EmfSession getSession(){
+        return session;
+    }
 }

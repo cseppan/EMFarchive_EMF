@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.meta.versions;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ConfirmDialog;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
@@ -11,12 +13,18 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.editor.DataEditor;
 import gov.epa.emissions.framework.client.data.viewer.DataViewer;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesEditor;
+import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
+import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenterImpl;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
+import gov.epa.emissions.framework.ui.EmfDatasetTableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
+import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -24,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -138,12 +147,47 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             }
         });
         markFinal.setToolTipText("Mark the selected versions as final so that no more edits can be made");
+
         if (dataset.getInternalSources().length == 0) {
             markFinal.setEnabled(false);
         }
         panel.add(markFinal);
-
+        ConfirmDialog confirmDialog = new ConfirmDialog("", "Warning", parentConsole);
+        SelectAwareButton propButton = new SelectAwareButton("Edit Properties", editPropAction(), getTable(),
+                confirmDialog);
+        panel.add(propButton);
         return panel;
+    }
+
+    private SelectableSortFilterWrapper getTable() {
+        EmfDatasetTableData tableData = new EmfDatasetTableData(new EmfDataset[] { dataset });
+        return new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+    }
+
+    private SortCriteria sortCriteria() {
+        String[] columnNames = { "Last Modified Date" };
+        return new SortCriteria(columnNames, new boolean[] { false }, new boolean[] { true });
+    }
+
+    private Action editPropAction() {
+        // DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+
+                DatasetPropertiesEditor view = new DatasetPropertiesEditor(presenter.getSession(), parentConsole,
+                        desktopManager);
+                PropertiesEditorPresenter editPresenter = new PropertiesEditorPresenterImpl(dataset, view, presenter
+                        .getSession());
+
+                clear();
+                try {
+                    editPresenter.doDisplay();
+                } catch (EmfException e) {
+                    // NOTE Auto-generated catch block
+                    messagePanel.setError(e.getMessage());
+                }
+            }
+        };
     }
 
     protected void doNew(Version[] versions) {

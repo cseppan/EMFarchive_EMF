@@ -121,4 +121,8 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
         RevisionsTabPresenter presenter = new RevisionsTabPresenter(dataset, session.dataCommonsService());
         presenter.display(view);
     }
+
+    public EmfSession getSession() {
+        return this.session;
+    }
 }
