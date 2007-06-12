@@ -367,6 +367,9 @@
                   value="${client.dist}/config/ref/delimited"
         />
         <property name="scc.ref.dir" value="config/ref/delimited" />
+    	<property name="linuxscripts.dir" value="${basedir}/deploy/linux_scripts" />
+    	<property name="linuxclient.dir" value="${linuxscripts.dir}/client" />
+    	<property name="clientzip.dir" value="${build.home}/EMFClient" />
     </target>
 
     <target name="client-dist-sandbox"
@@ -376,7 +379,8 @@
         <mkdir dir="${client.dist}" />
         <mkdir dir="${client.dist.lib}" />
         <mkdir dir="${client.dist.ref}" />
-
+		
+    	<!--copy files while preserving dates modified -->
         <copy todir="${client.dist.lib}" preservelastmodified="true">
             <fileset dir="${lib.dir}">
                 <exclude name="dev/**" />
@@ -396,6 +400,9 @@
             <fileset dir="${build.classes.dir}">
                 <include name="*.properties" />
             </fileset>
+        	<fileset dir="${linuxclient.dir}">
+				<include name="EMFClient.*" />
+        	</fileset>
         </copy>
         <copy todir="${client.dist.ref}"  preservelastmodified="true">
             <fileset dir="config/ref/delimited">
@@ -407,9 +414,18 @@
 
     <target name="client-dist"
             depends="client-dist-sandbox"
-            description="Builds the EMF Client distribution "
+            description="Builds the EMF Client distribution, zips and tars it up"
     >
-        <zip destfile="${build.home}/client.zip" basedir="${client.dist}" />
+    	
+    	<!-- zip and tar that directory up, placing it under the EMFClient archive dir -->
+    	<tar tarfile="${build.home}/EMFClient.tar">
+    		<tarfileset dir="${client.dist}" prefix="EMFClient" />				
+    	</tar>
+    	<gzip zipfile="${build.home}/EMFClient.tar.gz" src="${build.home}/EMFClient.tar" />
+    	<zip destfile="${build.home}/EMFClient.zip">
+    		<zipfileset dir="${client.dist}" prefix="EMFClient"/>				
+		</zip>
+ 
     </target>
 
     <target name="client-dist(only jar)"
