@@ -47,8 +47,15 @@ public class TableColumnWidth {
         }
         
         dbColumnSize = (dbColumnSize < MAX_WIDTH) ? dbColumnSize : MAX_WIDTH;
+        //System.out.println(metaData.getType());
+        
         int preferedWidth = (width > dbColumnSize) ? width : dbColumnSize;
-
+        
+        //Added to reduce the size of the columns when the data type is double.
+        
+        if (metaData.getType().equals("java.lang.Double")) {
+            preferedWidth = preferedWidth / 2;
+        }
         tableColumn.setPreferredWidth(preferedWidth);
     }
 
