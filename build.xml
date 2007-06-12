@@ -377,7 +377,7 @@
         <mkdir dir="${client.dist.lib}" />
         <mkdir dir="${client.dist.ref}" />
 
-        <copy todir="${client.dist.lib}">
+        <copy todir="${client.dist.lib}" preservelastmodified="true">
             <fileset dir="${lib.dir}">
                 <exclude name="dev/**" />
                 <exclude name="tomcat/**" />
@@ -388,7 +388,7 @@
         >
             <include name="**/*" />
         </jar>
-        <copy todir="${client.dist}">
+        <copy todir="${client.dist}"  preservelastmodified="true">
             <fileset dir="${basedir}">
                 <include name="launch-client.bat" />
                 <include name="client.xml" />
@@ -397,7 +397,7 @@
                 <include name="*.properties" />
             </fileset>
         </copy>
-        <copy todir="${client.dist.ref}">
+        <copy todir="${client.dist.ref}"  preservelastmodified="true">
             <fileset dir="config/ref/delimited">
                 <include name="**" />
             </fileset>
