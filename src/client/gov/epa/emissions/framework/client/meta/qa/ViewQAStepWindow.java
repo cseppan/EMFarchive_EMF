@@ -321,6 +321,10 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         programArguments = new TextArea("", step.getProgramArguments(), 40, 3);
         //addChangeable(programArguments);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programArguments);
+        
+        //Added new dimensioning to make the window wider
+        scrollableDetails.setPreferredSize(new Dimension(525,100));
+        
         layoutGenerator.addLabelWidgetPair("Arguments:", scrollableDetails, panel);
 
         required = new CheckBox("", step.isRequired());
@@ -346,6 +350,10 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         description = new TextArea("", step.getDescription(), 40, 3);
         //addChangeable(description);
         ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
+        
+        //Added new dimensioning to make the window wider
+        scrollableDesc.setPreferredSize(new Dimension(525,100));
+        
         layoutGenerator.addLabelWidgetPair("Description:", scrollableDesc, panel);
 
         // Lay out the panel.
