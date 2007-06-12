@@ -172,9 +172,7 @@ public class ControlStrategyDAO {
         List list = hibernateFacade.get(ControlStrategyResult.class, c, session);
         for (int i = 0; i < list.size(); i++) {
             ControlStrategyResult result = (ControlStrategyResult) list.get(i);
-            hibernateFacade.delete(result, session);
-            hibernateFacade.remove(result.getDetailedResultDataset(), session);
-            hibernateFacade.remove(result.getControlledInventoryDataset(), session);
+            hibernateFacade.delete(result,session);
         }
     }
 
