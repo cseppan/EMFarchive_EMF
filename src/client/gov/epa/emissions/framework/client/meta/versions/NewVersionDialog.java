@@ -16,7 +16,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
-import javax.swing.JLabel;
+//import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -31,15 +31,15 @@ public class NewVersionDialog extends Dialog {
     
     private ComboBox versionsCombo;
     
-    private EmfDataset dataset;
+    //private EmfDataset dataset;
 
-    private JLabel defaultVersion;
+    //private JLabel defaultVersion;
     
     public NewVersionDialog(EmfDataset dataset, Version[] versions, EmfConsole parent) {
         super("Create a new Version of " + dataset.getName(), parent);
-        this.dataset = dataset;
+       // this.dataset = dataset;
         versionsSet = new VersionsSet(versions);
-        super.setSize(new Dimension(450, 200));
+        super.setSize(new Dimension(450, 150));
 
         super.getContentPane().add(createLayout(versions));
         super.center();
@@ -66,12 +66,14 @@ public class NewVersionDialog extends Dialog {
         versionsCombo = createVersionsCombo(versionNames(versions));
         layoutGenerator.addLabelWidgetPair("Base Version", versionsCombo, panel);
 
-        String dvObject = versionsSet.versionString(dataset.getDefaultVersion());
-        defaultVersion = new JLabel(dvObject);
-        layoutGenerator.addLabelWidgetPair("Default Version", defaultVersion, panel);
+        //Commented code that had previously added label to incorrect window.
+        
+        //String dvObject = versionsSet.versionString(dataset.getDefaultVersion());
+        //defaultVersion = new JLabel(dvObject);
+        //layoutGenerator.addLabelWidgetPair("Default Version", defaultVersion, panel);
         
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
