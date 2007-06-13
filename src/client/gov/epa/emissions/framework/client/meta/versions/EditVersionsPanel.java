@@ -27,6 +27,7 @@ import gov.epa.emissions.framework.ui.ScrollableTable;
 //import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -137,6 +138,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             }
         });
         newButton.setToolTipText("Create a new version");
+        newButton.setMargin(new Insets(2, 2, 2, 2));
         panel.add(newButton);
         if (dataset.getInternalSources().length == 0) {
             newButton.setEnabled(false);
@@ -147,6 +149,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             }
         });
         markFinal.setToolTipText("Mark the selected versions as final so that no more edits can be made");
+        markFinal.setMargin(new Insets(2, 2, 2, 2));
 
         if (dataset.getInternalSources().length == 0) {
             markFinal.setEnabled(false);
