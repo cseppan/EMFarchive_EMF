@@ -39,8 +39,11 @@ public class EditQAStepPresenter {
         QAProgram[] programs = qaService.getQAPrograms();
         QAStepResult result = qaService.getQAStepResult(step);
         view.display(step, result, programs, dataset, versionName, session);
-        view.setMostRecentUsedFolder(getFolder());
+        
+        // Reversed the following line from behind the one after it to make sure that most recent folder
+        // is displayed properly.
         this.qastep = step;
+        view.setMostRecentUsedFolder(getFolder());
     }
 
     public void close() {
@@ -80,9 +83,20 @@ public class EditQAStepPresenter {
     }
 
     private String getDefaultFolder() {
+        // Added code here to fix the Null Pointer exception that occurs at first launch of Edit Window
+        // because qastep is null.
+        String folder;
+        if (qastep != null) {
         //String folder = session.preferences().outputFolder();
-        String folder = qastep.getOutputFolder();
-        if (!new File(folder).isDirectory())
+            folder = qastep.getOutputFolder();
+        } else {
+            folder = session.preferences().outputFolder();
+        }
+        //if (!new File(folder).isDirectory())
+        
+        //Added extra logical construct to handle a null folder
+        
+        if (folder != null && !new File(folder).isDirectory())
             folder = "";// default, if unspecified
 
         return folder;
