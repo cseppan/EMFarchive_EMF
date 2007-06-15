@@ -410,6 +410,12 @@
             </fileset>
         </copy>
 
+   	<!-- move epa-commons-0.5 to epa-commons.jar -->
+    	<move file="${client.dist.lib}/epa-commons-0.5.jar" 
+    		tofile="${client.dist.lib}/epa-commons.jar"
+    		preservelastmodified="true"/>
+
+
     </target>
 
     <target name="client-dist"
