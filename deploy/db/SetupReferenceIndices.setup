@@ -35,3 +35,13 @@ CREATE INDEX pollutant_codes_tonames
 
 -- some day, merge SCC and SCC-codes
 -- also, merge FIPS with state_county_fips_codes
+
+-- null out applicable pollutant_code values...
+update reference.pollutant_codes
+set molecular_weight = case when molecular_weight = '' then null else molecular_weight end,
+	spec4id = case when spec4id = '' then null else spec4id end,
+	nato_teq = case when nato_teq = '' then null else nato_teq end,
+	who_teq = case when who_teq = '' then null else who_teq end,
+	i_teq = case when i_teq = '' then null else i_teq end,
+	pollutant_rank = case when pollutant_rank = '' then null else pollutant_rank end,
+	factor = case when factor = '' then null else factor end;
