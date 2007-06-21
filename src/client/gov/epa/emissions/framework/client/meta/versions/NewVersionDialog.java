@@ -144,7 +144,7 @@ public class NewVersionDialog extends Dialog {
         String correctVersion = (String) versionsCombo.getSelectedItem();
         if (correctVersion == null || correctVersion.equalsIgnoreCase("Select One")) {
         JOptionPane.showMessageDialog(super.getParent(), 
-                "Please select a valid version", "Error", JOptionPane.ERROR_MESSAGE);
+                "Please select a base version", "Error", JOptionPane.ERROR_MESSAGE);
         return false;
     }
 
