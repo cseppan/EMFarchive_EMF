@@ -137,15 +137,15 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             doRun();
             Thread.sleep(5000);
-            int factor = 1;
+            int factor = 2;
             qaStepResult = presenter.getStepResult(step);
 
             while (qaStepResult == null || qaStepResult.getTable() == null) {
-                Thread.sleep(5000 + factor * 5000);
+                Thread.sleep(factor * 5000);
                 qaStepResult = presenter.getStepResult(step);
                 ++factor;
                 
-                if (factor > 5) {
+                if (factor > 60) { //if no result in 5 minutes, assume something wrong
                     messagePanel.setError("Could not get QA step result for " + step.getName() + ".");
                     return;
                 }
