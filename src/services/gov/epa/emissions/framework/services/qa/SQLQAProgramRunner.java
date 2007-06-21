@@ -115,15 +115,38 @@ public class SQLQAProgramRunner implements QAProgramRunner {
     }
 
     private String tableName(QAStep qaStep) {
-        String result = "QA" + qaStep.getName() + "_DSID" + qaStep.getDatasetId() + "_V" + qaStep.getVersion();
+        QAStepResult result = getResult(qaStep);
 
-        for (int i = 0; i < result.length(); i++) {
-            if (!Character.isJavaLetterOrDigit(result.charAt(i))) {
-                result = result.replace(result.charAt(i), '_');
+        if (result != null)
+            return result.getTable();
+
+        String table = "QA_DSID" + qaStep.getDatasetId() + "_V" + qaStep.getVersion() + "_"
+                + new String(Math.random() + "").substring(2);
+        
+        if (table.length() < 64) {                                   //postgresql table name max length is 64
+            String name = qaStep.getName();
+            int space = name.length() + table.length() - 64;
+            table += name.substring((space < 0) ? 0 : space + 1);
+        }
+
+        for (int i = 0; i < table.length(); i++) {
+            if (!Character.isLetterOrDigit(table.charAt(i))) {
+                table = table.replace(table.charAt(i), '_');
             }
         }
 
-        return result.trim().replaceAll(" ", "_");
+        return table.trim().replaceAll(" ", "_");
+    }
+
+    private QAStepResult getResult(QAStep qaStep) {
+        Session session = sessionFactory.getSession();
+
+        try {
+            QADAO qadao = new QADAO();
+            return qadao.qaStepResult(qaStep, session);
+        } finally {
+            session.close();
+        }
     }
 
 }

@@ -144,6 +144,11 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 Thread.sleep(5000 + factor * 5000);
                 qaStepResult = presenter.getStepResult(step);
                 ++factor;
+                
+                if (factor > 5) {
+                    messagePanel.setError("Could not get QA step result for " + step.getName() + ".");
+                    return;
+                }
             }
 
             resetRunStatus(qaStepResult);
