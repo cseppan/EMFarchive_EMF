@@ -45,3 +45,8 @@ set molecular_weight = case when molecular_weight = '' then null else molecular_
 	i_teq = case when i_teq = '' then null else i_teq end,
 	pollutant_rank = case when pollutant_rank = '' then null else pollutant_rank end,
 	factor = case when factor = '' then null else factor end;
+
+-- null out applicable invtable values...
+update reference.invtable
+set factor = case when factor = '' then null else factor end;
+
