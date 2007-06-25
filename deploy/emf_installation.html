@@ -158,6 +158,7 @@ EMF client installation</li>
 <li>Install <a href="http://www.postgresql.org">PostgreSQL 8.2</a></li>
 <li>Install <a href="http://tomcat.apache.org">Tomcat 5.5</a></li>
 <li>Install the EMF database setup script </li>
+<li>Setup the server's directory permissions</li>
 </ol>
 <h3 id="java_linux">Java Details</h3>
 <p>Note where java is installed.  For Tomcat and the client,  
@@ -199,7 +200,7 @@ chown postgres /usr/local/pgsql_data
 <li>Modify and add startup script</li>
 <pre>cp contrib/start-scripts/linux /etc/init.d/postgresql</pre>
 Edit new script-- set the <code>prefix</code> (e.g. to <em>/usr/local</em>) 
-and  <code>PGDATA</code> (e.g. to /usr/local/pgsql_data)
+and  <code>PGDATA</code> (e.g. to <em>/usr/local/pgsql_data</em>)
 <pre>
 chkconfig --add postgresql
 /etc/init.d/postgresql start
@@ -277,7 +278,7 @@ in the system firewall for the server to accept connections from remote EMF clie
 </ol>
 
 <h3 id="emf_database_linux">EMF database setup details</h3>
-<p>The last stage is to setup the EMF database.  You have two options, you could either 
+<p>To setup the EMF database, you could either 
 create a database that is empty or one which is fully populated with the EMF training
 data:</p>
 <dl>
@@ -287,7 +288,7 @@ data:</p>
 <li>Download and untar <a href="ftp://ftp.unc.edu/pub/empd/emf/EMFServer.tar.gz">EMFServer</a> tar file</li><br>
 <li>Run the setup script.  Note, this will create a new PostgreSQL user <q>emf</q> and a new
 database <q>EMF</q>. The script will ask you for a password for the <q>emf</q> user, this password
-must be "emf", and it is for the database server, not the linux user emf 
+must be "emf", and it is for the database server, not the Linux user emf 
 (see <a href="#tomcat_linux">Tomcat details</a>):</li>
 <pre>
 cd EMFServer/db
@@ -307,7 +308,7 @@ cp EMFServer/emf.war /usr/local/apache-tomcat/webapps
 <li>Download and untar <a href="ftp://ftp.unc.edu/pub/empd/emf/EMFServer_training.tar.gz">EMFServer_training</a> tar file</li><br>
 <li>Run the setup script.  Note, this will create a new PostgreSQL user <q>emf</q> and a new
 database <q>EMF</q>. The script will ask you for a password for the <q>emf</q> user, this password
-must be "emf", and it is for the database server, not the linux user emf 
+must be "emf", and it is for the database server, not the Linux user emf 
 (see <a href="#tomcat_linux">Tomcat details</a>):</li>
 <pre>
 cd EMFServer_training/db
@@ -324,6 +325,20 @@ cp EMFServer_training/emf.war /usr/local/apache-tomcat/webapps
 </dl>
 
 <div align="right"><a href="#contents">contents</a></div>
+
+<h3><a id="permissions_linux">Server directory permissions</a></h3>
+<p>For the server to properly import and export datasets, both the 
+tomcat user (in our case "emf") and the postgres user need to 
+have permissions to write to the export directory.  In addition, the 
+postgres user needs to have read and execute permissions for all
+directories in the directory hierarchy.  For example, if all exports were 
+written to  <em>/data/emf/emf_output</em>, then postgres should have read,execute
+permissions for <em>/data</em> and <em>/data/emf</em> and both users should
+have read,write,execute for <em>/data/emf/emf_output</em>.  For import, 
+only the tomcat user needs to have read, execute permissions for the 
+import directory.</p>
+<div align="right"><a href="#contents">contents</a></div>
+
 <hr align="left" width="50%">
 
 <h2><a id="serverupdate_linux">Updating an EMF Server
@@ -491,7 +506,7 @@ In the db subfolder, you will find the SQL setup scripts and restore data.</li><
 using pgadmin as in the next step.</li><br>
 <li>Start pgadmin (it is part of the postgreSQL distribution) and do the following:
 <ul type=disc>
-<li>Create a new user by double clicking "postgreSQL DB Server 8.2, then navigating
+<li>Create a new user by double clicking "postgreSQL DB Server 8.2", then navigating
 to login roles and right-clicking  "new Login Role".  The name of the role must be "emf",
 with the password of "emf".  Click all checkboxes for the role.
 <li>Create a new database by going to Databases and right-clicking "New Database".
