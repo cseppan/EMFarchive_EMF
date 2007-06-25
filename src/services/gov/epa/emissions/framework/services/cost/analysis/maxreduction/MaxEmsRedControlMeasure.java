@@ -11,7 +11,7 @@ public class MaxEmsRedControlMeasure {
 
     private ControlMeasure controlMeasure;
 
-    private EfficiencyRecord maxRecord;
+    private EfficiencyRecord matchingEffRecord;
 
     private CostYearTable table;
 
@@ -19,7 +19,7 @@ public class MaxEmsRedControlMeasure {
 
     public MaxEmsRedControlMeasure(ControlMeasure controlMeasure, EfficiencyRecord record, CostYearTable table) {
         this.controlMeasure = controlMeasure;
-        this.maxRecord = record;
+        this.matchingEffRecord = record;
         this.table = table;
         efficiencyRecordUtil = new EfficiencyRecordUtil();
     }
@@ -29,26 +29,26 @@ public class MaxEmsRedControlMeasure {
     }
 
     public Double adjustedCostPerTon() throws EmfException {
-        return efficiencyRecordUtil.adjustedCostPerTon(maxRecord, table);
+        return efficiencyRecordUtil.adjustedCostPerTon(matchingEffRecord, table);
     }
 
     public double effectiveReduction() {
-        return efficiencyRecordUtil.effectiveReduction(maxRecord);
+        return efficiencyRecordUtil.effectiveReduction(matchingEffRecord);
     }
 
     public double costPerTon() {
-        return maxRecord.getCostPerTon();
+        return matchingEffRecord.getCostPerTon();
     }
 
     public double controlEfficiency() {
-        return maxRecord.getEfficiency();
+        return matchingEffRecord.getEfficiency();
     }
 
     public double rulePenetration() {
-        return maxRecord.getRulePenetration();
+        return matchingEffRecord.getRulePenetration();
     }
 
     public double ruleEffectiveness() {
-        return maxRecord.getRuleEffectiveness();
+        return matchingEffRecord.getRuleEffectiveness();
     }
 }

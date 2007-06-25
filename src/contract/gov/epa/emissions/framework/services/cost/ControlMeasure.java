@@ -61,6 +61,10 @@ public class ControlMeasure implements Lockable, Serializable {
     private List sectors;
     private String lastModifiedBy;
 
+    private Double ruleEffectiveness;
+
+    private Double rulePenetration;
+
     public ControlMeasure() {
         this.lock = new Mutex();
         this.sccs = new ArrayList();
@@ -300,4 +304,19 @@ public class ControlMeasure implements Lockable, Serializable {
         sectors.add(sector);
     }
 
+    public void setRuleEffectiveness(Double ruleEffectiveness) {
+        this.ruleEffectiveness = ruleEffectiveness;
+    }
+
+    public Double getRuleEffectiveness() {
+        return ruleEffectiveness;
+    }
+
+    public void setRulePenetration(Double rulePenetration) {
+        this.rulePenetration = rulePenetration;
+    }
+
+    public Double getRulePenetration() {
+        return rulePenetration;
+    }
 }

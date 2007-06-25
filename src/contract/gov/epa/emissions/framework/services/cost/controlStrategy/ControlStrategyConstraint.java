@@ -8,14 +8,6 @@ public class ControlStrategyConstraint implements Serializable {
 
     private int controlStrategyId;
 
-//    private double maxEmisReduction;
-//
-//    private double maxControlEfficiency;
-//    
-//    private double minCostPerTon;
-//
-//    private double minAnnCost;
-//    
     private Double maxEmisReduction;
 
     private Double maxControlEfficiency;
@@ -74,5 +66,12 @@ public class ControlStrategyConstraint implements Serializable {
 
     public Double getMinAnnCost() {
         return minAnnCost;
+    }
+    
+    public boolean hasConstraints() {
+        return maxEmisReduction != null 
+            || maxControlEfficiency != null 
+            || minCostPerTon != null 
+            || minAnnCost != null;
     }
 }

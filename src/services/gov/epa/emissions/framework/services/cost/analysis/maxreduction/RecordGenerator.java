@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost.analysis.maxreduction;
 
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.analysis.maxreduction.MaxEmsRedControlMeasure;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

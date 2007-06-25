@@ -26,11 +26,13 @@ public class GenerateSccControlMeasuresMap {
 
     private ControlStrategy controlStrategy;
 
-    private SccControlMeasuresMap map;
-
     private String qualifiedEmissionTableName;
 
     private HibernateSessionFactory sessionFactory;
+
+    private String classFilterIds;
+    
+    private String controlMeasureFilterIds;
 
     public GenerateSccControlMeasuresMap(DbServer dbServer, String qualifiedEmissionTableName, ControlStrategy controlStrategy,
             HibernateSessionFactory sessionFactory) {
@@ -39,22 +41,37 @@ public class GenerateSccControlMeasuresMap {
         this.qualifiedEmissionTableName = qualifiedEmissionTableName;
         this.controlStrategy = controlStrategy;
         this.sessionFactory = sessionFactory;
-        map = new SccControlMeasuresMap();
+        //add additional class filter, if necessary, when selecting control measure for the calculations...
+        this.classFilterIds = classIdList();
+        this.controlMeasureFilterIds = controlMeasureIdList();
     }
 
     public SccControlMeasuresMap create() throws EmfException {
-        String query = query(qualifiedEmissionTableName);
+        String query = query();
         ResultSet rs = null;
         try {
             rs = emissionDatasource.query().executeQuery(query);
-            read(rs);
+            return buildMap(rs);
         } catch (SQLException e) {
             throw new EmfException("Could not create a SccControlMeasuresMap: " + e.getMessage());
         } finally {
             if (rs != null)
                 closeResultSet(rs);
         }
-        return map;
+    }
+
+    public SccControlMeasuresMap create(String scc) throws EmfException {
+        String query = query(scc);
+        ResultSet rs = null;
+        try {
+            rs = emissionDatasource.query().executeQuery(query);
+            return buildMap(rs);
+        } catch (SQLException e) {
+            throw new EmfException("Could not create a SccControlMeasuresMap: " + e.getMessage());
+        } finally {
+            if (rs != null)
+                closeResultSet(rs);
+        }
     }
 
     private void closeResultSet(ResultSet rs) throws EmfException {
@@ -67,12 +84,14 @@ public class GenerateSccControlMeasuresMap {
 
     }
 
-    private void read(ResultSet rs) throws SQLException {
+    private SccControlMeasuresMap buildMap(ResultSet rs) throws SQLException {
+        SccControlMeasuresMap map = new SccControlMeasuresMap();
         while (rs.next()) {
             String scc = rs.getString(1);
             int id = rs.getInt(2);
             map.add(scc, controlMeasure(id));
         }
+        return map;
     }
 
     private ControlMeasure controlMeasure(int id) {
@@ -81,7 +100,20 @@ public class GenerateSccControlMeasuresMap {
             ControlMeasure measure;
             ControlMeasureDAO dao = new ControlMeasureDAO();
             measure = dao.current(id, session);
+/*
+            //pouplate the Rule Pen and Effect, that was set during the strat...
+            LightControlMeasure[] cms = controlStrategy.getControlMeasures();
+            for (int i = 0; i < cms.length; i++) {
+                LightControlMeasure cm = cms[i];
+                if (measure.getId() == cm.getId()) {
+                    measure.setRuleEffectiveness(cm.getRuleEffectiveness());
+                    measure.setRulePenetration(cm.getRulePenetration());
+                }
+            }
+*/
             EfficiencyRecord[] ers = (EfficiencyRecord[]) dao.getEfficiencyRecords(measure.getId(), session).toArray(new EfficiencyRecord[0]);
+            //no need to keep these in the hibernate cache
+            session.clear();
 //            log.error("Measure = " + measure.getName() + " EfficiencyRecord length = " + ers.length);
             measure.setEfficiencyRecords(ers);
             return measure;
@@ -90,21 +122,7 @@ public class GenerateSccControlMeasuresMap {
         }
     }
 
-    private String query(String qualifiedEmissionTableName) {
-        //add additional class filter, if necessary, when selecting control measure for the calculations...
-        String classFilterIds = "";
-        String controlMeasureFilterIds = "";
-        ControlMeasureClass[] classes = controlStrategy.getControlMeasureClasses();
-        LightControlMeasure[] controlMeasures = controlStrategy.getControlMeasures();
-
-        if (classes != null) 
-            for (int i = 0; i < classes.length; i++)
-                classFilterIds += (classFilterIds.length() != 0 ? "," + classes[i].getId() : classes[i].getId());
-
-        if (controlMeasures != null) 
-            for (int i = 0; i < controlMeasures.length; i++)
-                controlMeasureFilterIds += (controlMeasureFilterIds.length() != 0 ? "," + controlMeasures[i].getId() : controlMeasures[i].getId());
-
+    private String query() {
         return "SELECT DISTINCT a.scc,b.control_measures_id FROM " + qualifiedEmissionTableName + " AS a, "
                 + qualifiedName("control_measure_sccs", emfDatasource) + " AS b, "
                 + qualifiedName("control_measures", emfDatasource) + " AS c"
@@ -115,8 +133,37 @@ public class GenerateSccControlMeasuresMap {
                 + (controlMeasureFilterIds.length() == 0 ? "" : " AND b.control_measures_id in (" + controlMeasureFilterIds + ")");
     }
 
+    private String query(String scc) {
+        return "SELECT DISTINCT b.name as scc,b.control_measures_id "
+                + " FROM " + qualifiedName("control_measure_sccs", emfDatasource) + " AS b, "
+                + qualifiedName("control_measures", emfDatasource) + " AS c"
+                + " WHERE b.name= '" + scc + "'"
+                + " AND c.id=b.control_measures_id"
+                + (controlMeasureFilterIds.length() == 0 ? (classFilterIds.length() == 0 ? "" : " AND c.cm_class_id in (" + classFilterIds + ")") : "")
+                + (controlMeasureFilterIds.length() == 0 ? "" : " AND b.control_measures_id in (" + controlMeasureFilterIds + ")");
+    }
+
     private String qualifiedName(String tableName, Datasource datasource) {
         return datasource.getName() + "." + tableName;
     }
 
+    private String controlMeasureIdList() {
+        String controlMeasureFilterIds = "";
+        LightControlMeasure[] controlMeasures = controlStrategy.getControlMeasures();
+
+        if (controlMeasures != null) 
+            for (int i = 0; i < controlMeasures.length; i++)
+                controlMeasureFilterIds += (controlMeasureFilterIds.length() != 0 ? "," + controlMeasures[i].getId() : controlMeasures[i].getId());
+        return controlMeasureFilterIds;
+    }
+
+    private String classIdList() {
+        String classFilterIds = "";
+        ControlMeasureClass[] classes = controlStrategy.getControlMeasureClasses();
+
+        if (classes != null) 
+            for (int i = 0; i < classes.length; i++)
+                classFilterIds += (classFilterIds.length() != 0 ? "," + classes[i].getId() : classes[i].getId());
+        return classFilterIds;
+    }
 }
