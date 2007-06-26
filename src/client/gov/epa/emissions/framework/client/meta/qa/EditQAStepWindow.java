@@ -96,6 +96,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private QAStepResult qaStepResult;
 
     private Button saveButton;
+    
+    private Button runButton;
 
     private JCheckBox currentTable;
 
@@ -135,7 +137,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     public void run() {
         try {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            doRun();
+            runQAStep();
             Thread.sleep(5000);
             int factor = 2;
             qaStepResult = presenter.getStepResult(step);
@@ -153,6 +155,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
             resetRunStatus(qaStepResult);
             setCursor(Cursor.getDefaultCursor());
+            this.runButton.setEnabled(false);
         } catch (Exception e) {
             messagePanel.setError(e.getMessage());
         }
@@ -474,8 +477,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         panel.add(cancel);
 
         panel.add(Box.createHorizontalStrut(50));
-        Button run = runButton();
-        panel.add(run);
+        runButton = runButton();
+        panel.add(runButton);
 
         Button viewResults = viewResultsButton();
         panel.add(viewResults);
@@ -518,7 +521,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         return export;
     }
 
-    protected void doRun() {
+    protected void runQAStep() {
         try {
             messagePanel.setMessage("Started Run. Please monitor the Status window " + "to track your run request.");
             status.setSelectedItem("In Progress");
