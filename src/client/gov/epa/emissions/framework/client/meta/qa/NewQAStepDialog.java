@@ -78,6 +78,10 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         versionsSelection = new JComboBox(versionsSet.nameAndNumbers());
+        //First try at resizing the version selection combo box, did not work as expected
+        //Added next line later -- may be useful
+        //versionsModel = new DefaultComboBoxModel(versionNames(versions));
+        //versionsSelection.setSize(new Dimension(900, 50));
         layoutGenerator.addLabelWidgetPair("Version", versionsSelection, panel);
 
         JList required = new JList(templates.required());
@@ -95,8 +99,9 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
         return panel;
     }
 
+    // Modified Dimension to make width fit the Dialog window
     private JScrollPane createScrollPane(Component component) {
-        return new ScrollableComponent(component, new Dimension(300, 100));
+        return new ScrollableComponent(component, new Dimension(450, 100));
     }
 
     private JList optional(QAStepTemplates templates) {
