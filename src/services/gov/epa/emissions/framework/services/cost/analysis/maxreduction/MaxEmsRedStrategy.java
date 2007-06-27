@@ -277,7 +277,7 @@ public class MaxEmsRedStrategy implements Strategy {
     private void setAndRunQASteps(ControlStrategyResult result) throws EmfException {
         EmfDataset resultDataset = (EmfDataset) result.getDetailedResultDataset();
         excuteSetAndRunQASteps(resultDataset, 0);
-        excuteSetAndRunQASteps(inputDataset, controlStrategy.getDatasetVersion());
+//        excuteSetAndRunQASteps(inputDataset, controlStrategy.getDatasetVersion());
     }
 
     private void excuteSetAndRunQASteps(EmfDataset dataset, int version) throws EmfException {
