@@ -230,7 +230,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         tableName = new TextField("tableName", table, 20);
         tableName.setEditable(false);
         tableName.setToolTipText("The name of the output of the step (e.g. name of a table in the database");
-        layoutGenerator.addLabelWidgetPair("Ouput Name:", tableName, panel);
+        layoutGenerator.addLabelWidgetPair("Output Name:", tableName, panel);
 
         creationStatusLabel = new JLabel();
         String tableCreationStatus = stepResult.getTableCreationStatus();
@@ -409,7 +409,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         JPanel checkBoxPanel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layout = new SpringLayoutGenerator();
         JPanel reqirepanel = new JPanel();
-        reqirepanel.add(new JLabel(EmptyStrings.create(20)));
+//      Modified the next line to move the Required? JLabel over
+        reqirepanel.add(new JLabel(EmptyStrings.create(34)));
+        
         reqirepanel.add(new JLabel("Required?"));
         reqirepanel.add(new JLabel(EmptyStrings.create(20)));
         reqirepanel.add(required);
@@ -617,10 +619,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private void clear() {
         messagePanel.clear();
     }
-
+//Modified length in Dimension to make View window ful size
     public void displayResultsTable(String qaStepName, String exportedFileName) {
         AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QAStep \"" + qaStepName + "\" results ",
-                new Dimension(500, 500), desktopManager, parentConsole);
+                new Dimension(800, 500), desktopManager, parentConsole);
         app.display(new String[] { exportedFileName });
     }
 }
