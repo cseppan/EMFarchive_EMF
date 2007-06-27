@@ -508,8 +508,10 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             if (subdir.exists())
                 throw new EmfException("Subfolder " + subfolder + " already existed.");
             
-            if (subdir.mkdirs())
+            if (subdir.mkdirs()) {
+                subdir.setWritable(true, false);
                 return EmfFileSerializer.convert(subdir);
+            }
 
             return null;
         } catch (Exception e) {
