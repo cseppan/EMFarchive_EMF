@@ -16,13 +16,14 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 
-public class DataViewer extends DisposableInteralFrame implements DataView {
+public class DataViewer extends DisposableInteralFrame implements DataView,Runnable {
 
     private JPanel layout;
 
@@ -33,12 +34,17 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
     private EmfDataset dataset;
 
     private EmfConsole parent;
+    
+    private TableMetadata tableMetadata;
+    
+    private volatile Thread viewThread;
 
     public DataViewer(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
         super("Data Viewer [Dataset:" + dataset.getName(), desktopManager);
         setDimension();
         this.dataset = dataset;
         this.parent = parent;
+        this.viewThread = new Thread(this);
 
         layout = new JPanel(new BorderLayout());
         layout.add(topPanel(), BorderLayout.PAGE_START);
@@ -65,15 +71,11 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
     }
 
     public void display(Version version, String table, TableMetadata tableMetadata) {
+        this.tableMetadata = tableMetadata;
         updateTitle(version, table);
         super.setName("dataViewer:" + version.getDatasetId() + ":" + version.getId());
-
-        JPanel container = new JPanel(new BorderLayout());
-        container.add(tablePanel(tableMetadata), BorderLayout.CENTER);
-        container.add(controlsPanel(), BorderLayout.PAGE_END);
-        layout.add(container, BorderLayout.CENTER);
-
         super.display();
+        viewThread.start();
     }
 
     private void updateTitle(Version version, String table) {
@@ -143,6 +145,22 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
 
     public void windowClosing() {
         doClose();
+    }
+
+    public void run() {
+        try {
+            messagePanel.setMessage("Please wait while retrieving data...");
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            JPanel container = new JPanel(new BorderLayout());
+            container.add(tablePanel(tableMetadata), BorderLayout.CENTER);
+            container.add(controlsPanel(), BorderLayout.PAGE_END);
+            layout.add(container, BorderLayout.CENTER);
+            super.refreshLayout();
+            messagePanel.clear();
+            setCursor(Cursor.getDefaultCursor());
+        } catch (Exception e) {
+            messagePanel.setError("Cannot retrieve data for " + dataset.getName() + ".");
+        }
     }
 
 }
