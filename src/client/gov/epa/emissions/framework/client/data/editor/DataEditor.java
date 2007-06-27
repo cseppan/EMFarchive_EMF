@@ -340,7 +340,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
             container.add(tablePanel(version, tableName, tableMetadata), BorderLayout.CENTER);
             container.add(bottomPanel(dataNotes), BorderLayout.PAGE_END);
             layout.add(container, BorderLayout.CENTER);
-            Thread.sleep(5000);
             super.refreshLayout();
             messagePanel.clear();
             setCursor(Cursor.getDefaultCursor());
