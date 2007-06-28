@@ -101,8 +101,13 @@ public class InputFieldsPanelPresenter {
         List<CaseJob> jobs = new ArrayList<CaseJob>();
         jobs.add(new CaseJob(ALL_FOR_SECTOR));
         jobs.addAll(Arrays.asList(caseService().getCaseJobs(caseId)));
+       
+        //Created by RVA to sort the Case Jobs before sending them to the ComboBox
+        CaseJob[] jobs2 = jobs.toArray(new CaseJob[jobs.size()]);
+        Arrays.sort(jobs2, new CaseJobNameComparator());
+        return jobs2; 
         
-        return jobs.toArray(new CaseJob[0]);
+        //return jobs.toArray(new CaseJob[0]);
     }
     
     public DatasetType[] getDSTypes() throws EmfException {

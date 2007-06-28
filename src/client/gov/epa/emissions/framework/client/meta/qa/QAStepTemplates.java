@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+
 public class QAStepTemplates {
 
     private QAStepTemplate[] templates;
@@ -32,8 +33,10 @@ public class QAStepTemplates {
             if (!templates[i].isRequired())
                 results.add(templates[i]);
         }
-
-        return (QAStepTemplate[]) results.toArray(new QAStepTemplate[0]);
+//      Created by RVA (with help from Alison) to sort the optional QA Step Templates before sending them to the JList
+        QAStepTemplate[] sortedArray = (QAStepTemplate[]) results.toArray(new QAStepTemplate[results.size()]);
+        Arrays.sort(sortedArray, new QAStepNameComparator());
+        return sortedArray;
     }
 
     public QAStep[] createRequiredSteps(EmfDataset dataset, Version version) {
@@ -54,8 +57,10 @@ public class QAStepTemplates {
             if (templates[i].isRequired())
                 required.add(templates[i]);
         }
-
-        return (QAStepTemplate[]) required.toArray(new QAStepTemplate[0]);
+        //Created by RVA to sort the required QA Step Templates before sending them to the JList
+        QAStepTemplate[] sortedArray2 = (QAStepTemplate[]) required.toArray(new QAStepTemplate[required.size()]);
+        Arrays.sort(sortedArray2, new QAStepNameComparator());
+        return sortedArray2;
     }
 
     public QAStep[] createOptionalSteps(QAStepTemplate[] optionals, EmfDataset dataset, Version version) {
