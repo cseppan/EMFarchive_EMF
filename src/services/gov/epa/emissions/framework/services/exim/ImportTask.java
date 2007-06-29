@@ -57,6 +57,7 @@ public class ImportTask implements Runnable {
             numSeconds = (System.currentTimeMillis() - startTime)/1000;
             complete(session);
         } catch (Exception e) {
+            // this doesn't give the full path for some reason
             logError("Failed to import file(s) : " + filesList(), e);
             setStatus("Failed to import dataset " + dataset.getName() + ". Reason: " + e.getMessage());
             removeDataset(dataset);
