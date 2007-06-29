@@ -93,7 +93,13 @@ public class StrategyLoader {
                 ResultSet resultSet = optimizedQuery.getResultSet();
                 doBatchInsert(resultSet);
             }
-        } finally {
+        } 
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            throw exc;
+        }
+        finally {
             modifier.finish();
             modifier.close();
         }

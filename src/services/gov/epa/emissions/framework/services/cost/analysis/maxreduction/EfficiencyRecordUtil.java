@@ -12,8 +12,13 @@ public class EfficiencyRecordUtil {
     }
 
     public Double adjustedCostPerTon(EfficiencyRecord record, CostYearTable costYearTable) throws EmfException {
-        int costYear = record.getCostYear();
-        double factor = costYearTable.factor(costYear);
+        if (record == null) System.out.println("record is null");
+        Integer costYear = record.getCostYear();
+        if (costYear == null)
+        {
+            return new Double(0);
+        }
+        double factor = costYearTable.factor(costYear.intValue());
         return record.getCostPerTon() != null ? factor * record.getCostPerTon() : 0;
     }
 
