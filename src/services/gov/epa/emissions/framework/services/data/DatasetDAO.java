@@ -231,7 +231,7 @@ public class DatasetDAO {
         String deleteClause = createDeleteClause(versions);
 
         String whereClause = " WHERE dataset_id = " + version.getDatasetId() + " AND version IN (" + versions
-                + ") AND " + deleteClause;
+                + ")" + deleteClause;
 
         return whereClause;
     }
@@ -243,11 +243,18 @@ public class DatasetDAO {
         // e.g.: delete_version NOT SIMILAR TO '(6|6,%|%,6,%|%,6)'
         while (tokenizer.hasMoreTokens()) {
             String version = tokenizer.nextToken();
-            String regex = "(" + version + "|" + version + ",%|%," + version + ",%|%," + version + ")";
-            buffer.append(" delete_versions NOT SIMILAR TO '" + regex + "'");
-
-            if (tokenizer.hasMoreTokens())
-                buffer.append(" AND ");
+            if (!version.equals("0"))
+            {    
+                String regex = "(" + version + "|" + version + ",%|%," + version + ",%|%," + version + ")";
+                if (buffer.length() == 0)
+                {
+                    buffer.append(" AND ");
+                }
+                buffer.append(" delete_versions NOT SIMILAR TO '" + regex + "'");
+    
+                if (tokenizer.hasMoreTokens())
+                    buffer.append(" AND ");
+            }
         }
 
         return buffer.toString();
