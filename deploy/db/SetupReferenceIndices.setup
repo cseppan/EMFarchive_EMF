@@ -50,3 +50,7 @@ set molecular_weight = case when molecular_weight = '' then null else molecular_
 update reference.invtable
 set factor = case when factor = '' then null else factor end;
 
+CREATE INDEX invtable_names
+  ON reference.invtable
+  USING btree
+  (name);
