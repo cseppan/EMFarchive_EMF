@@ -404,7 +404,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
             cmId = addCMFromImporter(cm, emfUser, sccs2);
             assertFalse("Should have throw an exception: abbrev exist", true);
         } catch (Exception e) {
-            assertEquals("The Control Measure Abbreviation already in use: 12345678", e.getMessage());
+            assertEquals("This control measure abbreviation is already in use: 12345678", e.getMessage());
             assertTrue("The exception is thrown: abbrev exist", true);
         }
 

@@ -263,7 +263,7 @@ public class ControlMeasureDAO {
             throw new EmfException("The Control Measure name is already in use: " + controlMeasure.getName());
 
         if (abbrExist(new Criterion[] { id, abbrev }, session))
-            throw new EmfException("The Control Measure Abbreviation already in use: "
+            throw new EmfException("This control measure abbreviation is already in use: "
                     + controlMeasure.getAbbreviation());
     }
 
@@ -306,7 +306,7 @@ public class ControlMeasureDAO {
 //            LOG.error("update measure and sccs");
             update(measure, sccs, session);
         } else if (abbrExist) {
-            throw new EmfException("The Control Measure Abbreviation already in use: " + measure.getAbbreviation());
+            throw new EmfException("This control measure abbreviation is already in use: " + measure.getAbbreviation());
         } else {
             cmId = add(measure, sccs, session);
         }
