@@ -180,6 +180,11 @@ public class ExportService {
     private int batchSize() {
         Session session = sessionFactory.getSession();
         try {
+            String batchSize = System.getProperty("EXPORT_BATCH_SIZE");
+            
+            if (batchSize != null)
+                return Integer.parseInt(batchSize);
+            
             EmfProperty property = new EmfPropertiesDAO().getProperty("export-batch-size", session);
             return Integer.parseInt(property.getValue());
         } finally {

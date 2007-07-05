@@ -6,11 +6,15 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.EmfServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import javax.sql.DataSource;
+
+import org.hibernate.Session;
 
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
@@ -41,6 +45,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     private void init(DbServer dbServer, HibernateSessionFactory sessionFactory) {
         threadPool = createThreadPool();
 
+        setProperties(sessionFactory);
+        
         exportService = new ExportService(dbServer, threadPool, sessionFactory);
 
         ImporterFactory importerFactory = new ImporterFactory(dbServer, dbServer.getSqlDataTypes());
@@ -53,6 +59,19 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         threadPool.setKeepAliveTime(1000 * 60 * 3);// terminate after 3 (unused) minutes
 
         return threadPool;
+    }
+    
+    private void setProperties(HibernateSessionFactory sessionFactory) {
+        Session session = sessionFactory.getSession();
+        try {
+            EmfProperty batchSize = new EmfPropertiesDAO().getProperty("export-batch-size", session);
+            EmfProperty eximTempDir = new EmfPropertiesDAO().getProperty("ImportExportTempDir", session);
+            
+            System.setProperty("IMPORT_EXPORT_TEMP_DIR", eximTempDir.getValue());
+            System.setProperty("EXPORT_BATCH_SIZE", batchSize.getValue());
+        } finally {
+            session.close();
+        }
     }
 
     public void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String dirName, String purpose) throws EmfException {
