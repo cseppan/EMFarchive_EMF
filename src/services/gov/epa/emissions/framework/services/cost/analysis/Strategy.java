@@ -9,5 +9,4 @@ public interface Strategy {
 
     ControlStrategy getControlStrategy();
 
-    void close() throws EmfException;
 }

@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
@@ -32,13 +33,16 @@ public class DatasetCreator {
 
     private HibernateSessionFactory sessionFactory;
 
+    private DbServerFactory dbServerFactory;
+
     private String datasetNamePrefix;
 
-    public DatasetCreator(String datasetNamePrefix, String tablePrefix, ControlStrategy strategy, User user, HibernateSessionFactory sessionFactory) {
+    public DatasetCreator(String datasetNamePrefix, String tablePrefix, ControlStrategy strategy, User user, HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
         this.datasetNamePrefix = datasetNamePrefix;
         this.prefix = tablePrefix;
         this.user = user;
         this.sessionFactory = sessionFactory;
+        this.dbServerFactory = dbServerFactory;
         this.outputDatasetName = getResultDatasetName(strategy.getName());
     }
 
@@ -105,7 +109,7 @@ public class DatasetCreator {
     private void add(EmfDataset dataset) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            DatasetDAO dao = new DatasetDAO();
+            DatasetDAO dao = new DatasetDAO(dbServerFactory);
             if (dao.datasetNameUsed(dataset.getName()))
                 throw new EmfException("The selected dataset name is already in use.");
 

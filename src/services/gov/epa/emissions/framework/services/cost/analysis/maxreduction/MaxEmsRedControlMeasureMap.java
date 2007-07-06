@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.services.cost.analysis.maxreduction;
 
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.analysis.common.BestMeasureEffRecord;
+import gov.epa.emissions.framework.services.cost.analysis.common.RetrieveBestEffRecord;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
@@ -15,11 +17,11 @@ public class MaxEmsRedControlMeasureMap {
 
     private CostYearTable costYearTable;
     
-    private RetrieveMaxEmsRedEfficiencyRecord retrieveMaxEmsRedEfficiencyRecord;
+    private RetrieveBestEffRecord retrieveBestEffRecord;
 
     public MaxEmsRedControlMeasureMap(CostYearTable costYearTable) {
         this.costYearTable = costYearTable;
-        this.retrieveMaxEmsRedEfficiencyRecord = new RetrieveMaxEmsRedEfficiencyRecord(costYearTable);
+        this.retrieveBestEffRecord = new RetrieveBestEffRecord(costYearTable);
         this.map = new HashMap();
     }
 
@@ -27,7 +29,7 @@ public class MaxEmsRedControlMeasureMap {
         map.put(record, measure);
     }
 
-    public MaxEmsRedControlMeasure findBestMeasure() throws EmfException {
+    public BestMeasureEffRecord findBestMeasure() throws EmfException {
         if (map.size() == 0)
             return null;// FIXME: do we have to warn or error
 
@@ -36,11 +38,11 @@ public class MaxEmsRedControlMeasureMap {
 
         while (iterator.hasNext()) {
             EfficiencyRecord record = (EfficiencyRecord) iterator.next();
-            maxRecord = retrieveMaxEmsRedEfficiencyRecord.findBestEfficiencyRecord(record, maxRecord);
+            maxRecord = retrieveBestEffRecord.findBestEfficiencyRecord(record, maxRecord);
         }
 
         ControlMeasure controlMeasure = (ControlMeasure) map.get(maxRecord);
-        MaxEmsRedControlMeasure maxMeasure = new MaxEmsRedControlMeasure(controlMeasure, maxRecord, costYearTable);
+        BestMeasureEffRecord maxMeasure = new BestMeasureEffRecord(controlMeasure, maxRecord, costYearTable);
         return maxMeasure;
 
     }

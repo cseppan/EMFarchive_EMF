@@ -39,6 +39,7 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
                     sessionFactory, dbServerFactory);
             output.create();
         } catch (Exception e) {
+            e.printStackTrace();
             LOG.error("Could not create inventory output. " + e.getMessage());
         }
     }

@@ -10,6 +10,12 @@ import gov.epa.emissions.commons.db.OptimizedTableModifier;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.analysis.common.BestMeasureEffRecord;
+import gov.epa.emissions.framework.services.cost.analysis.common.NonpointRecordGenerator;
+import gov.epa.emissions.framework.services.cost.analysis.common.NonroadRecordGenerator;
+import gov.epa.emissions.framework.services.cost.analysis.common.OnroadRecordGenerator;
+import gov.epa.emissions.framework.services.cost.analysis.common.PointRecordGenerator;
+import gov.epa.emissions.framework.services.cost.analysis.common.RecordGenerator;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
@@ -30,7 +36,7 @@ public class StrategyLoader {
 
     private ControlStrategyResult result;
 
-    private RetrieveMaxEmsRedControlMeasure retrieveMeasure;
+    private RetrieveBestMeasureEffRecord retrieveMeasure;
 
     private ControlStrategy controlStrategy;
 
@@ -56,7 +62,7 @@ public class StrategyLoader {
 
     private boolean newSource;
 
-    private MaxEmsRedControlMeasure maxCM;
+    private BestMeasureEffRecord maxCM;
     
     private Pollutants pollutants;
 
@@ -73,7 +79,7 @@ public class StrategyLoader {
         this.decFormat = new DecimalFormat("0.###E0");
         modifier = dataModifier(tableName, dbServer.getEmissionsDatasource());
         CostYearTable costYearTable = new CostYearTableReader(dbServer, controlStrategy.getCostYear()).costYearTable();
-        retrieveMeasure = new RetrieveMaxEmsRedControlMeasure(map, costYearTable, controlStrategy);
+        retrieveMeasure = new RetrieveBestMeasureEffRecord(map, costYearTable, controlStrategy);
         start();
         totalCost = 0.0;
         totalReduction = 0.0;
@@ -93,13 +99,7 @@ public class StrategyLoader {
                 ResultSet resultSet = optimizedQuery.getResultSet();
                 doBatchInsert(resultSet);
             }
-        } 
-        catch (Exception exc)
-        {
-            exc.printStackTrace();
-            throw exc;
-        }
-        finally {
+        } finally {
             modifier.finish();
             modifier.close();
         }
@@ -152,7 +152,6 @@ public class StrategyLoader {
                 }
                 sourceCount = resultSet.getInt("Record_Id");
                 poll = pollutants.getPollutant(resultSet.getString("poll"));
-                
                 //find best measure for source (based on target pollutant)...
                 if (newSource) {
                     if (!pointDatasetType) {
@@ -172,7 +171,7 @@ public class StrategyLoader {
                     continue;
                 try {
                     RecordGenerator generator = getRecordGenerator();
-                    Record record = generator.getRecord(resultSet, maxCM);
+                    Record record = generator.getRecord(resultSet, maxCM, resultSet.getDouble("ANN_EMIS"), true, true);
                     totalCost += generator.reducedEmission() * maxCM.adjustedCostPerTon();
                     if (poll.equals(controlStrategy.getTargetPollutant()))
                         totalReduction += generator.reducedEmission();
@@ -214,7 +213,6 @@ public class StrategyLoader {
             if (record.size() < colsSize)
                 throw new EmfException("The number of tokens in the record are " + record.size()
                         + ", It's less than the number of columns expected(" + colsSize + ")");
-
             dataModifier.insert((String[]) record.tokens().toArray(new String[0]));
         } catch (SQLException e) {
             throw new EmfException("Error processing insert query: " + e.getMessage());

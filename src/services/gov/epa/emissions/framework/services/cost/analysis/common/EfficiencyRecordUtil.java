@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.services.cost.analysis.common;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.client.cost.controlstrategy.LocaleFilter;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.cost.analysis.maxreduction.EffectiveDateFilter;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;

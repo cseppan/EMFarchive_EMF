@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
@@ -38,12 +39,19 @@ public class DatasetDAO {
     private LockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
+    
+    private DbServerFactory dbServerFactory;
 
     public DatasetDAO() {
         lockingScheme = new LockingScheme();
         hibernateFacade = new HibernateFacade();
     }
 
+    public DatasetDAO(DbServerFactory dbServerFactory) {
+        this();
+        this.dbServerFactory = dbServerFactory;
+    }
+    
     public boolean exists(int id, Class clazz, Session session) {
         return hibernateFacade.exists(id, clazz, session);
     }
@@ -278,8 +286,12 @@ public class DatasetDAO {
 
         if (!continueToRename(dataset, oldDataset))
             return;
-
-        DbServer dbServer = new EmfDbServer();
+        
+        DbServer dbServer;
+        if (dbServerFactory == null)
+            dbServer = new EmfDbServer();
+        else
+            dbServer = dbServerFactory.getDbServer();
 
         try {
             renameTable(dataset, oldDataset, dbServer);
@@ -321,7 +333,10 @@ public class DatasetDAO {
         DbServer dbServer = null;
 
         try {
-            dbServer = new EmfDbServer();
+            if (dbServerFactory == null)
+                dbServer = new EmfDbServer();
+            else
+                dbServer = dbServerFactory.getDbServer();
             Datasource datasource = dbServer.getEmfDatasource();
             Connection connection = datasource.getConnection();
             Statement statement = connection.createStatement();

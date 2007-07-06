@@ -48,7 +48,7 @@ public class ControlStrategyInventoryOutput {
         this.user = user;
         this.sessionFactory = sessionFactory;
         this.dbServer = dbServerFactory.getDbServer();
-        creator = new DatasetCreator("ControlledInventory_", "CSINVEN_", controlStrategy, user, sessionFactory);
+        creator = new DatasetCreator("ControlledInventory_", "CSINVEN_", controlStrategy, user, sessionFactory, dbServerFactory);
         this.tableFormat = new FileFormatFactory(dbServer).tableFormat(datasetType(controlStrategy));
         this.statusServices = new StatusDAO(sessionFactory);
     }
@@ -79,6 +79,7 @@ public class ControlStrategyInventoryOutput {
         } catch (Exception e) {
             failStatus(statusServices, e.getMessage());
             tableCreator.drop(outputInventoryTableName);
+            e.printStackTrace();
             throw e;
         } finally {
             setandRunQASteps();
@@ -104,11 +105,16 @@ public class ControlStrategyInventoryOutput {
     }
 
     private void setandRunQASteps() throws EmfException {
-        ControlStrategyResult result = controlStrategyResults(controlStrategy);
-        EmfDataset controlledDataset = (EmfDataset) result.getControlledInventoryDataset();
-        QAStepTask qaTask = new QAStepTask(controlledDataset, controlledDataset.getDefaultVersion(), user,
-                sessionFactory, dbServer);
-        qaTask.runSummaryQASteps(qaTask.getDefaultSummaryQANames());
+        try {
+            ControlStrategyResult result = controlStrategyResults(controlStrategy);
+            EmfDataset controlledDataset = (EmfDataset) result.getControlledInventoryDataset();
+            QAStepTask qaTask = new QAStepTask(controlledDataset, controlledDataset.getDefaultVersion(), user,
+                    sessionFactory, dbServer);
+            qaTask.runSummaryQASteps(qaTask.getDefaultSummaryQANames());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException(e.getMessage());
+        }
     }
 
     private String description(EmfDataset inputDataset) {
@@ -192,6 +198,8 @@ public class ControlStrategyInventoryOutput {
         try {
             emissionsDatasource.query().execute(query);
         } catch (SQLException e) {
+            System.err.println(query);
+            e.printStackTrace();
             throw new EmfException("Could not update inventory table '" + outputTable + "' using detail result table '"
                     + detailResultTable + "'");
         }
@@ -199,19 +207,18 @@ public class ControlStrategyInventoryOutput {
     }
 
     private String updateQuery(String outputTable, String detailResultTable, Datasource datasource) {
-        String sql = "";
-        if (!controlStrategy.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)"))
-            sql = "UPDATE " + qualifiedTable(outputTable, datasource) + " SET " + "ann_emis=b.final_emissions,"
-            + "ceff=b.control_eff," + "reff=b.rule_eff," + "rpen=b.rule_pen" + " FROM (SELECT "
-            + "final_emissions, control_eff, rule_eff, rule_pen, source_id" + " FROM "
-            + qualifiedTable(detailResultTable, datasource) + ") as b " + " WHERE "
-            + qualifiedTable(outputTable, datasource) + ".record_id=b.source_id";
-        else
-            sql = "UPDATE " + qualifiedTable(outputTable, datasource) + " SET " + "ann_emis=b.final_emissions,"
-            + "ceff=b.control_eff," + "reff=b.rule_eff FROM (SELECT "
-            + "final_emissions, control_eff, rule_eff, source_id" + " FROM "
-            + qualifiedTable(detailResultTable, datasource) + ") as b " + " WHERE "
-            + qualifiedTable(outputTable, datasource) + ".record_id=b.source_id";
+        boolean pointDatasetType = controlStrategy.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)");
+        String sql = "update " + qualifiedTable(outputTable, datasource) + " as o "
+        + "set ceff = case when ann_emis <> 0 then (1 - b.final_emissions / ann_emis) * 100 else 0 end, "
+        + "ann_emis = b.final_emissions, "
+        + "reff = 100 "
+        + (!pointDatasetType ? ", rpen = 100 " : " ")
+        + "FROM ( "
+        + "SELECT source_id, max(final_emissions) as final_emissions "
+        + "FROM " + qualifiedTable(detailResultTable, datasource) + " "
+        + "group by source_id "
+        + ") as b "
+        + "WHERE o.record_id = b.source_id";
         return sql;
     }
 

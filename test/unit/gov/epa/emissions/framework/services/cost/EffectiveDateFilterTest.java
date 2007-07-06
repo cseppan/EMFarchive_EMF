@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.cost;
 
 import java.text.ParseException;
 
-import gov.epa.emissions.framework.services.cost.analysis.maxreduction.EffectiveDateFilter;
+import gov.epa.emissions.framework.services.cost.analysis.common.EffectiveDateFilter;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import junit.framework.TestCase;

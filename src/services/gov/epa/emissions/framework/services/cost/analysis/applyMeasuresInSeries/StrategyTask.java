@@ -1,6 +1,5 @@
-package gov.epa.emissions.framework.services.cost.analysis.applySuitableMeasuresInSeries;
+package gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries;
 
-import java.sql.SQLException;
 import java.util.Date;
 
 import gov.epa.emissions.commons.db.OptimizedQuery;
@@ -30,34 +29,14 @@ public class StrategyTask extends AbstractStrategyTask {
             result.setRunStatus(status);
         } catch (Exception e) {
             status = "Failed. Error processing input dataset: " + inputDataset.getName() + ". " + result.getRunStatus();
+            e.printStackTrace();
             throw new EmfException(e.getMessage());
         } finally {
-            close(optimizedQuery);
+            closeOptimizedQuery();
             result.setCompletionTime(new Date());
             result.setRunStatus(status);
             saveResults();
-            try {
-                dbServer.disconnect();
-            } catch (SQLException e) {
-                throw new EmfException("Could not disconnect DbServer -" + e.getMessage());
-            }
-        }
-    }
-
-    public void close() throws EmfException {
-        try {
-            dbServer.disconnect();
-        } catch (SQLException e) {
-            throw new EmfException(e.getMessage());
-        }
-
-    }
-    
-    private void close(OptimizedQuery optimizedQuery) throws EmfException {
-        try {
-            optimizedQuery.close();
-        } catch (SQLException e) {
-            throw new EmfException("Could not close optimized query -" + e.getMessage());
+            disconnectDbServer();
         }
     }
 }

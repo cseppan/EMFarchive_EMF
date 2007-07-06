@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services.cost.analysis.applySuitableMeasuresInSeries;
+package gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries;
 
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
@@ -30,7 +30,7 @@ public class RetrieveBestMeasures {
             double invenRuleEffectiveness, double invenAnnualEmissions) throws EmfException {
         //if the strat doesn't have any constraints then return all measures.
         //the constraints are the only filter that could eliminate a measure from a source
-        if (!controlStrategy.getConstraint().hasConstraints()) return controlMeasures;
+        if (controlStrategy.getConstraint() == null || !controlStrategy.getConstraint().hasConstraints()) return controlMeasures;
         List<ControlMeasure> measureEffRecordList = new ArrayList<ControlMeasure>();
         for (int i = 0; i < controlMeasures.length; i++) {
             EfficiencyRecord[] efficiencyRecords = effRecordUtil.pollutantFilter(controlMeasures[i].getEfficiencyRecords(), controlStrategy.getTargetPollutant());

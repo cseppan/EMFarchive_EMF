@@ -18,20 +18,24 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
+import gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries.StrategyTask;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
-import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.controlmeasure.io.CMImportTask;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+
 import java.io.File;
 
 import org.hibernate.Session;
 
-public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
+public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
 
     protected DbServer dbServer;
 
     private SqlDataTypes sqlDataTypes;
+    
+    private String strategyTypeName = "Apply Measures In Series";
 //    protected ControlStrategyService service;
 
     protected String tableName = "test" + Math.round(Math.random() * 1000) % 1000;
@@ -110,7 +114,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         strategy.setInventoryYear(2000);
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant);
-        strategy.setStrategyType(maxEmisRedStrategyType());
+        strategy.setStrategyType(strategyType(strategyTypeName));
         strategy.setControlMeasureClasses(classes);
 //        strategy.setCountyFile("c:\\cep\\EMF\\test\\data\\cost\\controlStrategy\\070 Run Counties_OTC and West States Statewide.csv");
 //        strategy.setFilter("srctype = 2");
@@ -127,7 +131,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         strategy.setInventoryYear(2000);
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant);
-        strategy.setStrategyType(maxEmisRedStrategyType());
+        strategy.setStrategyType(strategyType(strategyTypeName));
         strategy.setControlMeasures(measures);
         add(strategy);
         return strategy;
@@ -142,7 +146,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         strategy.setInventoryYear(2000);
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant);
-        strategy.setStrategyType(maxEmisRedStrategyType());
+        strategy.setStrategyType(strategyType(strategyTypeName));
         add(strategy);
         return strategy;
     }
@@ -151,8 +155,8 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         return new UserDAO().get("emf", session);
     }
 
-    private StrategyType maxEmisRedStrategyType() {
-        return (StrategyType) load(StrategyType.class, "Max Emissions Reduction");
+    private StrategyType strategyType(String name) {
+        return (StrategyType) load(StrategyType.class, name);
     }
 
     private EmfDataset addORLPointDataset(EmfDataset inputDataset) throws ImporterException {
@@ -215,21 +219,6 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         return (EmfDataset) load(EmfDataset.class, tableName);
     }
 
-    protected ControlMeasure addControlMeasure(String name, String abbr, Scc[] sccs, EfficiencyRecord[] records) {
-        ControlMeasure measure = new ControlMeasure();
-        measure.setName(name);
-        measure.setAbbreviation(abbr);
-        measure.setEfficiencyRecords(records);
-        measure.setSccs(sccs);
-        add(measure);
-        ControlMeasure load = (ControlMeasure) load(ControlMeasure.class, measure.getName());
-        for (int i = 0; i < sccs.length; i++) {
-            sccs[i].setControlMeasureId(load.getId());
-            add(sccs[i]);
-        }
-        return load;
-    }
-
     protected EfficiencyRecord record(Pollutant pollutant, String locale, float efficiency, double cost, int costYear) {
         EfficiencyRecord record = new EfficiencyRecord();
         record.setPollutant(pollutant);
@@ -258,5 +247,18 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
         CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory, dbServerFactory());
         task.run();
+    }
+    
+    protected void runStrategy(ControlStrategy strategy) throws EmfException {
+        StrategyTask strategyTask = new StrategyTask(strategy, emfUser(), dbServerFactory,
+                new Integer(500), sessionFactory);
+        strategyTask.run();
+    }
+    
+    protected void createControlledInventory(ControlStrategy strategy) throws Exception {
+        //create the controlled inventory for this strategy run....
+        ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(emfUser(), strategy,
+                sessionFactory, dbServerFactory);
+        output.create();
     }
 }

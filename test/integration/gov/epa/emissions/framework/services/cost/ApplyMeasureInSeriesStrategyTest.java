@@ -3,10 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
-import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
-import gov.epa.emissions.framework.services.cost.analysis.maxreduction.MaxEmsRedStrategy;
-import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -22,7 +19,7 @@ import org.hibernate.Session;
 
 //import org.hibernate.Session;
 
-public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailedCase {
+public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrategyTestBase {
 
     private double tolerance = 1e-2;
     
@@ -37,12 +34,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 //            ControlMeasureClass[] cmcs = {(ControlMeasureClass)load(ControlMeasureClass.class, "Known"),
 //                    (ControlMeasureClass)load(ControlMeasureClass.class, "Emerging")};
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant(), cmcs);
-            User user = emfUser();
+
             strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
             ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
@@ -57,12 +52,12 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             //make sure 15 records come back...
             rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName);
             rs.next();
-            assertTrue("make sure there are 15 records in the summary results." + rs.getInt(1), rs.getInt(1) == 15);
+            assertTrue("make sure there are 21 records in the summary results." + rs.getInt(1), rs.getInt(1) == 21);
 
-            //make sure nothing shows up, this would not be the best control measure for this scc/fips...
+            //make sure this shows up, this would be applied for this scc/fips...
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2302002100' and cm_abbrev='PCHRBESP'");
-            assertTrue("SCC = 2302002100 and CM = PCHRBESP, don't use this cm, not the max reduction cm...", !rs.first());
+            assertTrue("SCC = 2302002100 and CM = PCHRBESP, use this cm...", rs.first());
 
             //make sure nothing shows up, assigned different pollutant (PM2.5) for same SCC...
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
@@ -72,11 +67,11 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             //make sure inv entry has the right numbers, there are NO locale specific measures for this entry...
             //check SCC = 2104008000 FIPS = 37029 inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
-                    + " where scc = '2104008000' and fips = '37029'");
+                    + " where scc = '2104008000' and fips = '37029' and cm_abbrev = 'PRESWDCSTV'");
             rs.next();
             assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 70034226.09", Math.abs(rs.getDouble("annual_cost") - 70034226.09)/70034226.09 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 35280", Math.abs(rs.getDouble("emis_reduction") - 35280)/35280 < tolerance);
+            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 35017100", Math.abs(rs.getDouble("annual_cost") - 35017100)/35017100 < tolerance);
+            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 17640", Math.abs(rs.getDouble("emis_reduction") - 17640)/17640 < tolerance);
 
             //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
             //check SCC = 2104008000 FIPS = 37029 inv entry
@@ -106,12 +101,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         try {
             ControlMeasureClass[] cmcs = {(ControlMeasureClass)load(ControlMeasureClass.class, "Known")};
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant(), cmcs);
-            User user = emfUser();
+
             strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
             ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
@@ -126,12 +119,12 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             //make sure 15 records come back...
             rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName);
             rs.next();
-            assertTrue("make sure there are 14 records in the summary results.", rs.getInt(1) == 14);
+            assertTrue("make sure there are 18 records in the summary results." + rs.getInt(1), rs.getInt(1) == 18);
 
-            //make sure nothing shows up, this would not be the best control measure for this scc/fips...
+            //make sure this shows up, this would be applied for this scc/fips...
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2302002100' and cm_abbrev='PCHRBESP'");
-            assertTrue("SCC = 2302002100 and CM = PCHRBESP, don't use this cm, not the max reduction cm...", !rs.first());
+            assertTrue("SCC = 2302002100 and CM = PCHRBESP, use this cm...", rs.first());
 
             //make sure nothing shows up, assigned different pollutant (PM2.5) for same SCC...
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
@@ -141,11 +134,11 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             //make sure inv entry has the right numbers, there are NO locale specific measures for this entry...
             //check SCC = 2104008000 FIPS = 37029 inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
-                    + " where scc = '2104008000' and fips = '37029'");
+                    + " where scc = '2104008000' and fips = '37029' and cm_abbrev = 'PRESWDCSTV'");
             rs.next();
             assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 70034226.09", Math.abs(rs.getDouble("annual_cost") - 70034226.09)/70034226.09 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 35280", Math.abs(rs.getDouble("emis_reduction") - 35280)/35280 < tolerance);
+            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 70034200", Math.abs(rs.getDouble("annual_cost") - 70034200)/70034200 < tolerance);
+            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 17640", Math.abs(rs.getDouble("emis_reduction") - 35280)/35280 < tolerance);
 
             //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
             //check SCC = 2104008000 FIPS = 37029 inv entry
@@ -176,12 +169,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             ControlMeasureClass[] cmcs = {(ControlMeasureClass)load(ControlMeasureClass.class, "Known"),
                     (ControlMeasureClass)load(ControlMeasureClass.class, "Emerging")};
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant(), cmcs);
-            User user = emfUser();
+
             strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
             ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
@@ -196,12 +187,12 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             //make sure 15 records come back...
             rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName);
             rs.next();
-            assertTrue("make sure there are 15 records in the summary results.", rs.getInt(1) == 15);
+            assertTrue("make sure there are 21 records in the summary results.", rs.getInt(1) == 21);
 
-            //make sure nothing shows up, this would not be the best control measure for this scc/fips...
+            //make sure this shows up, this would be applied for this scc/fips...
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2302002100' and cm_abbrev='PCHRBESP'");
-            assertTrue("SCC = 2302002100 and CM = PCHRBESP, don't use this cm, not the max reduction cm...", !rs.first());
+            assertTrue("SCC = 2302002100 and CM = PCHRBESP, use this cm...", rs.first());
 
             //make sure nothing shows up, assigned different pollutant (PM2.5) for same SCC...
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
@@ -211,11 +202,11 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             //make sure inv entry has the right numbers, there are NO locale specific measures for this entry...
             //check SCC = 2104008000 FIPS = 37029 inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
-                    + " where scc = '2104008000' and fips = '37029'");
+                    + " where scc = '2104008000' and fips = '37029' and cm_abbrev = 'PRESWDCSTV'");
             rs.next();
             assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 70034226.09", Math.abs(rs.getDouble("annual_cost") - 70034226.09)/70034226.09 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 35280", Math.abs(rs.getDouble("emis_reduction") - 35280)/35280 < tolerance);
+            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 35017100", Math.abs(rs.getDouble("annual_cost") - 35017100)/35017100 < tolerance);
+            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 17640", Math.abs(rs.getDouble("emis_reduction") - 17640)/17640 < tolerance);
 
             //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
             //check SCC = 2104008000 FIPS = 37029 inv entry
@@ -245,12 +236,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         try {
             ControlMeasureClass[] cmcs = {(ControlMeasureClass)load(ControlMeasureClass.class, "Emerging")};
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant(), cmcs);
-            User user = emfUser();
+
             strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
             ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
@@ -296,12 +285,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             LightControlMeasure[] cms = {(LightControlMeasure)load(LightControlMeasure.class, "Bale Stack/Propane Burning; Agricultural Burning"), 
                     (LightControlMeasure)load(LightControlMeasure.class, "ESP for Commercial Cooking; Conveyorized Charbroilers")};
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant(), cms);
-            User user = emfUser();
+
             strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
             ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
@@ -354,12 +341,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         Connection cn = null;
         try {
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant());
-            User user = emfUser();
+
             strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
             ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
@@ -412,12 +397,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         Connection cn = null;
         try {
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant());
-            User user = emfUser();
+
             strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
             ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
@@ -429,10 +412,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
                     ResultSet.CONCUR_READ_ONLY);
 
-            //make sure 15 records come back...
+            //make sure 5 records come back...
             rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName);
             rs.next();
-            assertTrue("make sure there are 4 records in the summary results." + rs.getInt(1), rs.getInt(1) == 4);
+            assertTrue("make sure there are 5 records in the summary results." + rs.getInt(1), rs.getInt(1) == 5);
 
             //make sure inv entry has the right numbers...
             //check SCC = 2302002100 FIPS = 37013 POLL = PM10 inv entry
@@ -484,12 +467,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 //                    (ControlMeasureClass)load(ControlMeasureClass.class, "Emerging")};
             String strategyName = "CS_test_case__" + Math.round(Math.random() * 10000);
             strategy = controlStrategy(inputDataset, strategyName, pm10Pollutant(), cmcs);
-            User user = emfUser();
+
             strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
-//            HibernateSessionFactory sessionFactory = sessionFactory;
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+
+            runStrategy(strategy);
 
             Session session = sessionFactory.getSession();
 
@@ -513,12 +494,12 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName);
             rs.next();
 
-            assertTrue("make sure there are 15 records in the summary results.", rs.getInt(1) == 15);
+            assertTrue("make sure there are 21 records in the summary results.", rs.getInt(1) == 21);
 
-            //make sure nothing shows up, this would not be the best control measure for this scc/fips...
+            //make sure this shows up, this would be applied for this scc/fips...
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2302002100' and cm_abbrev='PCHRBESP'");
-            assertTrue("SCC = 2302002100 and CM = PCHRBESP, don't use this cm, not the max reduction cm...", !rs.first());
+            assertTrue("SCC = 2302002100 and CM = PCHRBESP, use this cm...", rs.first());
 
             //make sure nothing shows up, assigned different pollutant (PM2.5) for same SCC...
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
@@ -528,11 +509,11 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             //make sure inv entry has the right numbers, there are NO locale specific measures for this entry...
             //check SCC = 2104008000 FIPS = 37029 inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
-                    + " where scc = '2104008000' and fips = '37029'");
+                    + " where scc = '2104008000' and fips = '37029' and cm_abbrev = 'PRESWDCSTV'");
             rs.next();
             assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 70034226.09 " + rs.getDouble("annual_cost"), Math.abs(rs.getDouble("annual_cost") - 70034226.09)/70034226.09 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 35280", Math.abs(rs.getDouble("emis_reduction") - 35280)/35280 < tolerance);
+            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 35017100", Math.abs(rs.getDouble("annual_cost") - 35017100)/35017100 < tolerance);
+            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 17640", Math.abs(rs.getDouble("emis_reduction") - 17640)/17640 < tolerance);
 
             //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
             //check SCC = 2104008000 FIPS = 37029 inv entry
@@ -544,9 +525,8 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < tolerance);
 
             //create the controlled inventory for this strategy run....
-            ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, strategy,
-                    sessionFactory, dbServerFactory);
-            output.create();
+            createControlledInventory(strategy);
+
             //reload
             result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
 
@@ -618,12 +598,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         String tableName2 = "";
         try {
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant());
-            User user = emfUser();
+
             strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
             result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
@@ -635,10 +613,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
                     ResultSet.CONCUR_READ_ONLY);
 
-            //make sure 15 records come back...
+            //make sure 10 records come back...
             rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName);
             rs.next();
-            assertTrue("make sure there are 9 records in the summary results. ", rs.getInt(1) == 9);
+            assertTrue("make sure there are 10 records in the summary results. " + rs.getInt(1), rs.getInt(1) == 10);
 
             /*
             //make sure inv entry has the right numbers, there are NO locale specific measures for this entry...
@@ -673,9 +651,8 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             rs.close();
 
             //create the controlled inventory for this strategy run....
-            ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, strategy,
-                    sessionFactory, dbServerFactory());
-            output.create();
+            createControlledInventory(strategy);
+
             //reload
             result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
 
@@ -706,24 +683,6 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             removeData();
         }
     }
-
-//    public void testCountyImport() throws Exception {
-//
-//        try {
-//            
-//            File file = new File("test/data/cost/controlStrategy/070 Run Counties_OTC and West States Statewide2.csv");
-//
-//            CSCountyImporter task = new CSCountyImporter(file, new CSCountyFileFormat());//folder, fileNames, emfUser(), sessionFactory, dbServerFactory());
-//            String[] fips = task.run();
-//System.out.print(fips.length);
-////            assertTrue("assigned different pollutant for same SCC", rs.getDouble("reff") == 0 && rs.getDouble("reff") == 0);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            //
-//        }
-//    }
 
     private void dropTables(ControlStrategy strategy, EmfDataset inputDataset) throws Exception {
         if (strategy != null) {

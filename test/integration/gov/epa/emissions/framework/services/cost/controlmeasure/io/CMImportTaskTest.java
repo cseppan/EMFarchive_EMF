@@ -31,17 +31,22 @@ public class CMImportTaskTest extends ServiceTestCase {
     public void testShouldImportControlMeasureFiles() throws Exception {
         try {
             File folder = new File("test/data/cost/controlMeasure");
-            String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
+            String[] fileNames = { "CMSummary_2020_ON_Controls.csv", "CMSCCs_2020_ON_Controls.csv", "CMEfficiencies_2020_ON_Controls_NC_SC_VA.csv" };
+//            String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
             CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory, dbServerFactory());
             task.run();
             ControlMeasure[] measures = measures();
-            assertEquals(32, measures.length);
-            assertEquals(1135, noOfRecords(measures));
-            assertEquals(126, noOfScc());
+//            assertEquals(32, measures.length);
+//            assertEquals(1135, noOfRecords(measures));
+//            assertEquals(126, noOfScc());
+            assertEquals(132, measures.length);
+            assertEquals(40800, noOfRecords(measures));
+            assertEquals(132, noOfScc());
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
             dropAll(Scc.class);
+            dropData("aggregrated_efficiencyrecords", dbServer().getEmfDatasource());
             dropAll(EfficiencyRecord.class);
             dropAll(ControlMeasure.class);
             dropAll(Status.class);

@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services.cost.analysis.maxreduction;
+package gov.epa.emissions.framework.services.cost.analysis.common;
 
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.Column;
@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MaxEmsRedTableFormat implements TableFormat {
+public class StrategyDetailedResultTableFormat implements TableFormat {
     private SqlDataTypes types;
     
     private Column[] cols;
 
-    public MaxEmsRedTableFormat(SqlDataTypes types) {
+    public StrategyDetailedResultTableFormat(SqlDataTypes types) {
         this.types = types;
         this.cols = createCols();
     }

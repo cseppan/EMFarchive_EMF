@@ -61,26 +61,10 @@ public class NonpointRecordGenerator implements RecordGenerator {
         tokens.add(resultSet.getString("scc"));
         tokens.add(resultSet.getString("fips"));
 
-//        try {
-//            tokens.add(resultSet.getString("PLANTID"));
-//        } catch (SQLException e) {
-            tokens.add("");
-//        }
-//        try {
-//            tokens.add(resultSet.getString("POINTID"));
-//        } catch (SQLException e) {
-            tokens.add("");
-//        }
-//        try {
-//            tokens.add(resultSet.getString("STACKID"));
-//        } catch (SQLException e) {
-            tokens.add("");
-//        }
-//        try {
-//            tokens.add(resultSet.getString("SEGMENT"));
-//        } catch (SQLException e) {
-            tokens.add("");
-//        }
+        tokens.add("");
+        tokens.add("");
+        tokens.add("");
+        tokens.add("");
 
         tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon() * reducedEmission));
         tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon()));

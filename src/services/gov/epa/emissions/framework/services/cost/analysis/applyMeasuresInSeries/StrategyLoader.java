@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services.cost.analysis.applySuitableMeasuresInSeries;
+package gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries;
 
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.data.DatasetType;
@@ -31,12 +31,12 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+//import org.apache.commons.logging.Log;
+//import org.apache.commons.logging.LogFactory;
 
 public class StrategyLoader {
 
-    private static Log LOG = LogFactory.getLog(StrategyLoader.class);
+//    private static Log LOG = LogFactory.getLog(StrategyLoader.class);
 
     private TableFormat tableFormat;
 
@@ -212,7 +212,7 @@ public class StrategyLoader {
 
                     if (newFips && targetPollutant) {
                         sourceMeasures = retrieveBestMeasures.findTargetPollutantBestMeasures(sccMeasures, fips, 
-                            resultSet.getDouble("CEFF"), resultSet.getDouble("RPEN"), 
+                            resultSet.getDouble("CEFF"), !pointDatasetType ? resultSet.getDouble("RPEN") : 100, 
                             resultSet.getDouble("REFF"), resultSet.getDouble("ANN_EMIS"));
                     } else {
                         sourceMeasures = sccMeasures;
@@ -235,8 +235,8 @@ public class StrategyLoader {
                             !pointDatasetType ? resultSet.getDouble("RPEN") : 100, !pointDatasetType ? resultSet.getDouble("REFF") : resultSet.getFloat("CEFF") > 0 && resultSet.getFloat("REFF") == 0 ? 100 : resultSet.getFloat("REFF"), resultSet.getDouble("ANN_EMIS"))
                     : retrieveBestMeasureEffRecords.findCobenefitPollutantBestMeasureEffRecords(sourceMeasures, fips, poll, resultSet.getDouble("ANN_EMIS"));
 
-for (BestMeasureEffRecord l : bestMeasureEffRecordList)
-    LOG.error(scc + " " + fips + " " + (l.adjustedCostPerTon() == null ? -1 : l.adjustedCostPerTon()) + ": " + l.measure().getAbbreviation() + ": " + l.efficiencyRecord().getPollutant() + ": " + l.efficiencyRecord().getLocale() + ": " + l.efficiencyRecord().getCostPerTon());
+//for (BestMeasureEffRecord l : bestMeasureEffRecordList)
+//    LOG.error(scc + " " + fips + " " + (l.adjustedCostPerTon() == null ? -1 : l.adjustedCostPerTon()) + ": " + l.measure().getAbbreviation() + ": " + l.efficiencyRecord().getPollutant() + ": " + l.efficiencyRecord().getLocale() + ": " + l.efficiencyRecord().getCostPerTon());
                 
                 if (bestMeasureEffRecordList == null || bestMeasureEffRecordList.size() == 0)
                     continue;

@@ -64,7 +64,7 @@ public class CMEfficiencyImporter {
         List effRecs = new ArrayList();
         if (recordParseCount == 0) addStatus("Start reading Efficiency file");
         if (reader == null ) reader = new CMCSVFileReader(file);
-        for (Record record = reader.read(); !(end = record.isEnd()) && recordCount <= 19999; record = reader.read()) {
+        for (Record record = reader.read(); !(end = record.isEnd()); record = reader.read()) {
             EfficiencyRecord efficiencyRecord;
             try {
                 efficiencyRecord = cmEfficiencyReader.parseEfficiencyRecord(controlMeasures, record, reader.lineNumber());
@@ -75,6 +75,8 @@ public class CMEfficiencyImporter {
                 effRecs.add(efficiencyRecord);
                 recordParseCount++;
                 recordCount++;
+                //process 20000 at a time...
+                if (recordCount == 20000) break;
             }
         }
         if (cmEfficiencyReader.getErrorCount() > 0) {

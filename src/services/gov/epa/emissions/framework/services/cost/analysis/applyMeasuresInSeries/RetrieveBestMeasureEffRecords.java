@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services.cost.analysis.applySuitableMeasuresInSeries;
+package gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries;
 
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.services.EmfException;

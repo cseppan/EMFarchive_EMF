@@ -16,7 +16,6 @@ import gov.epa.emissions.framework.services.QAStepTask;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
-import gov.epa.emissions.framework.services.cost.analysis.maxreduction.MaxEmsRedTableFormat;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.DatasetCreator;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
@@ -52,6 +51,8 @@ public abstract class AbstractStrategyTask implements Strategy {
     protected User user;
     
     protected ControlStrategyResult result;
+    
+    protected OptimizedQuery optimizedQuery;
 
     protected int batchSize;
 
@@ -63,9 +64,9 @@ public abstract class AbstractStrategyTask implements Strategy {
         this.sessionFactory = sessionFactory;
         this.user = user;
         this.batchSize = batchSize.intValue();
-        this.tableFormat = new MaxEmsRedTableFormat(dbServer.getSqlDataTypes());
-        creator = new DatasetCreator("Strategy_", "CSDR_", controlStrategy, user, sessionFactory);
-        inputDataset = controlStrategy.getInputDatasets()[0];
+        this.tableFormat = new StrategyDetailedResultTableFormat(dbServer.getSqlDataTypes());
+        this.creator = new DatasetCreator("Strategy_", "CSDR_", controlStrategy, user, sessionFactory, dbServerFactory);
+        this.inputDataset = controlStrategy.getInputDatasets()[0];
         //setup the strategy run
         setup();
     }
@@ -79,6 +80,7 @@ public abstract class AbstractStrategyTask implements Strategy {
         createTable(creator.outputTableName());
         //create strat result object
         result = strategyResult(controlStrategy, resultDataset);
+        optimizedQuery = sourceQuery(inputDataset);
     }
     
 //    public void run() throws EmfException {
@@ -273,5 +275,22 @@ public abstract class AbstractStrategyTask implements Strategy {
         }
 
         return sqlFilter;
+    }
+
+    protected void disconnectDbServer() throws EmfException {
+        try {
+            dbServer.disconnect();
+        } catch (SQLException e) {
+            throw new EmfException("Could not disconnect DbServer - " + e.getMessage());
+        }
+
+    }
+    
+    protected void closeOptimizedQuery() throws EmfException {
+        try {
+            optimizedQuery.close();
+        } catch (SQLException e) {
+            throw new EmfException("Could not close optimized query - " + e.getMessage());
+        }
     }
 }

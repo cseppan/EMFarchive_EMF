@@ -99,6 +99,7 @@ public class ControlMeasureDAO {
         hibernateFacade.add(measure, session);
         int cmId = controlMeasureIds(measure, sccs, session);
         hibernateFacade.add(sccs, session);
+        session.flush();
         return cmId;
     }
 
