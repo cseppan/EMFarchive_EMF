@@ -31,12 +31,17 @@ public class MaxEmsRedStrategy extends AbstractStrategyTask {
             result.setRunStatus(status);
         } catch (Exception e) {
             status = "Failed. Error processing input dataset: " + inputDataset.getName() + ". " + result.getRunStatus();
+            e.printStackTrace();
             throw new EmfException(e.getMessage());
         } finally {
             closeOptimizedQuery();
             result.setCompletionTime(new Date());
             result.setRunStatus(status);
-            saveResults();
+            try {
+                saveResults();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             disconnectDbServer();
         }
     }
