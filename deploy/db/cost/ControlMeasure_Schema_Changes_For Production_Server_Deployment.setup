@@ -174,4 +174,7 @@ UNIQUE (control_measures_id, pollutant_id, locale, existing_measure_abbr, effect
  -- modify details data type to be a text field instead of varchar(128)...
 ALTER TABLE emf.control_measure_efficiencyrecords ALTER detail TYPE text;
 
-  
+-- 7/9/2007 - Added new strategy type
+insert into emf.strategy_types (name, description, default_sortorder, strategy_classname)
+values ('Apply Measures In Series', 'Apply Measures In Series', '''''', 'gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries.StrategyTask');
+
