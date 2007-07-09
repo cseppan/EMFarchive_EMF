@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.gui.EmptyStrings;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 
@@ -17,7 +18,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -335,37 +335,39 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
 
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-        if (dirOnly) {
-            messagePanel.setMessage("Please wait while retrieving all subfolders ...");
-            subdirsList.setListData(getAllDirs(currentDir));
-            messagePanel.setMessage("Finished retrieving subfolders.");
-        } else {
-            messagePanel.setMessage("Please wait while retrieving all subfolders and files ...");
-            if (lastFilter.trim().isEmpty())
-                refreshFiles(getAllDirs(currentDir), new EmfFileInfo[0]);
-            else
-                refreshFiles(getAllDirs(currentDir), fsv.getFiles(currentDir, lastFilter));
-            messagePanel.setMessage("Finished retrieving subfolders and files.");
+        try {
+            if (dirOnly) {
+                messagePanel.setMessage("Please wait while retrieving all subfolders ...");
+                subdirsList.setListData(getAllDirs(currentDir));
+                messagePanel.setMessage("Finished retrieving subfolders.");
+            } else {
+                messagePanel.setMessage("Please wait while retrieving all subfolders and files ...");
+                if (lastFilter.trim().isEmpty())
+                    refreshFiles(getAllDirs(currentDir), new EmfFileInfo[0]);
+                else
+                    refreshFiles(getAllDirs(currentDir), fsv.getFiles(currentDir, lastFilter));
+                messagePanel.setMessage("Finished retrieving subfolders and files.");
+            }
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
         }
-
-        setCursor(Cursor.getDefaultCursor());
     }
 
-    private EmfFileInfo[] getAllDirs(EmfFileInfo dir) {
+    private EmfFileInfo[] getAllDirs(EmfFileInfo dir) throws EmfException {
+        if ((dir.getAbsolutePath().length() == 2) && (dir.getAbsolutePath().charAt(1) == ':'))
+            throw new EmfException("Please enter a '\\' after the drive letter (e.g., 'D:\\')");
+
         EmfFileInfo[] dirs = fsv.getSubdirs(dir);
 
-        if (dirs == null) {
-            if ((dir.getAbsolutePath().length() == 2) && (dir.getAbsolutePath().charAt(1) == ':'))
-                this.messagePanel.setError("Please enter a '\\' after the drive letter (e.g., 'D:\\')");          
-            else if (!(new File(dir.getAbsolutePath())).exists())
-                this.messagePanel.setError("Directory "+dir+" does not exist on the server");
-            else
-                this.messagePanel.setError("Connection to server timed out.");
-        }
+        if (dirs == null)
+            throw new EmfException("Connection to server timed out.");
 
         folder.setText(dirs[0].getAbsolutePath());
         if (!dirs[0].getAbsolutePath().equals(currentDir.getAbsolutePath()))
             currentDir = dirs[0];
+
         return dirs;
     }
 
@@ -406,7 +408,8 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
             updateDirSelections(this.currentDir);
         } catch (Exception e) {
             setCursor(Cursor.getDefaultCursor());
-            messagePanel.setError("Connection to server timed out: " + ((e.getMessage() == null) ? "" : e.getMessage()));
+            messagePanel
+                    .setError("Connection to server timed out: " + ((e.getMessage() == null) ? "" : e.getMessage()));
         }
     }
 
