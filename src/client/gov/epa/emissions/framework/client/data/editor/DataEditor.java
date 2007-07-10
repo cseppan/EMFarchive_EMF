@@ -23,7 +23,6 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.Date;
@@ -33,7 +32,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class DataEditor extends DisposableInteralFrame implements DataEditorView,Runnable {
+public class DataEditor extends DisposableInteralFrame implements DataEditorView {
 
     private JPanel layout;
 
@@ -52,25 +51,16 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private Version version;
 
     private User user;
-    
-    private Note[] dataNotes;
-    
-    private String tableName;
 
     private RevisionPanel revisionPanel;
 
     private ChangeAwareButton save, discard;
-    
-    private TableMetadata tableMetadata;
-    
-    private volatile Thread dataThread;
 
     public DataEditor(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
         super("Data Editor: " + dataset.getName(), desktopManager);
         setDimension();
         this.dataset = dataset;
         this.parent = parent;
-        this.dataThread = new Thread(this);
 
         layout = new JPanel(new BorderLayout());
         layout.add(topPanel(), BorderLayout.PAGE_START);
@@ -106,15 +96,16 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     public void display(Version version, String table, User user, TableMetadata tableMetadata, Note[] notes) {
         this.version = version;
         this.user = user;
-        this.tableMetadata = tableMetadata;
-        this.tableName = table;
-        this.dataNotes = notes;
 
         updateTitle(version, table);
         super.setName("dataEditor:" + version.getDatasetId() + ":" + version.getId());
+
+        JPanel container = new JPanel(new BorderLayout());
+        container.add(tablePanel(version, table, tableMetadata), BorderLayout.CENTER);
+        container.add(bottomPanel(notes), BorderLayout.PAGE_END);
+        layout.add(container, BorderLayout.CENTER);
+
         super.display();
-        
-        dataThread.start();
     }
 
     private void updateTitle(Version version, String table) {
@@ -330,22 +321,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     public void disableSaveDiscard() {
         save.signalSaved();
         discard.signalSaved();
-    }
-
-    public void run() {
-        try {
-            messagePanel.setMessage("Please wait while retrieving data...");
-            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            JPanel container = new JPanel(new BorderLayout());
-            container.add(tablePanel(version, tableName, tableMetadata), BorderLayout.CENTER);
-            container.add(bottomPanel(dataNotes), BorderLayout.PAGE_END);
-            layout.add(container, BorderLayout.CENTER);
-            super.refreshLayout();
-            messagePanel.clear();
-            setCursor(Cursor.getDefaultCursor());
-        } catch (Exception e) {
-            messagePanel.setError("Cannot retrieve data for " + dataset.getName() + ".");
-        }
     }
 
 }
