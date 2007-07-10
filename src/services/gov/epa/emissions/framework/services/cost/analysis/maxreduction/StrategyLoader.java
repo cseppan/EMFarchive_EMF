@@ -11,22 +11,18 @@ import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.analysis.common.BestMeasureEffRecord;
-import gov.epa.emissions.framework.services.cost.analysis.common.NonpointRecordGenerator;
-import gov.epa.emissions.framework.services.cost.analysis.common.NonroadRecordGenerator;
-import gov.epa.emissions.framework.services.cost.analysis.common.OnroadRecordGenerator;
-import gov.epa.emissions.framework.services.cost.analysis.common.PointRecordGenerator;
 import gov.epa.emissions.framework.services.cost.analysis.common.RecordGenerator;
+import gov.epa.emissions.framework.services.cost.analysis.common.RecordGeneratorFactory;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
 import gov.epa.emissions.framework.services.cost.controlStrategy.SccControlMeasuresMap;
 import gov.epa.emissions.framework.services.cost.controlmeasure.io.Pollutants;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-
-import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 public class StrategyLoader {
 
@@ -68,6 +64,8 @@ public class StrategyLoader {
 
     private DecimalFormat decFormat;
 
+    private RecordGenerator recordGenerator;
+
     public StrategyLoader(String tableName, TableFormat tableFormat, HibernateSessionFactory sessionFactory, DbServer dbServer, ControlStrategyResult result,
             SccControlMeasuresMap map, ControlStrategy controlStrategy) throws EmfException {
         this.tableFormat = tableFormat;
@@ -80,6 +78,7 @@ public class StrategyLoader {
         modifier = dataModifier(tableName, dbServer.getEmissionsDatasource());
         CostYearTable costYearTable = new CostYearTableReader(dbServer, controlStrategy.getCostYear()).costYearTable();
         retrieveMeasure = new RetrieveBestMeasureEffRecord(map, costYearTable, controlStrategy);
+        this.recordGenerator = new RecordGeneratorFactory(this.type, this.result, this.decFormat).getRecordGenerator();
         start();
         totalCost = 0.0;
         totalReduction = 0.0;
@@ -170,11 +169,10 @@ public class StrategyLoader {
                 if (maxCM == null)
                     continue;
                 try {
-                    RecordGenerator generator = getRecordGenerator();
-                    Record record = generator.getRecord(resultSet, maxCM, resultSet.getDouble("ANN_EMIS"), true, true);
-                    totalCost += generator.reducedEmission() * maxCM.adjustedCostPerTon();
+                    Record record = recordGenerator.getRecord(resultSet, maxCM, resultSet.getDouble("ANN_EMIS"), true, true);
+                    totalCost += recordGenerator.reducedEmission() * maxCM.adjustedCostPerTon();
                     if (poll.equals(controlStrategy.getTargetPollutant()))
-                        totalReduction += generator.reducedEmission();
+                        totalReduction += recordGenerator.reducedEmission();
                     insertRecord(record, modifier);
                 } catch (SQLException e) {
                     result.setRunStatus("Failed. Error in processing record for source record: " + sourceCount + ".");
@@ -183,20 +181,6 @@ public class StrategyLoader {
         } finally {
             resultSet.close();
         }
-    }
-
-    private RecordGenerator getRecordGenerator() {
-
-        if (type.getName().equalsIgnoreCase("ORL Nonpoint Inventory (ARINV)"))
-            return new NonpointRecordGenerator(result, decFormat);
-        else if (type.getName().equalsIgnoreCase("ORL Point Inventory (PTINV)"))
-            return new PointRecordGenerator(result, decFormat);
-        else if (type.getName().equalsIgnoreCase("ORL Onroad Inventory (MBINV)"))
-            return new OnroadRecordGenerator(result, decFormat);
-        else if (type.getName().equalsIgnoreCase("ORL Nonroad Inventory (ARINV)"))
-            return new NonroadRecordGenerator(result, decFormat);
-
-        return null;
     }
 
     private OptimizedTableModifier dataModifier(String table, Datasource datasource) throws EmfException {
