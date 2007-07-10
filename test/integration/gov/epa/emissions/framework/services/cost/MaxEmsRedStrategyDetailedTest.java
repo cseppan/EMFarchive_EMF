@@ -727,6 +727,8 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 
     private void dropTables(ControlStrategy strategy, EmfDataset inputDataset) throws Exception {
         if (strategy != null) {
+            //drop input dataset table
+            dropTable(inputDataset.getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
             //drop detailed result table
             dropTable(detailResultDatasetTableName(strategy), dbServer.getEmissionsDatasource());
             //drop input inventory qa step tables
