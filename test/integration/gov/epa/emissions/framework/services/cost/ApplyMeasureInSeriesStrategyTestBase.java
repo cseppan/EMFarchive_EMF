@@ -95,7 +95,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
     }
 
     protected void doTearDown() throws Exception {
-        dropTable(tableName, dbServer.getEmissionsDatasource());
+//        dropTable(tableName, dbServer.getEmissionsDatasource());
 
 //        dropAll(Version.class);
 //        dropAll(InternalSource.class);

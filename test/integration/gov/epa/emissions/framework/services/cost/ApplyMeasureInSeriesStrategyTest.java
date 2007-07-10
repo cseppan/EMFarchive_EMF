@@ -21,7 +21,7 @@ import org.hibernate.Session;
 
 public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrategyTestBase {
 
-    private double tolerance = 1e-2;
+    private double percentDiff = 1e-2;
     
     public void testShouldRunMaxEmsRedStrategyWithNonpointDataAndFilterOnAllMeasureClasses() throws Exception {
         ControlStrategy strategy = null;
@@ -69,18 +69,18 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2104008000' and fips = '37029' and cm_abbrev = 'PRESWDCSTV'");
             rs.next();
-            assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 35017100", Math.abs(rs.getDouble("annual_cost") - 35017100)/35017100 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 17640", Math.abs(rs.getDouble("emis_reduction") - 17640)/17640 < tolerance);
+            assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < percentDiff);
+            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 35017100", Math.abs(rs.getDouble("annual_cost") - 35017100)/35017100 < percentDiff);
+            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 17640", Math.abs(rs.getDouble("emis_reduction") - 17640)/17640 < percentDiff);
 
             //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
             //check SCC = 2104008000 FIPS = 37029 inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2801500000' and fips = '37015'");
             rs.next();
-            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < percentDiff);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -136,18 +136,18 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2104008000' and fips = '37029' and cm_abbrev = 'PRESWDCSTV'");
             rs.next();
-            assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 70034200", Math.abs(rs.getDouble("annual_cost") - 70034200)/70034200 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 17640", Math.abs(rs.getDouble("emis_reduction") - 35280)/35280 < tolerance);
+            assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < percentDiff);
+            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 70034200", Math.abs(rs.getDouble("annual_cost") - 70034200)/70034200 < percentDiff);
+            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 17640", Math.abs(rs.getDouble("emis_reduction") - 35280)/35280 < percentDiff);
 
             //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
             //check SCC = 2104008000 FIPS = 37029 inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2801500000' and fips = '37015'");
             rs.next();
-            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < percentDiff);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -204,18 +204,18 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2104008000' and fips = '37029' and cm_abbrev = 'PRESWDCSTV'");
             rs.next();
-            assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 35017100", Math.abs(rs.getDouble("annual_cost") - 35017100)/35017100 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 17640", Math.abs(rs.getDouble("emis_reduction") - 17640)/17640 < tolerance);
+            assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < percentDiff);
+            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 35017100", Math.abs(rs.getDouble("annual_cost") - 35017100)/35017100 < percentDiff);
+            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 17640", Math.abs(rs.getDouble("emis_reduction") - 17640)/17640 < percentDiff);
 
             //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
             //check SCC = 2104008000 FIPS = 37029 inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2801500000' and fips = '37015'");
             rs.next();
-            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < percentDiff);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -261,9 +261,9 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2104008000' and fips = '37029'");
             rs.next();
-            assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 50", Math.abs(rs.getDouble("percent_reduction") - 50)/50 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 36438495.61", Math.abs(rs.getDouble("annual_cost") - 36438495.61)/36438495.61 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 20000", Math.abs(rs.getDouble("emis_reduction") - 20000)/20000 < tolerance);
+            assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 50", Math.abs(rs.getDouble("percent_reduction") - 50)/50 < percentDiff);
+            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 36438495.61", Math.abs(rs.getDouble("annual_cost") - 36438495.61)/36438495.61 < percentDiff);
+            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 20000", Math.abs(rs.getDouble("emis_reduction") - 20000)/20000 < percentDiff);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -310,18 +310,18 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2302002100' and fips = '37005'");
             rs.next();
-            assertTrue("SCC = 2302002100 FIPS = 37005 reduction = 18.5", Math.abs(rs.getDouble("percent_reduction") - 18.5)/18.5 < tolerance);
-            assertTrue("SCC = 2302002100 FIPS = 37005 annual cost = 10282803.04", Math.abs(rs.getDouble("annual_cost") - 10282803.04)/10282803.04 < tolerance);
-            assertTrue("SCC = 2302002100 FIPS = 37005 emis reduction = 1480", Math.abs(rs.getDouble("emis_reduction") - 1480)/1480 < tolerance);
+            assertTrue("SCC = 2302002100 FIPS = 37005 reduction = 18.5", Math.abs(rs.getDouble("percent_reduction") - 18.5)/18.5 < percentDiff);
+            assertTrue("SCC = 2302002100 FIPS = 37005 annual cost = 10282803.04", Math.abs(rs.getDouble("annual_cost") - 10282803.04)/10282803.04 < percentDiff);
+            assertTrue("SCC = 2302002100 FIPS = 37005 emis reduction = 1480", Math.abs(rs.getDouble("emis_reduction") - 1480)/1480 < percentDiff);
 
             //make sure inv entry has the right numbers...
             //check SCC = 2801500000 FIPS = 37029 inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2801500000' and fips = '37015'");
             rs.next();
-            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < percentDiff);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -366,18 +366,18 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2294000270' and fips = '37001'");
             rs.next();
-            assertTrue("SCC = 2294000270 FIPS = 37001 reduction = 71.1" + rs.getDouble("percent_reduction"), Math.abs(rs.getDouble("percent_reduction") - 71.1)/71.1 < tolerance);
-            assertTrue("SCC = 2294000270 FIPS = 37001 annual cost = 7.02655E-07 " + rs.getDouble("annual_cost"), Math.abs(rs.getDouble("annual_cost") - 7.02655E-07)/7.02655E-07 < tolerance);
-            assertTrue("SCC = 2294000270 FIPS = 37001 emis reduction = 2.37705E-09", Math.abs(rs.getDouble("emis_reduction") - 2.37705E-09)/2.37705E-09 < tolerance);
+            assertTrue("SCC = 2294000270 FIPS = 37001 reduction = 71.1" + rs.getDouble("percent_reduction"), Math.abs(rs.getDouble("percent_reduction") - 71.1)/71.1 < percentDiff);
+            assertTrue("SCC = 2294000270 FIPS = 37001 annual cost = 7.02655E-07 " + rs.getDouble("annual_cost"), Math.abs(rs.getDouble("annual_cost") - 7.02655E-07)/7.02655E-07 < percentDiff);
+            assertTrue("SCC = 2294000270 FIPS = 37001 emis reduction = 2.37705E-09", Math.abs(rs.getDouble("emis_reduction") - 2.37705E-09)/2.37705E-09 < percentDiff);
 
             //make sure inv entry has the right numbers...
             //check SCC = 2801500000 FIPS = 37029 inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2801500130' and fips = '37001'");
             rs.next();
-            assertTrue("SCC = 2801500130 FIPS = 37001 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
-            assertTrue("SCC = 2801500130 FIPS = 37001 annual cost = 4.927410E-04", Math.abs(rs.getDouble("annual_cost") - 4.927410E-04)/4.927410E-04 < tolerance);
-            assertTrue("SCC = 2801500130 FIPS = 37001 emis reduction = 1.15727E-07", Math.abs(rs.getDouble("emis_reduction") - 1.15727E-07)/1.15727E-07 < tolerance);
+            assertTrue("SCC = 2801500130 FIPS = 37001 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < percentDiff);
+            assertTrue("SCC = 2801500130 FIPS = 37001 annual cost = 4.927410E-04", Math.abs(rs.getDouble("annual_cost") - 4.927410E-04)/4.927410E-04 < percentDiff);
+            assertTrue("SCC = 2801500130 FIPS = 37001 emis reduction = 1.15727E-07", Math.abs(rs.getDouble("emis_reduction") - 1.15727E-07)/1.15727E-07 < percentDiff);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -422,25 +422,25 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2311010000' and fips = '37013' and poll='PM10'");
             rs.next();
-            assertTrue("SCC = 2311010000 FIPS = 37013 reduction = 63 poll = PM10" + rs.getDouble("percent_reduction"), Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
-            assertTrue("SCC = 2311010000 FIPS = 37013 annual cost = 8.608595E-01 poll = PM10" + rs.getDouble("annual_cost"), Math.abs(rs.getDouble("annual_cost") - 8.608595E-01)/8.608595E-01 < tolerance);
-            assertTrue("SCC = 2311010000 FIPS = 37013 emis reduction = 1.732500E-04 poll = PM10", Math.abs(rs.getDouble("emis_reduction") - 1.732500E-04)/1.732500E-04 < tolerance);
+            assertTrue("SCC = 2311010000 FIPS = 37013 reduction = 63 poll = PM10" + rs.getDouble("percent_reduction"), Math.abs(rs.getDouble("percent_reduction") - 63)/63 < percentDiff);
+            assertTrue("SCC = 2311010000 FIPS = 37013 annual cost = 8.608595E-01 poll = PM10" + rs.getDouble("annual_cost"), Math.abs(rs.getDouble("annual_cost") - 8.608595E-01)/8.608595E-01 < percentDiff);
+            assertTrue("SCC = 2311010000 FIPS = 37013 emis reduction = 1.732500E-04 poll = PM10", Math.abs(rs.getDouble("emis_reduction") - 1.732500E-04)/1.732500E-04 < percentDiff);
 
             //check SCC = 2302002100 FIPS = 37013 POLL = NOX inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2311010000' and fips = '37013' and poll='NOX'");
             rs.next();
-            assertTrue("SCC = 2311010000 FIPS = 37013 reduction = 70 poll = NOX" + rs.getDouble("percent_reduction"), Math.abs(rs.getDouble("percent_reduction") - 70)/70 < tolerance);
-            assertTrue("SCC = 2311010000 FIPS = 37013 annual cost = 2.536202E+03 poll = NOX" + rs.getDouble("annual_cost"), Math.abs(rs.getDouble("annual_cost") - 2.536202E+03)/2.536202E+03 < tolerance);
-            assertTrue("SCC = 2311010000 FIPS = 37013 emis reduction = 1.750000E+00 poll = NOX", Math.abs(rs.getDouble("emis_reduction") - 1.750000E+00)/1.750000E+00 < tolerance);
+            assertTrue("SCC = 2311010000 FIPS = 37013 reduction = 70 poll = NOX" + rs.getDouble("percent_reduction"), Math.abs(rs.getDouble("percent_reduction") - 70)/70 < percentDiff);
+            assertTrue("SCC = 2311010000 FIPS = 37013 annual cost = 2.536202E+03 poll = NOX" + rs.getDouble("annual_cost"), Math.abs(rs.getDouble("annual_cost") - 2.536202E+03)/2.536202E+03 < percentDiff);
+            assertTrue("SCC = 2311010000 FIPS = 37013 emis reduction = 1.750000E+00 poll = NOX", Math.abs(rs.getDouble("emis_reduction") - 1.750000E+00)/1.750000E+00 < percentDiff);
 
             //check SCC = 2801500000 FIPS = 37029 POLL = PM10 inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2296000000' and fips = '37006' and poll='PM10'");
             rs.next();
-            assertTrue("SCC = 2296000000 FIPS = 37006 reduction = 68 poll = PM10", Math.abs(rs.getDouble("percent_reduction") - 68)/68 < tolerance);
-            assertTrue("SCC = 2296000000 FIPS = 37006 annual cost = 4.959112E+02 poll = PM10", Math.abs(rs.getDouble("annual_cost") - 4.959112E+02)/4.959112E+02 < tolerance);
-            assertTrue("SCC = 2296000000 FIPS = 37006 emis reduction = 6.690724E-01 poll = PM10", Math.abs(rs.getDouble("emis_reduction") - 6.690724E-01)/6.690724E-01 < tolerance);
+            assertTrue("SCC = 2296000000 FIPS = 37006 reduction = 68 poll = PM10", Math.abs(rs.getDouble("percent_reduction") - 68)/68 < percentDiff);
+            assertTrue("SCC = 2296000000 FIPS = 37006 annual cost = 4.959112E+02 poll = PM10", Math.abs(rs.getDouble("annual_cost") - 4.959112E+02)/4.959112E+02 < percentDiff);
+            assertTrue("SCC = 2296000000 FIPS = 37006 emis reduction = 6.690724E-01 poll = PM10", Math.abs(rs.getDouble("emis_reduction") - 6.690724E-01)/6.690724E-01 < percentDiff);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -511,18 +511,18 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2104008000' and fips = '37029' and cm_abbrev = 'PRESWDCSTV'");
             rs.next();
-            assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 35017100", Math.abs(rs.getDouble("annual_cost") - 35017100)/35017100 < tolerance);
-            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 17640", Math.abs(rs.getDouble("emis_reduction") - 17640)/17640 < tolerance);
+            assertTrue("SCC = 2104008000 FIPS = 37029 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < percentDiff);
+            assertTrue("SCC = 2104008000 FIPS = 37029 annual cost = 35017100", Math.abs(rs.getDouble("annual_cost") - 35017100)/35017100 < percentDiff);
+            assertTrue("SCC = 2104008000 FIPS = 37029 emis reduction = 17640", Math.abs(rs.getDouble("emis_reduction") - 17640)/17640 < percentDiff);
 
             //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
             //check SCC = 2104008000 FIPS = 37029 inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2801500000' and fips = '37015'");
             rs.next();
-            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < percentDiff);
 
             //create the controlled inventory for this strategy run....
             createControlledInventory(strategy);
@@ -686,6 +686,8 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
 
     private void dropTables(ControlStrategy strategy, EmfDataset inputDataset) throws Exception {
         if (strategy != null) {
+            //drop input dataset table
+            dropTable(inputDataset.getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
             //drop detailed result table
             dropTable(detailResultDatasetTableName(strategy), dbServer.getEmissionsDatasource());
             //drop input inventory qa step tables
