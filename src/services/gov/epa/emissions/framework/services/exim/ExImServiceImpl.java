@@ -46,7 +46,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         threadPool = createThreadPool();
 
         setProperties(sessionFactory);
-        
+
         exportService = new ExportService(dbServer, threadPool, sessionFactory);
 
         ImporterFactory importerFactory = new ImporterFactory(dbServer, dbServer.getSqlDataTypes());
@@ -60,26 +60,30 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
         return threadPool;
     }
-    
+
     private void setProperties(HibernateSessionFactory sessionFactory) {
         Session session = sessionFactory.getSession();
         try {
             EmfProperty batchSize = new EmfPropertiesDAO().getProperty("export-batch-size", session);
             EmfProperty eximTempDir = new EmfPropertiesDAO().getProperty("ImportExportTempDir", session);
-            
-            System.setProperty("IMPORT_EXPORT_TEMP_DIR", eximTempDir.getValue());
-            System.setProperty("EXPORT_BATCH_SIZE", batchSize.getValue());
+
+            if (eximTempDir != null)
+                System.setProperty("IMPORT_EXPORT_TEMP_DIR", eximTempDir.getValue());
+
+            if (batchSize != null)
+                System.setProperty("EXPORT_BATCH_SIZE", batchSize.getValue());
         } finally {
             session.close();
         }
     }
 
-    public void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String dirName, String purpose) throws EmfException {
+    public void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String dirName, String purpose)
+            throws EmfException {
         exportService.export(user, datasets, versions, dirName, purpose, false);
     }
 
-    public void exportDatasetsWithOverwrite(User user, EmfDataset[] datasets, Version[] versions, String dirName, String purpose)
-            throws EmfException {
+    public void exportDatasetsWithOverwrite(User user, EmfDataset[] datasets, Version[] versions, String dirName,
+            String purpose) throws EmfException {
         exportService.export(user, datasets, versions, dirName, purpose, true);
     }
 
