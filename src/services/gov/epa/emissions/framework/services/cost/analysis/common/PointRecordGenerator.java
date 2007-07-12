@@ -29,7 +29,7 @@ public class PointRecordGenerator implements RecordGenerator {
 
     public Record getRecord(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {
         Record record = new Record();
-        record.add(tokens(resultSet, maxCM, originalEmissions, displayOriginalEmissions, displayFinalEmissions));
+        record.add(tokens(resultSet, maxCM, originalEmissions, displayOriginalEmissions, displayFinalEmissions, true));
 
         return record;
     }
@@ -38,7 +38,8 @@ public class PointRecordGenerator implements RecordGenerator {
         return reducedEmission;
     }
 
-    public List tokens(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {
+    public List tokens(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions,
+            boolean hasSICandNAICS) throws SQLException, EmfException {
         List tokens = new ArrayList();
         double effectiveReduction = maxCM.effectiveReduction();
         
@@ -54,7 +55,8 @@ public class PointRecordGenerator implements RecordGenerator {
         tokens.add(maxCM.measure().getAbbreviation());
         tokens.add(resultSet.getString("poll"));
         tokens.add(resultSet.getString("scc"));
-        tokens.add(resultSet.getString("fips"));
+        String fullFips = resultSet.getString("fips").trim();
+        tokens.add(fullFips);  // 5 digit FIPS state+county code
 
         tokens.add(resultSet.getString("PLANTID"));
         tokens.add(resultSet.getString("POINTID"));
@@ -75,6 +77,11 @@ public class PointRecordGenerator implements RecordGenerator {
         tokens.add("" + decFormat.format(reducedEmission));
         tokens.add("" + (displayOriginalEmissions ? originalEmissions : 0));
 
+        tokens.add("" + fullFips.substring(fullFips.length()-5,2));  // FIPS state
+        tokens.add("" + fullFips.substring(fullFips.length()-3));    // FIPS county - accounts for possible country code
+        tokens.add("" + resultSet.getString("sic"));  // SIC
+        tokens.add("" + resultSet.getString("naics")); // NAICS
+        
         tokens.add("" + resultSet.getInt("Record_Id"));
         tokens.add("" + strategyResult.getInputDatasetId());
         tokens.add("" + strategyResult.getControlStrategyId());

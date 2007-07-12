@@ -85,6 +85,12 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         Column finalEmissions = new Column("Final_emissions", types.realType(), new RealFormatter());
         Column emissionsReduction = new Column("Emis_Reduction", types.realType(), new RealFormatter());
         Column inventoryEmissions = new Column("Inv_emissions", types.realType(), new RealFormatter());
+
+        Column fipsState = new Column("FIPSST", types.stringType(2), 2, new StringFormatter(2));
+        Column fipsCounty = new Column("FIPSCTY", types.stringType(3), 3, new StringFormatter(3));
+        Column sic = new Column("SIC", types.stringType(4), 4, new StringFormatter(4));
+        Column naics = new Column("NAICS", types.stringType(6), 6, new StringFormatter(6));
+
         
         Column sourceId = new Column("Source_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
         Column inputDatasetId = new Column("Input_DS_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
@@ -95,8 +101,8 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         return new Column[] { disable, controlMeasureAbbr, pollutant, scc, fips, plantId, pointId, stackId, segment, 
                 annualCost, annualCostPerTon, controlEfficiency, rulePenetration, ruleEffectiveness, percentReduction, 
                 inventoryControlEfficiency, inventoryRulePenetration, inventoryRuleEffectiveness, finalEmissions, 
-                emissionsReduction, inventoryEmissions, sourceId, inputDatasetId, controlStrategyId, controlMeasureId, 
-                comment };
+                emissionsReduction, inventoryEmissions, fipsState, fipsCounty, sic, naics, sourceId, inputDatasetId, 
+                controlStrategyId, controlMeasureId, comment };
     }
 
 }

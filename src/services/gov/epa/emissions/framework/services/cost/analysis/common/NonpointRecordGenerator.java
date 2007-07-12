@@ -38,52 +38,71 @@ public class NonpointRecordGenerator implements RecordGenerator {
 
     public Record getRecord(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {
         Record record = new Record();
-        record.add(tokens(resultSet, maxCM, originalEmissions, displayOriginalEmissions, displayFinalEmissions));
+        record.add(tokens(resultSet, maxCM, originalEmissions, displayOriginalEmissions, displayFinalEmissions,true));
 
         return record;
     }
 
-    public List tokens(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {
+    public List tokens(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions,
+            boolean hasSICandNAICS) throws SQLException, EmfException {
+        // here the resultSet is probably the result of the query to get all the inventory records
         List<String> tokens = new ArrayList<String>();
         double effectiveReduction = maxCM.effectiveReduction();
         
         calculateEmissionReduction(resultSet,maxCM);
         reducedEmission = originalEmissions * effectiveReduction;
         
+        
         tokens.add(""); // record id
-        tokens.add("" + strategyResult.getDetailedResultDataset().getId());
-        tokens.add("" + 0);
-        tokens.add("");
+        tokens.add("" + strategyResult.getDetailedResultDataset().getId());  // dataset ID
+        tokens.add("" + 0);  // version
+        tokens.add("");  // delete_versions
 
-        tokens.add("false");
-        tokens.add(maxCM.measure().getAbbreviation());
+        tokens.add("false");  // disable
+        tokens.add(maxCM.measure().getAbbreviation());  // measure abbreviation
         tokens.add(resultSet.getString("poll"));
         tokens.add(resultSet.getString("scc"));
-        tokens.add(resultSet.getString("fips"));
+        String fullFips = resultSet.getString("fips").trim();
+        tokens.add(fullFips);  // 5 digit FIPS state+county code
 
-        tokens.add("");
-        tokens.add("");
-        tokens.add("");
-        tokens.add("");
+        // these columns are only relevant to point sources, leave empty for nonpoint
+        tokens.add(""); // plant Id
+        tokens.add(""); // Point ID
+        tokens.add(""); // stack ID
+        tokens.add(""); // segment
 
-        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon() * reducedEmission));
-        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon()));
-        tokens.add("" + decFormat.format(maxCM.controlEfficiency()));
-        tokens.add("" + maxCM.rulePenetration());
-        tokens.add("" + maxCM.ruleEffectiveness());
-        tokens.add("" + decFormat.format(effectiveReduction * 100));
+        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon() * reducedEmission));  // annual cost for source
+        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon()));  // annual cost per ton
+        tokens.add("" + decFormat.format(maxCM.controlEfficiency()));   // control efficiency
+        tokens.add("" + maxCM.rulePenetration());  // rule penetration
+        tokens.add("" + maxCM.ruleEffectiveness());  // rule effectiveness
+        tokens.add("" + decFormat.format(effectiveReduction * 100));   // percent reduction
 
-        tokens.add("" + invenControlEfficiency);
-        tokens.add("" + invenRulePenetration);
-        tokens.add("" + invenRuleEffectiveness);
-        tokens.add("" + (displayFinalEmissions ? decFormat.format(originalEmissions - reducedEmission) : 0));
-        tokens.add("" + decFormat.format(reducedEmission));
-        tokens.add("" + (displayOriginalEmissions ? decFormat.format(originalEmissions) : 0));
+        tokens.add("" + invenControlEfficiency);  // inventory CE
+        tokens.add("" + invenRulePenetration);    // inventory RP
+        tokens.add("" + invenRuleEffectiveness);  // inventory RE
+        tokens.add("" + (displayFinalEmissions ? decFormat.format(originalEmissions - reducedEmission) : 0)); // final emissions
+        tokens.add("" + decFormat.format(reducedEmission));  // emissions reduction
+        tokens.add("" + (displayOriginalEmissions ? decFormat.format(originalEmissions) : 0)); // inventory emissions 
+        
+        tokens.add("" + fullFips.substring(fullFips.length()-5,2));  // FIPS state
+        tokens.add("" + fullFips.substring(fullFips.length()-3));    // FIPS county - accounts for possible country code
+        
+        if (hasSICandNAICS)  // this is needed because nonroad and onroad also execute this code and don't have SIC and NAICS
+        {
+            tokens.add("" + resultSet.getString("sic"));  // SIC
+            tokens.add("" + resultSet.getString("naics")); // NAICS
+        }
+        else
+        {
+            tokens.add("");  // SIC
+            tokens.add(""); // NAICS          
+        }
 
-        tokens.add("" + resultSet.getInt("Record_Id"));
-        tokens.add("" + strategyResult.getInputDatasetId());
-        tokens.add("" + strategyResult.getControlStrategyId());
-        tokens.add("" + maxCM.measure().getId());
+        tokens.add("" + resultSet.getInt("Record_Id"));  // sourceID from inventory
+        tokens.add("" + strategyResult.getInputDatasetId());  // inputDatasetID
+        tokens.add("" + strategyResult.getControlStrategyId());  
+        tokens.add("" + maxCM.measure().getId());  // control measureID
         tokens.add("" + comment);
 
         return tokens;

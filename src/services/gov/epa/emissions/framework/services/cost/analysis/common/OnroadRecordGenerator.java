@@ -28,7 +28,7 @@ public class OnroadRecordGenerator implements RecordGenerator {
         delegate.calculateEmissionReduction(resultSet, maxMeasure);
     }
 
-    public List tokens(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {
-        return delegate.tokens(resultSet, maxCM, originalEmissions, displayOriginalEmissions, displayFinalEmissions);
+    public List tokens(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions, boolean hasSICandNAICS) throws SQLException, EmfException {
+        return delegate.tokens(resultSet, maxCM, originalEmissions, displayOriginalEmissions, displayFinalEmissions, false);
     }
 }
