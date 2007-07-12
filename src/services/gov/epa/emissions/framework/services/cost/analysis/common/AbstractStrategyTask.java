@@ -219,7 +219,7 @@ public abstract class AbstractStrategyTask implements Strategy {
     protected void setAndRunQASteps() throws EmfException {
         EmfDataset resultDataset = (EmfDataset) result.getDetailedResultDataset();
         excuteSetAndRunQASteps(resultDataset, 0);
-        excuteSetAndRunQASteps(inputDataset, controlStrategy.getDatasetVersion());
+//        excuteSetAndRunQASteps(inputDataset, controlStrategy.getDatasetVersion());
     }
 
     protected void excuteSetAndRunQASteps(EmfDataset dataset, int version) throws EmfException {
