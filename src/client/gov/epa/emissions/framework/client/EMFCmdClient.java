@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client;
 
+import java.util.Date;
+
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.basic.UserService;
@@ -36,6 +38,10 @@ public class EMFCmdClient {
      *
      */
     private static void run(String[] args) throws Exception {
+        String msg;
+        long sTime;
+        long eTime;
+        
         try
         {
           String url = DEFAULT_URL;
@@ -46,8 +52,12 @@ public class EMFCmdClient {
           ServiceLocator serviceLocator = new RemoteServiceLocator(url);
 
           userAdmin=serviceLocator.userService();
-         
-          System.out.println("EMF VERSION INFO: " + userAdmin.getEmfVersion());
+          sTime = new Date().getTime();
+          msg = userAdmin.getEmfVersion();
+          eTime = new Date().getTime();
+          
+          
+          System.out.println("EMF VERSION INFO: [ " + msg + " ] message was acquired in " + (eTime-sTime) + " milliseconds");
           System.out.println("Exiting EMF Command Client");
           
         }
