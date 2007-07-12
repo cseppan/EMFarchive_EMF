@@ -40,52 +40,52 @@ public class PointRecordGenerator implements RecordGenerator {
 
     public List tokens(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions,
             boolean hasSICandNAICS) throws SQLException, EmfException {
-        List tokens = new ArrayList();
+        List<String> tokens = new ArrayList<String>();
         double effectiveReduction = maxCM.effectiveReduction();
         
         calculateEmissionReduction(resultSet,maxCM);
         reducedEmission = originalEmissions * effectiveReduction;
 
         tokens.add(""); // record id
-        tokens.add("" + strategyResult.getDetailedResultDataset().getId());
-        tokens.add("" + 0);
-        tokens.add("");
+        tokens.add("" + strategyResult.getDetailedResultDataset().getId());  //dataset ID
+        tokens.add("" + 0);  // version
+        tokens.add("");     //delete_versions
 
-        tokens.add("false");
-        tokens.add(maxCM.measure().getAbbreviation());
+        tokens.add("false");    //disable
+        tokens.add(maxCM.measure().getAbbreviation());  //measure abbreviation
         tokens.add(resultSet.getString("poll"));
         tokens.add(resultSet.getString("scc"));
         String fullFips = resultSet.getString("fips").trim();
         tokens.add(fullFips);  // 5 digit FIPS state+county code
 
-        tokens.add(resultSet.getString("PLANTID"));
-        tokens.add(resultSet.getString("POINTID"));
-        tokens.add(resultSet.getString("STACKID"));
-        tokens.add(resultSet.getString("SEGMENT"));
+        tokens.add(resultSet.getString("PLANTID")); //plant ID
+        tokens.add(resultSet.getString("POINTID")); //point ID
+        tokens.add(resultSet.getString("STACKID")); //stack ID
+        tokens.add(resultSet.getString("SEGMENT")); //segment
         
-        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon() * reducedEmission));
-        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon()));
-        tokens.add("" + decFormat.format(maxCM.controlEfficiency()));
+        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon() * reducedEmission));//annual cost for source
+        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon())); //annual cost per ton
+        tokens.add("" + decFormat.format(maxCM.controlEfficiency()));   //control efficiency
         tokens.add("" + 100);
-        tokens.add("" + maxCM.ruleEffectiveness());
+        tokens.add("" + maxCM.ruleEffectiveness()); //rule effectiveness
         tokens.add("" + decFormat.format(maxCM.effectiveReduction() * 100));
 
-        tokens.add("" + invenControlEfficiency);
-        tokens.add("" + invenRulePenetration);
-        tokens.add("" + invenRuleEffectiveness);
-        tokens.add("" + (displayFinalEmissions ? decFormat.format(originalEmissions - reducedEmission) : 0));
-        tokens.add("" + decFormat.format(reducedEmission));
-        tokens.add("" + (displayOriginalEmissions ? originalEmissions : 0));
+        tokens.add("" + invenControlEfficiency);    // inventory CE
+        tokens.add("" + invenRulePenetration);      // inventory RP   
+        tokens.add("" + invenRuleEffectiveness);    // inventory RE
+        tokens.add("" + (displayFinalEmissions ? decFormat.format(originalEmissions - reducedEmission) : 0));  //final emissions
+        tokens.add("" + decFormat.format(reducedEmission));     // emissions reduction
+        tokens.add("" + (displayOriginalEmissions ? originalEmissions : 0));    //inventory emissions
 
         tokens.add("" + fullFips.substring(fullFips.length()-5,2));  // FIPS state
         tokens.add("" + fullFips.substring(fullFips.length()-3));    // FIPS county - accounts for possible country code
         tokens.add("" + resultSet.getString("sic"));  // SIC
         tokens.add("" + resultSet.getString("naics")); // NAICS
         
-        tokens.add("" + resultSet.getInt("Record_Id"));
-        tokens.add("" + strategyResult.getInputDatasetId());
+        tokens.add("" + resultSet.getInt("Record_Id")); // sourceID from inventory
+        tokens.add("" + strategyResult.getInputDatasetId());    //inputDatasetID
         tokens.add("" + strategyResult.getControlStrategyId());
-        tokens.add("" + maxCM.measure().getId());
+        tokens.add("" + maxCM.measure().getId());   // control measureID
         tokens.add("" + comment);
 
         return tokens;
