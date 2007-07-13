@@ -117,7 +117,7 @@ public class SQLQAProgramRunner implements QAProgramRunner {
     private String tableName(QAStep qaStep) {
         QAStepResult result = getResult(qaStep);
 
-        if (result != null)
+        if (result != null && result.getTable() != null)
             return result.getTable();
 
         String table = "QA_DSID" + qaStep.getDatasetId() + "_V" + qaStep.getVersion() + "_"
