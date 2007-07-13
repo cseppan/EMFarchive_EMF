@@ -155,7 +155,6 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
             resetRunStatus(qaStepResult);
             setCursor(Cursor.getDefaultCursor());
-            this.runButton.setEnabled(false);
         } catch (Exception e) {
             messagePanel.setError(e.getMessage());
         }
@@ -529,11 +528,11 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             status.setSelectedItem("In Progress");
             date.setValue(new Date());
             who.setText(presenter.userName());
-
+            saveButton.setEnabled(false);// to prevent user from clicking save after started running a qa step
+            runButton.setEnabled(false); // only allow user to run one time at a open window session
+            
             presenter.run();
 
-            saveButton.setEnabled(false);// to prevent user from entering and click save after started running a qa
-            // step
             resetChanges();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
