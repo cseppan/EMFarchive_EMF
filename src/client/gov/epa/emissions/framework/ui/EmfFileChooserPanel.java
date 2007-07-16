@@ -68,11 +68,11 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
 
     private SortFilterSelectModel selectModel;
 
-    private String lastFilter = "*.*";
+    private String lastFilter = "*";
 
     private List<String> curFilterList;
 
-    private final String[] filters = { "*.*", "*.txt", "*.ncf" };
+    private final String[] filters = { "*", "*.*", "*.txt", "*.ncf" };
 
     public EmfFileChooserPanel(Component parent, EmfFileSystemView fsv, EmfFileInfo initialFile, boolean dirOnly) {
         this.fsv = fsv;
