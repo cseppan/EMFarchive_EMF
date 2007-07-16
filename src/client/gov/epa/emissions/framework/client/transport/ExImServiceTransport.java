@@ -19,17 +19,18 @@ public class ExImServiceTransport implements ExImService {
         mappings = new DataMappings();
     }
 
-    public void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String folder, String purpose) throws EmfException {
+    public void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String folder, String purpose)
+            throws EmfException {
         doExport("exportDatasets", user, datasets, versions, folder, purpose);
     }
 
-    public void exportDatasetsWithOverwrite(User user, EmfDataset[] datasets, Version[] versions, String folder, String purpose)
-            throws EmfException {
+    public void exportDatasetsWithOverwrite(User user, EmfDataset[] datasets, Version[] versions, String folder,
+            String purpose) throws EmfException {
         doExport("exportDatasetsWithOverwrite", user, datasets, versions, folder, purpose);
     }
 
-    private void doExport(String operationName, User user, EmfDataset[] datasets, Version[] versions, String folder, String purpose)
-            throws EmfException {
+    private void doExport(String operationName, User user, EmfDataset[] datasets, Version[] versions, String folder,
+            String purpose) throws EmfException {
         call.setOperation(operationName);
         call.addParam("user", mappings.user());
         call.addParam("datasets", mappings.datasets());
@@ -77,11 +78,46 @@ public class ExImServiceTransport implements ExImService {
 
     public Version getVersion(Dataset dataset, int version) throws EmfException {
         call.setOperation("getVersion");
-        call.addIntegerParam("dataset");
+        // call.addIntegerParam("dataset"); //commented out since parameter and paramType mismatch
+        call.addParam("dataset", mappings.dataset()); // added 07/13/2007
         call.addIntegerParam("version");
         call.setReturnType(mappings.version());
 
         return (Version) call.requestResponse(new Object[] { dataset, new Integer(version) });
+    }
+
+    /**
+     * Added 07/16/2007 for exporting with Datasetids - Conrad
+     */
+    public void exportDatasetids(User user, Integer[] datasetIds, Version[] versions, String folder, String purpose)
+            throws EmfException {
+        doExportWithIds("exportDatasetids", user, datasetIds, versions, folder, purpose);
+
+    }
+
+    /**
+     * Added 07/16/2007 for exporting with Datasetids - Conrad
+     */
+    public void exportDatasetidsWithOverwrite(User user, Integer[] datasetIds, Version[] versions, String folder,
+            String purpose) throws EmfException {
+        doExportWithIds("exportDatasetidsWithOverwrite", user, datasetIds, versions, folder, purpose);
+    }
+
+    /**
+     * Added 07/16/2007 for exporting with Datasetids - Conrad
+     */
+    private void doExportWithIds(String operationName, User user, Integer[] datasetids, Version[] versions, String folder,
+            String purpose) throws EmfException {
+        
+        call.setOperation(operationName);
+        call.addParam("user", mappings.user());
+        call.addParam("datasetids", mappings.integers());
+        call.addParam("versions", mappings.versions());
+        call.addStringParam("folder");
+        call.addBooleanParameter("purpose");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, datasetids, versions, folder, purpose });
     }
 
 }

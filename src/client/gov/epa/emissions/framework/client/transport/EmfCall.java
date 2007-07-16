@@ -89,6 +89,12 @@ public class EmfCall {
         mappings.addIntegerParam(call, id);
     }
 
+    //added 07/16/2007 --Conrad
+    public void addIntegerArrayParam(String id) {
+        mappings.addIntegerArrayParam(call, id);
+    }
+
+    //  Is this really needed?? --07/16/2007 Conrad
     public void addIntArrayParam() {
         mappings.addIntArrayParam(call);
     }
