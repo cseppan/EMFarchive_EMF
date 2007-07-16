@@ -56,6 +56,11 @@ public class Mappings {
         call.addParameter(id, Constants.XSD_INTEGER, ParameterMode.IN);
     }
 
+//    public void addIntegerArrayParam(Call call, String id) {
+//        // NOTE Auto-generated method stub
+//        
+//    }
+
     public void setOperation(Call call, String id) {
         call.setOperationName(qname(id));
     }
@@ -80,15 +85,20 @@ public class Mappings {
         return Constants.XSD_STRING;
     }
     
-    public void addIntParam(Call call) {
-        Class cls = int.class;
-        call.addParameter("int",qname("int"),cls,ParameterMode.IN);
-    }
-
     public QName strings() {
         return qname("strings");
     }
 
+    // Added 07/16/2007 for exporting using datasetids -- Conrad
+    public QName integer(){
+        return Constants.XSD_INTEGER;
+    }
+
+    // Added 07/16/2007 for exporting using datasetids -- Conrad
+    public QName integers(){
+     return qname("integers");    
+    }
+    
     public QName files() {
         return qname("Files");
     }
@@ -108,7 +118,14 @@ public class Mappings {
     public void addLongParam(Call call, String id) {
         call.addParameter(id, Constants.XSD_LONG, ParameterMode.IN);
     }
+
+ 
     
+    public void addIntParam(Call call) {
+        Class cls = int.class;
+        call.addParameter("int",qname("int"),cls,ParameterMode.IN);
+    }
+
     public void addIntArrayParam(Call call){
         Class cls = int[].class;
         call.addParameter("intArray",qname("intArray"),cls,ParameterMode.IN);
