@@ -27,8 +27,8 @@ public class ControlStrategyDAO {
         hibernateFacade = new HibernateFacade();
     }
 
-    public void add(ControlStrategy element, Session session) {
-        addObject(element, session);
+    public int add(ControlStrategy element, Session session) {
+        return addObject(element, session);
     }
 
     public void add(ControlStrategyConstraint element, Session session) {
@@ -39,8 +39,8 @@ public class ControlStrategyDAO {
         addObject(element, session);
     }
 
-    private void addObject(Object obj, Session session) {
-        hibernateFacade.add(obj, session);
+    private int addObject(Object obj, Session session) {
+        return (Integer)hibernateFacade.add(obj, session);
     }
 
     // return ControlStrategies orderby name

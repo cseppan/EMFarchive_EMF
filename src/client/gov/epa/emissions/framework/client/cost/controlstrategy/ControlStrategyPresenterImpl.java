@@ -23,7 +23,7 @@ public class ControlStrategyPresenterImpl implements ControlStrategyPresenter {
     }
 
     public void doDisplay() {
-        view.observe(this);
+        view.observe(this, managerPresenter);
         view.display();
     }
 
@@ -35,15 +35,16 @@ public class ControlStrategyPresenterImpl implements ControlStrategyPresenter {
         view.disposeView();
     }
 
-    public void doSave(ControlStrategy newControlStrategy) throws EmfException {
+    public int doSave(ControlStrategy newControlStrategy) throws EmfException {
         validateName(newControlStrategy);
 
         newControlStrategy.setCreator(session.user());
         newControlStrategy.setLastModifiedDate(new Date());
 
-        service().addControlStrategy(newControlStrategy);
+        int csId = service().addControlStrategy(newControlStrategy);
         closeView();
         managerPresenter.doRefresh();
+        return csId;
     }
 
     private void validateName(ControlStrategy controlStrategy) throws EmfException {

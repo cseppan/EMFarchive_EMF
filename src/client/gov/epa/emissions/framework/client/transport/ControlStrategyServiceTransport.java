@@ -31,14 +31,14 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (ControlStrategy[]) call.requestResponse(new Object[] {});
     }
 
-    public void addControlStrategy(ControlStrategy element) throws EmfException {
+    public int addControlStrategy(ControlStrategy element) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("addControlStrategy");
         call.addParam("element", mappings.controlStrategy());
-        call.setVoidReturnType();
+        call.setIntegerReturnType();
 
-        call.request(new Object[] { element });
+        return (Integer) call.requestResponse(new Object[] { element });
     }
 
     public ControlStrategy obtainLocked(User owner, ControlStrategy element) throws EmfException {

@@ -9,6 +9,6 @@ public interface ControlStrategyPresenter {
 
     void doClose() throws EmfException;
     
-    void doSave(ControlStrategy controlStrategy) throws EmfException;
+    int doSave(ControlStrategy controlStrategy) throws EmfException;
 
 }

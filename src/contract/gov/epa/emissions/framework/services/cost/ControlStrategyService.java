@@ -11,7 +11,7 @@ public interface ControlStrategyService extends EMFService {
     
     StrategyType[] getStrategyTypes() throws EmfException;
     
-    void addControlStrategy(ControlStrategy element) throws EmfException;
+    int addControlStrategy(ControlStrategy element) throws EmfException;
     
 //    void removeControlStrategies(ControlStrategy[] elements, User user) throws EmfException;
 

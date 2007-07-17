@@ -76,10 +76,11 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public void addControlStrategy(ControlStrategy element) throws EmfException {
+    public int addControlStrategy(ControlStrategy element) throws EmfException {
         Session session = sessionFactory.getSession();
+        int csId;
         try {
-            dao.add(element, session);
+            csId = dao.add(element, session);
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add Control Strategy: " + element, e);
@@ -87,6 +88,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         } finally {
             session.close();
         }
+        return csId;
     }
 
     public ControlStrategy obtainLocked(User owner, ControlStrategy element) throws EmfException {
@@ -188,17 +190,25 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 
     public void removeControlStrategies(int[] ids, User user) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+        String exception = "";
         try {
             for (int i = 0; i < ids.length; i++) {
                 ControlStrategy cs = dao.getById(ids[i], session);
                 session.clear();
-                if (!user.equals(cs.getCreator()))
-                    throw new EmfException("Only the creator of " + cs.getName()
-                            + " can remove it from the database.");
-                remove(cs);
+                
+                //check if admin user, then allow it to be removed.
+                if (user.equals(cs.getCreator())||user.isAdmin()){
+                    if (cs.isLocked())
+                        exception += "The control strategy, " + cs.getName() + ", is in edit mode and can not be removed. ";
+                    else
+                        remove(cs);
+                }
+                else{
+                    exception += "Permission denied to the strategy: " + cs.getName() + ". ";
+                }
             }
-
+            
+            if (exception.length() > 0) throw new EmfException(exception);
         } catch (RuntimeException e) {
             LOG.error("Could not remove Control Strategy", e);
             throw new EmfException("Could not remove ControlStrategy");
