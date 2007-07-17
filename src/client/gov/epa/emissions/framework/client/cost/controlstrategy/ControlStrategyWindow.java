@@ -6,8 +6,12 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.*;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyView;
+import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -37,15 +41,24 @@ public class ControlStrategyWindow extends DisposableInteralFrame implements Con
 
     private static int count = 1;
 
-    public ControlStrategyWindow(DesktopManager desktopManager) {
+    private EmfConsole parentConsole;
+
+    private EmfSession session;
+    
+    private ControlStrategiesManagerPresenter managerPresenter;
+    
+    public ControlStrategyWindow(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
         super("Create a Control Strategy", new Dimension(450, 150), desktopManager);
+        this.session = session;
+        this.parentConsole = parentConsole;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
     }
 
-    public void observe(ControlStrategyPresenter presenter) {
+    public void observe(ControlStrategyPresenter presenter, ControlStrategiesManagerPresenter managerPresenter) {
         this.presenter = presenter;
+        this.managerPresenter = managerPresenter;
     }
 
     public void display() {
@@ -131,7 +144,13 @@ public class ControlStrategyWindow extends DisposableInteralFrame implements Con
                 newControlStrategy.setDescription(description.getText());
                 newControlStrategy.setRunStatus("Not started");
                 try {
-                    presenter.doSave(newControlStrategy);
+                    int csId = presenter.doSave(newControlStrategy);
+                    newControlStrategy.setId(csId);
+                  
+                    //open the edit window for the new strategy
+                    EditControlStrategyView editControlStrategyView = new EditControlStrategyWindow(desktopManager, session, parentConsole);
+                    managerPresenter.doEdit(editControlStrategyView, newControlStrategy);
+
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
                 }
