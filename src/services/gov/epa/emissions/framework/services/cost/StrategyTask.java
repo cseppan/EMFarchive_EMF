@@ -83,7 +83,7 @@ public class StrategyTask implements Runnable {
     }
 
     private void addCompletedStatus() {
-        setStatus("Completed running control strategy: " + strategy.getControlStrategy().getName());
+        setStatus("Completed running control strategy: " + strategy.getControlStrategy().getName() + ". There were " + strategy.getRecordCount() + " records returned.");
     }
 
     private void setStatus(String message) {
