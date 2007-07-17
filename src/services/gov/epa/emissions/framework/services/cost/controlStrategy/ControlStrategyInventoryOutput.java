@@ -97,7 +97,7 @@ public class ControlStrategyInventoryOutput {
         updateDataWithDetailDatasetTable(outputInventoryTableName, detailDatasetTable(result), server
                 .getEmissionsDatasource());
 
-        EmfDataset dataset = creator.addDataset(controlStrategy.getDatasetType(), description(inputDataset),
+        EmfDataset dataset = creator.addDataset(inputDataset, controlStrategy.getDatasetType(), description(inputDataset),
                 tableFormat, inputDataset.getName(), datasource);
         updateDatasetIdAndVersion(outputInventoryTableName, server.getEmissionsDatasource(), dataset.getId());
 
