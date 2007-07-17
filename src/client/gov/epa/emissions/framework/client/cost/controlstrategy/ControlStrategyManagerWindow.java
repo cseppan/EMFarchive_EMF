@@ -278,8 +278,13 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
             for (int i = 0; i < records.length; i++) {
                 ids[i] = records[i].getId(); 
             }
-            presenter.doRemove(ids);
-            doRefresh();
+            try {
+                presenter.doRemove(ids);
+            } catch (EmfException ex) {
+                throw ex;
+            } finally {
+                doRefresh();
+            }
         }
     }
     
@@ -314,8 +319,8 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     }
 
     private void createNewStrategy() {
-        ControlStrategyView view = new ControlStrategyWindow(desktopManager);
-        presenter.doNew(view);
+        ControlStrategyView view = new ControlStrategyWindow(parentConsole, session, desktopManager);
+        presenter.doNew(view);   
     }
 
     public EmfConsole getParentConsole() {
