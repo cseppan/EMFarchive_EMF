@@ -37,4 +37,9 @@ public class LeastCostStrategy implements Strategy {
         
     }
 
+    public long getRecordCount() {
+        // NOTE Auto-generated method stub
+        return 0;
+    }
+
 }

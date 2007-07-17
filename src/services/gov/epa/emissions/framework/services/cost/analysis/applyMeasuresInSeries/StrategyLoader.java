@@ -106,6 +106,8 @@ public class StrategyLoader {
 //    private RecordGeneratorFactory recordGeneratorFactory;
 //    
     private RecordGenerator recordGenerator;
+    
+    private long recordCount = 0;
 
     public StrategyLoader(String tableName, TableFormat tableFormat, HibernateSessionFactory sessionFactory, 
             DbServer dbServer, ControlStrategyResult result, ControlStrategy controlStrategy) throws EmfException {
@@ -280,6 +282,7 @@ public class StrategyLoader {
                         + ", It's less than the number of columns expected(" + colsSize + ")");
 
             dataModifier.insert((String[]) record.tokens().toArray(new String[0]));
+            ++recordCount;
         } catch (SQLException e) {
             throw new EmfException("Error processing insert query: " + e.getMessage());
         }
@@ -293,4 +296,9 @@ public class StrategyLoader {
     private String qualifiedName(Datasource datasource, String table) {
         return datasource.getName() + "." + table;
     }
+    
+    public long getRecordCount() {
+        return recordCount;
+    }
 }
+

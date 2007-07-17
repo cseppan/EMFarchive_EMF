@@ -55,6 +55,8 @@ public abstract class AbstractStrategyTask implements Strategy {
     protected OptimizedQuery optimizedQuery;
 
     protected int batchSize;
+    
+    protected long recordCount;
 
     public AbstractStrategyTask(ControlStrategy strategy, User user, DbServerFactory dbServerFactory,
             Integer batchSize, HibernateSessionFactory sessionFactory) throws EmfException {
@@ -188,7 +190,7 @@ public abstract class AbstractStrategyTask implements Strategy {
     }
 
     protected EmfDataset resultDataset() throws EmfException {
-        return creator.addDataset(detailDatasetType(), description(controlStrategy), tableFormat,
+        return creator.addDataset(inputDataset, detailDatasetType(), description(controlStrategy), tableFormat,
                 source(controlStrategy), datasource);
     }
 
@@ -218,7 +220,9 @@ public abstract class AbstractStrategyTask implements Strategy {
 
     protected void setAndRunQASteps() throws EmfException {
         EmfDataset resultDataset = (EmfDataset) result.getDetailedResultDataset();
-        excuteSetAndRunQASteps(resultDataset, 0);
+        if (recordCount > 0) {
+            excuteSetAndRunQASteps(resultDataset, 0);
+        }
 //        excuteSetAndRunQASteps(inputDataset, controlStrategy.getDatasetVersion());
     }
 
@@ -292,5 +296,9 @@ public abstract class AbstractStrategyTask implements Strategy {
         } catch (SQLException e) {
             throw new EmfException("Could not close optimized query - " + e.getMessage());
         }
+    }
+    
+    public long getRecordCount() {
+        return recordCount;
     }
 }

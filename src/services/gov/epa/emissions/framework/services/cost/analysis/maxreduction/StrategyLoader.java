@@ -65,6 +65,8 @@ public class StrategyLoader {
     private DecimalFormat decFormat;
 
     private RecordGenerator recordGenerator;
+    
+    private long recordCount = 0;
 
     public StrategyLoader(String tableName, TableFormat tableFormat, HibernateSessionFactory sessionFactory, DbServer dbServer, ControlStrategyResult result,
             SccControlMeasuresMap map, ControlStrategy controlStrategy) throws EmfException {
@@ -198,9 +200,13 @@ public class StrategyLoader {
                 throw new EmfException("The number of tokens in the record are " + record.size()
                         + ", It's less than the number of columns expected(" + colsSize + ")");
             dataModifier.insert((String[]) record.tokens().toArray(new String[0]));
+            ++recordCount;
         } catch (SQLException e) {
             throw new EmfException("Error processing insert query: " + e.getMessage());
         }
     }
 
+    public long getRecordCount() {
+        return recordCount;
+    }
 }

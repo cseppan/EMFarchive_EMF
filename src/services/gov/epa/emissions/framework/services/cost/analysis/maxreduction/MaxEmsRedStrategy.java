@@ -12,7 +12,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import java.util.Date;
 
 public class MaxEmsRedStrategy extends AbstractStrategyTask {
-
+    
     public MaxEmsRedStrategy(ControlStrategy strategy, User user, DbServerFactory dbServerFactory, Integer batchSize,
             HibernateSessionFactory sessionFactory) throws EmfException {
         super(strategy, user, dbServerFactory, batchSize, sessionFactory);
@@ -27,6 +27,7 @@ public class MaxEmsRedStrategy extends AbstractStrategyTask {
             StrategyLoader loader = new StrategyLoader(creator.outputTableName(), tableFormat, sessionFactory, dbServer, result, map,
                     controlStrategy);
             loader.load(optimizedQuery);
+            recordCount = loader.getRecordCount();
             status = "Completed. Input dataset: " + inputDataset.getName() + ".";
             result.setRunStatus(status);
         } catch (Exception e) {

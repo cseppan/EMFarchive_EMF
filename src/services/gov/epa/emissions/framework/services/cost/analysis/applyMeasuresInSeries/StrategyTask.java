@@ -25,6 +25,7 @@ public class StrategyTask extends AbstractStrategyTask {
             StrategyLoader loader = new StrategyLoader(creator.outputTableName(), tableFormat, sessionFactory, 
                     dbServer, result, controlStrategy);
             loader.load(optimizedQuery);
+            recordCount = loader.getRecordCount(); 
             status = "Completed. Input dataset: " + inputDataset.getName() + ".";
             result.setRunStatus(status);
         } catch (Exception e) {
