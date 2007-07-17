@@ -303,4 +303,7 @@ public class ControlStrategy implements Lockable, Serializable {
         return constraint;
     }
 
+    public String toString() {
+        return name;
+    }
 }
