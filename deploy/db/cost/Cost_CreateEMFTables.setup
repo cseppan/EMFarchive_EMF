@@ -218,6 +218,9 @@ CREATE TABLE emf.control_strategy_measures
   control_measure_id int4 NOT NULL REFERENCES emf.control_measures (id),
   list_index int4 NOT NULL,
   include bool NOT NULL DEFAULT true,
+  rule_effectiveness double precision,
+  rule_penetration double precision,
+  apply_order double precision,
   UNIQUE (control_strategy_id,control_measure_id) 
 ) 
 WITHOUT OIDS;

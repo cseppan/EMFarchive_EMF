@@ -178,3 +178,9 @@ ALTER TABLE emf.control_measure_efficiencyrecords ALTER detail TYPE text;
 insert into emf.strategy_types (name, description, default_sortorder, strategy_classname)
 values ('Apply Measures In Series', 'Apply Measures In Series', '''''', 'gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries.StrategyTask');
 
+-- Added 7/18/12007 NEW RP, RE and ApplyOrder columns control strategy measure table.
+ALTER TABLE emf.control_strategy_measure_efficiencyrecords 
+	ADD COLUMN rule_effectiveness double precision DEFAULT 100,
+	ADD COLUMN rule_penetration double precision DEFAULT 100,
+	ADD COLUMN apply_order double precision DEFAULT 1;
+
