@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.analysis.common.BestMeasureEffRecord;
+import gov.epa.emissions.framework.services.cost.analysis.common.BestMeasureEffRecordComparatorByApplyOrderAndCost;
 import gov.epa.emissions.framework.services.cost.analysis.common.EfficiencyRecordUtil;
 import gov.epa.emissions.framework.services.cost.analysis.common.RetrieveBestEffRecord;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
@@ -12,7 +13,6 @@ import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class RetrieveBestMeasureEffRecords {
@@ -53,7 +53,8 @@ public class RetrieveBestMeasureEffRecords {
         }
 
         //Sort the list correctly, by cheapest to most expensive...
-        sortMeasureEffRecord(measureEffRecordList);
+        Collections.sort(measureEffRecordList, new BestMeasureEffRecordComparatorByApplyOrderAndCost());
+//        sortMeasureEffRecord(measureEffRecordList);
 
         return measureEffRecordList;
     }
@@ -75,7 +76,8 @@ public class RetrieveBestMeasureEffRecords {
         }
 
         //Sort the list correctly, by cheapest to most expensive...
-        sortMeasureEffRecord(measureEffRecordList);
+        Collections.sort(measureEffRecordList, new BestMeasureEffRecordComparatorByApplyOrderAndCost());
+//        sortMeasureEffRecord(measureEffRecordList);
 
         return measureEffRecordList;
     }
@@ -89,11 +91,12 @@ public class RetrieveBestMeasureEffRecords {
         efficiencyRecords = effRecordUtil.localeFilter(efficiencyRecords, fips);
         efficiencyRecords = effRecordUtil.effectiveDateFilter(efficiencyRecords, inventoryYear);
         //apply this additional filter ONLY for TARGET POLLUTANTS...
-        efficiencyRecords = effRecordUtil.filterByConstraints(controlStrategy.getConstraint(), costYearTable, efficiencyRecords, 
-                invenControlEfficiency, invenRulePenetration, invenRuleEffectiveness, 
-                invenAnnualEmissions);
+        efficiencyRecords = effRecordUtil.filterByConstraints(measure, controlStrategy.getConstraint(), 
+                costYearTable, efficiencyRecords, 
+                invenControlEfficiency, invenRulePenetration, 
+                invenRuleEffectiveness, invenAnnualEmissions);
 
-        return retrieveBestEffRecord.findBestEfficiencyRecord(efficiencyRecords);
+        return retrieveBestEffRecord.findBestEfficiencyRecord(measure, efficiencyRecords);
     }
 
     private EfficiencyRecord findCobenefitPollutantBestEffRecord(ControlMeasure measure, String fips, Pollutant pollutant,
@@ -103,20 +106,39 @@ public class RetrieveBestMeasureEffRecords {
         efficiencyRecords = effRecordUtil.localeFilter(efficiencyRecords, fips);
         efficiencyRecords = effRecordUtil.effectiveDateFilter(efficiencyRecords, inventoryYear);
 
-        return retrieveBestEffRecord.findBestEfficiencyRecord(efficiencyRecords);
+        return retrieveBestEffRecord.findBestEfficiencyRecord(measure, efficiencyRecords);
     }
     
-    private void sortMeasureEffRecord(List<BestMeasureEffRecord> measureEffRecordList) {
-        //Sort the list correctly, by cheapest to most expensive...
-        Collections.sort(measureEffRecordList, new Comparator<BestMeasureEffRecord>() {
-            public int compare(BestMeasureEffRecord o1, BestMeasureEffRecord o2) {
-                try {
-                    return (int)((o1.adjustedCostPerTon() != null ? o1.adjustedCostPerTon() : 0) 
-                            - (o2.adjustedCostPerTon() != null ? o2.adjustedCostPerTon() : 0));
-                } catch (EmfException e) {
-                    return 0;
-                }
-            }
-        });
-    }
+//    private void sortMeasureEffRecord(List<BestMeasureEffRecord> measureEffRecordList) {
+//        //Sort the list correctly, by cheapest to most expensive...
+//        Collections.sort(measureEffRecordList, new Comparator<BestMeasureEffRecord>() {
+//            public int compare(BestMeasureEffRecord o1, BestMeasureEffRecord o2) {
+//                try {
+//                    return (
+//                            signum((o1.measure().getApplyOrder() != null ? o1.measure().getApplyOrder() : 0)
+//                                    - (o2.measure().getApplyOrder() != null ? o2.measure().getApplyOrder() : 0))
+//                            +
+//                            signum((o1.adjustedCostPerTon() != null ? o1.adjustedCostPerTon() : 0) 
+//                            - (o2.adjustedCostPerTon() != null ? o2.adjustedCostPerTon() : 0))
+//                            );
+//                } catch (EmfException e) {
+//                    return 0;
+//                }
+//            }
+//            /**
+//             * Collapse number down to +1 0 or -1 depending on sign.
+//             * Typically used in compare routines to collapse a difference
+//             * of two longs to an int.
+//             *
+//             * @param diff usually represents the difference of two long.
+//             *
+//             * @return signum of diff, +1, 0 or -1.
+//             */
+//             public int signum(double diff) {
+//                if ( diff > 0 ) return 1;
+//                if ( diff < 0 ) return -1;
+//                return 0;
+//             }
+//        });
+//    }
 }

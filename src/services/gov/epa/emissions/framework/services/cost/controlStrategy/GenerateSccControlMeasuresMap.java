@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyMeasure;
 import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -100,17 +101,19 @@ public class GenerateSccControlMeasuresMap {
             ControlMeasure measure;
             ControlMeasureDAO dao = new ControlMeasureDAO();
             measure = dao.current(id, session);
-/*
-            //pouplate the Rule Pen and Effect, that was set during the strat...
-            LightControlMeasure[] cms = controlStrategy.getControlMeasures();
-            for (int i = 0; i < cms.length; i++) {
-                LightControlMeasure cm = cms[i];
-                if (measure.getId() == cm.getId()) {
-                    measure.setRuleEffectiveness(cm.getRuleEffectiveness());
-                    measure.setRulePenetration(cm.getRulePenetration());
+
+            //override the Rule Penetration and Effectiveness, that was set during the strat setup...
+            ControlStrategyMeasure[] controlStrategyMeasures = controlStrategy.getControlStrategyMeasures();
+            for (int i = 0; i < controlStrategyMeasures.length; i++) {
+                ControlStrategyMeasure controlStrategyMeasure = controlStrategyMeasures[i];
+                LightControlMeasure controlMeasure = controlStrategyMeasure.getControlMeasure();
+                if (measure.getId() == controlMeasure.getId()) {
+                    measure.setRuleEffectiveness(controlStrategyMeasure.getRuleEffectiveness());
+                    measure.setRulePenetration(controlStrategyMeasure.getRulePenetration());
+                    measure.setApplyOrder(controlStrategyMeasure.getApplyOrder());
                 }
             }
-*/
+
             EfficiencyRecord[] ers = (EfficiencyRecord[]) dao.getEfficiencyRecords(measure.getId(), session).toArray(new EfficiencyRecord[0]);
             //no need to keep these in the hibernate cache
             session.clear();
@@ -149,11 +152,11 @@ public class GenerateSccControlMeasuresMap {
 
     private String controlMeasureIdList() {
         String controlMeasureFilterIds = "";
-        LightControlMeasure[] controlMeasures = controlStrategy.getControlMeasures();
+        ControlStrategyMeasure[] controlMeasures = controlStrategy.getControlStrategyMeasures();
 
         if (controlMeasures != null) 
             for (int i = 0; i < controlMeasures.length; i++)
-                controlMeasureFilterIds += (controlMeasureFilterIds.length() != 0 ? "," + controlMeasures[i].getId() : controlMeasures[i].getId());
+                controlMeasureFilterIds += (controlMeasureFilterIds.length() != 0 ? "," + controlMeasures[i].getControlMeasure().getId() : controlMeasures[i].getControlMeasure().getId());
         return controlMeasureFilterIds;
     }
 

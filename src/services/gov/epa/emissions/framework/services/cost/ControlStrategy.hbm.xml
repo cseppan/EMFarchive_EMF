@@ -24,7 +24,7 @@
   	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
 	<property name="countyFile" column="county_file" type="java.lang.String" not-null="false"/>
 
-	<one-to-one cascade="save-update" 
+	<one-to-one 
 		name="constraint" 
 		class="gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint"/>
 
@@ -43,37 +43,75 @@
             class="gov.epa.emissions.commons.data.Project"
             column="project_id"/> 
 
-	<many-to-one cascade="save-update"
+	<many-to-one
             name="creator" 
             class="gov.epa.emissions.commons.security.User"
             column="creator_id"/> 
             
-	<many-to-one cascade="save-update"
+	<many-to-one cascade="none"
             name="datasetType" 
             class="gov.epa.emissions.commons.data.DatasetType"
             column="dataset_type_id"/> 
 
-	<many-to-one cascade="save-update"
+	<many-to-one
             name="strategyType" 
             class="gov.epa.emissions.framework.services.cost.StrategyType"
             column="strategy_type_id"/> 
             
-   	<array name="inputDatasets" table="input_datasets_control_strategies" >
+   	<array name="inputDatasets" table="input_datasets_control_strategies" cascade="none">
     	<key column="control_strategy_id" not-null="true"/>
 	    <list-index column="list_index"/>
     	<many-to-many class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id"/>
 	</array>
 	
-	<array name="controlMeasureClasses" table="control_strategy_classes">
+<!--	<array name="inputDatasets" table="input_datasets_control_strategies" cascade="none">
+      <key column="control_strategy_id" not-null="true"/>
+      <list-index column="list_index"/>
+      <composite-element class="gov.epa.emissions.framework.services.data.EmfDataset" />
+ 	</array>-->
+
+	<array name="controlMeasureClasses" table="control_strategy_classes" cascade="save-update">
     	<key column="control_strategy_id" not-null="true"/>
     	<list-index column="list_index"/>
     	<many-to-many class="gov.epa.emissions.framework.services.cost.ControlMeasureClass" column="control_measure_class_id"/>
 	</array>
 
-	<array name="controlMeasures" table="control_strategy_measures">
+<!--	<array name="controlMeasures" table="control_strategy_measures">
     	<key column="control_strategy_id" not-null="true"/>
     	<list-index column="list_index"/>
-    	<many-to-many class="gov.epa.emissions.framework.services.cost.LightControlMeasure" column="control_measure_id"/>
+	    <composite-element class="gov.epa.emissions.framework.services.cost.LightControlMeasure">
+		    <property name="ruleEffectiveness" column="rule_effectiveness" type="float" not-null="false"/>
+	        <property name="rulePenetration" column="rule_penetration" type="float" not-null="false"/>
+	    	<many-to-one name="lightControlMeasure" class="gov.epa.emissions.framework.services.cost.LightControlMeasure" column="control_measure_id"/>
+    	</composite-element>
+    	<many-to-many class="gov.epa.emissions.framework.services.cost.LightControlMeasure" column="control_measure_id">
+		    <property name="ruleEffectiveness" column="rule_effectiveness" type="float" not-null="false"/>
+	        <property name="rulePenetration" column="rule_penetration" type="float" not-null="false"/>
+    	</many-to-many>
+	</array>-->
+
+<!--	<array name="controlMeasures" table="control_strategy_measures">
+    	<key column="control_strategy_id" not-null="true"/>
+    	<list-index column="list_index"/>
+    	<many-to-many class="gov.epa.emissions.framework.services.cost.LightControlMeasure" column="control_measure_id">
+    	</many-to-many>
+	</array>-->
+
+<!--	<array name="controlMeasures" table="control_strategy_measures" cascade="none">
+      <key column="control_strategy_id" not-null="true"/>
+      <list-index column="list_index"/>
+      <composite-element class="gov.epa.emissions.framework.services.cost.LightControlMeasure" />
+ 	</array>-->
+
+	<array name="controlStrategyMeasures" table="control_strategy_measures" cascade="save-update">
+    	<key column="control_strategy_id" not-null="true"/>
+    	<list-index column="list_index"/>
+    	<composite-element class="gov.epa.emissions.framework.services.cost.ControlStrategyMeasure">
+		    <property name="ruleEffectiveness" column="rule_effectiveness" type="double" not-null="true"/>
+	        <property name="rulePenetration" column="rule_penetration" type="double" not-null="true"/>
+	        <property name="applyOrder" column="apply_order" type="double" not-null="true"/>
+        	<many-to-one name="controlMeasure" class="gov.epa.emissions.framework.services.cost.LightControlMeasure" column="control_measure_id" not-null="true" cascade="save-update"/>
+    	</composite-element>
 	</array>
 
   </class> 

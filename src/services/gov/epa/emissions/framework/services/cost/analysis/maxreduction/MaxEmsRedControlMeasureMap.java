@@ -32,17 +32,24 @@ public class MaxEmsRedControlMeasureMap {
     public BestMeasureEffRecord findBestMeasure() throws EmfException {
         if (map.size() == 0)
             return null;// FIXME: do we have to warn or error
+        
+        Iterator iterator = map.entrySet().iterator();
 
-        Iterator iterator = map.keySet().iterator();
-        EfficiencyRecord maxRecord = (EfficiencyRecord) iterator.next();
+        Map.Entry entry =  (Map.Entry)iterator.next();
+        EfficiencyRecord bestRecord = (EfficiencyRecord) entry.getKey();
+        ControlMeasure bestMeasure = (ControlMeasure) entry.getValue();
 
         while (iterator.hasNext()) {
-            EfficiencyRecord record = (EfficiencyRecord) iterator.next();
-            maxRecord = retrieveBestEffRecord.findBestEfficiencyRecord(record, maxRecord);
+            entry =  (Map.Entry)iterator.next();
+            EfficiencyRecord record = (EfficiencyRecord) entry.getKey();
+            ControlMeasure measure = (ControlMeasure) entry.getValue();
+            bestRecord = retrieveBestEffRecord.findBestEfficiencyRecord(measure, record, 
+                    bestMeasure, bestRecord);
+            bestMeasure = (ControlMeasure)map.get(bestRecord);
         }
 
-        ControlMeasure controlMeasure = (ControlMeasure) map.get(maxRecord);
-        BestMeasureEffRecord maxMeasure = new BestMeasureEffRecord(controlMeasure, maxRecord, costYearTable);
+        ControlMeasure controlMeasure = (ControlMeasure) map.get(bestRecord);
+        BestMeasureEffRecord maxMeasure = new BestMeasureEffRecord(controlMeasure, bestRecord, costYearTable);
         return maxMeasure;
 
     }

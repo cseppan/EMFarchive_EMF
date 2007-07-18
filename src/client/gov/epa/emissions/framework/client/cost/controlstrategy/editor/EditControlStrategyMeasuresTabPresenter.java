@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.cost.controlstrategy.ControlStrategiesManagerPresenter;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.ControlStrategyMeasure;
 import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
@@ -39,8 +40,8 @@ public class EditControlStrategyMeasuresTabPresenter  implements EditControlStra
         return strategy.getControlMeasureClasses();
     }
 
-    public LightControlMeasure[] getControlMeasures() {
-        return strategy.getControlMeasures();
+    public ControlStrategyMeasure[] getControlMeasures() {
+        return strategy.getControlStrategyMeasures();
     }
 
     public LightControlMeasure[] getAllControlMeasures() {

@@ -37,7 +37,7 @@ public class BestMeasureEffRecord {
     }
 
     public double effectiveReduction() {
-        return efficiencyRecordUtil.effectiveReduction(effRecord);
+        return efficiencyRecordUtil.effectiveReduction(controlMeasure, effRecord);
     }
 
     public double costPerTon() {

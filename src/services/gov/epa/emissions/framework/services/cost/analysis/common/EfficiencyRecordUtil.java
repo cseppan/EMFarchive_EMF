@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost.analysis.common;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.client.cost.controlstrategy.LocaleFilter;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
@@ -22,8 +23,13 @@ public class EfficiencyRecordUtil {
         this.localeFilter = new LocaleFilter();
     }
 
-    public double effectiveReduction(EfficiencyRecord record) {
-        return (record.getEfficiency() * record.getRuleEffectiveness() * record.getRulePenetration())
+    public double effectiveReduction(ControlMeasure controlMeasure, EfficiencyRecord record) {
+        //use the measure override values, if supplied...
+        return (
+                    record.getEfficiency() 
+                    * (controlMeasure.getRuleEffectiveness() == null ? record.getRuleEffectiveness() : controlMeasure.getRuleEffectiveness()) 
+                    * (controlMeasure.getRulePenetration() == null ? record.getRulePenetration() : controlMeasure.getRulePenetration())
+                )
                 / (100 * 100 * 100);
     }
 
@@ -34,10 +40,12 @@ public class EfficiencyRecordUtil {
         return record.getCostPerTon() != null ? factor * record.getCostPerTon() : 0;
     }
 
-    public double calculateEmissionReduction(EfficiencyRecord record, double invenControlEfficiency, double invenRulePenetration, double invenRuleEffectiveness, double invenAnnualEmissions) {
+    public double calculateEmissionReduction(ControlMeasure controlMeasure, EfficiencyRecord record, 
+            double invenControlEfficiency, double invenRulePenetration, 
+            double invenRuleEffectiveness, double invenAnnualEmissions) {
 //        double invenEffectiveReduction = invenControlEfficiency * invenRulePenetration * invenRuleEffectiveness
 //                / (100 * 100 * 100);
-        double effectiveReduction = effectiveReduction(record);
+        double effectiveReduction = effectiveReduction(controlMeasure, record);
 
         //FIXME -- TEMPORARY - Ignore if inv item has an exisiting measure, just replace for now...
         return invenAnnualEmissions * effectiveReduction;
@@ -81,10 +89,10 @@ public class EfficiencyRecordUtil {
         return localeFilter.closestRecords(records);
     }
 
-    public EfficiencyRecord[] filterByConstraints(ControlStrategyConstraint constraint, CostYearTable costYearTable, EfficiencyRecord[] efficiencyRecords, 
+    public EfficiencyRecord[] filterByConstraints(ControlMeasure controlMeasure, ControlStrategyConstraint constraint, CostYearTable costYearTable, EfficiencyRecord[] efficiencyRecords, 
             double invenControlEfficiency, double invenRulePenetration, double invenRuleEffectiveness, 
             double invenAnnualEmissions) throws EmfException {
-        return new ConstraintFilter(constraint, costYearTable).filter(efficiencyRecords, invenControlEfficiency, 
+        return new ConstraintFilter(constraint, costYearTable).filter(controlMeasure, efficiencyRecords, invenControlEfficiency, 
                 invenRulePenetration, invenRuleEffectiveness, 
                 invenAnnualEmissions);
     }

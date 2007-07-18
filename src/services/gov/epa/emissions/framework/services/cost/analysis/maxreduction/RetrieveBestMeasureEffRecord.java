@@ -112,12 +112,12 @@ public class RetrieveBestMeasureEffRecord {
         efficiencyRecords = effRecordUtil.localeFilter(efficiencyRecords, fips);
         efficiencyRecords = effRecordUtil.effectiveDateFilter(efficiencyRecords, inventoryYear);
         //apply this additional filter ONLY for TARGET POLLUTANTS...
-        efficiencyRecords = effRecordUtil.filterByConstraints(controlStrategy.getConstraint(), costYearTable,
-                efficiencyRecords, invenControlEfficiency, 
-                invenRulePenetration, invenRuleEffectiveness, 
-                invenAnnualEmissions);
+        efficiencyRecords = effRecordUtil.filterByConstraints(measure, controlStrategy.getConstraint(), 
+                costYearTable, efficiencyRecords, 
+                invenControlEfficiency, invenRulePenetration, 
+                invenRuleEffectiveness, invenAnnualEmissions);
 
-        return retrieveBestEffRecord.findBestEfficiencyRecord(efficiencyRecords);
+        return retrieveBestEffRecord.findBestEfficiencyRecord(measure, efficiencyRecords);
     }
 
     private EfficiencyRecord findBestEfficiencyRecord(ControlMeasure measure, String fips, 
@@ -128,6 +128,6 @@ public class RetrieveBestMeasureEffRecord {
         efficiencyRecords = effRecordUtil.localeFilter(efficiencyRecords, fips);
         efficiencyRecords = effRecordUtil.effectiveDateFilter(efficiencyRecords, inventoryYear);
 
-        return retrieveBestEffRecord.findBestEfficiencyRecord(efficiencyRecords);
+        return retrieveBestEffRecord.findBestEfficiencyRecord(measure, efficiencyRecords);
     }
 }

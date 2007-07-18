@@ -37,7 +37,7 @@ public class RetrieveBestMeasures {
             efficiencyRecords = effRecordUtil.minMaxEmisFilter(efficiencyRecords, invenAnnualEmissions);
             efficiencyRecords = effRecordUtil.localeFilter(efficiencyRecords, fips);
             efficiencyRecords = effRecordUtil.effectiveDateFilter(efficiencyRecords, controlStrategy.getInventoryYear());
-            efficiencyRecords = effRecordUtil.filterByConstraints(controlStrategy.getConstraint(), costYearTable, efficiencyRecords, 
+            efficiencyRecords = effRecordUtil.filterByConstraints(controlMeasures[i], controlStrategy.getConstraint(), costYearTable, efficiencyRecords, 
                 invenControlEfficiency, invenRulePenetration, invenRuleEffectiveness, 
                 invenAnnualEmissions);
             if (efficiencyRecords.length > 0) {

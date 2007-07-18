@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
@@ -32,17 +33,17 @@ public class ConstraintFilter {
         this.efficiencyRecordUtil = new EfficiencyRecordUtil();
     }
 
-    public EfficiencyRecord[] filter(EfficiencyRecord[] efficiencyRecords, double invenControlEfficiency, 
-            double invenRulePenetration, double invenRuleEffectiveness, 
-            double invenAnnualEmissions) throws EmfException {
+    public EfficiencyRecord[] filter(ControlMeasure controlMeasure, EfficiencyRecord[] efficiencyRecords, 
+            double invenControlEfficiency, double invenRulePenetration, 
+            double invenRuleEffectiveness, double invenAnnualEmissions) throws EmfException {
         return filterByMaxControlEfficiency(
                 filterByMinCostPerTon(
                         filterByMaxEmisReduction(
-                                filterByMinAnnCost(efficiencyRecords, invenControlEfficiency, 
-                                        invenRulePenetration, invenRuleEffectiveness, 
-                                        invenAnnualEmissions), invenControlEfficiency, 
-                                invenRulePenetration, invenRuleEffectiveness, 
-                                invenAnnualEmissions)));
+                                controlMeasure, filterByMinAnnCost(controlMeasure, efficiencyRecords, 
+                                        invenControlEfficiency, invenRulePenetration, 
+                                        invenRuleEffectiveness, invenAnnualEmissions), 
+                                invenControlEfficiency, invenRulePenetration, 
+                                invenRuleEffectiveness, invenAnnualEmissions)));
     }
 
     public EfficiencyRecord[] filterByMaxControlEfficiency(EfficiencyRecord[] efficiencyRecords) {
@@ -69,29 +70,33 @@ public class ConstraintFilter {
         return (EfficiencyRecord[]) records.toArray(new EfficiencyRecord[0]);
     }
 
-    public EfficiencyRecord[] filterByMaxEmisReduction(EfficiencyRecord[] efficiencyRecords, double invenControlEfficiency, 
-            double invenRulePenetration, double invenRuleEffectiveness, 
-            double invenAnnualEmissions) {
+    public EfficiencyRecord[] filterByMaxEmisReduction(ControlMeasure controlMeasure, EfficiencyRecord[] efficiencyRecords, 
+            double invenControlEfficiency, double invenRulePenetration, 
+            double invenRuleEffectiveness, double invenAnnualEmissions) {
         //return all eff records, if there is no constraint to filter on...
         if (maxEmisReduction == null) return efficiencyRecords;
         
         List records = new ArrayList();
         for (int i = 0; i < efficiencyRecords.length; i++) {
-            if (efficiencyRecordUtil.calculateEmissionReduction(efficiencyRecords[i], invenControlEfficiency, invenRulePenetration, invenRuleEffectiveness, invenAnnualEmissions) > maxEmisReduction)
+            if (efficiencyRecordUtil.calculateEmissionReduction(controlMeasure, efficiencyRecords[i], 
+                    invenControlEfficiency, invenRulePenetration, 
+                    invenRuleEffectiveness, invenAnnualEmissions) > maxEmisReduction)
                 records.add(efficiencyRecords[i]);
         }
         return (EfficiencyRecord[]) records.toArray(new EfficiencyRecord[0]);
     }
 
-    public EfficiencyRecord[] filterByMinAnnCost(EfficiencyRecord[] efficiencyRecords, double invenControlEfficiency, 
-            double invenRulePenetration, double invenRuleEffectiveness, 
-            double invenAnnualEmissions) throws EmfException {
+    public EfficiencyRecord[] filterByMinAnnCost(ControlMeasure controlMeasure, EfficiencyRecord[] efficiencyRecords, 
+            double invenControlEfficiency, double invenRulePenetration, 
+            double invenRuleEffectiveness, double invenAnnualEmissions) throws EmfException {
         //return all eff records, if there is no constraint to filter on...
         if (minAnnCost == null) return efficiencyRecords;
         
         List records = new ArrayList();
         for (int i = 0; i < efficiencyRecords.length; i++) {
-            if (efficiencyRecordUtil.calculateEmissionReduction(efficiencyRecords[i], invenControlEfficiency, invenRulePenetration, invenRuleEffectiveness, invenAnnualEmissions) *
+            if (efficiencyRecordUtil.calculateEmissionReduction(controlMeasure, efficiencyRecords[i], 
+                    invenControlEfficiency, invenRulePenetration, 
+                    invenRuleEffectiveness, invenAnnualEmissions) *
                     efficiencyRecordUtil.adjustedCostPerTon(efficiencyRecords[i], costYearTable) < minAnnCost)
                 records.add(efficiencyRecords[i]);
         }
