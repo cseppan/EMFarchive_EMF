@@ -27,6 +27,7 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyMeasure;
 import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
@@ -108,6 +109,7 @@ public class DataMappings extends Mappings {
 
     private void controlBeans(Call call) {
         bean(call, ControlMeasure.class, controlMeasure());
+        bean(call, ControlStrategyMeasure.class, controlStrategyMeasure());
         bean(call, LightControlMeasure.class, lightControlMeasure());
         bean(call, ControlTechnology.class, controlTechnology());
         bean(call, ControlStrategy.class, controlStrategy());
@@ -162,7 +164,9 @@ public class DataMappings extends Mappings {
         array(call, QAProgram[].class, programs());
 
         array(call, ControlMeasure[].class, controlMeasures());
+        array(call, ControlStrategyMeasure[].class, controlStrategyMeasures());
         array(call, LightControlMeasure[].class, lightControlMeasures());
+        
         array(call, ControlTechnology[].class, controlTechnologies());
         array(call, ControlStrategy[].class, controlStrategies());
         array(call, StrategyType[].class, strategyTypes());
@@ -351,6 +355,10 @@ public class DataMappings extends Mappings {
         return qname("ControlMeasure");
     }
 
+    public QName controlStrategyMeasure() {
+        return qname("ControlStrategyMeasure");
+    }
+
     public QName lightControlMeasure() {
         return qname("LightControlMeasure");
     }
@@ -359,6 +367,10 @@ public class DataMappings extends Mappings {
         return qname("ControlMeasures");
     }
 
+    public QName controlStrategyMeasures() {
+        return qname("ControlStrategyMeasures");
+    }
+    
     public QName lightControlMeasures() {
         return qname("LightControlMeasures");
     }
