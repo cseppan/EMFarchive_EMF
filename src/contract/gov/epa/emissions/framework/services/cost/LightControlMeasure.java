@@ -17,10 +17,6 @@ public class LightControlMeasure implements Serializable {
 
     private boolean includeExclude;
 
-    private Double ruleEffectiveness;
-
-    private Double rulePenetration;
-
     public LightControlMeasure() {
         //
     }
@@ -90,21 +86,5 @@ public class LightControlMeasure implements Serializable {
 
     public void setAbbreviation(String abbreviation) {
         this.abbreviation = abbreviation;
-    }
-
-    public void setRuleEffectiveness(Double ruleEffectiveness) {
-        this.ruleEffectiveness = ruleEffectiveness;
-    }
-
-    public Double getRuleEffectiveness() {
-        return ruleEffectiveness;
-    }
-
-    public void setRulePenetration(Double rulePenetration) {
-        this.rulePenetration = rulePenetration;
-    }
-
-    public Double getRulePenetration() {
-        return rulePenetration;
     }
 }
