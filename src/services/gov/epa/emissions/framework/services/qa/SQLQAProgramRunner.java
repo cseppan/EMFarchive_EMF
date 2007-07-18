@@ -89,9 +89,12 @@ public class SQLQAProgramRunner implements QAProgramRunner {
         }
     }
 
+    // Modified SQLQueryParser constructor to reflect the changes to the actual class -- added arguments
+    // for version and sessionFactory
+    
     private String query(DbServer dbServer, QAStep qaStep, String tableName) throws EmfException {
         SQLQueryParser parser = new SQLQueryParser(qaStep, tableName, dbServer.getEmissionsDatasource().getName(),
-                dataset(qaStep), version(qaStep));
+                dataset(qaStep), version(qaStep), sessionFactory);
         return parser.parse();
     }
 
