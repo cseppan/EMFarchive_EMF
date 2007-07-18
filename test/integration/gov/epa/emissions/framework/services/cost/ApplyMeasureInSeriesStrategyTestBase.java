@@ -43,6 +43,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
     protected void doSetUp() throws Exception {
         dbServer = dbServerFactory.getDbServer();
         sqlDataTypes = dbServer.getSqlDataTypes();
+        setProperties();
         //import control measures to use...
         importControlMeasures();
 //        service = new ControlStrategyServiceImpl(sessionFactory);
@@ -122,7 +123,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         return strategy;
     }
 
-    protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant, LightControlMeasure[] measures) {
+    protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant, ControlStrategyMeasure[] measures) {
         ControlStrategy strategy = new ControlStrategy();
         strategy.setName(name);
         strategy.setInputDatasets(new EmfDataset[] { inputDataset });
@@ -132,7 +133,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant);
         strategy.setStrategyType(strategyType(strategyTypeName));
-        strategy.setControlMeasures(measures);
+        strategy.setControlStrategyMeasures(measures);
         add(strategy);
         return strategy;
     }

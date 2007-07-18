@@ -137,7 +137,9 @@ public class ControlStrategyDAO {
         criterions.add(c1);
 
         EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
+//        System.err.println(inputDatasets.length);
         if (inputDatasets.length != 0) {
+//            System.err.println(inputDatasets[0] == null);
             Criterion c2 = Restrictions.eq("inputDatasetId", new Integer(inputDatasets[0].getId()));
             criterions.add(c2);
         }

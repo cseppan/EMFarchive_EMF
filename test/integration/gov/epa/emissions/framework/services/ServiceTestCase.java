@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.editor.Revision;
+import gov.epa.emissions.framework.services.exim.ExImServiceImpl;
 import gov.epa.emissions.framework.services.persistence.EmfDatabaseSetup;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LocalHibernateConfiguration;
@@ -54,6 +55,13 @@ public abstract class ServiceTestCase extends TestCase {
 
     abstract protected void doSetUp() throws Exception;
 
+    protected void setProperties() throws Exception {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        //this will set the properties...
+        new ExImServiceImpl(emf(), dbServer, sessionFactory);
+        dbServer.disconnect();
+    }
+    
     protected Properties config() throws Exception {
         File conf = configFile();
 

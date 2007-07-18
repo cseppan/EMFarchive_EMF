@@ -44,7 +44,8 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private DatasetType datasetType;
 
-    private List datasetsList;
+    private List inputDatasets;
+//    private List datasetsList;
 
     private Pollutant targetPollutant;
 
@@ -60,6 +61,8 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private List controlMeasures;
 
+    private List controlStrategyMeasures;
+
     private String countyFile;
 
     private Mutex lock;
@@ -68,9 +71,10 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public ControlStrategy() {
         this.lock = new Mutex();
-        this.datasetsList = new ArrayList();
+        this.inputDatasets = new ArrayList();
         this.controlMeasureClasses = new ArrayList();
         this.controlMeasures = new ArrayList();
+        this.controlStrategyMeasures = new ArrayList();
     }
 
     public ControlStrategy(String name) {
@@ -116,11 +120,11 @@ public class ControlStrategy implements Lockable, Serializable {
     }
 
     public EmfDataset[] getInputDatasets() {
-        return (EmfDataset[]) datasetsList.toArray(new EmfDataset[0]);
+        return (EmfDataset[]) inputDatasets.toArray(new EmfDataset[0]);
     }
 
-    public void setInputDatasets(EmfDataset[] datasets) {
-        this.datasetsList = Arrays.asList(datasets);
+    public void setInputDatasets(EmfDataset[] inputDatasets) {
+        this.inputDatasets = Arrays.asList(inputDatasets);
     }
 
     public DatasetType getDatasetType() {
@@ -285,6 +289,14 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public LightControlMeasure[] getControlMeasures() {
         return (LightControlMeasure[])controlMeasures.toArray(new LightControlMeasure[0]);
+    }
+
+    public void setControlStrategyMeasures(ControlStrategyMeasure[] controlStrategyMeasures) {
+        this.controlStrategyMeasures =  (controlStrategyMeasures != null) ? Arrays.asList(controlStrategyMeasures) : new ArrayList();
+    }
+
+    public ControlStrategyMeasure[] getControlStrategyMeasures() {
+        return (ControlStrategyMeasure[])controlStrategyMeasures.toArray(new ControlStrategyMeasure[0]);
     }
 
     public void setCountyFile(String countyFile) {

@@ -282,9 +282,18 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
         ResultSet rs = null;
         Connection cn = null;
         try {
-            LightControlMeasure[] cms = {(LightControlMeasure)load(LightControlMeasure.class, "Bale Stack/Propane Burning; Agricultural Burning"), 
-                    (LightControlMeasure)load(LightControlMeasure.class, "ESP for Commercial Cooking; Conveyorized Charbroilers")};
-            strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant(), cms);
+            ControlStrategyMeasure[] controlStrategyMeasures = new ControlStrategyMeasure[2];
+            ControlStrategyMeasure controlStrategyMeasure = new ControlStrategyMeasure((LightControlMeasure)load(LightControlMeasure.class, "Bale Stack/Propane Burning; Agricultural Burning"));
+            controlStrategyMeasure.setRulePenetration(75.0);
+            controlStrategyMeasure.setRuleEffectiveness(100.0);
+            controlStrategyMeasure.setApplyOrder(1.0);
+            controlStrategyMeasures[0] = controlStrategyMeasure;
+            controlStrategyMeasure = new ControlStrategyMeasure((LightControlMeasure)load(LightControlMeasure.class, "ESP for Commercial Cooking; Conveyorized Charbroilers"));
+            controlStrategyMeasure.setRulePenetration(75.0);
+            controlStrategyMeasure.setRuleEffectiveness(100.0);
+            controlStrategyMeasure.setApplyOrder(1.0);
+            controlStrategyMeasures[1] = controlStrategyMeasure;
+            strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant(), controlStrategyMeasures);
 
             strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
@@ -310,18 +319,18 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2302002100' and fips = '37005'");
             rs.next();
-            assertTrue("SCC = 2302002100 FIPS = 37005 reduction = 18.5", Math.abs(rs.getDouble("percent_reduction") - 18.5)/18.5 < percentDiff);
-            assertTrue("SCC = 2302002100 FIPS = 37005 annual cost = 10282803.04", Math.abs(rs.getDouble("annual_cost") - 10282803.04)/10282803.04 < percentDiff);
-            assertTrue("SCC = 2302002100 FIPS = 37005 emis reduction = 1480", Math.abs(rs.getDouble("emis_reduction") - 1480)/1480 < percentDiff);
+            assertTrue("SCC = 2302002100 FIPS = 37005 reduction = 13.88", Math.abs(rs.getDouble("percent_reduction") - 13.88)/13.88 < percentDiff);
+            assertTrue("SCC = 2302002100 FIPS = 37005 annual cost = 7712102.28", Math.abs(rs.getDouble("annual_cost") - 7712102.28)/7712102.28 < percentDiff);
+            assertTrue("SCC = 2302002100 FIPS = 37005 emis reduction = 1110", Math.abs(rs.getDouble("emis_reduction") - 1110)/1110 < percentDiff);
 
             //make sure inv entry has the right numbers...
             //check SCC = 2801500000 FIPS = 37029 inv entry
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2801500000' and fips = '37015'");
             rs.next();
-            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < percentDiff);
-            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 37553698.05", Math.abs(rs.getDouble("annual_cost") - 37553698.05)/37553698.05 < percentDiff);
-            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37015 reduction = 47.25", Math.abs(rs.getDouble("percent_reduction") - 47.25)/47.25 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37015 annual cost = 28165273.58", Math.abs(rs.getDouble("annual_cost") - 28165273.5375)/28165273.5375 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 6615", Math.abs(rs.getDouble("emis_reduction") - 6615)/6615 < percentDiff);
 
         } catch (Exception e) {
             e.printStackTrace();
