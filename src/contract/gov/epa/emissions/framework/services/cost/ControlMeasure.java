@@ -65,6 +65,8 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private Double rulePenetration;
 
+    private Double applyOrder;
+
     public ControlMeasure() {
         this.lock = new Mutex();
         this.sccs = new ArrayList();
@@ -304,6 +306,7 @@ public class ControlMeasure implements Lockable, Serializable {
         sectors.add(sector);
     }
 
+    //these properties will overide the efficiency record settings...
     public void setRuleEffectiveness(Double ruleEffectiveness) {
         this.ruleEffectiveness = ruleEffectiveness;
     }
@@ -318,5 +321,13 @@ public class ControlMeasure implements Lockable, Serializable {
 
     public Double getRulePenetration() {
         return rulePenetration;
+    }
+
+    public void setApplyOrder(Double applyOrder) {
+        this.applyOrder = applyOrder;
+    }
+
+    public Double getApplyOrder() {
+        return applyOrder;
     }
 }
