@@ -36,6 +36,19 @@ public class NumberFieldVerifier {
 
     }
 
+    public double parseDouble(String numberValue) throws EmfException {
+        try {
+            String text = numberValue.trim();
+            if (text.length() == 0)
+                return 0;
+
+            return Double.parseDouble(text);
+        } catch (NumberFormatException ex) {
+            throw new EmfException(message + " should be a double.");
+        }
+
+    }
+
     public float parseFloat(JTextField numberField) throws EmfException {
         try {
             String text = numberField.getText().trim();
@@ -44,6 +57,17 @@ public class NumberFieldVerifier {
             return Float.parseFloat(text);
         } catch (NumberFormatException ex) {
             throw new EmfException(message + numberField.getName() + " should be a floating point number.");
+        }
+    }
+
+    public float parseFloat(String numberValue) throws EmfException {
+        try {
+            String text = numberValue.trim();
+            if (text.length() == 0)
+                return 0;
+            return Float.parseFloat(text);
+        } catch (NumberFormatException ex) {
+            throw new EmfException(message + " should be a floating point number.");
         }
     }
 }
