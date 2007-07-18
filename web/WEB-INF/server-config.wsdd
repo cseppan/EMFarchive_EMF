@@ -300,6 +300,10 @@
 		qname="ns1:ControlStrategy" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlStrategyMeasure"
+		qname="ns1:ControlStrategyMeasure" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.StrategyType"
 		qname="ns1:StrategyType" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
@@ -703,6 +707,12 @@
 		xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasure[]"
 		innerType="ns1:ControlMeasure"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+	
+	<arrayMapping qname="ns1:ControlStrategyMeasures"
+		xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlStrategyMeasure[]"
+		innerType="ns1:ControlStrategyMeasure"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
 	<arrayMapping qname="ns1:EfficiencyRecords" xmlns:ns1="urn:gov.epa.services.EmfService"
