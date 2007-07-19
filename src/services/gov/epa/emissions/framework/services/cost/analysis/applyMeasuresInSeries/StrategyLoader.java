@@ -232,9 +232,9 @@ public class StrategyLoader {
                             !pointDatasetType ? resultSet.getDouble("RPEN") : 100, !pointDatasetType ? resultSet.getDouble("REFF") : resultSet.getFloat("CEFF") > 0 && resultSet.getFloat("REFF") == 0 ? 100 : resultSet.getFloat("REFF"), resultSet.getDouble("ANN_EMIS"))
                     : retrieveBestMeasureEffRecords.findCobenefitPollutantBestMeasureEffRecords(sourceMeasures, fips, poll, resultSet.getDouble("ANN_EMIS"));
 
-for (BestMeasureEffRecord l : bestMeasureEffRecordList)
-    System.err.println(targetPollutant + " " + scc + " " + fips + " " + (l.adjustedCostPerTon() == null ? -1 : l.adjustedCostPerTon()) + ": " + l.measure().getAbbreviation() + ": " + l.efficiencyRecord().getPollutant() + ": " + l.efficiencyRecord().getLocale() + ": " + l.efficiencyRecord().getCostPerTon() + ": " + l.measure().getApplyOrder());
-                
+//for (BestMeasureEffRecord l : bestMeasureEffRecordList)
+//    System.err.println(targetPollutant + " " + scc + " " + fips + " " + (l.adjustedCostPerTon() == null ? -1 : l.adjustedCostPerTon()) + ": " + l.measure().getAbbreviation() + ": " + l.efficiencyRecord().getPollutant() + ": " + l.efficiencyRecord().getLocale() + ": " + l.efficiencyRecord().getCostPerTon() + ": " + l.measure().getApplyOrder());
+
                 if (bestMeasureEffRecordList == null || bestMeasureEffRecordList.size() == 0)
                     continue;
 
