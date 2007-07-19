@@ -17,7 +17,11 @@ public class NonroadRecordGenerator implements RecordGenerator {
     }
 
     public Record getRecord(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {
-        return delegate.getRecord(resultSet, maxCM, originalEmissions, displayOriginalEmissions, displayFinalEmissions);
+        Record record = new Record();
+        record.add(tokens(resultSet, maxCM, originalEmissions, displayOriginalEmissions, displayFinalEmissions, false));
+
+        return record;
+//        return delegate.getRecord(resultSet, maxCM, originalEmissions, displayOriginalEmissions, displayFinalEmissions);
     }
 
     public double reducedEmission() {
@@ -29,6 +33,6 @@ public class NonroadRecordGenerator implements RecordGenerator {
     }
 
     public List tokens(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions, boolean hasSICandNAICS) throws SQLException, EmfException {
-        return delegate.tokens(resultSet, maxCM, originalEmissions, displayOriginalEmissions, displayFinalEmissions, false);
+        return delegate.tokens(resultSet, maxCM, originalEmissions, displayOriginalEmissions, displayFinalEmissions, hasSICandNAICS);
     }
 }
