@@ -5,9 +5,9 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.analysis.common.BestMeasureEffRecord;
-import gov.epa.emissions.framework.services.cost.analysis.common.BestMeasureEffRecordComparatorByApplyOrderAndCost;
 import gov.epa.emissions.framework.services.cost.analysis.common.EfficiencyRecordUtil;
 import gov.epa.emissions.framework.services.cost.analysis.common.RetrieveBestEffRecord;
+import gov.epa.emissions.framework.services.cost.analysis.common.SortBestMeasureEffRecordByApplyOrderAndLeastCost;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
@@ -34,8 +34,7 @@ public class RetrieveBestMeasureEffRecords {
 
     //get the best measures map for TARGET POLLUTANT
     //Also, sort the returned list in order for processing the inventory
-    //Sort by Least Cost first - we want to treat with the cheapest measure to
-    //the most expensive....
+    //  Sort by ApplyOrder and then Least Cost
     public List<BestMeasureEffRecord> findTargetPollutantBestMeasureEffRecords(ControlMeasure[] controlMeasures, String fips, 
             double invenControlEfficiency, double invenRulePenetration, 
             double invenRuleEffectiveness, double invenAnnualEmissions) throws EmfException {
@@ -52,8 +51,9 @@ public class RetrieveBestMeasureEffRecords {
             }
         }
 
-        //Sort the list correctly, by cheapest to most expensive...
-        Collections.sort(measureEffRecordList, new BestMeasureEffRecordComparatorByApplyOrderAndCost());
+        //Sort the list correctly, by apply order, then by least cost (cheapest to most expensive)...
+        Collections.sort(measureEffRecordList, new SortBestMeasureEffRecordByApplyOrderAndLeastCost());
+//        Collections.sort(measureEffRecordList, new SortBestMeasureEffRecordByLeastCost());
 //        sortMeasureEffRecord(measureEffRecordList);
 
         return measureEffRecordList;
@@ -61,7 +61,7 @@ public class RetrieveBestMeasureEffRecords {
 
     //get the best measures map for COBENEFIT POLLUTANTs
     //also, sort the returned list in order for processing the inventory
-    //  Sort by Least Cost first
+    //  Sort by ApplyOrder and then Least Cost
     public List<BestMeasureEffRecord> findCobenefitPollutantBestMeasureEffRecords(ControlMeasure[] controlMeasures, String fips, Pollutant pollutant, 
             double invenAnnualEmissions) throws EmfException {
 //        BestMeasureEffRecordMap measureEffRecordMap = new BestMeasureEffRecordMap(costYearTable);
@@ -75,9 +75,9 @@ public class RetrieveBestMeasureEffRecords {
             }
         }
 
-        //Sort the list correctly, by cheapest to most expensive...
-        Collections.sort(measureEffRecordList, new BestMeasureEffRecordComparatorByApplyOrderAndCost());
-//        sortMeasureEffRecord(measureEffRecordList);
+        //Sort the list correctly, by apply order, then by least cost (cheapest to most expensive)...
+        Collections.sort(measureEffRecordList, new SortBestMeasureEffRecordByApplyOrderAndLeastCost());
+//        Collections.sort(measureEffRecordList, new SortBestMeasureEffRecordByLeastCost());
 
         return measureEffRecordList;
     }

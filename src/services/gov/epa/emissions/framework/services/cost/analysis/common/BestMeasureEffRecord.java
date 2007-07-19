@@ -49,10 +49,10 @@ public class BestMeasureEffRecord {
     }
 
     public double rulePenetration() {
-        return effRecord.getRulePenetration();
+        return controlMeasure.getRulePenetration() != null ? controlMeasure.getRulePenetration() : effRecord.getRulePenetration();
     }
 
     public double ruleEffectiveness() {
-        return effRecord.getRuleEffectiveness();
+        return controlMeasure.getRuleEffectiveness() != null ? controlMeasure.getRuleEffectiveness() : effRecord.getRuleEffectiveness();
     }
 }
