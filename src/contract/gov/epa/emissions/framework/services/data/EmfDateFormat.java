@@ -63,4 +63,9 @@ public class EmfDateFormat {
         return date == null ? null : dateFormatter.parse(date);
     }
 
+    public static String parse_YYYYMMDDHHMMss(Date date) {
+        dateFormatter.applyPattern("yyyyMMddHHmmss");
+        return date == null ? "" : dateFormatter.format(date);
+    }
+
 }
