@@ -20,8 +20,7 @@ public class EMFClient {
     }
 
     private static void displayHelp() {
-        System.out
-                .println("Usage\njava "
+        System.out.println("Usage\njava "
                         + EMFClient.class.getName()
                         + " [url]"
                         + "\n\turl - location of EMF Services. Defaults to "
@@ -33,8 +32,12 @@ public class EMFClient {
       try
       {
         String url = DEFAULT_URL;
-        if (args.length == 1)
+        System.setProperty("emf.remote.host", "localhost");
+        
+        if (args.length == 1) {
             url = args[0];
+            setHost(url);
+        }
 
         System.out.println("Starting EMF Client");
         ServiceLocator serviceLocator = new RemoteServiceLocator(url);
@@ -53,6 +56,17 @@ public class EMFClient {
           exc.printStackTrace();
           throw exc;
       }
+    }
+    
+    private static void setHost(String url) {
+        int start = url.indexOf("://");
+        String temp = url.substring(start+3);
+        int end = temp.indexOf(":");
+        
+        if (end < 0)
+            end = temp.indexOf("/");
+        
+        System.setProperty("emf.remote.host", temp.substring(0, end));
     }
 
 }
