@@ -135,6 +135,21 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
+    public ControlMeasure getMeasure(int controlMeasureId) throws EmfException {
+        Session session = null;
+        try {
+            session = sessionFactory.getSession();
+            ControlMeasure measure = dao.current(controlMeasureId, session);
+            return measure;
+        } catch (RuntimeException e) {
+            LOG.error("Could not get Control Measure for Control Measure Id: " + controlMeasureId, e);
+            throw new EmfException("Could not get Control Measure for Control Measure Id: " + controlMeasureId);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
 //    public ControlMeasure releaseLockedControlMeasure(ControlMeasure locked) throws EmfException {
 //        Session session = sessionFactory.getSession();
 //        try {

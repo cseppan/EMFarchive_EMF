@@ -13,13 +13,13 @@ import java.util.List;
 
 public class EditorControlMeasurePresenterImpl implements ControlMeasurePresenter {
 
-    private ControlMeasure measure;
+    protected ControlMeasure measure;
 
-    private ControlMeasureView view;
+    protected ControlMeasureView view;
 
     private List presenters;
 
-    private EmfSession session;
+    protected EmfSession session;
 
     // private RefreshObserver parent;
 
@@ -52,7 +52,11 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
 
     public void doClose() throws EmfException {
         session.controlMeasureService().releaseLockedControlMeasure(measure.getId());
-        view.disposeView();
+        try {
+            view.disposeView();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void doSave() throws EmfException {

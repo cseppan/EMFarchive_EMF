@@ -486,4 +486,9 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         lastModifiedTime.setText(EmfDateFormat.format_YYYY_MM_DD_HH_MM(new Date()));
         lastModifiedBy.setText(session.user().getName());
     }
+
+    public void viewOnly() {
+        sectorsWidget.viewOnly();
+        
+    }
 }

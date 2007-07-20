@@ -272,4 +272,14 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
 //            System.out.println(new Date().toString() + " end transport.getSummaryControlMeasures");
         }
     }
+
+    public ControlMeasure getMeasure(int controlMeasureId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getMeasure");
+        call.addIntegerParam("controlMeasureId");
+        call.setReturnType(mappings.controlMeasure());
+
+        return (ControlMeasure) call.requestResponse(new Object[] { new Integer(controlMeasureId) });
+    }
 }

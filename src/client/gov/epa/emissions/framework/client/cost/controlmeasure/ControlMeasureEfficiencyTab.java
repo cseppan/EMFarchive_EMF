@@ -73,6 +73,14 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     private CostYearTable costYearTable;
     int _recordLimit = 100;
     String _rowFilter = "";
+
+    private Button addButton;
+    private Button editButton;
+    private Button copyButton;
+    private Button removeButton;
+    private Button viewButton;
+    
+    private boolean viewOnly = false;
     
     public ControlMeasureEfficiencyTab(ControlMeasure measure, ManageChangeables changeablesList, EmfConsole parent,
             EmfSession session, DesktopManager desktopManager, MessagePanel messagePanel, ControlMeasureView editControlMeasureWindowView,
@@ -87,6 +95,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         this.controlMeasurePresenter = controlMeasurePresenter;
         this.costYearTable = costYearTable;
         doLayout(measure);
+        
         cmService = session.controlMeasureService();
         this.populateThread = new Thread(this);
         populateThread.start();
@@ -156,17 +165,20 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
 //    }
 
     private JPanel controlPanel() {
-        Button addButton = new AddButton(addAction());
-        Button editButton = new EditButton(editAction());
-        Button copyButton = new CopyButton(copyAction());
-        Button removeButton = new RemoveButton(removeAction());
+        addButton = new AddButton(addAction());
+        editButton = new EditButton(editAction());
+        copyButton = new CopyButton(copyAction());
+        removeButton = new RemoveButton(removeAction());
+        viewButton = new Button("View", viewAction());
         copyButton.setEnabled(false);
+        viewButton.setVisible(false);
 
         JPanel panel = new JPanel();
         panel.add(addButton);
         panel.add(editButton);
         panel.add(copyButton);
         panel.add(removeButton);
+        panel.add(viewButton);
 
         JPanel container = new JPanel(new BorderLayout());
         container.add(panel, BorderLayout.LINE_START);
@@ -188,6 +200,26 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
 
                 for (int i = 0; i < records.length; i++) {
                     doEdit(records[i]);
+                }
+
+            }
+        };
+    }
+    
+    private Action viewAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                List list = selectModel.selected();
+                
+                if (list.size() == 0) {
+                    messagePanel.setError("Please select an item to view.");
+                    return;
+                }
+                
+                EfficiencyRecord[] records = (EfficiencyRecord[]) list.toArray(new EfficiencyRecord[0]);
+
+                for (int i = 0; i < records.length; i++) {
+                    doView(records[i]);
                 }
 
             }
@@ -277,9 +309,17 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
 
     private void doEdit(EfficiencyRecord record) {
         messagePanel.clear();
-        EditEfficiencyRecordView view = new EditEfficiencyRecordWindow(changeablesList, desktopManager, session, costYearTable);
-        EditEfficiencyRecordPresenter presenter = new EditEfficiencyRecordPresenter(this, view, session, measure);
+        EditEfficiencyRecordView editView = new EditEfficiencyRecordWindow ("Edit Efficiency Record", changeablesList, desktopManager, session, costYearTable);
+        EditEfficiencyRecordPresenter presenter = new EditEfficiencyRecordPresenter(this, editView, session, measure);
         presenter.display(measure, record);
+    }
+    
+    private void doView(EfficiencyRecord record) {
+        messagePanel.clear();
+        EditEfficiencyRecordView unEditView = new ViewEfficiencyRecordWindow(changeablesList, desktopManager, session, costYearTable);
+        EditEfficiencyRecordPresenter presenter = new EditEfficiencyRecordPresenter(this, unEditView, session, measure);
+        presenter.display(measure, record);
+        if (viewOnly) unEditView.viewOnly();
     }
 
     private EfficiencyRecord[] getSelectedRecords() {
@@ -525,5 +565,14 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         layoutGenerator.makeCompactGrid(panel, rows, cols, // rows, cols
                 initX, initY, // initialX, initialY
                 xPad, yPad);// xPad, yPad
+    }
+
+    public void viewOnly() {
+        addButton.setVisible(false);
+        editButton.setVisible(false);
+        copyButton.setVisible(false);
+        removeButton.setVisible(false);
+        viewButton.setVisible(true);
+        viewOnly = true;
     }
 }

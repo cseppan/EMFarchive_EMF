@@ -13,7 +13,6 @@ import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.ImportButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
-import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -265,15 +264,17 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         return controlPanel;
     }
 
+    // Create View, Edit, copy, new buttons to panel
     private JPanel createLeftControlPanel() {
         JPanel panel = new JPanel();
-
-        Button view = new ViewButton(null);
-        panel.add(view);
-        view.setEnabled(false);
-
+        
         String message = "You have asked to open a lot of windows. Do you wish to proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+
+        SelectAwareButton view = new SelectAwareButton("View", viewAction(), selectModel, confirmDialog);
+//        Button view = new ViewButton(viewAction());
+        panel.add(view);
+
         SelectAwareButton edit = new SelectAwareButton("Edit", editAction(), selectModel, confirmDialog);
         panel.add(edit);
 
@@ -381,6 +382,25 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
         return panel;
     }
+
+    private Action viewAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                ControlMeasure[] measures = (ControlMeasure[]) getSelectedMeasures().toArray(new ControlMeasure[0]);
+                if (measures.length == 0)
+                    showError("Please select a control measure.");
+                try {
+                    for (int i = 0; i < measures.length; i++)
+                        presenter.doView(parentConsole, measures[i], desktopManager);
+
+                } catch (EmfException e) {
+                    showError(e.getMessage());
+                }
+            }
+        };
+        return action;
+    }
+    
 
     private Action editAction() {
         Action action = new AbstractAction() {

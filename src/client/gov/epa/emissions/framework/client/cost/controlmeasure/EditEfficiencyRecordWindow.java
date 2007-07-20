@@ -13,17 +13,19 @@ public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implement
 
     private EditEfficiencyRecordPresenter presenter;
 
-    public EditEfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager,
+    public EditEfficiencyRecordWindow(String title, ManageChangeables changeablesList, DesktopManager desktopManager,
             EmfSession session, CostYearTable costYearTable) {
-        super("Edit Efficiency Record", changeablesList, desktopManager, session, costYearTable);
+        super(title, changeablesList, desktopManager, session, costYearTable);
     }
+    
+   
 
     public void display(ControlMeasure measure, EfficiencyRecord record) {
         super.display(measure, record);
         populateFields();
     }
 
-    private void populateFields() {
+    public void populateFields() {
         pollutant.setSelectedItem(record.getPollutant());
         equationType.setSelectedItem(record.getEquationType());
         efficiency.setText(record.getEfficiency() + "");
@@ -66,6 +68,13 @@ public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implement
     public void observe(EditEfficiencyRecordPresenter presenter) {
         this.presenter = presenter;
 
+    }
+
+
+
+    public void viewOnly() {
+        // NOTE Auto-generated method stub
+        
     }
 
 }

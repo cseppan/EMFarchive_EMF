@@ -50,6 +50,9 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
     private ControlMeasure measure;
     private ControlMeasurePresenter controlMeasurePresenter;
 
+    private Button addButton;
+    private Button removeButton;
+
     public EditableCMSCCTab(ControlMeasure measure, EmfSession session, ManageChangeables changeables,
             MessagePanel messagePanel, EmfConsole parent,
             ControlMeasurePresenter controlMeasurePresenter) {
@@ -149,12 +152,12 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
         sortFilterSelectionPanel.setPreferredSize(new Dimension(450, 120));
         return sortFilterSelectionPanel;
     }
-
+    
     private JPanel buttonPanel() {
         JPanel panel = new JPanel();
-        Button addButton = new AddButton(addAction());
+        addButton = new AddButton(addAction());
         panel.add(addButton);
-        Button removeButton = new RemoveButton(removeAction());
+        removeButton = new RemoveButton(removeAction());
         panel.add(removeButton);
 
         JPanel container = new JPanel(new BorderLayout());
@@ -268,4 +271,9 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
         controlMeasurePresenter.doModify();
     }
 
+    public void viewOnly() {
+        // NOTE Auto-generated method stub
+        addButton.setVisible(false);
+        removeButton.setVisible(false);
+    }
 }

@@ -53,7 +53,18 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
     private ControlMeasureService service() {
         return session.controlMeasureService();
     }
-
+    
+//View control measures
+    
+   public void doView(EmfConsole parent, ControlMeasure measure, DesktopManager desktopManager) throws EmfException {
+        
+        ControlMeasureView editor = new ViewControlMeasureWindow(parent, session, desktopManager, costYearTable);
+        ControlMeasurePresenter presenter = new ViewControlMeasurePresenterImpl(
+                measure, editor, session, this);
+        presenter.doDisplay();
+    }
+    
+    
     public void doEdit(EmfConsole parent, ControlMeasure measure, DesktopManager desktopManager) throws EmfException {
         
         ControlMeasureView editor = new EditControlMeasureWindow(parent, session, desktopManager, costYearTable);

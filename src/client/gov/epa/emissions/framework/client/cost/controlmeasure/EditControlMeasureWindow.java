@@ -37,10 +37,16 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
 
     private EmfConsole parent;
     
-    private EditableCMSummaryTab editableCMSummaryTabView;
+    protected EditableCMSummaryTab editableCMSummaryTabView;
 
     private CostYearTable costYearTable;
 
+    protected Button saveButton;
+    
+    protected ControlMeasureSccTabView controlMeasureSccTabView;
+    
+    protected ControlMeasureEfficiencyTab controlMeasureEfficiencyTabView;
+    
     public EditControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager, CostYearTable costYearTable) {
         super("Control Measure Editor", new Dimension(770, 475), desktopManager);
         this.desktopManager = desktopManager;
@@ -51,6 +57,12 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
 
     public void display(ControlMeasure measure) {
         setWindowTitle(measure);
+        buildDisplay(measure);
+        super.display();
+        super.resetChanges();
+    }
+
+    protected void buildDisplay(ControlMeasure measure) {
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 
@@ -61,10 +73,8 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         contentPane.add(panel);
-        super.display();
-        super.resetChanges();
     }
-
+    
     private JTabbedPane createTabbedPane(ControlMeasure measure, final MessagePanel messagePanel) {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
@@ -82,17 +92,17 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     }
 
     private JPanel createSCCTab(ControlMeasure measure, MessagePanel messagePanel) {
-        ControlMeasureSccTabView view = new EditableCMSCCTab(measure, session, this, messagePanel, parent, presenter);
-        presenter.set(view);
-        return (JPanel) view;
+        controlMeasureSccTabView = new EditableCMSCCTab(measure, session, this, messagePanel, parent, presenter);
+        presenter.set(controlMeasureSccTabView);
+        return (JPanel) controlMeasureSccTabView;
     }
 
     private Component createEfficiencyTab(ControlMeasure measure, MessagePanel messagePanel) {
-        ControlMeasureEfficiencyTab view = new ControlMeasureEfficiencyTab(measure, this, parent, session,
+        controlMeasureEfficiencyTabView = new ControlMeasureEfficiencyTab(measure, this, parent, session,
                 desktopManager, messagePanel, this, presenter, costYearTable);
-        presenter.set(view);
+        presenter.set(controlMeasureEfficiencyTabView);
 
-        return view;
+        return controlMeasureEfficiencyTabView;
     }
 
     private JPanel createSummaryTab(ControlMeasure measure, MessagePanel messagePanel) {
@@ -122,13 +132,13 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     private JPanel createControlPanel() {
         JPanel buttonsPanel = new JPanel();
 
-        Button save = new SaveButton(new AbstractAction() {
+        saveButton = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doSave();
             }
         });
 
-        buttonsPanel.add(save);
+        buttonsPanel.add(saveButton);
 
         Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -179,5 +189,6 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
         InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
     }
+
 
 }

@@ -9,5 +9,7 @@ public interface EditEfficiencyRecordView extends ManagedView {
     void observe(EditEfficiencyRecordPresenter presenter);
     
     void display(ControlMeasure measure, EfficiencyRecord record);
+    
+    void viewOnly();
 
 }

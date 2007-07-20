@@ -11,4 +11,7 @@ public interface ControlMeasureTabView {
     void refresh(ControlMeasure measure);
     
     void modify();
+    
+    void viewOnly();
+
 }

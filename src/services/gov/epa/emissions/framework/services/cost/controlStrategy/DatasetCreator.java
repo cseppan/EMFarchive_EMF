@@ -86,12 +86,12 @@ public class DatasetCreator {
         addKeyVal(dataset, "COST_YEAR", strategy.getCostYear() + "");
         addKeyVal(dataset, "STRATEGY_TYPE", strategy.getStrategyType().getName());
         addKeyVal(dataset, "TARGET_POLLUTANT", strategy.getTargetPollutant().getName());
-        addKeyVal(dataset, "REGION", strategy.getRegion().getName());
+        addKeyVal(dataset, "REGION", strategy.getRegion() != null ? strategy.getRegion().getName() : "");
         addKeyVal(dataset, "STRATEGY_NAME", strategy.getName());
         addKeyVal(dataset, "STRATEGY_ID", strategy.getId()+"");
         addKeyVal(dataset, "STRATEGY_INVENTORY_NAME", inputDataset.getName());
         addKeyVal(dataset, "STRAGEGY_INVENTORY_VERSION", inputDataset.getDefaultVersion()+"");
-        int measureCount = (strategy.getControlMeasures() != null ? strategy.getControlMeasures().length : 0);
+        int measureCount = (strategy.getControlStrategyMeasures() != null ? strategy.getControlStrategyMeasures().length : 0);
         addKeyVal(dataset, "MEASURES_INCLUDED", measureCount + "");
         ControlMeasureClass[] controlMeasureClasses = strategy.getControlMeasureClasses();
         String classList = "All";

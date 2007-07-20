@@ -25,6 +25,9 @@ public class AddRemoveSectorWidget extends JPanel {
     private Sector[] allSectors;
 
     private EmfConsole parentConsole;
+    
+    private Button addButton;
+    private Button removeButton;
 
     public AddRemoveSectorWidget(Sector[] allSectors, ManageChangeables changeables, EmfConsole parentConsole) {
         this.allSectors = allSectors;
@@ -57,8 +60,8 @@ public class AddRemoveSectorWidget extends JPanel {
 
     private JPanel addRemoveButtonPanel() {
         JPanel panel = new JPanel();
-        Button addButton = new AddButton("Add", addAction());
-        Button removeButton = new RemoveButton("Remove", removeAction());
+        addButton = new AddButton("Add", addAction());
+        removeButton = new RemoveButton("Remove", removeAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));      
         removeButton.setMargin(new Insets(1, 2, 1, 2));
         panel.add(addButton);
@@ -94,4 +97,8 @@ public class AddRemoveSectorWidget extends JPanel {
 
     }
 
+    public void viewOnly() {
+        addButton.setVisible(false);
+        removeButton.setVisible(false);  
+    }
 }

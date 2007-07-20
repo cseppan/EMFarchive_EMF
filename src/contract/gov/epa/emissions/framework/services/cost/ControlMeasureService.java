@@ -31,6 +31,8 @@ public interface ControlMeasureService extends EMFService {
 
     ControlMeasure obtainLockedMeasure(User user, int controlMeasureId) throws EmfException;
 
+    ControlMeasure getMeasure(int controlMeasureId) throws EmfException;
+
 //    Scc[] getSccsWithDescriptions(ControlMeasure measure) throws EmfException;
     
     Scc[] getSccsWithDescriptions(int controlMeasureId) throws EmfException;
