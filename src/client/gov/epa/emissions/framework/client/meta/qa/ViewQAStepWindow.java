@@ -95,7 +95,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     private EmfSession session;
 
     public ViewQAStepWindow(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
-        super("View QA Step", new Dimension(650, 580), desktopManager);
+        super("View QA Step", new Dimension(680, 580), desktopManager);
         this.parentConsole = parentConsole;
         this.session = session;
     }
@@ -453,7 +453,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         if (exportDir == null || exportDir.trim().isEmpty())
             throw new EmfException("Please specify an export directory.");
 
-        presenter.viewResults(step, qaStepResult, exportFolder.getText());
+        presenter.viewResults(step, exportDir.trim());
     }
     
     private Button closeButton() {

@@ -26,6 +26,12 @@ public class DefaultUserPreferences implements UserPreference {
     private static final String DEFAULT_USER_NAME = "user.name";
     
     private static final String DEFAULT_USER_PASSWORD = "user.password";
+    
+    private static final String REMOTE_COPY_PROGRAM = "remote.copy.program";
+    
+    private static final String LOCAL_TEMP_DIR = "local.temp.dir";
+
+    private static final String REMOTE_HOST = "remote.host";
 
     private static Log log = LogFactory.getLog(DefaultUserPreferences.class);
 
@@ -37,6 +43,18 @@ public class DefaultUserPreferences implements UserPreference {
         props = new Properties();
         try {
             FileInputStream inStream = new FileInputStream(getFile());
+            props.load(inStream);
+        } catch (Exception e) {
+            log.error("Cannot load user preferences file " + getFile().getAbsolutePath(), e);
+            throw new EmfException("Cannot load user preferences file "+getFile().getAbsolutePath());
+        }
+    }
+
+    //For testign purpose
+    public DefaultUserPreferences(String prefFile) throws EmfException {
+        props = new Properties();
+        try {
+            FileInputStream inStream = new FileInputStream(new File(prefFile));
             props.load(inStream);
         } catch (Exception e) {
             log.error("Cannot load user preferences file " + getFile().getAbsolutePath(), e);
@@ -104,5 +122,17 @@ public class DefaultUserPreferences implements UserPreference {
 
     public String userPassword() {
         return property(DEFAULT_USER_PASSWORD);
+    }
+    
+    public String remoteCopyProgram() {
+        return property(REMOTE_COPY_PROGRAM);
+    }
+    
+    public String localTempDir() {
+        return property(LOCAL_TEMP_DIR);
+    }
+
+    public String remoteHost() {
+        return property(REMOTE_HOST);
     }
 }

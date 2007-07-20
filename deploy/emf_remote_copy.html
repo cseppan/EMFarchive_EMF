@@ -1,0 +1,249 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 2.2  (Linux)">
+	<META NAME="AUTHOR" CONTENT="Qun He">
+	<META NAME="CREATED" CONTENT="20070720;13024500">
+	<META NAME="CHANGEDBY" CONTENT="Qun He">
+	<META NAME="CHANGED" CONTENT="20070720;13074100">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		P { margin-bottom: 0.21cm }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="zh-CN" DIR="LTR">
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=4><SPAN LANG="en-US"><B>Remote
+Copy Setup for Viewing QA Step Results</B></SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">This
+document describes two common remote file copying setups based on
+Linux EMF server. </SPAN></FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">EMF
+client can be run from either a Linux workstation or a Windows
+workstation.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US"><A HREF="#Windows XP">Windows
+XP</A></SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US"><A HREF="#Linux">Linux</A></SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US"><B>Windows
+XP</B></SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">There
+are multiple versions of ssh client tools packages available for
+Windows platforms. The</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">following
+steps decribe the setup of a common ssh client tool package (PuTTY).</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">First,
+please go to the PuTTY download page
+(http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html) </SPAN></FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">to
+download pscp.exe, pageant.exe, and puttygen.exe and put it in a
+proper directory (e.x. C:\local\bin). You</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">may
+choose to make this path known to your system by adding the directory
+to your %PATH% enviroment variable,</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">but
+it is optional.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">After
+the download, you may set up your remote access to EMF server by
+doing the following:</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">1.
+Generate private/public RSA key pair:</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Either
+double click puttygen.exe file link or run puttygen.exe from a
+Windows command line. This should</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">give
+you a pop-up window from where you can select RSA key type and key
+length (default to 1024) and click</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Create
+button to generate the key pair.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">With
+the puttygen window open, click Save button to save the private key
+into a file and secure the private</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">key
+file with a good pass phrase. Then save public key content into a
+text file by copy &amp; paste the public</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">key
+content area from the puttygen window.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">2.
+Copy public RSA key file to EMF server</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Run
+pscp.exe from a Windows command line by typing the following:</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">C:\local\bin\pscp.exe
+PUBLIC_KEY_FILE
+USER_NAME@EMF_SERVER:/home/USER_NAME/.ssh/authorized_keys2</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">you
+need your EMF server account password to transfer this file at this
+point.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">3
+. Add private RSA key file to SSH key agent</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Run
+pagent.exe from a Windows command line by typing the following:</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">C:\local\bin\pagent.exe
+PRIVATE_KEY_FILE</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">A
+pop-up window will ask you for the passphrase you have put on this
+file. After you input the correct</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">passphrase,
+the pagent logo will show up on your system task bar.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">From
+this point on, you don't need to type your EMF server user account
+password to transfer files or to open an</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">ssh
+session (you need putty.exe to do this).</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US"><B>Linux</B></SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Since
+most Linux distributions have ssh client tools installed, there is no
+need to install them</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">from
+scratch. In case you don't have them installed, you may download an
+OpenSSH package from</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">http://www.openssh.com/
+for your workstation.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Follow
+the following steps to set up your key-based ssh authentication to
+your EMF server once you</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">install
+the ssh client tools properly.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm">  
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">1.
+Generate private/public RSA key pair:</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">qunhe@cep00156:~$
+ssh-keygen</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Generating
+public/private rsa key pair.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Enter
+file in which to save the key (/home/qunhe/.ssh/id_rsa): </SPAN></FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">/home/qunhe/.ssh/id_rsa
+already exists.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Overwrite
+(y/n)? y</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Enter
+passphrase (empty for no passphrase): </SPAN></FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Enter
+same passphrase again: </SPAN></FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Your
+identification has been saved in /home/qunhe/.ssh/id_rsa.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Your
+public key has been saved in /home/qunhe/.ssh/id_rsa.pub.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">The
+key fingerprint is:</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">62:f8:2a:ff:bf:d6:0f:87:bc:08:8e:c5:26:15:33:c8
+qunhe@cep00156</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">qunhe@cep00156:~$
+</SPAN></FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">2.
+Copy public RSA key file to EMF server</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">qunhe@cep00156:~$
+scp /home/USER_NAME/.ssh/id_rsa.pub
+USER_NAME@remote_linux_server:/home/USER_NAME/.ssh/authorized_keys2</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">authorized_keys2
+                                     100%  396     0.4KB/s   00:00   
+</SPAN></FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">qunhe@cep00156:~$</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">3
+. Add private RSA key file to SSH key agent </SPAN></FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">qunhe@cep00156:~$
+ssh-add</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Enter
+passphrase for /home/qunhe/.ssh/id_rsa: </SPAN></FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Identity
+added: /home/qunhe/.ssh/id_rsa (/home/qunhe/.ssh/id_rsa)</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">qunhe@cep00156:~$
+</SPAN></FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=3><SPAN LANG="en-US"><B>For
+EMF Linux server admin:</B></SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Please
+open /etc/ssh/sshd.config file and set the following values:</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">#
+What ports, IPs and protocols we listen for</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Port
+22</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">Protocol
+2</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">RSAAuthentication
+yes</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Monospace"><FONT SIZE=2><SPAN LANG="en-US">PubkeyAuthentication
+yes</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"> 
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+</BODY>
+</HTML>

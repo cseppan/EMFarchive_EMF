@@ -72,8 +72,9 @@ public class QAServiceImpl implements QAService {
             session.close();
         }
     }
-
+    
     public void runQAStep(QAStep step, User user) throws EmfException {
+        updateResultStatus(step, "In process");
         updateWitoutCheckingConstraints(new QAStep[] { step });
         checkRestrictions(step);
         EmfDbServer dbServer = dbServer();
@@ -84,6 +85,21 @@ public class QAServiceImpl implements QAService {
         } catch (InterruptedException e) {
             LOG.error("Error running in qa step-" + step.getName(), e);
             throw new EmfException("Error running in qa step-" + step.getName() + ":" + e.getMessage());
+        }
+    }
+    
+    private void updateResultStatus(QAStep qaStep, String status) {
+        Session session = sessionFactory.getSession();
+        try {
+            QAStepResult result = dao.qaStepResult(qaStep, session);
+            
+            if (result == null)
+                return;
+            
+            result.setTableCreationStatus(status);
+            dao.updateQAStepResult(result, session);
+        } finally {
+            session.close();
         }
     }
 

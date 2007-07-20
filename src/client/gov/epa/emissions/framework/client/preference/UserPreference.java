@@ -17,4 +17,10 @@ public interface UserPreference {
     String userName();
     
     String userPassword();
+    
+    String remoteCopyProgram();
+    
+    String localTempDir();
+    
+    String remoteHost();
 }

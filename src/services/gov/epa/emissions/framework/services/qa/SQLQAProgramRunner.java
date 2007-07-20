@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -41,7 +42,7 @@ public class SQLQAProgramRunner implements QAProgramRunner {
         String query = query(dbServer, qaStep, tableName);
         printQuery(query);
         try {
-            dropTable(tableName);
+            dropTable(getExistedTableName(qaStep));
             dbServer.getEmissionsDatasource().query().execute(query);
             success(qaStep, tableName);
         } catch (Exception e) {
@@ -55,6 +56,9 @@ public class SQLQAProgramRunner implements QAProgramRunner {
     }
 
     private void dropTable(String tableName) throws EmfException {
+        if (tableName == null || tableName.isEmpty())
+            return;
+        
         try {
             if (tableCreator.exists(tableName)) {
                 tableCreator.drop(tableName);
@@ -118,15 +122,11 @@ public class SQLQAProgramRunner implements QAProgramRunner {
     }
 
     private String tableName(QAStep qaStep) {
-        QAStepResult result = getResult(qaStep);
-
-        if (result != null && result.getTable() != null)
-            return result.getTable();
-
+        String formattedDate = EmfDateFormat.format_YYYYMMDDHHMMSS(new Date());
         String table = "QA_DSID" + qaStep.getDatasetId() + "_V" + qaStep.getVersion() + "_"
-                + new String(Math.random() + "").substring(2);
+                + formattedDate;
         
-        if (table.length() < 64) {                                   //postgresql table name max length is 64
+        if (table.length() < 64) {     //postgresql table name max length is 64
             String name = qaStep.getName();
             int space = name.length() + table.length() - 64;
             table += name.substring((space < 0) ? 0 : space + 1);
@@ -139,6 +139,15 @@ public class SQLQAProgramRunner implements QAProgramRunner {
         }
 
         return table.trim().replaceAll(" ", "_");
+    }
+
+    private String getExistedTableName(QAStep qaStep) {
+        QAStepResult result = getResult(qaStep);
+
+        if (result != null && result.getTable() != null)
+            return result.getTable();
+        
+        return null;
     }
 
     private QAStepResult getResult(QAStep qaStep) {

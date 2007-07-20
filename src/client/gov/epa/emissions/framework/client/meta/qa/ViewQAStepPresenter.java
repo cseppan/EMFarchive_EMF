@@ -2,15 +2,15 @@ package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
+import gov.epa.emissions.framework.client.remote.RemoteCopy;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.qa.QAService;
 
 import java.io.File;
-import java.util.Date;
 
 public class ViewQAStepPresenter {
 
@@ -64,37 +64,38 @@ public class ViewQAStepPresenter {
         return folder;
     }
 
-//    private String mapToRemote(String dir) throws EmfException {
-//        if (dir == null || dir.trim().length() == 0)
-//            throw new EmfException("Please select a directory before export");
-//        return session.preferences().mapLocalOutputPathToRemote(dir);
-//    }
-
     public String userName() {
         return session.user().getUsername();
     }
 
-    public void viewResults(QAStep qaStep, QAStepResult qaStepResult, String exportDir) throws EmfException {
-        File exported = new File(exportDir, exportedQAStepFileName(qaStep));
+    public void viewResults(QAStep qaStep, String exportDir) throws EmfException {
+        QAStepResult qaResult = getStepResult(qaStep);
         
-        if (!exported.exists())
-            throw new EmfException("Please export run results before view them.");
+        if (qaResult == null || qaResult.getTable() == null || qaResult.getTable().isEmpty())
+            throw new EmfException("No QA Step result available to view.");
+        
+        File exported;
+        try {
+            RemoteCopy remoteCopy = new RemoteCopy(new DefaultUserPreferences());
+            String copied = remoteCopy.copyToLocal(exportedQAStepFilePath(exportDir, qaResult), "");
+            exported = new File(copied);
+            
+            if (!exported.exists())
+                throw new EmfException("Copy remote files failed.");
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
         
         view.displayResultsTable(qaStep.getName(), exported.getAbsolutePath());
     }
     
-    private String exportedQAStepFileName(QAStep qaStep) {
-        String formattedDate = EmfDateFormat.format_ddMMMyyyy(new Date());
-        String result = "QA" + qaStep.getName() + "_DSID" + qaStep.getDatasetId() + "_V" + qaStep.getVersion() + "_"
-                + formattedDate;
+    private String exportedQAStepFilePath(String exportDir, QAStepResult qaStepResult) {
+        String separator = (exportDir.charAt(0) == '/') ? "/" : "\\";
+        return exportDir + separator + qaStepResult.getTable() + ".csv"; // this is how exported file name was created
+    }
 
-        for (int i = 0; i < result.length(); i++) {
-            if (!Character.isJavaLetterOrDigit(result.charAt(i))) {
-                result = result.replace(result.charAt(i), '_');
-            }
-        }
-
-        return result.trim().replaceAll(" ", "_") + ".csv";
+    public QAStepResult getStepResult(QAStep step) throws EmfException {
+        return session.qaService().getQAStepResult(step);
     }
 
 }

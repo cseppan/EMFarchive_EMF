@@ -114,7 +114,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private JLabel creationDateLabel;
 
     public EditQAStepWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
-        super("Edit QA Step", new Dimension(650, 580), desktopManager);
+        super("Edit QA Step", new Dimension(680, 580), desktopManager);
         this.parentConsole = parentConsole;
         this.runThread = new Thread(this);
     }
@@ -142,7 +142,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             int factor = 2;
             qaStepResult = presenter.getStepResult(step);
 
-            while (qaStepResult == null || qaStepResult.getTable() == null) {
+            while (qaStepResult == null || qaStepResult.getTableCreationStatus().equalsIgnoreCase("In process")) {
                 Thread.sleep(factor * 5000);
                 qaStepResult = presenter.getStepResult(step);
                 ++factor;
@@ -153,7 +153,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 }
             }
 
-            resetRunStatus(qaStepResult);
+            resetRunStatus(presenter.getStepResult(step));
             setCursor(Cursor.getDefaultCursor());
         } catch (Exception e) {
             messagePanel.setError(e.getMessage());
@@ -170,6 +170,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         creationStatusLabel.setText(result.getTableCreationStatus());
         creationDateLabel.setText(EmfDateFormat.format_MM_DD_YYYY_HH_mm(result.getTableCreationDate()));
         currentTable.setSelected(result.isCurrentTable());
+        super.revalidate();
     }
 
     public void windowClosing() {
@@ -553,9 +554,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         String exportDir = exportFolder.getText();
 
         if (exportDir == null || exportDir.trim().isEmpty())
-            throw new EmfException("Please specify an export directory.");
-
-        presenter.viewResults(step, qaStepResult, exportFolder.getText());
+            throw new EmfException("Please specify the exported result directory.");
+        
+        presenter.viewResults(step, exportDir.trim());
     }
 
     private Button saveButton() {
