@@ -21,12 +21,15 @@ public class RemoteCopy {
     private int errorLevel;
 
     private String errorString;
+    
+    private String userName;
 
     public RemoteCopy(UserPreference pref) throws EmfException {
         os = System.getProperty("os.name");
         this.program = pref.remoteCopyProgram();
         this.tempDir = pref.localTempDir();
         this.host = System.getProperty("emf.remote.host");
+        this.userName = System.getProperty("user.name");
         checkParameters();
     }
 
@@ -65,7 +68,7 @@ public class RemoteCopy {
         if (new File(localPath).exists())
             return localPath;
 
-        String command = this.program + " " + this.host + ":" + remotePath + " " + localPath;
+        String command = this.program + " " + userName + "@" + this.host + ":" + remotePath + " " + localPath;
         execute(command);
 
         if (errorLevel > 0)
@@ -81,7 +84,7 @@ public class RemoteCopy {
         if (localPath == null || localPath.isEmpty())
             throw new EmfException("Remote copy: a valid local path must be specified.");
 
-        String command = this.program + " " + localPath + " " + this.host + ":" + remotePath;
+        String command = this.program + " " + userName + "@" + localPath + " " + this.host + ":" + remotePath;
         execute(command);
 
         if (errorLevel > 0)
