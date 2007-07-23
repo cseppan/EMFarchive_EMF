@@ -13,17 +13,17 @@ xmlns="http://www.w3.org/TR/REC-html40">
  <o:DocumentProperties>
   <o:Author>UNC</o:Author>
   <o:LastAuthor>UNC</o:LastAuthor>
-  <o:Revision>5</o:Revision>
-  <o:TotalTime>7</o:TotalTime>
+  <o:Revision>11</o:Revision>
+  <o:TotalTime>15</o:TotalTime>
   <o:Created>2007-07-20T17:38:00Z</o:Created>
-  <o:LastSaved>2007-07-20T17:45:00Z</o:LastSaved>
+  <o:LastSaved>2007-07-23T21:05:00Z</o:LastSaved>
   <o:Pages>1</o:Pages>
-  <o:Words>594</o:Words>
-  <o:Characters>3392</o:Characters>
+  <o:Words>595</o:Words>
+  <o:Characters>3393</o:Characters>
   <o:Company>UNC</o:Company>
   <o:Lines>28</o:Lines>
   <o:Paragraphs>7</o:Paragraphs>
-  <o:CharactersWithSpaces>3979</o:CharactersWithSpaces>
+  <o:CharactersWithSpaces>3981</o:CharactersWithSpaces>
   <o:Version>11.6360</o:Version>
  </o:DocumentProperties>
 </xml><![endif]--><!--[if gte mso 9]><xml>
@@ -55,15 +55,6 @@ xmlns="http://www.w3.org/TR/REC-html40">
 	mso-font-pitch:variable;
 	mso-font-signature:3 135135232 16 0 262145 0;}
 @font-face
-	{font-family:Monospace;
-	panose-1:0 0 0 0 0 0 0 0 0 0;
-	mso-font-alt:"Times New Roman";
-	mso-font-charset:0;
-	mso-generic-font-family:roman;
-	mso-font-format:other;
-	mso-font-pitch:auto;
-	mso-font-signature:0 0 0 0 0 0;}
-@font-face
 	{font-family:"\@SimSun";
 	panose-1:2 1 6 0 3 1 1 1 1 1;
 	mso-font-charset:134;
@@ -92,6 +83,14 @@ h1
 	font-family:Arial;
 	mso-font-kerning:16.0pt;
 	font-weight:bold;}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;
+	text-underline:single;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:blue;
+	text-decoration:underline;
+	text-underline:single;}
 p
 	{mso-margin-top-alt:auto;
 	margin-right:0in;
@@ -143,7 +142,7 @@ div.Section1
 <meta name=CHANGEDBY content="Qun He">
 <meta name=CHANGED content="20070720;13074100">
 <!--[if gte mso 9]><xml>
- <o:shapedefaults v:ext="edit" spidmax="2050"/>
+ <o:shapedefaults v:ext="edit" spidmax="3074"/>
 </xml><![endif]--><!--[if gte mso 9]><xml>
  <o:shapelayout v:ext="edit">
   <o:idmap v:ext="edit" data="1"/>
@@ -154,352 +153,286 @@ div.Section1
 
 <div class=Section1>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><a name="_top"></a><b><span
-style='font-size:13.5pt;font-family:Monospace'>Remote Copy Setup for Viewing QA
-Step Results</span></b></p>
+<p style='margin:0in;margin-bottom:.0001pt'><a name="_top"></a><b
+style='mso-bidi-font-weight:normal'><span style='font-size:14.0pt'>Remote Copy
+Setup for Viewing QA Step Results<o:p></o:p></span></b></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>This document describes two common remote file copying
-setups based on Linux EMF server. </span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>This document describes two common
+remote file copying setups based on Linux EMF server. </p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>EMF client can be run from either a Linux workstation or
-a Windows workstation.</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>EMF client can be run from either a
+Linux workstation or a Windows workstation.</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'><a href="#_Windows_XP" target="_top" title=Windows>Windows
-XP<span style='font-size:12.0pt;font-family:"Times New Roman"'><o:p></o:p></span></a></span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><a href="#_Windows_XP" target="_top"
+title=Windows>Windows XP</a><span class=MsoHyperlink><o:p></o:p></span></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'><a href="#_Linux">Linux<span style='font-size:12.0pt;
-font-family:"Times New Roman"'><o:p></o:p></span></a></span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><a href="#_Linux">Linux</a><span
+class=MsoHyperlink><o:p></o:p></span></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<h1><a name="_Windows_XP"></a>Windows XP</h1>
+<p style='margin:0in;margin-bottom:.0001pt'><a name="_Windows_XP"></a><b
+style='mso-bidi-font-weight:normal'>Windows XP<o:p></o:p></b></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>There are multiple versions of <span class=SpellE><span
-class=GramE>ssh</span></span> client tools packages available for Windows
-platforms. The</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>There are multiple versions of <span
+class=SpellE><span class=GramE>ssh</span></span> client tools packages
+available for Windows platforms. The</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>following</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> steps <span class=SpellE>decribe</span>
-the setup of a common <span class=SpellE>ssh</span> client tool package (<span
-class=SpellE>PuTTY</span>).</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>following</span>
+steps <span class=SpellE>decribe</span> the setup of a common <span
+class=SpellE>ssh</span> client tool package (<span class=SpellE>PuTTY</span>).</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>First, please go to the <span class=SpellE>PuTTY</span>
-download page (http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html)
-</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>First, please go to the <span
+class=SpellE>PuTTY</span> download page
+(http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html) </p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>to</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> download pscp.exe, pageant.exe,
-and puttygen.exe <span class=SpellE>and</span> put it in a proper directory (<span
-class=SpellE>e.x</span>. C:\local\bin). You</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>to</span>
+download pscp.exe, pageant.exe, and puttygen.exe and put it in a proper
+directory (<span class=SpellE>e.x</span>. C:\local\bin). You</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>may</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> choose to make this path known
-to your system by adding the directory to your %PATH% <span class=SpellE>enviroment</span>
-variable,</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>may</span> choose
+to make this path known to your system by adding the directory to your %PATH% <span
+class=SpellE>enviroment</span> variable,</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>but</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> it is optional.</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>but</span> it is
+optional.</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>After the download, you may set up your remote access to
-EMF server by doing the following:</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>After the download, you may set up
+your remote access to EMF server by doing the following:</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>1. Generate private/public RSA key pair:</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>1. Generate private/public RSA key
+pair:</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Either double click puttygen.exe file link or run
-puttygen.exe from a Windows command line. This should</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Either double click puttygen.exe
+file link or run puttygen.exe from a Windows command line. This should</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>give</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> you a pop-up window from where
-you can select RSA key type and key length (default to 1024) and click</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>give</span> you a
+pop-up window from where you can select RSA key type and key length (default to
+1024) and click</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Create button to generate the key pair.</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Create button to generate the key
+pair.</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>With the <span class=SpellE>puttygen</span> window open,
-click <span class=GramE>Save</span> button to save the private key into a file
-and secure the private</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>With the <span class=SpellE>puttygen</span>
+window open, click <span class=GramE>Save</span> button to save the private key
+into a file and secure the private</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>key</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> file with a good pass phrase.
-Then save public key content into a text file by copy &amp; paste the public</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>key</span> file
+with a good pass phrase. Then save public key content into a text file by copy
+&amp; paste the public</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>key</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> content area from the <span
-class=SpellE>puttygen</span> window.</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>key</span>
+content area from the <span class=SpellE>puttygen</span> window.</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>2. Copy public RSA key file to EMF server</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>2. Copy public RSA key file to EMF
+server</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Run pscp.exe from a Windows command line by typing the
-following:</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Run pscp.exe from a Windows command
+line by typing the following:</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>C:\local\bin\pscp.exe PUBLIC_KEY_FILE USER_NAME@EMF_SERVER:/home/USER_NAME/.ssh/authorized_keys2</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>C:\local\bin\pscp.exe
+PUBLIC_KEY_FILE USER_NAME@EMF_SERVER:/home/USER_NAME/.ssh/authorized_keys2</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>you</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> need your EMF server account
-password to transfer this file at this point.</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>you</span> need
+your EMF server account password to transfer this file at this point.</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>3 .</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> Add private RSA key file to SSH
-key agent</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>3 .</span> Add
+private RSA key file to SSH key agent</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Run pagent.exe from a Windows command line by typing the
-following:</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Run pagent.exe from a Windows command
+line by typing the following:</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>C:\local\bin\pagent.exe PRIVATE_KEY_FILE</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>C:\local\bin\pagent.exe
+PRIVATE_KEY_FILE</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>A pop-up window will ask you for the <span class=SpellE>passphrase</span>
-you have put on this file. After you input the correct</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>A pop-up window will ask you for
+the <span class=SpellE>passphrase</span> you have put on this file. After you
+input the correct</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=SpellE><span
-class=GramE><span style='font-size:10.0pt;font-family:Monospace'>passphrase</span></span></span><span
-style='font-size:10.0pt;font-family:Monospace'>, the <span class=SpellE>pagent</span>
-logo will show up on your system task bar.</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=SpellE><span
+class=GramE>passphrase</span></span>, the <span class=SpellE>pagent</span> logo
+will show up on your system task bar.</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>From this point on, you don't need to type your EMF
-server user account password to transfer files or to open an</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>From this point on, you don't need
+to type your EMF server user account password to transfer files or to open an</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=SpellE><span
-class=GramE><span style='font-size:10.0pt;font-family:Monospace'>ssh</span></span></span><span
-style='font-size:10.0pt;font-family:Monospace'> session (you need putty.exe to
-do this).</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=SpellE><span
+class=GramE>ssh</span></span> session (you need putty.exe to do this).</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<h1><a name="_Linux"></a>Linux</h1>
+<p style='margin:0in;margin-bottom:.0001pt'><a name="_Linux"></a><b
+style='mso-bidi-font-weight:normal'>Linux<o:p></o:p></b></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Since most Linux distributions have <span class=SpellE><span
-class=GramE>ssh</span></span> client tools installed, there is no need to
-install them</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Since most Linux distributions have
+<span class=SpellE><span class=GramE>ssh</span></span> client tools installed,
+there is no need to install them</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>from</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> scratch. In case you don't have
-them installed, you may download an <span class=SpellE>OpenSSH</span> package
-from</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>from</span>
+scratch. In case you don't have them installed, you may download an <span
+class=SpellE>OpenSSH</span> package from</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>http://www.openssh.com/ for your
-workstation.</span></span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>http://www.openssh.com/
+for your workstation.</span></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Follow the following steps to set up your key-based <span
-class=SpellE><span class=GramE>ssh</span></span> authentication to your EMF
-server once you</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Follow the following steps to set
+up your key-based <span class=SpellE><span class=GramE>ssh</span></span>
+authentication to your EMF server once you</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>install</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> the <span class=SpellE>ssh</span>
-client tools properly.</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>install</span>
+the <span class=SpellE>ssh</span> client tools properly.</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>1. Generate private/public RSA key pair:</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>1. Generate private/public RSA key
+pair:</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>qunhe@cep00156:~$ <span class=SpellE>ssh-keygen</span></span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>qunhe@cep00156:~$ <span
+class=SpellE>ssh-keygen</span></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>Generating public/private <span
-class=SpellE>rsa</span> key pair.</span></span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>Generating
+public/private <span class=SpellE>rsa</span> key pair.</span></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Enter file in which to save the key (/home/<span
-class=SpellE>qunhe/.ssh/id_rsa</span>): </span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Enter file in which to save the key
+(/home/<span class=SpellE>qunhe/.ssh/id_rsa</span>): </p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>/home/<span class=SpellE>qunhe/.ssh/id_rsa</span>
-already exists.</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>/home/<span class=SpellE>qunhe/.ssh/id_rsa</span>
+already exists.</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Overwrite (y/n)? <span class=GramE>y</span></span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Overwrite (y/n)? <span class=GramE>y</span></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Enter <span class=SpellE>passphrase</span> (empty for no
-<span class=SpellE>passphrase</span>): </span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Enter <span class=SpellE>passphrase</span>
+(empty for no <span class=SpellE>passphrase</span>): </p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Enter same <span class=SpellE>passphrase</span> again: </span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Enter same <span class=SpellE>passphrase</span>
+again: </p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Your identification has been saved in /home/<span
-class=SpellE>qunhe/.ssh/id_rsa</span>.</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Your identification has been saved
+in /home/<span class=SpellE>qunhe/.ssh/id_rsa</span>.</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Your public key has been saved in /home/<span
-class=SpellE>qunhe/.ssh/id_rsa.pub</span>.</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Your public key has been saved in
+/home/<span class=SpellE>qunhe/.ssh/id_rsa.pub</span>.</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>The key fingerprint is:</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>The key fingerprint is:</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>62:f8:2a<span class=GramE>:ff:bf:d6:0f:87:bc:08:8e:c5:26:15:33:c8</span>
-qunhe@cep00156</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>62:f8:2a<span class=GramE>:ff:bf:d6:0f:87:bc:08:8e:c5:26:15:33:c8</span>
+qunhe@cep00156</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>qunhe@cep00156:~$ </span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>qunhe@cep00156:~$ </p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>2. Copy public RSA key file to EMF server</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>2. Copy public RSA key file to EMF
+server</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>qunhe@cep00156:~$ <span class=SpellE><span class=GramE>scp</span></span>
-/home/USER_NAME/.<span class=SpellE>ssh/id_rsa.pub</span>
-USER_NAME@remote_linux_server:/home/USER_NAME/.ssh/authorized_keys2</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>qunhe@cep00156:~$ <span
+class=SpellE><span class=GramE>scp</span></span> /home/USER_NAME/.<span
+class=SpellE>ssh/id_rsa.pub</span>
+USER_NAME@remote_linux_server:/home/USER_NAME/.ssh/authorized_keys2</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>authorized_keys2</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> 100% 396 0.4KB/s 00:00 </span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>authorized_keys2</span>
+100% 396 0.4KB/s 00:00 </p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>qunhe@cep00156:~$</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>qunhe@cep00156:~$</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=GramE><span
-style='font-size:10.0pt;font-family:Monospace'>3 .</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> Add private RSA key file to SSH
-key agent </span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=GramE>3 .</span> Add
+private RSA key file to SSH key agent </p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>qunhe@cep00156:~$ <span class=SpellE><span class=GramE>ssh</span></span><span
-class=GramE>-</span>add</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>qunhe@cep00156:~$ <span
+class=SpellE><span class=GramE>ssh</span></span><span class=GramE>-</span>add</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Enter <span class=SpellE>passphrase</span> for /home/<span
-class=SpellE>qunhe/.ssh/id_rsa</span>: </span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Enter <span class=SpellE>passphrase</span>
+for /home/<span class=SpellE>qunhe/.ssh/id_rsa</span>: </p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Identity added: /home/<span class=SpellE>qunhe/.ssh/id_rsa</span>
-(/home/<span class=SpellE>qunhe/.ssh/id_rsa</span>)</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Identity added: /home/<span
+class=SpellE>qunhe/.ssh/id_rsa</span> (/home/<span class=SpellE>qunhe/.ssh/id_rsa</span>)</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>qunhe@cep00156:~$ </span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>qunhe@cep00156:~$ </p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><b><span style='font-family:
-Monospace'>For EMF Linux server admin:</span></b></p>
+<p style='margin:0in;margin-bottom:.0001pt'><b style='mso-bidi-font-weight:
+normal'>For EMF Linux server admin:<o:p></o:p></b></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Please open /etc/<span class=SpellE>ssh/sshd.config</span>
-file and set the following values:</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Please open /etc/<span
+class=SpellE>ssh/sshd.config</span> file and set the following values:</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'># <span class=GramE>What</span> ports, <span
-class=SpellE>IPs</span> and protocols we listen for</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'># <span class=GramE>What</span>
+ports, <span class=SpellE>IPs</span> and protocols we listen for</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Port 22</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Port 22</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'>Protocol 2</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Monospace'>Protocol 2</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=SpellE>RSAAuthentication</span>
+yes</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=SpellE>PubkeyAuthentication</span>
+yes</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=SpellE><span
-style='font-size:10.0pt;font-family:Monospace'>RSAAuthentication</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> yes</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=SpellE><span
-style='font-size:10.0pt;font-family:Monospace'>PubkeyAuthentication</span></span><span
-style='font-size:10.0pt;font-family:Monospace'> yes</span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><b style='mso-bidi-font-weight:
+normal'>EMFPreference.txt File:<o:p></o:p></b></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'>EMFPreference.txt File:</p>
+<p style='margin:0in;margin-bottom:.0001pt'>The following two items are needed
+in this file:</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'>The following two items are
-needed in this file:</p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=SpellE>remote.copy.program</span>=C:/temp/bin/pscp.exe</p>
 
-<p class=MsoNormal style='mso-layout-grid-align:none;text-autospace:none'><span
-class=SpellE><span style='font-size:10.0pt;font-family:"Courier New"'>remote.copy.program</span></span><span
-style='font-size:10.0pt;font-family:"Courier New"'>=C:/temp/bin/pscp.exe<o:p></o:p></span></p>
+<p style='margin:0in;margin-bottom:.0001pt'><span class=SpellE>local.temp.dir</span>=C:/temp</p>
 
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><span class=SpellE><span
-style='font-size:10.0pt;font-family:"Courier New"'>local.temp.dir</span></span><span
-style='font-size:10.0pt;font-family:"Courier New"'>=C:/temp</span></p>
-
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
-
-<p style='margin-bottom:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
+<p style='margin:0in;margin-bottom:.0001pt'><o:p>&nbsp;</o:p></p>
 
 </div>
 
