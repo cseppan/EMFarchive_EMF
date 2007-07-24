@@ -498,6 +498,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                     viewResults();
                 } catch (EmfException exc) {
                     messagePanel.setError(exc.getMessage());
+                    exc.printStackTrace();
                 }
             }
         });
