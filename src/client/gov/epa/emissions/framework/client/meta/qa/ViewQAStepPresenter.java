@@ -76,7 +76,7 @@ public class ViewQAStepPresenter {
         
         File exported;
         try {
-            RemoteCopy remoteCopy = new RemoteCopy(new DefaultUserPreferences());
+            RemoteCopy remoteCopy = new RemoteCopy(new DefaultUserPreferences(), session.user());
             String copied = remoteCopy.copyToLocal(exportedQAStepFilePath(exportDir, qaResult), "");
             exported = new File(copied);
             

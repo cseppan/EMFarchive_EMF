@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.remote;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 
@@ -24,12 +25,12 @@ public class RemoteCopy {
     
     private String userName;
 
-    public RemoteCopy(UserPreference pref) throws EmfException {
+    public RemoteCopy(UserPreference pref, User user) throws EmfException {
         os = System.getProperty("os.name");
         this.program = pref.remoteCopyProgram();
         this.tempDir = pref.localTempDir();
         this.host = System.getProperty("emf.remote.host");
-        this.userName = System.getProperty("user.name");
+        this.userName = user.getUsername();
         checkParameters();
     }
 
