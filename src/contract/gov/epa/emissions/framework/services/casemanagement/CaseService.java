@@ -83,7 +83,7 @@ public interface CaseService {
     
     void removeCaseJobs(CaseJob[] jobs) throws EmfException;
 
-    void updateCaseJob(CaseJob job) throws EmfException;
+    void updateCaseJob(User user, CaseJob job) throws EmfException;
 
     Host[] getHosts() throws EmfException;
 
