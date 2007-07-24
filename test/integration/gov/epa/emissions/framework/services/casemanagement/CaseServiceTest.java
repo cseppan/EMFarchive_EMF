@@ -413,7 +413,7 @@ public class CaseServiceTest extends ServiceTestCase {
         
         try {
             // Create a new user, case, job, and executable
-            // User owner = userService.getUser("emf");
+            User user = userService.getUser("emf");
             
             // Create a new executable and synch w/ db
             execVal = new Executable();
@@ -436,6 +436,7 @@ public class CaseServiceTest extends ServiceTestCase {
 
             // clears stale tables from db
             session.clear();
+           
 
             // new sub dir and synch w/ db
             subDirObj = new SubDir();
@@ -488,7 +489,7 @@ public class CaseServiceTest extends ServiceTestCase {
             // update everything to db
             job = loadNewCaseJob(job, caseObj);
 
-            service.runJob(job);
+            service.runJob(job, user);
 
         } catch (Exception e) {
             e.printStackTrace();
