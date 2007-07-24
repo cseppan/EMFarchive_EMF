@@ -107,7 +107,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         for (CaseJob job : jobs) {
             job.setRunStartDate(new Date());
             job.setRunstatus(statuses.get(runningIndex));
-            service().updateCaseJob(job);
+            service().updateCaseJob(session.user(), job);
         }
             
         service().runJobs(jobs, session.user());
