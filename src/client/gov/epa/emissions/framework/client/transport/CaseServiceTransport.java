@@ -415,14 +415,15 @@ public class CaseServiceTransport implements CaseService {
         call.request(new Object[]{jobs});
     }
 
-    public void updateCaseJob(CaseJob job) throws EmfException {
+    public void updateCaseJob(User user, CaseJob job) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateCaseJob");
+        call.addParam("user", dataMappings.user());
         call.addParam("job", caseMappings.casejob());
         call.setVoidReturnType();
 
-        call.request(new Object[] { job });
+        call.request(new Object[] { user, job });
     }
 
     public Host[] getHosts() throws EmfException {
