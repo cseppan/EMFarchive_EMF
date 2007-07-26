@@ -133,7 +133,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant);
         strategy.setStrategyType(strategyType(strategyTypeName));
-        strategy.setControlStrategyMeasures(measures);
+        strategy.setControlMeasures(measures);
         add(strategy);
         return strategy;
     }
@@ -235,7 +235,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
     protected String detailResultDatasetTableName(ControlStrategy strategy) throws Exception {
         Session session = sessionFactory.getSession();
         try {
-            ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, session);
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), session);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             return detailedResultDataset.getInternalSources()[0].getTable();
         } finally {
@@ -256,10 +256,10 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         strategyTask.run();
     }
     
-    protected void createControlledInventory(ControlStrategy strategy) throws Exception {
+    protected void createControlledInventory(ControlStrategy strategy, EmfDataset inputDataset) throws Exception {
         //create the controlled inventory for this strategy run....
         ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(emfUser(), strategy,
-                sessionFactory, dbServerFactory);
+                inputDataset, sessionFactory, dbServerFactory);
         output.create();
     }
 }

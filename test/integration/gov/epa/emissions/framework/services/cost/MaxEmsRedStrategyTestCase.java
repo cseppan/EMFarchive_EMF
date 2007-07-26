@@ -162,7 +162,7 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
     protected String detailResultDatasetTableName(ControlStrategy strategy) throws Exception {
         Session session = sessionFactory().getSession();
         try {
-            ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, session);
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), session);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             return detailedResultDataset.getInternalSources()[0].getTable();
         } finally {

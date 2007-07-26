@@ -61,8 +61,6 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private List controlMeasures;
 
-    private List controlStrategyMeasures;
-
     private String countyFile;
 
     private Mutex lock;
@@ -74,7 +72,6 @@ public class ControlStrategy implements Lockable, Serializable {
         this.inputDatasets = new ArrayList();
         this.controlMeasureClasses = new ArrayList();
         this.controlMeasures = new ArrayList();
-        this.controlStrategyMeasures = new ArrayList();
     }
 
     public ControlStrategy(String name) {
@@ -283,20 +280,12 @@ public class ControlStrategy implements Lockable, Serializable {
         return (ControlMeasureClass[])controlMeasureClasses.toArray(new ControlMeasureClass[0]);
     }
 
-    public void setControlMeasures(LightControlMeasure[] controlMeasures) {
+    public void setControlMeasures(ControlStrategyMeasure[] controlMeasures) {
         this.controlMeasures =  (controlMeasures != null) ? Arrays.asList(controlMeasures) : new ArrayList();
     }
 
-    public LightControlMeasure[] getControlMeasures() {
-        return (LightControlMeasure[])controlMeasures.toArray(new LightControlMeasure[0]);
-    }
-
-    public void setControlStrategyMeasures(ControlStrategyMeasure[] controlStrategyMeasures) {
-        this.controlStrategyMeasures =  (controlStrategyMeasures != null) ? Arrays.asList(controlStrategyMeasures) : new ArrayList();
-    }
-
-    public ControlStrategyMeasure[] getControlStrategyMeasures() {
-        return (ControlStrategyMeasure[])controlStrategyMeasures.toArray(new ControlStrategyMeasure[0]);
+    public ControlStrategyMeasure[] getControlMeasures() {
+        return (ControlStrategyMeasure[])controlMeasures.toArray(new ControlStrategyMeasure[0]);
     }
 
     public void setCountyFile(String countyFile) {

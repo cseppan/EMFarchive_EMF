@@ -87,7 +87,7 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         presenter.setConstraint(constraint);
     }
 
-    public void refresh(ControlStrategyResult controlStrategyResult) {
+    public void refresh(ControlStrategyResult[] controlStrategyResults) {
         // NOTE Auto-generated method stub
 
     }

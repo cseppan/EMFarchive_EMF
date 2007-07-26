@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.db.TableModifier;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.TableFormat;
@@ -16,7 +17,6 @@ import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
-import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -34,7 +34,7 @@ public class DatasetCreator {
 
     private User user;
 
-    private String outputDatasetName;
+//    private String outputDatasetName;
 
     private HibernateSessionFactory sessionFactory;
 
@@ -42,26 +42,36 @@ public class DatasetCreator {
 
     private String datasetNamePrefix;
     
-    private ControlStrategy strategy;
+    private ControlStrategy controlStrategy;
 
     private Keywords keywordMasterList;
     
-    public DatasetCreator(String datasetNamePrefix, String tablePrefix, ControlStrategy strategy, User user, HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) throws EmfException {
+    private Datasource datasource;
+    
+    public DatasetCreator(String datasetNamePrefix, String tablePrefix, 
+            ControlStrategy controlStrategy, User user, 
+            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory,
+            Datasource datasource, Keywords keywordMasterList) {
         this.datasetNamePrefix = datasetNamePrefix;
         this.prefix = tablePrefix;
         this.user = user;
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
-        this.outputDatasetName = getResultDatasetName(strategy.getName());
-        this.strategy = strategy;
-        this.keywordMasterList = new Keywords(new DataCommonsServiceImpl(sessionFactory).getKeywords());
+//        this.outputDatasetName = getResultDatasetName(strategy.getName());
+        this.controlStrategy = controlStrategy;
+        this.datasource = datasource;
+        this.keywordMasterList = keywordMasterList;//new Keywords(new DataCommonsServiceImpl(sessionFactory).getKeywords());
     }
 
-    public String outputTableName() {
-        return prefix+outputDatasetName;
+    private String getOutputTableName(String outputDatasetName) {
+        return prefix + outputDatasetName;
     }
     
-    public EmfDataset addDataset(EmfDataset inputDataset, DatasetType type, String description, TableFormat tableFormat, String source, Datasource datasource) throws EmfException{
+    public EmfDataset addDataset(EmfDataset inputDataset, DatasetType type, 
+            TableFormat tableFormat, String description) throws EmfException {
+        String outputDatasetName = getResultDatasetName(controlStrategy.getName());
+        String outputTableName = getOutputTableName(outputDatasetName);
+        
         EmfDataset dataset = new EmfDataset();
         Date start = new Date();
 
@@ -83,17 +93,17 @@ public class DatasetCreator {
         dataset.setCountry(inputDataset.getCountry());
         
         //Add keyword to the dataset
-        addKeyVal(dataset, "COST_YEAR", strategy.getCostYear() + "");
-        addKeyVal(dataset, "STRATEGY_TYPE", strategy.getStrategyType().getName());
-        addKeyVal(dataset, "TARGET_POLLUTANT", strategy.getTargetPollutant().getName());
-        addKeyVal(dataset, "REGION", strategy.getRegion() != null ? strategy.getRegion().getName() : "");
-        addKeyVal(dataset, "STRATEGY_NAME", strategy.getName());
-        addKeyVal(dataset, "STRATEGY_ID", strategy.getId()+"");
+        addKeyVal(dataset, "COST_YEAR", controlStrategy.getCostYear() + "");
+        addKeyVal(dataset, "STRATEGY_TYPE", controlStrategy.getStrategyType().getName());
+        addKeyVal(dataset, "TARGET_POLLUTANT", controlStrategy.getTargetPollutant().getName());
+        addKeyVal(dataset, "REGION", controlStrategy.getRegion() != null ? controlStrategy.getRegion().getName() : "");
+        addKeyVal(dataset, "STRATEGY_NAME", controlStrategy.getName());
+        addKeyVal(dataset, "STRATEGY_ID", controlStrategy.getId()+"");
         addKeyVal(dataset, "STRATEGY_INVENTORY_NAME", inputDataset.getName());
         addKeyVal(dataset, "STRAGEGY_INVENTORY_VERSION", inputDataset.getDefaultVersion()+"");
-        int measureCount = (strategy.getControlStrategyMeasures() != null ? strategy.getControlStrategyMeasures().length : 0);
+        int measureCount = (controlStrategy.getControlMeasures() != null ? controlStrategy.getControlMeasures().length : 0);
         addKeyVal(dataset, "MEASURES_INCLUDED", measureCount + "");
-        ControlMeasureClass[] controlMeasureClasses = strategy.getControlMeasureClasses();
+        ControlMeasureClass[] controlMeasureClasses = controlStrategy.getControlMeasureClasses();
         String classList = "All";
         if (controlMeasureClasses != null) {
             if (controlMeasureClasses.length > 0) classList = "";
@@ -104,15 +114,23 @@ public class DatasetCreator {
         }
         addKeyVal(dataset, "MEASURE_CLASSES", classList);
         
-        setDatasetInternalSource(dataset, outputTableName(),tableFormat, source);
+        setDatasetInternalSource(dataset, outputTableName, 
+                tableFormat, inputDataset.getName());
         add(dataset);
         try {
-            addVersionZeroEntryToVersionsTable(dataset, datasource);
+            addVersionZeroEntryToVersionsTable(dataset);
         } catch (Exception e) {
             throw new EmfException("Cannot add version zero entry to versions table for dataset: " + dataset.getName());
         }
 
+        createTable(outputTableName, tableFormat);
+
         return dataset;
+    }
+
+    public EmfDataset addDataset(EmfDataset inputDataset, DatasetType type, 
+            TableFormat tableFormat) throws EmfException {
+        return addDataset(inputDataset, type, tableFormat, description(inputDataset));
     }
     
     private void addKeyVal(EmfDataset dataset, String keywordName, String value) {
@@ -121,7 +139,7 @@ public class DatasetCreator {
         dataset.addKeyVal(keyval);
     }
     
-    private void addVersionZeroEntryToVersionsTable(Dataset dataset, Datasource datasource) throws Exception {
+    private void addVersionZeroEntryToVersionsTable(Dataset dataset) throws Exception {
         TableModifier modifier = new TableModifier(datasource, "versions");
         String[] data = { null, dataset.getId() + "", "0", "Initial Version", "", "true", null };
         modifier.insertOneRow(data);
@@ -169,8 +187,22 @@ public class DatasetCreator {
         }
     }
     
+    private void createTable(String tableName, TableFormat tableFormat) throws EmfException {
+        TableCreator creator = new TableCreator(datasource);
+        try {
+            if (creator.exists(tableName))
+                creator.drop(tableName);
 
-
+            creator.create(tableName, tableFormat);
+        } catch (Exception e) {
+            throw new EmfException("Could not create table '" + tableName + "'+\n" + e.getMessage());
+        }
+    }
     
+    private String description(EmfDataset inputDataset) {
+        return "#Control strategy detailed result\n" + 
+           "#Implements control strategy: " + controlStrategy.getName() + "\n"
+                + "#Input dataset used: " + inputDataset.getName()+"\n#";
+    }
 
 }

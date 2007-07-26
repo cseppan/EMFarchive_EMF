@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,12 +55,12 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
             view.notifyLockFailure(controlStrategy);
             return;
         }
-        ControlStrategyResult controlStrategyResult = getResult();
-        view.display(controlStrategy, controlStrategyResult);
+        ControlStrategyResult[] controlStrategyResults = getResult();
+        view.display(controlStrategy, controlStrategyResults);
     }
 
-    private ControlStrategyResult getResult() throws EmfException {
-        return service().controlStrategyResults(controlStrategy);
+    private ControlStrategyResult[] getResult() throws EmfException {
+        return service().getControlStrategyResults(controlStrategy.getId());
     }
 
     public void doClose() throws EmfException {
@@ -147,12 +148,12 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     public void doRefresh() throws EmfException {
         //ControlStrategyResult result = session.controlStrategyService().controlStrategyResults(controlStrategy);
-        ControlStrategyResult result = getResult();
+        ControlStrategyResult[] controlStrategyResults = getResult();
         String runStatus = service().controlStrategyRunStatus(controlStrategy.getId());
         if (runStatus == null || !runStatus.equalsIgnoreCase("Running")) {
             for (Iterator iter = presenters.iterator(); iter.hasNext();) {
                 EditControlStrategyTabPresenter element = (EditControlStrategyTabPresenter) iter.next();
-                element.doRefresh(result);
+                element.doRefresh(controlStrategyResults);
             }
         }
     }
@@ -183,5 +184,9 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
             measuresTabPresenter.doDisplay();
             inputsLoaded = true;
         }
+    }
+    
+    public CostYearTable getCostYearTable() throws EmfException {
+        return session.controlMeasureService().getCostYearTable(1999);
     }
 }

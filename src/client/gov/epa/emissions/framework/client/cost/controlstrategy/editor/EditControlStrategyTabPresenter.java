@@ -7,5 +7,5 @@ public interface EditControlStrategyTabPresenter {
 
     void doSave() throws EmfException;
 
-    void doRefresh(ControlStrategyResult result);
+    void doRefresh(ControlStrategyResult[] controlStrategyResults);
 }

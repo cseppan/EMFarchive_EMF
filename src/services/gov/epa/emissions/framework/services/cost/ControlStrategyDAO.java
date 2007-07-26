@@ -5,11 +5,9 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -129,38 +127,23 @@ public class ControlStrategyDAO {
         return null;
     }
 
-    public ControlStrategyResult controlStrategyResult(ControlStrategy controlStrategy, Session session) {
-        updateControlStrategyIds(controlStrategy, session);
-
-        List criterions = new ArrayList();
-        Criterion c1 = Restrictions.eq("controlStrategyId", new Integer(controlStrategy.getId()));
-        criterions.add(c1);
-
-        EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
-//        System.err.println(inputDatasets.length);
-        if (inputDatasets.length != 0) {
-//            System.err.println(inputDatasets[0] == null);
-            Criterion c2 = Restrictions.eq("inputDatasetId", new Integer(inputDatasets[0].getId()));
-            criterions.add(c2);
-        }
-
-        List list = hibernateFacade.get(ControlStrategyResult.class,
-                (Criterion[]) criterions.toArray(new Criterion[0]), session);
-        if (!list.isEmpty())
-            return (ControlStrategyResult) list.get(0);
-        return null;
+    public ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId, Session session) {
+        Criterion critControlStrategyId = Restrictions.eq("controlStrategyId", controlStrategyId);
+        Criterion critInputDatasetId = Restrictions.eq("inputDatasetId", inputDatasetId);
+        return (ControlStrategyResult)hibernateFacade.load(ControlStrategyResult.class, new Criterion[] {critControlStrategyId, critInputDatasetId}, 
+                session);
     }
 
-    private void updateControlStrategyIds(ControlStrategy controlStrategy, Session session) {
-        Criterion c1 = Restrictions.eq("name", controlStrategy.getName());
-        List list = hibernateFacade.get(ControlStrategy.class, c1, session);
-        if (!list.isEmpty()) {
-            ControlStrategy cs = (ControlStrategy) list.get(0);
-            controlStrategy.setId(cs.getId());
-        }
-    }
-
-    public void updateControlStrategyResults(ControlStrategyResult result, Session session) {
+//    private void updateControlStrategyIds(ControlStrategy controlStrategy, Session session) {
+//        Criterion c1 = Restrictions.eq("name", controlStrategy.getName());
+//        List list = hibernateFacade.get(ControlStrategy.class, c1, session);
+//        if (!list.isEmpty()) {
+//            ControlStrategy cs = (ControlStrategy) list.get(0);
+//            controlStrategy.setId(cs.getId());
+//        }
+//    }
+//
+    public void updateControlStrategyResult(ControlStrategyResult result, Session session) {
         hibernateFacade.saveOrUpdate(result, session);
     }
 
@@ -169,13 +152,21 @@ public class ControlStrategyDAO {
         return controlStrategy.getRunStatus();
     }
 
-    public void removeControlStrategyResult(ControlStrategy controlStrategy, Session session) {
-        Criterion c = Restrictions.eq("controlStrategyId", new Integer(controlStrategy.getId()));
-        List list = hibernateFacade.get(ControlStrategyResult.class, c, session);
-        for (int i = 0; i < list.size(); i++) {
-            ControlStrategyResult result = (ControlStrategyResult) list.get(i);
-            hibernateFacade.delete(result,session);
-        }
+//    public void removeControlStrategyResult(ControlStrategy controlStrategy, Session session) {
+//        Criterion c = Restrictions.eq("controlStrategyId", new Integer(controlStrategy.getId()));
+//        List list = hibernateFacade.get(ControlStrategyResult.class, c, session);
+//        for (int i = 0; i < list.size(); i++) {
+//            ControlStrategyResult result = (ControlStrategyResult) list.get(i);
+//            hibernateFacade.delete(result,session);
+//        }
+//    }
+
+    public void removeControlStrategyResults(int controlStrategyId, Session session) {
+        String hqlDelete = "delete ControlStrategyResult sr where sr.controlStrategyId = :controlStrategyId";
+        session.createQuery( hqlDelete )
+             .setInteger("controlStrategyId", controlStrategyId)
+             .executeUpdate();
+        session.flush();
     }
 
     public ControlStrategy getByName(String name, Session session) {
@@ -186,5 +177,10 @@ public class ControlStrategyDAO {
     public ControlStrategy getById(int id, Session session) {
         ControlStrategy cs = (ControlStrategy) hibernateFacade.load(ControlStrategy.class, Restrictions.eq("id", new Integer(id)), session);
         return cs;
+    }
+
+    public List getControlStrategyResults(int controlStrategyId, Session session) {
+        Criterion c = Restrictions.eq("controlStrategyId", controlStrategyId);
+        return hibernateFacade.get(ControlStrategyResult.class, c, session);
     }
 }

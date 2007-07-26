@@ -55,8 +55,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private EditControlStrategyMeasuresTab measuresTabView;
 
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
-        super("Edit Control Strategy", new Dimension(500, 300), desktopManager);
-        this.setMinimumSize(new Dimension(500, 300));
+        super("Edit Control Strategy", new Dimension(1000, 300), desktopManager);
+        this.setMinimumSize(new Dimension(1000, 300));
         this.session = session;
         this.desktopManager = desktopManager;
         this.parentConsole = parentConsole;
@@ -67,7 +67,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     }
 
-    public void display(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
+    public void display(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         super.setLabel(super.getTitle() + ": " + controlStrategy.getName());
 
         this.controlStrategy = controlStrategy;
@@ -77,7 +77,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         super.display();
     }
 
-    private void doLayout(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
+    private void doLayout(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         Container contentPane = getContentPane();
         contentPane.removeAll();
 
@@ -95,7 +95,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         contentPane.add(layout);
     }
 
-    private JTabbedPane createTabbedPane(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
+    private JTabbedPane createTabbedPane(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         final JTabbedPane tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Summary", createSummaryTab(controlStrategy, controlStrategyResults));
@@ -134,10 +134,10 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         presenter.doLoad(tabTitle);
     }
 
-    private JPanel createSummaryTab(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
+    private JPanel createSummaryTab(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         try {
             EditControlStrategySummaryTabView view = new EditControlStrategySummaryTab(controlStrategy,
-                    controlStrategyResults, session, this, messagePanel, parentConsole);
+                    controlStrategyResults, session, this, messagePanel, parentConsole, this.presenter.getCostYearTable());
             this.presenter.set(view);
             return (JPanel) view;
         } catch (EmfException e) {
@@ -149,11 +149,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     private JPanel createInventoryFilterTab(ControlStrategy controlStrategy) {
         EditControlStrategyTabView view = null;
-        try {
-            view = new EditControlStrategyInventoryFilterTab(controlStrategy, this,  messagePanel, parentConsole, session);
-        } catch (EmfException e) {
-            showError("Could not create Inventory tab.");
-        }
+        view = new EditControlStrategyInventoryFilterTab(controlStrategy, this,  messagePanel, parentConsole, session);
         this.presenter.set(view);
         return (JPanel) view;
     }
@@ -188,7 +184,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 //        return pollutantsTabView;
 //    }
     
-    private JPanel outputPanel(ControlStrategyResult controlStrategyResults) {
+    private JPanel outputPanel(ControlStrategyResult[] controlStrategyResults) {
         EditControlStrategyOutputTabView view = new EditControlStrategyOutputTab(controlStrategy,
                 controlStrategyResults, messagePanel, desktopManager, parentConsole, session);
         this.presenter.set(view);

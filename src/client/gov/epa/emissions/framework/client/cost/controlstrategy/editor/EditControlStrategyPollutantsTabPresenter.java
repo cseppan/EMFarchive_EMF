@@ -33,7 +33,7 @@ public class EditControlStrategyPollutantsTabPresenter  implements EditControlSt
         return new Pollutant[] {strategy.getTargetPollutant()};
     }
 
-    public void doRefresh(ControlStrategyResult result) {
+    public void doRefresh(ControlStrategyResult[] controlStrategyResults) {
         // NOTE Auto-generated method stub
         
     }

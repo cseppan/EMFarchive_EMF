@@ -10,11 +10,11 @@ public class ControlStrategyMeasure implements Serializable {
 
     private LightControlMeasure controlMeasure;
 
-    private Double ruleEffectiveness;
+    private Double ruleEffectiveness = 100.0;
 
-    private Double rulePenetration;
+    private Double rulePenetration = 100.0;
 
-    private Double applyOrder;
+    private Double applyOrder = 1.0;
 
     public ControlStrategyMeasure() {
         //

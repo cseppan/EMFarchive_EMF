@@ -8,7 +8,7 @@ public interface EditControlStrategyView extends ManagedView {
 
     void observe(EditControlStrategyPresenter presenter);
 
-    void display(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults);
+    void display(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults);
     
     void notifyLockFailure(ControlStrategy controlStrategy);
 

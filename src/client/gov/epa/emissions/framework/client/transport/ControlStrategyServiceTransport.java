@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public class ControlStrategyServiceTransport implements ControlStrategyService {
     private CallFactory callFactory;
@@ -144,27 +145,30 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.request(new Object[] {});
     }
 
-    public void createInventory(User user, ControlStrategy controlStrategy) throws EmfException {
+    public void createInventory(User user, ControlStrategy controlStrategy, EmfDataset inputDataset) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("createInventory");
         call.addParam("user", mappings.user());
         call.addParam("controlStrategy", mappings.controlStrategy());
+        call.addParam("inputDataset", mappings.dataset());
         call.setVoidReturnType();
 
-        call.request(new Object[] { user, controlStrategy });
+        call.request(new Object[] { user, controlStrategy, inputDataset });
 
     }
 
-    public ControlStrategyResult controlStrategyResults(ControlStrategy controlStrategy) throws EmfException {
+    public ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("controlStrategyResults");
-        call.addParam("controlStrategy", mappings.controlStrategy());
+        call.addIntegerParam("controlStrategyId");
+        call.addIntegerParam("inputDatasetId");
 
         call.setReturnType(mappings.controlStrategyResult());
 
-        return (ControlStrategyResult) call.requestResponse(new Object[] { controlStrategy });
+        return (ControlStrategyResult) call.requestResponse(new Object[] { new Integer(controlStrategyId), 
+                new Integer(inputDatasetId) });
     }
 
     public String controlStrategyRunStatus(int id) throws EmfException {
@@ -214,6 +218,16 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.addIntegerParam("id");
         call.setReturnType(mappings.controlStrategy());
         return (ControlStrategy) call.requestResponse(new Object[] { new Integer(id) });
+    }
+
+    public ControlStrategyResult[] getControlStrategyResults(int controlStrategyId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getControlStrategyResults");
+        call.addIntegerParam("controlStrategyId");
+        call.setReturnType(mappings.controlStrategyResults());
+
+        return (ControlStrategyResult[]) call.requestResponse(new Object[] { new Integer(controlStrategyId) });
     }
 
 }

@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 
 public interface EditControlStrategyPresenter {
 
@@ -32,4 +33,6 @@ public interface EditControlStrategyPresenter {
     void doRefresh() throws EmfException;
 
     void doLoad(String tabTitle) throws EmfException;
+
+    CostYearTable getCostYearTable() throws EmfException;
 }

@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -224,9 +225,10 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             if (!dao.canUpdate(element, session))
                 throw new EmfException("Control Strategy name already in use");
 
-            ControlStrategyResult result = controlStrategyResults(element);
-            if (result != null)
-                dao.remove(result, session);
+            ControlStrategyResult[] controlStrategyResults = getControlStrategyResults(element.getId());
+            for (int i = 0; i < controlStrategyResults.length; i++) {
+                dao.remove(controlStrategyResults[i], session);
+            }
 
             dao.remove(element, session);
             session.close();
@@ -275,9 +277,11 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public void createInventory(User user, ControlStrategy controlStrategy) throws EmfException {
+    public void createInventory(User user, ControlStrategy controlStrategy, EmfDataset inputDataset) throws EmfException {
         try {
-            ControlStrategyInventoryOutputTask task= new ControlStrategyInventoryOutputTask(user, controlStrategy, sessionFactory, dbServerFactory);
+            ControlStrategyInventoryOutputTask task= new ControlStrategyInventoryOutputTask(user, controlStrategy, 
+                    inputDataset, sessionFactory, 
+                    dbServerFactory);
             if(task.shouldProceed())
                 threadPool.execute(new GCEnforcerTask("Create Inventory: " + controlStrategy.getName(), task));
         } catch (Exception e) {
@@ -295,10 +299,11 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 //        }
 //    }
 
-    public ControlStrategyResult controlStrategyResults(ControlStrategy controlStrategy) throws EmfException {
+    public ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            ControlStrategyResult controlStrategyResult = dao.controlStrategyResult(controlStrategy, session);
+            ControlStrategyResult controlStrategyResult = dao.getControlStrategyResult(controlStrategyId, inputDatasetId, 
+                    session);
             return controlStrategyResult;
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve ControlStrategy Result", e);
@@ -394,4 +399,16 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
+    public ControlStrategyResult[] getControlStrategyResults(int controlStrategyId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            List all = dao.getControlStrategyResults(controlStrategyId, session);
+            return (ControlStrategyResult[]) all.toArray(new ControlStrategyResult[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve control measure efficiency records.", e);
+            throw new EmfException("Could not retrieve control measures efficiency records.");
+        } finally {
+            session.close();
+        }
+    }
 }

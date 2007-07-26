@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
@@ -72,22 +73,26 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private ComboBox strategyTypeCombo;
 
-    private ControlStrategyResult controlStrategyResult;
+    private ControlStrategyResult[] controlStrategyResults;
 
     private DecimalFormat decFormat;
     
-    public EditControlStrategySummaryTab(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResult,
-            EmfSession session, ManageChangeables changeablesList, MessagePanel messagePanel, EmfConsole parentConsole)
+    private CostYearTable costYearTable;
+    
+    public EditControlStrategySummaryTab(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults,
+            EmfSession session, ManageChangeables changeablesList, MessagePanel messagePanel, EmfConsole parentConsole,
+            CostYearTable costYearTable)
             throws EmfException {
         super.setName("summary");
         this.controlStrategy = controlStrategy;
-        this.controlStrategyResult = controlStrategyResult;
+        this.controlStrategyResults = controlStrategyResults;
         this.session = session;
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
         this.parentConsole = parentConsole;
         this.decFormat = new DecimalFormat("0.###E0");
-
+        this.costYearTable = costYearTable;
+        
         setLayout();
     }
 
@@ -261,7 +266,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         emissionReductionValue = new JLabel("");
         emissionReductionValue.setBackground(Color.white);
 
-        updateSummaryResultPanel(controlStrategy, controlStrategyResult);
+        updateSummaryResultPanel(controlStrategy, controlStrategyResults);
 
         layoutGenerator.addLabelWidgetPair("Start Date:", startDate, panel);
         layoutGenerator.addLabelWidgetPair("Completion Date:", completionDate, panel);
@@ -282,7 +287,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         updateProject();
 
         isDatasetSelected(controlStrategy);
-        controlStrategy.setCostYear(new YearValidation("Cost Year").value(costYear.getText()));
+        controlStrategy.setCostYear(new YearValidation("Cost Year").value(costYear.getText(), costYearTable.getStartYear(), costYearTable.getEndYear()));
         controlStrategy.setInventoryYear(new YearValidation("Inventory Year").value(inventoryYear.getText()));
         updateRegion();
         controlStrategy.setTargetPollutant(majorPollutant());
@@ -355,19 +360,19 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         // TODO:
     }
 
-    public void refresh(ControlStrategyResult controlStrategyResult) {
+    public void refresh(ControlStrategyResult[] controlStrategyResults) {
         messagePanel.clear();
-        updateSummaryResultPanel(controlStrategy, controlStrategyResult);
+        updateSummaryResultPanel(controlStrategy, controlStrategyResults);
     }
 
-    private void updateSummaryResultPanel(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResult) {
+    private void updateSummaryResultPanel(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         updateStartDate(controlStrategy);
-        if (controlStrategyResult == null) {
+        if (controlStrategyResults == null || controlStrategyResults.length == 0) {
             updateSummaryPanelValuesExceptStartDate("", "", "");
             return;
         }
         ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(
-                new ControlStrategyResult[] { controlStrategyResult });
+                controlStrategyResults);
         String runStatus = summary.getRunStatus();
         String completionTime = runStatus.indexOf("Failed") == -1 ? summary.getCompletionTime() : "Failed";
         updateSummaryPanelValuesExceptStartDate(completionTime, "" + summary.getStrategyTotalCost(), ""

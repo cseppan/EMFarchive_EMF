@@ -25,13 +25,16 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
@@ -57,7 +60,15 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     
     private EmfSession session;
 
-    public EditControlStrategyOutputTab(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults,
+    private JRadioButton detailButton;
+
+    private JRadioButton invButton;
+
+    private JRadioButton contInvButton;
+
+    private ButtonGroup buttonGroup;
+
+    public EditControlStrategyOutputTab(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults,
             MessagePanel messagePanel, DesktopManager desktopManager, EmfConsole parentConsole, EmfSession session) {
         super.setName("output");
         this.session = session;
@@ -68,7 +79,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         setLayout(controlStrategy, controlStrategyResults);
     }
 
-    private void setLayout(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
+    private void setLayout(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         setLayout(new BorderLayout());
         removeAll();
         add(outputPanel(controlStrategy, controlStrategyResults));
@@ -85,8 +96,17 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     public void export() {
         try {
-            EmfDataset[] datasets = getSelectedDatasets();
-            presenter.doExport(datasets, folder.getText());
+            ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
+            List<EmfDataset> datasetList = new ArrayList<EmfDataset>();
+            for (int i = 0; i < controlStrategyResults.length; i++) {
+                if (buttonGroup.getSelection().equals(detailButton.getModel())) {
+                    datasetList.add((EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
+                } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
+                    if (controlStrategyResults[i].getControlledInventoryDataset() != null)
+                        datasetList.add((EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
+                }
+            }
+            presenter.doExport(datasetList.toArray(new EmfDataset[0]), folder.getText());
             messagePanel.setMessage("Started Export. Please monitor the Status window to track your export request");
         } catch (EmfException e) {
             messagePanel.setMessage(e.getMessage());
@@ -95,15 +115,23 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     public void analyze() {
         try {
-            List list = selectModel.selected();
-            EmfDataset[] datasets = (EmfDataset[]) list.toArray(new EmfDataset[0]);
-            presenter.doAnalyze(controlStrategy.getName(), datasets);
+            ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
+            List<EmfDataset> datasetList = new ArrayList<EmfDataset>();
+            for (int i = 0; i < controlStrategyResults.length; i++) {
+                if (buttonGroup.getSelection().equals(detailButton.getModel())) {
+                    datasetList.add((EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
+                } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
+                    if (controlStrategyResults[i].getControlledInventoryDataset() != null)
+                        datasetList.add((EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
+                }
+            }
+            presenter.doAnalyze(controlStrategy.getName(), datasetList.toArray(new EmfDataset[0]));
         } catch (EmfException e) {
             messagePanel.setMessage(e.getMessage());
         }
     }
 
-    private JPanel bottomPanel(ControlStrategyResult controlStrategyResults) {
+    private JPanel bottomPanel(ControlStrategyResult[] controlStrategyResults) {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(productPanel());
         topPanel.add(createButtonPanel(), BorderLayout.SOUTH);
@@ -114,8 +142,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         return topPanel;
     }
 
-    private void disableTopPanel(ControlStrategyResult controlStrategyResult) {
-        boolean enable = (controlStrategyResult == null) ? false : true;
+    private void disableTopPanel(ControlStrategyResult[] controlStrategyResults) {
+        boolean enable = (controlStrategyResults == null) ? false : true;
         if (enable)
             return;
         inventoryCheckBox.setEnabled(enable);
@@ -141,9 +169,25 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     protected void doInventory() {
         try {
-            presenter.doInventory(controlStrategy);
+            ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
+            if (controlStrategyResults.length == 0) {
+                messagePanel.setError("Please select at least one item.");
+                return;
+            }
+            EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
+            for (int i = 0; i < controlStrategyResults.length; i++) {
+                EmfDataset inputDataset = null;
+                for (int j = 0; j < inputDatasets.length; j++) {
+                    if (inputDatasets[j].getId() == controlStrategyResults[i].getInputDatasetId()) {
+                        inputDataset = inputDatasets[j];
+                        break;
+                    }
+                }
+                if (inputDataset != null)
+                    presenter.doInventory(controlStrategy, inputDataset);
+            }
             messagePanel.setMessage(
-                    "Creating controlled inventory. Watch the status window for progress and refresh this window after completion.");
+                    "Creating controlled inventories. Watch the status window for progress and refresh this window after completion.");
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -174,7 +218,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         return panel;
     }
 
-    private JPanel outputPanel(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResults) {
+    private JPanel outputPanel(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         JPanel tablePanel = tablePanel(controlStrategy, controlStrategyResults);
         JPanel buttonPanel = buttonPanel();
 
@@ -189,15 +233,14 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         return outputPanel;
     }
 
-    private JPanel tablePanel(ControlStrategy controlStrategy, ControlStrategyResult controlStrategyResult) {
+    private JPanel tablePanel(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
-        ControlStrategyResult result = (controlStrategyResult != null) ? controlStrategyResult
-                : new ControlStrategyResult();
-        ControlStrategyOutputTableData tableData = new ControlStrategyOutputTableData(inputDatasets, result);
+        ControlStrategyOutputTableData tableData = new ControlStrategyOutputTableData(inputDatasets, controlStrategyResults);
         EmfTableModel model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
         JTable table = new JTable(selectModel);
-        JScrollPane scrollPane = new JScrollPane(table);
+        JScrollPane scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setPreferredSize(new Dimension(300, 150));
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.add(scrollPane);
@@ -209,11 +252,27 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         Button analysisButton = new Button("Analyze", analysisAction());
         Button view = new ViewButton("View", viewAction());
         view.setToolTipText("View output datasets.");
+        detailButton = new JRadioButton("Detail Result");
+        detailButton.setSelected(true);
+        invButton = new JRadioButton("Inventory");
+        contInvButton = new JRadioButton("Controlled Inventory");
+        //Group the radio buttons.
+        buttonGroup = new ButtonGroup();
+        buttonGroup.add(detailButton);
+        buttonGroup.add(invButton);
+        buttonGroup.add(contInvButton);
+        JPanel radioPanel = new JPanel();
+        radioPanel.add(detailButton);
+        radioPanel.add(invButton);
+        radioPanel.add(contInvButton);
+        JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel buttonPanel = new JPanel();
+        mainPanel.add(radioPanel, BorderLayout.NORTH);
         buttonPanel.add(exportButton);
         buttonPanel.add(analysisButton);
         buttonPanel.add(view);
-        return buttonPanel;
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        return mainPanel;
     }
 
     private Action exportAction() {
@@ -222,7 +281,6 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                 messagePanel.clear();
                 export();
             }
-
         };
     }
 
@@ -278,28 +336,39 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         app.display(fileNames);
     }
 
-    public void refresh(ControlStrategyResult controlStrategyResult) {
-        setLayout(controlStrategy, controlStrategyResult);
+    public void refresh(ControlStrategyResult[] controlStrategyResults) {
+        setLayout(controlStrategy, controlStrategyResults);
     }
 
     private void viewDataSets() {
-        EmfDataset[] datasets = getSelectedDatasets();
-        if (datasets.length == 0) {
+        ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
+        if (controlStrategyResults.length == 0) {
             messagePanel.setError("Please select at least one item.");
             return;
         }
 
-        for (int i = 0; i < datasets.length; i++) {
+        int counter = 0;
+        for (int i = 0; i < controlStrategyResults.length; i++) {
             DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
-            presenter.doDisplayPropertiesView(view, datasets[i]);
+            if (buttonGroup.getSelection().equals(detailButton.getModel())) {
+                presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
+                counter++;
+            } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
+                if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
+                    presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
+                    counter++;
+                }
+            }
+        }
+        
+        if (counter == 0) {
+            messagePanel.setError("Please select at least one item.");
+            return;
         }
     }
 
-    private EmfDataset[] getSelectedDatasets() {
-        List list = selectModel.selected();
-        EmfDataset[] datasets = (EmfDataset[]) list.toArray(new EmfDataset[0]);
-
-        return datasets;
+    private ControlStrategyResult[] getSelectedDatasets() {
+        return selectModel.selected().toArray(new ControlStrategyResult[0]);
     }
 
 }

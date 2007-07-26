@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.cost.analysis.maxreduction.MaxEmsRedStrategy;
@@ -17,6 +18,7 @@ import gov.epa.emissions.framework.services.qa.QADAO;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.List;
 
 import org.hibernate.Session;
 
@@ -45,7 +47,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             maxEmfEmsRedStrategy.run();
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -114,7 +116,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             maxEmfEmsRedStrategy.run();
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -184,7 +186,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             maxEmfEmsRedStrategy.run();
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -253,7 +255,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             maxEmfEmsRedStrategy.run();
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -316,7 +318,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             maxEmfEmsRedStrategy.run();
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -374,7 +376,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             maxEmfEmsRedStrategy.run();
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -432,7 +434,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             maxEmfEmsRedStrategy.run();
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -509,7 +511,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 //            session.clear();
 
             //get detailed result dataset
-            result = new ControlStrategyDAO().controlStrategyResult(strategy, session);
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), session);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -557,10 +559,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 
             //create the controlled inventory for this strategy run....
             ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, strategy,
-                    sessionFactory, dbServerFactory);
+                    strategy.getInputDatasets()[0], sessionFactory, dbServerFactory);
             output.create();
             //reload
-            result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
 
             tableName2 = 
                 result.getControlledInventoryDataset().getInternalSources()[0].getTable();
@@ -638,7 +640,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             maxEmfEmsRedStrategy.run();
 
             //get detailed result dataset
-            result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -686,10 +688,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 
             //create the controlled inventory for this strategy run....
             ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, strategy,
-                    sessionFactory, dbServerFactory());
+                    strategy.getInputDatasets()[0], sessionFactory, dbServerFactory());
             output.create();
             //reload
-            result = new ControlStrategyDAO().controlStrategyResult(strategy, sessionFactory.getSession());
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
 
             tableName2 = result.getControlledInventoryDataset().getName().replaceAll("ControlledInventory", "CSINVEN");
             
@@ -739,23 +741,28 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 
     private void dropTables(ControlStrategy strategy, EmfDataset inputDataset) throws Exception {
         if (strategy != null) {
-            //drop input dataset table
-            dropTable(inputDataset.getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
-            //drop detailed result table
-            dropTable(detailResultDatasetTableName(strategy), dbServer.getEmissionsDatasource());
-            //drop input inventory qa step tables
-            dropQASummaryTables(inputDataset);
-            ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, session);
-            if (result != null) {
-                //drop detailed result qa step tables
-                dropQASummaryTables((EmfDataset) result.getDetailedResultDataset());
-                //see if controlled inv was created, if so cleanup...
-                EmfDataset contInv = (EmfDataset) result.getControlledInventoryDataset();
-                if (contInv != null) {
-                    //drop controlled inv table
-                    dropTable(contInv.getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
-                    //drop controlled inv qa step tables
-                    dropQASummaryTables(contInv);
+            for (int i = 0; i < strategy.getInputDatasets().length; i++) {
+                //drop input dataset table
+                dropTable(strategy.getInputDatasets()[i].getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
+                //drop input inventory qa step tables
+                dropQASummaryTables(strategy.getInputDatasets()[i]);
+            }
+            List results = new ControlStrategyDAO().getControlStrategyResults(strategy.getId(), session);
+            for (int i = 0; i < results.size(); i++) {
+                ControlStrategyResult result = (ControlStrategyResult)results.get(i);
+                if (result != null) {
+                    //drop detailed result table
+                    dropTable(result.getDetailedResultDataset().getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
+                    //drop detailed result qa step tables
+                    dropQASummaryTables((EmfDataset) result.getDetailedResultDataset());
+                    //see if controlled inv was created, if so cleanup...
+                    EmfDataset contInv = (EmfDataset) result.getControlledInventoryDataset();
+                    if (contInv != null) {
+                        //drop controlled inv table
+                        dropTable(contInv.getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
+                        //drop controlled inv qa step tables
+                        dropQASummaryTables(contInv);
+                    }
                 }
             }
         }
@@ -790,6 +797,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         new PostgresDbUpdate().deleteAll("emf.input_datasets_control_strategies");
         dropAll("ControlStrategyResult");
         dropAll(EmfDataset.class);
+        dropAll(Version.class);
         dropAll(Dataset.class);
         new PostgresDbUpdate().deleteAll("emf.control_strategy_measures");
         new PostgresDbUpdate().deleteAll("emf.aggregrated_efficiencyrecords");

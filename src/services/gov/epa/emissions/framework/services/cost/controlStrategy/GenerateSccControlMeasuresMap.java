@@ -103,7 +103,7 @@ public class GenerateSccControlMeasuresMap {
             measure = dao.current(id, session);
 
             //override the Rule Penetration and Effectiveness, that was set during the strat setup...
-            ControlStrategyMeasure[] controlStrategyMeasures = controlStrategy.getControlStrategyMeasures();
+            ControlStrategyMeasure[] controlStrategyMeasures = controlStrategy.getControlMeasures();
             for (int i = 0; i < controlStrategyMeasures.length; i++) {
                 ControlStrategyMeasure controlStrategyMeasure = controlStrategyMeasures[i];
                 LightControlMeasure controlMeasure = controlStrategyMeasure.getControlMeasure();
@@ -152,7 +152,7 @@ public class GenerateSccControlMeasuresMap {
 
     private String controlMeasureIdList() {
         String controlMeasureFilterIds = "";
-        ControlStrategyMeasure[] controlMeasures = controlStrategy.getControlStrategyMeasures();
+        ControlStrategyMeasure[] controlMeasures = controlStrategy.getControlMeasures();
 
         if (controlMeasures != null) 
             for (int i = 0; i < controlMeasures.length; i++)

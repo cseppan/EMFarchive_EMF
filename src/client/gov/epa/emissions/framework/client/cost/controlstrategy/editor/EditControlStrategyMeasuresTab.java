@@ -277,9 +277,9 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
                 cms[i] = (ControlStrategyMeasure)tableData.element(i);
             }
         } else {
-            cms = controlStrategy.getControlStrategyMeasures();
+            cms = controlStrategy.getControlMeasures();
         }
-        controlStrategy.setControlStrategyMeasures(cms);
+        controlStrategy.setControlMeasures(cms);
     }
 
     private ControlMeasureClass[] getControlMeasureClasses() {
@@ -305,7 +305,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         return controlMeasureClasses;
     }
 
-    public void refresh(ControlStrategyResult controlStrategyResult) {
+    public void refresh(ControlStrategyResult[] controlStrategyResults) {
         // NOTE Auto-generated method stub
 
     }

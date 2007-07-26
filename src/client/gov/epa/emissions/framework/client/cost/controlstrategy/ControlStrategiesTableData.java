@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
-import gov.epa.emissions.commons.data.Dataset;
-import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
@@ -23,8 +21,11 @@ public class ControlStrategiesTableData extends AbstractTableData {
 
     private final static Double NAN_VALUE = new Double(Double.NaN);
     
+    private EmfSession session;
+    
     public ControlStrategiesTableData(ControlStrategy[] controlStrategies, EmfSession session) throws EmfException {
-        this.rows = createRows(controlStrategies, session);
+        this.session = session;
+        this.rows = createRows(controlStrategies);
     }
 
     public String[] columns() {
@@ -58,14 +59,14 @@ public class ControlStrategiesTableData extends AbstractTableData {
         return false;
     }
 
-    private List createRows(ControlStrategy[] controlStrategies, EmfSession session) throws EmfException {
+    private List createRows(ControlStrategy[] controlStrategies) throws EmfException {
         List rows = new ArrayList();
         for (int i = 0; i < controlStrategies.length; i++) {
             ControlStrategy element = controlStrategies[i];
             Object[] values = { element.getName(), format(element.getLastModifiedDate()), region(element),
-                    element.getTargetPollutant(), getTotalCost(element, session), getReduction(element, session), 
-                    project(element), analysisType(element), dataset(element), 
-                    version(element), datasetType(element), costYear(element), 
+                    element.getTargetPollutant(), getTotalCost(element.getId()), getReduction(element.getId()), 
+                    project(element), analysisType(element), ""/*dataset(element)*/, 
+                    ""/*version(element)*/, ""/*datasetType(element)*/, costYear(element), 
                     "" + (element.getInventoryYear() != 0 ? element.getInventoryYear() : ""), element.getRunStatus(), format(element.getCompletionDate()), 
                     element.getCreator().getName() };
             Row row = new ViewableRow(element, values);
@@ -75,52 +76,52 @@ public class ControlStrategiesTableData extends AbstractTableData {
         return rows;
     }
 
-    private Double getReduction(ControlStrategy element, EmfSession session) throws EmfException {
-        if (getResultSummary(element, session) == null)
+    private Double getReduction(int controlStrategyId) throws EmfException {
+        ControlStrategyResultsSummary summary = getResultSummary(controlStrategyId);
+        if (summary == null)
             return NAN_VALUE;
-        
-        return new Double(getResultSummary(element, session).getStrategyTotalReduction());
+ 
+        return new Double(summary.getStrategyTotalReduction());
     }
 
-    private Double getTotalCost(ControlStrategy element, EmfSession session) throws EmfException {
-        if (getResultSummary(element, session) == null)
+    private Double getTotalCost(int controlStrategyId) throws EmfException {
+        ControlStrategyResultsSummary summary = getResultSummary(controlStrategyId);
+        if (summary == null)
             return NAN_VALUE;
 
-        return new Double(getResultSummary(element, session).getStrategyTotalCost());
+        return new Double(summary.getStrategyTotalCost());
     }
 
-    private ControlStrategyResultsSummary getResultSummary(ControlStrategy element, EmfSession session) throws EmfException {
-        if (getResult(element, session) == null)
+    private ControlStrategyResult[] getControlStrategyResults(int controlStrategyId) throws EmfException {
+        return session.controlStrategyService().getControlStrategyResults(controlStrategyId);
+    }
+
+    private ControlStrategyResultsSummary getResultSummary(int controlStrategyId) throws EmfException {
+        ControlStrategyResult[] controlStrategyResults = getControlStrategyResults(controlStrategyId);
+        if (controlStrategyResults.length == 0)
             return null;
 
-        return new ControlStrategyResultsSummary(new ControlStrategyResult[] { getResult(element, session) });
+        return new ControlStrategyResultsSummary(controlStrategyResults);
     }
 
-    private ControlStrategyResult getResult(ControlStrategy element, EmfSession session) throws EmfException {
-        if (session == null)
-            return null;
+//    private String version(ControlStrategy element) {
+//        Dataset[] datasets = element.getInputDatasets();
+//        if (datasets.length == 0)
+//            return "";
+//        return "" + element.getDatasetVersion();
+//    }
 
-        return session.controlStrategyService().controlStrategyResults(element);
-    }
-
-    private String version(ControlStrategy element) {
-        Dataset[] datasets = element.getInputDatasets();
-        if (datasets.length == 0)
-            return "";
-        return "" + element.getDatasetVersion();
-    }
-
-    private String dataset(ControlStrategy element) {
-        Dataset[] datasets = element.getInputDatasets();
-        if (datasets.length == 0)
-            return "";
-
-        String name = datasets[0].getName();
-        if (datasets.length > 1)
-            name += "...";
-
-        return name;
-    }
+//    private String dataset(ControlStrategy element) {
+//        Dataset[] datasets = element.getInputDatasets();
+//        if (datasets.length == 0)
+//            return "";
+//
+//        String name = datasets[0].getName();
+//        if (datasets.length > 1)
+//            name += "...";
+//
+//        return name;
+//    }
 
     private String project(ControlStrategy element) {
         Project project = element.getProject();
@@ -136,10 +137,10 @@ public class ControlStrategiesTableData extends AbstractTableData {
         return type != null ? type.getName() : "";
     }
 
-    private String datasetType(ControlStrategy element) {
-        DatasetType datasetType = element.getDatasetType();
-        return (datasetType != null) ? datasetType.getName() : "";
-    }
+//    private String datasetType(ControlStrategy element) {
+//        DatasetType datasetType = element.getDatasetType();
+//        return (datasetType != null) ? datasetType.getName() : "";
+//    }
 
     // private String discountRate(ControlStrategy element) {
     // return "" + element.getDiscountRate();

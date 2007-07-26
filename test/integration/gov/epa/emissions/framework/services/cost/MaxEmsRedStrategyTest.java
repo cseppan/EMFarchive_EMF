@@ -68,7 +68,7 @@ public class MaxEmsRedStrategyTest extends MaxEmsRedStrategyTestCase {
         if (strategy != null)
             dropTable(detailResultDatasetTableName(strategy), dbServer().getEmissionsDatasource());
         dropQASummaryTables(inputDataset);
-        ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, session);
+        ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), session);
         dropQASummaryTables((EmfDataset) result.getDetailedResultDataset());
 
     }

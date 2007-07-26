@@ -159,11 +159,17 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
             LightControlMeasure[] cms = cmService.getLightControlMeasures();
             int cmLength = cms.length;
 
+            //add control measures to include to strategy, check no of stratgies for test...
+            ControlStrategyMeasure[] csms = new ControlStrategyMeasure[cms.length];
+
+            for (int i = 0; i < cms.length; i++) {
+                csms[i].setControlMeasure(cms[i]);
+            }
 
             locked.setName("TEST");
             locked.setDescription("TEST control strategy");
             locked.setControlMeasureClasses(cmcs);
-            locked.setControlMeasures(cms);
+            locked.setControlMeasures(csms);
 
             released = service.updateControlStrategy(locked);
             assertEquals("TEST", released.getName());
@@ -182,9 +188,9 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         StrategyType[] types = service.getStrategyTypes();
         session.clear();
 
-        assertEquals(2, types.length);
-        assertEquals("Max Emissions Reduction", types[1].getName());
-        assertEquals("Least Cost", types[0].getName());
+        assertEquals(3, types.length);
+        assertEquals("Max Emissions Reduction", types[2].getName());
+        assertEquals("Least Cost", types[1].getName());
     }
 
     public void testShouldUpdateControlStrategyWithLock() throws Exception {
@@ -229,9 +235,14 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
 
             //add control measures to include to strategy, check no of stratgies for test...
             LightControlMeasure[] cms = cmService.getLightControlMeasures();
+            ControlStrategyMeasure[] csms = new ControlStrategyMeasure[cms.length];
 
+            for (int i = 0; i < cms.length; i++) {
+                csms[i].setControlMeasure(cms[i]);
+            }
+            
             locked.setControlMeasureClasses(cmcs);
-            locked.setControlMeasures(cms);
+            locked.setControlMeasures(csms);
 
             released = service.updateControlStrategy(locked);
 

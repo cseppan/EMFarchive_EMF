@@ -30,7 +30,7 @@ public class EditControlStrategyConstraintsTabPresenter  implements EditControlS
         strategy.setConstraint(constraint);
     }
 
-    public void doRefresh(ControlStrategyResult result) {
+    public void doRefresh(ControlStrategyResult[] controlStrategyResults) {
         // NOTE Auto-generated method stub
         
     }

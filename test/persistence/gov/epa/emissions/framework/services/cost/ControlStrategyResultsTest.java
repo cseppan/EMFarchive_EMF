@@ -41,7 +41,7 @@ public class ControlStrategyResultsTest extends ServiceTestCase {
         try {
             controlStrategydao.add(result, session);
 
-            ControlStrategyResult savedResult = controlStrategydao.controlStrategyResult(element, session);
+            ControlStrategyResult savedResult = controlStrategydao.getControlStrategyResult(element.getId(), dataset.getId(), session);
             assertEquals(element.getId(), savedResult.getControlStrategyId());
         } finally {
             dropAll(ControlStrategyResult.class);

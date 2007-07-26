@@ -47,13 +47,13 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
 
     protected EmfDataset setInputDataset(String type) throws Exception {
         EmfDataset inputDataset = new EmfDataset();
-        inputDataset.setName(tableName);
+        inputDataset.setName("test" + Math.round(Math.random() * 1000) % 1000);
         inputDataset.setCreator(emfUser().getUsername());
         inputDataset.setDatasetType(getDatasetType(type));//orlNonpointDatasetType());
 
         add(inputDataset);
         session.flush();
-        inputDataset = (EmfDataset) load(EmfDataset.class, tableName);
+        inputDataset = (EmfDataset) load(EmfDataset.class, inputDataset.getName());
 
         if (type.equalsIgnoreCase("ORL nonpoint"))
             inputDataset = addORLNonpointDataset(inputDataset);
@@ -65,7 +65,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
             inputDataset = addORLNonroadDataset(inputDataset);
         
         addVersionZeroEntryToVersionsTable(inputDataset, dbServer.getEmissionsDatasource());
-        return (EmfDataset) load(EmfDataset.class, tableName);
+        return (EmfDataset) load(EmfDataset.class, inputDataset.getName());
     }
 
     private DatasetType getDatasetType(String type) {
@@ -102,10 +102,10 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         dbServer.disconnect();
     }
 
-    protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant, ControlMeasureClass[] classes) {
+    protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant, ControlMeasureClass[] classes) throws Exception {
         ControlStrategy strategy = new ControlStrategy();
         strategy.setName(name);
-        strategy.setInputDatasets(new EmfDataset[] { inputDataset });
+        strategy.setInputDatasets(new EmfDataset[] { inputDataset, setInputDataset("ORL nonpoint") });
         strategy.setDatasetType(inputDataset.getDatasetType());
         strategy.setDatasetVersion(0);// initial version
         strategy.setInventoryYear(2000);
@@ -129,7 +129,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant);
         strategy.setStrategyType(maxEmisRedStrategyType());
-        strategy.setControlStrategyMeasures(measures);
+        strategy.setControlMeasures(measures);
         add(strategy);
         return strategy;
     }
@@ -168,7 +168,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         importer.run();
         add(inputDataset);
         session.flush();
-        return (EmfDataset) load(EmfDataset.class, tableName);
+        return (EmfDataset) load(EmfDataset.class, inputDataset.getName());
     }
 
     private EmfDataset addORLNonpointDataset(EmfDataset inputDataset) throws ImporterException {
@@ -183,7 +183,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         importer.run();
         add(inputDataset);
         session.flush();
-        return (EmfDataset) load(EmfDataset.class, tableName);
+        return (EmfDataset) load(EmfDataset.class, inputDataset.getName());
     }
 
     private EmfDataset addORLOnroadDataset(EmfDataset inputDataset) throws ImporterException {
@@ -198,7 +198,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         importer.run();
         add(inputDataset);
         session.flush();
-        return (EmfDataset) load(EmfDataset.class, tableName);
+        return (EmfDataset) load(EmfDataset.class, inputDataset.getName());
     }
 
     private EmfDataset addORLNonroadDataset(EmfDataset inputDataset) throws ImporterException {
@@ -213,7 +213,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         importer.run();
         add(inputDataset);
         session.flush();
-        return (EmfDataset) load(EmfDataset.class, tableName);
+        return (EmfDataset) load(EmfDataset.class, inputDataset.getName());
     }
 
     protected ControlMeasure addControlMeasure(String name, String abbr, Scc[] sccs, EfficiencyRecord[] records) {
@@ -246,7 +246,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     protected String detailResultDatasetTableName(ControlStrategy strategy) throws Exception {
         Session session = sessionFactory.getSession();
         try {
-            ControlStrategyResult result = new ControlStrategyDAO().controlStrategyResult(strategy, session);
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), session);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             return detailedResultDataset.getInternalSources()[0].getTable();
         } finally {

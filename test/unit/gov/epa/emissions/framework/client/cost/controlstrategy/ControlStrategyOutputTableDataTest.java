@@ -27,7 +27,7 @@ public class ControlStrategyOutputTableDataTest extends TestCase {
         dataset1.setId(101);
         EmfDataset dataset2 = dataset("input dataset2");
         dataset2.setId(102);
-        data = new ControlStrategyOutputTableData(new EmfDataset[] { dataset1, dataset2 }, result );
+        data = new ControlStrategyOutputTableData(new EmfDataset[] { dataset1, dataset2 }, new ControlStrategyResult[] { result });
     }
 
     private EmfDataset detailDataset(String name) {

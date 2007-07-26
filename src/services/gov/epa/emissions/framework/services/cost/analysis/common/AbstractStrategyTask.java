@@ -1,284 +1,182 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
-import gov.epa.emissions.commons.data.Dataset;
-import gov.epa.emissions.commons.data.DatasetType;
-import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
-import gov.epa.emissions.commons.db.OptimizedQuery;
-import gov.epa.emissions.commons.db.TableCreator;
-import gov.epa.emissions.commons.io.TableFormat;
-import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.QAStepTask;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
-import gov.epa.emissions.framework.services.cost.analysis.Strategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
-import gov.epa.emissions.framework.services.cost.controlStrategy.DatasetCreator;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
-import gov.epa.emissions.framework.services.cost.controlStrategy.io.CSCountyFileFormat;
-import gov.epa.emissions.framework.services.cost.controlStrategy.io.CSCountyImporter;
-import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-import java.io.File;
 import java.sql.SQLException;
 import java.util.Date;
 
 import org.hibernate.Session;
 
 
-public abstract class AbstractStrategyTask implements Strategy {
+public abstract class AbstractStrategyTask implements StrategyTask {
     
-    protected TableFormat tableFormat;
-
     protected ControlStrategy controlStrategy;
 
     protected Datasource datasource;
 
     protected HibernateSessionFactory sessionFactory;
 
-    protected DatasetCreator creator;
-
-    protected EmfDataset inputDataset;
-
     protected DbServer dbServer;
 
     protected User user;
     
-    protected ControlStrategyResult result;
-    
-    protected OptimizedQuery optimizedQuery;
-
     protected int batchSize;
     
     protected long recordCount;
+    
+    private StatusDAO statusDAO;
 
-    public AbstractStrategyTask(ControlStrategy strategy, User user, DbServerFactory dbServerFactory,
-            Integer batchSize, HibernateSessionFactory sessionFactory) throws EmfException {
+    public AbstractStrategyTask(ControlStrategy strategy, User user, 
+            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) throws EmfException {
         this.controlStrategy = strategy;
         this.dbServer = dbServerFactory.getDbServer();
         this.datasource = dbServer.getEmissionsDatasource();
         this.sessionFactory = sessionFactory;
         this.user = user;
-        this.batchSize = batchSize.intValue();
-        this.tableFormat = new StrategyDetailedResultTableFormat(dbServer.getSqlDataTypes());
-        this.creator = new DatasetCreator("Strategy_", "CSDR_", controlStrategy, user, sessionFactory, dbServerFactory);
-        this.inputDataset = controlStrategy.getInputDatasets()[0];
+        this.statusDAO = new StatusDAO(sessionFactory);
         //setup the strategy run
         setup();
     }
 
     private void setup() throws EmfException {
-        //get rid of old strategy
-        removeControlStrategyResult(controlStrategy);
-        //create result dataset
-        EmfDataset resultDataset = resultDataset();
-        //create table for result dataset
-        createTable(creator.outputTableName());
-        //create strat result object
-        result = strategyResult(controlStrategy, resultDataset);
-        optimizedQuery = sourceQuery(inputDataset);
+        //get rid of old strategy results...
+        removeControlStrategyResults();
+ 
     }
     
-//    public void run() throws EmfException {
-//        GenerateSccControlMeasuresMap mapGenerator = new GenerateSccControlMeasuresMap(dbServer,
-//                emissionTableName(inputDataset), controlStrategy, sessionFactory);
-//        SccControlMeasuresMap map = mapGenerator.create();
+//    public abstract void run() throws EmfException;
 //
-//        OptimizedQuery optimizedQuery = sourceQuery(inputDataset, controlStrategy);
-//        String status = "";
-//        try {
-//            StrategyLoader loader = new StrategyLoader(creator.outputTableName(), tableFormat, sessionFactory, dbServer, result, map,
-//                    controlStrategy);
-//            loader.load(optimizedQuery);
-//            status = "Completed. Input dataset: " + inputDataset.getName() + ".";
-//            result.setRunStatus(status);
-//        } catch (Exception e) {
-//            status = "Failed. Error processing input dataset: " + inputDataset.getName() + ". " + result.getRunStatus();
-//            throw new EmfException(e.getMessage());
-//        } finally {
-//            close(optimizedQuery);
-//            result.setCompletionTime(new Date());
-//            result.setRunStatus(status);
-//            saveResults(result);
-//            try {
-//                dbServer.disconnect();
-//            } catch (SQLException e) {
-//                throw new EmfException("Could not disconnect DbServer -" + e.getMessage());
-//            }
-//        }
-//    }
+    public void run(StrategyLoader loader) throws EmfException {
+        String status = "";
+        try {
+            //process/load each input dataset
+            EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
+            for (int i = 0; i < inputDatasets.length; i++) {
+                ControlStrategyResult result = new ControlStrategyResult();
+                try {
+                    result = loader.loadStrategyResult(inputDatasets[i]);
+                    recordCount = loader.getRecordCount();
+                    status = "Completed.";
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    status = "Failed. Error processing input dataset: " + inputDatasets[i].getName() + ". " + result.getRunStatus();
+                } finally {
+                    result.setCompletionTime(new Date());
+                    result.setRunStatus(status);
+                    saveControlStrategyResult(result);
+                    addStatus(inputDatasets[i]);
+                }
+            }
+        } catch (Exception e) {
+            status = "Failed. Error processing input dataset";
+            e.printStackTrace();
+            throw new EmfException(e.getMessage());
+        } finally {
+            loader.disconnectDbServer();
+            disconnectDbServer();
+        }
+    }
 
-    protected void saveResults() throws EmfException {
+    protected void saveControlStrategyResult(ControlStrategyResult strategyResult) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            setAndRunQASteps();
+            runQASteps(strategyResult);
             ControlStrategyDAO dao = new ControlStrategyDAO();
-            dao.updateControlStrategyResults(result, session);
+            dao.updateControlStrategyResult(strategyResult, session);
         } catch (RuntimeException e) {
-            throw new EmfException("Could not save control strategy results-" + e.getMessage());
+            throw new EmfException("Could not save control strategy results: " + e.getMessage());
         } finally {
             session.close();
         }
     }
 
-    protected ControlStrategyResult strategyResult(ControlStrategy controlStrategy, EmfDataset resultDataset)
-            throws EmfException {
-
-        ControlStrategyResult result = new ControlStrategyResult();
-        result.setControlStrategyId(controlStrategy.getId());
-        result.setInputDatasetId(inputDataset.getId());
-        result.setDetailedResultDataset(resultDataset);
-
-        result.setStrategyResultType(getDetailedStrategyResultType());
-        result.setStartTime(new Date());
-        result.setRunStatus("Created for input dataset: " + inputDataset.getName());
-
-        return result;
-    }
-
-    protected void removeControlStrategyResult(ControlStrategy controlStrategy) throws EmfException {
+    private void removeControlStrategyResults() throws EmfException {
         ControlStrategyDAO dao = new ControlStrategyDAO();
         Session session = sessionFactory.getSession();
         try {
-            dao.removeControlStrategyResult(controlStrategy, session);
+            dao.removeControlStrategyResults(controlStrategy.getId(), session);
         } catch (RuntimeException e) {
-            throw new EmfException("Could not remove previous control strategy result");
+            throw new EmfException("Could not remove previous control strategy result(s)");
         } finally {
             session.close();
         }
     }
 
-    protected StrategyResultType getDetailedStrategyResultType() throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            ControlStrategyDAO dao = new ControlStrategyDAO();
-            StrategyResultType resultType = dao.getDetailedStrategyResultType(session);
-
-            return resultType;
-        } catch (RuntimeException e) {
-            throw new EmfException("Could not get detailed strategy result type");
-        } finally {
-            session.close();
-        }
-    }
-
-    protected void createTable(String tableName) throws EmfException {
-        TableCreator creator = new TableCreator(datasource);
-        try {
-            if (creator.exists(tableName))
-                creator.drop(tableName);
-
-            creator.create(tableName, tableFormat);
-        } catch (Exception e) {
-            throw new EmfException("Could not create table '" + tableName + "'+\n" + e.getMessage());
-        }
-    }
-
-    protected String emissionTableName(EmfDataset inputDataset) {
-        InternalSource[] internalSources = inputDataset.getInternalSources();
-        return qualifiedName(datasource, internalSources[0].getTable());
-    }
-
-    protected String qualifiedName(Datasource datasource, String table) {
-        return datasource.getName() + "." + table;
-    }
-
-    protected EmfDataset resultDataset() throws EmfException {
-        return creator.addDataset(inputDataset, detailDatasetType(), description(controlStrategy), tableFormat,
-                source(controlStrategy), datasource);
-    }
-
-    protected DatasetType detailDatasetType() {
-        Session session = sessionFactory.getSession();
-        try {
-            return new DatasetTypesDAO().get("Control Strategy Detailed Result", session);
-        } finally {
-            session.close();
-        }
-    }
-
-    protected String description(ControlStrategy controlStrategy) {
-        return "#Control strategy detailed result\n" + 
-           "#Implements control strategy: " + controlStrategy.getName() + "\n"
-                + "#Input dataset used: " + inputDataset.getName()+"\n#";
-    }
-
-    protected String source(ControlStrategy controlStrategy) {
-        Dataset dataset = controlStrategy.getInputDatasets()[0];
-        return dataset.getName();
-    }
+//    protected StrategyResultType getDetailedStrategyResultType() throws EmfException {
+//        Session session = sessionFactory.getSession();
+//        try {
+//            ControlStrategyDAO dao = new ControlStrategyDAO();
+//            StrategyResultType resultType = dao.getDetailedStrategyResultType(session);
+//
+//            return resultType;
+//        } catch (RuntimeException e) {
+//            throw new EmfException("Could not get detailed strategy result type");
+//        } finally {
+//            session.close();
+//        }
+//    }
+//
+//    protected String emissionTableName(EmfDataset inputDataset) {
+//        InternalSource[] internalSources = inputDataset.getInternalSources();
+//        return qualifiedName(datasource, internalSources[0].getTable());
+//    }
+//
+//    protected String qualifiedName(Datasource datasource, String table) {
+//        return datasource.getName() + "." + table;
+//    }
+//
+//    protected EmfDataset resultDataset(EmfDataset inputDataset) throws EmfException {
+//        return creator.addDataset(inputDataset, detailDatasetType(), description(controlStrategy), tableFormat,
+//                source(controlStrategy));
+//    }
+//
+//    protected DatasetType detailDatasetType() {
+//        Session session = sessionFactory.getSession();
+//        try {
+//            return new DatasetTypesDAO().get("Control Strategy Detailed Result", session);
+//        } finally {
+//            session.close();
+//        }
+//    }
+//
+//    protected String description(ControlStrategy controlStrategy) {
+//        return "#Control strategy detailed result\n" + 
+//           "#Implements control strategy: " + controlStrategy.getName() + "\n"
+//                + "#Input dataset used: " + inputDataset.getName()+"\n#";
+//    }
+//
+//    protected String source(ControlStrategy controlStrategy) {
+//        Dataset dataset = controlStrategy.getInputDatasets()[0];
+//        return dataset.getName();
+//    }
 
     public ControlStrategy getControlStrategy() {
         return controlStrategy;
     }
 
-    protected void setAndRunQASteps() throws EmfException {
-        EmfDataset resultDataset = (EmfDataset) result.getDetailedResultDataset();
+    protected void runQASteps(ControlStrategyResult strategyResult) throws EmfException {
+        EmfDataset resultDataset = (EmfDataset)strategyResult.getDetailedResultDataset();
         if (recordCount > 0) {
-            excuteSetAndRunQASteps(resultDataset, 0);
+            runSummaryQASteps(resultDataset, 0);
         }
 //        excuteSetAndRunQASteps(inputDataset, controlStrategy.getDatasetVersion());
     }
 
-    protected void excuteSetAndRunQASteps(EmfDataset dataset, int version) throws EmfException {
+    protected void runSummaryQASteps(EmfDataset dataset, int version) throws EmfException {
         QAStepTask qaTask = new QAStepTask(dataset, version, user, sessionFactory, dbServer);
         qaTask.runSummaryQASteps(qaTask.getDefaultSummaryQANames());
-    }
-
-    protected OptimizedQuery sourceQuery(EmfDataset dataset) throws EmfException {
-        String query = "SELECT *, case when poll = '" + controlStrategy.getTargetPollutant().getName() 
-            + "' then 1 else 0 end as sort FROM " + emissionTableName(dataset) 
-            + filterForSourceQuery()
-            + " order by scc, fips" 
-            + (controlStrategy.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)") ? ", plantid, pointid, stackid, segment" : "" ) 
-            + ", sort desc, poll ";
-        try {
-            return datasource.optimizedQuery(query, batchSize);
-        } catch (SQLException e) {
-            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
-
-        }
-    }
-
-    protected String filterForSourceQuery() throws EmfException {
-        String sqlFilter = "";
-        String filter = controlStrategy.getFilter();
-        String countyFile = controlStrategy.getCountyFile();
-
-        //get and build strategy filter...
-        if (filter == null || filter.trim().length() == 0)
-            sqlFilter = "";
-        else 
-            sqlFilter = " where " + filter; 
-
-        //get and build county filter...
-        if (countyFile != null && countyFile.trim().length() > 0) {
-            CSCountyImporter countyImporter = new CSCountyImporter(new File(countyFile), 
-                    new CSCountyFileFormat());
-            String[] fips;
-            try {
-                fips = countyImporter.run();
-            } catch (ImporterException e) {
-                throw new EmfException(e.getMessage());
-            }
-            if (fips.length > 0) 
-                sqlFilter += (sqlFilter.length() == 0 ? " where " : " and ") 
-                    + " fips in (";
-            for (int i = 0; i < fips.length; i++) {
-                sqlFilter += (i > 0 ? "," : "") + "'" 
-                    + fips[i] + "'";
-            }
-            if (fips.length > 0) 
-                sqlFilter += ")";
-        }
-
-        return sqlFilter;
     }
 
     protected void disconnectDbServer() throws EmfException {
@@ -290,15 +188,21 @@ public abstract class AbstractStrategyTask implements Strategy {
 
     }
     
-    protected void closeOptimizedQuery() throws EmfException {
-        try {
-            optimizedQuery.close();
-        } catch (SQLException e) {
-            throw new EmfException("Could not close optimized query - " + e.getMessage());
-        }
-    }
-    
     public long getRecordCount() {
         return recordCount;
+    }
+
+    private void addStatus(EmfDataset inputDataset) {
+        setStatus("Completed processing control strategy input dataset: " + inputDataset.getName() + ". There were " + recordCount + " records returned.");
+    }
+
+    protected void setStatus(String message) {
+        Status endStatus = new Status();
+        endStatus.setUsername(user.getUsername());
+        endStatus.setType("Strategy");
+        endStatus.setMessage(message);
+        endStatus.setTimestamp(new Date());
+
+        statusDAO.add(endStatus);
     }
 }

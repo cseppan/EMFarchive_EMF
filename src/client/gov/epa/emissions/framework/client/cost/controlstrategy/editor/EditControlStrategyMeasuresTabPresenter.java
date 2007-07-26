@@ -41,14 +41,14 @@ public class EditControlStrategyMeasuresTabPresenter  implements EditControlStra
     }
 
     public ControlStrategyMeasure[] getControlMeasures() {
-        return strategy.getControlStrategyMeasures();
+        return strategy.getControlMeasures();
     }
 
     public LightControlMeasure[] getAllControlMeasures() {
         return controlStrategiesManagerPresenter.getControlMeasures();
     }
 
-    public void doRefresh(ControlStrategyResult result) {
+    public void doRefresh(ControlStrategyResult[] controlStrategyResults) {
         // NOTE Auto-generated method stub
         
     }

@@ -17,13 +17,13 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class StrategyLoader extends AbstractStrategyLoader {
+public class StrategyLoaderv2 extends AbstractStrategyLoader {
 
     private RetrieveBestMeasureEffRecord retrieveMeasure;
 
     private BestMeasureEffRecord bestMeasureEffRecord;
 
-    public StrategyLoader(User user, DbServerFactory dbServerFactory, 
+    public StrategyLoaderv2(User user, DbServerFactory dbServerFactory, 
             HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
             int batchSize) throws EmfException {
         super(user, dbServerFactory, 
