@@ -9,9 +9,10 @@ import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 public class EditEfficiencyRecordPresenter extends EfficiencyRecordPresenter {
 
     private EditEfficiencyRecordView view;
+
     private ControlMeasureService cmService;
 
-    public EditEfficiencyRecordPresenter(ControlMeasureEfficiencyTabView parentView, EditEfficiencyRecordView view, 
+    public EditEfficiencyRecordPresenter(ControlMeasureEfficiencyTabView parentView, EditEfficiencyRecordView view,
             EmfSession session, ControlMeasure measure) {
         super(parentView);
         this.view = view;
@@ -29,6 +30,11 @@ public class EditEfficiencyRecordPresenter extends EfficiencyRecordPresenter {
 
     public void refresh() {
         parentView.refresh();
+    }
+
+    public void signalChanges(boolean hasChanges) {
+       if (hasChanges)
+           parentView.fireTracking();
     }
 
     public void update(EfficiencyRecord record) throws EmfException {

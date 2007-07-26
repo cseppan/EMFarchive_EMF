@@ -6,8 +6,6 @@ import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
@@ -25,10 +23,10 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
@@ -47,13 +45,12 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
 public class ControlMeasuresManagerWindow extends ReusableInteralFrame implements ControlMeasuresManagerView,
         RefreshObserver, Runnable {
 
-    private SortFilterSelectModel selectModel;
+//    private SortFilterSelectModel selectModel;
 
     private MessagePanel messagePanel;
 
@@ -63,7 +60,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private EmfSession session;
 
-    private EmfTableModel model;
+//    private EmfTableModel model;
 
     private ControlMeasureTableData tableData;
 
@@ -94,6 +91,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private Button copyButton;
     
     private Button refreshButton;
+
+    private SelectableSortFilterWrapper table;
     
     public ControlMeasuresManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Control Measure Manager", new Dimension(855, 350), desktopManager);
@@ -173,16 +172,17 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         this.mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
 
-        JScrollPane sortFilterPane = sortFilterPane(parentConsole);
-        mainPanel.add(sortFilterPane);
+//        JScrollPane sortFilterPane = sortFilterPane(parentConsole);
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+        mainPanel.add(table);
 
         return mainPanel;
     }
 
     private void setupTableModel(ControlMeasure[] measures) throws EmfException {
         tableData = new ControlMeasureTableData(measures, costYearTable, selectedPollutant(), selectedCostYear());
-        model = new EmfTableModel(tableData);
-        selectModel = new SortFilterSelectModel(model);
+//        model = new EmfTableModel(tableData);
+//        selectModel = new SortFilterSelectModel(model);
     }
 
     private void getAllPollutants(EmfSession session) throws EmfException {
@@ -203,14 +203,14 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         return session.dataCommonsService().getPollutants();
     }
 
-    private JScrollPane sortFilterPane(EmfConsole parentConsole) {
-        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        panel.sort(sortCriteria());
-        panel.getTable().setName("controlMeasuresTable");
-        panel.setPreferredSize(new Dimension(550, 120));
-
-        return new JScrollPane(panel);
-    }
+//    private JScrollPane sortFilterPane(EmfConsole parentConsole) {
+//        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
+//        panel.sort(sortCriteria());
+//        panel.getTable().setName("controlMeasuresTable");
+//        panel.setPreferredSize(new Dimension(550, 120));
+//
+//        return new JScrollPane(panel);
+//    }
 
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Name" };
@@ -271,11 +271,11 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         String message = "You have asked to open a lot of windows. Do you wish to proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
 
-        SelectAwareButton view = new SelectAwareButton("View", viewAction(), selectModel, confirmDialog);
+        SelectAwareButton view = new SelectAwareButton("View", viewAction(), table, confirmDialog);
 //        Button view = new ViewButton(viewAction());
         panel.add(view);
 
-        SelectAwareButton edit = new SelectAwareButton("Edit", editAction(), selectModel, confirmDialog);
+        SelectAwareButton edit = new SelectAwareButton("Edit", editAction(), table, confirmDialog);
         panel.add(edit);
 
         copyButton = new CopyButton(new AbstractAction() {
@@ -366,8 +366,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
             return;
         }
 
-        presenter.doExport((ControlMeasure[]) cmList.toArray(new ControlMeasure[0]), desktopManager, selectModel
-                .getRowCount(), parentConsole);
+        presenter.doExport((ControlMeasure[]) cmList.toArray(new ControlMeasure[0]), desktopManager, table.getSelectedCount(), parentConsole);
     }
 
     private Component getItem(String label, JComboBox box) {
@@ -386,7 +385,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private Action viewAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                ControlMeasure[] measures = (ControlMeasure[]) getSelectedMeasures().toArray(new ControlMeasure[0]);
+                ControlMeasure[] measures = getSelectedMeasures().toArray(new ControlMeasure[0]);
                 if (measures.length == 0)
                     showError("Please select a control measure.");
                 try {
@@ -405,7 +404,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private Action editAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                ControlMeasure[] measures = (ControlMeasure[]) getSelectedMeasures().toArray(new ControlMeasure[0]);
+                ControlMeasure[] measures = getSelectedMeasures().toArray(new ControlMeasure[0]);
                 if (measures.length == 0)
                     showError("Please select a control measure.");
                 try {
@@ -463,8 +462,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         presenter.doCreateNew(parentConsole, measure, desktopManager);
     }
 
-    private List getSelectedMeasures() {
-        return selectModel.selected();
+    private List<?> getSelectedMeasures() {
+        return table.selected();
     }
 
     protected void doDisplayPropertiesViewer() {
@@ -531,6 +530,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 //        clearMessage();
         try {
             setupTableModel(measures);
+            table.refresh(tableData);
             panelRefresh();
         } catch (EmfException e) {
             messagePanel.setError("Error in refreshing current table: " + e.getMessage());
@@ -552,10 +552,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     private void panelRefresh() {
-        selectModel.refresh();
-        // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
         mainPanel.removeAll();
-        mainPanel.add(sortFilterPane(parentConsole));
+        mainPanel.add(table);
         super.refreshLayout();
     }
     

@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.Changeable;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
@@ -81,8 +80,6 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     protected ComboBox equationType;
 
-    private ManageChangeables changeablesList;
-
     private NumberFieldVerifier verifier;
 
     protected EfficiencyRecord record;
@@ -108,7 +105,6 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     public EfficiencyRecordWindow(String title, ManageChangeables changeablesList, DesktopManager desktopManager,
             EmfSession session, CostYearTable costYearTable) {
         super(title, new Dimension(675, 445), desktopManager);
-        this.changeablesList = changeablesList;
         this.session = session;
         this.verifier = new NumberFieldVerifier("");
         this.costYearTable = costYearTable;
@@ -320,7 +316,6 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate, panel);
 
         lastModifiedBy = new TextField("Last Modified By", 10);
-        changeablesList.addChangeable(lastModifiedBy);
         lastModifiedBy.setEnabled(false);
         lastModifiedBy.setOpaque(false);
         lastModifiedBy.setDisabledTextColor(Color.BLACK);
@@ -328,7 +323,6 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         layoutGenerator.addLabelWidgetPair("Last Modified By:", lastModifiedBy, panel);
 
         lastModifiedTime = new TextField("Last Modified Time", 10);
-        changeablesList.addChangeable(lastModifiedTime);
         lastModifiedTime.setEnabled(false);
         lastModifiedTime.setOpaque(false);
         lastModifiedTime.setDisabledTextColor(Color.BLACK);
@@ -338,11 +332,6 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         widgetLayout(9, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
-    }
-
-    public void addChangeable(Changeable changeable) {
-        super.addChangeable(changeable);
-        changeablesList.addChangeable(changeable);
     }
 
     protected String formatEffectiveDate() {
@@ -362,7 +351,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
         Button cancel = new CancelButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                disposeView();
+                closeWindow();
             }
         });
         panel.add(cancel);
@@ -528,6 +517,11 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         layoutGenerator.makeCompactGrid(panel, rows, cols, // rows, cols
                 initX, initY, // initialX, initialY
                 xPad, yPad);// xPad, yPad
+    }
+    
+    private void closeWindow() {
+        if (shouldDiscardChanges())
+            disposeView();
     }
 
 }

@@ -99,7 +99,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         cmService = session.controlMeasureService();
         this.populateThread = new Thread(this);
         populateThread.start();
-    }
+    } //end of ControlMeasureEfficiencyTab Constructor
 
     public void run() {
         try {
@@ -574,5 +574,9 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         removeButton.setVisible(false);
         viewButton.setVisible(true);
         viewOnly = true;
+    }
+
+    public void fireTracking() {
+        controlMeasurePresenter.fireTracking();
     }
 }

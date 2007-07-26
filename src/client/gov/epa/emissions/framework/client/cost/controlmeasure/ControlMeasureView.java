@@ -15,4 +15,6 @@ public interface ControlMeasureView extends ManagedView {
     
     void notifyModified();
 
+    void signalChanges();
+
 }

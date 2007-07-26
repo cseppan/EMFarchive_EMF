@@ -96,4 +96,9 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
         measure.setLastModifiedTime(new Date());
         this.summaryTabView.modify();
     }
+
+    public void fireTracking() {
+        // NOTE Auto-generated method stub
+        
+    }
 }

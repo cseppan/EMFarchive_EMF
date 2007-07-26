@@ -23,6 +23,7 @@ public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implement
     public void display(ControlMeasure measure, EfficiencyRecord record) {
         super.display(measure, record);
         populateFields();
+        super.resetChanges();
     }
 
     public void populateFields() {

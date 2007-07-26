@@ -103,4 +103,8 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
         summaryTabView.modify();
     }
 
+    public void fireTracking() {
+        view.signalChanges();
+    }
+
 }

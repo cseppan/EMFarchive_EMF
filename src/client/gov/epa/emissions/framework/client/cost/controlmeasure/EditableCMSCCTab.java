@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
@@ -13,7 +14,6 @@ import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
-import gov.epa.emissions.framework.ui.TrackableSortFilterSelectModel;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.awt.BorderLayout;
@@ -35,7 +35,7 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
 
     private EmfTableModel tableModel;
 
-    private TrackableSortFilterSelectModel sortFilterSelectModel;
+    private SortFilterSelectModel sortFilterSelectModel;
 
     private MessagePanel messagePanel;
 
@@ -140,9 +140,7 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
     private void initModel(Scc[] sccs) {
         tableData = new SCCTableData(sccs);
         tableModel = new EmfTableModel(tableData);
-//        selectModel = new SortFilterSelectModel(model);
-        sortFilterSelectModel = new TrackableSortFilterSelectModel(tableModel);
-        changeables.addChangeable(sortFilterSelectModel);
+        sortFilterSelectModel = new SortFilterSelectModel(tableModel);
     }
 
     private SortFilterSelectionPanel sortFilterPanel() {
