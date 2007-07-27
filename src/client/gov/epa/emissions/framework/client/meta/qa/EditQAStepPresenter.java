@@ -93,12 +93,6 @@ public class EditQAStepPresenter {
         } else {
             folder = session.preferences().outputFolder();
         }
-        // if (!new File(folder).isDirectory())
-
-        // Added extra logical construct to handle a null folder
-
-        if (folder != null && !new File(folder).isDirectory())
-            folder = "";// default, if unspecified
 
         return folder;
     }

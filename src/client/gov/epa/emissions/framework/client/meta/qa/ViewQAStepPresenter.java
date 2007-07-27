@@ -20,8 +20,6 @@ public class ViewQAStepPresenter {
 
     private EmfSession session;
 
-    private static String lastFolder = null;
-
     public ViewQAStepPresenter(QAStepView view, EmfDataset dataset, EmfSession session) {
         this.view = view;
         this.dataset = dataset;
@@ -33,7 +31,6 @@ public class ViewQAStepPresenter {
         QAProgram[] programs = qaService.getQAPrograms();
         QAStepResult result = qaService.getQAStepResult(step);
         view.display(step, result, programs, dataset, session.user(), versionName);
-        view.setMostRecentUsedFolder(getFolder());
     }
 
     public void doClose() {
@@ -41,27 +38,13 @@ public class ViewQAStepPresenter {
     }
 
     public void doExport(QAStep qaStep, QAStepResult stepResult, String dirName) throws EmfException {
-        File dir = new File(dirName);
-        if (dir.isDirectory())
-            lastFolder = dirName;
-
         if (stepResult == null || stepResult.getTable() == null)
             throw new EmfException("You have to run the QA step successfully before exporting ");
 
+        qaStep.setOutputFolder(dirName);
+        session.qaService().updateWitoutCheckingConstraints(new QAStep[] { qaStep });
         session.qaService().exportQAStep(qaStep, session.user(), dirName);
 
-    }
-
-    private String getFolder() {
-        return (lastFolder != null) ? lastFolder : getDefaultFolder();
-    }
-
-    private String getDefaultFolder() {
-        String folder = session.preferences().outputFolder();
-        if (!new File(folder).isDirectory())
-            folder = "";// default, if unspecified
-
-        return folder;
     }
 
     public String userName() {
