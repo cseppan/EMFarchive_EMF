@@ -52,7 +52,7 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Input Dataset", "Output Dataset", "Controlled Inventory", "Status", "Total Cost", "Total Reduction" };
+        return new String[] { "Input Inventory", "Detailed Result", "Controlled Inventory", "Status", "Total Cost", "Total Reduction" };
     }
 
     public Class getColumnClass(int col) {
