@@ -48,7 +48,7 @@ public class RemoteCopy {
 
         if (this.tempDir == null || this.tempDir.isEmpty())
             tempDir = ".";
-        
+       
         if (!tempDir.equals(".") && ! new File(tempDir).exists())
             throw new EmfException("User specified temporary directory is invalid.");
 
@@ -69,7 +69,7 @@ public class RemoteCopy {
         if (new File(localPath).exists())
             return localPath;
 
-        String command = this.program + " " + userName + "@" + this.host + ":" + remotePath + " " + localPath;
+        String command = this.program + " " + userName + "@" + this.host + ":\"" + remotePath + "\" \"" + localPath + "\"";
         execute(command);
 
         if (errorLevel > 0)
@@ -85,7 +85,7 @@ public class RemoteCopy {
         if (localPath == null || localPath.isEmpty())
             throw new EmfException("Remote copy: a valid local path must be specified.");
 
-        String command = this.program + " " + userName + "@" + localPath + " " + this.host + ":" + remotePath;
+        String command = this.program + " \"" + localPath + "\" " + userName + "@" + this.host + ":\"" + remotePath + "\"";
         execute(command);
 
         if (errorLevel > 0)
