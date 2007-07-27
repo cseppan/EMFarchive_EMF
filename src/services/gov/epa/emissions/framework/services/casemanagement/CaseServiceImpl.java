@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.io.generic.LineExporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.RemoteCommand;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
@@ -26,6 +27,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,22 +54,25 @@ public class CaseServiceImpl implements CaseService {
     private DbServer dbServer;
 
     private ExportService exportService;
-    
+
     // these run fields are used to create the run script
-    private String runShell = "#!/bin/csh";  //shell to run under
-    
-    private String runSet = "setenv";  // how to set a variable
-    
-    private String runEq = " ";  // equate a variable (could be a space)
-    
+    private String runShell = "#!/bin/csh"; // shell to run under
+
+    private String runSet = "setenv"; // how to set a variable
+
+    private String runEq = " "; // equate a variable (could be a space)
+
     private String runTerminator = ""; // line terminator
-    
-    private String runComment = "##";  // line comment 
-    
-    private String runSuffix = ".csh";  // job run file suffix
+
+    private String runComment = "##"; // line comment
+
+    private String runSuffix = ".csh"; // job run file suffix
+
+    private String runRedirect = ">&"; // shell specific redirect
 
     // all sectors and all jobs id in the case inputs tb
     private static Sector ALL_SECTORS = null;
+
     private static int ALL_JOB_ID = 0;
 
     public CaseServiceImpl() {
@@ -590,8 +595,7 @@ public class CaseServiceImpl implements CaseService {
 
     private List<CaseInput> getJobInputs(int caseId, int jobId, Sector sector) throws EmfException {
         /**
-         * Gets all the inputs for this job, selects based on: 
-         *      case ID, job ID, and sector
+         * Gets all the inputs for this job, selects based on: case ID, job ID, and sector
          */
         Session session = sessionFactory.getSession();
 
@@ -599,57 +603,56 @@ public class CaseServiceImpl implements CaseService {
         try {
             List<CaseInput> inputs = dao.getJobInputs(caseId, jobId, sector, session);
             // return an array of all type CaseInput
-            //return inputs.toArray(new CaseInput[0]);
+            // return inputs.toArray(new CaseInput[0]);
             return inputs;
         } catch (Exception e) {
             e.printStackTrace();
-            LOG.error("Could not get all inputs for case (id=" + caseId + 
-                    "), job (id=" + jobId + ").\n" + e.getMessage());
-            throw new EmfException("Could not get all inputs for case (id=" + caseId + 
-                    "), job (id=" + jobId + ").\n");
+            LOG.error("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n"
+                    + e.getMessage());
+            throw new EmfException("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n");
         } finally {
             session.close();
         }
     }
-    
-    private List <CaseInput> excludeInputsEnv(List<CaseInput> inputs, String envname) {
+
+    private List<CaseInput> excludeInputsEnv(List<CaseInput> inputs, String envname) {
         /**
-         * Excludes input elements from the inputs list based on 
-         * environmental variable name.
+         * Excludes input elements from the inputs list based on environmental variable name.
          * 
-         * NOTE: the # of elements of inputs is modified in the calling routine
+         * NOTE: the # of elements of inputs is modified in the calling routine also, if an input has no environmental
+         * variable, it will be treated as having the name ""
          */
         List<CaseInput> exclInputs = new ArrayList();
-        
+        String inputEnvName = "";
+
         // loop of inputs (using an iterator) and test for this env name
         Iterator<CaseInput> iter = inputs.iterator();
-        while(iter.hasNext()) {
+        while (iter.hasNext()) {
             CaseInput input = iter.next();
-            
+
+            inputEnvName = (input.getEnvtVars() == null) ? "" : input.getEnvtVars().getName();
             // input has an environmental variable w/ this name
-            if (input.getEnvtVars().getName().equals(envname)){
+            if (inputEnvName.equals(envname)) {
                 // add the input to exclude
                 exclInputs.add(input);
-                
             }
         }
-        
+
         // Now remove the excluded elements from inputs
         Iterator<CaseInput> iter2 = exclInputs.iterator();
-        while(iter2.hasNext()){
+        while (iter2.hasNext()) {
             CaseInput exclInput = iter2.next();
             // remove this element from the input list
             inputs.remove(exclInput);
         }
-        
+
         // return the exclude list
         return exclInputs;
     }
 
     private CaseParameter[] getJobParameters(int caseId, int jobId, Sector sector) throws EmfException {
         /**
-         * Gets all the parameters for this job, selects based on: 
-         *      case ID, job ID, and sector
+         * Gets all the parameters for this job, selects based on: case ID, job ID, and sector
          */
         Session session = sessionFactory.getSession();
 
@@ -660,10 +663,10 @@ public class CaseServiceImpl implements CaseService {
             return parameters.toArray(new CaseParameter[0]);
         } catch (Exception e) {
             e.printStackTrace();
-            LOG.error("Could not get all parameters for case (id=" + caseId + 
-                    "), job (id=" + jobId + ").\n" + e.getMessage());
-            throw new EmfException("Could not get all parameters for case (id=" + caseId + 
-                    "), job (id=" + jobId + ").\n");
+            LOG.error("Could not get all parameters for case (id=" + caseId + "), job (id=" + jobId + ").\n"
+                    + e.getMessage());
+            throw new EmfException("Could not get all parameters for case (id=" + caseId + "), job (id=" + jobId
+                    + ").\n");
         } finally {
             session.close();
         }
@@ -908,9 +911,9 @@ public class CaseServiceImpl implements CaseService {
 
         try {
             CaseJob loaded = (CaseJob) dao.loadCaseJob(job, session);
-            if (user == null) 
+            if (user == null)
                 throw new EmfException("Running Case Job requires a valid user");
-            
+
             if (loaded != null && loaded.getId() != job.getId())
                 throw new EmfException("Case job uniqueness check failed (" + loaded.getId() + "," + job.getId() + ")");
 
@@ -959,143 +962,207 @@ public class CaseServiceImpl implements CaseService {
          * runs the job.
          * 
          * Creates a job run file which sets up the environment including input files and parameters for the run script
-         * defines the run script, and then executes it.
+         * defines the run script, creates a log file, exports the inputs,
+         * and then executes it.
          */
-        
+
         String executionStr = null;
-        
-        // get the case
-        Case caseObj = this.getCase(job.getCaseId());
+        String logFileName = null;
 
-        // Test ouput directory to place job script
-        String outputFileDir = caseObj.getOutputFileDir();
-        if ((outputFileDir == null) || (outputFileDir.equals(""))){
-            throw new EmfException("Output job script directory must be set to run job: " + job.getName() );
-        }
-
-        // Job run file name, put it in the top directory of SMOKE output job scripts
-        String dateStamp = EmfDateFormat.format_YYYYMMDDHHMMSS(new Date());
-        String jobName = job.getName().replace(" ", "_");
-        String fileName = jobName + "_" + dateStamp + this.runSuffix;
-        File ofile = new File(outputFileDir + System.getProperty("file.separator") + fileName);
-        
+        // Job run file name
+        File ofile = this.getOfile(job);
         
         // Create job script
         writeJobFile(job, user, ofile);
-        
-        // get log file for job script        
-        String logFileName = outputFileDir + System.getProperty("file.separator") + "logs"
-        + System.getProperty("file.separator") + jobName + "_" 
-        + dateStamp + ".log";
-        
-        //replace EMF_JOBLOG w/ log file
-        
-        
+
+        // get log file for job script
+        try {
+            logFileName = getLog(ofile);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException(e.getMessage());
+        }
+
         // Run export task
-        
+
         // Create an execution string and submit job to the queue,
-        // if the key word $EMF_JOBLOG is in the queue options, 
-        // replace w/ log file 
+        // if the key word $EMF_JOBLOG is in the queue options,
+        // replace w/ log file
         String queueOptions = job.getQueOptions();
         String queueOptionsLog = queueOptions.replace("$EMF_JOBLOG", logFileName);
-        if (queueOptionsLog.equals("")){
-            executionStr = ofile.getName();
+        if (queueOptionsLog.equals("")) {
+            executionStr = ofile.toString();
         } else {
-            executionStr = queueOptionsLog + " " + ofile; 
+            executionStr = queueOptionsLog + " " + ofile;
         }
-        System.out.println("Job execution string: " + executionStr);
+
+        /*
+         * execute the job script Note if hostname is localhost this is done locally w/o ssh and stdout and stderr is
+         * redirected to the log. This redirect is currently shell specific (should generalize) if hostname is not
+         * localhost it is through ssh
+         */
+        String username = user.getUsername();
+        String hostname = job.getHost().getName();
+        if (hostname.equals("localhost")) {
+            // execute on local machine
+            executionStr = executionStr + " " + this.runRedirect + " " + logFileName;
+            LOG.warn("Local Job execution string: " + executionStr);
+            RemoteCommand.executeLocal(executionStr);
+        } else {
+            // execute on remote machine and log stdout
+            InputStream inStream = RemoteCommand.execute(username, hostname, executionStr);
+            String outTitle = "stdout from (" + hostname + "): " + executionStr;
+            RemoteCommand.logStdout(outTitle, inStream);
+        }
 
     }
-    
 
-    private String setenvInput(CaseInput input, Case caseObj, ExportService exports) throws EmfException{
-        /**
-         * Creates a line of the run job file.  Sets the env variable
-         * to the value input file.
-         * 
-         * For eg.  If the env variable is GRIDDESC, and the 
-         * shell type is csh, this will return
-         * "setenv GRIDDESC /home/azubrow/smoke/ge_dat/griddesc_12Apr2007_vo.txt"
-         * 
-         * Note: this could be bash or tcsh format, could easily modify for other
-         * languages, for example python, perl, etc.
+    private File getOfile(CaseJob job) throws EmfException {
+        /*
+         * Creates the File object that corresponds to the
+         * job script file name.  Format:
+         *         <jobname>_<case_abbrev>_<datestamp>.csh
          */
+        String dateStamp = EmfDateFormat.format_YYYYMMDDHHMMSS(new Date());
+        String jobName = job.getName().replace(" ", "_");
+        Case caseObj = this.getCase(job.getCaseId());
         
+        // Get case abbreviation, if no case abbreviation construct one from id
+        String defaultAbbrev = "case" + job.getCaseId();  
+        String caseAbbrev = (caseObj.getAbbreviation() == null) ? defaultAbbrev : 
+                            caseObj.getAbbreviation().getName();
+        
+        // Test ouput directory to place job script
+        String outputFileDir = caseObj.getOutputFileDir();
+        if ((outputFileDir == null) || (outputFileDir.equals(""))) {
+            throw new EmfException("Output job script directory must be set to run job: " + job.getName());
+        }
+
+
+        String fileName = jobName + "_" + caseAbbrev + "_" + dateStamp + this.runSuffix;
+        File ofile = new File(outputFileDir + System.getProperty("file.separator") + fileName);
+        return ofile;
+    }
+    
+    private String getLog(File jobFile) throws EmfException {
+        /*
+         * From the job script name, it creates the name of corresponding log file. It also checks that an appropriate
+         * log directory exists.
+         */
+
+        // Create a log file name by replacing the suffix of the job
+        // of the job file w/ .log
+        String logFileName = jobFile.getName().replaceFirst(this.runSuffix, ".log");
+
+        // Check if logs dir (jobpath/logs) exists, if not create
+        File logDir = new File(jobFile.getParent() + System.getProperty("file.separator") + "logs");
+        if (!(logDir.isDirectory())) {
+            // Need to create the directory
+            if (!(logDir.mkdir())) {
+                throw new EmfException("Error creating job log directory: " + logDir);
+            }
+        }
+
+        // Make directory writable by everyone
+        if (!logDir.setWritable(true, false)) {
+            throw new EmfException("Error changing job log directory's write permissions: " + logDir);
+        }
+
+        // Create the logFile full name
+        logFileName = logDir + System.getProperty("file.separator") + logFileName;
+
+        return logFileName;
+
+    }
+
+    private String setenvInput(CaseInput input, Case caseObj, ExportService exports) throws EmfException {
+        /**
+         * Creates a line of the run job file. Sets the env variable to the value input file.
+         * 
+         * For eg. If the env variable is GRIDDESC, and the shell type is csh, this will return "setenv GRIDDESC
+         * /home/azubrow/smoke/ge_dat/griddesc_12Apr2007_vo.txt"
+         * 
+         * Note: this could be bash or tcsh format, could easily modify for other languages, for example python, perl,
+         * etc.
+         */
+
         EmfDataset dataset = input.getDataset();
         InputEnvtVar envvar = input.getEnvtVars();
         SubDir subdir = input.getSubdirObj();
         // check if dataset or env variable is null, if so e
-        if (dataset == null){
-            throw new EmfException("Input ("+input.getName()+
-                    ") must have a dataset");
-        }
-        if (envvar == null) {
-            throw new EmfException("Input ("+input.getName()+
-            ") must have an environmental variable");
+        if (dataset == null) {
+            throw new EmfException("Input (" + input.getName() + ") must have a dataset");
         }
 
         // Create a full path to the input file
         String fullPath = exports.getCleanDatasetName(input.getDataset(), input.getVersion());
-        if ((subdir != null) && !(subdir.toString()).equals("")){
+        if ((subdir != null) && !(subdir.toString()).equals("")) {
             fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + input.getSubdirObj()
-                    + System.getProperty("file.separator") + fullPath;            
+                    + System.getProperty("file.separator") + fullPath;
         } else {
             fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + fullPath;
         }
-        
-        String setenvLine = shellSetenv(envvar.getName(), fullPath);
+
+        String setenvLine = null;
+        if (envvar == null) {
+            // if no environmental variable, just created a commented
+            // line w/ input name = fullPath
+            setenvLine = this.runComment + " " + input.getName() + " = " + fullPath;
+        } else {
+            setenvLine = shellSetenv(envvar.getName(), fullPath);
+        }
         return setenvLine;
     }
-    
-    private String shellSetenv(String envvariable, String envvalue){
+
+    private String shellSetenv(String envvariable, String envvalue) {
         /**
          * Simply creates a setenv line from an environmental variable and a value.
          * 
-         * For eg.  If the env variable is IOAPI_GRIDNAME, and the 
-         * shell type is csh, this will return
-         * "setenv GRIDDESC US36_148x112"
+         * For eg. If the env variable is IOAPI_GRIDNAME, and the shell type is csh, this will return "setenv GRIDDESC
+         * US36_148x112"
          * 
-         * Note: this could be bash or tcsh format, could easily modify for other
-         * languages, for example python, perl, etc.
+         * Note: this could be bash or tcsh format, could easily modify for other languages, for example python, perl,
+         * etc.
          */
         String setenvLine = this.runSet + " " + envvariable + this.runEq + envvalue + this.runTerminator;
         return setenvLine;
-        
-    }
-    
 
-    private String setenvParameter(CaseParameter parameter) throws EmfException{
+    }
+
+    private String setenvParameter(CaseParameter parameter) throws EmfException {
         /**
-         * Creates a line of the run job file.  Sets the env variable
-         * to the value of the parameter.
+         * Creates a line of the run job file. Sets the env variable to the value of the parameter.
          * 
-         * For eg.  If the env variable is IOAPI_GRIDNAME, and the 
-         * shell type is csh, this will return
-         * "setenv GRIDDESC US36_148x112"
+         * For eg. If the env variable is IOAPI_GRIDNAME, and the shell type is csh, this will return "setenv GRIDDESC
+         * US36_148x112"
          * 
-         * Note: this could be bash or tcsh format, could easily modify for other
-         * languages, for example python, perl, etc.
+         * Note: this could be bash or tcsh format, could easily modify for other languages, for example python, perl,
+         * etc.
          */
-        
-        if (false) throw new EmfException();
-        String setenvLine = shellSetenv(parameter.getEnvVar().getName(), parameter.getValue());
+
+        if (false)
+            throw new EmfException();
+        String setenvLine = null;
+        if (parameter.getEnvVar() == null) {
+            // no environmental variable, therefore create commented line
+            // parameter name = value
+            setenvLine = this.runComment + " " + parameter.getName() + " = " + parameter.getValue();
+        } else {
+            setenvLine = shellSetenv(parameter.getEnvVar().getName(), parameter.getValue());
+
+        }
         return setenvLine;
     }
 
     private void writeJobFile(CaseJob job, User user, File ofile) throws EmfException {
         /**
-         * Writes a job run file w/ all necessary inputs and
-         * parameters set.  It will also export the input files. 
+         * Writes a job run file w/ all necessary inputs and parameters set. It will also export the input files.
          * 
-         * Input: 
-         *    job - the Case Job 
-         *    user - the user
-         *    ofile - the file to write the job script to
-         *    
-         * Output:
-         *    ofile - the job run file- File obj
+         * Input: job - the Case Job user - the user ofile - the file to write the job script to
+         * 
+         * Output: ofile - the job run file- File obj
          */
-        
+
         // Some objects needed for accessing data
         Case caseObj = this.getCase(job.getCaseId());
         DbServer dbServerlocal = dbFactory.getDbServer();
@@ -1103,95 +1170,89 @@ public class CaseServiceImpl implements CaseService {
         int caseId = job.getCaseId();
         int jobId = job.getId();
         CaseInput headerInput = null;
-        List <CaseInput> inputsAA = null;  // inputs for all sectors and all jobs
-        List <CaseInput> inputsSA = null;  // inputs for specific sector and all jobs
-        List <CaseInput> inputsAJ = null;  // inputs for all sectors specific jobs
-        List <CaseInput> inputsSJ = null;  // inputs for specific sectors specific jobs        
+        List<CaseInput> inputsAA = null; // inputs for all sectors and all jobs
+        List<CaseInput> inputsSA = null; // inputs for specific sector and all jobs
+        List<CaseInput> inputsAJ = null; // inputs for all sectors specific jobs
+        List<CaseInput> inputsSJ = null; // inputs for specific sectors specific jobs
         PrintWriter oStream = null;
         String jobName = job.getName().replace(" ", "_");
-
 
         try {
 
             /*
-             * Get the inputs in the following order:
-             *      all sectors, all jobs
-             *      sector specific, all jobs
-             *      all sectors, job specific
-             *      sector specific, job specific
-             *      
-             *  Need to search for inputs now, b/c want to see if there
-             *  is an EMF_HEADER
+             * Get the inputs in the following order: all sectors, all jobs sector specific, all jobs all sectors, job
+             * specific sector specific, job specific
+             * 
+             * Need to search for inputs now, b/c want to see if there is an EMF_HEADER
              */
 
             // Create an export service to get names of the datasets as inputs to Smoke script
             ExportService exports = new ExportService(dbServerlocal, this.threadPool, this.sessionFactory);
 
-
             // Get case inputs (the datasets associated w/ the case)
             // All sectors, all jobs
             inputsAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS);
-            
+
             // Exclude any inputs w/ environmental variable EMF_JOBHEADER
-            List <CaseInput> exclInputs = this.excludeInputsEnv(inputsAA, "EMF_JOBHEADER");
-            
-            if (exclInputs.size() != 0){
-                headerInput = exclInputs.get(0);   // get the first element as header
+            List<CaseInput> exclInputs = this.excludeInputsEnv(inputsAA, "EMF_JOBHEADER");
+
+            if (exclInputs.size() != 0) {
+                headerInput = exclInputs.get(0); // get the first element as header
             }
 
             // Sector specific, all jobs
             Sector sector = job.getSector();
-            if ( sector != this.ALL_SECTORS ){
+            if (sector != this.ALL_SECTORS) {
                 inputsSA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector);
 
                 // Exclude any inputs w/ environmental variable EMF_JOBHEADER
                 exclInputs = this.excludeInputsEnv(inputsSA, "EMF_JOBHEADER");
-                if (exclInputs.size() != 0){
-                    headerInput = exclInputs.get(0);   // get the first element as header
-                }                
+                if (exclInputs.size() != 0) {
+                    headerInput = exclInputs.get(0); // get the first element as header
+                }
             }
-            
+
             // All sectors, job specific
             inputsAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS);
 
             // Exclude any inputs w/ environmental variable EMF_JOBHEADER
             exclInputs = this.excludeInputsEnv(inputsAJ, "EMF_JOBHEADER");
-            if (exclInputs.size() != 0){
-                headerInput = exclInputs.get(0);   // get the first element as header
+            if (exclInputs.size() != 0) {
+                headerInput = exclInputs.get(0); // get the first element as header
             }
 
             // Specific sector and specific job
-            if ( sector != this.ALL_SECTORS ){
+            if (sector != this.ALL_SECTORS) {
                 inputsSJ = this.getJobInputs(caseId, jobId, sector);
 
                 // Exclude any inputs w/ environmental variable EMF_JOBHEADER
                 exclInputs = this.excludeInputsEnv(inputsSJ, "EMF_JOBHEADER");
-                if (exclInputs.size() != 0){
-                    headerInput = exclInputs.get(0);   // get the first element as header
+                if (exclInputs.size() != 0) {
+                    headerInput = exclInputs.get(0); // get the first element as header
                 }
-            }   
+            }
 
             // Write header to file:
-            if (headerInput != null){
+            if (headerInput != null) {
                 // Setup a line exporter for the EMF_JOBHEADER dataset and export to the file
                 // will close file, so need to reopen for appending, test that dbServer is closed
-                //headerInput.getDataset().s
-                LineExporter headerExporter = new LineExporter(headerInput.getDataset(), 
-                        dbServerlineexporter, dbServerlineexporter.getSqlDataTypes(), new Integer(10000));
-                
-                try{
+                // headerInput.getDataset().s
+                LineExporter headerExporter = new LineExporter(headerInput.getDataset(), dbServerlineexporter,
+                        dbServerlineexporter.getSqlDataTypes(), new Integer(10000));
+
+                try {
                     headerExporter.export(ofile);
-                } catch (Exception e){
+                } catch (Exception e) {
                     LOG.error("Could not write EMF header to job script file, " + e.getMessage());
                     throw new EmfException("Could not write EMF header to job script file");
-                } finally{
+                } finally {
                     try {
                         dbServerlineexporter.disconnect();
                     } catch (Exception e) {
                         throw new EmfException("dbServer error");
                     }
                 }
-                
+
                 // Setup output stream to append to already created file
                 try {
                     oStream = new PrintWriter(new FileWriter(ofile, true));
@@ -1200,7 +1261,7 @@ public class CaseServiceImpl implements CaseService {
                 }
 
             } else {
-            
+
                 // setup new output stream to write to new file
                 try {
                     oStream = new PrintWriter(new FileWriter(ofile));
@@ -1208,42 +1269,40 @@ public class CaseServiceImpl implements CaseService {
                     throw new EmfException("IO error writing to job run file: " + ofile);
                 }
 
-                // print header info to job run file -- shell or program 
+                // print header info to job run file -- shell or program
                 oStream.println(this.runShell);
             }
-            
+
             // print job name to file
             oStream.println();
-            oStream.println(this.runComment + " Job run file for job: "+ jobName);
-            
+            oStream.println(this.runComment + " Job run file for job: " + jobName);
+
             /*
              * Define some EMF specific variables
              */
             oStream.println();
-            
+
             oStream.println(this.runComment + " EMF specific variables");
             oStream.println(shellSetenv("EMF_JOBID", String.valueOf(jobId)));
             oStream.println(shellSetenv("EMF_JOBNAME", jobName));
             oStream.println(shellSetenv("EMF_USER", user.getUsername()));
             // Generate and get a unique job key and write it to the script
             job.generateJobkey(user);
-            oStream.println(shellSetenv("EMF_JOBKEY",job.getJobkey()));
-
+            oStream.println(shellSetenv("EMF_JOBKEY", job.getJobkey()));
 
             // Print the inputs to the file
 
-            /* 
-            * loop over inputs and write Env variables and input 
-            * (full name and path) to job run file, print comments
-            */
+            /*
+             * loop over inputs and write Env variables and input (full name and path) to job run file, print comments
+             */
             // All sectors and all jobs
             oStream.println();
-            oStream.println(this.runComment + " Inputs -- for all sectors and all jobs");            
+            oStream.println(this.runComment + " Inputs -- for all sectors and all jobs");
             for (CaseInput input : inputsAA) {
                 oStream.println(setenvInput(input, caseObj, exports));
             }
 
-            // Sector specific and all jobs 
+            // Sector specific and all jobs
             oStream.println();
             oStream.println(this.runComment + " Inputs -- sector (" + sector + ") and all jobs");
             for (CaseInput input : inputsSA) {
@@ -1256,37 +1315,33 @@ public class CaseServiceImpl implements CaseService {
             for (CaseInput input : inputsAJ) {
                 oStream.println(setenvInput(input, caseObj, exports));
             }
-            
+
             // Sector and Job specific
             oStream.println();
             oStream.println(this.runComment + " Inputs -- sector (" + sector + ") and job: " + job);
             for (CaseInput input : inputsSJ) {
                 oStream.println(setenvInput(input, caseObj, exports));
             }
-            
 
             /*
-             * Get the parameters for this job in following order:
-             *      all sectors, all jobs
-             *      sector specific, all jobs
-             *      all sectors, job specific
-             *      sector specific, job specific
+             * Get the parameters for this job in following order: all sectors, all jobs sector specific, all jobs all
+             * sectors, job specific sector specific, job specific
              */
-            
+
             // All sectors, all jobs
             oStream.println();
             oStream.println(this.runComment + " Parameters -- all sectors, all jobs ");
             CaseParameter[] parameters = this.getJobParameters(caseId, this.ALL_JOB_ID, this.ALL_SECTORS);
-            for (CaseParameter param: parameters) {
+            for (CaseParameter param : parameters) {
                 oStream.println(setenvParameter(param));
             }
-            
+
             // Specific sector, all jobs
-            if (sector != this.ALL_SECTORS){
+            if (sector != this.ALL_SECTORS) {
                 oStream.println();
-                oStream.println(this.runComment + " Parameters -- sectors (" + sector +"), all jobs ");
+                oStream.println(this.runComment + " Parameters -- sectors (" + sector + "), all jobs ");
                 parameters = this.getJobParameters(caseId, this.ALL_JOB_ID, sector);
-                for (CaseParameter param: parameters) {
+                for (CaseParameter param : parameters) {
                     oStream.println(setenvParameter(param));
                 }
             }
@@ -1295,16 +1350,16 @@ public class CaseServiceImpl implements CaseService {
             oStream.println();
             oStream.println(this.runComment + " Parameters -- all sectors, job: " + job);
             parameters = this.getJobParameters(caseId, jobId, this.ALL_SECTORS);
-            for (CaseParameter param: parameters) {
+            for (CaseParameter param : parameters) {
                 oStream.println(setenvParameter(param));
             }
-            
+
             // Specific sector, specific job
-            if (sector != this.ALL_SECTORS){
+            if (sector != this.ALL_SECTORS) {
                 oStream.println();
-                oStream.println(this.runComment + " Parameters -- sectors (" + sector +"), job: " + job);
+                oStream.println(this.runComment + " Parameters -- sectors (" + sector + "), job: " + job);
                 parameters = this.getJobParameters(caseId, jobId, sector);
-                for (CaseParameter param: parameters) {
+                for (CaseParameter param : parameters) {
                     oStream.println(setenvParameter(param));
                 }
             }
@@ -1319,15 +1374,14 @@ public class CaseServiceImpl implements CaseService {
             String execName = execVal.getName();
 
             // executable full name and arguments
-            String execFull = execPath + System.getProperty("file.separator") 
-                        + execName + " "  + job.getArgs();
+            String execFull = execPath + System.getProperty("file.separator") + execName + " " + job.getArgs();
 
             // print executable
             oStream.println();
             oStream.println(this.runComment + " job executable");
             oStream.println(execFull);
 
-            // add a test of the status and send info through the 
+            // add a test of the status and send info through the
             // command client -- should generalize so not csh specific
             oStream.println("if ( $status != 0 ) then");
             oStream.println("\t $EMF_CLIENT -k $EMF_JOBKEY -s 'Failed' -m \"ERROR running Job: $EMF_JOBNAME\"");
@@ -1335,11 +1389,11 @@ public class CaseServiceImpl implements CaseService {
             oStream.println("else");
             oStream.println("\t $EMF_CLIENT -k $EMF_JOBKEY -s 'Completed' -m \"Completed job: $EMF_JOBNAME\"");
             oStream.println("endif");
-            
-            // close output stream to file and make it executable
+
+            // close output stream to file and make it executable by everyone
             oStream.close();
-            ofile.setExecutable(true);
-            
+            ofile.setExecutable(true, false);
+
         } finally {
             // close the db server
             try {
@@ -1351,7 +1405,7 @@ public class CaseServiceImpl implements CaseService {
         }
 
     }
-    
+
     public Executable addExecutable(Executable exe) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -1529,42 +1583,20 @@ public class CaseServiceImpl implements CaseService {
 
         // need to create this user obj as final b.c. passed to threading
         final User localUser = user;
-        
-        // fill in access to jobTaskManager-- for now just loop over the 
+
+        // fill in access to jobTaskManager-- for now just loop over the
         // the jobs
-        for (CaseJob job : jobs){
-            try{
+        for (CaseJob job : jobs) {
+            try {
                 // set status as submitted and run the individual job
-                setStatus(localUser, "Job " + job.getName() + " submitted for case " + getCase(job.getCaseId()) + ".", "Run Job");
+                setStatus(localUser, "Job " + job.getName() + " submitted for case " + getCase(job.getCaseId()) + ".",
+                        "Run Job");
                 runJob(job, user);
             } catch (Exception e) {
                 LOG.error("Could not run case job " + job.getName() + ".", e);
                 throw new EmfException(e.getMessage());
-            }   
-                            
-            
-        }
-        
-        // loop over jobs and spawn a seperate thread for each -- old code
-//        for (final CaseJob job : jobs) {
-//            System.out.println("runJobs-- job: "+ job);
-//            try {
-//                threadPool.execute(new Runnable() {
-//                    public void run() {
-//                        // defining what the thread will run
-//                        try {
-//                         	setStatus(localUser, "Job " + job.getName() + " submitted for case " + getCase(job.getCaseId()) + ".", "Run Job");
-//                            runJob(job);
-//                        } catch (Exception e) {
-//                            LOG.error("Could not run case job " + job.getName() + ".", e);
-//                            //throw new EmfException(e.getMessage());
-//                        }
-//                    }
-//                });
-//            } catch (Exception e) {
-//                throw new EmfException(e.getMessage());
-//            }
-//        }
+            }
 
+        }
     }
 }
