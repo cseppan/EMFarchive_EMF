@@ -140,7 +140,7 @@ public class RemoteCopy {
         errorString = errorString.toLowerCase();
         
         if (errorString.contains("no supported authentication"))
-            return "Local key agent not started or local/remote ssh settings not right.";
+            return "Remote copy failed. Local key agent not started, logged in user has no account on EMF server or ssh settings not right.";
 
         if (errorString.contains("cannot create file"))
             return "Please check temporary folder permission/existance specified in the preference file (EMFPrefs.txt).";
