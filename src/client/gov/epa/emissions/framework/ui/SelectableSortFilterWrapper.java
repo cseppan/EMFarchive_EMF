@@ -55,7 +55,6 @@ public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
 
     public List<?> selected() {
         int[] selectedIndexes = topModelSelectedIndexes();
-        System.out.println("selected indexes in wrapper: "+ selectedIndexes.length);
         
         return selectModel.selected(selectedIndexes);
     }
