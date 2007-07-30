@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -62,21 +63,21 @@ public abstract class AbstractStrategyTask implements StrategyTask {
         String status = "";
         try {
             //process/load each input dataset
-            EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
-            for (int i = 0; i < inputDatasets.length; i++) {
+            ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy.getControlStrategyInputDatasets();
+            for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
                 ControlStrategyResult result = new ControlStrategyResult();
                 try {
-                    result = loader.loadStrategyResult(inputDatasets[i]);
+                    result = loader.loadStrategyResult(controlStrategyInputDatasets[i]);
                     recordCount = loader.getRecordCount();
                     status = "Completed.";
                 } catch (Exception e) {
                     e.printStackTrace();
-                    status = "Failed. Error processing input dataset: " + inputDatasets[i].getName() + ". " + result.getRunStatus();
+                    status = "Failed. Error processing input dataset: " + controlStrategyInputDatasets[i].getInputDataset().getName() + ". " + result.getRunStatus();
                 } finally {
                     result.setCompletionTime(new Date());
                     result.setRunStatus(status);
                     saveControlStrategyResult(result);
-                    addStatus(inputDatasets[i]);
+                    addStatus(controlStrategyInputDatasets[i]);
                 }
             }
         } catch (Exception e) {
@@ -192,8 +193,10 @@ public abstract class AbstractStrategyTask implements StrategyTask {
         return recordCount;
     }
 
-    private void addStatus(EmfDataset inputDataset) {
-        setStatus("Completed processing control strategy input dataset: " + inputDataset.getName() + ". There were " + recordCount + " records returned.");
+    private void addStatus(ControlStrategyInputDataset controlStrategyInputDataset) {
+        setStatus("Completed processing control strategy input dataset: " 
+                + controlStrategyInputDataset.getInputDataset().getName() 
+                + ". There were " + recordCount + " records returned.");
     }
 
     protected void setStatus(String message) {

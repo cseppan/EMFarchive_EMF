@@ -18,6 +18,8 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
+import gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries.StrategyTask;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.controlmeasure.io.CMImportTask;
@@ -45,7 +47,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
 //        service = new ControlStrategyServiceImpl(sessionFactory);
     }
 
-    protected EmfDataset setInputDataset(String type) throws Exception {
+    protected ControlStrategyInputDataset setInputDataset(String type) throws Exception {
         EmfDataset inputDataset = new EmfDataset();
         inputDataset.setName("test" + Math.round(Math.random() * 1000) % 1000);
         inputDataset.setCreator(emfUser().getUsername());
@@ -65,7 +67,10 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
             inputDataset = addORLNonroadDataset(inputDataset);
         
         addVersionZeroEntryToVersionsTable(inputDataset, dbServer.getEmissionsDatasource());
-        return (EmfDataset) load(EmfDataset.class, inputDataset.getName());
+        inputDataset = (EmfDataset) load(EmfDataset.class, inputDataset.getName());
+        ControlStrategyInputDataset controlStrategyInputDataset = new ControlStrategyInputDataset(inputDataset);
+        controlStrategyInputDataset.setVersion(inputDataset.getDefaultVersion());
+        return controlStrategyInputDataset;
     }
 
     private DatasetType getDatasetType(String type) {
@@ -102,12 +107,10 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         dbServer.disconnect();
     }
 
-    protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant, ControlMeasureClass[] classes) throws Exception {
+    protected ControlStrategy controlStrategy(ControlStrategyInputDataset inputDataset, String name, Pollutant pollutant, ControlMeasureClass[] classes) throws Exception {
         ControlStrategy strategy = new ControlStrategy();
         strategy.setName(name);
-        strategy.setInputDatasets(new EmfDataset[] { inputDataset, setInputDataset("ORL nonpoint") });
-        strategy.setDatasetType(inputDataset.getDatasetType());
-        strategy.setDatasetVersion(0);// initial version
+        strategy.setControlStrategyInputDatasets(new ControlStrategyInputDataset[] { inputDataset, setInputDataset("ORL nonpoint") });
         strategy.setInventoryYear(2000);
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant);
@@ -116,15 +119,13 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
 //        strategy.setCountyFile("c:\\cep\\EMF\\test\\data\\cost\\controlStrategy\\070 Run Counties_OTC and West States Statewide.csv");
 //        strategy.setFilter("srctype = 2");
         add(strategy);
-        return strategy;
+        return (ControlStrategy) load(ControlStrategy.class, strategy.getName());
     }
 
-    protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant, ControlStrategyMeasure[] measures) {
+    protected ControlStrategy controlStrategy(ControlStrategyInputDataset inputDataset, String name, Pollutant pollutant, ControlStrategyMeasure[] measures) {
         ControlStrategy strategy = new ControlStrategy();
         strategy.setName(name);
-        strategy.setInputDatasets(new EmfDataset[] { inputDataset });
-        strategy.setDatasetType(inputDataset.getDatasetType());
-        strategy.setDatasetVersion(0);// initial version
+        strategy.setControlStrategyInputDatasets(new ControlStrategyInputDataset[] { inputDataset });
         strategy.setInventoryYear(2000);
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant);
@@ -134,12 +135,10 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         return strategy;
     }
 
-    protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant) {
+    protected ControlStrategy controlStrategy(ControlStrategyInputDataset inputDataset, String name, Pollutant pollutant) {
         ControlStrategy strategy = new ControlStrategy();
         strategy.setName(name);
-        strategy.setInputDatasets(new EmfDataset[] { inputDataset });
-        strategy.setDatasetType(inputDataset.getDatasetType());
-        strategy.setDatasetVersion(0);// initial version
+        strategy.setControlStrategyInputDatasets(new ControlStrategyInputDataset[] { inputDataset });
         strategy.setInventoryYear(2000);
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant);
@@ -246,7 +245,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     protected String detailResultDatasetTableName(ControlStrategy strategy) throws Exception {
         Session session = sessionFactory.getSession();
         try {
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), session);
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), session);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             return detailedResultDataset.getInternalSources()[0].getTable();
         } finally {
@@ -259,5 +258,18 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
         CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory, dbServerFactory());
         task.run();
+    }
+    
+    protected void runStrategy(ControlStrategy strategy) throws EmfException {
+        StrategyTask strategyTask = new StrategyTask(strategy, emfUser(), dbServerFactory,
+                new Integer(500), sessionFactory);
+        strategyTask.run();
+    }
+    
+    protected void createControlledInventory(ControlStrategy strategy, EmfDataset inputDataset) throws Exception {
+        //create the controlled inventory for this strategy run....
+        ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(emfUser(), strategy,
+                inputDataset, sessionFactory, dbServerFactory);
+        output.create();
     }
 }

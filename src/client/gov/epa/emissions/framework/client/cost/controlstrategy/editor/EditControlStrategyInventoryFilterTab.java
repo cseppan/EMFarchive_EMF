@@ -11,11 +11,18 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
+import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPresenter;
+import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionView;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
+import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
@@ -45,7 +52,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     
     private TextField countyFileTextField;
     
-    private VersionPanel versionPanel;
+//    private VersionPanel versionPanel;
     
     private TextArea filter;
     
@@ -71,19 +78,23 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
     private JPanel mainPanel;
 
+    private DesktopManager desktopManager;
+    
     public EditControlStrategyInventoryFilterTab(ControlStrategy controlStrategy, ManageChangeables changeablesList, 
-            MessagePanel messagePanel, EmfConsole parentConsole, EmfSession session) {
+            MessagePanel messagePanel, EmfConsole parentConsole, 
+            EmfSession session, DesktopManager desktopManager) {
         super.setName("csFilter");
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
         this.controlStrategy = controlStrategy;
         this.parentConsole = parentConsole;
         this.session = session;
-        doLayout(controlStrategy);
+        this.desktopManager = desktopManager;
+        doLayout(controlStrategy.getControlStrategyInputDatasets());
     }
 
-    private void doLayout(ControlStrategy controlStrategy) {
-        tableData = new ControlStrategyInputDatasetTableData(controlStrategy.getInputDatasets());
+    private void doLayout(ControlStrategyInputDataset[] controlStrategyInputDatasets) {
+        tableData = new ControlStrategyInputDatasetTableData(controlStrategyInputDatasets);
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(createMiddleSection(controlStrategy), BorderLayout.CENTER);
         
@@ -108,32 +119,31 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
     private void buildSortFilterPanel() {
         mainPanel.removeAll();
-        mainPanel.add(sortFilterPanel());
+        mainPanel.add(new JLabel("Inventories:"), BorderLayout.NORTH);
+        SortFilterSelectionPanel panel = sortFilterPanel();
+        mainPanel.add(panel);
+        mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
+
+        // SortFilterSelectionPanel panel = sortFilterPanel();
+        // sortFilterPanelContainer.removeAll();
+        // sortFilterPanelContainer.add(panel);
+        // mainPanel.add(sortFilterPanelContainer);
     }
 
-    private JPanel sortFilterPanel() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.add(new JLabel("Inventories:"), BorderLayout.NORTH);
-
+    private SortFilterSelectionPanel sortFilterPanel() {
         tableModel = new EmfTableModel(tableData);
         sortFilterSelectModel = new TrackableSortFilterSelectModel(tableModel);
         changeablesList.addChangeable(sortFilterSelectModel);
         SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parentConsole, sortFilterSelectModel);
         sortFilterSelectionPanel.setPreferredSize(new Dimension(625, 200));
-        panel.add(sortFilterSelectionPanel);
-        panel.add(buttonPanel(), BorderLayout.SOUTH);
-        return panel;
+        return sortFilterSelectionPanel;
     }
 
     private JPanel buttonPanel() {
         JPanel panel = new JPanel();
         Button addButton = new BorderlessButton("Add", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    addAction();
-                } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
-                }
+                addAction();
             }
         });
         panel.add(addButton);
@@ -153,6 +163,12 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             }
         });
         panel.add(removeButton);
+        Button viewButton = new BorderlessButton("View", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                viewAction();
+            }
+        });
+        panel.add(viewButton);
 
         JPanel container = new JPanel(new BorderLayout());
         container.add(panel, BorderLayout.LINE_START);
@@ -160,16 +176,22 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         return container;
     }
 
-    private void addAction() throws EmfException {
-        throw new EmfException("");
-//        ControlMeasureSelectionView view = new ControlMeasureSelectionDialog(parent, changeablesList);
-//        ControlMeasureSelectionPresenter presenter = new ControlMeasureSelectionPresenter(this, view, session,
-//                this.presenter.getAllControlMeasures());
-//        try {
-//            presenter.display(view);
-//        } catch (Exception exp) {
-//            messagePanel.setError(exp.getMessage());
-//        }
+    private void addAction() {
+        InputDatasetSelectionView view = new InputDatasetSelectionDialog(parentConsole, changeablesList);
+        InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session);
+        try {
+            presenter.display();
+            EmfDataset[] inputDatasets = presenter.getDatasets();
+            ControlStrategyInputDataset[] controlStrategyInputDatasets = new ControlStrategyInputDataset[inputDatasets.length];
+            for (int i = 0; i < inputDatasets.length; i++) {
+                controlStrategyInputDatasets[i] = new ControlStrategyInputDataset(inputDatasets[i]);
+                controlStrategyInputDatasets[i].setVersion(inputDatasets[i].getDefaultVersion());
+            }
+            tableData.add(controlStrategyInputDatasets);
+            buildSortFilterPanel();
+        } catch (Exception exp) {
+            messagePanel.setError(exp.getMessage());
+        }
     }
 
     private void editAction() throws EmfException {
@@ -193,9 +215,9 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             return;
         }
 
-        EmfDataset[] inputDatasets = (EmfDataset[]) selected.toArray(new EmfDataset[0]);
+        ControlStrategyInputDataset[] controlStrategyInputDatasets = (ControlStrategyInputDataset[]) selected.toArray(new ControlStrategyInputDataset[0]);
 
-        if (inputDatasets.length == 0)
+        if (controlStrategyInputDatasets.length == 0)
             return;
 
         String title = "Warning";
@@ -204,8 +226,24 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
                 JOptionPane.QUESTION_MESSAGE);
 
         if (selection == JOptionPane.YES_OPTION) {
-            tableData.remove(inputDatasets);
+            tableData.remove(controlStrategyInputDatasets);
             buildSortFilterPanel();
+        }
+    }
+
+    protected void viewAction() {
+        messagePanel.clear();
+        List selected = sortFilterSelectModel.selected();
+
+        if (selected.size() == 0) {
+            messagePanel.setError("Please select an item to view.");
+            return;
+        }
+
+        for (int i = 0; i < selected.size(); i++) {
+            PropertiesViewPresenter presenter = new PropertiesViewPresenter((EmfDataset)selected.get(i), session);
+            DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
+            presenter.doDisplay(view);
         }
     }
 
@@ -370,10 +408,16 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         if (value.length() > 255)
             throw new EmfException("Filter Tab: The length of the sql filter should not exceed 255 characters.");
 
-        controlStrategy.setDatasetType(selectedDatasetType());
-        controlStrategy.setDatasetVersion(versionPanel.datasetVersion());
         controlStrategy.setFilter(value);
         controlStrategy.setCountyFile(countyFileTextField.getText().trim());
+        ControlStrategyInputDataset[] inputDatasets = {};
+        if (tableData != null) {
+            inputDatasets = new ControlStrategyInputDataset[tableData.rows().size()];
+            for (int i = 0; i < tableData.rows().size(); i++) {
+                inputDatasets[i] = (ControlStrategyInputDataset)tableData.element(i);
+            }
+            controlStrategy.setControlStrategyInputDatasets(inputDatasets);
+        }
     }
 
     public void refresh(ControlStrategyResult[] controlStrategyResults) {

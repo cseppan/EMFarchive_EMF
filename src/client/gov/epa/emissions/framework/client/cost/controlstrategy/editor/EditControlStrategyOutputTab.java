@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
@@ -174,9 +175,16 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                 messagePanel.setError("Please select at least one item.");
                 return;
             }
+            ControlStrategyInputDataset[] inputDatasets = controlStrategy.getControlStrategyInputDatasets();
            // EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
             for (int i = 0; i < controlStrategyResults.length; i++) {
                 EmfDataset inputDataset = null;
+                for (int j = 0; j < inputDatasets.length; j++) {
+                    if (inputDatasets[j].getInputDataset().getId() == controlStrategyResults[i].getInputDatasetId()) {
+                        inputDataset = inputDatasets[j].getInputDataset();
+                        break;
+                    }
+                }
                 inputDataset=getInputDataset(controlStrategyResults[i].getInputDatasetId());               
                 if (inputDataset != null)
                     presenter.doInventory(controlStrategy, inputDataset);
@@ -190,11 +198,11 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     private EmfDataset getInputDataset(int datasetId) {
-        EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
+        ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy.getControlStrategyInputDatasets();
         EmfDataset inputDataset = null;
-        for (int j = 0; j < inputDatasets.length; j++) {
-            if (inputDatasets[j].getId() == datasetId) {
-                inputDataset = inputDatasets[j];
+        for (int j = 0; j < controlStrategyInputDatasets.length; j++) {
+            if (controlStrategyInputDatasets[j].getInputDataset().getId() == datasetId) {
+                inputDataset = controlStrategyInputDatasets[j].getInputDataset();
                 break;
             }
         }
@@ -242,8 +250,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     private JPanel tablePanel(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
-        EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
-        ControlStrategyOutputTableData tableData = new ControlStrategyOutputTableData(inputDatasets, controlStrategyResults);
+        ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy.getControlStrategyInputDatasets();
+        ControlStrategyOutputTableData tableData = new ControlStrategyOutputTableData(controlStrategyInputDatasets, controlStrategyResults);
         EmfTableModel model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
         JTable table = new JTable(selectModel);

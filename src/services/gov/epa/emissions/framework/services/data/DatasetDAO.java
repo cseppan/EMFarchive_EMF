@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
@@ -200,9 +201,9 @@ public class DatasetDAO {
     }
 
     private boolean datasetUsed(ControlStrategy cs, EmfDataset dataset) {
-        EmfDataset[] inputDatasets = cs.getInputDatasets();
-        for (int i = 0; i < inputDatasets.length; i++)
-            if (inputDatasets[i].equals(dataset))
+        ControlStrategyInputDataset[] controlStrategyInputDatasets = cs.getControlStrategyInputDatasets();
+        for (int i = 0; i < controlStrategyInputDatasets.length; i++)
+            if (controlStrategyInputDatasets[i].getInputDataset().equals(dataset))
                 return true;
 
         return false;

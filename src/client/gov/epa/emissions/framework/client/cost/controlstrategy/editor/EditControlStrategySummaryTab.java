@@ -286,7 +286,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setDescription(description.getText());
         updateProject();
 
-        isDatasetSelected(controlStrategy);
+//        isDatasetSelected(controlStrategy);
         controlStrategy.setCostYear(new YearValidation("Cost Year").value(costYear.getText(), costYearTable.getStartYear(), costYearTable.getEndYear()));
         controlStrategy.setInventoryYear(new YearValidation("Inventory Year").value(inventoryYear.getText()));
         updateRegion();
@@ -310,11 +310,11 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return pollutant;
     }
 
-    private void isDatasetSelected(ControlStrategy controlStrategy) throws EmfException {
-        if (controlStrategy.getInputDatasets().length == 0) {
-            throw new EmfException("Please select a dataset");
-        }
-    }
+//    private void isDatasetSelected(ControlStrategy controlStrategy) throws EmfException {
+//        if (controlStrategy.getControlStrategyInputDatasets().length == 0) {
+//            throw new EmfException("Please select a dataset");
+//        }
+//    }
 
     private void updateRegion() {
         Object selected = regionsCombo.getSelectedItem();

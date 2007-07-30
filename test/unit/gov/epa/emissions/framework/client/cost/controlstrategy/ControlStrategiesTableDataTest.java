@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
-import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
@@ -28,7 +27,6 @@ public class ControlStrategiesTableDataTest extends TestCase {
         controlStrategy1.setName("name1");
         controlStrategy1.setRegion(new Region("region1"));
         controlStrategy1.setProject(new Project("project1"));
-        controlStrategy1.setDatasetType(new DatasetType("datasetType1"));
         controlStrategy1.setDiscountRate(0.5);
         controlStrategy1.setCostYear(2000);
         controlStrategy1.setInventoryYear(2001);
@@ -40,7 +38,6 @@ public class ControlStrategiesTableDataTest extends TestCase {
         controlStrategy2.setName("name2");
         controlStrategy2.setRegion(new Region("region2"));
         controlStrategy2.setProject(new Project("project2"));
-        controlStrategy2.setDatasetType(new DatasetType("datasetType2"));
         controlStrategy2.setDiscountRate(0.5);
         controlStrategy2.setCostYear(2000);
         controlStrategy2.setInventoryYear(2001);

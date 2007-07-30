@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services.cost.controlStrategy;
 
 import gov.epa.emissions.commons.data.Dataset;
-import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
@@ -54,19 +53,12 @@ public class ControlStrategyInventoryOutput {
         this.user = user;
         this.sessionFactory = sessionFactory;
         this.dbServer = dbServerFactory.getDbServer();
-        this.tableFormat = new FileFormatFactory(dbServer).tableFormat(datasetType(controlStrategy));
+        this.tableFormat = new FileFormatFactory(dbServer).tableFormat(inputDataset.getDatasetType());
         this.creator = new DatasetCreator("ControlledInventory_", "CSINVEN_", 
                 controlStrategy, user, 
                 sessionFactory, dbServerFactory,
                 dbServer.getEmissionsDatasource(), new Keywords(new DataCommonsServiceImpl(sessionFactory).getKeywords()));
         this.statusServices = new StatusDAO(sessionFactory);
-    }
-
-    private DatasetType datasetType(ControlStrategy strategy) throws EmfException {
-        DatasetType type = strategy.getDatasetType();
-        if (type == null)
-            throw new EmfException("Please select a dataset type");
-        return type;
     }
 
     public void create() throws Exception {
@@ -96,13 +88,13 @@ public class ControlStrategyInventoryOutput {
 //    private void copyAndUpdateData(EmfDbServer server, Datasource datasource, EmfDataset inputDataset,
     private void copyAndUpdateData(DbServer server, Datasource datasource, EmfDataset inputDataset,
             String inputTable) throws EmfException {
-        EmfDataset dataset = creator.addDataset(inputDataset, controlStrategy.getDatasetType(), 
+        EmfDataset dataset = creator.addDataset(inputDataset, inputDataset.getDatasetType(), 
                 tableFormat, description(inputDataset));
         
         String outputInventoryTableName = dataset.getInternalSources()[0].getTable();
         
-        copyDataFromOriginalTable(inputTable, outputInventoryTableName, version(inputDataset, controlStrategy
-                .getDatasetVersion()), inputDataset, datasource);
+        copyDataFromOriginalTable(inputTable, outputInventoryTableName, version(inputDataset, inputDataset
+                .getVersion()), inputDataset, datasource);
 
         ControlStrategyResult result = getControlStrategyResult();
         updateDataWithDetailDatasetTable(outputInventoryTableName, detailDatasetTable(result), server
@@ -217,7 +209,7 @@ public class ControlStrategyInventoryOutput {
     }
 
     private String updateQuery(String outputTable, String detailResultTable, Datasource datasource) {
-        boolean pointDatasetType = controlStrategy.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)");
+        boolean pointDatasetType = inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)");
         String sql = "update " + qualifiedTable(outputTable, datasource) + " as o "
         + "set ceff = case when ann_emis <> 0 then (1 - b.final_emissions / ann_emis) * 100 else 0 end, "
         + "ann_emis = b.final_emissions, "
@@ -275,7 +267,7 @@ public class ControlStrategyInventoryOutput {
     }
 
     private void startStatus(StatusDAO statusServices) {
-        String start = "Started creating controlled inventory of type '" + controlStrategy.getDatasetType()
+        String start = "Started creating controlled inventory of type '" + inputDataset.getDatasetType()
                 + "' using control strategy '" + controlStrategy.getName();
         Status status = status(user, start);
         statusServices.add(status);

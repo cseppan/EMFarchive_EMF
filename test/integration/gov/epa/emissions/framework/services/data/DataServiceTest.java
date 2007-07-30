@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Random;
@@ -286,7 +287,7 @@ public class DataServiceTest extends ServiceTestCase {
         User owner = userService.getUser("emf");
         EmfDataset dataset1 = newDataset();
         EmfDataset dataset2 = newDataset();
-        ControlStrategy strategy = newControlStrategy(dataset1);
+        ControlStrategy strategy = newControlStrategy(new ControlStrategyInputDataset(dataset1));
 
         try {
             assertEquals("data-service-test-strategy", strategy.getName());
@@ -325,9 +326,9 @@ public class DataServiceTest extends ServiceTestCase {
         }
     }
 
-    private ControlStrategy newControlStrategy(EmfDataset dataset) {
+    private ControlStrategy newControlStrategy(ControlStrategyInputDataset dataset) {
         ControlStrategy strategy = new ControlStrategy("data-service-test-strategy");
-        strategy.setInputDatasets(new EmfDataset[] { dataset });
+        strategy.setControlStrategyInputDatasets(new ControlStrategyInputDataset[] { dataset });
 
         session.clear();// flush cached objects
         Transaction tx = null;

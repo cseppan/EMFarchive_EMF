@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
@@ -119,7 +120,8 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     //call this to process the input and create the output in a batch fashion
-    public ControlStrategyResult loadStrategyResult(EmfDataset inputDataset) throws Exception {
+    public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {
+        EmfDataset inputDataset = controlStrategyInputDataset.getInputDataset();
         //reset record counter
         recordCount = 0;
         //setup result

@@ -69,6 +69,8 @@ public class EmfDataset implements Dataset, Lockable {
 
     private int defaultVersion;
 
+    private int version;
+
     private Mutex lock;
 
     public EmfDataset() {
@@ -85,6 +87,14 @@ public class EmfDataset implements Dataset, Lockable {
 
     public void setDefaultVersion(int defaultVersion) {
         this.defaultVersion = defaultVersion;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     public Date getAccessedDateTime() {

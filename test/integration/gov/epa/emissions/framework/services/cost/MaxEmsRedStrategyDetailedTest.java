@@ -4,10 +4,7 @@ import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfDbServer;
-import gov.epa.emissions.framework.services.cost.analysis.maxreduction.MaxEmsRedStrategy;
-import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -30,7 +27,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
     
     public void testShouldRunMaxEmsRedStrategyWithNonpointDataAndFilterOnAllMeasureClasses() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL nonpoint");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonpoint");
         
         ResultSet rs = null;
         Connection cn = null;
@@ -39,15 +36,11 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 //            ControlMeasureClass[] cmcs = {(ControlMeasureClass)load(ControlMeasureClass.class, "Known"),
 //                    (ControlMeasureClass)load(ControlMeasureClass.class, "Emerging")};
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant(), cmcs);
-            User user = emfUser();
-            strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -94,29 +87,25 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithNonpointDataAndFilterOnKnownMeasureClass() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL nonpoint");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonpoint");
         
         ResultSet rs = null;
         Connection cn = null;
         try {
             ControlMeasureClass[] cmcs = {(ControlMeasureClass)load(ControlMeasureClass.class, "Known")};
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant(), cmcs);
-            User user = emfUser();
-            strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -163,14 +152,14 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithNonpointDataAndFilterOnKnownAndEmergingMeasureClasses() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL nonpoint");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonpoint");
         
         ResultSet rs = null;
         Connection cn = null;
@@ -178,15 +167,11 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             ControlMeasureClass[] cmcs = {(ControlMeasureClass)load(ControlMeasureClass.class, "Known"),
                     (ControlMeasureClass)load(ControlMeasureClass.class, "Emerging")};
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant(), cmcs);
-            User user = emfUser();
-            strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -233,29 +218,25 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithNonpointDataAndFilterOnEmergingMeasureClass() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL nonpoint");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonpoint");
         
         ResultSet rs = null;
         Connection cn = null;
         try {
             ControlMeasureClass[] cmcs = {(ControlMeasureClass)load(ControlMeasureClass.class, "Emerging")};
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant(), cmcs);
-            User user = emfUser();
-            strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -283,14 +264,14 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithNonpointDataAndFilterOnSpecificMeasures() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL nonpoint");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonpoint");
         
         ResultSet rs = null;
         Connection cn = null;
@@ -310,15 +291,11 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 //            LightControlMeasure[] cmsa = {(LightControlMeasure)load(LightControlMeasure.class, "Bale Stack/Propane Burning; Agricultural Burning"), 
 //                    (LightControlMeasure)load(LightControlMeasure.class, "ESP for Commercial Cooking; Conveyorized Charbroilers")};
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant(), controlStrategyMeasures);
-            User user = emfUser();
-            strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -355,28 +332,24 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithNonRoadData() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL nonroad");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonroad");
         
         ResultSet rs = null;
         Connection cn = null;
         try {
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant());
-            User user = emfUser();
-            strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -413,28 +386,24 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithOnRoadData() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL onroad");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL onroad");
         
         ResultSet rs = null;
         Connection cn = null;
         try {
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant());
-            User user = emfUser();
-            strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -478,14 +447,14 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithNonpointDataAndFilterOnAllMeasureClassesAndCreateControlledInv() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL nonpoint");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonpoint");
         
         ResultSet rs = null;
         Connection cn = null;
@@ -498,12 +467,8 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 //                    (ControlMeasureClass)load(ControlMeasureClass.class, "Emerging")};
             String strategyName = "CS_test_case__" + Math.round(Math.random() * 10000);
             strategy = controlStrategy(inputDataset, strategyName, pm10Pollutant(), cmcs);
-            User user = emfUser();
-            strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
-//            HibernateSessionFactory sessionFactory = sessionFactory;
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+
+            runStrategy(strategy);
 
             Session session = sessionFactory.getSession();
 
@@ -511,7 +476,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 //            session.clear();
 
             //get detailed result dataset
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), session);
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), session);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -558,11 +523,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < percentDiff);
 
             //create the controlled inventory for this strategy run....
-            ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, strategy,
-                    strategy.getInputDatasets()[0], sessionFactory, dbServerFactory);
-            output.create();
+            createControlledInventory(strategy, inputDataset.getInputDataset());
+
             //reload
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
 
             tableName2 = 
                 result.getControlledInventoryDataset().getInternalSources()[0].getTable();
@@ -616,14 +580,14 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             if (rs != null) rs.close();
             if (cn != null) cn.close();
             if (cn2 != null) cn2.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithPointDataAndFilterOnAllMeasureClasses() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL point");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL point");
         
         ResultSet rs = null;
         Connection cn = null;
@@ -632,15 +596,11 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
         String tableName2 = "";
         try {
             strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant());
-            User user = emfUser();
-            strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
 
-            MaxEmsRedStrategy maxEmfEmsRedStrategy = new MaxEmsRedStrategy(strategy, user, dbServerFactory(),
-                    new Integer(500), sessionFactory);
-            maxEmfEmsRedStrategy.run();
+            runStrategy(strategy);
 
             //get detailed result dataset
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -687,11 +647,11 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             rs.close();
 
             //create the controlled inventory for this strategy run....
-            ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, strategy,
-                    strategy.getInputDatasets()[0], sessionFactory, dbServerFactory());
-            output.create();
+            //create the controlled inventory for this strategy run....
+            createControlledInventory(strategy, inputDataset.getInputDataset());
+
             //reload
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
 
             tableName2 = result.getControlledInventoryDataset().getName().replaceAll("ControlledInventory", "CSINVEN");
             
@@ -716,7 +676,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             if (rs != null) rs.close();
             if (cn != null) cn.close();
             if (cn2 != null) cn2.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
@@ -739,13 +699,13 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 //        }
 //    }
 
-    private void dropTables(ControlStrategy strategy, EmfDataset inputDataset) throws Exception {
+    private void dropTables(ControlStrategy strategy) throws Exception {
         if (strategy != null) {
-            for (int i = 0; i < strategy.getInputDatasets().length; i++) {
+            for (int i = 0; i < strategy.getControlStrategyInputDatasets().length; i++) {
                 //drop input dataset table
-                dropTable(strategy.getInputDatasets()[i].getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
+                dropTable(strategy.getControlStrategyInputDatasets()[i].getInputDataset().getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
                 //drop input inventory qa step tables
-                dropQASummaryTables(strategy.getInputDatasets()[i]);
+                dropQASummaryTables(strategy.getControlStrategyInputDatasets()[i].getInputDataset());
             }
             List results = new ControlStrategyDAO().getControlStrategyResults(strategy.getId(), session);
             for (int i = 0; i < results.size(); i++) {
@@ -779,18 +739,6 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
     }
 
     private void removeData() throws Exception {
-//        dropAll(Scc.class);
-//        dropAll(QAStepResult.class);
-//        dropAll(QAStep.class);
-//        new PostgresDbUpdate().deleteAll("emf.input_datasets_control_strategies");
-//        dropAll(ControlStrategyResult.class);
-//        dropAll(EmfDataset.class);
-//        dropAll(Dataset.class);
-//        new PostgresDbUpdate().deleteAll("emf.control_strategy_measures");
-//        dropAll(EfficiencyRecord.class);
-//        dropAll(ControlMeasure.class);
-//        dropAll(ControlStrategy.class);
-
         dropAll("Scc");
         dropAll("QAStepResult");
         dropAll("QAStep");

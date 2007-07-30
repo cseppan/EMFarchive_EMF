@@ -27,6 +27,7 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.ControlStrategyMeasure;
 import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.cost.StrategyType;
@@ -113,6 +114,7 @@ public class DataMappings extends Mappings {
         bean(call, LightControlMeasure.class, lightControlMeasure());
         bean(call, ControlTechnology.class, controlTechnology());
         bean(call, ControlStrategy.class, controlStrategy());
+        bean(call, ControlStrategyInputDataset.class, controlStrategyInputDataset());
         bean(call, StrategyType.class, strategyType());
         bean(call, ControlStrategyResult.class, controlStrategyResult());
         bean(call, EfficiencyRecord.class, efficiencyRecord());
@@ -169,6 +171,7 @@ public class DataMappings extends Mappings {
         
         array(call, ControlTechnology[].class, controlTechnologies());
         array(call, ControlStrategy[].class, controlStrategies());
+        array(call, ControlStrategyInputDataset[].class, controlStrategyInputDatasets());
         array(call, StrategyType[].class, strategyTypes());
         array(call, ControlStrategyResult[].class, controlStrategyResults());
         array(call, EfficiencyRecord[].class, efficiencyRecords());
@@ -389,6 +392,14 @@ public class DataMappings extends Mappings {
 
     public QName controlStrategies() {
         return qname("ControlStrategies");
+    }
+
+    public QName controlStrategyInputDataset() {
+        return qname("ControlStrategyInputDataset");
+    }
+
+    public QName controlStrategyInputDatasets() {
+        return qname("ControlStrategyInputDatasets");
     }
 
     public QName strategyType() {

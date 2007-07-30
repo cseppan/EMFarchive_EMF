@@ -114,7 +114,7 @@ public class StrategyLoader {
         this.tableFormat = tableFormat;
         this.result = result;
         this.controlStrategy = controlStrategy;
-        this.type = this.controlStrategy.getDatasetType();
+        //this.type = this.controlStrategy.getDatasetType();
         this.pointDatasetType = this.type.getName().equalsIgnoreCase("ORL Point Inventory (PTINV)");
         this.pollutants = new Pollutants(sessionFactory);
         this.decFormat = new DecimalFormat("0.#####E0");
@@ -123,7 +123,7 @@ public class StrategyLoader {
         this.datasource = dbServer.getEmissionsDatasource();
         this.modifier = dataModifier(tableName, dbServer.getEmissionsDatasource());
         this.mapGenerator = new GenerateSccControlMeasuresMap(dbServer,
-                emissionTableName(controlStrategy.getInputDatasets()[0]), controlStrategy, sessionFactory);
+                emissionTableName(controlStrategy.getControlStrategyInputDatasets()[0].getInputDataset()), controlStrategy, sessionFactory);
         this.costYearTable = new CostYearTableReader(dbServer, controlStrategy.getCostYear()).costYearTable();
         this.retrieveBestMeasureEffRecords = new RetrieveBestMeasureEffRecords(controlStrategy, costYearTable);
         this.retrieveBestMeasures = new RetrieveBestMeasures(controlStrategy, costYearTable);

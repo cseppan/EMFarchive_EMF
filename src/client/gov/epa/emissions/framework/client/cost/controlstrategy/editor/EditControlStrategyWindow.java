@@ -55,8 +55,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private EditControlStrategyMeasuresTab measuresTabView;
 
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
-        super("Edit Control Strategy", new Dimension(1000, 300), desktopManager);
-        this.setMinimumSize(new Dimension(1000, 300));
+        super("Edit Control Strategy", new Dimension(700, 300), desktopManager);
+        this.setMinimumSize(new Dimension(700, 300));
         this.session = session;
         this.desktopManager = desktopManager;
         this.parentConsole = parentConsole;
@@ -149,7 +149,9 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     private JPanel createInventoryFilterTab(ControlStrategy controlStrategy) {
         EditControlStrategyTabView view = null;
-        view = new EditControlStrategyInventoryFilterTab(controlStrategy, this,  messagePanel, parentConsole, session);
+        view = new EditControlStrategyInventoryFilterTab(controlStrategy, this, 
+                messagePanel, parentConsole, 
+                session, desktopManager);
         this.presenter.set(view);
         return (JPanel) view;
     }

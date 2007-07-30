@@ -17,7 +17,7 @@
 	<property name="lastModifiedDate" column="last_modified_date" type="java.util.Date" not-null="false" length="4"/>
   	<property name="startDate" column="start_date" type="java.util.Date" not-null="false" length="4"/>
   	<property name="completionDate" column="completion_date" type="java.util.Date" not-null="false" length="4"/>
-	<property name="datasetVersion" column="dataset_version" type="integer" not-null="true"/>
+<!--	<property name="datasetVersion" column="dataset_version" type="integer" not-null="true"/>-->
 	<property name="filter" column="filter" type="string" not-null="false"/>
 	
 	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
@@ -48,21 +48,38 @@
             class="gov.epa.emissions.commons.security.User"
             column="creator_id"/> 
             
-	<many-to-one cascade="none"
+<!--	<many-to-one cascade="none"
             name="datasetType" 
             class="gov.epa.emissions.commons.data.DatasetType"
-            column="dataset_type_id"/> 
+            column="dataset_type_id"/> -->
 
 	<many-to-one
             name="strategyType" 
             class="gov.epa.emissions.framework.services.cost.StrategyType"
             column="strategy_type_id"/> 
             
-   	<array name="inputDatasets" table="input_datasets_control_strategies" cascade="none">
+<!--   	<array name="inputDatasets" table="input_datasets_control_strategies" cascade="none">
     	<key column="control_strategy_id" not-null="true"/>
 	    <list-index column="list_index"/>
     	<many-to-many class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id"/>
+
+			<property name="version" column="dataset_version" type="integer" not-null="true"/>
+
+    	<composite-element class="gov.epa.emissions.framework.services.data.EmfDataset">
+			<property name="version" column="dataset_version" type="integer" not-null="true"/>
+        	<many-to-one name="controlMeasure" class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id" not-null="true" cascade="save-update"/>
+    	</composite-element>
+	</array>-->
+
+	<array name="controlStrategyInputDatasets" table="input_datasets_control_strategies" cascade="save-update">
+    	<key column="control_strategy_id" not-null="true"/>
+    	<list-index column="list_index"/>
+    	<composite-element class="gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset">
+			<property name="version" column="dataset_version" type="integer" not-null="true"/>
+        	<many-to-one name="inputDataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id" not-null="true" cascade="none"/>
+    	</composite-element>
 	</array>
+
 	
 	<array name="controlMeasureClasses" table="control_strategy_classes" cascade="save-update">
     	<key column="control_strategy_id" not-null="true"/>
@@ -74,10 +91,10 @@
     	<key column="control_strategy_id" not-null="true"/>
     	<list-index column="list_index"/>
     	<composite-element class="gov.epa.emissions.framework.services.cost.ControlStrategyMeasure">
-		    <property name="ruleEffectiveness" column="rule_effectiveness" type="double" not-null="true"/>
-	        <property name="rulePenetration" column="rule_penetration" type="double" not-null="true"/>
+		    <property name="ruleEffectiveness" column="rule_effectiveness" type="double"/>
+	        <property name="rulePenetration" column="rule_penetration" type="double"/>
 	        <property name="applyOrder" column="apply_order" type="double" not-null="true"/>
-        	<many-to-one name="controlMeasure" class="gov.epa.emissions.framework.services.cost.LightControlMeasure" column="control_measure_id" not-null="true" cascade="save-update"/>
+        	<many-to-one name="controlMeasure" class="gov.epa.emissions.framework.services.cost.LightControlMeasure" column="control_measure_id" not-null="true" cascade="none"/>
     	</composite-element>
 	</array>
 

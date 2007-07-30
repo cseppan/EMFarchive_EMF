@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 
 import java.util.List;
 
@@ -286,7 +287,7 @@ public class DatasetDaoTest extends ServiceTestCase {
         EmfDataset dataset3 = newDataset("test3");
         
         ControlStrategy strategy = newControlStrategy();
-        strategy.setInputDatasets(new EmfDataset[]{dataset});
+        strategy.setControlStrategyInputDatasets(new ControlStrategyInputDataset[]{new ControlStrategyInputDataset(dataset)});
         
         CaseInput input = new CaseInput();
         input.setDataset(dataset2);

@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -14,6 +15,7 @@ import gov.epa.emissions.framework.services.qa.QADAO;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.List;
 
 import org.hibernate.Session;
 
@@ -25,7 +27,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
     
     public void testShouldRunMaxEmsRedStrategyWithNonpointDataAndFilterOnAllMeasureClasses() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL nonpoint");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonpoint");
         
         ResultSet rs = null;
         Connection cn = null;
@@ -40,7 +42,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -87,14 +89,14 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithNonpointDataAndFilterOnKnownMeasureClass() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL nonpoint");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonpoint");
         
         ResultSet rs = null;
         Connection cn = null;
@@ -107,7 +109,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -154,14 +156,14 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithNonpointDataAndFilterOnKnownAndEmergingMeasureClasses() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL nonpoint");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonpoint");
         
         ResultSet rs = null;
         Connection cn = null;
@@ -175,7 +177,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -222,14 +224,14 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithNonpointDataAndFilterOnEmergingMeasureClass() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL nonpoint");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonpoint");
         
         ResultSet rs = null;
         Connection cn = null;
@@ -242,7 +244,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -270,14 +272,14 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithNonpointDataAndFilterOnSpecificMeasures() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL nonpoint");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonpoint");
         
         ResultSet rs = null;
         Connection cn = null;
@@ -300,7 +302,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -337,14 +339,14 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithNonRoadData() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL nonroad");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonroad");
         
         ResultSet rs = null;
         Connection cn = null;
@@ -356,7 +358,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -393,14 +395,14 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithOnRoadData() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL onroad");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL onroad");
         
         ResultSet rs = null;
         Connection cn = null;
@@ -412,7 +414,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -456,14 +458,14 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
         } finally {
             if (rs != null) rs.close();
             if (cn != null) cn.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithNonpointDataAndFilterOnAllMeasureClassesAndCreateControlledInv() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL nonpoint");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonpoint");
         
         ResultSet rs = null;
         Connection cn = null;
@@ -487,7 +489,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
 //            session.clear();
 
             //get detailed result dataset
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), session);
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), session);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -534,10 +536,10 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < percentDiff);
 
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset);
+            createControlledInventory(strategy, inputDataset.getInputDataset());
 
             //reload
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
 
             tableName2 = 
                 result.getControlledInventoryDataset().getInternalSources()[0].getTable();
@@ -591,14 +593,14 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             if (rs != null) rs.close();
             if (cn != null) cn.close();
             if (cn2 != null) cn2.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
     public void testShouldRunMaxEmsRedStrategyWithPointDataAndFilterOnAllMeasureClasses() throws Exception {
         ControlStrategy strategy = null;
-        EmfDataset inputDataset = setInputDataset("ORL point");
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL point");
         
         ResultSet rs = null;
         Connection cn = null;
@@ -613,7 +615,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -660,10 +662,10 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs.close();
 
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset);
+            createControlledInventory(strategy, inputDataset.getInputDataset());
 
             //reload
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), sessionFactory.getSession());
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), sessionFactory.getSession());
 
             tableName2 = result.getControlledInventoryDataset().getName().replaceAll("ControlledInventory", "CSINVEN");
             
@@ -688,30 +690,35 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             if (rs != null) rs.close();
             if (cn != null) cn.close();
             if (cn2 != null) cn2.close();
-            dropTables(strategy, inputDataset);
+            dropTables(strategy);
             removeData();
         }
     }
 
-    private void dropTables(ControlStrategy strategy, EmfDataset inputDataset) throws Exception {
+    private void dropTables(ControlStrategy strategy) throws Exception {
         if (strategy != null) {
-            //drop input dataset table
-            dropTable(inputDataset.getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
-            //drop detailed result table
-            dropTable(detailResultDatasetTableName(strategy), dbServer.getEmissionsDatasource());
-            //drop input inventory qa step tables
-            dropQASummaryTables(inputDataset);
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), session);
-            if (result != null) {
-                //drop detailed result qa step tables
-                dropQASummaryTables((EmfDataset) result.getDetailedResultDataset());
-                //see if controlled inv was created, if so cleanup...
-                EmfDataset contInv = (EmfDataset) result.getControlledInventoryDataset();
-                if (contInv != null) {
-                    //drop controlled inv table
-                    dropTable(contInv.getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
-                    //drop controlled inv qa step tables
-                    dropQASummaryTables(contInv);
+            for (int i = 0; i < strategy.getControlStrategyInputDatasets().length; i++) {
+                //drop input dataset table
+                dropTable(strategy.getControlStrategyInputDatasets()[i].getInputDataset().getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
+                //drop input inventory qa step tables
+                dropQASummaryTables(strategy.getControlStrategyInputDatasets()[i].getInputDataset());
+            }
+            List results = new ControlStrategyDAO().getControlStrategyResults(strategy.getId(), session);
+            for (int i = 0; i < results.size(); i++) {
+                ControlStrategyResult result = (ControlStrategyResult)results.get(i);
+                if (result != null) {
+                    //drop detailed result table
+                    dropTable(result.getDetailedResultDataset().getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
+                    //drop detailed result qa step tables
+                    dropQASummaryTables((EmfDataset) result.getDetailedResultDataset());
+                    //see if controlled inv was created, if so cleanup...
+                    EmfDataset contInv = (EmfDataset) result.getControlledInventoryDataset();
+                    if (contInv != null) {
+                        //drop controlled inv table
+                        dropTable(contInv.getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
+                        //drop controlled inv qa step tables
+                        dropQASummaryTables(contInv);
+                    }
                 }
             }
         }
@@ -728,24 +735,13 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
     }
 
     private void removeData() throws Exception {
-//        dropAll(Scc.class);
-//        dropAll(QAStepResult.class);
-//        dropAll(QAStep.class);
-//        new PostgresDbUpdate().deleteAll("emf.input_datasets_control_strategies");
-//        dropAll(ControlStrategyResult.class);
-//        dropAll(EmfDataset.class);
-//        dropAll(Dataset.class);
-//        new PostgresDbUpdate().deleteAll("emf.control_strategy_measures");
-//        dropAll(EfficiencyRecord.class);
-//        dropAll(ControlMeasure.class);
-//        dropAll(ControlStrategy.class);
-
         dropAll("Scc");
         dropAll("QAStepResult");
         dropAll("QAStep");
         new PostgresDbUpdate().deleteAll("emf.input_datasets_control_strategies");
         dropAll("ControlStrategyResult");
         dropAll(EmfDataset.class);
+        dropAll(Version.class);
         dropAll(Dataset.class);
         new PostgresDbUpdate().deleteAll("emf.control_strategy_measures");
         new PostgresDbUpdate().deleteAll("emf.aggregrated_efficiencyrecords");

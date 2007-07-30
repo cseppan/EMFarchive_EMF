@@ -186,10 +186,8 @@ CREATE TABLE emf.control_strategies
   last_modified_date timestamp,
   start_date timestamp,
   completion_date timestamp,
-  dataset_type_id int4 REFERENCES emf.dataset_types(id),
   strategy_type_id int4 REFERENCES emf.strategy_types(id),
   pollutant_id int4 REFERENCES emf.pollutants(id),
-  dataset_version int4,
   filter varchar(255),
   lock_owner varchar(255),
   lock_date timestamp,
@@ -232,7 +230,8 @@ CREATE TABLE emf.input_datasets_control_strategies
   id SERIAL PRIMARY KEY,
   control_strategy_id int4 NOT NULL REFERENCES emf.control_strategies(id),
   list_index int4,
-  dataset_id int4 REFERENCES emf.datasets (id)
+  dataset_id int4 REFERENCES emf.datasets (id),
+  dataset_version integer
 ) 
 WITHOUT OIDS;
 -- emf.datasets_control_strategies

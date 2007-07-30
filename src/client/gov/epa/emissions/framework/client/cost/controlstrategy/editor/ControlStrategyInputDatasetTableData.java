@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
-import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -13,22 +13,22 @@ public class ControlStrategyInputDatasetTableData extends AbstractTableData {
 
     private List rows;
 
-    public ControlStrategyInputDatasetTableData(EmfDataset[] inputDatasets) {
-        rows = createRows(inputDatasets);
+    public ControlStrategyInputDatasetTableData(ControlStrategyInputDataset[] controlStrategyInputDatasets) {
+        rows = createRows(controlStrategyInputDatasets);
     }
 
-    private List createRows(EmfDataset[] inputDatasets) {
+    private List createRows(ControlStrategyInputDataset[] controlStrategyInputDatasets) {
         List rows = new ArrayList();
-        for (int i = 0; i < inputDatasets.length; i++) {
-            Row row = row(inputDatasets[i]);
+        for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
+            Row row = row(controlStrategyInputDatasets[i]);
             rows.add(row);
         }
         return rows;
     }
 
-    private Row row(EmfDataset inputDataset) {
-        Object[] values = { inputDataset.getDatasetType().getName(), inputDataset.getName(), inputDataset.getDefaultVersion()};
-        return new ViewableRow(inputDataset, values);
+    private Row row(ControlStrategyInputDataset controlStrategyInputDataset) {
+        Object[] values = { controlStrategyInputDataset.getInputDataset().getDatasetType().getName(), controlStrategyInputDataset.getInputDataset().getName(), controlStrategyInputDataset.getVersion()};
+        return new ViewableRow(controlStrategyInputDataset, values);
     }
 
     public String[] columns() {
@@ -50,9 +50,9 @@ public class ControlStrategyInputDatasetTableData extends AbstractTableData {
         return false;
     }
 
-    public void add(EmfDataset[] inputDataset) {
-        for (int i = 0; i < inputDataset.length; i++) {
-            Row row = row(inputDataset[i]);
+    public void add(ControlStrategyInputDataset[] controlStrategyInputDatasets) {
+        for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
+            Row row = row(controlStrategyInputDatasets[i]);
             if (!rows.contains(row))
                 rows.add(row);
         }
@@ -63,9 +63,9 @@ public class ControlStrategyInputDatasetTableData extends AbstractTableData {
         this.rows = createRows(sources());
     }
 
-    public EmfDataset[] sources() {
+    public ControlStrategyInputDataset[] sources() {
         List sources = sourcesList();
-        return (EmfDataset[]) sources.toArray(new EmfDataset[0]);
+        return (ControlStrategyInputDataset[]) sources.toArray(new ControlStrategyInputDataset[0]);
     }
 
     private List sourcesList() {
@@ -78,22 +78,21 @@ public class ControlStrategyInputDatasetTableData extends AbstractTableData {
         return sources;
     }
 
-    private void remove(EmfDataset inputDataset) {
+    private void remove(ControlStrategyInputDataset controlStrategyInputDataset) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             ViewableRow row = (ViewableRow) iter.next();
-            EmfDataset source = (EmfDataset) row.source();
-            if (source == inputDataset) {
+            ControlStrategyInputDataset source = (ControlStrategyInputDataset) row.source();
+            if (source == controlStrategyInputDataset) {
                 rows.remove(row);
                 return;
             }
         }
     }
 
-    public void remove(EmfDataset[] inputDatasets) {
-        for (int i = 0; i < inputDatasets.length; i++)
-            remove(inputDatasets[i]);
+    public void remove(ControlStrategyInputDataset[] controlStrategyInputDatasets) {
+        for (int i = 0; i < controlStrategyInputDatasets.length; i++)
+            remove(controlStrategyInputDatasets[i]);
 
         refresh();
     }
-
 }

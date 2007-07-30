@@ -53,7 +53,7 @@ public class ControlStrategyResultsTest extends ServiceTestCase {
     private ControlStrategy controlStrategy(EmfDataset dataset) throws HibernateException, Exception {
         Session session = sessionFactory().getSession();
         ControlStrategy element = new ControlStrategy("test" + Math.random());
-        element.setInputDatasets(new EmfDataset[] { dataset });
+        element.setControlStrategyInputDatasets(new ControlStrategyInputDataset[] { new ControlStrategyInputDataset(dataset) });
         ControlStrategyDAO dao = new ControlStrategyDAO();
         try {
             dao.add(element, session);

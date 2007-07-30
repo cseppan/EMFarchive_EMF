@@ -6,12 +6,12 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.analysis.common.AbstractStrategyLoader;
 import gov.epa.emissions.framework.services.cost.analysis.common.BestMeasureEffRecord;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.GenerateSccControlMeasuresMap;
 import gov.epa.emissions.framework.services.cost.controlStrategy.SccControlMeasuresMap;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.ResultSet;
@@ -31,15 +31,15 @@ public class StrategyLoader extends AbstractStrategyLoader {
                 batchSize);
     }
 
-    public ControlStrategyResult loadStrategyResult(EmfDataset inputDataset) throws Exception {
+    public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {
         //set up things that are specific for this strategy...
-        GenerateSccControlMeasuresMap mapGenerator = new GenerateSccControlMeasuresMap(dbServer, qualifiedEmissionTableName(inputDataset), 
+        GenerateSccControlMeasuresMap mapGenerator = new GenerateSccControlMeasuresMap(dbServer, qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()), 
                 controlStrategy, sessionFactory);
         SccControlMeasuresMap map = mapGenerator.create();
         retrieveMeasure = new RetrieveBestMeasureEffRecord(map, costYearTable, 
                 controlStrategy);
         //call the abstract method to do the work...
-        return super.loadStrategyResult(inputDataset);
+        return super.loadStrategyResult(controlStrategyInputDataset);
     }
 
     public void doBatchInsert(ResultSet resultSet) throws Exception {

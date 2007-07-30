@@ -49,7 +49,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
 //        service = new ControlStrategyServiceImpl(sessionFactory);
     }
 
-    protected EmfDataset setInputDataset(String type) throws Exception {
+    protected ControlStrategyInputDataset setInputDataset(String type) throws Exception {
         EmfDataset inputDataset = new EmfDataset();
         inputDataset.setName(tableName);
         inputDataset.setCreator(emfUser().getUsername());
@@ -69,7 +69,10 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
             inputDataset = addORLNonroadDataset(inputDataset);
         
         addVersionZeroEntryToVersionsTable(inputDataset, dbServer.getEmissionsDatasource());
-        return (EmfDataset) load(EmfDataset.class, tableName);
+        inputDataset = (EmfDataset) load(EmfDataset.class, tableName);
+        ControlStrategyInputDataset controlStrategyInputDataset = new ControlStrategyInputDataset(inputDataset);
+        controlStrategyInputDataset.setVersion(inputDataset.getDefaultVersion());
+        return controlStrategyInputDataset;
     }
 
     private DatasetType getDatasetType(String type) {
@@ -106,12 +109,10 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         dbServer.disconnect();
     }
 
-    protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant, ControlMeasureClass[] classes) {
+    protected ControlStrategy controlStrategy(ControlStrategyInputDataset inputDataset, String name, Pollutant pollutant, ControlMeasureClass[] classes) {
         ControlStrategy strategy = new ControlStrategy();
         strategy.setName(name);
-        strategy.setInputDatasets(new EmfDataset[] { inputDataset });
-        strategy.setDatasetType(inputDataset.getDatasetType());
-        strategy.setDatasetVersion(0);// initial version
+        strategy.setControlStrategyInputDatasets(new ControlStrategyInputDataset[] { inputDataset });
         strategy.setInventoryYear(2000);
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant);
@@ -123,12 +124,10 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         return strategy;
     }
 
-    protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant, ControlStrategyMeasure[] measures) {
+    protected ControlStrategy controlStrategy(ControlStrategyInputDataset inputDataset, String name, Pollutant pollutant, ControlStrategyMeasure[] measures) {
         ControlStrategy strategy = new ControlStrategy();
         strategy.setName(name);
-        strategy.setInputDatasets(new EmfDataset[] { inputDataset });
-        strategy.setDatasetType(inputDataset.getDatasetType());
-        strategy.setDatasetVersion(0);// initial version
+        strategy.setControlStrategyInputDatasets(new ControlStrategyInputDataset[] { inputDataset });
         strategy.setInventoryYear(2000);
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant);
@@ -138,12 +137,10 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         return strategy;
     }
 
-    protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant) {
+    protected ControlStrategy controlStrategy(ControlStrategyInputDataset inputDataset, String name, Pollutant pollutant) {
         ControlStrategy strategy = new ControlStrategy();
         strategy.setName(name);
-        strategy.setInputDatasets(new EmfDataset[] { inputDataset });
-        strategy.setDatasetType(inputDataset.getDatasetType());
-        strategy.setDatasetVersion(0);// initial version
+        strategy.setControlStrategyInputDatasets(new ControlStrategyInputDataset[] { inputDataset });
         strategy.setInventoryYear(2000);
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant);
@@ -235,7 +232,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
     protected String detailResultDatasetTableName(ControlStrategy strategy) throws Exception {
         Session session = sessionFactory.getSession();
         try {
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), session);
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), session);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             return detailedResultDataset.getInternalSources()[0].getTable();
         } finally {

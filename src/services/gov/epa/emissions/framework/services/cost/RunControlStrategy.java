@@ -10,7 +10,6 @@ import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import org.apache.commons.logging.Log;
@@ -56,18 +55,19 @@ public class RunControlStrategy {
         if (controlStrategy.getStrategyType().getName().equalsIgnoreCase("Least Cost"))
             throw new EmfException("Least Cost Analysis is not supported.");
 
-        EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
-        if (inputDatasets.length == 0)
+        ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy.getControlStrategyInputDatasets();
+        if (controlStrategyInputDatasets.length == 0)
             return;
         
-        DatasetType datasetType = controlStrategy.getDatasetType();
-        int indexOfNonpoint = datasetType.getName().indexOf("Nonpoint");
-        int indexOfPoint = datasetType.getName().indexOf("Point");
-        int indexOfOnroad = datasetType.getName().indexOf("Onroad");
-        int indexOfNonroad = datasetType.getName().indexOf("Nonroad");
-        if (indexOfNonpoint == -1 && indexOfOnroad == -1 && indexOfNonroad == -1 && indexOfPoint == -1)
-            throw new EmfException("The dataset type '" + datasetType.getName() + "' is not supported yet.");
-
+        for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
+            DatasetType datasetType = controlStrategyInputDatasets[0].getInputDataset().getDatasetType();
+            int indexOfNonpoint = datasetType.getName().indexOf("Nonpoint");
+            int indexOfPoint = datasetType.getName().indexOf("Point");
+            int indexOfOnroad = datasetType.getName().indexOf("Onroad");
+            int indexOfNonroad = datasetType.getName().indexOf("Nonroad");
+            if (indexOfNonpoint == -1 && indexOfOnroad == -1 && indexOfNonroad == -1 && indexOfPoint == -1)
+                throw new EmfException("The dataset type '" + datasetType.getName() + "' is not supported yet.");
+        }
     }
 
     public void stop() {

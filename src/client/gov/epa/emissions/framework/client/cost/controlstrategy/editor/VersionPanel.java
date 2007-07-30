@@ -24,13 +24,10 @@ public class VersionPanel extends JPanel {
 
     protected String selected;
 
-    private ControlStrategy controlStrategy;
-
     private EmfSession session;
 
     public VersionPanel(ControlStrategy controlStrategy, EmfSession session, ManageChangeables changeables)
             throws EmfException {
-        this.controlStrategy = controlStrategy;
         this.session = session;
         createLayout(changeables);
     }
@@ -82,7 +79,7 @@ public class VersionPanel extends JPanel {
     }
 
     protected void initialize() throws EmfException {
-        EmfDataset[] datasets = controlStrategy.getInputDatasets();
+        EmfDataset[] datasets = {};//controlStrategy.getControlStrategyInputDatasets();
         if (datasets.length == 0) {// new control strategy
             comboBox.setEnabled(false);
         } else {
@@ -94,7 +91,7 @@ public class VersionPanel extends JPanel {
     }
 
     protected String getVersion(VersionsSet versionsSet) {
-        int ver = controlStrategy.getDatasetVersion();
+        int ver = 0;//controlStrategy.getDatasetVersion();
         return versionsSet.getVersionName(ver) + " (" + ver + ")";
     }
 

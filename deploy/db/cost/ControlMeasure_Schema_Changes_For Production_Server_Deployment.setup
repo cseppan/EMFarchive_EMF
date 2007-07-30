@@ -184,3 +184,10 @@ ALTER TABLE emf.control_strategy_measures
 	ADD COLUMN rule_penetration double precision DEFAULT 100,
 	ADD COLUMN apply_order double precision DEFAULT 1;
 
+-- Added 7/27/12007 NEW version column
+ALTER TABLE emf.input_datasets_control_strategies
+	ADD COLUMN dataset_version integer DEFAULT 0;
+
+ALTER TABLE emf.input_datasets_control_strategies
+	DROP COLUMN dataset_type_id,
+	DROP COLUMN dataset_version;

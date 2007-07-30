@@ -75,9 +75,7 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
     protected ControlStrategy controlStrategy(EmfDataset inputDataset, String name, Pollutant pollutant) {
         ControlStrategy strategy = new ControlStrategy();
         strategy.setName(name);
-        strategy.setInputDatasets(new EmfDataset[] { inputDataset });
-        strategy.setDatasetType(inputDataset.getDatasetType());
-        strategy.setDatasetVersion(0);// initial version
+        strategy.setControlStrategyInputDatasets(new ControlStrategyInputDataset[] { new ControlStrategyInputDataset(inputDataset) });
         strategy.setInventoryYear(2000);
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant);
@@ -162,7 +160,7 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
     protected String detailResultDatasetTableName(ControlStrategy strategy) throws Exception {
         Session session = sessionFactory().getSession();
         try {
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getInputDatasets()[0].getId(), session);
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), session);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             return detailedResultDataset.getInternalSources()[0].getTable();
         } finally {

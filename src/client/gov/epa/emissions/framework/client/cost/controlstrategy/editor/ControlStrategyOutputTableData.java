@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.AbstractTableData;
@@ -13,10 +14,10 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
 
     private List rows;
 
-    private EmfDataset[] inputDatasets;
+    private ControlStrategyInputDataset[] controlStrategyInputDatasets;
 
-    public ControlStrategyOutputTableData(EmfDataset[] inputDatasets, ControlStrategyResult[] controlStrategyResults) {
-        this.inputDatasets = inputDatasets;
+    public ControlStrategyOutputTableData(ControlStrategyInputDataset[] controlStrategyInputDatasets, ControlStrategyResult[] controlStrategyResults) {
+        this.controlStrategyInputDatasets = controlStrategyInputDatasets;
         this.rows = createRows(controlStrategyResults);
     }
 
@@ -44,9 +45,9 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
     }
 
     private String inputDatasetName(int inputDatasetId) {
-        for (int i = 0; i < inputDatasets.length; i++) {
-            if (inputDatasetId == inputDatasets[i].getId())
-                return inputDatasets[i].getName();
+        for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
+            if (inputDatasetId == controlStrategyInputDatasets[i].getInputDataset().getId())
+                return controlStrategyInputDatasets[i].getInputDataset().getName();
         }
         return "";
     }

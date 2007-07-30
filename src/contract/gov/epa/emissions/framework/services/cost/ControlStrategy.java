@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.cost;
 
-import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Lockable;
 import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.data.Pollutant;
@@ -8,7 +7,6 @@ import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -42,10 +40,7 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private Date completionDate;
 
-    private DatasetType datasetType;
-
-    private List inputDatasets;
-//    private List datasetsList;
+    private List controlStrategyInputDatasets;
 
     private Pollutant targetPollutant;
 
@@ -53,8 +48,6 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private StrategyType strategyType;
 
-    private int datasetVersion;
-    
     private String filter;
 
     private List controlMeasureClasses;
@@ -69,7 +62,7 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public ControlStrategy() {
         this.lock = new Mutex();
-        this.inputDatasets = new ArrayList();
+        this.controlStrategyInputDatasets = new ArrayList();
         this.controlMeasureClasses = new ArrayList();
         this.controlMeasures = new ArrayList();
     }
@@ -116,20 +109,12 @@ public class ControlStrategy implements Lockable, Serializable {
         this.creator = creator;
     }
 
-    public EmfDataset[] getInputDatasets() {
-        return (EmfDataset[]) inputDatasets.toArray(new EmfDataset[0]);
+    public ControlStrategyInputDataset[] getControlStrategyInputDatasets() {
+        return (ControlStrategyInputDataset[]) controlStrategyInputDatasets.toArray(new ControlStrategyInputDataset[0]);
     }
 
-    public void setInputDatasets(EmfDataset[] inputDatasets) {
-        this.inputDatasets = Arrays.asList(inputDatasets);
-    }
-
-    public DatasetType getDatasetType() {
-        return datasetType;
-    }
-
-    public void setDatasetType(DatasetType datasetType) {
-        this.datasetType = datasetType;
+    public void setControlStrategyInputDatasets(ControlStrategyInputDataset[] inputDatasets) {
+        this.controlStrategyInputDatasets = Arrays.asList(inputDatasets);
     }
 
     public String getDescription() {
@@ -222,14 +207,6 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public boolean isLocked() {
         return lock.isLocked();
-    }
-
-    public int getDatasetVersion() {
-        return datasetVersion;
-    }
-
-    public void setDatasetVersion(int datasetVersion) {
-        this.datasetVersion = datasetVersion;
     }
 
     public Date getCompletionDate() {
