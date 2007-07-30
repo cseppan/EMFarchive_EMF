@@ -188,6 +188,6 @@ ALTER TABLE emf.control_strategy_measures
 ALTER TABLE emf.input_datasets_control_strategies
 	ADD COLUMN dataset_version integer DEFAULT 0;
 
-ALTER TABLE emf.input_datasets_control_strategies
+ALTER TABLE emf.control_strategies
 	DROP COLUMN dataset_type_id,
 	DROP COLUMN dataset_version;
