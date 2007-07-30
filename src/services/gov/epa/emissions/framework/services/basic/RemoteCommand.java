@@ -81,7 +81,7 @@ public class RemoteCommand {
         String unixShell = "csh";
         String unixOptions = "-c";
         String sshCmd = "ssh";
-        String sshOptions = "";
+        String sshOptions = "-o PasswordAuthentication=no";
 
         try {
             return execute(unixShell, unixOptions, sshCmd, sshOptions, username, hostname, remoteCmd);
