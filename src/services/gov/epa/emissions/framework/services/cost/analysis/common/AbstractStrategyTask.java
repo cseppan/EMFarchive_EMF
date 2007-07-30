@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
+import gov.epa.emissions.framework.services.cost.analysis.Strategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -21,7 +22,7 @@ import java.util.Date;
 import org.hibernate.Session;
 
 
-public abstract class AbstractStrategyTask implements StrategyTask {
+public abstract class AbstractStrategyTask implements Strategy {
     
     protected ControlStrategy controlStrategy;
 
@@ -57,8 +58,6 @@ public abstract class AbstractStrategyTask implements StrategyTask {
  
     }
     
-//    public abstract void run() throws EmfException;
-//
     public void run(StrategyLoader loader) throws EmfException {
         String status = "";
         try {
@@ -93,7 +92,7 @@ public abstract class AbstractStrategyTask implements StrategyTask {
     protected void saveControlStrategyResult(ControlStrategyResult strategyResult) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            runQASteps(strategyResult);
+//            runQASteps(strategyResult);
             ControlStrategyDAO dao = new ControlStrategyDAO();
             dao.updateControlStrategyResult(strategyResult, session);
         } catch (RuntimeException e) {

@@ -241,7 +241,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         }
 
         for (int i = 0; i < selected.size(); i++) {
-            PropertiesViewPresenter presenter = new PropertiesViewPresenter((EmfDataset)selected.get(i), session);
+            PropertiesViewPresenter presenter = new PropertiesViewPresenter(((ControlStrategyInputDataset)selected.get(i)).getInputDataset(), session);
             DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
             presenter.doDisplay(view);
         }

@@ -18,7 +18,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
-import gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries.StrategyTask;
+import gov.epa.emissions.framework.services.cost.analysis.maxreduction.MaxEmsRedStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
@@ -110,7 +110,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     protected ControlStrategy controlStrategy(ControlStrategyInputDataset inputDataset, String name, Pollutant pollutant, ControlMeasureClass[] classes) throws Exception {
         ControlStrategy strategy = new ControlStrategy();
         strategy.setName(name);
-        strategy.setControlStrategyInputDatasets(new ControlStrategyInputDataset[] { inputDataset, setInputDataset("ORL nonpoint") });
+        strategy.setControlStrategyInputDatasets(new ControlStrategyInputDataset[] { inputDataset });
         strategy.setInventoryYear(2000);
         strategy.setCostYear(2000);
         strategy.setTargetPollutant(pollutant);
@@ -261,7 +261,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     }
     
     protected void runStrategy(ControlStrategy strategy) throws EmfException {
-        StrategyTask strategyTask = new StrategyTask(strategy, emfUser(), dbServerFactory,
+        MaxEmsRedStrategy strategyTask = new MaxEmsRedStrategy(strategy, emfUser(), dbServerFactory,
                 new Integer(500), sessionFactory);
         strategyTask.run();
     }

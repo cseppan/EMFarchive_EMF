@@ -7,8 +7,6 @@ public interface Strategy {
 
     void run() throws EmfException;
 
-    ControlStrategy getControlStrategy();
+    abstract ControlStrategy getControlStrategy();
     
-    long getRecordCount();
-
 }
