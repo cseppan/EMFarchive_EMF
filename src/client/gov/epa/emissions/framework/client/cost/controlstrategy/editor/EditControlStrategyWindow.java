@@ -56,7 +56,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
         super("Edit Control Strategy", new Dimension(700, 300), desktopManager);
-        this.setMinimumSize(new Dimension(700, 300));
+//        this.setMinimumSize(new Dimension(700, 300));
         this.session = session;
         this.desktopManager = desktopManager;
         this.parentConsole = parentConsole;

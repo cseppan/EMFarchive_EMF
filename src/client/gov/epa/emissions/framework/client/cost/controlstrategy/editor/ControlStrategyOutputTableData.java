@@ -38,9 +38,10 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
     private Object[] values(ControlStrategyResult result) {
         EmfDataset outputDataset = (EmfDataset) result.getDetailedResultDataset();
         EmfDataset controlledInvDataset = (EmfDataset) result.getControlledInventoryDataset();
-        Object[] values = { inputDatasetName(result.getInputDatasetId()), outputDataset.getName(),
-                controlledInvDataset == null ? "" : controlledInvDataset.getName(), result.getRunStatus(), 
-                result.getTotalCost(), result.getTotalReduction() };
+        Object[] values = { inputDatasetName(result.getInputDatasetId()), getControlStrategyInputDataset(result.getInputDatasetId()).getVersion(), 
+                outputDataset.getName(), controlledInvDataset == null ? "" : controlledInvDataset.getName(), 
+                result.getRunStatus(), result.getTotalCost(), 
+                result.getTotalReduction(), 0 };
         return values;
     }
 
@@ -52,11 +53,28 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
         return "";
     }
 
+    private ControlStrategyInputDataset getControlStrategyInputDataset(int datasetId) {
+        ControlStrategyInputDataset inputDataset = null;
+        for (int j = 0; j < controlStrategyInputDatasets.length; j++) {
+            if (controlStrategyInputDatasets[j].getInputDataset().getId() == datasetId) {
+                inputDataset = controlStrategyInputDatasets[j];
+                break;
+            }
+        }
+        return inputDataset;
+    }
+    
     public String[] columns() {
-        return new String[] { "Input Inventory", "Detailed Result", "Controlled Inventory", "Status", "Total Cost", "Total Reduction" };
+        return new String[] { "Input Inventory", "Input Version", "Detailed Result", "Controlled Inventory", "Status", "Total Cost", "Total Reduction", "Record Count" };
     }
 
     public Class getColumnClass(int col) {
+        if (col == 1 || col == 7)
+            return Integer.class;
+
+        if (col == 5 || col == 6)
+            return Double.class;
+
         return String.class;
     }
 

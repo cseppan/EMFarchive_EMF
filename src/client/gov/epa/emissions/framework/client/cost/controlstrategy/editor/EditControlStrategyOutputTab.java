@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
+import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
@@ -35,8 +36,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 
 public class EditControlStrategyOutputTab extends JPanel implements EditControlStrategyOutputTabView {
 
@@ -254,12 +253,12 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         ControlStrategyOutputTableData tableData = new ControlStrategyOutputTableData(controlStrategyInputDatasets, controlStrategyResults);
         EmfTableModel model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
-        JTable table = new JTable(selectModel);
-        JScrollPane scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setPreferredSize(new Dimension(300, 150));
+
+        SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
+        sortFilterSelectionPanel.setPreferredSize(new Dimension(625, 200));
+
         JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.add(scrollPane);
+        tablePanel.add(sortFilterSelectionPanel);
         return tablePanel;
     }
 

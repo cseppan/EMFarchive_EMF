@@ -147,7 +147,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             }
         });
         panel.add(addButton);
-        Button editButton = new BorderlessButton("Edit", new AbstractAction() {
+        Button editButton = new BorderlessButton("Set Version", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
                     editAction();
@@ -156,6 +156,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
                 }
             }
         });
+        editButton.setEnabled(false);
         panel.add(editButton);
         Button removeButton = new BorderlessButton("Remove", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
