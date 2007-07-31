@@ -15,6 +15,7 @@
 	<property name="runStatus" column="run_status"	type="java.lang.String"	/>
 	<property name="completionTime" column="completion_time" type="java.util.Date" not-null="false" length="4"/>
 	<property name="startTime" column="start_time" type="java.util.Date" not-null="false" length="4"/>
+	<property name="recordCount" column="record_count" type="integer" not-null="false"/>
 	<many-to-one cascade="save-update" name="strategyResultType"
 		 class ="gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType"
 		 column="strategy_result_type_id" unique="true" not-null="true"/>

@@ -260,7 +260,7 @@ CREATE TABLE emf.strategy_results
   start_time timestamp,
   completion_time timestamp,
   run_status VARCHAR(255),
-  
+  record_count integer,
   UNIQUE (control_strategy_id,dataset_id,detailed_result_dataset_id)
 ) 
 WITHOUT OIDS;

@@ -52,7 +52,9 @@ public class ControlStrategyResultsSummary {
         long latestCompletionTime = strategyResults[latestCompletionIndex].getStartTime().getTime();
         
         for (int i = 0; i < strategyResults.length; i++) {
-            long laterTime = strategyResults[i].getCompletionTime().getTime();
+            long laterTime = strategyResults[i].getCompletionTime() != null 
+                                ? strategyResults[i].getCompletionTime().getTime()
+                                : latestCompletionTime;
             if (laterTime > latestCompletionTime) {
                 latestCompletionTime = laterTime;
                 latestCompletionIndex = i;

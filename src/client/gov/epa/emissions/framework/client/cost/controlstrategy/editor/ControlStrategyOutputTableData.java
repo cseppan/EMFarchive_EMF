@@ -41,7 +41,8 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
         Object[] values = { inputDatasetName(result.getInputDatasetId()), getControlStrategyInputDataset(result.getInputDatasetId()).getVersion(), 
                 outputDataset.getName(), controlledInvDataset == null ? "" : controlledInvDataset.getName(), 
                 result.getRunStatus(), result.getTotalCost(), 
-                result.getTotalReduction(), 0 };
+                result.getTotalReduction(), format(result.getStartTime()),
+                format(result.getCompletionTime()), result.getRecordCount() == null ? 0 : result.getRecordCount() };
         return values;
     }
 
@@ -65,11 +66,15 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
     }
     
     public String[] columns() {
-        return new String[] { "Input Inventory", "Input Version", "Detailed Result", "Controlled Inventory", "Status", "Total Cost", "Total Reduction", "Record Count" };
+        return new String[] { "Input Inventory", "Input Version", 
+                "Detailed Result", "Controlled Inventory", 
+                "Status", "Total Cost", 
+                "Total Reduction", "Start Time", 
+                "Completion Time", "Record Count" };
     }
 
     public Class getColumnClass(int col) {
-        if (col == 1 || col == 7)
+        if (col == 1 || col == 9)
             return Integer.class;
 
         if (col == 5 || col == 6)

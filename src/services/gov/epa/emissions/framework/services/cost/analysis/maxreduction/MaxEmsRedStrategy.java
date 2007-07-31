@@ -11,10 +11,10 @@ public class MaxEmsRedStrategy extends AbstractStrategyTask {
     
     private StrategyLoader loader;
     
-    public MaxEmsRedStrategy(ControlStrategy strategy, User user, 
+    public MaxEmsRedStrategy(ControlStrategy controlStrategy, User user, 
             DbServerFactory dbServerFactory, Integer batchSize,
             HibernateSessionFactory sessionFactory) throws EmfException {
-        super(strategy, user, 
+        super(controlStrategy, user, 
                 dbServerFactory, sessionFactory);
         this.loader = new StrategyLoader(user, dbServerFactory, 
                 sessionFactory, controlStrategy, 
@@ -23,34 +23,5 @@ public class MaxEmsRedStrategy extends AbstractStrategyTask {
 
     public void run() throws EmfException {
         super.run(loader);
-//        String status = "";
-//        try {
-//
-//            //process/load each input dataset
-//            EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
-//            for (int i = 0; i < inputDatasets.length; i++) {
-//                ControlStrategyResult result = new ControlStrategyResult();
-//                try {
-//                    result = loader.loadStrategyResult(inputDatasets[i]);
-//                    recordCount += loader.getRecordCount();
-//                    status = "Completed.";
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    status = "Failed. Error processing input dataset: " + inputDatasets[i].getName() + ". " + result.getRunStatus();
-//                } finally {
-//                    result.setCompletionTime(new Date());
-//                    result.setRunStatus(status);
-//                    saveControlStrategyResult(result);
-//                }
-//            }
-//            
-//        } catch (Exception e) {
-//            status = "Failed. Error processing input dataset";
-//            e.printStackTrace();
-//            throw new EmfException(e.getMessage());
-//        } finally {
-//            loader.disconnectDbServer();
-//            disconnectDbServer();
-//        }
     }
 }

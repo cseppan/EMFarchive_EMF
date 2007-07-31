@@ -1,73 +1,28 @@
 package gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries;
 
 import gov.epa.emissions.commons.Record;
-import gov.epa.emissions.commons.data.DatasetType;
-import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.Pollutant;
-import gov.epa.emissions.commons.db.Datasource;
-import gov.epa.emissions.commons.db.DbServer;
-import gov.epa.emissions.commons.db.OptimizedQuery;
-import gov.epa.emissions.commons.db.OptimizedTableModifier;
-import gov.epa.emissions.commons.io.TableFormat;
+import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
+import gov.epa.emissions.framework.services.cost.analysis.common.AbstractStrategyLoader;
 import gov.epa.emissions.framework.services.cost.analysis.common.BestMeasureEffRecord;
-import gov.epa.emissions.framework.services.cost.analysis.common.RecordGenerator;
-import gov.epa.emissions.framework.services.cost.analysis.common.RecordGeneratorFactory;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
-import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
-import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
 import gov.epa.emissions.framework.services.cost.controlStrategy.GenerateSccControlMeasuresMap;
-import gov.epa.emissions.framework.services.cost.controlmeasure.io.Pollutants;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.util.List;
 
-//import org.apache.commons.logging.Log;
-//import org.apache.commons.logging.LogFactory;
-
-public class StrategyLoader {
-
-//    private static Log LOG = LogFactory.getLog(StrategyLoader.class);
-
-    private TableFormat tableFormat;
-
-    private OptimizedTableModifier modifier;
-
-    private ControlStrategyResult result;
+public class StrategyLoader extends AbstractStrategyLoader {
 
     private RetrieveBestMeasureEffRecords retrieveBestMeasureEffRecords;
     
     private RetrieveBestMeasures retrieveBestMeasures;
-
-    private ControlStrategy controlStrategy;
-
-    private double totalCost;
-
-    private double totalReduction;
-    
-    private DatasetType type;
-    
-    private boolean pointDatasetType;
-    
-    private String sourceScc = "";
-    
-    private String sourceFips = "";
-
-    private String sourcePlantId = "";
-    
-    private String sourcePointId = "";
-
-    private String sourceStackId = "";
-    
-    private String sourceSegment = "";
-
-    private boolean newSource;
 
     private boolean newScc;
 
@@ -75,88 +30,33 @@ public class StrategyLoader {
 
     private boolean targetPollutant;
 
-//    private boolean hasConstraints;
-
-//    private boolean startSourcePollutant;
-//
-//    private boolean endSourcePollutant;
-
-//    private double sourceEmis;
-
-//    private List<BestMeasureEffRecord> targetPollutantBestMeasureList;
-    
     private ControlMeasure[] sccMeasures = {};
     
     private ControlMeasure[] sourceMeasures = {};
     
-    private Pollutants pollutants;
-
-    private DecimalFormat decFormat;
-
-//    private DbServer dbServer;
-//    
-//    private HibernateSessionFactory sessionFactory;
-//    
-    private CostYearTable costYearTable;
-    
-    private Datasource datasource;
-
     private GenerateSccControlMeasuresMap mapGenerator;
     
-//    private RecordGeneratorFactory recordGeneratorFactory;
-//    
-    private RecordGenerator recordGenerator;
-    
-    private long recordCount = 0;
-
-    public StrategyLoader(String tableName, TableFormat tableFormat, HibernateSessionFactory sessionFactory, 
-            DbServer dbServer, ControlStrategyResult result, ControlStrategy controlStrategy) throws EmfException {
-        this.tableFormat = tableFormat;
-        this.result = result;
-        this.controlStrategy = controlStrategy;
-        //this.type = this.controlStrategy.getDatasetType();
-        this.pointDatasetType = this.type.getName().equalsIgnoreCase("ORL Point Inventory (PTINV)");
-        this.pollutants = new Pollutants(sessionFactory);
-        this.decFormat = new DecimalFormat("0.#####E0");
-//        this.dbServer = dbServer;
-//        this.sessionFactory = sessionFactory;
-        this.datasource = dbServer.getEmissionsDatasource();
-        this.modifier = dataModifier(tableName, dbServer.getEmissionsDatasource());
-        this.mapGenerator = new GenerateSccControlMeasuresMap(dbServer,
-                emissionTableName(controlStrategy.getControlStrategyInputDatasets()[0].getInputDataset()), controlStrategy, sessionFactory);
-        this.costYearTable = new CostYearTableReader(dbServer, controlStrategy.getCostYear()).costYearTable();
+    public StrategyLoader(User user, DbServerFactory dbServerFactory, 
+            HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
+            int batchSize) throws EmfException {
+        super(user, dbServerFactory, 
+                sessionFactory, controlStrategy, 
+                batchSize);
         this.retrieveBestMeasureEffRecords = new RetrieveBestMeasureEffRecords(controlStrategy, costYearTable);
         this.retrieveBestMeasures = new RetrieveBestMeasures(controlStrategy, costYearTable);
-        this.recordGenerator = new RecordGeneratorFactory(this.type, this.result, this.decFormat).getRecordGenerator();
-//        this.hasConstraints = controlStrategy.getConstraint().hasConstraints();
-        start();
-        this.totalCost = 0.0;
-        this.totalReduction = 0.0;
     }
 
-    private void start() throws EmfException {
-        try {
-            modifier.start();
-        } catch (SQLException e) {
-            throw new EmfException(e.getMessage());
-        }
+    public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {
+        this.mapGenerator = new GenerateSccControlMeasuresMap(dbServer, qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()), 
+                controlStrategy, sessionFactory);
+        newScc = false;
+        newFips = false;
+        targetPollutant = false;
+        //call the abstract method to do the work...
+        return super.loadStrategyResult(controlStrategyInputDataset);
     }
 
-    public void load(OptimizedQuery optimizedQuery) throws Exception {
-        try {
-            while (optimizedQuery.execute()) {
-                ResultSet resultSet = optimizedQuery.getResultSet();
-                doBatchInsert(resultSet);
-            }
-        } finally {
-            modifier.finish();
-            modifier.close();
-        }
-        result.setTotalCost(totalCost);
-        result.setTotalReduction(totalReduction);
-    }
-
-    private void doBatchInsert(ResultSet resultSet) throws SQLException, Exception {
+    protected void doBatchInsert(ResultSet resultSet) throws Exception {
         int sourceCount = 0;
         String scc = "";
         String fips = "";
@@ -250,47 +150,12 @@ public class StrategyLoader {
                             totalReduction += recordGenerator.reducedEmission();
                         insertRecord(record, modifier);
                     } catch (SQLException e) {
-                        result.setRunStatus("Failed. Error in processing record for source record: " + sourceCount + ".");
+                        throw new EmfException("Error in processing record for source record: " + sourceCount + ". Exception: " + e.getMessage());
                     }
                 }
             }
         } finally {
-            resultSet.close();
+            //
         }
-    }
-
-    private OptimizedTableModifier dataModifier(String table, Datasource datasource) throws EmfException {
-        try {
-            return new OptimizedTableModifier(datasource, table);
-        } catch (SQLException e) {
-            throw new EmfException(e.getMessage());
-        }
-    }
-
-    private void insertRecord(Record record, OptimizedTableModifier dataModifier) throws Exception {
-        try {
-            int colsSize = tableFormat.cols().length;
-            if (record.size() < colsSize)
-                throw new EmfException("The number of tokens in the record are " + record.size()
-                        + ", It's less than the number of columns expected(" + colsSize + ")");
-
-            dataModifier.insert((String[]) record.tokens().toArray(new String[0]));
-            ++recordCount;
-        } catch (SQLException e) {
-            throw new EmfException("Error processing insert query: " + e.getMessage());
-        }
-    }
-
-    private String emissionTableName(EmfDataset inputDataset) {
-        InternalSource[] internalSources = inputDataset.getInternalSources();
-        return qualifiedName(datasource, internalSources[0].getTable());
-    }
-
-    private String qualifiedName(Datasource datasource, String table) {
-        return datasource.getName() + "." + table;
-    }
-    
-    public long getRecordCount() {
-        return recordCount;
     }
 }

@@ -29,6 +29,8 @@ public class ControlStrategyResult implements Serializable {
     
     private StrategyResultType strategyResultType;
 
+    private Integer recordCount;
+
     public ControlStrategyResult() {
         //
     }
@@ -122,4 +124,11 @@ public class ControlStrategyResult implements Serializable {
         this.controlledInventoryDataset = controlledInventoryDataset;
     }
 
+    public Integer getRecordCount() {
+        return recordCount;
+    }
+
+    public void setRecordCount(Integer recordCount) {
+        this.recordCount = recordCount;
+    }
 }

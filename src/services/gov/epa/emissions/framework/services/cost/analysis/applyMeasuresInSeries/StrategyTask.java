@@ -9,32 +9,18 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 public class StrategyTask extends AbstractStrategyTask {
 
-    public StrategyTask(ControlStrategy strategy, User user, DbServerFactory dbServerFactory, Integer batchSize,
+    private StrategyLoader loader;
+    
+    public StrategyTask(ControlStrategy controlStrategy, User user, DbServerFactory dbServerFactory, Integer batchSize,
             HibernateSessionFactory sessionFactory) throws EmfException {
-        super(strategy, user, 
+        super(controlStrategy, user, 
                 dbServerFactory, sessionFactory);
+        this.loader = new StrategyLoader(user, dbServerFactory, 
+                sessionFactory, controlStrategy, 
+                batchSize);
     }
 
-    public void run() {
-//
-//        OptimizedQuery optimizedQuery = null;//sourceQuery(inputDataset);
-//        String status = "";
-//        try {
-//            StrategyLoader loader = new StrategyLoader(/*creator.outputTableName()*/"", tableFormat, sessionFactory, 
-//                    dbServer, result, controlStrategy);
-//            loader.load(optimizedQuery);
-//            recordCount = loader.getRecordCount(); 
-//            status = "Completed. Input dataset: " + inputDataset.getName() + ".";
-//            result.setRunStatus(status);
-//        } catch (Exception e) {
-//            status = "Failed. Error processing input dataset: " + inputDataset.getName() + ". " + result.getRunStatus();
-//            e.printStackTrace();
-//            throw new EmfException(e.getMessage());
-//        } finally {
-//            result.setCompletionTime(new Date());
-//            result.setRunStatus(status);
-//            saveResults();
-//            disconnectDbServer();
-//        }
+    public void run() throws EmfException {
+        super.run(loader);
     }
 }

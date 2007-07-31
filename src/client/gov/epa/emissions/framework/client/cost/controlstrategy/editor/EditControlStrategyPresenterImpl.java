@@ -149,13 +149,13 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     public void doRefresh() throws EmfException {
         //ControlStrategyResult result = session.controlStrategyService().controlStrategyResults(controlStrategy);
         ControlStrategyResult[] controlStrategyResults = getResult();
-        String runStatus = service().controlStrategyRunStatus(controlStrategy.getId());
-        if (runStatus == null || !runStatus.equalsIgnoreCase("Running")) {
+//        String runStatus = service().controlStrategyRunStatus(controlStrategy.getId());
+//        if (runStatus == null || !runStatus.equalsIgnoreCase("Running")) {
             for (Iterator iter = presenters.iterator(); iter.hasNext();) {
                 EditControlStrategyTabPresenter element = (EditControlStrategyTabPresenter) iter.next();
                 element.doRefresh(controlStrategyResults);
             }
-        }
+//        }
     }
 
     public void set(ControlStrategyMeasuresTabView view) {

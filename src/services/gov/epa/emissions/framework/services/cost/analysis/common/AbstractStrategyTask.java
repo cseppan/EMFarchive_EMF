@@ -36,13 +36,13 @@ public abstract class AbstractStrategyTask implements Strategy {
     
     protected int batchSize;
     
-    protected long recordCount;
+    protected int recordCount;
     
     private StatusDAO statusDAO;
 
-    public AbstractStrategyTask(ControlStrategy strategy, User user, 
+    public AbstractStrategyTask(ControlStrategy controlStrategy, User user, 
             DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) throws EmfException {
-        this.controlStrategy = strategy;
+        this.controlStrategy = controlStrategy;
         this.dbServer = dbServerFactory.getDbServer();
         this.datasource = dbServer.getEmissionsDatasource();
         this.sessionFactory = sessionFactory;
@@ -68,6 +68,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                 try {
                     result = loader.loadStrategyResult(controlStrategyInputDatasets[i]);
                     recordCount = loader.getRecordCount();
+                    result.setRecordCount(recordCount);
                     status = "Completed.";
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -346,11 +346,11 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
             return;
         }
 
-        String inputValue = JOptionPane.showInputDialog("Please input a rule penetration", "100");
+        String inputValue = JOptionPane.showInputDialog("Please input a rule penetration", "");
 
         if (inputValue != null) {
             //validate value
-            double value = validateRulePenetration(inputValue);
+            Double value = validateRulePenetration(inputValue);
             //only update items that have been selected
             for (int i = 0; i < selectedMeasures.length; i++) {
                 for (int j = 0; j < measures.length; j++) {
@@ -378,11 +378,11 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
             return;
         }
 
-        String inputValue = JOptionPane.showInputDialog("Please input a rule effectiveness", "100");
+        String inputValue = JOptionPane.showInputDialog("Please input a rule effectiveness", "");
 
         if (inputValue != null) {
             //validate value
-            double value = validateRuleEffectiveness(inputValue);
+            Double value = validateRuleEffectiveness(inputValue);
             //only update items that have been selected
             for (int i = 0; i < selectedMeasures.length; i++) {
                 for (int j = 0; j < measures.length; j++) {
@@ -430,20 +430,22 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         }
     }
     
-    private double validateRuleEffectiveness(String ruleEffectiveness) throws EmfException {
+    private Double validateRuleEffectiveness(String ruleEffectiveness) throws EmfException {
+        if (ruleEffectiveness == null || ruleEffectiveness.trim().length() == 0) return null;
         double value = verifier.parseDouble(ruleEffectiveness);
         if (value <= 0 || value > 100)
             throw new EmfException(
                     "Enter the Rule Effectiveness as a percent between 0 and 100. Eg: 1 = 1%.  0.01 = 0.01%");
-        return value;
+        return new Double(value);
     }
 
     private Double validateRulePenetration(String rulePenetration) throws EmfException {
+        if (rulePenetration == null || rulePenetration.trim().length() == 0) return null;
         double value = verifier.parseDouble(rulePenetration);
         if (value <= 0 || value > 100)
             throw new EmfException(
                     "Enter the Rule Penetration as a percent between 0 and 100. Eg: 1 = 1%.  0.01 = 0.01%");
-        return value;
+        return new Double(value);
     }
 
     private Double validateApplyOrder(String applyOrder) throws EmfException {

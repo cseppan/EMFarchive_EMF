@@ -150,7 +150,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         Button editButton = new BorderlessButton("Set Version", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    editAction();
+                    setVersionAction();
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
                 }
@@ -195,8 +195,9 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         }
     }
 
-    private void editAction() throws EmfException {
-        throw new EmfException("");
+    private void setVersionAction() throws EmfException {
+        //
+        if (1 == 2) throw new EmfException("");
 //        ControlMeasureSelectionView view = new ControlMeasureSelectionDialog(parent, changeablesList);
 //        ControlMeasureSelectionPresenter presenter = new ControlMeasureSelectionPresenter(this, view, session,
 //                this.presenter.getAllControlMeasures());

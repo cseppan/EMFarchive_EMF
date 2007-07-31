@@ -79,7 +79,7 @@ public class ControlStrategyInventoryOutput {
             e.printStackTrace();
             throw e;
         } finally {
-            setandRunQASteps();
+//            setandRunQASteps();
         }
         endStatus(statusServices);
         dbServer.disconnect();
@@ -105,7 +105,7 @@ public class ControlStrategyInventoryOutput {
         updateControlStrategyResults(result, dataset);
     }
 
-    private void setandRunQASteps() throws EmfException {
+    protected void setandRunQASteps() throws EmfException {
         try {
             ControlStrategyResult result = getControlStrategyResult();
             EmfDataset controlledDataset = (EmfDataset) result.getControlledInventoryDataset();

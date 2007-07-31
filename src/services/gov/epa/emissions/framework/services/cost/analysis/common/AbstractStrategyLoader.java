@@ -8,7 +8,10 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.OptimizedQuery;
 import gov.epa.emissions.commons.db.OptimizedTableModifier;
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.TableFormat;
+import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
@@ -56,7 +59,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
 
     protected RecordGenerator recordGenerator;
     
-    protected long recordCount = 0;
+    protected int recordCount = 0;
     
     private Datasource datasource;
     
@@ -122,8 +125,18 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     //call this to process the input and create the output in a batch fashion
     public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {
         EmfDataset inputDataset = controlStrategyInputDataset.getInputDataset();
-        //reset record counter
+        //reset counters
         recordCount = 0;
+        totalCost = 0.0;
+        totalReduction = 0.0;
+        sourceScc = "";
+        sourceFips = "";
+        sourcePlantId = "";
+        sourcePointId = "";
+        sourceStackId = "";
+        sourceSegment = "";
+        newSource = false;
+
         //setup result
         ControlStrategyResult result = createStrategyResult(inputDataset);
         //set class level variable if inputdataset is a point type
@@ -131,7 +144,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         //get the record generator appropriate for the input/output Dataset
         this.recordGenerator = new RecordGeneratorFactory(inputDataset.getDatasetType(), result, this.decFormat).getRecordGenerator();
         //get the OptimizedQuery, really just a batch of resultsets
-        OptimizedQuery optimizedQuery = sourceQuery(inputDataset);
+        OptimizedQuery optimizedQuery = sourceQuery(controlStrategyInputDataset);
         //get the OptimizedTableModifier so we can batch insert output
         modifier = dataModifier(emissionTableName(result.getDetailedResultDataset()));
         try {
@@ -154,7 +167,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     //implement code that is specific to the strategy type
-    public abstract void doBatchInsert(ResultSet resultSet) throws Exception;
+    abstract protected void doBatchInsert(ResultSet resultSet) throws Exception;
 
     public final void disconnectDbServer() throws EmfException {
         try {
@@ -173,9 +186,24 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         
         result.setStrategyResultType(getDetailedStrategyResultType());
         result.setStartTime(new Date());
-        result.setRunStatus("Created for input dataset: " + inputDataset.getName());
-        
+        result.setRunStatus("Start processing dataset");
+
+        //persist result
+        saveControlStrategyResult(result);
         return result;
+    }
+
+    protected void saveControlStrategyResult(ControlStrategyResult strategyResult) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+//            runQASteps(strategyResult);
+            ControlStrategyDAO dao = new ControlStrategyDAO();
+            dao.updateControlStrategyResult(strategyResult, session);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not save control strategy results: " + e.getMessage());
+        } finally {
+            session.close();
+        }
     }
 
     private StrategyResultType getDetailedStrategyResultType() throws EmfException {
@@ -230,13 +258,16 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         }
     }
 
-    public final long getRecordCount() {
+    public final int getRecordCount() {
         return recordCount;
     }
     
-    private OptimizedQuery sourceQuery(EmfDataset inputDataset) throws EmfException {
+    private OptimizedQuery sourceQuery(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
+        String versionedQuery = new VersionedQuery(version(controlStrategyInputDataset)).query();
+
         String query = "SELECT *, case when poll = '" + controlStrategy.getTargetPollutant().getName() 
-            + "' then 1 else 0 end as sort FROM " + qualifiedEmissionTableName(inputDataset) 
+            + "' then 1 else 0 end as sort FROM " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()) 
+            + " where " + versionedQuery
             + getFilterForSourceQuery()
             + " order by scc, fips" 
             + (pointDatasetType ? ", plantid, pointid, stackid, segment" : "" ) 
@@ -258,7 +289,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
             if (filter == null || filter.trim().length() == 0)
                 sqlFilter = "";
             else 
-                sqlFilter = " where " + filter; 
+                sqlFilter = " and (" + filter + ") "; 
 
             //get and build county filter...
             if (countyFile != null && countyFile.trim().length() > 0) {
@@ -271,8 +302,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
                     throw new EmfException(e.getMessage());
                 }
                 if (fips.length > 0) 
-                    sqlFilter += (sqlFilter.length() == 0 ? " where " : " and ") 
-                        + " fips in (";
+                    sqlFilter += " and fips in (";
                 for (int i = 0; i < fips.length; i++) {
                     sqlFilter += (i > 0 ? "," : "") + "'" 
                         + fips[i] + "'";
@@ -283,6 +313,16 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
             filterForSourceQuery = sqlFilter;
         }
         return filterForSourceQuery;
+    }
+
+    private Version version(ControlStrategyInputDataset controlStrategyInputDataset) {
+        Session session = sessionFactory.getSession();
+        try {
+            Versions versions = new Versions();
+            return versions.get(controlStrategyInputDataset.getInputDataset().getId(), controlStrategyInputDataset.getVersion(), session);
+        } finally {
+            session.close();
+        }
     }
 
     protected String qualifiedEmissionTableName(Dataset dataset) {

@@ -42,7 +42,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
         return super.loadStrategyResult(controlStrategyInputDataset);
     }
 
-    public void doBatchInsert(ResultSet resultSet) throws Exception {
+    protected void doBatchInsert(ResultSet resultSet) throws Exception {
         int sourceCount = 0;
         String scc = "";
         String fips = "";
