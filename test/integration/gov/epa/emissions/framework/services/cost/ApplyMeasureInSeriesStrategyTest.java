@@ -536,7 +536,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < percentDiff);
 
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset.getInputDataset());
+            createControlledInventory(strategy, inputDataset);
 
             //reload
             result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
@@ -662,12 +662,12 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs.close();
 
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset.getInputDataset());
+            createControlledInventory(strategy, inputDataset);
 
             //reload
             result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
 
-            tableName2 = result.getControlledInventoryDataset().getName().replaceAll("ControlledInventory", "CSINVEN");
+            tableName2 = result.getControlledInventoryDataset().getInternalSources()[0].getTable();
             
             cn2 = new EmfDatabaseSetup(config()).getDbServer().getEmissionsDatasource().getConnection();
             stmt = cn2.createStatement(
@@ -683,6 +683,134 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName2 
                     + " where scc = '2294000270' and fips = '37067' and poll ='PM2.5'");
 //            assertTrue("assigned different pollutant for same SCC", rs.getDouble("reff") == 0 && rs.getDouble("reff") == 0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) rs.close();
+            if (cn != null) cn.close();
+            if (cn2 != null) cn2.close();
+            dropTables(strategy);
+            removeData();
+        }
+    }
+
+    public void testShouldRunMaxEmsRedStrategyWithTwoPointDatasetsAndFilterOnAllMeasureClasses() throws Exception {
+        ControlStrategy strategy = null;
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL point");
+        ControlStrategyInputDataset inputDataset2 = setInputDataset("ORL point");
+        
+        ResultSet rs = null;
+        Connection cn = null;
+        Connection cn2 = null;
+        ControlStrategyResult result = null;
+        String tableName2 = "";
+        try {
+            strategy = controlStrategy(new ControlStrategyInputDataset[] {inputDataset, inputDataset2}, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant());
+
+            strategy = (ControlStrategy) load(ControlStrategy.class, strategy.getName());
+
+            runStrategy(strategy);
+
+            //get detailed result dataset
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            Dataset detailedResultDataset = result.getDetailedResultDataset();
+            String tableName = detailedResultDataset.getInternalSources()[0].getTable();
+
+            cn = dbServer().getEmissionsDatasource().getConnection();
+            Statement stmt = cn.createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY);
+
+            //make sure 10 records come back...
+            rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName);
+            rs.next();
+            assertTrue("make sure there are 10 records in the summary results. " + rs.getInt(1), rs.getInt(1) == 10);
+
+            /*
+            //make sure inv entry has the right numbers, there are NO locale specific measures for this entry...
+            //check SCC = 2801500000 FIPS = 37119 inv entry
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
+                    + " where scc = '2801500000' and fips = '37119' and plantid = '0001' and pointid='0001' and stackid='1' and segment='1'");
+            rs.next();
+            assertTrue("SCC = 2801500000 FIPS = 37119 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37119 annual cost = 2.603046E+04", Math.abs(rs.getDouble("annual_cost") - 2.603046E+04)/2.603046E+04 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37119 emis reduction = 6.113609E+00", Math.abs(rs.getDouble("emis_reduction") - 6.113609E+00)/6.113609E+00 < tolerance);
+
+            //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
+            //check SCC = 2104008010 FIPS = 37067 inv entry
+            //also make sure the right control eff was used, this point already had a cm eff...
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
+                    + " where scc = '2104008010' and fips = '37067' and plantid = '00466' and pointid='001' and stackid='1' and segment='1'");
+            rs.next();
+            assertTrue("SCC = 2104008010 FIPS = 37067 reduction = 88.2", Math.abs(rs.getDouble("percent_reduction") - 88.2)/88.2 < tolerance);
+            assertTrue("SCC = 2104008010 FIPS = 37067 annual cost = 3.699558E+04 ", Math.abs(rs.getDouble("annual_cost") - 3.699558E+04)/3.699558E+04 < tolerance);
+            assertTrue("SCC = 2104008010 FIPS = 37067 emis reduction = 1.863666E+01", Math.abs(rs.getDouble("emis_reduction") - 1.863666E+01)/1.863666E+01 < tolerance);
+
+            //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
+            //check SCC = 2104008010 FIPS = 37111 inv entry
+            //also make sure the right control eff was used, this point already had a more eff cm ...
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
+                    + " where scc = '2104008010' and fips = '37111' and plantid = '00778' and pointid='001' and stackid='2' and segment='1'");//00778 001 1 1 
+            rs.next();
+            assertTrue("SCC = 2104008010 FIPS = 37111 reduction = 99 " + rs.getDouble("percent_reduction"), Math.abs(rs.getDouble("percent_reduction") - 99)/99 < tolerance);
+            assertTrue("SCC = 2104008010 FIPS = 37111 annual cost = 8.093505E+01", Math.abs(rs.getDouble("annual_cost") - 8.093505E+01)/8.093505E+01 < tolerance);
+            assertTrue("SCC = 2104008010 FIPS = 37111 emis reduction = 4.576374E-02", Math.abs(rs.getDouble("emis_reduction") - 4.576374E-02)/4.576374E-02 < tolerance);
+*/
+            rs.close();
+
+            //create the controlled inventory for this strategy run....
+            createControlledInventory(strategy, inputDataset);
+
+            //reload
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+
+            tableName2 = result.getControlledInventoryDataset().getInternalSources()[0].getTable();
+            
+            cn2 = new EmfDatabaseSetup(config()).getDbServer().getEmissionsDatasource().getConnection();
+            stmt = cn2.createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY);
+
+            //make sure there are the corect amount of controlled inv records...
+            rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName2);
+            rs.next();
+            assertTrue("make sure there are 206 records in the summary results. " + rs.getInt(1), rs.getInt(1) == 206);
+
+            //make sure no inv info has been updated...
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName2 
+                    + " where scc = '2294000270' and fips = '37067' and poll ='PM2.5'");
+//            assertTrue("assigned different pollutant for same SCC", rs.getDouble("reff") == 0 && rs.getDouble("reff") == 0);
+
+            
+
+            
+            
+            
+            //create the controlled inventory for this strategy run....
+            createControlledInventory(strategy, inputDataset2);
+
+            //reload
+            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[1].getInputDataset().getId(), sessionFactory.getSession());
+
+            tableName2 = result.getControlledInventoryDataset().getInternalSources()[0].getTable();
+            
+            cn2 = new EmfDatabaseSetup(config()).getDbServer().getEmissionsDatasource().getConnection();
+            stmt = cn2.createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY);
+
+            //make sure there are the corect amount of controlled inv records...
+            rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName2);
+            rs.next();
+            assertTrue("make sure there are 206 records in the summary results. " + rs.getInt(1), rs.getInt(1) == 206);
+
+            //make sure no inv info has been updated...
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName2 
+                    + " where scc = '2294000270' and fips = '37067' and poll ='PM2.5'");
+//            assertTrue("assigned different pollutant for same SCC", rs.getDouble("reff") == 0 && rs.getDouble("reff") == 0);
+
+            
 
         } catch (Exception e) {
             e.printStackTrace();

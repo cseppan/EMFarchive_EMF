@@ -93,7 +93,7 @@ public abstract class AbstractStrategyTask implements Strategy {
     protected void saveControlStrategyResult(ControlStrategyResult strategyResult) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-//            runQASteps(strategyResult);
+            runQASteps(strategyResult);
             ControlStrategyDAO dao = new ControlStrategyDAO();
             dao.updateControlStrategyResult(strategyResult, session);
         } catch (RuntimeException e) {

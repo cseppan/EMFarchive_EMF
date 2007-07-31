@@ -8,7 +8,6 @@ import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -277,10 +276,10 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public void createInventory(User user, ControlStrategy controlStrategy, EmfDataset inputDataset) throws EmfException {
+    public void createInventory(User user, ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
         try {
             ControlStrategyInventoryOutputTask task= new ControlStrategyInventoryOutputTask(user, controlStrategy, 
-                    inputDataset, sessionFactory, 
+                    controlStrategyInputDataset, sessionFactory, 
                     dbServerFactory);
             if(task.shouldProceed())
                 threadPool.execute(new GCEnforcerTask("Create Inventory: " + controlStrategy.getName(), task));

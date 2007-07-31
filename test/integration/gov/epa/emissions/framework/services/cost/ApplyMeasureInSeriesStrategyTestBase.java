@@ -38,8 +38,6 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
     private String strategyTypeName = "Apply Measures In Series";
 //    protected ControlStrategyService service;
 
-    protected String tableName = "test" + Math.round(Math.random() * 1000) % 1000;
-
     protected void doSetUp() throws Exception {
         dbServer = dbServerFactory.getDbServer();
         sqlDataTypes = dbServer.getSqlDataTypes();
@@ -50,6 +48,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
     }
 
     protected ControlStrategyInputDataset setInputDataset(String type) throws Exception {
+        String tableName = "test" + Math.round(Math.random() * 1000) % 1000;
         EmfDataset inputDataset = new EmfDataset();
         inputDataset.setName(tableName);
         inputDataset.setCreator(emfUser().getUsername());
@@ -149,6 +148,18 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         return strategy;
     }
 
+    protected ControlStrategy controlStrategy(ControlStrategyInputDataset[] inputDatasets, String name, Pollutant pollutant) {
+        ControlStrategy strategy = new ControlStrategy();
+        strategy.setName(name);
+        strategy.setControlStrategyInputDatasets(inputDatasets);
+        strategy.setInventoryYear(2000);
+        strategy.setCostYear(2000);
+        strategy.setTargetPollutant(pollutant);
+        strategy.setStrategyType(strategyType(strategyTypeName));
+        add(strategy);
+        return strategy;
+    }
+
     protected User emfUser() {
         return new UserDAO().get("emf", session);
     }
@@ -169,7 +180,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         importer.run();
         add(inputDataset);
         session.flush();
-        return (EmfDataset) load(EmfDataset.class, tableName);
+        return (EmfDataset) load(EmfDataset.class, inputDataset.getName());
     }
 
     private EmfDataset addORLNonpointDataset(EmfDataset inputDataset) throws ImporterException {
@@ -184,7 +195,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         importer.run();
         add(inputDataset);
         session.flush();
-        return (EmfDataset) load(EmfDataset.class, tableName);
+        return (EmfDataset) load(EmfDataset.class, inputDataset.getName());
     }
 
     private EmfDataset addORLOnroadDataset(EmfDataset inputDataset) throws ImporterException {
@@ -199,7 +210,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         importer.run();
         add(inputDataset);
         session.flush();
-        return (EmfDataset) load(EmfDataset.class, tableName);
+        return (EmfDataset) load(EmfDataset.class, inputDataset.getName());
     }
 
     private EmfDataset addORLNonroadDataset(EmfDataset inputDataset) throws ImporterException {
@@ -214,7 +225,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         importer.run();
         add(inputDataset);
         session.flush();
-        return (EmfDataset) load(EmfDataset.class, tableName);
+        return (EmfDataset) load(EmfDataset.class, inputDataset.getName());
     }
 
     protected EfficiencyRecord record(Pollutant pollutant, String locale, float efficiency, double cost, int costYear) {
@@ -253,10 +264,10 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         strategyTask.run();
     }
     
-    protected void createControlledInventory(ControlStrategy strategy, EmfDataset inputDataset) throws Exception {
+    protected void createControlledInventory(ControlStrategy strategy, ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {
         //create the controlled inventory for this strategy run....
         ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(emfUser(), strategy,
-                inputDataset, sessionFactory, dbServerFactory);
+                controlStrategyInputDataset, sessionFactory, dbServerFactory);
         output.create();
     }
 }

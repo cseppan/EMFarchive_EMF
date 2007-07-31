@@ -10,7 +10,6 @@ import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.db.TableModifier;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.TableFormat;
-import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -19,9 +18,9 @@ import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +29,7 @@ import org.hibernate.Session;
 
 public class DatasetCreator {
 
-    private String prefix;
+    private String tablePrefix;
 
     private User user;
 
@@ -53,7 +52,7 @@ public class DatasetCreator {
             HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory,
             Datasource datasource, Keywords keywordMasterList) {
         this.datasetNamePrefix = datasetNamePrefix;
-        this.prefix = tablePrefix;
+        this.tablePrefix = tablePrefix;
         this.user = user;
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
@@ -63,14 +62,10 @@ public class DatasetCreator {
         this.keywordMasterList = keywordMasterList;//new Keywords(new DataCommonsServiceImpl(sessionFactory).getKeywords());
     }
 
-    private String getOutputTableName(String outputDatasetName) {
-        return prefix + outputDatasetName;
-    }
-    
     public EmfDataset addDataset(EmfDataset inputDataset, DatasetType type, 
             TableFormat tableFormat, String description) throws EmfException {
-        String outputDatasetName = getResultDatasetName(controlStrategy.getName());
-        String outputTableName = getOutputTableName(outputDatasetName);
+        String outputDatasetName = createResultDatasetName(inputDataset);
+        String outputTableName = createTableName(inputDataset);
         
         EmfDataset dataset = new EmfDataset();
         Date start = new Date();
@@ -162,16 +157,48 @@ public class DatasetCreator {
         return (String[]) names.toArray(new String[0]);
     }
 
-    private String getResultDatasetName(String name) {
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("MMddyyyy_HHmmss");
-        String timestamp = dateFormatter.format(new Date());
-        return DataTable.encodeTableName(
-                ((prefix + name + "_" + timestamp).length() <= 63 
-                    ? name
-                    : name.substring(0, 63 - (prefix + "_" + timestamp).length())) 
-                        + "_" + timestamp);
+    private String createResultDatasetName(EmfDataset inputDataset) {
+        String timestamp = EmfDateFormat.format_YYYYMMDDHHMMSS(new Date());
+        String name = datasetNamePrefix + inputDataset.getId() 
+            + "_V" + inputDataset.getDefaultVersion() 
+            + "_" + timestamp;
+
+        if (name.length() < 64) {     //postgresql table name max length is 64
+            String inputDatasetName = inputDataset.getName();
+            int space = inputDatasetName.length() + name.length() - 64;
+            name += inputDatasetName.substring((space < 0) ? 0 : space + 1);
+        }
+
+        for (int i = 0; i < name.length(); i++) {
+            if (!Character.isLetterOrDigit(name.charAt(i))) {
+                name = name.replace(name.charAt(i), '_');
+            }
+        }
+
+        return name.trim().replaceAll(" ", "_");
     }
     
+    private String createTableName(EmfDataset inputDataset) {
+        String formattedDate = EmfDateFormat.format_YYYYMMDDHHMMSS(new Date());
+        String table = tablePrefix + inputDataset.getId() 
+            + "_V" + inputDataset.getDefaultVersion() 
+            + "_" + formattedDate;
+        
+        if (table.length() < 64) {     //postgresql table name max length is 64
+            String name = inputDataset.getName();
+            int space = name.length() + table.length() - 64;
+            table += name.substring((space < 0) ? 0 : space + 1);
+        }
+
+        for (int i = 0; i < table.length(); i++) {
+            if (!Character.isLetterOrDigit(table.charAt(i))) {
+                table = table.replace(table.charAt(i), '_');
+            }
+        }
+
+        return table.trim().replaceAll(" ", "_");
+    }
+
     private void add(EmfDataset dataset) throws EmfException {
         Session session = sessionFactory.getSession();
         try {

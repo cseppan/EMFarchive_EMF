@@ -7,7 +7,6 @@ import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import org.apache.commons.logging.Log;
@@ -26,14 +25,14 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
 
     private DbServerFactory dbServerFactory;
 
-    private EmfDataset inputDataset;
+    private ControlStrategyInputDataset controlStrategyInputDataset;
     
     public ControlStrategyInventoryOutputTask(User user, ControlStrategy controlStrategy,
-            EmfDataset inputDataset, HibernateSessionFactory sessionFactory, 
+            ControlStrategyInputDataset controlStrategyInputDataset, HibernateSessionFactory sessionFactory, 
             DbServerFactory dbServerFactory) {
         this.user = user;
         this.controlStrategy = controlStrategy;
-        this.inputDataset = inputDataset;
+        this.controlStrategyInputDataset = controlStrategyInputDataset;
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
     }
@@ -41,7 +40,7 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
     public void run() {
         try {
             ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,
-                    inputDataset, sessionFactory, 
+                    controlStrategyInputDataset, sessionFactory, 
                     dbServerFactory);
             output.create();
         } catch (Exception e) {
@@ -63,7 +62,7 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
         Session session = sessionFactory.getSession();
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(controlStrategy.getId(), inputDataset.getId(),
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(controlStrategy.getId(), controlStrategyInputDataset.getInputDataset().getId(),
                     session);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             if (detailedResultDataset == null)

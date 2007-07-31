@@ -4,10 +4,10 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public class ControlStrategyServiceTransport implements ControlStrategyService {
     private CallFactory callFactory;
@@ -145,16 +145,16 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.request(new Object[] {});
     }
 
-    public void createInventory(User user, ControlStrategy controlStrategy, EmfDataset inputDataset) throws EmfException {
+    public void createInventory(User user, ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("createInventory");
         call.addParam("user", mappings.user());
         call.addParam("controlStrategy", mappings.controlStrategy());
-        call.addParam("inputDataset", mappings.dataset());
+        call.addParam("controlStrategyInputDataset", mappings.controlStrategyInputDataset());
         call.setVoidReturnType();
 
-        call.request(new Object[] { user, controlStrategy, inputDataset });
+        call.request(new Object[] { user, controlStrategy, controlStrategyInputDataset });
 
     }
 

@@ -174,20 +174,11 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                 messagePanel.setError("Please select at least one item.");
                 return;
             }
-            ControlStrategyInputDataset[] inputDatasets = controlStrategy.getControlStrategyInputDatasets();
-           // EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
             for (int i = 0; i < controlStrategyResults.length; i++) {
-                EmfDataset inputDataset = null;
-                for (int j = 0; j < inputDatasets.length; j++) {
-                    if (inputDatasets[j].getInputDataset().getId() == controlStrategyResults[i].getInputDatasetId()) {
-                        inputDataset = inputDatasets[j].getInputDataset();
-                        break;
-                    }
-                }
-                inputDataset=getInputDataset(controlStrategyResults[i].getInputDatasetId());               
-                if (inputDataset != null)
-                    presenter.doInventory(controlStrategy, inputDataset);
-               // inputDatasets[i]=inputDataset;
+                ControlStrategyInputDataset controlStrategyInputDataset = null;
+                controlStrategyInputDataset = getControlStrategyInputDataset(controlStrategyResults[i].getInputDatasetId());
+                if (controlStrategyInputDataset != null)
+                    presenter.doInventory(controlStrategy, controlStrategyInputDataset);
             }
             messagePanel.setMessage(
                     "Creating controlled inventories. Watch the status window for progress and refresh this window after completion.");
@@ -206,6 +197,18 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             }
         }
         return inputDataset;
+    }
+    
+    private ControlStrategyInputDataset getControlStrategyInputDataset(int datasetId) {
+        ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy.getControlStrategyInputDatasets();
+        ControlStrategyInputDataset controlStrategyInputDataset = null;
+        for (int j = 0; j < controlStrategyInputDatasets.length; j++) {
+            if (controlStrategyInputDatasets[j].getInputDataset().getId() == datasetId) {
+                controlStrategyInputDataset = controlStrategyInputDatasets[j];
+                break;
+            }
+        }
+        return controlStrategyInputDataset;
     }
     
 //    private JPanel productPanel() {

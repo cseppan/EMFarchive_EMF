@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -45,11 +46,14 @@ public class ControlStrategyInventoryOutput {
 
     private EmfDataset inputDataset;
     
+    private ControlStrategyInputDataset controlStrategyInputDataset;
+    
     public ControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
-            EmfDataset inputDataset, HibernateSessionFactory sessionFactory, 
+            ControlStrategyInputDataset controlStrategyInputDataset, HibernateSessionFactory sessionFactory, 
             DbServerFactory dbServerFactory) throws Exception {
         this.controlStrategy = controlStrategy;
-        this.inputDataset = inputDataset;
+        this.controlStrategyInputDataset = controlStrategyInputDataset;
+        this.inputDataset = controlStrategyInputDataset.getInputDataset();
         this.user = user;
         this.sessionFactory = sessionFactory;
         this.dbServer = dbServerFactory.getDbServer();
@@ -79,7 +83,7 @@ public class ControlStrategyInventoryOutput {
             e.printStackTrace();
             throw e;
         } finally {
-//            setandRunQASteps();
+            setandRunQASteps();
         }
         endStatus(statusServices);
         dbServer.disconnect();
@@ -93,8 +97,9 @@ public class ControlStrategyInventoryOutput {
         
         String outputInventoryTableName = dataset.getInternalSources()[0].getTable();
         
-        copyDataFromOriginalTable(inputTable, outputInventoryTableName, version(inputDataset, inputDataset
-                .getVersion()), inputDataset, datasource);
+        copyDataFromOriginalTable(inputTable, outputInventoryTableName, 
+                version(inputDataset, controlStrategyInputDataset.getVersion()), inputDataset, 
+                datasource);
 
         ControlStrategyResult result = getControlStrategyResult();
         updateDataWithDetailDatasetTable(outputInventoryTableName, detailDatasetTable(result), server
@@ -105,7 +110,7 @@ public class ControlStrategyInventoryOutput {
         updateControlStrategyResults(result, dataset);
     }
 
-    protected void setandRunQASteps() throws EmfException {
+    private void setandRunQASteps() throws EmfException {
         try {
             ControlStrategyResult result = getControlStrategyResult();
             EmfDataset controlledDataset = (EmfDataset) result.getControlledInventoryDataset();

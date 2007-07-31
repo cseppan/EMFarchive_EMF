@@ -523,7 +523,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < percentDiff);
 
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset.getInputDataset());
+            createControlledInventory(strategy, inputDataset);
 
             //reload
             result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
@@ -648,12 +648,12 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 
             //create the controlled inventory for this strategy run....
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset.getInputDataset());
+            createControlledInventory(strategy, inputDataset);
 
             //reload
             result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
 
-            tableName2 = result.getControlledInventoryDataset().getName().replaceAll("ControlledInventory", "CSINVEN");
+            tableName2 = result.getControlledInventoryDataset().getInternalSources()[0].getTable();
             
             cn2 = new EmfDatabaseSetup(config()).getDbServer().getEmissionsDatasource().getConnection();
             stmt = cn2.createStatement(
