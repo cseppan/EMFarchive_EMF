@@ -38,20 +38,13 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
     private Object[] values(ControlStrategyResult result) {
         EmfDataset outputDataset = (EmfDataset) result.getDetailedResultDataset();
         EmfDataset controlledInvDataset = (EmfDataset) result.getControlledInventoryDataset();
-        Object[] values = { inputDatasetName(result.getInputDatasetId()), getControlStrategyInputDataset(result.getInputDatasetId()).getVersion(), 
+        ControlStrategyInputDataset controlStrategyInputDataset = getControlStrategyInputDataset(result.getInputDatasetId());
+        Object[] values = { result.getInputDataset().getName(), controlStrategyInputDataset != null ? controlStrategyInputDataset.getVersion() : result.getInputDataset().getDefaultVersion(), 
                 outputDataset.getName(), controlledInvDataset == null ? "" : controlledInvDataset.getName(), 
                 result.getRunStatus(), result.getTotalCost(), 
                 result.getTotalReduction(), format(result.getStartTime()),
                 format(result.getCompletionTime()), result.getRecordCount() == null ? 0 : result.getRecordCount() };
         return values;
-    }
-
-    private String inputDatasetName(int inputDatasetId) {
-        for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
-            if (inputDatasetId == controlStrategyInputDatasets[i].getInputDataset().getId())
-                return controlStrategyInputDatasets[i].getInputDataset().getName();
-        }
-        return "";
     }
 
     private ControlStrategyInputDataset getControlStrategyInputDataset(int datasetId) {
@@ -64,7 +57,7 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
         }
         return inputDataset;
     }
-    
+
     public String[] columns() {
         return new String[] { "Input Inventory", "Input Version", 
                 "Detailed Result", "Controlled Inventory", 

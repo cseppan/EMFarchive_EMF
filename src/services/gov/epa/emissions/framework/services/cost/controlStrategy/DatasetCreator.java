@@ -70,7 +70,7 @@ public class DatasetCreator {
         EmfDataset dataset = new EmfDataset();
         Date start = new Date();
 
-        dataset.setName(datasetNamePrefix+outputDatasetName);
+        dataset.setName(outputDatasetName);
         dataset.setCreator(user.getUsername());
         dataset.setDatasetType(type);
         dataset.setDescription(description);

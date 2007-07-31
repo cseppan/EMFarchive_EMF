@@ -25,6 +25,10 @@
     <many-to-one name="controlledInventoryDataset"
 		 class ="gov.epa.emissions.framework.services.data.EmfDataset"
 		 column="controlled_inven_dataset_id" unique="true" not-null="false"/>
+	<many-to-one
+            name="inputDataset" 
+            class="gov.epa.emissions.framework.services.data.EmfDataset"
+            column="dataset_id" unique="true" not-null="true" insert="false" update="false"/> 
 	
   </class> 
 </hibernate-mapping>  

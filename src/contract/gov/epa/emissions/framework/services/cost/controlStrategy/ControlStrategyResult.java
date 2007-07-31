@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.controlStrategy;
 
 import gov.epa.emissions.commons.data.Dataset;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -23,6 +24,8 @@ public class ControlStrategyResult implements Serializable {
 
     private Date startTime;
 
+    private EmfDataset inputDataset;
+    
     private Dataset detailedResultDataset;
     
     private Dataset controlledInventoryDataset;
@@ -98,6 +101,14 @@ public class ControlStrategyResult implements Serializable {
 
     public void setDetailedResultDataset(Dataset detailedResultDataset) {
         this.detailedResultDataset = detailedResultDataset;
+    }
+
+    public EmfDataset getInputDataset() {
+        return inputDataset;
+    }
+
+    public void setInputDataset(EmfDataset inputDataset) {
+        this.inputDataset = inputDataset;
     }
 
     public String getRunStatus() {
