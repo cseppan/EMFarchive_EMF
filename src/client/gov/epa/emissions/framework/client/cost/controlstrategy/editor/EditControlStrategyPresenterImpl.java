@@ -189,4 +189,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     public CostYearTable getCostYearTable() throws EmfException {
         return session.controlMeasureService().getCostYearTable(1999);
     }
+
+    public void fireTracking() {
+        view.signalChanges();
+    }
 }

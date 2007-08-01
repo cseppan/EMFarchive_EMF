@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
@@ -28,7 +29,6 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
-import gov.epa.emissions.framework.ui.TrackableSortFilterSelectModel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -72,7 +72,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
     private ControlStrategyInputDatasetTableData tableData;
 
-    private TrackableSortFilterSelectModel sortFilterSelectModel;
+    private SortFilterSelectModel sortFilterSelectModel;
 
     private EmfTableModel tableModel;
 
@@ -80,9 +80,12 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
     private DesktopManager desktopManager;
     
+    private EditControlStrategyPresenter editControlStrategyPresenter;
+    
     public EditControlStrategyInventoryFilterTab(ControlStrategy controlStrategy, ManageChangeables changeablesList, 
             MessagePanel messagePanel, EmfConsole parentConsole, 
-            EmfSession session, DesktopManager desktopManager) {
+            EmfSession session, DesktopManager desktopManager,
+            EditControlStrategyPresenter editControlStrategyPresenter) {
         super.setName("csFilter");
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
@@ -90,6 +93,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         this.parentConsole = parentConsole;
         this.session = session;
         this.desktopManager = desktopManager;
+        this.editControlStrategyPresenter = editControlStrategyPresenter;
         doLayout(controlStrategy.getControlStrategyInputDatasets());
     }
 
@@ -100,12 +104,12 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         
         setLayout(new BorderLayout(10, 10));
 //        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        add(panel,BorderLayout.NORTH);
+        add(panel,BorderLayout.SOUTH);
         // mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
         mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         buildSortFilterPanel();
-        add(mainPanel, BorderLayout.SOUTH);
+        add(mainPanel, BorderLayout.NORTH);
 //        add(createInputDatasetsPanel(controlStrategy.getInputDatasets()), BorderLayout.SOUTH);
     }
 
@@ -132,8 +136,8 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
     private SortFilterSelectionPanel sortFilterPanel() {
         tableModel = new EmfTableModel(tableData);
-        sortFilterSelectModel = new TrackableSortFilterSelectModel(tableModel);
-        changeablesList.addChangeable(sortFilterSelectModel);
+        sortFilterSelectModel = new SortFilterSelectModel(tableModel);
+        //changeablesList.addChangeable(sortFilterSelectModel);
         SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parentConsole, sortFilterSelectModel);
         sortFilterSelectionPanel.setPreferredSize(new Dimension(625, 200));
         return sortFilterSelectionPanel;
@@ -189,6 +193,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
                 controlStrategyInputDatasets[i].setVersion(inputDatasets[i].getDefaultVersion());
             }
             tableData.add(controlStrategyInputDatasets);
+            if (inputDatasets.length > 0) editControlStrategyPresenter.fireTracking();
             buildSortFilterPanel();
         } catch (Exception exp) {
             messagePanel.setError(exp.getMessage());
@@ -229,6 +234,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
         if (selection == JOptionPane.YES_OPTION) {
             tableData.remove(controlStrategyInputDatasets);
+            if (controlStrategyInputDatasets.length > 0) editControlStrategyPresenter.fireTracking();
             buildSortFilterPanel();
         }
     }

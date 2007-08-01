@@ -196,7 +196,6 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     protected void saveControlStrategyResult(ControlStrategyResult strategyResult) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-//            runQASteps(strategyResult);
             ControlStrategyDAO dao = new ControlStrategyDAO();
             dao.updateControlStrategyResult(strategyResult, session);
         } catch (RuntimeException e) {

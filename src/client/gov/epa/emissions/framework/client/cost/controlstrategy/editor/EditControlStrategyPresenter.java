@@ -35,4 +35,6 @@ public interface EditControlStrategyPresenter {
     void doLoad(String tabTitle) throws EmfException;
 
     CostYearTable getCostYearTable() throws EmfException;
+    
+    void fireTracking();
 }

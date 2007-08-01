@@ -11,7 +11,8 @@ public class StrategyTask extends AbstractStrategyTask {
 
     private StrategyLoader loader;
     
-    public StrategyTask(ControlStrategy controlStrategy, User user, DbServerFactory dbServerFactory, Integer batchSize,
+    public StrategyTask(ControlStrategy controlStrategy, User user, 
+            DbServerFactory dbServerFactory, Integer batchSize,
             HibernateSessionFactory sessionFactory) throws EmfException {
         super(controlStrategy, user, 
                 dbServerFactory, sessionFactory);

@@ -241,9 +241,11 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         JPanel buttonPanel = buttonPanel();
 
         JPanel outputPanel = new JPanel(new BorderLayout(5, 10));
-        outputPanel.add(folderPanel(), BorderLayout.NORTH);
         outputPanel.add(tablePanel);
-        outputPanel.add(buttonPanel, BorderLayout.SOUTH);
+        JPanel panel = new JPanel(new BorderLayout(5, 10));
+        panel.add(buttonPanel, BorderLayout.NORTH);
+        panel.add(folderPanel(), BorderLayout.SOUTH);
+        outputPanel.add(panel, BorderLayout.SOUTH);
 
         outputPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createTitledBorder("Results")));

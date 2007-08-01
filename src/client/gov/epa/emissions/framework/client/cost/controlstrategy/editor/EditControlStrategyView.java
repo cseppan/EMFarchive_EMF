@@ -15,4 +15,7 @@ public interface EditControlStrategyView extends ManagedView {
     public void startControlMeasuresRefresh();
 
     public void endControlMeasuresRefresh();
+    
+    void signalChanges();
+
 }

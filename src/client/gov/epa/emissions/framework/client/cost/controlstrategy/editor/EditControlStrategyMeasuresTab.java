@@ -22,6 +22,7 @@ import gov.epa.emissions.framework.ui.TrackableSortFilterSelectModel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,8 +124,10 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         JPanel panel = new JPanel();
         if (presenter.getAllControlMeasures().length == 0)
             addButton.setEnabled(false);
+        addButton.setMargin(new Insets(2, 2, 2, 2));
         panel.add(addButton);
         Button removeButton = new RemoveButton(removeAction());
+        removeButton.setMargin(new Insets(2, 2, 2, 2));
         panel.add(removeButton);
 
         Button rpButton = new BorderlessButton("Set RP %", new AbstractAction() {
