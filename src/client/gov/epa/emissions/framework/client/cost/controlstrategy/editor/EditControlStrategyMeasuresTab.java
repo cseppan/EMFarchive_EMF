@@ -105,7 +105,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         // mainPanel.add(new JLabel("Measures to Include:"), BorderLayout.NORTH);
         buildSortFilterPanel();
         // mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
-        this.add(mainPanel, BorderLayout.EAST);
+        this.add(mainPanel, BorderLayout.CENTER);
         // disable class filter since there are measures selected
         if (sortFilterSelectModel.getRowCount() > 0) classesList.setEnabled(false);
     }
