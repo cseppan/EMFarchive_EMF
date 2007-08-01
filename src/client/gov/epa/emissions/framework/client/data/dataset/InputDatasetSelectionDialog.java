@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -56,7 +57,7 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
 
         setTitle("Select Datasets");
         this.pack();
-        this.setSize(700,600);
+        this.setSize(500,400);
         this.setLocation(ScreenUtils.getPointToCenter(parent));
         this.setVisible(true);
     }
@@ -72,7 +73,8 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
         return list.toArray(new EmfDataset[0]);
     }
 
-    private ComboBox buildDatasetTypeCombo(DatasetType[] datasetTypes) {
+    private JPanel buildDatasetTypeCombo(DatasetType[] datasetTypes) {
+        JPanel panel = new JPanel(new BorderLayout());
         datasetTypeCombo = new ComboBox("Choose an inventory type", datasetTypes);
 //        datasetTypeCombo.setSelectedItem(controlStrategy.getDatasetType());
 
@@ -86,7 +88,10 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
                 }
             }
         });
-        return datasetTypeCombo;
+        
+        panel.add(datasetTypeCombo, BorderLayout.LINE_START);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
+        return panel;
     }
 
     private JPanel buildDatasetsPanel() {
