@@ -195,4 +195,8 @@ ALTER TABLE emf.control_strategies
 ALTER TABLE emf.strategy_results
 	ADD COLUMN record_count integer;
 
+-- Added 8/1/12007 NEW Cap_Ann_Ratio + Incremental_Cost_Per_Ton columns for eff rec table
+ALTER TABLE emf.control_measure_efficiencyrecords 
+	ADD COLUMN Cap_Ann_Ratio double precision,
+	ADD COLUMN Incremental_Cost_Per_Ton double precision;
 	
