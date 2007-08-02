@@ -32,6 +32,8 @@
 		<property name="refYrCostPerTon" column="ref_yr_cost_per_ton" type="double" not-null="false"/>
         <property name="minEmis" column="min_emis" type="double" not-null="false"/>
 		<property name="maxEmis" column="max_emis" type="double" not-null="false"/>
+		<property name="capitalAnnualizedRatio" column="cap_ann_ratio" type="double" not-null="false"/>
+		<property name="incrementalCostPerTon" column="incremental_cost_per_ton" type="double" not-null="false"/>
     </class>
 </hibernate-mapping>  
 
