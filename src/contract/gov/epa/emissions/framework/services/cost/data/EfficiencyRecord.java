@@ -50,6 +50,9 @@ public class EfficiencyRecord implements Serializable {
 
     private Double maxEmis;
 
+    private Double capitalAnnualizedRatio;
+
+    private Double incrementalCostPerTon;
 
     public float getCapRecFactor() {
         return capRecFactor;
@@ -247,5 +250,21 @@ public class EfficiencyRecord implements Serializable {
 
     public Double getMaxEmis() {
         return maxEmis;
+    }
+
+    public void setCapitalAnnualizedRatio(Double capitalAnnualizedRatio) {
+        this.capitalAnnualizedRatio = capitalAnnualizedRatio;
+    }
+
+    public Double getCapitalAnnualizedRatio() {
+        return capitalAnnualizedRatio;
+    }
+
+    public void setIncrementalCostPerTon(Double incrementalCostPerTon) {
+        this.incrementalCostPerTon = incrementalCostPerTon;
+    }
+
+    public Double getIncrementalCostPerTon() {
+        return incrementalCostPerTon;
     }
 }

@@ -60,6 +60,8 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private ControlStrategyConstraint constraint;
 
+    private boolean useCostEquations;
+
     public ControlStrategy() {
         this.lock = new Mutex();
         this.controlStrategyInputDatasets = new ArrayList();
@@ -283,5 +285,13 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public String toString() {
         return name;
+    }
+
+    public void setUseCostEquations(boolean useCostEquations) {
+        this.useCostEquations = useCostEquations;
+    }
+
+    public boolean getUseCostEquations() {
+        return useCostEquations;
     }
 }

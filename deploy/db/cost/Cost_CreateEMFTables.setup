@@ -193,7 +193,8 @@ CREATE TABLE emf.control_strategies
   filter varchar(255),
   lock_owner varchar(255),
   lock_date timestamp,
-  county_file character varying
+  county_file character varying,
+  use_cost_equations boolean
 ) 
 WITHOUT OIDS;
 -- emf.control_strategies

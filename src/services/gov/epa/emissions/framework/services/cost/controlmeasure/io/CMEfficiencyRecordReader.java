@@ -100,6 +100,7 @@ public class CMEfficiencyRecordReader {
             locale(efficiencyRecord, tokens[2], sb);
             effectiveDate(efficiencyRecord, tokens[3], sb);
             existingMeasureAbbrev(efficiencyRecord, tokens[4]);
+            //original file format
             if (this.colCount == 15) {
                 controlEfficiency(efficiencyRecord, tokens[6], sb);
                 costYear(efficiencyRecord, tokens[7], sb);
@@ -113,6 +114,7 @@ public class CMEfficiencyRecordReader {
                 capitalRecoveryFactor(efficiencyRecord, tokens[12], sb);
                 discountFactor(efficiencyRecord, tokens[13], sb);
                 details(efficiencyRecord, tokens[14]);
+            //v2 file format
             } else if (this.colCount == 17) {
                 minEmis(efficiencyRecord, tokens[6], sb);
                 maxEmis(efficiencyRecord, tokens[7], sb);
@@ -127,6 +129,7 @@ public class CMEfficiencyRecordReader {
                 discountFactor(efficiencyRecord, tokens[15], sb);
                 details(efficiencyRecord, tokens[16]);
             }
+            //v3 file format -- will be similar to above, but with new columns...
 
         } catch (EmfException e) {
             // don't add the efficiency record if the validation fails

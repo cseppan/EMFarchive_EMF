@@ -200,3 +200,5 @@ ALTER TABLE emf.control_measure_efficiencyrecords
 	ADD COLUMN Cap_Ann_Ratio double precision,
 	ADD COLUMN Incremental_Cost_Per_Ton double precision;
 	
+ALTER TABLE emf.control_strategies  
+	ADD COLUMN Use_Cost_Equations boolean DEFAULT false;
