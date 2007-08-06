@@ -32,15 +32,16 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     private EmfConsole parent;
 
     private InputDatasetSelectionPresenter presenter;
-    
+
     private ComboBox datasetTypeCombo;
-    
+
     private JList datasetList;
     
+    private EmfDataset[] datasets = new EmfDataset[] {};
+
     public InputDatasetSelectionDialog(EmfConsole parent, ManageChangeables changeables) {
         super(parent);
         super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
-        
         this.parent = parent;
         setModal(true);
     }
@@ -67,16 +68,12 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     }
 
     public EmfDataset[] getDatasets() {
-        List<EmfDataset> list = new ArrayList<EmfDataset>(datasetList.getSelectedValues().length);
-        for (int i = 0; i < datasetList.getSelectedValues().length; i++)
-            list.add((EmfDataset)datasetList.getSelectedValues()[i]);
-        return list.toArray(new EmfDataset[0]);
+        return datasets;
     }
 
     private JPanel buildDatasetTypeCombo(DatasetType[] datasetTypes) {
         JPanel panel = new JPanel(new BorderLayout());
         datasetTypeCombo = new ComboBox("Choose an inventory type", datasetTypes);
-//        datasetTypeCombo.setSelectedItem(controlStrategy.getDatasetType());
 
         datasetTypeCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -84,7 +81,6 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
                     presenter.refreshDatasets((DatasetType)datasetTypeCombo.getSelectedItem());
                 } catch (EmfException e1) {
                     // NOTE Auto-generated catch block
-                    e1.printStackTrace();
                 }
             }
         });
@@ -125,14 +121,17 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     private Action okAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-//                add();
+                //get selected datasets
+                List<EmfDataset> list = new ArrayList<EmfDataset>(datasetList.getSelectedValues().length);
+                for (int i = 0; i < datasetList.getSelectedValues().length; i++)
+                    list.add((EmfDataset)datasetList.getSelectedValues()[i]);
+                datasets = list.toArray(new EmfDataset[0]);
                 setVisible(false);
                 dispose();
             }
         };
     }
 
- 
     public void observe(InputDatasetSelectionPresenter presenter) {
         this.presenter = presenter;
     }
