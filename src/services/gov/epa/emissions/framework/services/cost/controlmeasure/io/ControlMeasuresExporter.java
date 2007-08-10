@@ -140,7 +140,7 @@ public class ControlMeasuresExporter implements Exporter {
 
     private void writeEfficiencyFile() throws IOException {
         PrintWriter efficienciesWriter = openExportFile("_efficiencies.csv");
-        CMEfficiencyFileFormatv2 fileFormat = new CMEfficiencyFileFormatv2();
+        CMEfficiencyFileFormatv3 fileFormat = new CMEfficiencyFileFormatv3();
         String[] colNames = fileFormat.cols();
         ControlMeasureDAO dao = new ControlMeasureDAO();
         Session session = factory.getSession();
@@ -195,6 +195,9 @@ public class ControlMeasuresExporter implements Exporter {
         efficiencyRecord += record.getEquationType() + delimiter;
         efficiencyRecord += record.getCapRecFactor() + delimiter;
         efficiencyRecord += record.getDiscountRate() + delimiter;
+        efficiencyRecord += record.getCapitalAnnualizedRatio() + delimiter;
+        efficiencyRecord += record.getIncrementalCostPerTon() + delimiter;
+        
         efficiencyRecord += record.getDetail();
         
         return efficiencyRecord;

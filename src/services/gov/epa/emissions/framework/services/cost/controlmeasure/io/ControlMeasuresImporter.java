@@ -93,9 +93,12 @@ public class ControlMeasuresImporter implements Importer {
             updateControlMeasuresMap(measures);
             setStatus("Started reading efficiency record file");
             modifier.start();
+            //process 20000 eff rec at a time...
             while (!isLastEfficiencyRecord()) {
                 efficiencyRecords = runEfficiencyRecords();
+                System.out.println("runEfficiencyRecords()");
                 saveEfficiencyRecords(efficiencyRecords);
+                System.out.println("saveEfficiencyRecords()");
                 efficiencyRecordCount += efficiencyRecords.length;
                 //setStatus("Processed " + efficiencyRecordCount + " efficiency records");
                 efficiencyRecords = null;

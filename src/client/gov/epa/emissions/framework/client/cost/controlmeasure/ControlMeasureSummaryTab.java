@@ -371,6 +371,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         measure.setAbbreviation(abbreviation.getText());
         measure.setDataSouce(dataSources.getText());
         measure.setSectors(sectorsWidget.getSectors());
+        
+        // save items modified in efficiency tab
     }
 
     private void updateDateReviewed(ControlMeasure measure) throws EmfException {

@@ -66,12 +66,18 @@ public class EfficiencyRecordTableFormat implements TableFormat {
         Column ref_yr_cost_per_ton = new Column("ref_yr_cost_per_ton", types.realType(), new RealFormatter(), "DEFAULT NULL");
         Column min_emis = new Column("min_emis", types.realType(), new RealFormatter(), "DEFAULT NULL");
         Column max_emis = new Column("max_emis", types.realType(), new RealFormatter(), "DEFAULT NULL");
+        Column cap_ann_ratio = new Column("cap_ann_ratio", types.realType(), new RealFormatter(), "DEFAULT NULL");
+        Column incremental_cost_per_ton = new Column("incremental_cost_per_ton", types.realType(), new RealFormatter(), "DEFAULT NULL");
 
         
-        return new Column[] { controlMeasureId, list_index, record_id, pollutant_id, existing_measure_abbr, existing_dev_code, locale, efficiency, percent_reduction, 
-                cost_year, cost_per_ton, rule_effectiveness, rule_penetration, equation_type, cap_rec_factor, 
-                discount_rate, detail, effective_date, last_modified_by, 
-                last_modified_time, ref_yr_cost_per_ton, min_emis, max_emis};
+        return new Column[] { controlMeasureId, list_index, record_id, 
+                pollutant_id, existing_measure_abbr, existing_dev_code, 
+                locale, efficiency, percent_reduction, cost_year, 
+                cost_per_ton, rule_effectiveness, rule_penetration, 
+                equation_type, cap_rec_factor, discount_rate, detail, 
+                effective_date, last_modified_by, last_modified_time, 
+                ref_yr_cost_per_ton, min_emis, max_emis, 
+                cap_ann_ratio, incremental_cost_per_ton};
     }
 
 }

@@ -17,17 +17,21 @@ public class PointRecordGenerator implements RecordGenerator {
     private double invenControlEfficiency;
     private double invenRulePenetration;
     private double invenRuleEffectiveness;
+    private double discountRate;
 //    private double originalEmissions;
 //    private double finalEmissions;
 
     private DecimalFormat decFormat;
+    boolean useCostEquation;
 
-    public PointRecordGenerator(ControlStrategyResult result, DecimalFormat decFormat) {
+    public PointRecordGenerator(ControlStrategyResult result, DecimalFormat decFormat, double discountRate, boolean useCostEquation) {
         this.strategyResult = result;
         this.decFormat = decFormat;
+        this.discountRate= discountRate; 
+        this.useCostEquation=useCostEquation; 
     }
 
-    public Record getRecord(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {
+    public Record getRecord(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions,  boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {
         Record record = new Record();
         record.add(tokens(resultSet, maxCM, originalEmissions, displayOriginalEmissions, displayFinalEmissions, true));
 
@@ -42,10 +46,16 @@ public class PointRecordGenerator implements RecordGenerator {
             boolean hasSICandNAICS) throws SQLException, EmfException {
         List<String> tokens = new ArrayList<String>();
         double effectiveReduction = maxCM.effectiveReduction();
-        
+        Double om;
+        Double annulizedCCost;
+        Double capitalCost;
+        Double annualCost;
+       
         calculateEmissionReduction(resultSet,maxCM);
         reducedEmission = originalEmissions * effectiveReduction;
-
+        CostEquations costEquations = new CostEquationsFactory().getCostEquations(reducedEmission, maxCM, discountRate, useCostEquation);
+        
+        
         tokens.add(""); // record id
         tokens.add("" + strategyResult.getDetailedResultDataset().getId());  //dataset ID
         tokens.add("" + 0);  // version
@@ -63,7 +73,17 @@ public class PointRecordGenerator implements RecordGenerator {
         tokens.add(resultSet.getString("STACKID")); //stack ID
         tokens.add(resultSet.getString("SEGMENT")); //segment
         
-        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon() * reducedEmission));//annual cost for source
+//        tokens.add("" + (costEquations.getTotalAnnualizedCost() != null ? decFormat.format(costEquations.getTotalAnnualizedCost() : ""));
+        annualCost=costEquations.getAnnualCost();
+        tokens.add("" +  decFormat.format(annualCost!= null ? decFormat.format(annualCost) : ""));
+                //maxCM.adjustedCostPerTon() * reducedEmission));//annual cost for source
+        om=costEquations.getOperationMaintenanceCost();
+        tokens.add("" + decFormat.format(om!= null ? decFormat.format(om) : ""));
+        annulizedCCost=costEquations.getAnnualizedCapitalCost();
+        tokens.add("" + decFormat.format(annulizedCCost != null ? decFormat.format(annulizedCCost) : ""));//capital cost
+        capitalCost=costEquations.getCapitalCost();
+        tokens.add("" + (capitalCost != null ? decFormat.format(capitalCost) : ""));//Total capital cost
+        
         tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon())); //annual cost per ton
         tokens.add("" + decFormat.format(maxCM.controlEfficiency()));   //control efficiency
         tokens.add("" + 100);

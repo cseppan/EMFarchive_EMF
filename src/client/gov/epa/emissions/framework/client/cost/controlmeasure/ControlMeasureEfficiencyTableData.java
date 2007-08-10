@@ -32,7 +32,7 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
                 "Control Efficiency", "Min Emis", 
                 "Max Emis", "Rule Effectiveness", 
                 "Rule Penetration", "Equation Type", 
-                "Capital Rec Fac", "Discount Rate", 
+                "Capital Rec Fac", "Discount Rate", "Capital Annual Ratio", "Incremental CPT", 
                 "Last Modifed By", "Last Modifed Date", 
                 "Details", "Existing Measure", 
                 "Existing NEI Dev"};
@@ -48,15 +48,26 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
 
     private Row row(EfficiencyRecord record) {
         Object[] values = {
-                record.getPollutant().getName(), record.getLocale(),
-                effectiveDate(record.getEffectiveDate()), record.getCostYear() != null ? record.getCostYear() : "",
-                record.getCostPerTon() != null ? record.getCostPerTon() : NAN_VALUE, record.getRefYrCostPerTon() != null ? record.getRefYrCostPerTon() : NAN_VALUE, 
-                new Double(record.getEfficiency()), record.getMinEmis() != null ? record.getMinEmis() : NAN_VALUE, 
-                record.getMaxEmis() != null ? record.getMaxEmis() : NAN_VALUE, new Double(record.getRuleEffectiveness()), 
-                new Double(record.getRulePenetration()), record.getEquationType(), 
-                new Double(record.getCapRecFactor()), new Double(record.getDiscountRate()),
-                record.getLastModifiedBy(), EmfDateFormat.format_MM_DD_YYYY_HH_mm(record.getLastModifiedTime()), 
-                record.getDetail(), record.getExistingMeasureAbbr(),
+                record.getPollutant().getName(), 
+                record.getLocale(),
+                effectiveDate(record.getEffectiveDate()), 
+                record.getCostYear() != null ? record.getCostYear() : "",
+                record.getCostPerTon() != null ? record.getCostPerTon() : NAN_VALUE, 
+                record.getRefYrCostPerTon() != null ? record.getRefYrCostPerTon() : NAN_VALUE, 
+                new Double(record.getEfficiency()), 
+                record.getMinEmis() != null ? record.getMinEmis() : NAN_VALUE, 
+                record.getMaxEmis() != null ? record.getMaxEmis() : NAN_VALUE, 
+                new Double(record.getRuleEffectiveness()), 
+                new Double(record.getRulePenetration()), 
+                record.getEquationType(), 
+                new Double(record.getCapRecFactor()!= null ? record.getCapRecFactor() : NAN_VALUE), 
+                new Double(record.getDiscountRate()!= null ? record.getDiscountRate() : NAN_VALUE), 
+                new Double(record.getCapitalAnnualizedRatio()!= null ? record.getCapitalAnnualizedRatio() : NAN_VALUE), 
+                new Double(record.getIncrementalCostPerTon()!= null ? record.getIncrementalCostPerTon() : NAN_VALUE),
+                record.getLastModifiedBy(), 
+                EmfDateFormat.format_MM_DD_YYYY_HH_mm(record.getLastModifiedTime()), 
+                record.getDetail(), 
+                record.getExistingMeasureAbbr(),
                 new Integer(record.getExistingDevCode())
         };
 
@@ -79,10 +90,11 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        if (col == 18)
+        if (col == 20)
             return Integer.class;
 
-        if (col == 4 || col == 5 || col == 6 || col == 7 || col == 8 || col == 9 || col == 10 || col == 12 || col == 13)
+        if (col == 4 || col == 5 || col == 6 || col == 7 || col == 8 || 
+                col == 9 || col == 10 || col == 12 || col == 13 || col==14 || col==15 )
             return Double.class;
 
         return String.class;

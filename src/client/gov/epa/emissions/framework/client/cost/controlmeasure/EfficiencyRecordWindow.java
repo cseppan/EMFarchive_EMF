@@ -91,6 +91,10 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     protected TextField lastModifiedTime;
 
     protected TextField lastModifiedBy;
+    
+    protected TextField capAnnRatio;
+    
+    protected TextField incrementalCPT;
 
     protected CostYearTable costYearTable;
     
@@ -173,7 +177,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         try {
             allPollutants = session.dataCommonsService().getPollutants();
             pollutant = new ComboBox("Select One", allPollutants);
-            pollutant.setPreferredSize(new Dimension(113, 20));
+            pollutant.setPreferredSize(new Dimension(113, 30));
         } catch (EmfException e) {
             messagePanel.setError("Could not retrieve Pollutants");
         }
@@ -221,9 +225,16 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
                 }
             }
         });
+
         this.addChangeable(costperTon);
         layoutGenerator.addLabelWidgetPair("Cost Per Ton Reduced:*", costperTon, panel);
 
+        
+        capAnnRatio = new TextField("Capital Annual Ratio", 10);
+        this.addChangeable(capAnnRatio);
+        layoutGenerator.addLabelWidgetPair("Capital Annual Ratio:", capAnnRatio, panel);
+                      
+        
         refYrCostPerTon = new JLabel("");
         layoutGenerator.addLabelWidgetPair("Ref Yr Cost Per Ton Reduced:", refYrCostPerTon, panel);
 
@@ -238,7 +249,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         efficiency.setToolTipText("Enter the Control Efficiency as a percentage (e.g., 90%, or -10% for a disbenefit)");
         layoutGenerator.addLabelWidgetPair("Control Efficiency (% Red):*", efficiency, panel);
 
-        widgetLayout(9, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(10, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
@@ -314,6 +325,11 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         discountRate = new TextField("Discount Rate", 10);
         this.addChangeable(discountRate);
         layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate, panel);
+  //add invremental CPT      
+        incrementalCPT = new TextField("Incremental CPT", 10);
+        this.addChangeable(incrementalCPT);
+        layoutGenerator.addLabelWidgetPair("Incremental CPT:", incrementalCPT, panel);
+
 
         lastModifiedBy = new TextField("Last Modified By", 10);
         lastModifiedBy.setEnabled(false);
@@ -329,7 +345,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         lastModifiedTime.setBorder(BorderFactory.createEmptyBorder());
         layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
 
-        widgetLayout(9, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(10, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
@@ -371,6 +387,8 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         saveRuleEffectiveness();
         saveRulePenetration();
         saveCapRecFactor();
+        saveCapAnnRatio();
+        saveIncrementalCPT();
         saveDiscountRate();
         record.setDetail(detail.getText().trim());
         saveEffectiveDate();
@@ -378,6 +396,24 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         record.setLastModifiedBy(session.user().getName());
         record.setLastModifiedTime(new Date());
         saveExistingDevCode();
+    }
+
+    private void saveIncrementalCPT() throws EmfException {
+        if (incrementalCPT.getText().trim().length() > 0) {
+            double value = verifier.parseDouble(incrementalCPT);         
+            record.setIncrementalCostPerTon(value);
+        } else {
+            record.setIncrementalCostPerTon(null);
+        }
+    }
+
+    private void saveCapAnnRatio() throws EmfException {
+        if (capAnnRatio.getText().trim().length() > 0) {
+            double value = verifier.parseDouble(capAnnRatio);         
+            record.setCapitalAnnualizedRatio(value);
+        } else {
+            record.setCapitalAnnualizedRatio(null);
+        }
     }
 
     private void savePollutant() throws EmfException {
@@ -407,14 +443,14 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     }
 
     private void saveDiscountRate() throws EmfException {
-        float value = verifier.parseFloat(discountRate);
+        Double value = verifier.parseDouble(discountRate);
         if (value < 0 || value > 20)
             throw new EmfException("Enter the Discount Rate as a percent between 0 and 20. Eg: 1 = 1%.  0.01 = 0.01%");
         record.setDiscountRate(value);
     }
 
     private void saveCapRecFactor() throws EmfException {
-        record.setCapRecFactor(verifier.parseFloat(caprecFactor));
+        record.setCapRecFactor(verifier.parseDouble(caprecFactor));
     }
 
     private void saveRulePenetration() throws EmfException {

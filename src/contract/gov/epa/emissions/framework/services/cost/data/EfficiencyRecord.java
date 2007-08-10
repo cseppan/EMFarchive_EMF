@@ -27,9 +27,9 @@ public class EfficiencyRecord implements Serializable {
 
     private float rulePenetration;
 
-    private float capRecFactor;
+    private Double capRecFactor;
 
-    private float discountRate;
+    private Double discountRate;
 
     private float efficiency;
 
@@ -54,11 +54,11 @@ public class EfficiencyRecord implements Serializable {
 
     private Double incrementalCostPerTon;
 
-    public float getCapRecFactor() {
+    public Double getCapRecFactor() {
         return capRecFactor;
     }
 
-    public void setCapRecFactor(float capRecFactor) {
+    public void setCapRecFactor(Double capRecFactor) {
         this.capRecFactor = capRecFactor;
     }
 
@@ -78,11 +78,11 @@ public class EfficiencyRecord implements Serializable {
         this.costYear = costYear;
     }
 
-    public float getDiscountRate() {
+    public Double getDiscountRate() {
         return discountRate;
     }
 
-    public void setDiscountRate(float discountRate) {
+    public void setDiscountRate(Double discountRate) {
         this.discountRate = discountRate;
     }
 

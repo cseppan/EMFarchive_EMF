@@ -20,7 +20,7 @@ public class EfficiencyRecordGenerator {
     }
 
     public List tokens(EfficiencyRecord efficiencyRecord) {
-        List tokens = new ArrayList();
+        List<String> tokens = new ArrayList<String>();
         
 //      id serial NOT NULL,
 //      control_measures_id int4 NOT NULL,
@@ -63,6 +63,7 @@ public class EfficiencyRecordGenerator {
         tokens.add("" + efficiencyRecord.getEquationType());
         tokens.add("" + efficiencyRecord.getCapRecFactor());
         tokens.add("" + efficiencyRecord.getDiscountRate());
+        
         tokens.add("" + efficiencyRecord.getDetail());
         tokens.add("" + (efficiencyRecord.getEffectiveDate() == null ? "" : efficiencyRecord.getEffectiveDate()));
         tokens.add("" + efficiencyRecord.getLastModifiedBy());
@@ -71,6 +72,9 @@ public class EfficiencyRecordGenerator {
         tokens.add("" + (efficiencyRecord.getMinEmis() != null ? efficiencyRecord.getMinEmis() : ""));
         tokens.add("" + (efficiencyRecord.getMaxEmis() != null ? efficiencyRecord.getMaxEmis() : ""));
 
+        //8/8/07 - DCD - added new columns cap ann ratio and incremental cost per ton
+        tokens.add("" + (efficiencyRecord.getCapitalAnnualizedRatio() != null ? efficiencyRecord.getCapitalAnnualizedRatio() : ""));
+        tokens.add("" + (efficiencyRecord.getIncrementalCostPerTon() != null ?  efficiencyRecord.getIncrementalCostPerTon(): ""));
 
         return tokens;
     }

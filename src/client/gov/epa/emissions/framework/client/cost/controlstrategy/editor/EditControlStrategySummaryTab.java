@@ -23,8 +23,10 @@ import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.Border;
+import gov.epa.emissions.framework.ui.DoubleTextField;
 import gov.epa.emissions.framework.ui.IntTextField;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -33,6 +35,7 @@ import java.awt.Dimension;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -46,6 +49,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private TextField name;
 
     private TextArea description;
+    
+    private DoubleTextField discountRate;
 
     private EditableComboBox projectsCombo;
 
@@ -72,12 +77,16 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private JLabel startDate, completionDate, costValue, emissionReductionValue;
 
     private ComboBox strategyTypeCombo;
+    
+    private JCheckBox useCostEquationCheck; 
 
     private ControlStrategyResult[] controlStrategyResults;
 
     private DecimalFormat decFormat;
     
     private CostYearTable costYearTable;
+    
+    private NumberFieldVerifier verifier;
     
     public EditControlStrategySummaryTab(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults,
             EmfSession session, ManageChangeables changeablesList, MessagePanel messagePanel, EmfConsole parentConsole,
@@ -92,6 +101,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         this.parentConsole = parentConsole;
         this.decFormat = new DecimalFormat("0.###E0");
         this.costYearTable = costYearTable;
+        this.verifier= new NumberFieldVerifier("Summary tab: ");
         
         setLayout();
     }
@@ -133,7 +143,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         return strategyTypeCombo;
     }
-
+    
     private JPanel createLowerSection() throws EmfException {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(getBorderedPanel(createLowerLeftSection(), "Parameters"), BorderLayout.WEST);
@@ -159,19 +169,34 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         layoutGenerator.addLabelWidgetPair("Inventory Year:", inventoryYearTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Region:", regions(), panel);
         layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutants(), panel);
-
+        layoutGenerator.addLabelWidgetPair("Discount Rate:", discountRate(), panel);
+        layoutGenerator.addLabelWidgetPair("Use Cost Equation:", useCostEquation(), panel);
+        
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
     }
 
+    private DoubleTextField discountRate() {
+         discountRate= new DoubleTextField("discount rate", 0, 100, 10);
+          discountRate.setValue((controlStrategy.getDiscountRate()));
+          changeablesList.addChangeable(discountRate);
+        return discountRate;
+    }
+    
+    private JCheckBox useCostEquation() {
+        
+        useCostEquationCheck = new JCheckBox("", controlStrategy.getUseCostEquations());
+        return useCostEquationCheck;
+    }
+
+
     private IntTextField costYearTextField() {
         costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 10);
-        if (controlStrategy.getCostYear() != 0) 
-            costYear.setValue(controlStrategy.getCostYear());
+        costYear.setValue(controlStrategy.getCostYear());
         return costYear;
     }
 
@@ -292,8 +317,12 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         updateRegion();
         controlStrategy.setTargetPollutant(majorPollutant());
 
+        controlStrategy.setDiscountRate(verifier.parseDouble(discountRate.getText()));
         controlStrategy.setStrategyType(strategyType());
+        controlStrategy.setUseCostEquations(useCostEquationCheck.isSelected());
     }
+
+
 
     private StrategyType strategyType() throws EmfException {
         StrategyType strategyType = (StrategyType) this.strategyTypeCombo.getSelectedItem();
@@ -390,5 +419,5 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         costValue.setText(cost.length() == 0 ? "" : decFormat.format(new Double(cost)));
         emissionReductionValue.setText(emisReduction.length() == 0 ? "" : decFormat.format(new Double(emisReduction)));
     }
-
+    
 }

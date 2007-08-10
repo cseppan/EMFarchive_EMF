@@ -27,21 +27,21 @@ public class EfficiencyRecordValidation {
         }
     }
 
-    public float discountRate(String rate) throws EmfException {
+    public Double discountRate(String rate) throws EmfException {
         if (rate.length() == 0)
-            return 0;
+            return null;
 
-        float value = parseFloat("discount rate", rate);
+        double value = parseDouble("discount rate", rate);
         if (value < 0 || value > 20)
             throw new EmfException("discount rate should be a percent between 0 and 20 - e.g., 1 = 1%, 0.01 = 0.01%");
         return value;
     }
 
-    public float capRecFactor(String factor) throws EmfException {
+    public Double capRecFactor(String factor) throws EmfException {
         if (factor.length() == 0)
-            return 0;
+            return null;
 
-        return parseFloat("cap. recovery factor", factor);
+        return parseDouble("cap. recovery factor", factor);
     }
 
     public float rulePenetration(String penetration) throws EmfException {
@@ -97,6 +97,18 @@ public class EfficiencyRecordValidation {
     public Double maxEmis(String maxEmisValue) throws EmfException {
         if (maxEmisValue.trim().length() == 0) return null;
         double value = parseDouble("maximum emission", maxEmisValue);
+        return value;
+    }
+    
+    public Double capAnnRatio(String car) throws EmfException {
+        if (car.trim().length() == 0) return null;
+        double value = parseDouble("capital Annulized Ratio", car);
+        return value;
+    }
+    
+    public Double increCPT(String incCPT) throws EmfException {
+        if (incCPT.trim().length() == 0) return null;
+        double value = parseDouble("incremental cost per ton ", incCPT);
         return value;
     }
 

@@ -44,4 +44,6 @@ public interface ControlStrategyService extends EMFService {
     int copyControlStrategy(int id, User creator) throws EmfException;
 
     ControlStrategy getById(int id) throws EmfException;
+
+    //StrategyType[] getEquaitonTypes();
 }

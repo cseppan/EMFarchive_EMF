@@ -37,9 +37,13 @@ public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implement
         refYrCostPerTon.setText((record.getRefYrCostPerTon() != null ? record.getRefYrCostPerTon() : "")  + "");
         locale.setText(record.getLocale());
         ruleEffectiveness.setText(record.getRuleEffectiveness() + "");
-        rulePenetration.setText(record.getRulePenetration() + "");
+        rulePenetration.setText(record.getRulePenetration() + "");      
         caprecFactor.setText(record.getCapRecFactor() + "");
         discountRate.setText(record.getDiscountRate() + "");
+        
+        capAnnRatio.setText((record.getCapitalAnnualizedRatio() != null ? record.getCapitalAnnualizedRatio(): "") + "");
+        incrementalCPT.setText((record.getIncrementalCostPerTon() !=null ? record.getIncrementalCostPerTon(): "") +"");
+        
         detail.setText(record.getDetail());
         effectiveDate.setText(formatEffectiveDate());
         measureAbbreviation.setText(record.getExistingMeasureAbbr());

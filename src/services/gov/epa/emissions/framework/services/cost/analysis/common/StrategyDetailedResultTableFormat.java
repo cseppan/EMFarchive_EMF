@@ -50,7 +50,7 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         Column version = new Column("Version", types.intType(), new NullFormatter(), "NULL DEFAULT 0");
         Column deleteVersions = new Column("Delete_Versions", types.text(), new NullFormatter(), "DEFAULT ''::text");
 
-        return new Column[] { recordId, datasetId, version, deleteVersions};
+        return new Column[] { recordId, datasetId,  version, deleteVersions};
     }
 
     private Column recordID(SqlDataTypes types) {
@@ -66,7 +66,7 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         Column pollutant = new Column("Poll", types.stringType(20), new StringFormatter(20));
         Column scc = new Column("SCC", types.stringType(10), new StringFormatter(10));
         Column fips = new Column("FIPS", types.stringType(6), new StringFormatter(6)); //after fips will add 4 more cols plantid, etc.
-
+ 
         //new columns for point sources...
         Column plantId = new Column("PLANTID", types.stringType(15), 15, new StringFormatter(15));
         Column pointId = new Column("POINTID", types.stringType(15), 15, new StringFormatter(15));
@@ -75,6 +75,10 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
 
         Column annualCost = new Column("Annual_Cost", types.realType(), new RealFormatter());
         Column annualCostPerTon = new Column("Ann_Cost_per_Ton", types.realType(), new RealFormatter());
+        Column annualOperMaintCost = new Column("Annual_Oper_Maint_Cost", types.realType(), new RealFormatter());
+        Column AnnualizedCapical = new Column("Annualized_Capital_Cost", types.realType(), new RealFormatter());
+        Column TotalCapitalCost = new Column("Total_Capital_Cost", types.realType(), new RealFormatter());
+
         Column controlEfficiency = new Column("Control_Eff", types.realType(), new RealFormatter());
         Column rulePenetration = new Column("Rule_Pen", types.realType(), new RealFormatter());
         Column ruleEffectiveness = new Column("Rule_Eff", types.realType(), new RealFormatter());
@@ -99,7 +103,7 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         Column comment = new Column("Comment", types.stringType(128), new StringFormatter(128));
         
         return new Column[] { disable, controlMeasureAbbr, pollutant, scc, fips, plantId, pointId, stackId, segment, 
-                annualCost, annualCostPerTon, controlEfficiency, rulePenetration, ruleEffectiveness, percentReduction, 
+                annualCost, annualOperMaintCost,AnnualizedCapical, TotalCapitalCost,annualCostPerTon, controlEfficiency, rulePenetration, ruleEffectiveness, percentReduction, 
                 inventoryControlEfficiency, inventoryRulePenetration, inventoryRuleEffectiveness, finalEmissions, 
                 emissionsReduction, inventoryEmissions, fipsState, fipsCounty, sic, naics, sourceId, inputDatasetId, 
                 controlStrategyId, controlMeasureId, comment };

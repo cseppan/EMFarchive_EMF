@@ -129,7 +129,23 @@ public class CMEfficiencyRecordReader {
                 discountFactor(efficiencyRecord, tokens[15], sb);
                 details(efficiencyRecord, tokens[16]);
             }
-            //v3 file format -- will be similar to above, but with new columns...
+            //v3 file format
+            else if (this.colCount ==19 ){
+                minEmis(efficiencyRecord, tokens[6], sb);
+                maxEmis(efficiencyRecord, tokens[7], sb);
+                controlEfficiency(efficiencyRecord, tokens[8], sb);
+                costYear(efficiencyRecord, tokens[9], sb);
+                costPerTon(efficiencyRecord, tokens[10], tokens[9], sb);
+                refYrCostPerTon(efficiencyRecord, tokens[9], tokens[10]);
+                ruleEffectiveness(efficiencyRecord, tokens[11], sb);
+                rulePenetration(efficiencyRecord, tokens[12], sb);
+                equationType(efficiencyRecord, tokens[13]);
+                capitalRecoveryFactor(efficiencyRecord, tokens[14], sb);
+                discountFactor(efficiencyRecord, tokens[15], sb);
+                capitalAnnulizdRatio(efficiencyRecord, tokens[16],sb);
+                incrementalCTP(efficiencyRecord, tokens[17],sb);
+                details(efficiencyRecord, tokens[18]);  
+            }
 
         } catch (EmfException e) {
             // don't add the efficiency record if the validation fails
@@ -142,6 +158,22 @@ public class CMEfficiencyRecordReader {
 
         if (errorCount >= errorLimit) throw new EmfException("The maximum allowable error limit (" + errorLimit + ") has been reached while parsing the control measure efficiency records.");
         return efficiencyRecord;
+    }
+
+    private void incrementalCTP(EfficiencyRecord efficiencyRecord, String incCPT, StringBuffer sb) {
+        try {
+            efficiencyRecord.setIncrementalCostPerTon(validation.increCPT(incCPT));
+        } catch (EmfException e) {
+            sb.append(format(e.getMessage()));
+        } 
+    }
+
+    private void capitalAnnulizdRatio(EfficiencyRecord efficiencyRecord, String capAnnRatio, StringBuffer sb) {
+        try {
+            efficiencyRecord.setCapitalAnnualizedRatio(validation.capAnnRatio(capAnnRatio));
+        } catch (EmfException e) {
+            sb.append(format(e.getMessage()));
+        } 
     }
 
     private ControlMeasure controlMeasure(String token, Map controlMeasures, StringBuffer sb, int lineNo) {

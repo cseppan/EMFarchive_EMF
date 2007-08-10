@@ -19,6 +19,7 @@ public class NewEfficiencyRecordWindow extends EfficiencyRecordWindow implements
     public void display(ControlMeasure measure, EfficiencyRecord record) {
         super.display(measure,record);
         setDefaults();
+        super.resetChanges();
     }
 
     private void setDefaults() {

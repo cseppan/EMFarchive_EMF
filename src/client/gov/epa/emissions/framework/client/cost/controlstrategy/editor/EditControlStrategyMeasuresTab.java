@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
@@ -18,8 +19,6 @@ import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
-import gov.epa.emissions.framework.ui.TrackableSortFilterSelectModel;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -58,7 +57,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
     private ControlStrategyMeasureTableData tableData;
 
-    private TrackableSortFilterSelectModel sortFilterSelectModel;
+    private SortFilterSelectModel sortFilterSelectModel;
 
     private EmfConsole parent;
 
@@ -113,8 +112,8 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
     private SortFilterSelectionPanel sortFilterPanel() {
         tableModel = new EmfTableModel(tableData);
-        sortFilterSelectModel = new TrackableSortFilterSelectModel(tableModel);
-        changeablesList.addChangeable(sortFilterSelectModel);
+        sortFilterSelectModel = new SortFilterSelectModel(tableModel);
+//        changeablesList.addChangeable(sortFilterSelectModel);
         SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parent, sortFilterSelectModel);
         sortFilterSelectionPanel.setPreferredSize(new Dimension(550, 300));
         return sortFilterSelectionPanel;
