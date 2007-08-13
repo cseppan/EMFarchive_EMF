@@ -5,9 +5,6 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class InputDatasetSelectionPresenter {
 
     private EmfSession session;
@@ -37,13 +34,7 @@ public class InputDatasetSelectionPresenter {
         else
             datasetTypes = datasetTypesToInclude;
 
-        //FIXME:  For now show only ORL dataset types...
-        List<DatasetType> datasetTypeList = new ArrayList<DatasetType>();
-        for (int i = 0; i < datasetTypes.length; i++)
-            if (datasetTypes[i].getImporterClassName().indexOf("ORL") >= 0)
-                datasetTypeList.add(datasetTypes[i]);
-
-        view.display(datasetTypeList.toArray(new DatasetType[0]));
+        view.display(datasetTypes);
     }
     
     public void refreshDatasets(DatasetType datasetType) throws EmfException {

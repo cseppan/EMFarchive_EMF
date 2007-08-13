@@ -36,7 +36,7 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     private ComboBox datasetTypeCombo;
 
     private JList datasetList;
-    
+
     private EmfDataset[] datasets = new EmfDataset[] {};
 
     public InputDatasetSelectionDialog(EmfConsole parent, ManageChangeables changeables) {
@@ -58,7 +58,7 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
 
         setTitle("Select Datasets");
         this.pack();
-        this.setSize(500,400);
+        this.setSize(500, 400);
         this.setLocation(ScreenUtils.getPointToCenter(parent));
         this.setVisible(true);
     }
@@ -78,13 +78,13 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
         datasetTypeCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    presenter.refreshDatasets((DatasetType)datasetTypeCombo.getSelectedItem());
+                    presenter.refreshDatasets((DatasetType) datasetTypeCombo.getSelectedItem());
                 } catch (EmfException e1) {
                     // NOTE Auto-generated catch block
                 }
             }
         });
-        
+
         panel.add(datasetTypeCombo, BorderLayout.LINE_START);
         panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
         return panel;
@@ -121,10 +121,10 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     private Action okAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //get selected datasets
+                // get selected datasets
                 List<EmfDataset> list = new ArrayList<EmfDataset>(datasetList.getSelectedValues().length);
                 for (int i = 0; i < datasetList.getSelectedValues().length; i++)
-                    list.add((EmfDataset)datasetList.getSelectedValues()[i]);
+                    list.add((EmfDataset) datasetList.getSelectedValues()[i]);
                 datasets = list.toArray(new EmfDataset[0]);
                 setVisible(false);
                 dispose();

@@ -31,20 +31,12 @@ public class ControlStrategiesTableData extends AbstractTableData {
     public String[] columns() {
         return new String[] { "Name", "Last Modified", "Region", 
                 "Target Pollutant", "Total Cost", "Reduction", 
-                "Project", "Strategy Type", "Inv. Dataset", 
-                "Version", "Inventory Type", "Cost Year", 
+                "Project", "Strategy Type", "Cost Year", 
                 "Inv. Year", "Run Status", "Completion Date", 
                 "Creator" };
-//        return new String[] { "Name", "Last Modified", "Region", "Project", "Strategy Type", "Inv. Dataset", "Version",
-//                "Inventory Type", "Target Pollutant", "Cost Year", "Inv. Year", "Total Cost", "Reduction",
-//                "Run Status", "Completion Date", "Creator" };
     }
 
     public Class getColumnClass(int col) {
-//        return String.class;
-//        if (col == 11 || col == 12)
-//            return Integer.class;
-//
         if (col == 4 || col == 5)
             return Double.class;
 
@@ -65,8 +57,7 @@ public class ControlStrategiesTableData extends AbstractTableData {
             ControlStrategy element = controlStrategies[i];
             Object[] values = { element.getName(), format(element.getLastModifiedDate()), region(element),
                     element.getTargetPollutant(), getTotalCost(element.getId()), getReduction(element.getId()), 
-                    project(element), analysisType(element), ""/*dataset(element)*/, 
-                    ""/*version(element)*/, ""/*datasetType(element)*/, costYear(element), 
+                    project(element), analysisType(element), costYear(element), 
                     "" + (element.getInventoryYear() != 0 ? element.getInventoryYear() : ""), element.getRunStatus(), format(element.getCompletionDate()), 
                     element.getCreator().getName() };
             Row row = new ViewableRow(element, values);
@@ -104,25 +95,6 @@ public class ControlStrategiesTableData extends AbstractTableData {
         return new ControlStrategyResultsSummary(controlStrategyResults);
     }
 
-//    private String version(ControlStrategy element) {
-//        Dataset[] datasets = element.getInputDatasets();
-//        if (datasets.length == 0)
-//            return "";
-//        return "" + element.getDatasetVersion();
-//    }
-
-//    private String dataset(ControlStrategy element) {
-//        Dataset[] datasets = element.getInputDatasets();
-//        if (datasets.length == 0)
-//            return "";
-//
-//        String name = datasets[0].getName();
-//        if (datasets.length > 1)
-//            name += "...";
-//
-//        return name;
-//    }
-
     private String project(ControlStrategy element) {
         Project project = element.getProject();
         return project != null ? project.getName() : "";
@@ -136,15 +108,6 @@ public class ControlStrategiesTableData extends AbstractTableData {
         StrategyType type = element.getStrategyType();
         return type != null ? type.getName() : "";
     }
-
-//    private String datasetType(ControlStrategy element) {
-//        DatasetType datasetType = element.getDatasetType();
-//        return (datasetType != null) ? datasetType.getName() : "";
-//    }
-
-    // private String discountRate(ControlStrategy element) {
-    // return "" + element.getDiscountRate();
-    // }
 
     private String costYear(ControlStrategy element) {
         return "" + (element.getCostYear() != 0 ? element.getCostYear() : "");
@@ -180,5 +143,4 @@ public class ControlStrategiesTableData extends AbstractTableData {
         for (int i = 0; i < records.length; i++)
             remove(records[i]);
     }
-
 }

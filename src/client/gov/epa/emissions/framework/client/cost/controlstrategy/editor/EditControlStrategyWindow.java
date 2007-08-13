@@ -90,8 +90,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         layout.add(createTabbedPane(controlStrategy, controlStrategyResults));
         layout.add(createButtonsPanel(), BorderLayout.PAGE_END);
 
-//        if (controlStrategy.getRunStatus().equalsIgnoreCase("Running"))
-//            enableButtons(false);
+        if (controlStrategy.getRunStatus().equalsIgnoreCase("Running"))
+            enableButtons(false);
 
         contentPane.add(layout);
     }

@@ -75,12 +75,12 @@ public class PointRecordGenerator implements RecordGenerator {
         
 //        tokens.add("" + (costEquations.getTotalAnnualizedCost() != null ? decFormat.format(costEquations.getTotalAnnualizedCost() : ""));
         annualCost=costEquations.getAnnualCost();
-        tokens.add("" +  decFormat.format(annualCost!= null ? decFormat.format(annualCost) : ""));
+        tokens.add("" +  (annualCost!= null ? decFormat.format(annualCost) : ""));
                 //maxCM.adjustedCostPerTon() * reducedEmission));//annual cost for source
         om=costEquations.getOperationMaintenanceCost();
-        tokens.add("" + decFormat.format(om!= null ? decFormat.format(om) : ""));
+        tokens.add("" + (om!= null ? decFormat.format(om) : ""));
         annulizedCCost=costEquations.getAnnualizedCapitalCost();
-        tokens.add("" + decFormat.format(annulizedCCost != null ? decFormat.format(annulizedCCost) : ""));//capital cost
+        tokens.add("" + (annulizedCCost != null ? decFormat.format(annulizedCCost) : ""));//capital cost
         capitalCost=costEquations.getCapitalCost();
         tokens.add("" + (capitalCost != null ? decFormat.format(capitalCost) : ""));//Total capital cost
         

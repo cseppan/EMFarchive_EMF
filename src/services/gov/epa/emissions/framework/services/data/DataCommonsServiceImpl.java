@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class DataCommonsServiceImpl implements DataCommonsService {
@@ -145,6 +146,18 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         } catch (RuntimeException e) {
             LOG.error("Could not get all DatasetTypes", e);
             throw new EmfException("Could not get all DatasetTypes ");
+        }
+    }
+
+    public DatasetType getDatasetType(String name) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getDatasetType(name, session);
+        } catch (HibernateException e) {
+            LOG.error("Could not get DatasetType", e);
+            throw new EmfException("Could not get DatasetType");
+        } finally {
+            session.close();
         }
     }
 

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
@@ -37,4 +38,6 @@ public interface EditControlStrategyPresenter {
     CostYearTable getCostYearTable() throws EmfException;
     
     void fireTracking();
+    
+    DatasetType getDatasetType(String name) throws EmfException;
 }

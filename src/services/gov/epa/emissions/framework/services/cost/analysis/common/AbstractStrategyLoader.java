@@ -155,6 +155,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
                 resultSet.close();
             }
         } catch(Exception ex) {
+            ex.printStackTrace();
             result.setRunStatus("Failed: " + ex.getMessage());
         } finally {
             modifier.finish();

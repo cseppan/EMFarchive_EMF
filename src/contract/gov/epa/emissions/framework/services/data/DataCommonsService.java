@@ -50,6 +50,8 @@ public interface DataCommonsService {
     // DatasetType
     DatasetType[] getDatasetTypes() throws EmfException;
 
+    DatasetType getDatasetType(String name) throws EmfException;
+
     void addDatasetType(DatasetType type) throws EmfException;
 
     DatasetType obtainLockedDatasetType(User owner, DatasetType type) throws EmfException;

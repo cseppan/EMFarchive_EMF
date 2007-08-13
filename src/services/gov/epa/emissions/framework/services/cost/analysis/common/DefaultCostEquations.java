@@ -57,7 +57,7 @@ public class DefaultCostEquations implements CostEquations {
    
     public Double getCapRecFactor(){
         capRecFactor=maxCM.efficiencyRecord().getCapRecFactor();
-        if (capRecFactor != 0 ) {
+        if (capRecFactor != null && capRecFactor != 0) {
             return capRecFactor; 
         }
         return calculateCapRecFactor(discountRate, maxCM.measure().getEquipmentLife());

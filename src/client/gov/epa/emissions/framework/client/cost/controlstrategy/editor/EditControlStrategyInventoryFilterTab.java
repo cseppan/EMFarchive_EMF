@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
@@ -46,13 +45,7 @@ import javax.swing.SpringLayout;
 
 public class EditControlStrategyInventoryFilterTab extends JPanel implements EditControlStrategyTabView {
 
-    private ComboBox datasetTypeCombo;
-    
-//    private TextField datasetTextField;
-    
     private TextField countyFileTextField;
-    
-//    private VersionPanel versionPanel;
     
     private TextArea filter;
     
@@ -65,10 +58,6 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     protected EmfConsole parentConsole;
 
     private ManageChangeables changeablesList;
-
-//    private EditableInputDatasetTableData inputDatasetsTableData;
-//
-//    private ControlStrategyInputDatasetsPanel inputDatasetsPanel;
 
     private ControlStrategyInputDatasetTableData tableData;
 
@@ -147,7 +136,12 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         JPanel panel = new JPanel();
         Button addButton = new BorderlessButton("Add", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                addAction();
+                try {
+                    addAction();
+                } catch (EmfException e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         });
         panel.add(addButton);
@@ -181,9 +175,15 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         return container;
     }
 
-    private void addAction() {
+    private void addAction() throws EmfException {
         InputDatasetSelectionView view = new InputDatasetSelectionDialog(parentConsole, changeablesList);
-        InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session);
+        InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session,
+                new DatasetType[] { 
+                    editControlStrategyPresenter.getDatasetType("ORL Nonpoint Inventory (ARINV)"),
+                    editControlStrategyPresenter.getDatasetType("ORL Nonroad Inventory (ARINV)"),
+                    editControlStrategyPresenter.getDatasetType("ORL Onroad Inventory (MBINV)"),
+                    editControlStrategyPresenter.getDatasetType("ORL Point Inventory (PTINV)")
+                });
         try {
             presenter.display();
             EmfDataset[] inputDatasets = presenter.getDatasets();
@@ -282,50 +282,6 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         return middlePanel;
     }
     
-//    private ComboBox datasetTypeCombo(ControlStrategy controlStrategy) throws EmfException {
-//        DatasetType[] datasetTypes = getORLTypes();
-//        datasetTypeCombo = new ComboBox("Choose an inventory type", datasetTypes);
-//        datasetTypeCombo.setSelectedItem(controlStrategy.getDatasetType());
-////        datasetTypeCombo.addActionListener(new AbstractAction() {
-////            public void actionPerformed(ActionEvent e) {
-////                messagePanel.setMessage("clear test field.");
-////                datasetTextField.clear();
-////                datasetTextField.repaint();
-////            }
-////        });
-//        changeablesList.addChangeable(datasetTypeCombo);
-//        return datasetTypeCombo;
-//    }
-    
-//    private DatasetType[] getORLTypes() throws EmfException {
-//        List orlTypes = new ArrayList();
-//        DatasetType[] datasetTypes = session.dataCommonsService().getDatasetTypes();
-//        for (int i = 0; i < datasetTypes.length; i++)
-//            if (datasetTypes[i].getImporterClassName().indexOf("ORL") >= 0)
-//                orlTypes.add(datasetTypes[i]);
-//
-//        return (DatasetType[]) orlTypes.toArray(new DatasetType[0]);
-//    }
-//    
-//    private JPanel versionPanel() throws EmfException {
-//        this.versionPanel = new VersionPanelWithoutLabel(controlStrategy, session, changeablesList);
-//        return versionPanel;
-//    }
-//    
-//    private JPanel datasetPanel() {
-//        datasetTextField = new TextField("datasets", 40);
-//        datasetTextField.setEditable(false);
-//        datasetTextField.setText(selectedDatasets(controlStrategy.getInputDatasets()));
-//        changeablesList.addChangeable(datasetTextField);
-//
-//        Button chooseButton = new Button("Choose", chooseDatasetAction());
-//
-//        JPanel panel = new JPanel(new BorderLayout(5, 5));
-//        panel.add(datasetTextField);
-//        panel.add(chooseButton, BorderLayout.EAST);
-//        return panel;
-//    }
-    
     private JPanel countyFilePanel() {
         countyFileTextField = new TextField("countyFile", 40);
         countyFileTextField.setText(controlStrategy.getCountyFile());
@@ -369,47 +325,6 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             countyFileTextField.setText(files[0].getAbsolutePath());
         }
     }
-
-//    private Action chooseDatasetAction() {
-//        return new AbstractAction() {
-//            public void actionPerformed(ActionEvent e) {
-//                try {
-//                    DatasetType datasetType = selectedDatasetType();
-//                    DatasetChooserDialog dialog = new DatasetChooserDialog(datasetType, session, parentConsole,
-//                            EditControlStrategyInventoryFilterTab.this);
-//                    dialog.show();
-//                    EmfDataset dataset = dialog.dataset();
-//                    if (dataset != null) {
-//                        datasetTextField.setText(dataset.getName());
-//                        controlStrategy.setInputDatasets(new EmfDataset[] { dataset });
-//                        Version[] versions = session.dataEditorService().getVersions(dataset.getId());
-//                        versionPanel.update(versions);
-//                    }
-//                } catch (EmfException exp) {
-//                    messagePanel.setError(exp.getMessage());
-//                }
-//            }
-//        };
-//    }
-    
-    protected DatasetType selectedDatasetType() throws EmfException {
-        DatasetType datasetType = (DatasetType) datasetTypeCombo.getSelectedItem();
-        if (datasetType == null) {
-            throw new EmfException("Please select an inventory type");
-        }
-        return datasetType;
-    }
-
-//    private String selectedDatasets(EmfDataset[] datasets) {
-//        StringBuffer sb = new StringBuffer();
-//        for (int i = 0; i < datasets.length - 1; i++) {
-//            sb.append(datasets[i].getName() + "\n");
-//        }
-//        if (datasets.length > 0)
-//            sb.append(datasets[datasets.length - 1].getName());
-//
-//        return sb.toString();
-//    }
 
     public void save(ControlStrategy controlStrategy) throws EmfException {
         String value = filter.getText().trim();

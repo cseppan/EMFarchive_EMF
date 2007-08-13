@@ -404,8 +404,8 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             List all = dao.getControlStrategyResults(controlStrategyId, session);
             return (ControlStrategyResult[]) all.toArray(new ControlStrategyResult[0]);
         } catch (RuntimeException e) {
-            LOG.error("Could not retrieve control measure efficiency records.", e);
-            throw new EmfException("Could not retrieve control measures efficiency records.");
+            LOG.error("Could not retrieve control strategy results.", e);
+            throw new EmfException("Could not retrieve control strategy results.");
         } finally {
             session.close();
         }
