@@ -28,7 +28,7 @@ public class ExImServiceTransport implements ExImService {
             String purpose) throws EmfException {
         doExport("exportDatasetsWithOverwrite", user, datasets, versions, folder, purpose);
     }
-
+    
     private void doExport(String operationName, User user, EmfDataset[] datasets, Version[] versions, String folder,
             String purpose) throws EmfException {
         call.setOperation(operationName);
@@ -36,7 +36,7 @@ public class ExImServiceTransport implements ExImService {
         call.addParam("datasets", mappings.datasets());
         call.addParam("versions", mappings.versions());
         call.addStringParam("folder");
-        call.addBooleanParameter("purpose");
+        call.addStringParam("purpose");
         call.setVoidReturnType();
 
         call.request(new Object[] { user, datasets, versions, folder, purpose });
@@ -95,6 +95,10 @@ public class ExImServiceTransport implements ExImService {
 
     }
 
+    public void exportDatasetids(User user, Integer[] datasetIds, String folder, String purpose) throws EmfException {
+        exportWithIdsOnly("exportDatasetids", user, datasetIds, folder, purpose);
+    }
+
     /**
      * Added 07/16/2007 for exporting with Datasetids - Conrad
      */
@@ -103,21 +107,39 @@ public class ExImServiceTransport implements ExImService {
         doExportWithIds("exportDatasetidsWithOverwrite", user, datasetIds, versions, folder, purpose);
     }
 
+    public void exportDatasetidsWithOverwrite(User user, Integer[] datasetIds, String folder, String purpose) throws EmfException {
+        exportWithIdsOnly("exportDatasetidsWithOverwrite", user, datasetIds, folder, purpose);
+    }
+
     /**
      * Added 07/16/2007 for exporting with Datasetids - Conrad
      */
-    private void doExportWithIds(String operationName, User user, Integer[] datasetids, Version[] versions, String folder,
-            String purpose) throws EmfException {
-        
+    private void doExportWithIds(String operationName, User user, Integer[] datasetids, Version[] versions,
+            String folder, String purpose) throws EmfException {
+
         call.setOperation(operationName);
         call.addParam("user", mappings.user());
         call.addParam("datasetids", mappings.integers());
         call.addParam("versions", mappings.versions());
         call.addStringParam("folder");
-        call.addBooleanParameter("purpose");
+        call.addStringParam("purpose");
         call.setVoidReturnType();
 
         call.request(new Object[] { user, datasetids, versions, folder, purpose });
     }
+
+    private void exportWithIdsOnly(String operationName, User user, Integer[] datasetids, String folder,
+            String purpose) throws EmfException {
+
+        call.setOperation(operationName);
+        call.addParam("user", mappings.user());
+        call.addParam("datasetids", mappings.integers());
+        call.addStringParam("folder");
+        call.addStringParam("purpose");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, datasetids, folder, purpose });
+    }
+
 
 }

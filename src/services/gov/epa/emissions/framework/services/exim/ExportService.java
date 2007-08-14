@@ -152,6 +152,9 @@ public class ExportService {
 
     private void doExport(User user, String purpose, boolean overwrite, File path, EmfDataset dataset, Version version)
             throws Exception {
+        if (dataset.getId() != version.getDatasetId())
+            throw new EmfException("Dataset doesn't match version (dataset id=" + dataset.getId() + " but version shows dataset id=" + version.getDatasetId() + ")");
+            
         Services services = services();
         File file = validateExportFile(path, getCleanDatasetName(dataset, version), overwrite);
         Exporter exporter = exporterFactory.create(dataset, version);

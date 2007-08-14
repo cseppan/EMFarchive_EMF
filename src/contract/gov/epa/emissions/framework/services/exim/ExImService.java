@@ -32,7 +32,11 @@ public interface ExImService extends EMFService {
     void exportDatasetids(User user, Integer[] datasetIds, Version[] versions, String folder, String purpose)
             throws EmfException;
 
+    void exportDatasetids(User user, Integer[] datasetIds, String folder, String purpose) throws EmfException;
+    
     void exportDatasetidsWithOverwrite(User user, Integer[] datasetIds, Version[] versions, String folder, String purpose)
             throws EmfException;
+
+    void exportDatasetidsWithOverwrite(User user, Integer[] datasetIds, String folder, String purpose) throws EmfException;
 
 }

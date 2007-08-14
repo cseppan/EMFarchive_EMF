@@ -83,4 +83,14 @@ public class DataServiceTransport implements DataService {
         call.request(new Object[] { owner, datasets });
     }
 
+    public EmfDataset getDataset(Integer datasetId) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getDataset");
+        call.addParam("datasetId", mappings.integer());
+        call.setReturnType(mappings.dataset());
+        
+        return (EmfDataset)call.requestResponse(new Object[]{ datasetId });
+    }
+
 }

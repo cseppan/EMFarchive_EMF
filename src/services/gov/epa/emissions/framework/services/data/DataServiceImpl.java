@@ -40,6 +40,19 @@ public class DataServiceImpl implements DataService {
             throw new EmfException("Could not get all Datasets");
         }
     }
+    
+    public EmfDataset getDataset(Integer datasetId) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            EmfDataset dataset = dao.getDataset(session, datasetId.intValue());
+            session.close();
+            
+            return dataset;
+        } catch (RuntimeException e) {
+            LOG.error("Could not get dataset with id=" + datasetId.intValue(), e);
+            throw new EmfException("Could not get dataset with id=" + datasetId.intValue());
+        }
+    }
 
     public EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
         try {

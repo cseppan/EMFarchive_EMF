@@ -13,11 +13,6 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import javax.sql.DataSource;
 
 import org.hibernate.Session;
@@ -112,59 +107,79 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     public void exportDatasetids(User user, Integer[] datasetIds, Version[] versions, String folder, String purpose)
             throws EmfException {
-        EmfDataset[] datasets=null;
-        
-        //Using paramterized generic ArrayList
-        ArrayList<EmfDataset> ar = new ArrayList<EmfDataset>();
-        EmfDataset[] rawDatasets=null;
-        List<Integer> dsetIds = Arrays.asList(datasetIds);
-        
-        // get all the datasets from the dataservice.  
+        int numOfDS = datasetIds.length;
+        EmfDataset[] datasets = new EmfDataset[numOfDS];
         DataServiceImpl ds = new DataServiceImpl();
-        rawDatasets=ds.getDatasets();
-        
+
         // Sift through and choose only those whose id matches
         // one of the list of dataset ids in the array.
-        
-        for (int i=0; i<rawDatasets.length;i++){
-            if (dsetIds.contains(new Integer (rawDatasets[i].getId()))){
-                rawDatasets[i].setAccessedDateTime(new Date());
-                ar.add(rawDatasets[i]);
-            }
+        /** * this has caused the sequence of the retrieved datasets is different from the original one in datasetIds ** */
+
+        // for (int i=0; i<rawDatasets.length;i++){
+        // if (dsetIds.contains(new Integer (rawDatasets[i].getId()))){
+        // rawDatasets[i].setAccessedDateTime(new Date());
+        // ar.add(rawDatasets[i]);
+        // }
+        for (int i = 0; i < numOfDS; i++)
+            datasets[i] = ds.getDataset(new Integer(datasetIds[i]));
+
+        // if Vservion[] is not specified, get the default versions from datasets themselves
+        if (versions == null) {
+            Version[] defaultVersions = new Version[numOfDS];
+
+            for (int j = 0; j < numOfDS; j++)
+                defaultVersions[j] = getVersion(datasets[j], datasets[j].getDefaultVersion());
+
+            exportDatasets(user, datasets, defaultVersions, folder, purpose);
+            return;
         }
-        
-        datasets = ar.toArray(new EmfDataset[0]);
-        //Invoke the local method that uses the datasets
+
+        // Invoke the local method that uses the datasets
         exportDatasets(user, datasets, versions, folder, purpose);
-        
+    }
+
+    public void exportDatasetids(User user, Integer[] datasetIds, String folder, String purpose) throws EmfException {
+        // if Vservion[] is not specified, get the default versions from datasets themselves
+        exportDatasetids(user, datasetIds, null, folder, purpose);
     }
 
     public void exportDatasetidsWithOverwrite(User user, Integer[] datasetIds, Version[] versions, String folder,
             String purpose) throws EmfException {
-        EmfDataset[] datasets=null;
         
-        //Using paramterized generic ArrayList
-        ArrayList<EmfDataset> ar = new ArrayList<EmfDataset>();
-        EmfDataset[] rawDatasets=null;
-        List<Integer> dsetIds = Arrays.asList(datasetIds);
-        
-        // get all the datasets from the dataservice.  
+        int numOfDS = datasetIds.length;
+        EmfDataset[] datasets = new EmfDataset[numOfDS];
         DataServiceImpl ds = new DataServiceImpl();
-        rawDatasets=ds.getDatasets();
-        
+
         // Sift through and choose only those whose id matches
         // one of the list of dataset ids in the array.
-        
-        for (int i=0; i<rawDatasets.length;i++){
-            if (dsetIds.contains(new Integer (rawDatasets[i].getId()))){
-                rawDatasets[i].setAccessedDateTime(new Date());
-                ar.add(rawDatasets[i]);
-            }
+        /** * this has caused the sequence of the retrieved datasets is different from the original one in datasetIds ** */
+
+        // for (int i=0; i<rawDatasets.length;i++){
+        // if (dsetIds.contains(new Integer (rawDatasets[i].getId()))){
+        // rawDatasets[i].setAccessedDateTime(new Date());
+        // ar.add(rawDatasets[i]);
+        // }
+        for (int i = 0; i < numOfDS; i++)
+            datasets[i] = ds.getDataset(new Integer(datasetIds[i]));
+
+        // if Vservion[] is not specified, get the default versions from datasets themselves
+        if (versions == null) {
+            Version[] defaultVersions = new Version[numOfDS];
+
+            for (int j = 0; j < numOfDS; j++)
+                defaultVersions[j] = getVersion(datasets[j], datasets[j].getDefaultVersion());
+
+            exportDatasetsWithOverwrite(user, datasets, defaultVersions, folder, purpose);
+            return;
         }
-        datasets = ar.toArray(new EmfDataset[0]);
-       
-        //Invoke the local method that uses the datasets
+
+        // Invoke the local method that uses the datasets
         exportDatasetsWithOverwrite(user, datasets, versions, folder, purpose);
+    }
+
+    public void exportDatasetidsWithOverwrite(User user, Integer[] datasetIds, String folder, String purpose)
+            throws EmfException {
+        exportDatasetidsWithOverwrite(user, datasetIds, null, folder, purpose);
     }
 
 }

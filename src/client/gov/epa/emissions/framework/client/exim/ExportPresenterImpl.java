@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.exim;
 
-import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -52,16 +51,10 @@ public class ExportPresenterImpl implements ExportPresenter {
     private void doExportInvoke(EmfDataset[] datasets, String folder, boolean overwrite, String purpose) throws EmfException {
         ExImService services = session.eximService();
         
-        Version[] versions = new Version[datasets.length];
         Integer[] datasetIds = new Integer[datasets.length];
         
-        for (int i = 0; i < datasets.length; i++) {
-            //datasets[i].setAccessedDateTime(new Date()); //Commented out 07/13/2007 
-            
-            // get the dataset ids for the datasets selected for export
+        for (int i = 0; i < datasets.length; i++)
             datasetIds[i] = new Integer(datasets[i].getId());
-            versions[i] = services.getVersion(datasets[i], datasets[i].getDefaultVersion());
-        }
         
         session.setMostRecentExportFolder(folder);
 
@@ -70,16 +63,10 @@ public class ExportPresenterImpl implements ExportPresenter {
             lastFolder = folder;
 
         if (overwrite)
-            //services.exportDatasetsWithOverwrite(session.user(), datasets, versions, folder, purpose);
-            services.exportDatasetidsWithOverwrite(session.user(), datasetIds, versions, folder, purpose);
+            services.exportDatasetidsWithOverwrite(session.user(), datasetIds, folder, purpose);
         else
-            //services.exportDatasets(session.user(), datasets, versions, folder, purpose);
-            services.exportDatasetids(session.user(), datasetIds, versions, folder, purpose);
+            services.exportDatasetids(session.user(), datasetIds, folder, purpose);
     }
-
-//    private String mapToRemote(String dir) {
-//        return session.preferences().mapLocalOutputPathToRemote(dir);
-//    }
 
     private String getDefaultFolder() {
         String folder = session.preferences().outputFolder();
