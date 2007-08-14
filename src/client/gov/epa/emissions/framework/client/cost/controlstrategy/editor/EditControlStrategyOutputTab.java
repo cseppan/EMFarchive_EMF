@@ -248,7 +248,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         outputPanel.add(panel, BorderLayout.SOUTH);
 
         outputPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
-                BorderFactory.createTitledBorder("Results")));
+                BorderFactory.createTitledBorder("Output Datasets")));
 
         return outputPanel;
     }
