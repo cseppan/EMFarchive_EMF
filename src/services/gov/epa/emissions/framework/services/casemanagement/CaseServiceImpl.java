@@ -615,6 +615,69 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
+    private List<CaseInput> getAllJobInputs(CaseJob job) throws EmfException{
+        /**
+         * Gets all the inputs for a specific job
+         */
+        int caseId = job.getCaseId();
+        int jobId = job.getId();
+        
+        /*
+         * Need to get the inputs for 4 different scenarios:
+         *     All sectors, all jobs
+         *     Specific sector, all jobs
+         *     All sectors, specific job
+         *     specific sector, specific job
+         */ 
+        List<CaseInput> inputsAA = null; // inputs for all sectors and all jobs
+        List<CaseInput> inputsSA = null; // inputs for specific sector and all jobs
+        List<CaseInput> inputsAJ = null; // inputs for all sectors specific jobs
+        List<CaseInput> inputsSJ = null; // inputs for specific sectors specific jobs
+        List<CaseInput> inputsAll = new ArrayList(); // all inputs
+        try {
+
+            // Get case inputs (the datasets associated w/ the case)
+            // All sectors, all jobs
+            inputsAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS);
+
+            // Sector specific, all jobs
+            Sector sector = job.getSector();
+            if (sector != this.ALL_SECTORS) {
+                inputsSA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector);
+            }
+
+            // All sectors, job specific
+            inputsAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS);
+
+            // Specific sector and specific job
+            if (sector != this.ALL_SECTORS) {
+                inputsSJ = this.getJobInputs(caseId, jobId, sector);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n"
+                    + e.getMessage());
+            throw new EmfException("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n");
+        }      
+    
+        // append all the job inputs to the inputsAll list
+        if (inputsAA.size() > 0){
+            inputsAll.addAll(inputsAA);
+        }
+        if (inputsSA.size() > 0){
+            inputsAll.addAll(inputsSA);
+        }
+        if (inputsAJ.size() > 0){
+            inputsAll.addAll(inputsAJ);
+        }
+        if (inputsSJ.size() > 0){
+            inputsAll.addAll(inputsSJ);
+        }
+        
+        return(inputsAll);
+    }
+    
+    
     private List<CaseInput> excludeInputsEnv(List<CaseInput> inputs, String envname) {
         /**
          * Excludes input elements from the inputs list based on environmental variable name.
@@ -983,8 +1046,12 @@ public class CaseServiceImpl implements CaseService {
             throw new EmfException(e.getMessage());
         }
 
-        // Run export task
-
+        // Export all inputs
+        List<CaseInput> inputs = getAllJobInputs(job);
+        System.out.println("Number of inputs for this job: " + inputs.size());
+        // pass the inputs to the exportJobSubmitter
+        
+        
         // Create an execution string and submit job to the queue,
         // if the key word $EMF_JOBLOG is in the queue options,
         // replace w/ log file
