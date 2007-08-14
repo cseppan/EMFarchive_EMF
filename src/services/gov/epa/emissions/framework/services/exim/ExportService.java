@@ -32,6 +32,17 @@ import org.hibernate.Session;
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
 public class ExportService {
+    private static int svcCount = 0;
+    private String svcLabel = null;
+    public String myTag(){
+        if (svcLabel == null) {
+            svcCount++;
+            this.svcLabel = "#" + svcCount + "-" + getClass().getName()+"-"+new Date().getTime();
+        }
+        
+        return "For label: " + svcLabel + " # of active objects of this type= " + svcCount;
+    }
+
     private static Log log = LogFactory.getLog(ExportService.class);
 
     private VersionedExporterFactory exporterFactory;
@@ -41,6 +52,7 @@ public class ExportService {
     private PooledExecutor threadPool;
 
     public ExportService(DbServer dbServer, PooledExecutor threadPool, HibernateSessionFactory sessionFactory) {
+        System.out.println(">>>> " + myTag());
         this.sessionFactory = sessionFactory;
         this.exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes(), batchSize());
         this.threadPool = threadPool;
@@ -127,6 +139,8 @@ public class ExportService {
 
     public void export(User user, EmfDataset[] datasets, Version[] versions, String dirName, String purpose,
             boolean overwrite) throws EmfException {
+        System.out.println(">>## In export service:export() " + myTag() + " for datasets: " + datasets.toString());
+
         File path = validatePath(dirName);
 
         if (datasets.length != versions.length) {
@@ -152,6 +166,7 @@ public class ExportService {
 
     private void doExport(User user, String purpose, boolean overwrite, File path, EmfDataset dataset, Version version)
             throws Exception {
+        System.out.println(">>## In export service:doExport() " + myTag() + " for datasetId: " + dataset.getId());
         if (dataset.getId() != version.getDatasetId())
             throw new EmfException("Dataset doesn't match version (dataset id=" + dataset.getId() + " but version shows dataset id=" + version.getDatasetId() + ")");
             
@@ -193,5 +208,12 @@ public class ExportService {
         } finally {
             session.close();
         }
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        svcCount--;
+        System.out.println(">>>> Destroying object: " + myTag());
+        super.finalize();
     }
 }
