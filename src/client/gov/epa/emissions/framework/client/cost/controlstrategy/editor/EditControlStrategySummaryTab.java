@@ -169,8 +169,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         layoutGenerator.addLabelWidgetPair("Inventory Year:", inventoryYearTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Region:", regions(), panel);
         layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutants(), panel);
-        layoutGenerator.addLabelWidgetPair("Discount Rate:", discountRate(), panel);
-        layoutGenerator.addLabelWidgetPair("Use Cost Equation:", useCostEquation(), panel);
+        layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate(), panel);
+        layoutGenerator.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), panel);
         
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
