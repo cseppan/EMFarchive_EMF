@@ -25,6 +25,7 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -36,7 +37,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -91,14 +91,14 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(createMiddleSection(controlStrategy), BorderLayout.CENTER);
         
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout(5, 5));
 //        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(panel,BorderLayout.SOUTH);
         // mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
         mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         buildSortFilterPanel();
-        add(mainPanel, BorderLayout.NORTH);
+        this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        this.add(mainPanel, BorderLayout.CENTER);
 //        add(createInputDatasetsPanel(controlStrategy.getInputDatasets()), BorderLayout.SOUTH);
     }
 
@@ -112,10 +112,12 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
     private void buildSortFilterPanel() {
         mainPanel.removeAll();
-        mainPanel.add(new JLabel("Inventories:"), BorderLayout.NORTH);
-        SortFilterSelectionPanel panel = sortFilterPanel();
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(new Border("Inventories to Process"));
+        SortFilterSelectionPanel sfpanel = sortFilterPanel();
+        panel.add(sfpanel, BorderLayout.CENTER);
+        panel.add(buttonPanel(), BorderLayout.SOUTH);
         mainPanel.add(panel);
-        mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
 
         // SortFilterSelectionPanel panel = sortFilterPanel();
         // sortFilterPanelContainer.removeAll();
@@ -258,13 +260,14 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
     private JPanel createMiddleSection(ControlStrategy controlStrategy) {
         JPanel middlePanel = new JPanel(new SpringLayout());
+        middlePanel.setBorder(new Border("Filters"));
 
         String value = controlStrategy.getFilter();
         if (value == null)
             value = "";
         
         filter = new TextArea("filter", value, 40, 4);
-        filter.setToolTipText("Enter a filter that could be entered as a SQL where clause (e.g., ANN_EMIS>5000)");
+        filter.setToolTipText("Enter a filter that could be entered as a SQL where clause (e.g., ANN_EMIS>5000 and SCC like '30300%')");
         JScrollPane scrollPane = new JScrollPane(filter);
         changeablesList.addChangeable(filter);
         
@@ -284,6 +287,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     
     private JPanel countyFilePanel() {
         countyFileTextField = new TextField("countyFile", 40);
+        countyFileTextField.setToolTipText("Browse to find a CSV file with a column named FIPS that lists the counties to which the strategy should apply");
         countyFileTextField.setText(controlStrategy.getCountyFile());
         changeablesList.addChangeable(countyFileTextField);
 
