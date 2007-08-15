@@ -43,7 +43,7 @@ public class RetrieveEfficiencyRecord {
         effRecColumnMap.put("Last Modifed By", "er.last_modified_by");
         effRecColumnMap.put("Last Modifed Date", "er.last_modified_time");
         effRecColumnMap.put("Details", "er.detail");
-        effRecColumnMap.put("Capital Annual Ratio", "er.cap_ann_ratio");
+        effRecColumnMap.put("Cap Ann Ratio", "er.cap_ann_ratio");
         effRecColumnMap.put("Incremental CPT", "er.incremental_cost_per_ton");
     }
 
