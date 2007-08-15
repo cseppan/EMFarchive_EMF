@@ -32,7 +32,7 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
                 "Control Efficiency", "Min Emis", 
                 "Max Emis", "Rule Effectiveness", 
                 "Rule Penetration", "Equation Type", 
-                "Capital Rec Fac", "Discount Rate", "Capital Annual Ratio", "Incremental CPT", 
+                "Capital Rec Fac", "Discount Rate", "Cap Ann Ratio", "Incremental CPT", 
                 "Last Modifed By", "Last Modifed Date", 
                 "Details", "Existing Measure", 
                 "Existing NEI Dev"};

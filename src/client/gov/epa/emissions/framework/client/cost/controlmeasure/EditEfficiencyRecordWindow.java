@@ -38,8 +38,8 @@ public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implement
         locale.setText(record.getLocale());
         ruleEffectiveness.setText(record.getRuleEffectiveness() + "");
         rulePenetration.setText(record.getRulePenetration() + "");      
-        caprecFactor.setText(record.getCapRecFactor() + "");
-        discountRate.setText(record.getDiscountRate() + "");
+        caprecFactor.setText((record.getCapRecFactor() !=null ? record.getCapRecFactor() : "") + "");
+        discountRate.setText((record.getDiscountRate() !=null ? record.getDiscountRate() : "") + "");
         
         capAnnRatio.setText((record.getCapitalAnnualizedRatio() != null ? record.getCapitalAnnualizedRatio(): "") + "");
         incrementalCPT.setText((record.getIncrementalCostPerTon() !=null ? record.getIncrementalCostPerTon(): "") +"");

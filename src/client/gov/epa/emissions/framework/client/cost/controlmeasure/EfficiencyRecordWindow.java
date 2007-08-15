@@ -108,7 +108,8 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     public EfficiencyRecordWindow(String title, ManageChangeables changeablesList, DesktopManager desktopManager,
             EmfSession session, CostYearTable costYearTable) {
-        super(title, new Dimension(675, 445), desktopManager);
+        super(title, new Dimension(675, 500), desktopManager);
+        super.setMinimumSize(new Dimension(675,460));
         this.session = session;
         this.verifier = new NumberFieldVerifier("");
         this.costYearTable = costYearTable;
@@ -134,45 +135,50 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     private JPanel createLayout() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
+        
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        panel.add(RecordPanel());
+        panel.add(recordPanel());
+
+ //       panel.add(detailPanel());
         panel.add(buttonsPanel());
 
         return panel;
     }
 
-    private JPanel RecordPanel() {
+
+    private JPanel recordPanel() {
+  
         JPanel panel = new JPanel(new BorderLayout());
 
         JPanel container = new JPanel();
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+//        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         container.add(LeftRecordPanel());
         container.add(RightRecordPanel());
-        panel.add(container, BorderLayout.CENTER);//LINE_START);
+        panel.add(container, BorderLayout.NORTH);//LINE_START);
 
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         JPanel detailContainer = new JPanel(new SpringLayout());
-        layoutGenerator = new SpringLayoutGenerator();
-        detail = new TextArea("Details", "");
+        detail = new TextArea("Details", "", 50, 5);
         ScrollableComponent detailPane = new ScrollableComponent(detail);
-        detailPane.setPreferredSize(new Dimension(540, 50));
+//      detailPane.setPreferredSize(new Dimension(540, 50));
+
         this.addChangeable(detail);
         layoutGenerator.addLabelWidgetPair("Details:", detailPane, detailContainer);
+        layoutGenerator.makeCompactGrid(detailContainer, 1, 2, 30, 5, 10, 10);
         
-        widgetLayout(1, 2, 5, 5, 10, 10, layoutGenerator, detailContainer);
-
-        JPanel detailCenterPanel = new JPanel();
-        detailCenterPanel.add(detailContainer, BorderLayout.CENTER);
-        panel.add(detailCenterPanel, BorderLayout.SOUTH);
-        
+////        JPanel emptyPane=new JPanel();
+////        JPanel dPane=new JPanel(new BorderLayout());
+//        //dPane.add(detailContainer, BorderLayout.NORTH);
+//        dPane.add(emptyPane, BorderLayout.SOUTH);
+        panel.add(detailContainer, BorderLayout.CENTER);
         return panel;
     }
 
     private Component LeftRecordPanel() {
-        JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        JPanel panel = new JPanel(new SpringLayout());
 
         try {
             allPollutants = session.dataCommonsService().getPollutants();
@@ -230,9 +236,9 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         layoutGenerator.addLabelWidgetPair("Cost Per Ton Reduced:*", costperTon, panel);
 
         
-        capAnnRatio = new TextField("Capital Annual Ratio", 10);
+        capAnnRatio = new TextField("Cap Ann Ratio", 10);
         this.addChangeable(capAnnRatio);
-        layoutGenerator.addLabelWidgetPair("Capital Annual Ratio:", capAnnRatio, panel);
+        layoutGenerator.addLabelWidgetPair("Capital to Annual Ratio:", capAnnRatio, panel);
                       
         
         refYrCostPerTon = new JLabel("");
@@ -443,14 +449,22 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     }
 
     private void saveDiscountRate() throws EmfException {
-        Double value = verifier.parseDouble(discountRate);
-        if (value < 0 || value > 20)
-            throw new EmfException("Enter the Discount Rate as a percent between 0 and 20. Eg: 1 = 1%.  0.01 = 0.01%");
-        record.setDiscountRate(value);
+        if (discountRate.getText().trim().length() > 0) {
+            double value = verifier.parseDouble(discountRate);
+            if (value < 0 || value > 20)
+                throw new EmfException("Enter the Discount Rate as a percent between 0 and 20. Eg: 1 = 1%.  0.01 = 0.01%");   
+            record.setDiscountRate(value);
+        }else
+            record.setDiscountRate(null);
     }
 
     private void saveCapRecFactor() throws EmfException {
-        record.setCapRecFactor(verifier.parseDouble(caprecFactor));
+        
+        if (caprecFactor.getText().trim().length() > 0) {
+            double value=verifier.parseDouble(caprecFactor);
+            record.setCapRecFactor(value);   
+        }else  
+            record.setCapRecFactor(null);
     }
 
     private void saveRulePenetration() throws EmfException {
