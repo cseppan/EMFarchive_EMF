@@ -105,7 +105,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private EmfConsole parentConsole;
 
-    private volatile Thread runThread;
+    private Thread runThread;
 
     private TextField tableName;
 
@@ -551,12 +551,26 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     private void viewResults() throws EmfException {
-        String exportDir = exportFolder.getText();
+        final String exportDir = exportFolder.getText();
 
         if (exportDir == null || exportDir.trim().isEmpty())
             throw new EmfException("Please specify the exported result directory.");
         
-        presenter.viewResults(step, exportDir.trim());
+        Thread viewResultsThread = new Thread(new Runnable(){
+            public void run() {
+                try {
+                    clear();
+                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    presenter.viewResults(step, exportDir.trim());
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                } finally {
+                    setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        });
+        
+        viewResultsThread.start();
     }
 
     private Button saveButton() {
