@@ -451,8 +451,8 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     private void saveDiscountRate() throws EmfException {
         if (discountRate.getText().trim().length() > 0) {
             double value = verifier.parseDouble(discountRate);
-            if (value < 0 || value > 20)
-                throw new EmfException("Enter the Discount Rate as a percent between 0 and 20. Eg: 1 = 1%.  0.01 = 0.01%");   
+            if (value < 1 || value > 20)
+                throw new EmfException("Enter the Discount Rate as a percent between 1 and 20 (e.g., 7% is entered as 7)");
             record.setDiscountRate(value);
         }else
             record.setDiscountRate(null);
@@ -469,17 +469,17 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     private void saveRulePenetration() throws EmfException {
         float value = verifier.parseFloat(rulePenetration);
-        if (value <= 0 || value > 100)
+        if (value <= 1 || value > 100)
             throw new EmfException(
-                    "Enter the Rule Penetration as a percent between 0 and 100. Eg: 1 = 1%.  0.01 = 0.01%");
+                    "Enter the Rule Penetration as a percent between 1 and 100 (e.g., 75% is entered as 75).");
         record.setRulePenetration(value);
     }
 
     private void saveRuleEffectiveness() throws EmfException {
         float value = verifier.parseFloat(ruleEffectiveness);
-        if (value <= 0 || value > 100)
+        if (value <= 1 || value > 100)
             throw new EmfException(
-                    "Enter the Rule Effectiveness as a percent between 0 and 100. Eg: 1 = 1%.  0.01 = 0.01%");
+                    "Enter the Rule Effectiveness as a percent between 1 and 100.(e.g., 75% is entered as 75)");
         record.setRuleEffectiveness(value);
     }
 
@@ -525,8 +525,8 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     }
 
     private void saveEfficiency(TextField efficiency) throws EmfException {
-        if (efficiency.getText().length() == 0)
-            throw new EmfException("Enter the Control Efficiency as a percentage (e.g., 90%, or -10% for a disbenefit)");
+        if (efficiency.getText().trim().length() == 0)
+            throw new EmfException("Enter the Control Efficiency as a percentage (e.g., 90 for 90% reduction, or -10 for a 10% disbenefit)");
 
         float value = verifier.parseFloat(efficiency);
 
@@ -537,6 +537,9 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         if (value < -100)
             throw new EmfException("The Control Efficiency can't be less than -100%.");
 
+        if ((value >= 0) && (value <= 1)) // shouldn't have control efficiencies between 0 and 1
+            throw new EmfException("Enter the Control Efficiency as a percentage (e.g., 90 for 90% reduction, or -10 for a 10% disbenefit)");          
+        
         record.setEfficiency(value);
     }
 
