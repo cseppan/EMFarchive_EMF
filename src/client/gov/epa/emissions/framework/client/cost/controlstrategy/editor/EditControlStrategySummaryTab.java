@@ -181,15 +181,16 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private DoubleTextField discountRate() {
-         discountRate= new DoubleTextField("discount rate", 0, 100, 10);
+         discountRate= new DoubleTextField("discount rate", 1, 20, 10);
           discountRate.setValue((controlStrategy.getDiscountRate()));
+          discountRate.setToolTipText("This value is only used for point sources");
           changeablesList.addChangeable(discountRate);
         return discountRate;
     }
     
     private JCheckBox useCostEquation() {
         
-        useCostEquationCheck = new JCheckBox("", controlStrategy.getUseCostEquations());
+        useCostEquationCheck = new JCheckBox("use cost equations ", null, controlStrategy.getUseCostEquations());
         return useCostEquationCheck;
     }
 
@@ -315,23 +316,37 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setCostYear(new YearValidation("Cost Year").value(costYear.getText(), costYearTable.getStartYear(), costYearTable.getEndYear()));
         controlStrategy.setInventoryYear(new YearValidation("Inventory Year").value(inventoryYear.getText()));
         updateRegion();
-        controlStrategy.setTargetPollutant(majorPollutant());
+        controlStrategy.setTargetPollutant(checkMajorPollutant());
 
-        controlStrategy.setDiscountRate(verifier.parseDouble(discountRate.getText()));
-        controlStrategy.setStrategyType(strategyType());
+        controlStrategy.setDiscountRate(checkDiscountRate());
+        controlStrategy.setStrategyType(checkStrategyType());
         controlStrategy.setUseCostEquations(useCostEquationCheck.isSelected());
     }
 
 
+    private double checkDiscountRate() throws EmfException {
+        // check to see that it's not empty
+        if (discountRate.getText().trim().length() == 0)
+            throw new EmfException("Enter the Discount Rate as a percentage (e.g., 9 for 9% percent)");
 
-    private StrategyType strategyType() throws EmfException {
+        double value = verifier.parseDouble(discountRate.getText());
+
+        //make sure the number makes sense...
+        if (value < 1 || value > 20){
+            throw new EmfException("Enter the Discount Rate as a percent between 1 and 20 (e.g., 7% is entered as 7)");
+        }
+        return value;
+        
+    }
+
+    private StrategyType checkStrategyType() throws EmfException {
         StrategyType strategyType = (StrategyType) this.strategyTypeCombo.getSelectedItem();
         if (strategyType == null)
             throw new EmfException("Please select a strategy type");
         return strategyType;
     }
 
-    private Pollutant majorPollutant() throws EmfException {
+    private Pollutant checkMajorPollutant() throws EmfException {
         Pollutant pollutant = (Pollutant) majorPollutant.getSelectedItem();
         if (pollutant == null) {
             throw new EmfException("Please select a target pollutant");
