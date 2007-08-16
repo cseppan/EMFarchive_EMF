@@ -71,10 +71,10 @@ public class NonpointRecordGenerator implements RecordGenerator {
         tokens.add(""); // stack ID
         tokens.add(""); // segment
 
-        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon() * reducedEmission));  // annual cost for source
         tokens.add(""); // O&M
         tokens.add(""); // Annualizd Capital
         tokens.add(""); // Total Capital Cost
+        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon() * reducedEmission));  // annual cost for source
         tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon()));  // annual cost per ton
         
         tokens.add("" + decFormat.format(maxCM.controlEfficiency()));   // control efficiency

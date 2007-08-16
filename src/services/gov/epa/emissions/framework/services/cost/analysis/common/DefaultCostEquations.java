@@ -12,17 +12,17 @@ public class DefaultCostEquations implements CostEquations {
     private double emissionReduction;
     //private double costPerTon;
     private double discountRate;
-    Double capitalCost;
-    Double capRecFactor;
-    Double capAnnRatio; 
-    Double annulizedCCost;
+    private Double capitalCost;
+    private Double capRecFactor;
+    private Double capAnnRatio; 
+    private Double annulizedCCost;
  
     
     public DefaultCostEquations(double emissionReduction, BestMeasureEffRecord maxCM, double discountRate) {
         this.maxCM=maxCM;
  //       this.resultSet=resultSet;
         this.emissionReduction=emissionReduction;
-        this.discountRate=discountRate;
+        this.discountRate=discountRate/100;
     }
 
  
@@ -56,17 +56,24 @@ public class DefaultCostEquations implements CostEquations {
 
    
     public Double getCapRecFactor(){
-        capRecFactor=maxCM.efficiencyRecord().getCapRecFactor();
+        // Calculate capital recovery factor 
+        double equipmentLife=maxCM.measure().getEquipmentLife();
+        if (equipmentLife==0) 
+            capRecFactor=maxCM.efficiencyRecord().getCapRecFactor();
+        else 
+            capRecFactor=calculateCapRecFactor(discountRate, equipmentLife);
+        
         if (capRecFactor != null && capRecFactor != 0) {
             return capRecFactor; 
         }
-        return calculateCapRecFactor(discountRate, maxCM.measure().getEquipmentLife());
+        return null;
     }
+    
     private Double calculateCapRecFactor(double discountRate, double equipmentLife){
         if(discountRate==0 || equipmentLife==0) return null;
         return (discountRate*Math.pow((1+discountRate),equipmentLife))/(Math.pow((discountRate+1),equipmentLife)-1);
     }
- 
+
 }
 
 //what the difference of cost per ton and adjusted cost per ton.

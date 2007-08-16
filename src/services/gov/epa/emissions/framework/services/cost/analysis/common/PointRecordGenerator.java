@@ -73,16 +73,16 @@ public class PointRecordGenerator implements RecordGenerator {
         tokens.add(resultSet.getString("STACKID")); //stack ID
         tokens.add(resultSet.getString("SEGMENT")); //segment
         
-//        tokens.add("" + (costEquations.getTotalAnnualizedCost() != null ? decFormat.format(costEquations.getTotalAnnualizedCost() : ""));
-        annualCost=costEquations.getAnnualCost();
-        tokens.add("" +  (annualCost!= null ? decFormat.format(annualCost) : ""));
-                //maxCM.adjustedCostPerTon() * reducedEmission));//annual cost for source
+       
         om=costEquations.getOperationMaintenanceCost();
         tokens.add("" + (om!= null ? decFormat.format(om) : ""));
         annulizedCCost=costEquations.getAnnualizedCapitalCost();
         tokens.add("" + (annulizedCCost != null ? decFormat.format(annulizedCCost) : ""));//capital cost
         capitalCost=costEquations.getCapitalCost();
         tokens.add("" + (capitalCost != null ? decFormat.format(capitalCost) : ""));//Total capital cost
+        annualCost=costEquations.getAnnualCost();
+        tokens.add("" +  (annualCost!= null ? decFormat.format(annualCost) : ""));
+                //maxCM.adjustedCostPerTon() * reducedEmission));//annual cost for source
         
         tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon())); //annual cost per ton
         tokens.add("" + decFormat.format(maxCM.controlEfficiency()));   //control efficiency

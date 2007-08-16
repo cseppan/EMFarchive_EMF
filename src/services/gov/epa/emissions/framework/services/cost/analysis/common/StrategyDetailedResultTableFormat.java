@@ -103,7 +103,7 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         Column comment = new Column("Comment", types.stringType(128), new StringFormatter(128));
         
         return new Column[] { disable, controlMeasureAbbr, pollutant, scc, fips, plantId, pointId, stackId, segment, 
-                annualCost, annualOperMaintCost,AnnualizedCapical, TotalCapitalCost,annualCostPerTon, controlEfficiency, rulePenetration, ruleEffectiveness, percentReduction, 
+                annualOperMaintCost,AnnualizedCapical, TotalCapitalCost,annualCost, annualCostPerTon, controlEfficiency, rulePenetration, ruleEffectiveness, percentReduction, 
                 inventoryControlEfficiency, inventoryRulePenetration, inventoryRuleEffectiveness, finalEmissions, 
                 emissionsReduction, inventoryEmissions, fipsState, fipsCounty, sic, naics, sourceId, inputDatasetId, 
                 controlStrategyId, controlMeasureId, comment };
