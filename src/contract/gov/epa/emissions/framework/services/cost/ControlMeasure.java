@@ -67,12 +67,29 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private Double applyOrder;
 
+    private List equationTypes;
+
+//    private EquationType equationType;
+
     public ControlMeasure() {
         this.lock = new Mutex();
         this.sccs = new ArrayList();
         this.efficiencyRecords = new ArrayList();
         this.aggregatedPollutantEfficiencyRecords = new ArrayList();
         this.sectors = new ArrayList();
+        this.equationTypes = new ArrayList();
+        ControlMeasureEquationType controlMeasureEquationType = new ControlMeasureEquationType(new EquationType("Type 5"));
+        ControlMeasureEquationTypeVariable[] controlMeasureEquationTypeVariables = new ControlMeasureEquationTypeVariable[] 
+                { new ControlMeasureEquationTypeVariable(new EquationTypeVariable("Scaling Factor"), 2.5),
+                    new ControlMeasureEquationTypeVariable(new EquationTypeVariable("Scaling Factor2"), 5.5)};
+        controlMeasureEquationType.setControlMeasureEquationTypeVariables(controlMeasureEquationTypeVariables);
+        this.equationTypes.add(controlMeasureEquationType);
+        controlMeasureEquationType = new ControlMeasureEquationType(new EquationType("Type 4"));
+        controlMeasureEquationTypeVariables = new ControlMeasureEquationTypeVariable[] 
+                { new ControlMeasureEquationTypeVariable(new EquationTypeVariable("Scaling Factor"), 2.5),
+                    new ControlMeasureEquationTypeVariable(new EquationTypeVariable("Scaling Factor2"), 5.5)};
+        controlMeasureEquationType.setControlMeasureEquationTypeVariables(controlMeasureEquationTypeVariables);
+        this.equationTypes.add(controlMeasureEquationType);
     }
 
     public ControlMeasure(String name) {
@@ -274,6 +291,14 @@ public class ControlMeasure implements Lockable, Serializable {
         this.sectors = Arrays.asList(sectors);
     }
 
+    public ControlMeasureEquationType[] getEquationTypes() {
+        return (ControlMeasureEquationType[]) equationTypes.toArray(new ControlMeasureEquationType[0]);
+    }
+
+    public void setEquationTypes(ControlMeasureEquationType[] equationTypes) {
+        this.equationTypes = Arrays.asList(equationTypes);
+    }
+    
     public void addEfficiencyRecord(EfficiencyRecord efficiencyRecord) {
         this.efficiencyRecords.add(efficiencyRecord);
     }
@@ -330,4 +355,12 @@ public class ControlMeasure implements Lockable, Serializable {
     public Double getApplyOrder() {
         return applyOrder;
     }
+    
+//    public void setEquationType(EquationType equationType) {
+//        this.equationType = equationType;
+//    }
+//
+//    public EquationType getEquationType() {
+//        return equationType;
+//    }
 }

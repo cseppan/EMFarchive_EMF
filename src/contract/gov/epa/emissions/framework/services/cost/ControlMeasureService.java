@@ -67,4 +67,6 @@ public interface ControlMeasureService extends EMFService {
     
     ControlMeasure[] getSummaryControlMeasures() throws EmfException;
     
+    EquationType[] getEquationTypes() throws EmfException;
+    
 }

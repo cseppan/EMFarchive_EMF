@@ -47,12 +47,27 @@
             class="gov.epa.emissions.framework.services.cost.ControlMeasureClass"
             column="cm_class_id"/> 
   
- 	   <array name="sectors" table="control_measurs_sectors" cascade="save-update">
+   <!--     <many-to-one 
+            name="equationType" 
+            class="gov.epa.emissions.framework.services.cost.EquationType"
+            column="equation_type_id"/> 
+-->
+ 		<array name="sectors" table="control_measurs_sectors" cascade="save-update">
     		<key column="control_measure_id" not-null="true"/>
     		<list-index column="list_index"/>
     		<many-to-many class="gov.epa.emissions.commons.data.Sector" column="sector_id"/>
-  	   </array>
+  		</array>
             
+<!--		<array name="equationTypes" table="control_measure_equation_type_variables" cascade="save-update">
+	    	<key column="control_measure_id" not-null="true"/>
+	    	<list-index column="list_index"/>
+	    	<composite-element class="gov.epa.emissions.framework.services.cost.ControlMeasureEquationType">
+		        <property name="value" column="value" type="double" not-null="true"/>
+	        	<many-to-one name="equationType" class="gov.epa.emissions.framework.services.cost.EquationType" column="equation_type_id" not-null="true" cascade="none"/>
+	    		<many-to-many name="controlMeasureEquationTypeVariables" class="gov.epa.emissions.framework.services.cost.ControlMeasureEquationTypeVariable" column="equation_type_variable_id" not-null="true" cascade="none"/>
+	    	</composite-element>
+		</array>
+-->
     </class>
 </hibernate-mapping>  
 

@@ -481,4 +481,8 @@ public class ControlMeasureDAO {
             throw new EmfException(e.getMessage());
         }
     }
+
+    public List getEquationTypes(Session session) {
+        return hibernateFacade.getAll(EquationType.class, Order.asc("name"), session);
+    }
 }

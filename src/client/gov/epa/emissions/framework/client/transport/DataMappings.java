@@ -26,9 +26,13 @@ import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
+import gov.epa.emissions.framework.services.cost.ControlMeasureEquationType;
+import gov.epa.emissions.framework.services.cost.ControlMeasureEquationTypeVariable;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.ControlStrategyMeasure;
+import gov.epa.emissions.framework.services.cost.EquationType;
+import gov.epa.emissions.framework.services.cost.EquationTypeVariable;
 import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
@@ -125,6 +129,11 @@ public class DataMappings extends Mappings {
         bean(call, CostYearTable.class, costYearTable());
         bean(call, ControlMeasureClass.class, controlMeasureClass());
         bean(call, ControlStrategyConstraint.class, controlStrategyConstraint());
+        bean(call, EquationType.class, equationType());
+        bean(call, EquationTypeVariable.class, equationTypeVariable());
+        bean(call, ControlMeasureEquationTypeVariable.class, controlMeasureEquationTypeVariable());
+        bean(call, ControlMeasureEquationType.class, controlMeasureEquationType());
+        
     }
 
     private void registerArrays(Call call) {
@@ -178,7 +187,11 @@ public class DataMappings extends Mappings {
         array(call, AggregatedPollutantEfficiencyRecord[].class, aggregatedPollutantEfficiencyRecords());
         array(call, Scc[].class, sccs());
         array(call, ControlMeasureClass[].class, controlMeasureClasses());
-
+        array(call, EquationType[].class, equationTypes());
+        array(call, EquationTypeVariable[].class, equationTypeVariables());
+        array(call, ControlMeasureEquationTypeVariable[].class, controlMeasureEquationTypeVariables());
+        array(call, ControlMeasureEquationType[].class, controlMeasureEquationTypes());
+        
         array(call, EmfFileInfo[].class, emfFileInfos());
     }
 
@@ -384,6 +397,38 @@ public class DataMappings extends Mappings {
     
     public QName controlMeasureClasses() {
         return qname("ControlMeasureClasses");
+    }
+
+    public QName equationTypes() {
+        return qname("EquationTypes");
+    }
+
+    public QName equationType() {
+        return qname("EquationType");
+    }
+
+    public QName equationTypeVariables() {
+        return qname("EquationTypeVariables");
+    }
+
+    public QName equationTypeVariable() {
+        return qname("EquationTypeVariable");
+    }
+
+    public QName controlMeasureEquationTypes() {
+        return qname("ControlMeasureEquationTypes");
+    }
+
+    public QName controlMeasureEquationType() {
+        return qname("ControlMeasureEquationType");
+    }
+
+    public QName controlMeasureEquationTypeVariables() {
+        return qname("ControlMeasureEquationTypeVariables");
+    }
+
+    public QName controlMeasureEquationTypeVariable() {
+        return qname("ControlMeasureEquationTypeVariable");
     }
 
     public QName controlStrategy() {
