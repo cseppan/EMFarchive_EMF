@@ -31,6 +31,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -411,6 +412,11 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     }
 
     private char getFileSeparator(String path) {
+        if (path == null)
+        {
+            // this assumes that the server and client are running on the same platform
+            return File.pathSeparatorChar;
+        }
         if (path.charAt(0) == '/')
             return '/';
 
