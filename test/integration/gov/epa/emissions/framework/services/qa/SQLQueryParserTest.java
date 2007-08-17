@@ -31,8 +31,7 @@ public class SQLQueryParserTest extends ServiceTestCase {
 
         SQLQueryParser parser = new SQLQueryParser(qaStep, "table1", emissioDatasourceName, null, null, sessionFactory);
         String query = parser.parse();
-        String expected = "CREATE TABLE emissions.table1 AS " + userQuery.toUpperCase();
-        
+        String expected = "CREATE TABLE emissions.table1 AS " + userQuery;
         assertEquals(expected, query);
     }
 
@@ -78,7 +77,6 @@ public class SQLQueryParserTest extends ServiceTestCase {
                 + qualfiedName(tableName)
                 + " E  WHERE  (E.version IN (0) AND E.dataset_id="
                 + dataset.getId() + ") " + " group by";
-        
         dropVersionDataFromTable();
         remove(dataset);
         assertEquals(expected.toUpperCase(), query.toUpperCase());

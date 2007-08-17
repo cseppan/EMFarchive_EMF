@@ -19,5 +19,9 @@ public interface EditQAStepView extends ManagedView {
     void setMostRecentUsedFolder(String mostRecentUsedFolder);
 
     void displayResultsTable(String qaStepName, String exportedFileName) throws EmfException;
+    
+    void updateArgumentsTextArea (String text);
+    
+    void updateDatasets(Object [] datasets, Object [] invDatasets);
 
 }

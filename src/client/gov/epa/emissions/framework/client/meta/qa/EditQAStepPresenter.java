@@ -132,4 +132,7 @@ public class EditQAStepPresenter {
         return session.qaService().getQAStepResult(step);
     }
 
+    public EmfDataset getDataset(String datasetName ) throws EmfException {
+        return session.dataService().getDataset(datasetName);
+    }
 }

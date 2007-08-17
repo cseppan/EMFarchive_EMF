@@ -18,13 +18,13 @@ import org.hibernate.Session;
 
 public class SQLQAProgramRunner implements QAProgramRunner {
 
-    private DbServer dbServer;
+    protected DbServer dbServer;
 
-    private QAStep qaStep;
+    protected QAStep qaStep;
 
-    private TableCreator tableCreator;
+    protected TableCreator tableCreator;
 
-    private HibernateSessionFactory sessionFactory;
+    protected HibernateSessionFactory sessionFactory;
 
     public SQLQAProgramRunner(DbServer dbServer, HibernateSessionFactory sessionFactory, QAStep qaStep) {
         this.dbServer = dbServer;
@@ -51,11 +51,11 @@ public class SQLQAProgramRunner implements QAProgramRunner {
         }
     }
 
-    private void printQuery(String query) {
+    public void printQuery(String query) {
         System.out.println("QA Step '" + qaStep.getName() + "' query: " + query);
     }
 
-    private void dropTable(String tableName) throws EmfException {
+    public void dropTable(String tableName) throws EmfException {
         if (tableName == null || tableName.isEmpty())
             return;
         
@@ -68,11 +68,11 @@ public class SQLQAProgramRunner implements QAProgramRunner {
         }
     }
 
-    private void success(QAStep qaStep, String tableName) {
+    protected void success(QAStep qaStep, String tableName) {
         updateQAStepResult(qaStep, "Success", tableName, new Date());
     }
 
-    private void failure(QAStep qaStep) {
+    protected void failure(QAStep qaStep) {
         updateQAStepResult(qaStep, "Failed", null, null);
     }
 
@@ -96,13 +96,13 @@ public class SQLQAProgramRunner implements QAProgramRunner {
     // Modified SQLQueryParser constructor to reflect the changes to the actual class -- added arguments
     // for version and sessionFactory
     
-    private String query(DbServer dbServer, QAStep qaStep, String tableName) throws EmfException {
+    protected String query(DbServer dbServer, QAStep qaStep, String tableName) throws EmfException {
         SQLQueryParser parser = new SQLQueryParser(qaStep, tableName, dbServer.getEmissionsDatasource().getName(),
                 dataset(qaStep), version(qaStep), sessionFactory);
         return parser.parse();
     }
 
-    private EmfDataset dataset(QAStep qaStep) {
+    protected EmfDataset dataset(QAStep qaStep) {
         DatasetDAO dao = new DatasetDAO();
         Session session = sessionFactory.getSession();
         try {
@@ -112,7 +112,7 @@ public class SQLQAProgramRunner implements QAProgramRunner {
         }
     }
 
-    private Version version(QAStep qaStep) {
+    protected Version version(QAStep qaStep) {
         Session session = sessionFactory.getSession();
         try {
             return new Versions().get(qaStep.getDatasetId(), qaStep.getVersion(), session);
@@ -121,7 +121,8 @@ public class SQLQAProgramRunner implements QAProgramRunner {
         }
     }
 
-    private String tableName(QAStep qaStep) {
+    protected String tableName(QAStep qaStep) {
+        //System.out.println("The input is:" + qaStep);
         String formattedDate = EmfDateFormat.format_YYYYMMDDHHMMSS(new Date());
         String table = "QA_DSID" + qaStep.getDatasetId() + "_V" + qaStep.getVersion() + "_"
                 + formattedDate;
@@ -137,11 +138,11 @@ public class SQLQAProgramRunner implements QAProgramRunner {
                 table = table.replace(table.charAt(i), '_');
             }
         }
-
+        //System.out.println("Table name is: " + table);
         return table.trim().replaceAll(" ", "_");
     }
 
-    private String getExistedTableName(QAStep qaStep) {
+    protected String getExistedTableName(QAStep qaStep) {
         QAStepResult result = getResult(qaStep);
 
         if (result != null && result.getTable() != null)

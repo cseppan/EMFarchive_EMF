@@ -54,6 +54,21 @@ public class DataServiceImpl implements DataService {
         }
     }
 
+    public EmfDataset getDataset(String datasetName) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            EmfDataset dataset = dao.getDataset(session, datasetName);
+            
+            return dataset;
+        } catch (RuntimeException e) {
+            LOG.error("Could not get dataset " + datasetName, e);
+            throw new EmfException("Could not get dataset " + datasetName);
+        } finally {
+            session.close();
+        }
+    }
+
     public EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();

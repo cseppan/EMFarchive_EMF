@@ -45,7 +45,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -112,11 +114,30 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private JLabel creationStatusLabel;
 
     private JLabel creationDateLabel;
+    
+    private EmfDataset [] datasets;
+    
+    private EmfDataset [] invDatasets;
+    
+    private ArrayList<EmfDataset> inputDatasets;
+    
+    private ArrayList<EmfDataset> inputInvDatasets;
+    
+    private EmfDataset [] inputDatasetsArray;
+    
+    private EmfDataset [] inputInvDatasetsArray;
+    
+    private EmfDataset origDataset;
+    
 
     public EditQAStepWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
         super("Edit QA Step", new Dimension(680, 580), desktopManager);
         this.parentConsole = parentConsole;
+        //Need for new class
+        this.desktopManager = desktopManager;
         this.runThread = new Thread(this);
+        inputDatasets = new ArrayList<EmfDataset>();
+        inputInvDatasets = new ArrayList<EmfDataset>();
     }
 
     public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset,
@@ -126,6 +147,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         this.qaStepResult = qaStepResult;
         this.user = session.user();
         this.qaPrograms = new QAPrograms(session, programs);
+        this.origDataset = dataset;
         super.setLabel(super.getTitle() + ": " + step.getName() + " - " + dataset.getName() + " (v" + step.getVersion()
                 + ")");
 
@@ -367,6 +389,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         layoutGenerator.addLabelWidgetPair("Name:", new Label(step.getName()), panel);
 
         program = new EditableComboBox(qaPrograms.names());
+        program.setPreferredSize(new Dimension(250,20));
         program.setPrototypeDisplayValue(EmptyStrings.create(20));
         QAProgram qaProgram = step.getProgram();
         if (qaProgram != null)
@@ -380,23 +403,38 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             }
         });
 
+        //JPanel setButtonPanel = new JPanel();
+        //setButtonPanel.setLayout(new BoxLayout(setButtonPanel, BoxLayout.X_AXIS));
         JPanel prgpanel = new JPanel();
         prgpanel.add(new Label(versionName + " (" + step.getVersion() + ")"));
         prgpanel.add(new JLabel(EmptyStrings.create(20)));
         prgpanel.add(new JLabel("Program:  "));
         prgpanel.add(program);
+        //prgpanel.add(prgpanel);
+        //Button button1 = setButton();
+        //setButtonPanel.add(button1);
         layoutGenerator.addLabelWidgetPair("Version:", prgpanel, panel);
+        
 
-        programArguments = new TextArea("", step.getProgramArguments(), 40, 3);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        programArguments = new TextArea("", step.getProgramArguments(),40, 3);
         addChangeable(programArguments);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programArguments);
-        layoutGenerator.addLabelWidgetPair("Arguments:", scrollableDetails, panel);
+        buttonPanel.add(scrollableDetails);
+        Button button1 = setButton();
+        buttonPanel.add(button1);
+        layoutGenerator.addLabelWidgetPair("Arguments:", buttonPanel, panel);
+        //layoutGenerator.addLabelWidgetPair("Arguments:", scrollableDetails, panel);
         programArguments.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 currentTable.setSelected(false);
             }
         });
 
+        //Button button1 = setButton();
+        //prgpanel.add(button1);
+        
         required = new CheckBox("", step.isRequired());
         if (step.isRequired())
             required.setEnabled(false);
@@ -522,7 +560,142 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         });
         return export;
     }
+    
+    private Button setButton() {
+        Button export = new Button("Set", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                clear();
+                //System.out.println("The program is: " + (String)program.getSelectedItem());
+                String annEmis = "Average day to Annual State Summary";
+                if (annEmis.equals(program.getSelectedItem())) {
+                    //System.out.println("You selected annual emissions");
+                    doSetAnnEmisWindow();
+                } else {
+                    //System.out.println("You selected some other program");
+                    doSetWindow();
+                    
+                }
+            }
+        });
+        return export;
+    }
+    
+    private void doSetAnnEmisWindow() {
+        
+        //String inventoriesToken = "";
+        //String invtableToken = "";
+        //String invTableDatasetName = "";
+        final String invTableTag = "-invtable";
+        String programSwitches = "";
 
+        
+        programSwitches = programArguments.getText();
+        //System.out.println("Text: " + programSwitches);
+        if (!(programSwitches.equals(""))) {
+            int index1 = programSwitches.indexOf(invTableTag);
+            if (programSwitches.substring(0,12).equals("-inventories")) {
+                //System.out.println("Substring: " + programSwitches.substring(0, index1));
+                String inventoriesToken = programSwitches.substring(0, index1);
+                String invtableToken = programSwitches.substring(index1 + invTableTag.length());
+        
+                StringTokenizer tokenizer2 = new StringTokenizer(inventoriesToken);
+         
+                tokenizer2.nextToken();
+                int i = 0;
+                while (tokenizer2.hasMoreTokens()) {
+                    //System.out.println("Next Dataset: " +  tokenizer2.nextToken());
+                    try {
+                        //System.out.println("Dataset: " +  tokenizer2.nextToken());
+                        //System.out.println("Size: "+ inputDatasets.size());
+                        inputDatasets.add(presenter.getDataset(tokenizer2.nextToken().trim()));
+                        //System.out.println("Next item: " + inputDatasets.get(i).toString());
+                        i++;
+                    } catch(EmfException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                inputDatasetsArray = new EmfDataset [inputDatasets.size()];
+                inputDatasets.toArray(inputDatasetsArray);
+                //System.out.println("inventories array: " + inputDatasetsArray.length);
+            
+                StringTokenizer tokenizer3 = new StringTokenizer(invtableToken);
+         
+                int j = 0;
+                while (tokenizer3.hasMoreTokens()) {
+                    //System.out.println("Next Dataset: " +  tokenizer3.nextToken());
+                    try{
+                        inputInvDatasets.add(presenter.getDataset(tokenizer3.nextToken().trim()));
+                        //System.out.println("Next item: " + inputInvDatasets.get(j).toString());
+                        j++;
+                    } catch(EmfException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                inputInvDatasetsArray = new EmfDataset [inputInvDatasets.size()];
+                inputInvDatasets.toArray(inputInvDatasetsArray);
+                //System.out.println("invtable array: " + inputInvDatasetsArray.length);
+            }
+        }
+        EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, session, inputDatasetsArray, inputInvDatasetsArray);
+        EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+        presenter.display(origDataset, step);
+        //view.updateDatasetsToEmissionsWindow(datasets, invDatasets);
+
+        inputDatasets.clear();
+        inputInvDatasets.clear();
+        
+        for (int i = 0; i < inputDatasetsArray.length; i++)
+            inputDatasetsArray[i] = null;
+        
+        for (int i = 0; i < inputInvDatasetsArray.length; i++)
+            inputInvDatasetsArray[i] = null;
+     }
+    
+    private void doSetWindow() {
+        
+            String argumentsText = programArguments.getText();
+            //System.out.println("Arguments Text: " + argumentsText);
+            EditQAArgumentsWindow view = new EditQAArgumentsWindow(desktopManager, argumentsText);
+            EditQAArgumentsPresenter presenter = new EditQAArgumentsPresenter(view, this);
+            presenter.display();
+            view.display(origDataset, step);
+    }
+    
+    public void updateArgumentsTextArea (String text){
+        programArguments.clear();
+        programArguments.setText(text);
+    }
+
+    public void updateDatasets(Object [] retreivedDatasets, Object [] retrievedInvDatasets){
+        
+        String datasetNames = "-inventories\n";
+        //String invDatasetNames = "";
+        for (int i = 0; i < retreivedDatasets.length; i++){
+            //System.out.println("retrived dataset is: " + retreivedDatasets[i]);
+            datasets = new EmfDataset[36];
+           // if(!(datasets[i].equals("")))
+                datasets[i] = (EmfDataset)retreivedDatasets[i];
+            
+            //System.out.println("dataset[" + i + "] is: " + datasets[i]);
+            datasetNames += datasets[i] + "\n";
+        }
+        
+        for (int i = 0; i < retrievedInvDatasets.length; i++) {
+            //System.out.println("inventory dataset is: " + retrievedInvDatasets[i]);
+            invDatasets = new EmfDataset[1];
+           // if(!(invDatasets[i].equals("")))
+                    invDatasets[i] = (EmfDataset)retrievedInvDatasets[i];
+            //System.out.println("inventory dataset[" + i + "] is: " + invDatasets[i]);
+            datasetNames += "-invtable " + "\n" + invDatasets[i];
+        }
+        
+        //System.out.println(" Program arguments string is: " + datasetNames);
+        
+        updateArgumentsTextArea(datasetNames);
+        // Add the code to start the runner to provide the proper SQL query result (pre-parsing) to the 
+        // arguments window.
+        
+    }
     protected void runQAStep() {
         try {
             messagePanel.setMessage("Started Run. Please monitor the Status window " + "to track your run request.");
@@ -633,6 +806,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private void clear() {
         messagePanel.clear();
     }
+    
 //Modified length in Dimension to make View window ful size
     public void displayResultsTable(String qaStepName, String exportedFileName) {
         AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QAStep \"" + qaStepName + "\" results ",

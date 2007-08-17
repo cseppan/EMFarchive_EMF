@@ -19,6 +19,8 @@ public class ListWidget extends JList implements Changeable {
     private Changeables changeables;
 
     private DefaultListModel model;
+    
+    private IntList indexes;
 
     public ListWidget(Object[] items) {
         model = model(items);
@@ -40,11 +42,15 @@ public class ListWidget extends JList implements Changeable {
     }
 
     public void setSelected(Object[] selected) {
-        IntList indexes = new ArrayIntList();
+        indexes = new ArrayIntList();
         for (int i = 0; i < selected.length; i++)
             indexes.add(model.indexOf(selected[i]));
 
         super.setSelectedIndices(indexes.toArray());
+    }
+    
+    public IntList getSelected() {
+        return indexes;
     }
 
     public boolean hasChanges() {
@@ -95,6 +101,14 @@ public class ListWidget extends JList implements Changeable {
         for (int i = 0; i < removeValues.length; i++) {
             model.removeElement(removeValues[i]);
         }
+    }
+    
+    public void removeSelectedElements() {
+        
+        Object [] selectedValues = this.getSelectedValues();
+       for (int i = 0; i < selectedValues.length; i++) {
+           model.removeElement(selectedValues[i]);
+       }
     }
 
     public Object[] getAllElements() {
