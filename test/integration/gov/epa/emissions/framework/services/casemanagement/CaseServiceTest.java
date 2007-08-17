@@ -489,7 +489,7 @@ public class CaseServiceTest extends ServiceTestCase {
             // update everything to db
             job = loadNewCaseJob(job, caseObj);
 
-            service.runJob(job, user);
+            service.runJob(job, user,caseObj);
 
         } catch (Exception e) {
             e.printStackTrace();
