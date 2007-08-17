@@ -99,8 +99,8 @@ public class RemoteCopy implements Runnable {
         BufferedReader reader = null;
 
         try {
-            Process process = Runtime.getRuntime().exec(cmds);
             checkStatus.start();
+            Process process = Runtime.getRuntime().exec(cmds);
             errorLevel = process.waitFor();
 
             if (errorLevel > 0) {
@@ -172,10 +172,8 @@ public class RemoteCopy implements Runnable {
         String msg = null;
 
         if (os.equalsIgnoreCase("Linux") || os.equalsIgnoreCase("Unix")) {
-            cmd = getCommands("kill -9 `ps -aux | grep scp | awk '{print $2}'`"); // kill the secure copy program
-        }
-
-        if (os.equalsIgnoreCase("Windows 98") || os.equalsIgnoreCase("Windows 95")) {
+            cmd = getCommands("kill -9 `ps aux | grep " + program + " | awk '{print $2}'`"); // kill the secure copy program
+        } else if (os.equalsIgnoreCase("Windows 98") || os.equalsIgnoreCase("Windows 95")) {
             msg = "Cannot kill process " + program
                     + " under current Windows system. Please go to Windows task manager to kill EMF application.";
         } else { // kill the secure copy program
