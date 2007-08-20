@@ -207,8 +207,8 @@ public class TaskManagedExportService {
                 fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator");
             }
             
+            //FIXME:  Verify at team meeting  Test if subpath exists.  If not create subpath
             
-
             // FIXME: Investigate if services reference needs to be unique for each dataset in this call
             if (isExportable(dataset, services, user)) {
                 try {
@@ -250,7 +250,7 @@ public class TaskManagedExportService {
         return exportTaskSubmitter.getSubmitterId();
     }
 
-    public synchronized String export(User user, EmfDataset[] datasets, Version[] versions, String dirName,
+    public synchronized String exportForClient(User user, EmfDataset[] datasets, Version[] versions, String dirName,
             String purpose, boolean overwrite) throws EmfException {
 
         // FIXME: always overwrite

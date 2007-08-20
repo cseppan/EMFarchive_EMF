@@ -117,7 +117,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         if (DebugLevels.DEBUG_4)
             System.out.println(">>## calling export datasets in eximSvcImp: " + myTag() + " for datasets: "
                     + datasets.toString());
-        String submitterId = exportService.export(user, datasets, versions, dirName, purpose, false);
+        String submitterId = exportService.exportForClient(user, datasets, versions, dirName, purpose, false);
         if (DebugLevels.DEBUG_4)
             System.out.println("In ExImServiceImpl:exportDatasets() SUBMITTERID= " + submitterId);
     }
@@ -127,7 +127,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         if (DebugLevels.DEBUG_4)
             System.out.println(">>## calling export datasets with overwrite in eximSvcImp: " + myTag()
                     + " for datasets: " + datasets.toString());
-        String submitterId = exportService.export(user, datasets, versions, dirName, purpose, true);
+        String submitterId = exportService.exportForClient(user, datasets, versions, dirName, purpose, true);
         if (DebugLevels.DEBUG_4)
             System.out.println("In ExImServiceImpl:exportDatasetsWithOverwrite() SUBMITTERID= " + submitterId);
     }
