@@ -52,9 +52,6 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
     private EmfDataset [] datasets;
     
     private EmfDataset [] invDatasets;
-    
-    
-   // private ManageChangeables changeables;
         
 public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session, EmfDataset [] datasets, EmfDataset [] invDatasets) {
         
@@ -66,6 +63,17 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session, 
         this.getContentPane().add(createLayout());
         
     }
+
+public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) {
+    
+    super("Emissions Inventories Editor", new Dimension(600, 300), desktopManager);
+
+    this.session = session;
+    this.datasets = null;
+    this.invDatasets = null;
+    this.getContentPane().add(createLayout());
+    
+}
 
     public void display(EmfDataset dataset, QAStep qaStep) {
         super.setTitle("EditQAEmissionsEditor: " + dataset.getName() + "_" + qaStep.getId() );
