@@ -58,7 +58,7 @@ public class ExportQAStepTask implements Runnable {
             logError("Failed to export QA step : " + qastep.getName() + suffix, e);
             setStatus("Failed to export QA step " + qastep.getName() + suffix + ". Reason: " + e.getMessage());
         } finally {
-            disconnect(dbServer);
+            disconnect(dbServer); // Note: to disconnect db server from within the exporter (not obvious).
         }
     }
 
