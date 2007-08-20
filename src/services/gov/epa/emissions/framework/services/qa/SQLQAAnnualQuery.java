@@ -124,8 +124,12 @@ public class SQLQAAnnualQuery {
             
             //String year = "";
             String month = "";
-            
-            EmfDataset dataset = getDataset(allDatasetNames.get(j).toString().trim());
+            EmfDataset dataset;
+            try {
+            dataset = getDataset(allDatasetNames.get(j).toString().trim());
+            } catch(EmfException ex){
+                throw new EmfException("There is at least one invalid dataset name");
+            }
             
             
             // The names and/or properties of the dataset are to be checked to determine year and month that 
@@ -178,10 +182,10 @@ public class SQLQAAnnualQuery {
             
             if(startMonth.equals(stopMonth) && startYear.equals(stopYear)) {
                 month = startMonth;
-                System.out.println("The month of the dataset from startMonth is: " + month);
+                //System.out.println("The month of the dataset from startMonth is: " + month);
             } else if (!(month2.equals(""))){
                 month = month2;
-                System.out.println("The month of the dataset from month2 is: " + month);
+                //System.out.println("The month of the dataset from month2 is: " + month);
             }else {
                 throw new EmfException("The dataset covers more than one month.");
             }
