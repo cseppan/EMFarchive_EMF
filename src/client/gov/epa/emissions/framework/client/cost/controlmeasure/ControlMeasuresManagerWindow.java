@@ -97,7 +97,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     public ControlMeasuresManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Control Measure Manager", new Dimension(855, 350), desktopManager);
         super.setName("controlMeasures");
-        super.setMinimumSize(new Dimension(10, 10));
+        super.setMinimumSize(new Dimension(800, 250));
         this.session = session;
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
@@ -533,22 +533,19 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
             table.refresh(tableData);
             panelRefresh();
         } catch (EmfException e) {
-            messagePanel.setError("Error in refreshing current table: " + e.getMessage());
+            messagePanel.setError("Error refreshing table: " + e.getMessage());
         }
     }
 
     public void getEfficiencyAndCost() {
         clearMessage();
         try {
-            refreshTableData();
+            tableData.refresh(selectedPollutant(), selectedCostYear());
+           table.refresh(tableData); // AME: added to fix refresh issue
             panelRefresh();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
-    }
-
-    private void refreshTableData() throws EmfException {
-        tableData.refresh(selectedPollutant(), selectedCostYear());
     }
 
     private void panelRefresh() {
