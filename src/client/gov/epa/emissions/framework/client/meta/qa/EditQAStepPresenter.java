@@ -64,7 +64,6 @@ public class EditQAStepPresenter {
         step.setDate(new Date());
         step.setWho(session.user().getUsername());
         tabView.refresh();
-        // step.setTableCreationStatus("In Progress");
         session.qaService().runQAStep(step, session.user());
     }
 
@@ -88,7 +87,6 @@ public class EditQAStepPresenter {
         // because qastep is null.
         String folder;
         if (qastep != null) {
-            // String folder = session.preferences().outputFolder();
             folder = qastep.getOutputFolder();
         } else {
             folder = session.preferences().outputFolder();

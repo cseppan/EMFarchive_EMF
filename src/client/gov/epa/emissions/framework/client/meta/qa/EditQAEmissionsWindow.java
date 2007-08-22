@@ -87,14 +87,7 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) 
     // A JList with Add and Remove buttons for the Emission Inventories.
     // A Text Field for Adding the Inventory Table with a Select button
     // OK and Cancel buttons.
-    
-    // Then this must be tied into the EditQA Step window so that it comes up when the Set button is pressed
-    // and the Program in the combobox is set to Annual Emissions.
-    
-    // Then selecting Add must tie this into Darin's Dialog box with 6 datasets selected.
-    
-    //  Finally, selecting Remove on a particular dataset must delete it.
-    
+
     public JPanel createLayout() {
         
         layout = new JPanel();
@@ -122,13 +115,11 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) 
     }
     
     private JPanel invTablePanel() {
-        //invTable = new JTextField(40);
-        //invTable = new ListWidget(new EmfDataset[0]);
+        
         invTable = new ListWidget(new EmfDataset[0]);
         if(!(invDatasets==null) && (invDatasets.length > 0))
             setDatasetsFromStepWindow(invDatasets);
-        //this.datasetsList = new ListWidget(new EmfDataset[0]);
-        //changeables.addChangeable(invTable);
+        
         JScrollPane pane = new JScrollPane(invTable);
         pane.setPreferredSize(new Dimension(350, 25));
         invTable.setToolTipText("The inventory table dataset.  Press select button to choose from a list.");
@@ -137,8 +128,7 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) 
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
         JPanel invPanel = new JPanel(new BorderLayout());
-        //JLabel invLabel = new JLabel("Inventory Table");
-        //invPanel.add(invLabel);
+        
         invPanel.add(pane, BorderLayout.LINE_START);
         invPanel.add(addButton);
         return invPanel;
@@ -173,7 +163,7 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) 
     private Action okAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //presenter.refreshArgs(argumentsText);
+                
                 //System.out.println(invTable.getDataset());
                 presenter1.updateDatasets(datasetWidget.getDatasets(), getInvDatasets());
                 dispose();

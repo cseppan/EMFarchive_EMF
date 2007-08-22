@@ -11,5 +11,4 @@ public interface EditQAEmissionsView extends ManagedView {
 
     void observe(EditQAEmissionsPresenter presenter);
     
-    //void updateDatasetsToEmissionsWindow(EmfDataset [] datasets1, EmfDataset [] invDatasets1);
 }

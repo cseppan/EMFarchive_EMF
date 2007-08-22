@@ -11,15 +11,11 @@ public class SQLAnnualQueryRunner extends SQLQAProgramRunner {
 
     public SQLAnnualQueryRunner(DbServer dbServer, HibernateSessionFactory sessionFactory, QAStep qaStep) {
         super(dbServer, sessionFactory, qaStep);
-        //this.sessionFactory = sessionFactory;
         this.emissioDatasourceName = dbServer.getEmissionsDatasource().getName();
-        //this.qaStep = qaStep;
         
     }
     
     protected String query(DbServer dbServer, QAStep qaStep, String tableName) throws EmfException {
-    //protected String query() throws EmfException {
-        //System.out.println("The string is: " + qaStep.getProgramArguments());
         SQLQAAnnualQuery parser = new SQLQAAnnualQuery(sessionFactory, emissioDatasourceName, tableName, qaStep);
         return parser.createAnnualQuery();
     }
@@ -30,8 +26,6 @@ public class SQLAnnualQueryRunner extends SQLQAProgramRunner {
         // for processing.
         
         String programArguments = qaStep.getProgramArguments();
-        //System.out.println("The string is: " + programArguments);
-        //String programArguments = "hello";
         if (programArguments == null || programArguments.trim().length() == 0) {
             throw new EmfException("Please specify the annual emissions query");
         }

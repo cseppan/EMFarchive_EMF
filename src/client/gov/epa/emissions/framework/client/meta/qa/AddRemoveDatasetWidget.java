@@ -9,7 +9,6 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPresenter;
-//import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -19,12 +18,10 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-//import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-//import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -43,8 +40,6 @@ public class AddRemoveDatasetWidget extends JPanel {
     private Button removeButton;
     
     private ManageChangeables changeables;
-    
-    //private EmfDataset [] invDatasets;
 
     public AddRemoveDatasetWidget(ManageChangeables changeables, EmfConsole parentConsole, EmfSession session) {
         this.parentConsole = parentConsole;
@@ -140,8 +135,6 @@ public class AddRemoveDatasetWidget extends JPanel {
             presenter.display();
             setDatasets(presenter.getDatasets());
 
-        //} catch (EmfException e) {
-            // messagePanel.setError(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
              messagePanel.setError(e.getMessage());

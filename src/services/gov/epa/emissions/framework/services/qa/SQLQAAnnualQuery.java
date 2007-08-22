@@ -103,10 +103,6 @@ public class SQLQAAnnualQuery {
         //System.out.println("The outer part of the query so is: \n" + almostQuery + "\n");
         //System.out.println("The query so far is: \n" + fullQuery);
         
-        // Parse the query using a new method which uses a new constructor of SQLQueryParser.?????
-
-        //return query(dbServer, qaStep, tableName, fullQuery, dataset, version);
-        
         //Find the pound tag to make the substitution of the monthly query part.
         int index = almostQuery.indexOf(poundQueryTag);
         if (index == -1)
@@ -140,9 +136,7 @@ public class SQLQAAnnualQuery {
             // They are compared to determine if they fall in the same month.
             
             StringTokenizer tokenizer5 = new StringTokenizer(dataset.getStartDateTime().toString());
-            /*while(tokenizer5.hasMoreTokens()){
-                System.out.println(tokenizer5.nextToken());
-            }*/
+            
             String yearMonthDay = tokenizer5.nextToken();
             StringTokenizer tokenizer8 = new StringTokenizer(yearMonthDay, "-");
             
@@ -150,9 +144,7 @@ public class SQLQAAnnualQuery {
             String startMonth = tokenizer8.nextToken();
             
             StringTokenizer tokenizer6 = new StringTokenizer(dataset.getStopDateTime().toString());
-            /*while(tokenizer6.hasMoreTokens()){
-                System.out.println(tokenizer6.nextToken());
-            }*/
+            
             String yearMonthDay2 = tokenizer6.nextToken();
             StringTokenizer tokenizer9 = new StringTokenizer(yearMonthDay2, "-");
             
@@ -304,12 +296,9 @@ public class SQLQAAnnualQuery {
                  // note that the big query below does not have version info for the 
                  // monthly datasets, but the real version will need to
                
-               //singleMonthlyQuery [i] = query(currentMonthlyQuery, false);
-               
                if (i != datasetNames.size() -1 && i >=0)
                    fullMonthlyQuery+= " union all ";
-                   //singleMonthlyQuery[i] += " union all ";
-                   //currentMonthlyQuery += " union all\n ";
+                   
            }
            
            if (datasetNames.size() > 0)
@@ -325,8 +314,7 @@ public class SQLQAAnnualQuery {
         
         //private String query(DbServer dbServer, QAStep qaStep, String tableName, String partialQuery, EmfDataset dataset, Version version) throws EmfException {
         private String query(String partialQuery, boolean createClause) throws EmfException {
-            //System.out.println(dbServer + "\n" + qaStep + "\n" + tableName + "\n" 
-                    //+ partialQuery + "\n" + dataset + "\n" + version);
+            
             SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissioDatasourceName, tableName );
             return parser.parse(partialQuery, createClause);
         }
