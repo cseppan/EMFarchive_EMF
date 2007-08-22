@@ -117,7 +117,9 @@ public class QAServiceImpl implements QAService {
 
     private void checkRestrictions(QAStep step) throws EmfException {
         QAProgram program = step.getProgram();
-        if (program == null || !program.getName().startsWith("SQL") && !program.getName().startsWith("Average day to Annual State Summary"))
+        if (program == null || !program.getName().startsWith("SQL") 
+                && !program.getName().startsWith("Average day to Annual State Summary")
+                && !program.getName().startsWith("Average day to Annual State by Pollutant"))
             throw new EmfException("SQL and annual emissions are the only programs currently supported for running a QA Step");
     }
 

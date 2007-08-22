@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+//import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
@@ -127,6 +128,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     
     private EmfDataset origDataset;
     
+    private final String invTableTag = "-invtable";
+    
 
     public EditQAStepWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
         super("Edit QA Step", new Dimension(680, 580), desktopManager);
@@ -152,6 +155,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         super.getContentPane().add(layout);
         super.display();
     }
+
 
     public void windowClosing() {
         doClose();
@@ -379,7 +383,6 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         Button button1 = setButton();
         buttonPanel.add(button1);
         layoutGenerator.addLabelWidgetPair("Arguments:", buttonPanel, panel);
-        //layoutGenerator.addLabelWidgetPair("Arguments:", scrollableDetails, panel);
         programArguments.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 currentTable.setSelected(false);
@@ -516,10 +519,14 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         final String invTableTag = "-invtable";
         String programSwitches = "";
+        
+        String annEmis = "Average day to Annual State Summary";
+        String annEmis2 = "Average day to Annual State by Pollutant";
+        //String firstElementContains = "";
 
         programSwitches = programArguments.getText();
         //System.out.println("Text: " + programSwitches);
-        if (!(programSwitches.equals(""))) {
+        if (annEmis.equals(program.getSelectedItem()) && !(programSwitches.equals(""))) {
             int index1 = programSwitches.indexOf(invTableTag);
             if (programSwitches.substring(0,12).equals("-inventories") && index1 != -1) {
                 //System.out.println("Substring: " + programSwitches.substring(0, index1));
@@ -560,6 +567,31 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                     }
                 }
              }
+          } else if  (annEmis2.equals(program.getSelectedItem()) && !(programSwitches.equals(""))){
+              if (programSwitches.substring(0,12).equals("-inventories")) {
+                  //System.out.println("Substring: " + programSwitches.substring(0, index1));
+          
+                  StringTokenizer tokenizer2 = new StringTokenizer(programSwitches);
+           
+                  tokenizer2.nextToken();
+                  int i = 0;
+                  while (tokenizer2.hasMoreTokens()) {
+                      //System.out.println("Next Dataset: " +  tokenizer2.nextToken());
+                      try {
+                          //System.out.println("Dataset: " +  tokenizer2.nextToken());
+                          //System.out.println("Size: "+ inputDatasets.size());
+                          inputDatasets.add(presenter.getDataset(tokenizer2.nextToken().trim()));
+                          //System.out.println("Next item: " + inputDatasets.get(i).toString());
+                          i++;
+                      } catch(EmfException ex) {
+                          throw new EmfException("At least one of the inventory emissions datasets is invalid");
+                      }
+                  }
+                  inputDatasetsArray = new EmfDataset [inputDatasets.size()];
+                  inputDatasets.toArray(inputDatasetsArray);
+                  
+                  //System.out.println("inventories array: " + inputDatasetsArray.length);
+              } 
           }
     }
     
@@ -609,9 +641,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 clear();
                 //System.out.println("The program is: " + (String)program.getSelectedItem());
                 String annEmis = "Average day to Annual State Summary";
+                String annEmis2 = "Average day to Annual State by Pollutant";
                 if (annEmis.equals(program.getSelectedItem())) {
                     //System.out.println("You selected annual emissions");
                     doSetAnnEmisWindow();
+                } else if (annEmis2.equals(program.getSelectedItem())){
+                    doSetAnnEmis2Window();
                 } else {
                     //System.out.println("You selected some other program");
                     doSetWindow();
@@ -628,8 +663,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         // with the warning message to also show up.  When data in window is invalid, a new window still
         // pops up, but with a different warning message.
         
- //Also change the window name to EditQASetArgumentsWindow
-        final String invTableTag = "-invtable";
+        //Also change the window name to EditQASetArgumentsWindow
+        
         String programSwitches = "";
 
         programSwitches = programArguments.getText();
@@ -703,6 +738,69 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         messagePanel.setError("The Program Arguments window is blank");
     }
      }
+    
+    private void doSetAnnEmis2Window(){
+        
+        //When there is no data in window, set button causes new window to pop up,
+        // with the warning message to also show up.  When data in window is invalid, a new window still
+        // pops up, but with a different warning message.
+        
+        String programSwitches = "";
+        StringTokenizer tokenizer2;
+
+        programSwitches = programArguments.getText();
+        //System.out.println("Text: " + programSwitches);
+        if (!(programSwitches.equals(""))) {
+            int index1 = programSwitches.indexOf(invTableTag);
+            if (programSwitches.substring(0,12).equals("-inventories") ) {
+                //System.out.println("Substring: " + programSwitches.substring(0, index1));
+                if (index1 != -1) {
+                    String inventoriesToken = programSwitches.substring(0, index1);  
+                    tokenizer2 = new StringTokenizer(inventoriesToken);
+                } else {
+                    tokenizer2 = new StringTokenizer(programSwitches);
+                }
+                tokenizer2.nextToken();
+                int i = 0;
+                while (tokenizer2.hasMoreTokens()) {
+                    //System.out.println("Next Dataset: " +  tokenizer2.nextToken());
+                    try {
+                        //System.out.println("Dataset: " +  tokenizer2.nextToken());
+                        //System.out.println("Size: "+ inputDatasets.size());
+                        inputDatasets.add(presenter.getDataset(tokenizer2.nextToken().trim()));
+                        //System.out.println("Next item: " + inputDatasets.get(i).toString());
+                        i++;
+                    } catch(EmfException ex) {
+                        messagePanel.setError("At least one of the inventory emissions datasets is invalid");
+                    }
+                }
+                inputDatasetsArray = new EmfDataset [inputDatasets.size()];
+                inputDatasets.toArray(inputDatasetsArray);
+                
+                //System.out.println("inventories array: " + inputDatasetsArray.length);
+            
+        EditQANonsummaryEmissionsWindow view = new EditQANonsummaryEmissionsWindow(desktopManager, session, inputDatasetsArray, messagePanel);
+        EditQANonsummaryEmissionsPresenter presenter = new EditQANonsummaryEmissionsPresenter(view, this);
+        presenter.display(origDataset, step);
+
+        inputDatasets.clear();
+        
+        for (int m = 0; m < inputDatasetsArray.length; m++)
+            inputDatasetsArray[m] = null;
+        
+       } else {
+           EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, session);
+           EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+           presenter.display(origDataset, step);
+           messagePanel.setError("The data in the Program Arguments window is invalid");
+       }
+    } else {
+        EditQANonsummaryEmissionsWindow view = new EditQANonsummaryEmissionsWindow(desktopManager, session);
+        EditQANonsummaryEmissionsPresenter presenter = new EditQANonsummaryEmissionsPresenter(view, this);
+        presenter.display(origDataset, step);
+        messagePanel.setError("The Program Arguments window is blank");
+    }
+     }
 
     private void doSetWindow() {
         
@@ -746,6 +844,23 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         updateArgumentsTextArea(datasetNames);
         
     }
+    
+public void updateDatasets(Object [] retreivedDatasets){
+        
+        String datasetNames = "-inventories\n";
+
+        for (int i = 0; i < retreivedDatasets.length; i++){
+            //System.out.println("retrived dataset is: " + retreivedDatasets[i]);
+            datasets = new EmfDataset[36];
+            datasets[i] = (EmfDataset)retreivedDatasets[i];
+            
+            //System.out.println("dataset[" + i + "] is: " + datasets[i]);
+            datasetNames += datasets[i] + "\n";
+        }
+        
+        updateArgumentsTextArea(datasetNames);
+     }
+    
     protected void runQAStep() {
         try {
             messagePanel.setMessage("Started Run. Please monitor the Status window " + "to track your run request.");
@@ -837,8 +952,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     public QAStep save() throws EmfException {
-        // if (step.getTableCreationStatus().equals("In Progress"))
-        // throw new EmfException("You can't save changes while running it");
+
         if (order.getText().equals("")) {
             throw new EmfException("Order should be a floating point number");
         }
