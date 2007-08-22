@@ -2,13 +2,9 @@ package gov.epa.emissions.framework.services.cost.analysis.common;
 
 import gov.epa.emissions.framework.services.EmfException;
 
-
-
-
-public class DefaultCostEquations implements CostEquations {
+public class Type6CostEquation implements CostEquations {
     
     private BestMeasureEffRecord bestMeasureEffRecord;
-//   private ResultSet resultSet; 
     private double emissionReduction;
     //private double costPerTon;
     private double discountRate;
@@ -16,53 +12,51 @@ public class DefaultCostEquations implements CostEquations {
     private Double capRecFactor;
     private Double capAnnRatio; 
     private Double annulizedCCost;
- 
     
-    public DefaultCostEquations(double discountRate) {
-        this.discountRate = discountRate / 100;
+    public Type6CostEquation(double discountRate) {
+        this.discountRate=discountRate/100;
     }
 
     public void setUp(double emissionReduction, BestMeasureEffRecord bestMeasureEffRecord) {
         this.bestMeasureEffRecord = bestMeasureEffRecord;
-        this.emissionReduction = emissionReduction;
+        this.emissionReduction=emissionReduction;
     }
 
     public Double getAnnualCost() throws EmfException {
-        double tAnnualCost = emissionReduction * bestMeasureEffRecord.adjustedCostPerTon();
-        if (tAnnualCost == 0) return null; 
+        double tAnnualCost=emissionReduction * bestMeasureEffRecord.adjustedCostPerTon();
+        if (tAnnualCost==0) return null; 
         return tAnnualCost;
     }
 
     public Double getCapitalCost() throws EmfException {
-        capAnnRatio = bestMeasureEffRecord.efficiencyRecord().getCapitalAnnualizedRatio();
+        capAnnRatio=bestMeasureEffRecord.efficiencyRecord().getCapitalAnnualizedRatio();
         if (capAnnRatio == null) return null;
-        return capAnnRatio * getAnnualCost();
+        return (capAnnRatio)*getAnnualCost();
     }  
     
     public Double getOperationMaintenanceCost() throws EmfException {
-        annulizedCCost = getAnnualizedCapitalCost();
+        annulizedCCost=getAnnualizedCapitalCost();
         if (annulizedCCost == null) return null;
-        double omCost = getAnnualCost() - annulizedCCost;
+        double omCost=getAnnualCost()-annulizedCCost;
         return omCost;
     }
     
     public Double getAnnualizedCapitalCost() throws EmfException { 
-        capitalCost = getCapitalCost();
-        capRecFactor = getCapRecFactor();
+        capitalCost=getCapitalCost();
+        capRecFactor=getCapRecFactor();
         if (capitalCost == null || capRecFactor == null) return null;
         return capitalCost * capRecFactor;
  //       maxCM.measure().getAnnualizedCost();
         
     }
 
-   
     public Double getCapRecFactor(){
         // Calculate capital recovery factor 
-        double equipmentLife = bestMeasureEffRecord.measure().getEquipmentLife();
+        double equipmentLife=bestMeasureEffRecord.measure().getEquipmentLife();
         if (equipmentLife==0) 
-            capRecFactor = bestMeasureEffRecord.efficiencyRecord().getCapRecFactor();
+            capRecFactor=bestMeasureEffRecord.efficiencyRecord().getCapRecFactor();
         else 
-            capRecFactor = calculateCapRecFactor(discountRate, equipmentLife);
+            capRecFactor=calculateCapRecFactor(discountRate, equipmentLife);
         
         if (capRecFactor != null && capRecFactor != 0) {
             return capRecFactor; 
@@ -72,8 +66,9 @@ public class DefaultCostEquations implements CostEquations {
     
     private Double calculateCapRecFactor(double discountRate, double equipmentLife){
         if(discountRate==0 || equipmentLife==0) return null;
-        return (discountRate * Math.pow((1 + discountRate), equipmentLife)) / (Math.pow((discountRate + 1), equipmentLife) - 1);
+        return (discountRate*Math.pow((1+discountRate),equipmentLife))/(Math.pow((discountRate+1),equipmentLife)-1);
     }
+
 }
 
 //what the difference of cost per ton and adjusted cost per ton.

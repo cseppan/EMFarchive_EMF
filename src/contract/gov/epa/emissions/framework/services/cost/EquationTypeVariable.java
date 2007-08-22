@@ -8,8 +8,10 @@ public class EquationTypeVariable implements Serializable {
     private String name;
 
     private int equationTypeId;
+    
+    private short fileColPosition;
 
-   public EquationTypeVariable() {
+    public EquationTypeVariable() {
         //
     }
 
@@ -57,5 +59,13 @@ public class EquationTypeVariable implements Serializable {
     
     public String toString() {
         return this.name;
+    }
+
+    public void setFileColPosition(short fileColPosition) {
+        this.fileColPosition = fileColPosition;
+    }
+
+    public short getFileColPosition() {
+        return fileColPosition;
     }
 }

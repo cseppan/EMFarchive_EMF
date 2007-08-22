@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false"> 
+	<class name="gov.epa.emissions.framework.services.cost.ControlMeasureEquationType" table="control_measure_equation_types" schema="emf">
+        <id name="id" type="integer" column="id">
+            <generator class="identity"/>
+        </id>
+          
+  		<many-to-one 
+            name="equationType" 
+            class="gov.epa.emissions.framework.services.cost.EquationType"
+            column="equation_type_id"/>
+
+ 		<array name="equationTypeVariables" table="control_measure_equation_type_variables" cascade="save-update">
+    		<key column="control_measure_equation_type_id" not-null="true"/>
+    		<list-index column="list_index"/>
+	    	<composite-element class="gov.epa.emissions.framework.services.cost.ControlMeasureEquationTypeVariable">
+		        <property name="value" column="value" type="double" not-null="true"/>
+	    		<many-to-one name="equationTypeVariable" class="gov.epa.emissions.framework.services.cost.EquationTypeVariable" column="equation_type_variable_id" not-null="true" cascade="none"/>
+	    	</composite-element>
+  		</array>
+    </class>
+</hibernate-mapping>

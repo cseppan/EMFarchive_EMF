@@ -7,14 +7,16 @@ import java.util.List;
 
 public class ControlMeasureEquationType implements Serializable {
 
-    private long id;
+    private int id;
 
     private EquationType equationType;
     
-    private List controlMeasureEquationTypeVariables;
+    private ControlMeasure controlMeasure;
+    
+    private List equationTypeVariables;
 
     public ControlMeasureEquationType() {// persistence/bean
-        this.controlMeasureEquationTypeVariables = new ArrayList();
+        this.equationTypeVariables = new ArrayList();
     }
 
     public ControlMeasureEquationType(EquationType equationType) {
@@ -22,11 +24,11 @@ public class ControlMeasureEquationType implements Serializable {
         this.equationType = equationType;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -38,11 +40,33 @@ public class ControlMeasureEquationType implements Serializable {
         this.equationType = equationType;
     }
 
-    public ControlMeasureEquationTypeVariable[] getControlMeasureEquationTypeVariables() {
-        return (ControlMeasureEquationTypeVariable[]) controlMeasureEquationTypeVariables.toArray(new ControlMeasureEquationTypeVariable[0]);
+    public ControlMeasureEquationTypeVariable[] getEquationTypeVariables() {
+        return (ControlMeasureEquationTypeVariable[]) equationTypeVariables.toArray(new ControlMeasureEquationTypeVariable[0]);
     }
 
-    public void setControlMeasureEquationTypeVariables(ControlMeasureEquationTypeVariable[] controlMeasureEquationTypeVariables) {
-        this.controlMeasureEquationTypeVariables = Arrays.asList(controlMeasureEquationTypeVariables);
+    public void setEquationTypeVariables(ControlMeasureEquationTypeVariable[] controlMeasureEquationTypeVariables) {
+        this.equationTypeVariables = Arrays.asList(controlMeasureEquationTypeVariables);
+    }
+
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof ControlMeasureEquationType)) {
+            return false;
+        }
+
+        ControlMeasureEquationType other = (ControlMeasureEquationType) obj;
+
+        return (id == other.getId());
+    }
+
+    public int hashCode() {
+        return equationType.hashCode();
+    }
+
+    public void setControlMeasure(ControlMeasure controlMeasure) {
+        this.controlMeasure = controlMeasure;
+    }
+
+    public ControlMeasure getControlMeasure() {
+        return controlMeasure;
     }
 }

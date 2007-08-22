@@ -69,8 +69,6 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private List equationTypes;
 
-//    private EquationType equationType;
-
     public ControlMeasure() {
         this.lock = new Mutex();
         this.sccs = new ArrayList();
@@ -78,20 +76,9 @@ public class ControlMeasure implements Lockable, Serializable {
         this.aggregatedPollutantEfficiencyRecords = new ArrayList();
         this.sectors = new ArrayList();
         this.equationTypes = new ArrayList();
-        ControlMeasureEquationType controlMeasureEquationType = new ControlMeasureEquationType(new EquationType("Type 5"));
-        ControlMeasureEquationTypeVariable[] controlMeasureEquationTypeVariables = new ControlMeasureEquationTypeVariable[] 
-                { new ControlMeasureEquationTypeVariable(new EquationTypeVariable("Scaling Factor"), 2.5),
-                    new ControlMeasureEquationTypeVariable(new EquationTypeVariable("Scaling Factor2"), 5.5)};
-        controlMeasureEquationType.setControlMeasureEquationTypeVariables(controlMeasureEquationTypeVariables);
-        this.equationTypes.add(controlMeasureEquationType);
-        controlMeasureEquationType = new ControlMeasureEquationType(new EquationType("Type 4"));
-        controlMeasureEquationTypeVariables = new ControlMeasureEquationTypeVariable[] 
-                { new ControlMeasureEquationTypeVariable(new EquationTypeVariable("Scaling Factor"), 2.5),
-                    new ControlMeasureEquationTypeVariable(new EquationTypeVariable("Scaling Factor2"), 5.5)};
-        controlMeasureEquationType.setControlMeasureEquationTypeVariables(controlMeasureEquationTypeVariables);
-        this.equationTypes.add(controlMeasureEquationType);
     }
 
+    
     public ControlMeasure(String name) {
         this();
         this.name = name;

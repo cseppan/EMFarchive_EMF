@@ -4,9 +4,11 @@ import java.io.Serializable;
 
 public class ControlMeasureEquationTypeVariable implements Serializable {
 
-    private long id;
+    private int id;
 
     private EquationTypeVariable equationTypeVariable;
+    
+    private EquationType equationType;
 
     private double value;
 
@@ -20,11 +22,11 @@ public class ControlMeasureEquationTypeVariable implements Serializable {
         this.value = value;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -50,5 +52,27 @@ public class ControlMeasureEquationTypeVariable implements Serializable {
 
     public void setListindex(long listindex) {
         this.listindex = listindex;
+    }
+
+    public void setEquationType(EquationType equationType) {
+        this.equationType = equationType;
+    }
+
+    public EquationType getEquationType() {
+        return equationType;
+    }
+
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof ControlMeasureEquationType)) {
+            return false;
+        }
+
+        ControlMeasureEquationTypeVariable other = (ControlMeasureEquationTypeVariable) obj;
+
+        return (id == other.getId());
+    }
+
+    public int hashCode() {
+        return equationType.hashCode();
     }
 }

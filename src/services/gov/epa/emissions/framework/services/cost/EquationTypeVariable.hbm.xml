@@ -11,6 +11,7 @@
           
   		<property name="equationTypeId" column="equation_type_id" type="integer" not-null="true"/>
         <property name="name" column="name" type="java.lang.String" not-null="true"/>
+        <property name="fileColPosition" column="file_col_position" type="short" not-null="true"/>
             
     </class>
 </hibernate-mapping>
