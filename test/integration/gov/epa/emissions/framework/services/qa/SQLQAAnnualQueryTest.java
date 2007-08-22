@@ -86,7 +86,20 @@ public class SQLQAAnnualQueryTest extends ServiceTestCase {
         //runner.query(dbServer, qaStep, tableName);
         dbServer.disconnect();
     }
-
+    
+    /*public void testOfNonsummaryQueryThroughRunner() throws Exception {
+        QAStep qaStep = new QAStep();
+        qaStep.setName("Step1");
+        DbServer dbServer = dbServerFactory.getDbServer();
+        //String emissioDatasourceName = dbServer().getEmissionsDatasource().getName();
+        //this will set the properties...
+        //new ExImServiceImpl(emf(), dbServer, sessionFactory);
+        SQLQAAnnualNonsummaryQueryRunner runner = new SQLQAAnnualNonsummaryQueryRunner(dbServer, sessionFactory, qaStep);
+        //runner.query();
+        runner.run();
+        //runner.query(dbServer, qaStep, tableName);
+        dbServer.disconnect();
+    }*/
     
     private EmfDataset dataset(int datasetId, String tableName) {
         EmfDataset dataset = new EmfDataset();
@@ -128,11 +141,7 @@ public class SQLQAAnnualQueryTest extends ServiceTestCase {
         TableModifier modifier = new TableModifier(dbSetup.getDbServer().getEmissionsDatasource(), "versions");
         modifier.dropAllData();
    }
-   
-   /*private Date lastModifiedDate(File folder, String fileName) {
-       return new Date(new File(folder,fileName).lastModified());
-   }*/
-   
+    
    protected void doSetUp() throws Exception {
        //Nothing
     }
