@@ -80,7 +80,12 @@ public class RemoteCopy implements Runnable {
         if (new File(localPath).exists())
             return localPath;
 
-        if (this.program.contains("pscp"))
+        if (host.equalsIgnoreCase("localhost")) {
+            if (os.toUpperCase().contains("WINDOWS"))
+                command = "copy " + "\"" + remotePath + "\" \"" + localPath + "\"";
+            if (os.toUpperCase().contains("LINUX") || os.toUpperCase().contains("UNIX"))
+                command = "cp " + "\"" + remotePath + "\" \"" + localPath + "\"";
+        } else if (this.program.contains("pscp"))
             command = this.program + " -batch " + userName + "@" + this.host + ":\"" + remotePath + "\" \"" + localPath
                     + "\"";
         else if (this.program.contains("scp"))
@@ -137,7 +142,7 @@ public class RemoteCopy implements Runnable {
 
     private String processError() {
         if (errorString == null || errorString.isEmpty())
-            return "";
+            return "Copy file failed. Please check if you have exported the result.";
 
         errorString = errorString.toLowerCase();
 
@@ -172,7 +177,8 @@ public class RemoteCopy implements Runnable {
         String msg = null;
 
         if (os.equalsIgnoreCase("Linux") || os.equalsIgnoreCase("Unix")) {
-            cmd = getCommands("kill -9 `ps aux | grep " + program + " | awk '{print $2}'`"); // kill the secure copy program
+            cmd = getCommands("kill -9 `ps aux | grep " + program + " | awk '{print $2}'`"); // kill the secure copy
+            // program
         } else if (os.equalsIgnoreCase("Windows 98") || os.equalsIgnoreCase("Windows 95")) {
             msg = "Cannot kill process " + program
                     + " under current Windows system. Please go to Windows task manager to kill EMF application.";
