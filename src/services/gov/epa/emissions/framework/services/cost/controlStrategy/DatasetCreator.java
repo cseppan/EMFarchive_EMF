@@ -95,7 +95,7 @@ public class DatasetCreator {
         addKeyVal(dataset, "STRATEGY_NAME", controlStrategy.getName());
         addKeyVal(dataset, "STRATEGY_ID", controlStrategy.getId()+"");
         addKeyVal(dataset, "STRATEGY_INVENTORY_NAME", inputDataset.getName());
-        addKeyVal(dataset, "STRAGEGY_INVENTORY_VERSION", inputDataset.getDefaultVersion()+"");
+        addKeyVal(dataset, "STRATEGY_INVENTORY_VERSION", inputDataset.getDefaultVersion()+"");
         int measureCount = (controlStrategy.getControlMeasures() != null ? controlStrategy.getControlMeasures().length : 0);
         addKeyVal(dataset, "MEASURES_INCLUDED", measureCount + "");
         addKeyVal(dataset, "DISCOUNT_RATE", controlStrategy.getDiscountRate()+"%");
