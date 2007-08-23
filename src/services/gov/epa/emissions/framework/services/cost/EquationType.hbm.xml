@@ -5,6 +5,7 @@
 
 <hibernate-mapping default-lazy="false"> 
 	<class name="gov.epa.emissions.framework.services.cost.EquationType" table="equation_types" schema="emf">
+	<cache usage="read-only"/>
         <id name="id" type="integer" column="id">
             <generator class="identity"/>
         </id>

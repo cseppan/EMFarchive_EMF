@@ -14,7 +14,7 @@
             class="gov.epa.emissions.framework.services.cost.EquationType"
             column="equation_type_id"/>
 
- 		<array name="equationTypeVariables" table="control_measure_equation_type_variables" cascade="save-update">
+ 		<array name="equationTypeVariables" table="control_measure_equation_type_variables">
     		<key column="control_measure_equation_type_id" not-null="true"/>
     		<list-index column="list_index"/>
 	    	<composite-element class="gov.epa.emissions.framework.services.cost.ControlMeasureEquationTypeVariable">

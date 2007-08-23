@@ -98,6 +98,8 @@ public class DatasetCreator {
         addKeyVal(dataset, "STRAGEGY_INVENTORY_VERSION", inputDataset.getDefaultVersion()+"");
         int measureCount = (controlStrategy.getControlMeasures() != null ? controlStrategy.getControlMeasures().length : 0);
         addKeyVal(dataset, "MEASURES_INCLUDED", measureCount + "");
+        addKeyVal(dataset, "DISCOUNT_RATE", controlStrategy.getDiscountRate()+"%");
+        addKeyVal(dataset, "USE_COST_EQUATION",(controlStrategy.getUseCostEquations()==true? "true" : "false"));
         ControlMeasureClass[] controlMeasureClasses = controlStrategy.getControlMeasureClasses();
         String classList = "All";
         if (controlMeasureClasses != null) {
