@@ -48,6 +48,10 @@ public class ControlMeasureEquationType implements Serializable {
         this.equationTypeVariables = Arrays.asList(controlMeasureEquationTypeVariables);
     }
 
+    public void setEquationTypeVariable(ControlMeasureEquationTypeVariable controlMeasureEquationTypeVariable) {
+        this.equationTypeVariables.add(controlMeasureEquationTypeVariable);
+    }
+
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof ControlMeasureEquationType)) {
             return false;

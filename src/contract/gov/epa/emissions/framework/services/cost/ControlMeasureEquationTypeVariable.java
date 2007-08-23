@@ -10,15 +10,17 @@ public class ControlMeasureEquationTypeVariable implements Serializable {
     
     private EquationType equationType;
 
-    private double value;
+    private Double value;
 
     private long listindex;
 
     public ControlMeasureEquationTypeVariable() {// persistence/bean
     }
 
-    public ControlMeasureEquationTypeVariable(EquationTypeVariable equationTypeVariable, double value) {
+    public ControlMeasureEquationTypeVariable(EquationType equationType, EquationTypeVariable equationTypeVariable, 
+            Double value) {
         this.equationTypeVariable = equationTypeVariable;
+        this.equationType = equationType;
         this.value = value;
     }
 
@@ -38,11 +40,11 @@ public class ControlMeasureEquationTypeVariable implements Serializable {
         this.equationTypeVariable = equationTypeVariable;
     }
 
-    public double getValue() {
+    public Double getValue() {
         return value;
     }
 
-    public void setValue(double value) {
+    public void setValue(Double value) {
         this.value = value;
     }
 
