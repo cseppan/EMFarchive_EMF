@@ -80,17 +80,12 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     }
 
     private JPanel createSummaryTab(Case caseObj, MessagePanel messagePanel) {
-        try {
-            EditableCaseSummaryTab view = new EditableCaseSummaryTab(caseObj, session, this, parentConsole);
-            EditCaseSummaryTabPresenter summaryPresenter = new EditCaseSummaryTabPresenter(view,messagePanel,session);
-            view.observe(summaryPresenter);
-            view.display();
-            presenter.set(view);
-            return view;
-        } catch (EmfException e) {
-            showError("Could not load Summary Tab." + e.getMessage());
-            return createErrorTab("Could not load Summary Tab." + e.getMessage());
-        }
+        EditableCaseSummaryTab view = new EditableCaseSummaryTab(caseObj, messagePanel, session, this, parentConsole);
+        EditCaseSummaryTabPresenter summaryPresenter = new EditCaseSummaryTabPresenter(session);
+        view.observe(summaryPresenter);
+        view.display();
+        presenter.set(view);
+        return view;
     }
 
     private Component createParameterTab(MessagePanel messagePanel) {

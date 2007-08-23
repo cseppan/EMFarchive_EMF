@@ -25,10 +25,13 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
@@ -75,32 +78,34 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         String width = "To make the combobox a bit wider ...............................";
 
-        InputName[] inputNames = presenter.getCaseInputNames().getAll();
-        inputName = new EditableComboBox(inputNames);
+        inputName = new EditableComboBox(new InputName[]{input.getInputName()});
+        addPopupMenuListener(inputName, "inputnames");
         changeablesList.addChangeable(inputName);
         inputName.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Input Name:", inputName, panel);
 
-        CaseProgram[] programs = presenter.getCasePrograms().getAll();
-        program = new EditableComboBox(programs);
+        program = new EditableComboBox(new CaseProgram[]{input.getProgram()});
+        addPopupMenuListener(program, "programs");
         changeablesList.addChangeable(program);
         program.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
-        InputEnvtVar[] envtVars = presenter.getCaseInputEnvtVars().getAll();
-        envtVar = new EditableComboBox(envtVars);
+        envtVar = new EditableComboBox(new InputEnvtVar[]{input.getEnvtVars()});
+        addPopupMenuListener(envtVar, "envtvars");
         changeablesList.addChangeable(envtVar);
         envtVar.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Envt. Variable:", envtVar, panel);
 
-        sector = new ComboBox(presenter.getSectors());
+        sector = new ComboBox(new Sector[]{input.getSector()});
+        addPopupMenuListener(sector, "sectors");
         changeablesList.addChangeable(sector);
         sector.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
 
-        dsType = new ComboBox(presenter.getDSTypes());
+        dsType = new ComboBox(new DatasetType[]{input.getDatasetType()});
+        addPopupMenuListener(dsType, "dstypes");
         dsType.addActionListener(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 fillDatasets((DatasetType) dsType.getSelectedItem());
             }
         });
@@ -125,7 +130,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         version.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Version:", version, panel);
 
-        jobs = new ComboBox(presenter.getCaseJobs());
+        setJob();
         changeablesList.addChangeable(jobs);
         jobs.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Job:", jobs, panel);
@@ -137,8 +142,8 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         // changeablesList.addChangeable(subDir);
         // layoutGenerator.addLabelWidgetPair("Subdirectory:", subDir, panel);
 
-        SubDir[] subdirs = presenter.getSubDirs().getAll();
-        subDir = new EditableComboBox(subdirs);
+        subDir = new EditableComboBox(new SubDir[]{input.getSubdirObj()});
+        addPopupMenuListener(subDir, "subdirs");
         changeablesList.addChangeable(subDir);
         subDir.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Subdirectory:", subDir, panel);
@@ -156,27 +161,55 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
                 10, 10, // initialX, initialY
                 10, 10);// xPad, yPad
 
-        populateFields(input);
         container.add(panel);
     }
 
-    private void populateFields(CaseInput input) throws EmfException {
-        inputName.setSelectedItem(input.getInputName());
-        program.setSelectedItem(input.getProgram());
+    private void addPopupMenuListener(final JComboBox box, final String toget) {
+        box.addPopupMenuListener(new PopupMenuListener(){
+            public void popupMenuCanceled(PopupMenuEvent event) {
+                // NOTE Auto-generated method stub
+            }
 
-        Sector sct = input.getSector();
-        if (sct != null)
-            sector.setSelectedItem(sct);
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent event) {
+                // NOTE Auto-generated method stub
+            }
 
-        envtVar.setSelectedItem(input.getEnvtVars());
-        dsType.setSelectedItem(input.getDatasetType());
-        dataset.setSelectedItem(input.getDataset());
-        version.setSelectedItem(input.getVersion());
-        qaStatus.setText("");
-        subDir.setSelectedItem(input.getSubdirObj());
-        required.setSelected(input.isRequired());
-        show.setSelected(input.isShow());
+            public void popupMenuWillBecomeVisible(PopupMenuEvent event) {
+                try {
+                    box.setModel(new DefaultComboBoxModel(getAllObjects(toget)));
+                    box.revalidate();
+                    refresh();
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
+            }
+        });
+    }
 
+    protected Object[] getAllObjects(String toget) throws EmfException {
+        if (toget.equals("dstypes"))
+            return presenter.getDSTypes();
+
+        if (toget.equals("inputnames"))
+            return presenter.getCaseInputNames().getAll();
+        
+        if (toget.equals("programs"))
+            return presenter.getCasePrograms().getAll();
+        
+        if (toget.equals("envtvars"))
+            return presenter.getCaseInputEnvtVars().getAll();
+        
+        if (toget.equals("sectors"))
+            return presenter.getSectors();
+        
+        if (toget.equals("subdirs"))
+            return presenter.getSubDirs().getAll();
+        
+        return null;
+    }
+    
+    private void setJob() throws EmfException {
+        jobs = new ComboBox(presenter.getCaseJobs());
         int selected = presenter.getJobIndex(input.getCaseJobID());
         if (selected > 0)
             jobs.setSelectedIndex(selected);
@@ -343,6 +376,10 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             throw new EmfException("Please specify a program.");
 
         setFields();
+    }
+    
+    private void refresh() {
+        super.revalidate();
     }
 
 }

@@ -30,10 +30,9 @@ public class JobFieldsPanelPresenter {
     private Case caseObj;
 
     public JobFieldsPanelPresenter(JobFieldsPanelView jobFields, EmfSession session,
-            EditJobsTabPresenter parentPresenter, Case caseObj) throws EmfException {
+            EditJobsTabPresenter parentPresenter, Case caseObj) {
         this.session = session;
         this.view = jobFields;
-        this.hosts = new Hosts(session, getHosts());
         this.parentPresenter = parentPresenter;
         this.caseObj = caseObj;
     }
@@ -51,18 +50,20 @@ public class JobFieldsPanelPresenter {
         return list.toArray(new Sector[0]);
     }
 
-    private Host[] getHosts() throws EmfException {
-        List<Host> list = new ArrayList<Host>();
-        list.addAll(Arrays.asList(caseService().getHosts()));
-
-        return list.toArray(new Host[0]);
-    }
-
-    public Hosts getHostsObject() {
-        return this.hosts;
+    public Host[] getHosts() throws EmfException {
+        if (hosts == null) {
+            Host[] hostarray = caseService().getHosts();
+            this.hosts = new Hosts(session, hostarray);
+            return hostarray;
+        }
+        
+        return hosts.getAll();
     }
 
     public Host getHost(Object host) throws EmfException {
+        if (hosts == null)
+            this.hosts = new Hosts(session, caseService().getHosts());
+        
         return hosts.get(host);
     }
 

@@ -37,12 +37,16 @@ import java.util.Date;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
@@ -114,12 +118,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         this.caseObj = caseObj;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        try {
-            container.add(nameNPurposPanel());
-            container.add(setupPanel());
-        } catch (EmfException e) {
-            setError("Could not retrieve all job related fields.");
-        }
+        container.add(nameNPurposPanel());
+        container.add(setupPanel());
 
         if (edit) {
             container.add(resultPanel());
@@ -163,7 +163,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         return panel;
     }
 
-    private JPanel setupPanel() throws EmfException {
+    private JPanel setupPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(leftSetupPanel(), BorderLayout.LINE_START);
@@ -197,9 +197,9 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         changeablesList.addChangeable(jobOrder);
         layoutGenerator.addLabelWidgetPair("Job Order:", jobOrder, panel);
         
-        Host[] hosts = presenter.getHostsObject().getAll();
-        host = new EditableComboBox(hosts);
+        host = new EditableComboBox(new Host[]{job.getHost()});
         host.setPrototypeDisplayValue(comboWidth);
+        addPopupMenuListener(host, "hosts");
         changeablesList.addChangeable(host);
         layoutGenerator.addLabelWidgetPair("Host:", host, panel);
 
@@ -216,7 +216,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         return panel;
     }
 
-    private Component rightSetupPanel() throws EmfException {
+    private Component rightSetupPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -225,15 +225,16 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         changeablesList.addChangeable(version);
         layoutGenerator.addLabelWidgetPair("Version:", version, panel);
 
-        Sector[] sectors = presenter.getSectors();
-        sector = new ComboBox(sectors);
+        sector = new ComboBox(new Sector[]{job.getSector() == null ? new Sector("All sectors", "All sectors") : job
+                .getSector()});
         sector.setPrototypeDisplayValue(comboWidth);
+        addPopupMenuListener(sector, "sectors");
         changeablesList.addChangeable(sector);
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
 
-        JobRunStatus[] statuses = presenter.getRunStatuses();
-        status = new ComboBox(statuses);
+        status = new ComboBox(new JobRunStatus[]{job.getRunstatus()});
         status.setPrototypeDisplayValue(comboWidth);
+        addPopupMenuListener(status, "status");
         changeablesList.addChangeable(status);
         layoutGenerator.addLabelWidgetPair("Run Status:", status, panel);
 
@@ -249,6 +250,41 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         return panel;
     }
 
+    private void addPopupMenuListener(final JComboBox box, final String toget) {
+        box.addPopupMenuListener(new PopupMenuListener(){
+            public void popupMenuCanceled(PopupMenuEvent event) {
+                // NOTE Auto-generated method stub
+            }
+
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent event) {
+                // NOTE Auto-generated method stub
+            }
+
+            public void popupMenuWillBecomeVisible(PopupMenuEvent event) {
+                try {
+                    box.setModel(new DefaultComboBoxModel(getAllObjects(toget)));
+                    box.revalidate();
+                    refresh();
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
+            }
+        });
+    }
+
+    protected Object[] getAllObjects(String toget) throws EmfException {
+        if (toget.equals("hosts"))
+            return presenter.getHosts();
+
+        if (toget.equals("sectors"))
+            return presenter.getSectors();
+        
+        if (toget.equals("status"))
+            return presenter.getRunStatuses();
+        
+        return null;
+    }
+    
     private JPanel getFolderChooserPanel(final JTextField dir, final String title) {
         Button browseButton = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
@@ -348,12 +384,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         args.setText(job.getArgs());
         jobNo.setText(job.getJobNo() + "");
         jobOrder.setText(job.getOrder() + "");
-        host.setSelectedItem(job.getHost());
         this.qoption.setText(job.getQueOptions());
         this.version.setText(job.getVersion() + "");
-        this.sector.setSelectedItem(job.getSector() == null ? new Sector("All sectors", "All sectors") : job
-                .getSector());
-        this.status.setSelectedItem(job.getRunstatus());
 
         User user = job.getUser();
         Date startDate = job.getRunStartDate();
@@ -510,6 +542,10 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
     private void setError(String error) {
         messagePanel.setError(error);
+    }
+    
+    private void refresh() {
+        super.revalidate();
     }
 
 }

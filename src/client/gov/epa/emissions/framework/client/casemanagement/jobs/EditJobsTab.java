@@ -32,7 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
+public class EditJobsTab extends JPanel implements EditJobsTabView {
 
     private EmfConsole parentConsole;
 
@@ -52,8 +52,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
 
     private DesktopManager desktopManager;
 
-    private volatile Thread populateThread;
-
     public EditJobsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager, EmfSession session) {
         super.setName("editJobsTab");
@@ -61,8 +59,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;
         this.session = session;
-        this.populateThread = new Thread(this);
-
         super.setLayout(new BorderLayout());
     }
 
@@ -78,10 +74,15 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, Runnable {
             messagePanel.setError("Cannot retrieve all case jobs.");
         }
 
+        Thread populateThread = new Thread(new Runnable(){
+            public void run() {
+                retrieveJobs();
+            }
+        });
         populateThread.start();
     }
 
-    public void run() {
+    public void retrieveJobs() {
         try {
             messagePanel.setMessage("Please wait while retrieving all case jobs...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

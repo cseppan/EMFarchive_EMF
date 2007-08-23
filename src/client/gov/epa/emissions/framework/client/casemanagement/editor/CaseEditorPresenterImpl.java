@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
-import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenter;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabPresenter;
@@ -139,14 +138,6 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         outputPresenter = new EditOutputsTabPresenterImpl(session, OutputsView, caseObj);
         outputPresenter.display();
         presenters.add(outputPresenter);
-    }
-
-    public void doExport(User user, String dirName, String purpose, boolean overWrite, Case caseToExport) throws EmfException {
-        service().export(user, mapToRemote(dirName), purpose, overWrite, caseToExport);
-    }
-    
-    private String mapToRemote(String dir) {
-        return session.preferences().mapLocalOutputPathToRemote(dir);
     }
 
     public void doSaveWithoutClose() throws EmfException {

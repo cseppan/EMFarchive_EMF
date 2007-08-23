@@ -48,7 +48,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable {
+public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     private EmfConsole parentConsole;
 
@@ -74,8 +74,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
 
     private ManageChangeables changeables;
     
-    private volatile Thread populateThread;
-
     public EditInputsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager) {
         super.setName("editInputsTab");
@@ -83,8 +81,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;
         this.changeables = changeables;
-        this.populateThread = new Thread(this);
-
         super.setLayout(new BorderLayout());
     }
 
@@ -105,10 +101,15 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
             messagePanel.setError("Cannot retrieve all case inputs.");
         }
 
+        Thread populateThread = new Thread(new Runnable(){
+            public void run() {
+                retrieveInputs();
+            }
+        });
         populateThread.start();
     }
     
-    public void run() {
+    private void retrieveInputs() {
         try {
             messagePanel.setMessage("Please wait while retrieving all case inputs...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -117,6 +118,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, Runnable
             setCursor(Cursor.getDefaultCursor());
         } catch (Exception e) {
             messagePanel.setError("Cannot retrieve all case inputs.");
+            setCursor(Cursor.getDefaultCursor());
         }
     }
 

@@ -31,7 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class EditParametersTab extends JPanel implements EditCaseParametersTabView, Runnable {
+public class EditParametersTab extends JPanel implements EditCaseParametersTabView {
 
     private EmfConsole parentConsole;
 
@@ -53,16 +53,12 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
     private EmfSession session;
 
-    private volatile Thread populateThread;
-
     public EditParametersTab(EmfConsole parentConsole, MessagePanel messagePanel,
             DesktopManager desktopManager) {
         super.setName("editParametersTab");
         this.parentConsole = parentConsole;
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;
-        this.populateThread = new Thread(this);
-
         super.setLayout(new BorderLayout());
     }
 
@@ -80,10 +76,16 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             messagePanel.setError("Cannot retrieve all case parameters.");
         }
 
+        Thread populateThread = new Thread(new Runnable() {
+            public void run() {
+                retrieveParams();
+            }
+        });
+        
         populateThread.start();
     }
     
-    public void run() {
+    public void retrieveParams() {
         try {
             messagePanel.setMessage("Please wait while retrieving all case parameters...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

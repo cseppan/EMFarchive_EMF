@@ -341,7 +341,7 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("getCaseInputs");
-        call.addIntegerParam("caseId");
+        call.addParam("caseId", dataMappings.integer());
         call.setReturnType(caseMappings.caseinputs());
 
         return (CaseInput[]) call.requestResponse(new Object[] { new Integer(caseId) });
