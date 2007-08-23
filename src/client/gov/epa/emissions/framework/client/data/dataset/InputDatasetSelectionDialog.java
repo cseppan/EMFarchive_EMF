@@ -85,8 +85,8 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
             }
         });
 
-        panel.add(datasetTypeCombo, BorderLayout.LINE_START);
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
+        panel.add(datasetTypeCombo, BorderLayout.CENTER);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 5, 20));
         return panel;
     }
 
