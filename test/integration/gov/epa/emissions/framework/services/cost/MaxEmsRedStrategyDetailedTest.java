@@ -620,9 +620,9 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
                     + " where scc = '2801500000' and fips = '37119' and plantid = '0001' and pointid='0001' and stackid='1' and segment='1'");
             rs.next();
-            assertTrue("SCC = 2801500000 FIPS = 37119 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37119 annual cost = 2.603046E+04", Math.abs(rs.getDouble("annual_cost") - 2.603046E+04)/2.603046E+04 < tolerance);
-            assertTrue("SCC = 2801500000 FIPS = 37119 emis reduction = 6.113609E+00", Math.abs(rs.getDouble("emis_reduction") - 6.113609E+00)/6.113609E+00 < tolerance);
+            assertTrue("SCC = 2801500000 FIPS = 37119 reduction = 63", Math.abs(rs.getDouble("percent_reduction") - 63)/63 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37119 annual cost = 2.603046E+04", Math.abs(rs.getDouble("annual_cost") - 2.603046E+04)/2.603046E+04 < percentDiff);
+            assertTrue("SCC = 2801500000 FIPS = 37119 emis reduction = 6.113609E+00", Math.abs(rs.getDouble("emis_reduction") - 6.113609E+00)/6.113609E+00 < percentDiff);
 
             //make sure inv entry has the right numbers, this a locale (37015) specific measure for this entry...
             //check SCC = 2104008010 FIPS = 37067 inv entry
