@@ -33,5 +33,7 @@ public class ViewControlMeasureWindow extends EditControlMeasureWindow {
         controlMeasureSccTabView.viewOnly();
         controlMeasureEfficiencyTabView.viewOnly();
         editableCMSummaryTabView.viewOnly();
+        controlMeasureEquationTabView.viewOnly();
+        
     }
 }

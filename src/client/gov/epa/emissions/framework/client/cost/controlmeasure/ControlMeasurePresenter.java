@@ -20,6 +20,8 @@ public interface ControlMeasurePresenter {
     void set(ControlMeasureSccTabView effTabView);
 
     void set(ControlMeasureEfficiencyTabView effTabView);
+    
+    void set(ControlMeasureEquationTab equationTabView);
 
     void fireTracking();
 }

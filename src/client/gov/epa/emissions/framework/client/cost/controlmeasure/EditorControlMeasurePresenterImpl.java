@@ -92,6 +92,11 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
         ControlMeasureTabPresenterImpl sccPresenter = new ControlMeasureTabPresenterImpl(sccTabView);
         presenters.add(sccPresenter);
     }
+    
+    public void set(ControlMeasureEquationTab equationTabView) {
+        ControlMeasureTabPresenterImpl equationPresenter = new ControlMeasureTabPresenterImpl(equationTabView);
+        presenters.add(equationPresenter);
+    }
 
     public void doRefresh(ControlMeasure controlMeasure) {
         this.measure = controlMeasure;

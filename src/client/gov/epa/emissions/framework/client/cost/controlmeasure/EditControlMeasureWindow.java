@@ -47,6 +47,8 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     
     protected ControlMeasureEfficiencyTab controlMeasureEfficiencyTabView;
     
+    protected ControlMeasureEquationTab controlMeasureEquationTabView; 
+    
     public EditControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager, CostYearTable costYearTable) {
         super("Control Measure Editor", new Dimension(770, 475), desktopManager);
         this.desktopManager = desktopManager;
@@ -62,7 +64,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
         super.resetChanges();
     }
 
-    protected void buildDisplay(ControlMeasure measure) {
+    protected void buildDisplay(ControlMeasure measure){
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 
@@ -75,12 +77,13 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
         contentPane.add(panel);
     }
     
-    private JTabbedPane createTabbedPane(ControlMeasure measure, final MessagePanel messagePanel) {
+    private JTabbedPane createTabbedPane(ControlMeasure measure, final MessagePanel messagePanel){
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
         tabbedPane.addTab("Summary", createSummaryTab(measure, messagePanel));
         tabbedPane.addTab("Efficiencies", createEfficiencyTab(measure, messagePanel));
         tabbedPane.addTab("SCCs", createSCCTab(measure, messagePanel));
+        tabbedPane.addTab("Equations", createEquationTab(measure, messagePanel));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -89,6 +92,12 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
         });
 
         return tabbedPane;
+    }
+
+    private JPanel createEquationTab(ControlMeasure measure, MessagePanel messagePanel){
+        controlMeasureEquationTabView=new ControlMeasureEquationTab(measure, session, this, messagePanel, parent, presenter); 
+        presenter.set(controlMeasureEquationTabView);
+        return controlMeasureEquationTabView;
     }
 
     private JPanel createSCCTab(ControlMeasure measure, MessagePanel messagePanel) {

@@ -83,6 +83,12 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
     public void set(ControlMeasureSccTabView sccTabView) {
         this.sccView = sccTabView;
     }
+    
+    public void set(ControlMeasureEquationTab equationTabView) {
+        ControlMeasureTabPresenterImpl equationPresenter = new ControlMeasureTabPresenterImpl(equationTabView);
+        presenters.add(equationPresenter);
+        
+    }
 
     public void doRefresh(ControlMeasure controlMeasure) {
         for (Iterator iter = presenters.iterator(); iter.hasNext();) {
@@ -101,4 +107,6 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
         // NOTE Auto-generated method stub
         
     }
+
+ 
 }
