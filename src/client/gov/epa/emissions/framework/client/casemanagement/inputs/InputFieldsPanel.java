@@ -96,7 +96,8 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         envtVar.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Envt. Variable:", envtVar, panel);
 
-        sector = new ComboBox(new Sector[]{input.getSector()});
+        sector = new ComboBox(new Sector[]{input.getSector() == null ? new Sector("All sectors", "All sectors") : input
+                .getSector()});
         addPopupMenuListener(sector, "sectors");
         changeablesList.addChangeable(sector);
         sector.setPrototypeDisplayValue(width);

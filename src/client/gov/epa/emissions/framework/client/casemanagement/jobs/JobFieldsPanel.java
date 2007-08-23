@@ -444,10 +444,10 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     }
 
     private char getFileSeparator(String path) {
-        if (path == null)
+        if (path == null || path.isEmpty())
         {
             // this assumes that the server and client are running on the same platform
-            return File.pathSeparatorChar;
+            return File.separatorChar;
         }
         if (path.charAt(0) == '/')
             return '/';
