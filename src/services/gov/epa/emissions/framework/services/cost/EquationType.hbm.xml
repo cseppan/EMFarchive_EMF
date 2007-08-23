@@ -12,6 +12,11 @@
         <property name="name" column="name" type="java.lang.String" not-null="true"/>
         <property name="description" column="description" type="java.lang.String" not-null="true"/>
             
+		<array name="equationTypeVariables" table="equation_type_variables" cascade="none">
+	    	<key column="equation_type_id" not-null="true"/>
+	    	<list-index column="list_index"/>
+        	<one-to-many class="gov.epa.emissions.framework.services.cost.EquationTypeVariable"/>
+		</array>
     </class>
 </hibernate-mapping>  
 
