@@ -8,7 +8,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public abstract class TaskManager {
+public abstract class RunManager {
     static int refCount = 0;
 
     protected final int poolSize = 4;
@@ -19,7 +19,7 @@ public abstract class TaskManager {
 
     protected static long idleTime = 0;
 
-    protected static TaskManager ref;
+    protected static RunManager ref;
 
     protected static TaskConsumer consumer = null;
 
@@ -70,12 +70,12 @@ public abstract class TaskManager {
     }
 
     public static synchronized void addTasks(ArrayList<Runnable> tasks) {
-        TaskManager.resetIdleTime();
+        RunManager.resetIdleTime();
         taskQueue.addAll(tasks);
 
-        synchronized (TaskManager.runTable) {
-            if (TaskManager.runTable.size() == 0) {
-                ExportTaskManager.processTaskQueue();
+        synchronized (RunManager.runTable) {
+            if (RunManager.runTable.size() == 0) {
+                ExportTaskRunManager.processTaskQueue();
             }
         }// synchronized
     }
@@ -89,14 +89,14 @@ public abstract class TaskManager {
     }
 
     public static synchronized void setIdleTime(long idleTime) {
-        TaskManager.idleTime = idleTime;
+        RunManager.idleTime = idleTime;
     }
 
     @Override
     protected synchronized void finalize() throws Throwable {
-        if (DebugLevels.DEBUG_0) System.out.println("Finalizing TaskManager # of taskmanagers= " + TaskManager.refCount);
+        if (DebugLevels.DEBUG_0) System.out.println("Finalizing RunManager # of taskmanagers= " + RunManager.refCount);
 
-        TaskManager.shutDown();
+        RunManager.shutDown();
         //consumer.finalize();
         super.finalize();
     }

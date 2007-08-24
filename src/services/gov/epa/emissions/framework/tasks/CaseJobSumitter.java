@@ -9,12 +9,17 @@ public class CaseJobSumitter implements TaskSubmitter {
         
     }
 
-    public void callbackFromTaskManager(String taskId, String status, String mesg) {
+    public void callbackFromRunManager(String taskId, String status, String mesg) {
         // NOTE Auto-generated method stub
         
     }
 
     public void cancelTasks(ArrayList<Runnable> tasks) {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    public void deregisterSubmitterFromRunManager(TaskSubmitter ts) {
         // NOTE Auto-generated method stub
         
     }
@@ -29,22 +34,7 @@ public class CaseJobSumitter implements TaskSubmitter {
         return 0;
     }
 
-    public void registerTaskManager(TaskManager tm) {
-        // NOTE Auto-generated method stub
-        
-    }
-
-    public void setSubmitterId(String submitterId) {
-        // NOTE Auto-generated method stub
-        
-    }
-
-    public void setTaskCount(int taskCount) {
-        // NOTE Auto-generated method stub
-        
-    }
-
-    public void submitTasksToTaskManager(String submitterId, ArrayList<Runnable> tasks) {
+    public void submitTasksToRunManager(String submitterId, ArrayList<Runnable> tasks) {
         // NOTE Auto-generated method stub
         
     }
@@ -54,9 +44,5 @@ public class CaseJobSumitter implements TaskSubmitter {
         
     }
 
-    public void deregisterSubmitterFromTaskManager(TaskSubmitter ts) {
-        // NOTE Auto-generated method stub
-        
-    }
 
 }
