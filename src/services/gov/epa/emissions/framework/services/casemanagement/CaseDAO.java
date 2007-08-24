@@ -401,4 +401,9 @@ public class CaseDAO {
     public void removeCaseParameters(CaseParameter[] params, Session session) {
         hibernateFacade.remove(params, session);
     }
+
+    public CaseInput getCaseInput(int inputId, Session session) {
+        Criterion crit = Restrictions.eq("id", new Integer(inputId));
+        return (CaseInput)hibernateFacade.load(CaseInput.class, crit, session);
+    }
 }
