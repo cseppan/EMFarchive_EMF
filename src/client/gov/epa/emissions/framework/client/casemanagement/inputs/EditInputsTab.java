@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
 import gov.epa.emissions.commons.data.DatasetType;
-import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
@@ -24,7 +23,6 @@ import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
-import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.EmfTableModel;
@@ -48,7 +46,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-public class EditInputsTab extends JPanel implements EditInputsTabView {
+public class EditInputsTab extends JPanel implements EditInputsTabView{
 
     private EmfConsole parentConsole;
 
@@ -334,38 +332,44 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
     }
 
     private void doDisplayInputDatasetsPropertiesViewer() {
-        List datasets = getSelectedDatasets(getSelectedInputs());
+        List<EmfDataset> datasets = getSelectedDatasets(getSelectedInputs());
         if (datasets.isEmpty()) {
             messagePanel.setMessage("Please select one or more inputs with datasets specified to view.");
             return;
         }
-        for (Iterator iter = datasets.iterator(); iter.hasNext();) {
+        for (Iterator<EmfDataset> iter = datasets.iterator(); iter.hasNext();) {
             DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
-            EmfDataset dataset = (EmfDataset) iter.next();
+            EmfDataset dataset = iter.next();
             presenter.doDisplayPropertiesView(view, dataset);
         }
     }
 
     private void doExportInputDatasets(List inputlist) {
+        System.out.println("EditInputsTab::doExportInputDatasets size of list= " + inputlist.size());
         if (inputlist.size() == 0) {
             messagePanel.setMessage("Please select input(s) to export.");
             return;
         }
 
         int numberToExport = checkToWriteStartMessage(inputlist);
+        System.out.println("Size? " + numberToExport);
         if (!checkExportDir(inputDir.getText()) || !checkDatasets(inputlist) || numberToExport < 1)
             return;
 
-        EmfDataset[] datasets = (EmfDataset[]) getSelectedDatasets(inputlist).toArray(new EmfDataset[0]);
+//        EmfDataset[] datasets = getSelectedDatasets(inputlist).toArray(new EmfDataset[0]);
         int ok = checkOverWrite();
         String purpose = "Used by case: " + this.caseObj.getName() + ".";
-
+System.out.println(purpose);
         try {
-            if (ok != JOptionPane.YES_OPTION)
-                presenter.doExport(datasets, getSelectedDatasetVersions(), getSelectedInputSubdirs(), purpose);
-            else
-                presenter.doExportWithOverwrite(datasets, getSelectedDatasetVersions(), getSelectedInputSubdirs(), purpose);
-
+            if (ok != JOptionPane.YES_OPTION){
+                System.out.println("YES Option");
+//                presenter.doExport(datasets, getSelectedDatasetVersions(), getSelectedInputSubdirs(), purpose);
+                    presenter.exportCaseInputs(inputlist, purpose);
+            }else{
+                    System.out.println("No Option");
+//                presenter.doExportWithOverwrite(datasets, getSelectedDatasetVersions(), getSelectedInputSubdirs(), purpose);
+                    presenter.exportCaseInputsWithOverwrite(inputlist, purpose);
+                }
             messagePanel.setMessage("Started export of " + numberToExport
                     + " input datasets.  Please see the Status Window for additional information.");
         } catch (EmfException e) {
@@ -396,13 +400,17 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
 
     // returns the number of datasets that will actually be exported
     private int checkToWriteStartMessage(List inputList) {
+        System.out.println("In checkToWriteStartMessage size of list = " + inputList.size());
         CaseInput[] inputs = (CaseInput[]) inputList.toArray(new CaseInput[0]);
+        System.out.println("In checkToWriteStartMessage size of inputs array created = " + inputs.length);
+        
         int count = 0;
         int external = 0;
 
         for (int i = 0; i < inputs.length; i++) {
             DatasetType type = inputs[i].getDatasetType();
             EmfDataset dataset = inputs[i].getDataset();
+            System.out.println("In loop dataset id= " + dataset.getId());
             if (type != null && dataset != null && !type.isExternal())
                 count++;
 
@@ -415,7 +423,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
                     .setMessage("Please select some inputs to export (make sure they have datasets and are not all external)");
             return count;
         }
-
+        
+        System.out.println("At end of method count= " + count);
         return count;
     }
 
@@ -426,8 +435,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
                 JOptionPane.QUESTION_MESSAGE);
     }
 
-    private List getSelectedDatasets(List inputlist) {
-        List datasetList = new ArrayList();
+    private List<EmfDataset> getSelectedDatasets(List inputlist) {
+        List<EmfDataset> datasetList = new ArrayList<EmfDataset>();
 
         for (int i = 0; i < inputlist.size(); i++) {
             EmfDataset dataset = ((CaseInput) inputlist.get(i)).getDataset();
@@ -438,45 +447,45 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         return datasetList;
     }
 
-    private Version[] getSelectedDatasetVersions() {
-        List list = getSelectedInputs();
-        List versionList = new ArrayList();
+//    private Version[] getSelectedDatasetVersions() {
+//        List list = getSelectedInputs();
+//        List versionList = new ArrayList();
+//
+//        for (int i = 0; i < list.size(); i++) {
+//            Version version = ((CaseInput) list.get(i)).getVersion();
+//            if (version != null)
+//                versionList.add(version);
+//        }
+//
+//        return (Version[]) versionList.toArray(new Version[0]);
+//    }
 
-        for (int i = 0; i < list.size(); i++) {
-            Version version = ((CaseInput) list.get(i)).getVersion();
-            if (version != null)
-                versionList.add(version);
-        }
-
-        return (Version[]) versionList.toArray(new Version[0]);
-    }
-
-    private String[] getSelectedInputSubdirs() {
-        List list = getSelectedInputs();
-        List<String> subDirList = new ArrayList<String>();
-        String defaultExportDir = session.preferences().outputFolder();
-        if (!inputDir.getText().equals(""))
-            defaultExportDir = inputDir.getText();
-        
-        String separator = getFileSeparator(defaultExportDir);
-
-        for (int i = 0; i < list.size(); i++) {
-            SubDir subdir = ((CaseInput) list.get(i)).getSubdirObj();
-            if (subdir != null)
-                subDirList.add(defaultExportDir + separator + subdir.getName());
-            else
-                subDirList.add(defaultExportDir);
-        }
-
-        return subDirList.toArray(new String[0]);
-    }
+//    private String[] getSelectedInputSubdirs() {
+//        List list = getSelectedInputs();
+//        List<String> subDirList = new ArrayList<String>();
+//        String defaultExportDir = session.preferences().outputFolder();
+//        if (!inputDir.getText().equals(""))
+//            defaultExportDir = inputDir.getText();
+//        
+//        String separator = getFileSeparator(defaultExportDir);
+//
+//        for (int i = 0; i < list.size(); i++) {
+//            SubDir subdir = ((CaseInput) list.get(i)).getSubdirObj();
+//            if (subdir != null)
+//                subDirList.add(defaultExportDir + separator + subdir.getName());
+//            else
+//                subDirList.add(defaultExportDir);
+//        }
+//
+//        return subDirList.toArray(new String[0]);
+//    }
     
-    private String getFileSeparator(String folder) {
-        if (folder.trim().charAt(0) == '/')
-            return "/";
-
-        return "\\";
-    }
+//    private String getFileSeparator(String folder) {
+//        if (folder.trim().charAt(0) == '/')
+//            return "/";
+//
+//        return "\\";
+//    }
 
     public void addInput(CaseInput note) {
         tableData.add(note);

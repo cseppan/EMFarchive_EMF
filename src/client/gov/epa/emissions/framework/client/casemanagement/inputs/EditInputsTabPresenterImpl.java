@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
-import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
@@ -9,9 +8,8 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.exim.ExImService;
 
-import java.util.Date;
+import java.util.List;
 
 import javax.swing.JComponent;
 
@@ -36,7 +34,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     public void doSave() {
         String caseInputDir = view.getCaseInputFileDir();
         if (caseInputDir != null)
-           caseObj.setInputFileDir(caseInputDir);
+            caseObj.setInputFileDir(caseInputDir);
         view.refresh();
     }
 
@@ -65,7 +63,8 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     }
 
     public void doEditInput(CaseInput input, EditCaseInputView inputEditor) throws EmfException {
-        EditInputPresenter editInputPresenter = new EditCaseInputPresenterImpl(caseObj.getId(), inputEditor, view, session);
+        EditInputPresenter editInputPresenter = new EditCaseInputPresenterImpl(caseObj.getId(), inputEditor, view,
+                session);
         editInputPresenter.display(input);
     }
 
@@ -75,7 +74,8 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         newInput.setRequired(true);
         newInput.setShow(true);
 
-        InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj.getId(), inputFields, session);
+        InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj.getId(), inputFields,
+                session);
         inputFieldsPresenter.display(newInput, container);
     }
 
@@ -86,38 +86,64 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         presenter.doDisplay(propertiesView);
     }
 
-    public void doExportWithOverwrite(EmfDataset[] datasets, Version[] versions, String[] folders, String purpose)
-            throws EmfException {
-        doExport(datasets, versions, folders, true, purpose);
-    }
-
-    public void doExport(EmfDataset[] datasets, Version[] versions, String[] folders, String purpose)
-            throws EmfException {
-        doExport(datasets, versions, folders, false, purpose);
-    }
-
-    private void doExport(EmfDataset[] datasets, Version[] versions, String[] folders, boolean overwrite, String purpose)
-            throws EmfException {
-        ExImService services = session.eximService();
-
-        for (int i = 0; i < datasets.length; i++) {
-            datasets[i].setAccessedDateTime(new Date());
-
-            if (overwrite)
-                services.exportDatasetsWithOverwrite(session.user(), new EmfDataset[] { datasets[i] },
-                        new Version[] { versions[i] }, folders[i], purpose);
-            else
-                services.exportDatasets(session.user(), new EmfDataset[] { datasets[i] },
-                        new Version[] { versions[i] }, folders[i], purpose);
-        }
-    }
-
-//    private String mapToRemote(String dir) {
-//        return session.preferences().mapLocalOutputPathToRemote(dir);
+//    public void doExportWithOverwrite(EmfDataset[] datasets, Version[] versions, String[] folders, String purpose)
+//            throws EmfException {
+//        doExport(datasets, versions, folders, true, purpose);
 //    }
+
+//    public void doExport(EmfDataset[] datasets, Version[] versions, String[] folders, String purpose)
+//            throws EmfException {
+//        doExport(datasets, versions, folders, false, purpose);
+//    }
+
+    // private void doExport(EmfDataset[] datasets, Version[] versions, String[] folders, boolean overwrite, String
+    // purpose)
+    // throws EmfException {
+    // ExImService services = session.eximService();
+    //
+    // for (int i = 0; i < datasets.length; i++) {
+    // datasets[i].setAccessedDateTime(new Date());
+    //
+    // if (overwrite)
+    // services.exportDatasetsWithOverwrite(session.user(), new EmfDataset[] { datasets[i] },
+    // new Version[] { versions[i] }, folders[i], purpose);
+    // else
+    // services.exportDatasets(session.user(), new EmfDataset[] { datasets[i] },
+    // new Version[] { versions[i] }, folders[i], purpose);
+    // }
+    // }
+
+    // private String mapToRemote(String dir) {
+    // return session.preferences().mapLocalOutputPathToRemote(dir);
+    // }
 
     public CaseInput[] getCaseInput(int caseId) throws EmfException {
         return service().getCaseInputs(caseId);
+    }
+
+    private void doExport(List<CaseInput> caseInputs, boolean overwrite, String purpose)
+            throws EmfException {
+        //ExImService services = session.eximService();
+        CaseService services = session.caseService();
+        Integer[] caseInputIds = new Integer[caseInputs.size()];
+
+        for (int i=0; i<caseInputIds.length;i++){
+            caseInputIds[i] = new Integer(caseInputs.get(i).getId());
+        }
+        System.out.println("EditInputsTabPresenterImp::doExport CaseInputIds size= " + caseInputIds.length);
+            if (overwrite)
+                services.exportCaseInputsWithOverwrite(session.user(), caseInputIds, purpose);
+            
+            else
+                services.exportCaseInputs(session.user(), caseInputIds, purpose);
+    }
+
+    public void exportCaseInputs(List<CaseInput> inputList, String purpose) throws EmfException {
+        doExport(inputList, false, purpose);
+    }
+
+    public void exportCaseInputsWithOverwrite(List<CaseInput> inputList, String purpose) throws EmfException {
+        doExport(inputList, true, purpose);
     }
 
 }
