@@ -42,15 +42,15 @@ public class DataServiceImpl implements DataService {
     }
     
     public EmfDataset getDataset(Integer datasetId) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
             EmfDataset dataset = dao.getDataset(session, datasetId.intValue());
-            session.close();
-            
             return dataset;
         } catch (RuntimeException e) {
             LOG.error("Could not get dataset with id=" + datasetId.intValue(), e);
             throw new EmfException("Could not get dataset with id=" + datasetId.intValue());
+        } finally {
+            session.close();
         }
     }
 
