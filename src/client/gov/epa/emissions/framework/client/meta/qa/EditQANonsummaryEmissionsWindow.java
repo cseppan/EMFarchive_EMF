@@ -129,22 +129,24 @@ public EditQANonsummaryEmissionsWindow(DesktopManager desktopManager, EmfSession
     private Action okAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                EmfDataset [] newDatasets = new EmfDataset [datasetWidget.getDatasets().length];
-                for (int k =0; k < datasetWidget.getDatasets().length; k++) {
-                    newDatasets[k] = (EmfDataset) datasetWidget.getDatasets()[k];
-                }
+                if (datasetWidget.getDatasets().length > 0) {
+                    EmfDataset [] newDatasets = new EmfDataset [datasetWidget.getDatasets().length];
+                    for (int k =0; k < datasetWidget.getDatasets().length; k++) {
+                        newDatasets[k] = (EmfDataset) datasetWidget.getDatasets()[k];
+                    }
                 // Get the dataset type for the first dataset. Set firstElementDatasetType to that value.
-                 
-                DatasetType firstElementDatasetType = newDatasets[0].getDatasetType();
-                //System.out.println("Dataset 1 type: " + newDatasets[0]);
+                
+                    DatasetType firstElementDatasetType = newDatasets[0].getDatasetType();
+
+                //System.out.println("Dataset 1 type: " + firstElementDatasetType);
                 // Go through the rest of the datasets.  If the dataset type for any of them is not
                 // the same as in firstElementContains, throw an exception.
-                   for (int j = 1; j < newDatasets.length; j++) {
-                         //System.out.println("Dataset " + (j + 1) + " type: " + newDatasets[j]);
-                         if (!(newDatasets[j].getDatasetType().equals(firstElementDatasetType)))
-                             messagePanel.setError("There is a mismatch of inventory dataset types.");
-                  }
-                
+                    for (int j = 1; j < newDatasets.length; j++) {
+                         //System.out.println("Dataset " + (j + 1) + " type: " + newDatasets[j].getDatasetType());
+                             if (!(newDatasets[j].getDatasetType().equals(firstElementDatasetType)))
+                                 messagePanel.setError("There is a mismatch of inventory dataset types.");
+                    }
+                }
                 presenter1.updateDatasets(datasetWidget.getDatasets());
                 dispose();
                 disposeView();

@@ -747,6 +747,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         
         String programSwitches = "";
         StringTokenizer tokenizer2;
+        inputDatasets.clear();
 
         programSwitches = programArguments.getText();
         //System.out.println("Text: " + programSwitches);
@@ -783,7 +784,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         EditQANonsummaryEmissionsPresenter presenter = new EditQANonsummaryEmissionsPresenter(view, this);
         presenter.display(origDataset, step);
 
-        inputDatasets.clear();
+        //inputDatasets.clear();
         
         for (int m = 0; m < inputDatasetsArray.length; m++)
             inputDatasetsArray[m] = null;
