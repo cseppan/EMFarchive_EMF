@@ -146,7 +146,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
         String execPath = job.getPath();
         String caseInputPath = this.caseObj.getInputFileDir();
-        if (execPath == null || execPath.trim().isEmpty())
+        if ((execPath == null || execPath.trim().isEmpty()) && caseInputPath != null && !caseInputPath.isEmpty())
             execPath = caseInputPath + getFileSeparator(caseInputPath);
 
         path = new TextField("path", execPath, 32);
@@ -189,15 +189,15 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         jobNo.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(jobNo);
         layoutGenerator.addLabelWidgetPair("Job Number:", jobNo, panel);
-        jobNo.setToolTipText("A number that makes this job unique for the " +
-                "given case (used to specify dependencies between jobs)");
+        jobNo.setToolTipText("A number that makes this job unique for the "
+                + "given case (used to specify dependencies between jobs)");
 
         jobOrder = new TextField("jobOrder", job.getOrder() + "", 12);
         jobOrder.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(jobOrder);
         layoutGenerator.addLabelWidgetPair("Job Order:", jobOrder, panel);
-        
-        host = new EditableComboBox(new Host[]{job.getHost()});
+
+        host = new EditableComboBox(new Host[] { job.getHost() });
         host.setPrototypeDisplayValue(comboWidth);
         addPopupMenuListener(host, "hosts");
         changeablesList.addChangeable(host);
@@ -225,14 +225,14 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         changeablesList.addChangeable(version);
         layoutGenerator.addLabelWidgetPair("Version:", version, panel);
 
-        sector = new ComboBox(new Sector[]{job.getSector() == null ? new Sector("All sectors", "All sectors") : job
-                .getSector()});
+        sector = new ComboBox(new Sector[] { job.getSector() == null ? new Sector("All sectors", "All sectors") : job
+                .getSector() });
         sector.setPrototypeDisplayValue(comboWidth);
         addPopupMenuListener(sector, "sectors");
         changeablesList.addChangeable(sector);
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
 
-        status = new ComboBox(new JobRunStatus[]{job.getRunstatus()});
+        status = new ComboBox(new JobRunStatus[] { job.getRunstatus() });
         status.setPrototypeDisplayValue(comboWidth);
         addPopupMenuListener(status, "status");
         changeablesList.addChangeable(status);
@@ -251,7 +251,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     }
 
     private void addPopupMenuListener(final JComboBox box, final String toget) {
-        box.addPopupMenuListener(new PopupMenuListener(){
+        box.addPopupMenuListener(new PopupMenuListener() {
             public void popupMenuCanceled(PopupMenuEvent event) {
                 // NOTE Auto-generated method stub
             }
@@ -278,13 +278,13 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
         if (toget.equals("sectors"))
             return presenter.getSectors();
-        
+
         if (toget.equals("status"))
             return presenter.getRunStatuses();
-        
+
         return null;
     }
-    
+
     private JPanel getFolderChooserPanel(final JTextField dir, final String title) {
         Button browseButton = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
@@ -380,7 +380,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
         if (jobPath != null && !path.isEmpty())
             path.setText(jobPath + getFileSeparator(jobPath) + ((exec == null) ? "" : exec.getName()));
-        
+
         args.setText(job.getArgs());
         jobNo.setText(job.getJobNo() + "");
         jobOrder.setText(job.getOrder() + "");
@@ -411,7 +411,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         job.setRunstatus((JobRunStatus) status.getSelectedItem());
         job.setVersion(Integer.parseInt(version.getText().trim()));
         job.setQueOptions(qoption.getText().trim());
-        
+
         if (edit) {
             job.setRunLog(runLog.getText());
             job.setRunNotes(runNote.getText());
@@ -444,8 +444,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     }
 
     private char getFileSeparator(String path) {
-        if (path == null || path.isEmpty())
-        {
+        if (path == null || path.isEmpty()) {
             // this assumes that the server and client are running on the same platform
             return File.separatorChar;
         }
@@ -543,7 +542,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     private void setError(String error) {
         messagePanel.setError(error);
     }
-    
+
     private void refresh() {
         super.revalidate();
     }
