@@ -46,7 +46,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 //    private TaskManagedImportService importService;
 
     // private ExportService exportService;
-    private TaskManagedExportService exportService;
+    private ManagedExportService exportService;
 
     public ExImServiceImpl() throws Exception {
         super("ExIm Service");
@@ -82,7 +82,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
         // Use the TaskManagedExport Service instead of the old ad-hoc thread pool ExportService
         // exportService = new ExportService(dbServer, threadPool, sessionFactory);
-        exportService = new TaskManagedExportService(dbServer, sessionFactory);
+        exportService = new ManagedExportService(dbServer, sessionFactory);
 
         ImporterFactory importerFactory = new ImporterFactory(dbServer, dbServer.getSqlDataTypes());
         importService = new ImportService(importerFactory, sessionFactory, threadPool);
@@ -289,5 +289,6 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             throws EmfException {
         exportDatasetidsWithOverwrite(user, datasetIds, null, folder, purpose);
     }
+
 
 }

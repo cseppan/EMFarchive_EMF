@@ -14,7 +14,7 @@ import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
-import gov.epa.emissions.framework.tasks.ExportTaskManager;
+import gov.epa.emissions.framework.tasks.ExportTaskRunManager;
 import gov.epa.emissions.framework.tasks.Task;
 
 import java.io.File;
@@ -111,10 +111,10 @@ public class ExportTask extends Task {
 
             if (DebugLevels.DEBUG_4)
                 System.out.println("#### Task #" + taskId
-                        + " has completed processing making the callback to ExportTaskManager THREAD ID: "
+                        + " has completed processing making the callback to ExportTaskRunManager THREAD ID: "
                         + Thread.currentThread().getId());
 
-            // ExportTaskManager.callBackFromThread(taskId, this.submitterId, "completed", "succefully in THREAD ID: "
+            // ExportTaskRunManager.callBackFromThread(taskId, this.submitterId, "completed", "succefully in THREAD ID: "
             // + Thread.currentThread().getId());
 
         } catch (Exception e) {
@@ -182,7 +182,7 @@ public class ExportTask extends Task {
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 
-        ExportTaskManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(), message);
+        ExportTaskRunManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(), message);
 
     }
 

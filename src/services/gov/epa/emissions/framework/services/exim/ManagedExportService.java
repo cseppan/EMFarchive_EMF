@@ -27,7 +27,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.ExportClientSubmitter;
 import gov.epa.emissions.framework.tasks.ExportJobSubmitter;
-import gov.epa.emissions.framework.tasks.TaskManagerFactory;
+import gov.epa.emissions.framework.tasks.RunManagerFactory;
 import gov.epa.emissions.framework.tasks.TaskSubmitter;
 
 import java.io.File;
@@ -40,8 +40,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 
-public class TaskManagedExportService {
-    private static Log log = LogFactory.getLog(TaskManagedExportService.class);
+public class ManagedExportService {
+    private static Log log = LogFactory.getLog(ManagedExportService.class);
 
     private static int svcCount = 0;
 
@@ -64,7 +64,7 @@ public class TaskManagedExportService {
 
     private HibernateSessionFactory sessionFactory;
 
-    public TaskManagedExportService(DbServer dbServer, HibernateSessionFactory sessionFactory) {
+    public ManagedExportService(DbServer dbServer, HibernateSessionFactory sessionFactory) {
         myTag();
         if (DebugLevels.DEBUG_1)
             System.out.println(">>>> " + myTag());
@@ -160,7 +160,7 @@ public class TaskManagedExportService {
         if (exportTaskSubmitter == null) {
             exportTaskSubmitter = new ExportJobSubmitter();
             // exportTaskSubmitter.registerTaskManager();
-            TaskManagerFactory.getExportTaskManager().registerTaskSubmitter(exportTaskSubmitter);
+            RunManagerFactory.getExportTaskRunManager().registerTaskSubmitter(exportTaskSubmitter);
         }
 
         // FIXME: Any checks for CaseInputs or Jobs needs to happen here
@@ -242,10 +242,10 @@ public class TaskManagedExportService {
             System.out.println("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + exportTaskSubmitter.getTaskCount());
 
         log.info("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + exportTaskSubmitter.getTaskCount());
-        log.info("TaskManagedExportService:export() submitted all exportTasks dropping out of loop");
+        log.info("ManagedExportService:export() submitted all exportTasks dropping out of loop");
 
         if (DebugLevels.DEBUG_0)
-            System.out.println("TaskManagedExportService:export() exiting at: " + new Date());
+            System.out.println("ManagedExportService:export() exiting at: " + new Date());
 
         return exportTaskSubmitter.getSubmitterId();
     }
@@ -257,7 +257,7 @@ public class TaskManagedExportService {
         // FIXME: hardcode overwite=true until verified with Alison
         overwrite = true;
         if (DebugLevels.DEBUG_0)
-            System.out.println("TaskManagedExportService:export() called at: " + new Date());
+            System.out.println("ManagedExportService:export() called at: " + new Date());
 
         if (DebugLevels.DEBUG_4)
             System.out.println(">>## In export service:export() " + myTag() + " for datasets: " + datasets.toString());
@@ -267,7 +267,7 @@ public class TaskManagedExportService {
         if (exportTaskSubmitter == null) {
             exportTaskSubmitter = new ExportClientSubmitter();
             // exportTaskSubmitter.registerTaskManager();
-            TaskManagerFactory.getExportTaskManager().registerTaskSubmitter(exportTaskSubmitter);
+            RunManagerFactory.getExportTaskRunManager().registerTaskSubmitter(exportTaskSubmitter);
         }
 
         File path = validatePath(dirName);
@@ -317,10 +317,10 @@ public class TaskManagedExportService {
                         + exportTaskSubmitter.getTaskCount());
 
             log.info("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + exportTaskSubmitter.getTaskCount());
-            log.info("TaskManagedExportService:export() submitted all exportTasks dropping out of loop");
+            log.info("ManagedExportService:export() submitted all exportTasks dropping out of loop");
 
             if (DebugLevels.DEBUG_0)
-                System.out.println("TaskManagedExportService:export() exiting at: " + new Date());
+                System.out.println("ManagedExportService:export() exiting at: " + new Date());
 
         } catch (Exception e) {
             // don't need to log messages about exporting to existing file
