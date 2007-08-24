@@ -213,7 +213,7 @@ public class CaseServiceTransport implements CaseService {
         return (CaseProgram[]) call.requestResponse(new Object[] {});
     }
 
-    public void export(User user, String dirName, String purpose, boolean overWrite, Case caseToExport)
+    public void export(User user, String dirName, String purpose, boolean overWrite, int caseId)
             throws EmfException {
         EmfCall call = call();
 
@@ -222,12 +222,13 @@ public class CaseServiceTransport implements CaseService {
         call.addStringParam("dirName");
         call.addStringParam("purpose");
         call.addBooleanParameter("overWrite");
-        call.addParam("caseToExport", caseMappings.caseObject());
+        call.addParam("caseId", caseMappings.integer());
         call.setVoidReturnType();
 
-        call.request(new Object[] { user, dirName, purpose, Boolean.valueOf(overWrite), caseToExport });
+        call.request(new Object[] { user, dirName, purpose, Boolean.valueOf(overWrite), Integer.valueOf(caseId) });
     }
 
+    
     public InputName addCaseInputName(InputName name) throws EmfException {
         EmfCall call = call();
 
@@ -349,22 +350,22 @@ public class CaseServiceTransport implements CaseService {
 
     public Case[] copyCaseObject(int[] toCopy) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("copyCaseObject");
         call.addIntArrayParam();
         call.setReturnType(caseMappings.cases());
-        
-        return (Case[]) call.requestResponse(new Object[] {toCopy});
+
+        return (Case[]) call.requestResponse(new Object[] { toCopy });
     }
 
     public CaseJob addCaseJob(CaseJob job) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("addCaseJob");
         call.addParam("job", caseMappings.casejob());
         call.setReturnType(caseMappings.casejob());
-        
-        return (CaseJob) call.requestResponse(new Object[]{job});
+
+        return (CaseJob) call.requestResponse(new Object[] { job });
     }
 
     public CaseJob[] getCaseJobs(int caseId) throws EmfException {
@@ -379,11 +380,11 @@ public class CaseServiceTransport implements CaseService {
 
     public CaseJob getCaseJob(int jobId) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("getCaseJob");
         call.addIntegerParam("jobId");
         call.setReturnType(caseMappings.casejob());
-        
+
         return (CaseJob) call.requestResponse(new Object[] { new Integer(jobId) });
     }
 
@@ -393,7 +394,7 @@ public class CaseServiceTransport implements CaseService {
         call.setOperation("getJobRunStatuses");
         call.setReturnType(caseMappings.jobRunStatuses());
 
-        return (JobRunStatus[]) call.requestResponse(new Object[] { });
+        return (JobRunStatus[]) call.requestResponse(new Object[] {});
     }
 
     public Executable[] getExecutables(int casejobId) throws EmfException {
@@ -402,17 +403,17 @@ public class CaseServiceTransport implements CaseService {
         call.setOperation("getExecutables");
         call.setReturnType(caseMappings.executables());
 
-        return (Executable[]) call.requestResponse(new Object[] { });
+        return (Executable[]) call.requestResponse(new Object[] {});
     }
 
     public void removeCaseJobs(CaseJob[] jobs) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("removeCaseJobs");
         call.addParam("jobs", caseMappings.casejobs());
         call.setVoidReturnType();
-        
-        call.request(new Object[]{jobs});
+
+        call.request(new Object[] { jobs });
     }
 
     public void updateCaseJob(User user, CaseJob job) throws EmfException {
@@ -432,103 +433,102 @@ public class CaseServiceTransport implements CaseService {
         call.setOperation("getHosts");
         call.setReturnType(caseMappings.hosts());
 
-        return (Host[]) call.requestResponse(new Object[] { });
+        return (Host[]) call.requestResponse(new Object[] {});
     }
 
     public Host addHost(Host host) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("addHost");
         call.addParam("host", caseMappings.host());
         call.setReturnType(caseMappings.host());
-        
-        return (Host) call.requestResponse(new Object[] {host});
+
+        return (Host) call.requestResponse(new Object[] { host });
     }
 
     public void runJobs(CaseJob job) throws EmfException {
         // NOTE Auto-generated method stub
         if (false) {
             throw new EmfException("error");
-            
+
         }
     }
 
     public Executable addExecutable(Executable exe) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("addExecutable");
         call.addParam("exe", caseMappings.executable());
         call.setReturnType(caseMappings.executable());
-        
-        return (Executable) call.requestResponse(new Object[] {exe});
-    }
 
+        return (Executable) call.requestResponse(new Object[] { exe });
+    }
 
     public ParameterEnvVar addParameterEnvVar(ParameterEnvVar envVar) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("addParameterEnvVar");
         call.addParam("envVar", caseMappings.parameterEnvVar());
         call.setReturnType(caseMappings.parameterEnvVar());
-        
-        return (ParameterEnvVar)call.requestResponse(new Object[]{envVar});
+
+        return (ParameterEnvVar) call.requestResponse(new Object[] { envVar });
     }
 
     public ParameterEnvVar[] getParameterEnvVars() throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("getParameterEnvVars");
         call.setReturnType(caseMappings.parameterEnvVars());
-        
-        return (ParameterEnvVar[])call.requestResponse(new Object[]{});
+
+        return (ParameterEnvVar[]) call.requestResponse(new Object[] {});
     }
 
     public ValueType addValueType(ValueType type) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("addValueType");
         call.addParam("type", caseMappings.valueType());
         call.setReturnType(caseMappings.valueType());
-        
-        return (ValueType)call.requestResponse(new Object[]{type});
+
+        return (ValueType) call.requestResponse(new Object[] { type });
     }
 
     public ValueType[] getValueTypes() throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("getValueTypes");
         call.setReturnType(caseMappings.valueTypes());
-        
-        return (ValueType[])call.requestResponse(new Object[]{});
+
+        return (ValueType[]) call.requestResponse(new Object[] {});
     }
 
     public ParameterName addParameterName(ParameterName name) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("addParameterName");
         call.addParam("name", caseMappings.parameterName());
         call.setReturnType(caseMappings.parameterName());
-        
-        return (ParameterName)call.requestResponse(new Object[]{name});
+
+        return (ParameterName) call.requestResponse(new Object[] { name });
     }
 
     public ParameterName[] getParameterNames() throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("getParameterNames");
         call.setReturnType(caseMappings.parameterNames());
-        
-        return (ParameterName[])call.requestResponse(new Object[]{});
+
+        return (ParameterName[]) call.requestResponse(new Object[] {});
     }
 
     public CaseParameter addCaseParameter(CaseParameter param) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("addCaseParameter");
         call.addParam("param", caseMappings.caseParameter());
         call.setReturnType(caseMappings.caseParameter());
-        
-        return (CaseParameter)call.requestResponse(new Object[]{param});
+
+        return (CaseParameter) call.requestResponse(new Object[] { param });
     }
 
     public CaseParameter[] getCaseParameters(int caseId) throws EmfException {
@@ -540,15 +540,15 @@ public class CaseServiceTransport implements CaseService {
 
         return (CaseParameter[]) call.requestResponse(new Object[] { new Integer(caseId) });
     }
-    
+
     public void removeCaseParameters(CaseParameter[] params) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("removeCaseParameters");
         call.addParam("params", caseMappings.caseParameters());
         call.setVoidReturnType();
-        
-        call.request(new Object[]{params});
+
+        call.request(new Object[] { params });
     }
 
     public void updateCaseParameter(User user, CaseParameter parameter) throws EmfException {
@@ -571,6 +571,43 @@ public class CaseServiceTransport implements CaseService {
         call.setVoidReturnType();
 
         call.request(new Object[] { jobs, user });
+    }
+
+    public String runJobs(Integer[] jobIds, int caseId, User user) throws EmfException {
+        EmfCall call = call();
+        call.setOperation("runJobs");
+        call.addParam("jobids", caseMappings.casejobIds());
+        call.addParam("caseId", caseMappings.integer());        
+        call.addParam("user", dataMappings.user());
+        call.setStringReturnType();
+        return (String) call.requestResponse(new Object[] { jobIds, Integer.valueOf(caseId), user });
+    }
+
+    public void exportCaseInputs(User user, Integer[] caseInputIds, String purpose)
+            throws EmfException {
+        EmfCall call = call();
+        call.setOperation("exportCaseInputs");
+        call.addParam("user", dataMappings.user());
+        call.addParam("caseInputIds", caseMappings.caseInputIds());
+        call.addStringParam("purpose");
+        
+        call.setVoidReturnType();
+        call.request(new Object[] { user, caseInputIds, purpose });
+        
+    }
+
+    public void exportCaseInputsWithOverwrite(User user, Integer[] caseInputIds, String purpose)
+            throws EmfException {
+        EmfCall call = call();
+        call.setOperation("exportCaseInputsWithOverwrite");
+        call.addParam("user", dataMappings.user());
+        call.addParam("caseInputIds", caseMappings.caseInputIds());
+        call.addStringParam("purpose");
+        
+        call.setVoidReturnType();
+        call.request(new Object[] { user, caseInputIds, purpose });
+        
+        
     }
 
 }
