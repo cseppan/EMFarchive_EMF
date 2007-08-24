@@ -51,7 +51,7 @@ public interface CaseService {
 
     Case updateCase(Case element) throws EmfException;
     
-    void export(User user, String dirName, String purpose, boolean overWrite, Case caseToExport) throws EmfException;
+    void export(User user, String dirName, String purpose, boolean overWrite, int caseId) throws EmfException;
 
     InputName addCaseInputName(InputName name) throws EmfException;
 
@@ -114,5 +114,11 @@ public interface CaseService {
     void updateCaseParameter(User user, CaseParameter parameter) throws EmfException;
 
     void runJobs(CaseJob[] jobs, User user) throws EmfException;
+    String runJobs(Integer[] jobIds, int caseId, User user) throws EmfException;
+
+    // Used for CaseService ExportInputs
+    void exportCaseInputs(User user, Integer[] caseInputIds, String purpose) throws EmfException;
+    void exportCaseInputsWithOverwrite(User user, Integer[] caseInputIds, String purpose) throws EmfException;
+    
 
  }

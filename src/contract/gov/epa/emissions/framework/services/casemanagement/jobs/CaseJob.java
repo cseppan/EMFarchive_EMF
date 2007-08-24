@@ -238,7 +238,7 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     public void generateJobkey(User user){
         /**
          * Generates a unique job key for a particular user and
-         * a particular instatiation of a job.
+         * a particular instantiation of a job.
          */
         
         // Should generate based on user, job id, and date stamp
