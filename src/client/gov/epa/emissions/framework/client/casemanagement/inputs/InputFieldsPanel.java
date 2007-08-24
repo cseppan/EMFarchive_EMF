@@ -114,7 +114,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         dsType.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Dataset Type:", dsType, panel);
 
-        dataset = new ComboBox();
+        dataset = new ComboBox(new EmfDataset[]{input.getDataset()});
         dataset.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 fillVersions((EmfDataset) dataset.getSelectedItem());
@@ -125,7 +125,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         dataset.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Dataset:", dataset, panel);
 
-        version = new ComboBox();
+        version = new ComboBox(new Version[]{input.getVersion()});
         version.setEnabled(false);
         changeablesList.addChangeable(version);
         version.setPrototypeDisplayValue(width);
