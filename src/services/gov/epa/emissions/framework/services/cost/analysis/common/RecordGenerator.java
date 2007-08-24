@@ -13,6 +13,8 @@ public interface RecordGenerator {
     
     double reducedEmission();
     
+    Double totalCost();
+    
     void calculateEmissionReduction(ResultSet resultSet, BestMeasureEffRecord maxMeasure) throws SQLException;
     
     List tokens(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions, boolean hasSICandNAICS) throws SQLException, EmfException;

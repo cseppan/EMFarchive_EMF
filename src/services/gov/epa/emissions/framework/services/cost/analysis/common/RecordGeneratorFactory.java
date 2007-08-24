@@ -13,13 +13,13 @@ public class RecordGeneratorFactory {
     
     private DecimalFormat decFormat;
     
-    private CostEquationsFactory costEquationsFactory;
+    private CostEquationFactory costEquationsFactory;
 
     public RecordGeneratorFactory(DatasetType datasetType, ControlStrategyResult result, DecimalFormat decFormat, double discountRate, boolean useCostEquation) {
         this.datasetType = datasetType;
         this.result = result;
         this.decFormat = decFormat;
-        this.costEquationsFactory = new CostEquationsFactory(useCostEquation, discountRate);
+        this.costEquationsFactory = new CostEquationFactory(useCostEquation, discountRate);
     }
 
     public RecordGenerator getRecordGenerator() {

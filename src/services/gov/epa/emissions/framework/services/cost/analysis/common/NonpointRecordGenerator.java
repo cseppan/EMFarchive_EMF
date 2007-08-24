@@ -30,6 +30,8 @@ public class NonpointRecordGenerator implements RecordGenerator {
 
     private DecimalFormat decFormat;
 
+    private Double annualCost;
+
     public NonpointRecordGenerator(ControlStrategyResult result, DecimalFormat decFormat) {
         this.strategyResult = result;
         this.comment = "";
@@ -74,7 +76,8 @@ public class NonpointRecordGenerator implements RecordGenerator {
         tokens.add(""); // O&M
         tokens.add(""); // Annualizd Capital
         tokens.add(""); // Total Capital Cost
-        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon() * reducedEmission));  // annual cost for source
+        annualCost = maxCM.adjustedCostPerTon() * reducedEmission;
+        tokens.add("" + decFormat.format(annualCost));  // annual cost for source
         tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon()));  // annual cost per ton
         
         tokens.add("" + decFormat.format(maxCM.controlEfficiency()));   // control efficiency
@@ -158,6 +161,10 @@ public class NonpointRecordGenerator implements RecordGenerator {
 
     public double reducedEmission() {
         return reducedEmission;
+    }
+
+    public Double totalCost() {
+        return annualCost;
     }
 
 }

@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.cost.analysis.common;
 
 import gov.epa.emissions.framework.services.EmfException;
 
-public interface CostEquations {
+public interface CostEquation {
 
     public Double getAnnualCost() throws EmfException;
 

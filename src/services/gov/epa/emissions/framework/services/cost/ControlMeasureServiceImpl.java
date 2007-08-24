@@ -398,8 +398,8 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             List all = dao.getEquationTypes(session);
             return (EquationType[]) all.toArray(new EquationType[0]);
         } catch (RuntimeException e) {
-            LOG.error("Could not retrieve control measure efficiency records.", e);
-            throw new EmfException("Could not retrieve control measures efficiency records.");
+            LOG.error("Could not retrieve control measure Equation Types.", e);
+            throw new EmfException("Could not retrieve control measures Equation Types.");
         } finally {
             session.close();
         }

@@ -17,13 +17,15 @@ public class PointRecordGenerator implements RecordGenerator {
     private double invenControlEfficiency;
     private double invenRulePenetration;
     private double invenRuleEffectiveness;
+    private Double annualCost;
+
 //    private double originalEmissions;
 //    private double finalEmissions;
 
     private DecimalFormat decFormat;
-    private CostEquationsFactory costEquationsFactory;
+    private CostEquationFactory costEquationsFactory;
     
-    public PointRecordGenerator(ControlStrategyResult result, DecimalFormat decFormat, CostEquationsFactory costEquationsFactory) {
+    public PointRecordGenerator(ControlStrategyResult result, DecimalFormat decFormat, CostEquationFactory costEquationsFactory) {
         this.strategyResult = result;
         this.decFormat = decFormat;
         this.costEquationsFactory = costEquationsFactory;
@@ -47,11 +49,12 @@ public class PointRecordGenerator implements RecordGenerator {
         Double om;
         Double annulizedCCost;
         Double capitalCost;
-        Double annualCost;
        
         calculateEmissionReduction(resultSet, bestMeasureEffRecord);
         reducedEmission = originalEmissions * effectiveReduction;
-        CostEquations costEquations = costEquationsFactory.getCostEquations(reducedEmission, bestMeasureEffRecord);
+        Double minStackFlowRate = resultSet.getDouble("stkflow");
+        if (resultSet.wasNull()) minStackFlowRate = null;
+        CostEquation costEquations = costEquationsFactory.getCostEquation(reducedEmission, bestMeasureEffRecord, minStackFlowRate);
         
         
         tokens.add(""); // record id
@@ -148,6 +151,10 @@ public class PointRecordGenerator implements RecordGenerator {
 //        originalEmissions = originalEmissions / invenControlEfficiency;
 //        reducedEmission = originalEmissions * invenEffectiveReduction;
 //        finalEmissions = originalEmissions - reducedEmission;
+    }
+
+    public Double totalCost() {
+        return annualCost;
     }
 
 }

@@ -2,23 +2,17 @@ package gov.epa.emissions.framework.services.cost.analysis.common;
 
 import gov.epa.emissions.framework.services.EmfException;
 
-
-
-
-public class DefaultCostEquations implements CostEquations {
+public class DefaultCostEquation implements CostEquation {
     
     private BestMeasureEffRecord bestMeasureEffRecord;
-//   private ResultSet resultSet; 
     private double emissionReduction;
-    //private double costPerTon;
     private double discountRate;
     private Double capitalCost;
     private Double capRecFactor;
     private Double capAnnRatio; 
     private Double annulizedCCost;
- 
-    
-    public DefaultCostEquations(double discountRate) {
+
+    public DefaultCostEquation(double discountRate) {
         this.discountRate = discountRate / 100;
     }
 
@@ -51,8 +45,6 @@ public class DefaultCostEquations implements CostEquations {
         capRecFactor = getCapRecFactor();
         if (capitalCost == null || capRecFactor == null) return null;
         return capitalCost * capRecFactor;
- //       maxCM.measure().getAnnualizedCost();
-        
     }
 
    
@@ -70,7 +62,7 @@ public class DefaultCostEquations implements CostEquations {
         return null;
     }
     
-    private Double calculateCapRecFactor(double discountRate, double equipmentLife){
+    public static Double calculateCapRecFactor(double discountRate, double equipmentLife) {
         if(discountRate==0 || equipmentLife==0) return null;
         return (discountRate * Math.pow((1 + discountRate), equipmentLife)) / (Math.pow((discountRate + 1), equipmentLife) - 1);
     }

@@ -19,7 +19,7 @@
     		<list-index column="list_index"/>
 	    	<composite-element class="gov.epa.emissions.framework.services.cost.ControlMeasureEquationTypeVariable">
 		        <property name="value" column="value" type="double" not-null="true"/>
-	    		<many-to-one name="equationTypeVariable" class="gov.epa.emissions.framework.services.cost.EquationTypeVariable" column="equation_type_variable_id" not-null="true" cascade="none"/>
+	    		<many-to-one name="equationTypeVariable" class="gov.epa.emissions.framework.services.cost.EquationTypeVariable" column="equation_type_variable_id" not-null="true" cascade="all"/>
 	    	</composite-element>
   		</array>
     </class>

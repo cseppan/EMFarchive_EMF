@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
@@ -483,6 +484,8 @@ public class ControlMeasureDAO {
     }
 
     public List getEquationTypes(Session session) {
-        return hibernateFacade.getAll(EquationType.class, Order.asc("name"), session);
+        Query query = session.createQuery("from EquationType as e");
+        query.setCacheable(true);
+        return query.list();//hibernateFacade.getAll(EquationType.class, Order.asc("name"), session);
     }
 }

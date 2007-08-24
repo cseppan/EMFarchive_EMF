@@ -35,4 +35,8 @@ public class NonroadRecordGenerator implements RecordGenerator {
     public List tokens(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions, boolean hasSICandNAICS) throws SQLException, EmfException {
         return delegate.tokens(resultSet, maxCM, originalEmissions, displayOriginalEmissions, displayFinalEmissions, hasSICandNAICS);
     }
+
+    public Double totalCost() {
+        return delegate.totalCost();
+    }
 }

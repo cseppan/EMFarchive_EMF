@@ -9,10 +9,10 @@ public class EquationTypeVariable implements Serializable {
 
     private int equationTypeId;
     
-    private String description;
-    
     private short fileColPosition;
 
+    private String description;
+    
     public EquationTypeVariable() {
         //
     }
@@ -63,19 +63,19 @@ public class EquationTypeVariable implements Serializable {
         return this.name;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
     public void setFileColPosition(short fileColPosition) {
         this.fileColPosition = fileColPosition;
     }
 
     public short getFileColPosition() {
         return fileColPosition;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }
