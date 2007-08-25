@@ -295,7 +295,7 @@ public class ManagedCaseService {
     public void removeCase(Case caseObj) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            setStatus(caseObj.getLastModifiedBy(), "Start removing case " + caseObj.getName() + ".", "Remove Case");
+            setStatus(caseObj.getLastModifiedBy(), "Started removing case " + caseObj.getName() + ".", "Remove Case");
             List<CaseInput> inputs = dao.getCaseInputs(caseObj.getId(), session);
             dao.removeCaseInputs(inputs.toArray(new CaseInput[0]), session);
 
@@ -359,7 +359,7 @@ public class ManagedCaseService {
             return released;
         } catch (RuntimeException e) {
             log.error("Could not update Case", e);
-            throw new EmfException("Could not update Case: " + element);
+            throw new EmfException("Could not update Case: " + element + "; "+e.getMessage());
         } finally {
             session.close();
         }
@@ -594,7 +594,7 @@ public class ManagedCaseService {
             // FIXME: Verify the session.clear()
             session.clear();
             dao.updateCaseInput(input, session);
-            setStatus(user, "Saved input " + input.getName() + " to database.", "Save Input");
+            //setStatus(user, "Saved input " + input.getName() + " to database.", "Save Input");
         } catch (RuntimeException e) {
             log.error("Could not update case input: " + input.getName() + ".\n" + e);
             throw new EmfException("Could not update case input: " + input.getName() + ".");
@@ -1204,7 +1204,7 @@ public class ManagedCaseService {
             // FIXME: why session.clear()?
             session.clear();
             dao.updateCaseParameter(parameter, session);
-            setStatus(user, "Saved parameter " + parameter.getName() + " to database.", "Save Parameter");
+            //setStatus(user, "Saved parameter " + parameter.getName() + " to database.", "Save Parameter");
         } catch (RuntimeException e) {
             log.error("Could not update case parameter: " + parameter.getName() + ".\n" + e);
             throw new EmfException("Could not update case parameter: " + parameter.getName() + ".");
@@ -1333,7 +1333,8 @@ public class ManagedCaseService {
             // FIXME: Why session.clear()???
             session.clear();
             dao.updateCaseJob(job, session);
-            setStatus(user, "Saved job " + job.getName() + " to database.", "Save Job");
+            // this should go to case message panel instead
+            //setStatus(user, "Saved job " + job.getName() + " to database.", "Save Job");
         } catch (RuntimeException e) {
             e.printStackTrace();
             log.error("Could not update case job: " + job.getName() + ".\n" + e);
