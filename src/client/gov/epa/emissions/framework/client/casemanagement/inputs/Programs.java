@@ -22,7 +22,7 @@ public class Programs {
 
     public CaseProgram get(Object selected) throws EmfException {
         if (selected instanceof String) {
-            return editProgramType(selected);
+            return addNewProgram(selected);
         }
         
         if (selected == null)
@@ -36,7 +36,7 @@ public class Programs {
         return (CaseProgram[]) list.toArray(new CaseProgram[0]);
     }
 
-    private CaseProgram editProgramType(Object selected) throws EmfException {
+    private CaseProgram addNewProgram(Object selected) throws EmfException {
         String newProgram = ((String) selected).trim();
         if (newProgram.length() == 0)
             return null;
