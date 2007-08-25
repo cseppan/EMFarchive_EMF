@@ -75,13 +75,14 @@ public class CaseObjectManager {
     
     public synchronized void refresh() throws EmfException
     {
-        programs = caseService.getPrograms();
-        inputEnvtVars = caseService.getInputEnvtVars();
-        inputNames = caseService.getInputNames();
-        subDirs = caseService.getSubDirs();
+        // refresh the pieces of the cache that have been used so far
+        if (programs != null) programs = caseService.getPrograms();
+        if (inputEnvtVars != null) inputEnvtVars = caseService.getInputEnvtVars();
+        if (inputNames != null) inputNames = caseService.getInputNames();
+        if (subDirs != null) subDirs = caseService.getSubDirs();
         
-        sectors = dataCommonsService.getSectors();
-        datasetTypes = dataCommonsService.getDatasetTypes();
+        if (sectors != null) sectors = dataCommonsService.getSectors();
+        if (datasetTypes != null) datasetTypes = dataCommonsService.getDatasetTypes();
     }
 
     public synchronized DatasetType[] getDatasetTypes() throws EmfException {
