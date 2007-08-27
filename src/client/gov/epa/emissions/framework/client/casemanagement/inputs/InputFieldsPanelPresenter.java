@@ -139,9 +139,6 @@ public class InputFieldsPanelPresenter {
 
     public EmfDataset[] getDatasets(DatasetType type) throws EmfException
 {
-        System.out.println("InputFieldsPanelPresenter: Get datasets");
-        boolean isAProblem = false;
-        if (isAProblem) throw new EmfException("A fake problem");
         if (type == null)
             return new EmfDataset[0];
 
@@ -150,14 +147,10 @@ public class InputFieldsPanelPresenter {
 
     public Version[] getVersions(EmfDataset dataset) throws EmfException 
     {
-        boolean isAProblem = false;
-        if (isAProblem) throw new EmfException("A fake problem");
-        System.out.println("InputFieldsPanelPresenter: Get versions");
         if (dataset == null) {
             return new Version[0];
         }
-
-        return dataEditorServive().getVersions(dataset.getId());
+        return dataEditorService().getVersions(dataset.getId());
     }
 
 //    private CaseService caseService() {
@@ -172,13 +165,12 @@ public class InputFieldsPanelPresenter {
         return session.dataService();
     }
 
-    private DataEditorService dataEditorServive() {
+    private DataEditorService dataEditorService() {
         return session.dataEditorService();
     }
 
     public void doSave() throws EmfException {
         //view.setFields();
-        System.out.println("Calling updateCaseInput from service");
         session.caseService().updateCaseInput(session.user(), view.setFields());
     }
 
@@ -202,16 +194,20 @@ public class InputFieldsPanelPresenter {
         return caseObjectManager.getOrAddSubDir(selected);
     }
 
-    public CaseJob getJob(int caseJobID) throws EmfException {
-        return session.caseService().getCaseJob(caseJobID);
-    }
+//    public CaseJob getJob(int caseJobID) throws EmfException {
+//        return session.caseService().getCaseJob(caseJobID);
+//    }
 
-    public int getJobIndex(int caseJobID) throws EmfException {
-        CaseJob[] jobs = session.caseService().getCaseJobs(caseId);
+    public int getJobIndex(int caseJobId, CaseJob [] jobs) //throws EmfException 
+    {
+        //CaseJob[] jobs = session.caseService().getCaseJobs(caseId);
+        // AME: don't go get the jobs again!
+        
+        if (caseJobId == 0) return 0;
         
         for (int i = 0; i < jobs.length; i++)
-            if (jobs[i].getId() == caseJobID)
-                return i + 1; // because of the default "All jobs" job is not in db
+            if (jobs[i].getId() == caseJobId)
+                return i; // because of the default "All jobs" job is not in db
         
         return 0;
     }
