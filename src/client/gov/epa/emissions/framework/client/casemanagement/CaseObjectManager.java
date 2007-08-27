@@ -129,7 +129,7 @@ public class CaseObjectManager {
         jobs.add(allJobsForSector);
         jobs.addAll(Arrays.asList(caseService.getCaseJobs(caseId)));
         //sort the Case Jobs before sending them to the ComboBox
-        CaseJob[] jobsForLastCaseId = jobs.toArray(new CaseJob[jobs.size()]);
+        jobsForLastCaseId = jobs.toArray(new CaseJob[jobs.size()]);
         Arrays.sort(jobsForLastCaseId, new CaseJobNameComparator());
         lastCaseId = caseId;
         return jobsForLastCaseId;       
