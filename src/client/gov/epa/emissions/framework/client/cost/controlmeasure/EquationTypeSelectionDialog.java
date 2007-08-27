@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.cost.EquationType;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 
@@ -21,16 +22,19 @@ import javax.swing.JPanel;
 
 public class EquationTypeSelectionDialog extends JDialog implements EquationTypeSelectionView {
 
-    private EmfConsole parent;
+    private Component dialogParent;
 
     private ComboBox equationTypeCombo;
     
     private EquationType equationType;
 
-    public EquationTypeSelectionDialog(EmfConsole parent, ManageChangeables changeables) {
+    private ManageChangeables changeables;
+    
+    public EquationTypeSelectionDialog(EmfConsole parent, Component dialogParent, ManageChangeables changeables) {
         super(parent);
         super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
-        this.parent = parent;
+        this.dialogParent = dialogParent;
+        this.changeables = changeables;
         setModal(true);
     }
 
@@ -45,17 +49,19 @@ public class EquationTypeSelectionDialog extends JDialog implements EquationType
 
         setTitle("Select Equation Type");
         this.pack();
-        this.setSize(500, 200);
-        this.setLocation(ScreenUtils.getPointToCenter(parent));
+        this.setSize(400, 150);
+        this.setLocation(ScreenUtils.getPointToCenter(dialogParent));
         this.setVisible(true);
     }
 
     private JPanel buildEquationTypeCombo(EquationType[] equationTypes) {
         JPanel panel = new JPanel(new BorderLayout());
+        
         equationTypeCombo = new ComboBox("Choose an equation type", equationTypes);
+        changeables.addChangeable(equationTypeCombo);
 
-        panel.add(equationTypeCombo, BorderLayout.LINE_START);
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
+        panel.add(equationTypeCombo, BorderLayout.CENTER);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         return panel;
     }
 

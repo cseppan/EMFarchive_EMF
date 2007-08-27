@@ -19,13 +19,12 @@ public class EditableEquationVariableRowSource implements RowSource {
     public Object[] values() {
         if (controlMeasureEquationTypeVariable.getEquationTypeVariable()==null){
             Object[] values = {controlMeasureEquationTypeVariable.getEquationType().getName(), 
-                    "NO VARIABLES", NAN_VALUE, "" };
+                    "NO VARIABLES", NAN_VALUE };
             return values;           
         }
         Double value=(controlMeasureEquationTypeVariable.getValue()!=null? controlMeasureEquationTypeVariable.getValue() : NAN_VALUE);
         Object[] values = {controlMeasureEquationTypeVariable.getEquationType().getName(), 
-                controlMeasureEquationTypeVariable.getEquationTypeVariable().getName(), value, 
-                controlMeasureEquationTypeVariable.getEquationTypeVariable().getDescription()+"" };
+                controlMeasureEquationTypeVariable.getEquationTypeVariable().getName(), value };
         return values;
     }
 

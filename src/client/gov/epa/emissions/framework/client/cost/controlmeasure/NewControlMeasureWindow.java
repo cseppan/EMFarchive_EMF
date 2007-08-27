@@ -73,11 +73,19 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
 
         tabbedPane.addTab("SCCs", createSCCTab(measure, messagePanel));
         
+        tabbedPane.addTab("Equations", createEquationTab(measure, messagePanel));
+        
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
         return tabbedPane;
     }
 
+    private JPanel createEquationTab(ControlMeasure measure, MessagePanel messagePanel){
+        ControlMeasureEquationTab view=new ControlMeasureEquationTab(measure, session, this, messagePanel, parent, presenter); 
+        presenter.set(view);
+        return view;
+    }
+    
     private JPanel createSCCTab(ControlMeasure measure, MessagePanel messagePanel) {
         ControlMeasureSccTabView view = new EditableCMSCCTab(measure, session,
                 this, messagePanel, 
