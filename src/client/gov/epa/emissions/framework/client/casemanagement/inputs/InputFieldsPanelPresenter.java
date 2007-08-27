@@ -51,12 +51,6 @@ public class InputFieldsPanelPresenter {
         this.view = inputFields;
         this.caseId = caseId;
         this.caseObjectManager = CaseObjectManager.getCaseObjectManager(session);
-//        this.programs = new Programs(session, getPrograms());
-//        System.out.println("InputFieldsPanelPresenter: getting inputnames, envt vars, programs, subdirs");
-//        this.caseInputNames = new CaseInputNames(session,getInputNames());
-//        this.caseInputEnvtVars = new CaseInputEnvtVars(session, getEnvtVars());
-//        this.programs = new Programs(session, getPrograms());
-//        this.subdirs = new SubDirs(session, getSubdirs());
     }
 
     public void display(CaseInput input, JComponent container) throws EmfException {
@@ -98,11 +92,6 @@ public class InputFieldsPanelPresenter {
 
     public Sector[] getSectors() throws EmfException {
         return caseObjectManager.getSectorsWithAll();
-//        List list = new ArrayList();
-//        list.add(new Sector("All sectors", "All sectors"));
-//        list.addAll(Arrays.asList(caseObjectManager.getSectorsWithAll()));
-//
-//        return (Sector[]) list.toArray(new Sector[0]);
     }
 
     public CaseProgram[] getPrograms() throws EmfException {
@@ -120,18 +109,7 @@ public class InputFieldsPanelPresenter {
     public CaseJob[] getCaseJobs() throws EmfException 
     {
         return caseObjectManager.getCaseJobsWithAll(caseId);
-        // this is different than the others because we want only jobs for a particular case
-//        List<CaseJob> jobs = new ArrayList<CaseJob>();
-//        jobs.add(new CaseJob(ALL_FOR_SECTOR));
-//        
-//        // NOTE: This causes an extra session to be created 8/25/2007        
-//        jobs.addAll(Arrays.asList(caseService().getCaseJobs(caseId)));
-//       
-//        //Created by RVA to sort the Case Jobs before sending them to the ComboBox
-//        CaseJob[] jobs2 = jobs.toArray(new CaseJob[jobs.size()]);
-//        Arrays.sort(jobs2, new CaseJobNameComparator());
-//        return jobs2;       
-    }
+   }
     
     public DatasetType[] getDSTypes() throws EmfException {
        return caseObjectManager.getDatasetTypes();
@@ -153,14 +131,6 @@ public class InputFieldsPanelPresenter {
         return dataEditorService().getVersions(dataset.getId());
     }
 
-//    private CaseService caseService() {
-//        return session.caseService();
-//    }
-
-//    private DataCommonsService dataCommonsService() {
-//        return session.dataCommonsService();
-//    }
-
     private DataService dataService() {
         return session.dataService();
     }
@@ -170,8 +140,7 @@ public class InputFieldsPanelPresenter {
     }
 
     public void doSave() throws EmfException {
-        //view.setFields();
-        session.caseService().updateCaseInput(session.user(), view.setFields());
+         session.caseService().updateCaseInput(session.user(), view.setFields());
     }
 
     public void doValidateFields() throws EmfException {
@@ -194,14 +163,10 @@ public class InputFieldsPanelPresenter {
         return caseObjectManager.getOrAddSubDir(selected);
     }
 
-//    public CaseJob getJob(int caseJobID) throws EmfException {
-//        return session.caseService().getCaseJob(caseJobID);
-//    }
-
     public int getJobIndex(int caseJobId, CaseJob [] jobs) //throws EmfException 
     {
         //CaseJob[] jobs = session.caseService().getCaseJobs(caseId);
-        // AME: don't go get the jobs again!
+        // AME: don't go get the jobs from the server again!
         
         if (caseJobId == 0) return 0;
         
