@@ -101,7 +101,14 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("Envt. Variable:", envtVar, panel);
 
         sector = new ComboBox(presenter.getSectors());
-        sector.setSelectedItem(input.getSector());
+        if (input.getSector() == null)
+        {
+            sector.setSelectedIndex(0); // set to all sectors
+        }
+        else
+        {    
+           sector.setSelectedItem(input.getSector());
+        }   
 //        addPopupMenuListener(sector, "sectors");
         changeablesList.addChangeable(sector);
         sector.setPrototypeDisplayValue(width);
@@ -109,7 +116,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
         dsType = new ComboBox(presenter.getDSTypes());
 //        addPopupMenuListener(dsType, "dstypes");
-        sector.setSelectedItem(input.getDatasetType());
+        dsType.setSelectedItem(input.getDatasetType());
         dsType.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 fillDatasets((DatasetType) dsType.getSelectedItem());
@@ -220,15 +227,9 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     }
     
     private void setJob() throws EmfException {
-        // TBD: also need to defer loading of jobs until they are needed
-        jobs = new ComboBox(presenter.getCaseJobs());
-        int selected = presenter.getJobIndex(input.getCaseJobID());
-        if (selected > 0)
-        {
-//            jobs.setSelectedIndex(selected);
-            boolean fakeProblem = false;
-            if (fakeProblem) throw new EmfException("A fake problem");
-        }
+        CaseJob [] jobArray = presenter.getCaseJobs();
+        jobs = new ComboBox(jobArray);
+        jobs.setSelectedIndex(presenter.getJobIndex(input.getCaseJobID(),jobArray));
     }
 
     private void fillDatasets(DatasetType type) {
