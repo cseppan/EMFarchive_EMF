@@ -63,6 +63,8 @@ public class EquationType implements Serializable {
     }
     
     public String toString() {
+        if (this.description.trim()=="")
+            return this.name;
         String string=this.name +" -- " +this.description + ""; 
         return string;
     }
