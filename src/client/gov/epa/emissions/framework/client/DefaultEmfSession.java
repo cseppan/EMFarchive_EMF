@@ -28,6 +28,8 @@ public class DefaultEmfSession implements EmfSession {
     private String mostRecentExportFolder;
 
     private UserPreference preferences;
+    
+    private CaseService caseService;
 
     public DefaultEmfSession(User user, ServiceLocator locator) throws EmfException {
         serviceLocator = locator;
@@ -88,7 +90,10 @@ public class DefaultEmfSession implements EmfSession {
     }
 
     public CaseService caseService() {
-        return serviceLocator.caseService();
+        if (caseService == null)
+            caseService = serviceLocator.caseService();
+        
+        return caseService;
     }
 
     public ControlMeasureService controlMeasureService() {

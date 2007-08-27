@@ -25,6 +25,8 @@ public class RemoteServiceLocator implements ServiceLocator {
 
     private EmfCall eximCall;
     
+    private CaseService caseService;
+    
     public RemoteServiceLocator(String baseUrl) throws Exception {
         this.baseUrl = baseUrl;
         editCall = this.createSessionEnabledCall("DataEditor Service", baseUrl
@@ -67,7 +69,10 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
 
     public CaseService caseService() {
-        return new CaseServiceTransport(baseUrl + "/gov.epa.emissions.framework.services.casemanagement.CaseService");
+        if (caseService == null)
+            caseService = new CaseServiceTransport(baseUrl + "/gov.epa.emissions.framework.services.casemanagement.CaseService");
+        
+        return caseService;
     }
     
     public ControlMeasureService controlMeasureService() {
