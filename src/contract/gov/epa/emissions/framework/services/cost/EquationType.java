@@ -57,12 +57,14 @@ public class EquationType implements Serializable {
         return (id == other.getId() || name.equalsIgnoreCase(other.getName()));
     }
 
+    
     public int hashCode() {
         return name.hashCode();
     }
     
     public String toString() {
-        return this.name;
+        String string=this.name +" -- " +this.description + ""; 
+        return string;
     }
 
     public EquationTypeVariable[] getEquationTypeVariables() {
