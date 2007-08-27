@@ -303,14 +303,18 @@ public class CaseServiceImpl implements CaseService {
     }
 
     public void exportCaseInputs(User user, Integer[] caseInputIds, String purpose) throws EmfException {
+        if (false)
+            throw new EmfException("");
         System.out.println("CaseServiceImpl::exportCaseInputs Total inputs size for export= " + caseInputIds.length);
-         getCaseService().exportCaseInputs(user, caseInputIds, purpose);
+         //getCaseService().exportCaseInputs(user, caseInputIds, purpose);
     }
 
     public void exportCaseInputsWithOverwrite(User user, Integer[] caseInputIds, String purpose) throws EmfException {
+        if (false)
+            throw new EmfException("");
         System.out.println("CaseServiceImpl::exportCaseInputsWithOverwrite Total inputs size for export= "
                 + caseInputIds.length);
-        getCaseService().exportCaseInputsWithOverwrite(user, caseInputIds, purpose);
+        //getCaseService().exportCaseInputsWithOverwrite(user, caseInputIds, purpose);
 
     }
 
