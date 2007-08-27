@@ -332,10 +332,10 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         leftlayout.addLabelWidgetPair("Queue ID:", queID, leftpanel);
 
         start = new JLabel();
-        leftlayout.addLabelWidgetPair("Start Date:", start, leftpanel);
+        leftlayout.addLabelWidgetPair("Date Started:", start, leftpanel);
 
         complete = new JLabel();
-        leftlayout.addLabelWidgetPair("Complete Date:", complete, leftpanel);
+        leftlayout.addLabelWidgetPair("Date Completed:", complete, leftpanel);
 
         // Lay out the panel.
         leftlayout.makeCompactGrid(leftpanel, 3, 2, // rows, cols
