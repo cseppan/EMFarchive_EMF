@@ -1,16 +1,11 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
-import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 
 import javax.swing.JComponent;
@@ -101,16 +96,12 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     }
 
     public void runJobs(CaseJob[] jobs) throws EmfException {
-        List<JobRunStatus> statuses = Arrays.asList(service().getJobRunStatuses());
-        int runningIndex = statuses.indexOf(new JobRunStatus("Submitted"));
+        Integer[] jobIds = new Integer[jobs.length];
         
-        for (CaseJob job : jobs) {
-            job.setRunStartDate(new Date());
-            job.setRunstatus(statuses.get(runningIndex));
-            service().updateCaseJob(session.user(), job);
-        }
+        for (int i = 0; i < jobs.length; i++)
+            jobIds[i] = new Integer(jobs[i].getId());
             
-        service().runJobs(jobs, session.user());
+        service().runJobs(jobIds, caseObj.getId(), session.user());
     }
 
 }
