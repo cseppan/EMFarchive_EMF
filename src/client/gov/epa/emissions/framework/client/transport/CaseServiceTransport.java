@@ -35,6 +35,8 @@ public class CaseServiceTransport implements CaseService {
 
     private CaseMappings caseMappings;
 
+    private EmfCall emfCall;
+    
     public CaseServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
         dataMappings = new DataMappings();
@@ -42,7 +44,13 @@ public class CaseServiceTransport implements CaseService {
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createCall("Case Service");
+        if (emfCall==null){
+            System.out.println("No emfcall so create");
+//            emfCall=callFactory.createCall("Case Service");
+            emfCall=callFactory.createSessionEnabledCall("Case Service");
+
+        }
+        return this.emfCall;
     }
 
     public Case[] getCases() throws EmfException {
