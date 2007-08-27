@@ -85,7 +85,7 @@ public class PointRecordGenerator implements RecordGenerator {
         tokens.add("" +  (annualCost!= null ? decFormat.format(annualCost) : ""));
                 //maxCM.adjustedCostPerTon() * reducedEmission));//annual cost for source
         
-        tokens.add("" + decFormat.format(bestMeasureEffRecord.adjustedCostPerTon())); //annual cost per ton
+        tokens.add("" + decFormat.format(costEquations.getComputedCPT())); //annual cost per ton
         tokens.add("" + decFormat.format(bestMeasureEffRecord.controlEfficiency()));   //control efficiency
         tokens.add("" + 100);
         tokens.add("" + bestMeasureEffRecord.ruleEffectiveness()); //rule effectiveness

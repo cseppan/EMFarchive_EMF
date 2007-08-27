@@ -31,11 +31,14 @@ public class NonpointRecordGenerator implements RecordGenerator {
     private DecimalFormat decFormat;
 
     private Double annualCost;
+    
+    private CostEquationFactory costEquationsFactory;
 
-    public NonpointRecordGenerator(ControlStrategyResult result, DecimalFormat decFormat) {
+    public NonpointRecordGenerator(ControlStrategyResult result, DecimalFormat decFormat, CostEquationFactory costEquationsFactory) {
         this.strategyResult = result;
         this.comment = "";
         this.decFormat = decFormat;
+        this.costEquationsFactory = costEquationsFactory;
     }
 
     public Record getRecord(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {
@@ -68,6 +71,9 @@ public class NonpointRecordGenerator implements RecordGenerator {
         tokens.add(fullFips);  // 5 digit FIPS state+county code
 
         // these columns are only relevant to point sources, leave empty for nonpoint
+        
+        CostEquation costEquations=costEquationsFactory.getCostEquation(reducedEmission, maxCM, null);
+        
         tokens.add(""); // plant Id
         tokens.add(""); // Point ID
         tokens.add(""); // stack ID
@@ -76,9 +82,10 @@ public class NonpointRecordGenerator implements RecordGenerator {
         tokens.add(""); // O&M
         tokens.add(""); // Annualizd Capital
         tokens.add(""); // Total Capital Cost
-        annualCost = maxCM.adjustedCostPerTon() * reducedEmission;
+        annualCost=costEquations.getAnnualCost();
+ //       annualCost = maxCM.adjustedCostPerTon() * reducedEmission;
         tokens.add("" + decFormat.format(annualCost));  // annual cost for source
-        tokens.add("" + decFormat.format(maxCM.adjustedCostPerTon()));  // annual cost per ton
+        tokens.add("" + decFormat.format(costEquations.getComputedCPT()));  // annual cost per ton
         
         tokens.add("" + decFormat.format(maxCM.controlEfficiency()));   // control efficiency
         tokens.add("" + maxCM.rulePenetration());  // rule penetration

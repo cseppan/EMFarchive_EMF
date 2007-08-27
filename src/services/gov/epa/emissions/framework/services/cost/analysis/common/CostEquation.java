@@ -11,5 +11,7 @@ public interface CostEquation {
     public Double getAnnualizedCapitalCost() throws EmfException;
 
     public Double getOperationMaintenanceCost() throws EmfException;
+    
+    public Double getComputedCPT();
 
 }

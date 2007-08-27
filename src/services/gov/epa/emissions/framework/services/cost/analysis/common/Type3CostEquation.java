@@ -1,15 +1,18 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
 
-
-public class Type6CostEquation implements CostEquation {
+public class Type3CostEquation implements CostEquation {
 
     private BestMeasureEffRecord bestMeasureEffRecord;
+    
+    private double emissionReduction; 
     private double discountRate;
     private Double minStackFlowRate;
-    private double emissionReduction;
+    private double capitalCostFactor=192;
+    private double gasFlowRateFactor=.486;
+    private double retrofitFactor=1.1;
     
-    public Type6CostEquation(double discountRate) {
+    public Type3CostEquation(double discountRate) {
         this.discountRate = discountRate / 100;
     }
 
@@ -18,6 +21,11 @@ public class Type6CostEquation implements CostEquation {
         this.bestMeasureEffRecord = bestMeasureEffRecord;
         this.minStackFlowRate = minStackFlowRate;
         this.emissionReduction=emissionReduction;
+        getFactors();
+    }
+    
+    public void getFactors(){
+        //
     }
 
     public Double getAnnualCost() {
@@ -30,12 +38,14 @@ public class Type6CostEquation implements CostEquation {
 
     public Double getCapitalCost() {
         if (minStackFlowRate == null || minStackFlowRate == 0.0) return null;
-        return 3449803.0 + (135.86 * minStackFlowRate);
+        if (minStackFlowRate <1028000 )
+            return Math.pow(1028000/minStackFlowRate, 0.6)*capitalCostFactor*gasFlowRateFactor*retrofitFactor*minStackFlowRate;
+        return capitalCostFactor*gasFlowRateFactor*retrofitFactor*minStackFlowRate;
     }  
     
     public Double getOperationMaintenanceCost() {
         if (minStackFlowRate == null || minStackFlowRate == 0.0) return null;
-        return 797667.0 + (58.84 * minStackFlowRate);
+        return (3.35+(0.00729*8736))* minStackFlowRate*0.9383;
     }
     
     public Double getAnnualizedCapitalCost() { 

@@ -1,23 +1,22 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
 
-
-public class Type6CostEquation implements CostEquation {
+public class Type5CostEquation implements CostEquation {
 
     private BestMeasureEffRecord bestMeasureEffRecord;
     private double discountRate;
     private Double minStackFlowRate;
-    private double emissionReduction;
+    private double reducedEmission;
     
-    public Type6CostEquation(double discountRate) {
+    public Type5CostEquation(double discountRate) {
         this.discountRate = discountRate / 100;
     }
 
-    public void setUp(double emissionReduction, BestMeasureEffRecord bestMeasureEffRecord, Double minStackFlowRate) {
+    public void setUp(double reducedEmission, BestMeasureEffRecord bestMeasureEffRecord, Double minStackFlowRate) {
         //define required inputs
         this.bestMeasureEffRecord = bestMeasureEffRecord;
         this.minStackFlowRate = minStackFlowRate;
-        this.emissionReduction=emissionReduction;
+        this.reducedEmission=reducedEmission;
     }
 
     public Double getAnnualCost() {
@@ -30,12 +29,12 @@ public class Type6CostEquation implements CostEquation {
 
     public Double getCapitalCost() {
         if (minStackFlowRate == null || minStackFlowRate == 0.0) return null;
-        return 3449803.0 + (135.86 * minStackFlowRate);
+        return 2882540.0 + (244.74 * minStackFlowRate);
     }  
     
     public Double getOperationMaintenanceCost() {
         if (minStackFlowRate == null || minStackFlowRate == 0.0) return null;
-        return 797667.0 + (58.84 * minStackFlowRate);
+        return 749170.0 + (148.40 * minStackFlowRate);
     }
     
     public Double getAnnualizedCapitalCost() { 
@@ -62,7 +61,7 @@ public class Type6CostEquation implements CostEquation {
 
     public Double getComputedCPT() {
         Double totalCost=getAnnualCost();
-        if (totalCost==null || emissionReduction == 0.0) return null; 
-        return totalCost/emissionReduction;
+        if (totalCost==null || reducedEmission == 0.0) return null; 
+        return totalCost/reducedEmission;
     }
 }

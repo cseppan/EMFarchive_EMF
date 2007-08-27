@@ -11,14 +11,16 @@ public class DefaultCostEquation implements CostEquation {
     private Double capRecFactor;
     private Double capAnnRatio; 
     private Double annulizedCCost;
+    private Double annualCost;
 
     public DefaultCostEquation(double discountRate) {
         this.discountRate = discountRate / 100;
     }
 
-    public void setUp(double emissionReduction, BestMeasureEffRecord bestMeasureEffRecord) {
+    public void setUp(double emissionReduction, BestMeasureEffRecord bestMeasureEffRecord) throws EmfException {
         this.bestMeasureEffRecord = bestMeasureEffRecord;
         this.emissionReduction = emissionReduction;
+        this.annualCost=getAnnualCost();
     }
 
     public Double getAnnualCost() throws EmfException {
@@ -27,20 +29,20 @@ public class DefaultCostEquation implements CostEquation {
         return tAnnualCost;
     }
 
-    public Double getCapitalCost() throws EmfException {
+    public Double getCapitalCost() {
         capAnnRatio = bestMeasureEffRecord.efficiencyRecord().getCapitalAnnualizedRatio();
-        if (capAnnRatio == null) return null;
-        return capAnnRatio * getAnnualCost();
+        if (capAnnRatio == null || annualCost==null) return null;
+        return capAnnRatio * annualCost;
     }  
     
-    public Double getOperationMaintenanceCost() throws EmfException {
+    public Double getOperationMaintenanceCost() {
         annulizedCCost = getAnnualizedCapitalCost();
         if (annulizedCCost == null) return null;
-        double omCost = getAnnualCost() - annulizedCCost;
+        double omCost = annualCost - annulizedCCost;
         return omCost;
     }
     
-    public Double getAnnualizedCapitalCost() throws EmfException { 
+    public Double getAnnualizedCapitalCost() { 
         capitalCost = getCapitalCost();
         capRecFactor = getCapRecFactor();
         if (capitalCost == null || capRecFactor == null) return null;
@@ -66,22 +68,10 @@ public class DefaultCostEquation implements CostEquation {
         if(discountRate==0 || equipmentLife==0) return null;
         return (discountRate * Math.pow((1 + discountRate), equipmentLife)) / (Math.pow((discountRate + 1), equipmentLife) - 1);
     }
+
+    public Double getComputedCPT() {
+        
+        return annualCost/emissionReduction;
+    }
 }
 
-//what the difference of cost per ton and adjusted cost per ton.
-
-//input for new CoST equations
-//maxCM.measure().getEquipmentLife() //equipment life
-//controlStrategy.getDiscountRate() //interest rate
-//maxCM.adjustedCostPerTon() * reducedEmission //annualized cost
-//maxCM.adjustedCostPerTon() //Cost Per Ton
-//reducedEmission  //Tons reduced
-//maxCM.efficiencyRecord().getCapitalAnnualizedRatio()
-    
-//how to get CapRecFactor
-//if (discountRate = 0.07 && maxCM.efficiencyRecord().getCapRecFactor() != null && maxCM.efficiencyRecord().getCapRecFactor() != 0)
-//    maxCM.efficiencyRecord().getCapRecFactor() 
-//else 
-//    calculateCapRecFactor(discountRate, equipmentLife)
-
-//ned to return O&M Costs & Capital Cost

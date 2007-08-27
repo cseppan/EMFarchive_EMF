@@ -12,8 +12,8 @@ import java.util.List;
 public class NonroadRecordGenerator implements RecordGenerator {
     private NonpointRecordGenerator delegate;
 
-    public NonroadRecordGenerator(ControlStrategyResult result, DecimalFormat decFormat) {
-        this.delegate = new NonpointRecordGenerator(result, decFormat);
+    public NonroadRecordGenerator(ControlStrategyResult result, DecimalFormat decFormat, CostEquationFactory costEquationsFactory) {
+        this.delegate = new NonpointRecordGenerator(result, decFormat, costEquationsFactory);
     }
 
     public Record getRecord(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {

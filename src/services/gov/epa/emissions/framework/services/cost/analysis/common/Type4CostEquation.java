@@ -1,15 +1,14 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
 
-
-public class Type6CostEquation implements CostEquation {
+public class Type4CostEquation implements CostEquation {
 
     private BestMeasureEffRecord bestMeasureEffRecord;
     private double discountRate;
     private Double minStackFlowRate;
     private double emissionReduction;
     
-    public Type6CostEquation(double discountRate) {
+    public Type4CostEquation(double discountRate) {
         this.discountRate = discountRate / 100;
     }
 
@@ -30,12 +29,12 @@ public class Type6CostEquation implements CostEquation {
 
     public Double getCapitalCost() {
         if (minStackFlowRate == null || minStackFlowRate == 0.0) return null;
-        return 3449803.0 + (135.86 * minStackFlowRate);
+        return 990000 + (9.836 * minStackFlowRate);
     }  
     
     public Double getOperationMaintenanceCost() {
         if (minStackFlowRate == null || minStackFlowRate == 0.0) return null;
-        return 797667.0 + (58.84 * minStackFlowRate);
+        return 75800 + (12.82 * minStackFlowRate);
     }
     
     public Double getAnnualizedCapitalCost() { 
