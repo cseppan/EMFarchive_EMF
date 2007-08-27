@@ -83,7 +83,10 @@ public class CaseObjectManager {
         
         if (sectors != null) sectors = dataCommonsService.getSectors();
         if (datasetTypes != null) datasetTypes = dataCommonsService.getDatasetTypes();
-    }
+        
+        lastCaseId = -1;        
+        jobsForLastCaseId = null;
+   }
 
     public synchronized DatasetType[] getDatasetTypes() throws EmfException {
         if (datasetTypes == null)
