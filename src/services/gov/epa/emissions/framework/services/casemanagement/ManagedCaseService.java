@@ -22,7 +22,9 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ManagedExportService;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.CaseJobSumitter;
 import gov.epa.emissions.framework.tasks.DebugLevels;
+import gov.epa.emissions.framework.tasks.RunManagerFactory;
 import gov.epa.emissions.framework.tasks.TaskSubmitter;
 
 import java.io.File;
@@ -44,7 +46,7 @@ public class ManagedCaseService {
 
     private String svcLabel = null;
 
-    public String myTag() {
+    public synchronized String myTag() {
         if (svcLabel == null) {
             svcCount++;
             this.svcLabel = "#" + svcCount + "-" + getClass().getName() + "-" + new Date().getTime();
@@ -56,9 +58,9 @@ public class ManagedCaseService {
 
     private CaseDAO dao;
 
-    private TaskSubmitter exportTaskSubmitter = null;
+    private TaskSubmitter caseJobSubmitter = null;
 
-    private ArrayList<Runnable> eximTasks = new ArrayList<Runnable>();
+    private ArrayList<Runnable> caseJobTasks = new ArrayList<Runnable>();
 
     private HibernateSessionFactory sessionFactory = null;
 
@@ -90,14 +92,14 @@ public class ManagedCaseService {
 
     private static int ALL_JOB_ID = 0;
 
-    // public ManagedCaseService() {
-    // super();
-    // log.info("ManagedCaseService");
-    // log.info("exportTaskSubmitter: " + exportTaskSubmitter);
-    // log.info("eximTasks: " + eximTasks.size());
-    // log.info("Session factory null? " + (sessionFactory == null));
-    // log.info("dBServer null? " + (dbServer == null));
-    // }
+    protected Session session = null;
+
+    private Session getSession() {
+        if (session == null) {
+            session = sessionFactory.getSession();
+        }
+        return session;
+    }
 
     public ManagedCaseService(DbServer dbServer, HibernateSessionFactory sessionFactory) {
         this.dbServer = dbServer;
@@ -110,15 +112,24 @@ public class ManagedCaseService {
             System.out.println(">>>> " + myTag());
 
         log.info("ManagedCaseService");
-        log.info("exportTaskSubmitter: " + exportTaskSubmitter);
-        log.info("eximTasks: " + eximTasks.size());
+        log.info("exportTaskSubmitter: " + caseJobSubmitter);
+        log.info("eximTasks: " + caseJobTasks.size());
         log.info("Session factory null? " + (sessionFactory == null));
         log.info("dBServer null? " + (this.dbServer == null));
         log.info("User null? : " + (user == null));
 
     }
 
-    private ManagedExportService getExportService() {
+    private synchronized TaskSubmitter getCaseJobSubmitter(){
+        if (caseJobSubmitter==null){
+            caseJobSubmitter=new CaseJobSumitter();
+            RunManagerFactory.getCaseJobRunManager().registerTaskSubmitter(caseJobSubmitter);
+
+        }
+        return this.caseJobSubmitter;
+    }
+    
+    private synchronized ManagedExportService getExportService() {
         log.info("ManagedCaseService::getExportService");
 
         if (exportService == null) {
@@ -163,16 +174,18 @@ public class ManagedCaseService {
     }
 
     public CaseJob getCaseJob(int jobId) throws EmfException {
-        Session session = sessionFactory.getSession();
+        // Session session = sessionFactory.getSession();
 
         try {
-            return dao.getCaseJob(jobId, session);
+            // return dao.getCaseJob(jobId, session);
+            return dao.getCaseJob(jobId, this.getSession());
         } catch (Exception e) {
             log.error("Could not get job for job id " + jobId + ".\n" + e.getMessage());
             throw new EmfException("Could not get job for job id " + jobId + ".\n");
-        } finally {
-            session.close();
-        }
+            // } finally {
+            // session.close();
+            // }
+        }// remove this if the finally block is uncommented
     }
 
     public Abbreviation[] getAbbreviations() throws EmfException {
@@ -280,7 +293,7 @@ public class ManagedCaseService {
         }
     }
 
-    public void addCase(Case element) throws EmfException {
+    public synchronized void addCase(Case element) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(element, session);
@@ -292,7 +305,7 @@ public class ManagedCaseService {
         }
     }
 
-    public void removeCase(Case caseObj) throws EmfException {
+    public synchronized void removeCase(Case caseObj) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             setStatus(caseObj.getLastModifiedBy(), "Started removing case " + caseObj.getName() + ".", "Remove Case");
@@ -315,7 +328,7 @@ public class ManagedCaseService {
         }
     }
 
-    private void setStatus(User user, String message, String type) {
+    private synchronized void setStatus(User user, String message, String type) {
         Status status = new Status();
         status.setUsername(user.getUsername());
         status.setType(type);
@@ -351,7 +364,7 @@ public class ManagedCaseService {
         }
     }
 
-    public Case updateCase(Case element) throws EmfException {
+    public synchronized Case updateCase(Case element) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
 
@@ -359,7 +372,7 @@ public class ManagedCaseService {
             return released;
         } catch (RuntimeException e) {
             log.error("Could not update Case", e);
-            throw new EmfException("Could not update Case: " + element + "; "+e.getMessage());
+            throw new EmfException("Could not update Case: " + element + "; " + e.getMessage());
         } finally {
             session.close();
         }
@@ -471,7 +484,7 @@ public class ManagedCaseService {
         return subdirs;
     }
 
-    public InputName addCaseInputName(InputName name) throws EmfException {
+    public synchronized InputName addCaseInputName(InputName name) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(name, session);
@@ -484,7 +497,7 @@ public class ManagedCaseService {
         }
     }
 
-    public CaseProgram addProgram(CaseProgram program) throws EmfException {
+    public synchronized CaseProgram addProgram(CaseProgram program) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(program, session);
@@ -497,7 +510,7 @@ public class ManagedCaseService {
         }
     }
 
-    public InputEnvtVar addInputEnvtVar(InputEnvtVar inputEnvtVar) throws EmfException {
+    public synchronized InputEnvtVar addInputEnvtVar(InputEnvtVar inputEnvtVar) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(inputEnvtVar, session);
@@ -511,7 +524,7 @@ public class ManagedCaseService {
         }
     }
 
-    public ModelToRun addModelToRun(ModelToRun model) throws EmfException {
+    public synchronized ModelToRun addModelToRun(ModelToRun model) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(model, session);
@@ -524,7 +537,7 @@ public class ManagedCaseService {
         }
     }
 
-    public GridResolution addGridResolution(GridResolution gridResolution) throws EmfException {
+    public synchronized GridResolution addGridResolution(GridResolution gridResolution) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(gridResolution, session);
@@ -550,7 +563,7 @@ public class ManagedCaseService {
         }
     }
 
-    public SubDir addSubDir(SubDir subdir) throws EmfException {
+    public synchronized SubDir addSubDir(SubDir subdir) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(subdir, session);
@@ -563,7 +576,7 @@ public class ManagedCaseService {
         }
     }
 
-    public CaseInput addCaseInput(CaseInput input) throws EmfException {
+    public synchronized CaseInput addCaseInput(CaseInput input) throws EmfException {
         Session session = sessionFactory.getSession();
 
         if (dao.caseInputExists(input, session))
@@ -580,7 +593,7 @@ public class ManagedCaseService {
         }
     }
 
-    public void updateCaseInput(User user, CaseInput input) throws EmfException {
+    public synchronized void updateCaseInput(User user, CaseInput input) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -594,7 +607,7 @@ public class ManagedCaseService {
             // FIXME: Verify the session.clear()
             session.clear();
             dao.updateCaseInput(input, session);
-            //setStatus(user, "Saved input " + input.getName() + " to database.", "Save Input");
+            // setStatus(user, "Saved input " + input.getName() + " to database.", "Save Input");
         } catch (RuntimeException e) {
             log.error("Could not update case input: " + input.getName() + ".\n" + e);
             throw new EmfException("Could not update case input: " + input.getName() + ".");
@@ -654,7 +667,7 @@ public class ManagedCaseService {
         }
     }
 
-    private List<CaseInput> excludeInputsEnv(List<CaseInput> inputs, String envname) {
+    private synchronized List<CaseInput> excludeInputsEnv(List<CaseInput> inputs, String envname) {
         /**
          * Excludes input elements from the inputs list based on environmental variable name.
          * 
@@ -711,71 +724,71 @@ public class ManagedCaseService {
         }
     }
 
-    // private List<CaseInput> getAllJobInputs(CaseJob job) throws EmfException {
-    // /**
-    // * Gets all the inputs for a specific job
-    // */
-    // int caseId = job.getCaseId();
-    // int jobId = job.getId();
-    //
-    // /*
-    // * Need to get the inputs for 4 different scenarios: All sectors, all jobs Specific sector, all jobs All
-    // * sectors, specific job specific sector, specific job
-    // */
-    // List<CaseInput> inputsAA = null; // inputs for all sectors and all jobs
-    // List<CaseInput> inputsSA = null; // inputs for specific sector and all jobs
-    // List<CaseInput> inputsAJ = null; // inputs for all sectors specific jobs
-    // List<CaseInput> inputsSJ = null; // inputs for specific sectors specific jobs
-    // List<CaseInput> inputsAll = new ArrayList(); // all inputs
-    // try {
-    //
-    // // Get case inputs (the datasets associated w/ the case)
-    // // All sectors, all jobs
-    // inputsAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS);
-    //
-    // // Sector specific, all jobs
-    // Sector sector = job.getSector();
-    // if (sector != this.ALL_SECTORS) {
-    // inputsSA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector);
-    // }
-    //
-    // // All sectors, job specific
-    // inputsAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS);
-    //
-    // // Specific sector and specific job
-    // if (sector != this.ALL_SECTORS) {
-    // inputsSJ = this.getJobInputs(caseId, jobId, sector);
-    // }
-    // } catch (Exception e) {
-    // e.printStackTrace();
-    // log.error("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n"
-    // + e.getMessage());
-    // throw new EmfException("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n");
-    // }
-    //
-    // // append all the job inputs to the inputsAll list
-    // if ((inputsAA != null) && (inputsAA.size() > 0)) {
-    // System.out.println("Number of AA inputs = " + inputsAA.size());
-    // inputsAll.addAll(inputsAA);
-    // }
-    // if ((inputsSA != null) && (inputsSA.size() > 0)) {
-    // System.out.println("Number of SA inputs = " + inputsSA.size());
-    // inputsAll.addAll(inputsSA);
-    // }
-    // if ((inputsAJ != null) && (inputsAJ.size() > 0)) {
-    // System.out.println("Number of AJ inputs = " + inputsAJ.size());
-    // inputsAll.addAll(inputsAJ);
-    // }
-    // if ((inputsSJ != null) && (inputsSJ.size() > 0)) {
-    // System.out.println("Number of SJ inputs = " + inputsSJ.size());
-    // inputsAll.addAll(inputsSJ);
-    // }
-    // System.out.println("Total number of inputs = " + inputsAll.size());
-    //
-    // return (inputsAll);
-    // }
+    private List<CaseInput> getAllJobInputs(CaseJob job) throws EmfException {
+        /**
+         * Gets all the inputs for a specific job
+         */
+        int caseId = job.getCaseId();
+        int jobId = job.getId();
 
-    public Case[] copyCaseObject(int[] toCopy) throws EmfException {
+        /*
+         * Need to get the inputs for 4 different scenarios: All sectors, all jobs Specific sector, all jobs All
+         * sectors, specific job specific sector, specific job
+         */
+        List<CaseInput> inputsAA = null; // inputs for all sectors and all jobs
+        List<CaseInput> inputsSA = null; // inputs for specific sector and all jobs
+        List<CaseInput> inputsAJ = null; // inputs for all sectors specific jobs
+        List<CaseInput> inputsSJ = null; // inputs for specific sectors specific jobs
+        List<CaseInput> inputsAll = new ArrayList(); // all inputs
+        try {
+
+            // Get case inputs (the datasets associated w/ the case)
+            // All sectors, all jobs
+            inputsAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS);
+
+            // Sector specific, all jobs
+            Sector sector = job.getSector();
+            if (sector != this.ALL_SECTORS) {
+                inputsSA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector);
+            }
+
+            // All sectors, job specific
+            inputsAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS);
+
+            // Specific sector and specific job
+            if (sector != this.ALL_SECTORS) {
+                inputsSJ = this.getJobInputs(caseId, jobId, sector);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n"
+                    + e.getMessage());
+            throw new EmfException("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n");
+        }
+
+        // append all the job inputs to the inputsAll list
+        if ((inputsAA != null) && (inputsAA.size() > 0)) {
+            System.out.println("Number of AA inputs = " + inputsAA.size());
+            inputsAll.addAll(inputsAA);
+        }
+        if ((inputsSA != null) && (inputsSA.size() > 0)) {
+            System.out.println("Number of SA inputs = " + inputsSA.size());
+            inputsAll.addAll(inputsSA);
+        }
+        if ((inputsAJ != null) && (inputsAJ.size() > 0)) {
+            System.out.println("Number of AJ inputs = " + inputsAJ.size());
+            inputsAll.addAll(inputsAJ);
+        }
+        if ((inputsSJ != null) && (inputsSJ.size() > 0)) {
+            System.out.println("Number of SJ inputs = " + inputsSJ.size());
+            inputsAll.addAll(inputsSJ);
+        }
+        System.out.println("Total number of inputs = " + inputsAll.size());
+
+        return (inputsAll);
+    }
+
+    public synchronized Case[] copyCaseObject(int[] toCopy) throws EmfException {
         List<Case> copiedList = new ArrayList<Case>();
 
         for (int i = 0; i < toCopy.length; i++) {
@@ -791,14 +804,14 @@ public class ManagedCaseService {
         return copiedList.toArray(new Case[0]);
     }
 
-    private void copyCaseInputs(int origCaseId, int copiedCaseId) throws Exception {
+    private synchronized void copyCaseInputs(int origCaseId, int copiedCaseId) throws Exception {
         CaseInput[] tocopy = getCaseInputs(origCaseId);
 
         for (int i = 0; i < tocopy.length; i++)
             copySingleInput(tocopy[i], copiedCaseId);
     }
 
-    private CaseInput copySingleInput(CaseInput input, int copiedCaseId) throws Exception {
+    private synchronized CaseInput copySingleInput(CaseInput input, int copiedCaseId) throws Exception {
         CaseInput copied = (CaseInput) DeepCopy.copy(input);
         copied.setCaseID(copiedCaseId);
 
@@ -817,7 +830,7 @@ public class ManagedCaseService {
         return addCaseInput(copied);
     }
 
-    private Case addCopiedCase(Case element) throws EmfException {
+    private synchronized Case addCopiedCase(Case element) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -831,14 +844,14 @@ public class ManagedCaseService {
         }
     }
 
-    private void copyCaseJobs(int toCopyCaseId, int copiedCaseId) throws Exception {
+    private synchronized void copyCaseJobs(int toCopyCaseId, int copiedCaseId) throws Exception {
         CaseJob[] tocopy = getCaseJobs(toCopyCaseId);
 
         for (int i = 0; i < tocopy.length; i++)
             copySingleJob(tocopy[i], copiedCaseId);
     }
 
-    private CaseJob copySingleJob(CaseJob job, int copiedCaseId) throws Exception {
+    private synchronized CaseJob copySingleJob(CaseJob job, int copiedCaseId) throws Exception {
         CaseJob copied = (CaseJob) DeepCopy.copy(job);
         copied.setCaseId(copiedCaseId);
 
@@ -860,7 +873,7 @@ public class ManagedCaseService {
         }
     }
 
-    public CaseParameter addCaseParameter(CaseParameter param) throws EmfException {
+    public synchronized CaseParameter addCaseParameter(CaseParameter param) throws EmfException {
         Session session = sessionFactory.getSession();
 
         if (dao.caseParameterExists(param, session))
@@ -906,7 +919,7 @@ public class ManagedCaseService {
         }
     }
 
-    public Executable addExecutable(Executable exe) throws EmfException {
+    public synchronized Executable addExecutable(Executable exe) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             if (!dao.exeutableExists(session, exe))
@@ -921,7 +934,7 @@ public class ManagedCaseService {
         }
     }
 
-    public ParameterName addParameterName(ParameterName name) throws EmfException {
+    public synchronized ParameterName addParameterName(ParameterName name) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.addParameterName(name, session);
@@ -949,7 +962,7 @@ public class ManagedCaseService {
         }
     }
 
-    public ValueType addValueType(ValueType type) throws EmfException {
+    public synchronized ValueType addValueType(ValueType type) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.addValueType(type, session);
@@ -977,7 +990,7 @@ public class ManagedCaseService {
         }
     }
 
-    public ParameterEnvVar addParameterEnvVar(ParameterEnvVar envVar) throws EmfException {
+    public synchronized ParameterEnvVar addParameterEnvVar(ParameterEnvVar envVar) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(envVar, session);
@@ -990,14 +1003,14 @@ public class ManagedCaseService {
         }
     }
 
-    private void copyCaseParameters(int toCopyCaseId, int copiedCaseId) throws Exception {
+    private synchronized void copyCaseParameters(int toCopyCaseId, int copiedCaseId) throws Exception {
         CaseParameter[] tocopy = getCaseParameters(toCopyCaseId);
 
         for (int i = 0; i < tocopy.length; i++)
             copySingleParameter(tocopy[i], copiedCaseId);
     }
 
-    private CaseParameter copySingleParameter(CaseParameter parameter, int copiedCaseId) throws Exception {
+    private synchronized CaseParameter copySingleParameter(CaseParameter parameter, int copiedCaseId) throws Exception {
         CaseParameter copied = (CaseParameter) DeepCopy.copy(parameter);
         copied.setCaseID(copiedCaseId);
 
@@ -1016,7 +1029,7 @@ public class ManagedCaseService {
         return addCaseParameter(copied);
     }
 
-    public CaseJob addCaseJob(CaseJob job) throws EmfException {
+    public synchronized CaseJob addCaseJob(CaseJob job) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(job, session);
@@ -1147,7 +1160,7 @@ public class ManagedCaseService {
         }
     }
 
-    private Case copySingleCaseObj(Case toCopy) throws Exception {
+    private synchronized Case copySingleCaseObj(Case toCopy) throws Exception {
         Case copied = (Case) DeepCopy.copy(toCopy);
         copied.setName("Copy of " + toCopy.getName() + " " + new Date().getTime());
         copied.setTemplateUsed(toCopy.getName());
@@ -1170,8 +1183,8 @@ public class ManagedCaseService {
         return loaded;
     }
 
-    public void exportInputsForCase(User user, String dirName, String purpose, boolean overWrite, int caseId)
-            throws EmfException {
+    public synchronized void exportInputsForCase(User user, String dirName, String purpose, boolean overWrite,
+            int caseId) throws EmfException {
         EmfDataset[] datasets = getInputDatasets(caseId);
         Version[] versions = getInputDatasetVersions(caseId);
         SubDir[] subdirs = getSubdirs(caseId);
@@ -1191,7 +1204,7 @@ public class ManagedCaseService {
         }
     }
 
-    public void updateCaseParameter(User user, CaseParameter parameter) throws EmfException {
+    public synchronized void updateCaseParameter(User user, CaseParameter parameter) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -1204,7 +1217,7 @@ public class ManagedCaseService {
             // FIXME: why session.clear()?
             session.clear();
             dao.updateCaseParameter(parameter, session);
-            //setStatus(user, "Saved parameter " + parameter.getName() + " to database.", "Save Parameter");
+            // setStatus(user, "Saved parameter " + parameter.getName() + " to database.", "Save Parameter");
         } catch (RuntimeException e) {
             log.error("Could not update case parameter: " + parameter.getName() + ".\n" + e);
             throw new EmfException("Could not update case parameter: " + parameter.getName() + ".");
@@ -1213,23 +1226,51 @@ public class ManagedCaseService {
         }
     }
 
-    public String submitJobs(Integer[] jobIds, int caseId, User user) throws EmfException {
-        String caseJobSubmitterId = null;
+    public synchronized String submitJobs(Integer[] jobIds, int caseId, User user) throws EmfException {
+        String caseJobExportSubmitterId = null;
+        String caseJobSubmitterId = getCaseJobSubmitter().getSubmitterId();
+        
         List<CaseJob> caseJobs = new ArrayList<CaseJob>();
 
+        System.out.println("Is CaseJobSubmitterId null? " + (caseJobSubmitterId==null));
         // FIXME: Does this need to be done in a new DAO method???
         // Get the CaseJobs for each jobId
         for (Integer jobId : jobIds) {
             int jid = jobId.intValue();
-            CaseJob caseJob = this.getCaseJob(jid);
-            caseJobs.add(caseJob);
-        }
 
-        // FIXME: Is this line needed?
-        this.user = user;
-        // FIXME: Remove next line
-        if (false)
-            throw new EmfException();
+            System.out.println("The jobId= " + jid);
+            CaseJob caseJob = this.getCaseJob(jid);
+            System.out.println("Is the caseJob for this jobId null? " + (caseJob == null));
+            Case jobCase = this.getCase(caseId);
+
+            System.out.println("caseId= " + caseId + "Is the Case for this job null? " + (jobCase == null));
+            // FIXME: Is this still needed?????
+            // caseJob.setRunStartDate(new Date());
+            CaseJobTask cjt = new CaseJobTask(jid,caseId,user);
+            cjt.setSubmitterId(caseJobSubmitterId);
+            
+            //FIXME:  Do we still need the casejob around?
+            caseJobs.add(caseJob);
+            //Create the list of case job tasks for the submitter and task manager
+            caseJobTasks.add(cjt);
+            
+            List<CaseInput> inputs = getAllJobInputs(caseJob);
+            System.out.println("Number of inputs for this job: " + inputs.size());
+
+            // FIXME: Need to flesh this string out
+            // purpose = "Used by CaseName and JobName"
+
+            String purpose = "Used by " + caseJob.getName() + " of Case " + jobCase.getName();
+            System.out.println("Purpose= " + purpose);
+
+            // pass the inputs to the exportService which uses an exportJobSubmitter to work with exportTaskManager
+//            caseJobExportSubmitterId = this.getExportService().exportForJob(user, inputs, purpose, caseJob, jobCase);
+            caseJobExportSubmitterId="123456789 :::: stubbed out for testing";
+            if (DebugLevels.DEBUG_6)
+                System.out.println("Case Job Export Submitter Id for case job:" + caseJobExportSubmitterId);
+
+        }
+        this.getCaseJobSubmitter().addTasksToSubmitter(caseJobTasks);
 
         return caseJobSubmitterId;
     }
@@ -1319,7 +1360,7 @@ public class ManagedCaseService {
     //
     // }
 
-    public void updateCaseJob(User user, CaseJob job) throws EmfException {
+    public synchronized void updateCaseJob(User user, CaseJob job) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -1334,7 +1375,7 @@ public class ManagedCaseService {
             session.clear();
             dao.updateCaseJob(job, session);
             // this should go to case message panel instead
-            //setStatus(user, "Saved job " + job.getName() + " to database.", "Save Job");
+            // setStatus(user, "Saved job " + job.getName() + " to database.", "Save Job");
         } catch (RuntimeException e) {
             e.printStackTrace();
             log.error("Could not update case job: " + job.getName() + ".\n" + e);
@@ -1384,7 +1425,7 @@ public class ManagedCaseService {
         return setenvLine;
     }
 
-    public Host addHost(Host host) throws EmfException {
+    public synchronized Host addHost(Host host) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(host, session);
@@ -1397,7 +1438,7 @@ public class ManagedCaseService {
         }
     }
 
-    public void exportCaseInputs(User user, Integer[] caseInputIds, String purpose) throws EmfException {
+    public synchronized void exportCaseInputs(User user, Integer[] caseInputIds, String purpose) throws EmfException {
 
         for (Integer caseInputId : caseInputIds) {
             CaseInput caseInput = this.getCaseInput(caseInputId.intValue());
@@ -1406,7 +1447,7 @@ public class ManagedCaseService {
             EmfDataset ds = caseInput.getDataset();
             Version version = caseInput.getVersion();
             SubDir subdirObj = caseInput.getSubdirObj();
-            
+
             String subDir = "";
 
             if (subdirObj != null) {
@@ -1424,7 +1465,8 @@ public class ManagedCaseService {
 
     }
 
-    public void exportCaseInputsWithOverwrite(User user, Integer[] caseInputIds, String purpose) throws EmfException {
+    public synchronized void exportCaseInputsWithOverwrite(User user, Integer[] caseInputIds, String purpose)
+            throws EmfException {
         for (Integer caseInputId : caseInputIds) {
             CaseInput caseInput = this.getCaseInput(caseInputId.intValue());
             Case caseObj = this.getCase(caseInput.getCaseID());
@@ -1449,7 +1491,8 @@ public class ManagedCaseService {
 
     }
 
-    public void export(User user, String dirName, String purpose, boolean overWrite, int caseId) throws EmfException {
+    public synchronized void export(User user, String dirName, String purpose, boolean overWrite, int caseId)
+            throws EmfException {
         System.out.println("ManagedCaseService::export for caseId: " + caseId);
 
         EmfDataset[] datasets = getInputDatasets(caseId);
@@ -1473,7 +1516,7 @@ public class ManagedCaseService {
         }
     }
 
-    public void writeJobFile(CaseJob job, User user, File ofile) throws EmfException {
+    public synchronized void writeJobFile(CaseJob job, User user, File ofile) throws EmfException {
         /**
          * Writes a job run file w/ all necessary inputs and parameters set. It will also export the input files.
          * 

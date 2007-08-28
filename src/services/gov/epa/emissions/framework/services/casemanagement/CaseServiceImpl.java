@@ -68,7 +68,7 @@ public class CaseServiceImpl implements CaseService {
         super.finalize();
     }
 
-    private ManagedCaseService getCaseService() {
+    private synchronized ManagedCaseService getCaseService() {
         log.info("CaseServiceImpl::getCaseService");
 
         if (caseService == null) {
@@ -254,6 +254,8 @@ public class CaseServiceImpl implements CaseService {
     }
 
     public String runJobs(Integer[] jobIds, int caseId, User user) throws EmfException {
+        System.out.println("Called CaseServiceImpl::runJobs with Integer[] jobIds size of array= " + jobIds.length);
+System.out.println("runJobs for caseId=" + caseId + " and submitted by User= " + user.getUsername());
         // submit the list of CaseJobs to the ManagedService
         return caseService.submitJobs(jobIds, caseId, user);
     }
@@ -303,18 +305,14 @@ public class CaseServiceImpl implements CaseService {
     }
 
     public void exportCaseInputs(User user, Integer[] caseInputIds, String purpose) throws EmfException {
-        if (false)
-            throw new EmfException("");
         System.out.println("CaseServiceImpl::exportCaseInputs Total inputs size for export= " + caseInputIds.length);
-         //getCaseService().exportCaseInputs(user, caseInputIds, purpose);
+         getCaseService().exportCaseInputs(user, caseInputIds, purpose);
     }
 
     public void exportCaseInputsWithOverwrite(User user, Integer[] caseInputIds, String purpose) throws EmfException {
-        if (false)
-            throw new EmfException("");
         System.out.println("CaseServiceImpl::exportCaseInputsWithOverwrite Total inputs size for export= "
                 + caseInputIds.length);
-        //getCaseService().exportCaseInputsWithOverwrite(user, caseInputIds, purpose);
+        getCaseService().exportCaseInputsWithOverwrite(user, caseInputIds, purpose);
 
     }
 
@@ -420,7 +418,7 @@ public class CaseServiceImpl implements CaseService {
         //
         // }
 
-        System.out.println("Called CaseServiceImpl::runJobs size of CaseJobs= " + jobs.length);
+        System.out.println("Called CaseServiceImpl::runJobs with CaseJob[] size of CaseJobs= " + jobs.length);
     }
 
 }

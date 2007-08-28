@@ -19,8 +19,6 @@ public abstract class RunManager {
 
     protected static long idleTime = 0;
 
-    protected static RunManager ref;
-
     protected static TaskConsumer consumer = null;
 
     protected static Timer taskManagerTimer = null;
@@ -67,17 +65,6 @@ public abstract class RunManager {
             System.out.println("DeREGISTERED SUBMITTER: " + ts.getSubmitterId() + " Confirm task count= "
                     + ts.getTaskCount());
         submitters.remove(ts);
-    }
-
-    public static synchronized void addTasks(ArrayList<Runnable> tasks) {
-        RunManager.resetIdleTime();
-        taskQueue.addAll(tasks);
-
-        synchronized (RunManager.runTable) {
-            if (RunManager.runTable.size() == 0) {
-                ExportTaskRunManager.processTaskQueue();
-            }
-        }// synchronized
     }
 
     public synchronized static void resetIdleTime() {

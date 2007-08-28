@@ -15,7 +15,7 @@ public class ExportJobSubmitter extends ExportSubmitter {
             System.out.println(">>>> For label: " + myTag());
 
         if (DebugLevels.DEBUG_1)
-            System.out.println("Export Client @@@@@ THREAD ID: " + Thread.currentThread().getId());
+            System.out.println("Export Job Submitter @@@@@ THREAD ID: " + Thread.currentThread().getId());
     }
 
     public synchronized void callbackFromRunManager(String taskId, String status, String mesg) {

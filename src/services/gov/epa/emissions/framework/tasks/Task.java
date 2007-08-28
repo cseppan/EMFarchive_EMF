@@ -61,4 +61,12 @@ public abstract class Task implements Runnable, Comparable<Object> {
 		return 0;
 	}
 
+    @Override
+    protected void finalize() throws Throwable {
+        taskCount--;
+        if (DebugLevels.DEBUG_1)
+            System.out.println(">>>> Destroying object: " + createId());
+        super.finalize();
+    }
+
 }

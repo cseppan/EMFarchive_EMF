@@ -113,7 +113,7 @@ public abstract class ExportSubmitter implements TaskSubmitter {
 //            System.out.println("SUBMITTER::submittedtasks before ADD: " + this.submitterId + " has task count= "
 //                    + this.submittedTasks.size());
 
-        RunManager.addTasks(tasks);
+        RunManagerFactory.getExportTaskRunManager().addTasks(tasks);
 
         // FIXME: May not need to do this next step since submitted Table is uptodate
 //        submittedTasks.addAll(tasks);

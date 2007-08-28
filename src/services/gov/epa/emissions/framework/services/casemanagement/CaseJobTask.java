@@ -1,10 +1,11 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.basic.RemoteCommand;
+//import gov.epa.emissions.framework.services.basic.RemoteCommand;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.Task;
 
-import java.io.InputStream;
+//import java.io.InputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,7 +15,7 @@ public class CaseJobTask extends Task {
 
     private User user = null;
 
-    private String runRedirect = ">&"; // shell specific redirect
+ //   private String runRedirect = ">&"; // shell specific redirect
 
     String logFile = null;
     String jobFile = null;
@@ -27,61 +28,64 @@ public class CaseJobTask extends Task {
         
     public CaseJobTask(int jobId, int caseId, User user) {
         super();
-        log.info("CaseJobTask");
-        
+        createId();
+        if (DebugLevels.DEBUG_1)
+            System.out.println(">>>> " + createId());
+        log.info("created a CaseJobTask: " + this.taskId);
         this.user = user;
         this.jobId=jobId;
         this.caseId=caseId;
     }
 
     public void run() {
-        String executionStr = null;
-        String qOptions = this.queueOptions;
-        
-        // Create an execution string and submit job to the queue,
-        // if the key word $EMF_JOBLOG is in the queue options,
-        // replace w/ log file
-        String queueOptionsLog = qOptions.replace("$EMF_JOBLOG", this.logFile);
-
-        if (queueOptionsLog.equals("")) {
-            executionStr = this.jobFile;
-        } else {
-            executionStr = queueOptionsLog + " " + this.jobFile;
-        }
-
-        /*
-         * execute the job script Note if hostname is localhost this is done locally w/o ssh and stdout and stderr is
-         * redirected to the log. This redirect is currently shell specific (should generalize) if hostname is not
-         * localhost it is through ssh
-         */
-        String username = this.user.getUsername();
-        try{
-            if (hostName.equals("localhost")) {
-                // execute on local machine
-                executionStr = executionStr + " " + this.runRedirect + " " + this.logFile;
-      
-                RemoteCommand.executeLocal(executionStr);
-                            
-            } else {
-                // execute on remote machine and log stdout
-                InputStream inStream = RemoteCommand.execute(username, hostName, executionStr);
-                
-                String outTitle = "stdout from (" + hostName + "): " + executionStr;
-                RemoteCommand.logStdout(outTitle, inStream);
-                
-                // capture PBSqueueId and send back to case job submitter
-                //TODO:
-            }
-            
-        }catch(Exception e){
-            log.error("Error executing job file: " + jobFile + " Execution string= " + executionStr);
-            e.printStackTrace();
-        }
- 
+        System.out.println("@@@@ CASE job task RUNNING jobId= " + jobId + " jobName= " + jobName + " caseId= " + caseId + " CaseJobTask id= " + this.getTaskId() + " now running in Thread id= " + Thread.currentThread().getId());
+//        String executionStr = null;
+//        String qOptions = this.queueOptions;
+//        
+//        // Create an execution string and submit job to the queue,
+//        // if the key word $EMF_JOBLOG is in the queue options,
+//        // replace w/ log file
+//        String queueOptionsLog = qOptions.replace("$EMF_JOBLOG", this.logFile);
+//
+//        if (queueOptionsLog.equals("")) {
+//            executionStr = this.jobFile;
+//        } else {
+//            executionStr = queueOptionsLog + " " + this.jobFile;
+//        }
+//
+//        /*
+//         * execute the job script Note if hostname is localhost this is done locally w/o ssh and stdout and stderr is
+//         * redirected to the log. This redirect is currently shell specific (should generalize) if hostname is not
+//         * localhost it is through ssh
+//         */
+//        String username = this.user.getUsername();
+//        try{
+//            if (hostName.equals("localhost")) {
+//                // execute on local machine
+//                executionStr = executionStr + " " + this.runRedirect + " " + this.logFile;
+//      
+//                RemoteCommand.executeLocal(executionStr);
+//                            
+//            } else {
+//                // execute on remote machine and log stdout
+//                InputStream inStream = RemoteCommand.execute(username, hostName, executionStr);
+//                
+//                String outTitle = "stdout from (" + hostName + "): " + executionStr;
+//                RemoteCommand.logStdout(outTitle, inStream);
+//                
+//                // capture PBSqueueId and send back to case job submitter
+//                //TODO:
+//            }
+//            
+//        }catch(Exception e){
+//            log.error("Error executing job file: " + jobFile + " Execution string= " + executionStr);
+//            e.printStackTrace();
+//        }
+// 
     }
 
     public void setRunRedirect(String runRedirect) {
-        this.runRedirect = runRedirect;
+//        this.runRedirect = runRedirect;
     }
 
     public User getUser() {
@@ -131,5 +135,6 @@ public class CaseJobTask extends Task {
     public void setHostName(String hostName) {
         this.hostName = hostName;
     }
+
 
 }

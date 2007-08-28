@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.tasks;
 
 import gov.epa.emissions.framework.services.exim.ExportTask;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -14,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class ExportTaskRunManager extends RunManager {
     private static Log log = LogFactory.getLog(ExportTaskRunManager.class);
+    private static ExportTaskRunManager ref;
 
     // Singleton factory method
     public static synchronized RunManager getExportTaskRunManager() {
@@ -68,6 +70,17 @@ public class ExportTaskRunManager extends RunManager {
             }
         }
         ExportTaskRunManager.processTaskQueue();
+    }
+
+    public static synchronized void addTasks(ArrayList<Runnable> tasks) {
+        RunManager.resetIdleTime();
+        taskQueue.addAll(tasks);
+
+        synchronized (RunManager.runTable) {
+            if (RunManager.runTable.size() == 0) {
+                ExportTaskRunManager.processTaskQueue();
+            }
+        }// synchronized
     }
 
     public static synchronized void processTaskQueue() {
