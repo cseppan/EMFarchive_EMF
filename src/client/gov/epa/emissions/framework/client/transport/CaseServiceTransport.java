@@ -454,14 +454,6 @@ public class CaseServiceTransport implements CaseService {
         return (Host) call.requestResponse(new Object[] { host });
     }
 
-    public void runJobs(CaseJob job) throws EmfException {
-        // NOTE Auto-generated method stub
-        if (false) {
-            throw new EmfException("error");
-
-        }
-    }
-
     public Executable addExecutable(Executable exe) throws EmfException {
         EmfCall call = call();
 
