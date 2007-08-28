@@ -45,7 +45,8 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
 
     public void doExport(ExportView exportView, ExportPresenter presenter, EmfDataset[] datasets) {
         if (datasets.length == 0) {
-            view.showMessage("To Export, you will need to select at least one non-External type Dataset");
+//            view.showMessage("To Export, you will need to select at least one non-External type Dataset");
+            view.showMessage("To Export, you will need to select at least one Dataset"); // external type allowed to export now
             return;
         }
 

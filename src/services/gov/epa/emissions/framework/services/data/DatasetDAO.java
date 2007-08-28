@@ -211,6 +211,11 @@ public class DatasetDAO {
 
     public long getDatasetRecordsNumber(DbServer dbServer, Session session, EmfDataset dataset, Version version)
             throws SQLException {
+        DatasetType type = dataset.getDatasetType();
+        
+        if (type.getExporterClassName().endsWith("ExternalFilesExporter"))
+            return dataset.getExternalSources().length;
+            
         Datasource datasource = dbServer.getEmissionsDatasource();
         InternalSource source = dataset.getInternalSources()[0];
         String qualifiedTable = datasource.getName() + "." + source.getTable();

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.exim;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.Exporter;
@@ -49,6 +50,8 @@ public class ExportTask extends Task {
     private LoggingServiceImpl loggingService;
 
     private EmfDataset dataset;
+    
+    private DatasetType type;
 
     private Exporter exporter;
 
@@ -67,6 +70,7 @@ public class ExportTask extends Task {
         this.user = user;
         this.file = file;
         this.dataset = dataset;
+        this.type = dataset.getDatasetType();
         this.statusServices = services.getStatus();
         this.loggingService = services.getLoggingService();
         this.exporter = exporter;
@@ -96,17 +100,23 @@ public class ExportTask extends Task {
                 exporter.export(file);
                 accesslog.setEnddate(new Date());
                 accesslog.setLinesExported(exporter.getExportedLinesCount());
-
-                loggingService.setAccessLog(accesslog);
-
                 printLogInfo(accesslog);
+                
                 if (!compareDatasetRecordsNumbers(accesslog))
                     return;
                 // updateDataset(dataset); //Disabled because of nothing updated during exporting
 
-                setStatus("completed", "Completed export of " + dataset.getName() + " to " + file.getAbsolutePath()
-                        + " in " + accesslog.getTimereqrd() + " seconds.");
-
+                String msghead = "Completed export of " + dataset.getName();
+                String msgend = " in " + accesslog.getTimereqrd() + " seconds.";
+                
+                if (type.getExporterClassName().endsWith("ExternalFilesExporter")) {
+                    setStatus("completed", msghead + msgend);
+                    accesslog.setFolderPath("");
+                }
+                else 
+                    setStatus("completed", msghead + " to " + file.getAbsolutePath() + msgend);
+                
+                loggingService.setAccessLog(accesslog);
             }
 
             if (DebugLevels.DEBUG_4)
@@ -118,7 +128,7 @@ public class ExportTask extends Task {
             // + Thread.currentThread().getId());
 
         } catch (Exception e) {
-            setErrorStatus(e, e.getMessage());
+            setErrorStatus(e, "");
         }
     }
 
@@ -172,7 +182,10 @@ public class ExportTask extends Task {
     }
 
     private void setStartStatus() {
-        setStatus("started", "Started exporting " + dataset.getName() + " to " + file.getAbsolutePath());
+        if (type.getExporterClassName().endsWith("ExternalFilesExporter"))
+            setStatus("started", "Started exporting " + dataset.getName());
+        else 
+            setStatus("started", "Started exporting " + dataset.getName() + " to " + file.getAbsolutePath());
     }
 
     private void setStatus(String status, String message) {

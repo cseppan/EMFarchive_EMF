@@ -268,7 +268,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     protected void exportSelectedDatasets() {
         // NOTE: get selected dataset will give you all the dataset selected in the base model of sort filter table
         // model
-        EmfDataset[] emfDatasets = getNonExternalDatasets(getSelectedDatasets());
+//        EmfDataset[] emfDatasets = getNonExternalDatasets(getSelectedDatasets()); //export external datasets allowed now
+        EmfDataset[] emfDatasets = getSelectedDatasets().toArray(new EmfDataset[0]);
 
         ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager, parentConsole, session);
         getDesktopPane().add(exportView);
@@ -277,19 +278,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         presenter.doExport(exportView, exportPresenter, emfDatasets);
     }
 
-    private EmfDataset[] getNonExternalDatasets(List emfDatasets) {
-        List<EmfDataset> nonExternal = new ArrayList<EmfDataset>();
-        for (int i = 0; i < emfDatasets.size(); i++) {
-            EmfDataset temp = (EmfDataset) emfDatasets.get(i);
-            if (!temp.getDatasetType().isExternal())
-                nonExternal.add(temp);
-        }
-
-        return nonExternal.toArray(new EmfDataset[0]);
-    }
-
-    private List getSelectedDatasets() {
-        return table.selected();
+    private List<EmfDataset> getSelectedDatasets() {
+        return (List<EmfDataset>) table.selected();
     }
 
     protected void doDisplayPropertiesViewer() {
