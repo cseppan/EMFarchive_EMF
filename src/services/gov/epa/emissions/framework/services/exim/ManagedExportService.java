@@ -47,11 +47,12 @@ public class ManagedExportService {
 
     private String svcLabel = null;
 
-    public String myTag() {
+    public synchronized String myTag() {
         if (svcLabel == null) {
             svcCount++;
             this.svcLabel = "#" + svcCount + "-" + getClass().getName() + "-" + new Date().getTime();
         }
+        log.info(svcLabel);
 
         return "For label: " + svcLabel + " # of active objects of this type= " + svcCount;
     }
@@ -154,13 +155,15 @@ public class ManagedExportService {
 
     public synchronized String exportForJob(User user, List<CaseInput> inputs, String purpose, CaseJob job, Case caseObj)
             throws EmfException {
+        
+        TaskSubmitter exportJobTaskSubmitter = null;
 
         // The service instance (one per session) will have only one submitter for the type of service
         // Here the TaskManagerExportService has one reference to the ExportJobSubmitter
-        if (exportTaskSubmitter == null) {
-            exportTaskSubmitter = new ExportJobSubmitter();
+        if (exportJobTaskSubmitter == null) {
+            exportJobTaskSubmitter = new ExportJobSubmitter();
             // exportTaskSubmitter.registerTaskManager();
-            RunManagerFactory.getExportTaskRunManager().registerTaskSubmitter(exportTaskSubmitter);
+            RunManagerFactory.getExportTaskRunManager().registerTaskSubmitter(exportJobTaskSubmitter);
         }
 
         // FIXME: Any checks for CaseInputs or Jobs needs to happen here

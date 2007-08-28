@@ -196,13 +196,13 @@ public class ExportTask extends Task {
     // statusServices.add(endStatus);
     // }
 
-    @Override
-    protected void finalize() throws Throwable {
-        taskCount--;
-        if (DebugLevels.DEBUG_1)
-            System.out.println(">>>> Destroying object: " + createId());
-        super.finalize();
-    }
+//    @Override
+//    protected void finalize() throws Throwable {
+//        taskCount--;
+//        if (DebugLevels.DEBUG_1)
+//            System.out.println(">>>> Destroying object: " + createId());
+//        super.finalize();
+//    }
 
     public File getFile() {
         return file;
