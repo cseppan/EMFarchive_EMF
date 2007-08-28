@@ -162,10 +162,12 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("Subdirectory:", subDir, panel);
 
         required = new CheckBox("");
+        required.setSelected(input.isRequired());
         changeablesList.addChangeable(required);
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
         show = new CheckBox("");
+        show.setSelected(input.isShow());
         changeablesList.addChangeable(show);
         layoutGenerator.addLabelWidgetPair("Show?", show, panel);
 
