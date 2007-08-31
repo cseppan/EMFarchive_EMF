@@ -119,7 +119,7 @@ public class QAServiceImpl implements QAService {
         QAProgram program = step.getProgram();
         if (program == null || !program.getName().startsWith("SQL") 
                 && !program.getName().startsWith("Average day to Annual State Summary")
-                && !program.getName().startsWith("Average day to Annual State by Pollutant"))
+                && !program.getName().startsWith("Average day to Annual Inventory"))
             throw new EmfException("SQL and annual emissions are the only programs currently supported for running a QA Step");
     }
 
