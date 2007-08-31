@@ -51,3 +51,31 @@ CREATE TABLE cases.cases_parameters
 ) 
 WITHOUT OIDS;
 -- cases.cases_parameters
+
+-- 8/29/07 to change run job status from 'Succeeded' to 'Completed' etc
+update cases.case_jobrunstatus set name='Completed' where name='Succeeded';
+update cases.case_jobrunstatus set description='Completed' where name='Completed';
+insert into cases.case_jobrunstatus values(DEFAULT, 'Exporting', 'Exporting');
+
+-- 8/31/07 to add a column to jobs table 'job_key'
+ALTER TABLE cases.cases_casejobs ADD COLUMN job_key TEXT;
+
+-- 8/31/07 to add a job message table
+-- cases.job_messages
+CREATE TABLE cases.job_messages
+(
+  id SERIAL PRIMARY KEY,
+  case_id int4 NOT NULL REFERENCES cases.cases(id),
+  job_id int4 NOT NULL REFERENCES cases.cases_casejobs(id),
+  exec_path varchar(255),
+  exec_name varchar(255),
+  period varchar(128),
+  message text,
+  message_type varchar(32),
+  status varchar(64),
+  remote_user varchar(128),
+  exec_modified_date timestamp,
+  received_time timestamp
+)
+WITHOUT OIDS;
+-- cases.job_messages

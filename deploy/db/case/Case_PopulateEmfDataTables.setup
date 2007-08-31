@@ -37,11 +37,12 @@ insert into cases.input_envt_vars values(DEFAULT,'INVTABLE');
 
 -- cases.case_jobrunstatus
 insert into cases.case_jobrunstatus values(DEFAULT, 'Not Started', 'Not Started');
-insert into cases.case_jobrunstatus values(DEFAULT, 'Succeeded', 'Succeeded');
+insert into cases.case_jobrunstatus values(DEFAULT, 'Completed', 'Completed');
 insert into cases.case_jobrunstatus values(DEFAULT, 'Quality Assured', 'Quality Assured');
 insert into cases.case_jobrunstatus values(DEFAULT, 'Failed', 'Failed');
 insert into cases.case_jobrunstatus values(DEFAULT, 'Running', 'Running');
 insert into cases.case_jobrunstatus values(DEFAULT, 'Submitted', 'Submitted');
+insert into cases.case_jobrunstatus values(DEFAULT, 'Exporting', 'Exporting');
 -- cases.case_jobrunstatus
 
 -- cases.hosts

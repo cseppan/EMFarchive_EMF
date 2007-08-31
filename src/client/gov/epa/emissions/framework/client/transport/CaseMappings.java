@@ -285,4 +285,12 @@ public class CaseMappings extends Mappings {
     public QName caseInputIds() {
         return qname("IntegerArray");
     }
+    
+    public QName jobMessage() {
+        return qname("JobMessage");
+    }
+    
+    public QName jobMessages() {
+        return qname("JobMessages");
+    }
 }

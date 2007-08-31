@@ -536,6 +536,15 @@
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage"
+		qname="ns1:JobMessage" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:JobMessages" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage[]"
+		innerType="ns1:JobMessage"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.jobs.Executable"
 		qname="ns1:Executable" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
 		

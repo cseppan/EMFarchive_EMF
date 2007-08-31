@@ -252,4 +252,8 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     public String getJobkey(){
         return this.jobkey;
     }
+
+    public void setJobkey(String jobKey){
+        this.jobkey = jobKey;
+    }
 }

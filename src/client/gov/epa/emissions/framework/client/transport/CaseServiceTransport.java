@@ -21,6 +21,7 @@ import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
@@ -608,6 +609,28 @@ public class CaseServiceTransport implements CaseService {
         call.request(new Object[] { user, caseInputIds, purpose });
         
         
+    }
+
+    public int recordJobMessage(JobMessage message, String jobKey) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("recordJobMessage");
+        call.addParam("message", caseMappings.jobMessage());
+        call.addStringParam("jobKey");
+        call.setIntegerReturnType();
+        
+        return (Integer)call.requestResponse(new Object[]{ message, jobKey });
+    }
+
+    public JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getJobMessages");
+        call.addIntegerParam("caseId");
+        call.addIntegerParam("jobId");
+        call.setReturnType(caseMappings.jobMessages());
+        
+        return (JobMessage[])call.requestResponse(new Object[]{new Integer(caseId), new Integer(jobId)});
     }
 
 }

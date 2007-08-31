@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
@@ -419,6 +420,15 @@ System.out.println("runJobs for caseId=" + caseId + " and submitted by User= " +
         // }
 
         System.out.println("Called CaseServiceImpl::runJobs with CaseJob[] size of CaseJobs= " + jobs.length);
+    }
+
+    // for command line client
+    public int recordJobMessage(JobMessage message, String jobKey) throws EmfException {
+        return getCaseService().recordJobMessage(message, jobKey);
+    }
+
+    public JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException {
+        return getCaseService().getJobMessages(caseId, jobId);
     }
 
 }

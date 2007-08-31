@@ -124,7 +124,7 @@ CREATE TABLE cases.cases
 (
   id SERIAL PRIMARY KEY,
   name varchar(128) NOT NULL UNIQUE,
-  abbreviation_id int4 REFERENCES cases.case_abbreviations(id),
+  abbreviation_id int4 UNIQUE REFERENCES cases.case_abbreviations(id),
   description text,
   user_id int4  REFERENCES emf.users(id),
   creator_user_id int4  REFERENCES emf.users(id),
@@ -222,6 +222,7 @@ CREATE TABLE cases.cases_casejobs
   exe_id int4 REFERENCES cases.executables(id),
   que_option varchar(255),
   path varchar(255),
+  job_key text,
   UNIQUE (case_id, name)
 )
 WITHOUT OIDS;
@@ -297,3 +298,22 @@ CREATE TABLE cases.cases_parameters
 ) 
 WITHOUT OIDS;
 -- cases.cases_parameters
+
+-- cases.job_messages
+CREATE TABLE cases.job_messages
+(
+  id SERIAL PRIMARY KEY,
+  case_id int4 NOT NULL REFERENCES cases.cases(id),
+  job_id int4 NOT NULL REFERENCES cases.cases_casejobs(id),
+  exec_path varchar(255),
+  exec_name varchar(255),
+  period varchar(128),
+  message text,
+  message_type varchar(32),
+  status varchar(64),
+  remote_user varchar(128),
+  exec_modified_date timestamp,
+  received_time timestamp
+)
+WITHOUT OIDS;
+-- cases.job_messages

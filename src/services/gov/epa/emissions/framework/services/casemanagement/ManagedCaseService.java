@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
@@ -120,15 +121,15 @@ public class ManagedCaseService {
 
     }
 
-    private synchronized TaskSubmitter getCaseJobSubmitter(){
-        if (caseJobSubmitter==null){
-            caseJobSubmitter=new CaseJobSumitter();
+    private synchronized TaskSubmitter getCaseJobSubmitter() {
+        if (caseJobSubmitter == null) {
+            caseJobSubmitter = new CaseJobSumitter();
             RunManagerFactory.getCaseJobRunManager().registerTaskSubmitter(caseJobSubmitter);
 
         }
         return this.caseJobSubmitter;
     }
-    
+
     private synchronized ManagedExportService getExportService() {
         log.info("ManagedCaseService::getExportService");
 
@@ -1164,6 +1165,7 @@ public class ManagedCaseService {
         Case copied = (Case) DeepCopy.copy(toCopy);
         copied.setName("Copy of " + toCopy.getName() + " " + new Date().getTime());
         copied.setTemplateUsed(toCopy.getName());
+        copied.setAbbreviation(new Abbreviation(new Date().toString()));
         Case loaded = addCopiedCase(copied);
         copyCaseJobs(toCopy.getId(), loaded.getId()); // copy job first for references in input and parameter
         copyCaseInputs(toCopy.getId(), loaded.getId());
@@ -1229,10 +1231,10 @@ public class ManagedCaseService {
     public synchronized String submitJobs(Integer[] jobIds, int caseId, User user) throws EmfException {
         String caseJobExportSubmitterId = null;
         String caseJobSubmitterId = getCaseJobSubmitter().getSubmitterId();
-        
+
         List<CaseJob> caseJobs = new ArrayList<CaseJob>();
 
-        System.out.println("Is CaseJobSubmitterId null? " + (caseJobSubmitterId==null));
+        System.out.println("Is CaseJobSubmitterId null? " + (caseJobSubmitterId == null));
         // FIXME: Does this need to be done in a new DAO method???
         // Get the CaseJobs for each jobId
         for (Integer jobId : jobIds) {
@@ -1246,14 +1248,14 @@ public class ManagedCaseService {
             System.out.println("caseId= " + caseId + "Is the Case for this job null? " + (jobCase == null));
             // FIXME: Is this still needed?????
             // caseJob.setRunStartDate(new Date());
-            CaseJobTask cjt = new CaseJobTask(jid,caseId,user);
+            CaseJobTask cjt = new CaseJobTask(jid, caseId, user);
             cjt.setSubmitterId(caseJobSubmitterId);
-            
-            //FIXME:  Do we still need the casejob around?
+
+            // FIXME: Do we still need the casejob around?
             caseJobs.add(caseJob);
-            //Create the list of case job tasks for the submitter and task manager
+            // Create the list of case job tasks for the submitter and task manager
             caseJobTasks.add(cjt);
-            
+
             List<CaseInput> inputs = getAllJobInputs(caseJob);
             System.out.println("Number of inputs for this job: " + inputs.size());
 
@@ -1264,8 +1266,8 @@ public class ManagedCaseService {
             System.out.println("Purpose= " + purpose);
 
             // pass the inputs to the exportService which uses an exportJobSubmitter to work with exportTaskManager
-//            caseJobExportSubmitterId = this.getExportService().exportForJob(user, inputs, purpose, caseJob, jobCase);
-            caseJobExportSubmitterId="123456789 :::: stubbed out for testing";
+            // caseJobExportSubmitterId = this.getExportService().exportForJob(user, inputs, purpose, caseJob, jobCase);
+            caseJobExportSubmitterId = "123456789 :::: stubbed out for testing";
             if (DebugLevels.DEBUG_6)
                 System.out.println("Case Job Export Submitter Id for case job:" + caseJobExportSubmitterId);
 
@@ -1765,6 +1767,56 @@ public class ManagedCaseService {
 
         }
 
+    }
+
+    // for command line client
+    public int recordJobMessage(JobMessage message, String jobKey) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            List<CaseJob> jobs = dao.getCaseJobs(jobKey, session);
+
+            if (jobs.size() == 0)
+                throw new EmfException("No jobs found associated with job key: " + jobKey);
+
+            if (jobs.size() > 1)
+                throw new EmfException("Jobkey: " + jobKey + " is not unique.");
+
+            CaseJob job = jobs.get(0);
+            User user = job.getUser();
+
+            if (!user.getUsername().equalsIgnoreCase(message.getRemoteUser()))
+                throw new EmfException("Remote user doesn't match the user who runs the job.");
+
+            dao.add(message, session);
+
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+
+    public JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        List<JobMessage> msgs = null;
+
+        try {
+            if (jobId == 0)
+                msgs = dao.getJobMessages(caseId, session);
+            else
+                msgs = dao.getJobMessages(caseId, jobId, session);
+            
+            return msgs.toArray(new JobMessage[0]);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
     }
 
 }

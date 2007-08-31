@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
@@ -32,6 +33,10 @@ public class CaseDAO {
         lockingScheme = new LockingScheme();
     }
 
+    public void add(JobMessage message, Session session) {
+        addObject(message, session);
+    }
+    
     public void add(Executable exe, Session session) {
         addObject(exe, session);
     }
@@ -283,6 +288,25 @@ public class CaseDAO {
 
         return hibernateFacade.get(CaseJob.class, crit, session);
     }
+    
+    public List<CaseJob> getCaseJobs(String jobKey, Session session) {
+        Criterion crit = Restrictions.eq("jobkey", jobKey);
+        
+        return hibernateFacade.get(CaseJob.class, crit, session);
+    }
+    
+    public List<JobMessage> getJobMessages(int caseId, Session session) {
+        Criterion crit = Restrictions.eq("caseId", new Integer(caseId));
+        
+        return hibernateFacade.get(JobMessage.class, crit, session);
+    }
+
+    public List<JobMessage> getJobMessages(int caseId, int jobId, Session session) {
+        Criterion crit1 = Restrictions.eq("caseId", new Integer(caseId));
+        Criterion crit2 = Restrictions.eq("jobId", new Integer(jobId));
+        
+        return hibernateFacade.get(JobMessage.class, new Criterion[] {crit1, crit2}, session);
+    }
 
     public CaseJob getCaseJob(int jobId, Session session) {
         Criterion crit = Restrictions.eq("id", new Integer(jobId));
@@ -295,7 +319,7 @@ public class CaseDAO {
         
         return (CaseJob)hibernateFacade.load(CaseJob.class, new Criterion[]{crit1, crit2}, session);
     }
-    
+
     public void updateCaseJob(CaseJob job, Session session) {
         hibernateFacade.updateOnly(job, session);
     }
