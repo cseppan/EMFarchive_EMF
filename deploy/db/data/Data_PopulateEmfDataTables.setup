@@ -134,7 +134,7 @@ insert into emf.qa_programs values(DEFAULT,'Smkreport','');
 insert into emf.qa_programs values(DEFAULT,'Manual','');
 insert into emf.qa_programs values(DEFAULT,'Analysis Engine','');
 insert into emf.qa_programs values(DEFAULT,'Average Day to Annual State Summary','gov.epa.emissions.framework.services.qa.SQLAnnualQueryRunner');
-insert into emf.qa_programs values(DEFAULT,'Average day to Annual State by Pollutant','gov.epa.emissions.framework.services.qa.SQLQAAnnualNonsummaryQueryRunner');
+insert into emf.qa_programs values(DEFAULT,'Average day to Annual Inventory','gov.epa.emissions.framework.services.qa.SQLQAAnnualNonsummaryQueryRunner');
 
 --
 -- the dataset type id field depends on the order of dataset type table (ORL type being first)
