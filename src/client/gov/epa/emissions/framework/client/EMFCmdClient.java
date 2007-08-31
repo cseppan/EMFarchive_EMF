@@ -59,6 +59,8 @@ public class EMFCmdClient {
           
           System.out.println("EMF VERSION INFO: [ " + msg + " ] message was acquired in " + (eTime-sTime) + " milliseconds");
           System.out.println("Exiting EMF Command Client");
+
+          
           
         }
         catch (Exception exc)
