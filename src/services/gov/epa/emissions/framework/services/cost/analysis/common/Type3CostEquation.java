@@ -8,9 +8,11 @@ public class Type3CostEquation implements CostEquation {
     private double emissionReduction; 
     private double discountRate;
     private Double minStackFlowRate;
-    private double capitalCostFactor=192;
-    private double gasFlowRateFactor=.486;
-    private double retrofitFactor=1.1;
+    private Double capRecFactor;
+    
+    private static final double capitalCostFactor=192;
+    private static final double gasFlowRateFactor=.486;
+    private static final double retrofitFactor=1.1;
     
     public Type3CostEquation(double discountRate) {
         this.discountRate = discountRate / 100;
@@ -21,6 +23,7 @@ public class Type3CostEquation implements CostEquation {
         this.bestMeasureEffRecord = bestMeasureEffRecord;
         this.minStackFlowRate = minStackFlowRate;
         this.emissionReduction=emissionReduction;
+        this.capRecFactor=getCapRecFactor();
         getFactors();
     }
     
@@ -29,7 +32,6 @@ public class Type3CostEquation implements CostEquation {
     }
 
     public Double getAnnualCost() {
-        Double capRecFactor = getCapRecFactor();
         Double capitalCost = getCapitalCost();
         Double operationMaintenanceCost = getOperationMaintenanceCost();
         if (capRecFactor == null || capitalCost == null || operationMaintenanceCost == null) return null;
@@ -49,30 +51,57 @@ public class Type3CostEquation implements CostEquation {
     }
     
     public Double getAnnualizedCapitalCost() { 
-        Double capRecFactor = getCapRecFactor();
         Double capitalCost = getCapitalCost();
         if (capitalCost == null || capRecFactor == null) return null;
         return capitalCost * capRecFactor;
     }
 
-    public Double getCapRecFactor(){
-        // Calculate capital recovery factor 
-        double equipmentLife = bestMeasureEffRecord.measure().getEquipmentLife();
-        Double capRecFactor;
-        if (equipmentLife==0) 
-            capRecFactor = bestMeasureEffRecord.efficiencyRecord().getCapRecFactor();
-        else 
-            capRecFactor = DefaultCostEquation.calculateCapRecFactor(discountRate, equipmentLife);
-        
-        if (capRecFactor != null && capRecFactor != 0) {
-            return capRecFactor; 
-        }
-        return null;
-    }
+//    public Double getCapRecFactor(){
+//        // Calculate capital recovery factor 
+//        double equipmentLife = bestMeasureEffRecord.measure().getEquipmentLife();
+//        Double capRecFactor;
+//        if (equipmentLife==0) 
+//            capRecFactor = bestMeasureEffRecord.efficiencyRecord().getCapRecFactor();
+//        else 
+//            capRecFactor = DefaultCostEquation.calculateCapRecFactor(discountRate, equipmentLife);
+//        
+//        if (capRecFactor != null && capRecFactor != 0) {
+//            return capRecFactor; 
+//        }
+//        return null;
+//    }
 
     public Double getComputedCPT() {
         Double totalCost=getAnnualCost();
         if (totalCost==null || emissionReduction == 0.0) return null; 
         return totalCost/emissionReduction;
     }
+    
+    public Double getCapRecFactor(){
+        // Calculate capital recovery factor
+        return getCapRecFactor(bestMeasureEffRecord.measure().getEquipmentLife(), 
+                bestMeasureEffRecord.efficiencyRecord().getCapRecFactor());
+    }
+
+    public Double getCapRecFactor(float equipmentLife, Double effRecCapRecFactor){
+        // Calculate capital recovery factor 
+        Double capRecFactor = effRecCapRecFactor;
+        if (equipmentLife!=0) 
+             capRecFactor = DefaultCostEquation.calculateCapRecFactor(discountRate, equipmentLife);
+        
+        if (capRecFactor != null && capRecFactor != 0) {
+            return capRecFactor; 
+        }
+        return null;
+    }
+    
+    // This is for test ----
+    public void setUpTest(double reducedEmission, float equipmentLife, Double effRecCapRecFactor, BestMeasureEffRecord bestMeasureEffRecord, Double minStackFlowRate) {
+        //define required inputs
+        this.bestMeasureEffRecord = bestMeasureEffRecord;
+        this.minStackFlowRate = minStackFlowRate;
+        this.emissionReduction=reducedEmission;
+        this.capRecFactor=getCapRecFactor(equipmentLife, effRecCapRecFactor);
+    }
+
 }
