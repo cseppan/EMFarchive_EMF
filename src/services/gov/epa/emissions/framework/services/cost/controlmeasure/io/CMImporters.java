@@ -22,6 +22,8 @@ public class CMImporters {
 
     private CMReferenceImporter referenceImporter;
 
+    private CMEquationImporter equationImporter;
+
     private HibernateSessionFactory sessionFactory;
 
     private User user;
@@ -38,6 +40,7 @@ public class CMImporters {
         efficiencyImporter = createEfficiencyImporter();
         sccImporter = createSCCImporter();
         referenceImporter = createReferenceImporter();
+        equationImporter = createEquationImporter();
     }
 
     public CMSummaryImporter summaryImporter() {
@@ -54,6 +57,10 @@ public class CMImporters {
 
     public CMReferenceImporter referenceImporter() {
         return referenceImporter;
+    }
+
+    public CMEquationImporter equationImporter() {
+        return equationImporter;
     }
 
     private CMSummaryImporter createSummaryImporter() throws EmfException {
@@ -101,6 +108,19 @@ public class CMImporters {
 
     }
 
+    private CMEquationImporter createEquationImporter() throws EmfException {
+        CMEquationFileFormat fileFormat = new CMEquationFileFormat();
+        String[] cols = fileFormat.cols();
+        for (int i = 0; i < records.length; i++) {
+            if (matches(cols, records[i].getTokens())) {
+                return new CMEquationImporter(files[i], fileFormat, user, sessionFactory);
+            }
+        }
+        return null;
+        //don't throw an error this file is optional...
+//        throw new EmfException("Failed to import control measures: Control Measure Equation file is required, the file is missing or has the wrong format, expected header format: " + getHeaderFormat(cols));
+    }
+
     private CMReferenceImporter createReferenceImporter() {
         CMReferenceFileFormat fileFormat = new CMReferenceFileFormat();
         String[] cols = fileFormat.cols();
@@ -109,7 +129,6 @@ public class CMImporters {
                 return new CMReferenceImporter(files[i], fileFormat);
             }
         }
-
         return null;
     }
 

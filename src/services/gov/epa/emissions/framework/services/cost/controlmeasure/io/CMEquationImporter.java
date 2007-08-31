@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -21,7 +22,7 @@ public class CMEquationImporter{
 
     private HibernateSessionFactory sessionFactory;
     
-    public CMEquationImporter(File file, CMEquationFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) {
+    public CMEquationImporter(File file, CMEquationFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) throws EmfException {
         this.file = file;
         this.user = user;
         this.sessionFactory = sessionFactory;
@@ -32,7 +33,8 @@ public class CMEquationImporter{
         addStatus("Started reading Equation Variable file");
         CMCSVFileReader reader = new CMCSVFileReader(file);
         for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
-            equationReader.parse(controlMeasures,record, reader.lineNumber());
+            equationReader.parse(controlMeasures, record, 
+                    reader.lineNumber());
         }
         if (equationReader.getErrorCount() > 0) {
             addStatus("Failed to import control measure Equation records, " + equationReader.getErrorCount() + " errors were found.");

@@ -5,25 +5,25 @@
 
 <hibernate-mapping default-lazy="false"> 
 	<class name="gov.epa.emissions.framework.services.cost.EquationType" table="equation_types" schema="emf">
-		<cache usage="read-only"/>
+<!--		<cache usage="read-only"/>-->
         <id name="id" type="integer" column="id">
             <generator class="identity"/>
         </id>
-          
+
         <property name="name" column="name" type="java.lang.String" not-null="true"/>
         <property name="description" column="description" type="java.lang.String" not-null="true"/>
-            
-		<array name="equationTypeVariables" table="equation_type_variables" cascade="none">
-			<cache usage="read-only"/>
+
+		<array name="equationTypeVariables" >
+<!--		<cache usage="read-only"/>-->
 	    	<key column="equation_type_id" not-null="true"/>
 	    	<list-index column="list_index"/>
-	    	<composite-element class="gov.epa.emissions.framework.services.cost.EquationTypeVariable">
+        	<one-to-many class="gov.epa.emissions.framework.services.cost.EquationTypeVariable"/>
+<!--	    	<composite-element class="gov.epa.emissions.framework.services.cost.EquationTypeVariable">
 		        <property name="name" column="name" type="java.lang.String" not-null="true"/>
 		        <property name="fileColPosition" column="file_col_position" type="short" not-null="true"/>
 		        <property name="description" column="description" type="java.lang.String" not-null="true"/>
-	    	</composite-element>
+	    	</composite-element>-->
 		</array>
 	
     </class>
-</hibernate-mapping>  
-
+</hibernate-mapping>

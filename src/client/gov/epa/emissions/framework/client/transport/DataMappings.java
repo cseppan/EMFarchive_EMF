@@ -26,8 +26,7 @@ import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
-import gov.epa.emissions.framework.services.cost.ControlMeasureEquationType;
-import gov.epa.emissions.framework.services.cost.ControlMeasureEquationTypeVariable;
+import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.ControlStrategyMeasure;
@@ -131,9 +130,7 @@ public class DataMappings extends Mappings {
         bean(call, ControlStrategyConstraint.class, controlStrategyConstraint());
         bean(call, EquationType.class, equationType());
         bean(call, EquationTypeVariable.class, equationTypeVariable());
-        bean(call, ControlMeasureEquationTypeVariable.class, controlMeasureEquationTypeVariable());
-        bean(call, ControlMeasureEquationType.class, controlMeasureEquationType());
-        
+        bean(call, ControlMeasureEquation.class, controlMeasureEquation());
     }
 
     private void registerArrays(Call call) {
@@ -189,8 +186,7 @@ public class DataMappings extends Mappings {
         array(call, ControlMeasureClass[].class, controlMeasureClasses());
         array(call, EquationType[].class, equationTypes());
         array(call, EquationTypeVariable[].class, equationTypeVariables());
-        array(call, ControlMeasureEquationTypeVariable[].class, controlMeasureEquationTypeVariables());
-        array(call, ControlMeasureEquationType[].class, controlMeasureEquationTypes());
+        array(call, ControlMeasureEquation[].class, controlMeasureEquations());
         
         array(call, EmfFileInfo[].class, emfFileInfos());
     }
@@ -415,20 +411,12 @@ public class DataMappings extends Mappings {
         return qname("EquationTypeVariable");
     }
 
-    public QName controlMeasureEquationTypes() {
-        return qname("ControlMeasureEquationTypes");
+    public QName controlMeasureEquations() {
+        return qname("ControlMeasureEquations");
     }
 
-    public QName controlMeasureEquationType() {
-        return qname("ControlMeasureEquationType");
-    }
-
-    public QName controlMeasureEquationTypeVariables() {
-        return qname("ControlMeasureEquationTypeVariables");
-    }
-
-    public QName controlMeasureEquationTypeVariable() {
-        return qname("ControlMeasureEquationTypeVariable");
+    public QName controlMeasureEquation() {
+        return qname("ControlMeasureEquation");
     }
 
     public QName controlStrategy() {

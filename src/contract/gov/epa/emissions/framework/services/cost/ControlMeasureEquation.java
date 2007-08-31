@@ -2,26 +2,29 @@ package gov.epa.emissions.framework.services.cost;
 
 import java.io.Serializable;
 
-public class ControlMeasureEquationTypeVariable implements Serializable {
+public class ControlMeasureEquation implements Serializable {
 
     private int id;
 
-    private EquationTypeVariable equationTypeVariable;
-    
     private EquationType equationType;
 
+    private EquationTypeVariable equationTypeVariable;
+    
     private Double value;
 
-    private long listindex;
-
-    public ControlMeasureEquationTypeVariable() {// persistence/bean
+    public ControlMeasureEquation() {// persistence/bean
     }
 
-    public ControlMeasureEquationTypeVariable(EquationType equationType, EquationTypeVariable equationTypeVariable, 
+    public ControlMeasureEquation(EquationType equationType, EquationTypeVariable equationTypeVariable, 
             Double value) {
+        this(equationType);
         this.equationTypeVariable = equationTypeVariable;
-        this.equationType = equationType;
         this.value = value;
+    }
+
+    public ControlMeasureEquation(EquationType equationType) {
+        this();
+        this.equationType = equationType;
     }
 
     public int getId() {
@@ -48,14 +51,6 @@ public class ControlMeasureEquationTypeVariable implements Serializable {
         this.value = value;
     }
 
-    public long getListindex() {
-        return listindex;
-    }
-
-    public void setListindex(long listindex) {
-        this.listindex = listindex;
-    }
-
     public void setEquationType(EquationType equationType) {
         this.equationType = equationType;
     }
@@ -65,13 +60,17 @@ public class ControlMeasureEquationTypeVariable implements Serializable {
     }
 
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof ControlMeasureEquationType)) {
+        if (obj == null || !(obj instanceof ControlMeasureEquation)) {
             return false;
         }
 
-        ControlMeasureEquationTypeVariable other = (ControlMeasureEquationTypeVariable) obj;
+        ControlMeasureEquation other = (ControlMeasureEquation) obj;
 
-        return (id == other.getId());
+        return (
+                id == other.getId() 
+                && (equationType != null && other.getEquationType()!= null && equationType.getId() == other.getEquationType().getId())
+                && ((equationTypeVariable == null) || (equationTypeVariable != null && other.getEquationTypeVariable()!= null && equationTypeVariable.getId() == other.getEquationTypeVariable().getId()))
+                );
     }
 
     public int hashCode() {

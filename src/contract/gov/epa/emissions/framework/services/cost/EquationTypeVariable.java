@@ -13,6 +13,16 @@ public class EquationTypeVariable implements Serializable {
 
     private String description;
     
+    private long listindex;
+
+    public long getListindex() {
+        return listindex;
+    }
+
+    public void setListindex(long listindex) {
+        this.listindex = listindex;
+    }
+
     public EquationTypeVariable() {
         //
     }

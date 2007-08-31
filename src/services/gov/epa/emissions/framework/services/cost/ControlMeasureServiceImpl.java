@@ -123,6 +123,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         try {
             session = sessionFactory.getSession();
             ControlMeasure locked = dao.obtainLocked(owner, controlMeasureId, session);
+            
             return locked;
         } catch (RuntimeException e) {
             LOG.error("Could not obtain lock for ControlMeasure Id: " + controlMeasureId + " by owner: "

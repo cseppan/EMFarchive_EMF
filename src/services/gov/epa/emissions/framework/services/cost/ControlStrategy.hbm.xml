@@ -72,7 +72,7 @@
     	</composite-element>
 	</array>-->
 
-	<array name="controlStrategyInputDatasets" table="input_datasets_control_strategies" cascade="save-update">
+	<array name="controlStrategyInputDatasets" table="input_datasets_control_strategies">
     	<key column="control_strategy_id" not-null="true"/>
     	<list-index column="list_index"/>
     	<composite-element class="gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset">

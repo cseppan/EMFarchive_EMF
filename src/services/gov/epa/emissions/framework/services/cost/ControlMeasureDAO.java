@@ -189,7 +189,6 @@ public class ControlMeasureDAO {
 
     public ControlMeasure update(ControlMeasure locked, Scc[] sccs, Session session) throws EmfException {
         checkForConstraints(locked, session);
-
         ControlMeasure releaseLockOnUpdate = (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, current(locked.getId(),
                 session), session);
         updateSccs(sccs, locked.getId(), session);
@@ -331,6 +330,19 @@ public class ControlMeasureDAO {
             tx.rollback();
             throw e;
         }
+    }
+
+    public void removeMeasureEquationType(int controlMeasureEquationTypeId, Session session) {
+        String hqlDelete = "delete ControlMeasureEquationType et where et.id = :controlMeasureEquationTypeId";
+        session.createQuery( hqlDelete )
+             .setInteger("controlMeasureEquationTypeId", controlMeasureEquationTypeId)
+             .executeUpdate();
+        session.flush();
+//        Criterion c = Restrictions.eq("controlMeasureId", new Integer(controlMeasureId));
+//        List list = hibernateFacade.get(EfficiencyRecord.class, c, session);
+//        for (int i = 0; i < list.size(); i++) {
+//            hibernateFacade.remove(list.get(i), session);
+//        }
     }
 
     public void removeEfficiencyRecords(int controlMeasureId, Session session) {

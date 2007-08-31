@@ -7,8 +7,7 @@ import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.ControlMeasureEquationType;
-import gov.epa.emissions.framework.services.cost.ControlMeasureEquationTypeVariable;
+import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 import gov.epa.emissions.framework.services.cost.EquationType;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -73,22 +72,22 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
 
     private void doLayout(ControlMeasure measure){
         mainPanel.setBorder(BorderFactory.createTitledBorder("Equation"));
-        updateMainPanel(measure.getEquationTypes());
+        updateMainPanel(measure.getEquations());
         this.add(mainPanel, BorderLayout.CENTER);
         this.add(buttonPanel(), BorderLayout.SOUTH);
     }
 
-    private void updateMainPanel(ControlMeasureEquationType[] equationTypes){
-        
+    private void updateMainPanel(ControlMeasureEquation[] equations){
         mainPanel.removeAll();  
-        mainPanel.add(createTable(equationTypes), BorderLayout.CENTER);
+//
+        mainPanel.add(createTable(equations), BorderLayout.CENTER);
         mainPanel.validate();
-        
+
     }
     
-    private ScrollableTable createTable(ControlMeasureEquationType[] cmEquationTypes) {
+    private ScrollableTable createTable(ControlMeasureEquation[] cmEquations) {
         
-        tableData = new CMEquationsTableData(cmEquationTypes);
+        tableData = new CMEquationsTableData(cmEquations);
         tableModel = new EmfTableModel(tableData);
 
         ScrollableTable table = new ScrollableTable(tableModel, null);
@@ -119,50 +118,42 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
                 if(tableData.rows().size()>0)  
                     messagePanel.setError("Please remove old equation type to add new one" );
                 else {
-                EquationTypeSelectionView view = new EquationTypeSelectionDialog(parent, dialogParent, changeables);
-                EquationTypeSelectionPresenter presenter = new EquationTypeSelectionPresenter(view, session);
-                try {
-                    presenter.display();
-                    //get Equation Type...
-                    EquationType equationType = presenter.getEquationType();
-                    
-                    if (equationType!=null){
-                        ControlMeasureEquationType cMEquationType = new ControlMeasureEquationType(equationType); 
-                        int n=equationType.getEquationTypeVariables().length;
-                        ControlMeasureEquationTypeVariable[] variables;
-                        //if we have variables...
-                        if (n > 0 ) {
-                            variables = new ControlMeasureEquationTypeVariable[n];
-                            for(int i=0; i<n; i++){                              
-                                ControlMeasureEquationTypeVariable controlMeasureEquationTypeVariable 
-                                    = new ControlMeasureEquationTypeVariable(equationType, 
-                                        equationType.getEquationTypeVariables()[i], 
-                                        0.0);
-                                variables[i] = controlMeasureEquationTypeVariable;   
+                    EquationTypeSelectionView view = new EquationTypeSelectionDialog(parent, dialogParent, changeables);
+                    EquationTypeSelectionPresenter presenter = new EquationTypeSelectionPresenter(view, session);
+                    try {
+                        presenter.display();
+                        //get Equation Type...
+                        EquationType equationType = presenter.getEquationType();
+    
+                        if (equationType!=null){
+                            int n = equationType.getEquationTypeVariables().length;
+                            ControlMeasureEquation[] equations;
+                            //if equation type have variables...
+                            if (n > 0 ) {
+                                equations = new ControlMeasureEquation[n];
+                                for(int i = 0; i < n; i++){                              
+                                    ControlMeasureEquation equation = new ControlMeasureEquation(equationType, equationType.getEquationTypeVariables()[i], 
+                                            0.0);
+                                    equations[i] = equation;   
+                                }
+                            //if equation type doesn't have variables...
+                            } else {
+                                equations = new ControlMeasureEquation[1];
+                                ControlMeasureEquation equation = new ControlMeasureEquation(equationType);
+                                equations[0] = equation;   
                             }
-                        //if we DON'T have variables...
-                        } else {
-                            variables = new ControlMeasureEquationTypeVariable[1];
-                            ControlMeasureEquationTypeVariable controlMeasureEquationTypeVariable 
-                            = new ControlMeasureEquationTypeVariable(equationType, 
-                                null, 
-                                null);
-                            variables[0] = controlMeasureEquationTypeVariable;   
+                            updateMainPanel(equations);
                         }
-                        cMEquationType.setEquationTypeVariables(variables);
-
-                        updateMainPanel(new ControlMeasureEquationType[]{cMEquationType});
+                        
+                        //messagePanel.setError(equationType.getName());
+                        //wrap it with ControlMeasureEquationType...
+    //                    cmEquationTypes
+                        
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        messagePanel.setError("Could not return equation type: " + e.getMessage());
                     }
-                    
-                    //messagePanel.setError(equationType.getName());
-                    //wrap it with ControlMeasureEquationType...
-//                    cmEquationTypes
-                    
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    messagePanel.setError("Could not return equation type: " + e.getMessage());
                 }
-            }
             }
         };
         
@@ -193,6 +184,9 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
         };
     }
     private void doRemove(){
+        ControlMeasureEquation[] equations = new ControlMeasureEquation[]{};
+        refresh(measure);
+        updateMainPanel(equations);
         if (tableData.rows().size()==0)
             return; 
         String title = "Warning";
@@ -202,9 +196,9 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
 
         if (selection == JOptionPane.YES_OPTION) {
             if(tableData.rows().size()>0){
-                ControlMeasureEquationType[] cmEquationTypes=new ControlMeasureEquationType[]{};
+                ControlMeasureEquation[] cmEquations=new ControlMeasureEquation[]{};
                 refresh(measure);
-                updateMainPanel(cmEquationTypes);
+                updateMainPanel(cmEquations);
                 
                 }
             }
@@ -279,22 +273,14 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
 
 
     public void save(ControlMeasure measure) {
-        //THIS will only work with ONE equation type
-        //Check when there is no variables
-        List<ControlMeasureEquationType> equationTypes = new ArrayList<ControlMeasureEquationType>();
-        ControlMeasureEquationTypeVariable[] equationTypeVariables = tableData.sources();
-        
+        List<ControlMeasureEquation> equationList = new ArrayList<ControlMeasureEquation>();
+        ControlMeasureEquation[] equations = tableData.sources();
 
-        if (equationTypeVariables.length > 0) {
-            ControlMeasureEquationType equationType = new ControlMeasureEquationType(equationTypeVariables[0].getEquationType());
-            for (int i=0; i<equationTypeVariables.length; i++){
-                if (equationTypeVariables[i].getEquationTypeVariable() != null) {
-                    equationType.setEquationTypeVariable(equationTypeVariables[i]);
-                }
-            }
-            equationTypes.add(equationType);
+        for (int i = 0; i < equations.length; i++) {
+            ControlMeasureEquation equation = equations[i];
+            equationList.add(equation);
         }
-        measure.setEquationTypes(equationTypes.toArray(new ControlMeasureEquationType[0]));
+        measure.setEquations(equationList.toArray(new ControlMeasureEquation[0]));
     }
-  
+
 }

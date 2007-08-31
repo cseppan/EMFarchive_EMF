@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
-import gov.epa.emissions.framework.services.cost.ControlMeasureEquationType;
-import gov.epa.emissions.framework.services.cost.ControlMeasureEquationTypeVariable;
+import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 import gov.epa.emissions.framework.ui.AbstractEditableTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
@@ -14,29 +13,25 @@ public class CMEquationsTableData extends AbstractEditableTableData {
 
     private List<EditableRow> rows;
     
-    public CMEquationsTableData(ControlMeasureEquationType[] equationTypes) {
-        rows = createRows(equationTypes);
+    public CMEquationsTableData(ControlMeasureEquation[] equations) {
+        rows = createRows(equations);
     }
 
-    private List createRows(ControlMeasureEquationType[] equationTypes) {
-        rows = new ArrayList();
-        for(int i=0; i<equationTypes.length; i++){
-            ControlMeasureEquationTypeVariable[] cMEquaitonTypeVariables = equationTypes[i].getEquationTypeVariables();
-            
-            for (int j = 0; j < cMEquaitonTypeVariables.length; j++) {
-                rows.add(row(equationTypes[i], cMEquaitonTypeVariables[j]));
-            }
+    private List<EditableRow> createRows(ControlMeasureEquation[] equations) {
+        rows = new ArrayList<EditableRow>();
+        for(int i=0; i< equations.length; i++){
+            rows.add(row(equations[i]));
         }
         return rows;
     }
 
-    private EditableRow row(ControlMeasureEquationType equationType,ControlMeasureEquationTypeVariable equaitonTypeVariable) {
-        RowSource source = new EditableEquationVariableRowSource(equaitonTypeVariable);
+    private EditableRow row(ControlMeasureEquation equation) {
+        RowSource source = new EditableEquationVariableRowSource(equation);
         return new EditableRow(source);
     }
 
     public String[] columns() {
-        return new String[] { "Eqs","Variable Name", "Value"};
+        return new String[] { "Eqs", "Variable Name", "Value"};
     }
 
     public Class getColumnClass(int col) {
@@ -59,20 +54,20 @@ public class CMEquationsTableData extends AbstractEditableTableData {
        //
     }
 
-    public ControlMeasureEquationTypeVariable[] sources() {
-        List<ControlMeasureEquationTypeVariable> sources = sourcesList();
-        return sources.toArray(new ControlMeasureEquationTypeVariable[0]);
+    public ControlMeasureEquation[] sources() {
+        List<ControlMeasureEquation> sources = sourcesList();
+        return sources.toArray(new ControlMeasureEquation[0]);
     }
 
-    private List<ControlMeasureEquationTypeVariable> sourcesList() {
-        List<ControlMeasureEquationTypeVariable> sources = new ArrayList<ControlMeasureEquationTypeVariable>();
+    private List<ControlMeasureEquation> sourcesList() {
+        List<ControlMeasureEquation> sources = new ArrayList<ControlMeasureEquation>();
         int rowNumber = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             rowNumber++;
             EditableRow row = (EditableRow) iter.next();
             EditableEquationVariableRowSource rowSource = (EditableEquationVariableRowSource) row.rowSource();
             rowSource.validate(rowNumber);
-            sources.add((ControlMeasureEquationTypeVariable)rowSource.source());
+            sources.add((ControlMeasureEquation)rowSource.source());
         }
         return sources;
     }

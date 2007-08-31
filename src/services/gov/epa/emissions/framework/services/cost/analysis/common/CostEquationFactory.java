@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.cost.ControlMeasureEquationType;
+import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 
 public class CostEquationFactory {
 
@@ -29,15 +29,15 @@ public class CostEquationFactory {
 
         if (useCostEquations) {
             //see which type of equation to use...
-            ControlMeasureEquationType[] equationTypes = bestMeasureEffRecord.measure().getEquationTypes();
+            ControlMeasureEquation[] equations = bestMeasureEffRecord.measure().getEquations();
             
             //NOTE, we are currently only supporting one equation type, in the future we might need to support multiple 
             //equations (i.e., if Type 6 is the primary but we are missing some inputs we might want to try Type 10, and if
             //we don't have all the inputs for this Type, then we could use default equation approach) 
-            if (equationTypes.length > 0) {
+            if (equations.length > 0) {
                 
                 //use type 6 equation...
-                if (equationTypes[0].getEquationType().getName().equals("Type 6")) {
+                if (equations[0].getEquationType().getName().equals("Type 6")) {
                     //evaluate inputs, if they missing, use the default
                     if (minStackFlowRate != null && minStackFlowRate != 0.0) {
                         type6CostEquation.setUp(reducedEmission, bestMeasureEffRecord, 
@@ -46,7 +46,7 @@ public class CostEquationFactory {
                     }
                 }
                 
-                if (equationTypes[0].getEquationType().getName().equals("Type 5")) {
+                if (equations[0].getEquationType().getName().equals("Type 5")) {
                     //evaluate inputs, if they missing, use the default
                     if (minStackFlowRate != null && minStackFlowRate != 0.0) {
                         type5CostEquation.setUp(reducedEmission, bestMeasureEffRecord, 
@@ -55,7 +55,7 @@ public class CostEquationFactory {
                     }
                 }
                 
-                if (equationTypes[0].getEquationType().getName().equals("Type 4")) {
+                if (equations[0].getEquationType().getName().equals("Type 4")) {
                     //evaluate inputs, if they missing, use the default
                     if (minStackFlowRate != null && minStackFlowRate != 0.0) {
                         type4CostEquation.setUp(reducedEmission, bestMeasureEffRecord, 
@@ -64,7 +64,7 @@ public class CostEquationFactory {
                     }
                 }
                 
-                if (equationTypes[0].getEquationType().getName().equals("Type 3")) {
+                if (equations[0].getEquationType().getName().equals("Type 3")) {
                     //evaluate inputs, if they missing, use the default
                     if (minStackFlowRate != null && minStackFlowRate != 0.0) {
                         type3CostEquation.setUp(reducedEmission, bestMeasureEffRecord, 

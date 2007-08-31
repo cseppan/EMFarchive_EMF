@@ -1,30 +1,25 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
-import gov.epa.emissions.framework.services.cost.ControlMeasureEquationTypeVariable;
+import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 import gov.epa.emissions.framework.ui.RowSource;
 
 public class EditableEquationVariableRowSource implements RowSource {
 
-    private ControlMeasureEquationTypeVariable controlMeasureEquationTypeVariable;
+    private ControlMeasureEquation equation;
 
     private Boolean selected;
     
-    private final static Double NAN_VALUE=new Double(Double.NaN);
+    private final static Double NAN_VALUE = new Double(Double.NaN);
 
-    public EditableEquationVariableRowSource(ControlMeasureEquationTypeVariable controlMeasureEquationTypeVariable) {
-        this.controlMeasureEquationTypeVariable = controlMeasureEquationTypeVariable;
+    public EditableEquationVariableRowSource(ControlMeasureEquation equation) {
+        this.equation = equation;
         this.selected = Boolean.FALSE;
     }
 
     public Object[] values() {
-        if (controlMeasureEquationTypeVariable.getEquationTypeVariable()==null){
-            Object[] values = {controlMeasureEquationTypeVariable.getEquationType().getName(), 
-                    "NO VARIABLES", NAN_VALUE };
-            return values;           
-        }
-        Double value=(controlMeasureEquationTypeVariable.getValue()!=null? controlMeasureEquationTypeVariable.getValue() : NAN_VALUE);
-        Object[] values = {controlMeasureEquationTypeVariable.getEquationType().getName(), 
-                controlMeasureEquationTypeVariable.getEquationTypeVariable().getName(), value };
+        Object[] values = {equation.getEquationType().getName(), 
+                equation.getEquationTypeVariable() != null ? equation.getEquationTypeVariable().getName() : "NO VARIABLES", 
+                equation.getValue()!= null ? equation.getValue() : NAN_VALUE };
         return values;
     }
 
@@ -38,7 +33,7 @@ public class EditableEquationVariableRowSource implements RowSource {
 //            break;
         case 2:
             //maybe add some logic if the value is non-numeric...
-            controlMeasureEquationTypeVariable.setValue((Double) val);
+            equation.setValue((Double) val);
             break;
         default:
             throw new RuntimeException("invalid column - " + column);
@@ -46,7 +41,7 @@ public class EditableEquationVariableRowSource implements RowSource {
     }
 
     public Object source() {
-        return controlMeasureEquationTypeVariable;
+        return equation;
     }
 
     public boolean isSelected() {

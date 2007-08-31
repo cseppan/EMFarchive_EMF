@@ -67,7 +67,7 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private Double applyOrder;
 
-    private List equationTypes;
+    private List equations = new ArrayList();
 
     public ControlMeasure() {
         this.lock = new Mutex();
@@ -75,7 +75,9 @@ public class ControlMeasure implements Lockable, Serializable {
         this.efficiencyRecords = new ArrayList();
         this.aggregatedPollutantEfficiencyRecords = new ArrayList();
         this.sectors = new ArrayList();
-        this.equationTypes = new ArrayList();
+//        this.equationTypeList = new ArrayList();
+//        this.equationTypes = new ArrayList();
+        
     }
 
     
@@ -278,14 +280,6 @@ public class ControlMeasure implements Lockable, Serializable {
         this.sectors = Arrays.asList(sectors);
     }
 
-    public ControlMeasureEquationType[] getEquationTypes() {
-        return (ControlMeasureEquationType[]) equationTypes.toArray(new ControlMeasureEquationType[0]);
-    }
-
-    public void setEquationTypes(ControlMeasureEquationType[] equationTypes) {
-        this.equationTypes = Arrays.asList(equationTypes);
-    }
-    
     public void addEfficiencyRecord(EfficiencyRecord efficiencyRecord) {
         this.efficiencyRecords.add(efficiencyRecord);
     }
@@ -342,12 +336,19 @@ public class ControlMeasure implements Lockable, Serializable {
     public Double getApplyOrder() {
         return applyOrder;
     }
-    
-//    public void setEquationType(EquationType equationType) {
-//        this.equationType = equationType;
-//    }
-//
-//    public EquationType getEquationType() {
-//        return equationType;
-//    }
+
+    public void setEquations(ControlMeasureEquation[] equations) {
+        this.equations.removeAll(this.equations);
+        for (int i = 0; i < equations.length; i++) {
+            this.equations.add(equations[i]);
+        }
+    }
+
+    public void addEquation(ControlMeasureEquation equation) {
+        this.equations.add(equation);
+    }
+
+    public ControlMeasureEquation[] getEquations() {
+        return (ControlMeasureEquation[]) equations.toArray(new ControlMeasureEquation[0]);
+    }
 }

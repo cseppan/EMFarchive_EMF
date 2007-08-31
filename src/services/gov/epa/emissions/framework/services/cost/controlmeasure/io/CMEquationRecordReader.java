@@ -3,11 +3,18 @@ package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
+import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
+import gov.epa.emissions.framework.services.cost.EquationType;
+import gov.epa.emissions.framework.services.cost.EquationTypeVariable;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.util.List;
 import java.util.Map;
+
+import org.hibernate.Session;
 
 public class CMEquationRecordReader {
 
@@ -16,15 +23,19 @@ public class CMEquationRecordReader {
     private CMAddImportStatus status;
     
     //Add EqTypVar map -- contains a map between eq type no to list of variables. 
-    
+    private EquationTypeMap equationTypeMap;
 
     private int errorCount = 0;
 
     private int errorLimit = 100;
+    
+    private HibernateSessionFactory sessionFactory;
 
-    public CMEquationRecordReader(CMEquationFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) {
+    public CMEquationRecordReader(CMEquationFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) throws EmfException {
         this.fileFormat = fileFormat;
         this.status = new CMAddImportStatus(user, sessionFactory);
+        this.sessionFactory = sessionFactory;
+        this.equationTypeMap = new EquationTypeMap(getEquationTypes());
     }
 
     public void parse(Map controlMeasures, Record record, int lineNo) throws ImporterException {
@@ -34,16 +45,41 @@ public class CMEquationRecordReader {
         if (tokens == null || cm == null)
             return;
 
-        Scc scc = new Scc();
-        scc.setCode(tokens[1]);
-        scc.setStatus(tokens[2]);
-
+        //first lets get the equation type using the map, the seconds columns should
+        //contain the equation type name.
+        EquationType equationType = equationTypeMap.getEquationType(tokens[1]);
+        if (equationType != null) {
+            EquationTypeVariable[] equationTypeVariables = equationType.getEquationTypeVariables();
+            //get rid of original settings
+            cm.setEquations(new ControlMeasureEquation[] {});
+            //now add equation settings...
+            if (equationTypeVariables.length > 0) {
+                for (int i = 0; i < equationTypeVariables.length; i++) {
+                    EquationTypeVariable equationTypeVariable = equationTypeVariables[i];
+                    ControlMeasureEquation equation = new ControlMeasureEquation(equationType);
+                    equation.setEquationTypeVariable(equationTypeVariable);
+                    try {
+                        Double value = Double.valueOf(tokens[equationTypeVariable.getFileColPosition() + 1]);
+                        equation.setValue(value);
+                    } catch (NumberFormatException e) {
+                        sb.append(format("variable value must be a number, column position = " + (equationTypeVariable.getFileColPosition() + 1) + ", value = " + tokens[equationTypeVariable.getFileColPosition() + 1]));
+                        break;
+                    }
+                    cm.addEquation(equation);
+                }
+            } else {
+                ControlMeasureEquation equation = new ControlMeasureEquation(equationType);
+                cm.addEquation(equation);
+            }
+            
+        } else {
+            sb.append(format("unknown equation type '" + tokens[1] + "'"));
+        }
         if (sb.length() > 0) {
             errorCount++;
             status.addStatus(lineNo, sb);
         }
-        if (errorCount >= errorLimit) throw new ImporterException("The maximum allowable error limit (" + errorLimit + ") has been reached while parsing the control measure SCC records.");
-        cm.addScc(scc);
+        if (errorCount >= errorLimit) throw new ImporterException("The maximum allowable error limit (" + errorLimit + ") has been reached while parsing the control measure equation records.");
     }
 
     private ControlMeasure controlMeasure(String token, Map controlMeasures, StringBuffer sb, int lineNo) {
@@ -75,5 +111,17 @@ public class CMEquationRecordReader {
 
     public int getErrorCount() {
         return errorCount;
+    }
+    
+    private EquationType[] getEquationTypes() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            List<EquationType> all = new ControlMeasureDAO().getEquationTypes(session);
+            return all.toArray(new EquationType[0]);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not retrieve control measures Equation Types.");
+        } finally {
+            session.close();
+        }
     }
 }

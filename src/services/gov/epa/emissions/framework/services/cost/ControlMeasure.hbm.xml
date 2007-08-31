@@ -53,11 +53,21 @@
     		<many-to-many class="gov.epa.emissions.commons.data.Sector" column="sector_id"/>
   		</array>
 
-		<array name="equationTypes" table="control_measure_equation_types">
+		<array name="equations" table="control_measure_equations">
 	    	<key column="control_measure_id" not-null="true"/>
 	    	<list-index column="list_index"/>
-        	<one-to-many class="gov.epa.emissions.framework.services.cost.ControlMeasureEquationType"/>
+	    	<composite-element class="gov.epa.emissions.framework.services.cost.ControlMeasureEquation">
+		        <property name="value" column="value" type="double"/>
+	        	<many-to-one name="equationType" class="gov.epa.emissions.framework.services.cost.EquationType" column="equation_type_id" not-null="true"/>
+	        	<many-to-one name="equationTypeVariable" class="gov.epa.emissions.framework.services.cost.EquationTypeVariable" column="equation_type_variable_id"/>
+	    	</composite-element>
 		</array>
+
+<!--		<set name="equationTypeSet" cascade="all, delete-orphan" inverse="true">
+	    	<key column="control_measure_id" not-null="true"/>-->
+<!--	    	<list-index column="list_index"/>-->
+<!--        	<one-to-many class="gov.epa.emissions.framework.services.cost.ControlMeasureEquationType"/>
+		</set>-->
 
     </class>
 </hibernate-mapping>

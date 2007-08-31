@@ -85,8 +85,12 @@ public class ControlMeasuresImporter implements Importer {
         EfficiencyRecord[] efficiencyRecords;
         int efficiencyRecordCount = 0;
         try {
+            //import summary file
             runSummary(controlMeasures);
+            //import scc file
             runSCC(controlMeasures);
+            //import equation file
+            runEquation(controlMeasures);
             measures = controlMeasures();
             saveMeasureAndSCCs(measures, user);
             //this is needed so we know what the Ids are for the saved measures
@@ -173,6 +177,16 @@ public class ControlMeasuresImporter implements Importer {
         CMSCCImporter sccImporter = cmImporters.sccImporter();
         sccImporter.run(controlMeasures);
         setStatus("Finished reading SCC file");
+    }
+
+    private void runEquation(Map controlMeasures) throws ImporterException {
+        CMEquationImporter equationImporter = cmImporters.equationImporter();
+        if (equationImporter != null) {
+            setStatus("Started reading equation file");
+            equationImporter.run(controlMeasures);
+            setStatus("Finished reading equation file");
+        } else
+            setStatus("No equation file was specified");
     }
 
     private OptimizedTableModifier dataModifier(String table, Datasource datasource) throws EmfException {
