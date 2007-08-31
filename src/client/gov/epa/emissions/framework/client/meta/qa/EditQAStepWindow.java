@@ -521,7 +521,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         String programSwitches = "";
         
         String annEmis = "Average day to Annual State Summary";
-        String annEmis2 = "Average day to Annual State by Pollutant";
+        String annEmis2 = "Average day to Annual Inventory";
         //String firstElementContains = "";
 
         programSwitches = programArguments.getText();
@@ -641,7 +641,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 clear();
                 //System.out.println("The program is: " + (String)program.getSelectedItem());
                 String annEmis = "Average day to Annual State Summary";
-                String annEmis2 = "Average day to Annual State by Pollutant";
+                String annEmis2 = "Average day to Annual Inventory";
                 if (annEmis.equals(program.getSelectedItem())) {
                     //System.out.println("You selected annual emissions");
                     doSetAnnEmisWindow();
