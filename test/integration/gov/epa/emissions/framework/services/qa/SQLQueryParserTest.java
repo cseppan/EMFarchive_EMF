@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.TableModifier;
@@ -9,6 +10,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 
 import java.sql.SQLException;
 
@@ -175,6 +177,52 @@ public class SQLQueryParserTest extends ServiceTestCase {
                 + " E left outer join emissions.table1 F INNER JOIN emissions.table1 K  WHERE  (E.version IN (0) AND E.dataset_id="
                 + dataset.getId() + ") AND  (K.version IN (0) AND K.dataset_id=" + dataset.getId() + ") AND  (F.version IN (0) AND F.dataset_id=" + dataset.getId() + ")  group by";
   
+        dropVersionDataFromTable();
+        remove(dataset);
+        assertEquals(expected.toUpperCase(), query.toUpperCase());
+    }
+    
+    public void testShoudParseTheQueryWhichContainsQAStepTags() throws Exception {
+        String tableName = "table1";
+        EmfDataset dataset = dataset(0, tableName);
+        add(dataset);
+        dataset = (EmfDataset)load(EmfDataset.class, dataset.getName());
+        Version version = version(dataset.getId());
+        Version version1 = version1(dataset.getId());
+        addVersionEntryToVersionsTable(version);
+        addVersionEntryToVersionsTable(version1);
+        
+        QAProgram qaProgram = new QAProgram("Average day to Annual State Summary");
+        
+        QAStep qaStep = new QAStep();
+        qaStep.setName("Step1");
+        qaStep.setProgram(qaProgram);
+        qaStep.setDatasetId(dataset.getId());
+        
+        QAStepResult qaStepResult = new QAStepResult(qaStep);
+        qaStepResult.setTable("QA_DSID603_V0_20070827122550Test1");
+        qaStepResult.getTable();
+        
+        String userQuery = "SELECT fipsst, sum(ann_emis) as ann_emis, poll FROM ((select br.fipsst, be.poll, be.ann_emis from $DATASET_QASTEP[TEST, Average day to Annual State Summary] as be) union all (select te.fipsst, te.name, te.ann_emis from $DATASET_QASTEP[TEST, Average day to Annual State Summary] as te)) as ab group by ab.fipsst, ab.ann_emis, ab.poll order by ab.fipsst";
+        
+        //emissions.QA_DSID135_V0_20070824135517Summarize_by_US_State_and_Pollutant 
+        //emissions.QA_DSID603_V0_20070827122550Test1
+
+        // Alternate query to use in the client.
+        // String userQuery = "select coalesce(fips.state_abbr,'AN UNSPECIFIED STATE ABBREVIATION') as state_abbr, coalesce(fips.state_name, 'AN UNSPECIFIED STATE NAME') as state_name, e.POLL, coalesce(e.mact, 'AN UNSPECIFIED MACT CODE') as mact_code, coalesce(m.mact_source_category, 'AN UNSPECIFIED CATEGORY NAME') as mact_source_category,e.scc, coalesce(scc.scc_description,'AN UNSPECIFIED DESCRIPTION') as scc_description, e.sic, coalesce(r.description,'AN UNSPECIFIED DESCRIPTION') as description, coalesce(p.pollutant_code_desc,'AN UNSPECIFIED DESCRIPTION') as pollutant_code_desc, coalesce(p.smoke_name,'AN UNSPECIFIED SMOKE NAME') as smoke_name, p.factor,p.voctog, p.species, coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis from $TABLE[1] e left outer join $DATASET_TABLE[TEST, 1] p on e.POLL=p.pollutant_code left outer join reference.fips on fips.state_county_fips = e.FIPS left outer join reference.mact_codes m on m.mact_code = e.mact left outer join reference.scc on scc.scc = e.scc left outer join reference.sic_codes r on r.sic = e.sic where fips.country_num = '0' and  e.POLL in ('593748','7487947','7439976','22967926','62384','202','201','200','199') group by fips.state_name, fips.state_abbr, e.POLL, p.pollutant_code_desc, p.smoke_name, p.factor, p.voctog, p.species, scc.scc_description, r.description, e.sic, e.scc, e.mact, m.mact_source_category order by e.mact, e.sic, e.scc, e.POLL";
+
+        
+        qaStep.setProgramArguments(userQuery);
+        String qaStepOutputTable = "qa_step_table1";
+        //String qaStepOutputTable = "qa_table1";
+        SQLQueryParser parser = new SQLQueryParser(qaStep, qaStepOutputTable, emissioDatasourceName, dataset, version, sessionFactory);
+        String query = parser.parse();
+        System.out.println("The input query is: " + userQuery);
+        System.out.println("The final query is : " + query);
+        String expected = "CREATE TABLE " + qualfiedName(qaStepOutputTable) + " AS SELECT * FROM "
+                + qualfiedName(tableName)
+                + " E  WHERE  (E.version IN (0) AND E.dataset_id="
+                + dataset.getId() + ") " + " group by";
         dropVersionDataFromTable();
         remove(dataset);
         assertEquals(expected.toUpperCase(), query.toUpperCase());

@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 
 import java.util.Hashtable;
 import java.util.StringTokenizer;
@@ -44,10 +45,16 @@ public class SQLQueryParser {
     private static final String startSecondQueryTag = "$DATASET_TABLE[";
 
     private static final String startSecondVersQueryTag = "$DATASET_TABLE_VERSION[";
+    
+    private static final String startQAstepQueryTag = "$DATASET_QASTEP[";
+    
+    private static final String startQAstepVersQueryTag = "$DATASET_QASTEP_VERSION[";
 
     private static final String endQueryTag = "]";
 
     private static final String isErrorQueryTag = "$";
+    
+    private QAServiceImpl qaServiceImpl;
 
     public SQLQueryParser(QAStep qaStep, String tableName, String emissionDatasourceName, EmfDataset dataset,
             Version version, HibernateSessionFactory sessionFactory) {
@@ -58,6 +65,7 @@ public class SQLQueryParser {
         this.version = version;
         this.sessionFactory = sessionFactory;
         tableValuesAliasesVersions = new Hashtable<String, String[]>();
+        qaServiceImpl = new QAServiceImpl(sessionFactory);
     }
 
     // New constructor for far fewer arguments.
@@ -66,6 +74,7 @@ public class SQLQueryParser {
         this.emissionDatasourceName = emissionDatasourceName;
         this.tableName = tableName;
         tableValuesAliasesVersions = new Hashtable<String, String[]>();
+        qaServiceImpl = new QAServiceImpl(sessionFactory);
     }
 
     public String parse() throws EmfException {
@@ -84,7 +93,8 @@ public class SQLQueryParser {
         // This is an indication that the startQueryString tag was not found in the query.
 
         if (query.indexOf(startQueryTag) == -1 && query.indexOf(startSecondQueryTag) == -1
-                && query.indexOf(startSecondVersQueryTag) == -1)
+                && query.indexOf(startSecondVersQueryTag) == -1 && query.indexOf(startQAstepQueryTag) == -1
+                && query.indexOf(startQAstepVersQueryTag) == -1)
             return query;
 
         return expandTag(query);
@@ -111,6 +121,14 @@ public class SQLQueryParser {
         // Added code to add a new tag
         while ((query.indexOf(startSecondVersQueryTag)) != -1) {
             query = expandThreeTag(query);
+        }
+        //System.out.println("The query at point 3 is " + query);
+        while ((query.indexOf(startQAstepQueryTag)) != -1) {
+            query = expandFourTag(query);
+        }
+        
+        while ((query.indexOf(startQAstepVersQueryTag)) != -1) {
+            query = expandFiveTag(query);
         }
 
         // Check to see if there are any "$'s" left
@@ -177,6 +195,9 @@ public class SQLQueryParser {
 
         // Split the suffix into three tokens
         String[] suffixTokens = suffixSplit(suffix);
+        //for (int v = 0; v < suffixTokens.length; v++) {
+          //  System.out.println(suffixTokens[v]+ "\n");
+            //}
 
         // The dataset name is retreived as the first argument in the second token.
         // It is then trimmed and then converted into an EmfDataset type throught
@@ -313,6 +334,164 @@ public class SQLQueryParser {
         return prefix + tableNameFromDataset(tableNum, dataSet3) + suffixTokens[2];
         // return "OK";
     }
+    
+//  Added this method to handle new tag $DATASET_QASTEP[ datasetname, QAStepName ]
+
+    private String expandFourTag(String query) throws EmfException {
+        // Point to the start of the second tag, the first substring is from the beginning of the
+        // query to that point. The suffix is from that point to the end of the tag.
+        String outputTable = "";
+        
+        int index = query.indexOf(startQAstepQueryTag);
+        
+        String prefix = query.substring(0, index);
+        //System.out.println("Prefix: "+ prefix);
+        String suffix = query.substring(index + startQAstepQueryTag.length());
+        //System.out.println("Suffix: "+ suffix);
+
+        // Split the suffix into two tokens
+        String[] suffixTokens = noAliasSuffixSplit(suffix);
+
+        // The dataset name is retreived as the first argument in the second token.
+        // It is then trimmed and then converted into an EmfDataset type throught
+        // the getDataset method created below
+
+        int index4 = suffixTokens[0].indexOf(",");
+        String dataSetName = suffixTokens[0].substring(0, index4) + " ";
+        EmfDataset dataSet4 = getDataset(dataSetName.trim());
+        //System.out.println("Database name = \n" + dataSet4 + "\n");
+
+        // The integer value of the default version is retrieved from the getDefaultVersion
+        // method of the EmfDataset just created. It is converted to a String for the hashtable.
+
+        int ds4IntVersion = dataSet4.getDefaultVersion();
+
+        //System.out.println("Default Version as integer " + ds4IntVersion);
+
+        // The dataset id is retrieved from the dataset through its getId method.
+        // It is then converted to a string to put in the hashtable.
+        // Next a version object is created from the dataset id and the version.
+
+        //int dataSet4_id = dataSet4.getId();
+        //String ds4Id = Integer.toString(dataSet4_id);
+        //Version version1 = version(dataSet4_id, ds4IntVersion);
+        //System.out.println("version object" + version1);
+
+        //The QA Step name is retrieved from the second argument in the second token.
+        String qaStepName = suffixTokens[0].substring(index4 + 1).trim();
+        //System.out.println("QA Step Name: " + qaStepName);
+        
+        // Use the QAServiceImpl object which was created in the constructor.  Run the 
+        // method which gets an array of the QA Steps associated with this dataset.
+        
+        QAStep [] qaSteps = qaServiceImpl.getQASteps(dataSet4);
+        //System.out.println("The array size is: " + qaSteps.length);
+        
+        // Go through each of them and find the matching dataset with the correct name and
+        // version number.
+        for (int r = 0; r < qaSteps.length; r++) {
+            //System.out.println("Next step: " + qaSteps[r]);
+            //System.out.println(" Step version : " + qaSteps[r].getVersion());
+            if (qaSteps[r].toString().equals(qaStepName) && qaSteps[r].getVersion()== ds4IntVersion) {
+                QAStepResult qaStepResult = qaServiceImpl.getQAStepResult(qaSteps[r]);
+                
+                outputTable = qaStepResult.getTable();
+            //System.out.println("The output table for the next step: " + outputTable);
+            }
+        }
+        if (outputTable == "")
+                throw new EmfException("An appropriate QA Step could not be found");
+       
+        // Only need to send back the schema concatenated with the output table.
+        return prefix + emissionDatasourceName + "." + outputTable + suffixTokens[1];
+    }
+
+    // Added method to handle new tag $DATASET_QASTEP_VERSION[ datasetname, QAStepName, versionnum]
+    
+    private String expandFiveTag(String query) throws EmfException {
+        // Point to the start of the second tag, the first substring is from the beginning of the
+        // query to that point. The suffix is from that point to the end of the tag.
+        String outputTable = "";
+        
+        int index = query.indexOf(startQAstepVersQueryTag);
+        
+        String prefix = query.substring(0, index);
+        //System.out.println("Prefix: "+ prefix);
+        String suffix = query.substring(index + startQAstepVersQueryTag.length());
+        //System.out.println("Suffix: "+ suffix);
+
+        // Split the suffix into two tokens
+        String[] suffixTokens = noAliasSuffixSplit(suffix);
+
+        // The dataset name is retreived as the first argument in the second token.
+        // It is then trimmed and then converted into an EmfDataset type throught
+        // the getDataset method created below.
+        
+        // The dataset name is retreived as the first argument in the first token.
+        StringTokenizer tokenizer = new StringTokenizer(suffixTokens[0], ",");
+        // int index2 = suffixTokens[1].indexOf(",");
+        String dataSetName = tokenizer.nextToken();
+        String qaStepName = tokenizer.nextToken().trim();
+        String ds5version = tokenizer.nextToken().trim();
+
+        //int index5 = suffixTokens[0].indexOf(",");
+        //String dataSetName = suffixTokens[0].substring(0, index5) + " ";
+        EmfDataset dataSet5 = getDataset(dataSetName.trim());
+        //System.out.println("Database name = \n" + dataSet4 + "\n");
+
+        // The integer value of the default version is retrieved from the getDefaultVersion
+        // method of the EmfDataset just created. It is converted to a String for the hashtable.
+
+        //int ds5IntVersion = dataSet5.getDefaultVersion();
+
+        //System.out.println("Default Version as integer " + ds4IntVersion);
+
+        // The dataset id is retrieved from the dataset through its getId method.
+        // It is then converted to a string to put in the hashtable.
+        // Next a version object is created from the dataset id and the version.
+        
+        // The (String) value of the version is retrieved as the third argument
+        // of the tag. It is then converted to an integer. The value is then compared
+        // to make sure it is > or = 0.
+
+        int ds5IntVersion = Integer.parseInt(ds5version);
+        //System.out.println("This is a number " + ds5IntVersion);
+        if (ds5IntVersion < 0)
+            throw new EmfException("The version number should be greater or equal to zero");
+
+        //int dataSet5_id = dataSet5.getId();
+        //String ds5Id = Integer.toString(dataSet5_id);
+        //Version version1 = version(dataSet5_id, ds5IntVersion);
+        //System.out.println("version object" + version1);
+        //System.out.println("version as integer" + ds5Id);
+
+        //System.out.println("QA Step Name: " + qaStepName);
+        
+        // Use the QAServiceImpl object which was created in the constructor.  Run the 
+        // method which gets an array of the QA Steps associated with this dataset.
+        
+        QAStep [] qaSteps = qaServiceImpl.getQASteps(dataSet5);
+        //System.out.println("The array size is: " + qaSteps.length);
+        
+        // Go through each of them and find the matching dataset with the correct name and
+        // version number.
+        for (int r = 0; r < qaSteps.length; r++) {
+            //System.out.println("The next step: " + qaSteps[r]);
+            //int qaName = qaSteps[r].getId();
+            //System.out.println("The id of the next step: " + qaName);
+            if (qaSteps[r].toString().equals(qaStepName) && qaSteps[r].getVersion()== ds5IntVersion) {
+                QAStepResult qaStepResult = qaServiceImpl.getQAStepResult(qaSteps[r]);
+            outputTable = qaStepResult.getTable();
+            //System.out.println("The output table for the next step: " + outputTable);
+            }
+        }
+        if (outputTable == "")
+            throw new EmfException("An appropriate QA Step could not be found");
+        
+        // Only need to send back the schema concatenated with the output table.
+        return prefix + emissionDatasourceName + "." + outputTable + suffixTokens[1];
+    }
+
 
     // Added method to create new version objects associated with the second and third tags.
     private Version version(int dataset_id, int versionNum) {
@@ -336,8 +515,9 @@ public class SQLQueryParser {
     }
 
     private String insertVersionClause(String partQuery, String versionClause) {
-        String[] keywords = { "GROUP BY", "HAVING", "ORDER BY", "LIMIT" };
         
+        String[] keywords = { "GROUP BY", "HAVING", "ORDER BY", "LIMIT" };
+        //System.out.println("Version clause: " + versionClause);
         //Make new string of upper case just to handle these keywords.
         String tempPartQuery = partQuery.toUpperCase();
         //Create a "tempQuery to upper case" here
@@ -351,10 +531,13 @@ public class SQLQueryParser {
                 break;
             }
         }
-        if (tempPartQuery.indexOf("WHERE") == -1)
+        if (tempPartQuery.indexOf("WHERE") == -1) {
         //if (firstPart.indexOf("WHERE") == -1)
+            if (versionClause == "")
+                return firstPart +  versionClause + " " + secondPart;
+            
             return firstPart + " WHERE " + versionClause + " " + secondPart;
-
+        }
         return firstPart + " AND " + versionClause + " " + secondPart;
     }
 
@@ -413,6 +596,32 @@ public class SQLQueryParser {
 
         return new String[] { aliasValue, prefix, suffix };
     }
+    
+    
+    private String[] noAliasSuffixSplit(String token) throws EmfException {
+
+        String nextDollarSign;
+
+        // Look for a missing end tag and either the end of the query or the next dollar sign
+        // If it is missing, throw an exception.
+
+        if (token.indexOf(isErrorQueryTag) != -1)
+            nextDollarSign = token.substring(0, token.indexOf(isErrorQueryTag));
+        else
+            nextDollarSign = token;
+
+        int index = nextDollarSign.indexOf(endQueryTag);
+        if (index == -1)
+            throw new EmfException("The '" + endQueryTag + "' is expected in the program arguments");
+
+        // Break up the token into a prefix and suffix string.
+
+        String prefix = token.substring(0, index);
+        String suffix = token.substring(index + endQueryTag.length());
+        
+        return new String[] {prefix, suffix };
+    }
+
 
     private String tableNameFromDataset(String tableNo, EmfDataset dataset) throws EmfException {
         int tableID = tableID(tableNo);
