@@ -1,7 +1,11 @@
 package gov.epa.emissions.framework.services.cost;
 
 
+import java.sql.SQLException;
+
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.cost.analysis.common.BestMeasureEffRecord;
 import gov.epa.emissions.framework.services.cost.analysis.common.DefaultCostEquation;
 import gov.epa.emissions.framework.services.cost.analysis.common.Type3CostEquation;
@@ -9,10 +13,10 @@ import gov.epa.emissions.framework.services.cost.analysis.common.Type4CostEquati
 import gov.epa.emissions.framework.services.cost.analysis.common.Type5CostEquation;
 import gov.epa.emissions.framework.services.cost.analysis.common.Type6CostEquation;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
-import junit.framework.TestCase;
 
-public class EquationTypeTest extends TestCase {
+public class EquationTypeTest extends ServiceTestCase {
 
     private double tolerance = 1e-2;
     
@@ -270,13 +274,11 @@ public class EquationTypeTest extends TestCase {
         efficiencyRecord.setCapitalAnnualizedRatio(6.0);
         efficiencyRecord.setCostPerTon(200.0);
         
-        CostYearTable costYearTable=new CostYearTable(2000);
-        costYearTable.factor(2001);
-        return new BestMeasureEffRecord(measure, efficiencyRecord, costYearTable);
+        return new BestMeasureEffRecord(measure, efficiencyRecord, getCostYearTable(2000));
             
     }  
     
-    private BestMeasureEffRecord buildBestMeasureEffRecord(float equipmentLife, Double capEcFactor) {
+    private BestMeasureEffRecord buildBestMeasureEffRecord(float equipmentLife, Double capEcFactor) throws EmfException {
         
         
         ControlMeasure measure=new ControlMeasure();
@@ -286,8 +288,37 @@ public class EquationTypeTest extends TestCase {
         efficiencyRecord.setCapitalAnnualizedRatio(6.0);
         efficiencyRecord.setCostPerTon(200.0);
        
-        return new BestMeasureEffRecord(measure, efficiencyRecord, null);
+        return new BestMeasureEffRecord(measure, efficiencyRecord, getCostYearTable(2000));
             
+    }
+
+    private CostYearTable getCostYearTable(int targetYear) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        try {
+            CostYearTableReader reader = new CostYearTableReader(dbServer, targetYear);
+            return reader.costYearTable();
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            try {
+                dbServer.disconnect();
+            } catch (SQLException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    protected void doSetUp() throws Exception {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    @Override
+    protected void doTearDown() throws Exception {
+        // NOTE Auto-generated method stub
+        
     }    
 
 
