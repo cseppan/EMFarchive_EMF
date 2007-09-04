@@ -82,14 +82,5 @@ public class Type4CostEquation implements CostEquation {
         }
         return null;
     }
-
-    // This is for test ----
-    public void setUpTest(double reducedEmission, float equipmentLife, Double effRecCapRecFactor, BestMeasureEffRecord bestMeasureEffRecord, Double minStackFlowRate) {
-        //define required inputs
-        this.bestMeasureEffRecord = bestMeasureEffRecord;
-        this.minStackFlowRate = minStackFlowRate;
-        this.emissionReduction=reducedEmission;
-        this.capRecFactor=getCapRecFactor(equipmentLife, effRecCapRecFactor);
-    }
     
 }
