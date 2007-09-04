@@ -21,6 +21,7 @@ public class DefaultCostEquation implements CostEquation {
         this.bestMeasureEffRecord = bestMeasureEffRecord;
         this.emissionReduction = emissionReduction;
         this.annualCost=getAnnualCost();
+        this.capRecFactor=getCapRecFactor();
     }
 
     public Double getAnnualCost() throws EmfException {
@@ -39,24 +40,28 @@ public class DefaultCostEquation implements CostEquation {
         annulizedCCost = getAnnualizedCapitalCost();
         if (annulizedCCost == null) return null;
         double omCost = annualCost - annulizedCCost;
+        if (omCost==0) return null; 
         return omCost;
     }
     
     public Double getAnnualizedCapitalCost() { 
         capitalCost = getCapitalCost();
-        capRecFactor = getCapRecFactor();
         if (capitalCost == null || capRecFactor == null) return null;
         return capitalCost * capRecFactor;
     }
 
    
     public Double getCapRecFactor(){
+        // Calculate capital recovery factor
+        return getCapRecFactor(bestMeasureEffRecord.measure().getEquipmentLife(), 
+                bestMeasureEffRecord.efficiencyRecord().getCapRecFactor());
+    }
+    
+    public Double getCapRecFactor(float equipmentLife, Double effRecCapRecFactor){
         // Calculate capital recovery factor 
-        double equipmentLife = bestMeasureEffRecord.measure().getEquipmentLife();
-        if (equipmentLife==0) 
-            capRecFactor = bestMeasureEffRecord.efficiencyRecord().getCapRecFactor();
-        else 
-            capRecFactor = calculateCapRecFactor(discountRate, equipmentLife);
+        Double capRecFactor = effRecCapRecFactor;
+        if (equipmentLife!=0) 
+             capRecFactor = DefaultCostEquation.calculateCapRecFactor(discountRate, equipmentLife);
         
         if (capRecFactor != null && capRecFactor != 0) {
             return capRecFactor; 
@@ -70,8 +75,9 @@ public class DefaultCostEquation implements CostEquation {
     }
 
     public Double getComputedCPT() {
-        
+        if (annualCost==null ||annualCost==0.0 || emissionReduction==0.0 ) return null;
         return annualCost/emissionReduction;
     }
+    
 }
 
