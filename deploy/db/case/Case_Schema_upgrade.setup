@@ -79,3 +79,6 @@ CREATE TABLE cases.job_messages
 )
 WITHOUT OIDS;
 -- cases.job_messages
+
+-- add a new contraint to cases.cases table
+ALTER TABLE cases.cases ADD CONSTRAINT  unique_abbreviation  UNIQUE (abbreviation_id);
