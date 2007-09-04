@@ -19,6 +19,7 @@ import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
@@ -60,6 +61,7 @@ public class CaseMappings extends Mappings {
         bean(call, ValueType.class, valueType());
         bean(call, ParameterName.class, parameterName());
         bean(call, CaseParameter.class, caseParameter());
+        bean(call, JobMessage.class, jobMessage());
         
         bean(call, Mutex.class, mutex());
     }
@@ -88,6 +90,7 @@ public class CaseMappings extends Mappings {
         array(call, ValueType[].class, valueTypes());
         array(call, ParameterName[].class, parameterNames());
         array(call, CaseParameter[].class, caseParameters());
+        array(call, JobMessage[].class, jobMessages());
     }
 
     public QName caseObject() {

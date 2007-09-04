@@ -1784,6 +1784,9 @@ public class ManagedCaseService {
 
             CaseJob job = jobs.get(0);
             User user = job.getUser();
+            message.setCaseId(job.getCaseId());
+            message.setJobId(job.getId());
+            message.setReceivedTime(new Date());
 
             if (!user.getUsername().equalsIgnoreCase(message.getRemoteUser()))
                 throw new EmfException("Remote user doesn't match the user who runs the job.");
