@@ -190,7 +190,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     
     private JCheckBox useCostEquation() {
         
-        useCostEquationCheck = new JCheckBox("use cost equations ", null, controlStrategy.getUseCostEquations());
+        useCostEquationCheck = new JCheckBox(" ", null, controlStrategy.getUseCostEquations());
         return useCostEquationCheck;
     }
 
