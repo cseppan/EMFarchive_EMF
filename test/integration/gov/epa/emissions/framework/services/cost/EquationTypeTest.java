@@ -34,7 +34,7 @@ public class EquationTypeTest extends ServiceTestCase {
         type6.setUp(reducedEmission, buildBestMeasureEffRecord(15, 0.2), minStackFlowRate);
         
         try {
-            System.out.println("begin-----");
+            
             double capRecFactor1=type6.getCapRecFactor(15, 0.2);
             double capRecFactor2=type6.getCapRecFactor(0, 0.2);
             double expCapRecFactor1=0.1098;
@@ -65,7 +65,7 @@ public class EquationTypeTest extends ServiceTestCase {
              
              assertTrue("Check Type 6 capital recovery factor with equipment life=15 ", (capRecFactor1 - expCapRecFactor1) < tolerance);
              assertTrue("Check Type 6 capital recovery factor with equipment life=0 ", (capRecFactor2 - expCapRecFactor2) < tolerance);
-             System.out.println("end type 6 test --------------------");
+             
         } catch (Exception e) {
             e.printStackTrace();
         } 
@@ -91,7 +91,7 @@ public class EquationTypeTest extends ServiceTestCase {
              
              double computedCPT=type5.getComputedCPT();
              double expectedComputedCPT=1066.53;
-             System.out.println("begin type 5 test --------------------");
+  //           System.out.println("begin type 5 test --------------------");
              assertTrue("Check Type 5 operating and maintenance cost", (operatingCostResult - expectedOperatingCost) < tolerance);
              assertTrue("Check Type 5 annual cost", (annualCost - expectdAnnualCost) < tolerance);
              assertTrue("Check Type 5 capital cost", (capitalCost - expectedCapitalCost) < tolerance);
@@ -105,7 +105,7 @@ public class EquationTypeTest extends ServiceTestCase {
              
              assertTrue("Check Type 5 capital recovery factor with equipment life=15 ", (capRecFactor1 - expCapRecFactor1) < tolerance);
              assertTrue("Check Type 5 capital recovery factor with equipment life=0 ", (capRecFactor2 - expCapRecFactor2) < tolerance);
-             System.out.println("end type 5 test --------------------");
+             
         } catch (Exception e) {
             e.printStackTrace();
         } 
@@ -117,7 +117,7 @@ public class EquationTypeTest extends ServiceTestCase {
         type4.setUp(reducedEmission, buildBestMeasureEffRecord(15, 0.2), minStackFlowRate);
         
         try {
-            System.out.println("begin type 4 test --------------------");
+           
              double operatingCostResult = type4.getOperationMaintenanceCost();
              double expectedOperatingCost = 75864.1;
              
@@ -146,7 +146,7 @@ public class EquationTypeTest extends ServiceTestCase {
              
              assertTrue("Check Type 4 capital recovery factor with equipment life=15 ", (capRecFactor1 - expCapRecFactor1) < tolerance);
              assertTrue("Check Type 4 capital recovery factor with equipment life=0 ", (capRecFactor2 - expCapRecFactor2) < tolerance);
-             System.out.println("end type 4 test --------------------");
+ //            System.out.println("end type 4 test --------------------");
         } catch (Exception e) {
             e.printStackTrace();
         } 
@@ -187,7 +187,7 @@ public class EquationTypeTest extends ServiceTestCase {
              
              assertTrue("Check Type 3 capital recovery factor with equipment life=15 ",   (capRecFactor1 - expCapRecFactor1) < tolerance);
              assertTrue("Check Type 3 capital recovery factor with equipment life=0 ",   (capRecFactor2 - expCapRecFactor2) < tolerance);
-             System.out.println("end type 3 test --------------------");
+  //           System.out.println("end type 3 test --------------------");
         } catch (Exception e) {
             e.printStackTrace();
         } 
@@ -222,7 +222,7 @@ public class EquationTypeTest extends ServiceTestCase {
              assertTrue("Check Type 3 annualized cost", (annualizedCapitalCost - expectedAnnualizedCCost) < tolerance);
              assertTrue("Check Type 3 computed CPT", (computedCPT - expectedComputedCPT) < tolerance);
              
-             System.out.println("end type 3 large test --------------------");
+ //            System.out.println("end type 3 large test --------------------");
         } catch (Exception e) {
             e.printStackTrace();
         } 
@@ -231,21 +231,22 @@ public class EquationTypeTest extends ServiceTestCase {
 
     public void testEquationDefault() throws Exception {
         DefaultCostEquation typeDefault = new DefaultCostEquation(discountRate);
-    
- //       type3.setUpTest(reducedEmission, 15, 0.2, bestMeasureEffRecord, 1028000.0);
- //       bestMeasureEffRecord=buildBestMeasureEffRecord(15, 0.2);
-        typeDefault.setUp(reducedEmission, buildBestMeasureEffRecordDefault(15, 0.2));
-    
+ 
+        typeDefault.setUp(reducedEmission, buildBestMeasureEffRecord(15, 0.2));
+        System.out.println("begin default ------");
     try {
-        double operatingCostResult = typeDefault.getOperationMaintenanceCost();
-        double expectedOperatingCost = 68246.45;
-    
         double annualCost = typeDefault.getAnnualCost();
         double expectdAnnualCost=200000.0;
-    
+//        System.out.println("Default test annual Cost "+  annualCost);
         double capitalCost = typeDefault.getCapitalCost();
         double expectedCapitalCost=11200000.0;
-    
+//        System.out.println("Default test capital Cost "+  capitalCost);
+        
+        
+        double operatingCostResult = typeDefault.getOperationMaintenanceCost();
+        double expectedOperatingCost = 68246.45;
+ //       System.out.println("Default test O&M "+  operatingCostResult);
+        
         double annualizedCapitalCost=typeDefault.getAnnualizedCapitalCost();
         double expectedAnnualizedCCost=131753.55;
     
@@ -258,37 +259,27 @@ public class EquationTypeTest extends ServiceTestCase {
         assertTrue("Check Type default annualized cost", (annualizedCapitalCost - expectedAnnualizedCCost) < tolerance);
         assertTrue("Check Type default computed CPT", (computedCPT - expectedComputedCPT) < tolerance);
     
-        System.out.println("end type default large test --------------------");
+        System.out.println("Cost equation test is successful -----------");
         } catch (Exception e) {
             e.printStackTrace();
         } 
     }
-    
-    private BestMeasureEffRecord buildBestMeasureEffRecordDefault(float equipmentLife, Double capEcFactor) throws EmfException {
-        
-       
-        ControlMeasure measure=new ControlMeasure();
-        measure.setEquipmentLife(15);
-        EfficiencyRecord efficiencyRecord=new EfficiencyRecord();
-        efficiencyRecord.setCapRecFactor(0.2);
-        efficiencyRecord.setCapitalAnnualizedRatio(6.0);
-        efficiencyRecord.setCostPerTon(200.0);
-        
-        return new BestMeasureEffRecord(measure, efficiencyRecord, getCostYearTable(2000));
-            
-    }  
+      
     
     private BestMeasureEffRecord buildBestMeasureEffRecord(float equipmentLife, Double capEcFactor) throws EmfException {
-        
-        
+            
         ControlMeasure measure=new ControlMeasure();
         measure.setEquipmentLife(15);
         EfficiencyRecord efficiencyRecord=new EfficiencyRecord();
         efficiencyRecord.setCapRecFactor(0.2);
         efficiencyRecord.setCapitalAnnualizedRatio(6.0);
+        efficiencyRecord.setCostYear(2000);
         efficiencyRecord.setCostPerTon(200.0);
-       
-        return new BestMeasureEffRecord(measure, efficiencyRecord, getCostYearTable(2000));
+        CostYearTable table=getCostYearTable(2000);
+        
+        BestMeasureEffRecord record= new BestMeasureEffRecord(measure, efficiencyRecord, table);
+ //       System.out.println("AdjustedCostPerTon : "+ record.adjustedCostPerTon());
+        return record;
             
     }
 
