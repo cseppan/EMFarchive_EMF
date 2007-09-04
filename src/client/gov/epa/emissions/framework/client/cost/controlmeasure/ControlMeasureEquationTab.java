@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.EditableTable;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
@@ -9,9 +10,8 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 import gov.epa.emissions.framework.services.cost.EquationType;
-import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
-import gov.epa.emissions.framework.ui.ScrollableTable;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -25,6 +25,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 //import java.util.ArrayList;
 //import java.util.List;
@@ -44,7 +45,7 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
     private JPanel mainPanel;
     
     
-    private EmfTableModel tableModel;
+    private EditableEmfTableModel tableModel;
     private CMEquationsTableData tableData;
     private ManageChangeables changeables;
     
@@ -72,29 +73,29 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
 
     private void doLayout(ControlMeasure measure){
         mainPanel.setBorder(BorderFactory.createTitledBorder("Equation"));
-        updateMainPanel(measure.getEquations());
+        mainPanel.add(createTable(measure.getEquations()), BorderLayout.CENTER);
         this.add(mainPanel, BorderLayout.CENTER);
         this.add(buttonPanel(), BorderLayout.SOUTH);
     }
 
     private void updateMainPanel(ControlMeasureEquation[] equations){
         mainPanel.removeAll();  
-//
         mainPanel.add(createTable(equations), BorderLayout.CENTER);
         mainPanel.validate();
 
     }
     
-    private ScrollableTable createTable(ControlMeasureEquation[] cmEquations) {
+    private JScrollPane createTable(ControlMeasureEquation[] cmEquations) {
         
         tableData = new CMEquationsTableData(cmEquations);
-        tableModel = new EmfTableModel(tableData);
+        tableModel = new EditableEmfTableModel(tableData);
 
-        ScrollableTable table = new ScrollableTable(tableModel, null);
-        table.setColWidthsBasedOnColNames();
+        EditableTable table = new EditableTable(tableModel);
+//        table.setColWidthsBasedOnColNames();
+        changeables.addChangeable(table);
  //       table.disableScrolling();
  //       table.setRowHeight(20);
-        return table;
+        return new JScrollPane(table);
     }
  
     
@@ -143,6 +144,7 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
                                 equations[0] = equation;   
                             }
                             updateMainPanel(equations);
+                            tableModel.refresh(tableData);
                         }
                         
                         //messagePanel.setError(equationType.getName());
@@ -174,7 +176,8 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
                
                 try {
                     messagePanel.clear();
-                    doRemove();                  
+                    doRemove(); 
+                    
                 } catch (Exception e1) {
                     messagePanel.setError("Could not remove equation type");
                 }
@@ -184,9 +187,8 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
         };
     }
     private void doRemove(){
-        ControlMeasureEquation[] equations = new ControlMeasureEquation[]{};
-        refresh(measure);
-        updateMainPanel(equations);
+ //       ControlMeasureEquation[] equations = new ControlMeasureEquation[]{};
+        
         if (tableData.rows().size()==0)
             return; 
         String title = "Warning";
@@ -199,7 +201,7 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
                 ControlMeasureEquation[] cmEquations=new ControlMeasureEquation[]{};
                 refresh(measure);
                 updateMainPanel(cmEquations);
-                
+                tableModel.refresh(tableData);
                 }
             }
     }
@@ -284,3 +286,5 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
     }
 
 }
+
+

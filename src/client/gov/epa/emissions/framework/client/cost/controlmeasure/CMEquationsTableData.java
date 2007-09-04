@@ -31,7 +31,7 @@ public class CMEquationsTableData extends AbstractEditableTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Eqs", "Variable Name", "Value"};
+        return new String[] { "Equation Type", "Variable Name", "Value"};
     }
 
     public Class getColumnClass(int col) {

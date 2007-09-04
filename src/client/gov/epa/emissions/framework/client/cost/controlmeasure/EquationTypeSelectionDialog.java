@@ -58,7 +58,7 @@ public class EquationTypeSelectionDialog extends JDialog implements EquationType
         JPanel panel = new JPanel(new BorderLayout());
         
         equationTypeCombo = new ComboBox("Choose an equation type", equationTypes);
-        changeables.addChangeable(equationTypeCombo);
+  
 
         panel.add(equationTypeCombo, BorderLayout.CENTER);
         panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -89,6 +89,8 @@ public class EquationTypeSelectionDialog extends JDialog implements EquationType
             public void actionPerformed(ActionEvent e) {
                 //set Equation Type...
                 equationType = (EquationType)equationTypeCombo.getSelectedItem();
+                changeables.addChangeable(equationTypeCombo);
+//                System.out.println("add changeables: " +changeables.toString().trim());
                 setVisible(false);
                 dispose();
             }
