@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.casemanagement.editor;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenter;
+import gov.epa.emissions.framework.client.casemanagement.history.ShowHistoryTabPresenter;
+import gov.epa.emissions.framework.client.casemanagement.history.ShowHistoryTabView;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabPresenter;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabPresenterImpl;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabView;
@@ -44,12 +46,16 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     private EditOutputsTabPresenter outputPresenter;
     
     private EditableCaseSummaryTabPresenter summaryPresenter;
+
+    private ShowHistoryTabPresenter historyPresenter;
     
     private boolean inputsLoaded = false;
 
     private boolean jobsLoaded = false;
 
     private boolean parameterLoaded = false;
+
+    private boolean historyLoaded = false;
     
     public CaseEditorPresenterImpl(Case caseObj, EmfSession session, CaseEditorView view,
             CaseManagerPresenter managerPresenter) {
@@ -164,6 +170,11 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         parametersPresenter = new EditParametersTabPresenterImpl(session, parameterview, caseObj);
         presenters.add(parametersPresenter);
     }
+    
+    public void set(ShowHistoryTabView caseHistoryView) {
+        historyPresenter = new ShowHistoryTabPresenter(session, caseHistoryView, caseObj);
+        presenters.add(parametersPresenter);
+    }
 
     public void doLoad(String tabTitle) throws EmfException {
         if (!inputsLoaded && tabTitle.equalsIgnoreCase("Inputs")) {
@@ -179,6 +190,11 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         if (!parameterLoaded && tabTitle.equalsIgnoreCase("Parameters")) {
             parametersPresenter.display();
             parameterLoaded = true;
+        }
+
+        if (!historyLoaded && tabTitle.equalsIgnoreCase("History")) {
+            historyPresenter.display();
+            historyLoaded = true;
         }
     }
 

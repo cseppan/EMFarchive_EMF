@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
+import gov.epa.emissions.framework.client.casemanagement.history.ShowHistoryTabView;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabView;
 import gov.epa.emissions.framework.client.casemanagement.jobs.EditJobsTabView;
 import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTabView;
@@ -25,6 +26,8 @@ public interface CaseEditorPresenter {
     void set(EditOutputsTabView inputsView) throws EmfException;
 
     void set(EditCaseParametersTabView parameterview);
+
+    void set(ShowHistoryTabView caseHistoryView);
 
     void doLoad(String tabTitle) throws EmfException;
 

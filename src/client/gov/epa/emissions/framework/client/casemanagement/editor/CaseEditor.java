@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.history.ShowHistoryTab;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTab;
 import gov.epa.emissions.framework.client.casemanagement.jobs.EditJobsTab;
 import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTab;
@@ -57,7 +58,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         tabbedPane.addTab("Inputs", createInputTab());
         tabbedPane.addTab("Parameters", createParameterTab(messagePanel));
         tabbedPane.addTab("Outputs", createOutputTab());
-        tabbedPane.addTab("History", new JPanel());
+        tabbedPane.addTab("History", createHistoryTab());
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
         tabbedPane.addChangeListener(new ChangeListener(){
@@ -122,9 +123,15 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
             presenter.set(view);
             return view;
         } catch (EmfException e) {
-            showError("Could not load Output Tab." + e.getMessage());
-            return createErrorTab("Could not load Output Tab." + e.getMessage());
+            showError("Could not load Output Tab. " + e.getMessage());
+            return createErrorTab("Could not load Output Tab. " + e.getMessage());
         }
+    }
+    
+    private JPanel createHistoryTab() {
+        ShowHistoryTab view = new ShowHistoryTab(parentConsole, messagePanel, session);
+        presenter.set(view);
+        return view;
     }
 
     protected JPanel createErrorTab(String message) {
