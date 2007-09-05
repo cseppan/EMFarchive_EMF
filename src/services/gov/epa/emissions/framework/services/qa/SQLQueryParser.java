@@ -144,7 +144,7 @@ public class SQLQueryParser {
         // Point to the start of the first tag, the first substring is from the beginning of the
         // query to that point. The suffix is from that point to the end of the tag.
         int index = query.indexOf(startQueryTag);
-        System.out.println("orig: " + query + " uper: " + query + " startQT:" + startQueryTag);
+        //System.out.println("orig: " + query + " uper: " + query + " startQT:" + startQueryTag);
         String prefix = query.substring(0, index);
         String suffix = query.substring(index + startQueryTag.length());
 
@@ -341,6 +341,7 @@ public class SQLQueryParser {
         // Point to the start of the second tag, the first substring is from the beginning of the
         // query to that point. The suffix is from that point to the end of the tag.
         String outputTable = "";
+        EmfDataset dataSet4;
         
         int index = query.indexOf(startQAstepQueryTag);
         
@@ -358,8 +359,14 @@ public class SQLQueryParser {
 
         int index4 = suffixTokens[0].indexOf(",");
         String dataSetName = suffixTokens[0].substring(0, index4) + " ";
-        EmfDataset dataSet4 = getDataset(dataSetName.trim());
-        //System.out.println("Database name = \n" + dataSet4 + "\n");
+        //System.out.println("datasetName = \n" + dataSetName + "\n");
+        if (dataSetName.trim().equals("CURRENT_DATASET")) {
+            dataSet4 = dataset;
+        } else {
+            dataSet4 = getDataset(dataSetName.trim());
+        }
+        //EmfDataset dataSet4 = getDataset(dataSetName.trim());
+        //System.out.println("dataSet4 = \n" + dataSet4 + "\n");
 
         // The integer value of the default version is retrieved from the getDefaultVersion
         // method of the EmfDataset just created. It is converted to a String for the hashtable.
@@ -412,6 +419,7 @@ public class SQLQueryParser {
         // Point to the start of the second tag, the first substring is from the beginning of the
         // query to that point. The suffix is from that point to the end of the tag.
         String outputTable = "";
+        EmfDataset dataSet5;
         
         int index = query.indexOf(startQAstepVersQueryTag);
         
@@ -431,13 +439,19 @@ public class SQLQueryParser {
         StringTokenizer tokenizer = new StringTokenizer(suffixTokens[0], ",");
         // int index2 = suffixTokens[1].indexOf(",");
         String dataSetName = tokenizer.nextToken();
+        //System.out.println("datasetName = \n" + dataSetName + "\n");
         String qaStepName = tokenizer.nextToken().trim();
         String ds5version = tokenizer.nextToken().trim();
 
         //int index5 = suffixTokens[0].indexOf(",");
         //String dataSetName = suffixTokens[0].substring(0, index5) + " ";
-        EmfDataset dataSet5 = getDataset(dataSetName.trim());
-        //System.out.println("Database name = \n" + dataSet4 + "\n");
+        if (dataSetName.trim().equals("CURRENT_DATASET")) {
+            dataSet5 = dataset;
+        } else {
+            dataSet5 = getDataset(dataSetName.trim());
+        }
+        //EmfDataset dataSet5 = getDataset(dataSetName.trim());
+        //System.out.println("Database name = \n" + dataSet5 + "\n");
 
         // The integer value of the default version is retrieved from the getDefaultVersion
         // method of the EmfDataset just created. It is converted to a String for the hashtable.
