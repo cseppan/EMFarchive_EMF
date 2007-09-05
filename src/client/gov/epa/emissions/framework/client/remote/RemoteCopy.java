@@ -61,7 +61,7 @@ public class RemoteCopy implements Runnable {
         if (!tempDir.equals(".") && !new File(tempDir).exists())
             throw new EmfException("User specified temporary directory is invalid.");
 
-        if (this.program == null || this.program.isEmpty())
+        if (!host.equalsIgnoreCase("localhost") && (this.program == null || this.program.isEmpty()))
             throw new EmfException(
                     "A valid remote copy program must be specified in the preference file (EMFPrefs.txt).");
     }
