@@ -74,7 +74,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView {
             messagePanel.setError("Cannot retrieve all case jobs.");
         }
 
-        Thread populateThread = new Thread(new Runnable(){
+        Thread populateThread = new Thread(new Runnable() {
             public void run() {
                 retrieveJobs();
             }
@@ -218,15 +218,15 @@ public class EditJobsTab extends JPanel implements EditJobsTabView {
         }
 
         String title = "Warning";
-        
+
         if (presenter.jobsUsed(jobs)) {
             String message1 = "Selected job(s) used by case inputs or parameters.\n Are you sure you want to remove the selected job(s)?";
             int selection1 = JOptionPane.showConfirmDialog(parentConsole, message1, title, JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
-            
+
             if (selection1 != JOptionPane.YES_OPTION)
                 return;
-            
+
             removeSelectedJobs(jobs);
             return;
         }
@@ -272,11 +272,17 @@ public class EditJobsTab extends JPanel implements EditJobsTabView {
 
         setMessage("Please wait while submitting all case jobs...");
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        
-        presenter.runJobs(jobs);
-        doRefresh(presenter.getCaseJobs());
-        setMessage("Finished summitting jobs to run.");
-        setCursor(Cursor.getDefaultCursor());
+
+        try {
+            presenter.runJobs(jobs);
+            doRefresh(presenter.getCaseJobs());
+            setMessage("Finished summitting jobs to run.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
+        }
     }
 
     private List<CaseJob> getSelectedJobs() {
@@ -304,7 +310,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView {
     private void setMessage(String msg) {
         messagePanel.setMessage(msg);
     }
-    
+
     public void addJob(CaseJob job) {
         tableData.add(job);
         selectModel.refresh();
