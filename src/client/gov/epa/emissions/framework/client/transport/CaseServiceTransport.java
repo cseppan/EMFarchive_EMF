@@ -46,7 +46,7 @@ public class CaseServiceTransport implements CaseService {
 
     private EmfCall call() throws EmfException {
         if (emfCall==null){
-            System.out.println("No emfcall so create");
+//            System.out.println("No emfcall so create");
 //            emfCall=callFactory.createCall("Case Service");
             emfCall=callFactory.createSessionEnabledCall("Case Service");
 

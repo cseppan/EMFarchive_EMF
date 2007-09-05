@@ -1787,6 +1787,13 @@ public class ManagedCaseService {
             message.setCaseId(job.getCaseId());
             message.setJobId(job.getId());
             message.setReceivedTime(new Date());
+            String status = message.getStatus();
+            String jobStatus = job.getRunstatus().getName();
+            
+            if (!status.isEmpty() && !jobStatus.equalsIgnoreCase(status)) {
+                job.setRunstatus(dao.getJobRunStatuse(status, session));
+                dao.updateCaseJob(job, session);
+            }
 
             if (!user.getUsername().equalsIgnoreCase(message.getRemoteUser()))
                 throw new EmfException("Remote user doesn't match the user who runs the job.");
@@ -1795,7 +1802,6 @@ public class ManagedCaseService {
 
             return 0;
         } catch (Exception e) {
-            e.printStackTrace();
             log.error(e.getMessage());
             throw new EmfException(e.getMessage());
         } finally {

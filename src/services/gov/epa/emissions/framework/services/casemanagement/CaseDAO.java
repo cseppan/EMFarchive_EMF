@@ -328,6 +328,11 @@ public class CaseDAO {
         return hibernateFacade.getAll(JobRunStatus.class, Order.asc("name"), session);
     }
 
+    public JobRunStatus getJobRunStatuse(String status, Session session) {
+        Criterion crit = Restrictions.eq("name", status);
+        return (JobRunStatus)hibernateFacade.load(JobRunStatus.class, crit, session);
+    }
+
     public List<Host> getHosts(Session session) {
         return hibernateFacade.getAll(Host.class, Order.asc("name"), session);
     }
