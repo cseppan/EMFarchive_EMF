@@ -1677,6 +1677,7 @@ public class ManagedCaseService {
                     // FIXME: Figure out how this will be implemented
                     jobFileHeader = getJobFileHeader(headerInput);
                     sbuf.append(jobFileHeader);
+                    System.out.println("EMF_JOBHEADER 2: " + jobFileHeader);
                 } catch (Exception e) {
                     e.printStackTrace();
                     log.error("Could not write EMF header to job script file, " + e.getMessage());
@@ -1692,11 +1693,13 @@ public class ManagedCaseService {
             } else {
                 // Start the job file content string and append the end of line characters for this OS
                 sbuf.append(this.runShell + this.eolString);
-            }
+                System.out.println("Sbuf in else: " + sbuf.toString());
+           }
 
             // print job name to file
             sbuf.append(eolString);
             sbuf.append(this.runComment + " Job run file for job: " + jobName + eolString);
+            System.out.println("Sbuf: " + sbuf.toString());
 
             /*
              * Define some EMF specific variables
@@ -1811,8 +1814,7 @@ public class ManagedCaseService {
             // print executable
             sbuf.append(eolString);
             sbuf.append(this.runComment + " job executable" + eolString);
-            sbuf.append("$EMF_CLIENT -k $EMF_JOBKEY -x " + execFull + " -m \"Running top level script\""
-                    + eolString);
+            sbuf.append("$EMF_CLIENT -k $EMF_JOBKEY -x " + execFull + " -m \"Running top level script\"" + eolString);
             sbuf.append(execFullArgs);
 
             // add a test of the status and send info through the
@@ -1840,8 +1842,12 @@ public class ManagedCaseService {
     }// /end of createJobFileContent()
 
     private String getJobFileHeader(CaseInput headerInput) {
-        // NOTE Auto-generated method stub
-        return "";
+
+        // FIXME: temporarily write shell header and client
+        String fileHeader = this.runShell + this.eolString + "setenv EMF_CLIENT ~/bin/emf_log.py" + this.eolString;
+        System.out.println("EMF JOBHEADER tmp: " + fileHeader);
+        return fileHeader;
+
     }
 
     private String getJobFileName(CaseJob job) throws EmfException {
