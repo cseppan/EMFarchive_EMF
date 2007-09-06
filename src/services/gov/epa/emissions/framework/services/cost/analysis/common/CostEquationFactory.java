@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 
 public class CostEquationFactory {
@@ -24,7 +23,7 @@ public class CostEquationFactory {
     }
 
     public CostEquation getCostEquation(double reducedEmission, BestMeasureEffRecord bestMeasureEffRecord, 
-            Double minStackFlowRate, Double designCapacity) throws EmfException {
+            Double minStackFlowRate, Double designCapacity) {
         //always setup the default cost equation, the other equation types will default to using this approach when the other equation don't work
         //for example, maybe some of the inputs are missing, or maybe some constraint is not met...
         defaultCostEquations.setUp(reducedEmission, bestMeasureEffRecord);
