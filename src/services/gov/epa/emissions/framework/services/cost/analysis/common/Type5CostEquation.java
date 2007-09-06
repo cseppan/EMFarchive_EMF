@@ -7,7 +7,7 @@ public class Type5CostEquation implements CostEquation {
     private double discountRate;
     private Double minStackFlowRate;
     private double reducedEmission;
-    private Double capRecFactor;
+    
     
     public Type5CostEquation(double discountRate) {
         this.discountRate = discountRate / 100;
@@ -18,17 +18,15 @@ public class Type5CostEquation implements CostEquation {
         this.bestMeasureEffRecord = bestMeasureEffRecord;
         this.minStackFlowRate = minStackFlowRate;
         this.reducedEmission=reducedEmission;
-        this.capRecFactor=getCapRecFactor();
+       
     }
-   
 
-
-    public Double getAnnualCost() {
-        
-        Double capitalCost = getCapitalCost();
+    public Double getAnnualCost() {     
+ //       Double capitalCost = getCapitalCost();
+        Double annualizedCost=getAnnualizedCapitalCost();
         Double operationMaintenanceCost = getOperationMaintenanceCost();
-        if (capRecFactor == null || capitalCost == null || operationMaintenanceCost == null) return null;
-        return capitalCost * capRecFactor + operationMaintenanceCost;
+        if (annualizedCost == null || operationMaintenanceCost == null) return null;
+        return annualizedCost + operationMaintenanceCost;
     }
 
     public Double getCapitalCost() {
@@ -43,6 +41,7 @@ public class Type5CostEquation implements CostEquation {
     
     public Double getAnnualizedCapitalCost() { 
         Double capitalCost = getCapitalCost();
+        Double capRecFactor=getCapRecFactor();
         if (capitalCost == null || capRecFactor == null) return null;
         return capitalCost * capRecFactor;
     }

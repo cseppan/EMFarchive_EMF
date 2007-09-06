@@ -8,8 +8,7 @@ public class DefaultCostEquation implements CostEquation {
     private double emissionReduction;
     private double discountRate;
     private Double capitalCost;
-    private Double capRecFactor;
-    private Double capAnnRatio; 
+    
     private Double annulizedCCost;
     private Double annualCost;
 
@@ -20,14 +19,11 @@ public class DefaultCostEquation implements CostEquation {
     public void setUp(double emissionReduction, BestMeasureEffRecord bestMeasureEffRecord) {
         this.bestMeasureEffRecord = bestMeasureEffRecord;
         this.emissionReduction = emissionReduction;
- //       this.annualCost=getAnnualCost();
- //       this.capRecFactor=getCapRecFactor();
     }
 
     public Double getAnnualCost() throws EmfException {
         double tAnnualCost = emissionReduction * bestMeasureEffRecord.adjustedCostPerTon();
-        if (tAnnualCost == 0) return null; 
-        
+        if (tAnnualCost == 0) return null;         
         return tAnnualCost;
     }
 
@@ -37,23 +33,29 @@ public class DefaultCostEquation implements CostEquation {
         } catch (EmfException e) {
             e.printStackTrace();
         }
-        capAnnRatio = bestMeasureEffRecord.efficiencyRecord().getCapitalAnnualizedRatio();
-        if (capAnnRatio == null || annualCost==null) return null;
+        Double capAnnRatio = bestMeasureEffRecord.efficiencyRecord().getCapitalAnnualizedRatio();
         
+        if (capAnnRatio == null || annualCost==null){
+            return null;
+        }     
         return capAnnRatio * annualCost;
     }  
     
     public Double getOperationMaintenanceCost() {
         annulizedCCost = getAnnualizedCapitalCost();
-        
-        if (annulizedCCost == null) return null;
+        try {
+            annualCost=getAnnualCost();
+        } catch (EmfException e) {
+            e.printStackTrace();
+        }
+        if (annulizedCCost == null) return annualCost;
         double omCost = annualCost - annulizedCCost;
-        if (omCost==0) return null; 
+        if (omCost==0.0) return null; 
         return omCost;
     }
     
     public Double getAnnualizedCapitalCost(){ 
-        capRecFactor=getCapRecFactor();
+        Double capRecFactor=getCapRecFactor();
         capitalCost = getCapitalCost();
         if (capitalCost == null || capRecFactor == null) return null;
         return capitalCost * capRecFactor;

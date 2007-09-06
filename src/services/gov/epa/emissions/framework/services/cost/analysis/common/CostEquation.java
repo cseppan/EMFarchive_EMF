@@ -6,11 +6,11 @@ public interface CostEquation {
 
     public Double getAnnualCost() throws EmfException;
 
-    public Double getCapitalCost() throws EmfException;
+    public Double getCapitalCost() ;
     
-    public Double getAnnualizedCapitalCost() throws EmfException;
+    public Double getAnnualizedCapitalCost() ;
 
-    public Double getOperationMaintenanceCost() throws EmfException;
+    public Double getOperationMaintenanceCost() ;
     
     public Double getComputedCPT();
 

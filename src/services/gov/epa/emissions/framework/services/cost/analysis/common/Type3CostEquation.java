@@ -8,7 +8,7 @@ public class Type3CostEquation implements CostEquation {
     private double emissionReduction; 
     private double discountRate;
     private Double minStackFlowRate;
-    private Double capRecFactor;
+    
     
     private static final double capitalCostFactor=192;
     private static final double gasFlowRateFactor=.486;
@@ -22,17 +22,13 @@ public class Type3CostEquation implements CostEquation {
         //define required inputs
         this.bestMeasureEffRecord = bestMeasureEffRecord;
         this.minStackFlowRate = minStackFlowRate;
-        this.emissionReduction=emissionReduction;
-        this.capRecFactor=getCapRecFactor();
-        getFactors();
+        this.emissionReduction=emissionReduction;     
     }
     
-    public void getFactors(){
-        //
-    }
 
     public Double getAnnualCost() {
         Double capitalCost = getCapitalCost();
+        Double capRecFactor=getCapRecFactor();
         Double operationMaintenanceCost = getOperationMaintenanceCost();
         if (capRecFactor == null || capitalCost == null || operationMaintenanceCost == null) return null;
         return capitalCost * capRecFactor + operationMaintenanceCost;
@@ -52,24 +48,10 @@ public class Type3CostEquation implements CostEquation {
     
     public Double getAnnualizedCapitalCost() { 
         Double capitalCost = getCapitalCost();
+        Double capRecFactor=getCapRecFactor();
         if (capitalCost == null || capRecFactor == null) return null;
         return capitalCost * capRecFactor;
     }
-
-//    public Double getCapRecFactor(){
-//        // Calculate capital recovery factor 
-//        double equipmentLife = bestMeasureEffRecord.measure().getEquipmentLife();
-//        Double capRecFactor;
-//        if (equipmentLife==0) 
-//            capRecFactor = bestMeasureEffRecord.efficiencyRecord().getCapRecFactor();
-//        else 
-//            capRecFactor = DefaultCostEquation.calculateCapRecFactor(discountRate, equipmentLife);
-//        
-//        if (capRecFactor != null && capRecFactor != 0) {
-//            return capRecFactor; 
-//        }
-//        return null;
-//    }
 
     public Double getComputedCPT() {
         Double totalCost=getAnnualCost();
