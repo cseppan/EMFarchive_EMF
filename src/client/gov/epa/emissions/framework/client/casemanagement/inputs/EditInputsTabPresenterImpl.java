@@ -86,56 +86,23 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         presenter.doDisplay(propertiesView);
     }
 
-//    public void doExportWithOverwrite(EmfDataset[] datasets, Version[] versions, String[] folders, String purpose)
-//            throws EmfException {
-//        doExport(datasets, versions, folders, true, purpose);
-//    }
-
-//    public void doExport(EmfDataset[] datasets, Version[] versions, String[] folders, String purpose)
-//            throws EmfException {
-//        doExport(datasets, versions, folders, false, purpose);
-//    }
-
-    // private void doExport(EmfDataset[] datasets, Version[] versions, String[] folders, boolean overwrite, String
-    // purpose)
-    // throws EmfException {
-    // ExImService services = session.eximService();
-    //
-    // for (int i = 0; i < datasets.length; i++) {
-    // datasets[i].setAccessedDateTime(new Date());
-    //
-    // if (overwrite)
-    // services.exportDatasetsWithOverwrite(session.user(), new EmfDataset[] { datasets[i] },
-    // new Version[] { versions[i] }, folders[i], purpose);
-    // else
-    // services.exportDatasets(session.user(), new EmfDataset[] { datasets[i] },
-    // new Version[] { versions[i] }, folders[i], purpose);
-    // }
-    // }
-
-    // private String mapToRemote(String dir) {
-    // return session.preferences().mapLocalOutputPathToRemote(dir);
-    // }
-
     public CaseInput[] getCaseInput(int caseId) throws EmfException {
         return service().getCaseInputs(caseId);
     }
 
-    private void doExport(List<CaseInput> caseInputs, boolean overwrite, String purpose)
-            throws EmfException {
-        //ExImService services = session.eximService();
+    private void doExport(List<CaseInput> caseInputs, boolean overwrite, String purpose) throws EmfException {
         CaseService services = session.caseService();
         Integer[] caseInputIds = new Integer[caseInputs.size()];
 
-        for (int i=0; i<caseInputIds.length;i++){
+        for (int i = 0; i < caseInputIds.length; i++) {
             caseInputIds[i] = new Integer(caseInputs.get(i).getId());
         }
-        System.out.println("EditInputsTabPresenterImp::doExport CaseInputIds size= " + caseInputIds.length);
-            if (overwrite)
-                services.exportCaseInputsWithOverwrite(session.user(), caseInputIds, purpose);
-            
-            else
-                services.exportCaseInputs(session.user(), caseInputIds, purpose);
+
+        if (overwrite)
+            services.exportCaseInputsWithOverwrite(session.user(), caseInputIds, purpose);
+
+        else
+            services.exportCaseInputs(session.user(), caseInputIds, purpose);
     }
 
     public void exportCaseInputs(List<CaseInput> inputList, String purpose) throws EmfException {

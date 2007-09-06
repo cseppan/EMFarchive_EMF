@@ -345,29 +345,23 @@ public class EditInputsTab extends JPanel implements EditInputsTabView{
     }
 
     private void doExportInputDatasets(List inputlist) {
-        System.out.println("EditInputsTab::doExportInputDatasets size of list= " + inputlist.size());
         if (inputlist.size() == 0) {
             messagePanel.setMessage("Please select input(s) to export.");
             return;
         }
 
         int numberToExport = checkToWriteStartMessage(inputlist);
-        System.out.println("Size? " + numberToExport);
+
         if (!checkExportDir(inputDir.getText()) || !checkDatasets(inputlist) || numberToExport < 1)
             return;
 
-//        EmfDataset[] datasets = getSelectedDatasets(inputlist).toArray(new EmfDataset[0]);
         int ok = checkOverWrite();
         String purpose = "Used by case: " + this.caseObj.getName() + ".";
-System.out.println(purpose);
+
         try {
             if (ok != JOptionPane.YES_OPTION){
-                System.out.println("YES Option");
-//                presenter.doExport(datasets, getSelectedDatasetVersions(), getSelectedInputSubdirs(), purpose);
                     presenter.exportCaseInputs(inputlist, purpose);
             }else{
-                    System.out.println("No Option");
-//                presenter.doExportWithOverwrite(datasets, getSelectedDatasetVersions(), getSelectedInputSubdirs(), purpose);
                     presenter.exportCaseInputsWithOverwrite(inputlist, purpose);
                 }
             messagePanel.setMessage("Started export of " + numberToExport
@@ -400,37 +394,26 @@ System.out.println(purpose);
 
     // returns the number of datasets that will actually be exported
     private int checkToWriteStartMessage(List inputList) {
-        System.out.println("In checkToWriteStartMessage size of list = " + inputList.size());
         CaseInput[] inputs = (CaseInput[]) inputList.toArray(new CaseInput[0]);
-        System.out.println("In checkToWriteStartMessage size of inputs array created = " + inputs.length);
-        
         int count = 0;
-        int external = 0;
 
         for (int i = 0; i < inputs.length; i++) {
             DatasetType type = inputs[i].getDatasetType();
             EmfDataset dataset = inputs[i].getDataset();
-            System.out.println("In loop dataset id= " + dataset.getId());
-            if (type != null && dataset != null && !type.isExternal())
+            if (type != null && dataset != null)
                 count++;
-
-            if (type != null && dataset != null && type.isExternal())
-                external++;
         }
 
-        if (count == 0) {
+        if (count == 0)
             messagePanel
-                    .setMessage("Please select some inputs to export (make sure they have datasets and are not all external)");
-            return count;
-        }
+                    .setMessage("Please make sure the selected inputs have datasets in them).");
         
-        System.out.println("At end of method count= " + count);
         return count;
     }
 
     private int checkOverWrite() {
         String title = "Message";
-        String message = "Do you want to overwrite exported files if they already exist?";
+        String message = "Would you like to remove previously exported files prior to export?";
         return JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
     }
