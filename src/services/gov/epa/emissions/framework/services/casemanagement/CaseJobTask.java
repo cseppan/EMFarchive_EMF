@@ -35,13 +35,14 @@ public class CaseJobTask extends Task {
     private String jobName = null;
 
     private int caseId;
-    
+
     private String exportTaskSubmitterId = null;
-    
+
     boolean exportsSuccess = false;
+
     boolean dependenciesSet = true;
 
-//    private String runRedirect = ">&"; // shell specific redirect
+    // private String runRedirect = ">&"; // shell specific redirect
 
     public boolean isExportsSuccess() {
         return exportsSuccess;
@@ -99,93 +100,91 @@ public class CaseJobTask extends Task {
             log.error("Exception while creating JobFile when running CaseJobTask. See stacktrace for details");
             e.printStackTrace();
         }
-        
 
         // Create an execution string and submit job to the queue,
         // if the key word $EMF_JOBLOG is in the queue options,
         // replace w/ log file
-        
-//      String executionStr = null;
-//      String qOptions = this.queueOptions;
-//        String queueOptionsLog = qOptions.replace("$EMF_JOBLOG", this.logFile);
-//
-//        if (queueOptionsLog.equals("")) {
-//            executionStr = this.jobFile;
-//        } else {
-//            executionStr = queueOptionsLog + " " + this.jobFile;
-//        }
-//
-//        /*
-//         * execute the job script Note if hostname is localhost this is done locally w/o ssh and stdout and stderr is
-//         * redirected to the log. This redirect is currently shell specific (should generalize) if hostname is not
-//         * localhost it is through ssh
-//         */
-//        String username = this.user.getUsername();
-//        try {
-//            if (hostName.equals("localhost")) {
-//                // execute on local machine
-//                executionStr = executionStr + " " + this.runRedirect + " " + this.logFile;
-//
-//                RemoteCommand.executeLocal(executionStr);
-//
-//            } else {
-//                // execute on remote machine and log stdout
-//                InputStream inStream = RemoteCommand.execute(username, hostName, executionStr);
-//
-//                String outTitle = "stdout from (" + hostName + "): " + executionStr;
-//                RemoteCommand.logStdout(outTitle, inStream);
-//
-//                // capture PBSqueueId and send back to case job submitter
-//                // TODO:
-//            }
-//
-//        } catch (Exception e) {
-//            log.error("Error executing job file: " + jobFile + " Execution string= " + executionStr);
-//            e.printStackTrace();
-//        }
 
-        String status="completed";
+        // String executionStr = null;
+        // String qOptions = this.queueOptions;
+        // String queueOptionsLog = qOptions.replace("$EMF_JOBLOG", this.logFile);
+        //
+        // if (queueOptionsLog.equals("")) {
+        // executionStr = this.jobFile;
+        // } else {
+        // executionStr = queueOptionsLog + " " + this.jobFile;
+        // }
+        //
+        // /*
+        // * execute the job script Note if hostname is localhost this is done locally w/o ssh and stdout and stderr is
+        // * redirected to the log. This redirect is currently shell specific (should generalize) if hostname is not
+        // * localhost it is through ssh
+        // */
+        // String username = this.user.getUsername();
+        // try {
+        // if (hostName.equals("localhost")) {
+        // // execute on local machine
+        // executionStr = executionStr + " " + this.runRedirect + " " + this.logFile;
+        //
+        // RemoteCommand.executeLocal(executionStr);
+        //
+        // } else {
+        // // execute on remote machine and log stdout
+        // InputStream inStream = RemoteCommand.execute(username, hostName, executionStr);
+        //
+        // String outTitle = "stdout from (" + hostName + "): " + executionStr;
+        // RemoteCommand.logStdout(outTitle, inStream);
+        //
+        // // capture PBSqueueId and send back to case job submitter
+        // // TODO:
+        // }
+        //
+        // } catch (Exception e) {
+        // log.error("Error executing job file: " + jobFile + " Execution string= " + executionStr);
+        // e.printStackTrace();
+        // }
+
+        String status = "completed";
         String mesg = " was pseudo successfull";
-        
+
         CaseJobTaskManager.callBackFromThread(this.taskId, this.submitterId, status, mesg);
     }
 
     /**
-     *  Write out the contents of the string (jobFileContent) to the
-     *  file (jobFile)
-     * @throws EmfException 
+     * Write out the contents of the string (jobFileContent) to the file (jobFile)
+     * 
+     * @throws EmfException
      */
     private void createJobFile() throws EmfException {
-       FileOutputStream out; // declare a file output object
-       PrintStream p; // declare a print stream object
-       File outFile = null;
-       
-       try
-       {
-               outFile = new File(jobFile);
-               outFile.setExecutable(true, false);
-               
-               // Create a new file output stream
-               // connected to jobFile
-               out = new FileOutputStream(outFile);
+        FileOutputStream out; // declare a file output object
+        PrintStream p; // declare a print stream object
+        File outFile = null;
 
-               // Connect print stream to the output stream
-               p = new PrintStream( out );
+        try {
+            outFile = new File(jobFile);
 
-               p.println (this.jobFileContent);
+            // Create a new file output stream
+            // connected to jobFile
+            out = new FileOutputStream(outFile);
 
-               p.close();
-       }
-       catch (Exception e)
-       {
-           e.printStackTrace();
-           log.error(e);
-           throw new EmfException ("In createJobFile: Error writing jobFile: " + jobFile);
-       }
+            // Connect print stream to the output stream
+            p = new PrintStream(out);
+
+            p.println(this.jobFileContent);
+            p.flush();
+            p.close();
+
+            // Make script executable
+            outFile.setExecutable(true, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e);
+            throw new EmfException("In createJobFile: Error writing jobFile: " + jobFile);
+        }
     }
 
     public void setRunRedirect(String runRedirect) {
-//        this.runRedirect = runRedirect;
+        // this.runRedirect = runRedirect;
     }
 
     public User getUser() {
