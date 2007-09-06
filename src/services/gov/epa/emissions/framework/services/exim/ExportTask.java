@@ -15,7 +15,7 @@ import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
-import gov.epa.emissions.framework.tasks.ExportTaskRunManager;
+import gov.epa.emissions.framework.tasks.ExportTaskManager;
 import gov.epa.emissions.framework.tasks.Task;
 
 import java.io.File;
@@ -121,11 +121,12 @@ public class ExportTask extends Task {
 
             if (DebugLevels.DEBUG_4)
                 System.out.println("#### Task #" + taskId
-                        + " has completed processing making the callback to ExportTaskRunManager THREAD ID: "
+                        + " has completed processing making the callback to ExportTaskManager THREAD ID: "
                         + Thread.currentThread().getId());
 
-            // ExportTaskRunManager.callBackFromThread(taskId, this.submitterId, "completed", "succefully in THREAD ID: "
-            // + Thread.currentThread().getId());
+            //FIXME: Why was the callBack method commented out?
+//            ExportTaskManager.callBackFromThread(taskId, this.submitterId, "completed", "succefully in THREAD ID: "
+//             + Thread.currentThread().getId());
 
         } catch (Exception e) {
             setErrorStatus(e, "");
@@ -195,7 +196,7 @@ public class ExportTask extends Task {
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 
-        ExportTaskRunManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(), message);
+        ExportTaskManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(), message);
 
     }
 
@@ -209,13 +210,13 @@ public class ExportTask extends Task {
     // statusServices.add(endStatus);
     // }
 
-//    @Override
-//    protected void finalize() throws Throwable {
-//        taskCount--;
-//        if (DebugLevels.DEBUG_1)
-//            System.out.println(">>>> Destroying object: " + createId());
-//        super.finalize();
-//    }
+    @Override
+    protected void finalize() throws Throwable {
+        taskCount--;
+        if (DebugLevels.DEBUG_1)
+            System.out.println(">>>> Destroying object: " + createId());
+        super.finalize();
+    }
 
     public File getFile() {
         return file;

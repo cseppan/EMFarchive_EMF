@@ -11,7 +11,7 @@ public class TaskConsumer extends TimerTask {
         // No arg constructor
     }
 
-    public TaskConsumer(ExportTaskRunManager tm) {
+    public TaskConsumer(ExportTaskManager tm) {
         if (DebugLevels.DEBUG_1)
             System.out.println("Export Task Consumer created @@@@@ in THREAD ID: " + Thread.currentThread().getId());
 
@@ -29,9 +29,9 @@ public class TaskConsumer extends TimerTask {
         if (DebugLevels.DEBUG_0)
             System.out.println("Export Task Consumer RUNNING @@@@@ THREAD ID: " + Thread.currentThread().getId());
 
-        synchronized (RunManager.runTable) {
-            if (RunManager.runTable.size() == 0) {
-                ExportTaskRunManager.processTaskQueue();
+        synchronized (TaskManager.runTable) {
+            if (TaskManager.runTable.size() == 0) {
+                ExportTaskManager.processTaskQueue();
             }
         }// synchronized
 

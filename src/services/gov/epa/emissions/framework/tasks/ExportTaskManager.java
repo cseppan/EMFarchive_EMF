@@ -13,34 +13,34 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ExportTaskRunManager extends RunManager {
-    private static Log log = LogFactory.getLog(ExportTaskRunManager.class);
-    private static ExportTaskRunManager ref;
+public class ExportTaskManager extends TaskManager {
+    private static Log log = LogFactory.getLog(ExportTaskManager.class);
+    private static ExportTaskManager ref;
 
     // Singleton factory method
-    public static synchronized RunManager getExportTaskRunManager() {
+    public static synchronized TaskManager getExportTaskManager() {
         if (ref == null)
-            ref = new ExportTaskRunManager();
+            ref = new ExportTaskManager();
         return ref;
     }
 
     // The constructor
-    private ExportTaskRunManager() {
+    private ExportTaskManager() {
         super();
-        log.info("ExportTaskRunManager");
-        if (DebugLevels.DEBUG_1)
+        log.info("ExportTaskManager");
+        if (DebugLevels.DEBUG_9)
             System.out.println("Export Task Manager created @@@@@ THREAD ID: " + Thread.currentThread().getId());
 
         refCount++;
-        if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_9)
             System.out.println("Task Manager created refCount= " + refCount);
-        if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_9)
             System.out.println("Priority Blocking queue created? " + !(taskQueue == null));
 
         threadPool = new ThreadPoolExecutor(poolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS, threadPoolQueue);
-        if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_9)
             System.out.println("ThreadPool created? " + !(threadPool == null));
-        if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_9)
             System.out.println("Initial # of jobs in Thread Pool: " + threadPool.getPoolSize());
 
         // Create the consumer
@@ -49,36 +49,36 @@ public class ExportTaskRunManager extends RunManager {
         // Create the timer
         taskManagerTimer = new Timer();
 
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_9)
             System.out.println("Timer started: ");
 
     }
 
     public synchronized static void callBackFromThread(String taskId, String submitterId, String status, String mesg) {
-        if (DebugLevels.DEBUG_2)
-            System.out.println("ExportTaskRunManager refCount= " + refCount);
-        if (DebugLevels.DEBUG_2)
-            System.out.println("%%%% ExportTaskRunManager reports that Task# " + taskId + " for submitter= " + submitterId
+        if (DebugLevels.DEBUG_9)
+            System.out.println("ExportTaskManager refCount= " + refCount);
+        if (DebugLevels.DEBUG_9)
+            System.out.println("%%%% ExportTaskManager reports that Task# " + taskId + " for submitter= " + submitterId
                     + " completed with status= " + status + " and message= " + mesg);
         Iterator<TaskSubmitter> iter = submitters.iterator();
         while (iter.hasNext()) {
             TaskSubmitter submitter = iter.next();
             if (submitterId.equals(submitter.getSubmitterId())) {
-                if (DebugLevels.DEBUG_2)
+                if (DebugLevels.DEBUG_9)
                     System.out.println(">>@@ Found a submitter in the taskmanager collection of submitters");
-                submitter.callbackFromRunManager(taskId, status, mesg);
+                submitter.callbackFromTaskManager(taskId, status, mesg);
             }
         }
-        ExportTaskRunManager.processTaskQueue();
+        ExportTaskManager.processTaskQueue();
     }
 
     public static synchronized void addTasks(ArrayList<Runnable> tasks) {
-        RunManager.resetIdleTime();
+        //TaskManager.resetIdleTime();
         taskQueue.addAll(tasks);
 
-        synchronized (RunManager.runTable) {
-            if (RunManager.runTable.size() == 0) {
-                ExportTaskRunManager.processTaskQueue();
+        synchronized (ExportTaskManager.runTable) {
+            if (ExportTaskManager.runTable.size() == 0) {
+                ExportTaskManager.processTaskQueue();
             }
         }// synchronized
     }
@@ -86,43 +86,43 @@ public class ExportTaskRunManager extends RunManager {
     public static synchronized void processTaskQueue() {
         int threadsAvail = -99;
 
-        if (DebugLevels.DEBUG_0)
-            System.out.println("*** BEGIN ExportTaskRunManager::processTaskQueue() *** " + new Date());
-        if (DebugLevels.DEBUG_0)
-            System.out.println("Size of PBQ taskQueue: " + ExportTaskRunManager.taskQueue.size());
-        if (DebugLevels.DEBUG_0)
-            System.out.println("Size of WAIT TABLE: " + ExportTaskRunManager.waitTable.size());
-        if (DebugLevels.DEBUG_0)
-            System.out.println("Size of RUN TABLE: " + ExportTaskRunManager.runTable.size());
+        if (DebugLevels.DEBUG_9)
+            System.out.println("*** BEGIN ExportTaskManager::processTaskQueue() *** " + new Date());
+        if (DebugLevels.DEBUG_9)
+            System.out.println("Size of PBQ taskQueue: " + ExportTaskManager.taskQueue.size());
+        if (DebugLevels.DEBUG_9)
+            System.out.println("Size of WAIT TABLE: " + ExportTaskManager.waitTable.size());
+        if (DebugLevels.DEBUG_9)
+            System.out.println("Size of RUN TABLE: " + ExportTaskManager.runTable.size());
 
-        if (DebugLevels.DEBUG_0)
-            System.out.println("Number of tasks left in queue: " + ExportTaskRunManager.getSizeofTaskQueue());
+        if (DebugLevels.DEBUG_9)
+            System.out.println("Number of tasks left in queue: " + ExportTaskManager.getSizeofTaskQueue());
 
-        if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_9)
             System.out.println("# of tasks in Thread Pool size: " + threadPool.getPoolSize());
-        if (DebugLevels.DEBUG_5)
+        if (DebugLevels.DEBUG_9)
             System.out.println("Active Thread Count= " + threadPool.getActiveCount());
-        if (DebugLevels.DEBUG_5)
+        if (DebugLevels.DEBUG_9)
             System.out.println("Core pool size: " + threadPool.getCorePoolSize());
-        if (DebugLevels.DEBUG_5)
+        if (DebugLevels.DEBUG_9)
             System.out.println("Maximum pool size= " + threadPool.getMaximumPoolSize());
-        if (DebugLevels.DEBUG_5)
+        if (DebugLevels.DEBUG_9)
             System.out.println("Threads available for processing= "
                     + (threadPool.getCorePoolSize() - threadPool.getPoolSize()));
-        if (DebugLevels.DEBUG_5)
+        if (DebugLevels.DEBUG_9)
             System.out.println("Completed task count: " + threadPool.getCompletedTaskCount());
-        if (DebugLevels.DEBUG_5)
+        if (DebugLevels.DEBUG_9)
             System.out.println("TASK COUNT: " + threadPool.getTaskCount());
-        if (DebugLevels.DEBUG_3)
+        if (DebugLevels.DEBUG_9)
             System.out.println("ACTIVE TASK COUNT: " + threadPool.getActiveCount());
 
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_9)
             System.out.println("SIZE OF waiting list-table: " + waitTable.size());
 
         // iterate over the tasks in the waitTable and find as many that can
         // be run in all available threads
         Collection<Task> waitTasks = waitTable.values();
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_9)
             System.out.println("Number of waitTasks acquired from waitTable: " + waitTasks.size());
 
         Iterator<Task> iter = waitTasks.iterator();
@@ -132,7 +132,7 @@ public class ExportTaskRunManager extends RunManager {
             // synchronized (threadPool) {
             //threadsAvail = threadPool.getCorePoolSize() - threadPool.getActiveCount();
             threadsAvail = threadPool.getCorePoolSize() - runTable.size();
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_9)
                 System.out.println("Number of threads available before waiting list-table: " + threadsAvail);
             // }
 
@@ -143,11 +143,11 @@ public class ExportTaskRunManager extends RunManager {
                 // to any of the tasks currently in the runTable
                 // synchronized (waitTable) {
                 if (notEqualsToAnyRunTask(tsk)) {
-                    if (DebugLevels.DEBUG_0)
+                    if (DebugLevels.DEBUG_9)
                         System.out.println("WAIT TABLE Before Moving Task from WAIT to RUN: " + waitTable.size());
-                    if (DebugLevels.DEBUG_0)
+                    if (DebugLevels.DEBUG_9)
                         System.out.println("RUN TABLE Before Moving Task from WAIT to RUN: " + runTable.size());
-                    if (DebugLevels.DEBUG_0)
+                    if (DebugLevels.DEBUG_9)
                         System.out.println("#THREADS Before Moving Task from WAIT to RUN: " + threadsAvail);
 
                     // remove from waitTable
@@ -160,37 +160,37 @@ public class ExportTaskRunManager extends RunManager {
                     threadPool.execute(tsk);
 //                    threadsAvail--;
 
-                    if (DebugLevels.DEBUG_0)
+                    if (DebugLevels.DEBUG_9)
                         System.out.println("WAITTABLE After Moving Task from WAIT to RUN: " + waitTable.size());
-                    if (DebugLevels.DEBUG_0)
+                    if (DebugLevels.DEBUG_9)
                         System.out.println("RUNTABLE After Moving Task from WAIT to RUN: " + runTable.size());
-                    if (DebugLevels.DEBUG_0)
+                    if (DebugLevels.DEBUG_9)
                         System.out.println("#THREADS After Moving Task from WAIT to RUN: " + threadsAvail);
 
                 }
                 // }// synchronized (...)
 
             } else {
-                if (DebugLevels.DEBUG_0)
+                if (DebugLevels.DEBUG_9)
                     System.out.println("#THREADS == 0?? Breaking out of WAIT TEST loop: " + threadsAvail);
                 break;
             }
 
         }
 
-        if (DebugLevels.DEBUG_0)
-            System.out.println("SIZE OF TASKQUEUE: " + ExportTaskRunManager.getSizeofTaskQueue());
+        if (DebugLevels.DEBUG_9)
+            System.out.println("SIZE OF TASKQUEUE: " + ExportTaskManager.getSizeofTaskQueue());
         boolean done = false;
         while (!done) {
-            if (RunManager.taskQueue.size() == 0) {
-                if (DebugLevels.DEBUG_0)
+            if (ExportTaskManager.taskQueue.size() == 0) {
+                if (DebugLevels.DEBUG_9)
                     System.out.println("#tasks in taskQueue == 0?? Breaking out of taskQueue TEST loop: ");
                 done = true;
             } else {
-                if (DebugLevels.DEBUG_0)
+                if (DebugLevels.DEBUG_9)
                     System.out.println("Before Peak into taskQueue: " + taskQueue.size());
                 if (taskQueue.peek() != null) {
-                    if (DebugLevels.DEBUG_0)
+                    if (DebugLevels.DEBUG_9)
                         System.out.println("Peak into taskQueue has an object in head: " + taskQueue.size());
 
                     try {
@@ -201,7 +201,7 @@ public class ExportTaskRunManager extends RunManager {
                         threadsAvail = threadPool.getCorePoolSize() - runTable.size();
 
                         // }// synchronized
-                        if (DebugLevels.DEBUG_0)
+                        if (DebugLevels.DEBUG_9)
                             System.out.println("Number of threads available before taskQueue PDQ: " + threadsAvail);
 
                         if (threadsAvail == 0) {
@@ -243,14 +243,14 @@ public class ExportTaskRunManager extends RunManager {
 
         // TODO:
 
-        if (DebugLevels.DEBUG_0)
-            System.out.println("*** END ExportTaskRunManager::processTaskQueue() *** " + new Date());
+        if (DebugLevels.DEBUG_9)
+            System.out.println("*** END ExportTaskManager::processTaskQueue() *** " + new Date());
 
     }
 
     private static synchronized boolean notEqualsToAnyRunTask(ExportTask tsk) {
         boolean notFound = true;
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_9)
             System.out.println("SIZE OF RUN list-table: " + runTable.size());
 
         Collection<Task> runTasks = runTable.values();
@@ -270,37 +270,37 @@ public class ExportTaskRunManager extends RunManager {
 
     public synchronized static void callBackFromThread(String taskId, String submitterId, String status, long id,
             String mesg) {
-        if (DebugLevels.DEBUG_0)
-            System.out.println("*** BEGIN ExportTaskRunManager::callBackFromThread() *** " + new Date());
+        if (DebugLevels.DEBUG_9)
+            System.out.println("*** BEGIN ExportTaskManager::callBackFromThread() *** " + new Date());
 
-        if (DebugLevels.DEBUG_2)
-            System.out.println("ExportTaskRunManager refCount= " + refCount);
-        if (DebugLevels.DEBUG_0)
-            System.out.println("Size of PBQ taskQueue: " + ExportTaskRunManager.taskQueue.size());
-        if (DebugLevels.DEBUG_0)
-            System.out.println("Size of WAIT TABLE: " + ExportTaskRunManager.waitTable.size());
-        if (DebugLevels.DEBUG_0)
-            System.out.println("Size of RUN TABLE: " + ExportTaskRunManager.runTable.size());
+        if (DebugLevels.DEBUG_9)
+            System.out.println("ExportTaskManager refCount= " + refCount);
+        if (DebugLevels.DEBUG_9)
+            System.out.println("Size of PBQ taskQueue: " + ExportTaskManager.taskQueue.size());
+        if (DebugLevels.DEBUG_9)
+            System.out.println("Size of WAIT TABLE: " + ExportTaskManager.waitTable.size());
+        if (DebugLevels.DEBUG_9)
+            System.out.println("Size of RUN TABLE: " + ExportTaskManager.runTable.size());
 
         if (status.equals("started")) {
-            if (DebugLevels.DEBUG_0)
-                System.out.println("%%%% ExportTaskRunManager reports that Task# " + taskId
+            if (DebugLevels.DEBUG_9)
+                System.out.println("%%%% ExportTaskManager reports that Task# " + taskId
                         + " that is running in thread#: " + id + " for submitter= " + submitterId + " has status= "
                         + status + " and message= " + mesg);
 
         } else {
-            if (DebugLevels.DEBUG_0)
-                System.out.println("%%%% ExportTaskRunManager reports that Task# " + taskId + " that ran in thread#: "
+            if (DebugLevels.DEBUG_9)
+                System.out.println("%%%% ExportTaskManager reports that Task# " + taskId + " that ran in thread#: "
                         + id + " for submitter= " + submitterId + " completed with status= " + status
                         + " and message= " + mesg);
             // remove from waitTable
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_9)
                 System.out.println("SIZE OF RUN TABLE BEFORE REMOVE= " + runTable.size());
             // synchronized (runTable) {
             runTable.remove(taskId);
             // }// synchronized
 
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_9)
                 System.out.println("SIZE OF RUN TABLE AFTER REMOVE= " + runTable.size());
 
         }
@@ -308,18 +308,18 @@ public class ExportTaskRunManager extends RunManager {
         while (iter.hasNext()) {
             TaskSubmitter submitter = iter.next();
             if (submitterId.equals(submitter.getSubmitterId())) {
-                if (DebugLevels.DEBUG_0)
+                if (DebugLevels.DEBUG_9)
                     System.out.println("@@##@@ Found a submitter in the taskmanager collection of submitters: "
                             + submitter.getSubmitterId());
-                submitter.callbackFromRunManager(taskId, status, mesg);
+                submitter.callbackFromTaskManager(taskId, status, mesg);
             }
         }
         
         //done with the call back ... so process the two tables and task queue
-        ExportTaskRunManager.processTaskQueue();
+        ExportTaskManager.processTaskQueue();
 
-        if (DebugLevels.DEBUG_0)
-            System.out.println("*** END ExportTaskRunManager::callBackFromThread() *** " + new Date());
+        if (DebugLevels.DEBUG_9)
+            System.out.println("*** END ExportTaskManager::callBackFromThread() *** " + new Date());
 
     }
 

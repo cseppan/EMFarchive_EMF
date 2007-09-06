@@ -31,10 +31,10 @@ public class CaseJobSumitter implements TaskSubmitter {
 
     public void addTasksToSubmitter(ArrayList<Runnable> tasksForSubmitter) {
         System.out.println("CaseJobSubmitter::addTasksToSubmitter Total number of tasks= " + tasksForSubmitter.size());
-        this.submitTasksToRunManager(submitterId, tasksForSubmitter);
+        this.submitTasksToTaskManager(submitterId, tasksForSubmitter);
     }
 
-    public void callbackFromRunManager(String taskId, String status, String mesg) {
+    public void callbackFromTaskManager(String taskId, String status, String mesg) {
         // NOTE Auto-generated method stub
         
     }
@@ -58,29 +58,29 @@ public class CaseJobSumitter implements TaskSubmitter {
         return 0;
     }
 
-    public synchronized void submitTasksToRunManager(String submitterId, ArrayList<Runnable> tasks) {
+    public synchronized void submitTasksToTaskManager(String submitterId, ArrayList<Runnable> tasks) {
         if (DebugLevels.DEBUG_0)
             System.out.println("In submitter::submitTasksToTaskManager= " + this.getSubmitterId());
         if (DebugLevels.DEBUG_0)
             System.out.println("In submitter::submitTasksToTaskManager # of elements in param array= " + tasks.size());
 
         if (DebugLevels.DEBUG_0)
-            System.out.println("Submitter::exportTasks before ADD: " + this.submitterId + " has task count= "
+            System.out.println("Submitter::caseJobTasks size before ADD: " + this.submitterId + " has task count= "
                     + this.caseJobTasks.size());
-//        if (DebugLevels.DEBUG_0)
-//            System.out.println("SUBMITTER::submittedtasks before ADD: " + this.submitterId + " has task count= "
-//                    + this.submittedTasks.size());
+        if (DebugLevels.DEBUG_0)
+            System.out.println("#### SUBMITTER:: incoming tasks size before ADD: " + this.submitterId + " has task count= "
+                    + tasks.size());
 
-        RunManagerFactory.getCaseJobRunManager().addTasks(tasks);
+        TaskManagerFactory.getCaseJobTaskManager().addTasks(tasks);
 
         // FIXME: May not need to do this next step since submitted Table is uptodate
 //        submittedTasks.addAll(tasks);
 
-        // Remove all tasks from exportTasks and keep it available for new submissions if necessary
+        // Remove all tasks from  and keep it available for new submissions if necessary
         caseJobTasks.removeAll(tasks);
 
         if (DebugLevels.DEBUG_0)
-            System.out.println("Submitter::submitTasksToRunManager after ADD: " + this.submitterId + " has task count= "
+            System.out.println("CaseJobSubmitter::submitTasksToRunManager after ADD: " + this.submitterId + " has task count= "
                     + this.caseJobTasks.size());
 
 //        if (DebugLevels.DEBUG_0)

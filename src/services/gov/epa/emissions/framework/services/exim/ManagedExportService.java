@@ -27,7 +27,8 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.ExportClientSubmitter;
 import gov.epa.emissions.framework.tasks.ExportJobSubmitter;
-import gov.epa.emissions.framework.tasks.RunManagerFactory;
+import gov.epa.emissions.framework.tasks.Task;
+import gov.epa.emissions.framework.tasks.TaskManagerFactory;
 import gov.epa.emissions.framework.tasks.TaskSubmitter;
 
 import java.io.File;
@@ -67,7 +68,7 @@ public class ManagedExportService {
 
     public ManagedExportService(DbServer dbServer, HibernateSessionFactory sessionFactory) {
         myTag();
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_9)
             System.out.println(">>>> " + myTag());
         this.sessionFactory = sessionFactory;
         this.exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes(), batchSize());
@@ -153,17 +154,18 @@ public class ManagedExportService {
         return prefix + name + "_" + date.toLowerCase() + "_v" + +version.getVersion() + suffix;
     }
 
-    public synchronized String exportForJob(User user, List<CaseInput> inputs, String purpose, CaseJob job, Case caseObj)
-            throws EmfException {
-        
-        TaskSubmitter exportJobTaskSubmitter = null;
+    public synchronized String exportForJob(User user, List<CaseInput> inputs, String cjtId, String purpose,
+            CaseJob job, Case caseObj) throws EmfException {
+
+        ExportJobSubmitter exportJobTaskSubmitter = null;
 
         // The service instance (one per session) will have only one submitter for the type of service
         // Here the TaskManagerExportService has one reference to the ExportJobSubmitter
         if (exportJobTaskSubmitter == null) {
             exportJobTaskSubmitter = new ExportJobSubmitter();
-            // exportTaskSubmitter.registerTaskManager();
-            RunManagerFactory.getExportTaskRunManager().registerTaskSubmitter(exportJobTaskSubmitter);
+            // the casejobTask for these exports.
+            exportJobTaskSubmitter.setCaseJobTaskId(cjtId);
+            TaskManagerFactory.getExportTaskManager().registerTaskSubmitter(exportJobTaskSubmitter);
         }
 
         // FIXME: Any checks for CaseInputs or Jobs needs to happen here
@@ -201,21 +203,25 @@ public class ManagedExportService {
             SubDir subdir = caseIp.getSubdirObj();
 
             String fullPath = getCleanDatasetName(dataset, version);
-            
-            System.out.println("CleanDataset Name: " + fullPath);
+
+            if (DebugLevels.DEBUG_9) System.out.println("CleanDataset Name: " + fullPath);
             if ((subdir != null) && !(subdir.toString()).equals("")) {
                 fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + subdir
                         + System.getProperty("file.separator");
             } else {
                 fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator");
             }
-            
-            //FIXME:  Verify at team meeting  Test if subpath exists.  If not create subpath
-            
+
+            // FIXME: Verify at team meeting Test if subpath exists. If not create subpath
+
             // FIXME: Investigate if services reference needs to be unique for each dataset in this call
             if (isExportable(dataset, services, user)) {
                 try {
-                    createExportTask(user, purpose, true, new File(fullPath), dataset, version);
+                    Task tsk = createExportTask(user, purpose, true, new File(fullPath), dataset, version);
+
+                    // Add the newly created Export Task to the list of eximTasks
+                    eximTasks.add(tsk);
+
                 } catch (Exception e) {
                     // don't need to log messages about exporting to existing file
                     if (e.getMessage() != null && e.getMessage().indexOf("existing file") < 0)
@@ -227,30 +233,30 @@ public class ManagedExportService {
 
         }// while
 
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_9)
             System.out.println("Before exportTaskSubmitter.addTasksToSubmitter # of elements in eximTasks array= "
                     + eximTasks.size());
 
         // All eximTasks have been created...so add to the submitter
-        exportTaskSubmitter.addTasksToSubmitter(eximTasks);
+        exportJobTaskSubmitter.addTasksToSubmitter(eximTasks);
 
         // now that all tasks have been submitted remove them from from eximTasks
         eximTasks.removeAll(eximTasks);
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_9)
             System.out
                     .println("After exportTaskSubmitter.addTasksToSubmitter and eximTasks cleanout # of elements in eximTasks array= "
                             + eximTasks.size());
 
-        if (DebugLevels.DEBUG_0)
-            System.out.println("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + exportTaskSubmitter.getTaskCount());
+        if (DebugLevels.DEBUG_9)
+            System.out.println("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + exportJobTaskSubmitter.getTaskCount());
 
-        log.info("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + exportTaskSubmitter.getTaskCount());
+        log.info("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + exportJobTaskSubmitter.getTaskCount());
         log.info("ManagedExportService:export() submitted all exportTasks dropping out of loop");
 
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_9)
             System.out.println("ManagedExportService:export() exiting at: " + new Date());
 
-        return exportTaskSubmitter.getSubmitterId();
+        return exportJobTaskSubmitter.getSubmitterId();
     }
 
     public synchronized String exportForClient(User user, EmfDataset[] datasets, Version[] versions, String dirName,
@@ -259,10 +265,10 @@ public class ManagedExportService {
         // FIXME: always overwrite
         // FIXME: hardcode overwite=true until verified with Alison
         overwrite = true;
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_9)
             System.out.println("ManagedExportService:export() called at: " + new Date());
 
-        if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_9)
             System.out.println(">>## In export service:export() " + myTag() + " for datasets: " + datasets.toString());
 
         // The service instance (one per session) will have only one submitter for the type of service
@@ -270,7 +276,7 @@ public class ManagedExportService {
         if (exportTaskSubmitter == null) {
             exportTaskSubmitter = new ExportClientSubmitter();
             // exportTaskSubmitter.registerTaskManager();
-            RunManagerFactory.getExportTaskRunManager().registerTaskSubmitter(exportTaskSubmitter);
+            TaskManagerFactory.getExportTaskManager().registerTaskSubmitter(exportTaskSubmitter);
         }
 
         File path = validatePath(dirName);
@@ -280,7 +286,7 @@ public class ManagedExportService {
             throw new EmfException("Export failed: version numbers do not match " + "those for specified datasets.");
         }
 
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_9)
             System.out.println("# of datasets= " + datasets.length);
 
         // FIXME: Moved here to see if session problem is solved.
@@ -294,14 +300,14 @@ public class ManagedExportService {
 
                 // FIXME: Investigate if services reference needs to be unique for each dataset in this call
                 if (isExportable(dataset, services, user)) {
-                    createExportTask(user, purpose, overwrite, path, dataset, version);// new ExportTask added
-                    // implictly to eximTasks
-                    // collection
+                    Task tsk = createExportTask(user, purpose, overwrite, path, dataset, version);
+                    
+                    eximTasks.add(tsk);
 
                 }
             }
 
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_9)
                 System.out.println("Before exportTaskSubmitter.addTasksToSubmitter # of elements in eximTasks array= "
                         + eximTasks.size());
 
@@ -310,19 +316,19 @@ public class ManagedExportService {
 
             // now that all tasks have been submitted remove them from from eximTasks
             eximTasks.removeAll(eximTasks);
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_9)
                 System.out
                         .println("After exportTaskSubmitter.addTasksToSubmitter and eximTasks cleanout # of elements in eximTasks array= "
                                 + eximTasks.size());
 
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_9)
                 System.out.println("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: "
                         + exportTaskSubmitter.getTaskCount());
 
             log.info("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + exportTaskSubmitter.getTaskCount());
             log.info("ManagedExportService:export() submitted all exportTasks dropping out of loop");
 
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_9)
                 System.out.println("ManagedExportService:export() exiting at: " + new Date());
 
         } catch (Exception e) {
@@ -336,9 +342,9 @@ public class ManagedExportService {
         return exportTaskSubmitter.getSubmitterId();
     }
 
-    private synchronized void createExportTask(User user, String purpose, boolean overwrite, File path,
+    private synchronized Task createExportTask(User user, String purpose, boolean overwrite, File path,
             EmfDataset dataset, Version version) throws Exception {
-        if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_9)
             System.out.println(">>## In export service:doExport() " + myTag() + " for datasetId: " + dataset.getId());
 
         // Match version in dataset
@@ -357,10 +363,7 @@ public class ManagedExportService {
                 version);
         // eximTask.setSubmitterId(exportTaskSubmitter.getSubmitterId());
 
-        // threadPool.execute(new GCEnforcerTask("Export of Dataset: " + dataset.getName(), eximTask));
-        // eximTasks.add(new GCEnforcerTask("Export of Dataset: " + dataset.getName(), eximTask));
-        eximTasks.add(eximTask);
-
+        return eximTask;
     }
 
     public Version getVersion(Dataset dataset, int version) throws EmfException {
@@ -396,7 +399,7 @@ public class ManagedExportService {
     protected void finalize() throws Throwable {
         svcCount--;
         exportTaskSubmitter = null;
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_9)
             System.out.println(">>>> Destroying object: " + myTag());
         super.finalize();
     }

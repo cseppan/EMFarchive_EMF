@@ -10,7 +10,7 @@ public abstract class Task implements Runnable, Comparable<Object> {
     protected static int taskCount = 0;
     protected User user;
     protected StatusDAO statusServices;
-
+    protected boolean isReadyFlag=false;
 
     protected String taskId = null;
 
@@ -69,4 +69,20 @@ public abstract class Task implements Runnable, Comparable<Object> {
         super.finalize();
     }
 
+    public boolean isReady() {
+        return isReadyFlag;
+    }
+
+    public void setReady(boolean isReady) {
+        this.isReadyFlag = isReady;
+    }
+
+    public void setReadyTrue(){
+        this.isReadyFlag=true;
+    }
+    
+    public void setReadyFalse(){
+        this.isReadyFlag=false;
+    }
+    
 }

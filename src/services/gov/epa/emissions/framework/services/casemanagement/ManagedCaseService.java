@@ -5,9 +5,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.DeepCopy;
-import gov.epa.emissions.commons.io.generic.LineExporter;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
@@ -21,16 +19,14 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterE
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.exim.ManagedExportService;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.CaseJobSumitter;
 import gov.epa.emissions.framework.tasks.DebugLevels;
-import gov.epa.emissions.framework.tasks.RunManagerFactory;
 import gov.epa.emissions.framework.tasks.TaskSubmitter;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -59,7 +55,7 @@ public class ManagedCaseService {
 
     private CaseDAO dao;
 
-    private TaskSubmitter caseJobSubmitter = null;
+    // private TaskSubmitter caseJobSubmitter = null;
 
     private ArrayList<Runnable> caseJobTasks = new ArrayList<Runnable>();
 
@@ -69,9 +65,7 @@ public class ManagedCaseService {
 
     private User user;
 
-    private DbServerFactory dbFactory;
-
-    private ManagedExportService exportService = null;
+    private String eolString = System.getProperty("line.separator");
 
     // these run fields are used to create the run script
     private String runShell = "#!/bin/csh"; // shell to run under
@@ -84,14 +78,12 @@ public class ManagedCaseService {
 
     private String runComment = "##"; // line comment
 
-    // private String runSuffix = ".csh"; // job run file suffix
-
-    // private String runRedirect = ">&"; // shell specific redirect
+    private String runSuffix = ".csh"; // job run file suffix
 
     // all sectors and all jobs id in the case inputs tb
-    private static Sector ALL_SECTORS = null;
+    private final Sector ALL_SECTORS = null;
 
-    private static int ALL_JOB_ID = 0;
+    private final int ALL_JOB_ID = 0;
 
     protected Session session = null;
 
@@ -113,7 +105,7 @@ public class ManagedCaseService {
             System.out.println(">>>> " + myTag());
 
         log.info("ManagedCaseService");
-        log.info("exportTaskSubmitter: " + caseJobSubmitter);
+        // log.info("exportTaskSubmitter: " + caseJobSubmitter);
         log.info("eximTasks: " + caseJobTasks.size());
         log.info("Session factory null? " + (sessionFactory == null));
         log.info("dBServer null? " + (this.dbServer == null));
@@ -121,17 +113,18 @@ public class ManagedCaseService {
 
     }
 
-    private synchronized TaskSubmitter getCaseJobSubmitter() {
-        if (caseJobSubmitter == null) {
-            caseJobSubmitter = new CaseJobSumitter();
-            RunManagerFactory.getCaseJobRunManager().registerTaskSubmitter(caseJobSubmitter);
-
-        }
-        return this.caseJobSubmitter;
-    }
+    // private synchronized TaskSubmitter getCaseJobSubmitter() {
+    // if (caseJobSubmitter == null) {
+    // caseJobSubmitter = new CaseJobSumitter();
+    // TaskManagerFactory.getCaseJobTaskManager().registerTaskSubmitter(caseJobSubmitter);
+    //
+    // }
+    // return this.caseJobSubmitter;
+    // }
 
     private synchronized ManagedExportService getExportService() {
         log.info("ManagedCaseService::getExportService");
+        ManagedExportService exportService = null;
 
         if (exportService == null) {
             try {
@@ -142,7 +135,7 @@ public class ManagedCaseService {
             }
         }
 
-        return this.exportService;
+        return exportService;
     }
 
     // ***************************************************************************
@@ -154,6 +147,7 @@ public class ManagedCaseService {
 
             return (Case[]) cases.toArray(new Case[0]);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Cases", e);
             throw new EmfException("Could not get all Cases");
         } finally {
@@ -167,6 +161,7 @@ public class ManagedCaseService {
             Case caseObj = dao.getCase(caseId, session);
             return caseObj;
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Cases", e);
             throw new EmfException("Could not get all Cases");
         } finally {
@@ -181,6 +176,7 @@ public class ManagedCaseService {
             // return dao.getCaseJob(jobId, session);
             return dao.getCaseJob(jobId, this.getSession());
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not get job for job id " + jobId + ".\n" + e.getMessage());
             throw new EmfException("Could not get job for job id " + jobId + ".\n");
             // } finally {
@@ -196,6 +192,7 @@ public class ManagedCaseService {
 
             return (Abbreviation[]) abbreviations.toArray(new Abbreviation[0]);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Abbreviations", e);
             throw new EmfException("Could not get all Abbreviations");
         } finally {
@@ -209,6 +206,7 @@ public class ManagedCaseService {
             List airQualityModels = dao.getAirQualityModels(session);
             return (AirQualityModel[]) airQualityModels.toArray(new AirQualityModel[0]);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Air Quality Models", e);
             throw new EmfException("Could not get all Air Quality Models");
         } finally {
@@ -222,6 +220,7 @@ public class ManagedCaseService {
             List results = dao.getCaseCategories(session);
             return (CaseCategory[]) results.toArray(new CaseCategory[0]);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Case Categories", e);
             throw new EmfException("Could not get all Case Categories");
         } finally {
@@ -235,6 +234,7 @@ public class ManagedCaseService {
             List results = dao.getEmissionsYears(session);
             return (EmissionsYear[]) results.toArray(new EmissionsYear[0]);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Emissions Years", e);
             throw new EmfException("Could not get all Emissions Years");
         } finally {
@@ -248,6 +248,7 @@ public class ManagedCaseService {
             List results = dao.getGrids(session);
             return (Grid[]) results.toArray(new Grid[0]);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Grids", e);
             throw new EmfException("Could not get all Grids");
         } finally {
@@ -261,6 +262,7 @@ public class ManagedCaseService {
             List results = dao.getGridResolutions(session);
             return (GridResolution[]) results.toArray(new GridResolution[0]);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Grid Resolutions", e);
             throw new EmfException("Could not get all Grid Resolutions");
         } finally {
@@ -274,6 +276,7 @@ public class ManagedCaseService {
             List results = dao.getMeteorlogicalYears(session);
             return (MeteorlogicalYear[]) results.toArray(new MeteorlogicalYear[0]);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Meteorological Years", e);
             throw new EmfException("Could not get all Meteorological Years");
         } finally {
@@ -287,6 +290,7 @@ public class ManagedCaseService {
             List results = dao.getSpeciations(session);
             return (Speciation[]) results.toArray(new Speciation[0]);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Speciations", e);
             throw new EmfException("Could not get all Speciations");
         } finally {
@@ -299,6 +303,7 @@ public class ManagedCaseService {
         try {
             dao.add(element, session);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not add Case: " + element, e);
             throw new EmfException("Could not add Case: " + element);
         } finally {
@@ -322,6 +327,7 @@ public class ManagedCaseService {
             dao.remove(caseObj, session);
             setStatus(caseObj.getLastModifiedBy(), "Finished removing case " + caseObj.getName() + ".", "Remove Case");
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not remove Case: " + caseObj, e);
             throw new EmfException("Could not remove Case: " + caseObj);
         } finally {
@@ -345,6 +351,7 @@ public class ManagedCaseService {
             Case locked = dao.obtainLocked(owner, element, session);
             return locked;
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not obtain lock for Case: " + element + " by owner: " + owner.getUsername(), e);
             throw new EmfException("Could not obtain lock for Case: " + element + " by owner: " + owner.getUsername());
         } finally {
@@ -358,6 +365,7 @@ public class ManagedCaseService {
             Case released = dao.releaseLocked(locked, session);
             return released;
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not release lock by " + locked.getLockOwner(), e);
             throw new EmfException("Could not release lock by " + locked.getLockOwner() + " for Case: " + locked);
         } finally {
@@ -372,6 +380,7 @@ public class ManagedCaseService {
             Case released = dao.update(element, session);
             return released;
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not update Case", e);
             throw new EmfException("Could not update Case: " + element + "; " + e.getMessage());
         } finally {
@@ -387,6 +396,7 @@ public class ManagedCaseService {
             CaseInput input = dao.getCaseInput(inputId, session);
             return input;
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Input Names", e);
             throw new EmfException("Could not get all Input Names");
         } finally {
@@ -401,6 +411,7 @@ public class ManagedCaseService {
             List results = dao.getInputNames(session);
             return (InputName[]) results.toArray(new InputName[0]);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Input Names", e);
             throw new EmfException("Could not get all Input Names");
         } finally {
@@ -414,6 +425,7 @@ public class ManagedCaseService {
             List results = dao.getInputEnvtVars(session);
             return (InputEnvtVar[]) results.toArray(new InputEnvtVar[0]);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Input Environment Variables", e);
             throw new EmfException("Could not get all Input Environment Variables");
         } finally {
@@ -427,6 +439,7 @@ public class ManagedCaseService {
             List results = dao.getPrograms(session);
             return (CaseProgram[]) results.toArray(new CaseProgram[0]);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Programs", e);
             throw new EmfException("Could not get all Programs");
         } finally {
@@ -440,6 +453,7 @@ public class ManagedCaseService {
             List results = dao.getModelToRuns(session);
             return (ModelToRun[]) results.toArray(new ModelToRun[0]);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all Models To Run", e);
             throw new EmfException("Could not get all Models To Run");
         } finally {
@@ -491,6 +505,7 @@ public class ManagedCaseService {
             dao.add(name, session);
             return (InputName) dao.load(InputName.class, name.getName(), session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not add new case input name '" + name.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new case input name '" + name.getName() + "'");
         } finally {
@@ -504,6 +519,7 @@ public class ManagedCaseService {
             dao.add(program, session);
             return (CaseProgram) dao.load(CaseProgram.class, program.getName(), session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not add new program '" + program.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new program '" + program.getName() + "'");
         } finally {
@@ -517,6 +533,7 @@ public class ManagedCaseService {
             dao.add(inputEnvtVar, session);
             return (InputEnvtVar) dao.load(InputEnvtVar.class, inputEnvtVar.getName(), session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not add new input environment variable '" + inputEnvtVar.getName() + "'\n"
                     + e.getMessage());
             throw new EmfException("Could not add new input environment variable '" + inputEnvtVar.getName() + "'");
@@ -531,6 +548,7 @@ public class ManagedCaseService {
             dao.add(model, session);
             return (ModelToRun) dao.load(ModelToRun.class, model.getName(), session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not add new model to run '" + model.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new model to run '" + model.getName() + "'");
         } finally {
@@ -544,6 +562,7 @@ public class ManagedCaseService {
             dao.add(gridResolution, session);
             return (GridResolution) dao.load(GridResolution.class, gridResolution.getName(), session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not add new Grid Resolution '" + gridResolution.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new Grid Resolution '" + gridResolution.getName() + "'");
         } finally {
@@ -557,6 +576,7 @@ public class ManagedCaseService {
             List results = dao.getSubDirs(session);
             return (SubDir[]) results.toArray(new SubDir[0]);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not get all subdirectories", e);
             throw new EmfException("Could not get all subdirectories");
         } finally {
@@ -570,6 +590,7 @@ public class ManagedCaseService {
             dao.add(subdir, session);
             return (SubDir) dao.load(SubDir.class, subdir.getName(), session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not add new subdirectory '" + subdir.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new subdirectory '" + subdir.getName() + "'");
         } finally {
@@ -587,6 +608,7 @@ public class ManagedCaseService {
             dao.add(input, session);
             return (CaseInput) dao.loadCaseInput(input, session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not add new case input '" + input.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new case input '" + input.getName() + "'");
         } finally {
@@ -610,6 +632,7 @@ public class ManagedCaseService {
             dao.updateCaseInput(input, session);
             // setStatus(user, "Saved input " + input.getName() + " to database.", "Save Input");
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not update case input: " + input.getName() + ".\n" + e);
             throw new EmfException("Could not update case input: " + input.getName() + ".");
         } finally {
@@ -623,6 +646,7 @@ public class ManagedCaseService {
         try {
             dao.removeCaseInputs(inputs, session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not remove case input " + inputs[0].getName() + " etc.\n" + e.getMessage());
             throw new EmfException("Could not remove case input " + inputs[0].getName() + " etc.");
         } finally {
@@ -644,63 +668,6 @@ public class ManagedCaseService {
         } finally {
             session.close();
         }
-    }
-
-    private CaseParameter[] getJobParameters(int caseId, int jobId, Sector sector) throws EmfException {
-        /**
-         * Gets all the parameters for this job, selects based on: case ID, job ID, and sector
-         */
-        Session session = sessionFactory.getSession();
-
-        // select the inputs based on 3 criteria
-        try {
-            List<CaseParameter> parameters = dao.getJobParameters(caseId, jobId, sector, session);
-            // return an array of all type CaseParameter
-            return parameters.toArray(new CaseParameter[0]);
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not get all parameters for case (id=" + caseId + "), job (id=" + jobId + ").\n"
-                    + e.getMessage());
-            throw new EmfException("Could not get all parameters for case (id=" + caseId + "), job (id=" + jobId
-                    + ").\n");
-        } finally {
-            session.close();
-        }
-    }
-
-    private synchronized List<CaseInput> excludeInputsEnv(List<CaseInput> inputs, String envname) {
-        /**
-         * Excludes input elements from the inputs list based on environmental variable name.
-         * 
-         * NOTE: the # of elements of inputs is modified in the calling routine also, if an input has no environmental
-         * variable, it will be treated as having the name ""
-         */
-        List<CaseInput> exclInputs = new ArrayList();
-        String inputEnvName = "";
-
-        // loop of inputs (using an iterator) and test for this env name
-        Iterator<CaseInput> iter = inputs.iterator();
-        while (iter.hasNext()) {
-            CaseInput input = iter.next();
-
-            inputEnvName = (input.getEnvtVars() == null) ? "" : input.getEnvtVars().getName();
-            // input has an environmental variable w/ this name
-            if (inputEnvName.equals(envname)) {
-                // add the input to exclude
-                exclInputs.add(input);
-            }
-        }
-
-        // Now remove the excluded elements from inputs
-        Iterator<CaseInput> iter2 = exclInputs.iterator();
-        while (iter2.hasNext()) {
-            CaseInput exclInput = iter2.next();
-            // remove this element from the input list
-            inputs.remove(exclInput);
-        }
-
-        // return the exclude list
-        return exclInputs;
     }
 
     private List<CaseInput> getJobInputs(int caseId, int jobId, Sector sector) throws EmfException {
@@ -797,6 +764,7 @@ public class ManagedCaseService {
             try {
                 copiedList.add(copySingleCaseObj(caseToCopy));
             } catch (Exception e) {
+                e.printStackTrace();
                 log.error("Could not copy case " + caseToCopy.getName() + ".", e);
                 throw new EmfException("Could not copy case " + caseToCopy.getName() + ". " + e.getMessage());
             }
@@ -824,7 +792,11 @@ public class ManagedCaseService {
                 CaseJob copiedJob = dao.getCaseJob(copiedCaseId, job, session);
                 copied.setCaseJobID(copiedJob.getId());
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e);
         } finally {
+
             session.close();
         }
 
@@ -838,6 +810,7 @@ public class ManagedCaseService {
             dao.add(element, session);
             return (Case) dao.load(Case.class, element.getName(), session);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not add case " + element, e);
             throw new EmfException("Could not add case " + element);
         } finally {
@@ -867,6 +840,7 @@ public class ManagedCaseService {
 
             return type.toArray(new ParameterName[0]);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not get all parameter names.\n" + e.getMessage());
             throw new EmfException("Could not get all parameter names.\n");
         } finally {
@@ -885,6 +859,7 @@ public class ManagedCaseService {
             dao.addParameter(param, session);
             return (CaseParameter) dao.loadCaseParameter(param, session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not add new case parameter '" + param.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new case parameter '" + param.getName() + "'");
         } finally {
@@ -898,6 +873,7 @@ public class ManagedCaseService {
         try {
             dao.removeCaseParameters(params, session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not remove case parameter " + params[0].getName() + " etc.\n" + e.getMessage());
             throw new EmfException("Could not remove case parameter " + params[0].getName() + " etc.");
         } finally {
@@ -913,6 +889,7 @@ public class ManagedCaseService {
 
             return params.toArray(new CaseParameter[0]);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not get all parameters for case (id=" + caseId + ").\n" + e.getMessage());
             throw new EmfException("Could not get all parameters for case (id=" + caseId + ").\n");
         } finally {
@@ -928,6 +905,7 @@ public class ManagedCaseService {
 
             return (Executable) dao.load(Executable.class, exe.getName(), session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not add new executable '" + exe.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new executable '" + exe.getName() + "'");
         } finally {
@@ -941,6 +919,7 @@ public class ManagedCaseService {
             dao.addParameterName(name, session);
             return (ParameterName) dao.load(ParameterName.class, name.getName(), session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not add new parameter name '" + name.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new parameter name '" + name.getName() + "'");
         } finally {
@@ -956,6 +935,7 @@ public class ManagedCaseService {
 
             return type.toArray(new ValueType[0]);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not get all value types.\n" + e.getMessage());
             throw new EmfException("Could not get all value types.\n");
         } finally {
@@ -969,6 +949,7 @@ public class ManagedCaseService {
             dao.addValueType(type, session);
             return (ValueType) dao.load(ValueType.class, type.getName(), session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not add new value type '" + type.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new value type '" + type.getName() + "'");
         } finally {
@@ -984,6 +965,7 @@ public class ManagedCaseService {
 
             return envvar.toArray(new ParameterEnvVar[0]);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not get all parameter env variables.\n" + e.getMessage());
             throw new EmfException("Could not get all parameter env variables.\n");
         } finally {
@@ -997,6 +979,7 @@ public class ManagedCaseService {
             dao.add(envVar, session);
             return (ParameterEnvVar) dao.load(ParameterEnvVar.class, envVar.getName(), session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not add new parameter env variable '" + envVar.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new parameter env variable '" + envVar.getName() + "'");
         } finally {
@@ -1036,6 +1019,7 @@ public class ManagedCaseService {
             dao.add(job, session);
             return (CaseJob) dao.loadCaseJob(job, session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not add new case job '" + job.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new case job '" + job.getName() + "'");
         } finally {
@@ -1052,6 +1036,7 @@ public class ManagedCaseService {
 
             return jobs.toArray(new CaseJob[0]);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not get all jobs for case (id=" + caseId + ").\n" + e.getMessage());
             throw new EmfException("Could not get all jobs for case (id=" + caseId + ").\n");
         } finally {
@@ -1068,6 +1053,7 @@ public class ManagedCaseService {
 
             return runstatuses.toArray(new JobRunStatus[0]);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not get all job run statuses.\n" + e.getMessage());
             throw new EmfException("Could not get all job run statuses.\n");
         } finally {
@@ -1083,36 +1069,13 @@ public class ManagedCaseService {
 
             return runstatuses.toArray(new Executable[0]);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not get all executables.\n" + e.getMessage());
             throw new EmfException("Could not get all executables.\n");
         } finally {
             session.close();
         }
     }
-
-    // private File getOfile(CaseJob job) throws EmfException {
-    // /*
-    // * Creates the File object that corresponds to the job script file name. Format:
-    // <jobname>_<case_abbrev>_<datestamp>.csh
-    // */
-    // String dateStamp = EmfDateFormat.format_YYYYMMDDHHMMSS(new Date());
-    // String jobName = job.getName().replace(" ", "_");
-    // Case caseObj = this.getCase(job.getCaseId());
-    //
-    // // Get case abbreviation, if no case abbreviation construct one from id
-    // String defaultAbbrev = "case" + job.getCaseId();
-    // String caseAbbrev = (caseObj.getAbbreviation() == null) ? defaultAbbrev : caseObj.getAbbreviation().getName();
-    //
-    // // Test ouput directory to place job script
-    // String outputFileDir = caseObj.getOutputFileDir();
-    // if ((outputFileDir == null) || (outputFileDir.equals(""))) {
-    // throw new EmfException("Output job script directory must be set to run job: " + job.getName());
-    // }
-    //
-    // String fileName = jobName + "_" + caseAbbrev + "_" + dateStamp + this.runSuffix;
-    // File ofile = new File(outputFileDir + System.getProperty("file.separator") + fileName);
-    // return ofile;
-    // }
 
     private void resetRelatedJobsField(CaseJob[] jobs) throws EmfException {
         int jobslen = jobs.length;
@@ -1137,6 +1100,7 @@ public class ManagedCaseService {
                         params[k].setJobId(0);
             }
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not reset case job.\n" + e.getMessage());
             throw new EmfException("Could not reset case job ");
         } finally {
@@ -1154,6 +1118,7 @@ public class ManagedCaseService {
         try {
             dao.removeCaseJobs(jobs, session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not remove case job " + jobs[0].getName() + " etc.\n" + e.getMessage());
             throw new EmfException("Could not remove case job " + jobs[0].getName() + " etc.");
         } finally {
@@ -1221,6 +1186,7 @@ public class ManagedCaseService {
             dao.updateCaseParameter(parameter, session);
             // setStatus(user, "Saved parameter " + parameter.getName() + " to database.", "Save Parameter");
         } catch (RuntimeException e) {
+            e.printStackTrace();
             log.error("Could not update case parameter: " + parameter.getName() + ".\n" + e);
             throw new EmfException("Could not update case parameter: " + parameter.getName() + ".");
         } finally {
@@ -1228,139 +1194,114 @@ public class ManagedCaseService {
         }
     }
 
+    /**
+     * SubmitJobs(...) is called form the CaseServiceImpl.
+     * 
+     * 
+     */
     public synchronized String submitJobs(Integer[] jobIds, int caseId, User user) throws EmfException {
-        String caseJobExportSubmitterId = null;
-        String caseJobSubmitterId = getCaseJobSubmitter().getSubmitterId();
+        System.out.println("ManagedCaseService::submitJobs size: " + jobIds.length + " for caseId= " + caseId);
 
-        List<CaseJob> caseJobs = new ArrayList<CaseJob>();
+        // create a new caseJobSubmitter for each client call in a session
+        TaskSubmitter caseJobSubmitter = new CaseJobSumitter();
 
-        System.out.println("Is CaseJobSubmitterId null? " + (caseJobSubmitterId == null));
-        // FIXME: Does this need to be done in a new DAO method???
-        // Get the CaseJobs for each jobId
-        for (Integer jobId : jobIds) {
-            int jid = jobId.intValue();
+        try {
+            String caseJobExportSubmitterId = null;
+            String caseJobSubmitterId = caseJobSubmitter.getSubmitterId();
 
-            System.out.println("The jobId= " + jid);
-            CaseJob caseJob = this.getCaseJob(jid);
-            System.out.println("Is the caseJob for this jobId null? " + (caseJob == null));
-            Case jobCase = this.getCase(caseId);
+            List<CaseJob> caseJobs = new ArrayList<CaseJob>();
 
-            System.out.println("caseId= " + caseId + "Is the Case for this job null? " + (jobCase == null));
-            // FIXME: Is this still needed?????
-            // caseJob.setRunStartDate(new Date());
-            CaseJobTask cjt = new CaseJobTask(jid, caseId, user);
-            cjt.setSubmitterId(caseJobSubmitterId);
+            System.out.println("Is CaseJobSubmitterId null? " + (caseJobSubmitterId == null));
+            // FIXME: Does this need to be done in a new DAO method???
+            // Get the CaseJobs for each jobId
+            for (Integer jobId : jobIds) {
+                int jid = jobId.intValue();
 
-            // FIXME: Do we still need the casejob around?
-            caseJobs.add(caseJob);
-            // Create the list of case job tasks for the submitter and task manager
-            caseJobTasks.add(cjt);
+                System.out.println("The jobId= " + jid);
+                CaseJob caseJob = this.getCaseJob(jid);
+                System.out.println("Is the caseJob for this jobId null? " + (caseJob == null));
+                Case jobCase = this.getCase(caseId);
 
-            List<CaseInput> inputs = getAllJobInputs(caseJob);
-            System.out.println("Number of inputs for this job: " + inputs.size());
+                System.out.println("caseId= " + caseId + " Is the Case for this job null? " + (jobCase == null));
+                // FIXME: Is this still needed?????
+                // caseJob.setRunStartDate(new Date());
+                CaseJobTask cjt = new CaseJobTask(jid, caseId, user);
 
-            // FIXME: Need to flesh this string out
-            // purpose = "Used by CaseName and JobName"
+                if (DebugLevels.DEBUG_6)
+                    System.out.println("set the casejobsubmitter id = " + caseJobSubmitterId);
 
-            String purpose = "Used by " + caseJob.getName() + " of Case " + jobCase.getName();
-            System.out.println("Purpose= " + purpose);
+                cjt.setSubmitterId(caseJobSubmitterId);
 
-            // pass the inputs to the exportService which uses an exportJobSubmitter to work with exportTaskManager
-            // caseJobExportSubmitterId = this.getExportService().exportForJob(user, inputs, purpose, caseJob, jobCase);
-            caseJobExportSubmitterId = "123456789 :::: stubbed out for testing";
+                if (DebugLevels.DEBUG_6)
+                    System.out.println("setJobFileContent");
+
+                cjt.setJobFileContent(this.createJobFileContent(caseJob, user));
+
+                String jobFileName = this.getJobFileName(caseJob);
+
+                cjt.setJobFile(jobFileName);
+                cjt.setLogFile(this.getLog(jobFileName));
+                cjt.setJobName(caseJob.getName());
+                if (DebugLevels.DEBUG_6)
+                    System.out.println("set Host Name");
+                cjt.setHostName(caseJob.getHost().getName());
+                if (DebugLevels.DEBUG_6)
+                    System.out.println("getQueOptions");
+                cjt.setQueueOptions(caseJob.getQueOptions());
+
+                // FIXME: BELOW FOR TESTING ONLY
+                cjt.setReadyTrue();
+                cjt.setDependenciesSet(true);
+                // FIXME: ABOVE FOR TESTING ONLY
+
+                if (DebugLevels.DEBUG_6)
+                    System.out.println("Completed setting the CaseJobTask");
+
+                List<CaseInput> inputs = getAllJobInputs(caseJob);
+
+                if (DebugLevels.DEBUG_6)
+                    System.out.println("Number of inputs for this job: " + inputs.size());
+
+                // FIXME: Need to flesh this string out
+                // purpose = "Used by CaseName and JobName"
+
+                String purpose = "Used by " + caseJob.getName() + " of Case " + jobCase.getName();
+                if (DebugLevels.DEBUG_6)
+                    System.out.println("Purpose= " + purpose);
+
+                // pass the inputs to the exportService which uses an exportJobSubmitter to work with exportTaskManager
+                // caseJobExportSubmitterId = this.getExportService().exportForJob(user, inputs, cjt.getTaskId(),
+                // purpose,
+                // caseJob, jobCase);
+                caseJobExportSubmitterId = "DUMMY caseJobExportSubmitterId";
+
+                // FIXME: Do we still need the casejob around?
+                caseJobs.add(caseJob);
+                // Create the list of case job tasks for the submitter and task manager
+                caseJobTasks.add(cjt);
+                if (DebugLevels.DEBUG_6)
+                    System.out.println("Added caseJobTask to collection");
+
+                if (DebugLevels.DEBUG_0)
+                    System.out.println("Case Job Export Submitter Id for case job:" + caseJobExportSubmitterId);
+
+            }
+
             if (DebugLevels.DEBUG_6)
-                System.out.println("Case Job Export Submitter Id for case job:" + caseJobExportSubmitterId);
+                System.out.println("About to add caseJobTasks to caseJobSubmitter submitrId= "
+                        + caseJobSubmitter.getSubmitterId());
+            caseJobSubmitter.addTasksToSubmitter(caseJobTasks);
+
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Case Job Submitter Id for case job:" + caseJobSubmitterId);
+
+            return caseJobSubmitterId;
+        } catch (EmfException ex) {
+            ex.printStackTrace();
+            throw ex;
 
         }
-        this.getCaseJobSubmitter().addTasksToSubmitter(caseJobTasks);
-
-        return caseJobSubmitterId;
     }
-
-    private String setenvInput(CaseInput input, Case caseObj, ManagedExportService exports) throws EmfException {
-        /**
-         * Creates a line of the run job file. Sets the env variable to the value input file.
-         * 
-         * For eg. If the env variable is GRIDDESC, and the shell type is csh, this will return "setenv GRIDDESC
-         * /home/azubrow/smoke/ge_dat/griddesc_12Apr2007_vo.txt"
-         * 
-         * Note: this could be bash or tcsh format, could easily modify for other languages, for example python, perl,
-         * etc.
-         */
-
-        EmfDataset dataset = input.getDataset();
-        InputEnvtVar envvar = input.getEnvtVars();
-        SubDir subdir = input.getSubdirObj();
-        // check if dataset or env variable is null, if so e
-        if (dataset == null) {
-            throw new EmfException("Input (" + input.getName() + ") must have a dataset");
-        }
-
-        // Create a full path to the input file
-        String fullPath = exports.getCleanDatasetName(input.getDataset(), input.getVersion());
-        if ((subdir != null) && !(subdir.toString()).equals("")) {
-            fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + input.getSubdirObj()
-                    + System.getProperty("file.separator") + fullPath;
-        } else {
-            fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + fullPath;
-        }
-
-        String setenvLine = null;
-        if (envvar == null) {
-            // if no environmental variable, just created a commented
-            // line w/ input name = fullPath
-            setenvLine = this.runComment + " " + input.getName() + " = " + fullPath;
-        } else {
-            setenvLine = shellSetenv(envvar.getName(), fullPath);
-        }
-        return setenvLine;
-    }
-
-    private String shellSetenv(String envvariable, String envvalue) {
-        /**
-         * Simply creates a setenv line from an environmental variable and a value.
-         * 
-         * For eg. If the env variable is IOAPI_GRIDNAME, and the shell type is csh, this will return "setenv GRIDDESC
-         * US36_148x112"
-         * 
-         * Note: this could be bash or tcsh format, could easily modify for other languages, for example python, perl,
-         * etc.
-         */
-        String setenvLine = this.runSet + " " + envvariable + this.runEq + envvalue + this.runTerminator;
-        return setenvLine;
-
-    }
-
-    // private String getLog(File jobFile) throws EmfException {
-    // /*
-    // * From the job script name, it creates the name of corresponding log file. It also checks that an appropriate
-    // * log directory exists.
-    // */
-    //
-    // // Create a log file name by replacing the suffix of the job
-    // // of the job file w/ .log
-    // String logFileName = jobFile.getName().replaceFirst(this.runSuffix, ".log");
-    //
-    // // Check if logs dir (jobpath/logs) exists, if not create
-    // File logDir = new File(jobFile.getParent() + System.getProperty("file.separator") + "logs");
-    // if (!(logDir.isDirectory())) {
-    // // Need to create the directory
-    // if (!(logDir.mkdir())) {
-    // throw new EmfException("Error creating job log directory: " + logDir);
-    // }
-    // }
-    //
-    // // Make directory writable by everyone
-    // if (!logDir.setWritable(true, false)) {
-    // throw new EmfException("Error changing job log directory's write permissions: " + logDir);
-    // }
-    //
-    // // Create the logFile full name
-    // logFileName = logDir + System.getProperty("file.separator") + logFileName;
-    //
-    // return logFileName;
-    //
-    // }
 
     public synchronized void updateCaseJob(User user, CaseJob job) throws EmfException {
         Session session = sessionFactory.getSession();
@@ -1395,36 +1336,12 @@ public class ManagedCaseService {
 
             return hosts.toArray(new Host[0]);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not get all hosts.\n" + e.getMessage());
             throw new EmfException("Could not get all hosts.\n");
         } finally {
             session.close();
         }
-    }
-
-    private String setenvParameter(CaseParameter parameter) throws EmfException {
-        /**
-         * Creates a line of the run job file. Sets the env variable to the value of the parameter.
-         * 
-         * For eg. If the env variable is IOAPI_GRIDNAME, and the shell type is csh, this will return "setenv GRIDDESC
-         * US36_148x112"
-         * 
-         * Note: this could be bash or tcsh format, could easily modify for other languages, for example python, perl,
-         * etc.
-         */
-
-        if (false)
-            throw new EmfException();
-        String setenvLine = null;
-        if (parameter.getEnvVar() == null) {
-            // no environmental variable, therefore create commented line
-            // parameter name = value
-            setenvLine = this.runComment + " " + parameter.getName() + " = " + parameter.getValue();
-        } else {
-            setenvLine = shellSetenv(parameter.getEnvVar().getName(), parameter.getValue());
-
-        }
-        return setenvLine;
     }
 
     public synchronized Host addHost(Host host) throws EmfException {
@@ -1433,6 +1350,7 @@ public class ManagedCaseService {
             dao.add(host, session);
             return (Host) dao.load(Host.class, host.getName(), session);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not add new host '" + host.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new host '" + host.getName() + "'");
         } finally {
@@ -1518,27 +1436,175 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized void writeJobFile(CaseJob job, User user, File ofile) throws EmfException {
+    private CaseParameter[] getJobParameters(int caseId, int jobId, Sector sector) throws EmfException {
         /**
-         * Writes a job run file w/ all necessary inputs and parameters set. It will also export the input files.
+         * Gets all the parameters for this job, selects based on: case ID, job ID, and sector
+         */
+        Session session = sessionFactory.getSession();
+
+        // select the inputs based on 3 criteria
+        try {
+            List<CaseParameter> parameters = dao.getJobParameters(caseId, jobId, sector, session);
+            // return an array of all type CaseParameter
+            return parameters.toArray(new CaseParameter[0]);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get all parameters for case (id=" + caseId + "), job (id=" + jobId + ").\n"
+                    + e.getMessage());
+            throw new EmfException("Could not get all parameters for case (id=" + caseId + "), job (id=" + jobId
+                    + ").\n");
+        } finally {
+            session.close();
+        }
+    }
+
+    private synchronized List<CaseInput> excludeInputsEnv(List<CaseInput> inputs, String envname) {
+        /**
+         * Excludes input elements from the inputs list based on environmental variable name.
          * 
-         * Input: job - the Case Job user - the user ofile - the file to write the job script to
+         * NOTE: the # of elements of inputs is modified in the calling routine also, if an input has no environmental
+         * variable, it will be treated as having the name ""
+         */
+        List<CaseInput> exclInputs = new ArrayList();
+        String inputEnvName = "";
+
+        // loop of inputs (using an iterator) and test for this env name
+        Iterator<CaseInput> iter = inputs.iterator();
+        while (iter.hasNext()) {
+            CaseInput input = iter.next();
+
+            inputEnvName = (input.getEnvtVars() == null) ? "" : input.getEnvtVars().getName();
+            // input has an environmental variable w/ this name
+            if (inputEnvName.equals(envname)) {
+                // add the input to exclude
+                exclInputs.add(input);
+            }
+        }
+
+        // Now remove the excluded elements from inputs
+        Iterator<CaseInput> iter2 = exclInputs.iterator();
+        while (iter2.hasNext()) {
+            CaseInput exclInput = iter2.next();
+            // remove this element from the input list
+            inputs.remove(exclInput);
+        }
+
+        // return the exclude list
+        return exclInputs;
+    }
+
+    private String setenvInput(CaseInput input, Case caseObj) throws EmfException {
+        /**
+         * Creates a line of the run job file. Sets the env variable to the value input file.
          * 
-         * Output: ofile - the job run file- File obj
+         * For eg. If the env variable is GRIDDESC, and the shell type is csh, this will return "setenv GRIDDESC
+         * /home/azubrow/smoke/ge_dat/griddesc_12Apr2007_vo.txt"
+         * 
+         * Note: this could be bash or tcsh format, could easily modify for other languages, for example python, perl,
+         * etc.
+         */
+
+        EmfDataset dataset = input.getDataset();
+        InputEnvtVar envvar = input.getEnvtVars();
+        SubDir subdir = input.getSubdirObj();
+        // check if dataset or env variable is null, if so e
+        if (dataset == null) {
+            throw new EmfException("Input (" + input.getName() + ") must have a dataset");
+        }
+
+        // Create a full path to the input file
+        String fullPath = getExportService().getCleanDatasetName(input.getDataset(), input.getVersion());
+        if ((subdir != null) && !(subdir.toString()).equals("")) {
+            fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + input.getSubdirObj()
+                    + System.getProperty("file.separator") + fullPath;
+        } else {
+            fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + fullPath;
+        }
+
+        String setenvLine = null;
+        if (envvar == null) {
+            // if no environmental variable, just created a commented
+            // line w/ input name = fullPath
+            setenvLine = this.runComment + " " + input.getName() + " = " + fullPath + eolString;
+        } else {
+            setenvLine = shellSetenv(envvar.getName(), fullPath);
+        }
+        return setenvLine;
+    }
+
+    private String shellSetenv(String envvariable, String envvalue) {
+        /**
+         * Simply creates a setenv line from an environmental variable and a value.
+         * 
+         * For eg. If the env variable is IOAPI_GRIDNAME, and the shell type is csh, this will return "setenv GRIDDESC
+         * US36_148x112"
+         * 
+         * Note: this could be bash or tcsh format, could easily modify for other languages, for example python, perl,
+         * etc.
+         */
+        String setenvLine = this.runSet + " " + envvariable + this.runEq + envvalue + this.runTerminator;
+        return setenvLine + eolString;
+
+    }
+
+    /**
+     * Creates a line of the run job file. Sets the env variable to the value of the parameter.
+     * 
+     * For eg. If the env variable is IOAPI_GRIDNAME, and the shell type is csh, this will return
+     * 
+     * "setenv GRIDDESC US36_148x112"
+     * 
+     * Note: this could be bash or tcsh format, could easily modify for other languages, for example python, perl, etc.
+     */
+    private String setenvParameter(CaseParameter parameter) throws EmfException {
+
+        if (false)
+            throw new EmfException();
+        String setenvLine = null;
+        if (parameter.getEnvVar() == null) {
+            // no environmental variable, therefore create commented line
+            // parameter name = value
+            setenvLine = this.runComment + " " + parameter.getName() + " = " + parameter.getValue() + eolString;
+        } else {
+            setenvLine = shellSetenv(parameter.getEnvVar().getName(), parameter.getValue());
+
+        }
+        return setenvLine;
+    }
+
+    public synchronized String createJobFileContent(CaseJob job, User user) throws EmfException {
+        // String jobContent="";
+        String jobFileHeader = "";
+
+        StringBuffer sbuf = new StringBuffer();
+
+        /**
+         * Creates the content string for a job run file w/ all necessary inputs and parameters set.
+         * 
+         * Input: job - the Case Job user - the user
+         * 
+         * Output: String - the job content
          */
 
         // Some objects needed for accessing data
         Case caseObj = this.getCase(job.getCaseId());
-        DbServer dbServerlocal = dbFactory.getDbServer();
-        DbServer dbServerlineexporter = dbFactory.getDbServer();
+
+        // FIXME: Remove after verified not needed
+        // for inputs
+        // DbServer dbServerlocal = dbFactory.getDbServer();
+        // for the header file
+        // DbServer dbServerlineexporter = dbFactory.getDbServer();
+
         int caseId = job.getCaseId();
         int jobId = job.getId();
+
         CaseInput headerInput = null;
+
         List<CaseInput> inputsAA = null; // inputs for all sectors and all jobs
         List<CaseInput> inputsSA = null; // inputs for specific sector and all jobs
         List<CaseInput> inputsAJ = null; // inputs for all sectors specific jobs
         List<CaseInput> inputsSJ = null; // inputs for specific sectors specific jobs
-        PrintWriter oStream = null;
+
         String jobName = job.getName().replace(" ", "_");
 
         try {
@@ -1554,7 +1620,7 @@ public class ManagedCaseService {
             // ExportService exports = new ExportService(dbServerlocal, this.threadPool, this.sessionFactory);
             // Get case inputs (the datasets associated w/ the case)
             // All sectors, all jobs
-            inputsAA = this.getJobInputs(caseId, ManagedCaseService.ALL_JOB_ID, ManagedCaseService.ALL_SECTORS);
+            inputsAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS);
 
             // Exclude any inputs w/ environmental variable EMF_JOBHEADER
             List<CaseInput> exclInputs = this.excludeInputsEnv(inputsAA, "EMF_JOBHEADER");
@@ -1565,8 +1631,8 @@ public class ManagedCaseService {
 
             // Sector specific, all jobs
             Sector sector = job.getSector();
-            if (sector != ManagedCaseService.ALL_SECTORS) {
-                inputsSA = this.getJobInputs(caseId, ManagedCaseService.ALL_JOB_ID, sector);
+            if (sector != this.ALL_SECTORS) {
+                inputsSA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector);
 
                 // Exclude any inputs w/ environmental variable EMF_JOBHEADER
                 exclInputs = this.excludeInputsEnv(inputsSA, "EMF_JOBHEADER");
@@ -1576,7 +1642,7 @@ public class ManagedCaseService {
             }
 
             // All sectors, job specific
-            inputsAJ = this.getJobInputs(caseId, jobId, ManagedCaseService.ALL_SECTORS);
+            inputsAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS);
 
             // Exclude any inputs w/ environmental variable EMF_JOBHEADER
             exclInputs = this.excludeInputsEnv(inputsAJ, "EMF_JOBHEADER");
@@ -1595,63 +1661,55 @@ public class ManagedCaseService {
                 }
             }
 
-            // Write header to file:
+            // Get header String:
             if (headerInput != null) {
+                // Header string starts the job file content string
+
                 // Setup a line exporter for the EMF_JOBHEADER dataset and export to the file
                 // will close file, so need to reopen for appending, test that dbServer is closed
                 // headerInput.getDataset().s
-                LineExporter headerExporter = new LineExporter(headerInput.getDataset(), dbServerlineexporter,
-                        dbServerlineexporter.getSqlDataTypes(), new Integer(10000));
+                // LineExporter headerExporter = new LineExporter(headerInput.getDataset(), dbServerlineexporter,
+                // dbServerlineexporter.getSqlDataTypes(), new Integer(10000));
 
                 try {
-                    headerExporter.export(ofile);
+                    // headerExporter.export(ofile);
+
+                    // FIXME: Figure out how this will be implemented
+                    jobFileHeader = getJobFileHeader(headerInput);
+                    sbuf.append(jobFileHeader);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     log.error("Could not write EMF header to job script file, " + e.getMessage());
                     throw new EmfException("Could not write EMF header to job script file");
                 } finally {
-                    try {
-                        dbServerlineexporter.disconnect();
-                    } catch (Exception e) {
-                        throw new EmfException("dbServer error");
-                    }
-                }
-
-                // Setup output stream to append to already created file
-                try {
-                    oStream = new PrintWriter(new FileWriter(ofile, true));
-                } catch (Exception e) {
-                    throw new EmfException("IO error writing to job run file: " + ofile);
+                    // try {
+                    // dbServerlineexporter.disconnect();
+                    // } catch (Exception e) {
+                    // throw new EmfException("dbServer error");
+                    // }
                 }
 
             } else {
-
-                // setup new output stream to write to new file
-                try {
-                    oStream = new PrintWriter(new FileWriter(ofile));
-                } catch (Exception e) {
-                    throw new EmfException("IO error writing to job run file: " + ofile);
-                }
-
-                // print header info to job run file -- shell or program
-                oStream.println(this.runShell);
+                // Start the job file content string and append the end of line characters for this OS
+                sbuf.append(this.runShell + this.eolString);
             }
 
             // print job name to file
-            oStream.println();
-            oStream.println(this.runComment + " Job run file for job: " + jobName);
+            sbuf.append(eolString);
+            sbuf.append(this.runComment + " Job run file for job: " + jobName + eolString);
 
             /*
              * Define some EMF specific variables
              */
-            oStream.println();
+            sbuf.append(eolString);
 
-            oStream.println(this.runComment + " EMF specific variables");
-            oStream.println(shellSetenv("EMF_JOBID", String.valueOf(jobId)));
-            oStream.println(shellSetenv("EMF_JOBNAME", jobName));
-            oStream.println(shellSetenv("EMF_USER", user.getUsername()));
+            sbuf.append(this.runComment + " EMF specific variables" + eolString);
+            sbuf.append(shellSetenv("EMF_JOBID", String.valueOf(jobId)));
+            sbuf.append(shellSetenv("EMF_JOBNAME", jobName));
+            sbuf.append(shellSetenv("EMF_USER", user.getUsername()));
             // Generate and get a unique job key and write it to the script
             job.generateJobkey(user);
-            oStream.println(shellSetenv("EMF_JOBKEY", job.getJobkey()));
+            sbuf.append(shellSetenv("EMF_JOBKEY", job.getJobkey()));
 
             // Print the inputs to the file
 
@@ -1659,74 +1717,85 @@ public class ManagedCaseService {
              * loop over inputs and write Env variables and input (full name and path) to job run file, print comments
              */
             // All sectors and all jobs
-            oStream.println();
-            oStream.println(this.runComment + " Inputs -- for all sectors and all jobs");
-            for (CaseInput input : inputsAA) {
-                oStream.println(setenvInput(input, caseObj, exportService));
+            sbuf.append(eolString);
+            sbuf.append(this.runComment + " Inputs -- for all sectors and all jobs" + eolString);
+            if (inputsAA != null) {
+                for (CaseInput input : inputsAA) {
+                    sbuf.append(setenvInput(input, caseObj));
+                }
             }
 
             // Sector specific and all jobs
-            oStream.println();
-            oStream.println(this.runComment + " Inputs -- sector (" + sector + ") and all jobs");
-            for (CaseInput input : inputsSA) {
-                oStream.println(setenvInput(input, caseObj, exportService));
+            sbuf.append(eolString);
+            sbuf.append(this.runComment + " Inputs -- sector (" + sector + ") and all jobs" + eolString);
+            if (inputsSA != null) {
+                for (CaseInput input : inputsSA) {
+                    sbuf.append(setenvInput(input, caseObj));
+                }
             }
-
             // All sectors and specific job
-            oStream.println();
-            oStream.println(this.runComment + " Inputs -- for all sectors and job: " + job);
-            for (CaseInput input : inputsAJ) {
-                oStream.println(setenvInput(input, caseObj, exportService));
+            sbuf.append(eolString);
+            sbuf.append(this.runComment + " Inputs -- for all sectors and job: " + job + eolString);
+            if (inputsAJ != null) {
+                for (CaseInput input : inputsAJ) {
+                    sbuf.append(setenvInput(input, caseObj));
+                }
             }
-
             // Sector and Job specific
-            oStream.println();
-            oStream.println(this.runComment + " Inputs -- sector (" + sector + ") and job: " + job);
-            for (CaseInput input : inputsSJ) {
-                oStream.println(setenvInput(input, caseObj, exportService));
+            sbuf.append(eolString);
+            sbuf.append(this.runComment + " Inputs -- sector (" + sector + ") and job: " + job + eolString);
+            if (inputsSJ != null) {
+                for (CaseInput input : inputsSJ) {
+                    sbuf.append(setenvInput(input, caseObj));
+                }
             }
-
             /*
              * Get the parameters for this job in following order: all sectors, all jobs sector specific, all jobs all
              * sectors, job specific sector specific, job specific
              */
 
             // All sectors, all jobs
-            oStream.println();
-            oStream.println(this.runComment + " Parameters -- all sectors, all jobs ");
+            sbuf.append(eolString);
+            sbuf.append(this.runComment + " Parameters -- all sectors, all jobs " + eolString);
             CaseParameter[] parameters = this.getJobParameters(caseId, this.ALL_JOB_ID, this.ALL_SECTORS);
-            for (CaseParameter param : parameters) {
-                oStream.println(setenvParameter(param));
+            if (parameters != null) {
+                for (CaseParameter param : parameters) {
+                    sbuf.append(setenvParameter(param));
+                }
+
             }
 
             // Specific sector, all jobs
             if (sector != this.ALL_SECTORS) {
-                oStream.println();
-                oStream.println(this.runComment + " Parameters -- sectors (" + sector + "), all jobs ");
+                sbuf.append(eolString);
+                sbuf.append(this.runComment + " Parameters -- sectors (" + sector + "), all jobs " + eolString);
                 parameters = this.getJobParameters(caseId, this.ALL_JOB_ID, sector);
-                for (CaseParameter param : parameters) {
-                    oStream.println(setenvParameter(param));
+                if (parameters != null) {
+                    for (CaseParameter param : parameters) {
+                        sbuf.append(setenvParameter(param));
+                    }
                 }
             }
-
             // All sectors, specific job
-            oStream.println();
-            oStream.println(this.runComment + " Parameters -- all sectors, job: " + job);
+            sbuf.append(eolString);
+            sbuf.append(this.runComment + " Parameters -- all sectors, job: " + job + eolString);
             parameters = this.getJobParameters(caseId, jobId, this.ALL_SECTORS);
-            for (CaseParameter param : parameters) {
-                oStream.println(setenvParameter(param));
+            if (parameters != null) {
+                for (CaseParameter param : parameters) {
+                    sbuf.append(setenvParameter(param));
+                }
             }
-
             // Specific sector, specific job
             if (sector != this.ALL_SECTORS) {
-                oStream.println();
-                oStream.println(this.runComment + " Parameters -- sectors (" + sector + "), job: " + job);
+                sbuf.append(eolString);
+                sbuf.append(this.runComment + " Parameters -- sectors (" + sector + "), job: " + job + eolString);
                 parameters = this.getJobParameters(caseId, jobId, sector);
-                for (CaseParameter param : parameters) {
-                    oStream.println(setenvParameter(param));
+                if (parameters != null) {
+                    for (CaseParameter param : parameters) {
+                        sbuf.append(setenvParameter(param));
+                    }
                 }
             }
-
             // Getting the executable object from the job
             Executable execVal = job.getExecutable();
 
@@ -1737,35 +1806,99 @@ public class ManagedCaseService {
             String execName = execVal.getName();
 
             // executable full name and arguments
-            String execFull = execPath + System.getProperty("file.separator") + execName + " " + job.getArgs();
-
+            String execFull = execPath + System.getProperty("file.separator") + execName;
+            String execFullArgs = execFull + " " + job.getArgs() + eolString;
             // print executable
-            oStream.println();
-            oStream.println(this.runComment + " job executable");
-            oStream.println(execFull);
+            sbuf.append(eolString);
+            sbuf.append(this.runComment + " job executable" + eolString);
+            sbuf.append("$EMF_CLIENT -k $EMF_JOBKEY -x " + execFull + " -m \"Running top level script\""
+                    + eolString);
+            sbuf.append(execFullArgs);
 
             // add a test of the status and send info through the
             // command client -- should generalize so not csh specific
-            oStream.println("if ( $status != 0 ) then");
-            oStream.println("\t $EMF_CLIENT -k $EMF_JOBKEY -s 'Failed' -m \"ERROR running Job: $EMF_JOBNAME\"");
-            oStream.println("\t exit(1)");
-            oStream.println("else");
-            oStream.println("\t $EMF_CLIENT -k $EMF_JOBKEY -s 'Completed' -m \"Completed job: $EMF_JOBNAME\"");
-            oStream.println("endif");
-
-            // close output stream to file and make it executable by everyone
-            oStream.close();
-            ofile.setExecutable(true, false);
+            sbuf.append("if ( $status != 0 ) then" + eolString);
+            sbuf.append("\t $EMF_CLIENT -k $EMF_JOBKEY -s 'Failed' -m \"ERROR running Job: $EMF_JOBNAME\" -t 'e' "
+                    + eolString);
+            sbuf.append("\t exit(1)" + eolString);
+            sbuf.append("else" + eolString);
+            sbuf.append("\t $EMF_CLIENT -k $EMF_JOBKEY -s 'Completed' -m \"Completed job: $EMF_JOBNAME\"" + eolString);
+            sbuf.append("endif" + eolString);
 
         } finally {
             // close the db server
-            try {
-                dbServerlocal.disconnect();
-            } catch (Exception e) {
-                throw new EmfException("dbServer error");
-            }
+            // try {
+            // dbServerlocal.disconnect();
+            // } catch (Exception e) {
+            // throw new EmfException("dbServer error");
+            // }
 
         }
+
+        // Send back the contents of jobFileHeader and jobContent string for job file
+        return jobFileHeader + sbuf.toString();
+    }// /end of createJobFileContent()
+
+    private String getJobFileHeader(CaseInput headerInput) {
+        // NOTE Auto-generated method stub
+        return "";
+    }
+
+    private String getJobFileName(CaseJob job) throws EmfException {
+        /*
+         * Creates the File name that corresponds to the job script file name.
+         * 
+         * Format: <jobname>_<case_abbrev>_<datestamp>.csh
+         */
+        String dateStamp = EmfDateFormat.format_YYYYMMDDHHMMSS(new Date());
+        String jobName = job.getName().replace(" ", "_");
+        Case caseObj = this.getCase(job.getCaseId());
+
+        // Get case abbreviation, if no case abbreviation construct one from id
+        String defaultAbbrev = "case" + job.getCaseId();
+        String caseAbbrev = (caseObj.getAbbreviation() == null) ? defaultAbbrev : caseObj.getAbbreviation().getName();
+
+        // Test ouput directory to place job script
+        String outputFileDir = caseObj.getOutputFileDir();
+        if ((outputFileDir == null) || (outputFileDir.equals(""))) {
+            throw new EmfException("Output job script directory must be set to run job: " + job.getName());
+        }
+
+        String fileName = jobName + "_" + caseAbbrev + "_" + dateStamp + this.runSuffix;
+        fileName = outputFileDir + System.getProperty("file.separator") + fileName;
+        return fileName;
+    }
+
+    private String getLog(String jobFileName) throws EmfException {
+        /*
+         * From the job script name, it creates the name of corresponding log file. It also checks that an appropriate
+         * log directory exists.
+         */
+
+        File file = new File(jobFileName);
+
+        // Create a log file name by replacing the suffix of the job
+        // of the job file w/ .log
+        String logFileName = jobFileName.replaceFirst(this.runSuffix, ".log");
+
+        // Check if logs dir (jobpath/logs) exists, if not create
+        File logDir = new File(file.getParent() + System.getProperty("file.separator") + "logs");
+        if (!(logDir.isDirectory())) {
+            // Need to create the directory
+            if (!(logDir.mkdir())) {
+                throw new EmfException("Error creating job log directory: " + logDir);
+            }
+        }
+
+        // Make directory writable by everyone
+        if (!logDir.setWritable(true, false)) {
+            throw new EmfException("Error changing job log directory's write permissions: " + logDir);
+        }
+
+        // Create the logFile full name
+        logFileName = logDir + System.getProperty("file.separator") + logFileName;
+
+        return logFileName;
 
     }
 
@@ -1789,7 +1922,7 @@ public class ManagedCaseService {
             message.setReceivedTime(new Date());
             String status = message.getStatus();
             String jobStatus = job.getRunstatus().getName();
-            
+
             if (!status.isEmpty() && !jobStatus.equalsIgnoreCase(status)) {
                 job.setRunstatus(dao.getJobRunStatuse(status, session));
                 dao.updateCaseJob(job, session);
@@ -1802,6 +1935,7 @@ public class ManagedCaseService {
 
             return 0;
         } catch (Exception e) {
+            e.printStackTrace();
             log.error(e.getMessage());
             throw new EmfException(e.getMessage());
         } finally {
@@ -1818,9 +1952,10 @@ public class ManagedCaseService {
                 msgs = dao.getJobMessages(caseId, session);
             else
                 msgs = dao.getJobMessages(caseId, jobId, session);
-            
+
             return msgs.toArray(new JobMessage[0]);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error(e.getMessage());
             throw new EmfException(e.getMessage());
         } finally {

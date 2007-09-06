@@ -8,7 +8,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public abstract class RunManager {
+public abstract class TaskManager {
     static int refCount = 0;
 
     protected final int poolSize = 4;
@@ -39,7 +39,15 @@ public abstract class RunManager {
     public synchronized static int getSizeofTaskQueue() {
         return taskQueue.size();
     }
+    
+    public synchronized static int getSizeofWaitTable(){
+        return waitTable.size();
+    }
 
+    public synchronized static int getSizeofRunTable(){
+        return runTable.size();
+    }
+    
     public static synchronized void shutDown() {
         if (DebugLevels.DEBUG_1)
             System.out.println("Shutdown called on Task Manager");
@@ -76,14 +84,14 @@ public abstract class RunManager {
     }
 
     public static synchronized void setIdleTime(long idleTime) {
-        RunManager.idleTime = idleTime;
+        TaskManager.idleTime = idleTime;
     }
 
     @Override
     protected synchronized void finalize() throws Throwable {
-        if (DebugLevels.DEBUG_0) System.out.println("Finalizing RunManager # of taskmanagers= " + RunManager.refCount);
+        if (DebugLevels.DEBUG_0) System.out.println("Finalizing TaskManager # of taskmanagers= " + TaskManager.refCount);
 
-        RunManager.shutDown();
+        TaskManager.shutDown();
         //consumer.finalize();
         super.finalize();
     }

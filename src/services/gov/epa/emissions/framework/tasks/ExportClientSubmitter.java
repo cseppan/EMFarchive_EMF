@@ -15,11 +15,11 @@ public class ExportClientSubmitter extends ExportSubmitter {
             System.out.println("Export Client @@@@@ THREAD ID: " + Thread.currentThread().getId());
     }
 
-    public synchronized void callbackFromRunManager(String taskId, String status, String mesg) {
+    public synchronized void callbackFromTaskManager(String taskId, String status, String mesg) {
         if (DebugLevels.DEBUG_0)
             System.out
                     .println(">>>>>>>> ExportClientSubmitter::callbackFromTaskManager id= " + submitterId
-                            + " got callback from RunManager for Task: " + taskId + " status= " + status
+                            + " got callback from TaskManager for Task: " + taskId + " status= " + status
                             + " message= " + mesg);
 
 //        int statis = -99;
@@ -129,7 +129,7 @@ public class ExportClientSubmitter extends ExportSubmitter {
 //        }
 
         if (DebugLevels.DEBUG_0)
-            System.out.println(">>>>>>>> Submitter: " + submitterId + " EXITING callback from RunManager for Task: "
+            System.out.println(">>>>>>>> Submitter: " + submitterId + " EXITING callback from TaskManager for Task: "
                     + taskId + " status= " + status + " message= " + mesg);
 
     }

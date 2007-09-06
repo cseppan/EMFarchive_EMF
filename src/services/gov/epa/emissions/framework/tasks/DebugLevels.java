@@ -9,6 +9,8 @@ public class DebugLevels {
 	public static final boolean DEBUG_4 = true;
     public static final boolean DEBUG_5 = true;
     public static final boolean DEBUG_6 = true;
-    
+    public static final boolean DEBUG_7 = true;
+    public static final boolean DEBUG_8 = true;
+    public static final boolean DEBUG_9 = false;
 
 }

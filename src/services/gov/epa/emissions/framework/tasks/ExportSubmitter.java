@@ -32,7 +32,7 @@ public abstract class ExportSubmitter implements TaskSubmitter {
 
     protected Hashtable<String, ExportTaskStatus> submittedTable = null;
 
-    // protected ExportTaskRunManager taskManager = null;
+    // protected ExportTaskManager taskManager = null;
 
     public ExportSubmitter() {
         myTag();
@@ -75,7 +75,7 @@ public abstract class ExportSubmitter implements TaskSubmitter {
         submittedTable.put(tsk.getTaskId(), ets);
         if (DebugLevels.DEBUG_6) System.out.println("Size of submitted table after ETS added= " + submittedTable.size());   
         
-        // Add this task to exportTasks queue to prepare for the submit to the RunManager
+        // Add this task to exportTasks queue to prepare for the submit to the TaskManager
         exportTasks.add(task);
     }
 
@@ -96,11 +96,11 @@ public abstract class ExportSubmitter implements TaskSubmitter {
 
         if (DebugLevels.DEBUG_0)
             System.out.println("In submitter # of elements in exportTasks= " + this.exportTasks.size());
-        this.submitTasksToRunManager(submitterId, exportTasks);
+        this.submitTasksToTaskManager(submitterId, exportTasks);
 
     }
 
-    public synchronized void submitTasksToRunManager(String submitterId, ArrayList<Runnable> tasks) {
+    public synchronized void submitTasksToTaskManager(String submitterId, ArrayList<Runnable> tasks) {
         if (DebugLevels.DEBUG_0)
             System.out.println("In submitter::submitTasksToTaskManager= " + this.getSubmitterId());
         if (DebugLevels.DEBUG_0)
@@ -113,7 +113,7 @@ public abstract class ExportSubmitter implements TaskSubmitter {
 //            System.out.println("SUBMITTER::submittedtasks before ADD: " + this.submitterId + " has task count= "
 //                    + this.submittedTasks.size());
 
-        RunManagerFactory.getExportTaskRunManager().addTasks(tasks);
+        TaskManagerFactory.getExportTaskManager().addTasks(tasks);
 
         // FIXME: May not need to do this next step since submitted Table is uptodate
 //        submittedTasks.addAll(tasks);
@@ -146,7 +146,7 @@ public abstract class ExportSubmitter implements TaskSubmitter {
     }
 
     public synchronized void deregisterSubmitterFromRunManager(TaskSubmitter ts) {
-        RunManager.deregisterSubmitter(ts);
+        TaskManager.deregisterSubmitter(ts);
     }
 
     protected synchronized void setStatus(User user, StatusDAO statusServices, String message) {
