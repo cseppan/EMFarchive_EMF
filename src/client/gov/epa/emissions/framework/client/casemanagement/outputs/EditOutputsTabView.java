@@ -9,6 +9,4 @@ public interface EditOutputsTabView {
 
     void refresh();
     
-    void saveCaseOutputFileDir();
-
 }

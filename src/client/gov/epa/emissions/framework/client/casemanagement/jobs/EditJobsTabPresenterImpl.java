@@ -29,9 +29,10 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     }
 
     public void doSave() {
+        view.saveCaseOutputFileDir();
         view.refresh();
     }
-
+    
     public void addNewJobDialog(NewJobView dialog) {
         dialog.register(this);
         dialog.display();

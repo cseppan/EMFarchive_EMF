@@ -4,19 +4,26 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.commons.gui.buttons.RunButton;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileInfo;
+import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
@@ -31,8 +38,10 @@ import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 
-public class EditJobsTab extends JPanel implements EditJobsTabView {
+public class EditJobsTab extends JPanel implements EditJobsTabView,RefreshObserver {
 
     private EmfConsole parentConsole;
 
@@ -47,6 +56,10 @@ public class EditJobsTab extends JPanel implements EditJobsTabView {
     private JPanel tablePanel;
 
     private MessagePanel messagePanel;
+    
+    private ManageChangeables changeables;
+
+    private TextField outputDir;
 
     private EmfSession session;
 
@@ -59,12 +72,16 @@ public class EditJobsTab extends JPanel implements EditJobsTabView {
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;
         this.session = session;
+        this.changeables = changeables;
+        
         super.setLayout(new BorderLayout());
     }
 
     public void display(EmfSession session, Case caseObj, EditJobsTabPresenter presenter) {
         super.removeAll();
-
+        this.outputDir = new TextField("outputdir", 30);
+        outputDir.setText(caseObj.getOutputFileDir());
+        this.changeables.addChangeable(outputDir);
         this.caseObj = caseObj;
         this.presenter = presenter;
 
@@ -74,6 +91,10 @@ public class EditJobsTab extends JPanel implements EditJobsTabView {
             messagePanel.setError("Cannot retrieve all case jobs.");
         }
 
+        kickPopulateThread();
+    }
+
+    private void kickPopulateThread() {
         Thread populateThread = new Thread(new Runnable() {
             public void run() {
                 retrieveJobs();
@@ -88,24 +109,73 @@ public class EditJobsTab extends JPanel implements EditJobsTabView {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             doRefresh(presenter.getCaseJobs());
             messagePanel.clear();
-            setCursor(Cursor.getDefaultCursor());
         } catch (Exception e) {
             messagePanel.setError("Cannot retrieve all case jobs.");
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
         }
     }
 
     private void doRefresh(CaseJob[] jobs) throws Exception {
         super.removeAll();
+        String outputFileDir = caseObj.getOutputFileDir();
+        
+        if (!outputDir.getText().equalsIgnoreCase(outputFileDir))
+            outputDir.setText(outputFileDir);
+        
         super.add(createLayout(jobs, parentConsole), BorderLayout.CENTER);
     }
 
     private JPanel createLayout(CaseJob[] jobs, EmfConsole parentConsole) throws Exception {
         final JPanel layout = new JPanel(new BorderLayout());
 
+        layout.add(createFolderPanel(), BorderLayout.NORTH);
         layout.add(tablePanel(jobs, parentConsole), BorderLayout.CENTER);
         layout.add(controlPanel(), BorderLayout.PAGE_END);
 
         return layout;
+    }
+    
+    public JPanel createFolderPanel() {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        layoutGenerator.addLabelWidgetPair("Output Folder:", getFolderChooserPanel(outputDir, "Select the base Output Folder for the Case"), panel);
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+                5, 5, // initialX, initialY
+                5, 5);// xPad, yPad
+
+        return panel;
+    }
+
+    private JPanel getFolderChooserPanel(final JTextField dir, final String title) {
+        Button browseButton = new BrowseButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                selectFolder(dir, title);
+            }
+        });
+        JPanel folderPanel = new JPanel(new BorderLayout(2,0));
+        folderPanel.add(dir,BorderLayout.LINE_START);
+        folderPanel.add(browseButton, BorderLayout.LINE_END);
+
+        return folderPanel;
+    }
+
+    private void selectFolder(JTextField dir, String title) {
+        EmfFileInfo initDir = new EmfFileInfo(dir.getText(), true, true);
+
+        EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
+        chooser.setTitle(title);
+        int option = chooser.showDialog(parentConsole, "Select a folder");
+
+        EmfFileInfo file = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;
+        if (file == null)
+            return;
+
+        if (file.isDirectory()) {
+            caseObj.setOutputFileDir(file.getAbsolutePath());
+            dir.setText(file.getAbsolutePath());
+        }
     }
 
     private JPanel tablePanel(CaseJob[] jobs, EmfConsole parentConsole) {
@@ -321,6 +391,18 @@ public class EditJobsTab extends JPanel implements EditJobsTabView {
 
     public CaseJob[] caseJobs() {
         return tableData.sources();
+    }
+    
+    public void saveCaseOutputFileDir() {
+        caseObj.setOutputFileDir(outputDir.getText());
+    }
+
+    public void doRefresh() throws EmfException {
+        try {
+            kickPopulateThread();
+        } catch (RuntimeException e) {
+            throw new EmfException(e.getMessage());
+        }
     }
 
 }

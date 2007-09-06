@@ -18,6 +18,8 @@ public interface EditJobsTabView {
 
     void clearMessage();
     
+    void saveCaseOutputFileDir();
+    
 //    void notifychanges();
 
 }

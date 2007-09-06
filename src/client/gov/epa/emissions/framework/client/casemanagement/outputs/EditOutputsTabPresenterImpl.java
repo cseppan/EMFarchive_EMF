@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement.outputs;
 
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 
 public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
@@ -21,8 +22,10 @@ public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
         view.display(caseObj, this, session);
     }
 
-    public void doSave() {
-        view.saveCaseOutputFileDir();
+    public void doSave() throws EmfException {
+        // NOTE Auto-generated method stub
+        if (false)
+            throw new EmfException("");
     }
 
 }

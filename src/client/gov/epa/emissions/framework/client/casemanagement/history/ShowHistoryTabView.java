@@ -6,8 +6,6 @@ public interface ShowHistoryTabView {
 
     void display(EmfSession session, int caseId, ShowHistoryTabPresenter presenter);
 
-    void refresh();
-    
     int numberOfRecord();
 
     void clearMessage();

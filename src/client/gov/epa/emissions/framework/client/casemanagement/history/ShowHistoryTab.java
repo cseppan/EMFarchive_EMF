@@ -4,9 +4,11 @@ import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
@@ -16,7 +18,7 @@ import java.awt.Dimension;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class ShowHistoryTab extends JPanel implements ShowHistoryTabView {
+public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, RefreshObserver {
     private EmfConsole parentConsole;
 
     private ShowHistoryTabPresenter presenter;
@@ -28,7 +30,7 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView {
     private SortFilterSelectModel selectModel;
 
     private JPanel tablePanel;
-
+    
     private MessagePanel messagePanel;
 
     private EmfSession session;
@@ -53,7 +55,11 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView {
             messagePanel.setError("Cannot retrieve all case histories. " + e.getMessage());
         }
 
-        Thread populateThread = new Thread(new Runnable(){
+        kickPopulateThread();
+    }
+
+    private void kickPopulateThread() {
+        Thread populateThread = new Thread(new Runnable() {
             public void run() {
                 retrieveJobMsgs();
             }
@@ -65,7 +71,7 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView {
         try {
             messagePanel.setMessage("Please wait while retrieving all case histories...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            doRefresh(presenter.getJobMessages(this.caseId));
+            refreshTab(presenter.getJobMessages(this.caseId));
             messagePanel.clear();
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,7 +81,7 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView {
         }
     }
 
-    private void doRefresh(JobMessage[] msgs) throws Exception {
+    private void refreshTab(JobMessage[] msgs) throws Exception {
         super.removeAll();
         super.add(createLayout(msgs, parentConsole), BorderLayout.CENTER);
     }
@@ -111,22 +117,21 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView {
         return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
     }
 
-    public void refresh() {
-        // note that this will get called when the case is save
-        try {
-            if (tableData != null) // it's still null if you've never displayed this tab
-                doRefresh(tableData.sources());
-        } catch (Exception e) {
-            messagePanel.setError("Cannot refresh current tab. " + e.getMessage());
-        }
-    }
-
     public int numberOfRecord() {
         return tableData.sources().length;
     }
 
     public void clearMessage() {
         messagePanel.clear();
+    }
+
+    public void doRefresh() throws EmfException {
+        try {
+            kickPopulateThread();
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+
     }
 
 }

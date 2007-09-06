@@ -28,7 +28,7 @@ public class ShowHistoryTabPresenter {
     }
 
     public void doSave() {
-        view.refresh();
+        //doesn't need to save anything
     }
 
     private CaseService service() {

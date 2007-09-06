@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
@@ -31,7 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class EditParametersTab extends JPanel implements EditCaseParametersTabView {
+public class EditParametersTab extends JPanel implements EditCaseParametersTabView, RefreshObserver {
 
     private EmfConsole parentConsole;
 
@@ -53,8 +54,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
     private EmfSession session;
 
-    public EditParametersTab(EmfConsole parentConsole, MessagePanel messagePanel,
-            DesktopManager desktopManager) {
+    public EditParametersTab(EmfConsole parentConsole, MessagePanel messagePanel, DesktopManager desktopManager) {
         super.setName("editParametersTab");
         this.parentConsole = parentConsole;
         this.messagePanel = messagePanel;
@@ -76,15 +76,19 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             messagePanel.setError("Cannot retrieve all case parameters.");
         }
 
+        kickPopulateThread();
+    }
+
+    private void kickPopulateThread() {
         Thread populateThread = new Thread(new Runnable() {
             public void run() {
                 retrieveParams();
             }
         });
-        
+
         populateThread.start();
     }
-    
+
     public void retrieveParams() {
         try {
             messagePanel.setMessage("Please wait while retrieving all case parameters...");
@@ -176,7 +180,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         });
         edit.setMargin(insets);
         container.add(edit);
-        
+
         Button copy = new CopyButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 //
@@ -283,6 +287,14 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
     private void setMessage(String msg) {
         messagePanel.setError(msg);
+    }
+
+    public void doRefresh() throws EmfException {
+        try {
+            kickPopulateThread();
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
     }
 
 }

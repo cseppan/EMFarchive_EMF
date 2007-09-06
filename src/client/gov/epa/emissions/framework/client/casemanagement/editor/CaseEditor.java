@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.ErrorPanel;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -43,6 +44,10 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
     private EmfConsole parentConsole;
     
+    private String tabTitle;
+    
+    private JTabbedPane tabbedPane;
+    
     public CaseEditor(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
         super("Case Editor", new Dimension(750, 580), desktopManager);
         this.session = session;
@@ -51,7 +56,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     }
 
     private JTabbedPane createTabbedPane(Case caseObj, MessagePanel messagePanel) {
-        final JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Summary", createSummaryTab(caseObj, messagePanel));
         tabbedPane.addTab("Jobs", createJobsTab());
@@ -64,7 +69,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         tabbedPane.addChangeListener(new ChangeListener(){
             public void stateChanged(ChangeEvent e) {
                 try {
-                    loadComponents(tabbedPane);
+                    loadComponents();
                 } catch (EmfException exc) {
                     showError("Could not load component: "  + tabbedPane.getSelectedComponent().getName());
                 }
@@ -74,9 +79,9 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         return tabbedPane;
     }
     
-    protected void loadComponents(JTabbedPane tabbedPane) throws EmfException {
+    protected void loadComponents() throws EmfException {
         int tabIndex = tabbedPane.getSelectedIndex();
-        String tabTitle = tabbedPane.getTitleAt(tabIndex);
+        tabTitle = tabbedPane.getTitleAt(tabIndex);
         presenter.doLoad(tabTitle);
     }
 
@@ -164,6 +169,18 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private JPanel createControlPanel() {
         JPanel buttonsPanel = new JPanel();
 
+        Button refresh = new Button("Refresh", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    refreshCurrentTab();
+                } catch (EmfException e) {
+                    showError(e.getMessage());
+                }
+            }
+        });
+        buttonsPanel.add(refresh);
+        refresh.setToolTipText("Refresh only the current tab with focus.");
+
         Button save = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doSave();
@@ -171,7 +188,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         });
         buttonsPanel.add(save);
         save.setToolTipText(
-                "Saves only the information on the Summary tab and the input and output folders.");
+        "Saves only the information on the Summary tab and the input and output folders.");
 
         Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -182,6 +199,15 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         buttonsPanel.add(close);
 
         return buttonsPanel;
+    }
+
+    private void refreshCurrentTab() throws EmfException {
+        RefreshObserver tab = (RefreshObserver)tabbedPane.getSelectedComponent();
+        try {
+            tab.doRefresh();
+        } catch (Exception e) {
+            throw new EmfException(tabbedPane.getSelectedComponent().getName() + e.getMessage());
+        }
     }
 
     public void observe(CaseEditorPresenter presenter) {

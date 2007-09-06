@@ -4,23 +4,19 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
-import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
-import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.basic.EmfFileInfo;
-import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
-import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -30,28 +26,20 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
 
-public class EditOutputsTab extends JPanel implements EditOutputsTabView {
+public class EditOutputsTab extends JPanel implements EditOutputsTabView, RefreshObserver {
 
     private EmfConsole parentConsole;
 
     private EditOutputsTabPresenter presenter;
 
-    private Case caseObj;
-
     private OutputsTableData tableData;
+
+    private ManageChangeables changeables;
 
     private SortFilterSelectModel selectModel;
 
     private JPanel tablePanel;
-
-    private ManageChangeables changeables;
-
-    private TextField outputDir;
-    
-    private EmfSession session;
 
     public EditOutputsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager) {
@@ -59,24 +47,16 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
         this.parentConsole = parentConsole;
         this.changeables = changeables;
 
-        this.outputDir = new TextField("outputdir", 30);
-        this.changeables.addChangeable(outputDir);
-        
         super.setLayout(new BorderLayout());
     }
 
     public void display(Case caseObj, EditOutputsTabPresenter presenter, EmfSession session) {
         super.removeAll();
-        outputDir.setText(caseObj.getOutputFileDir());
         super.add(createLayout(new CaseInput[0], presenter, parentConsole), BorderLayout.CENTER);
-        this.caseObj = caseObj;
         this.presenter = presenter;
-        this.session = session;
     }
 
     private void doRefresh(CaseInput[] inputs) {
-        outputDir.setText(caseObj.getOutputFileDir());
-
         super.removeAll();
         super.add(createLayout(inputs, presenter, parentConsole), BorderLayout.CENTER);
     }
@@ -84,7 +64,6 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
     private JPanel createLayout(CaseInput[] inputs, EditOutputsTabPresenter presenter, EmfConsole parentConsole) {
         JPanel layout = new JPanel(new BorderLayout());
 
-        layout.add(createFolderPanel(), BorderLayout.NORTH);
         layout.add(tablePanel(inputs, parentConsole), BorderLayout.CENTER);
         layout.add(controlPanel(presenter), BorderLayout.PAGE_END);
 
@@ -108,48 +87,6 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
         JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
         sortFilterPanel.setPreferredSize(new Dimension(450, 60));
         return scrollPane;
-    }
-
-    public JPanel createFolderPanel() {
-        JPanel panel = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-
-        layoutGenerator.addLabelWidgetPair("Output Folder:", getFolderChooserPanel(outputDir, "Select the base Output Folder for the Case"), panel);
-        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-                5, 5, // initialX, initialY
-                5, 5);// xPad, yPad
-
-        return panel;
-    }
-
-    private JPanel getFolderChooserPanel(final JTextField dir, final String title) {
-        Button browseButton = new BrowseButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent arg0) {
-                selectFolder(dir, title);
-            }
-        });
-        JPanel folderPanel = new JPanel(new BorderLayout(2,0));
-        folderPanel.add(dir,BorderLayout.LINE_START);
-        folderPanel.add(browseButton, BorderLayout.LINE_END);
-
-        return folderPanel;
-    }
-
-    private void selectFolder(JTextField dir, String title) {
-        EmfFileInfo initDir = new EmfFileInfo(dir.getText(), true, true);
-
-        EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
-        chooser.setTitle(title);
-        int option = chooser.showDialog(parentConsole, "Select a folder");
-
-        EmfFileInfo file = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;
-        if (file == null)
-            return;
-
-        if (file.isDirectory()) {
-            caseObj.setOutputFileDir(file.getAbsolutePath());
-            dir.setText(file.getAbsolutePath());
-        }
     }
 
     private JPanel controlPanel(final EditOutputsTabPresenter presenter) {
@@ -211,8 +148,9 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView {
         doRefresh(tableData.sources());
     }
 
-    public void saveCaseOutputFileDir() {
-        caseObj.setOutputFileDir(outputDir.getText());
+    public void doRefresh() throws EmfException {
+        if (false)
+            throw new EmfException("under construction...");
     }
 
 }

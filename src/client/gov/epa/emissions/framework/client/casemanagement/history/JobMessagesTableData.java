@@ -101,16 +101,16 @@ public class JobMessagesTableData extends ChangeableTableData {
     }
 
     public JobMessage[] sources() {
-        List<Row> sources = sourcesList();
+        List<JobMessage> sources = sourcesList();
         return sources.toArray(new JobMessage[0]);
     }
 
-    private List<Row> sourcesList() {
-        List<Row> sources = new ArrayList<Row>();
+    private List<JobMessage> sourcesList() {
+        List<JobMessage> sources = new ArrayList<JobMessage>();
         
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             ViewableRow row = (ViewableRow) iter.next();
-            sources.add((Row)row.source());
+            sources.add((JobMessage)row.source());
         }
 
         return sources;

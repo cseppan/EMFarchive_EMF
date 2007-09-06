@@ -27,6 +27,7 @@ import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -47,7 +48,7 @@ import javax.swing.SpringLayout;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummaryTabView {
+public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummaryTabView, RefreshObserver {
 
     private Case caseObj;
 
@@ -130,11 +131,11 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private EditCaseSummaryTabPresenter presenter;
 
     private EmfConsole parentConsole;
-    
+
     private MessagePanel messagePanel;
 
-    public EditableCaseSummaryTab(Case caseObj, MessagePanel messagePanel, EmfSession session, ManageChangeables changeablesList,
-            EmfConsole parentConsole) {
+    public EditableCaseSummaryTab(Case caseObj, MessagePanel messagePanel, EmfSession session,
+            ManageChangeables changeablesList, EmfConsole parentConsole) {
         super.setName("summary");
         this.caseObj = caseObj;
         this.session = session;
@@ -451,7 +452,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private void addPopupMenuListener(final JComboBox box, final String toget) {
-        box.addPopupMenuListener(new PopupMenuListener(){
+        box.addPopupMenuListener(new PopupMenuListener() {
             public void popupMenuCanceled(PopupMenuEvent event) {
                 // NOTE Auto-generated method stub
             }
@@ -475,43 +476,43 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     protected Object[] getAllObjects(String toget) throws EmfException {
         if (toget.equals("projects"))
             return new Projects(session.dataCommonsService().getProjects()).names();
-        
+
         if (toget.equals("runmodels"))
             return new ModelToRuns(session, session.caseService().getModelToRuns()).getAll();
-        
+
         if (toget.equals("modregions"))
             return new Regions(session.dataCommonsService().getRegions()).names();
-        
+
         if (toget.equals("gridreslns"))
             return new GridResolutions(session, session.caseService().getGridResolutions()).getAll();
-        
+
         if (toget.equals("contrlregions"))
             return new Regions(session.dataCommonsService().getRegions()).names();
-        
+
         if (toget.equals("abbrs"))
             return new Abbreviations(session.caseService().getAbbreviations()).names();
-        
+
         if (toget.equals("aqmodels"))
             return new AirQualityModels(session.caseService().getAirQualityModels()).names();
-        
+
         if (toget.equals("categories"))
             return new CaseCategories(session.caseService().getCaseCategories()).names();
-        
+
         if (toget.equals("emisyears"))
             return new EmissionsYears(session.caseService().getEmissionsYears()).names();
-        
+
         if (toget.equals("grids"))
             return new Grids(session.caseService().getGrids()).names();
-        
+
         if (toget.equals("meteoyears"))
             return new MeteorlogicalYears(session.caseService().getMeteorlogicalYears()).names();
-        
+
         if (toget.equals("speciations"))
             return new Speciations(session.caseService().getSpeciations()).all();
-        
+
         return null;
     }
-    
+
     private ComboBox runStatus() {
         runStatusCombo = new ComboBox(runStatuses.all());
         runStatusCombo.setPreferredSize(defaultDimension);
@@ -644,6 +645,11 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private void refresh() {
         super.revalidate();
+    }
+
+    public void doRefresh() throws EmfException {
+        if (false)
+            throw new EmfException("Nothing to update since case object is locked.");
     }
 
 }
