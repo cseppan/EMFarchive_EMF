@@ -11,6 +11,9 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
+import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
+import gov.epa.emissions.framework.services.cost.EquationType;
+import gov.epa.emissions.framework.services.cost.EquationTypeVariable;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -19,7 +22,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.hibernate.Session;
 
@@ -40,6 +45,8 @@ public class ControlMeasuresExporter implements Exporter {
     private String[] cmAbbrevSccs;
 
     private long exportedLinesCount = 0;
+    
+//    private EquationTypeMap equationTypeMap;
 
     public ControlMeasuresExporter(File folder, String prefix, ControlMeasure[] controlMeasures, String[] sccs,
             User user, HibernateSessionFactory factory) {
@@ -50,6 +57,7 @@ public class ControlMeasuresExporter implements Exporter {
         this.factory = factory;
         this.cmAbbrevSccs = sccs;
         this.delimiter = ",";
+ //       this.equationTypeMap = new EquationTypeMap(getEquationTypes());
     }
 
     public void run() throws ExporterException {
@@ -75,8 +83,60 @@ public class ControlMeasuresExporter implements Exporter {
         writeSummaryFile();
         writeEfficiencyFile();
         writeSccFile();
+        writeEquationFile();
     }
 
+    private void writeEquationFile() throws IOException {
+        
+        PrintWriter equationWriter = openExportFile("_equation.csv");
+        CMEquationFileFormat fileFormat = new CMEquationFileFormat();
+        String[] colNames = fileFormat.cols();
+        
+        for (int i = 0; i < colNames.length; i++) {
+            if (i == colNames.length - 1) {
+                equationWriter.write(colNames[i]);
+                break;
+            }
+            
+            equationWriter.write(colNames[i] + delimiter);
+        }
+        
+        equationWriter.write(System.getProperty("line.separator"));
+        
+        for (int j = 0; j < controlMeasures.length; j++) {
+            if (controlMeasures[j].getEquations().length != 0) {
+                equationWriter.write(equationRecord(controlMeasures[j], fileFormat.cols().length));
+                equationWriter.write(System.getProperty("line.separator"));
+            }
+        }
+
+        equationWriter.close();
+    }
+    
+    private String equationRecord(ControlMeasure measure, int size) {
+        List list=new ArrayList(size);
+         
+        String name = measure.getName();
+        list.add(0,name);
+        
+        ControlMeasureEquation cMequation[]=measure.getEquations();
+        EquationType equationType=cMequation[0].getEquationType();
+        list.add(1,equationType.getName());
+        
+        for (int k=0; k< cMequation.length; k++){
+            EquationTypeVariable typeVariable=cMequation[k].getEquationTypeVariable();
+            if (typeVariable!=null)
+                list.add(typeVariable.getFileColPosition()+1, cMequation[k].getValue());         
+        }       
+        
+        String equationRecord = list.get(0) + delimiter;
+        for (int i=1; i<size-1; i++)
+            equationRecord += list.get(i) + delimiter; 
+        equationRecord += list.get(size-1) + delimiter; 
+        return equationRecord; 
+    }
+    
+        
     private void writeSummaryFile() throws IOException {
         PrintWriter summaryWriter = openExportFile("_summary.csv");
         CMSummaryFileFormat fileFormat = new CMSummaryFileFormat();
@@ -253,5 +313,17 @@ public class ControlMeasuresExporter implements Exporter {
     public long getExportedLinesCount() {
         return this.exportedLinesCount;
     }
+    
+//    private EquationType[] getEquationTypes() throws EmfException {
+//        Session session = factory.getSession();
+//        try {
+//            List<EquationType> all = new ControlMeasureDAO().getEquationTypes(session);
+//            return all.toArray(new EquationType[0]);
+//        } catch (RuntimeException e) {
+//            throw new EmfException("Could not retrieve control measures Equation Types.");
+//        } finally {
+//            session.close();
+//        }
+//    }
 
 }
