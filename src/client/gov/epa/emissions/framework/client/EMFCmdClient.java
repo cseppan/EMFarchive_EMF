@@ -30,8 +30,8 @@ public class EMFCmdClient {
             return;
         }
 
-        if (!options.contains("-k") || !options.contains("-t")) {
-            System.out.println("Please specify required options '-k' and '-t'.");
+        if (!options.contains("-k")) {
+            System.out.println("Please specify required options '-k'.");
             displayHelp();
             return;
         }
@@ -39,15 +39,23 @@ public class EMFCmdClient {
         int keyIndex = options.indexOf("-k");
         int typeIndex = options.indexOf("-t");
         String keyString = options.get(++keyIndex);
-        String typeString = options.get(++typeIndex);
+        String typeString = (typeIndex < 0) ? "" : options.get(++typeIndex);
 
         if (keyString.startsWith("-")) {
             System.out.println("Please specify a correct jobkey.");
             return;
         }
 
-        if (!typeString.equalsIgnoreCase("i") && !typeString.equalsIgnoreCase("e") && !typeString.equalsIgnoreCase("w")) {
-            System.out.println("Please specify a correct message type - i (info), e (error), w (warning).");
+        String msgTypeError = "Please specify a correct message type - i (info), e (error), w (warning).";
+        
+        if (typeString != null && !typeString.isEmpty() && typeString.startsWith("-")) {
+            System.out.println(msgTypeError);
+            return;
+        }
+
+        if (typeString != null && !typeString.isEmpty() && !typeString.equalsIgnoreCase("i")
+                && !typeString.equalsIgnoreCase("e") && !typeString.equalsIgnoreCase("w")) {
+            System.out.println(msgTypeError);
             return;
         }
 
@@ -90,7 +98,7 @@ public class EMFCmdClient {
         jobMsg.setExecName(execPath.isEmpty() ? "" : execPath.substring(execPath.lastIndexOf(File.separator) + 1));
         jobMsg.setExecPath(execPath.isEmpty() ? "" : execPath.substring(0, execPath.lastIndexOf(File.separator) + 1));
         jobMsg.setMessage(message);
-        jobMsg.setMessageType(type);
+        jobMsg.setMessageType((type.isEmpty()) ? "i" : type);
         jobMsg.setStatus(status);
         jobMsg.setPeriod(period);
         jobMsg.setRemoteUser(System.getProperty("user.name"));

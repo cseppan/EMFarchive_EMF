@@ -50,7 +50,7 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView {
         try {
             super.add(createLayout(new JobMessage[0], parentConsole), BorderLayout.CENTER);
         } catch (Exception e) {
-            messagePanel.setError("Cannot retrieve all case jobs.");
+            messagePanel.setError("Cannot retrieve all case histories. " + e.getMessage());
         }
 
         Thread populateThread = new Thread(new Runnable(){
@@ -69,7 +69,7 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView {
             messagePanel.clear();
         } catch (Exception e) {
             e.printStackTrace();
-            messagePanel.setError("Cannot retrieve all case histories.");
+            messagePanel.setError("Cannot retrieve all case histories. " + e.getMessage());
         } finally {
             setCursor(Cursor.getDefaultCursor());
         }
