@@ -54,7 +54,10 @@ public class PointRecordGenerator implements RecordGenerator {
         reducedEmission = originalEmissions * effectiveReduction;
         Double minStackFlowRate = resultSet.getDouble("stkflow");
         if (resultSet.wasNull()) minStackFlowRate = null;
-        CostEquation costEquations = costEquationsFactory.getCostEquation(reducedEmission, bestMeasureEffRecord, minStackFlowRate);
+        Double designCapacity = null;//resultSet.getDouble("designcapacity");
+        //if (resultSet.wasNull()) minStackFlowRate = null;
+        CostEquation costEquations = costEquationsFactory.getCostEquation(reducedEmission, bestMeasureEffRecord, 
+                minStackFlowRate, designCapacity);
         
         
         tokens.add(""); // record id

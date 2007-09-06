@@ -72,7 +72,8 @@ public class NonpointRecordGenerator implements RecordGenerator {
 
         // these columns are only relevant to point sources, leave empty for nonpoint
         
-        CostEquation costEquations=costEquationsFactory.getCostEquation(reducedEmission, maxCM, null);
+        CostEquation costEquations = costEquationsFactory.getCostEquation(reducedEmission, maxCM, 
+                null, null);
         
         tokens.add(""); // plant Id
         tokens.add(""); // Point ID

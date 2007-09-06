@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 
 public class CostEquationFactory {
@@ -10,6 +11,7 @@ public class CostEquationFactory {
     private Type5CostEquation type5CostEquation;
     private Type4CostEquation type4CostEquation;
     private Type3CostEquation type3CostEquation;
+    private Type2CostEquation type2CostEquation;
     
     public CostEquationFactory(boolean useCostEquations, double discountRate) {
         this.useCostEquations = useCostEquations;
@@ -18,10 +20,11 @@ public class CostEquationFactory {
         this.type5CostEquation = new Type5CostEquation(discountRate);
         this.type4CostEquation = new Type4CostEquation(discountRate);
         this.type3CostEquation = new Type3CostEquation(discountRate);
+        this.type2CostEquation = new Type2CostEquation(discountRate);
     }
 
     public CostEquation getCostEquation(double reducedEmission, BestMeasureEffRecord bestMeasureEffRecord, 
-            Double minStackFlowRate) {
+            Double minStackFlowRate, Double designCapacity) throws EmfException {
         //always setup the default cost equation, the other equation types will default to using this approach when the other equation don't work
         //for example, maybe some of the inputs are missing, or maybe some constraint is not met...
         defaultCostEquations.setUp(reducedEmission, bestMeasureEffRecord);
@@ -69,6 +72,15 @@ public class CostEquationFactory {
                         type3CostEquation.setUp(reducedEmission, bestMeasureEffRecord, 
                                 minStackFlowRate);
                         return type3CostEquation;
+                    }
+                }
+                
+                if (equations[0].getEquationType().getName().equals("Type 2")) {
+                    //evaluate inputs, if they missing, use the default
+                    if (minStackFlowRate != null && minStackFlowRate != 0.0) {
+                        type2CostEquation.setUp(reducedEmission, bestMeasureEffRecord, 
+                                designCapacity);
+                        return type2CostEquation;
                     }
                 }
                 
