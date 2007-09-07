@@ -281,10 +281,11 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             presenter.doCopyCases(caseIds);
             doRefresh();
             clearMsgPanel();
-            setCursor(Cursor.getDefaultCursor());
             messagePanel.setMessage("Finished copying cases.");
         } catch (Exception e) {
             showError("Could not copy cases." + e.getMessage());
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
         }
     }
 

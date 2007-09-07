@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1128,9 +1129,9 @@ public class ManagedCaseService {
 
     private synchronized Case copySingleCaseObj(Case toCopy) throws Exception {
         Case copied = (Case) DeepCopy.copy(toCopy);
-        copied.setName("Copy of " + toCopy.getName() + " " + new Date().getTime());
+        copied.setName(getUniqueNewName("Copy of " + toCopy.getName()));
         copied.setTemplateUsed(toCopy.getName());
-        copied.setAbbreviation(new Abbreviation(new Date().toString()));
+        copied.setAbbreviation(new Abbreviation(Math.abs(new Random().nextInt()) + ""));
         Case loaded = addCopiedCase(copied);
         copyCaseJobs(toCopy.getId(), loaded.getId()); // copy job first for references in input and parameter
         copyCaseInputs(toCopy.getId(), loaded.getId());
@@ -1141,6 +1142,7 @@ public class ManagedCaseService {
         try {
 
             // FIXME: Verfiy why locked?
+            // NOTE: it could be being edited by other user, but you still want to copy it
             if (loaded.isLocked())
                 dao.releaseLocked(loaded, session);
         } finally {
@@ -1148,6 +1150,55 @@ public class ManagedCaseService {
         }
 
         return loaded;
+    }
+
+    private String getUniqueNewName(String name) {
+        Session session = sessionFactory.getSession();
+        List<String> names = new ArrayList<String>();
+
+        try {
+            List<Case> allCases = dao.getCases(session);
+
+            for (Iterator<Case> iter = allCases.iterator(); iter.hasNext();) {
+                Case caseObj = iter.next();
+                if (caseObj.getName().startsWith(name)) {
+                    names.add(caseObj.getName());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get all cases.\n" + e.getMessage());
+        } finally {
+            session.close();
+        }
+
+        return name + " " + getSequence(name, names);
+    }
+
+    private int getSequence(String stub, List<String> names) {
+        int sequence = names.size() + 1;
+        String integer = "";
+
+        try {
+            for (Iterator<String> iter = names.iterator(); iter.hasNext();) {
+                integer = iter.next().substring(stub.length()).trim();
+
+                if (!integer.isEmpty()) {
+                    int temp = Integer.parseInt(integer);
+
+                    if (temp == sequence)
+                        ++sequence;
+                    else if (temp > sequence)
+                        sequence = temp + 1;
+                }
+            }
+            
+            return sequence;
+        } catch (Exception e) {
+            //NOTE: Assume one case won't be copied 10000 times.
+            // This is farely safe assuming the random number do not duplicate.
+            return Math.abs(new Random().nextInt()) % 10000; 
+        }
     }
 
     public synchronized void exportInputsForCase(User user, String dirName, String purpose, boolean overWrite,
@@ -1694,7 +1745,7 @@ public class ManagedCaseService {
                 // Start the job file content string and append the end of line characters for this OS
                 sbuf.append(this.runShell + this.eolString);
                 System.out.println("Sbuf in else: " + sbuf.toString());
-           }
+            }
 
             // print job name to file
             sbuf.append(eolString);
