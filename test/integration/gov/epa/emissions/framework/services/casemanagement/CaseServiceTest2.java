@@ -103,6 +103,7 @@ public class CaseServiceTest2 extends ServiceTestCase {
     }
 
     public void testShouldCopyACaseWithCaseInputs() throws Exception {
+        User owner = userService.getUser("emf");
         Case element = newCase();
         Case copied = null;
         CaseInput cpdInput1 = null;
@@ -132,7 +133,7 @@ public class CaseServiceTest2 extends ServiceTestCase {
             add(inputOne);
             add(inputTwo);
 
-            copied = service.copyCaseObject(new int[] { caseId })[0];
+            copied = service.copyCaseObject(new int[] { caseId }, owner)[0];
             CaseInput[] copiedInputs = service.getCaseInputs(copied.getId());
             cpdInput1 = copiedInputs[0];
             cpdInput2 = copiedInputs[1];

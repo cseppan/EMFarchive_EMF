@@ -56,7 +56,7 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
         newCase.setLastModifiedDate(new Date());
         newCase.setTemplateUsed(templateused);
 
-        service().addCase(newCase);
+        service().addCase(session.user(), newCase);
         doRefresh();
     }
     
@@ -80,6 +80,6 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
     }
 
     public void doCopyCases(int[] caseIds) throws EmfException {
-        service().copyCaseObject(caseIds);
+        service().copyCaseObject(caseIds, session.user());
     }
 }

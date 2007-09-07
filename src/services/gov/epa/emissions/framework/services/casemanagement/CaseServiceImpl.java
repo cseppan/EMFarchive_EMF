@@ -85,8 +85,8 @@ public class CaseServiceImpl implements CaseService {
         return this.caseService;
     }
 
-    public void addCase(Case element) throws EmfException {
-        getCaseService().addCase(element);
+    public void addCase(User user, Case element) throws EmfException {
+        getCaseService().addCase(user, element);
     }
 
     public void removeCase(Case caseObj) throws EmfException {
@@ -214,8 +214,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getCaseInputs(caseId);
     }
 
-    public Case[] copyCaseObject(int[] toCopy) throws EmfException {
-        return getCaseService().copyCaseObject(toCopy);
+    public Case[] copyCaseObject(int[] toCopy, User user) throws EmfException {
+        return getCaseService().copyCaseObject(toCopy, user);
     }
 
     public CaseJob addCaseJob(CaseJob job) throws EmfException {

@@ -41,7 +41,7 @@ public class NewCasePresenter {
         newCase.setLastModifiedBy(session.user());
         newCase.setLastModifiedDate(new Date());
         
-        service().addCase(newCase);
+        service().addCase(session.user(), newCase);
         closeView();
         managerPresenter.doRefresh();
     }

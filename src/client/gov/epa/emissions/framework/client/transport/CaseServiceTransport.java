@@ -126,14 +126,15 @@ public class CaseServiceTransport implements CaseService {
         return (Speciation[]) call.requestResponse(new Object[] {});
     }
 
-    public void addCase(Case element) throws EmfException {
+    public void addCase(User user, Case element) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("addCase");
+        call.addParam("user", dataMappings.user());
         call.addParam("element", caseMappings.caseObject());
         call.setVoidReturnType();
 
-        call.request(new Object[] { element });
+        call.request(new Object[] { user, element });
     }
 
     public void removeCase(Case element) throws EmfException {
@@ -357,14 +358,15 @@ public class CaseServiceTransport implements CaseService {
         return (CaseInput[]) call.requestResponse(new Object[] { new Integer(caseId) });
     }
 
-    public Case[] copyCaseObject(int[] toCopy) throws EmfException {
+    public Case[] copyCaseObject(int[] toCopy, User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("copyCaseObject");
         call.addIntArrayParam();
+        call.addParam("user", dataMappings.user());
         call.setReturnType(caseMappings.cases());
 
-        return (Case[]) call.requestResponse(new Object[] { toCopy });
+        return (Case[]) call.requestResponse(new Object[] { toCopy, user });
     }
 
     public CaseJob addCaseJob(CaseJob job) throws EmfException {

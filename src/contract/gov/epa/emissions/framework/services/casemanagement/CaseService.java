@@ -42,7 +42,7 @@ public interface CaseService {
 
     Case[] getCases() throws EmfException;
 
-    void addCase(Case element) throws EmfException;
+    void addCase(User owner, Case element) throws EmfException;
 
     void removeCase(Case element) throws EmfException;
 
@@ -74,7 +74,7 @@ public interface CaseService {
     
     CaseInput[] getCaseInputs(int caseId) throws EmfException;
     
-    Case[] copyCaseObject(int[] toCopy) throws EmfException;
+    Case[] copyCaseObject(int[] toCopy, User user) throws EmfException;
     
     CaseJob addCaseJob(CaseJob job) throws EmfException;
     

@@ -299,10 +299,14 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized void addCase(Case element) throws EmfException {
+    public synchronized void addCase(User user, Case element) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(element, session);
+            Case loaded = (Case)dao.load(Case.class, element.getName(), session);
+            Case locked = dao.obtainLocked(user, loaded, session);
+            locked.setAbbreviation(new Abbreviation(loaded.getId()+""));
+            dao.update(locked, session);
         } catch (RuntimeException e) {
             e.printStackTrace();
             log.error("Could not add Case: " + element, e);
@@ -757,13 +761,13 @@ public class ManagedCaseService {
         return (inputsAll);
     }
 
-    public synchronized Case[] copyCaseObject(int[] toCopy) throws EmfException {
+    public synchronized Case[] copyCaseObject(int[] toCopy, User user) throws EmfException {
         List<Case> copiedList = new ArrayList<Case>();
 
         for (int i = 0; i < toCopy.length; i++) {
             Case caseToCopy = getCase(toCopy[i]);
             try {
-                copiedList.add(copySingleCaseObj(caseToCopy));
+                copiedList.add(copySingleCaseObj(caseToCopy, user));
             } catch (Exception e) {
                 e.printStackTrace();
                 log.error("Could not copy case " + caseToCopy.getName() + ".", e);
@@ -804,12 +808,15 @@ public class ManagedCaseService {
         return addCaseInput(copied);
     }
 
-    private synchronized Case addCopiedCase(Case element) throws EmfException {
+    private synchronized Case addCopiedCase(Case element, User user) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
             dao.add(element, session);
-            return (Case) dao.load(Case.class, element.getName(), session);
+            Case loaded = (Case) dao.load(Case.class, element.getName(), session);
+            Case locked = dao.obtainLocked(user, loaded, session);
+            locked.setAbbreviation(new Abbreviation(loaded.getId() + ""));
+            return dao.update(locked, session);
         } catch (RuntimeException e) {
             e.printStackTrace();
             log.error("Could not add case " + element, e);
@@ -1127,12 +1134,12 @@ public class ManagedCaseService {
         }
     }
 
-    private synchronized Case copySingleCaseObj(Case toCopy) throws Exception {
+    private synchronized Case copySingleCaseObj(Case toCopy, User user) throws Exception {
         Case copied = (Case) DeepCopy.copy(toCopy);
         copied.setName(getUniqueNewName("Copy of " + toCopy.getName()));
         copied.setTemplateUsed(toCopy.getName());
-        copied.setAbbreviation(new Abbreviation(Math.abs(new Random().nextInt()) + ""));
-        Case loaded = addCopiedCase(copied);
+        copied.setAbbreviation(null);
+        Case loaded = addCopiedCase(copied, user);
         copyCaseJobs(toCopy.getId(), loaded.getId()); // copy job first for references in input and parameter
         copyCaseInputs(toCopy.getId(), loaded.getId());
         copyCaseParameters(toCopy.getId(), loaded.getId());
@@ -1171,6 +1178,9 @@ public class ManagedCaseService {
         } finally {
             session.close();
         }
+        
+        if (names.size() == 0)
+            return name;
 
         return name + " " + getSequence(name, names);
     }

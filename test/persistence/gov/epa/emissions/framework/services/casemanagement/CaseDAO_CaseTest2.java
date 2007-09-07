@@ -310,7 +310,7 @@ public class CaseDAO_CaseTest2 extends ServiceTestCase {
         Case coppied = null;
 
         try {
-            coppied = service.copyCaseObject(new int[] { loaded.getId() })[0];
+            coppied = service.copyCaseObject(new int[] { loaded.getId() }, owner)[0];
             assertTrue(coppied.getName().startsWith("Copy of " + caseToCopyName));
             assertTrue(coppied.getIsFinal());
         } finally {

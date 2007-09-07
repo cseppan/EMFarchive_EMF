@@ -21,11 +21,14 @@ public class CaseServiceTest extends ServiceTestCase {
     private UserServiceImpl userService;
 
     private HibernateSessionFactory sessionFactory;
+    
+    private User user;
 
     protected void doSetUp() throws Exception {
         sessionFactory = sessionFactory(configFile());
         service = new CaseServiceImpl(sessionFactory, dbServerFactory);
         userService = new UserServiceImpl(sessionFactory);
+        user = userService.getUser("emf");
     }
 
     protected void doTearDown() throws Exception {
@@ -246,7 +249,7 @@ public class CaseServiceTest extends ServiceTestCase {
         int totalBeforeAdd = service.getCases().length;
         Case element = new Case("test" + Math.random());
 
-        service.addCase(element);
+        service.addCase(user, element);
 
         try {
             List list = Arrays.asList(service.getCases());
@@ -259,11 +262,10 @@ public class CaseServiceTest extends ServiceTestCase {
     }
 
     public void testShouldRemoveCase() throws Exception {
-        User user = userService.getUser("emf");
         int totalBeforeAdd = service.getCases().length;
         Case element = new Case("test" + Math.random());
         element.setLastModifiedBy(user);
-        service.addCase(element);
+        service.addCase(user, element);
 
         service.removeCase(element);
 
