@@ -22,11 +22,9 @@ import gov.epa.emissions.framework.client.data.Projects;
 import gov.epa.emissions.framework.client.data.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
-import gov.epa.emissions.framework.services.casemanagement.GridResolution;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
-import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
 import java.awt.BorderLayout;
@@ -39,14 +37,10 @@ import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 
 public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummaryTabView, RefreshObserver {
 
@@ -85,9 +79,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private EditableComboBox meteorlogicalYearCombo;
 
     private EditableComboBox speciationCombo;
-
+    
     private EditableComboBox gridResolutionCombo;
-
+    
     private CheckBox isFinal;
 
     private CheckBox isTemplate;
@@ -115,7 +109,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private Regions modRegions;
 
     private Regions controlRegions;
-
+    
     private GridResolutions gridResolutions;
 
     private RunStatuses runStatuses;
@@ -132,23 +126,21 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EmfConsole parentConsole;
 
-    private MessagePanel messagePanel;
-
-    public EditableCaseSummaryTab(Case caseObj, MessagePanel messagePanel, EmfSession session,
-            ManageChangeables changeablesList, EmfConsole parentConsole) {
+    public EditableCaseSummaryTab(Case caseObj, EmfSession session, ManageChangeables changeablesList,
+            EmfConsole parentConsole) {
         super.setName("summary");
         this.caseObj = caseObj;
         this.session = session;
         this.changeablesList = changeablesList;
         this.parentConsole = parentConsole;
-        this.messagePanel = messagePanel;
+
     }
 
-    public void display() {
+    public void display() throws EmfException {
         setLayout();
     }
 
-    private void setLayout() {
+    private void setLayout() throws EmfException {
         super.setLayout(new BorderLayout());
 
         JPanel panel = new JPanel();
@@ -158,8 +150,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         super.add(panel, BorderLayout.CENTER);
     }
+    
 
-    private JPanel createOverviewSection() {
+    private JPanel createOverviewSection() throws EmfException {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 
@@ -174,7 +167,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return panel;
     }
 
-    private JPanel createLeftOverviewSection() {
+    private JPanel createLeftOverviewSection() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -193,28 +186,28 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return panel;
     }
 
-    private JPanel createRightOverviewSection() {
+    private JPanel createRightOverviewSection() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Abbreviation:", abbreviations(), panel);
-        JPanel finalTemplatePanel = new JPanel(new GridLayout(1, 2));
+        JPanel finalTemplatePanel = new JPanel(new GridLayout(1,2));
         finalTemplatePanel.add(isFinal());
         finalTemplatePanel.add(isTemplate());
         layoutGenerator.addLabelWidgetPair("Is Final:", finalTemplatePanel, panel);
-        // layoutGenerator.addLabelWidgetPair("Is Template:", isTemplate(), panel);
+        //layoutGenerator.addLabelWidgetPair("Is Template:", isTemplate(), panel);
         layoutGenerator.addLabelWidgetPair("<html>Sectors:<br><br><br></html>", sectors(), panel);
         // layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
         layoutGenerator.addLabelWidgetPair("Copied From:", template(), panel);
         // layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
         layoutGenerator.addLabelWidgetPair("Last Modified By:", creator(), panel);
-
+ 
         layoutGenerator.makeCompactGrid(panel, 5, 2, 10, 10, 10, 10);
 
         return panel;
     }
 
-    private JPanel createLowerSection() {
+    private JPanel createLowerSection() throws EmfException {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 
@@ -228,7 +221,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return panel;
     }
 
-    private JPanel createLowerLeftSection() {
+    private JPanel createLowerLeftSection() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -244,7 +237,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return panel;
     }
 
-    private JPanel createLowerRightSection() {
+    private JPanel createLowerRightSection() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -271,7 +264,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private ScrollableComponent description() {
         description = new TextArea("description", caseObj.getDescription(), 19, 3);
         changeablesList.addChangeable(description);
-        // description.setPreferredSize(new Dimension(200, 60));
+        //description.setPreferredSize(new Dimension(200, 60));
 
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(description);
         descScrollableTextArea.setMinimumSize(defaultDimension);
@@ -320,197 +313,163 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return isFinal;
     }
 
-    private EditableComboBox projects() {
+    private EditableComboBox projects() throws EmfException {
+        projects = new Projects(session.dataCommonsService().getProjects());
+        projectsCombo = new EditableComboBox(projects.names());
         String name = caseObj.getProject() != null ? caseObj.getProject().getName() : "";
-        projectsCombo = new EditableComboBox(new String[] { name });
+        projectsCombo.setSelectedItem(name);
         projectsCombo.setPreferredSize(defaultDimension);
-        addPopupMenuListener(projectsCombo, "projects");
+
         changeablesList.addChangeable(projectsCombo);
 
         return projectsCombo;
     }
 
-    private EditableComboBox modelToRun() {
+    private EditableComboBox modelToRun() throws EmfException {
+        models = new ModelToRuns(session, session.caseService().getModelToRuns());
+        modelToRunCombo = new EditableComboBox(models.getAll());
+        
         ModelToRun model = caseObj.getModel();
-        modelToRunCombo = new EditableComboBox(new ModelToRun[] { model });
+        modelToRunCombo.setSelectedItem(model);
         modelToRunCombo.setPreferredSize(defaultDimension);
-        addPopupMenuListener(modelToRunCombo, "runmodels");
+        
         changeablesList.addChangeable(modelToRunCombo);
-
+        
         return modelToRunCombo;
     }
 
-    private ComboBox modRegions() {
+    private ComboBox modRegions() throws EmfException {
+        modRegions = new Regions(session.dataCommonsService().getRegions());
+        modRegionsCombo = new ComboBox(modRegions.names());
+
         String name = caseObj.getModelingRegion() != null ? caseObj.getModelingRegion().getName() : "";
-        modRegionsCombo = new ComboBox(new String[] { name });
+        modRegionsCombo.setSelectedItem(name);
         modRegionsCombo.setPreferredSize(defaultDimension);
-        addPopupMenuListener(modRegionsCombo, "modregions");
+
         changeablesList.addChangeable(modRegionsCombo);
 
         return modRegionsCombo;
     }
-
-    private EditableComboBox gridResolution() {
-        gridResolutionCombo = new EditableComboBox(new GridResolution[] { caseObj.getGridResolution() });
+    
+    private EditableComboBox gridResolution() throws EmfException {
+        gridResolutions = new GridResolutions(session, session.caseService().getGridResolutions());
+        gridResolutionCombo = new EditableComboBox(gridResolutions.getAll());
+        gridResolutionCombo.setSelectedItem(caseObj.getGridResolution());
         gridResolutionCombo.setPreferredSize(defaultDimension);
-        addPopupMenuListener(gridResolutionCombo, "gridreslns");
         changeablesList.addChangeable(gridResolutionCombo);
-
+        
         return gridResolutionCombo;
     }
 
-    private ComboBox controlRegions() {
+    private ComboBox controlRegions() throws EmfException {
+        controlRegions = new Regions(session.dataCommonsService().getRegions());
+        controlRegionsCombo = new ComboBox(controlRegions.names());
+
         String name = caseObj.getControlRegion() != null ? caseObj.getControlRegion().getName() : "";
-        controlRegionsCombo = new ComboBox(new String[] { name });
+        controlRegionsCombo.setSelectedItem(name);
         controlRegionsCombo.setPreferredSize(defaultDimension);
-        addPopupMenuListener(controlRegionsCombo, "contrlregions");
+
         changeablesList.addChangeable(controlRegionsCombo);
 
         return controlRegionsCombo;
     }
 
-    private EditableComboBox abbreviations() {
+    private EditableComboBox abbreviations() throws EmfException {
+        abbreviations = new Abbreviations(session.caseService().getAbbreviations());
+        abbreviationsCombo = new EditableComboBox(abbreviations.names());
+
         String name = caseObj.getAbbreviation() != null ? caseObj.getAbbreviation().getName() : "";
-        abbreviationsCombo = new EditableComboBox(new String[] { name });
+        abbreviationsCombo.setSelectedItem(name);
         abbreviationsCombo.setPreferredSize(defaultDimension);
-        addPopupMenuListener(abbreviationsCombo, "abbrs");
+
         changeablesList.addChangeable(abbreviationsCombo);
 
         return abbreviationsCombo;
     }
 
-    private EditableComboBox airQualityModels() {
+    private EditableComboBox airQualityModels() throws EmfException {
+        airQualityModels = new AirQualityModels(session.caseService().getAirQualityModels());
+        airQualityModelsCombo = new EditableComboBox(airQualityModels.names());
+
         String name = caseObj.getAirQualityModel() != null ? caseObj.getAirQualityModel().getName() : "";
-        airQualityModelsCombo = new EditableComboBox(new String[] { name });
+        airQualityModelsCombo.setSelectedItem(name);
         airQualityModelsCombo.setPreferredSize(defaultDimension);
-        addPopupMenuListener(airQualityModelsCombo, "aqmodels");
+
         changeablesList.addChangeable(airQualityModelsCombo);
 
         return airQualityModelsCombo;
     }
 
-    private EditableComboBox categories() {
+    private EditableComboBox categories() throws EmfException {
+        categories = new CaseCategories(session.caseService().getCaseCategories());
+        categoriesCombo = new EditableComboBox(categories.names());
+
         String name = caseObj.getCaseCategory() != null ? caseObj.getCaseCategory().getName() : "";
-        categoriesCombo = new EditableComboBox(new String[] { name });
+        categoriesCombo.setSelectedItem(name);
         categoriesCombo.setPreferredSize(defaultDimension);
-        addPopupMenuListener(categoriesCombo, "categories");
+
         changeablesList.addChangeable(categoriesCombo);
 
         return categoriesCombo;
     }
 
-    private JPanel sectors() {
-        try {
-            sectorsWidget = new AddRemoveSectorWidget(presenter.getAllSectors(), changeablesList, parentConsole);
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
+    private JPanel sectors() throws EmfException {
+        sectorsWidget = new AddRemoveSectorWidget(presenter.getAllSectors(), changeablesList, parentConsole);
         sectorsWidget.setSectors(caseObj.getSectors());
-        sectorsWidget.setPreferredSize(new Dimension(220, 80));
+        sectorsWidget.setPreferredSize(new Dimension(220,80));
         return sectorsWidget;
     }
 
-    private EditableComboBox emissionsYears() {
+    private EditableComboBox emissionsYears() throws EmfException {
+        emissionsYears = new EmissionsYears(session.caseService().getEmissionsYears());
+        emissionsYearCombo = new EditableComboBox(emissionsYears.names());
+
         String name = caseObj.getEmissionsYear() != null ? caseObj.getEmissionsYear().getName() : "";
-        emissionsYearCombo = new EditableComboBox(new String[] { name });
+        emissionsYearCombo.setSelectedItem(name);
         emissionsYearCombo.setPreferredSize(defaultDimension);
-        addPopupMenuListener(emissionsYearCombo, "emisyears");
+
         changeablesList.addChangeable(emissionsYearCombo);
 
         return emissionsYearCombo;
     }
 
-    private EditableComboBox grids() {
+    private EditableComboBox grids() throws EmfException {
+        grids = new Grids(session.caseService().getGrids());
+        gridCombo = new EditableComboBox(grids.names());
+
         String name = caseObj.getGrid() != null ? caseObj.getGrid().getName() : "";
-        gridCombo = new EditableComboBox(new String[] { name });
+        gridCombo.setSelectedItem(name);
         gridCombo.setPreferredSize(defaultDimension);
-        addPopupMenuListener(gridCombo, "grids");
+
         changeablesList.addChangeable(gridCombo);
 
         return gridCombo;
     }
 
-    private EditableComboBox meteorlogicalYears() {
+    private EditableComboBox meteorlogicalYears() throws EmfException {
+        meteorlogicalYears = new MeteorlogicalYears(session.caseService().getMeteorlogicalYears());
+        meteorlogicalYearCombo = new EditableComboBox(meteorlogicalYears.names());
+
         String name = caseObj.getMeteorlogicalYear() != null ? caseObj.getMeteorlogicalYear().getName() : "";
-        meteorlogicalYearCombo = new EditableComboBox(new String[] { name });
+        meteorlogicalYearCombo.setSelectedItem(name);
         meteorlogicalYearCombo.setPreferredSize(defaultDimension);
-        addPopupMenuListener(meteorlogicalYearCombo, "meteoyears");
+
         changeablesList.addChangeable(meteorlogicalYearCombo);
 
         return meteorlogicalYearCombo;
     }
 
-    private EditableComboBox speciations() {
+    private EditableComboBox speciations() throws EmfException {
+        speciations = new Speciations(session.caseService().getSpeciations());
+        speciationCombo = new EditableComboBox(speciations.all());
+
         String name = caseObj.getSpeciation() != null ? caseObj.getSpeciation().getName() : "";
-        speciationCombo = new EditableComboBox(new String[] { name });
+        speciationCombo.setSelectedItem(name);
         speciationCombo.setPreferredSize(defaultDimension);
-        addPopupMenuListener(speciationCombo, "speciations");
 
         changeablesList.addChangeable(speciationCombo);
 
         return speciationCombo;
-    }
-
-    private void addPopupMenuListener(final JComboBox box, final String toget) {
-        box.addPopupMenuListener(new PopupMenuListener() {
-            public void popupMenuCanceled(PopupMenuEvent event) {
-                // NOTE Auto-generated method stub
-            }
-
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent event) {
-                // NOTE Auto-generated method stub
-            }
-
-            public void popupMenuWillBecomeVisible(PopupMenuEvent event) {
-                try {
-                    box.setModel(new DefaultComboBoxModel(getAllObjects(toget)));
-                    box.revalidate();
-                    refresh();
-                } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
-                }
-            }
-        });
-    }
-
-    protected Object[] getAllObjects(String toget) throws EmfException {
-        if (toget.equals("projects"))
-            return new Projects(session.dataCommonsService().getProjects()).names();
-
-        if (toget.equals("runmodels"))
-            return new ModelToRuns(session, session.caseService().getModelToRuns()).getAll();
-
-        if (toget.equals("modregions"))
-            return new Regions(session.dataCommonsService().getRegions()).names();
-
-        if (toget.equals("gridreslns"))
-            return new GridResolutions(session, session.caseService().getGridResolutions()).getAll();
-
-        if (toget.equals("contrlregions"))
-            return new Regions(session.dataCommonsService().getRegions()).names();
-
-        if (toget.equals("abbrs"))
-            return new Abbreviations(session.caseService().getAbbreviations()).names();
-
-        if (toget.equals("aqmodels"))
-            return new AirQualityModels(session.caseService().getAirQualityModels()).names();
-
-        if (toget.equals("categories"))
-            return new CaseCategories(session.caseService().getCaseCategories()).names();
-
-        if (toget.equals("emisyears"))
-            return new EmissionsYears(session.caseService().getEmissionsYears()).names();
-
-        if (toget.equals("grids"))
-            return new Grids(session.caseService().getGrids()).names();
-
-        if (toget.equals("meteoyears"))
-            return new MeteorlogicalYears(session.caseService().getMeteorlogicalYears()).names();
-
-        if (toget.equals("speciations"))
-            return new Speciations(session.caseService().getSpeciations()).all();
-
-        return null;
     }
 
     private ComboBox runStatus() {
@@ -518,14 +477,16 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         runStatusCombo.setPreferredSize(defaultDimension);
         if (caseObj.getRunStatus() == null) {
             runStatusCombo.setSelectedIndex(0);
-        } else {
+        }
+        else
+        {
             runStatusCombo.setSelectedItem(caseObj.getRunStatus());
         }
         changeablesList.addChangeable(runStatusCombo);
 
         return runStatusCombo;
     }
-
+    
     private TextField startDate() {
         startDate = new TextField("Start Date", 10);
         startDate.setText(format(caseObj.getStartDate()) + "");
@@ -555,52 +516,73 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return label;
     }
 
+    // private JPanel addRemoveButtonPanel() {
+    // JPanel panel = new JPanel();
+    // // TBD: this needs to be changed so you have handles to the buttons
+    // // and can set actions
+    // Button addButton = new AddButton("Add", addAction());
+    // Button removeButton = new RemoveButton("Remove", removeAction());
+    //
+    // panel.add(addButton);
+    // panel.add(removeButton);
+    // // for now, disable these
+    //
+    // return panel;
+    // }
+    //
+    // private Action removeAction() {
+    // return new AbstractAction() {
+    // public void actionPerformed(ActionEvent e) {
+    // removeSectors();
+    // }
+    // };
+    // }
+    //
+    //    
+    // private Action addAction() {
+    // return new AbstractAction() {
+    // public void actionPerformed(ActionEvent e) {
+    // addSectors();
+    // }
+    // };
+    // }
+    //
+    // private void addSectors() {
+    // Sector[] allSectors = presenter.getAllSectors();
+    // if (allSectors == null)
+    // return;
+    // SectorSelector sectorSelector = new SectorSelector(allSectors, sectorsWidget, parentConsole);
+    // sectorSelector.display();
+    // }
+    //    
+    // protected void removeSectors() {
+    // Object[] removeValues = sectorsWidget.getSelectedValues();
+    // sectorsWidget.removeElements(removeValues);
+    //        
+    // }
+
     public void save(Case caseObj) throws EmfException {
         caseObj.setName(name.getText());
         saveFutureYear();
         caseObj.setDescription(description.getText());
         caseObj.setCaseTemplate(isTemplate.isSelected());
         caseObj.setIsFinal(isFinal.isSelected());
-        if (projects != null)
-            caseObj.setProject(projects.get((String) projectsCombo.getSelectedItem()));
-
-        if (modRegions != null)
-            caseObj.setModelingRegion(modRegions.get((String) modRegionsCombo.getSelectedItem()));
-
-        if (controlRegions != null)
-            caseObj.setControlRegion(controlRegions.get((String) controlRegionsCombo.getSelectedItem()));
-
-        if (abbreviations != null)
-            caseObj.setAbbreviation(abbreviations.get((String) abbreviationsCombo.getSelectedItem()));
-
-        if (airQualityModels != null)
-            caseObj.setAirQualityModel(airQualityModels.get((String) airQualityModelsCombo.getSelectedItem()));
-
-        if (categories != null)
-            caseObj.setCaseCategory(categories.get((String) categoriesCombo.getSelectedItem()));
-
-        if (emissionsYears != null)
-            caseObj.setEmissionsYear(emissionsYears.get((String) emissionsYearCombo.getSelectedItem()));
-
-        if (grids != null)
-            caseObj.setGrid(grids.get((String) gridCombo.getSelectedItem()));
-
-        if (meteorlogicalYears != null)
-            caseObj.setMeteorlogicalYear(meteorlogicalYears.get((String) meteorlogicalYearCombo.getSelectedItem()));
-
-        if (speciations != null)
-            caseObj.setSpeciation(speciations.get((String) speciationCombo.getSelectedItem()));
-
+        caseObj.setProject(projects.get((String) projectsCombo.getSelectedItem()));
+        caseObj.setModelingRegion(modRegions.get((String) modRegionsCombo.getSelectedItem()));
+        caseObj.setControlRegion(controlRegions.get((String) controlRegionsCombo.getSelectedItem()));
+        caseObj.setAbbreviation(abbreviations.get((String) abbreviationsCombo.getSelectedItem()));
+        caseObj.setAirQualityModel(airQualityModels.get((String) airQualityModelsCombo.getSelectedItem()));
+        caseObj.setCaseCategory(categories.get((String) categoriesCombo.getSelectedItem()));
+        caseObj.setEmissionsYear(emissionsYears.get((String) emissionsYearCombo.getSelectedItem()));
+        caseObj.setGrid(grids.get((String) gridCombo.getSelectedItem()));
+        caseObj.setMeteorlogicalYear(meteorlogicalYears.get((String) meteorlogicalYearCombo.getSelectedItem()));
+        caseObj.setSpeciation(speciations.get((String) speciationCombo.getSelectedItem()));
         caseObj.setRunStatus(runStatusCombo.getSelectedItem() + "");
         saveStartDate();
         saveEndDate();
         caseObj.setSectors(sectorsWidget.getSectors());
-
-        if (models != null)
-            caseObj.setModel(models.get(modelToRunCombo.getSelectedItem()));
-
-        if (gridResolutions != null)
-            caseObj.setGridResolution(gridResolutions.get(gridResolutionCombo.getSelectedItem()));
+        caseObj.setModel(models.get(modelToRunCombo.getSelectedItem()));
+        caseObj.setGridResolution(gridResolutions.get(gridResolutionCombo.getSelectedItem()));
     }
 
     private void saveFutureYear() throws EmfException {
@@ -611,7 +593,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         }
         YearValidation validation = new YearValidation("Future Year");
         caseObj.setFutureYear(validation.value(futureYear.getText()));
-    }
+     }
 
     private void saveEndDate() throws EmfException {
         try {
@@ -643,13 +625,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         this.presenter = presenter;
     }
 
-    private void refresh() {
-        super.revalidate();
-    }
-
     public void doRefresh() throws EmfException {
         if (false)
-            throw new EmfException("Nothing to update since case object is locked.");
+            throw new EmfException("No need to refresh when the case object is locked.");
     }
 
 }
