@@ -46,13 +46,13 @@ public class CaseJobTaskManager extends TaskManager {
 
     public static synchronized void addTasks(ArrayList<Runnable> tasks) {
         // TaskManager.resetIdleTime();
-        System.out.println("IN CaseJobTaskManager number of tasks received= " + tasks.size());
+        if (DebugLevels.DEBUG_0)System.out.println("IN CaseJobTaskManager number of tasks received= " + tasks.size());
         taskQueue.addAll(tasks);
-        System.out.println("IN CaseJobTaskManager size of task Queue= " + taskQueue.size());
+        if (DebugLevels.DEBUG_0)System.out.println("IN CaseJobTaskManager size of task Queue= " + taskQueue.size());
 
         synchronized (CaseJobTaskManager.runTable) {
             if (threadPool.getCorePoolSize() - runTable.size() > 0) {
-                CaseJobTaskManager.processTaskQueue();
+                //CaseJobTaskManager.processTaskQueue();
             }
         }// synchronized
     }
@@ -78,7 +78,7 @@ public class CaseJobTaskManager extends TaskManager {
         if (DebugLevels.DEBUG_0)
             System.out.println("After Task removed Size of RUN TABLE: " + CaseJobTaskManager.getSizeofRunTable());
 
-        CaseJobTaskManager.processTaskQueue();
+        //CaseJobTaskManager.processTaskQueue();
     }
 
     public static synchronized void processTaskQueue() {
@@ -292,18 +292,22 @@ public class CaseJobTaskManager extends TaskManager {
 
         System.out.println("CaseJobTaskManager::callBackFromExportJobSubmitter for caseJobTask= " + cjtId + " status= "
                 + status + " and message= " + mesg);
-        CaseJobTask cjt = (CaseJobTask) waitTable.get(cjtId);
-
-        if (status.equals("completed"))
-            cjt.setExportsSuccess(true);
-        if (status.equals("failed"))
-            cjt.setExportsSuccess(false);
+        synchronized (waitTable){
+            if (DebugLevels.DEBUG_9) System.out.println("Size of the wait Table: " + waitTable.size());
+          CaseJobTask cjt = (CaseJobTask) waitTable.get(cjtId);
+         if (DebugLevels.DEBUG_9) System.out.println("For cjtId=" + cjtId + " Is the CaseJobTaksk null? " + (cjt==null));   
+        }
+//
+//        if (status.equals("completed"))
+//            cjt.setExportsSuccess(true);
+//        if (status.equals("failed"))
+//            cjt.setExportsSuccess(false);
 
         // FIXME: expand the dependencies logic with Alexis
-        cjt.setDependenciesSet(true);
+//        cjt.setDependenciesSet(true);
 
         
-        CaseJobTaskManager.processTaskQueue();
+        //CaseJobTaskManager.processTaskQueue();
 
     }
 

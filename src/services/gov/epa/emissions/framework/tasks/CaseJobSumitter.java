@@ -24,13 +24,13 @@ public class CaseJobSumitter implements TaskSubmitter {
     public CaseJobSumitter() {
         myTag();
         submitterId = svcLabel;
-        System.out.println("CaseJobSubmitter myTag called: " + submitterId);
+        if (DebugLevels.DEBUG_0) System.out.println("CaseJobSubmitter myTag called: " + submitterId);
         caseJobTasks = new ArrayList<Runnable>();
 
     }
 
     public void addTasksToSubmitter(ArrayList<Runnable> tasksForSubmitter) {
-        System.out.println("CaseJobSubmitter::addTasksToSubmitter Total number of tasks= " + tasksForSubmitter.size());
+        if (DebugLevels.DEBUG_0) System.out.println("CaseJobSubmitter::addTasksToSubmitter Total number of tasks= " + tasksForSubmitter.size());
         this.submitTasksToTaskManager(submitterId, tasksForSubmitter);
     }
 

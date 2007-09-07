@@ -736,22 +736,22 @@ public class ManagedCaseService {
 
         // append all the job inputs to the inputsAll list
         if ((inputsAA != null) && (inputsAA.size() > 0)) {
-            System.out.println("Number of AA inputs = " + inputsAA.size());
+            if (DebugLevels.DEBUG_0) System.out.println("Number of AA inputs = " + inputsAA.size());
             inputsAll.addAll(inputsAA);
         }
         if ((inputsSA != null) && (inputsSA.size() > 0)) {
-            System.out.println("Number of SA inputs = " + inputsSA.size());
+            if (DebugLevels.DEBUG_0) System.out.println("Number of SA inputs = " + inputsSA.size());
             inputsAll.addAll(inputsSA);
         }
         if ((inputsAJ != null) && (inputsAJ.size() > 0)) {
-            System.out.println("Number of AJ inputs = " + inputsAJ.size());
+            if (DebugLevels.DEBUG_0) System.out.println("Number of AJ inputs = " + inputsAJ.size());
             inputsAll.addAll(inputsAJ);
         }
         if ((inputsSJ != null) && (inputsSJ.size() > 0)) {
-            System.out.println("Number of SJ inputs = " + inputsSJ.size());
+            if (DebugLevels.DEBUG_0) System.out.println("Number of SJ inputs = " + inputsSJ.size());
             inputsAll.addAll(inputsSJ);
         }
-        System.out.println("Total number of inputs = " + inputsAll.size());
+        if (DebugLevels.DEBUG_0) System.out.println("Total number of inputs = " + inputsAll.size());
 
         return (inputsAll);
     }
@@ -1200,7 +1200,7 @@ public class ManagedCaseService {
      * 
      */
     public synchronized String submitJobs(Integer[] jobIds, int caseId, User user) throws EmfException {
-        System.out.println("ManagedCaseService::submitJobs size: " + jobIds.length + " for caseId= " + caseId);
+        if (DebugLevels.DEBUG_0) System.out.println("ManagedCaseService::submitJobs size: " + jobIds.length + " for caseId= " + caseId);
 
         // create a new caseJobSubmitter for each client call in a session
         TaskSubmitter caseJobSubmitter = new CaseJobSumitter();
@@ -1211,18 +1211,18 @@ public class ManagedCaseService {
 
             List<CaseJob> caseJobs = new ArrayList<CaseJob>();
 
-            System.out.println("Is CaseJobSubmitterId null? " + (caseJobSubmitterId == null));
+            if (DebugLevels.DEBUG_0) System.out.println("Is CaseJobSubmitterId null? " + (caseJobSubmitterId == null));
             // FIXME: Does this need to be done in a new DAO method???
             // Get the CaseJobs for each jobId
             for (Integer jobId : jobIds) {
                 int jid = jobId.intValue();
 
-                System.out.println("The jobId= " + jid);
+                if (DebugLevels.DEBUG_0) System.out.println("The jobId= " + jid);
                 CaseJob caseJob = this.getCaseJob(jid);
-                System.out.println("Is the caseJob for this jobId null? " + (caseJob == null));
+                if (DebugLevels.DEBUG_0) System.out.println("Is the caseJob for this jobId null? " + (caseJob == null));
                 Case jobCase = this.getCase(caseId);
 
-                System.out.println("caseId= " + caseId + " Is the Case for this job null? " + (jobCase == null));
+                if (DebugLevels.DEBUG_0) System.out.println("caseId= " + caseId + " Is the Case for this job null? " + (jobCase == null));
                 // FIXME: Is this still needed?????
                 // caseJob.setRunStartDate(new Date());
                 CaseJobTask cjt = new CaseJobTask(jid, caseId, user);
@@ -1270,10 +1270,10 @@ public class ManagedCaseService {
                     System.out.println("Purpose= " + purpose);
 
                 // pass the inputs to the exportService which uses an exportJobSubmitter to work with exportTaskManager
-                // caseJobExportSubmitterId = this.getExportService().exportForJob(user, inputs, cjt.getTaskId(),
-                // purpose,
-                // caseJob, jobCase);
-                caseJobExportSubmitterId = "DUMMY caseJobExportSubmitterId";
+                 caseJobExportSubmitterId = this.getExportService().exportForJob(user, inputs, cjt.getTaskId(),
+                 purpose,
+                 caseJob, jobCase);
+                //caseJobExportSubmitterId = "DUMMY caseJobExportSubmitterId";
 
                 // FIXME: Do we still need the casejob around?
                 caseJobs.add(caseJob);
