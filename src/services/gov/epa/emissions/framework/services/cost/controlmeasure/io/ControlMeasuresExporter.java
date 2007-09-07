@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -114,25 +114,29 @@ public class ControlMeasuresExporter implements Exporter {
     }
     
     private String equationRecord(ControlMeasure measure, int size) {
-        List list=new ArrayList(size);
+        String values[]= {" "," "," "," "," "," "," "," "," "," "," "," " };
+        List<String> list=Arrays.asList(values);
+//        StringBuffer eString = new StringBuffer(12);
+//        for (int i=0; i<12; i++)
+//            eString[i]=new StringBuffer(" ");
          
-        String name = measure.getName();
-        list.add(0,name);
+        String name = measure.getAbbreviation();
+        list.set(0, name);
         
         ControlMeasureEquation cMequation[]=measure.getEquations();
         EquationType equationType=cMequation[0].getEquationType();
-        list.add(1,equationType.getName());
+        list.set(1, equationType.getName());
         
         for (int k=0; k< cMequation.length; k++){
             EquationTypeVariable typeVariable=cMequation[k].getEquationTypeVariable();
             if (typeVariable!=null)
-                list.add(typeVariable.getFileColPosition()+1, cMequation[k].getValue());         
+                list.set(typeVariable.getFileColPosition()+1, cMequation[k].getValue()+"");         
         }       
         
         String equationRecord = list.get(0) + delimiter;
         for (int i=1; i<size-1; i++)
             equationRecord += list.get(i) + delimiter; 
-        equationRecord += list.get(size-1) + delimiter; 
+        equationRecord += list.get(size-1); 
         return equationRecord; 
     }
     
