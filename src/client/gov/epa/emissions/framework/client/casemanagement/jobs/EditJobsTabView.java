@@ -18,7 +18,7 @@ public interface EditJobsTabView {
 
     void clearMessage();
     
-    void saveCaseOutputFileDir();
+    String getCaseOutputFileDir();
     
 //    void notifychanges();
 

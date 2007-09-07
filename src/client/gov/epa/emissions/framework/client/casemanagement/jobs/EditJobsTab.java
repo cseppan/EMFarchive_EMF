@@ -41,7 +41,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-public class EditJobsTab extends JPanel implements EditJobsTabView,RefreshObserver {
+public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObserver {
 
     private EmfConsole parentConsole;
 
@@ -56,7 +56,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView,RefreshObserv
     private JPanel tablePanel;
 
     private MessagePanel messagePanel;
-    
+
     private ManageChangeables changeables;
 
     private TextField outputDir;
@@ -73,7 +73,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView,RefreshObserv
         this.desktopManager = desktopManager;
         this.session = session;
         this.changeables = changeables;
-        
+
         super.setLayout(new BorderLayout());
     }
 
@@ -119,10 +119,10 @@ public class EditJobsTab extends JPanel implements EditJobsTabView,RefreshObserv
     private void doRefresh(CaseJob[] jobs) throws Exception {
         super.removeAll();
         String outputFileDir = caseObj.getOutputFileDir();
-        
+
         if (!outputDir.getText().equalsIgnoreCase(outputFileDir))
             outputDir.setText(outputFileDir);
-        
+
         super.add(createLayout(jobs, parentConsole), BorderLayout.CENTER);
     }
 
@@ -135,12 +135,13 @@ public class EditJobsTab extends JPanel implements EditJobsTabView,RefreshObserv
 
         return layout;
     }
-    
+
     public JPanel createFolderPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Output Folder:", getFolderChooserPanel(outputDir, "Select the base Output Folder for the Case"), panel);
+        layoutGenerator.addLabelWidgetPair("Output Folder:", getFolderChooserPanel(outputDir,
+                "Select the base Output Folder for the Case"), panel);
         layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
@@ -154,8 +155,8 @@ public class EditJobsTab extends JPanel implements EditJobsTabView,RefreshObserv
                 selectFolder(dir, title);
             }
         });
-        JPanel folderPanel = new JPanel(new BorderLayout(2,0));
-        folderPanel.add(dir,BorderLayout.LINE_START);
+        JPanel folderPanel = new JPanel(new BorderLayout(2, 0));
+        folderPanel.add(dir, BorderLayout.LINE_START);
         folderPanel.add(browseButton, BorderLayout.LINE_END);
 
         return folderPanel;
@@ -392,9 +393,11 @@ public class EditJobsTab extends JPanel implements EditJobsTabView,RefreshObserv
     public CaseJob[] caseJobs() {
         return tableData.sources();
     }
-    
-    public void saveCaseOutputFileDir() {
-        caseObj.setOutputFileDir(outputDir.getText());
+
+    public String getCaseOutputFileDir() {
+        if (outputDir == null)
+            return null;
+        return outputDir.getText();
     }
 
     public void doRefresh() throws EmfException {

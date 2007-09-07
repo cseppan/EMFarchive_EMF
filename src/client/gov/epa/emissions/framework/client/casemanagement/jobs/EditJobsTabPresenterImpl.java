@@ -29,7 +29,9 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     }
 
     public void doSave() {
-        view.saveCaseOutputFileDir();
+        String caseOutputDir = view.getCaseOutputFileDir();
+        if (caseOutputDir != null)
+            caseObj.setInputFileDir(caseOutputDir);
         view.refresh();
     }
     
