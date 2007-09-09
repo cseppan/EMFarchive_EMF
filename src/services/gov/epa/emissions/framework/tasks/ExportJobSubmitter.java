@@ -31,7 +31,7 @@ public class ExportJobSubmitter extends ExportSubmitter {
     public synchronized void callbackFromTaskManager(String taskId, String status, String mesg) {
         if (DebugLevels.DEBUG_9)
             System.out
-                    .println(">>>>>>>> ExportClientSubmitter::callbackFromTaskManager id= " + submitterId
+                    .println(">>>>>>>> ExportJobSubmitter::callbackFromTaskManager id= " + submitterId
                             + " got callback from TaskManager for Task: " + taskId + " status= " + status
                             + " message= " + mesg);
 

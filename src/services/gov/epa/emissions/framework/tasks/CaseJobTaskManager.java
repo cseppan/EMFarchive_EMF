@@ -2,21 +2,93 @@ package gov.epa.emissions.framework.tasks;
 
 import gov.epa.emissions.framework.services.casemanagement.CaseJobTask;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class CaseJobTaskManager extends TaskManager {
+public class CaseJobTaskManager implements TaskManager {
     private static Log log = LogFactory.getLog(CaseJobTaskManager.class);
 
     private static CaseJobTaskManager ref;
+    private static int refCount = 0;
+
+    private final int poolSize = 4;
+    private final int maxPoolSize = 4;
+    private final long keepAliveTime = 60;
+
+    private static ArrayList<TaskSubmitter> submitters = new ArrayList<TaskSubmitter>();
+
+    private static ThreadPoolExecutor threadPool = null;
+
+    // PBQ is the queue for submitting jobs
+    private static BlockingQueue<Runnable> taskQueue = new PriorityBlockingQueue<Runnable>();
+
+    private static ArrayBlockingQueue<Runnable> threadPoolQueue = new ArrayBlockingQueue<Runnable>(5);
+
+    private static Hashtable<String, Task> runTable = new Hashtable<String, Task>();
+
+    private static Hashtable<String, Task> waitTable = new Hashtable<String, Task>();
+
+    public static synchronized int getSizeofTaskQueue() {
+        return taskQueue.size();
+    }
+    
+    public static synchronized int getSizeofWaitTable(){
+        return waitTable.size();
+    }
+
+    public static synchronized int getSizeofRunTable(){
+        return runTable.size();
+    }
+    
+    public static synchronized void shutDown() {
+        if (DebugLevels.DEBUG_1)
+            System.out.println("Shutdown called on Task Manager");
+        taskQueue.clear();
+        threadPoolQueue.clear();
+        threadPool.shutdownNow();
+    }
+
+    public static synchronized void removeTask(Runnable task) {
+        taskQueue.remove(task);
+    }
+
+    public static synchronized void removeTasks(ArrayList<?> tasks) {
+        taskQueue.removeAll(tasks);
+    }
+
+    public static synchronized void registerTaskSubmitter(TaskSubmitter ts) {
+        submitters.add(ts);
+    }
+
+    public static synchronized void deregisterSubmitter(TaskSubmitter ts) {
+        if (DebugLevels.DEBUG_1)
+            System.out.println("DeREGISTERED SUBMITTER: " + ts.getSubmitterId() + " Confirm task count= "
+                    + ts.getTaskCount());
+        submitters.remove(ts);
+    }
+
+
+    public synchronized void finalize() throws Throwable {
+        if (DebugLevels.DEBUG_0) System.out.println("Finalizing TaskManager # of taskmanagers= " + refCount);
+
+        shutDown();
+    }
+
+    // clone not supported needs to be added
+    public Object clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException();
+    }
 
     private CaseJobTaskManager() {
         super();
@@ -38,7 +110,7 @@ public class CaseJobTaskManager extends TaskManager {
 
     }
 
-    public static TaskManager getCaseJobTaskManager() {
+    public static synchronized CaseJobTaskManager getCaseJobTaskManager() {
         if (ref == null)
             ref = new CaseJobTaskManager();
         return ref;
@@ -46,18 +118,24 @@ public class CaseJobTaskManager extends TaskManager {
 
     public static synchronized void addTasks(ArrayList<Runnable> tasks) {
         // TaskManager.resetIdleTime();
+        Iterator iter = tasks.iterator();
+        while (iter.hasNext()){
+            Task tsk = (Task) iter.next();
+            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In CaseJobTaskManager::addTasks the types of TASK objects coming in are: " + tsk.getClass().getName());
+        }
+        
         if (DebugLevels.DEBUG_0)System.out.println("IN CaseJobTaskManager number of tasks received= " + tasks.size());
         taskQueue.addAll(tasks);
         if (DebugLevels.DEBUG_0)System.out.println("IN CaseJobTaskManager size of task Queue= " + taskQueue.size());
 
-        synchronized (CaseJobTaskManager.runTable) {
+        synchronized (runTable) {
             if (threadPool.getCorePoolSize() - runTable.size() > 0) {
-                //CaseJobTaskManager.processTaskQueue();
+                processTaskQueue();
             }
         }// synchronized
     }
 
-    public synchronized static void callBackFromThread(String taskId, String submitterId, String status, String mesg) {
+    public static synchronized void callBackFromThread(String taskId, String submitterId, String status, String mesg) {
         if (DebugLevels.DEBUG_2)
             System.out.println("CaseJobTaskManager::callBackFromThread  refCount= " + refCount);
         if (DebugLevels.DEBUG_2)
@@ -67,18 +145,18 @@ public class CaseJobTaskManager extends TaskManager {
         if (DebugLevels.DEBUG_0)
             System.out.println("***BELOW*** In callback the sizes are ***BELOW***");
         if (DebugLevels.DEBUG_0)
-            System.out.println("Size of PBQ taskQueue: " + CaseJobTaskManager.getSizeofTaskQueue());
+            System.out.println("Size of PBQ taskQueue: " + getSizeofTaskQueue());
         if (DebugLevels.DEBUG_0)
-            System.out.println("Size of WAIT TABLE: " + CaseJobTaskManager.getSizeofWaitTable());
+            System.out.println("Size of WAIT TABLE: " + getSizeofWaitTable());
         if (DebugLevels.DEBUG_0)
-            System.out.println("Size of RUN TABLE: " + CaseJobTaskManager.getSizeofRunTable());
+            System.out.println("Size of RUN TABLE: " + getSizeofRunTable());
         if (DebugLevels.DEBUG_0)
             System.out.println("***ABOVE*** In callback the sizes are shown ***ABOVE***");
         runTable.remove(taskId);
         if (DebugLevels.DEBUG_0)
-            System.out.println("After Task removed Size of RUN TABLE: " + CaseJobTaskManager.getSizeofRunTable());
+            System.out.println("After Task removed Size of RUN TABLE: " + getSizeofRunTable());
 
-        //CaseJobTaskManager.processTaskQueue();
+        processTaskQueue();
     }
 
     public static synchronized void processTaskQueue() {
@@ -88,58 +166,35 @@ public class CaseJobTaskManager extends TaskManager {
         if (DebugLevels.DEBUG_0)
             System.out.println(">>>>> BEGIN CaseJobTaskManager::processTaskQueue() *** " + new Date());
         if (DebugLevels.DEBUG_0)
-            System.out.println("Size of PBQ taskQueue: " + CaseJobTaskManager.getSizeofTaskQueue());
+            System.out.println("Size of PBQ taskQueue: " + getSizeofTaskQueue());
         if (DebugLevels.DEBUG_0)
-            System.out.println("Size of WAIT TABLE: " + CaseJobTaskManager.getSizeofWaitTable());
+            System.out.println("Size of WAIT TABLE: " + getSizeofWaitTable());
         if (DebugLevels.DEBUG_0)
-            System.out.println("Size of RUN TABLE: " + CaseJobTaskManager.getSizeofRunTable());
-
-        // if (DebugLevels.DEBUG_4)
-        // System.out.println("# of tasks in Thread Pool size: " + threadPool.getPoolSize());
-        //
-        // if (DebugLevels.DEBUG_5)
-        // System.out.println("Active Thread Count= " + threadPool.getActiveCount());
-        //        
-        // if (DebugLevels.DEBUG_5)
-        // System.out.println("Core pool size: " + threadPool.getCorePoolSize());
-        //        
-        // if (DebugLevels.DEBUG_5)
-        // System.out.println("Maximum pool size= " + threadPool.getMaximumPoolSize());
-        //        
-        // if (DebugLevels.DEBUG_5)
-        // System.out.println("Threads available for processing= "
-        // + (threadPool.getCorePoolSize() - threadPool.getPoolSize()));
-        //        
-        // if (DebugLevels.DEBUG_5)
-        // System.out.println("Completed task count: " + threadPool.getCompletedTaskCount());
-        //        
-        // if (DebugLevels.DEBUG_5)
-        // System.out.println("TASK COUNT: " + threadPool.getTaskCount());
-        //        
-        // if (DebugLevels.DEBUG_3)
-        // System.out.println("ACTIVE TASK COUNT: " + threadPool.getActiveCount());
+            System.out.println("Size of RUN TABLE: " + getSizeofRunTable());
 
         if (DebugLevels.DEBUG_0)
             System.out.println("Before processing the taskQueue");
         if (DebugLevels.DEBUG_0)
-            System.out.println("SIZE OF TASKQUEUE: " + CaseJobTaskManager.getSizeofTaskQueue());
+            System.out.println("SIZE OF TASKQUEUE: " + getSizeofTaskQueue());
 
         boolean done = false;
         while (!done) {
-            if (CaseJobTaskManager.getSizeofTaskQueue() == 0) {
+            if (getSizeofTaskQueue() == 0) {
                 if (DebugLevels.DEBUG_0)
                     System.out.println("#tasks in taskQueue == 0?? Breaking out of taskQueue TEST loop: ");
                 done = true;
             } else {
                 if (DebugLevels.DEBUG_0)
-                    System.out.println("Before Peak into taskQueue: " + CaseJobTaskManager.getSizeofTaskQueue());
+                    System.out.println("Before Peak into taskQueue: " + getSizeofTaskQueue());
                 if (taskQueue.peek() != null) {
                     if (DebugLevels.DEBUG_0)
                         System.out.println("Peak into taskQueue has an object in head: "
-                                + CaseJobTaskManager.getSizeofTaskQueue());
+                                + getSizeofTaskQueue());
 
                     try {
                         CaseJobTask nextTask = (CaseJobTask) taskQueue.take();
+                        if (DebugLevels.DEBUG_9) System.out.println("&&&&& In CaseJobTaskManager::processQueue pop the queue the type of TASK objects nextTask is : " + nextTask.getClass().getName());
+
                         // number of threads available before inspecting the priority blocking queue
                         synchronized (threadPool) {
                             // threadsAvail = threadPool.getCorePoolSize() - threadPool.getActiveCount();
@@ -186,11 +241,11 @@ public class CaseJobTaskManager extends TaskManager {
             System.out.println("After processing the taskQueue");
 
         if (DebugLevels.DEBUG_0)
-            System.out.println("Size of PBQ taskQueue: " + CaseJobTaskManager.getSizeofTaskQueue());
+            System.out.println("Size of PBQ taskQueue: " + getSizeofTaskQueue());
         if (DebugLevels.DEBUG_0)
-            System.out.println("Size of WAIT TABLE: " + CaseJobTaskManager.getSizeofWaitTable());
+            System.out.println("Size of WAIT TABLE: " + getSizeofWaitTable());
         if (DebugLevels.DEBUG_0)
-            System.out.println("Size of RUN TABLE: " + CaseJobTaskManager.getSizeofRunTable());
+            System.out.println("Size of RUN TABLE: " + getSizeofRunTable());
 
         if (DebugLevels.DEBUG_0)
             System.out.println("Before processing the WAIT TABLE");
@@ -203,6 +258,8 @@ public class CaseJobTaskManager extends TaskManager {
             Iterator<Task> copyIter = waitTasks.iterator();
             while (copyIter.hasNext()) {
                 Task copyTask = copyIter.next();
+                if (DebugLevels.DEBUG_9) System.out.println("&&&&& In CaseJobTaskManager::processQueue process waitTasks the type of TASK object: " + copyTask.getClass().getName());
+                
                 tempWaitTable.put(copyTask.getTaskId(), copyTask);
             }
         }// synchronized (waitTable)
@@ -229,7 +286,10 @@ public class CaseJobTaskManager extends TaskManager {
 
             if (threadsAvail > 0) {
                 CaseJobTask tsk = (CaseJobTask) iter.next();
+
+                if (DebugLevels.DEBUG_9) System.out.println("&&&&& In CaseJobTaskManager::processQueue run a waitTasks the type of TASK object: " + tsk.getClass().getName());
                 System.out.println(tsk.taskId);
+                
                 if (DebugLevels.DEBUG_0)
                     System.out.println("Is the caseJobTask null? " + (tsk == null));
                 if (DebugLevels.DEBUG_0)
@@ -307,7 +367,7 @@ public class CaseJobTaskManager extends TaskManager {
 //        cjt.setDependenciesSet(true);
 
         
-        //CaseJobTaskManager.processTaskQueue();
+        processTaskQueue();
 
     }
 

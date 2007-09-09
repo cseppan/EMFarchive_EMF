@@ -16,11 +16,11 @@ public class TaskManagerFactory {
 	}
 
 	public static synchronized ExportTaskManager getExportTaskManager(){
-		return (ExportTaskManager) ExportTaskManager.getExportTaskManager();
+		return ExportTaskManager.getExportTaskManager();
 	}
 	
     public static synchronized CaseJobTaskManager getCaseJobTaskManager(){
-        return (CaseJobTaskManager) CaseJobTaskManager.getCaseJobTaskManager();
+        return CaseJobTaskManager.getCaseJobTaskManager();
     }
 	
 }

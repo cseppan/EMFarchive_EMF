@@ -214,10 +214,9 @@ public class ManagedExportService {
 
             // FIXME: Verify at team meeting Test if subpath exists. If not create subpath
 
-            // FIXME: Investigate if services reference needs to be unique for each dataset in this call
             if (isExportable(dataset, services, user)) {
                 try {
-                    Task tsk = createExportTask(user, purpose, true, new File(fullPath), dataset, version);
+                    ExportTask tsk = createExportTask(user, purpose, true, new File(fullPath), dataset, version);
 
                     // Add the newly created Export Task to the list of eximTasks
                     eximTasks.add(tsk);
@@ -236,6 +235,12 @@ public class ManagedExportService {
         if (DebugLevels.DEBUG_9)
             System.out.println("Before exportTaskSubmitter.addTasksToSubmitter # of elements in eximTasks array= "
                     + eximTasks.size());
+
+        Iterator iter2 = eximTasks.iterator();
+        while (iter2.hasNext()){
+            Task tsk = (Task) iter2.next();
+            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In ManagedExportService::exportForJob the types of TASK objects in eximTasks: " + tsk.getClass().getName());
+        }
 
         // All eximTasks have been created...so add to the submitter
         exportJobTaskSubmitter.addTasksToSubmitter(eximTasks);
@@ -300,7 +305,7 @@ public class ManagedExportService {
 
                 // FIXME: Investigate if services reference needs to be unique for each dataset in this call
                 if (isExportable(dataset, services, user)) {
-                    Task tsk = createExportTask(user, purpose, overwrite, path, dataset, version);
+                    ExportTask tsk = createExportTask(user, purpose, overwrite, path, dataset, version);
                     
                     eximTasks.add(tsk);
 
@@ -342,7 +347,7 @@ public class ManagedExportService {
         return exportTaskSubmitter.getSubmitterId();
     }
 
-    private synchronized Task createExportTask(User user, String purpose, boolean overwrite, File path,
+    private synchronized ExportTask createExportTask(User user, String purpose, boolean overwrite, File path,
             EmfDataset dataset, Version version) throws Exception {
         if (DebugLevels.DEBUG_9)
             System.out.println(">>## In export service:doExport() " + myTag() + " for datasetId: " + dataset.getId());

@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.tasks;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 
 
 public class CaseJobSumitter implements TaskSubmitter {
@@ -30,6 +31,12 @@ public class CaseJobSumitter implements TaskSubmitter {
     }
 
     public void addTasksToSubmitter(ArrayList<Runnable> tasksForSubmitter) {
+        Iterator iter = tasksForSubmitter.iterator();
+        while (iter.hasNext()){
+            Task tsk = (Task) iter.next();
+            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In CaseJobSubmitter::addTasksToSubmitter the types of TASK objects coming in are: " + tsk.getClass().getName());
+        }
+
         if (DebugLevels.DEBUG_0) System.out.println("CaseJobSubmitter::addTasksToSubmitter Total number of tasks= " + tasksForSubmitter.size());
         this.submitTasksToTaskManager(submitterId, tasksForSubmitter);
     }
@@ -59,6 +66,12 @@ public class CaseJobSumitter implements TaskSubmitter {
     }
 
     public synchronized void submitTasksToTaskManager(String submitterId, ArrayList<Runnable> tasks) {
+        Iterator iter = tasks.iterator();
+        while (iter.hasNext()){
+            Task tsk = (Task) iter.next();
+            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In CaseJobSubmitter::submitTasksToTaskManager the types of TASK objects coming in are: " + tsk.getClass().getName());
+        }
+
         if (DebugLevels.DEBUG_0)
             System.out.println("In submitter::submitTasksToTaskManager= " + this.getSubmitterId());
         if (DebugLevels.DEBUG_0)
