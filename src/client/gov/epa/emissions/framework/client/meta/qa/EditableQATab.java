@@ -83,7 +83,8 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Version", "Order" };
-        return new SortCriteria(columnNames, new boolean[] { false, false }, new boolean[] { true, true });
+        return new SortCriteria(columnNames, new boolean[] { false, true }, new boolean[] { true, true });
+        //return new SortCriteria(columnNames, new boolean[] { false, false }, new boolean[] { true, true });
     }
 
     private JPanel createButtonsSection() {
