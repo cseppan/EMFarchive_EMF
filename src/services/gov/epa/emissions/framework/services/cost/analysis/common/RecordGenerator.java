@@ -9,13 +9,13 @@ import java.util.List;
 
 public interface RecordGenerator {
 
-    Record getRecord(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException;
+    Record getRecord(ResultSet resultSet, BestMeasureEffRecord bestMeasureEffRecord, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException;
     
     double reducedEmission();
     
     Double totalCost();
     
-    void calculateEmissionReduction(ResultSet resultSet, BestMeasureEffRecord maxMeasure) throws SQLException;
+    void calculateEmissionReduction(ResultSet resultSet, BestMeasureEffRecord bestMeasureEffRecord) throws SQLException;
     
-    List tokens(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions, boolean hasSICandNAICS) throws SQLException, EmfException;
+    List tokens(ResultSet resultSet, BestMeasureEffRecord bestMeasureEffRecord, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions, boolean hasSICandNAICS) throws SQLException, EmfException;
 }

@@ -22,13 +22,15 @@ public class CostEquationFactory {
         this.type2CostEquation = new Type2CostEquation(discountRate);
     }
 
-    public CostEquation getCostEquation(double reducedEmission, BestMeasureEffRecord bestMeasureEffRecord, 
-            Double minStackFlowRate, Double designCapacity) {
+    public CostEquation getCostEquation(String pollutantName, double reducedEmission, 
+            BestMeasureEffRecord bestMeasureEffRecord, Double minStackFlowRate, 
+            Double designCapacity) {
         //always setup the default cost equation, the other equation types will default to using this approach when the other equation don't work
         //for example, maybe some of the inputs are missing, or maybe some constraint is not met...
         defaultCostEquations.setUp(reducedEmission, bestMeasureEffRecord);
 
-        if (useCostEquations) {
+        //use CoST equations only for the measures major pollutant, else use the default approach
+        if (useCostEquations && pollutantName.equalsIgnoreCase(bestMeasureEffRecord.measure().getMajorPollutant().getName())) {
             //see which type of equation to use...
             ControlMeasureEquation[] equations = bestMeasureEffRecord.measure().getEquations();
             
@@ -76,7 +78,7 @@ public class CostEquationFactory {
                 
                 if (equations[0].getEquationType().getName().equals("Type 2")) {
                     //evaluate inputs, if they missing, use the default
-                    if (minStackFlowRate != null && minStackFlowRate != 0.0) {
+                    if (designCapacity != null && designCapacity != 0.0) {
                         type2CostEquation.setUp(reducedEmission, bestMeasureEffRecord, 
                                 designCapacity);
                         return type2CostEquation;

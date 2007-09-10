@@ -41,20 +41,20 @@ public class NonpointRecordGenerator implements RecordGenerator {
         this.costEquationsFactory = costEquationsFactory;
     }
 
-    public Record getRecord(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {
+    public Record getRecord(ResultSet resultSet, BestMeasureEffRecord bestMeasureEffRecord, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {
         Record record = new Record();
-        record.add(tokens(resultSet, maxCM, originalEmissions, displayOriginalEmissions, displayFinalEmissions,true));
+        record.add(tokens(resultSet, bestMeasureEffRecord, originalEmissions, displayOriginalEmissions, displayFinalEmissions,true));
 
         return record;
     }
 
-    public List tokens(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions,
+    public List tokens(ResultSet resultSet, BestMeasureEffRecord bestMeasureEffRecord, double originalEmissions, boolean displayOriginalEmissions, boolean displayFinalEmissions,
             boolean hasSICandNAICS) throws SQLException, EmfException {
         // here the resultSet is probably the result of the query to get all the inventory records
         List<String> tokens = new ArrayList<String>();
-        double effectiveReduction = maxCM.effectiveReduction();
+        double effectiveReduction = bestMeasureEffRecord.effectiveReduction();
         
-        calculateEmissionReduction(resultSet,maxCM);
+        calculateEmissionReduction(resultSet,bestMeasureEffRecord);
         reducedEmission = originalEmissions * effectiveReduction;
         
         
@@ -64,7 +64,7 @@ public class NonpointRecordGenerator implements RecordGenerator {
         tokens.add("");  // delete_versions
 
         tokens.add("false");  // disable
-        tokens.add(maxCM.measure().getAbbreviation());  // measure abbreviation
+        tokens.add(bestMeasureEffRecord.measure().getAbbreviation());  // measure abbreviation
         tokens.add(resultSet.getString("poll"));
         tokens.add(resultSet.getString("scc"));
         String fullFips = resultSet.getString("fips").trim();
@@ -72,8 +72,9 @@ public class NonpointRecordGenerator implements RecordGenerator {
 
         // these columns are only relevant to point sources, leave empty for nonpoint
         
-        CostEquation costEquations = costEquationsFactory.getCostEquation(reducedEmission, maxCM, 
-                null, null);
+        CostEquation costEquations = costEquationsFactory.getCostEquation(resultSet.getString("poll"), reducedEmission, 
+                bestMeasureEffRecord, null, 
+                null);
         
         tokens.add(""); // plant Id
         tokens.add(""); // Point ID
@@ -88,9 +89,9 @@ public class NonpointRecordGenerator implements RecordGenerator {
         tokens.add("" + decFormat.format(annualCost));  // annual cost for source
         tokens.add("" + decFormat.format(costEquations.getComputedCPT()));  // annual cost per ton
         
-        tokens.add("" + decFormat.format(maxCM.controlEfficiency()));   // control efficiency
-        tokens.add("" + maxCM.rulePenetration());  // rule penetration
-        tokens.add("" + maxCM.ruleEffectiveness());  // rule effectiveness
+        tokens.add("" + decFormat.format(bestMeasureEffRecord.controlEfficiency()));   // control efficiency
+        tokens.add("" + bestMeasureEffRecord.rulePenetration());  // rule penetration
+        tokens.add("" + bestMeasureEffRecord.ruleEffectiveness());  // rule effectiveness
         tokens.add("" + decFormat.format(effectiveReduction * 100));   // percent reduction
 
         tokens.add("" + invenControlEfficiency);  // inventory CE
@@ -117,13 +118,13 @@ public class NonpointRecordGenerator implements RecordGenerator {
         tokens.add("" + resultSet.getInt("Record_Id"));  // sourceID from inventory
         tokens.add("" + strategyResult.getInputDatasetId());  // inputDatasetID
         tokens.add("" + strategyResult.getControlStrategyId());  
-        tokens.add("" + maxCM.measure().getId());  // control measureID
+        tokens.add("" + bestMeasureEffRecord.measure().getId());  // control measureID
         tokens.add("" + comment);
 
         return tokens;
     }
 
-    public void calculateEmissionReduction(ResultSet resultSet, BestMeasureEffRecord maxMeasure) throws SQLException {
+    public void calculateEmissionReduction(ResultSet resultSet, BestMeasureEffRecord bestMeasureEffRecord) throws SQLException {
         invenControlEfficiency = resultSet.getDouble("CEFF");
         invenRulePenetration = resultSet.getDouble("RPEN");
         invenRuleEffectiveness = resultSet.getDouble("REFF");

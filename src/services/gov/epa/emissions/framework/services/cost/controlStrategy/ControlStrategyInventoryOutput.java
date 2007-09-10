@@ -215,17 +215,30 @@ public class ControlStrategyInventoryOutput {
 
     private String updateQuery(String outputTable, String detailResultTable, Datasource datasource) {
         boolean pointDatasetType = inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)");
+        boolean costPointDatasetType = inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL CoST Point Inventory (PTINV)");
+        
         String sql = "update " + qualifiedTable(outputTable, datasource) + " as o "
         + "set ceff = case when ann_emis <> 0 then (1 - b.final_emissions / ann_emis) * 100 else 0 end, "
         + "ann_emis = b.final_emissions, "
         + "reff = 100 "
-        + (!pointDatasetType ? ", rpen = 100 " : " ")
+        + (!pointDatasetType && !costPointDatasetType? ", rpen = 100 " : " ")
+        + (costPointDatasetType? ", total_cost = b.annual_cost " : " ")
         + "FROM ( "
         + "SELECT source_id, max(final_emissions) as final_emissions "
+        + (costPointDatasetType ? ", sum(annual_cost) as annual_cost " : " ")
         + "FROM " + qualifiedTable(detailResultTable, datasource) + " "
         + "group by source_id "
         + ") as b "
-        + "WHERE o.record_id = b.source_id";
+        + "WHERE o.record_id = b.source_id;";
+
+        //FIXME:  Need to figure out a way to update the fields with the order the measure was applied, 
+        if (costPointDatasetType) {
+            sql += "update " + qualifiedTable(outputTable, datasource) + " as i "
+            + "set CONTROL_MEASURES = case when i.CONTROL_MEASURES is null then dr.cm_abbrev else i.CONTROL_MEASURES || '|' || dr.cm_abbrev end, "
+            + "PCT_REDUCTION = case when i.PCT_REDUCTION is null then cast(dr.percent_reduction as varchar) else i.PCT_REDUCTION || '|' || cast(dr.percent_reduction as varchar) end "
+            + "FROM qualifiedTable(detailResultTable, datasource) as dr "
+            + "where i.record_id = dr.source_id;";
+        }
         return sql;
     }
 

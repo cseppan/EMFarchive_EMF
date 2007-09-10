@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.TableFormat;
+import gov.epa.emissions.commons.io.orl.ORLCoSTPointFileFormat;
 import gov.epa.emissions.commons.io.orl.ORLNonPointFileFormat;
 import gov.epa.emissions.commons.io.orl.ORLNonRoadFileFormat;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadFileFormat;
@@ -36,6 +37,9 @@ public class FileFormatFactory {
 
         if (type.getName().startsWith("ORL Point"))
             return new VersionedTableFormat(new ORLPointFileFormat(types), types);
+
+        if (type.getName().startsWith("ORL CoST Point"))
+            return new VersionedTableFormat(new ORLCoSTPointFileFormat(types), types);
 
         throw new Exception("The dataset type '" + type.getName() + "' is not supported for inventory output");
     }

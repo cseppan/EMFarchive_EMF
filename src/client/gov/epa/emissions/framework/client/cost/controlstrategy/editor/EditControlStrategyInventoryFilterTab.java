@@ -184,7 +184,8 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
                     editControlStrategyPresenter.getDatasetType("ORL Nonpoint Inventory (ARINV)"),
                     editControlStrategyPresenter.getDatasetType("ORL Nonroad Inventory (ARINV)"),
                     editControlStrategyPresenter.getDatasetType("ORL Onroad Inventory (MBINV)"),
-                    editControlStrategyPresenter.getDatasetType("ORL Point Inventory (PTINV)")
+                    editControlStrategyPresenter.getDatasetType("ORL Point Inventory (PTINV)"),
+                    editControlStrategyPresenter.getDatasetType("ORL CoST Point Inventory (PTINV)")
                 });
         try {
             presenter.display();
