@@ -52,3 +52,4 @@ Country_Code,State_Code,State_Abbr,State_Name
 01,54,WV ,West Virginia 
 01,55,WI ,Wisconsin 
 01,56,WY ,Wyoming 
+01,88,TB ,Tribal Data
