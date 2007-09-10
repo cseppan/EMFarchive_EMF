@@ -113,8 +113,8 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
     }
 
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Job", "Received Date", "Exec. Mod. Date" };
-        return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
+        String[] columnNames = { "Received Date"};
+        return new SortCriteria(columnNames, new boolean[] {false}, new boolean[] {false});
     }
 
     public int numberOfRecord() {
