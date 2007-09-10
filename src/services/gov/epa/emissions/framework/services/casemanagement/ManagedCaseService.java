@@ -836,6 +836,7 @@ public class ManagedCaseService {
     private synchronized CaseJob copySingleJob(CaseJob job, int copiedCaseId) throws Exception {
         CaseJob copied = (CaseJob) DeepCopy.copy(job);
         copied.setCaseId(copiedCaseId);
+        copied.setJobkey(""); //jobkey supposedly generated when it is run
 
         return addCaseJob(copied);
     }
@@ -1280,6 +1281,12 @@ public class ManagedCaseService {
 
                 if (DebugLevels.DEBUG_0) System.out.println("The jobId= " + jid);
                 CaseJob caseJob = this.getCaseJob(jid);
+                User jobUser = caseJob.getUser();
+                
+                if (jobUser == null || !jobUser.equals(user)) {
+                    updateJobUser(caseJob, user);
+                }
+                
                 if (DebugLevels.DEBUG_0) System.out.println("Is the caseJob for this jobId null? " + (caseJob == null));
                 Case jobCase = this.getCase(caseId);
 
@@ -1361,6 +1368,18 @@ public class ManagedCaseService {
             ex.printStackTrace();
             throw ex;
 
+        }
+    }
+
+    private synchronized void updateJobUser(CaseJob caseJob, User user) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            caseJob.setUser(user);
+            dao.updateCaseJob(caseJob, session);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
         }
     }
 
