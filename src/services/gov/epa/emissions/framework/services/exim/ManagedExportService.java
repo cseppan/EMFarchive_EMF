@@ -173,27 +173,6 @@ public class ManagedExportService {
         // FIXME: Moved here to see if session problem is solved.
         Services services = services();
 
-        // FIXME: Create the ExportTask one at a time and add to eximTasks
-        // for (int i=0; i<caseInputs.length;i++){
-        // CaseInput caseIp = caseInputs[i];
-        // EmfDataset dataset = caseIp.getDataset();
-        // Version version = caseIp.getVersion();
-        // String path = caseIp.getSubdir();
-        //            
-        // // FIXME: Investigate if services reference needs to be unique for each dataset in this call
-        // if (isExportable(dataset, services, user)) {
-        // try {
-        // createExportTask(user, purpose, true, new File(path), dataset, version);
-        // } catch (Exception e) {
-        // // don't need to log messages about exporting to existing file
-        // if (e.getMessage() != null && e.getMessage().indexOf("existing file") < 0)
-        // log.error("ERROR starting to export to folder: " + path, e);
-        // e.printStackTrace();
-        // throw new EmfException("Export failed: " + e.getMessage());
-        // }//try-catch
-        // }//if exportable
-        // }//for
-
         Iterator<CaseInput> iter = inputs.iterator();
 
         while (iter.hasNext()) {
@@ -204,7 +183,8 @@ public class ManagedExportService {
 
             String fullPath = getCleanDatasetName(dataset, version);
 
-            if (DebugLevels.DEBUG_9) System.out.println("CleanDataset Name: " + fullPath);
+            if (DebugLevels.DEBUG_9)
+                System.out.println("CleanDataset Name: " + fullPath);
             if ((subdir != null) && !(subdir.toString()).equals("")) {
                 fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + subdir
                         + System.getProperty("file.separator");
@@ -213,10 +193,18 @@ public class ManagedExportService {
             }
 
             // FIXME: Verify at team meeting Test if subpath exists. If not create subpath
+            File toSubDir = null;
+            if (DebugLevels.DEBUG_9)
+                System.out.println("FULL PATH= " + fullPath);
+         
+            toSubDir = new File(fullPath);
+            if (!toSubDir.exists()) {
+                toSubDir.mkdirs();
+            }
 
             if (isExportable(dataset, services, user)) {
                 try {
-                    ExportTask tsk = createExportTask(user, purpose, true, new File(fullPath), dataset, version);
+                    ExportTask tsk = createExportTask(user, purpose, true, toSubDir, dataset, version);
 
                     // Add the newly created Export Task to the list of eximTasks
                     eximTasks.add(tsk);
@@ -237,9 +225,12 @@ public class ManagedExportService {
                     + eximTasks.size());
 
         Iterator iter2 = eximTasks.iterator();
-        while (iter2.hasNext()){
+        while (iter2.hasNext()) {
             Task tsk = (Task) iter2.next();
-            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In ManagedExportService::exportForJob the types of TASK objects in eximTasks: " + tsk.getClass().getName());
+            if (DebugLevels.DEBUG_9)
+                System.out
+                        .println("&&&&& In ManagedExportService::exportForJob the types of TASK objects in eximTasks: "
+                                + tsk.getClass().getName());
         }
 
         // All eximTasks have been created...so add to the submitter
@@ -253,7 +244,8 @@ public class ManagedExportService {
                             + eximTasks.size());
 
         if (DebugLevels.DEBUG_9)
-            System.out.println("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + exportJobTaskSubmitter.getTaskCount());
+            System.out.println("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: "
+                    + exportJobTaskSubmitter.getTaskCount());
 
         log.info("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + exportJobTaskSubmitter.getTaskCount());
         log.info("ManagedExportService:export() submitted all exportTasks dropping out of loop");
@@ -284,6 +276,16 @@ public class ManagedExportService {
             TaskManagerFactory.getExportTaskManager().registerTaskSubmitter(exportTaskSubmitter);
         }
 
+        // FIXME: Verify at team meeting Test if subpath exists. If not create subpath
+        File toSubDir = null;
+        if (DebugLevels.DEBUG_9)
+            System.out.println("FULL PATH= " + dirName);
+
+        toSubDir = new File(dirName);
+        if (!toSubDir.exists()) {
+            toSubDir.mkdirs();
+        }
+
         File path = validatePath(dirName);
 
         if (datasets.length != versions.length) {
@@ -306,7 +308,7 @@ public class ManagedExportService {
                 // FIXME: Investigate if services reference needs to be unique for each dataset in this call
                 if (isExportable(dataset, services, user)) {
                     ExportTask tsk = createExportTask(user, purpose, overwrite, path, dataset, version);
-                    
+
                     eximTasks.add(tsk);
 
                 }
