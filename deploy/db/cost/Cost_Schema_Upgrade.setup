@@ -231,11 +231,97 @@ CREATE TABLE emf.equation_type_variables
 WITHOUT OIDS;
 ALTER TABLE emf.equation_type_variables OWNER TO postgres;
 
-
+-- poulate new equation and variable tables...
+-- Add Eqautions
+insert into emf.equation_types (name, description)
+select 'Type 1', 'Type 1';
+insert into emf.equation_types (name, description)
+select 'Type 2', 'Type 2';
+insert into emf.equation_types (name, description)
+select 'Type 3', 'Type 3';
+insert into emf.equation_types (name, description)
+select 'Type 4', 'Type 4';
+insert into emf.equation_types (name, description)
+select 'Type 5', 'Type 5';
 insert into emf.equation_types (name, description)
 select 'Type 6', 'Type 6';
 insert into emf.equation_types (name, description)
-select 'Type 5', 'Type 5';
+select 'Type 7', 'Type 7';
+insert into emf.equation_types (name, description)
+select 'Type 8', 'Type 8';
+
+
+-- Add Eqaution Variables
+
+-- Type 2
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Capital Cost Multiplier', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 2';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Capital Cost Exponent', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 2';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Annual Cost Multiplier', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 2';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Annual Cost Exponent', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 2';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Incremental Capital Cost Multiplier', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 2';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Incremental Capital Cost Exponent', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 2';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Incremental Annual Cost Multiplier', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 2';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Incremental Annual Cost Exponent', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 2';
+
+-- Type 1
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Capital Cost Multiplier', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 1';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Fixed O&M Cost Multiplier', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 1';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Variable O&M Cost Multiplier', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 1';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Scaling Factor - Model Size (MW)', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 1';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Scaling Factor - Exponent', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 1';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Capacity Factor', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 1';
+
+-- Type 8
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Typical Capital Control Cost Factor', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 8';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Typical O&M Control Cost Factor', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 8';
 
 -- 8/27/07 - DCD new table for measure equations...
 CREATE TABLE emf.control_measure_equations
