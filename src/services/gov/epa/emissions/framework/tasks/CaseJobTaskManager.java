@@ -20,10 +20,13 @@ public class CaseJobTaskManager implements TaskManager {
     private static Log log = LogFactory.getLog(CaseJobTaskManager.class);
 
     private static CaseJobTaskManager ref;
+
     private static int refCount = 0;
 
     private final int poolSize = 4;
+
     private final int maxPoolSize = 4;
+
     private final long keepAliveTime = 60;
 
     private static ArrayList<TaskSubmitter> submitters = new ArrayList<TaskSubmitter>();
@@ -42,15 +45,15 @@ public class CaseJobTaskManager implements TaskManager {
     public static synchronized int getSizeofTaskQueue() {
         return taskQueue.size();
     }
-    
-    public static synchronized int getSizeofWaitTable(){
+
+    public static synchronized int getSizeofWaitTable() {
         return waitTable.size();
     }
 
-    public static synchronized int getSizeofRunTable(){
+    public static synchronized int getSizeofRunTable() {
         return runTable.size();
     }
-    
+
     public static synchronized void shutDown() {
         if (DebugLevels.DEBUG_1)
             System.out.println("Shutdown called on Task Manager");
@@ -78,9 +81,9 @@ public class CaseJobTaskManager implements TaskManager {
         submitters.remove(ts);
     }
 
-
     public synchronized void finalize() throws Throwable {
-        if (DebugLevels.DEBUG_0) System.out.println("Finalizing TaskManager # of taskmanagers= " + refCount);
+        if (DebugLevels.DEBUG_0)
+            System.out.println("Finalizing TaskManager # of taskmanagers= " + refCount);
 
         shutDown();
     }
@@ -119,14 +122,18 @@ public class CaseJobTaskManager implements TaskManager {
     public static synchronized void addTasks(ArrayList<Runnable> tasks) {
         // TaskManager.resetIdleTime();
         Iterator iter = tasks.iterator();
-        while (iter.hasNext()){
+        while (iter.hasNext()) {
             Task tsk = (Task) iter.next();
-            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In CaseJobTaskManager::addTasks the types of TASK objects coming in are: " + tsk.getClass().getName());
+            if (DebugLevels.DEBUG_9)
+                System.out.println("&&&&& In CaseJobTaskManager::addTasks the types of TASK objects coming in are: "
+                        + tsk.getClass().getName());
         }
-        
-        if (DebugLevels.DEBUG_0)System.out.println("IN CaseJobTaskManager number of tasks received= " + tasks.size());
+
+        if (DebugLevels.DEBUG_0)
+            System.out.println("IN CaseJobTaskManager number of tasks received= " + tasks.size());
         taskQueue.addAll(tasks);
-        if (DebugLevels.DEBUG_0)System.out.println("IN CaseJobTaskManager size of task Queue= " + taskQueue.size());
+        if (DebugLevels.DEBUG_0)
+            System.out.println("IN CaseJobTaskManager size of task Queue= " + taskQueue.size());
 
         synchronized (runTable) {
             if (threadPool.getCorePoolSize() - runTable.size() > 0) {
@@ -185,15 +192,17 @@ public class CaseJobTaskManager implements TaskManager {
                 done = true;
             } else {
                 if (DebugLevels.DEBUG_0)
-                    System.out.println("Before Peak into taskQueue: " + getSizeofTaskQueue());
+                    System.out.println("Before Peek into taskQueue: " + getSizeofTaskQueue());
                 if (taskQueue.peek() != null) {
                     if (DebugLevels.DEBUG_0)
-                        System.out.println("Peak into taskQueue has an object in head: "
-                                + getSizeofTaskQueue());
+                        System.out.println("Peak into taskQueue has an object in head: " + getSizeofTaskQueue());
 
                     try {
                         CaseJobTask nextTask = (CaseJobTask) taskQueue.take();
-                        if (DebugLevels.DEBUG_9) System.out.println("&&&&& In CaseJobTaskManager::processQueue pop the queue the type of TASK objects nextTask is : " + nextTask.getClass().getName());
+                        if (DebugLevels.DEBUG_9)
+                            System.out
+                                    .println("&&&&& In CaseJobTaskManager::processQueue pop the queue the type of TASK objects nextTask is : "
+                                            + nextTask.getClass().getName());
 
                         // number of threads available before inspecting the priority blocking queue
                         synchronized (threadPool) {
@@ -258,8 +267,11 @@ public class CaseJobTaskManager implements TaskManager {
             Iterator<Task> copyIter = waitTasks.iterator();
             while (copyIter.hasNext()) {
                 Task copyTask = copyIter.next();
-                if (DebugLevels.DEBUG_9) System.out.println("&&&&& In CaseJobTaskManager::processQueue process waitTasks the type of TASK object: " + copyTask.getClass().getName());
-                
+                if (DebugLevels.DEBUG_9)
+                    System.out
+                            .println("&&&&& In CaseJobTaskManager::processQueue process waitTasks the type of TASK object: "
+                                    + copyTask.getClass().getName());
+
                 tempWaitTable.put(copyTask.getTaskId(), copyTask);
             }
         }// synchronized (waitTable)
@@ -287,17 +299,19 @@ public class CaseJobTaskManager implements TaskManager {
             if (threadsAvail > 0) {
                 CaseJobTask tsk = (CaseJobTask) iter.next();
 
-                if (DebugLevels.DEBUG_9) System.out.println("&&&&& In CaseJobTaskManager::processQueue run a waitTasks the type of TASK object: " + tsk.getClass().getName());
+                if (DebugLevels.DEBUG_9)
+                    System.out
+                            .println("&&&&& In CaseJobTaskManager::processQueue run a waitTasks the type of TASK object: "
+                                    + tsk.getClass().getName());
                 System.out.println(tsk.taskId);
-                
+
                 if (DebugLevels.DEBUG_0)
                     System.out.println("Is the caseJobTask null? " + (tsk == null));
                 if (DebugLevels.DEBUG_0)
                     System.out.println("Is this task ready? " + tsk.isReady());
 
                 // look at this waitTable element and see if it isReady()==true
-                if (true){
-                //                if (tsk.isReady()) {
+                if (tsk.isReady()) {
                     if (DebugLevels.DEBUG_0)
                         System.out.println("WAIT TABLE Before Moving Task from WAIT to RUN: " + waitTable.size());
                     if (DebugLevels.DEBUG_0)
@@ -349,24 +363,29 @@ public class CaseJobTaskManager implements TaskManager {
     }
 
     public static void callBackFromExportJobSubmitter(String cjtId, String status, String mesg) {
-
+        CaseJobTask cjt = null;
+        
         System.out.println("CaseJobTaskManager::callBackFromExportJobSubmitter for caseJobTask= " + cjtId + " status= "
                 + status + " and message= " + mesg);
-        synchronized (waitTable){
-            if (DebugLevels.DEBUG_9) System.out.println("Size of the wait Table: " + waitTable.size());
-          CaseJobTask cjt = (CaseJobTask) waitTable.get(cjtId);
-         if (DebugLevels.DEBUG_9) System.out.println("For cjtId=" + cjtId + " Is the CaseJobTaksk null? " + (cjt==null));   
+        synchronized (waitTable) {
+            if (DebugLevels.DEBUG_9)
+                System.out.println("Size of the wait Table: " + waitTable.size());
+            cjt = (CaseJobTask) waitTable.get(cjtId);
+            if (DebugLevels.DEBUG_9)
+                System.out.println("For cjtId=" + cjtId + " Is the CaseJobTaksk null? " + (cjt == null));
         }
-//
-//        if (status.equals("completed"))
-//            cjt.setExportsSuccess(true);
-//        if (status.equals("failed"))
-//            cjt.setExportsSuccess(false);
-
-        // FIXME: expand the dependencies logic with Alexis
-//        cjt.setDependenciesSet(true);
-
         
+         if (cjt != null){
+             if (status.equals("completed"))
+                 cjt.setExportsSuccess(true);
+                 if (status.equals("failed"))
+                 cjt.setExportsSuccess(false);
+
+                // FIXME: expand the dependencies logic with Alexis
+                 cjt.setDependenciesSet(true);
+             
+         }
+
         processTaskQueue();
 
     }
