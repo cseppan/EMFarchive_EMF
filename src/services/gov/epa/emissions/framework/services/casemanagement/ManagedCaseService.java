@@ -2008,6 +2008,10 @@ public class ManagedCaseService {
             message.setReceivedTime(new Date());
             String status = message.getStatus();
             String jobStatus = job.getRunstatus().getName();
+            String lastMsg = message.getMessage();
+            
+            if (lastMsg != null && !lastMsg.trim().isEmpty())
+                job.setRunLog(lastMsg);
 
             if (!status.isEmpty() && !jobStatus.equalsIgnoreCase(status)) {
                 job.setRunstatus(dao.getJobRunStatuse(status, session));

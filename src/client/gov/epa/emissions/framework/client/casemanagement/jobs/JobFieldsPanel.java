@@ -94,7 +94,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
     private TextArea runNote;
 
-    private TextArea runLog;
+    private TextArea lastMsg;
 
     private JLabel userLabel;
 
@@ -349,13 +349,13 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         changeablesList.addChangeable(runNote);
         ScrollableComponent scrolpane1 = new ScrollableComponent(runNote);
         scrolpane1.setPreferredSize(new Dimension(224, 80));
-        rightlayout.addLabelWidgetPair("Run Notes:", scrolpane1, rightpanel);
+        rightlayout.addLabelWidgetPair("Job Notes:", scrolpane1, rightpanel);
 
-        runLog = new TextArea("runLog", job.getRunNotes());
-        changeablesList.addChangeable(runLog);
-        ScrollableComponent scrolpane2 = new ScrollableComponent(runLog);
+        lastMsg = new TextArea("lastmessage", job.getRunNotes());
+        changeablesList.addChangeable(lastMsg);
+        ScrollableComponent scrolpane2 = new ScrollableComponent(lastMsg);
         scrolpane2.setPreferredSize(new Dimension(224, 80));
-        rightlayout.addLabelWidgetPair("Run Log:", scrolpane2, rightpanel);
+        rightlayout.addLabelWidgetPair("Last Message:", scrolpane2, rightpanel);
 
         // Lay out the panel.
         rightlayout.makeCompactGrid(rightpanel, 2, 2, // rows, cols
@@ -396,7 +396,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         this.start.setText(startDate == null ? "" : EmfDateFormat.format_MM_DD_YYYY_HH_mm(startDate));
         this.complete.setText(completeDate == null ? "" : EmfDateFormat.format_MM_DD_YYYY_HH_mm(completeDate));
         this.runNote.setText(job.getRunNotes());
-        this.runLog.setText(job.getRunLog());
+        this.lastMsg.setText(job.getRunLog());
     }
 
     public CaseJob setFields() throws EmfException {
@@ -413,7 +413,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         job.setQueOptions(qoption.getText().trim());
 
         if (edit) {
-            job.setRunLog(runLog.getText());
+            job.setRunLog(lastMsg.getText());
             job.setRunNotes(runNote.getText());
             job.setUser(session.user());
         }

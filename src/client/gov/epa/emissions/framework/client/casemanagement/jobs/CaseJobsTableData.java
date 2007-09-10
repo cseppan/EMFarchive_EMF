@@ -25,7 +25,7 @@ public class CaseJobsTableData extends ChangeableTableData {
     public String[] columns() {
         return new String[] { "Name", "Job Num.", "Sector", "Executable", "Arguments",  
                 "Exec. Version", "Order", "Run Status", "Path", "Queue Options", "ID in Queue",   
-                "Start Date", "Completion Date", "User", "Run Log", "Host", "Purpose" };
+                "Start Date", "Completion Date", "User", "Last Message", "Host", "Purpose" };
     }
 
     public Class getColumnClass(int col) {
