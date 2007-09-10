@@ -23,16 +23,16 @@ public class CaseJobsTableData extends ChangeableTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Job Num.", "Sector", "Executable", "Arguments",  
-                "Exec. Version", "Order", "Run Status", "Path", "Queue Options", "ID in Queue",   
-                "Start Date", "Completion Date", "User", "Last Message", "Host", "Purpose" };
+        return new String[] { "Name", "Job Num.", "Sector", "Run Status", "Last Message", "Start Date",  
+                "Completion Date", "Executable", "Arguments", "Exec. Version", "Order", "Path",    
+                "Queue Options", "ID in Queue", "User", "Host", "Purpose" };
     }
 
     public Class getColumnClass(int col) {
         if (col == 1)
             return Float.class;
         
-        if (col == 5 || col == 6)
+        if (col == 9 || col == 10)
             return Integer.class;
         
         return String.class;

@@ -834,9 +834,15 @@ public class ManagedCaseService {
     }
 
     private synchronized CaseJob copySingleJob(CaseJob job, int copiedCaseId) throws Exception {
+        job.setRunCompletionDate(new Date());
+        job.setRunStartDate(new Date());
         CaseJob copied = (CaseJob) DeepCopy.copy(job);
         copied.setCaseId(copiedCaseId);
-        copied.setJobkey(""); //jobkey supposedly generated when it is run
+        copied.setJobkey(null); //jobkey supposedly generated when it is run
+        copied.setRunstatus(null);
+        copied.setRunLog(null);
+        copied.setRunStartDate(null);
+        copied.setRunCompletionDate(null);
 
         return addCaseJob(copied);
     }
