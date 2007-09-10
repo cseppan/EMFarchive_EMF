@@ -319,3 +319,65 @@ CREATE INDEX constraint_strategy_id
   ON emf.control_strategy_constraints
   USING btree
   (control_strategy_id);
+
+CREATE TABLE emf.equation_types
+(
+  id serial NOT NULL,
+  name character varying(255) NOT NULL,
+  description text NOT NULL DEFAULT ''::text,
+  CONSTRAINT equation_types_pkey PRIMARY KEY (id),
+  CONSTRAINT equation_types_name_key UNIQUE (name)
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.equation_types OWNER TO postgres;
+
+CREATE TABLE emf.equation_type_variables
+(
+  id serial NOT NULL,
+  equation_type_id integer NOT NULL,
+  name character varying(255) NOT NULL,
+  file_col_position smallint,
+  description character varying(50) DEFAULT ''::character varying,
+  list_index integer,
+  CONSTRAINT equation_type_variables_pkey PRIMARY KEY (id),
+  CONSTRAINT equation_type_variables_equation_type_id_fkey FOREIGN KEY (equation_type_id)
+      REFERENCES emf.equation_types (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT equation_type_variables_id_key UNIQUE (id, equation_type_id)
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.equation_type_variables OWNER TO postgres;
+
+CREATE TABLE emf.control_measure_equations
+(
+  id serial NOT NULL,
+  control_measure_id integer NOT NULL,
+  equation_type_id integer NOT NULL,
+  equation_type_variable_id integer,
+  value double precision,
+  list_index integer NOT NULL,
+  CONSTRAINT control_measure_equations_pkey PRIMARY KEY (id),
+  CONSTRAINT control_measure_equations_control_measure_id_fkey FOREIGN KEY (control_measure_id)
+      REFERENCES emf.control_measures (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT control_measure_equations_equation_type_id_fkey FOREIGN KEY (equation_type_id, equation_type_variable_id)
+      REFERENCES emf.equation_type_variables (equation_type_id, id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT control_measure_equations_equation_type_id_fkey1 FOREIGN KEY (equation_type_id)
+      REFERENCES emf.equation_types (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.control_measure_equations OWNER TO emf;
+
+CREATE INDEX fki_
+  ON emf.control_measure_equations
+  USING btree
+  (equation_type_id, equation_type_variable_id);
+
+CREATE INDEX fki_equation_measure
+  ON emf.control_measure_equations
+  USING btree
+  (control_measure_id);
+
+  

@@ -202,3 +202,105 @@ ALTER TABLE emf.control_measure_efficiencyrecords
 	
 ALTER TABLE emf.control_strategies  
 	ADD COLUMN Use_Cost_Equations boolean DEFAULT false;
+	
+CREATE TABLE emf.equation_types
+(
+  id serial NOT NULL,
+  name character varying(255) NOT NULL,
+  description text NOT NULL DEFAULT ''::text,
+  CONSTRAINT equation_types_pkey PRIMARY KEY (id),
+  CONSTRAINT equation_types_name_key UNIQUE (name)
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.equation_types OWNER TO postgres;
+
+CREATE TABLE emf.equation_type_variables
+(
+  id serial NOT NULL,
+  equation_type_id integer NOT NULL,
+  name character varying(255) NOT NULL,
+  file_col_position smallint,
+  description character varying(50) DEFAULT ''::character varying,
+  list_index integer,
+  CONSTRAINT equation_type_variables_pkey PRIMARY KEY (id),
+  CONSTRAINT equation_type_variables_equation_type_id_fkey FOREIGN KEY (equation_type_id)
+      REFERENCES emf.equation_types (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT equation_type_variables_id_key UNIQUE (id, equation_type_id)
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.equation_type_variables OWNER TO postgres;
+
+
+insert into emf.equation_types (name, description)
+select 'Type 6', 'Type 6';
+insert into emf.equation_types (name, description)
+select 'Type 5', 'Type 5';
+
+-- 8/27/07 - DCD new table for measure equations...
+CREATE TABLE emf.control_measure_equations
+(
+  id serial NOT NULL,
+  control_measure_id integer NOT NULL,
+  equation_type_id integer NOT NULL,
+  equation_type_variable_id integer,
+  value double precision,
+  list_index integer NOT NULL,
+  CONSTRAINT control_measure_equations_pkey PRIMARY KEY (id),
+  CONSTRAINT control_measure_equations_control_measure_id_fkey FOREIGN KEY (control_measure_id)
+      REFERENCES emf.control_measures (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT control_measure_equations_equation_type_id_fkey FOREIGN KEY (equation_type_id, equation_type_variable_id)
+      REFERENCES emf.equation_type_variables (equation_type_id, id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT control_measure_equations_equation_type_id_fkey1 FOREIGN KEY (equation_type_id)
+      REFERENCES emf.equation_types (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.control_measure_equations OWNER TO emf;
+
+CREATE INDEX fki_
+  ON emf.control_measure_equations
+  USING btree
+  (equation_type_id, equation_type_variable_id);
+
+CREATE INDEX fki_equation_measure
+  ON emf.control_measure_equations
+  USING btree
+  (control_measure_id);
+
+
+
+-- 9/7/2007 -- added new ORL CoST Point dataset type 
+insert into emf.dataset_types (name,
+  description,
+  min_files ,
+  max_files,
+  "external",
+  importer_classname,
+  exporter_classname,
+  table_per_dataset)
+select 'ORL CoST Point Inventory (PTINV)','ORL CoST Point Inventory (PTINV)',1,1,'FALSE','gov.epa.emissions.commons.io.orl.ORLCoSTPointImporter','gov.epa.emissions.commons.io.orl.ORLCoSTPointExporter',1;
+
+-- 9/7/2007 - DCD qa steps for orl CosT Point dataset type
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by Pollutant', 1, 'select POLL, sum(ann_emis) as ann_emis from $TABLE[1] e group by POLL order by POLL', false, 1, ''
+from emf.dataset_types dt
+where name = 'ORL CoST Point Inventory (PTINV)';
+
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by SCC and Pollutant', 1, 'select SCC, POLL, sum(ann_emis) as ann_emis from $TABLE[1] e group by SCC, POLL order by SCC, POLL', false, 1, ''
+from emf.dataset_types dt
+where name = 'ORL CoST Point Inventory (PTINV)';
+
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by County and Pollutant', 1, 'select FIPS, POLL, sum(ann_emis) as ann_emis from $TABLE[1] e group by FIPS, POLL order by FIPS, POLL', false, 1, ''
+from emf.dataset_types dt
+where name = 'ORL CoST Point Inventory (PTINV)';
+
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by US State and Pollutant', 1, 'select fips.state_name, fips.state_abbr, fips.fipsst, e.POLL, sum(ann_emis) as ann_emis from $TABLE[1] e inner join reference.fips on fips.state_county_fips = e.FIPS where fips.country_num = ''0'' group by fips.state_name, fips.state_abbr, fips.fipsst, POLL order by fips.state_name, POLL', false, 1, ''
+from emf.dataset_types dt
+where name = 'ORL CoST Point Inventory (PTINV)';
+
