@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.cost.analysis.common.BestMeasureEffRecord;
 import gov.epa.emissions.framework.services.cost.analysis.common.DefaultCostEquation;
+import gov.epa.emissions.framework.services.cost.analysis.common.Type2CostEquation;
 import gov.epa.emissions.framework.services.cost.analysis.common.Type3CostEquation;
 import gov.epa.emissions.framework.services.cost.analysis.common.Type4CostEquation;
 import gov.epa.emissions.framework.services.cost.analysis.common.Type5CostEquation;
@@ -266,12 +267,63 @@ public class EquationTypeTest extends ServiceTestCase {
     }
       
     
-    private BestMeasureEffRecord buildBestMeasureEffRecord(float equipmentLife, Double capEcFactor) throws EmfException {
+    public void testEquationType2() throws Exception {
+        Type2CostEquation type2 = new Type2CostEquation(discountRate);
+        
+        Double designCapacity = 150.0;
+        
+        type2.setUp(reducedEmission, buildBestMeasureEffRecord(15, 0.2, 
+                new ControlMeasureEquation[] {
+                buildEquation("Type 2", "Capital Cost Multiplier", 110487.6),
+                buildEquation("Type 2", "Capital Cost Exponent", 0.423),
+                buildEquation("Type 2", "Annual Cost Multiplier", 3440.9),
+                buildEquation("Type 2", "Annual Cost Exponent", 0.7337)
+                    }
+                ), designCapacity);
+
+        try {
+            System.out.println("begin type 2 test --------------------");
+             double operatingCostResult = type2.getOperationMaintenanceCost();
+             double expectedOperatingCost = 34901.9629;
+             
+             double annualCost = type2.getAnnualCost();
+             double expectdAnnualCost = 135915.8821;
+             
+             double capitalCost = type2.getCapitalCost();
+             double expectedCapitalCost = 920026.0886;
+             
+             double annualizedCapitalCost = type2.getAnnualizedCapitalCost();
+             double expectedAnnualizedCCost = 101013.9191;
+             
+             double computedCPT = type2.getComputedCPT();
+             double expectedComputedCPT = 135.9158821;
             
+             assertTrue("Check Type 2 operating and maintenance cost", Math.abs(operatingCostResult - expectedOperatingCost) < tolerance);
+             assertTrue("Check Type 2 annual cost", Math.abs(annualCost - expectdAnnualCost) < tolerance);
+             assertTrue("Check Type 2 capital cost", Math.abs(capitalCost - expectedCapitalCost) < tolerance);
+             assertTrue("Check Type 2 annualized cost", Math.abs(annualizedCapitalCost - expectedAnnualizedCCost) < tolerance);
+             assertTrue("Check Type 2 computed CPT", Math.abs(computedCPT - expectedComputedCPT) < tolerance);
+             
+             double capRecFactor1 = type2.getCapRecFactor(15, 0.2);
+             double capRecFactor2 = type2.getCapRecFactor(0, 0.2);
+             double expCapRecFactor1 = 0.1098;
+             double expCapRecFactor2 = 0.2;
+             
+             assertTrue("Check Type 2 capital recovery factor with equipment life=15 ", Math.abs(capRecFactor1 - expCapRecFactor1) < tolerance);
+             assertTrue("Check Type 2 capital recovery factor with equipment life=0 ", Math.abs(capRecFactor2 - expCapRecFactor2) < tolerance);
+             System.out.println("end type 2 test --------------------");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+    }
+    
+    private BestMeasureEffRecord buildBestMeasureEffRecord(float equipmentLife, Double capRecFactor) throws EmfException {
+        
+        
         ControlMeasure measure=new ControlMeasure();
-        measure.setEquipmentLife(15);
+        measure.setEquipmentLife(equipmentLife);
         EfficiencyRecord efficiencyRecord=new EfficiencyRecord();
-        efficiencyRecord.setCapRecFactor(0.2);
+        efficiencyRecord.setCapRecFactor(capRecFactor);
         efficiencyRecord.setCapitalAnnualizedRatio(6.0);
         efficiencyRecord.setCostYear(2000);
         efficiencyRecord.setCostPerTon(200.0);
@@ -283,6 +335,17 @@ public class EquationTypeTest extends ServiceTestCase {
             
     }
 
+    private BestMeasureEffRecord buildBestMeasureEffRecord(float equipmentLife, Double capRecFactor, ControlMeasureEquation[] equations) throws EmfException {
+        BestMeasureEffRecord record = buildBestMeasureEffRecord(equipmentLife, capRecFactor);
+        record.measure().setEquations(equations);
+        return record;
+            
+    }
+
+    private ControlMeasureEquation buildEquation(String typeName, String variableName, Double variableValue) {
+        return new ControlMeasureEquation(new EquationType(typeName), new EquationTypeVariable(variableName),
+                variableValue);
+    }
     private CostYearTable getCostYearTable(int targetYear) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
