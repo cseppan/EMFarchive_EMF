@@ -57,16 +57,16 @@ public class EquationTypeTest extends ServiceTestCase {
             double expectedComputedCPT=1176.81;
              
              System.out.println("begin type 6 test --------------------");
-             assertTrue("Check Type 6 operating and maintenance cost", (operatingCostResult - expectedOperatingCost) < tolerance);
-             assertTrue("Check Type 6 annual cost", (annualCost - expectdAnnualCost) < tolerance);
-             assertTrue("Check Type 6 capital cost", (capitalCost - expectedCapitalCost) < tolerance);
-             assertTrue("Check Type 6 annualized cost", (annualizedCapitalCost - expectedAnnualizedCCost) < tolerance);
-             assertTrue("Check Type 6 computed CPT", (computedCPT - expectedComputedCPT) < tolerance);
+             assertTrue("Check Type 6 operating and maintenance cost", Math.abs(operatingCostResult - expectedOperatingCost) < tolerance);
+             assertTrue("Check Type 6 annual cost", Math.abs(annualCost - expectdAnnualCost) < tolerance);
+             assertTrue("Check Type 6 capital cost", Math.abs(capitalCost - expectedCapitalCost) < tolerance);
+             assertTrue("Check Type 6 annualized cost", Math.abs(annualizedCapitalCost - expectedAnnualizedCCost) < tolerance);
+             assertTrue("Check Type 6 computed CPT", Math.abs(computedCPT - expectedComputedCPT) < tolerance);
              
              
-             assertTrue("Check Type 6 capital recovery factor with equipment life=15 ", (capRecFactor1 - expCapRecFactor1) < tolerance);
-             assertTrue("Check Type 6 capital recovery factor with equipment life=0 ", (capRecFactor2 - expCapRecFactor2) < tolerance);
-             
+             assertTrue("Check Type 6 capital recovery factor with equipment life=15 ", Math.abs(capRecFactor1 - expCapRecFactor1) < tolerance);
+             assertTrue("Check Type 6 capital recovery factor with equipment life=0 ", Math.abs(capRecFactor2 - expCapRecFactor2) < tolerance);
+             System.out.println("End of type 6 test ------");
         } catch (Exception e) {
             e.printStackTrace();
         } 
@@ -93,20 +93,20 @@ public class EquationTypeTest extends ServiceTestCase {
              double computedCPT=type5.getComputedCPT();
              double expectedComputedCPT=1066.53;
   //           System.out.println("begin type 5 test --------------------");
-             assertTrue("Check Type 5 operating and maintenance cost", (operatingCostResult - expectedOperatingCost) < tolerance);
-             assertTrue("Check Type 5 annual cost", (annualCost - expectdAnnualCost) < tolerance);
-             assertTrue("Check Type 5 capital cost", (capitalCost - expectedCapitalCost) < tolerance);
-             assertTrue("Check Type 5 annualized cost", (annualizedCapitalCost - expectedAnnualizedCCost) < tolerance);
-             assertTrue("Check Type 5 computed CPT", (computedCPT - expectedComputedCPT) < tolerance);
+             assertTrue("Check Type 5 operating and maintenance cost", Math.abs(operatingCostResult - expectedOperatingCost) < tolerance);
+             assertTrue("Check Type 5 annual cost", Math.abs(annualCost - expectdAnnualCost) < tolerance);
+             assertTrue("Check Type 5 capital cost", Math.abs(capitalCost - expectedCapitalCost) < tolerance);
+             assertTrue("Check Type 5 annualized cost", Math.abs(annualizedCapitalCost - expectedAnnualizedCCost) < tolerance);
+             assertTrue("Check Type 5 computed CPT", Math.abs(computedCPT - expectedComputedCPT) < tolerance);
              
              double capRecFactor1=type5.getCapRecFactor(15, 0.2);
              double capRecFactor2=type5.getCapRecFactor(0, 0.2);
              double expCapRecFactor1=0.1098;
              double expCapRecFactor2=0.2;
              
-             assertTrue("Check Type 5 capital recovery factor with equipment life=15 ", (capRecFactor1 - expCapRecFactor1) < tolerance);
-             assertTrue("Check Type 5 capital recovery factor with equipment life=0 ", (capRecFactor2 - expCapRecFactor2) < tolerance);
-             
+             assertTrue("Check Type 5 capital recovery factor with equipment life=15 ", Math.abs(capRecFactor1 - expCapRecFactor1) < tolerance);
+             assertTrue("Check Type 5 capital recovery factor with equipment life=0 ", Math.abs(capRecFactor2 - expCapRecFactor2) < tolerance);
+             System.out.println("end type 5 test --------------------");
         } catch (Exception e) {
             e.printStackTrace();
         } 
@@ -134,20 +134,20 @@ public class EquationTypeTest extends ServiceTestCase {
              double computedCPT=type4.getComputedCPT();
              double expectedComputedCPT=184.57;
             
-             assertTrue("Check Type 4 operating and maintenance cost", (operatingCostResult - expectedOperatingCost) < tolerance);
-             assertTrue("Check Type 4 annual cost", (annualCost - expectdAnnualCost) < tolerance);
-             assertTrue("Check Type 4 capital cost", (capitalCost - expectedCapitalCost) < tolerance);
-             assertTrue("Check Type 4 annualized cost", (annualizedCapitalCost - expectedAnnualizedCCost) < tolerance);
-             assertTrue("Check Type 4 computed CPT", (computedCPT - expectedComputedCPT) < tolerance);
+             assertTrue("Check Type 4 operating and maintenance cost", Math.abs(operatingCostResult - expectedOperatingCost) < tolerance);
+             assertTrue("Check Type 4 annual cost", Math.abs(annualCost - expectdAnnualCost) < tolerance);
+             assertTrue("Check Type 4 capital cost", Math.abs(capitalCost - expectedCapitalCost) < tolerance);
+             assertTrue("Check Type 4 annualized cost", Math.abs(annualizedCapitalCost - expectedAnnualizedCCost) < tolerance);
+             assertTrue("Check Type 4 computed CPT", Math.abs(computedCPT - expectedComputedCPT) < tolerance);
              
              double capRecFactor1=type4.getCapRecFactor(15, 0.2);
              double capRecFactor2=type4.getCapRecFactor(0, 0.2);
              double expCapRecFactor1=0.1098;
              double expCapRecFactor2=0.2;
              
-             assertTrue("Check Type 4 capital recovery factor with equipment life=15 ", (capRecFactor1 - expCapRecFactor1) < tolerance);
-             assertTrue("Check Type 4 capital recovery factor with equipment life=0 ", (capRecFactor2 - expCapRecFactor2) < tolerance);
- //            System.out.println("end type 4 test --------------------");
+             assertTrue("Check Type 4 capital recovery factor with equipment life=15 ", Math.abs(capRecFactor1 - expCapRecFactor1) < tolerance);
+             assertTrue("Check Type 4 capital recovery factor with equipment life=0 ", Math.abs(capRecFactor2 - expCapRecFactor2) < tolerance);
+             System.out.println("end type 4 test --------------------");
         } catch (Exception e) {
             e.printStackTrace();
         } 
@@ -183,12 +183,12 @@ public class EquationTypeTest extends ServiceTestCase {
              double capRecFactor1=type3.getCapRecFactor(15, 0.2);
              
              double capRecFactor2=type3.getCapRecFactor(0, 0.2);
-             double expCapRecFactor1=0.2;
+             double expCapRecFactor1=0.1098;
              double expCapRecFactor2=0.2;
              
-             assertTrue("Check Type 3 capital recovery factor with equipment life=15 ",   (capRecFactor1 - expCapRecFactor1) < tolerance);
-             assertTrue("Check Type 3 capital recovery factor with equipment life=0 ",   (capRecFactor2 - expCapRecFactor2) < tolerance);
-  //           System.out.println("end type 3 test --------------------");
+             assertTrue("Check Type 3 capital recovery factor with equipment life=15 ",   Math.abs(capRecFactor1 - expCapRecFactor1) < tolerance);
+             assertTrue("Check Type 3 capital recovery factor with equipment life=0 ",   Math.abs(capRecFactor2 - expCapRecFactor2) < tolerance);
+             System.out.println("end type 3 test --------------------");
         } catch (Exception e) {
             e.printStackTrace();
         } 
@@ -199,7 +199,7 @@ public class EquationTypeTest extends ServiceTestCase {
         
 //        type3.setUpTest(reducedEmission, 15, 0.2, bestMeasureEffRecord, 1028000.0);
         
-        type3.setUp(reducedEmission, buildBestMeasureEffRecord(15, 0.2), minStackFlowRate);
+        type3.setUp(reducedEmission, buildBestMeasureEffRecord(15, 0.2), 1028000.0);
         
         try {
              double operatingCostResult = type3.getOperationMaintenanceCost();
@@ -217,13 +217,13 @@ public class EquationTypeTest extends ServiceTestCase {
              double computedCPT=type3.getComputedCPT();
              double expectedComputedCPT=76245.76;
             
-             assertTrue("Check Type 3 operating and maintenance cost", (operatingCostResult - expectedOperatingCost) < tolerance);
-             assertTrue("Check Type 3 annual cost", (annualCost - expectdAnnualCost) < tolerance);
-             assertTrue("Check Type 3 capital cost", (capitalCost - expectedCapitalCost) < tolerance);
-             assertTrue("Check Type 3 annualized cost", (annualizedCapitalCost - expectedAnnualizedCCost) < tolerance);
-             assertTrue("Check Type 3 computed CPT", (computedCPT - expectedComputedCPT) < tolerance);
+             assertTrue("Check Type 3 operating and maintenance cost", Math.abs(operatingCostResult - expectedOperatingCost) < tolerance);
+             assertTrue("Check Type 3 annual cost", Math.abs(annualCost - expectdAnnualCost) < tolerance);
+             assertTrue("Check Type 3 capital cost", Math.abs(capitalCost - expectedCapitalCost) < tolerance);
+             assertTrue("Check Type 3 annualized cost", Math.abs(annualizedCapitalCost - expectedAnnualizedCCost) < tolerance);
+             assertTrue("Check Type 3 computed CPT", Math.abs(computedCPT - expectedComputedCPT) < tolerance);
              
- //            System.out.println("end type 3 large test --------------------");
+             System.out.println("end type 3 large test --------------------");
         } catch (Exception e) {
             e.printStackTrace();
         } 
@@ -240,8 +240,8 @@ public class EquationTypeTest extends ServiceTestCase {
         double expectdAnnualCost=200000.0;
 //        System.out.println("Default test annual Cost "+  annualCost);
         double capitalCost = typeDefault.getCapitalCost();
-        double expectedCapitalCost=11200000.0;
-//        System.out.println("Default test capital Cost "+  capitalCost);
+        double expectedCapitalCost=1200000.0;
+//       System.out.println("Default test capital Cost "+  capitalCost);
         
         
         double operatingCostResult = typeDefault.getOperationMaintenanceCost();
@@ -254,13 +254,13 @@ public class EquationTypeTest extends ServiceTestCase {
         double computedCPT=typeDefault.getComputedCPT();
         double expectedComputedCPT=200.0;
     
-        assertTrue("Check Type default operating and maintenance cost", (operatingCostResult - expectedOperatingCost) < tolerance);
-        assertTrue("Check Type default annual cost", (annualCost - expectdAnnualCost) < tolerance);
-        assertTrue("Check Type default capital cost", (capitalCost - expectedCapitalCost) < tolerance);
-        assertTrue("Check Type default annualized cost", (annualizedCapitalCost - expectedAnnualizedCCost) < tolerance);
-        assertTrue("Check Type default computed CPT", (computedCPT - expectedComputedCPT) < tolerance);
+        assertTrue("Check Type default operating and maintenance cost", Math.abs(operatingCostResult - expectedOperatingCost) < tolerance);
+        assertTrue("Check Type default annual cost", Math.abs(annualCost - expectdAnnualCost) < tolerance);
+        assertTrue("Check Type default capital cost", Math.abs(capitalCost - expectedCapitalCost) < tolerance);
+        assertTrue("Check Type default annualized cost", Math.abs(annualizedCapitalCost - expectedAnnualizedCCost) < tolerance);
+        assertTrue("Check Type default computed CPT", Math.abs(computedCPT - expectedComputedCPT) < tolerance);
     
-        System.out.println("Cost equation test is successful -----------");
+        System.out.println("End of default cost equation type -----------");
         } catch (Exception e) {
             e.printStackTrace();
         } 
