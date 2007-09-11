@@ -43,6 +43,8 @@ insert into cases.case_jobrunstatus values(DEFAULT, 'Failed', 'Failed');
 insert into cases.case_jobrunstatus values(DEFAULT, 'Running', 'Running');
 insert into cases.case_jobrunstatus values(DEFAULT, 'Submitted', 'Submitted');
 insert into cases.case_jobrunstatus values(DEFAULT, 'Exporting', 'Exporting');
+insert into cases.case_jobrunstatus values(DEFAULT, 'Waiting', 'Waiting');
+
 -- cases.case_jobrunstatus
 
 -- cases.hosts
