@@ -291,9 +291,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         String title = "Warning";
 
         if (presenter.jobsUsed(jobs)) {
-            String message1 = "Selected job(s) used by case inputs or parameters.\n Are you sure you want to remove the selected job(s)?";
-            int selection1 = JOptionPane.showConfirmDialog(parentConsole, message1, title, JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);
+            int selection1 = showDialog("Selected job(s) used by case inputs or parameters.\n Are you sure you want to remove the selected job(s)?", title);
 
             if (selection1 != JOptionPane.YES_OPTION)
                 return;
@@ -302,9 +300,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             return;
         }
 
-        String message2 = "Are you sure you want to remove the selected job(s)?";
-        int selection2 = JOptionPane.showConfirmDialog(parentConsole, message2, title, JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
+        int selection2 = showDialog("Are you sure you want to remove the selected job(s)?", title);
 
         if (selection2 == JOptionPane.YES_OPTION) {
             removeSelectedJobs(jobs);
@@ -341,13 +337,21 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             return;
         }
 
-        setMessage("Please wait while submitting all case jobs...");
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-
         try {
-            presenter.runJobs(jobs);
-            doRefresh(presenter.getCaseJobs());
-            setMessage("Finished summitting jobs to run.");
+            String msg = presenter.getJobsStatus(jobs);
+
+            if (msg.equalsIgnoreCase("OK")) {
+                proceedRunningJobs(jobs);
+            }
+            
+            if (msg.equalsIgnoreCase("CANCEL"))
+                setMessage("One or more selected jobs in process. Quit running jobs.");
+            
+            if (msg.equalsIgnoreCase("WARNING")) {
+                int option = showDialog("Are you sure to rerun the selected job(s)?", "Warning");
+                if (option == JOptionPane.YES_OPTION)
+                    proceedRunningJobs(jobs);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -356,8 +360,21 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
     }
 
+    private void proceedRunningJobs(CaseJob[] jobs) throws EmfException, Exception {
+        setMessage("Please wait while submitting all case jobs...");
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        presenter.runJobs(jobs);
+        doRefresh(presenter.getCaseJobs());
+        setMessage("Finished summitting jobs to run.");
+    }
+
     private List<CaseJob> getSelectedJobs() {
         return (List<CaseJob>) selectModel.selected();
+    }
+    
+    private int showDialog(String msg, String title) {
+        return JOptionPane.showConfirmDialog(parentConsole, msg, title, JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
     }
 
     public void refresh() {
