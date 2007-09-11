@@ -27,7 +27,6 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.ExportClientSubmitter;
 import gov.epa.emissions.framework.tasks.ExportJobSubmitter;
-import gov.epa.emissions.framework.tasks.Task;
 import gov.epa.emissions.framework.tasks.TaskManagerFactory;
 import gov.epa.emissions.framework.tasks.TaskSubmitter;
 
@@ -224,14 +223,14 @@ public class ManagedExportService {
             System.out.println("Before exportTaskSubmitter.addTasksToSubmitter # of elements in eximTasks array= "
                     + eximTasks.size());
 
-        Iterator iter2 = eximTasks.iterator();
-        while (iter2.hasNext()) {
-            Task tsk = (Task) iter2.next();
-            if (DebugLevels.DEBUG_9)
-                System.out
-                        .println("&&&&& In ManagedExportService::exportForJob the types of TASK objects in eximTasks: "
-                                + tsk.getClass().getName());
-        }
+//        Iterator iter2 = eximTasks.iterator();
+//        while (iter2.hasNext()) {
+//            Task tsk = (Task) iter2.next();
+//            if (DebugLevels.DEBUG_9)
+//                System.out
+//                        .println("&&&&& In ManagedExportService::exportForJob the types of TASK objects in eximTasks: "
+//                                + tsk.getClass().getName());
+//        }
 
         // All eximTasks have been created...so add to the submitter
         exportJobTaskSubmitter.addTasksToSubmitter(eximTasks);

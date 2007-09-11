@@ -142,11 +142,11 @@ public class ExportTaskManager implements TaskManager {
     }
 
     public synchronized void addTasks(ArrayList<Runnable> tasks) {
-        Iterator iter = tasks.iterator();
-        while (iter.hasNext()){
-            Task tsk = (Task) iter.next();
-            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In ExportTaskManager::addTasks the types of TASK objects coming in are: " + tsk.getClass().getName());
-        }
+//        Iterator iter = tasks.iterator();
+//        while (iter.hasNext()){
+//            Task tsk = (Task) iter.next();
+//            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In ExportTaskManager::addTasks the types of TASK objects coming in are: " + tsk.getClass().getName());
+//        }
 
         taskQueue.addAll(tasks);
 

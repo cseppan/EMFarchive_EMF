@@ -119,7 +119,7 @@ public class CaseJobTaskManager implements TaskManager {
         if (DebugLevels.DEBUG_4)
             System.out.println("Initial # of jobs in Thread Pool: " + threadPool.getPoolSize());
 
-        // this.sessionFactory=sessionFactory;
+        this.sessionFactory = sessionFactory;
 
     }
 
@@ -131,13 +131,13 @@ public class CaseJobTaskManager implements TaskManager {
 
     public static synchronized void addTasks(ArrayList<Runnable> tasks) {
         // TaskManager.resetIdleTime();
-        Iterator iter = tasks.iterator();
-        while (iter.hasNext()) {
-            Task tsk = (Task) iter.next();
-            if (DebugLevels.DEBUG_9)
-                System.out.println("&&&&& In CaseJobTaskManager::addTasks the types of TASK objects coming in are: "
-                        + tsk.getClass().getName());
-        }
+        // Iterator iter = tasks.iterator();
+        // while (iter.hasNext()) {
+        // Task tsk = (Task) iter.next();
+        // if (DebugLevels.DEBUG_9)
+        // System.out.println("&&&&& In CaseJobTaskManager::addTasks the types of TASK objects coming in are: "
+        // + tsk.getClass().getName());
+        // }
 
         if (DebugLevels.DEBUG_0)
             System.out.println("IN CaseJobTaskManager number of tasks received= " + tasks.size());

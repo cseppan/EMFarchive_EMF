@@ -35,11 +35,11 @@ public class CaseJobSumitter implements TaskSubmitter {
     }
 
     public void addTasksToSubmitter(ArrayList<Runnable> tasksForSubmitter) {
-        Iterator iter = tasksForSubmitter.iterator();
-        while (iter.hasNext()){
-            Task tsk = (Task) iter.next();
-            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In CaseJobSubmitter::addTasksToSubmitter the types of TASK objects coming in are: " + tsk.getClass().getName());
-        }
+//        Iterator iter = tasksForSubmitter.iterator();
+//        while (iter.hasNext()){
+//            Task tsk = (Task) iter.next();
+//            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In CaseJobSubmitter::addTasksToSubmitter the types of TASK objects coming in are: " + tsk.getClass().getName());
+//        }
 
         if (DebugLevels.DEBUG_0) System.out.println("CaseJobSubmitter::addTasksToSubmitter Total number of tasks= " + tasksForSubmitter.size());
         this.submitTasksToTaskManager(submitterId, tasksForSubmitter);

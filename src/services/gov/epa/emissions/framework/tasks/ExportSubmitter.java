@@ -90,7 +90,7 @@ public abstract class ExportSubmitter implements TaskSubmitter {
         while (iter.hasNext()) {
             Task task = (Task) iter.next();
             task.setSubmitterId(submitterId);
-            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In ExportSubmitter::addTasksToSubmitter the types of TASK objects coming in are: " + task.getClass().getName());
+//            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In ExportSubmitter::addTasksToSubmitter the types of TASK objects coming in are: " + task.getClass().getName());
             this.addTaskToSubmitter(task);
         }
 
@@ -113,11 +113,11 @@ public abstract class ExportSubmitter implements TaskSubmitter {
 //            System.out.println("SUBMITTER::submittedtasks before ADD: " + this.submitterId + " has task count= "
 //                    + this.submittedTasks.size());
 
-        Iterator iter = tasks.iterator();
-        while (iter.hasNext()){
-            Task tsk = (Task) iter.next();
-            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In ExportSubmitter::submitTasksToTaskManager the types of TASK objects coming in are: " + tsk.getClass().getName());
-        }
+//        Iterator iter = tasks.iterator();
+//        while (iter.hasNext()){
+//            Task tsk = (Task) iter.next();
+//            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In ExportSubmitter::submitTasksToTaskManager the types of TASK objects coming in are: " + tsk.getClass().getName());
+//        }
 
         TaskManagerFactory.getExportTaskManager().addTasks(tasks);
 
