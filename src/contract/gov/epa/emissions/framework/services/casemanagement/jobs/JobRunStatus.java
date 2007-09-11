@@ -6,7 +6,7 @@ public class JobRunStatus implements Serializable {
 
     private int id;
     
-    private String name;
+    private String name="Not Started";
     
     private String description;
     
