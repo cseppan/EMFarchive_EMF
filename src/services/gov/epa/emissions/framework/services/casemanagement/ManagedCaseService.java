@@ -118,11 +118,10 @@ public class ManagedCaseService {
      * Generate the unique job key
      * 
      */
-    private synchronized String createJobKey(int jobId){
+    private synchronized String createJobKey(int jobId) {
         return jobId + "_" + new Date().getTime();
     }
-    
-    
+
     private synchronized ManagedExportService getExportService() {
         log.info("ManagedCaseService::getExportService");
         ManagedExportService exportService = null;
@@ -171,19 +170,17 @@ public class ManagedCaseService {
     }
 
     public CaseJob getCaseJob(int jobId) throws EmfException {
-        // Session session = sessionFactory.getSession();
+        Session session = sessionFactory.getSession();
 
         try {
-            // return dao.getCaseJob(jobId, session);
-            return dao.getCaseJob(jobId, this.getSession());
+            return dao.getCaseJob(jobId, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not get job for job id " + jobId + ".\n" + e.getMessage());
             throw new EmfException("Could not get job for job id " + jobId + ".\n");
-            // } finally {
-            // session.close();
-            // }
-        }// remove this if the finally block is uncommented
+        } finally {
+            session.close();
+        }
     }
 
     public Abbreviation[] getAbbreviations() throws EmfException {
@@ -684,7 +681,7 @@ public class ManagedCaseService {
         Session session = this.getSession();
         EmfDataset cipDataset = null;
         String badCipName = null;
-        
+
         // select the inputs based on 3 criteria
         try {
             List<CaseInput> inputs = dao.getJobInputs(caseId, jobId, sector, session);
@@ -718,8 +715,8 @@ public class ManagedCaseService {
             e.printStackTrace();
             log.error("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n"
                     + e.getMessage());
-                throw new EmfException("Required dataset not set for Case Input name = " + badCipName);
-            
+            throw new EmfException("Required dataset not set for Case Input name = " + badCipName);
+
         }
     }
 
@@ -869,7 +866,7 @@ public class ManagedCaseService {
         job.setRunStartDate(new Date());
         CaseJob copied = (CaseJob) DeepCopy.copy(job);
         copied.setCaseId(copiedCaseId);
-        copied.setJobkey(null); //jobkey supposedly generated when it is run
+        copied.setJobkey(null); // jobkey supposedly generated when it is run
         copied.setRunstatus(null);
         copied.setRunLog(null);
         copied.setRunStartDate(null);
@@ -1304,7 +1301,7 @@ public class ManagedCaseService {
 
         // create a new caseJobSubmitter for each client call in a session
         TaskSubmitter caseJobSubmitter = new CaseJobSumitter(sessionFactory);
-        
+
         try {
             String caseJobExportSubmitterId = null;
             String caseJobSubmitterId = caseJobSubmitter.getSubmitterId();
@@ -1318,23 +1315,23 @@ public class ManagedCaseService {
             for (Integer jobId : jobIds) {
                 int jid = jobId.intValue();
                 String jobKey = null;
-            
+
                 if (DebugLevels.DEBUG_0)
                     System.out.println("The jobId= " + jid);
                 CaseJob caseJob = this.getCaseJob(jid);
-                
-                //NOTE: This is where the jobkey is generated and set in the CaseJob
+
+                // NOTE: This is where the jobkey is generated and set in the CaseJob
                 jobKey = this.createJobKey(jid);
-                
-                //set the job key in the case job
-                caseJob.setJobkey(jobKey);  
-                
-                //set the user for the case job
+
+                // set the job key in the case job
+                caseJob.setJobkey(jobKey);
+
+                // set the user for the case job
                 User jobUser = caseJob.getUser();
                 if (jobUser == null || !jobUser.equals(user)) {
                     caseJob.setUser(user);
                 }
-                
+
                 if (DebugLevels.DEBUG_0)
                     System.out.println("Is the caseJob for this jobId null? " + (caseJob == null));
                 Case jobCase = this.getCase(caseId);
@@ -1395,16 +1392,16 @@ public class ManagedCaseService {
                 caseJobExportSubmitterId = expSvc
                         .exportForJob(user, inputs, cjt.getTaskId(), purpose, caseJob, jobCase);
 
-                String runStatusExporting="Exporting";
-                
+                String runStatusExporting = "Exporting";
+
                 caseJob.setRunstatus(getJobRunStatus(runStatusExporting));
                 caseJob.setRunStartDate(new Date());
-                
+
                 // FIXME: Do we still need the casejob around?
                 caseJobs.add(caseJob);
                 // Create the list of case job tasks for the submitter and task manager
                 caseJobTasks.add(cjt);
-                
+
                 // Now update the casejob in the database
                 updateJob(caseJob);
 
@@ -1436,10 +1433,10 @@ public class ManagedCaseService {
 
         Session session = sessionFactory.getSession();
         JobRunStatus jrStat = null;
-        
+
         try {
             jrStat = dao.getJobRunStatuse(runStatus, session);
-            
+
             return jrStat;
         } catch (Exception e) {
             e.printStackTrace();
@@ -2094,16 +2091,16 @@ public class ManagedCaseService {
 
             if (!status.isEmpty() && !jobStatus.equalsIgnoreCase(status)) {
                 job.setRunstatus(dao.getJobRunStatuse(status, session));
-                
-                //If the status from the Command Client is not Completed or not Failed
-                // then the job is Running.  A Running job gets a Run Start Date
+
+                // If the status from the Command Client is not Completed or not Failed
+                // then the job is Running. A Running job gets a Run Start Date
                 // all other statuses get a Run Completion Date.
-                if (!(status.equalsIgnoreCase("Running"))){
+                if (!(status.equalsIgnoreCase("Running"))) {
                     job.setRunCompletionDate(new Date());
-                }else{
+                } else {
                     job.setRunStartDate(new Date());
                 }
-                
+
                 dao.updateCaseJob(job, session);
             }
 

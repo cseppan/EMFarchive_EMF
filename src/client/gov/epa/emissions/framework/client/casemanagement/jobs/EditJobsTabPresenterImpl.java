@@ -141,6 +141,9 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
                                 
             if (status != null && status.equalsIgnoreCase("Exporting"))
                 cancel.add(status);
+
+            if (status != null && status.equalsIgnoreCase("Waiting"))
+                cancel.add(status);
         }
         
         if (ok.size() == jobs.length)
