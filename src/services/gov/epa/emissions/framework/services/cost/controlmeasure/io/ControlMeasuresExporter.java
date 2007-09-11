@@ -88,7 +88,7 @@ public class ControlMeasuresExporter implements Exporter {
 
     private void writeEquationFile() throws IOException {
         
-        PrintWriter equationWriter = openExportFile("_equation.csv");
+        PrintWriter equationWriter = openExportFile("_equations.csv");
         CMEquationFileFormat fileFormat = new CMEquationFileFormat();
         String[] colNames = fileFormat.cols();
         
@@ -114,7 +114,7 @@ public class ControlMeasuresExporter implements Exporter {
     }
     
     private String equationRecord(ControlMeasure measure, int size) {
-        String values[]= {" "," "," "," "," "," "," "," "," "," "," "," " };
+        String values[]= {" "," "," "," "," "," "," "," "," "," "," "," ", " " };
         List<String> list=Arrays.asList(values);
 //        StringBuffer eString = new StringBuffer(12);
 //        for (int i=0; i<12; i++)
@@ -131,7 +131,8 @@ public class ControlMeasuresExporter implements Exporter {
             EquationTypeVariable typeVariable=cMequation[k].getEquationTypeVariable();
             if (typeVariable!=null)
                 list.set(typeVariable.getFileColPosition()+1, cMequation[k].getValue()+"");         
-        }       
+        }
+        list.set(size-1, measure.getCostYear()+"");
         
         String equationRecord = list.get(0) + delimiter;
         for (int i=1; i<size-1; i++)
