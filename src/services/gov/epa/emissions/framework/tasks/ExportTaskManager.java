@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.services.exim.ExportTask;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -158,6 +159,7 @@ public class ExportTaskManager implements TaskManager {
 
     public static synchronized void processTaskQueue() {
         int threadsAvail = -99;
+        try{
         if (DebugLevels.DEBUG_9)
 System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         if (DebugLevels.DEBUG_9)
@@ -332,6 +334,11 @@ System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         if (DebugLevels.DEBUG_9)
             System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
+        }catch(ConcurrentModificationException cmex){
+            //do nothing
+            log.info("Java is complaining about a ConcurrentModificationException again");
+            if (DebugLevels.DEBUG_9) System.out.println("Java is complaining about a ConcurrentModificationException again");
+        }
     }
 
     private static synchronized boolean notEqualsToAnyRunTask(ExportTask tsk) {
