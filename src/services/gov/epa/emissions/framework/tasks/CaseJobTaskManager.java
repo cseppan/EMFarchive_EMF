@@ -1,6 +1,11 @@
 package gov.epa.emissions.framework.tasks;
 
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.CaseJobTask;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,9 +20,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
 
 public class CaseJobTaskManager implements TaskManager {
     private static Log log = LogFactory.getLog(CaseJobTaskManager.class);
+
+    private static HibernateSessionFactory sessionFactory = null;
 
     private static CaseJobTaskManager ref;
 
@@ -93,7 +101,7 @@ public class CaseJobTaskManager implements TaskManager {
         throw new CloneNotSupportedException();
     }
 
-    private CaseJobTaskManager() {
+    private CaseJobTaskManager(HibernateSessionFactory sessionFactory) {
         super();
         log.info("CaseJobTaskManager constructor");
         if (DebugLevels.DEBUG_0)
@@ -111,11 +119,13 @@ public class CaseJobTaskManager implements TaskManager {
         if (DebugLevels.DEBUG_4)
             System.out.println("Initial # of jobs in Thread Pool: " + threadPool.getPoolSize());
 
+        // this.sessionFactory=sessionFactory;
+
     }
 
-    public static synchronized CaseJobTaskManager getCaseJobTaskManager() {
+    public static synchronized CaseJobTaskManager getCaseJobTaskManager(HibernateSessionFactory sessionFactory) {
         if (ref == null)
-            ref = new CaseJobTaskManager();
+            ref = new CaseJobTaskManager(sessionFactory);
         return ref;
     }
 
@@ -142,7 +152,8 @@ public class CaseJobTaskManager implements TaskManager {
         }// synchronized
     }
 
-    public static synchronized void callBackFromThread(String taskId, String submitterId, String status, String mesg) {
+    public static synchronized void callBackFromThread(String taskId, String submitterId, String status, String mesg)
+            throws EmfException {
         if (DebugLevels.DEBUG_2)
             System.out.println("CaseJobTaskManager::callBackFromThread  refCount= " + refCount);
         if (DebugLevels.DEBUG_2)
@@ -159,11 +170,73 @@ public class CaseJobTaskManager implements TaskManager {
             System.out.println("Size of RUN TABLE: " + getSizeofRunTable());
         if (DebugLevels.DEBUG_0)
             System.out.println("***ABOVE*** In callback the sizes are shown ***ABOVE***");
-        runTable.remove(taskId);
+
+        updateRunStatus(taskId, status);
+
         if (DebugLevels.DEBUG_0)
             System.out.println("After Task removed Size of RUN TABLE: " + getSizeofRunTable());
 
         processTaskQueue();
+    }
+
+    private static void updateRunStatus(String taskId, String status) throws EmfException {
+
+        CaseJobTask cjt = null;
+        Session session = sessionFactory.getSession();
+        CaseDAO dao = new CaseDAO();
+        String jobStatus = "";
+
+        try {
+            if ((status.equals("completed")) || (status.equals("failed"))) {
+
+                synchronized (runTable) {
+                    cjt = (CaseJobTask) runTable.get(taskId);
+
+                    runTable.remove(taskId);
+                }
+            }
+
+            if (status.equals("export failed")) {
+                synchronized (waitTable) {
+                    cjt = (CaseJobTask) waitTable.get(taskId);
+                    waitTable.remove(taskId);
+                }
+            }
+
+            if (status.equals("export succeeded")) {
+                synchronized (waitTable) {
+                    cjt = (CaseJobTask) waitTable.get(taskId);
+                }
+            }
+
+            // update the run status in the Case_CaseJobs
+            int jid = cjt.getJobId();
+            CaseJob caseJob = dao.getCaseJob(jid, session);
+
+            if (status.equals("completed")) {
+                jobStatus = "Submitted";
+                caseJob.setRunStartDate(new Date());
+            }
+
+            if (status.equals("failed")) {
+                jobStatus = "Failed";
+                caseJob.setRunCompletionDate(new Date());
+            }
+
+            if (status.equals("export succeeded")) {
+                jobStatus = "Waiting";
+                caseJob.setRunStartDate(new Date());
+            }
+
+            JobRunStatus jrStat = dao.getJobRunStatuse(jobStatus, session);
+            caseJob.setRunstatus(jrStat);
+
+            dao.updateCaseJob(caseJob, session);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
     }
 
     public static synchronized void processTaskQueue() {
@@ -362,9 +435,9 @@ public class CaseJobTaskManager implements TaskManager {
 
     }
 
-    public static void callBackFromExportJobSubmitter(String cjtId, String status, String mesg) {
+    public static void callBackFromExportJobSubmitter(String cjtId, String status, String mesg) throws EmfException {
         CaseJobTask cjt = null;
-        
+
         System.out.println("CaseJobTaskManager::callBackFromExportJobSubmitter for caseJobTask= " + cjtId + " status= "
                 + status + " and message= " + mesg);
         synchronized (waitTable) {
@@ -374,17 +447,23 @@ public class CaseJobTaskManager implements TaskManager {
             if (DebugLevels.DEBUG_9)
                 System.out.println("For cjtId=" + cjtId + " Is the CaseJobTaksk null? " + (cjt == null));
         }
-        
-         if (cjt != null){
-             if (status.equals("completed"))
-                 cjt.setExportsSuccess(true);
-                 if (status.equals("failed"))
-                 cjt.setExportsSuccess(false);
 
-                // FIXME: expand the dependencies logic with Alexis
-                 cjt.setDependenciesSet(true);
-             
-         }
+        if (cjt != null) {
+
+            if (status.equals("completed")) {
+                cjt.setExportsSuccess(true);
+                updateRunStatus(cjtId, "export succeeded");
+            }
+
+            if (status.equals("failed")) {
+                cjt.setExportsSuccess(false);
+                updateRunStatus(cjtId, "export failed");
+            }
+
+            // FIXME: expand the dependencies logic with Alexis
+            cjt.setDependenciesSet(true);
+
+        }
 
         processTaskQueue();
 

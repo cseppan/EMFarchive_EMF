@@ -42,7 +42,17 @@ public class CaseJobTask extends Task {
 
     boolean dependenciesSet = true;
 
+    private String jobkey;
+
     // private String runRedirect = ">&"; // shell specific redirect
+
+    public String getJobkey() {
+        return jobkey;
+    }
+
+    public void setJobkey(String jobkey) {
+        this.jobkey = jobkey;
+    }
 
     public boolean isExportsSuccess() {
         return exportsSuccess;
@@ -147,7 +157,12 @@ public class CaseJobTask extends Task {
         String status = "completed";
         String mesg = " was pseudo successfull";
 
-        CaseJobTaskManager.callBackFromThread(this.taskId, this.submitterId, status, mesg);
+        try {
+            CaseJobTaskManager.callBackFromThread(this.taskId, this.submitterId, status, mesg);
+        } catch (EmfException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     /**

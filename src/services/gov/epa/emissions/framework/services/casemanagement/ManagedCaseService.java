@@ -114,15 +114,15 @@ public class ManagedCaseService {
 
     }
 
-    // private synchronized TaskSubmitter getCaseJobSubmitter() {
-    // if (caseJobSubmitter == null) {
-    // caseJobSubmitter = new CaseJobSumitter();
-    // TaskManagerFactory.getCaseJobTaskManager().registerTaskSubmitter(caseJobSubmitter);
-    //
-    // }
-    // return this.caseJobSubmitter;
-    // }
-
+    /**
+     * Generate the unique job key
+     * 
+     */
+    private synchronized String createJobKey(int jobId){
+        return jobId + "_" + new Date().getTime();
+    }
+    
+    
     private synchronized ManagedExportService getExportService() {
         log.info("ManagedCaseService::getExportService");
         ManagedExportService exportService = null;
@@ -303,9 +303,9 @@ public class ManagedCaseService {
         Session session = sessionFactory.getSession();
         try {
             dao.add(element, session);
-            Case loaded = (Case)dao.load(Case.class, element.getName(), session);
+            Case loaded = (Case) dao.load(Case.class, element.getName(), session);
             Case locked = dao.obtainLocked(user, loaded, session);
-            locked.setAbbreviation(new Abbreviation(loaded.getId()+""));
+            locked.setAbbreviation(new Abbreviation(loaded.getId() + ""));
             dao.update(locked, session);
         } catch (RuntimeException e) {
             e.printStackTrace();
@@ -675,25 +675,51 @@ public class ManagedCaseService {
         }
     }
 
+    /**
+     * Gets all the inputs for this job, selects based on: case ID, job ID, and sector
+     */
     private List<CaseInput> getJobInputs(int caseId, int jobId, Sector sector) throws EmfException {
-        /**
-         * Gets all the inputs for this job, selects based on: case ID, job ID, and sector
-         */
-        Session session = sessionFactory.getSession();
+        List<CaseInput> outInputs = new ArrayList<CaseInput>();
 
+        Session session = this.getSession();
+        EmfDataset cipDataset = null;
+        String badCipName = null;
+        
         // select the inputs based on 3 criteria
         try {
             List<CaseInput> inputs = dao.getJobInputs(caseId, jobId, sector, session);
-            // return an array of all type CaseInput
-            // return inputs.toArray(new CaseInput[0]);
-            return inputs;
+
+            Iterator<CaseInput> iter = inputs.iterator();
+
+            while (iter.hasNext()) {
+
+                CaseInput cip = iter.next();
+
+                if (DebugLevels.DEBUG_9)
+                    System.out.println(cip.getCaseID());
+                cipDataset = cip.getDataset();
+
+                if (cipDataset == null) {
+
+                    if (cip.isRequired()) {
+                        if (DebugLevels.DEBUG_9)
+                            System.out.println("CIP DATASET IS NULL AND IS REQD FOR CIP INPUT " + cip.getName());
+                        badCipName = cip.getName();
+                        // emf exception
+                        throw new EmfException("Required dataset not set for CaseInput= " + badCipName);
+                    }
+                } else {
+                    outInputs.add(cip);
+                }
+            }
+
+            return outInputs;
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n"
                     + e.getMessage());
-            throw new EmfException("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n");
-        } finally {
-            session.close();
+                throw new EmfException("Required dataset not set for Case Input name = " + badCipName);
+            
         }
     }
 
@@ -741,22 +767,27 @@ public class ManagedCaseService {
 
         // append all the job inputs to the inputsAll list
         if ((inputsAA != null) && (inputsAA.size() > 0)) {
-            if (DebugLevels.DEBUG_0) System.out.println("Number of AA inputs = " + inputsAA.size());
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Number of AA inputs = " + inputsAA.size());
             inputsAll.addAll(inputsAA);
         }
         if ((inputsSA != null) && (inputsSA.size() > 0)) {
-            if (DebugLevels.DEBUG_0) System.out.println("Number of SA inputs = " + inputsSA.size());
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Number of SA inputs = " + inputsSA.size());
             inputsAll.addAll(inputsSA);
         }
         if ((inputsAJ != null) && (inputsAJ.size() > 0)) {
-            if (DebugLevels.DEBUG_0) System.out.println("Number of AJ inputs = " + inputsAJ.size());
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Number of AJ inputs = " + inputsAJ.size());
             inputsAll.addAll(inputsAJ);
         }
         if ((inputsSJ != null) && (inputsSJ.size() > 0)) {
-            if (DebugLevels.DEBUG_0) System.out.println("Number of SJ inputs = " + inputsSJ.size());
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Number of SJ inputs = " + inputsSJ.size());
             inputsAll.addAll(inputsSJ);
         }
-        if (DebugLevels.DEBUG_0) System.out.println("Total number of inputs = " + inputsAll.size());
+        if (DebugLevels.DEBUG_0)
+            System.out.println("Total number of inputs = " + inputsAll.size());
 
         return (inputsAll);
     }
@@ -1185,7 +1216,7 @@ public class ManagedCaseService {
         } finally {
             session.close();
         }
-        
+
         if (names.size() == 0)
             return name;
 
@@ -1209,12 +1240,12 @@ public class ManagedCaseService {
                         sequence = temp + 1;
                 }
             }
-            
+
             return sequence;
         } catch (Exception e) {
-            //NOTE: Assume one case won't be copied 10000 times.
+            // NOTE: Assume one case won't be copied 10000 times.
             // This is farely safe assuming the random number do not duplicate.
-            return Math.abs(new Random().nextInt()) % 10000; 
+            return Math.abs(new Random().nextInt()) % 10000;
         }
     }
 
@@ -1268,38 +1299,55 @@ public class ManagedCaseService {
      * 
      */
     public synchronized String submitJobs(Integer[] jobIds, int caseId, User user) throws EmfException {
-        if (DebugLevels.DEBUG_0) System.out.println("ManagedCaseService::submitJobs size: " + jobIds.length + " for caseId= " + caseId);
+        if (DebugLevels.DEBUG_0)
+            System.out.println("ManagedCaseService::submitJobs size: " + jobIds.length + " for caseId= " + caseId);
 
         // create a new caseJobSubmitter for each client call in a session
-        TaskSubmitter caseJobSubmitter = new CaseJobSumitter();
-
+        TaskSubmitter caseJobSubmitter = new CaseJobSumitter(sessionFactory);
+        
         try {
             String caseJobExportSubmitterId = null;
             String caseJobSubmitterId = caseJobSubmitter.getSubmitterId();
 
             List<CaseJob> caseJobs = new ArrayList<CaseJob>();
 
-            if (DebugLevels.DEBUG_0) System.out.println("Is CaseJobSubmitterId null? " + (caseJobSubmitterId == null));
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Is CaseJobSubmitterId null? " + (caseJobSubmitterId == null));
             // FIXME: Does this need to be done in a new DAO method???
             // Get the CaseJobs for each jobId
             for (Integer jobId : jobIds) {
                 int jid = jobId.intValue();
-
-                if (DebugLevels.DEBUG_0) System.out.println("The jobId= " + jid);
+                String jobKey = null;
+            
+                if (DebugLevels.DEBUG_0)
+                    System.out.println("The jobId= " + jid);
                 CaseJob caseJob = this.getCaseJob(jid);
-                User jobUser = caseJob.getUser();
                 
+                //NOTE: This is where the jobkey is generated and set in the CaseJob
+                jobKey = this.createJobKey(jid);
+                
+                //set the job key in the case job
+                caseJob.setJobkey(jobKey);  
+                
+                //set the user for the case job
+                User jobUser = caseJob.getUser();
                 if (jobUser == null || !jobUser.equals(user)) {
-                    updateJobUser(caseJob, user);
+                    caseJob.setUser(user);
                 }
                 
-                if (DebugLevels.DEBUG_0) System.out.println("Is the caseJob for this jobId null? " + (caseJob == null));
+                if (DebugLevels.DEBUG_0)
+                    System.out.println("Is the caseJob for this jobId null? " + (caseJob == null));
                 Case jobCase = this.getCase(caseId);
 
-                if (DebugLevels.DEBUG_0) System.out.println("caseId= " + caseId + " Is the Case for this job null? " + (jobCase == null));
+                if (DebugLevels.DEBUG_0)
+                    System.out.println("caseId= " + caseId + " Is the Case for this job null? " + (jobCase == null));
                 // FIXME: Is this still needed?????
                 // caseJob.setRunStartDate(new Date());
                 CaseJobTask cjt = new CaseJobTask(jid, caseId, user);
+                cjt.setJobkey(jobKey);
+
+                // get or create the reference to the Managed Export Service for this casejobtask
+                ManagedExportService expSvc = this.getExportService();
 
                 if (DebugLevels.DEBUG_6)
                     System.out.println("set the casejobsubmitter id = " + caseJobSubmitterId);
@@ -1309,7 +1357,7 @@ public class ManagedCaseService {
                 if (DebugLevels.DEBUG_6)
                     System.out.println("setJobFileContent");
 
-                cjt.setJobFileContent(this.createJobFileContent(caseJob, user));
+                cjt.setJobFileContent(this.createJobFileContent(caseJob, user, expSvc));
 
                 String jobFileName = this.getJobFileName(caseJob);
 
@@ -1344,15 +1392,22 @@ public class ManagedCaseService {
                     System.out.println("Purpose= " + purpose);
 
                 // pass the inputs to the exportService which uses an exportJobSubmitter to work with exportTaskManager
-                 caseJobExportSubmitterId = this.getExportService().exportForJob(user, inputs, cjt.getTaskId(),
-                 purpose,
-                 caseJob, jobCase);
-                //caseJobExportSubmitterId = "DUMMY caseJobExportSubmitterId";
+                caseJobExportSubmitterId = expSvc
+                        .exportForJob(user, inputs, cjt.getTaskId(), purpose, caseJob, jobCase);
 
+                String runStatusExporting="Exporting";
+                
+                caseJob.setRunstatus(getJobRunStatus(runStatusExporting));
+                caseJob.setRunStartDate(new Date());
+                
                 // FIXME: Do we still need the casejob around?
                 caseJobs.add(caseJob);
                 // Create the list of case job tasks for the submitter and task manager
                 caseJobTasks.add(cjt);
+                
+                // Now update the casejob in the database
+                updateJob(caseJob);
+
                 if (DebugLevels.DEBUG_6)
                     System.out.println("Added caseJobTask to collection");
 
@@ -1377,10 +1432,27 @@ public class ManagedCaseService {
         }
     }
 
-    private synchronized void updateJobUser(CaseJob caseJob, User user) throws EmfException {
+    private JobRunStatus getJobRunStatus(String runStatus) throws EmfException {
+
+        Session session = sessionFactory.getSession();
+        JobRunStatus jrStat = null;
+        
+        try {
+            jrStat = dao.getJobRunStatuse(runStatus, session);
+            
+            return jrStat;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get job run status.\n" + e.getMessage());
+            throw new EmfException("Could not get job run status.\n");
+        } finally {
+            session.close();
+        }
+    }
+
+    private synchronized void updateJob(CaseJob caseJob) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            caseJob.setUser(user);
             dao.updateCaseJob(caseJob, session);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
@@ -1579,7 +1651,7 @@ public class ManagedCaseService {
         return exclInputs;
     }
 
-    private String setenvInput(CaseInput input, Case caseObj) throws EmfException {
+    private String setenvInput(CaseInput input, Case caseObj, ManagedExportService expSvc) throws EmfException {
         /**
          * Creates a line of the run job file. Sets the env variable to the value input file.
          * 
@@ -1599,7 +1671,7 @@ public class ManagedCaseService {
         }
 
         // Create a full path to the input file
-        String fullPath = getExportService().getCleanDatasetName(input.getDataset(), input.getVersion());
+        String fullPath = expSvc.getCleanDatasetName(input.getDataset(), input.getVersion());
         if ((subdir != null) && !(subdir.toString()).equals("")) {
             fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + input.getSubdirObj()
                     + System.getProperty("file.separator") + fullPath;
@@ -1658,7 +1730,8 @@ public class ManagedCaseService {
         return setenvLine;
     }
 
-    public synchronized String createJobFileContent(CaseJob job, User user) throws EmfException {
+    public synchronized String createJobFileContent(CaseJob job, User user, ManagedExportService expSvc)
+            throws EmfException {
         // String jobContent="";
         String jobFileHeader = "";
 
@@ -1810,7 +1883,7 @@ public class ManagedCaseService {
             sbuf.append(this.runComment + " Inputs -- for all sectors and all jobs" + eolString);
             if (inputsAA != null) {
                 for (CaseInput input : inputsAA) {
-                    sbuf.append(setenvInput(input, caseObj));
+                    sbuf.append(setenvInput(input, caseObj, expSvc));
                 }
             }
 
@@ -1819,7 +1892,7 @@ public class ManagedCaseService {
             sbuf.append(this.runComment + " Inputs -- sector (" + sector + ") and all jobs" + eolString);
             if (inputsSA != null) {
                 for (CaseInput input : inputsSA) {
-                    sbuf.append(setenvInput(input, caseObj));
+                    sbuf.append(setenvInput(input, caseObj, expSvc));
                 }
             }
             // All sectors and specific job
@@ -1827,7 +1900,7 @@ public class ManagedCaseService {
             sbuf.append(this.runComment + " Inputs -- for all sectors and job: " + job + eolString);
             if (inputsAJ != null) {
                 for (CaseInput input : inputsAJ) {
-                    sbuf.append(setenvInput(input, caseObj));
+                    sbuf.append(setenvInput(input, caseObj, expSvc));
                 }
             }
             // Sector and Job specific
@@ -1835,7 +1908,7 @@ public class ManagedCaseService {
             sbuf.append(this.runComment + " Inputs -- sector (" + sector + ") and job: " + job + eolString);
             if (inputsSJ != null) {
                 for (CaseInput input : inputsSJ) {
-                    sbuf.append(setenvInput(input, caseObj));
+                    sbuf.append(setenvInput(input, caseObj, expSvc));
                 }
             }
             /*
@@ -2015,12 +2088,22 @@ public class ManagedCaseService {
             String status = message.getStatus();
             String jobStatus = job.getRunstatus().getName();
             String lastMsg = message.getMessage();
-            
+
             if (lastMsg != null && !lastMsg.trim().isEmpty())
                 job.setRunLog(lastMsg);
 
             if (!status.isEmpty() && !jobStatus.equalsIgnoreCase(status)) {
                 job.setRunstatus(dao.getJobRunStatuse(status, session));
+                
+                //If the status from the Command Client is not Completed or not Failed
+                // then the job is Running.  A Running job gets a Run Start Date
+                // all other statuses get a Run Completion Date.
+                if (!(status.equalsIgnoreCase("Running"))){
+                    job.setRunCompletionDate(new Date());
+                }else{
+                    job.setRunStartDate(new Date());
+                }
+                
                 dao.updateCaseJob(job, session);
             }
 

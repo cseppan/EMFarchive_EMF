@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.tasks;
 
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 
 import java.util.Collection;
@@ -145,7 +146,12 @@ public class ExportJobSubmitter extends ExportSubmitter {
                     + " Completed= " + done + " Failed= " + fail + " Canceled= " + canned;
 
             this.setStatus(user, statusServices, message);
-            CaseJobTaskManager.callBackFromExportJobSubmitter(this.caseJobTaskId, status, mesg);
+            try {
+                CaseJobTaskManager.callBackFromExportJobSubmitter(this.caseJobTaskId, status, mesg);
+            } catch (EmfException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
         }
 
         if (DebugLevels.DEBUG_9)

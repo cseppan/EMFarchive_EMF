@@ -1,4 +1,6 @@
 package gov.epa.emissions.framework.tasks;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -21,13 +23,15 @@ public class CaseJobSumitter implements TaskSubmitter {
     protected String submitterId;
 
     protected ArrayList<Runnable> caseJobTasks = null;
+    
+    private HibernateSessionFactory sessionFactory = null;
 
-    public CaseJobSumitter() {
+    public CaseJobSumitter(HibernateSessionFactory sessionFactory) {
         myTag();
         submitterId = svcLabel;
         if (DebugLevels.DEBUG_0) System.out.println("CaseJobSubmitter myTag called: " + submitterId);
         caseJobTasks = new ArrayList<Runnable>();
-
+        this.sessionFactory=sessionFactory;
     }
 
     public void addTasksToSubmitter(ArrayList<Runnable> tasksForSubmitter) {
@@ -84,7 +88,7 @@ public class CaseJobSumitter implements TaskSubmitter {
             System.out.println("#### SUBMITTER:: incoming tasks size before ADD: " + this.submitterId + " has task count= "
                     + tasks.size());
 
-        TaskManagerFactory.getCaseJobTaskManager().addTasks(tasks);
+        TaskManagerFactory.getCaseJobTaskManager(sessionFactory).addTasks(tasks);
 
         // FIXME: May not need to do this next step since submitted Table is uptodate
 //        submittedTasks.addAll(tasks);
