@@ -234,21 +234,7 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     public void setVersion(int version) {
         this.version = version;
     }
-    
-    public void generateJobkey(User user){
-        /**
-         * Generates a unique job key for a particular user and
-         * a particular instantiation of a job.
-         */
-        
-        // Should generate based on user, job id, and date stamp
-        
-        // for know just setting explicitly
-        this.jobkey = "q982435kjjs987719485jasfai98";
-        
-        // need to be recorded in a table w/ respective jobId and user
-    }
-  
+     
     public String getJobkey(){
         return this.jobkey;
     }
