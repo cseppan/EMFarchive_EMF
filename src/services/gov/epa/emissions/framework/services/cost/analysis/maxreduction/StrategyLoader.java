@@ -112,7 +112,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
                             true);
                     
                     System.out.println("recordGenerator.getRecord");
-                    totalCost += recordGenerator.totalCost();
+                    totalCost += recordGenerator.totalCost() != null ? recordGenerator.totalCost() : 0.0;
                     if (poll.equals(controlStrategy.getTargetPollutant()))
                         totalReduction += recordGenerator.reducedEmission();
                     insertRecord(record, modifier);

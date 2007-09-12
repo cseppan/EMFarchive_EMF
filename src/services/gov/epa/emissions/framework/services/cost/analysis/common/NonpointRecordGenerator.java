@@ -87,7 +87,7 @@ public class NonpointRecordGenerator implements RecordGenerator {
         annualCost=costEquations.getAnnualCost();
  //       annualCost = maxCM.adjustedCostPerTon() * reducedEmission;
         tokens.add("" + decFormat.format(annualCost));  // annual cost for source
-        tokens.add("" + decFormat.format(costEquations.getComputedCPT()));  // annual cost per ton
+        tokens.add("" + (costEquations.getComputedCPT() != null ? decFormat.format(costEquations.getComputedCPT()) : ""));  // annual cost per ton
         
         tokens.add("" + decFormat.format(bestMeasureEffRecord.controlEfficiency()));   // control efficiency
         tokens.add("" + bestMeasureEffRecord.rulePenetration());  // rule penetration

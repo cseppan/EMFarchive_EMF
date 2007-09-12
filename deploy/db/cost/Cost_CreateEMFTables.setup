@@ -380,4 +380,16 @@ CREATE INDEX fki_equation_measure
   USING btree
   (control_measure_id);
 
-  
+-- 9/12/2007 - DCD add user-defined functionm and aggreagte function to help build a comma-delimted list from a set
+create function public.join_with_ampersand(text,text)
+  returns text
+  immutable strict language 'sql'
+  as 'select $1||''& ''||$2'
+;
+
+create aggregate public.concatenate_with_ampersand (
+  sfunc = join_with_ampersand,
+  basetype = text,
+  stype = text
+);
+

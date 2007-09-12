@@ -322,6 +322,18 @@ insert into emf.equation_type_variables (equation_type_id, name, file_col_positi
 select e.id, 'Typical O&M Control Cost Factor', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
 from emf.equation_types as e 
 where name = 'Type 8';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Typical Default CPT Factor - Capital', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 8';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Typical Default CPT Factor - O&M', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 8';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Typical Default CPT Factor - Annualized', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 8';
 
 -- 8/27/07 - DCD new table for measure equations...
 CREATE TABLE emf.control_measure_equations
@@ -389,4 +401,17 @@ insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, na
 select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by US State and Pollutant', 1, 'select fips.state_name, fips.state_abbr, fips.fipsst, e.POLL, sum(ann_emis) as ann_emis from $TABLE[1] e inner join reference.fips on fips.state_county_fips = e.FIPS where fips.country_num = ''0'' group by fips.state_name, fips.state_abbr, fips.fipsst, POLL order by fips.state_name, POLL', false, 1, ''
 from emf.dataset_types dt
 where name = 'ORL CoST Point Inventory (PTINV)';
+
+-- 9/12/2007 - DCD add user-defined functionm and aggreagte function to help build a comma-delimted list from a set
+create function public.join_with_ampersand(text,text)
+  returns text
+  immutable strict language 'sql'
+  as 'select $1||''& ''||$2'
+;
+
+create aggregate public.concatenate_with_ampersand (
+  sfunc = join_with_ampersand,
+  basetype = text,
+  stype = text
+);
 

@@ -6,6 +6,7 @@ public class CostEquationFactory {
 
     private boolean useCostEquations;
     private DefaultCostEquation defaultCostEquations;
+    private Type8CostEquation type8CostEquation;
     private Type6CostEquation type6CostEquation;
     private Type5CostEquation type5CostEquation;
     private Type4CostEquation type4CostEquation;
@@ -15,6 +16,7 @@ public class CostEquationFactory {
     public CostEquationFactory(boolean useCostEquations, double discountRate) {
         this.useCostEquations = useCostEquations;
         this.defaultCostEquations = new DefaultCostEquation(discountRate);
+        this.type8CostEquation = new Type8CostEquation(discountRate);
         this.type6CostEquation = new Type6CostEquation(discountRate);
         this.type5CostEquation = new Type5CostEquation(discountRate);
         this.type4CostEquation = new Type4CostEquation(discountRate);
@@ -38,6 +40,16 @@ public class CostEquationFactory {
             //equations (i.e., if Type 6 is the primary but we are missing some inputs we might want to try Type 10, and if
             //we don't have all the inputs for this Type, then we could use default equation approach) 
             if (equations.length > 0) {
+                
+                //use type 8 equation...
+                if (equations[0].getEquationType().getName().equals("Type 8")) {
+                    //evaluate inputs, if they missing, use the default
+                    if (minStackFlowRate != null && minStackFlowRate != 0.0) {
+                        type8CostEquation.setUp(reducedEmission, bestMeasureEffRecord, 
+                                minStackFlowRate);
+                        return type8CostEquation;
+                    }
+                }
                 
                 //use type 6 equation...
                 if (equations[0].getEquationType().getName().equals("Type 6")) {

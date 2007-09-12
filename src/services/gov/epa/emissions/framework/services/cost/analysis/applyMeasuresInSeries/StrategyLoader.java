@@ -147,12 +147,13 @@ public class StrategyLoader extends AbstractStrategyLoader {
                     try {
                         Record record = recordGenerator.getRecord(resultSet, bestMeasureEffRecord, 
                                 sourceEmis, i == 0 ? true : false, i == listSize - 1 ? true : false);
-                        totalCost += recordGenerator.totalCost();
+                        totalCost += recordGenerator.totalCost() != null ? recordGenerator.totalCost() : 0.0;
                         sourceEmis -= recordGenerator.reducedEmission();
                         if (poll.equals(controlStrategy.getTargetPollutant()))
                             totalReduction += recordGenerator.reducedEmission();
                         insertRecord(record, modifier);
                     } catch (SQLException e) {
+                        e.printStackTrace();
                         throw new EmfException("Error in processing record for source record: " + sourceCount + ". Exception: " + e.getMessage());
                     }
                 }

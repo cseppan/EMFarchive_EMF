@@ -140,7 +140,8 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         //setup result
         ControlStrategyResult result = createStrategyResult(inputDataset);
         //set class level variable if inputdataset is a point type
-        this.pointDatasetType = inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)");
+        this.pointDatasetType = inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)")
+            || inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL CoST Point Inventory (PTINV)");
         //get the record generator appropriate for the input/output Dataset
         this.recordGenerator = new RecordGeneratorFactory(inputDataset.getDatasetType(), result, decFormat, controlStrategy.getDiscountRate(), controlStrategy.getUseCostEquations()).getRecordGenerator();
         //get the OptimizedQuery, really just a batch of resultsets
