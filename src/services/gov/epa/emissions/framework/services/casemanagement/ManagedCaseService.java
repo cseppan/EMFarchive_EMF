@@ -5,6 +5,8 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.DeepCopy;
+import gov.epa.emissions.commons.io.generic.GenericExporterToString;
+import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
@@ -1744,17 +1746,10 @@ public class ManagedCaseService {
 
         // Some objects needed for accessing data
         Case caseObj = this.getCase(job.getCaseId());
-
-        // FIXME: Remove after verified not needed
-        // for inputs
-        // DbServer dbServerlocal = dbFactory.getDbServer();
-        // for the header file
-        // DbServer dbServerlineexporter = dbFactory.getDbServer();
-
         int caseId = job.getCaseId();
         int jobId = job.getId();
 
-        CaseInput headerInput = null;
+        CaseInput headerInput = null; // input for the EMF Job header
 
         List<CaseInput> inputsAA = null; // inputs for all sectors and all jobs
         List<CaseInput> inputsSA = null; // inputs for specific sector and all jobs
@@ -1763,246 +1758,240 @@ public class ManagedCaseService {
 
         String jobName = job.getName().replace(" ", "_");
 
-        try {
+        /*
+         * Get the inputs in the following order: all sectors, all jobs sector specific, all jobs all sectors, job
+         * specific sector specific, job specific
+         * 
+         * Need to search for inputs now, b/c want to see if there is an EMF_HEADER
+         */
 
-            /*
-             * Get the inputs in the following order: all sectors, all jobs sector specific, all jobs all sectors, job
-             * specific sector specific, job specific
-             * 
-             * Need to search for inputs now, b/c want to see if there is an EMF_HEADER
-             */
+        // Create an export service to get names of the datasets as inputs to Smoke script
+        // ExportService exports = new ExportService(dbServerlocal, this.threadPool, this.sessionFactory);
+        // Get case inputs (the datasets associated w/ the case)
+        // All sectors, all jobs
+        inputsAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS);
 
-            // Create an export service to get names of the datasets as inputs to Smoke script
-            // ExportService exports = new ExportService(dbServerlocal, this.threadPool, this.sessionFactory);
-            // Get case inputs (the datasets associated w/ the case)
-            // All sectors, all jobs
-            inputsAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS);
+        // Exclude any inputs w/ environmental variable EMF_JOBHEADER
+        List<CaseInput> exclInputs = this.excludeInputsEnv(inputsAA, "EMF_JOBHEADER");
+
+        if (exclInputs.size() != 0) {
+            headerInput = exclInputs.get(0); // get the first element as header
+        }
+
+        // Sector specific, all jobs
+        Sector sector = job.getSector();
+        if (sector != this.ALL_SECTORS) {
+            inputsSA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector);
 
             // Exclude any inputs w/ environmental variable EMF_JOBHEADER
-            List<CaseInput> exclInputs = this.excludeInputsEnv(inputsAA, "EMF_JOBHEADER");
-
+            exclInputs = this.excludeInputsEnv(inputsSA, "EMF_JOBHEADER");
             if (exclInputs.size() != 0) {
                 headerInput = exclInputs.get(0); // get the first element as header
             }
+        }
 
-            // Sector specific, all jobs
-            Sector sector = job.getSector();
-            if (sector != this.ALL_SECTORS) {
-                inputsSA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector);
+        // All sectors, job specific
+        inputsAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS);
 
-                // Exclude any inputs w/ environmental variable EMF_JOBHEADER
-                exclInputs = this.excludeInputsEnv(inputsSA, "EMF_JOBHEADER");
-                if (exclInputs.size() != 0) {
-                    headerInput = exclInputs.get(0); // get the first element as header
-                }
-            }
+        // Exclude any inputs w/ environmental variable EMF_JOBHEADER
+        exclInputs = this.excludeInputsEnv(inputsAJ, "EMF_JOBHEADER");
+        if (exclInputs.size() != 0) {
+            headerInput = exclInputs.get(0); // get the first element as header
+        }
 
-            // All sectors, job specific
-            inputsAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS);
+        // Specific sector and specific job
+        if (sector != this.ALL_SECTORS) {
+            inputsSJ = this.getJobInputs(caseId, jobId, sector);
 
             // Exclude any inputs w/ environmental variable EMF_JOBHEADER
-            exclInputs = this.excludeInputsEnv(inputsAJ, "EMF_JOBHEADER");
+            exclInputs = this.excludeInputsEnv(inputsSJ, "EMF_JOBHEADER");
             if (exclInputs.size() != 0) {
                 headerInput = exclInputs.get(0); // get the first element as header
             }
+        }
 
-            // Specific sector and specific job
-            if (sector != this.ALL_SECTORS) {
-                inputsSJ = this.getJobInputs(caseId, jobId, sector);
+        // Get header String:
+        if (headerInput != null) {
+            // Header string starts the job file content string
 
-                // Exclude any inputs w/ environmental variable EMF_JOBHEADER
-                exclInputs = this.excludeInputsEnv(inputsSJ, "EMF_JOBHEADER");
-                if (exclInputs.size() != 0) {
-                    headerInput = exclInputs.get(0); // get the first element as header
-                }
+            try {
+                // get the string of the EMF_JOBHEADER from the input
+                jobFileHeader = getJobFileHeader(headerInput);
+                sbuf.append(jobFileHeader);
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.error("Could not write EMF header to job script file, " + e.getMessage());
+                throw new EmfException("Could not write EMF header to job script file");
             }
 
-            // Get header String:
-            if (headerInput != null) {
-                // Header string starts the job file content string
+        } else {
+            // Start the job file content string and append the end of line characters for this OS
+            sbuf.append(this.runShell + this.eolString);
+        }
 
-                // Setup a line exporter for the EMF_JOBHEADER dataset and export to the file
-                // will close file, so need to reopen for appending, test that dbServer is closed
-                // headerInput.getDataset().s
-                // LineExporter headerExporter = new LineExporter(headerInput.getDataset(), dbServerlineexporter,
-                // dbServerlineexporter.getSqlDataTypes(), new Integer(10000));
+        // print job name to file
+        sbuf.append(eolString);
+        sbuf.append(this.runComment + " Job run file for job: " + jobName + eolString);
 
-                try {
-                    // headerExporter.export(ofile);
+        /*
+         * Define some EMF specific variables
+         */
+        sbuf.append(eolString);
 
-                    // FIXME: Figure out how this will be implemented
-                    jobFileHeader = getJobFileHeader(headerInput);
-                    sbuf.append(jobFileHeader);
-                    System.out.println("EMF_JOBHEADER 2: " + jobFileHeader);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    log.error("Could not write EMF header to job script file, " + e.getMessage());
-                    throw new EmfException("Could not write EMF header to job script file");
-                } finally {
-                    // try {
-                    // dbServerlineexporter.disconnect();
-                    // } catch (Exception e) {
-                    // throw new EmfException("dbServer error");
-                    // }
-                }
+        sbuf.append(this.runComment + " EMF specific variables" + eolString);
+        sbuf.append(shellSetenv("EMF_JOBID", String.valueOf(jobId)));
+        sbuf.append(shellSetenv("EMF_JOBNAME", jobName));
+        sbuf.append(shellSetenv("EMF_USER", user.getUsername()));
 
-            } else {
-                // Start the job file content string and append the end of line characters for this OS
-                sbuf.append(this.runShell + this.eolString);
-                System.out.println("Sbuf in else: " + sbuf.toString());
+        // Generate and get a unique job key, add it to the job,
+        // update the db, and write it to the script
+        String jobKey = createJobKey(jobId);
+        job.setJobkey(jobKey);
+        updateCaseJob(user, job);
+        sbuf.append(shellSetenv("EMF_JOBKEY", job.getJobkey()));
+
+        // Print the inputs to the file
+
+        /*
+         * loop over inputs and write Env variables and input (full name and path) to job run file, print comments
+         */
+        // All sectors and all jobs
+        sbuf.append(eolString);
+        sbuf.append(this.runComment + " Inputs -- for all sectors and all jobs" + eolString);
+        if (inputsAA != null) {
+            for (CaseInput input : inputsAA) {
+                sbuf.append(setenvInput(input, caseObj, expSvc));
             }
+        }
 
-            // print job name to file
-            sbuf.append(eolString);
-            sbuf.append(this.runComment + " Job run file for job: " + jobName + eolString);
-            System.out.println("Sbuf: " + sbuf.toString());
-
-            /*
-             * Define some EMF specific variables
-             */
-            sbuf.append(eolString);
-
-            sbuf.append(this.runComment + " EMF specific variables" + eolString);
-            sbuf.append(shellSetenv("EMF_JOBID", String.valueOf(jobId)));
-            sbuf.append(shellSetenv("EMF_JOBNAME", jobName));
-            sbuf.append(shellSetenv("EMF_USER", user.getUsername()));
-            // Generate and get a unique job key and write it to the script
-            job.generateJobkey(user);
-            sbuf.append(shellSetenv("EMF_JOBKEY", job.getJobkey()));
-
-            // Print the inputs to the file
-
-            /*
-             * loop over inputs and write Env variables and input (full name and path) to job run file, print comments
-             */
-            // All sectors and all jobs
-            sbuf.append(eolString);
-            sbuf.append(this.runComment + " Inputs -- for all sectors and all jobs" + eolString);
-            if (inputsAA != null) {
-                for (CaseInput input : inputsAA) {
-                    sbuf.append(setenvInput(input, caseObj, expSvc));
-                }
+        // Sector specific and all jobs
+        sbuf.append(eolString);
+        sbuf.append(this.runComment + " Inputs -- sector (" + sector + ") and all jobs" + eolString);
+        if (inputsSA != null) {
+            for (CaseInput input : inputsSA) {
+                sbuf.append(setenvInput(input, caseObj, expSvc));
             }
-
-            // Sector specific and all jobs
-            sbuf.append(eolString);
-            sbuf.append(this.runComment + " Inputs -- sector (" + sector + ") and all jobs" + eolString);
-            if (inputsSA != null) {
-                for (CaseInput input : inputsSA) {
-                    sbuf.append(setenvInput(input, caseObj, expSvc));
-                }
+        }
+        // All sectors and specific job
+        sbuf.append(eolString);
+        sbuf.append(this.runComment + " Inputs -- for all sectors and job: " + job + eolString);
+        if (inputsAJ != null) {
+            for (CaseInput input : inputsAJ) {
+                sbuf.append(setenvInput(input, caseObj, expSvc));
             }
-            // All sectors and specific job
-            sbuf.append(eolString);
-            sbuf.append(this.runComment + " Inputs -- for all sectors and job: " + job + eolString);
-            if (inputsAJ != null) {
-                for (CaseInput input : inputsAJ) {
-                    sbuf.append(setenvInput(input, caseObj, expSvc));
-                }
+        }
+        // Sector and Job specific
+        sbuf.append(eolString);
+        sbuf.append(this.runComment + " Inputs -- sector (" + sector + ") and job: " + job + eolString);
+        if (inputsSJ != null) {
+            for (CaseInput input : inputsSJ) {
+                sbuf.append(setenvInput(input, caseObj, expSvc));
             }
-            // Sector and Job specific
-            sbuf.append(eolString);
-            sbuf.append(this.runComment + " Inputs -- sector (" + sector + ") and job: " + job + eolString);
-            if (inputsSJ != null) {
-                for (CaseInput input : inputsSJ) {
-                    sbuf.append(setenvInput(input, caseObj, expSvc));
-                }
+        }
+        /*
+         * Get the parameters for this job in following order: all sectors, all jobs sector specific, all jobs all
+         * sectors, job specific sector specific, job specific
+         */
+
+        // All sectors, all jobs
+        sbuf.append(eolString);
+        sbuf.append(this.runComment + " Parameters -- all sectors, all jobs " + eolString);
+        CaseParameter[] parameters = this.getJobParameters(caseId, this.ALL_JOB_ID, this.ALL_SECTORS);
+        if (parameters != null) {
+            for (CaseParameter param : parameters) {
+                sbuf.append(setenvParameter(param));
             }
-            /*
-             * Get the parameters for this job in following order: all sectors, all jobs sector specific, all jobs all
-             * sectors, job specific sector specific, job specific
-             */
-
-            // All sectors, all jobs
-            sbuf.append(eolString);
-            sbuf.append(this.runComment + " Parameters -- all sectors, all jobs " + eolString);
-            CaseParameter[] parameters = this.getJobParameters(caseId, this.ALL_JOB_ID, this.ALL_SECTORS);
-            if (parameters != null) {
-                for (CaseParameter param : parameters) {
-                    sbuf.append(setenvParameter(param));
-                }
-
-            }
-
-            // Specific sector, all jobs
-            if (sector != this.ALL_SECTORS) {
-                sbuf.append(eolString);
-                sbuf.append(this.runComment + " Parameters -- sectors (" + sector + "), all jobs " + eolString);
-                parameters = this.getJobParameters(caseId, this.ALL_JOB_ID, sector);
-                if (parameters != null) {
-                    for (CaseParameter param : parameters) {
-                        sbuf.append(setenvParameter(param));
-                    }
-                }
-            }
-            // All sectors, specific job
-            sbuf.append(eolString);
-            sbuf.append(this.runComment + " Parameters -- all sectors, job: " + job + eolString);
-            parameters = this.getJobParameters(caseId, jobId, this.ALL_SECTORS);
-            if (parameters != null) {
-                for (CaseParameter param : parameters) {
-                    sbuf.append(setenvParameter(param));
-                }
-            }
-            // Specific sector, specific job
-            if (sector != this.ALL_SECTORS) {
-                sbuf.append(eolString);
-                sbuf.append(this.runComment + " Parameters -- sectors (" + sector + "), job: " + job + eolString);
-                parameters = this.getJobParameters(caseId, jobId, sector);
-                if (parameters != null) {
-                    for (CaseParameter param : parameters) {
-                        sbuf.append(setenvParameter(param));
-                    }
-                }
-            }
-            // Getting the executable object from the job
-            Executable execVal = job.getExecutable();
-
-            // path to executable
-            String execPath = job.getPath();
-
-            // executable string
-            String execName = execVal.getName();
-
-            // executable full name and arguments
-            String execFull = execPath + System.getProperty("file.separator") + execName;
-            String execFullArgs = execFull + " " + job.getArgs() + eolString;
-            // print executable
-            sbuf.append(eolString);
-            sbuf.append(this.runComment + " job executable" + eolString);
-            sbuf.append("$EMF_CLIENT -k $EMF_JOBKEY -x " + execFull + " -m \"Running top level script\"" + eolString);
-            sbuf.append(execFullArgs);
-
-            // add a test of the status and send info through the
-            // command client -- should generalize so not csh specific
-            sbuf.append("if ( $status != 0 ) then" + eolString);
-            sbuf.append("\t $EMF_CLIENT -k $EMF_JOBKEY -s 'Failed' -m \"ERROR running Job: $EMF_JOBNAME\" -t 'e' "
-                    + eolString);
-            sbuf.append("\t exit(1)" + eolString);
-            sbuf.append("else" + eolString);
-            sbuf.append("\t $EMF_CLIENT -k $EMF_JOBKEY -s 'Completed' -m \"Completed job: $EMF_JOBNAME\"" + eolString);
-            sbuf.append("endif" + eolString);
-
-        } finally {
-            // close the db server
-            // try {
-            // dbServerlocal.disconnect();
-            // } catch (Exception e) {
-            // throw new EmfException("dbServer error");
-            // }
 
         }
 
-        // Send back the contents of jobFileHeader and jobContent string for job file
-        return jobFileHeader + sbuf.toString();
+        // Specific sector, all jobs
+        if (sector != this.ALL_SECTORS) {
+            sbuf.append(eolString);
+            sbuf.append(this.runComment + " Parameters -- sectors (" + sector + "), all jobs " + eolString);
+            parameters = this.getJobParameters(caseId, this.ALL_JOB_ID, sector);
+            if (parameters != null) {
+                for (CaseParameter param : parameters) {
+                    sbuf.append(setenvParameter(param));
+                }
+            }
+        }
+        // All sectors, specific job
+        sbuf.append(eolString);
+        sbuf.append(this.runComment + " Parameters -- all sectors, job: " + job + eolString);
+        parameters = this.getJobParameters(caseId, jobId, this.ALL_SECTORS);
+        if (parameters != null) {
+            for (CaseParameter param : parameters) {
+                sbuf.append(setenvParameter(param));
+            }
+        }
+        // Specific sector, specific job
+        if (sector != this.ALL_SECTORS) {
+            sbuf.append(eolString);
+            sbuf.append(this.runComment + " Parameters -- sectors (" + sector + "), job: " + job + eolString);
+            parameters = this.getJobParameters(caseId, jobId, sector);
+            if (parameters != null) {
+                for (CaseParameter param : parameters) {
+                    sbuf.append(setenvParameter(param));
+                }
+            }
+        }
+        // Getting the executable object from the job
+        Executable execVal = job.getExecutable();
+
+        // path to executable
+        String execPath = job.getPath();
+
+        // executable string
+        String execName = execVal.getName();
+
+        // executable full name and arguments
+        String execFull = execPath + System.getProperty("file.separator") + execName;
+        String execFullArgs = execFull + " " + job.getArgs() + eolString;
+        // print executable
+        sbuf.append(eolString);
+        sbuf.append(this.runComment + " job executable" + eolString);
+        sbuf.append("$EMF_CLIENT -k $EMF_JOBKEY -x " + execFull + " -m \"Running top level script\"" + eolString);
+        sbuf.append(execFullArgs);
+
+        // add a test of the status and send info through the
+        // command client -- should generalize so not csh specific
+        sbuf.append("if ( $status != 0 ) then" + eolString);
+        sbuf.append("\t $EMF_CLIENT -k $EMF_JOBKEY -s 'Failed' -m \"ERROR running Job: $EMF_JOBNAME\" -t 'e' "
+                + eolString);
+        sbuf.append("\t exit(1)" + eolString);
+        sbuf.append("else" + eolString);
+        sbuf.append("\t $EMF_CLIENT -k $EMF_JOBKEY -s 'Completed' -m \"Completed job: $EMF_JOBNAME\"" + eolString);
+        sbuf.append("endif" + eolString);
+
+        // Send back the contents of jobContent string for job file
+        return sbuf.toString();
+
     }// /end of createJobFileContent()
 
-    private String getJobFileHeader(CaseInput headerInput) {
+    private String getJobFileHeader(CaseInput headerInput) throws EmfException {
+        /**
+         * gets the EMF JOBHEADER as a string
+         */
 
-        // FIXME: temporarily write shell header and client
-        String fileHeader = this.runShell + this.eolString + "setenv EMF_CLIENT ~/bin/emf_log.py" + this.eolString;
-        System.out.println("EMF JOBHEADER tmp: " + fileHeader);
-        return fileHeader;
+        // get some info from the header input
+        EmfDataset dataset = headerInput.getDataset();
+        Version version = headerInput.getVersion();
+        System.out.println("Version of EMF JOBHEADER : " + version.getVersion());
+        
+        // create an exporter to get the string
+        GenericExporterToString exporter = new GenericExporterToString(dataset, this.dbServer, 
+                this.dbServer.getSqlDataTypes(), new VersionedDataFormatFactory(version, dataset), null);
+
+        // Get the string from the exporter
+        try {
+            exporter.export(null);
+            String fileHeader = exporter.getOutputString();
+            return fileHeader;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException(e.getMessage());
+        }
 
     }
 
@@ -2038,10 +2027,10 @@ public class ManagedCaseService {
          */
 
         File file = new File(jobFileName);
-
+        String fileShort = file.getName(); // file w/o path
         // Create a log file name by replacing the suffix of the job
         // of the job file w/ .log
-        String logFileName = jobFileName.replaceFirst(this.runSuffix, ".log");
+        String logFileName = fileShort.replaceFirst(this.runSuffix, ".log");
 
         // Check if logs dir (jobpath/logs) exists, if not create
         File logDir = new File(file.getParent() + System.getProperty("file.separator") + "logs");
