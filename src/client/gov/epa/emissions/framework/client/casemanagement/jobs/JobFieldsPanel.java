@@ -352,7 +352,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         rightlayout.addLabelWidgetPair("Job Notes:", scrolpane1, rightpanel);
 
         lastMsg = new TextArea("lastmessage", job.getRunNotes());
-        changeablesList.addChangeable(lastMsg);
+        lastMsg.setEditable(false);
         ScrollableComponent scrolpane2 = new ScrollableComponent(lastMsg);
         scrolpane2.setPreferredSize(new Dimension(224, 80));
         rightlayout.addLabelWidgetPair("Last Message:", scrolpane2, rightpanel);
