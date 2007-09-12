@@ -2,12 +2,14 @@ package gov.epa.emissions.framework.services.casemanagement;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.RemoteCommand;
 import gov.epa.emissions.framework.tasks.CaseJobTaskManager;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.Task;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.PrintStream;
 
 import org.apache.commons.logging.Log;
@@ -44,7 +46,7 @@ public class CaseJobTask extends Task {
 
     private String jobkey;
 
-    // private String runRedirect = ">&"; // shell specific redirect
+    private String runRedirect = ">&"; // shell specific redirect
 
     public String getJobkey() {
         return jobkey;
@@ -115,44 +117,43 @@ public class CaseJobTask extends Task {
         // if the key word $EMF_JOBLOG is in the queue options,
         // replace w/ log file
 
-        // String executionStr = null;
-        // String qOptions = this.queueOptions;
-        // String queueOptionsLog = qOptions.replace("$EMF_JOBLOG", this.logFile);
-        //
-        // if (queueOptionsLog.equals("")) {
-        // executionStr = this.jobFile;
-        // } else {
-        // executionStr = queueOptionsLog + " " + this.jobFile;
-        // }
-        //
-        // /*
-        // * execute the job script Note if hostname is localhost this is done locally w/o ssh and stdout and stderr is
-        // * redirected to the log. This redirect is currently shell specific (should generalize) if hostname is not
-        // * localhost it is through ssh
-        // */
-        // String username = this.user.getUsername();
-        // try {
-        // if (hostName.equals("localhost")) {
-        // // execute on local machine
-        // executionStr = executionStr + " " + this.runRedirect + " " + this.logFile;
-        //
-        // RemoteCommand.executeLocal(executionStr);
-        //
-        // } else {
-        // // execute on remote machine and log stdout
-        // InputStream inStream = RemoteCommand.execute(username, hostName, executionStr);
-        //
-        // String outTitle = "stdout from (" + hostName + "): " + executionStr;
-        // RemoteCommand.logStdout(outTitle, inStream);
-        //
-        // // capture PBSqueueId and send back to case job submitter
-        // // TODO:
-        // }
-        //
-        // } catch (Exception e) {
-        // log.error("Error executing job file: " + jobFile + " Execution string= " + executionStr);
-        // e.printStackTrace();
-        // }
+        String executionStr = null;
+        String qOptions = this.queueOptions;
+        String queueOptionsLog = qOptions.replace("$EMF_JOBLOG", this.logFile);
+
+        if (queueOptionsLog.equals("")) {
+            executionStr = this.jobFile;
+        } else {
+            executionStr = queueOptionsLog + " " + this.jobFile;
+        }
+
+        /*
+         * execute the job script Note if hostname is localhost this is done locally w/o ssh and stdout and stderr is
+         * redirected to the log. This redirect is currently shell specific (should generalize) if hostname is not
+         * localhost it is through ssh
+         */
+        String username = this.user.getUsername();
+        try {
+            if (hostName.equals("localhost")) {
+                // execute on local machine
+                executionStr = executionStr + " " + this.runRedirect + " " + this.logFile;
+                RemoteCommand.executeLocal(executionStr);
+
+            } else {
+                // execute on remote machine and log stdout
+                InputStream inStream = RemoteCommand.execute(username, hostName, executionStr);
+
+                String outTitle = "stdout from (" + hostName + "): " + executionStr;
+                RemoteCommand.logStdout(outTitle, inStream);
+
+                // capture PBSqueueId and send back to case job submitter
+                // TODO:
+            }
+
+        } catch (Exception e) {
+            log.error("Error executing job file: " + jobFile + " Execution string= " + executionStr);
+            e.printStackTrace();
+        }
 
         String status = "completed";
         String mesg = " was pseudo successfull";
