@@ -279,7 +279,7 @@ public class EquationTypeTest extends ServiceTestCase {
                 buildEquation("Type 2", "Annual Cost Multiplier", 3440.9),
                 buildEquation("Type 2", "Annual Cost Exponent", 0.7337)
                     }
-                ), designCapacity);
+                ), designCapacity, "MMBtu", "MMBtu");
 
         try {
             System.out.println("begin type 2 test --------------------");
