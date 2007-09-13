@@ -26,6 +26,7 @@ import gov.epa.emissions.framework.services.exim.ManagedExportService;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.CaseJobSumitter;
 import gov.epa.emissions.framework.tasks.DebugLevels;
+import gov.epa.emissions.framework.tasks.TaskManagerFactory;
 import gov.epa.emissions.framework.tasks.TaskSubmitter;
 
 import java.io.File;
@@ -57,10 +58,6 @@ public class ManagedCaseService {
     }
 
     private CaseDAO dao;
-
-    // private TaskSubmitter caseJobSubmitter = null;
-
-    private ArrayList<Runnable> caseJobTasks = new ArrayList<Runnable>();
 
     private HibernateSessionFactory sessionFactory = null;
 
@@ -109,7 +106,6 @@ public class ManagedCaseService {
 
         log.info("ManagedCaseService");
         // log.info("exportTaskSubmitter: " + caseJobSubmitter);
-        log.info("eximTasks: " + caseJobTasks.size());
         log.info("Session factory null? " + (sessionFactory == null));
         log.info("dBServer null? " + (this.dbServer == null));
         log.info("User null? : " + (user == null));
@@ -1308,8 +1304,6 @@ public class ManagedCaseService {
             String caseJobExportSubmitterId = null;
             String caseJobSubmitterId = caseJobSubmitter.getSubmitterId();
 
-            List<CaseJob> caseJobs = new ArrayList<CaseJob>();
-
             if (DebugLevels.DEBUG_0)
                 System.out.println("Is CaseJobSubmitterId null? " + (caseJobSubmitterId == null));
             // FIXME: Does this need to be done in a new DAO method???
@@ -1399,11 +1393,6 @@ public class ManagedCaseService {
                 caseJob.setRunstatus(getJobRunStatus(runStatusExporting));
                 caseJob.setRunStartDate(new Date());
 
-                // FIXME: Do we still need the casejob around?
-                caseJobs.add(caseJob);
-                // Create the list of case job tasks for the submitter and task manager
-                caseJobTasks.add(cjt);
-
                 // Now update the casejob in the database
                 updateJob(caseJob);
 
@@ -1413,12 +1402,8 @@ public class ManagedCaseService {
                 if (DebugLevels.DEBUG_0)
                     System.out.println("Case Job Export Submitter Id for case job:" + caseJobExportSubmitterId);
 
+                TaskManagerFactory.getCaseJobTaskManager(sessionFactory).addTask(cjt);
             }
-
-            if (DebugLevels.DEBUG_6)
-                System.out.println("About to add caseJobTasks to caseJobSubmitter submitrId= "
-                        + caseJobSubmitter.getSubmitterId());
-            caseJobSubmitter.addTasksToSubmitter(caseJobTasks);
 
             if (DebugLevels.DEBUG_0)
                 System.out.println("Case Job Submitter Id for case job:" + caseJobSubmitterId);
@@ -1882,10 +1867,30 @@ public class ManagedCaseService {
             }
         }
         /*
-         * Get the parameters for this job in following order: all sectors, all jobs sector specific, all jobs all
-         * sectors, job specific sector specific, job specific
+         * Get the parameters for this job in following order: 
+         * from summary tab, all sectors, all jobs sector specific,
+         * all jobs all sectors, job specific sector specific, job specific
          */
 
+        // Parameters from the summary tab
+        sbuf.append(eolString);
+        sbuf.append(this.runComment + " Parameters -- from Case summary " + eolString);
+        sbuf.append(shellSetenv("CASE", caseObj.getAbbreviation().toString()));
+//      Need to have quotes around model name b/c could be more than one word
+        String modelName = '"' + caseObj.getModel().toString() + '"';  
+        sbuf.append(shellSetenv("MODEL_LABEL", modelName));
+        sbuf.append(shellSetenv("IOAPI_GRIDNAME_1", caseObj.getGrid().toString()));
+        sbuf.append(shellSetenv("EMF_GRID", caseObj.getGridResolution().toString()));
+        sbuf.append(shellSetenv("EMF_AQM", caseObj.getAirQualityModel().toString()));
+        sbuf.append(shellSetenv("EMF_SPC", caseObj.getSpeciation().toString()));
+        sbuf.append(shellSetenv("BASE_YEAR", caseObj.getEmissionsYear().toString()));  // Should base year == emissions year ????
+//        sbuf.append(shellSetenv("BASE_YEAR", String.valueOf(caseObj.getBaseYear())));
+        sbuf.append(shellSetenv("FUTURE_YEAR", String.valueOf(caseObj.getFutureYear())));
+//        sbuf.append(shellSetenv("EPI_STDATE_TIME", caseObj.getStartDate()));
+//        sbuf.append(shellSetenv("EPI_ENDATE_TIME", caseObj.getEndDate()));
+
+        
+        
         // All sectors, all jobs
         sbuf.append(eolString);
         sbuf.append(this.runComment + " Parameters -- all sectors, all jobs " + eolString);
@@ -1970,10 +1975,10 @@ public class ManagedCaseService {
         EmfDataset dataset = headerInput.getDataset();
         Version version = headerInput.getVersion();
         System.out.println("Version of EMF JOBHEADER : " + version.getVersion());
-        
+
         // create an exporter to get the string
-        GenericExporterToString exporter = new GenericExporterToString(dataset, this.dbServer, 
-                this.dbServer.getSqlDataTypes(), new VersionedDataFormatFactory(version, dataset), null);
+        GenericExporterToString exporter = new GenericExporterToString(dataset, this.dbServer, this.dbServer
+                .getSqlDataTypes(), new VersionedDataFormatFactory(version, dataset), null);
 
         // Get the string from the exporter
         try {
