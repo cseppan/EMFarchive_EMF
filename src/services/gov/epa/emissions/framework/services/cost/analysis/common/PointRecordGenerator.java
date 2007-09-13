@@ -18,7 +18,8 @@ public class PointRecordGenerator implements RecordGenerator {
     private double invenRulePenetration;
     private double invenRuleEffectiveness;
     private Double annualCost;
-
+    private boolean isCostPointDatasetType = false;
+    
 //    private double originalEmissions;
 //    private double finalEmissions;
 
@@ -29,6 +30,7 @@ public class PointRecordGenerator implements RecordGenerator {
         this.strategyResult = result;
         this.decFormat = decFormat;
         this.costEquationsFactory = costEquationsFactory;
+        this.isCostPointDatasetType = result.getInputDataset().getDatasetType().getName().equalsIgnoreCase("ORL CoST Point Inventory (PTINV)");
     }
 
     public Record getRecord(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions,  boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {
@@ -54,12 +56,17 @@ public class PointRecordGenerator implements RecordGenerator {
         reducedEmission = originalEmissions * effectiveReduction;
         Double minStackFlowRate = resultSet.getDouble("stkflow");
         if (resultSet.wasNull()) minStackFlowRate = null;
-        Double designCapacity = resultSet.getDouble("design_capacity");
-        if (resultSet.wasNull()) designCapacity = null;
-        String designCapacityUnitNumerator = resultSet.getString("design_capacity_unit_numerator");
-        if (resultSet.wasNull()) designCapacityUnitNumerator = null;
-        String designCapacityUnitDenominator = resultSet.getString("design_capacity_unit_denominator");
-        if (resultSet.wasNull()) designCapacityUnitDenominator = null;
+        Double designCapacity = null;
+        String designCapacityUnitNumerator = null;
+        String designCapacityUnitDenominator = null;
+        if (isCostPointDatasetType) {
+            designCapacity = resultSet.getDouble("design_capacity");
+            if (resultSet.wasNull()) designCapacity = null;
+            designCapacityUnitNumerator = resultSet.getString("design_capacity_unit_numerator");
+            if (resultSet.wasNull()) designCapacityUnitNumerator = null;
+            designCapacityUnitDenominator = resultSet.getString("design_capacity_unit_denominator");
+            if (resultSet.wasNull()) designCapacityUnitDenominator = null;
+        } 
         CostEquation costEquations = costEquationsFactory.getCostEquation(resultSet.getString("poll"), reducedEmission, 
                 bestMeasureEffRecord, minStackFlowRate, 
                 designCapacity, designCapacityUnitNumerator,
