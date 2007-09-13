@@ -74,6 +74,7 @@ public class NonpointRecordGenerator implements RecordGenerator {
         
         CostEquation costEquations = costEquationsFactory.getCostEquation(resultSet.getString("poll"), reducedEmission, 
                 bestMeasureEffRecord, null, 
+                null, null, 
                 null);
         
         tokens.add(""); // plant Id

@@ -52,16 +52,11 @@ public class Type8CostEquation implements CostEquation {
             }
         }
         if (capCostFactor == null
-                || capCostFactor == 0.0
                 || operMaintCostFactor == null
-                || operMaintCostFactor == 0.0
                 || defaultCapitalCPTFactor == null
-                || defaultCapitalCPTFactor == 0.0
                 || defaultOperMaintCPTFactor == null
-                || defaultOperMaintCPTFactor == 0.0
-                || defaultAnnualizedCPTFactor == null
-                || defaultAnnualizedCPTFactor == 0.0
-                ) hasAllVariables = false;
+                || defaultAnnualizedCPTFactor == null) 
+            hasAllVariables = false;
     }
 
     public Double getAnnualCost() {
@@ -79,9 +74,9 @@ public class Type8CostEquation implements CostEquation {
     }
 
     public Double getCapitalCost() {
-        if (stackFlowRate == null 
-                || stackFlowRate == 0.0
-                || !hasAllVariables) return null;
+        if (!hasAllVariables
+                || stackFlowRate == null 
+                || stackFlowRate == 0.0) return null;
         //stack flow rate is greater than or equal 5 cfm
         if (stackFlowRate >= 5)
             return capCostFactor * stackFlowRate;
@@ -90,9 +85,9 @@ public class Type8CostEquation implements CostEquation {
     }
 
     public Double getOperationMaintenanceCost() {
-        if (stackFlowRate == null 
-                || stackFlowRate == 0.0
-                || !hasAllVariables) return null;
+        if (!hasAllVariables
+                || stackFlowRate == null 
+                || stackFlowRate == 0.0) return null;
         //stack flow rate is greater than or equal 5 cfm
         if (stackFlowRate >= 5)
             return operMaintCostFactor * stackFlowRate;

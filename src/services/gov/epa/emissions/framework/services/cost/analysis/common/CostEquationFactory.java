@@ -26,7 +26,8 @@ public class CostEquationFactory {
 
     public CostEquation getCostEquation(String pollutantName, double reducedEmission, 
             BestMeasureEffRecord bestMeasureEffRecord, Double minStackFlowRate, 
-            Double designCapacity) {
+            Double designCapacity, String designCapacityUnitNumerator,
+            String designCapacityUnitDenominator) {
         //always setup the default cost equation, the other equation types will default to using this approach when the other equation don't work
         //for example, maybe some of the inputs are missing, or maybe some constraint is not met...
         defaultCostEquations.setUp(reducedEmission, bestMeasureEffRecord);
@@ -90,9 +91,15 @@ public class CostEquationFactory {
                 
                 if (equations[0].getEquationType().getName().equals("Type 2")) {
                     //evaluate inputs, if they missing, use the default
-                    if (designCapacity != null && designCapacity != 0.0) {
+                    //design capacity must be less than or equal to 2000 
+                    if (designCapacity != null && designCapacity != 0.0 
+                            && type2CostEquation.convertDesignCapacity(designCapacity, designCapacityUnitNumerator, 
+                                    designCapacityUnitDenominator) != null
+                            && type2CostEquation.convertDesignCapacity(designCapacity, designCapacityUnitNumerator, 
+                                    designCapacityUnitDenominator) <= 2000.0) {
                         type2CostEquation.setUp(reducedEmission, bestMeasureEffRecord, 
-                                designCapacity);
+                                designCapacity, designCapacityUnitNumerator,
+                                designCapacityUnitDenominator);
                         return type2CostEquation;
                     }
                 }
