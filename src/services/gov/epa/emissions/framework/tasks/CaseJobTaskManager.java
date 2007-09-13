@@ -228,10 +228,10 @@ public class CaseJobTaskManager implements TaskManager {
                 caseJob.setRunStartDate(new Date());
             }
 
-            JobRunStatus jrStat = dao.getJobRunStatuse(jobStatus, session);
+            JobRunStatus jrStat = dao.getJobRunStatuse(jobStatus);
             caseJob.setRunstatus(jrStat);
 
-            dao.updateCaseJob(caseJob, session);
+            dao.updateCaseJob(caseJob);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         } finally {

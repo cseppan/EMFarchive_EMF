@@ -100,7 +100,7 @@ public class ManagedCaseService {
     public ManagedCaseService(DbServer dbServer, HibernateSessionFactory sessionFactory) {
         this.dbServer = dbServer;
         this.sessionFactory = sessionFactory;
-        this.dao = new CaseDAO();
+        this.dao = new CaseDAO(sessionFactory);
 
         myTag();
 
@@ -1062,7 +1062,7 @@ public class ManagedCaseService {
         Session session = sessionFactory.getSession();
         try {
             dao.add(job, session);
-            return (CaseJob) dao.loadCaseJob(job, session);
+            return (CaseJob) dao.loadCaseJob(job);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not add new case job '" + job.getName() + "'\n" + e.getMessage());
@@ -1437,7 +1437,7 @@ public class ManagedCaseService {
         JobRunStatus jrStat = null;
 
         try {
-            jrStat = dao.getJobRunStatuse(runStatus, session);
+            jrStat = dao.getJobRunStatuse(runStatus);
 
             return jrStat;
         } catch (Exception e) {
@@ -1450,9 +1450,8 @@ public class ManagedCaseService {
     }
 
     private synchronized void updateJob(CaseJob caseJob) throws EmfException {
-        Session session = sessionFactory.getSession();
         try {
-            dao.updateCaseJob(caseJob, session);
+            dao.updateCaseJob(caseJob);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         } finally {
@@ -1461,27 +1460,21 @@ public class ManagedCaseService {
     }
 
     public synchronized void updateCaseJob(User user, CaseJob job) throws EmfException {
-        Session session = sessionFactory.getSession();
-
         try {
-            CaseJob loaded = (CaseJob) dao.loadCaseJob(job, session);
+            CaseJob loaded = (CaseJob) dao.loadCaseJob(job);
             if (user == null)
                 throw new EmfException("Running Case Job requires a valid user");
 
             if (loaded != null && loaded.getId() != job.getId())
                 throw new EmfException("Case job uniqueness check failed (" + loaded.getId() + "," + job.getId() + ")");
 
-            // FIXME: Why session.clear()???
-            session.clear();
-            dao.updateCaseJob(job, session);
+            dao.updateCaseJob(job);
             // this should go to case message panel instead
             // setStatus(user, "Saved job " + job.getName() + " to database.", "Save Job");
         } catch (RuntimeException e) {
             e.printStackTrace();
             log.error("Could not update case job: " + job.getName() + ".\n" + e);
             throw new EmfException("Could not update case job: " + job.getName() + ".");
-        } finally {
-            session.close();
         }
     }
 
@@ -2055,18 +2048,12 @@ public class ManagedCaseService {
 
     // for command line client
     public int recordJobMessage(JobMessage message, String jobKey) throws EmfException {
-        Session session = sessionFactory.getSession();
-
         try {
-            List<CaseJob> jobs = dao.getCaseJobs(jobKey, session);
+            CaseJob job = dao.getCaseJob(jobKey);
 
-            if (jobs.size() == 0)
+            if (job == null)
                 throw new EmfException("No jobs found associated with job key: " + jobKey);
 
-            if (jobs.size() > 1)
-                throw new EmfException("Jobkey: " + jobKey + " is not unique.");
-
-            CaseJob job = jobs.get(0);
             User user = job.getUser();
             message.setCaseId(job.getCaseId());
             message.setJobId(job.getId());
@@ -2079,7 +2066,7 @@ public class ManagedCaseService {
                 job.setRunLog(lastMsg);
 
             if (!status.isEmpty() && !jobStatus.equalsIgnoreCase(status)) {
-                job.setRunstatus(dao.getJobRunStatuse(status, session));
+                job.setRunstatus(dao.getJobRunStatuse(status));
 
                 // If the status from the Command Client is not Completed or not Failed
                 // then the job is Running. A Running job gets a Run Start Date
@@ -2090,22 +2077,20 @@ public class ManagedCaseService {
                     job.setRunStartDate(new Date());
                 }
 
-                dao.updateCaseJob(job, session);
+                dao.updateCaseJob(job);
             }
 
             if (!user.getUsername().equalsIgnoreCase(message.getRemoteUser()))
                 throw new EmfException("Remote user doesn't match the user who runs the job.");
 
-            dao.add(message, session);
+            dao.add(message);
 
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
             throw new EmfException(e.getMessage());
-        } finally {
-            session.close();
-        }
+        } 
     }
 
     public JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException {
@@ -2126,6 +2111,11 @@ public class ManagedCaseService {
         } finally {
             session.close();
         }
+    }
+    
+    public void finalize() throws Throwable {
+        this.session = null;
+        super.finalize();
     }
 
 }

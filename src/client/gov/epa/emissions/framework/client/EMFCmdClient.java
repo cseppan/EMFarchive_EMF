@@ -16,6 +16,8 @@ public class EMFCmdClient {
 
     private static CaseService caseService;
 
+    private static ServiceLocator serviceLocator;
+
     public static void main(String[] args) throws Exception {
         List<String> options = new ArrayList<String>();
         options.addAll(Arrays.asList(args));
@@ -47,7 +49,7 @@ public class EMFCmdClient {
         }
 
         String msgTypeError = "Please specify a correct message type - i (info), e (error), w (warning).";
-        
+
         if (typeString != null && !typeString.isEmpty() && typeString.startsWith("-")) {
             System.out.println(msgTypeError);
             return;
@@ -111,7 +113,10 @@ public class EMFCmdClient {
                 url = args.get(0);
 
             System.out.println("Starting EMF Command Client");
-            ServiceLocator serviceLocator = new RemoteServiceLocator(url);
+
+            if (serviceLocator == null)
+                serviceLocator = new RemoteServiceLocator(url);
+            
             caseService = serviceLocator.caseService();
             caseService.recordJobMessage(jobMsg, jobkey);
             System.out.println("Exiting EMF Command Client");

@@ -40,6 +40,20 @@ public class HibernateFacade {
         return id;
     }
 
+    public Serializable add(Object obj, StatelessSession session) {
+        Transaction tx = null;
+        Serializable id;
+        try {
+            tx = session.beginTransaction();
+            id = session.insert(obj);
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+        return id;
+    }
+
     public void add(Object[] objects, Session session) {
         for (int i = 0; i < objects.length; i++)
             add(objects[i], session);
@@ -122,6 +136,18 @@ public class HibernateFacade {
     }
 
     public void updateOnly(Object object, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.update(object);
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    public void updateOnly(Object object, StatelessSession session) {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
@@ -222,6 +248,19 @@ public class HibernateFacade {
             throw e;
         }
     }
+    
+    public Object get(Class clazz, Criterion criterion, StatelessSession session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Object obj = session.get(clazz, criterion);
+            tx.commit();
+            return obj;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
 
     public List get(Class clazz, Criterion[] criterions, Session session) {
         Transaction tx = null;
@@ -253,6 +292,20 @@ public class HibernateFacade {
         }
     }
 
+    public Object load(Class clazz, Criterion criterion, StatelessSession session) {
+        Transaction tx = null;
+
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(clazz).add(criterion);
+            tx.commit();
+            return crit.uniqueResult();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
     public void delete(Object object, Session session) {
         Transaction tx = null;
         try {
@@ -266,6 +319,23 @@ public class HibernateFacade {
     }
 
     public Object load(Class clazz, Criterion[] criterions, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria criteria = session.createCriteria(clazz);
+            for (int i = 0; i < criterions.length; i++)
+                criteria.add(criterions[i]);
+
+            tx.commit();
+
+            return criteria.uniqueResult();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    public Object load(Class clazz, Criterion[] criterions, StatelessSession session) {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();

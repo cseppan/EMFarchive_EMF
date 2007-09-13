@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterE
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
 import java.util.List;
@@ -28,15 +29,34 @@ public class CaseDAO {
 
     private LockingScheme lockingScheme;
 
+    private HibernateSessionFactory sessionFactory;
+
+    public CaseDAO(HibernateSessionFactory sessionFactory) {
+        super();
+        this.sessionFactory = sessionFactory;
+        daoInit();
+    }
+
     public CaseDAO() {
+        daoInit();
+    }
+
+    private void daoInit() {
         hibernateFacade = new HibernateFacade();
         lockingScheme = new LockingScheme();
     }
 
-    public void add(JobMessage message, Session session) {
-        addObject(message, session);
+    public void add(JobMessage message) {
+        Session session = sessionFactory.getSession();
+        try{
+            hibernateFacade.add(message, session);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }finally{
+            session.close();
+        }
     }
-    
+
     public void add(Executable exe, Session session) {
         addObject(exe, session);
     }
@@ -140,10 +160,10 @@ public class CaseDAO {
     public List getCases(Session session) {
         return hibernateFacade.getAll(Case.class, Order.asc("name"), session);
     }
-    
+
     public Case getCase(int caseId, Session session) {
         Criterion criterion = Restrictions.eq("id", new Integer(caseId));
-        return (Case)hibernateFacade.get(Case.class, criterion, session).get(0);
+        return (Case) hibernateFacade.get(Case.class, criterion, session).get(0);
     }
 
     public List getPrograms(Session session) {
@@ -184,7 +204,7 @@ public class CaseDAO {
 
     public boolean caseInputExists(CaseInput input, Session session) {
         Criterion[] criterions = uniqueCaseInputCriteria(input);
-        
+
         return hibernateFacade.exists(CaseInput.class, criterions, session);
     }
 
@@ -194,14 +214,14 @@ public class CaseDAO {
         Sector sector = input.getSector();
         CaseProgram program = input.getProgram();
         Integer jobID = new Integer(input.getCaseJobID());
-        
+
         Criterion c1 = Restrictions.eq("caseID", caseId);
         Criterion c2 = (inputname == null) ? Restrictions.isNull("inputName") : Restrictions.eq("inputName", inputname);
         Criterion c3 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
         Criterion c4 = (program == null) ? Restrictions.isNull("program") : Restrictions.eq("program", program);
         Criterion c5 = Restrictions.eq("caseJobID", jobID);
 
-        return new Criterion[]{ c1, c2, c3, c4, c5 };
+        return new Criterion[] { c1, c2, c3, c4, c5 };
     }
 
     public Object load(Class clazz, String name, Session session) {
@@ -209,27 +229,25 @@ public class CaseDAO {
         return hibernateFacade.load(clazz, criterion, session);
     }
 
-     
     public Object loadCaseInput(CaseInput input, Session session) {
         Criterion[] criterions = uniqueCaseInputCriteria(input);
-        
+
         return hibernateFacade.load(CaseInput.class, criterions, session);
     }
-    
+
     public List getCaseInputs(int caseId, Session session) {
         Criterion crit = Restrictions.eq("caseID", new Integer(caseId));
 
         return hibernateFacade.get(CaseInput.class, crit, session);
     }
-    
-    public List getJobInputs(int caseId, int jobId, Sector sector, Session session){
+
+    public List getJobInputs(int caseId, int jobId, Sector sector, Session session) {
         /**
-         * Gets inputs for a job.  Selects on the following 3 criteria:
-         *      caseId, jobId, sectorId
+         * Gets inputs for a job. Selects on the following 3 criteria: caseId, jobId, sectorId
          */
         Integer caseID = new Integer(caseId);
         Integer jobID = new Integer(jobId);
-       
+
         // setup the 3 criteria
         Criterion c1 = Restrictions.eq("caseID", caseID);
         Criterion c2 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
@@ -237,20 +255,19 @@ public class CaseDAO {
         Criterion[] criterions = { c1, c2, c3 };
 
         // query the db using hibernate for the inputs that
-        // match the criterias 
+        // match the criterias
         // what is the difference b/w hibernate get and getAll
         return hibernateFacade.get(CaseInput.class, criterions, session);
-        
+
     }
 
-    public List getJobParameters(int caseId, int jobId, Sector sector, Session session){
+    public List getJobParameters(int caseId, int jobId, Sector sector, Session session) {
         /**
-         * Gets parameters for a job.  Selects on the following 3 criteria:
-         *      caseId, jobId, sectorId
+         * Gets parameters for a job. Selects on the following 3 criteria: caseId, jobId, sectorId
          */
         Integer caseID = new Integer(caseId);
         Integer jobID = new Integer(jobId);
-       
+
         // setup the 3 criteria
         Criterion c1 = Restrictions.eq("caseID", caseID);
         Criterion c2 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
@@ -258,9 +275,9 @@ public class CaseDAO {
         Criterion[] criterions = { c1, c2, c3 };
 
         // query the db using hibernate for the parameters that
-        // match the criterias 
+        // match the criterias
         return hibernateFacade.get(CaseParameter.class, criterions, session);
-        
+
     }
 
     public List getAllCaseInputs(Session session) {
@@ -288,49 +305,79 @@ public class CaseDAO {
 
         return hibernateFacade.get(CaseJob.class, crit, session);
     }
-    
-    public List<CaseJob> getCaseJobs(String jobKey, Session session) {
-        Criterion crit = Restrictions.eq("jobkey", jobKey);
+
+    public CaseJob getCaseJob(String jobKey) {
+        Session session = sessionFactory.getSession();
+        CaseJob job = null;
         
-        return hibernateFacade.get(CaseJob.class, crit, session);
+        try {
+            Criterion crit = Restrictions.eq("jobkey", jobKey);
+            job = (CaseJob)hibernateFacade.load(CaseJob.class, crit, session);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            session.close();
+        }
+        
+        return job;
     }
-    
+
     public List<JobMessage> getJobMessages(int caseId, Session session) {
         Criterion crit = Restrictions.eq("caseId", new Integer(caseId));
-        
+
         return hibernateFacade.get(JobMessage.class, crit, session);
     }
 
     public List<JobMessage> getJobMessages(int caseId, int jobId, Session session) {
         Criterion crit1 = Restrictions.eq("caseId", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("jobId", new Integer(jobId));
-        
-        return hibernateFacade.get(JobMessage.class, new Criterion[] {crit1, crit2}, session);
+
+        return hibernateFacade.get(JobMessage.class, new Criterion[] { crit1, crit2 }, session);
     }
 
     public CaseJob getCaseJob(int jobId, Session session) {
         Criterion crit = Restrictions.eq("id", new Integer(jobId));
-        return (CaseJob)hibernateFacade.load(CaseJob.class, crit, session);
+        return (CaseJob) hibernateFacade.load(CaseJob.class, crit, session);
     }
 
     public CaseJob getCaseJob(int caseId, CaseJob job, Session session) {
         Criterion crit1 = Restrictions.eq("caseId", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("name", job.getName());
-        
-        return (CaseJob)hibernateFacade.load(CaseJob.class, new Criterion[]{crit1, crit2}, session);
+
+        return (CaseJob) hibernateFacade.load(CaseJob.class, new Criterion[] { crit1, crit2 }, session);
     }
 
-    public void updateCaseJob(CaseJob job, Session session) {
-        hibernateFacade.updateOnly(job, session);
+    public void updateCaseJob(CaseJob job) {
+        Session session = sessionFactory.getSession();
+        try{
+            hibernateFacade.updateOnly(job, session);
+            
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }finally{
+            session.close();
+        }
     }
 
     public List<JobRunStatus> getJobRunStatuses(Session session) {
         return hibernateFacade.getAll(JobRunStatus.class, Order.asc("name"), session);
     }
 
-    public JobRunStatus getJobRunStatuse(String status, Session session) {
-        Criterion crit = Restrictions.eq("name", status);
-        return (JobRunStatus)hibernateFacade.load(JobRunStatus.class, crit, session);
+    public JobRunStatus getJobRunStatuse(String status) {
+        Session session = sessionFactory.getSession();
+        JobRunStatus jrs = null;
+        
+        try{
+            Criterion crit = Restrictions.eq("name", status);
+            jrs = (JobRunStatus) hibernateFacade.load(JobRunStatus.class, crit, session);            
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }finally{
+            session.close();
+        }
+        
+        return jrs;
+        
     }
 
     public List<Host> getHosts(Session session) {
@@ -340,7 +387,7 @@ public class CaseDAO {
     public List<Executable> getExecutables(Session session) {
         return hibernateFacade.getAll(Executable.class, Order.asc("name"), session);
     }
-    
+
     public boolean exeutableExists(Session session, Executable exe) {
         return hibernateFacade.exists(exe.getName(), Executable.class, session);
     }
@@ -376,10 +423,10 @@ public class CaseDAO {
     public void addParameter(CaseParameter param, Session session) {
         addObject(param, session);
     }
-    
+
     public Object loadCaseParameter(CaseParameter param, Session session) {
         Criterion[] criterions = uniqueCaseParameterCriteria(param);
-        
+
         return hibernateFacade.load(CaseParameter.class, criterions, session);
     }
 
@@ -389,14 +436,15 @@ public class CaseDAO {
         Sector sector = param.getSector();
         CaseProgram program = param.getProgram();
         Integer jobID = new Integer(param.getJobId());
-        
+
         Criterion c1 = Restrictions.eq("caseID", caseId);
-        Criterion c2 = (paramname == null) ? Restrictions.isNull("parameterName") : Restrictions.eq("parameterName", paramname);
+        Criterion c2 = (paramname == null) ? Restrictions.isNull("parameterName") : Restrictions.eq("parameterName",
+                paramname);
         Criterion c3 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
         Criterion c4 = (program == null) ? Restrictions.isNull("program") : Restrictions.eq("program", program);
         Criterion c5 = Restrictions.eq("jobId", jobID);
 
-        return new Criterion[]{ c1, c2, c3, c4, c5 };
+        return new Criterion[] { c1, c2, c3, c4, c5 };
     }
 
     public List<CaseParameter> getCaseParameters(int caseId, Session session) {
@@ -407,22 +455,31 @@ public class CaseDAO {
 
     public boolean caseParameterExists(CaseParameter param, Session session) {
         Criterion[] criterions = uniqueCaseParameterCriteria(param);
-        
+
         return hibernateFacade.exists(CaseParameter.class, criterions, session);
     }
-    
+
     public void updateCaseParameter(CaseParameter parameter, Session session) {
         hibernateFacade.updateOnly(parameter, session);
     }
 
-    public Object loadCaseJob(CaseJob job, Session session) {
-        Criterion c1 = Restrictions.eq("caseId", new Integer(job.getCaseId()));
-        Criterion c2 = Restrictions.eq("name", job.getName());
-        Criterion[] criterions = {c1, c2};
-        
-        return hibernateFacade.load(CaseJob.class, criterions, session);
+    public Object loadCaseJob(CaseJob job) {
+        Session session = sessionFactory.getSession();
+        Object obj = null;
+        try{
+            Criterion c1 = Restrictions.eq("caseId", new Integer(job.getCaseId()));
+            Criterion c2 = Restrictions.eq("name", job.getName());
+            Criterion[] criterions = { c1, c2 };
+            obj =  hibernateFacade.load(CaseJob.class, criterions, session);
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }finally{
+            session.close();
+        }
+        return obj;
+
     }
-    
+
     public void removeCaseJobs(CaseJob[] jobs, Session session) {
         hibernateFacade.remove(jobs, session);
     }
@@ -433,6 +490,6 @@ public class CaseDAO {
 
     public CaseInput getCaseInput(int inputId, Session session) {
         Criterion crit = Restrictions.eq("id", new Integer(inputId));
-        return (CaseInput)hibernateFacade.load(CaseInput.class, crit, session);
+        return (CaseInput) hibernateFacade.load(CaseInput.class, crit, session);
     }
 }
