@@ -63,6 +63,11 @@ public class EmfDateFormat {
         return date == null ? null : dateFormatter.parse(date);
     }
 
+    public static String format_YYYY_MM_DD_HH_MM_ss_SS(Date date) {
+        dateFormatter.applyPattern("yyyy/MM/dd HH:mm:ss:SS");
+        return date == null ? "" : dateFormatter.format(date);
+    }
+
     public static String format_YYYYMMDDHHMMSS(Date date) {
         dateFormatter.applyPattern("yyyyMMddHHmmss");
         return date == null ? "" : dateFormatter.format(date);

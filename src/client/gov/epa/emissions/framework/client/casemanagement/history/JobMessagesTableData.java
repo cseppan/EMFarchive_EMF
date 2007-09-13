@@ -59,7 +59,7 @@ public class JobMessagesTableData extends ChangeableTableData {
                 msg.getPeriod(), msg.getMessage(), msg.getMessageType(),
                 msg.getStatus(), msg.getRemoteUser(), 
                 EmfDateFormat.format_YYYY_MM_DD_HH_MM(msg.getExecModifiedDate()),
-                EmfDateFormat.format_YYYY_MM_DD_HH_MM(msg.getReceivedTime())});
+                EmfDateFormat.format_YYYY_MM_DD_HH_MM_ss_SS(msg.getReceivedTime())});
     }
     
     private String getJob(JobMessage msg) {
