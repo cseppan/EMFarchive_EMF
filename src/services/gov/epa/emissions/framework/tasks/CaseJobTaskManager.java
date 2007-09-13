@@ -129,15 +129,22 @@ public class CaseJobTaskManager implements TaskManager {
         return ref;
     }
 
+    /**
+     * Add a CaseJobTask to the PBQ
+     */
+    public static synchronized void addTask(CaseJobTask task) {
+        if (DebugLevels.DEBUG_0)
+            System.out.println("IN CaseJobTaskManager::add task= " + task.getTaskId() + " for job= " + task.getJobId());
+        taskQueue.add(task);
+        if (DebugLevels.DEBUG_0)
+            System.out.println("IN CaseJobTaskManager size of task Queue= " + taskQueue.size());
+
+        // Process the TaskQueue
+        processTaskQueue();
+
+    }
+
     public static synchronized void addTasks(ArrayList<Runnable> tasks) {
-        // TaskManager.resetIdleTime();
-        // Iterator iter = tasks.iterator();
-        // while (iter.hasNext()) {
-        // Task tsk = (Task) iter.next();
-        // if (DebugLevels.DEBUG_9)
-        // System.out.println("&&&&& In CaseJobTaskManager::addTasks the types of TASK objects coming in are: "
-        // + tsk.getClass().getName());
-        // }
 
         if (DebugLevels.DEBUG_0)
             System.out.println("IN CaseJobTaskManager number of tasks received= " + tasks.size());
@@ -180,6 +187,7 @@ public class CaseJobTaskManager implements TaskManager {
     }
 
     private static void updateRunStatus(String taskId, String status) throws EmfException {
+        System.out.println("CaseJobTaskManager::updateRunStatus: " + taskId + " status= " + status);
 
         CaseJobTask cjt = null;
         Session session = sessionFactory.getSession();
@@ -188,7 +196,7 @@ public class CaseJobTaskManager implements TaskManager {
 
         try {
             if ((status.equals("completed")) || (status.equals("failed"))) {
-
+System.out.println("CaseJobTaskManager::updateRunStatus:  job completed or failed");
                 synchronized (runTable) {
                     cjt = (CaseJobTask) runTable.get(taskId);
 
@@ -197,6 +205,7 @@ public class CaseJobTaskManager implements TaskManager {
             }
 
             if (status.equals("export failed")) {
+                System.out.println("CaseJobTaskManager::updateRunStatus:  export failed");
                 synchronized (waitTable) {
                     cjt = (CaseJobTask) waitTable.get(taskId);
                     waitTable.remove(taskId);
@@ -204,6 +213,7 @@ public class CaseJobTaskManager implements TaskManager {
             }
 
             if (status.equals("export succeeded")) {
+                System.out.println("CaseJobTaskManager::updateRunStatus:  export success");
                 synchronized (waitTable) {
                     cjt = (CaseJobTask) waitTable.get(taskId);
                 }
@@ -214,16 +224,19 @@ public class CaseJobTaskManager implements TaskManager {
             CaseJob caseJob = dao.getCaseJob(jid, session);
 
             if (status.equals("completed")) {
+                System.out.println("CaseJobTaskManager::updateRunStatus:  job Status is completed jobStatus=Submitted");
                 jobStatus = "Submitted";
                 caseJob.setRunStartDate(new Date());
             }
 
             if (status.equals("failed")) {
+                System.out.println("CaseJobTaskManager::updateRunStatus:  jobStatus is Failed jobStatus=Failed");
                 jobStatus = "Failed";
                 caseJob.setRunCompletionDate(new Date());
             }
 
             if (status.equals("export succeeded")) {
+                System.out.println("CaseJobTaskManager::updateRunStatus:  export Succeeded jobStatus=Waiting");
                 jobStatus = "Waiting";
                 caseJob.setRunStartDate(new Date());
             }
@@ -233,6 +246,10 @@ public class CaseJobTaskManager implements TaskManager {
 
             dao.updateCaseJob(caseJob);
         } catch (Exception e) {
+            System.out.println("^^^^^^^^^^^^^^");
+            e.printStackTrace();
+            
+            System.out.println("^^^^^^^^^^^^^^");
             throw new EmfException(e.getMessage());
         } finally {
             session.close();
