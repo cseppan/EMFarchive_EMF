@@ -61,7 +61,7 @@ public class CaseDAO_CaseTest2 extends ServiceTestCase {
         
         session.clear();
         try {
-            dao.add(msg, session);
+            dao.add(msg);
             JobMessage msgRetrieved = dao.getJobMessages(caseObj.getId(), session).get(0);
             
             assertEquals(msg.getMessage(), msgRetrieved.getMessage());
