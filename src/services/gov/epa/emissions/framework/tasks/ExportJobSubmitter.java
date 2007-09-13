@@ -10,6 +10,8 @@ import java.util.Iterator;
 public class ExportJobSubmitter extends ExportSubmitter {
 
     String caseJobTaskId = null;
+    private String caseJobName = null;
+    
     
     public String getCaseJobTaskId() {
         return caseJobTaskId;
@@ -29,6 +31,17 @@ public class ExportJobSubmitter extends ExportSubmitter {
             System.out.println("Export Job Submitter @@@@@ THREAD ID: " + Thread.currentThread().getId());
     }
 
+    /**
+     * Set the job name for this submitter
+     */
+    public void setJobName(String jobName){
+        this.caseJobName = jobName;
+    }
+    
+    public String getJobName(){
+        return this.caseJobName;
+    }
+    
     public synchronized void callbackFromTaskManager(String taskId, String status, String mesg) {
         if (DebugLevels.DEBUG_9)
             System.out
@@ -141,8 +154,9 @@ public class ExportJobSubmitter extends ExportSubmitter {
         if (DebugLevels.DEBUG_9)
             System.out.println(" Size of submittedTable: " + submittedTable.size());
 
+        // jobName) are completed: 
         if (submittedTable.size() == (done + fail + canned)) {
-            String message = "Submitted job completed. Total exports submitted=" + submittedTable.size()
+            String message = "Exports for job (" + this.caseJobName + ") are completed. Total exports submitted=" + submittedTable.size()
                     + " Completed= " + done + " Failed= " + fail + " Canceled= " + canned;
 
             this.setStatus(user, statusServices, message);
