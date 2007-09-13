@@ -41,9 +41,9 @@ public class CMEfficiencyImporter {
         this.sessionFactory = sessionFactory;
         CostYearTable costYearTable = null;
         try {
-            CostYearTableReader reader = new CostYearTableReader(dbServer, 1999);
+            CostYearTableReader reader = new CostYearTableReader(dbServer, 2006);
             costYearTable = reader.costYearTable();
-            costYearTable.setTargetYear(1999);
+            costYearTable.setTargetYear(2006);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         } 

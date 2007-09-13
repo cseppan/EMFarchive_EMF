@@ -98,7 +98,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
             List<EmfDataset> datasetList = new ArrayList<EmfDataset>();
             for (int i = 0; i < controlStrategyResults.length; i++) {
-                if (buttonGroup.getSelection().equals(detailButton.getModel())) {
+                if (buttonGroup.getSelection().equals(invButton.getModel())) {
+                    datasetList.add(controlStrategyResults[i].getInputDataset());
+                } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
                     datasetList.add((EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
                 } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
                     if (controlStrategyResults[i].getControlledInventoryDataset() != null)
@@ -117,7 +119,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
             List<EmfDataset> datasetList = new ArrayList<EmfDataset>();
             for (int i = 0; i < controlStrategyResults.length; i++) {
-                if (buttonGroup.getSelection().equals(detailButton.getModel())) {
+                if (buttonGroup.getSelection().equals(invButton.getModel())) {
+                    datasetList.add(controlStrategyResults[i].getInputDataset());
+                } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
                     datasetList.add((EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
                 } 
                 else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {

@@ -28,7 +28,7 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     private int targetYear;
 
-    private final static int refYear = 1999;
+    private final static int refYear = 2006;
 
     private final static Double NAN_VALUE = new Double(Double.NaN);
     

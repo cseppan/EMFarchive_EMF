@@ -8,7 +8,7 @@ import junit.framework.TestCase;
 public class ControlMeasureTableDataTest extends TestCase {
 
     public void testShouldAppropriateColumnClassDefinedForAllColumns() throws EmfException {
-        ControlMeasureTableData data = new ControlMeasureTableData(new ControlMeasure[0], null, new Pollutant("major"), "1999");
+        ControlMeasureTableData data = new ControlMeasureTableData(new ControlMeasure[0], null, new Pollutant("major"), "2006");
         for (int i = 0; i < data.columns().length; i++) {
             if ((i >= 3 && i <= 10) || i == 13)
                 assertEquals(Double.class, data.getColumnClass(i));

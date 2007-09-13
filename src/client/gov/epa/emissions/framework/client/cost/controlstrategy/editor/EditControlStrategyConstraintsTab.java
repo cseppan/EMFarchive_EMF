@@ -61,12 +61,12 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         costPerTon = new TextField("cost per ton", 10);
         costPerTon.setText(constraint != null ? (constraint.getMinCostPerTon() != null ? constraint.getMinCostPerTon() + "" : "") : "");
         changeables.addChangeable(costPerTon);
-        layoutGenerator.addLabelWidgetPair("Maximum 1999 Cost per Ton ($/ton)", costPerTon, panel);
+        layoutGenerator.addLabelWidgetPair("Maximum 2006 Cost per Ton ($/ton)", costPerTon, panel);
 
         annCost = new TextField("annual cost", 10);
         annCost.setText(constraint != null ? (constraint.getMinAnnCost() != null ? constraint.getMinAnnCost() + "" : "") : "");
         changeables.addChangeable(annCost);
-        layoutGenerator.addLabelWidgetPair("Maximum 1999 Annualized Cost ($/yr)", annCost, panel);
+        layoutGenerator.addLabelWidgetPair("Maximum 2006 Annualized Cost ($/yr)", annCost, panel);
 
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 10, 10, // initialX, initialY

@@ -78,7 +78,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private Pollutant[] pollsFromDB;
 
-    private String[] years = { "1999", "2000", "2001", "2002", "2003", "2004", "2005" };
+    private String[] years = { "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006" };
 
     private CostYearTable costYearTable;
 
@@ -326,7 +326,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private void createYearsComboBox() {
         costYear = new EditableComboBox(years);
-        costYear.setSelectedIndex(0);
+        costYear.setSelectedIndex(7);
         costYear.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 getEfficiencyAndCost();

@@ -100,7 +100,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     
     protected JLabel refYrCostPerTon;
 
-    protected final int refYear = 1999;
+    protected final int refYear = 2006;
     
     static int counter = 0;
     
