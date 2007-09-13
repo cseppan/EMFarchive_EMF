@@ -103,7 +103,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         populateThread.start();
     }
 
-    public void retrieveJobs() {
+    public synchronized void retrieveJobs() {
         try {
             messagePanel.setMessage("Please wait while retrieving all case jobs...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

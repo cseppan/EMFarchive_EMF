@@ -67,7 +67,7 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
         populateThread.start();
     }
 
-    public void retrieveJobMsgs() {
+    public synchronized void retrieveJobMsgs() {
         try {
             messagePanel.setMessage("Please wait while retrieving all case histories...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

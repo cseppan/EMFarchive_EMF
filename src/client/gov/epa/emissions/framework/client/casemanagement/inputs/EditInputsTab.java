@@ -112,7 +112,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         populateThread.start();
     }
 
-    private void retrieveInputs() {
+    private synchronized void retrieveInputs() {
         try {
             messagePanel.setMessage("Please wait while retrieving all case inputs...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

@@ -89,7 +89,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         populateThread.start();
     }
 
-    public void retrieveParams() {
+    public synchronized void retrieveParams() {
         try {
             messagePanel.setMessage("Please wait while retrieving all case parameters...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
