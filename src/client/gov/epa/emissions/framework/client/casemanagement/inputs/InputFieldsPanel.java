@@ -100,14 +100,11 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("Envt. Variable:", envtVar, panel);
 
         sector = new ComboBox(presenter.getSectors());
-        if (input.getSector() == null)
-        {
+        if (input.getSector() == null) {
             sector.setSelectedIndex(0); // set to all sectors
+        } else {
+            sector.setSelectedItem(input.getSector());
         }
-        else
-        {    
-           sector.setSelectedItem(input.getSector());
-        }   
         addPopupMenuListener(sector, "sectors");
         changeablesList.addChangeable(sector);
         sector.setPrototypeDisplayValue(width);
@@ -125,8 +122,14 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         dsType.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Dataset Type:", dsType, panel);
 
-        dataset = new ComboBox(new EmfDataset[]{input.getDataset()});
-//        dataset.setEnabled(false);
+        dataset = new ComboBox(new EmfDataset[0]);
+        DatasetType type = input.getDatasetType();
+        EmfDataset ds = input.getDataset();
+        fillDatasets(type);
+
+        if (type != null && ds != null)
+            dataset.setSelectedItem(input.getDataset());
+        
         dataset.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 fillVersions((EmfDataset) dataset.getSelectedItem());
@@ -136,8 +139,9 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         dataset.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Dataset:", dataset, panel);
 
-        version = new ComboBox(new Version[]{input.getVersion()});
-//        version.setEnabled(false);
+        version = new ComboBox(new Version[] { input.getVersion() });
+        fillVersions(input.getDataset());
+        // version.setEnabled(false);
         changeablesList.addChangeable(version);
         version.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Version:", version, panel);
@@ -180,7 +184,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     }
 
     private void addPopupMenuListener(final JComboBox box, final String toget) {
-        box.addPopupMenuListener(new PopupMenuListener(){
+        box.addPopupMenuListener(new PopupMenuListener() {
             public void popupMenuCanceled(PopupMenuEvent event) {
                 // NOTE Auto-generated method stub
             }
@@ -191,7 +195,6 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
             public void popupMenuWillBecomeVisible(PopupMenuEvent event) {
                 try {
-                    System.out.println("Refreshing menu for "+toget);
                     box.setModel(new DefaultComboBoxModel(getAllObjects(toget)));
                     box.revalidate();
                     refresh();
@@ -203,34 +206,33 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     }
 
     protected Object[] getAllObjects(String toget) throws EmfException {
-        System.out.println("InputFieldsPanel: getAllObjects for "+toget);
         if (toget.equals("dstypes"))
             return presenter.getDSTypes();
 
         else if (toget.equals("inputnames"))
             return presenter.getInputNames();
-        
+
         else if (toget.equals("programs"))
             return presenter.getPrograms();
-        
+
         else if (toget.equals("envtvars"))
             return presenter.getEnvtVars();
-        
+
         else if (toget.equals("sectors"))
             return presenter.getSectors();
-        
+
         else if (toget.equals("subdirs"))
             return presenter.getSubdirs();
-        
+
         else
-            throw new EmfException("Unknown object type: "+toget);
-        
+            throw new EmfException("Unknown object type: " + toget);
+
     }
-    
+
     private void setJob() throws EmfException {
-        CaseJob [] jobArray = presenter.getCaseJobs();
+        CaseJob[] jobArray = presenter.getCaseJobs();
         jobs = new ComboBox(jobArray);
-        jobs.setSelectedIndex(presenter.getJobIndex(input.getCaseJobID(),jobArray));
+        jobs.setSelectedIndex(presenter.getJobIndex(input.getCaseJobID(), jobArray));
     }
 
     private void fillDatasets(DatasetType type) {
@@ -260,8 +262,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             version.revalidate();
             if (versions.length > 0)
                 version.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
-        } 
-        catch (EmfException e) {
+        } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
     }
@@ -296,9 +297,8 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
         if (job == null)
             return;
-        
-        if (((CaseJob) job).getName().equalsIgnoreCase(
-                InputFieldsPanelPresenter.ALL_FOR_SECTOR)) {
+
+        if (((CaseJob) job).getName().equalsIgnoreCase(InputFieldsPanelPresenter.ALL_FOR_SECTOR)) {
             input.setCaseJobID(0);
             return;
         }
@@ -396,7 +396,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
         setFields();
     }
-    
+
     private void refresh() {
         super.revalidate();
     }
