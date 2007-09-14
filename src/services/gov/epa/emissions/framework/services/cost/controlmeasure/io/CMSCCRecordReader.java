@@ -7,7 +7,8 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class CMSCCRecordReader {
@@ -15,7 +16,8 @@ public class CMSCCRecordReader {
     private CMSCCsFileFormat fileFormat;
 
     private CMAddImportStatus status;
-    private HashSet sccSet;
+//    private HashSet sccSet;
+    private List sccList;
     
     private int errorCount = 0;
 
@@ -24,7 +26,8 @@ public class CMSCCRecordReader {
     public CMSCCRecordReader(CMSCCsFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) {
         this.fileFormat = fileFormat;
         this.status = new CMAddImportStatus(user, sessionFactory);
-        this.sccSet = new HashSet();
+ //       this.sccSet = new HashSet();
+        this.sccList=new ArrayList();
     }
 
     public void parse(Map controlMeasures, Record record, int lineNo) throws ImporterException {
@@ -33,7 +36,7 @@ public class CMSCCRecordReader {
         ControlMeasure cm = controlMeasure(tokens[0], controlMeasures, sb, lineNo);
         if (tokens == null || cm == null)
             return;
-        if (constraintCheck(tokens, sb)) {
+        if (constraintCheck(cm, tokens, sb)) {
             Scc scc = new Scc();
             scc.setCode(tokens[1]);
             scc.setStatus(tokens[2]);
@@ -46,15 +49,22 @@ public class CMSCCRecordReader {
         if (errorCount >= errorLimit) throw new ImporterException("The maximum allowable error limit (" + errorLimit + ") has been reached while parsing the control measure SCC records.");
     }
 
-    private boolean constraintCheck(String[] tokens, StringBuffer sb) {
-        Scc scct = new Scc();
-        scct.setCode(tokens[1]);
-        scct.setStatus(tokens[2]);    
-        if (sccSet.contains(scct)){ 
+    private boolean constraintCheck(ControlMeasure cm,String[] tokens, StringBuffer sb) {
+//        Scc scct = new Scc();
+//        scct.setControlMeasureId(cm.getId());
+//        scct.setCode(tokens[1]);
+//        scct.setStatus(tokens[2]);    
+//        if (sccSet.contains(scct)){ 
+//            sb.append(format(" SCC already in the file: "+ tokens[0]));
+//            return false;
+//        }
+//        sccSet.add(scct);
+        String sccString=tokens[0].toLowerCase()+tokens[1].toLowerCase();
+        if (sccList.contains(sccString)){ 
             sb.append(format(" SCC already in the file: "+ tokens[0]));
             return false;
         }
-        sccSet.add(scct);
+        sccList.add(sccString);
         return true;
     }
 
