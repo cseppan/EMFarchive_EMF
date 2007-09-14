@@ -694,8 +694,8 @@ public class ManagedCaseService {
 
                 CaseInput cip = iter.next();
                 badCipName = cip.getName();
-                if (DebugLevels.DEBUG_9)
-                    System.out.println(cip.getCaseID());
+//                if (DebugLevels.DEBUG_9)
+//                    System.out.println(cip.getCaseID());
                 cipDataset = cip.getDataset();
 
                 if (cipDataset == null) {
