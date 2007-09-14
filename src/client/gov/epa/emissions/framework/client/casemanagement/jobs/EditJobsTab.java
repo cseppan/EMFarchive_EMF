@@ -360,7 +360,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
     }
 
-    private void proceedRunningJobs(CaseJob[] jobs) throws EmfException, Exception {
+    private void proceedRunningJobs(CaseJob[] jobs) throws Exception {
         setMessage("Please wait while submitting all case jobs...");
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         presenter.runJobs(jobs);
