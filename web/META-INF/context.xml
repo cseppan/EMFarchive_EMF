@@ -11,7 +11,7 @@
           maxIdle="30"
           maxWait="10000"
           removeAbandoned="true"
-          removeAbandonedTimeout="60"
+          removeAbandonedTimeout="1"
           logAbandoned="true"
           />
 </Context>
