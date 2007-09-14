@@ -684,13 +684,13 @@ public class ManagedCaseService {
         // select the inputs based on 3 criteria
         try {
             List<CaseInput> inputs = dao.getJobInputs(caseId, jobId, sector, session);
-
+            if (DebugLevels.DEBUG_9) System.out.println("Are inputs null?" + (inputs == null));
             Iterator<CaseInput> iter = inputs.iterator();
 
             while (iter.hasNext()) {
 
                 CaseInput cip = iter.next();
-
+                badCipName = cip.getName();
                 if (DebugLevels.DEBUG_9)
                     System.out.println(cip.getCaseID());
                 cipDataset = cip.getDataset();
@@ -714,7 +714,8 @@ public class ManagedCaseService {
             e.printStackTrace();
             log.error("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n"
                     + e.getMessage());
-            throw new EmfException("Required dataset not set for Case Input name = " + badCipName);
+            //throw new EmfException("Required dataset not set for Case Input name = " + badCipName);
+            throw new EmfException(e.getMessage());
 
         }
     }
