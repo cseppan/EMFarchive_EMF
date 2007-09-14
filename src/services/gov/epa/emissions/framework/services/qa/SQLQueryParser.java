@@ -12,7 +12,7 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 
 import java.util.Hashtable;
-import java.util.StringTokenizer;
+//import java.util.StringTokenizer;
 
 import org.hibernate.Session;
 
@@ -108,21 +108,20 @@ public class SQLQueryParser {
 
     private String expandTag(String query) throws EmfException {
 
+        //System.out.println("Query: " + query); 
         while ((query.indexOf(startQueryTag)) != -1) {
             query = expandOneTag(query);
         }
-        // System.out.println("The query at point 1 is " + query);
         // Added two new while clauses to handle the parsing of the two new tags
         // Added code to add a new tag
         while ((query.indexOf(startSecondQueryTag)) != -1) {
             query = expandTwoTag(query);
         }
-        // System.out.println("The query at point 2 is " + query);
         // Added code to add a new tag
         while ((query.indexOf(startSecondVersQueryTag)) != -1) {
             query = expandThreeTag(query);
         }
-        //System.out.println("The query at point 3 is " + query);
+        
         while ((query.indexOf(startQAstepQueryTag)) != -1) {
             query = expandFourTag(query);
         }
@@ -135,7 +134,7 @@ public class SQLQueryParser {
         if (query.indexOf(isErrorQueryTag) != -1) {
             throw new EmfException("There is still a  '" + isErrorQueryTag + "' in the program arguments");
         }
-        // System.out.println("The query at point 3 is " + query);
+        
         return versioned(query);
     }
 
@@ -163,11 +162,6 @@ public class SQLQueryParser {
 
         int dataSet_id = dataset.getId();
         String dsId = Integer.toString(dataSet_id);
-
-        /*
-         * System.out.println("dataset of 1: " + dataSetName); System.out.println("version of 1: " + ds1version);
-         * System.out.println("alias of 1: " + suffixTokens[0]); System.out.println("Dataset id: " + dataSet_id);
-         */
 
         // The complete path of the version is retrieved from the version attribute.
         String versionCompletePath = version.createCompletePath();
@@ -203,8 +197,20 @@ public class SQLQueryParser {
         // It is then trimmed and then converted into an EmfDataset type throught
         // the getDataset method created below
 
-        int index2 = suffixTokens[1].indexOf(",");
-        String dataSetName = suffixTokens[1].substring(0, index2) + " ";
+        // Look for first double quote (fdq).  Go from there to second double quote (sdq).
+        // The new first token is from fdq to sdq.
+        // The new second token is from sdq to end of string.
+        // Repeat once more for this tag.
+        
+        int quoteIndex = suffixTokens[1].indexOf("\"");
+        String firstQuoteRemoved = suffixTokens[1].substring(quoteIndex + 1);
+        //System.out.println("firstQuoteRemoved: " + firstQuoteRemoved);
+        int quoteIndex2 = firstQuoteRemoved.indexOf("\"");
+        String dataSetName = firstQuoteRemoved.substring(0, quoteIndex2) + " ";
+        //System.out.println("dataSetName: " + dataSetName);
+        
+        //int index2 = suffixTokens[1].indexOf(",");
+        //String dataSetName = suffixTokens[1].substring(0, index2) + " ";
         EmfDataset dataSet2 = getDataset(dataSetName.trim());
 
         // The integer value of the default version is retrieved from the getDefaultVersion
@@ -225,7 +231,13 @@ public class SQLQueryParser {
         // System.out.println("version object" + version1);
 
         // The table number is retrieved from the second argument in the second token.
-        String tableNum = suffixTokens[1].substring(index2 + 1).trim();
+        String secondQuoteRemoved = firstQuoteRemoved.substring(quoteIndex2 + 1);
+        int quoteIndex3 = secondQuoteRemoved.indexOf("\"");
+        String thirdQuoteRemoved = secondQuoteRemoved.substring(quoteIndex3 + 1);
+        int quoteIndex4 = thirdQuoteRemoved.indexOf("\"");
+        String tableNum = thirdQuoteRemoved.substring(0, quoteIndex4);
+        //System.out.println("tableNum: " + tableNum);
+        //String tableNum = suffixTokens[1].substring(index2 + 1).trim();
 
         /*
          * System.out.println("Dataset information: " + dataSet2); System.out.println("Dataset id: " + dataSet2_id);
@@ -267,11 +279,37 @@ public class SQLQueryParser {
         String[] suffixTokens = suffixSplit(suffix);
 
         // The dataset name is retreived as the first argument in the second token.
-        StringTokenizer tokenizer = new StringTokenizer(suffixTokens[1], ",");
+        // Look for first double quote (fdq).  Go from there to second double quote (sdq).
+        // The new first token is from fdq to sdq.
+        // The new second token is from sdq to end of string.
+        // Repeat twice more for this tag.
+        
+        int quoteIndex = suffixTokens[1].indexOf("\"");
+        String firstQuoteRemoved = suffixTokens[1].substring(quoteIndex + 1);
+        //System.out.println("firstQuoteRemoved: " + firstQuoteRemoved);
+        int quoteIndex2 = firstQuoteRemoved.indexOf("\"");
+        String dataSetName = firstQuoteRemoved.substring(0, quoteIndex2) + " ";
+        //System.out.println("dataSetName: " + dataSetName);
+        
+        String secondQuoteRemoved = firstQuoteRemoved.substring(quoteIndex2 + 1);
+        int quoteIndex3 = secondQuoteRemoved.indexOf("\"");
+        String thirdQuoteRemoved = secondQuoteRemoved.substring(quoteIndex3 + 1);
+        int quoteIndex4 = thirdQuoteRemoved.indexOf("\"");
+        String tableNum = thirdQuoteRemoved.substring(0, quoteIndex4);
+        //System.out.println("tableNum: " + tableNum);
+        
+        String fourthQuoteRemoved = thirdQuoteRemoved.substring(quoteIndex4 + 1);
+        int quoteIndex5 = fourthQuoteRemoved.indexOf("\"");
+        String fifthQuoteRemoved = fourthQuoteRemoved.substring(quoteIndex5 + 1);
+        int quoteIndex6 = fifthQuoteRemoved.indexOf("\"");
+        String ds3version = fifthQuoteRemoved.substring(0, quoteIndex6);
+        //System.out.println("ds3version: " + ds3version);
+        
+        //StringTokenizer tokenizer = new StringTokenizer(suffixTokens[1], ",");
         // int index2 = suffixTokens[1].indexOf(",");
-        String dataSetName = tokenizer.nextToken();
-        String tableNum = tokenizer.nextToken().trim();
-        String ds3version = tokenizer.nextToken().trim();
+        //String dataSetName = tokenizer.nextToken();
+        //String tableNum = tokenizer.nextToken().trim();
+        //String ds3version = tokenizer.nextToken().trim();
 
         // The (String) value of the version is retrieved as the third argument
         // of the tag. It is then converted to an integer. The value is then compared
@@ -314,8 +352,6 @@ public class SQLQueryParser {
 
         versionCompletePath = version1.createCompletePath();
 
-        // For debugging purposes
-
         /*
          * System.out.println("prefix: " + prefix); System.out.println("Table number: " + tableNum);
          * System.out.println("Dataset information: " + dataSet3); System.out.println("Dataset id: " + dataSet3_id);
@@ -352,13 +388,27 @@ public class SQLQueryParser {
 
         // Split the suffix into two tokens
         String[] suffixTokens = noAliasSuffixSplit(suffix);
+        //for (int v = 0; v < suffixTokens.length; v++) {
+           // System.out.println(suffixTokens[v]+ "\n");
+            //}
 
         // The dataset name is retreived as the first argument in the second token.
         // It is then trimmed and then converted into an EmfDataset type throught
-        // the getDataset method created below
+        // the getDataset method created below.
+        // Look for first double quote (fdq).  Go from there to second double quote (sdq).
+        // The new first token is from fdq to sdq.
+        // The new second token is from sdq to end of string.
+        // Repeat once more for this tag.
 
-        int index4 = suffixTokens[0].indexOf(",");
-        String dataSetName = suffixTokens[0].substring(0, index4) + " ";
+        int quoteIndex = suffixTokens[0].indexOf("\"");
+        String firstQuoteRemoved = suffixTokens[0].substring(quoteIndex + 1);
+        //System.out.println("almostDataSetName: " + firstQuoteRemoved);
+        int quoteIndex2 = firstQuoteRemoved.indexOf("\"");
+        String dataSetName = firstQuoteRemoved.substring(0, quoteIndex2) + " ";
+        //System.out.println("dataSetName: " + dataSetName);
+        
+        //int index4 = suffixTokens[0].indexOf(",");
+        //String dataSetName = suffixTokens[0].substring(0, index4) + " ";
         //System.out.println("datasetName = \n" + dataSetName + "\n");
         if (dataSetName.trim().equals("CURRENT_DATASET")) {
             dataSet4 = dataset;
@@ -384,8 +434,16 @@ public class SQLQueryParser {
         //Version version1 = version(dataSet4_id, ds4IntVersion);
         //System.out.println("version object" + version1);
 
+        String secondQuoteRemoved = firstQuoteRemoved.substring(quoteIndex2 + 1);
+        int quoteIndex3 = secondQuoteRemoved.indexOf("\"");
+        String thirdQuoteRemoved = secondQuoteRemoved.substring(quoteIndex3 + 1);
+        int quoteIndex4 = thirdQuoteRemoved.indexOf("\"");
+        String qaStepName = thirdQuoteRemoved.substring(0, quoteIndex4);
+        //System.out.println("qaStepname: " + qaStepName);
+        
+        
         //The QA Step name is retrieved from the second argument in the second token.
-        String qaStepName = suffixTokens[0].substring(index4 + 1).trim();
+        //String qaStepName = suffixTokens[0].substring(index4 + 1).trim();
         //System.out.println("QA Step Name: " + qaStepName);
         
         // Use the QAServiceImpl object which was created in the constructor.  Run the 
@@ -436,12 +494,38 @@ public class SQLQueryParser {
         // the getDataset method created below.
         
         // The dataset name is retreived as the first argument in the first token.
-        StringTokenizer tokenizer = new StringTokenizer(suffixTokens[0], ",");
+        // Look for first double quote (fdq).  Go from there to second double quote (sdq).
+        // The new first token is from fdq to sdq.
+        // The new second token is from sdq to end of string.
+        // Repeat twice more for this tag.
+        
+        int quoteIndex = suffixTokens[0].indexOf("\"");
+        String firstQuoteRemoved = suffixTokens[0].substring(quoteIndex + 1);
+        //System.out.println("firstQuoteRemoved: " + firstQuoteRemoved);
+        int quoteIndex2 = firstQuoteRemoved.indexOf("\"");
+        String dataSetName = firstQuoteRemoved.substring(0, quoteIndex2) + " ";
+        //System.out.println("dataSetName: " + dataSetName);
+        
+        String secondQuoteRemoved = firstQuoteRemoved.substring(quoteIndex2 + 1);
+        int quoteIndex3 = secondQuoteRemoved.indexOf("\"");
+        String thirdQuoteRemoved = secondQuoteRemoved.substring(quoteIndex3 + 1);
+        int quoteIndex4 = thirdQuoteRemoved.indexOf("\"");
+        String qaStepName = thirdQuoteRemoved.substring(0, quoteIndex4);
+        //System.out.println("tableNum: " + qaStepName);
+        
+        String fourthQuoteRemoved = thirdQuoteRemoved.substring(quoteIndex4 + 1);
+        int quoteIndex5 = fourthQuoteRemoved.indexOf("\"");
+        String fifthQuoteRemoved = fourthQuoteRemoved.substring(quoteIndex5 + 1);
+        int quoteIndex6 = fifthQuoteRemoved.indexOf("\"");
+        String ds5version = fifthQuoteRemoved.substring(0, quoteIndex6);
+        //System.out.println("ds5version: " + ds5version);
+        
+        //StringTokenizer tokenizer = new StringTokenizer(suffixTokens[0], ",");
         // int index2 = suffixTokens[1].indexOf(",");
-        String dataSetName = tokenizer.nextToken();
+        //String dataSetName = tokenizer.nextToken();
         //System.out.println("datasetName = \n" + dataSetName + "\n");
-        String qaStepName = tokenizer.nextToken().trim();
-        String ds5version = tokenizer.nextToken().trim();
+        //String qaStepName = tokenizer.nextToken().trim();
+        //String ds5version = tokenizer.nextToken().trim();
 
         //int index5 = suffixTokens[0].indexOf(",");
         //String dataSetName = suffixTokens[0].substring(0, index5) + " ";
@@ -588,26 +672,30 @@ public class SQLQueryParser {
         String prefix = token.substring(0, index);
         String suffix = token.substring(index + endQueryTag.length());
 
-        /*
-         * System.out.println("suffixSplit prefix: " + prefix); System.out.println("suffixSplit suffix: " + suffix);
-         * System.out.println("Index: " + index);
-         */
-
-        // Added to find alias value
-        /*
-         * System.out.println("Should be a space: " + suffix.substring(0,1)); System.out.println("Should be a letter: " +
-         * suffix.substring(1,2)); System.out.println("Should also be a space: " + suffix.substring(2,3));
-         */
+        //System.out.println("suffixSplit prefix: " + prefix); 
+        //System.out.println("suffixSplit suffix: " + suffix);
+        //System.out.println("Index: " + index);
+        
+        if (prefix.trim().equals("")) {
+            throw new EmfException("Appropriate comma-separated arguments must be specified within the brackets");
+        }
 
         // Determine whether the alias value exists or not. If it does, isolate it.
         // If it does not, throw an exception.
-        if (suffix.charAt(0) == ' ' && suffix.charAt(1) != ',' && (suffix.charAt(2) == ' ' || suffix.charAt(2) == ',')) {
+        
+        //System.out.println("first char: " + suffix.charAt(0));
+        //System.out.println("second char: " + suffix.charAt(1));
+        if (suffix.charAt(0) == ' ' && suffix.charAt(0) != ')' && suffix.charAt(1) != ',' 
+            && suffix.charAt(1) != ')' && (suffix.charAt(2) == ' ' || suffix.charAt(2) == ','))
+        {
             aliasValue = suffix.substring(0, 2);
             aliasValue = aliasValue.trim();
+        } else if ((suffix.charAt(0) == ')') || (suffix.charAt(1) == ')')) {
+            aliasValue = null;
         } else {
             throw new EmfException("A one-character alias value is expected after the '" + endQueryTag + "'");
         }
-
+        //System.out.println("alias: " + aliasValue);
         return new String[] { aliasValue, prefix, suffix };
     }
     
@@ -668,7 +756,7 @@ public class SQLQueryParser {
     // Added method to get the dataset given the dataset name.
 
     private EmfDataset getDataset(String dsName) throws EmfException {
-        //System.out.println("Database name = \n" + dsName + "\n");
+        //System.out.println("Dataset name = \n" + dsName + "\n");
         DatasetDAO dao = new DatasetDAO();
         try {
             return dao.getDataset(sessionFactory.getSession(), dsName);
