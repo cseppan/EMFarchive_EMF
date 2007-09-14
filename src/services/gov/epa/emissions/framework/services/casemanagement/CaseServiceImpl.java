@@ -271,8 +271,7 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().submitJobs(jobIds, caseId, user);
         }catch(Exception e){
             e.printStackTrace();
-            
-            throw new EmfException(e.toString());
+            throw new EmfException(e.getMessage());
         }
     }
 
