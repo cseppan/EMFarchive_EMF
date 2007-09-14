@@ -100,7 +100,9 @@ public class ManagedCaseService {
         this.dao = new CaseDAO(sessionFactory);
 
         myTag();
-        if (DebugLevels.DEBUG_9) System.out.println("In ManagedCaseService constructor: Is the session Factory null? " + (sessionFactory==null));
+        if (DebugLevels.DEBUG_9)
+            System.out.println("In ManagedCaseService constructor: Is the session Factory null? "
+                    + (sessionFactory == null));
 
         if (DebugLevels.DEBUG_1)
             System.out.println(">>>> " + myTag());
@@ -684,7 +686,8 @@ public class ManagedCaseService {
         // select the inputs based on 3 criteria
         try {
             List<CaseInput> inputs = dao.getJobInputs(caseId, jobId, sector, session);
-            if (DebugLevels.DEBUG_9) System.out.println("Are inputs null?" + (inputs == null));
+            if (DebugLevels.DEBUG_9)
+                System.out.println("Are inputs null?" + (inputs == null));
             Iterator<CaseInput> iter = inputs.iterator();
 
             while (iter.hasNext()) {
@@ -714,7 +717,7 @@ public class ManagedCaseService {
             e.printStackTrace();
             log.error("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n"
                     + e.getMessage());
-            //throw new EmfException("Required dataset not set for Case Input name = " + badCipName);
+            // throw new EmfException("Required dataset not set for Case Input name = " + badCipName);
             throw new EmfException(e.getMessage());
 
         }
@@ -759,7 +762,9 @@ public class ManagedCaseService {
             e.printStackTrace();
             log.error("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n"
                     + e.getMessage());
-            throw new EmfException("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n");
+            // throw new EmfException("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId +
+            // ").\n");
+            throw new EmfException(e.getMessage());
         }
 
         // append all the job inputs to the inputsAll list
@@ -1351,12 +1356,14 @@ public class ManagedCaseService {
 
                 if (DebugLevels.DEBUG_6)
                     System.out.println("setJobFileContent");
-                
-                if (DebugLevels.DEBUG_9) System.out.println("before setJobFileContent");
+
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("before setJobFileContent");
 
                 cjt.setJobFileContent(this.createJobFileContent(caseJob, user, expSvc));
 
-                if (DebugLevels.DEBUG_9) System.out.println("before getJobFileName");
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("before getJobFileName");
 
                 String jobFileName = this.getJobFileName(caseJob);
 
@@ -1417,7 +1424,7 @@ public class ManagedCaseService {
             return caseJobSubmitterId;
         } catch (EmfException ex) {
             ex.printStackTrace();
-            throw ex;
+            throw new EmfException(ex.getMessage());
 
         }
     }
@@ -1873,8 +1880,7 @@ public class ManagedCaseService {
             }
         }
         /*
-         * Get the parameters for this job in following order: 
-         * from summary tab, all sectors, all jobs sector specific,
+         * Get the parameters for this job in following order: from summary tab, all sectors, all jobs sector specific,
          * all jobs all sectors, job specific sector specific, job specific
          */
 
@@ -1882,21 +1888,20 @@ public class ManagedCaseService {
         sbuf.append(eolString);
         sbuf.append(this.runComment + " Parameters -- from Case summary " + eolString);
         sbuf.append(shellSetenv("CASE", caseObj.getAbbreviation().toString()));
-//      Need to have quotes around model name b/c could be more than one word
-        String modelName = '"' + caseObj.getModel().toString() + '"';  
+        // Need to have quotes around model name b/c could be more than one word
+        String modelName = '"' + caseObj.getModel().toString() + '"';
         sbuf.append(shellSetenv("MODEL_LABEL", modelName));
         sbuf.append(shellSetenv("IOAPI_GRIDNAME_1", caseObj.getGrid().toString()));
         sbuf.append(shellSetenv("EMF_GRID", caseObj.getGridResolution().toString()));
         sbuf.append(shellSetenv("EMF_AQM", caseObj.getAirQualityModel().toString()));
         sbuf.append(shellSetenv("EMF_SPC", caseObj.getSpeciation().toString()));
-        sbuf.append(shellSetenv("BASE_YEAR", caseObj.getEmissionsYear().toString()));  // Should base year == emissions year ????
-//        sbuf.append(shellSetenv("BASE_YEAR", String.valueOf(caseObj.getBaseYear())));
+        sbuf.append(shellSetenv("BASE_YEAR", caseObj.getEmissionsYear().toString())); // Should base year == emissions
+                                                                                        // year ????
+        // sbuf.append(shellSetenv("BASE_YEAR", String.valueOf(caseObj.getBaseYear())));
         sbuf.append(shellSetenv("FUTURE_YEAR", String.valueOf(caseObj.getFutureYear())));
-//        sbuf.append(shellSetenv("EPI_STDATE_TIME", caseObj.getStartDate()));
-//        sbuf.append(shellSetenv("EPI_ENDATE_TIME", caseObj.getEndDate()));
+        // sbuf.append(shellSetenv("EPI_STDATE_TIME", caseObj.getStartDate()));
+        // sbuf.append(shellSetenv("EPI_ENDATE_TIME", caseObj.getEndDate()));
 
-        
-        
         // All sectors, all jobs
         sbuf.append(eolString);
         sbuf.append(this.runComment + " Parameters -- all sectors, all jobs " + eolString);
@@ -2101,7 +2106,7 @@ public class ManagedCaseService {
             e.printStackTrace();
             log.error(e.getMessage());
             throw new EmfException(e.getMessage());
-        } 
+        }
     }
 
     public JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException {
@@ -2123,7 +2128,7 @@ public class ManagedCaseService {
             session.close();
         }
     }
-    
+
     public void finalize() throws Throwable {
         this.session = null;
         super.finalize();
