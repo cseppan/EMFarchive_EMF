@@ -229,9 +229,9 @@ public class SQLQAAnnualNonsummaryQuery {
 {
            String monthlyQueryPrefix = "select substr(fips, 1, 2) as fipsst, poll, scc, sum( avd_emis * ";
 
-           String monthlyQueryMiddle = ") as mo_emis from\n $DATASET_TABLE[";
+           String monthlyQueryMiddle = ") as mo_emis from\n $DATASET_TABLE[\"";
            
-           String monthlyQuerySuffix = ", 1] m group by substr(fips, 1, 2), poll, scc ";
+           String monthlyQuerySuffix = "\", \"1\"] m group by substr(fips, 1, 2), poll, scc ";
 
            String fullMonthlyQuery = "";
            

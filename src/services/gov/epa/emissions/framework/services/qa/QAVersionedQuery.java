@@ -53,17 +53,18 @@ public class QAVersionedQuery {
             
             //if (i == tableValuesAliasesVersions.size() - 1 ) {
             if (i == tableValuesAliasesVersions.size() - 1 && Integer.parseInt(versions) != 0){
-                finalAliasString += " (" + aliasString + "version IN (" + versionsPath + ")" + deleteClause + " AND " + aliasString +datasetIdClause(dataSetId ) + ") ";  
+                finalAliasString += " ( (" + aliasString + "version is null) OR ( " + aliasString + "version IN (" + versionsPath + ")" + deleteClause + " AND " + aliasString +datasetIdClause(dataSetId ) + ") ) "; 
+                //finalAliasString += " (" + aliasString + "version IN (" + versionsPath + ")" + deleteClause + " AND " + aliasString +datasetIdClause(dataSetId ) + ") ";  
                 }
             else if (i == tableValuesAliasesVersions.size() - 1 && Integer.parseInt(versions) == 0) {
-                finalAliasString += " (" + aliasString + "version IN (" + versionsPath + ")" + deleteClause + aliasString + datasetIdClause(dataSetId ) + ") ";
+                finalAliasString += " ( (" + aliasString + "version is null) OR ( " + aliasString + "version IN (" + versionsPath + ")" + deleteClause + aliasString + datasetIdClause(dataSetId ) + ") ) ";
+                //finalAliasString += " (" + aliasString + "version IN (" + versionsPath + ")" + deleteClause + aliasString + datasetIdClause(dataSetId ) + ") ";
             }
             else{
-                finalAliasString += " (" + aliasString + "version IN (" + versionsPath + ")" + deleteClause + aliasString + datasetIdClause(dataSetId ) + ") AND "; 
-            //finalAliasString += " AND (" + aliasString + "version IN (" + versionsPath[i] + ")" + deleteClause + " AND " + aliasString + datasetIdClause(aliases[i],dataSetId [i] ) + ")"; 
-            //return "(" + aliasString + "version IN (" + versionsPath + ") AND " + aliasString + deleteClause + " AND " + aliasString + datasetIdClause(aliases[i]) + ") "; 
-                }
-            i++;
+                finalAliasString += " ( (" + aliasString + "version is null) OR ( " + aliasString + "version IN (" + versionsPath + ")" + deleteClause + aliasString + datasetIdClause(dataSetId ) + ") ) AND "; 
+                //finalAliasString += " (" + aliasString + "version IN (" + versionsPath + ")" + deleteClause + aliasString + datasetIdClause(dataSetId ) + ") AND ";             }
+               }
+                i++;
             //System.out.println("The string is " + finalAliasString);
         }
         return finalAliasString;
