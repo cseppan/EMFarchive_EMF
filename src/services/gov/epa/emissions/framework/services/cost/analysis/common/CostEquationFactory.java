@@ -12,6 +12,7 @@ public class CostEquationFactory {
     private Type4CostEquation type4CostEquation;
     private Type3CostEquation type3CostEquation;
     private Type2CostEquation type2CostEquation;
+    private Type1CostEquation type1CostEquation;
     
     public CostEquationFactory(boolean useCostEquations, double discountRate) {
         this.useCostEquations = useCostEquations;
@@ -22,6 +23,7 @@ public class CostEquationFactory {
         this.type4CostEquation = new Type4CostEquation(discountRate);
         this.type3CostEquation = new Type3CostEquation(discountRate);
         this.type2CostEquation = new Type2CostEquation(discountRate);
+        this.type1CostEquation = new Type1CostEquation(discountRate);
     }
 
     public CostEquation getCostEquation(String pollutantName, double reducedEmission, 
@@ -101,6 +103,15 @@ public class CostEquationFactory {
                                 designCapacity, designCapacityUnitNumerator,
                                 designCapacityUnitDenominator);
                         return type2CostEquation;
+                    }
+                }
+                
+                if (equations[0].getEquationType().getName().equals("Type 1")) {
+                    //evaluate inputs, if they missing, use the default
+                    if (designCapacity != null && designCapacity != 0.0) {
+                        type1CostEquation.setUp(reducedEmission, bestMeasureEffRecord, 
+                                designCapacity);
+                        return type1CostEquation;
                     }
                 }
                 

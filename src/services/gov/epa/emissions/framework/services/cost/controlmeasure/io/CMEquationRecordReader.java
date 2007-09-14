@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.cost.EquationType;
 import gov.epa.emissions.framework.services.cost.EquationTypeVariable;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,8 @@ public class CMEquationRecordReader {
     private EquationTypeMap equationTypeMap;
 
     private int errorCount = 0;
+    
+    private List equList;
 
     private int errorLimit = 100;
     
@@ -36,6 +39,7 @@ public class CMEquationRecordReader {
         this.status = new CMAddImportStatus(user, sessionFactory);
         this.sessionFactory = sessionFactory;
         this.equationTypeMap = new EquationTypeMap(getEquationTypes());
+        this.equList= new ArrayList();
     }
 
     public void parse(Map controlMeasures, Record record, int lineNo) throws ImporterException {
@@ -54,24 +58,27 @@ public class CMEquationRecordReader {
             cm.setEquations(new ControlMeasureEquation[] {});
             //now add equation settings...
             if (equationTypeVariables.length > 0) {
-                for (int i = 0; i < equationTypeVariables.length; i++) {
-                    EquationTypeVariable equationTypeVariable = equationTypeVariables[i];
-                    ControlMeasureEquation equation = new ControlMeasureEquation(equationType);
-                    equation.setEquationTypeVariable(equationTypeVariable);
-                    try {
-                        Double value = Double.valueOf(tokens[equationTypeVariable.getFileColPosition() + 1]);
-                        equation.setValue(value);
-                    } catch (NumberFormatException e) {
-                        sb.append(format("variable value must be a number, column position = " + (equationTypeVariable.getFileColPosition() + 1) + ", value = " + tokens[equationTypeVariable.getFileColPosition() + 1]));
-                        break;
+                if (constraintCheck(tokens[0], equationType, sb)){
+                    for (int i = 0; i < equationTypeVariables.length; i++) {
+
+                        EquationTypeVariable equationTypeVariable = equationTypeVariables[i];
+                        ControlMeasureEquation equation = new ControlMeasureEquation(equationType);
+                        equation.setEquationTypeVariable(equationTypeVariable);
+                        try {
+                            Double value = Double.valueOf(tokens[equationTypeVariable.getFileColPosition() + 1]);
+                            equation.setValue(value);
+                        } catch (NumberFormatException e) {
+                            sb.append(format("variable value must be a number, column position = " + (equationTypeVariable.getFileColPosition() + 1) + ", value = " + tokens[equationTypeVariable.getFileColPosition() + 1]));
+                            break;
+                        }
+                        cm.addEquation(equation);
                     }
-                    cm.addEquation(equation);
                 }
             } else {
                 ControlMeasureEquation equation = new ControlMeasureEquation(equationType);
                 cm.addEquation(equation);
             }
-            
+
         } else {
             sb.append(format("unknown equation type '" + tokens[1] + "'"));
         }
@@ -80,6 +87,16 @@ public class CMEquationRecordReader {
             status.addStatus(lineNo, sb);
         }
         if (errorCount >= errorLimit) throw new ImporterException("The maximum allowable error limit (" + errorLimit + ") has been reached while parsing the control measure equation records.");
+    }
+
+    private boolean constraintCheck(String abbre, EquationType equationType, StringBuffer sb) {
+        String equString=abbre + equationType.getName();
+        if (equList.contains(equString)){ 
+            sb.append(format("Equation already in the file: "+ equString));
+            return false;
+        }
+        equList.add(equString);
+        return true;
     }
 
     private ControlMeasure controlMeasure(String token, Map controlMeasures, StringBuffer sb, int lineNo) {
