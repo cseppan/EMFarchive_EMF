@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.util.HashSet;
 import java.util.Map;
 
 public class CMSCCRecordReader {
@@ -14,7 +15,8 @@ public class CMSCCRecordReader {
     private CMSCCsFileFormat fileFormat;
 
     private CMAddImportStatus status;
-
+    private HashSet sccSet;
+    
     private int errorCount = 0;
 
     private int errorLimit = 100;
@@ -22,6 +24,7 @@ public class CMSCCRecordReader {
     public CMSCCRecordReader(CMSCCsFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) {
         this.fileFormat = fileFormat;
         this.status = new CMAddImportStatus(user, sessionFactory);
+        this.sccSet = new HashSet();
     }
 
     public void parse(Map controlMeasures, Record record, int lineNo) throws ImporterException {
@@ -30,17 +33,29 @@ public class CMSCCRecordReader {
         ControlMeasure cm = controlMeasure(tokens[0], controlMeasures, sb, lineNo);
         if (tokens == null || cm == null)
             return;
-
-        Scc scc = new Scc();
-        scc.setCode(tokens[1]);
-        scc.setStatus(tokens[2]);
-
+        if (constraintCheck(tokens, sb)) {
+            Scc scc = new Scc();
+            scc.setCode(tokens[1]);
+            scc.setStatus(tokens[2]);
+            cm.addScc(scc);
+        }
         if (sb.length() > 0) {
             errorCount++;
             status.addStatus(lineNo, sb);
         }
         if (errorCount >= errorLimit) throw new ImporterException("The maximum allowable error limit (" + errorLimit + ") has been reached while parsing the control measure SCC records.");
-        cm.addScc(scc);
+    }
+
+    private boolean constraintCheck(String[] tokens, StringBuffer sb) {
+        Scc scct = new Scc();
+        scct.setCode(tokens[1]);
+        scct.setStatus(tokens[2]);    
+        if (sccSet.contains(scct)){ 
+            sb.append(format(" SCC already in the file: "+ tokens[0]));
+            return false;
+        }
+        sccSet.add(scct);
+        return true;
     }
 
     private ControlMeasure controlMeasure(String token, Map controlMeasures, StringBuffer sb, int lineNo) {
