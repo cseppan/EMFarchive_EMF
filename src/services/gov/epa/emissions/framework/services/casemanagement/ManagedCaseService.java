@@ -87,12 +87,12 @@ public class ManagedCaseService {
 
     protected Session session = null;
 
-    private Session getSession() {
-        if (session == null) {
-            session = sessionFactory.getSession();
-        }
-        return session;
-    }
+//    private Session getSession() {
+//        if (session == null) {
+//            session = sessionFactory.getSession();
+//        }
+//        return session;
+//    }
 
     public ManagedCaseService(DbServer dbServer, HibernateSessionFactory sessionFactory) {
         this.dbServer = dbServer;
@@ -679,7 +679,7 @@ public class ManagedCaseService {
     private List<CaseInput> getJobInputs(int caseId, int jobId, Sector sector) throws EmfException {
         List<CaseInput> outInputs = new ArrayList<CaseInput>();
 
-        Session session = this.getSession();
+        Session session = sessionFactory.getSession();
         EmfDataset cipDataset = null;
         String badCipName = null;
 
@@ -720,6 +720,8 @@ public class ManagedCaseService {
             // throw new EmfException("Required dataset not set for Case Input name = " + badCipName);
             throw new EmfException(e.getMessage());
 
+        } finally {
+            session.close();
         }
     }
 
@@ -1452,9 +1454,7 @@ public class ManagedCaseService {
             dao.updateCaseJob(caseJob);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
-        } finally {
-            session.close();
-        }
+        } 
     }
 
     public synchronized void updateCaseJob(User user, CaseJob job) throws EmfException {
