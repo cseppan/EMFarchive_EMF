@@ -100,6 +100,7 @@ public class ManagedCaseService {
         this.dao = new CaseDAO(sessionFactory);
 
         myTag();
+        if (DebugLevels.DEBUG_9) System.out.println("In ManagedCaseService constructor: Is the session Factory null? " + (sessionFactory==null));
 
         if (DebugLevels.DEBUG_1)
             System.out.println(">>>> " + myTag());
@@ -1349,8 +1350,12 @@ public class ManagedCaseService {
 
                 if (DebugLevels.DEBUG_6)
                     System.out.println("setJobFileContent");
+                
+                if (DebugLevels.DEBUG_9) System.out.println("before setJobFileContent");
 
                 cjt.setJobFileContent(this.createJobFileContent(caseJob, user, expSvc));
+
+                if (DebugLevels.DEBUG_9) System.out.println("before getJobFileName");
 
                 String jobFileName = this.getJobFileName(caseJob);
 

@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class CaseDAO {
         daoInit();
     }
 
-    public CaseDAO() {
+     public CaseDAO() {
         daoInit();
     }
 
@@ -48,11 +49,11 @@ public class CaseDAO {
 
     public void add(JobMessage message) {
         Session session = sessionFactory.getSession();
-        try{
+        try {
             hibernateFacade.add(message, session);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
-        }finally{
+        } finally {
             session.close();
         }
     }
@@ -309,16 +310,16 @@ public class CaseDAO {
     public CaseJob getCaseJob(String jobKey) {
         Session session = sessionFactory.getSession();
         CaseJob job = null;
-        
+
         try {
             Criterion crit = Restrictions.eq("jobkey", jobKey);
-            job = (CaseJob)hibernateFacade.load(CaseJob.class, crit, session);
+            job = (CaseJob) hibernateFacade.load(CaseJob.class, crit, session);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
             session.close();
         }
-        
+
         return job;
     }
 
@@ -340,6 +341,20 @@ public class CaseDAO {
         return (CaseJob) hibernateFacade.load(CaseJob.class, crit, session);
     }
 
+    public CaseJob getCaseJob(int jobId) {
+        CaseJob caseJob = null;
+        Session session = sessionFactory.getSession();
+        try {
+            Criterion crit = Restrictions.eq("id", new Integer(jobId));
+            caseJob = (CaseJob) hibernateFacade.load(CaseJob.class, crit, session);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return caseJob;
+    }
+
     public CaseJob getCaseJob(int caseId, CaseJob job, Session session) {
         Criterion crit1 = Restrictions.eq("caseId", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("name", job.getName());
@@ -349,12 +364,12 @@ public class CaseDAO {
 
     public void updateCaseJob(CaseJob job) {
         Session session = sessionFactory.getSession();
-        try{
+        try {
             hibernateFacade.updateOnly(job, session);
-            
-        }catch (Exception ex){
+
+        } catch (Exception ex) {
             ex.printStackTrace();
-        }finally{
+        } finally {
             session.close();
         }
     }
@@ -364,20 +379,24 @@ public class CaseDAO {
     }
 
     public JobRunStatus getJobRunStatuse(String status) {
+        if (DebugLevels.DEBUG_9)
+            System.out
+                    .println("In CaseDAO::getJobRunStatuse: Is the session Factory null? " + (sessionFactory == null));
+
         Session session = sessionFactory.getSession();
         JobRunStatus jrs = null;
-        
-        try{
+
+        try {
             Criterion crit = Restrictions.eq("name", status);
-            jrs = (JobRunStatus) hibernateFacade.load(JobRunStatus.class, crit, session);            
-        }catch (Exception ex){
+            jrs = (JobRunStatus) hibernateFacade.load(JobRunStatus.class, crit, session);
+        } catch (Exception ex) {
             ex.printStackTrace();
-        }finally{
+        } finally {
             session.close();
         }
-        
+
         return jrs;
-        
+
     }
 
     public List<Host> getHosts(Session session) {
@@ -466,14 +485,14 @@ public class CaseDAO {
     public Object loadCaseJob(CaseJob job) {
         Session session = sessionFactory.getSession();
         Object obj = null;
-        try{
+        try {
             Criterion c1 = Restrictions.eq("caseId", new Integer(job.getCaseId()));
             Criterion c2 = Restrictions.eq("name", job.getName());
             Criterion[] criterions = { c1, c2 };
-            obj =  hibernateFacade.load(CaseJob.class, criterions, session);
-        }catch(Exception ex){
+            obj = hibernateFacade.load(CaseJob.class, criterions, session);
+        } catch (Exception ex) {
             ex.printStackTrace();
-        }finally{
+        } finally {
             session.close();
         }
         return obj;

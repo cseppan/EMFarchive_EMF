@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Session;
 
 public class CaseJobTaskManager implements TaskManager {
     private static Log log = LogFactory.getLog(CaseJobTaskManager.class);
@@ -190,8 +189,8 @@ public class CaseJobTaskManager implements TaskManager {
         System.out.println("CaseJobTaskManager::updateRunStatus: " + taskId + " status= " + status);
 
         CaseJobTask cjt = null;
-        Session session = sessionFactory.getSession();
-        CaseDAO dao = new CaseDAO();
+        //Session session = sessionFactory.getSession();
+        CaseDAO dao = new CaseDAO(sessionFactory);
         String jobStatus = "";
 
         try {
@@ -221,8 +220,10 @@ System.out.println("CaseJobTaskManager::updateRunStatus:  job completed or faile
 
             // update the run status in the Case_CaseJobs
             int jid = cjt.getJobId();
-            CaseJob caseJob = dao.getCaseJob(jid, session);
+            CaseJob caseJob = dao.getCaseJob(jid);
 
+            if (DebugLevels.DEBUG_9) System.out.println("In CaseJobTaskManager::updateRunStatus for jobId= " + jid + " Is the CaseJob null? " + caseJob==null);
+            
             if (status.equals("completed")) {
                 System.out.println("CaseJobTaskManager::updateRunStatus:  job Status is completed jobStatus=Submitted");
                 jobStatus = "Submitted";
@@ -251,8 +252,6 @@ System.out.println("CaseJobTaskManager::updateRunStatus:  job completed or faile
             
             System.out.println("^^^^^^^^^^^^^^");
             throw new EmfException(e.getMessage());
-        } finally {
-            session.close();
         }
     }
 
