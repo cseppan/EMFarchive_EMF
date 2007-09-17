@@ -23,6 +23,7 @@
 		<property name="queOptions" column="que_option" type="java.lang.String" not-null="false"/>
 		<property name="path" column="path" type="java.lang.String" not-null="false"/>
 		<property name="jobkey" column="job_key" type="java.lang.String" not-null="false"/>
+		<property name="idInQueue" column="q_id" type="integer" not-null="false"/>
 		
 		<many-to-one
          	name="sector" 

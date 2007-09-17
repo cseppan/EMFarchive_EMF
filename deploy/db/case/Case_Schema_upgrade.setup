@@ -94,3 +94,6 @@ CREATE TABLE cases.job_dependencies
 )
 WITHOUT OIDS;
 -- cases.job_dependencies
+
+-- 9/17/2007 map queue id to cases.case_jobs table
+ALTER TABLE cases.cases_casejobs ADD COLUMN q_id int8;
