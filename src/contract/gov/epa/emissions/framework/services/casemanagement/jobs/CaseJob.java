@@ -4,7 +4,10 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class CaseJob implements Serializable, Comparable<CaseJob> {
 
@@ -49,13 +52,16 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     private String path;
     
     private String jobkey;
+    
+    private List<DependentJob> dependentJobs;
 
     public CaseJob() {
-        //
+        this("");
     }
     
     public CaseJob(String name) {
         this.name = name;
+        this.dependentJobs = new ArrayList<DependentJob>();
     }
     
     public String getPath() {
@@ -242,4 +248,13 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     public void setJobkey(String jobKey){
         this.jobkey = jobKey;
     }
+    
+    public DependentJob[] getDependentJobs() {
+        return dependentJobs.toArray(new DependentJob[0]);
+    }
+
+    public void setDependentJobs(DependentJob[] dependentJobs) {
+        this.dependentJobs = Arrays.asList(dependentJobs);
+    }
+
 }

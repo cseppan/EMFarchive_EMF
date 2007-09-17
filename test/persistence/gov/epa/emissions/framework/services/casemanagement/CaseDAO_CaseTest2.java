@@ -18,6 +18,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.DependentJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUse;
@@ -344,6 +345,34 @@ public class CaseDAO_CaseTest2 extends ServiceTestCase {
             dropAll(CaseProgram.class);
         }
     }
+    
+    public void testShouldSaveJobDependencies() {
+        Case caseObj = load(newCase());
+        CaseJob jobA = load(newCaseJob(caseObj));
+        CaseJob jobB = load(newCaseJob(caseObj));
+        CaseJob jobC = load(newCaseJob(caseObj));
+        DependentJob dependJobA = new DependentJob();
+        dependJobA.setJobId(jobA.getId());
+        DependentJob dependJobB = new DependentJob();
+        dependJobB.setJobId(jobB.getId());
+        DependentJob dependJobC = new DependentJob();
+        dependJobC.setJobId(jobC.getId());
+        CaseJob jobD = load(newCaseJob(caseObj, new DependentJob[]{dependJobA, dependJobB, dependJobC}));
+        
+        session.clear();
+        try {
+            DependentJob[] dependents = jobD.getDependentJobs();
+            assertEquals(jobA.getId(), dependents[0].getJobId());
+            assertEquals(jobB.getId(), dependents[1].getJobId());
+            assertEquals(jobC.getId(), dependents[2].getJobId());
+        } finally {
+            remove(jobD);
+            remove(jobA);
+            remove(jobB);
+            remove(jobC);
+            remove(caseObj);
+        }
+    }
 
     private Case newCase() {
         Case element = new Case("test" + Math.random());
@@ -353,8 +382,17 @@ public class CaseDAO_CaseTest2 extends ServiceTestCase {
     }
 
     private CaseJob newCaseJob(Case caseObj) {
+        CaseJob job = new CaseJob("test" + Math.random());
+        job.setCaseId(caseObj.getId());
+        add(job);
+        
+        return job;
+    }
+
+    private CaseJob newCaseJob(Case caseObj, DependentJob[] dependJobIds) {
         CaseJob element = new CaseJob("test" + Math.random());
         element.setCaseId(caseObj.getId());
+        element.setDependentJobs(dependJobIds);
         add(element);
         
         return element;

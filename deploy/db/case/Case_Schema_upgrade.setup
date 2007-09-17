@@ -82,3 +82,15 @@ WITHOUT OIDS;
 
 -- add a new contraint to cases.cases table
 ALTER TABLE cases.cases ADD CONSTRAINT  unique_abbreviation  UNIQUE (abbreviation_id);
+
+-- 9/14/2007 added job_dependencies table
+-- cases.job_dependencies
+CREATE TABLE cases.job_dependencies
+(
+  id SERIAL PRIMARY KEY,
+  job_id int4 NOT NULL REFERENCES cases.cases_casejobs(id),
+  list_index int4,
+  depend_job_id int4 NOT NULL REFERENCES cases.cases_casejobs(id)
+)
+WITHOUT OIDS;
+-- cases.job_dependencies
