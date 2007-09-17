@@ -1887,20 +1887,42 @@ public class ManagedCaseService {
         // Parameters from the summary tab
         sbuf.append(eolString);
         sbuf.append(this.runComment + " Parameters -- from Case summary " + eolString);
-        sbuf.append(shellSetenv("CASE", caseObj.getAbbreviation().toString()));
-        // Need to have quotes around model name b/c could be more than one word
-        String modelName = '"' + caseObj.getModel().toString() + '"';
-        sbuf.append(shellSetenv("MODEL_LABEL", modelName));
-        sbuf.append(shellSetenv("IOAPI_GRIDNAME_1", caseObj.getGrid().toString()));
-        sbuf.append(shellSetenv("EMF_GRID", caseObj.getGridResolution().toString()));
-        sbuf.append(shellSetenv("EMF_AQM", caseObj.getAirQualityModel().toString()));
-        sbuf.append(shellSetenv("EMF_SPC", caseObj.getSpeciation().toString()));
-        sbuf.append(shellSetenv("BASE_YEAR", caseObj.getEmissionsYear().toString())); // Should base year == emissions
-                                                                                        // year ????
-        // sbuf.append(shellSetenv("BASE_YEAR", String.valueOf(caseObj.getBaseYear())));
-        sbuf.append(shellSetenv("FUTURE_YEAR", String.valueOf(caseObj.getFutureYear())));
-        // sbuf.append(shellSetenv("EPI_STDATE_TIME", caseObj.getStartDate()));
-        // sbuf.append(shellSetenv("EPI_ENDATE_TIME", caseObj.getEndDate()));
+        if (caseObj.getAbbreviation() != null) {
+            sbuf.append(shellSetenv("CASE", caseObj.getAbbreviation().getName()));
+        }
+        //      Need to have quotes around model name b/c could be more than one word
+        if (caseObj.getModel() != null) {
+            String modelName = '"' + caseObj.getModel().getName() + '"';  
+            sbuf.append(shellSetenv("MODEL_LABEL", modelName));
+        }
+        if (caseObj.getGrid() != null) {
+            sbuf.append(shellSetenv("IOAPI_GRIDNAME_1", caseObj.getGrid().getName()));
+        }        
+        if (caseObj.getGridResolution() != null) {
+            sbuf.append(shellSetenv("EMF_GRID", caseObj.getGridResolution().getName()));
+        }
+        if (caseObj.getAirQualityModel() != null) {
+            sbuf.append(shellSetenv("EMF_AQM", caseObj.getAirQualityModel().getName()));
+        }
+        if (caseObj.getSpeciation() != null) {
+            sbuf.append(shellSetenv("EMF_SPC", caseObj.getSpeciation().getName()));
+        }
+        if (caseObj.getEmissionsYear() != null) {
+            sbuf.append(shellSetenv("BASE_YEAR", caseObj.getEmissionsYear().getName()));  // Should base year == emissions year ????
+        }
+            //        sbuf.append(shellSetenv("BASE_YEAR", String.valueOf(caseObj.getBaseYear())));
+        if (caseObj.getFutureYear() != 0) { //CHECK: should it be included if == 0 ???
+            sbuf.append(shellSetenv("FUTURE_YEAR", String.valueOf(caseObj.getFutureYear())));
+        }
+        //      Need to have quotes around start and end date b/c could be more than one word  'DD/MM/YYYY HH:MM'
+        if (caseObj.getStartDate() != null) {
+            String startString = '"' + caseObj.getStartDate().toString() + '"';  
+            sbuf.append(shellSetenv("EPI_STDATE_TIME", startString));
+        }
+        if (caseObj.getEndDate() != null) {
+            String endString = '"' + caseObj.getEndDate().toString() + '"';  
+            sbuf.append(shellSetenv("EPI_ENDATE_TIME", endString));
+        }
 
         // All sectors, all jobs
         sbuf.append(eolString);
