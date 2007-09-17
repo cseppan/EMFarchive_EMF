@@ -155,13 +155,22 @@ public class ExportJobSubmitter extends ExportSubmitter {
             System.out.println(" Size of submittedTable: " + submittedTable.size());
 
         // jobName) are completed: 
+        String message = null;
         if (submittedTable.size() == (done + fail + canned)) {
-            String message = "Exports for job (" + this.caseJobName + ") are completed. Total exports submitted=" + submittedTable.size()
+            message = "Exports for job (" + this.caseJobName + ") are completed. Total exports submitted=" + submittedTable.size()
                     + " Completed= " + done + " Failed= " + fail + " Canceled= " + canned;
 
             this.setStatus(user, statusServices, message);
-            try {
-                CaseJobTaskManager.callBackFromExportJobSubmitter(this.caseJobTaskId, status, mesg);
+            
+            if (submittedTable.size() == done) {
+                status = "completed";
+                
+            }else{
+                status = "failed";
+            }
+
+                try {
+                CaseJobTaskManager.callBackFromExportJobSubmitter(this.caseJobTaskId, status, message);
             } catch (EmfException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
@@ -170,7 +179,7 @@ public class ExportJobSubmitter extends ExportSubmitter {
 
         if (DebugLevels.DEBUG_9)
             System.out.println(">>>>>>>> Submitter: " + submitterId + " EXITING callback from TaskManager for Task: "
-                    + taskId + " status= " + status + " message= " + mesg);
+                    + taskId + " status= " + status + " message= " + message);
 
     }
 
