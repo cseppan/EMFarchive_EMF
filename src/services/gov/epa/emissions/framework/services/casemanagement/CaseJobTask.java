@@ -102,15 +102,25 @@ public class CaseJobTask extends Task {
     }
 
     public void run() {
+        String status = null;
+        String mesg = null;
+
         System.out.println("@@@@ CASE job task RUNNING jobId= " + jobId + " jobName= " + jobName + " caseId= " + caseId
                 + " CaseJobTask id= " + this.getTaskId() + " now running in Thread id= "
                 + Thread.currentThread().getId());
 
+//        String status = "completed";
+//        String mesg = " was pseudo successfull";
+
         try {
             this.createJobFile();
+            status = "completed";
         } catch (Exception e) {
             log.error("Exception while creating JobFile when running CaseJobTask. See stacktrace for details");
             e.printStackTrace();
+            
+            status = "failed";
+            mesg="Failed to create  job script: " + this.jobFile;
         }
 
         // Create an execution string and submit job to the queue,
@@ -150,13 +160,16 @@ public class CaseJobTask extends Task {
                 // TODO:
             }
 
+            status="completed";
+
         } catch (Exception e) {
             log.error("Error executing job file: " + jobFile + " Execution string= " + executionStr);
             e.printStackTrace();
+            status = "failed";
+            mesg="Failed to submit job to Host: " + hostName + " for job: " + this.jobFile;
+
         }
 
-        String status = "completed";
-        String mesg = " was pseudo successfull";
 
         try {
             CaseJobTaskManager.callBackFromThread(this.taskId, this.submitterId, status, mesg);
