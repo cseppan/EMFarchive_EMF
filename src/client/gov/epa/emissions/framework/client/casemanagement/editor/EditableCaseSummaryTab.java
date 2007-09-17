@@ -492,6 +492,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         startDate.setText(format(caseObj.getStartDate()) + "");
         changeablesList.addChangeable(startDate);
         startDate.setPreferredSize(defaultDimension);
+        startDate.setToolTipText("Date in format MM/dd/yyyy HH:mm");
 
         return startDate;
     }
@@ -501,6 +502,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         endDate.setText(format(caseObj.getEndDate()) + "");
         changeablesList.addChangeable(endDate);
         endDate.setPreferredSize(defaultDimension);
+        endDate.setToolTipText("Date in format MM/dd/yyyy HH:mm");
 
         return endDate;
     }
@@ -602,7 +604,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
                 caseObj.setStartDate(null);
                 return;
             }
-            caseObj.setStartDate(EmfDateFormat.parse_YYYY_MM_DD_HH_MM(startDate.getText()));
+            caseObj.setStartDate(EmfDateFormat.parse_MM_DD_YYYY_HH_mm(startDate.getText()));
         } catch (ParseException e) {
             throw new EmfException("Please enter the Start Date in the correct format (MM/dd/yyyy HH:mm)");
         }
@@ -615,7 +617,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
                 caseObj.setEndDate(null);
                 return;
             }
-            caseObj.setEndDate(EmfDateFormat.parse_YYYY_MM_DD_HH_MM(endDate.getText()));
+            caseObj.setEndDate(EmfDateFormat.parse_MM_DD_YYYY_HH_mm(endDate.getText()));
         } catch (ParseException e) {
             throw new EmfException("Please enter the End Date in the correct format (MM/dd/yyyy HH:mm)");
         }
