@@ -19,7 +19,7 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     
     private float jobNo;
     
-    private int idInQueue;
+//    private int idInQueue;
     
     private Sector sector;
     
@@ -81,11 +81,14 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     }
 
     public int getIdInQueue() {
-        return idInQueue;
+        //return idInQueue;
+        return 0;
     }
 
     public void setIdInQueue(int idInQueue) {
-        this.idInQueue = idInQueue;
+        // FIXME:
+//        this.idInQueue = idInQueue;
+        System.out.println(idInQueue);
     }
 
     public float getJobNo() {
