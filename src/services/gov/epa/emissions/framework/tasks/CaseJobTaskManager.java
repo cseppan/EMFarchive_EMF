@@ -206,8 +206,13 @@ System.out.println("CaseJobTaskManager::updateRunStatus:  job completed or faile
             if (status.equals("export failed")) {
                 System.out.println("CaseJobTaskManager::updateRunStatus:  export failed");
                 synchronized (waitTable) {
+                    System.out.println("Export Failed");
                     cjt = (CaseJobTask) waitTable.get(taskId);
+                    System.out.println("CaseJobTask Id for failed exports = " + cjt.getJobId());
+                    System.out.println("CaseJobTask Id for failed exports = " + cjt.getTaskId());
+                    System.out.println("Size of the waitTable before remove: " + waitTable.size());
                     waitTable.remove(taskId);
+                    System.out.println("Size of the waitTable after remove: " + waitTable.size());
                 }
             }
 
@@ -220,9 +225,10 @@ System.out.println("CaseJobTaskManager::updateRunStatus:  job completed or faile
 
             // update the run status in the Case_CaseJobs
             int jid = cjt.getJobId();
+
             CaseJob caseJob = dao.getCaseJob(jid);
 
-            if (DebugLevels.DEBUG_9) System.out.println("In CaseJobTaskManager::updateRunStatus for jobId= " + jid + " Is the CaseJob null? " + caseJob==null);
+            if (DebugLevels.DEBUG_9) System.out.println("In CaseJobTaskManager::updateRunStatus for jobId= " + jid + " Is the CaseJob null? " + (caseJob==null));
             
             if (status.equals("completed")) {
                 System.out.println("CaseJobTaskManager::updateRunStatus:  job Status is completed jobStatus=Submitted");
@@ -239,6 +245,12 @@ System.out.println("CaseJobTaskManager::updateRunStatus:  job completed or faile
             if (status.equals("export succeeded")) {
                 System.out.println("CaseJobTaskManager::updateRunStatus:  export Succeeded jobStatus=Waiting");
                 jobStatus = "Waiting";
+                caseJob.setRunStartDate(new Date());
+            }
+
+            if (status.equals("export failed")) {
+                System.out.println("CaseJobTaskManager::updateRunStatus:  export FAILED jobStatus=FAILED");
+                jobStatus = "Failed";
                 caseJob.setRunStartDate(new Date());
             }
 
