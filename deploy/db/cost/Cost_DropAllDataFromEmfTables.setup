@@ -13,9 +13,13 @@ DELETE FROM emf.strategy_types;
 DELETE FROM emf.control_measure_sccs;
 DELETE FROM emf.aggregrated_efficiencyrecords;
 DELETE FROM emf.control_measure_efficiencyrecords;
-DELETE FROM emf.control_measurs_sectors;
+DELETE FROM emf.control_measure_sectors;
 DELETE FROM emf.control_measures;
 DELETE FROM emf.pollutants;
 DELETE FROM emf.source_groups;
 DELETE FROM emf.control_technologies;
 DELETE FROM emf.control_measure_classes;
+DELETE FROM emf.control_measure_equations;
+DELETE FROM emf.equation_type_variables;
+DELETE FROM emf.equation_types;
+

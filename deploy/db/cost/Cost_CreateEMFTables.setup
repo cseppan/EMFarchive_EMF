@@ -9,6 +9,7 @@ CREATE TABLE emf.pollutants
   lock_date timestamp
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.pollutants OWNER TO emf;
 CREATE INDEX pollutant_id
   ON emf.pollutants
   USING btree
@@ -25,6 +26,7 @@ CREATE TABLE emf.source_groups
   lock_date timestamp
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.source_groups OWNER TO emf;
 -- emf.source_groups
 --
 
@@ -36,6 +38,7 @@ CREATE TABLE emf.control_measure_classes
   description varchar(255)
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.control_measure_classes OWNER TO emf;
 -- emf.control_measure_classes
 
 -- emf control_technologies
@@ -48,6 +51,7 @@ CREATE TABLE emf.control_technologies
   lock_date timestamp
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.control_technologies OWNER TO emf;
 -- emf control_technologies
 
 -- emf.control_measures
@@ -73,6 +77,7 @@ CREATE TABLE emf.control_measures
   last_modified_by varchar(255) NOT NULL
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.control_measures OWNER TO emf;
 CREATE INDEX measure_id
   ON emf.control_measures
   USING btree
@@ -90,6 +95,7 @@ CREATE TABLE emf.control_measure_sccs
    UNIQUE(control_measures_id,name)
 )
 WITHOUT OIDS;
+ALTER TABLE emf.control_measure_sccs OWNER TO emf;
 CREATE INDEX measure_scc_measure_id
   ON emf.control_measure_sccs
   USING btree
@@ -132,6 +138,7 @@ CREATE TABLE emf.control_measure_efficiencyrecords
   UNIQUE (control_measures_id,pollutant_id,locale,existing_measure_abbr,effective_date, min_emis, max_emis)
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.control_measure_efficiencyrecords OWNER TO emf;
 CREATE INDEX er_measureid
   ON emf.control_measure_efficiencyrecords
   USING btree
@@ -143,8 +150,8 @@ CREATE INDEX er_pollutantid
   
 -- emf.control_measure_efficiencyrecords
 
--- emf control_measurs_sectors
-CREATE TABLE emf.control_measurs_sectors
+-- emf control_measure_sectors
+CREATE TABLE emf.control_measure_sectors
 (
   id SERIAL PRIMARY KEY,
   control_measure_id int4 NOT NULL REFERENCES emf.control_measures(id) ,
@@ -153,7 +160,8 @@ CREATE TABLE emf.control_measurs_sectors
   UNIQUE (control_measure_id,sector_id) 
 ) 
 WITHOUT OIDS;
--- emf control_measurs_sectors
+ALTER TABLE emf.control_measure_sectors OWNER TO emf;
+-- emf control_measure_sectors
 
 -- emf.strategy_types
 CREATE TABLE emf.strategy_types
@@ -167,6 +175,7 @@ CREATE TABLE emf.strategy_types
   lock_date timestamp
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.strategy_types OWNER TO emf;
 -- emf.strategy_types
 
 
@@ -197,6 +206,7 @@ CREATE TABLE emf.control_strategies
   use_cost_equations boolean
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.control_strategies OWNER TO emf;
 -- emf.control_strategies
 
 -- emf.control_strategy_classes
@@ -209,6 +219,7 @@ CREATE TABLE emf.control_strategy_classes
   UNIQUE (control_strategy_id,control_measure_class_id) 
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.control_strategy_classes OWNER TO emf;
 -- emf.control_strategy_classes
 
 -- emf.control_strategy_measures
@@ -225,6 +236,7 @@ CREATE TABLE emf.control_strategy_measures
   UNIQUE (control_strategy_id,control_measure_id) 
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.control_strategy_measures OWNER TO emf;
 -- emf.control_strategy_measures
 
 -- emf.input_datasets_control_strategies
@@ -237,6 +249,7 @@ CREATE TABLE emf.input_datasets_control_strategies
   dataset_version integer
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.input_datasets_control_strategies OWNER TO emf;
 -- emf.datasets_control_strategies
 
 -- emf.strategy_result_types
@@ -246,6 +259,7 @@ CREATE TABLE emf.strategy_result_types
   name varchar(255) NOT NULL UNIQUE
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.strategy_result_types OWNER TO emf;
 -- emf.strategy_result_types
 
 -- emf.strategy_results
@@ -267,6 +281,7 @@ CREATE TABLE emf.strategy_results
   UNIQUE (control_strategy_id,dataset_id,detailed_result_dataset_id)
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.strategy_results OWNER TO emf;
 -- emf.strategy_results
 
 -- emf.aggregrated_efficiencyrecords
@@ -291,6 +306,7 @@ CREATE TABLE emf.aggregrated_efficiencyrecords
       ON UPDATE NO ACTION ON DELETE NO ACTION
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.aggregrated_efficiencyrecords OWNER TO emf;
 CREATE INDEX aggeffrec_measureid
   ON emf.aggregrated_efficiencyrecords
   USING btree
@@ -314,6 +330,7 @@ CREATE TABLE emf.control_strategy_constraints
       ON UPDATE NO ACTION ON DELETE NO ACTION
 ) 
 WITHOUT OIDS;
+ALTER TABLE emf.control_strategy_constraints OWNER TO emf;
 
 CREATE INDEX constraint_strategy_id
   ON emf.control_strategy_constraints
@@ -329,7 +346,7 @@ CREATE TABLE emf.equation_types
   CONSTRAINT equation_types_name_key UNIQUE (name)
 ) 
 WITHOUT OIDS;
-ALTER TABLE emf.equation_types OWNER TO postgres;
+ALTER TABLE emf.equation_types OWNER TO emf;
 
 CREATE TABLE emf.equation_type_variables
 (
@@ -346,7 +363,7 @@ CREATE TABLE emf.equation_type_variables
   CONSTRAINT equation_type_variables_id_key UNIQUE (id, equation_type_id)
 ) 
 WITHOUT OIDS;
-ALTER TABLE emf.equation_type_variables OWNER TO postgres;
+ALTER TABLE emf.equation_type_variables OWNER TO emf;
 
 CREATE TABLE emf.control_measure_equations
 (
@@ -386,10 +403,12 @@ create function public.join_with_ampersand(text,text)
   immutable strict language 'sql'
   as 'select $1||''& ''||$2'
 ;
+ALTER function public.join_with_ampersand(text,text) OWNER TO emf;
 
 create aggregate public.concatenate_with_ampersand (
   sfunc = join_with_ampersand,
   basetype = text,
   stype = text
 );
+ALTER aggregate public.concatenate_with_ampersand(text) OWNER TO emf;
 
