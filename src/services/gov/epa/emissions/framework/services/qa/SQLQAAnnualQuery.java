@@ -95,7 +95,7 @@ public class SQLQAAnnualQuery {
         
         //Create the outer query
         
-        String outerQuery = "select te.fipsst, i.name, sum(cast(i.factor as double precision) * mo_emis) as ann_emis from\n # as te left outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", \"1\"] i on te.poll = i.cas  group by te.fipsst, i.name order by te.fipsst, i.name";
+        String outerQuery = "select te.fipsst, i.name, sum(cast(i.factor as double precision) * mo_emis) as ann_emis from\n # as te left outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i on te.poll = i.cas  group by te.fipsst, i.name order by te.fipsst, i.name";
         
         //System.out.println("The input for the outer query is: \n" + outerQuery);
         String almostQuery = query(outerQuery, true);
@@ -278,7 +278,7 @@ public class SQLQAAnnualQuery {
            String monthlyQueryMiddle = ") as mo_emis from\n $DATASET_TABLE[\"";
            //System.out.println("middle query: " + monthlyQueryMiddle);
            
-           String monthlyQuerySuffix = "\", \"1\"] m group by substr(fips, 1, 2), poll ";
+           String monthlyQuerySuffix = "\", 1] m group by substr(fips, 1, 2), poll ";
            //System.out.println("end query: " + monthlyQuerySuffix);
 
            String fullMonthlyQuery = "";

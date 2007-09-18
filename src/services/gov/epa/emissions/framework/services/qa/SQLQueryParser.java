@@ -200,7 +200,7 @@ public class SQLQueryParser {
         // Look for first double quote (fdq).  Go from there to second double quote (sdq).
         // The new first token is from fdq to sdq.
         // The new second token is from sdq to end of string.
-        // Repeat once more for this tag.
+        // From this point parse on the next comma because the other value is a number
         
         int quoteIndex = suffixTokens[1].indexOf("\"");
         String firstQuoteRemoved = suffixTokens[1].substring(quoteIndex + 1);
@@ -232,10 +232,14 @@ public class SQLQueryParser {
 
         // The table number is retrieved from the second argument in the second token.
         String secondQuoteRemoved = firstQuoteRemoved.substring(quoteIndex2 + 1);
-        int quoteIndex3 = secondQuoteRemoved.indexOf("\"");
+        /*int quoteIndex3 = secondQuoteRemoved.indexOf("\"");
         String thirdQuoteRemoved = secondQuoteRemoved.substring(quoteIndex3 + 1);
         int quoteIndex4 = thirdQuoteRemoved.indexOf("\"");
-        String tableNum = thirdQuoteRemoved.substring(0, quoteIndex4);
+        String tableNum = thirdQuoteRemoved.substring(0, quoteIndex4);*/
+        
+        int commaIndex = secondQuoteRemoved.indexOf(",");
+        String tableNum = secondQuoteRemoved.substring(commaIndex + 1).trim();
+        
         //System.out.println("tableNum: " + tableNum);
         //String tableNum = suffixTokens[1].substring(index2 + 1).trim();
 
@@ -282,7 +286,7 @@ public class SQLQueryParser {
         // Look for first double quote (fdq).  Go from there to second double quote (sdq).
         // The new first token is from fdq to sdq.
         // The new second token is from sdq to end of string.
-        // Repeat twice more for this tag.
+        // From this point parse on the next commas because the other values are numbers
         
         int quoteIndex = suffixTokens[1].indexOf("\"");
         String firstQuoteRemoved = suffixTokens[1].substring(quoteIndex + 1);
@@ -292,17 +296,33 @@ public class SQLQueryParser {
         //System.out.println("dataSetName: " + dataSetName);
         
         String secondQuoteRemoved = firstQuoteRemoved.substring(quoteIndex2 + 1);
-        int quoteIndex3 = secondQuoteRemoved.indexOf("\"");
-        String thirdQuoteRemoved = secondQuoteRemoved.substring(quoteIndex3 + 1);
-        int quoteIndex4 = thirdQuoteRemoved.indexOf("\"");
-        String tableNum = thirdQuoteRemoved.substring(0, quoteIndex4);
+        //int quoteIndex3 = secondQuoteRemoved.indexOf("\"");
+        
+        int commaIndex = secondQuoteRemoved.indexOf(",");
+        //System.out.println("biggersuffix: " + secondQuoteRemoved);
+        
+        String firstCommaRemoved = secondQuoteRemoved.substring(commaIndex + 1);
+        //System.out.println("suffix: " + firstCommaRemoved);
+        
+        int commaIndex2 = firstCommaRemoved.indexOf(",");
+        
+        String tableNum = firstCommaRemoved.substring(0, commaIndex2).trim();
+        
+        //String tableNum = secondQuoteRemoved.substring(commaIndex + 1, commaIndex2).trim();
+        
+        //String thirdQuoteRemoved = secondQuoteRemoved.substring(quoteIndex3 + 1);
+        //int quoteIndex4 = thirdQuoteRemoved.indexOf("\"");
+        //String tableNum = thirdQuoteRemoved.substring(0, quoteIndex4);
         //System.out.println("tableNum: " + tableNum);
         
-        String fourthQuoteRemoved = thirdQuoteRemoved.substring(quoteIndex4 + 1);
-        int quoteIndex5 = fourthQuoteRemoved.indexOf("\"");
-        String fifthQuoteRemoved = fourthQuoteRemoved.substring(quoteIndex5 + 1);
-        int quoteIndex6 = fifthQuoteRemoved.indexOf("\"");
-        String ds3version = fifthQuoteRemoved.substring(0, quoteIndex6);
+        //String fourthQuoteRemoved = thirdQuoteRemoved.substring(quoteIndex4 + 1);
+        //int quoteIndex5 = fourthQuoteRemoved.indexOf("\"");
+        //String fifthQuoteRemoved = fourthQuoteRemoved.substring(quoteIndex5 + 1);
+        //int quoteIndex6 = fifthQuoteRemoved.indexOf("\"");
+        
+        String ds3version = firstCommaRemoved.substring(commaIndex2 +1).trim();
+        
+        //String ds3version = fifthQuoteRemoved.substring(0, quoteIndex6);
         //System.out.println("ds3version: " + ds3version);
         
         //StringTokenizer tokenizer = new StringTokenizer(suffixTokens[1], ",");
@@ -497,7 +517,8 @@ public class SQLQueryParser {
         // Look for first double quote (fdq).  Go from there to second double quote (sdq).
         // The new first token is from fdq to sdq.
         // The new second token is from sdq to end of string.
-        // Repeat twice more for this tag.
+        // Repeat once more for this tag.
+        // From that point parse on the next comma because the other value is a number
         
         int quoteIndex = suffixTokens[0].indexOf("\"");
         String firstQuoteRemoved = suffixTokens[0].substring(quoteIndex + 1);
@@ -514,10 +535,14 @@ public class SQLQueryParser {
         //System.out.println("tableNum: " + qaStepName);
         
         String fourthQuoteRemoved = thirdQuoteRemoved.substring(quoteIndex4 + 1);
-        int quoteIndex5 = fourthQuoteRemoved.indexOf("\"");
-        String fifthQuoteRemoved = fourthQuoteRemoved.substring(quoteIndex5 + 1);
-        int quoteIndex6 = fifthQuoteRemoved.indexOf("\"");
-        String ds5version = fifthQuoteRemoved.substring(0, quoteIndex6);
+        //int quoteIndex5 = fourthQuoteRemoved.indexOf("\"");
+        //String fifthQuoteRemoved = fourthQuoteRemoved.substring(quoteIndex5 + 1);
+        //int quoteIndex6 = fifthQuoteRemoved.indexOf("\"");
+        //String ds5version = fifthQuoteRemoved.substring(0, quoteIndex6);
+        
+        int commaIndex = fourthQuoteRemoved.indexOf(",");
+        String ds5version = fourthQuoteRemoved.substring(commaIndex + 1).trim();
+        
         //System.out.println("ds5version: " + ds5version);
         
         //StringTokenizer tokenizer = new StringTokenizer(suffixTokens[0], ",");
