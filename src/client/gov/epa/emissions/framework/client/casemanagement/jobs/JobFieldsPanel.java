@@ -392,7 +392,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         Date completeDate = job.getRunCompletionDate();
 
         this.userLabel.setText(user == null ? "" : user.getName());
-        this.queID.setText(job.getIdInQueue() + "");
+        this.queID.setText(job.getIdInQueue() == null ? "" : job.getIdInQueue());
         this.start.setText(startDate == null ? "" : EmfDateFormat.format_MM_DD_YYYY_HH_mm(startDate));
         this.complete.setText(completeDate == null ? "" : EmfDateFormat.format_MM_DD_YYYY_HH_mm(completeDate));
         this.runNote.setText(job.getRunNotes());

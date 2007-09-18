@@ -57,8 +57,8 @@ public class CaseJobsRowSource implements RowSource {
         return job.getPath();
     }
     
-    private Integer getIDInQ(CaseJob job) {
-        return new Integer(job.getIdInQueue());
+    private String getIDInQ(CaseJob job) {
+        return job.getIdInQueue();
     }
 
     private String getQOpt(CaseJob job) {

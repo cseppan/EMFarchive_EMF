@@ -96,4 +96,8 @@ WITHOUT OIDS;
 -- cases.job_dependencies
 
 -- 9/17/2007 map queue id to cases.case_jobs table
-ALTER TABLE cases.cases_casejobs ADD COLUMN q_id int8;
+--ALTER TABLE cases.cases_casejobs ADD COLUMN q_id int8 DEFAULT 0;
+
+-- 9/18/2007 change the q_id column to string type
+ALTER TABLE cases.cases_casejobs DROP COLUMN q_id;
+ALTER TABLE cases.cases_casejobs ADD COLUMN q_id VARCHAR(255);

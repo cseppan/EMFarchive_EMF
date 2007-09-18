@@ -223,7 +223,7 @@ CREATE TABLE cases.cases_casejobs
   que_option varchar(255),
   path varchar(255),
   job_key text,
-  q_id int8,
+  q_id varchar(255) ,
   UNIQUE (case_id, name)
 )
 WITHOUT OIDS;
