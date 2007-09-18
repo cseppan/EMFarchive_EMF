@@ -111,7 +111,6 @@ public class StrategyLoader extends AbstractStrategyLoader {
                             resultSet.getDouble("ANN_EMIS"), true, 
                             true);
                     
-                    System.out.println("recordGenerator.getRecord");
                     totalCost += recordGenerator.totalCost() != null ? recordGenerator.totalCost() : 0.0;
                     if (poll.equals(controlStrategy.getTargetPollutant()))
                         totalReduction += recordGenerator.reducedEmission();
