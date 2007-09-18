@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.services.cost.analysis.common.Type3CostEquati
 import gov.epa.emissions.framework.services.cost.analysis.common.Type4CostEquation;
 import gov.epa.emissions.framework.services.cost.analysis.common.Type5CostEquation;
 import gov.epa.emissions.framework.services.cost.analysis.common.Type6CostEquation;
+import gov.epa.emissions.framework.services.cost.analysis.common.Type8CostEquation;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
@@ -316,6 +317,58 @@ public class EquationTypeTest extends ServiceTestCase {
             e.printStackTrace();
         } 
     }
+    
+    public void testEquationType8() throws Exception {
+        Type8CostEquation type8 = new Type8CostEquation(discountRate);
+        
+//        Double designCapacity = 150.0;
+        
+        type8.setUp(reducedEmission, buildBestMeasureEffRecord(15, 0.2, 
+                new ControlMeasureEquation[] {
+                buildEquation("Type 8", "Typical Capital Control Cost Factor", 110487.6),
+                buildEquation("Type 8", "Typical O&M Control Cost Factor", 0.423),
+                buildEquation("Type 8", "Typical Default CPT Factor", 3440.9),
+                buildEquation("Type 8", "Typical Default CPT Factor - O&M", 0.7337),
+                buildEquation("Type 8", "Typical Default CPT Factor - Annualized", 0.7337)
+                    }
+                ), minStackFlowRate);
+
+        try {
+            System.out.println("begin type 8 test --------------------");
+             double operatingCostResult = type8.getOperationMaintenanceCost();
+             double expectedOperatingCost = 34901.9629;
+             
+             double annualCost = type8.getAnnualCost();
+             double expectdAnnualCost = 135915.8821;
+             
+             double capitalCost = type8.getCapitalCost();
+             double expectedCapitalCost = 920026.0886;
+             
+             double annualizedCapitalCost = type8.getAnnualizedCapitalCost();
+             double expectedAnnualizedCCost = 101013.9191;
+             
+             double computedCPT = type8.getComputedCPT();
+             double expectedComputedCPT = 135.9158821;
+            
+             assertTrue("Check Type 8 operating and maintenance cost", Math.abs(operatingCostResult - expectedOperatingCost) < tolerance);
+             assertTrue("Check Type 8 annual cost", Math.abs(annualCost - expectdAnnualCost) < tolerance);
+             assertTrue("Check Type 8 capital cost", Math.abs(capitalCost - expectedCapitalCost) < tolerance);
+             assertTrue("Check Type 8 annualized cost", Math.abs(annualizedCapitalCost - expectedAnnualizedCCost) < tolerance);
+             assertTrue("Check Type 8 computed CPT", Math.abs(computedCPT - expectedComputedCPT) < tolerance);
+             
+             double capRecFactor1 = type8.getCapRecFactor(15, 0.2);
+             double capRecFactor2 = type8.getCapRecFactor(0, 0.2);
+             double expCapRecFactor1 = 0.1098;
+             double expCapRecFactor2 = 0.2;
+             
+             assertTrue("Check Type 8 capital recovery factor with equipment life=15 ", Math.abs(capRecFactor1 - expCapRecFactor1) < tolerance);
+             assertTrue("Check Type 8 capital recovery factor with equipment life=0 ", Math.abs(capRecFactor2 - expCapRecFactor2) < tolerance);
+             System.out.println("end type 8 test --------------------");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+    }
+    
     
     private BestMeasureEffRecord buildBestMeasureEffRecord(float equipmentLife, Double capRecFactor) throws EmfException {
         
