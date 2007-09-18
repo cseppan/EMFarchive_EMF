@@ -65,7 +65,11 @@ public class CaseServiceImpl implements CaseService {
 
     }
 
+    @Override
     protected void finalize() throws Throwable {
+        this.sessionFactory = null;
+        this.dbServer.disconnect();
+        dbServer=null;
         super.finalize();
     }
 
@@ -445,5 +449,6 @@ public class CaseServiceImpl implements CaseService {
     public JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException {
         return getCaseService().getJobMessages(caseId, jobId);
     }
+
 
 }

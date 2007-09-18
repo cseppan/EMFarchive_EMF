@@ -9,7 +9,7 @@
           password="emf"
           maxActive="100"
           maxIdle="30"
-          maxWait="10000"
+          maxWait="-1"
           removeAbandoned="true"
           removeAbandonedTimeout="1"
           logAbandoned="true"

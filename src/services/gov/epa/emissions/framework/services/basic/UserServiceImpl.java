@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.Date;
 import java.util.List;
@@ -20,13 +21,35 @@ public class UserServiceImpl implements UserService {
 
     private UserDAO dao;
 
+    private static int svcCount = 0;
+
+    private String svcLabel = null;
+
+    public String myTag() {
+        if (svcLabel == null) {
+            svcCount++;
+            this.svcLabel = "#" + svcCount + "-" + getClass().getName() + "-" + new Date().getTime();
+        }
+
+        return "For label: " + svcLabel + " # of active objects of this type= " + svcCount;
+    }
+
     public UserServiceImpl() {
         this(HibernateSessionFactory.get());
+        myTag();
+
+        if (DebugLevels.DEBUG_1)
+            System.out.println(">>>> " + myTag());
+
     }
 
     public UserServiceImpl(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         dao = new UserDAO();
+        myTag();
+
+        if (DebugLevels.DEBUG_1)
+            System.out.println(">>>> " + myTag());
     }
 
     public void authenticate(String username, String password) throws EmfException {
@@ -143,7 +166,7 @@ public class UserServiceImpl implements UserService {
 
     public String getEmfVersion() throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             EmfProperty property = new EmfPropertiesDAO().getProperty("EMF-version", session);
             return property == null ? null : property.getValue();
@@ -154,5 +177,22 @@ public class UserServiceImpl implements UserService {
             session.close();
         }
     }
+
+    @Override
+    protected void finalize() throws Throwable {
+        this.sessionFactory = null;
+        super.finalize();
+    }
+
+    // public String getEmfVersion() throws EmfException {
+    //        
+    // try {
+    // EmfProperty property = new EmfPropertiesDAO(sessionFactory).getProperty("EMF-version");
+    // return property == null ? null : property.getValue();
+    // } catch (Exception e) {
+    // LOG.error("Could not get EMF version info.", e);
+    // throw new EmfException("Could not get EMF version info.");
+    // }
+    // }
 
 }
