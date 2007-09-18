@@ -23,12 +23,11 @@ public class RecordGeneratorFactory {
     }
 
     public RecordGenerator getRecordGenerator() {
-
         if (datasetType.getName().equalsIgnoreCase("ORL Nonpoint Inventory (ARINV)"))
             return new NonpointRecordGenerator(result, decFormat, costEquationsFactory);
         else if (datasetType.getName().equalsIgnoreCase("ORL Point Inventory (PTINV)") ||
                 datasetType.getName().equalsIgnoreCase("ORL CoST Point Inventory (PTINV)"))
-            return new PointRecordGenerator(result, decFormat, costEquationsFactory);
+            return new PointRecordGenerator(datasetType, result, decFormat, costEquationsFactory);
         else if (datasetType.getName().equalsIgnoreCase("ORL Onroad Inventory (MBINV)"))
             return new OnroadRecordGenerator(result, decFormat, costEquationsFactory);
         else if (datasetType.getName().equalsIgnoreCase("ORL Nonroad Inventory (ARINV)"))

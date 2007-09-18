@@ -134,13 +134,13 @@ public class RetrieveControlMeasure {
                 "null as avgruleff, null as avgrulpen, " +
                 "cm.equipment_life, cm.data_souce, cms.sector_id " +
                 "from emf.control_measures cm " +
-                "left outer join emf.control_measurs_sectors cms " +
+                "left outer join emf.control_measure_sectors cms " +
                 "on cms.control_measure_id = cm.id " +
                 "left outer join emf.sectors s " +
                 "on s.id = cms.sector_id " +
 //                "left outer join ( " +
 //                "select cms.control_measure_id, s.name || '...' as SCCNameList " +
-//                "from control_measurs_sectors cms " +
+//                "from control_measure_sectors cms " +
 //                "inner join sectors s " +
 //                "on s.id = cms.sector_id " +
 //                "limit 1) scclist " +
@@ -185,13 +185,13 @@ public class RetrieveControlMeasure {
                 "avg_rule_effectiveness, avg_rule_penetration, " +
                 "cm.equipment_life, cm.data_souce, cms.sector_id " +
                 "from emf.control_measures cm " +
-                "left outer join emf.control_measurs_sectors cms " +
+                "left outer join emf.control_measure_sectors cms " +
                 "on cms.control_measure_id = cm.id " +
                 "left outer join emf.sectors s " +
                 "on s.id = cms.sector_id " +
 //                "left outer join ( " +
 //                "select cms.control_measure_id, s.name || '...' as SCCNameList " +
-//                "from control_measurs_sectors cms " +
+//                "from control_measure_sectors cms " +
 //                "inner join sectors s " +
 //                "on s.id = cms.sector_id " +
 //                "limit 1) scclist " +
@@ -243,13 +243,13 @@ public class RetrieveControlMeasure {
                 "null as avgruleff, null as avgrulpen, " +
                 "cm.equipment_life, cm.data_souce " +
                 "from emf.control_measures cm " +
-                "left outer join emf.control_measurs_sectors cms " +
+                "left outer join emf.control_measure_sectors cms " +
                 "on cms.control_measure_id = cm.id " +
                 "left outer join emf.sectors s " +
                 "on s.id = cms.sector_id " +
 //                "left outer join ( " +
 //                "select cms.control_measure_id, s.name || '...' as SCCNameList " +
-//                "from control_measurs_sectors cms " +
+//                "from control_measure_sectors cms " +
 //                "inner join sectors s " +
 //                "on s.id = cms.sector_id " +
 //                "limit 1) scclist " +
@@ -296,13 +296,13 @@ public class RetrieveControlMeasure {
         "avg_rule_effectiveness, avg_rule_penetration, " +
         "cm.equipment_life, cm.data_souce, cms.sector_id " +
         "from emf.control_measures cm " +
-        "left outer join emf.control_measurs_sectors cms " +
+        "left outer join emf.control_measure_sectors cms " +
         "on cms.control_measure_id = cm.id " +
         "left outer join emf.sectors s " +
         "on s.id = cms.sector_id " +
 //        "left outer join ( " +
 //        "select cms.control_measure_id, s.name || '...' as SCCNameList " +
-//        "from control_measurs_sectors cms " +
+//        "from control_measure_sectors cms " +
 //        "inner join sectors s " +
 //        "on s.id = cms.sector_id " +
 //        "limit 1) scclist " +

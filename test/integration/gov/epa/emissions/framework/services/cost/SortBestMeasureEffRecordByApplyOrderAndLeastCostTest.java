@@ -15,7 +15,7 @@ public class SortBestMeasureEffRecordByApplyOrderAndLeastCostTest extends Servic
     private CostYearTable costYearTable;
 
     protected void doSetUp() throws Exception {
-        costYearTable = new ControlMeasureServiceImpl(sessionFactory, dbServerFactory).getCostYearTable(1999);
+        costYearTable = new ControlMeasureServiceImpl(sessionFactory, dbServerFactory).getCostYearTable(2006);
     }
 
     protected void doTearDown() throws Exception {
@@ -26,18 +26,18 @@ public class SortBestMeasureEffRecordByApplyOrderAndLeastCostTest extends Servic
 
         List<BestMeasureEffRecord> bestMeasureEffRecordList = new ArrayList<BestMeasureEffRecord>();
 
-        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 1.0, 1999, 1000);
-        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 1.1, 1999, 1100);
-        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 1.0, 1999, 900);
-        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 1.0, 1999, 1000);
-        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 2.1, 1999, 2100);
-        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 3.1, 1999, 1100);
-        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 0.9, 1999, 0);
-        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 4.1, 1999, 1100);
-        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 0.1, 1999, 1);
-        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 0.1, 1999, 0);
-        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 0.1, 1999, 0);
-        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 0.1, 1999, .1);
+        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 1.0, 2006, 1000);
+        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 1.1, 2006, 1100);
+        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 1.0, 2006, 900);
+        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 1.0, 2006, 1000);
+        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 2.1, 2006, 2100);
+        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 3.1, 2006, 1100);
+        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 0.9, 2006, 0);
+        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 4.1, 2006, 1100);
+        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 0.1, 2006, 1);
+        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 0.1, 2006, 0);
+        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 0.1, 2006, 0);
+        addBestMeasureEffRecordToList(bestMeasureEffRecordList, 0.1, 2006, .1);
 
         Collections.sort(bestMeasureEffRecordList, new SortBestMeasureEffRecordByApplyOrderAndLeastCost());
         for (int i=0; i < bestMeasureEffRecordList.size(); i++) {

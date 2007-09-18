@@ -47,7 +47,7 @@
             class="gov.epa.emissions.framework.services.cost.ControlMeasureClass"
             column="cm_class_id"/> 
   
- 		<array name="sectors" table="control_measurs_sectors" cascade="save-update">
+ 		<array name="sectors" table="control_measure_sectors" cascade="save-update">
     		<key column="control_measure_id" not-null="true"/>
     		<list-index column="list_index"/>
     		<many-to-many class="gov.epa.emissions.commons.data.Sector" column="sector_id"/>

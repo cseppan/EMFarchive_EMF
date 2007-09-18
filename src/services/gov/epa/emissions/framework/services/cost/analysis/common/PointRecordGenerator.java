@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
 import gov.epa.emissions.commons.Record;
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 
@@ -26,11 +27,11 @@ public class PointRecordGenerator implements RecordGenerator {
     private DecimalFormat decFormat;
     private CostEquationFactory costEquationsFactory;
     
-    public PointRecordGenerator(ControlStrategyResult result, DecimalFormat decFormat, CostEquationFactory costEquationsFactory) {
+    public PointRecordGenerator(DatasetType datasetType, ControlStrategyResult result, DecimalFormat decFormat, CostEquationFactory costEquationsFactory) {
         this.strategyResult = result;
         this.decFormat = decFormat;
         this.costEquationsFactory = costEquationsFactory;
-        this.isCostPointDatasetType = result.getInputDataset().getDatasetType().getName().equalsIgnoreCase("ORL CoST Point Inventory (PTINV)");
+        this.isCostPointDatasetType = datasetType.getName().equalsIgnoreCase("ORL CoST Point Inventory (PTINV)");
     }
 
     public Record getRecord(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions,  boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {
