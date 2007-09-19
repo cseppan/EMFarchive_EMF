@@ -49,7 +49,7 @@ public class CMSCCRecordReader {
         if (errorCount >= errorLimit) throw new ImporterException("The maximum allowable error limit (" + errorLimit + ") has been reached while parsing the control measure SCC records.");
     }
 
-    private boolean constraintCheck(ControlMeasure cm,String[] tokens, StringBuffer sb) {
+    private boolean constraintCheck(ControlMeasure cm, String[] tokens, StringBuffer sb) {
 //        Scc scct = new Scc();
 //        scct.setControlMeasureId(cm.getId());
 //        scct.setCode(tokens[1]);
@@ -61,7 +61,7 @@ public class CMSCCRecordReader {
 //        sccSet.add(scct);
         String sccString=tokens[0].toLowerCase()+tokens[1].toLowerCase();
         if (sccList.contains(sccString)){ 
-            sb.append(format(" SCC already in the file: "+ tokens[0]));
+            sb.append(format(" SCC already in the file: Abbreviation = " + tokens[0] + " SCC = " + tokens[1]));
             return false;
         }
         sccList.add(sccString);
