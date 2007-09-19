@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
@@ -87,12 +88,12 @@ public class ManagedCaseService {
 
     protected Session session = null;
 
-//    private Session getSession() {
-//        if (session == null) {
-//            session = sessionFactory.getSession();
-//        }
-//        return session;
-//    }
+    // private Session getSession() {
+    // if (session == null) {
+    // session = sessionFactory.getSession();
+    // }
+    // return session;
+    // }
 
     public ManagedCaseService(DbServer dbServer, HibernateSessionFactory sessionFactory) {
         this.dbServer = dbServer;
@@ -694,8 +695,8 @@ public class ManagedCaseService {
 
                 CaseInput cip = iter.next();
                 badCipName = cip.getName();
-//                if (DebugLevels.DEBUG_9)
-//                    System.out.println(cip.getCaseID());
+                // if (DebugLevels.DEBUG_9)
+                // System.out.println(cip.getCaseID());
                 cipDataset = cip.getDataset();
 
                 if (cipDataset == null) {
@@ -1454,7 +1455,7 @@ public class ManagedCaseService {
             dao.updateCaseJob(caseJob);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
-        } 
+        }
     }
 
     public synchronized void updateCaseJob(User user, CaseJob job) throws EmfException {
@@ -1655,22 +1656,34 @@ public class ManagedCaseService {
         EmfDataset dataset = input.getDataset();
         InputEnvtVar envvar = input.getEnvtVars();
         SubDir subdir = input.getSubdirObj();
-        // check if dataset or env variable is null, if so e
+        String fullPath = null;
+        String setenvLine = null;
+       
+        // check if dataset is null, if so exception
         if (dataset == null) {
             throw new EmfException("Input (" + input.getName() + ") must have a dataset");
         }
 
-        // Create a full path to the input file
-        String fullPath = expSvc.getCleanDatasetName(input.getDataset(), input.getVersion());
-        if ((subdir != null) && !(subdir.toString()).equals("")) {
-            fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + input.getSubdirObj()
-                    + System.getProperty("file.separator") + fullPath;
+        // check for external dataset
+        if (dataset.isExternal()) {
+            // set the full path to the first external file in the dataset
+            ExternalSource[] externalDatasets = dataset.getExternalSources();
+            if (externalDatasets.length == 0) {
+                throw new EmfException("Input (" + input.getName() + ") must have at least 1 external dataset");
+            }
+            fullPath = externalDatasets[0].getDatasource();
         } else {
-            fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + fullPath;
+            // internal dataset
+            // Create a full path to the input file
+            fullPath = expSvc.getCleanDatasetName(input.getDataset(), input.getVersion());
+            if ((subdir != null) && !(subdir.toString()).equals("")) {
+                fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + input.getSubdirObj()
+                        + System.getProperty("file.separator") + fullPath;
+            } else {
+                fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + fullPath;
+            }
         }
-
-        String setenvLine = null;
-        if (envvar == null) {
+         if (envvar == null) {
             // if no environmental variable, just created a commented
             // line w/ input name = fullPath
             setenvLine = this.runComment + " " + input.getName() + " = " + fullPath + eolString;
@@ -1890,14 +1903,14 @@ public class ManagedCaseService {
         if (caseObj.getAbbreviation() != null) {
             sbuf.append(shellSetenv("CASE", caseObj.getAbbreviation().getName()));
         }
-        //      Need to have quotes around model name b/c could be more than one word
+        // Need to have quotes around model name b/c could be more than one word
         if (caseObj.getModel() != null) {
-            String modelName = '"' + caseObj.getModel().getName() + '"';  
+            String modelName = '"' + caseObj.getModel().getName() + '"';
             sbuf.append(shellSetenv("MODEL_LABEL", modelName));
         }
         if (caseObj.getGrid() != null) {
             sbuf.append(shellSetenv("IOAPI_GRIDNAME_1", caseObj.getGrid().getName()));
-        }        
+        }
         if (caseObj.getGridResolution() != null) {
             sbuf.append(shellSetenv("EMF_GRID", caseObj.getGridResolution().getName()));
         }
@@ -1908,19 +1921,20 @@ public class ManagedCaseService {
             sbuf.append(shellSetenv("EMF_SPC", caseObj.getSpeciation().getName()));
         }
         if (caseObj.getEmissionsYear() != null) {
-            sbuf.append(shellSetenv("BASE_YEAR", caseObj.getEmissionsYear().getName()));  // Should base year == emissions year ????
+            sbuf.append(shellSetenv("BASE_YEAR", caseObj.getEmissionsYear().getName())); // Should base year ==
+            // emissions year ????
         }
-            //        sbuf.append(shellSetenv("BASE_YEAR", String.valueOf(caseObj.getBaseYear())));
-        if (caseObj.getFutureYear() != 0) { //CHECK: should it be included if == 0 ???
+        // sbuf.append(shellSetenv("BASE_YEAR", String.valueOf(caseObj.getBaseYear())));
+        if (caseObj.getFutureYear() != 0) { // CHECK: should it be included if == 0 ???
             sbuf.append(shellSetenv("FUTURE_YEAR", String.valueOf(caseObj.getFutureYear())));
         }
-        //      Need to have quotes around start and end date b/c could be more than one word  'DD/MM/YYYY HH:MM'
+        // Need to have quotes around start and end date b/c could be more than one word 'DD/MM/YYYY HH:MM'
         if (caseObj.getStartDate() != null) {
-            String startString = '"' + caseObj.getStartDate().toString() + '"';  
+            String startString = '"' + caseObj.getStartDate().toString() + '"';
             sbuf.append(shellSetenv("EPI_STDATE_TIME", startString));
         }
         if (caseObj.getEndDate() != null) {
-            String endString = '"' + caseObj.getEndDate().toString() + '"';  
+            String endString = '"' + caseObj.getEndDate().toString() + '"';
             sbuf.append(shellSetenv("EPI_ENDATE_TIME", endString));
         }
 
@@ -1981,7 +1995,7 @@ public class ManagedCaseService {
         // print executable
         sbuf.append(eolString);
         sbuf.append(this.runComment + " job executable" + eolString);
-        sbuf.append("$EMF_CLIENT -k $EMF_JOBKEY -x " + execFull + " -m \"Running top level script\"" + eolString);
+        sbuf.append("$EMF_CLIENT -k $EMF_JOBKEY -x " + execFull + " -m \"Running top level script for job: " + jobName + "\"" + eolString);
         sbuf.append(execFullArgs);
 
         // add a test of the status and send info through the
