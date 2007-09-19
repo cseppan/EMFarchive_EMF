@@ -273,31 +273,32 @@ public class EquationTypeTest extends ServiceTestCase {
         
         Double designCapacity = 150.0;
         
-        type2.setUp(reducedEmission, buildBestMeasureEffRecord(15, 0.2, 
+        type2.setUp(reducedEmission, buildBestMeasureEffRecord(20, 0.2, 
                 new ControlMeasureEquation[] {
                 buildEquation("Type 2", "Capital Cost Multiplier", 110487.6),
                 buildEquation("Type 2", "Capital Cost Exponent", 0.423),
                 buildEquation("Type 2", "Annual Cost Multiplier", 3440.9),
                 buildEquation("Type 2", "Annual Cost Exponent", 0.7337)
                     }
-                ), designCapacity, "MMBtu", "MMBtu");
+                ), designCapacity, "MMBtu",
+                "hr");
 
         try {
             System.out.println("begin type 2 test --------------------");
              double operatingCostResult = type2.getOperationMaintenanceCost();
-             double expectedOperatingCost = 34901.9629;
+             double expectedOperatingCost = 3558.8;
              
              double annualCost = type2.getAnnualCost();
-             double expectdAnnualCost = 135915.8821;
+             double expectdAnnualCost = 55233.36;
              
              double capitalCost = type2.getCapitalCost();
-             double expectedCapitalCost = 920026.0886;
+             double expectedCapitalCost = 547441.01;
              
              double annualizedCapitalCost = type2.getAnnualizedCapitalCost();
-             double expectedAnnualizedCCost = 101013.9191;
+             double expectedAnnualizedCCost = 51674.558;
              
              double computedCPT = type2.getComputedCPT();
-             double expectedComputedCPT = 135.9158821;
+             double expectedComputedCPT = 55.233;
             
              assertTrue("Check Type 2 operating and maintenance cost", Math.abs(operatingCostResult - expectedOperatingCost) < tolerance);
              assertTrue("Check Type 2 annual cost", Math.abs(annualCost - expectdAnnualCost) < tolerance);

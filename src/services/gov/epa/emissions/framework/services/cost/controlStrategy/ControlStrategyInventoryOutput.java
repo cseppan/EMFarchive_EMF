@@ -218,34 +218,25 @@ public class ControlStrategyInventoryOutput {
         boolean costPointDatasetType = inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL CoST Point Inventory (PTINV)");
         
         String sql = "update " + qualifiedTable(outputTable, datasource) + " as o "
-        + "set ceff = case when ann_emis <> 0 then (1 - b.final_emissions / ann_emis) * 100 else 0 end, "
-        + "ann_emis = b.final_emissions, "
-        + "reff = 100 "
-        + (!pointDatasetType && !costPointDatasetType? ", rpen = 100 " : " ")
-        //ONLY APPLICABLE for new ORL CoST Point dataset type
-        + (costPointDatasetType? ", current_cost = annual_cost " : " ")
-        + (costPointDatasetType? ", cumulative_cost = case when cumulative_cost is null and annual_cost is null then null else coalesce(cumulative_cost, 0) + coalesce(annual_cost, 0) end " : " ")
-        + (costPointDatasetType? ", control_measures = case when control_measures is null then cm_abbrev_list else control_measures || '& ' || cm_abbrev_list end " : " ")
-        + (costPointDatasetType? ", pct_reduction = case when pct_reduction is null then percent_reduction_list else pct_reduction || '& ' || percent_reduction_list end " : " ")
-        + "FROM ( "
-        + "SELECT source_id, max(final_emissions) as final_emissions "
-        //ONLY APPLICABLE for new ORL CoST Point dataset type
-        + (costPointDatasetType ? ", sum(annual_cost) as annual_cost " : " ")
-        + (costPointDatasetType ? ", public.concatenate_with_ampersand(cm_abbrev) as cm_abbrev_list " : " ")
-        + (costPointDatasetType ? ", public.concatenate_with_ampersand(cast(percent_reduction as varchar)) as percent_reduction_list " : " ")
-        + "FROM " + qualifiedTable(detailResultTable, datasource) + " "
-        + "group by source_id "
-        + ") as b "
-        + "WHERE o.record_id = b.source_id;";
-
-//        //FIXME:  Need to figure out a way to update the fields with the order the measure was applied, 
-//        if (costPointDatasetType) {
-//            sql += "update " + qualifiedTable(outputTable, datasource) + " as i "
-//            + "set CONTROL_MEASURES = case when i.CONTROL_MEASURES is null then dr.cm_abbrev else i.CONTROL_MEASURES || '|' || dr.cm_abbrev end, "
-//            + "PCT_REDUCTION = case when i.PCT_REDUCTION is null then cast(dr.percent_reduction as varchar) else i.PCT_REDUCTION || '|' || cast(dr.percent_reduction as varchar) end "
-//            + "FROM qualifiedTable(detailResultTable, datasource) as dr "
-//            + "where i.record_id = dr.source_id;";
-//        }
+            + "set ceff = case when ann_emis <> 0 then (1 - b.final_emissions / ann_emis) * 100 else 0 end, "
+            + "ann_emis = b.final_emissions, "
+            + "reff = 100 "
+            + (!pointDatasetType && !costPointDatasetType? ", rpen = 100 " : " ")
+            //ONLY APPLICABLE for new ORL CoST Point dataset type
+            + (costPointDatasetType? ", current_cost = annual_cost " : " ")
+            + (costPointDatasetType? ", cumulative_cost = case when cumulative_cost is null and annual_cost is null then null else coalesce(cumulative_cost, 0) + coalesce(annual_cost, 0) end " : " ")
+            + (costPointDatasetType? ", control_measures = case when control_measures is null or length(control_measures) = 0 then cm_abbrev_list else control_measures || '& ' || cm_abbrev_list end " : " ")
+            + (costPointDatasetType? ", pct_reduction = case when pct_reduction is null or length(pct_reduction) = 0 then percent_reduction_list else pct_reduction || '& ' || percent_reduction_list end " : " ")
+            + "FROM ( "
+            + "SELECT source_id, max(final_emissions) as final_emissions "
+            //ONLY APPLICABLE for new ORL CoST Point dataset type
+            + (costPointDatasetType ? ", sum(annual_cost) as annual_cost " : " ")
+            + (costPointDatasetType ? ", public.concatenate_with_ampersand(cm_abbrev) as cm_abbrev_list " : " ")
+            + (costPointDatasetType ? ", public.concatenate_with_ampersand(cast(percent_reduction as varchar)) as percent_reduction_list " : " ")
+            + "FROM " + qualifiedTable(detailResultTable, datasource) + " "
+            + "group by source_id "
+            + ") as b "
+            + "WHERE o.record_id = b.source_id;";
         return sql;
     }
 

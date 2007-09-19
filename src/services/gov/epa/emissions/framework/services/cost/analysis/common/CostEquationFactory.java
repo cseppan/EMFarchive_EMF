@@ -93,12 +93,12 @@ public class CostEquationFactory {
                 
                 if (equations[0].getEquationType().getName().equals("Type 2")) {
                     //evaluate inputs, if they missing, use the default
-                    //design capacity must be less than or equal to 2000 
+                    //design capacity must be less than or equal to 2000 MMBTU/hr (or 586.1665 MW))
                     if (designCapacity != null && designCapacity != 0.0 
                             && type2CostEquation.convertDesignCapacity(designCapacity, designCapacityUnitNumerator, 
                                     designCapacityUnitDenominator) != null
                             && type2CostEquation.convertDesignCapacity(designCapacity, designCapacityUnitNumerator, 
-                                    designCapacityUnitDenominator) <= 2000.0) {
+                                    designCapacityUnitDenominator) <= 586.1665) {
                         type2CostEquation.setUp(reducedEmission, bestMeasureEffRecord, 
                                 designCapacity, designCapacityUnitNumerator,
                                 designCapacityUnitDenominator);

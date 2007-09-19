@@ -78,9 +78,9 @@ public class Type2CostEquation implements CostEquation {
             //convert numerator unit
             if (designCapacityUnitNumerator.equalsIgnoreCase("MMBtu") 
                     || designCapacityUnitNumerator.equalsIgnoreCase("E6BTU")) 
-                convertedDesignCapacity = 3.412 * designCapacity;
+                convertedDesignCapacity = designCapacity / 3.412;
             if (designCapacityUnitNumerator.equalsIgnoreCase("Btu")) 
-                convertedDesignCapacity = 3.412 * designCapacity / 1000000.0;
+                convertedDesignCapacity = designCapacity / 3.412 / 1000000.0;
             if (designCapacityUnitNumerator.equalsIgnoreCase("hp")
                     || designCapacityUnitNumerator.equalsIgnoreCase("BLRHP")) 
                 convertedDesignCapacity = designCapacity / 1341.02;
