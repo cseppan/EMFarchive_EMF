@@ -2151,6 +2151,36 @@ public class ManagedCaseService {
         }
     }
 
+    public String[] getAllValidJobs(int jobId) throws EmfException {
+        try {
+            return dao.getAllValidJobs(jobId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get all valid jobs for job (id=" + jobId + ").\n" + e.getMessage());
+            throw new EmfException("Could not get all valid jobs for job (id=" + jobId + ").\n");
+        } 
+    }
+
+    public String[] getDependentJobs(int jobId) throws EmfException {
+        try {
+            return dao.getDependentJobs(jobId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get all dependent jobs for job (id=" + jobId + ").\n" + e.getMessage());
+            throw new EmfException("Could not get all dependent jobs for job (id=" + jobId + ").\n");
+        } 
+    }
+
+    public int[] getJobIds(int caseId, String[] jobNames) throws EmfException {
+        try {
+            return dao.getJobIds(caseId, jobNames);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get all job ids for job (" + jobNames[0] + ", etc.).\n" + e.getMessage());
+            throw new EmfException("Could not get all job ids for job (" + jobNames[0] + ", etc.).\n");
+        } 
+    }
+    
     public void finalize() throws Throwable {
         this.session = null;
         super.finalize();

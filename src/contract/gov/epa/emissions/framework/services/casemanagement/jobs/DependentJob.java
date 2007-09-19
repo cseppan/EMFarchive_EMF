@@ -7,7 +7,11 @@ public class DependentJob implements Serializable {
     private int jobId;
     
     public DependentJob(){
-        super();
+        //
+    }
+
+    public DependentJob(int id){
+        this.jobId = id;
     }
     
     public int getJobId() {

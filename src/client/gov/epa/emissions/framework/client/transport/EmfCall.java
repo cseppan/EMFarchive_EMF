@@ -102,6 +102,10 @@ public class EmfCall {
     public void setIntegerReturnType() {
         mappings.setIntegerReturnType(call);
     }
+
+    public void setIntArrayReturnType() {
+        mappings.setIntArrayReturnType(call);
+    }
     
     public void addFileArrayParam() {
         mappings.addFileArrayParam(call);

@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.DependentJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
@@ -134,6 +135,24 @@ public class JobFieldsPanelPresenter {
 
     public void doValidateFields() throws EmfException {
         view.setFields(); // FIXME: should do more check here
+    }
+
+    public String[] getAllValidJobs(int jobId) throws EmfException {
+        return caseService().getAllValidJobs(jobId);
+    }
+
+    public String[] getDependentJobs(int jobId) throws EmfException {
+        return caseService().getDependentJobs(jobId);
+    }
+
+    public DependentJob[] dependentJobs(String[] jobNames) throws EmfException {
+        int[] jobIds = caseService().getJobIds(caseObj.getId(), jobNames);
+        DependentJob[] dependentJobs = new DependentJob[jobIds.length];
+        
+        for (int i = 0; i < jobIds.length; i++)
+            dependentJobs[i] = new DependentJob(jobIds[i]);
+        
+        return dependentJobs;
     }
 
 }

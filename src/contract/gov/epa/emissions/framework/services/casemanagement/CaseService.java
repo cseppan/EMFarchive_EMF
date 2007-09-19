@@ -78,7 +78,15 @@ public interface CaseService {
     
     CaseJob addCaseJob(CaseJob job) throws EmfException;
     
+    CaseJob getCaseJob(int jobId) throws EmfException;
+    
     CaseJob[] getCaseJobs(int caseId) throws EmfException;
+    
+    int[] getJobIds(int caseId, String[] jobNames) throws EmfException;
+    
+    String[] getDependentJobs(int jobId) throws EmfException;
+    
+    String[] getAllValidJobs(int jobId) throws EmfException;
 
     JobRunStatus[] getJobRunStatuses() throws EmfException;
     
@@ -90,8 +98,6 @@ public interface CaseService {
 
     Host addHost(Host host) throws EmfException;
         
-    CaseJob getCaseJob(int jobId) throws EmfException;
-
     Executable addExecutable(Executable exe) throws EmfException;
     
     ParameterEnvVar addParameterEnvVar(ParameterEnvVar envVar) throws EmfException;

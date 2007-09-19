@@ -11,6 +11,7 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.client.AddRemoveWidget;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -101,6 +102,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     private Case caseObj;
 
     private TextField jobOrder;
+    
+    private AddRemoveWidget dependentJobsList;
 
     private static String lastPath = "";
 
@@ -119,7 +122,12 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         container.add(nameNPurposPanel());
-        container.add(setupPanel());
+        
+        try {
+            container.add(setupPanel());
+        } catch (EmfException e) {
+            setError(e.getMessage());
+        }
 
         if (edit) {
             container.add(resultPanel());
@@ -163,11 +171,11 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         return panel;
     }
 
-    private JPanel setupPanel() {
+    private JPanel setupPanel() throws EmfException {
         JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        panel.add(leftSetupPanel(), BorderLayout.LINE_START);
-        panel.add(rightSetupPanel(), BorderLayout.LINE_END);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(leftSetupPanel());
+        panel.add(rightSetupPanel());
 
         if (edit)
             // panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.gray), "Job Setup",
@@ -181,6 +189,11 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
+        version = new TextField("version", job.getVersion() + "", 12);
+        version.setMaximumSize(new Dimension(300, 15));
+        changeablesList.addChangeable(version);
+        layoutGenerator.addLabelWidgetPair("Version:", version, panel);
+        
         args = new TextField("args", job.getArgs(), 12);
         changeablesList.addChangeable(args);
         layoutGenerator.addLabelWidgetPair("Arguments:", args, panel);
@@ -197,33 +210,28 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         changeablesList.addChangeable(jobOrder);
         layoutGenerator.addLabelWidgetPair("Job Order:", jobOrder, panel);
 
-        host = new EditableComboBox(new Host[] { job.getHost() });
-        host.setPrototypeDisplayValue(comboWidth);
-        addPopupMenuListener(host, "hosts");
-        changeablesList.addChangeable(host);
-        layoutGenerator.addLabelWidgetPair("Host:", host, panel);
-
         qoption = new TextField("qoption", job.getQueOptions(), 12);
         qoption.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(qoption);
         layoutGenerator.addLabelWidgetPair("Queue Options:", qoption, panel);
+        
+        String user = job.getUser() == null ? session.user().getName() : job.getUser().getName();
+        userLabel = new JLabel(user);
+        layoutGenerator.addLabelWidgetPair("User:", userLabel, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
     }
 
-    private Component rightSetupPanel() {
+    private Component rightSetupPanel() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        version = new TextField("version", job.getVersion() + "", 12);
-        version.setMaximumSize(new Dimension(300, 15));
-        changeablesList.addChangeable(version);
-        layoutGenerator.addLabelWidgetPair("Version:", version, panel);
+        layoutGenerator.addLabelWidgetPair("<html>Depends on:<br><br><br></html>", jobDependencyPanel(), panel);
 
         sector = new ComboBox(new Sector[] { job.getSector() == null ? new Sector("All sectors", "All sectors") : job
                 .getSector() });
@@ -232,15 +240,17 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         changeablesList.addChangeable(sector);
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
 
+        host = new EditableComboBox(new Host[] { job.getHost() });
+        host.setPrototypeDisplayValue(comboWidth);
+        addPopupMenuListener(host, "hosts");
+        changeablesList.addChangeable(host);
+        layoutGenerator.addLabelWidgetPair("Host:", host, panel);
+        
         status = new ComboBox(new JobRunStatus[] { job.getRunstatus() });
         status.setPrototypeDisplayValue(comboWidth);
         addPopupMenuListener(status, "status");
         changeablesList.addChangeable(status);
         layoutGenerator.addLabelWidgetPair("Run Status:", status, panel);
-
-        String user = job.getUser() == null ? session.user().getName() : job.getUser().getName();
-        userLabel = new JLabel(user);
-        layoutGenerator.addLabelWidgetPair("User:", userLabel, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
@@ -323,7 +333,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
     private JPanel resultPanel() {
         JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
         JPanel leftpanel = new JPanel(new SpringLayout());
         SpringLayoutGenerator leftlayout = new SpringLayoutGenerator();
@@ -362,8 +372,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
-        panel.add(leftpanel, BorderLayout.LINE_START);
-        panel.add(rightpanel, BorderLayout.LINE_END);
+        panel.add(leftpanel);
+        panel.add(rightpanel);
         // panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.gray), "Job Run
         // Results",
         // 1, 1, Font.getFont(Font.SANS_SERIF), Color.blue));
@@ -411,6 +421,13 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         job.setRunstatus((JobRunStatus) status.getSelectedItem());
         job.setVersion(Integer.parseInt(version.getText().trim()));
         job.setQueOptions(qoption.getText().trim());
+        Object[] objects = dependentJobsList.getObjects();
+        String[] jobNames = new String[objects.length];
+        
+        for (int i = 0; i < jobNames.length; i++)
+            jobNames[i] = objects[i].toString();
+        
+        job.setDependentJobs(presenter.dependentJobs(jobNames));
 
         if (edit) {
             job.setRunLog(lastMsg.getText());
@@ -533,6 +550,13 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     public CaseJob getJob() throws EmfException {
         presenter.doValidateFields();
         return this.job;
+    }
+    
+    private JPanel jobDependencyPanel() throws EmfException {
+        dependentJobsList = new AddRemoveWidget(presenter.getAllValidJobs(job.getId()), changeablesList, parent);
+        dependentJobsList.setObjects(presenter.getDependentJobs(job.getId()));
+        dependentJobsList.setPreferredSize(new Dimension(140,120));
+        return dependentJobsList;
     }
 
     private void clearMessage() {

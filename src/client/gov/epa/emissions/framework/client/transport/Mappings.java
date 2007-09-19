@@ -118,8 +118,6 @@ public class Mappings {
     public void addLongParam(Call call, String id) {
         call.addParameter(id, Constants.XSD_LONG, ParameterMode.IN);
     }
-
- 
     
     public void addIntParam(Call call) {
         Class cls = int.class;
@@ -129,6 +127,10 @@ public class Mappings {
     public void addIntArrayParam(Call call){
         Class cls = int[].class;
         call.addParameter("intArray",qname("intArray"),cls,ParameterMode.IN);
+    }
+    
+    public void setIntArrayReturnType(Call call) {
+        call.setReturnType(qname("intArray"));
     }
 
     public void addFileArrayParam(Call call){

@@ -450,5 +450,17 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getJobMessages(caseId, jobId);
     }
 
+    public String[] getAllValidJobs(int jobId) throws EmfException {
+        return getCaseService().getAllValidJobs(jobId);
+    }
+
+    public String[] getDependentJobs(int jobId) throws EmfException {
+        return getCaseService().getDependentJobs(jobId);
+    }
+
+    public int[] getJobIds(int caseId, String[] jobNames) throws EmfException {
+        return getCaseService().getJobIds(caseId, jobNames);
+    }
+
 
 }

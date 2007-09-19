@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.DependentJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
@@ -17,6 +18,8 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -38,7 +41,7 @@ public class CaseDAO {
         daoInit();
     }
 
-     public CaseDAO() {
+    public CaseDAO() {
         daoInit();
     }
 
@@ -307,6 +310,22 @@ public class CaseDAO {
         return hibernateFacade.get(CaseJob.class, crit, session);
     }
 
+    public List<CaseJob> getCaseJobs(int caseId) {
+        Session session = sessionFactory.getSession();
+        List<CaseJob> jobs = null;
+
+        try {
+            Criterion crit = Restrictions.eq("caseId", new Integer(caseId));
+            jobs = hibernateFacade.get(CaseJob.class, crit, session);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            session.close();
+        }
+        
+        return jobs;
+    }
+
     public CaseJob getCaseJob(String jobKey) {
         Session session = sessionFactory.getSession();
         CaseJob job = null;
@@ -510,5 +529,68 @@ public class CaseDAO {
     public CaseInput getCaseInput(int inputId, Session session) {
         Criterion crit = Restrictions.eq("id", new Integer(inputId));
         return (CaseInput) hibernateFacade.load(CaseInput.class, crit, session);
+    }
+
+    public String[] getAllValidJobs(int jobId) {
+        List<String> validJobNames = new ArrayList<String>();
+        int caseId = getCaseJob(jobId).getCaseId();
+        List<CaseJob> jobs = getCaseJobs(caseId);
+        
+        for(Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
+            CaseJob job = iter.next();
+            
+            if (canDependOn(jobId, job.getId()))
+                validJobNames.add(job.getName());
+        }
+
+        return validJobNames.toArray(new String[0]);
+    }
+    
+    private boolean canDependOn(int jobId, int dependentJobId) {
+        // FIXME: this really should be a recursive check on all the possible dependencies
+        // to avoid cycle dependencies.
+        if (jobId == dependentJobId)
+            return false;
+        
+        CaseJob job = getCaseJob(dependentJobId);
+        DependentJob[] depentdentJobs = job.getDependentJobs();
+        
+        for (DependentJob dpj : depentdentJobs)
+            if (jobId == dpj.getJobId())
+                return false;
+        
+        return true;
+    }
+
+    public String[] getDependentJobs(int jobId) {
+        DependentJob[] dependentJobs = getCaseJob(jobId).getDependentJobs();
+        String[] dependentJobNames = new String[dependentJobs.length];
+
+        for (int i = 0; i < dependentJobs.length; i++) {
+            int id = dependentJobs[i].getJobId();
+            dependentJobNames[i] = getCaseJob(id).getName();
+        }
+
+        return dependentJobNames;
+    }
+
+    public int[] getJobIds(int caseId, String[] jobNames) {
+        int[] ids = new int[jobNames.length];
+        Session session = sessionFactory.getSession();
+
+        try {
+            for (int i = 0; i < jobNames.length; i++) {
+                Criterion crit1 = Restrictions.eq("caseId", new Integer(caseId));
+                Criterion crit2 = Restrictions.eq("name", jobNames[i]);
+                CaseJob job = (CaseJob) hibernateFacade.load(CaseJob.class, new Criterion[] { crit1, crit2 }, session);
+                ids[i] = job.getId();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return ids;
     }
 }
