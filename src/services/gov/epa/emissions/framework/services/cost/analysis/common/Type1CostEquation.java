@@ -13,6 +13,7 @@ public class Type1CostEquation implements CostEquation {
     private Double capCostMultiplier;
     private Double omCostMultiFixed;
     private Double omCostMultiVariable;
+    private Double scalingFactorSize;
     private Double scalingFactorExponent;
     private Double capacityFactor;
 //    private Double incCapCostMultiplier;
@@ -42,11 +43,13 @@ public class Type1CostEquation implements CostEquation {
                 String variableName = variable.getName();
                 if (variableName.equalsIgnoreCase("Capital Cost Multiplier")) {
                     capCostMultiplier = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("O&M Cost Multiplier Fixed")) {
+                } else if (variableName.equalsIgnoreCase("Fixed O&M Cost Multiplier")) {
                     omCostMultiFixed = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("O&M Cost Multiplier Variable")) {
+                } else if (variableName.equalsIgnoreCase("Variable O&M Cost Multiplier")) {
                     omCostMultiVariable = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("Scaling Factor Exponent")) {
+                } else if (variableName.equalsIgnoreCase("Scaling Factor - Model Size (MW)")) {
+                    scalingFactorSize = equations[i].getValue();
+                } else if (variableName.equalsIgnoreCase("Scaling Factor - Exponent")) {
                     scalingFactorExponent = equations[i].getValue();
                 } else if (variableName.equalsIgnoreCase("Capacity Factor")) {
                     capacityFactor = equations[i].getValue();
@@ -73,19 +76,21 @@ public class Type1CostEquation implements CostEquation {
     }
 
     public Double getCapitalCost() {
+        Double scallFactor=getScallingFactor();
         if (boilerCapacity == null 
                 || capCostMultiplier == 0.0 || capCostMultiplier== null
-                || omCostMultiFixed == 0.0 || omCostMultiFixed ==null
-                || omCostMultiVariable == 0.0 || omCostMultiVariable == null
-                || scalingFactorExponent == null) return null;
-        return capCostMultiplier * boilerCapacity*getScallingFactor()*1000;
+                || scallFactor==0.0         || scallFactor== null) return null;
+        return capCostMultiplier * boilerCapacity*scallFactor*1000;
     }
 
-    private double getScallingFactor() {
+    public Double getScallingFactor() {
         String abbre=bestMeasureEffRecord.measure().getAbbreviation();
-        if ((abbre=="NSCR_UBCW" ||abbre =="NSCR_UBCT") && boilerCapacity>=600)  return 1; 
-        if (boilerCapacity>=500) return 1; 
-        return Math.pow(boilerCapacity, scalingFactorExponent);
+        if ((abbre=="NSCR_UBCW" ||abbre =="NSCR_UBCT") && boilerCapacity>=600)  return 1.0; 
+        if (boilerCapacity>=500) return 1.0; 
+        if (scalingFactorSize==0.0 ||scalingFactorSize==null
+                || scalingFactorExponent==0.0 ||scalingFactorExponent==null)
+            return null;
+        return Math.pow(scalingFactorSize, scalingFactorExponent);
     }
 
     public Double getOperationMaintenanceCost() {
