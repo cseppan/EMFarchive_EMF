@@ -26,7 +26,7 @@ public class MinMaxEmissionFilter {
         Double maxEmis;
         for (int i = 0; i < efficiencyRecords.length; i++) {
             minEmis = efficiencyRecords[i].getMinEmis();
-            maxEmis = efficiencyRecords[i].getMinEmis();
+            maxEmis = efficiencyRecords[i].getMaxEmis();
             //if no min or max is specified, then include it in the arraylist...
             if (minEmis == null && maxEmis == null) {
                 records.add(efficiencyRecords[i]);
