@@ -2128,9 +2128,9 @@ public class ManagedCaseService {
                 } else {
                     job.setRunStartDate(new Date());
                 }
-
-                dao.updateCaseJob(job);
             }
+            
+            dao.updateCaseJob(job);
 
             if (!user.getUsername().equalsIgnoreCase(message.getRemoteUser()))
                 throw new EmfException("Remote user doesn't match the user who runs the job.");
