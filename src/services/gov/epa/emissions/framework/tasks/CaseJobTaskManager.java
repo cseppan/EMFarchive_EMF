@@ -525,7 +525,11 @@ public class CaseJobTaskManager implements TaskManager {
             CaseJobTask cjt = (CaseJobTask) iter.next();
 
             // For this CaseJobTask if dependencies have not been set yet
+            if (DebugLevels.DEBUG_9)
+                System.out.println("Testing dependencies for job: " + cjt.getJobName());
             if (!(cjt.isDependenciesSet())) {
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("job (" + cjt.getJobName() +") has dependencies that are not met.");
                 // get the caseJob
                 CaseJob caseJob = caseDAO.getCaseJob(cjt.getJobId());
                 // get the dependents of this caseJob
