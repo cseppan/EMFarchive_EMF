@@ -41,7 +41,10 @@ public class RunQAStepTask {
                 qaStep = qasteps[i];
                 runSteps(qaStep);
             }
-        } catch (EmfException e) {
+        } catch (Exception e) {
+            // need to catch the general exception in case there is a 
+            // non-EMFException that is generated - else the user never gets a message
+            e.printStackTrace();
             setStatus("Failed to run QA step " + qaStep.getName() + suffix(qaStep) + ". " + e.getMessage());
             throw new EmfException("Failed to run QA step : " + qaStep.getName() + suffix(qaStep));
         }
