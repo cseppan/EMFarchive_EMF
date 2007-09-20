@@ -61,7 +61,7 @@ public class Type2CostEquation implements CostEquation {
         into an energy term such as MW or mmBTU/hr.  Applying some density
         measure (which is mass/volume) will likely be necessary.   Let me know
         if you need help with the conversions. 
-*/       
+*/
 
 
         //capacity is already in the right units...

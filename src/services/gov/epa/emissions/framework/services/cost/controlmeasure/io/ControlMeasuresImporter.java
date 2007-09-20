@@ -92,17 +92,17 @@ public class ControlMeasuresImporter implements Importer {
             //import equation file
             runEquation(controlMeasures);
             measures = controlMeasures();
+            setStatus("Saving measure and SCC information to the database");
             saveMeasureAndSCCs(measures, user);
             //this is needed so we know what the Ids are for the saved measures
             updateControlMeasuresMap(measures);
             setStatus("Started reading efficiency record file");
+            setStatus("Saving efficiency records to the database");
             modifier.start();
             //process 20000 eff rec at a time...
             while (!isLastEfficiencyRecord()) {
                 efficiencyRecords = runEfficiencyRecords();
-                System.out.println("runEfficiencyRecords()");
                 saveEfficiencyRecords(efficiencyRecords);
-                System.out.println("saveEfficiencyRecords()");
                 efficiencyRecordCount += efficiencyRecords.length;
                 //setStatus("Processed " + efficiencyRecordCount + " efficiency records");
                 efficiencyRecords = null;
@@ -186,7 +186,7 @@ public class ControlMeasuresImporter implements Importer {
             equationImporter.run(controlMeasures);
             setStatus("Finished reading equation file");
         } else
-            setStatus("No equation file was specified");
+            setStatus("Warning, no equation file was specified");
     }
 
     private OptimizedTableModifier dataModifier(String table, Datasource datasource) throws EmfException {
