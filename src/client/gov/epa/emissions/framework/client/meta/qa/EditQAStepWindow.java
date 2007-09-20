@@ -128,8 +128,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     
     private EmfDataset origDataset;
     
-    private final String invTableTag = "-invtable";
+    private static final String invTableTag = "-invtable";
     
+    private static final String avgDaySummaryProgram = "Average day to Annual State Summary";
+    private static final String avgDayToAnnualProgram = "Average day to Annual Inventory";
 
     public EditQAStepWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
         super("Edit QA Step", new Dimension(680, 580), desktopManager);
@@ -523,13 +525,11 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         final String invTableTag = "-invtable";
         String programSwitches = "";
         
-        String annEmis = "Average day to Annual State Summary";
-        String annEmis2 = "Average day to Annual Inventory";
         //String firstElementContains = "";
 
         programSwitches = programArguments.getText();
         //System.out.println("Text: " + programSwitches);
-        if (annEmis.equals(program.getSelectedItem()) && !(programSwitches.equals(""))) {
+        if (avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString()) && !(programSwitches.equals(""))) {
             int index1 = programSwitches.indexOf(invTableTag);
             if (programSwitches.substring(0,12).equals("-inventories") && index1 != -1) {
                 //System.out.println("Substring: " + programSwitches.substring(0, index1));
@@ -570,7 +570,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                     }
                 }
              }
-          } else if  (annEmis2.equals(program.getSelectedItem()) && !(programSwitches.equals(""))){
+          } else if  (avgDayToAnnualProgram.equals(program.getSelectedItem()) && !(programSwitches.equals(""))){
               if (programSwitches.substring(0,12).equals("-inventories")) {
                   //System.out.println("Substring: " + programSwitches.substring(0, index1));
           
@@ -643,13 +643,11 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             public void actionPerformed(ActionEvent e) {
                 clear();
                 //System.out.println("The program is: " + (String)program.getSelectedItem());
-                String annEmis = "Average day to Annual State Summary";
-                String annEmis2 = "Average day to Annual Inventory";
-                if (annEmis.equalsIgnoreCase(program.getSelectedItem().toString())) {
+                if (avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
                     //System.out.println("You selected annual emissions");
-                    doSetAnnEmisWindow();
-                } else if (annEmis2.equalsIgnoreCase(program.getSelectedItem().toString())){
-                    doSetAnnEmis2Window();
+                    showAvgDaySummaryWindow();
+                } else if (avgDayToAnnualProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+                    showAvgDayToAnnualWindow();
                 } else {
                     //System.out.println("You selected some other program");
                     doSetWindow();
@@ -660,7 +658,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         return export;
     }
     
-    private void doSetAnnEmisWindow() {
+    private void showAvgDaySummaryWindow() {
         
         //When there is no data in window, set button causes new window to pop up,
         // with the warning message to also show up.  When data in window is invalid, a new window still
@@ -742,7 +740,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
      }
     
-    private void doSetAnnEmis2Window(){
+    private void showAvgDayToAnnualWindow(){
         
         //When there is no data in window, set button causes new window to pop up,
         // with the warning message to also show up.  When data in window is invalid, a new window still
