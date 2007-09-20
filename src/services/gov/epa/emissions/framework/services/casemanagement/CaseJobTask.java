@@ -45,7 +45,7 @@ public class CaseJobTask extends Task {
 
     boolean exportsSuccess = false;
 
-    boolean dependenciesSet = true;
+    boolean dependenciesSet = false;
 
     private String jobkey;
 
