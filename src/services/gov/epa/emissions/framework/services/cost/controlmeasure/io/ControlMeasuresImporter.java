@@ -92,12 +92,13 @@ public class ControlMeasuresImporter implements Importer {
             //import equation file
             runEquation(controlMeasures);
             measures = controlMeasures();
-            setStatus("Saving measure and SCC information to the database");
+            setDetailStatus("Saving measure and SCC information to the database");
             saveMeasureAndSCCs(measures, user);
             //this is needed so we know what the Ids are for the saved measures
             updateControlMeasuresMap(measures);
             setStatus("Started reading efficiency record file");
-            setStatus("Saving efficiency records to the database");
+            setDetailStatus("Started reading efficiency record file");
+            setDetailStatus("Saving efficiency records to the database");
             modifier.start();
             //process 20000 eff rec at a time...
             while (!isLastEfficiencyRecord()) {
@@ -120,6 +121,7 @@ public class ControlMeasuresImporter implements Importer {
             }
             aerDAO.updateAggregateEfficiencyRecords(measures, dbServer);
             setStatus("Finished reading efficiency record file");
+            setDetailStatus("Finished reading efficiency record file");
             
         } catch (Exception e) {
             logError("Failed to import all control measures", e);
