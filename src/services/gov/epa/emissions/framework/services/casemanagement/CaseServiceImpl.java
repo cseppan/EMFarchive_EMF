@@ -258,6 +258,9 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().addHost(host);
     }
 
+    /*
+     * The String re
+     */
     public String runJobs(Integer[] jobIds, int caseId, User user) throws EmfException {
         try{
         if (DebugLevels.DEBUG_0)
@@ -450,6 +453,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getJobMessages(caseId, jobId);
     }
 
+
+
     public String[] getAllValidJobs(int jobId) throws EmfException {
         return getCaseService().getAllValidJobs(jobId);
     }
@@ -461,6 +466,11 @@ public class CaseServiceImpl implements CaseService {
     public int[] getJobIds(int caseId, String[] jobNames) throws EmfException {
         return getCaseService().getJobIds(caseId, jobNames);
     }
+
+
+
+
+
 
 
 }

@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
 import gov.epa.emissions.commons.data.DatasetType;
-import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
@@ -32,7 +31,9 @@ import gov.epa.emissions.framework.tasks.TaskSubmitter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -88,23 +89,24 @@ public class ManagedCaseService {
 
     protected Session session = null;
 
-    // private Session getSession() {
-    // if (session == null) {
-    // session = sessionFactory.getSession();
-    // }
-    // return session;
-    // }
+//    private Session getSession() {
+//        if (session == null) {
+//            session = sessionFactory.getSession();
+//        }
+//        return session;
+//    }
 
     public ManagedCaseService(DbServer dbServer, HibernateSessionFactory sessionFactory) {
         this.dbServer = dbServer;
         this.sessionFactory = sessionFactory;
         this.dao = new CaseDAO(sessionFactory);
 
-        myTag();
         if (DebugLevels.DEBUG_9)
             System.out.println("In ManagedCaseService constructor: Is the session Factory null? "
                     + (sessionFactory == null));
 
+        myTag();
+ 
         if (DebugLevels.DEBUG_1)
             System.out.println(">>>> " + myTag());
 
@@ -695,8 +697,8 @@ public class ManagedCaseService {
 
                 CaseInput cip = iter.next();
                 badCipName = cip.getName();
-                // if (DebugLevels.DEBUG_9)
-                // System.out.println(cip.getCaseID());
+//                if (DebugLevels.DEBUG_9)
+//                    System.out.println(cip.getCaseID());
                 cipDataset = cip.getDataset();
 
                 if (cipDataset == null) {
@@ -1310,6 +1312,12 @@ public class ManagedCaseService {
         // create a new caseJobSubmitter for each client call in a session
         TaskSubmitter caseJobSubmitter = new CaseJobSumitter(sessionFactory);
 
+        Hashtable<String, CaseJob> caseJobsTable = new Hashtable<String, CaseJob>();
+        ManagedExportService expSvc = null;
+        
+        CaseJobTask[] caseJobsTasksInSubmission = null;
+        ArrayList<CaseJobTask> caseJobsTasksList = new ArrayList<CaseJobTask>();
+        
         try {
             String caseJobExportSubmitterId = null;
             String caseJobSubmitterId = caseJobSubmitter.getSubmitterId();
@@ -1318,12 +1326,16 @@ public class ManagedCaseService {
                 System.out.println("Is CaseJobSubmitterId null? " + (caseJobSubmitterId == null));
             // FIXME: Does this need to be done in a new DAO method???
             // Get the CaseJobs for each jobId
+            // create a CaseJobTask per CaseJob.
+            // save the CaseJobTask in an array and the CaseJob in the hashTable with
+            // the casejjobtask unique id as the key to find the casejob
             for (Integer jobId : jobIds) {
                 int jid = jobId.intValue();
                 String jobKey = null;
 
                 if (DebugLevels.DEBUG_0)
                     System.out.println("The jobId= " + jid);
+
                 CaseJob caseJob = this.getCaseJob(jid);
 
                 // NOTE: This is where the jobkey is generated and set in the CaseJob
@@ -1338,19 +1350,14 @@ public class ManagedCaseService {
                     caseJob.setUser(user);
                 }
 
-                if (DebugLevels.DEBUG_0)
-                    System.out.println("Is the caseJob for this jobId null? " + (caseJob == null));
-                Case jobCase = this.getCase(caseId);
-
-                if (DebugLevels.DEBUG_0)
-                    System.out.println("caseId= " + caseId + " Is the Case for this job null? " + (jobCase == null));
                 // FIXME: Is this still needed?????
                 // caseJob.setRunStartDate(new Date());
                 CaseJobTask cjt = new CaseJobTask(jid, caseId, user);
                 cjt.setJobkey(jobKey);
-
+                cjt.setNumDepends(caseJob.getDependentJobs().length);
+                
                 // get or create the reference to the Managed Export Service for this casejobtask
-                ManagedExportService expSvc = this.getExportService();
+                expSvc = this.getExportService();
 
                 if (DebugLevels.DEBUG_6)
                     System.out.println("set the casejobsubmitter id = " + caseJobSubmitterId);
@@ -1379,26 +1386,56 @@ public class ManagedCaseService {
                 if (DebugLevels.DEBUG_6)
                     System.out.println("getQueOptions");
                 cjt.setQueueOptions(caseJob.getQueOptions());
+                if (DebugLevels.DEBUG_6)
+                    System.out.println("Completed setting the CaseJobTask");
 
                 // FIXME: BELOW FOR TESTING ONLY
                 cjt.setReadyTrue();
                 cjt.setDependenciesSet(true);
                 // FIXME: ABOVE FOR TESTING ONLY
+                
+                // Now add the CaseJobTask to the caseJobsTasksList
+                caseJobsTasksList.add(cjt);
+                //Add the caseJob to the Hashtable caseJobsTable with the cjt taskid as the key
+                caseJobsTable.put(cjt.getTaskId(), caseJob);
+                
+            }// for jobIds
 
+            
+           //convert the  caseJobsTasksList to an array caseJobsTasksInSubmission
+            caseJobsTasksInSubmission= caseJobsTasksList.toArray(new CaseJobTask[0]);
+            
+            // Now sort the Array using the built in comparator
+            Arrays.sort(caseJobsTasksInSubmission);
+            
+            for (CaseJobTask cjt : caseJobsTasksInSubmission) {
+
+                //get the caseJob out of the hashtable
+                CaseJob caseJob = caseJobsTable.get(cjt.getTaskId());
+
+
+                if (DebugLevels.DEBUG_0)
+                    System.out.println("Is the caseJob for this jobId null? " + (caseJob == null));
+                
+                //now get the Case (called jobCase since case is a reserved word in Java) using
+                // the caseId sent in from the GUI
+                Case jobCase = this.getCase(caseId);
+
+                String purpose = "Used by " + caseJob.getName() + " of Case " + jobCase.getName();
                 if (DebugLevels.DEBUG_6)
-                    System.out.println("Completed setting the CaseJobTask");
+                    System.out.println("Purpose= " + purpose);
 
+                if (DebugLevels.DEBUG_0)
+                    System.out.println("caseId= " + caseId + " Is the Case for this job null? " + (jobCase == null));
+
+                
                 List<CaseInput> inputs = getAllJobInputs(caseJob);
 
                 if (DebugLevels.DEBUG_6)
                     System.out.println("Number of inputs for this job: " + inputs.size());
 
-                // FIXME: Need to flesh this string out
-                // purpose = "Used by CaseName and JobName"
-
-                String purpose = "Used by " + caseJob.getName() + " of Case " + jobCase.getName();
-                if (DebugLevels.DEBUG_6)
-                    System.out.println("Purpose= " + purpose);
+                //send the casejobtask to the CJTM priority queue and then to wait queue
+                TaskManagerFactory.getCaseJobTaskManager(sessionFactory).addTask(cjt);
 
                 // pass the inputs to the exportService which uses an exportJobSubmitter to work with exportTaskManager
                 caseJobExportSubmitterId = expSvc
@@ -1418,9 +1455,13 @@ public class ManagedCaseService {
                 if (DebugLevels.DEBUG_0)
                     System.out.println("Case Job Export Submitter Id for case job:" + caseJobExportSubmitterId);
 
-                TaskManagerFactory.getCaseJobTaskManager(sessionFactory).addTask(cjt);
-            }
+            }// for cjt
 
+            
+            
+            
+            
+            
             if (DebugLevels.DEBUG_0)
                 System.out.println("Case Job Submitter Id for case job:" + caseJobSubmitterId);
 
@@ -1455,7 +1496,7 @@ public class ManagedCaseService {
             dao.updateCaseJob(caseJob);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
-        }
+        } 
     }
 
     public synchronized void updateCaseJob(User user, CaseJob job) throws EmfException {
@@ -1656,34 +1697,22 @@ public class ManagedCaseService {
         EmfDataset dataset = input.getDataset();
         InputEnvtVar envvar = input.getEnvtVars();
         SubDir subdir = input.getSubdirObj();
-        String fullPath = null;
-        String setenvLine = null;
-       
-        // check if dataset is null, if so exception
+        // check if dataset or env variable is null, if so e
         if (dataset == null) {
             throw new EmfException("Input (" + input.getName() + ") must have a dataset");
         }
 
-        // check for external dataset
-        if (dataset.isExternal()) {
-            // set the full path to the first external file in the dataset
-            ExternalSource[] externalDatasets = dataset.getExternalSources();
-            if (externalDatasets.length == 0) {
-                throw new EmfException("Input (" + input.getName() + ") must have at least 1 external dataset");
-            }
-            fullPath = externalDatasets[0].getDatasource();
+        // Create a full path to the input file
+        String fullPath = expSvc.getCleanDatasetName(input.getDataset(), input.getVersion());
+        if ((subdir != null) && !(subdir.toString()).equals("")) {
+            fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + input.getSubdirObj()
+                    + System.getProperty("file.separator") + fullPath;
         } else {
-            // internal dataset
-            // Create a full path to the input file
-            fullPath = expSvc.getCleanDatasetName(input.getDataset(), input.getVersion());
-            if ((subdir != null) && !(subdir.toString()).equals("")) {
-                fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + input.getSubdirObj()
-                        + System.getProperty("file.separator") + fullPath;
-            } else {
-                fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + fullPath;
-            }
+            fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + fullPath;
         }
-         if (envvar == null) {
+
+        String setenvLine = null;
+        if (envvar == null) {
             // if no environmental variable, just created a commented
             // line w/ input name = fullPath
             setenvLine = this.runComment + " " + input.getName() + " = " + fullPath + eolString;
@@ -1903,14 +1932,14 @@ public class ManagedCaseService {
         if (caseObj.getAbbreviation() != null) {
             sbuf.append(shellSetenv("CASE", caseObj.getAbbreviation().getName()));
         }
-        // Need to have quotes around model name b/c could be more than one word
+        //      Need to have quotes around model name b/c could be more than one word
         if (caseObj.getModel() != null) {
-            String modelName = '"' + caseObj.getModel().getName() + '"';
+            String modelName = '"' + caseObj.getModel().getName() + '"';  
             sbuf.append(shellSetenv("MODEL_LABEL", modelName));
         }
         if (caseObj.getGrid() != null) {
             sbuf.append(shellSetenv("IOAPI_GRIDNAME_1", caseObj.getGrid().getName()));
-        }
+        }        
         if (caseObj.getGridResolution() != null) {
             sbuf.append(shellSetenv("EMF_GRID", caseObj.getGridResolution().getName()));
         }
@@ -1921,20 +1950,19 @@ public class ManagedCaseService {
             sbuf.append(shellSetenv("EMF_SPC", caseObj.getSpeciation().getName()));
         }
         if (caseObj.getEmissionsYear() != null) {
-            sbuf.append(shellSetenv("BASE_YEAR", caseObj.getEmissionsYear().getName())); // Should base year ==
-            // emissions year ????
+            sbuf.append(shellSetenv("BASE_YEAR", caseObj.getEmissionsYear().getName()));  // Should base year == emissions year ????
         }
-        // sbuf.append(shellSetenv("BASE_YEAR", String.valueOf(caseObj.getBaseYear())));
-        if (caseObj.getFutureYear() != 0) { // CHECK: should it be included if == 0 ???
+            //        sbuf.append(shellSetenv("BASE_YEAR", String.valueOf(caseObj.getBaseYear())));
+        if (caseObj.getFutureYear() != 0) { //CHECK: should it be included if == 0 ???
             sbuf.append(shellSetenv("FUTURE_YEAR", String.valueOf(caseObj.getFutureYear())));
         }
-        // Need to have quotes around start and end date b/c could be more than one word 'DD/MM/YYYY HH:MM'
+        //      Need to have quotes around start and end date b/c could be more than one word  'DD/MM/YYYY HH:MM'
         if (caseObj.getStartDate() != null) {
-            String startString = '"' + caseObj.getStartDate().toString() + '"';
+            String startString = '"' + caseObj.getStartDate().toString() + '"';  
             sbuf.append(shellSetenv("EPI_STDATE_TIME", startString));
         }
         if (caseObj.getEndDate() != null) {
-            String endString = '"' + caseObj.getEndDate().toString() + '"';
+            String endString = '"' + caseObj.getEndDate().toString() + '"';  
             sbuf.append(shellSetenv("EPI_ENDATE_TIME", endString));
         }
 
@@ -1995,7 +2023,7 @@ public class ManagedCaseService {
         // print executable
         sbuf.append(eolString);
         sbuf.append(this.runComment + " job executable" + eolString);
-        sbuf.append("$EMF_CLIENT -k $EMF_JOBKEY -x " + execFull + " -m \"Running top level script for job: " + jobName + "\"" + eolString);
+        sbuf.append("$EMF_CLIENT -k $EMF_JOBKEY -x " + execFull + " -m \"Running top level script\"" + eolString);
         sbuf.append(execFullArgs);
 
         // add a test of the status and send info through the
@@ -2128,6 +2156,9 @@ public class ManagedCaseService {
                 } else {
                     job.setRunStartDate(new Date());
                 }
+                
+                //Notify CaseJobTaskManager that the job status has changed
+                TaskManagerFactory.getCaseJobTaskManager(sessionFactory).callBackFromJobRunServer();
             }
             
             dao.updateCaseJob(job);
@@ -2194,7 +2225,7 @@ public class ManagedCaseService {
             throw new EmfException("Could not get all job ids for job (" + jobNames[0] + ", etc.).\n");
         } 
     }
-    
+
     public void finalize() throws Throwable {
         this.session = null;
         super.finalize();

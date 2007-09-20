@@ -1,4 +1,5 @@
 package gov.epa.emissions.framework.tasks;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.ArrayList;
@@ -88,7 +89,12 @@ public class CaseJobSumitter implements TaskSubmitter {
             System.out.println("#### SUBMITTER:: incoming tasks size before ADD: " + this.submitterId + " has task count= "
                     + tasks.size());
 
-        TaskManagerFactory.getCaseJobTaskManager(sessionFactory).addTasks(tasks);
+        //FIXME:  FIND OUT WHY THIS METHOD IS THROWING AN UNHANDLED EXCEPTION
+        try {
+            TaskManagerFactory.getCaseJobTaskManager(sessionFactory).addTasks(tasks);
+        } catch (EmfException e) {
+            e.printStackTrace();
+        }
 
         // FIXME: May not need to do this next step since submitted Table is uptodate
 //        submittedTasks.addAll(tasks);

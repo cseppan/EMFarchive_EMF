@@ -322,7 +322,7 @@ public class CaseDAO {
         } finally {
             session.close();
         }
-        
+
         return jobs;
     }
 
@@ -531,35 +531,26 @@ public class CaseDAO {
         return (CaseInput) hibernateFacade.load(CaseInput.class, crit, session);
     }
 
+
+    private boolean loopDepends(int jid, DependentJob job) {
+        boolean loopDetected = false;
+
+        return loopDetected;
+    }
+
     public String[] getAllValidJobs(int jobId) {
         List<String> validJobNames = new ArrayList<String>();
         int caseId = getCaseJob(jobId).getCaseId();
         List<CaseJob> jobs = getCaseJobs(caseId);
-        
-        for(Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
+
+        for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = iter.next();
-            
+
             if (canDependOn(jobId, job.getId()))
                 validJobNames.add(job.getName());
         }
 
         return validJobNames.toArray(new String[0]);
-    }
-    
-    private boolean canDependOn(int jobId, int dependentJobId) {
-        // FIXME: this really should be a recursive check on all the possible dependencies
-        // to avoid cycle dependencies.
-        if (jobId == dependentJobId)
-            return false;
-        
-        CaseJob job = getCaseJob(dependentJobId);
-        DependentJob[] depentdentJobs = job.getDependentJobs();
-        
-        for (DependentJob dpj : depentdentJobs)
-            if (jobId == dpj.getJobId())
-                return false;
-        
-        return true;
     }
 
     public String[] getDependentJobs(int jobId) {
@@ -572,6 +563,22 @@ public class CaseDAO {
         }
 
         return dependentJobNames;
+    }
+
+    private boolean canDependOn(int jobId, int dependentJobId) {
+        // FIXME: this really should be a recursive check on all the possible dependencies
+        // to avoid cycle dependencies.
+        if (jobId == dependentJobId)
+            return false;
+
+        CaseJob job = getCaseJob(dependentJobId);
+        DependentJob[] depentdentJobs = job.getDependentJobs();
+
+        for (DependentJob dpj : depentdentJobs)
+            if (jobId == dpj.getJobId())
+                return false;
+
+        return true;
     }
 
     public int[] getJobIds(int caseId, String[] jobNames) {
@@ -593,4 +600,5 @@ public class CaseDAO {
 
         return ids;
     }
+
 }

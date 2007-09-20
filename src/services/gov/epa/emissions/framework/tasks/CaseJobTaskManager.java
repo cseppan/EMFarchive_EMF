@@ -1,9 +1,13 @@
 package gov.epa.emissions.framework.tasks;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.CaseJobTask;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.DependentJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -24,7 +28,9 @@ import org.apache.commons.logging.LogFactory;
 public class CaseJobTaskManager implements TaskManager {
     private static Log log = LogFactory.getLog(CaseJobTaskManager.class);
 
-    private static HibernateSessionFactory sessionFactory = null;
+    private static CaseDAO caseDAO = null;
+
+    private static StatusDAO statusDAO = null;
 
     private static CaseJobTaskManager ref;
 
@@ -118,8 +124,12 @@ public class CaseJobTaskManager implements TaskManager {
         if (DebugLevels.DEBUG_4)
             System.out.println("Initial # of jobs in Thread Pool: " + threadPool.getPoolSize());
 
-        this.sessionFactory = sessionFactory;
+        caseDAO = new CaseDAO(sessionFactory);
+        statusDAO = new StatusDAO(sessionFactory);
 
+        // FIXME: Remove the next line after statusDAO is used in this class
+        if (DebugLevels.DEBUG_9)
+            System.out.println("Dummy: " + statusDAO.getClass().getName());
     }
 
     public static synchronized CaseJobTaskManager getCaseJobTaskManager(HibernateSessionFactory sessionFactory) {
@@ -130,8 +140,10 @@ public class CaseJobTaskManager implements TaskManager {
 
     /**
      * Add a CaseJobTask to the PBQ
+     * 
+     * @throws EmfException
      */
-    public static synchronized void addTask(CaseJobTask task) {
+    public static synchronized void addTask(CaseJobTask task) throws EmfException {
         if (DebugLevels.DEBUG_0)
             System.out.println("IN CaseJobTaskManager::add task= " + task.getTaskId() + " for job= " + task.getJobId());
         taskQueue.add(task);
@@ -143,7 +155,7 @@ public class CaseJobTaskManager implements TaskManager {
 
     }
 
-    public static synchronized void addTasks(ArrayList<Runnable> tasks) {
+    public static synchronized void addTasks(ArrayList<Runnable> tasks) throws EmfException {
 
         if (DebugLevels.DEBUG_0)
             System.out.println("IN CaseJobTaskManager number of tasks received= " + tasks.size());
@@ -189,13 +201,11 @@ public class CaseJobTaskManager implements TaskManager {
         System.out.println("CaseJobTaskManager::updateRunStatus: " + taskId + " status= " + status);
 
         CaseJobTask cjt = null;
-        //Session session = sessionFactory.getSession();
-        CaseDAO dao = new CaseDAO(sessionFactory);
         String jobStatus = "";
 
         try {
             if ((status.equals("completed")) || (status.equals("failed"))) {
-System.out.println("CaseJobTaskManager::updateRunStatus:  job completed or failed");
+                System.out.println("CaseJobTaskManager::updateRunStatus:  job completed or failed");
                 synchronized (runTable) {
                     cjt = (CaseJobTask) runTable.get(taskId);
 
@@ -226,10 +236,12 @@ System.out.println("CaseJobTaskManager::updateRunStatus:  job completed or faile
             // update the run status in the Case_CaseJobs
             int jid = cjt.getJobId();
 
-            CaseJob caseJob = dao.getCaseJob(jid);
+            CaseJob caseJob = caseDAO.getCaseJob(jid);
 
-            if (DebugLevels.DEBUG_9) System.out.println("In CaseJobTaskManager::updateRunStatus for jobId= " + jid + " Is the CaseJob null? " + (caseJob==null));
-            
+            if (DebugLevels.DEBUG_9)
+                System.out.println("In CaseJobTaskManager::updateRunStatus for jobId= " + jid
+                        + " Is the CaseJob null? " + (caseJob == null));
+
             if (status.equals("completed")) {
                 System.out.println("CaseJobTaskManager::updateRunStatus:  job Status is completed jobStatus=Submitted");
                 jobStatus = "Submitted";
@@ -254,21 +266,24 @@ System.out.println("CaseJobTaskManager::updateRunStatus:  job completed or faile
                 caseJob.setRunStartDate(new Date());
             }
 
-            JobRunStatus jrStat = dao.getJobRunStatuse(jobStatus);
+            JobRunStatus jrStat = caseDAO.getJobRunStatuse(jobStatus);
             caseJob.setRunstatus(jrStat);
 
-            dao.updateCaseJob(caseJob);
+            caseDAO.updateCaseJob(caseJob);
         } catch (Exception e) {
             System.out.println("^^^^^^^^^^^^^^");
             e.printStackTrace();
-            
+
             System.out.println("^^^^^^^^^^^^^^");
             throw new EmfException(e.getMessage());
         }
     }
 
-    public static synchronized void processTaskQueue() {
+    public static synchronized void processTaskQueue() throws EmfException {
+        testAndSetWaitingTasksDependencies();
+
         int threadsAvail = -99;
+        
         if (DebugLevels.DEBUG_0)
             System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         if (DebugLevels.DEBUG_0)
@@ -488,13 +503,121 @@ System.out.println("CaseJobTaskManager::updateRunStatus:  job completed or faile
                 updateRunStatus(cjtId, "export failed");
             }
 
-            // FIXME: expand the dependencies logic with Alexis
-            cjt.setDependenciesSet(true);
-
         }
 
         processTaskQueue();
 
     }
 
+    /**
+     * Loop over all the waiting tasks. Test and set the dependencies of each task in the waitTable
+     * 
+     */
+    private static synchronized void testAndSetWaitingTasksDependencies() throws EmfException {
+
+        //Get all the waiting CaseJobTasks in the waitTable
+        Collection<Task> allWaitTasks = waitTable.values();
+        Iterator<Task> iter = allWaitTasks.iterator();
+
+        //Loop over all the waiting CaseJobTasks tasks
+        while (iter.hasNext()) {
+            
+            CaseJobTask cjt = (CaseJobTask) iter.next();
+
+            // For this CaseJobTask if dependencies have not been set yet
+            if (!(cjt.isDependenciesSet())) {
+                // get the caseJob
+                CaseJob caseJob = caseDAO.getCaseJob(cjt.getJobId());
+                // get the dependents of this caseJob
+                DependentJob[] dependJobs = caseJob.getDependentJobs();
+
+                // the caseJob has no dependencies therefore set to True
+                if ((dependJobs == null) || (dependJobs.length == 0)) {
+                    cjt.setDependenciesSet(true);
+                } else {
+                    // this CaseJob has dependents
+//                    ArrayList<CaseJob> allDependentCaseJobs = new ArrayList<CaseJob>();
+
+                    int nonFinalD = 0;
+                    int foNSD = 0;
+                    int compD = 0;
+
+                    int TotalD = dependJobs.length;
+
+                    // Loop over dependetJobs and add the corresponding CaseJob to the allDependentCaseJobs
+                    for (int i = 0; i < dependJobs.length; i++) {
+                        DependentJob dJob = dependJobs[i];
+
+                        CaseJob dcj = caseDAO.getCaseJob(dJob.getJobId());
+                        JobRunStatus jrs = dcj.getRunstatus();
+
+                        String status = jrs.getName();
+
+                        if ((status.equals("Not Started")) || (status.equals("Failed"))) {
+                            foNSD++;
+                        } else if (status.equals("Completed")) {
+                            compD++;
+                        } else {
+                            nonFinalD++;
+                        }
+
+//                        allDependentCaseJobs.add(dcj);
+
+                    }// for dependentJobs
+
+                    // If none of the jobs are in a non-Final state
+                    if (nonFinalD == 0) {
+                        // all our jobs are in a final=completed state
+                        if (compD == TotalD) {
+                            cjt.setDependenciesSet(true);
+                        } else {
+                            // We have a parent job that has atleast one dependent job that has failed or
+                            // not started therefore send an error message to the user's status window
+                            // log a failed jobstatus to the casejobs table
+                            // and remove the corresponding casejobtask from the waitTable
+                            User user = caseJob.getUser();
+
+                            // set the CaseJob jobstatus (casejob table) to Failed
+                            updateRunStatus(cjt.getTaskId(), "failed");
+
+                            String message = "Job name= " + cjt.getJobName()
+                                    + " failed due to at least one dependent jobs state = Failed or Not Started";
+
+                            // set the status in the user's status window
+                            setStatus(user, statusDAO, message);
+
+                            // now remove the job with bad dependencies from the waitTable
+                            synchronized (waitTable) {
+                                waitTable.remove(cjt.getTaskId());
+                            }
+
+                        }
+                    }
+
+                }// CJT had dependents
+            }// cjt dependencies was false
+
+
+        }// loop over all waiting tasks
+
+    }
+
+    protected static synchronized void setStatus(User user, StatusDAO statusServices, String message) {
+        Status endStatus = new Status();
+        endStatus.setUsername(user.getUsername());
+        endStatus.setType("Export");
+        endStatus.setMessage(message);
+        endStatus.setTimestamp(new Date());
+
+        statusServices.add(endStatus);
+    }
+
+    /**
+     *  There was a change in the status of a waiting job so process the Queue 
+     */
+    public static synchronized void callBackFromJobRunServer()
+            throws EmfException {
+
+        processTaskQueue();
+    }
 }

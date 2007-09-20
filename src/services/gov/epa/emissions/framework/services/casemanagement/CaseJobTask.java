@@ -16,10 +16,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class CaseJobTask extends Task {
+    
     private static Log log = LogFactory.getLog(CaseJobTask.class);
 
     private User user = null;
 
+    private int numDepends=0;
+    
     // private String runRedirect = ">&"; // shell specific redirect
 
     private String jobFileContent = null;
@@ -291,5 +294,29 @@ public class CaseJobTask extends Task {
     }
     // FIXME: After code is working remove everything ABOVE
     // ***********************************************************
+
+    public int getNumDepends() {
+        return numDepends;
+    }
+
+    public void setNumDepends(int numDepends) {
+        this.numDepends = numDepends;
+    }
+
+
+    @Override
+    public int compareTo(Object o) {
+        CaseJobTask second = (CaseJobTask) o;
+       int thisDependsSize = this.numDepends;
+       int secondDependsSize = second.getNumDepends();
+       
+       if (thisDependsSize < secondDependsSize){
+           return -1;
+       }else if (secondDependsSize < thisDependsSize){
+           return 1;
+       }
+       return 0;
+    }
+
 
 }

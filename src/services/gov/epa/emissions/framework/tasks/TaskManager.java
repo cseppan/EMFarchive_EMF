@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.tasks;
 
-
 public interface TaskManager {
 //    int getSizeofTaskQueue();
 //    int getSizeofWaitTable();
