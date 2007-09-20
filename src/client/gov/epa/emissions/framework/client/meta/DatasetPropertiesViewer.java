@@ -68,7 +68,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         tabbedPane.addTab("Keywords", createKeywordsTab());
         tabbedPane.addTab("Notes", createNotesTab(parentConsole));
         tabbedPane.addTab("Revisions", createRevisionsTab(parentConsole));
-        tabbedPane.addTab("Logs", createLogsTab(parentConsole));
+        tabbedPane.addTab("History", createLogsTab(parentConsole));
         tabbedPane.addTab("Tables", createInfoTab(parentConsole));
         tabbedPane.addTab("QA", createQAStepsTab(desktopManager));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
