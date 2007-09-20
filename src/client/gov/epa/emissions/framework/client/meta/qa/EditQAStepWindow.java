@@ -367,7 +367,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         JPanel prgpanel = new JPanel();
         prgpanel.add(new Label(versionName + " (" + step.getVersion() + ")"));
-        prgpanel.add(new JLabel(EmptyStrings.create(20)));
+        prgpanel.add(new JLabel(EmptyStrings.create(37)));
         prgpanel.add(new JLabel("Program:  "));
         prgpanel.add(program);
         
@@ -380,8 +380,11 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         addChangeable(programArguments);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programArguments);
         buttonPanel.add(scrollableDetails);
+        JPanel setButtonPanel = new JPanel(new BorderLayout());
+        setButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 0));
         Button button1 = setButton();
-        buttonPanel.add(button1);
+        setButtonPanel.add(button1, BorderLayout.NORTH);
+        buttonPanel.add(setButtonPanel);
         layoutGenerator.addLabelWidgetPair("Arguments:", buttonPanel, panel);
         programArguments.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
@@ -393,7 +396,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         if (step.isRequired())
             required.setEnabled(false);
 
-        order = new NumberFormattedTextField(5, orderAction());
+        order = new NumberFormattedTextField(3, orderAction());
         order.setText(step.getOrder() + "");
         order.addKeyListener(keyListener());
         addChangeable(order);
@@ -402,10 +405,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         SpringLayoutGenerator layout = new SpringLayoutGenerator();
         JPanel reqirepanel = new JPanel();
 //      Modified the next line to move the Required? JLabel over
-        reqirepanel.add(new JLabel(EmptyStrings.create(34)));
+        reqirepanel.add(new JLabel(EmptyStrings.create(57)));
         
         reqirepanel.add(new JLabel("Required?"));
-        reqirepanel.add(new JLabel(EmptyStrings.create(20)));
+//        reqirepanel.add(new JLabel(EmptyStrings.create(1)));
         reqirepanel.add(required);
         layout.addWidgetPair(order, reqirepanel, checkBoxPanel);
         layout.makeCompactGrid(checkBoxPanel, 1, 2, 0, 0, 0, 0);
