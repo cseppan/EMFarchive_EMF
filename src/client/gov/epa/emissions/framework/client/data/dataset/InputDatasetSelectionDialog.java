@@ -29,7 +29,7 @@ import javax.swing.ListSelectionModel;
 
 public class InputDatasetSelectionDialog extends JDialog implements InputDatasetSelectionView {
 
-    private EmfConsole parent;
+//    private EmfConsole parent;
 
     private InputDatasetSelectionPresenter presenter;
 
@@ -42,7 +42,7 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     public InputDatasetSelectionDialog(EmfConsole parent, ManageChangeables changeables) {
         super(parent);
         super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
-        this.parent = parent;
+//        this.parent = parent;
         setModal(true);
     }
 
@@ -55,11 +55,17 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
         panel.add(buildDatasetsPanel(), BorderLayout.CENTER);
         panel.add(buttonPanel(), BorderLayout.SOUTH);
         contentPane.add(panel);
-
-        setTitle("Select Datasets");
+        if (datasetTypes.length == 1)
+        {
+            setTitle("Select "+datasetTypes[0].getName()+" Datasets");           
+        }
+        else
+        {
+           setTitle("Select Inventory Datasets");
+        }   
         this.pack();
         this.setSize(500, 400);
-        this.setLocation(ScreenUtils.getPointToCenter(parent));
+        this.setLocation(ScreenUtils.getPointToCenter(this));
         this.setVisible(true);
     }
 
@@ -73,7 +79,7 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
 
     private JPanel buildDatasetTypeCombo(DatasetType[] datasetTypes) {
         JPanel panel = new JPanel(new BorderLayout());
-        datasetTypeCombo = new ComboBox("Choose an inventory type", datasetTypes);
+        datasetTypeCombo = new ComboBox("Choose an dataset type", datasetTypes);
 
         datasetTypeCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
