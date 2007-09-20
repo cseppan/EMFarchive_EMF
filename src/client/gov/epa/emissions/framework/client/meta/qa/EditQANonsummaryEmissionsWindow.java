@@ -63,7 +63,7 @@ public EditQANonsummaryEmissionsWindow(DesktopManager desktopManager, EmfSession
 
 public EditQANonsummaryEmissionsWindow(DesktopManager desktopManager, EmfSession session) {
     
-    super("Emissions Inventories Editor", new Dimension(600, 300), desktopManager);
+    super("Set Inventories", new Dimension(600, 300), desktopManager);
 
     this.session = session;
     this.datasets = null;
@@ -72,7 +72,7 @@ public EditQANonsummaryEmissionsWindow(DesktopManager desktopManager, EmfSession
 }
 
     public void display(EmfDataset dataset, QAStep qaStep) {
-        super.setTitle("EditQANonsummaryEmissionsEditor: " + dataset.getName() + "_" + qaStep.getId() );
+        super.setTitle("Set Inventories: " + qaStep.getName()+ "_" + qaStep.getId()+" ("+dataset.getName()+")");
         super.display();
     }
 
