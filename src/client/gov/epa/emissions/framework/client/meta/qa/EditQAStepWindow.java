@@ -376,7 +376,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        programArguments = new TextArea("", step.getProgramArguments(),40, 3);
+        programArguments = new TextArea("", step.getProgramArguments(),41, 3);
         addChangeable(programArguments);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programArguments);
         buttonPanel.add(scrollableDetails);
@@ -414,7 +414,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         layout.makeCompactGrid(checkBoxPanel, 1, 2, 0, 0, 0, 0);
         layoutGenerator.addLabelWidgetPair("Order:", checkBoxPanel, panel);
 
-        description = new TextArea("", step.getDescription(), 40, 3);
+        description = new TextArea("", step.getDescription(), 41, 3);
         addChangeable(description);
         ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
         layoutGenerator.addLabelWidgetPair("Description:", scrollableDesc, panel);
@@ -645,10 +645,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 //System.out.println("The program is: " + (String)program.getSelectedItem());
                 String annEmis = "Average day to Annual State Summary";
                 String annEmis2 = "Average day to Annual Inventory";
-                if (annEmis.equals(program.getSelectedItem())) {
+                if (annEmis.equalsIgnoreCase(program.getSelectedItem().toString())) {
                     //System.out.println("You selected annual emissions");
                     doSetAnnEmisWindow();
-                } else if (annEmis2.equals(program.getSelectedItem())){
+                } else if (annEmis2.equalsIgnoreCase(program.getSelectedItem().toString())){
                     doSetAnnEmis2Window();
                 } else {
                     //System.out.println("You selected some other program");
