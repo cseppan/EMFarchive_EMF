@@ -532,11 +532,11 @@ public class CaseDAO {
     }
 
 
-    private boolean loopDepends(int jid, DependentJob job) {
-        boolean loopDetected = false;
-
-        return loopDetected;
-    }
+//    private boolean loopDepends(int jid, DependentJob job) {
+//        boolean loopDetected = false;
+//
+//        return loopDetected;
+//    }
 
     public String[] getAllValidJobs(int jobId) {
         List<String> validJobNames = new ArrayList<String>();
