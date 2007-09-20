@@ -76,7 +76,7 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) 
 }
 
     public void display(EmfDataset dataset, QAStep qaStep) {
-        super.setTitle("EditQAEmissionsEditor: " + dataset.getName() + "_" + qaStep.getId() );
+        super.setTitle("Setup "+qaStep.getName()+": " + dataset.getName() + "_" + qaStep.getId() );
         super.display();
     }
 
@@ -127,7 +127,7 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) 
         addButton = new AddButton("Select", addAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel invPanel = new JPanel(new BorderLayout());
+        JPanel invPanel = new JPanel(new BorderLayout(5,0));
         
         invPanel.add(pane, BorderLayout.LINE_START);
         invPanel.add(addButton);
