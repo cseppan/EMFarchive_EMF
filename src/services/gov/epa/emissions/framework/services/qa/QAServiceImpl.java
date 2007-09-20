@@ -116,11 +116,11 @@ public class QAServiceImpl implements QAService {
     }
 
     private void checkRestrictions(QAStep step) throws EmfException {
-        QAProgram program = step.getProgram();
-        if (program == null || !program.getName().startsWith("SQL") 
-                && !program.getName().startsWith("Average day to Annual State Summary")
-                && !program.getName().startsWith("Average day to Annual Inventory"))
-            throw new EmfException("SQL and annual emissions are the only programs currently supported for running a QA Step");
+        QAProgram program = step.getProgram(); 
+        if (program == null) throw new EmfException("Please specify a runnable QA program before running (e.g., SQL)");
+        String runClassName = program.getRunClassName();
+        if ((runClassName == null) || (runClassName.trim().length() == 0))
+            throw new EmfException("The program "+program.getName()+" cannot currently be run in the EMF");
     }
 
     private EmfDbServer dbServer() throws EmfException {
