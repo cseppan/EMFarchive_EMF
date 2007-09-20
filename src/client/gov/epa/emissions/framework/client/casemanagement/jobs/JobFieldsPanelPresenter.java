@@ -137,6 +137,16 @@ public class JobFieldsPanelPresenter {
         view.setFields(); // FIXME: should do more check here
     }
 
+    public String[] getExistedJobs() throws EmfException {
+        CaseJob[] existedJobs = parentPresenter.getCaseJobs();
+        String[] names = new String[existedJobs.length];
+        
+        for (int i = 0; i < existedJobs.length; i++)
+            names[i] = existedJobs[i].getName();
+        
+        return names;
+    }
+    
     public String[] getAllValidJobs(int jobId) throws EmfException {
         return caseService().getAllValidJobs(jobId);
     }

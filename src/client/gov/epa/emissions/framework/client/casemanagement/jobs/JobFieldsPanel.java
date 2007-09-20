@@ -553,8 +553,19 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     }
     
     private JPanel jobDependencyPanel() throws EmfException {
-        dependentJobsList = new AddRemoveWidget(presenter.getAllValidJobs(job.getId()), changeablesList, parent);
-        dependentJobsList.setObjects(presenter.getDependentJobs(job.getId()));
+        String[] jobNames = null;
+        String[] dependentJobNames = null;
+        
+        if (edit) {
+            jobNames = presenter.getAllValidJobs(job.getId());
+            dependentJobNames = presenter.getDependentJobs(job.getId());
+        } else {
+            jobNames = presenter.getExistedJobs();
+            dependentJobNames = new String[0];
+        }
+        
+        dependentJobsList = new AddRemoveWidget(jobNames, changeablesList, parent);
+        dependentJobsList.setObjects(dependentJobNames);
         dependentJobsList.setPreferredSize(new Dimension(140,120));
         return dependentJobsList;
     }
