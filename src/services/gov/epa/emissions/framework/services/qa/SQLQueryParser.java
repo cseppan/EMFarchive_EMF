@@ -273,7 +273,6 @@ public class SQLQueryParser {
             e.printStackTrace();
             throw new EmfException(e.getMessage());
         }
-        return null;  // should never get here
     }
 
     // Added this method to handle new tag $DATASET_TABLE_VERSION[ datasetname, tablenum, versionnum ]
