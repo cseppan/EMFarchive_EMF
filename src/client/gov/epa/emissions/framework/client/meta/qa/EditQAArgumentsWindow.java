@@ -41,7 +41,7 @@ public class EditQAArgumentsWindow extends DisposableInteralFrame implements Edi
     }
 
   public void display(EmfDataset dataset, QAStep qaStep) {
-      super.setTitle("EditQAArgumentsEditor: " + dataset.getName() + "_" + qaStep.getId());
+      super.setTitle("Edit QA Step Arguments: " + qaStep.getName() + "_" + qaStep.getId()+" ("+dataset.getName()+")");
       super.display();
   }
   
@@ -60,6 +60,8 @@ public class EditQAArgumentsWindow extends DisposableInteralFrame implements Edi
         // QAStepWindow arguments text area.
         
         arguments = new JTextArea();
+        arguments.setWrapStyleWord(true);
+        arguments.setLineWrap(true);
         arguments.setText(textAreaArguments);
         
         //Put the text area in a scroll pane and set its size.
