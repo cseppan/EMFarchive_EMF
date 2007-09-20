@@ -22,8 +22,19 @@ public class QAStepRowSource implements RowSource {
 
         return new Object[] { new Integer(source.getVersion()), source.getName(), Boolean.valueOf(source.isRequired()),
                 new Float(source.getOrder()), source.getStatus(), format(source.getDate()), source.getWho(), comments,
-                program(source.getProgram()), source.getProgramArguments(), source.getConfiguration() };
+                program(source.getProgram()), getShortenedProgramArguments(source.getProgramArguments()), 
+                source.getConfiguration() };
     }
+    
+    public String getShortenedProgramArguments(String programArguments) {
+        if (programArguments == null)
+           return programArguments;
+        else if (programArguments.length() > 70)
+           return programArguments.substring(0, 70);   
+        else 
+           return programArguments;
+    }
+
 
     private String program(QAProgram program) {
         return (program != null) ? program.getName() : "";
