@@ -179,92 +179,101 @@ public class SQLQueryParser {
     // Added this method to handle new tag $DATASET_TABLE[ datasetname, tablenum ]
 
     private String expandTwoTag(String query) throws EmfException {
-        // Point to the start of the second tag, the first substring is from the beginning of the
-        // query to that point. The suffix is from that point to the end of the tag.
-
-        int index = query.indexOf(startSecondQueryTag);
         //System.out.println(query + "[]" + query);
-        String prefix = query.substring(0, index);
-        String suffix = query.substring(index + startSecondQueryTag.length());
-
+        String prefix;
         // Split the suffix into three tokens
-        String[] suffixTokens = suffixSplit(suffix);
-        //for (int v = 0; v < suffixTokens.length; v++) {
-          //  System.out.println(suffixTokens[v]+ "\n");
-            //}
-
-        // The dataset name is retreived as the first argument in the second token.
-        // It is then trimmed and then converted into an EmfDataset type throught
-        // the getDataset method created below
-
-        // Look for first double quote (fdq).  Go from there to second double quote (sdq).
-        // The new first token is from fdq to sdq.
-        // The new second token is from sdq to end of string.
-        // From this point parse on the next comma because the other value is a number
-        
-        int quoteIndex = suffixTokens[1].indexOf("\"");
-        String firstQuoteRemoved = suffixTokens[1].substring(quoteIndex + 1);
-        //System.out.println("firstQuoteRemoved: " + firstQuoteRemoved);
-        int quoteIndex2 = firstQuoteRemoved.indexOf("\"");
-        String dataSetName = firstQuoteRemoved.substring(0, quoteIndex2) + " ";
-        //System.out.println("dataSetName: " + dataSetName);
-        
+        String[] suffixTokens;
         //int index2 = suffixTokens[1].indexOf(",");
-        //String dataSetName = suffixTokens[1].substring(0, index2) + " ";
-        EmfDataset dataSet2 = getDataset(dataSetName.trim());
+                //String dataSetName = suffixTokens[1].substring(0, index2) + " ";
+        EmfDataset dataSet2;
+        String tableNum;
+        try {
+            // Point to the start of the second tag, the first substring is from the beginning of the
+            // query to that point. The suffix is from that point to the end of the tag.
 
-        // The integer value of the default version is retrieved from the getDefaultVersion
-        // method of the EmfDataset just created. It is converted to a String for the hashtable.
+            int index = query.indexOf(startSecondQueryTag);
+            prefix = query.substring(0, index);
+            String suffix = query.substring(index + startSecondQueryTag.length());
 
-        int ds2IntVersion = dataSet2.getDefaultVersion();
-        String ds2version = Integer.toString(ds2IntVersion);
+            suffixTokens = suffixSplit(suffix);
 
-        // System.out.println("Default Version as integer " + ds2IntVersion);
+            // The dataset name is retreived as the first argument in the second token.
+            // It is then trimmed and then converted into an EmfDataset type throught
+            // the getDataset method created below
 
-        // The dataset id is retrieved from the dataset through its getId method.
-        // It is then converted to a string to put in the hashtable.
-        // Next a version object is created from the dataset id and the version.
+            // Look for first double quote (fdq).  Go from there to second double quote (sdq).
+            // The new first token is from fdq to sdq.
+            // The new second token is from sdq to end of string.
+            // From this point parse on the next comma because the other value is a number
+            
+            int quoteIndex = suffixTokens[1].indexOf("\"");
+            String firstQuoteRemoved = suffixTokens[1].substring(quoteIndex + 1);
+//            System.out.println("firstQuoteRemoved: " + firstQuoteRemoved);
+            int quoteIndex2 = firstQuoteRemoved.indexOf("\"");
+            String dataSetName = firstQuoteRemoved.substring(0, quoteIndex2) + " ";
+            //System.out.println("dataSetName: " + dataSetName);
+            
+            dataSet2 = getDataset(dataSetName.trim());
 
-        int dataSet2_id = dataSet2.getId();
-        String ds2Id = Integer.toString(dataSet2_id);
-        Version version1 = version(dataSet2_id, ds2IntVersion);
-        // System.out.println("version object" + version1);
+            // The integer value of the default version is retrieved from the getDefaultVersion
+            // method of the EmfDataset just created. It is converted to a String for the hashtable.
 
-        // The table number is retrieved from the second argument in the second token.
-        String secondQuoteRemoved = firstQuoteRemoved.substring(quoteIndex2 + 1);
-        /*int quoteIndex3 = secondQuoteRemoved.indexOf("\"");
-        String thirdQuoteRemoved = secondQuoteRemoved.substring(quoteIndex3 + 1);
-        int quoteIndex4 = thirdQuoteRemoved.indexOf("\"");
-        String tableNum = thirdQuoteRemoved.substring(0, quoteIndex4);*/
-        
-        int commaIndex = secondQuoteRemoved.indexOf(",");
-        String tableNum = secondQuoteRemoved.substring(commaIndex + 1).trim();
-        
-        //System.out.println("tableNum: " + tableNum);
-        //String tableNum = suffixTokens[1].substring(index2 + 1).trim();
+            int ds2IntVersion = dataSet2.getDefaultVersion();
+            String ds2version = Integer.toString(ds2IntVersion);
 
-        /*
-         * System.out.println("Dataset information: " + dataSet2); System.out.println("Dataset id: " + dataSet2_id);
-         * System.out.println("Dataset name: " + dataSetName); System.out.println("Table number: " + tableNum);
-         */
+//            System.out.println("Default Version as integer " + ds2IntVersion);
 
-        // The complete path of the version is retrieved from the version object just created.
-        String versionCompletePath = version1.createCompletePath();
+            // The dataset id is retrieved from the dataset through its getId method.
+            // It is then converted to a string to put in the hashtable.
+            // Next a version object is created from the dataset id and the version.
 
-        // The second string array value is calculated for the hashtable.
-        // The appropriate key plus the string array (as a "value") is put into the hashtable.
-        String[] ds2 = { dataSetName, suffixTokens[0], ds2version, ds2Id, versionCompletePath };
-        tableValuesAliasesVersions.put("ds2", ds2);
+            int dataSet2_id = dataSet2.getId();
+            String ds2Id = Integer.toString(dataSet2_id);
+            Version version1 = version(dataSet2_id, ds2IntVersion);
+//            System.out.println("version object" + version1);
 
-        /*
-         * System.out.println("prefix: " + prefix); System.out.println("Table number: " + tableNum);
-         * System.out.println("dataset of 2: " + dataSetName); System.out.println("version of 2: " + ds2version);
-         * System.out.println("alias of 2: " + suffixTokens[0]); System.out.println("Rest of query: " +
-         * suffixTokens[2]);
-         */
+            // The table number is retrieved from the second argument in the second token.
+            String secondQuoteRemoved = firstQuoteRemoved.substring(quoteIndex2 + 1);
+            /*int quoteIndex3 = secondQuoteRemoved.indexOf("\"");
+            String thirdQuoteRemoved = secondQuoteRemoved.substring(quoteIndex3 + 1);
+            int quoteIndex4 = thirdQuoteRemoved.indexOf("\"");
+            String tableNum = thirdQuoteRemoved.substring(0, quoteIndex4);*/
+            
+            int commaIndex = secondQuoteRemoved.indexOf(",");
+            tableNum = secondQuoteRemoved.substring(commaIndex + 1).trim();
+            
+//            System.out.println("tableNum: " + tableNum);
+            //String tableNum = suffixTokens[1].substring(index2 + 1).trim();
 
-        // The table name from the dataset is derived from the method below off of the second token.
-        return prefix + tableNameFromDataset(tableNum, dataSet2) + suffixTokens[2];
+            /*
+             * System.out.println("Dataset information: " + dataSet2); System.out.println("Dataset id: " + dataSet2_id);
+             * System.out.println("Dataset name: " + dataSetName); System.out.println("Table number: " + tableNum);
+             */
+
+            // The complete path of the version is retrieved from the version object just created.
+            String versionCompletePath = version1.createCompletePath();
+
+            // The second string array value is calculated for the hashtable.
+            // The appropriate key plus the string array (as a "value") is put into the hashtable.
+            String[] ds2 = { dataSetName, suffixTokens[0], ds2version, ds2Id, versionCompletePath };
+            tableValuesAliasesVersions.put("ds2", ds2);
+
+            /*
+             * System.out.println("prefix: " + prefix); System.out.println("Table number: " + tableNum);
+             * System.out.println("dataset of 2: " + dataSetName); System.out.println("version of 2: " + ds2version);
+             * System.out.println("alias of 2: " + suffixTokens[0]); System.out.println("Rest of query: " +
+             * suffixTokens[2]);
+             */
+
+            // The table name from the dataset is derived from the method below off of the second token.
+            return prefix + tableNameFromDataset(tableNum, dataSet2) + suffixTokens[2];
+        } catch (RuntimeException e) {
+            // NOTE Auto-generated catch block
+            System.out.println("Could not parse query: "+query);
+            e.printStackTrace();
+            throw new EmfException(e.getMessage());
+        }
+        return null;  // should never get here
     }
 
     // Added this method to handle new tag $DATASET_TABLE_VERSION[ datasetname, tablenum, versionnum ]
