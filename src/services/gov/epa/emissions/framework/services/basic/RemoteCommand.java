@@ -5,6 +5,8 @@ import gov.epa.emissions.framework.services.EmfException;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,6 +16,8 @@ public class RemoteCommand {
      * Performes a command on a remote machine (or localhost)
      */
     private static Log LOG = LogFactory.getLog(RemoteCommand.class);
+
+    private static String qID;
 
     public static void logStdout(String title, InputStream inStream) throws EmfException {
         /**
@@ -29,8 +33,14 @@ public class RemoteCommand {
         if (reader != null) {
             try {
                 String message = reader.readLine();
+                boolean processQId = true;
+
                 while (message != null) {
                     LOG.warn(message);
+
+                    if (processQId)
+                        processQId = extractQId(message);
+
                     message = reader.readLine();
                 }
                 reader.close();
@@ -39,6 +49,21 @@ public class RemoteCommand {
                 throw new EmfException("Error logging remote command's stdout/stderr: " + e.getMessage());
             }
         }
+    }
+
+    private static boolean extractQId(String message) {
+        if (message == null || message.trim().isEmpty())
+            return true;
+        
+        Pattern p = Pattern.compile("^[0-9]*\\.(.)*");
+        Matcher m = p.matcher(message.trim());
+
+        if (m.find()) {
+            qID = message.trim();
+            return false;
+        }
+        
+        return true;
     }
 
     public static void logStderr(String title, InputStream inStream) throws EmfException {
@@ -90,7 +115,7 @@ public class RemoteCommand {
         }
     }
 
-    public static void executeLocal(String localCmd) throws EmfException {
+    public static InputStream executeLocal(String localCmd) throws EmfException {
         /**
          * Executes command on local machine -- short form
          * 
@@ -102,7 +127,7 @@ public class RemoteCommand {
         String unixOptions = "-c";
 
         try {
-            executeLocal(unixShell, unixOptions, localCmd);
+            return executeLocal(unixShell, unixOptions, localCmd);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
@@ -201,7 +226,7 @@ public class RemoteCommand {
         }
     }
 
-    public static void executeLocal(String unixShell, String unixOptions, String localCmd) throws EmfException {
+    public static InputStream executeLocal(String unixShell, String unixOptions, String localCmd) throws EmfException {
         /**
          * Executes a command on a local machine -- long form
          * 
@@ -226,16 +251,22 @@ public class RemoteCommand {
                 // process is not finished wait -- don't wait
             }
             LOG.warn("Started command on the local EMF machine: " + localCmd);
+
+            if (errorLevel > 0) {
+                // error in local command
+                throw new EmfException("ERROR in executing local command: " + localCmd);
+            }
+
+            return p.getInputStream();
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("ERROR in executing local command: " + localCmd);
             throw new EmfException("ERROR in executing local command: " + e.getMessage());
+        }
+    }
 
-        }
-        if (errorLevel > 0) {
-            // error in local command
-            throw new EmfException("ERROR in executing local command: " + localCmd);
-        }
+    public static String getQueueId() {
+        return qID;
     }
 
 }

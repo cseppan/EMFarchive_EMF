@@ -245,6 +245,7 @@ public class CaseJobTaskManager implements TaskManager {
             if (status.equals("completed")) {
                 System.out.println("CaseJobTaskManager::updateRunStatus:  job Status is completed jobStatus=Submitted");
                 jobStatus = "Submitted";
+                caseJob.setIdInQueue(cjt.getQId());
                 caseJob.setRunStartDate(new Date());
             }
 
@@ -268,6 +269,7 @@ public class CaseJobTaskManager implements TaskManager {
 
             JobRunStatus jrStat = caseDAO.getJobRunStatuse(jobStatus);
             caseJob.setRunstatus(jrStat);
+            caseDAO.updateCaseJob(caseJob);
 
             caseDAO.updateCaseJob(caseJob);
         } catch (Exception e) {

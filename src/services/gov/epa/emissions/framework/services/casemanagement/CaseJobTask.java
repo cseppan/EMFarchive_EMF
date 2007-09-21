@@ -50,6 +50,8 @@ public class CaseJobTask extends Task {
     private String jobkey;
 
     private String runRedirect = ">&"; // shell specific redirect
+    
+    private String qId;
 
     public String getJobkey() {
         return jobkey;
@@ -150,15 +152,12 @@ public class CaseJobTask extends Task {
             if (hostName.equals("localhost")) {
                 // execute on local machine
                 executionStr = executionStr + " " + this.runRedirect + " " + this.logFile;
-                RemoteCommand.executeLocal(executionStr);
-
+                InputStream inStream = RemoteCommand.executeLocal(executionStr);
+                processLogs(executionStr, inStream, "localhost");
             } else {
                 // execute on remote machine and log stdout
                 InputStream inStream = RemoteCommand.execute(username, hostName, executionStr);
-
-                String outTitle = "stdout from (" + hostName + "): " + executionStr;
-                RemoteCommand.logStdout(outTitle, inStream);
-
+                processLogs(executionStr, inStream, hostName);
                 // capture PBSqueueId and send back to case job submitter
                 // TODO:
             }
@@ -180,6 +179,12 @@ public class CaseJobTask extends Task {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    private void processLogs(String executionStr, InputStream inStream, String host) throws EmfException {
+        String outTitle = "stdout from (" + host + "): " + executionStr;
+        RemoteCommand.logStdout(outTitle, inStream);
+        qId = RemoteCommand.getQueueId();
     }
 
     /**
@@ -270,7 +275,11 @@ public class CaseJobTask extends Task {
     public void setJobFileContent(String jobFileContent) {
         this.jobFileContent = jobFileContent;
     }
-
+    
+    public String getQId() {
+        return this.qId;
+    }
+    
     // ***********************************************************
     // FIXME: After code is working remove everything below
     public String getJobFileContent() {

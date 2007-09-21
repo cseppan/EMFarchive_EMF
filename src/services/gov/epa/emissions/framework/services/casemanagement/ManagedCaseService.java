@@ -1069,6 +1069,9 @@ public class ManagedCaseService {
     public synchronized CaseJob addCaseJob(CaseJob job) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
+            if (job.getRunstatus() == null)
+                job.setRunstatus(dao.getJobRunStatuse("Not Started"));
+            
             dao.add(job, session);
             return (CaseJob) dao.loadCaseJob(job);
         } catch (Exception e) {
