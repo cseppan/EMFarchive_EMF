@@ -75,18 +75,20 @@ public class JobFieldsPanelPresenter {
         for (int i = 0; i < statuses.length; i++) {
             String status = statuses[i].getName().toUpperCase();
 
-            if (status.startsWith("NOT"))
+            if (status.startsWith("NOT START"))
                 sorted[0] = statuses[i];
-            else if (status.startsWith("SUBMIT"))
+            else if (status.startsWith("EXPORT"))
                 sorted[1] = statuses[i];
-            else if (status.startsWith("RUN"))
+            else if (status.startsWith("SUBMIT"))
                 sorted[2] = statuses[i];
-            else if (status.startsWith("SUCCEED"))
+            else if (status.startsWith("RUN"))
                 sorted[3] = statuses[i];
-            else if (status.startsWith("QUALITY"))
+            else if (status.startsWith("COMPLET"))
                 sorted[4] = statuses[i];
-            else if (status.startsWith("FAIL"))
+            else if (status.startsWith("QUALITY"))
                 sorted[5] = statuses[i];
+            else if (status.startsWith("FAIL"))
+                sorted[6] = statuses[i];
         }
 
         return sorted;
