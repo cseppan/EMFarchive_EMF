@@ -1388,11 +1388,6 @@ public class ManagedCaseService {
                 cjt.setQueueOptions(caseJob.getQueOptions());
                 if (DebugLevels.DEBUG_6)
                     System.out.println("Completed setting the CaseJobTask");
-
-                // FIXME: BELOW FOR TESTING ONLY
-                cjt.setReadyTrue();
-                cjt.setDependenciesSet(true);
-                // FIXME: ABOVE FOR TESTING ONLY
                 
                 // Now add the CaseJobTask to the caseJobsTasksList
                 caseJobsTasksList.add(cjt);
