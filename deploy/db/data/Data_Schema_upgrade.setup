@@ -159,7 +159,7 @@ where name = 'Summarize by Control Technology and Pollutant'
 	
 -- To add exporter class name for external dataset types
 update emf.dataset_types set exporter_classname='gov.epa.emissions.commons.io.external.ExternalFilesExporter' 
-where name like '%External%';
+where external='TRUE';
 
 
 
