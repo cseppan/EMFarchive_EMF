@@ -202,7 +202,8 @@ public class CaseJobTaskManager implements TaskManager {
 
         CaseJobTask cjt = null;
         String jobStatus = "";
-
+        CaseJob caseJob = null;
+        
         try {
             if ((status.equals("completed")) || (status.equals("failed"))) {
                 System.out.println("CaseJobTaskManager::updateRunStatus:  job completed or failed");
@@ -233,10 +234,18 @@ public class CaseJobTaskManager implements TaskManager {
                 }
             }
 
+            if (DebugLevels.DEBUG_9) System.out.println("CJTM::updateRunStatus is casejobtask null? " + (cjt==null));
+
+            // if this was a forced failed due to dependencies failing the casejobtask needs to come from
+            // the wait queue since cjt will be null
+            synchronized (waitTable) {
+                cjt = (CaseJobTask) waitTable.get(taskId);
+            }
+            
             // update the run status in the Case_CaseJobs
             int jid = cjt.getJobId();
 
-            CaseJob caseJob = caseDAO.getCaseJob(jid);
+            caseJob = caseDAO.getCaseJob(jid);
 
             if (DebugLevels.DEBUG_9)
                 System.out.println("In CaseJobTaskManager::updateRunStatus for jobId= " + jid
@@ -622,7 +631,7 @@ public class CaseJobTaskManager implements TaskManager {
                             
                             cjt.setDependenciesSet(true);
                         } else {
-                            if (DebugLevels.DEBUG_9) System.out.println("Some of the dependent jobs have failed or not started");
+                            if (DebugLevels.DEBUG_9) System.out.println("Some of the dependent jobs have failed or not started for job= " + cjt.getJobName());
 
                             // We have a parent job that has atleast one dependent job that has failed or
                             // not started therefore send an error message to the user's status window
