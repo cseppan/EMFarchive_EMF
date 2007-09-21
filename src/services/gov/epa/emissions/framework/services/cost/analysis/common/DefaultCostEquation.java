@@ -11,7 +11,7 @@ public class DefaultCostEquation implements CostEquation {
     
     private Double annulizedCCost;
     private Double annualCost;
-
+   
     public DefaultCostEquation(double discountRate) {
         this.discountRate = discountRate / 100;
     }
@@ -86,6 +86,11 @@ public class DefaultCostEquation implements CostEquation {
     }
 
     public Double getComputedCPT() {
+        try { 
+            annualCost=getAnnualCost();
+        } catch (EmfException e){ 
+           e.printStackTrace(); 
+        }
         if (annualCost==null ||annualCost==0.0 || emissionReduction==0.0 ) return null;
         return annualCost/emissionReduction;
     }
