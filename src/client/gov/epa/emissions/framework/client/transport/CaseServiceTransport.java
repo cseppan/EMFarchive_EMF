@@ -620,6 +620,7 @@ public class CaseServiceTransport implements CaseService {
         call.addParam("message", caseMappings.jobMessage());
         call.addStringParam("jobKey");
         call.setIntegerReturnType();
+        call.setTimeOut(20000); //set time out in milliseconds to terminate if service doesn't response
         
         return (Integer)call.requestResponse(new Object[]{ message, jobKey });
     }
