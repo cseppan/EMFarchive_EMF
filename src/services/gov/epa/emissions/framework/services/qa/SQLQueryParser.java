@@ -493,7 +493,7 @@ public class SQLQueryParser {
             }
         }
         if (outputTable == "")
-                throw new EmfException("An appropriate QA Step could not be found");
+                throw new EmfException("The " +  qaStepName + " QA Step could not be found in the " + dataSet4 + " dataset.");
        
         // Only need to send back the schema concatenated with the output table.
         return prefix + emissionDatasourceName + "." + outputTable + suffixTokens[1];
@@ -617,7 +617,7 @@ public class SQLQueryParser {
             }
         }
         if (outputTable == "")
-            throw new EmfException("An appropriate QA Step could not be found");
+            throw new EmfException("The " +  qaStepName + " QA Step could not be found in the " + dataSet5 + " dataset.");
         
         // Only need to send back the schema concatenated with the output table.
         return prefix + emissionDatasourceName + "." + outputTable + suffixTokens[1];
@@ -795,7 +795,7 @@ public class SQLQueryParser {
             return dao.getDataset(sessionFactory.getSession(), dsName);
         } catch (Exception ex) {
             ex.printStackTrace();
-            throw new EmfException("The dataset name must be valid");
+            throw new EmfException("The dataset name " + dsName + " is not valid");
         }
     }
 
