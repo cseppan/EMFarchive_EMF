@@ -524,6 +524,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         final String invTableTag = "-invtable";
         String programSwitches = "";
+        String nextDataset = "";
         
         //String firstElementContains = "";
 
@@ -537,7 +538,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 String invtableToken = programSwitches.substring(index1 + invTableTag.length());
         
                 StringTokenizer tokenizer2 = new StringTokenizer(inventoriesToken);
-         
+                
                 tokenizer2.nextToken();
                 int i = 0;
                 while (tokenizer2.hasMoreTokens()) {
@@ -545,11 +546,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                     try {
                         //System.out.println("Dataset: " +  tokenizer2.nextToken());
                         //System.out.println("Size: "+ inputDatasets.size());
-                        inputDatasets.add(presenter.getDataset(tokenizer2.nextToken().trim()));
+                        nextDataset = tokenizer2.nextToken().trim();
+                        inputDatasets.add(presenter.getDataset(nextDataset));
                         //System.out.println("Next item: " + inputDatasets.get(i).toString());
                         i++;
                     } catch(EmfException ex) {
-                        throw new EmfException("At least one of the inventory emissions datasets is invalid");
+                        throw new EmfException("The dataset name " + nextDataset + " is not valid");
                     }
                 }
                 inputDatasetsArray = new EmfDataset [inputDatasets.size()];
@@ -583,11 +585,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                       try {
                           //System.out.println("Dataset: " +  tokenizer2.nextToken());
                           //System.out.println("Size: "+ inputDatasets.size());
-                          inputDatasets.add(presenter.getDataset(tokenizer2.nextToken().trim()));
+                          nextDataset = tokenizer2.nextToken().trim();
+                          inputDatasets.add(presenter.getDataset(nextDataset));
                           //System.out.println("Next item: " + inputDatasets.get(i).toString());
                           i++;
                       } catch(EmfException ex) {
-                          throw new EmfException("At least one of the inventory emissions datasets is invalid");
+                          throw new EmfException("The dataset name " + nextDataset + " is not valid");
                       }
                   }
                   inputDatasetsArray = new EmfDataset [inputDatasets.size()];
@@ -667,6 +670,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         //Also change the window name to EditQASetArgumentsWindow
         
         String programSwitches = "";
+        String nextDataset = "";
 
         programSwitches = programArguments.getText();
         //System.out.println("Text: " + programSwitches);
@@ -686,11 +690,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                     try {
                         //System.out.println("Dataset: " +  tokenizer2.nextToken());
                         //System.out.println("Size: "+ inputDatasets.size());
-                        inputDatasets.add(presenter.getDataset(tokenizer2.nextToken().trim()));
+                        nextDataset = tokenizer2.nextToken().trim();
+                        inputDatasets.add(presenter.getDataset(nextDataset));
                         //System.out.println("Next item: " + inputDatasets.get(i).toString());
                         i++;
                     } catch(EmfException ex) {
-                        messagePanel.setError("At least one of the inventory emissions datasets is invalid");
+                        messagePanel.setError("The dataset name " + nextDataset + " is not valid");
                     }
                 }
                 inputDatasetsArray = new EmfDataset [inputDatasets.size()];
@@ -748,6 +753,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         
         String programSwitches = "";
         StringTokenizer tokenizer2;
+        String nextDataset = "";
         inputDatasets.clear();
 
         programSwitches = programArguments.getText();
@@ -769,11 +775,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                     try {
                         //System.out.println("Dataset: " +  tokenizer2.nextToken());
                         //System.out.println("Size: "+ inputDatasets.size());
-                        inputDatasets.add(presenter.getDataset(tokenizer2.nextToken().trim()));
+                        nextDataset = tokenizer2.nextToken().trim();
+                        inputDatasets.add(presenter.getDataset(nextDataset));
                         //System.out.println("Next item: " + inputDatasets.get(i).toString());
                         i++;
                     } catch(EmfException ex) {
-                        messagePanel.setError("At least one of the inventory emissions datasets is invalid");
+                        messagePanel.setError("The dataset name " + nextDataset + " is not valid");
                     }
                 }
                 inputDatasetsArray = new EmfDataset [inputDatasets.size()];
