@@ -38,9 +38,11 @@ public class SQLAnnualQueryRunner extends SQLQAProgramRunner {
             dropTable(getExistedTableName(qaStep));
             dbServer.getEmissionsDatasource().query().execute(query);
             success(qaStep, tableName);
+        // Changed as per SQLQAProgramRunner
         } catch (Exception e) {
             failure(qaStep);
-            throw new EmfException("Check the query - " + query);
+            //throw new EmfException("Check the query - " + query);
+            throw new EmfException("Check the query - " + e.getMessage());
         }
     }
 }

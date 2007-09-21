@@ -45,9 +45,13 @@ public class SQLQAProgramRunner implements QAProgramRunner {
             dropTable(getExistedTableName(qaStep));
             dbServer.getEmissionsDatasource().query().execute(query);
             success(qaStep, tableName);
+            
+        // Changed this code by using e.message to pull out more detailed failure information.
         } catch (Exception e) {
             failure(qaStep);
-            throw new EmfException("Check the query - " + query);
+            //throw new EmfException("Check the query - " + query);
+            throw new EmfException("Check the query - " + e.getMessage());
+            
         }
     }
 
