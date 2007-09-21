@@ -1507,8 +1507,11 @@ public class ManagedCaseService {
                 throw new EmfException("Case job uniqueness check failed (" + loaded.getId() + "," + job.getId() + ")");
 
             dao.updateCaseJob(job);
-            // this should go to case message panel instead
-            // setStatus(user, "Saved job " + job.getName() + " to database.", "Save Job");
+            
+            // This is a manual update of the waiting tasks in CaseJobTask manager
+            //If CaseJobTaskManager is not null.  check the dependencies in the WaitTable
+            TaskManagerFactory.getCaseJobTaskManager(sessionFactory).callBackFromJobRunServer();
+            
         } catch (RuntimeException e) {
             e.printStackTrace();
             log.error("Could not update case job: " + job.getName() + ".\n" + e);
