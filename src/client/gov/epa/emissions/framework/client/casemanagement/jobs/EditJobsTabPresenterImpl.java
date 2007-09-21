@@ -104,8 +104,12 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     public void runJobs(CaseJob[] jobs) throws EmfException {
         Integer[] jobIds = new Integer[jobs.length];
 
-        for (int i = 0; i < jobs.length; i++)
+        for (int i = 0; i < jobs.length; i++) {
+            if (jobs[i].getExecutable() == null)
+                throw new EmfException("Job " + jobs[i].getName() 
+                        + " doesn't have a valid executable file.");
             jobIds[i] = new Integer(jobs[i].getId());
+        }
 
         service().runJobs(jobIds, caseObj.getId(), session.user());
     }

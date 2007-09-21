@@ -65,10 +65,12 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         tabbedPane.addTab("Outputs", createOutputTab());
         tabbedPane.addTab("History", createHistoryTab());
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        final MessagePanel localMsgPanel = this.messagePanel;
 
         tabbedPane.addChangeListener(new ChangeListener(){
             public void stateChanged(ChangeEvent e) {
                 try {
+                    localMsgPanel.clear();
                     loadComponents();
                 } catch (EmfException exc) {
                     showError("Could not load component: "  + tabbedPane.getSelectedComponent().getName());
@@ -208,6 +210,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private void refreshCurrentTab() throws EmfException {
         RefreshObserver tab = (RefreshObserver)tabbedPane.getSelectedComponent();
         try {
+            messagePanel.clear();
             tab.doRefresh();
         } catch (Exception e) {
             throw new EmfException(tabbedPane.getSelectedComponent().getName() + e.getMessage());

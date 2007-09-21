@@ -353,7 +353,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
                     proceedRunningJobs(jobs);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw e;
         } finally {
             setCursor(Cursor.getDefaultCursor());

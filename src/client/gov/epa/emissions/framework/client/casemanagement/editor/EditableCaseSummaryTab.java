@@ -518,51 +518,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return label;
     }
 
-    // private JPanel addRemoveButtonPanel() {
-    // JPanel panel = new JPanel();
-    // // TBD: this needs to be changed so you have handles to the buttons
-    // // and can set actions
-    // Button addButton = new AddButton("Add", addAction());
-    // Button removeButton = new RemoveButton("Remove", removeAction());
-    //
-    // panel.add(addButton);
-    // panel.add(removeButton);
-    // // for now, disable these
-    //
-    // return panel;
-    // }
-    //
-    // private Action removeAction() {
-    // return new AbstractAction() {
-    // public void actionPerformed(ActionEvent e) {
-    // removeSectors();
-    // }
-    // };
-    // }
-    //
-    //    
-    // private Action addAction() {
-    // return new AbstractAction() {
-    // public void actionPerformed(ActionEvent e) {
-    // addSectors();
-    // }
-    // };
-    // }
-    //
-    // private void addSectors() {
-    // Sector[] allSectors = presenter.getAllSectors();
-    // if (allSectors == null)
-    // return;
-    // SectorSelector sectorSelector = new SectorSelector(allSectors, sectorsWidget, parentConsole);
-    // sectorSelector.display();
-    // }
-    //    
-    // protected void removeSectors() {
-    // Object[] removeValues = sectorsWidget.getSelectedValues();
-    // sectorsWidget.removeElements(removeValues);
-    //        
-    // }
-
     public void save(Case caseObj) throws EmfException {
         caseObj.setName(name.getText());
         saveFutureYear();
