@@ -124,7 +124,7 @@ public class SQLQAAnnualQuery {
             try {
             dataset = getDataset(allDatasetNames.get(j).toString().trim());
             } catch(EmfException ex){
-                throw new EmfException("There is at least one invalid dataset name");
+                throw new EmfException("The dataset name " + allDatasetNames.get(j).toString().trim() + " is not valid");
             }
             
             
@@ -328,7 +328,7 @@ public class SQLQAAnnualQuery {
                 return dao.getDataset(sessionFactory.getSession(), dsName);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                throw new EmfException("The dataset name must be valid");
+                throw new EmfException("The dataset name " + dsName + " is not valid");
             }
         }
 }
