@@ -19,6 +19,8 @@ public class DefaultCostEquation implements CostEquation {
     public void setUp(double emissionReduction, BestMeasureEffRecord bestMeasureEffRecord) {
         this.bestMeasureEffRecord = bestMeasureEffRecord;
         this.emissionReduction = emissionReduction;
+        
+        //
     }
 
     public Double getAnnualCost() throws EmfException {
@@ -27,12 +29,8 @@ public class DefaultCostEquation implements CostEquation {
         return tAnnualCost;
     }
 
-    public Double getCapitalCost(){
-        try {
-            annualCost=getAnnualCost();
-        } catch (EmfException e) {
-            e.printStackTrace();
-        }
+    public Double getCapitalCost() throws EmfException {
+        annualCost=getAnnualCost();
         Double capAnnRatio = bestMeasureEffRecord.efficiencyRecord().getCapitalAnnualizedRatio();
         
         if (capAnnRatio == null || annualCost==null){
@@ -41,20 +39,16 @@ public class DefaultCostEquation implements CostEquation {
         return capAnnRatio * annualCost;
     }  
     
-    public Double getOperationMaintenanceCost() {
+    public Double getOperationMaintenanceCost() throws EmfException {
         annulizedCCost = getAnnualizedCapitalCost();
-        try {
-            annualCost=getAnnualCost();
-        } catch (EmfException e) {
-            e.printStackTrace();
-        }
+        annualCost=getAnnualCost();
         if (annulizedCCost == null) return annualCost;
         double omCost = annualCost - annulizedCCost;
         if (omCost==0.0) return null; 
         return omCost;
     }
     
-    public Double getAnnualizedCapitalCost(){ 
+    public Double getAnnualizedCapitalCost() throws EmfException { 
         Double capRecFactor=getCapRecFactor();
         capitalCost = getCapitalCost();
         if (capitalCost == null || capRecFactor == null) return null;

@@ -70,6 +70,7 @@ public class Type8CostEquation implements CostEquation {
             return capitalCost * capRecFactor + 0.04 * capitalCost
                 + getOperationMaintenanceCost();
         //stack flow rate is less than 5 cfm
+        
         return defaultAnnualizedCPTFactor * reducedEmission;
     }
 
@@ -124,4 +125,11 @@ public class Type8CostEquation implements CostEquation {
         }
         return null;
     }
+    
+//    public String toString(){
+//        return "Typical Capital Control Cost Factor: " + capCostFactor +
+//        " Annual cost: " + getAnnualCost() + "  "
+//        + defaultCapitalCPTFactor +" "+defaultOperMaintCPTFactor+ " "
+//        + defaultAnnualizedCPTFactor+" "+ hasAllVariables;
+//    }
 }

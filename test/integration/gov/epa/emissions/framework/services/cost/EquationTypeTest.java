@@ -240,20 +240,19 @@ public class EquationTypeTest extends ServiceTestCase {
     try {
         double annualCost = typeDefault.getAnnualCost();
         double expectdAnnualCost=200000.0;
-//        System.out.println("Default test annual Cost "+  annualCost);
+
         double capitalCost = typeDefault.getCapitalCost();
         double expectedCapitalCost=1200000.0;
-//       System.out.println("Default test capital Cost "+  capitalCost);
-        
         
         double operatingCostResult = typeDefault.getOperationMaintenanceCost();
         double expectedOperatingCost = 68246.45;
- //       System.out.println("Default test O&M "+  operatingCostResult);
+ 
         
         double annualizedCapitalCost=typeDefault.getAnnualizedCapitalCost();
         double expectedAnnualizedCCost=131753.55;
     
         double computedCPT=typeDefault.getComputedCPT();
+ //       System.out.println("Default test computed CPT "+  computedCPT);
         double expectedComputedCPT=200.0;
     
         assertTrue("Check Type default operating and maintenance cost", Math.abs(operatingCostResult - expectedOperatingCost) < tolerance);
