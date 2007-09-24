@@ -89,12 +89,12 @@ public class ManagedCaseService {
 
     protected Session session = null;
 
-//    private Session getSession() {
-//        if (session == null) {
-//            session = sessionFactory.getSession();
-//        }
-//        return session;
-//    }
+    // private Session getSession() {
+    // if (session == null) {
+    // session = sessionFactory.getSession();
+    // }
+    // return session;
+    // }
 
     public ManagedCaseService(DbServer dbServer, HibernateSessionFactory sessionFactory) {
         this.dbServer = dbServer;
@@ -106,7 +106,7 @@ public class ManagedCaseService {
                     + (sessionFactory == null));
 
         myTag();
- 
+
         if (DebugLevels.DEBUG_1)
             System.out.println(">>>> " + myTag());
 
@@ -697,8 +697,8 @@ public class ManagedCaseService {
 
                 CaseInput cip = iter.next();
                 badCipName = cip.getName();
-//                if (DebugLevels.DEBUG_9)
-//                    System.out.println(cip.getCaseID());
+                // if (DebugLevels.DEBUG_9)
+                // System.out.println(cip.getCaseID());
                 cipDataset = cip.getDataset();
 
                 if (cipDataset == null) {
@@ -1071,7 +1071,7 @@ public class ManagedCaseService {
         try {
             if (job.getRunstatus() == null)
                 job.setRunstatus(dao.getJobRunStatuse("Not Started"));
-            
+
             dao.add(job, session);
             return (CaseJob) dao.loadCaseJob(job);
         } catch (Exception e) {
@@ -1317,10 +1317,10 @@ public class ManagedCaseService {
 
         Hashtable<String, CaseJob> caseJobsTable = new Hashtable<String, CaseJob>();
         ManagedExportService expSvc = null;
-        
+
         CaseJobTask[] caseJobsTasksInSubmission = null;
         ArrayList<CaseJobTask> caseJobsTasksList = new ArrayList<CaseJobTask>();
-        
+
         try {
             String caseJobExportSubmitterId = null;
             String caseJobSubmitterId = caseJobSubmitter.getSubmitterId();
@@ -1358,7 +1358,7 @@ public class ManagedCaseService {
                 CaseJobTask cjt = new CaseJobTask(jid, caseId, user);
                 cjt.setJobkey(jobKey);
                 cjt.setNumDepends(caseJob.getDependentJobs().length);
-                
+
                 // get or create the reference to the Managed Export Service for this casejobtask
                 expSvc = this.getExportService();
 
@@ -1391,31 +1391,29 @@ public class ManagedCaseService {
                 cjt.setQueueOptions(caseJob.getQueOptions());
                 if (DebugLevels.DEBUG_6)
                     System.out.println("Completed setting the CaseJobTask");
-                
+
                 // Now add the CaseJobTask to the caseJobsTasksList
                 caseJobsTasksList.add(cjt);
-                //Add the caseJob to the Hashtable caseJobsTable with the cjt taskid as the key
+                // Add the caseJob to the Hashtable caseJobsTable with the cjt taskid as the key
                 caseJobsTable.put(cjt.getTaskId(), caseJob);
-                
+
             }// for jobIds
 
-            
-           //convert the  caseJobsTasksList to an array caseJobsTasksInSubmission
-            caseJobsTasksInSubmission= caseJobsTasksList.toArray(new CaseJobTask[0]);
-            
+            // convert the caseJobsTasksList to an array caseJobsTasksInSubmission
+            caseJobsTasksInSubmission = caseJobsTasksList.toArray(new CaseJobTask[0]);
+
             // Now sort the Array using the built in comparator
             Arrays.sort(caseJobsTasksInSubmission);
-            
+
             for (CaseJobTask cjt : caseJobsTasksInSubmission) {
 
-                //get the caseJob out of the hashtable
+                // get the caseJob out of the hashtable
                 CaseJob caseJob = caseJobsTable.get(cjt.getTaskId());
-
 
                 if (DebugLevels.DEBUG_0)
                     System.out.println("Is the caseJob for this jobId null? " + (caseJob == null));
-                
-                //now get the Case (called jobCase since case is a reserved word in Java) using
+
+                // now get the Case (called jobCase since case is a reserved word in Java) using
                 // the caseId sent in from the GUI
                 Case jobCase = this.getCase(caseId);
 
@@ -1426,13 +1424,12 @@ public class ManagedCaseService {
                 if (DebugLevels.DEBUG_0)
                     System.out.println("caseId= " + caseId + " Is the Case for this job null? " + (jobCase == null));
 
-                
                 List<CaseInput> inputs = getAllJobInputs(caseJob);
 
                 if (DebugLevels.DEBUG_6)
                     System.out.println("Number of inputs for this job: " + inputs.size());
 
-                //send the casejobtask to the CJTM priority queue and then to wait queue
+                // send the casejobtask to the CJTM priority queue and then to wait queue
                 TaskManagerFactory.getCaseJobTaskManager(sessionFactory).addTask(cjt);
 
                 // pass the inputs to the exportService which uses an exportJobSubmitter to work with exportTaskManager
@@ -1455,11 +1452,6 @@ public class ManagedCaseService {
 
             }// for cjt
 
-            
-            
-            
-            
-            
             if (DebugLevels.DEBUG_0)
                 System.out.println("Case Job Submitter Id for case job:" + caseJobSubmitterId);
 
@@ -1494,7 +1486,7 @@ public class ManagedCaseService {
             dao.updateCaseJob(caseJob);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
-        } 
+        }
     }
 
     public synchronized void updateCaseJob(User user, CaseJob job) throws EmfException {
@@ -1507,11 +1499,11 @@ public class ManagedCaseService {
                 throw new EmfException("Case job uniqueness check failed (" + loaded.getId() + "," + job.getId() + ")");
 
             dao.updateCaseJob(job);
-            
+
             // This is a manual update of the waiting tasks in CaseJobTask manager
-            //If CaseJobTaskManager is not null.  check the dependencies in the WaitTable
+            // If CaseJobTaskManager is not null. check the dependencies in the WaitTable
             TaskManagerFactory.getCaseJobTaskManager(sessionFactory).callBackFromJobRunServer();
-            
+
         } catch (RuntimeException e) {
             e.printStackTrace();
             log.error("Could not update case job: " + job.getName() + ".\n" + e);
@@ -1933,14 +1925,14 @@ public class ManagedCaseService {
         if (caseObj.getAbbreviation() != null) {
             sbuf.append(shellSetenv("CASE", caseObj.getAbbreviation().getName()));
         }
-        //      Need to have quotes around model name b/c could be more than one word
+        // Need to have quotes around model name b/c could be more than one word
         if (caseObj.getModel() != null) {
-            String modelName = '"' + caseObj.getModel().getName() + '"';  
+            String modelName = '"' + caseObj.getModel().getName() + '"';
             sbuf.append(shellSetenv("MODEL_LABEL", modelName));
         }
         if (caseObj.getGrid() != null) {
             sbuf.append(shellSetenv("IOAPI_GRIDNAME_1", caseObj.getGrid().getName()));
-        }        
+        }
         if (caseObj.getGridResolution() != null) {
             sbuf.append(shellSetenv("EMF_GRID", caseObj.getGridResolution().getName()));
         }
@@ -1951,19 +1943,20 @@ public class ManagedCaseService {
             sbuf.append(shellSetenv("EMF_SPC", caseObj.getSpeciation().getName()));
         }
         if (caseObj.getEmissionsYear() != null) {
-            sbuf.append(shellSetenv("BASE_YEAR", caseObj.getEmissionsYear().getName()));  // Should base year == emissions year ????
+            sbuf.append(shellSetenv("BASE_YEAR", caseObj.getEmissionsYear().getName())); // Should base year ==
+                                                                                            // emissions year ????
         }
-            //        sbuf.append(shellSetenv("BASE_YEAR", String.valueOf(caseObj.getBaseYear())));
-        if (caseObj.getFutureYear() != 0) { //CHECK: should it be included if == 0 ???
+        // sbuf.append(shellSetenv("BASE_YEAR", String.valueOf(caseObj.getBaseYear())));
+        if (caseObj.getFutureYear() != 0) { // CHECK: should it be included if == 0 ???
             sbuf.append(shellSetenv("FUTURE_YEAR", String.valueOf(caseObj.getFutureYear())));
         }
-        //      Need to have quotes around start and end date b/c could be more than one word  'DD/MM/YYYY HH:MM'
+        // Need to have quotes around start and end date b/c could be more than one word 'DD/MM/YYYY HH:MM'
         if (caseObj.getStartDate() != null) {
-            String startString = '"' + caseObj.getStartDate().toString() + '"';  
+            String startString = '"' + caseObj.getStartDate().toString() + '"';
             sbuf.append(shellSetenv("EPI_STDATE_TIME", startString));
         }
         if (caseObj.getEndDate() != null) {
-            String endString = '"' + caseObj.getEndDate().toString() + '"';  
+            String endString = '"' + caseObj.getEndDate().toString() + '"';
             sbuf.append(shellSetenv("EPI_ENDATE_TIME", endString));
         }
 
@@ -2149,19 +2142,18 @@ public class ManagedCaseService {
             if (!status.isEmpty() && !jobStatus.equalsIgnoreCase(status)) {
                 job.setRunstatus(dao.getJobRunStatuse(status));
 
-                // If the status from the Command Client is not Completed or not Failed
-                // then the job is Running. A Running job gets a Run Start Date
-                // all other statuses get a Run Completion Date.
                 if (!(status.equalsIgnoreCase("Running"))) {
+                    // status is Completed or Failed - set completion date
                     job.setRunCompletionDate(new Date());
+                    // Notify CaseJobTaskManager that the job status has changed to Completed or Failed
+                    TaskManagerFactory.getCaseJobTaskManager(sessionFactory).callBackFromJobRunServer();
                 } else {
+                    // status is running - set running date
                     job.setRunStartDate(new Date());
                 }
-                
-                //Notify CaseJobTaskManager that the job status has changed
-                TaskManagerFactory.getCaseJobTaskManager(sessionFactory).callBackFromJobRunServer();
+
             }
-            
+
             dao.updateCaseJob(job);
 
             if (!user.getUsername().equalsIgnoreCase(message.getRemoteUser()))
@@ -2204,7 +2196,7 @@ public class ManagedCaseService {
             e.printStackTrace();
             log.error("Could not get all valid jobs for job (id=" + jobId + ").\n" + e.getMessage());
             throw new EmfException("Could not get all valid jobs for job (id=" + jobId + ").\n");
-        } 
+        }
     }
 
     public String[] getDependentJobs(int jobId) throws EmfException {
@@ -2214,7 +2206,7 @@ public class ManagedCaseService {
             e.printStackTrace();
             log.error("Could not get all dependent jobs for job (id=" + jobId + ").\n" + e.getMessage());
             throw new EmfException("Could not get all dependent jobs for job (id=" + jobId + ").\n");
-        } 
+        }
     }
 
     public int[] getJobIds(int caseId, String[] jobNames) throws EmfException {
@@ -2224,7 +2216,7 @@ public class ManagedCaseService {
             e.printStackTrace();
             log.error("Could not get all job ids for job (" + jobNames[0] + ", etc.).\n" + e.getMessage());
             throw new EmfException("Could not get all job ids for job (" + jobNames[0] + ", etc.).\n");
-        } 
+        }
     }
 
     public void finalize() throws Throwable {
