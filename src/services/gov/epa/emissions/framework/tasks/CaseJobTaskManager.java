@@ -203,22 +203,43 @@ public class CaseJobTaskManager implements TaskManager {
         CaseJobTask cjt = null;
         String jobStatus = "";
         CaseJob caseJob = null;
-        
+
         try {
+
             if ((status.equals("completed")) || (status.equals("failed"))) {
                 System.out.println("CaseJobTaskManager::updateRunStatus:  job completed or failed");
                 synchronized (runTable) {
                     cjt = (CaseJobTask) runTable.get(taskId);
 
-                    runTable.remove(taskId);
+                    if (!(cjt == null)){
+                        System.out.println("Details of CJT: " + cjt.getJobName());
+                        runTable.remove(taskId);
+                    }
+                }
+                
+                if (cjt == null){
+                    //CaseJobTask was null because it was not a running job therefore get from waitTable
+                    System.out.println("CaseJobTask was null because it was not a running job therefore get from waitTable");
+                    synchronized(waitTable){
+                        cjt = (CaseJobTask) waitTable.get(taskId);
+                        System.out.println("Details of CJT: " + cjt.getJobName());
+                        System.out.println("CaseJobTask Id for failed exports = " + cjt.getJobId());
+                        System.out.println("CaseJobTask Id for failed exports = " + cjt.getTaskId());
+                        System.out.println("Size of the waitTable before remove: " + waitTable.size());
+                        waitTable.remove(taskId);
+                        System.out.println("Size of the waitTable after remove: " + waitTable.size());                        
+                    }
                 }
             }
+
+            System.out.println("After removal from Run Table is the CJT null? " + (cjt == null));
 
             if (status.equals("export failed")) {
                 System.out.println("CaseJobTaskManager::updateRunStatus:  export failed");
                 synchronized (waitTable) {
                     System.out.println("Export Failed");
                     cjt = (CaseJobTask) waitTable.get(taskId);
+                    System.out.println("Details of CJT: " + cjt.getJobName());
                     System.out.println("CaseJobTask Id for failed exports = " + cjt.getJobId());
                     System.out.println("CaseJobTask Id for failed exports = " + cjt.getTaskId());
                     System.out.println("Size of the waitTable before remove: " + waitTable.size());
@@ -231,54 +252,78 @@ public class CaseJobTaskManager implements TaskManager {
                 System.out.println("CaseJobTaskManager::updateRunStatus:  export success");
                 synchronized (waitTable) {
                     cjt = (CaseJobTask) waitTable.get(taskId);
+                    System.out.println("Details of CJT: " + cjt.getJobName());
                 }
             }
 
-            if (DebugLevels.DEBUG_9) System.out.println("CJTM::updateRunStatus is casejobtask null? " + (cjt==null));
+            if (DebugLevels.DEBUG_9)
+                System.out.println("CJTM::updateRunStatus is casejobtask null? " + (cjt == null));
 
             // if this was a forced failed due to dependencies failing the casejobtask needs to come from
             // the wait queue since cjt will be null
-            synchronized (waitTable) {
-                cjt = (CaseJobTask) waitTable.get(taskId);
-            }
-            
+            // if (cjt == null){
+            // synchronized (waitTable) {
+            // cjt = (CaseJobTask) waitTable.get(taskId);
+            // }
+            //                
+            // }
+
+            System.out.println("Before getJobId is the CJT null? " + (cjt == null));
+
             // update the run status in the Case_CaseJobs
             int jid = cjt.getJobId();
+            System.out.println("Before getJobId jid= " + jid);
+
+            System.out.println("after getJobId is the CJT null? " + (cjt == null));
 
             caseJob = caseDAO.getCaseJob(jid);
+            String currentJobStatus = caseJob.getRunstatus().getName();
+
+            System.out.println("For JOB NAME= " + caseJob.getName() + "Incoming status flag= " + status
+                    + ", Current database jobstatus= " + caseJob.getRunstatus().getName());
 
             if (DebugLevels.DEBUG_9)
                 System.out.println("In CaseJobTaskManager::updateRunStatus for jobId= " + jid
                         + " Is the CaseJob null? " + (caseJob == null));
 
-            if (status.equals("completed")) {
-                System.out.println("CaseJobTaskManager::updateRunStatus:  job Status is completed jobStatus=Submitted");
+            boolean toUpdate = false;
+
+            if (status.equals("completed") && (currentJobStatus.equalsIgnoreCase("Waiting"))) {
+                System.out
+                        .println("CaseJobTaskManager::updateRunStatus:  thread Status is completed current=Waiting set jobStatus=Submitted");
                 jobStatus = "Submitted";
                 caseJob.setIdInQueue(cjt.getQId());
                 caseJob.setRunStartDate(new Date());
+                toUpdate = true;
             }
 
             if (status.equals("failed")) {
                 System.out.println("CaseJobTaskManager::updateRunStatus:  jobStatus is Failed jobStatus=Failed");
                 jobStatus = "Failed";
                 caseJob.setRunCompletionDate(new Date());
+                toUpdate = true;
             }
 
             if (status.equals("export succeeded")) {
                 System.out.println("CaseJobTaskManager::updateRunStatus:  export Succeeded jobStatus=Waiting");
                 jobStatus = "Waiting";
                 caseJob.setRunStartDate(new Date());
+                toUpdate = true;
             }
 
             if (status.equals("export failed")) {
                 System.out.println("CaseJobTaskManager::updateRunStatus:  export FAILED jobStatus=FAILED");
                 jobStatus = "Failed";
                 caseJob.setRunStartDate(new Date());
+                toUpdate = true;
             }
 
-            JobRunStatus jrStat = caseDAO.getJobRunStatuse(jobStatus);
-            caseJob.setRunstatus(jrStat);
-            caseDAO.updateCaseJob(caseJob);
+            if (toUpdate) {
+                JobRunStatus jrStat = caseDAO.getJobRunStatuse(jobStatus);
+                caseJob.setRunstatus(jrStat);
+                caseDAO.updateCaseJob(caseJob);
+
+            }
         } catch (Exception e) {
             System.out.println("^^^^^^^^^^^^^^");
             e.printStackTrace();
@@ -290,12 +335,12 @@ public class CaseJobTaskManager implements TaskManager {
 
     public static synchronized void processTaskQueue() throws EmfException {
         testAndSetWaitingTasksDependencies();
-        
-        //FIXME: Dump the waitTable below. Remove after testing
-        synchronized(waitTable){
+
+        // FIXME: Dump the waitTable below. Remove after testing
+        synchronized (waitTable) {
             Collection<Task> all = waitTable.values();
             Iterator<Task> iter = all.iterator();
-            while (iter.hasNext()){
+            while (iter.hasNext()) {
                 CaseJobTask cjt = (CaseJobTask) iter.next();
                 boolean readyF = cjt.isReady();
                 boolean expSucceed = cjt.isExportsSuccess();
@@ -303,14 +348,15 @@ public class CaseJobTaskManager implements TaskManager {
                 String name = cjt.getJobName();
                 String dump = "[" + readyF + "/" + expSucceed + "/" + dependSet + "/" + "]";
                 String mesg = "CJT::processTaskQueue for CJT/Job= " + name + " Flags Ready/exports/depends are " + dump;
-                if (DebugLevels.DEBUG_9) System.out.println(mesg);
+                if (DebugLevels.DEBUG_9)
+                    System.out.println(mesg);
             }
-            
-        }//synch waitTable
-        //FIXME: Dump the waitTable above. Remove after testing
+
+        }// synch waitTable
+        // FIXME: Dump the waitTable above. Remove after testing
 
         int threadsAvail = -99;
-        
+
         if (DebugLevels.DEBUG_0)
             System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         if (DebugLevels.DEBUG_0)
@@ -542,28 +588,32 @@ public class CaseJobTaskManager implements TaskManager {
      */
     private static synchronized void testAndSetWaitingTasksDependencies() throws EmfException {
 
-        //Get all the waiting CaseJobTasks in the waitTable
+        // Get all the waiting CaseJobTasks in the waitTable
         Collection<Task> allWaitTasks = waitTable.values();
         Iterator<Task> iter = allWaitTasks.iterator();
 
-        //Loop over all the waiting CaseJobTasks tasks
+        // Loop over all the waiting CaseJobTasks tasks
         while (iter.hasNext()) {
-            
+
             CaseJobTask cjt = (CaseJobTask) iter.next();
             if (DebugLevels.DEBUG_9)
-                System.out.println("In CJTM: testAndSetWaitingTasksDependencies job (" + cjt.getJobName() +") has Ready Flag= " + cjt.isReadyFlag);
+                System.out.println("In CJTM: testAndSetWaitingTasksDependencies job (" + cjt.getJobName()
+                        + ") has Ready Flag= " + cjt.isReadyFlag);
             if (DebugLevels.DEBUG_9)
-                System.out.println("In CJTM: testAndSetWaitingTasksDependencies job (" + cjt.getJobName() +") has ExportsSuccess Flag= " + cjt.isExportsSuccess());
+                System.out.println("In CJTM: testAndSetWaitingTasksDependencies job (" + cjt.getJobName()
+                        + ") has ExportsSuccess Flag= " + cjt.isExportsSuccess());
             if (DebugLevels.DEBUG_9)
-                System.out.println("In CJTM: testAndSetWaitingTasksDependencies job (" + cjt.getJobName() +") has DependenciesSet Flag= " + cjt.isDependenciesSet());
-            
+                System.out.println("In CJTM: testAndSetWaitingTasksDependencies job (" + cjt.getJobName()
+                        + ") has DependenciesSet Flag= " + cjt.isDependenciesSet());
 
             // For this CaseJobTask if dependencies have not been set yet
             if (DebugLevels.DEBUG_9)
-                System.out.println("CJTM::testAndSetWaitingTasksDependencies Testing dependencies for job: " + cjt.getJobName());
+                System.out.println("CJTM::testAndSetWaitingTasksDependencies Testing dependencies for job: "
+                        + cjt.getJobName());
             if (!(cjt.isDependenciesSet())) {
-                if (DebugLevels.DEBUG_9) System.out.println("Are dependencies flag was false. So test and set/reset");
-                
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("Are dependencies flag was false. So test and set/reset");
+
                 // get the caseJob
                 CaseJob caseJob = caseDAO.getCaseJob(cjt.getJobId());
                 // get the dependents of this caseJob
@@ -571,39 +621,55 @@ public class CaseJobTaskManager implements TaskManager {
 
                 // the caseJob has no dependencies therefore set to True
                 if ((dependJobs == null) || (dependJobs.length == 0)) {
-                    if (DebugLevels.DEBUG_9)System.out.println("CJTM::testAndSetWaitingTasksDependencies no dependent jobs so set the flag to true");
-                    
+                    if (DebugLevels.DEBUG_9)
+                        System.out
+                                .println("CJTM::testAndSetWaitingTasksDependencies no dependent jobs so set the flag to true");
+
                     cjt.setDependenciesSet(true);
-                    if (DebugLevels.DEBUG_9)System.out.println("CJTM::testAndSetWaitingTasksDependencies is dependent jobs flag set to true? " + cjt.isDependenciesSet());
-                    
+                    if (DebugLevels.DEBUG_9)
+                        System.out
+                                .println("CJTM::testAndSetWaitingTasksDependencies is dependent jobs flag set to true? "
+                                        + cjt.isDependenciesSet());
+
                 } else {
                     if (DebugLevels.DEBUG_9)
-                        System.out.println("job (" + cjt.getJobName() +") has dependencies that are not met.");
+                        System.out.println("job (" + cjt.getJobName() + ") has dependencies that are not met.");
                     // this CaseJob has dependents
-//                    ArrayList<CaseJob> allDependentCaseJobs = new ArrayList<CaseJob>();
+                    // ArrayList<CaseJob> allDependentCaseJobs = new ArrayList<CaseJob>();
 
                     int nonFinalD = 0;
                     int foNSD = 0;
                     int compD = 0;
 
                     int TotalD = dependJobs.length;
-                    
+
                     // FIXME: BELOW FOR DEBUG ONLY REMOVE AFTER TESTING
-                    //nonFinal/foNSD/compD/Total 
-                    String tempFlag = "["+ nonFinalD + "/" + foNSD + "/" + compD + "/" +TotalD + "]";
-                    if (DebugLevels.DEBUG_9)System.out.println("CJTM::testAndSetWaitingTasksDependencies The flags nonFinal/foNSD/compD/Total = "+ tempFlag);
+                    // nonFinal/foNSD/compD/Total
+                    String tempFlag = "[" + nonFinalD + "/" + foNSD + "/" + compD + "/" + TotalD + "]";
+                    if (DebugLevels.DEBUG_9)
+                        System.out
+                                .println("CJTM::testAndSetWaitingTasksDependencies The flags nonFinal/foNSD/compD/Total = "
+                                        + tempFlag);
                     // FIXME: ABOVE FOR DEBUG ONLY REMOVE AFTER TESTING
-                    
+
                     // Loop over dependetJobs and add the corresponding CaseJob to the allDependentCaseJobs
                     for (int i = 0; i < dependJobs.length; i++) {
                         DependentJob dJob = dependJobs[i];
                         CaseJob dcj = caseDAO.getCaseJob(dJob.getJobId());
-                        if (DebugLevels.DEBUG_9)System.out.println("dependent job: " + dcj.getName());
+                        if (DebugLevels.DEBUG_9)
+                            System.out.println("dependent job: " + dcj.getName());
                         JobRunStatus jrs = dcj.getRunstatus();
+                        String status = null;
 
-                        String status = jrs.getName();
-                        if (DebugLevels.DEBUG_9)System.out.println("dependent job status: " + status);
+                        if (jrs == null){
+                            status="Failed";
+                        }else{
+                            status = jrs.getName();
+                        }
                         
+                        if (DebugLevels.DEBUG_9)
+                            System.out.println("dependent job status: " + status);
+
                         if ((status.equals("Not Started")) || (status.equals("Failed"))) {
                             foNSD++;
                         } else if (status.equals("Completed")) {
@@ -612,26 +678,33 @@ public class CaseJobTaskManager implements TaskManager {
                             nonFinalD++;
                         }
 
-//                        allDependentCaseJobs.add(dcj);
+                        // allDependentCaseJobs.add(dcj);
 
                         // FIXME: BELOW FOR DEBUG ONLY REMOVE AFTER TESTING
-                        //nonFinal/foNSD/compD/Total 
-                        tempFlag = "["+ nonFinalD + "/" + foNSD + "/" + compD + "/" +TotalD + "]";
-                        if (DebugLevels.DEBUG_9)System.out.println("CJTM::testAndSetWaitingTasksDependencies The flags nonFinal/foNSD/compD/Total = "+ tempFlag);
+                        // nonFinal/foNSD/compD/Total
+                        tempFlag = "[" + nonFinalD + "/" + foNSD + "/" + compD + "/" + TotalD + "]";
+                        if (DebugLevels.DEBUG_9)
+                            System.out
+                                    .println("CJTM::testAndSetWaitingTasksDependencies The flags nonFinal/foNSD/compD/Total = "
+                                            + tempFlag);
                         // FIXME: ABOVE FOR DEBUG ONLY REMOVE AFTER TESTING
 
                     }// for dependentJobs
 
                     // If none of the jobs are in a non-Final state
                     if (nonFinalD == 0) {
-                        if (DebugLevels.DEBUG_9) System.out.println("All my dependents are in a final state");
+                        if (DebugLevels.DEBUG_9)
+                            System.out.println("All my dependents are in a final state");
                         // all our jobs are in a final=completed state
                         if (compD == TotalD) {
-                            if (DebugLevels.DEBUG_9) System.out.println("All my dependents are COMPLETED");
-                            
+                            if (DebugLevels.DEBUG_9)
+                                System.out.println("All my dependents are COMPLETED");
+
                             cjt.setDependenciesSet(true);
                         } else {
-                            if (DebugLevels.DEBUG_9) System.out.println("Some of the dependent jobs have failed or not started for job= " + cjt.getJobName());
+                            if (DebugLevels.DEBUG_9)
+                                System.out.println("Some of the dependent jobs have failed or not started for job= "
+                                        + cjt.getJobName());
 
                             // We have a parent job that has atleast one dependent job that has failed or
                             // not started therefore send an error message to the user's status window
@@ -650,17 +723,19 @@ public class CaseJobTaskManager implements TaskManager {
 
                             // now remove the job with bad dependencies from the waitTable
                             synchronized (waitTable) {
-                                if (DebugLevels.DEBUG_9) System.out.println("Size of waitTable before remove: " + waitTable.size());
+                                if (DebugLevels.DEBUG_9)
+                                    System.out.println("Size of waitTable before remove: " + waitTable.size());
                                 waitTable.remove(cjt.getTaskId());
-                                if (DebugLevels.DEBUG_9) System.out.println("Size of waitTable after remove: " + waitTable.size());
+                                if (DebugLevels.DEBUG_9)
+                                    System.out.println("Size of waitTable after remove: " + waitTable.size());
                             }
-                        }//some of the dependent jobs failed
-                    }//none of the jobs are in a non-Final state
+                        }// some of the dependent jobs failed
+                    }// none of the jobs are in a non-Final state
 
                 }// CJT had dependents
             }// cjt dependencies was false
         }// loop over all waiting tasks
-    }//testAndSetWaitingTasksDependencies
+    }// testAndSetWaitingTasksDependencies
 
     protected static synchronized void setStatus(User user, StatusDAO statusServices, String message) {
         Status endStatus = new Status();
@@ -673,11 +748,10 @@ public class CaseJobTaskManager implements TaskManager {
     }
 
     /**
-     *  There was a change in the status of a waiting job so process the Queue 
+     * There was a change in the status of a waiting job so process the Queue
      */
-    public static synchronized void callBackFromJobRunServer()
-            throws EmfException {
-
+    public static synchronized void callBackFromJobRunServer() throws EmfException {
+        System.out.println("EMF CMD CLIENT SENT A COMPLETED or FAILED STATUS BACK FROM THE RUNNING JOB.");
         processTaskQueue();
     }
 }
