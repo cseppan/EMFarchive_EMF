@@ -448,12 +448,23 @@ public class CaseServiceImpl implements CaseService {
     public int recordJobMessage(JobMessage message, String jobKey) throws EmfException {
         return getCaseService().recordJobMessage(message, jobKey);
     }
+    
+    public int recordJobMessage(JobMessage[] msgs, String[] keys) throws EmfException {
+        int msgLength = msgs.length;
+        int returnVal = 0;
+        
+        if (msgs.length != keys.length)
+            throw new EmfException("No. of job messages doesn't match No. of job keys.");
+        
+        for(int i = 0; i < msgLength; i++)
+            returnVal = recordJobMessage(msgs[i], keys[i]);
+        
+        return returnVal;
+    }
 
     public JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException {
         return getCaseService().getJobMessages(caseId, jobId);
     }
-
-
 
     public String[] getAllValidJobs(int jobId) throws EmfException {
         return getCaseService().getAllValidJobs(jobId);
@@ -466,11 +477,5 @@ public class CaseServiceImpl implements CaseService {
     public int[] getJobIds(int caseId, String[] jobNames) throws EmfException {
         return getCaseService().getJobIds(caseId, jobNames);
     }
-
-
-
-
-
-
 
 }

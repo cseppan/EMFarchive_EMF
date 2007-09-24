@@ -130,4 +130,6 @@ public interface CaseService {
     // For command line client
     int recordJobMessage(JobMessage message, String jobKey) throws EmfException;
     JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException;
+
+    int recordJobMessage(JobMessage[] msgs, String[] keys) throws EmfException;
  }

@@ -624,6 +624,18 @@ public class CaseServiceTransport implements CaseService {
         
         return (Integer)call.requestResponse(new Object[]{ message, jobKey });
     }
+    
+    public int recordJobMessage(JobMessage[] msgs, String[] keys) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("recordJobMessage");
+        call.addParam("msgs", caseMappings.jobMessages());
+        call.addParam("keys", caseMappings.strings());
+        call.setIntegerReturnType();
+        call.setTimeOut(20000); //set time out in milliseconds to terminate if service doesn't response
+        
+        return (Integer)call.requestResponse(new Object[]{ msgs, keys });
+    }
 
     public JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException {
         EmfCall call = call();
