@@ -171,7 +171,7 @@ public class EMFCmdClient {
 
         br.close();
 
-        if (now || (end - start > logInterval)) {
+        if (now || ((end - start)/1000 > logInterval)) {
             resend(args, resendTimes, msgs, keys);
             try {
                 rewriteSentLinesNumber(++lineCount, logfile, logfile + ".tmp");
