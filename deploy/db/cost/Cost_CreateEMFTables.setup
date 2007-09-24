@@ -401,7 +401,7 @@ CREATE INDEX fki_equation_measure
 create function public.join_with_ampersand(text,text)
   returns text
   immutable strict language 'sql'
-  as 'select $1||''& ''||$2'
+  as 'select $1||''&''||$2'
 ;
 ALTER function public.join_with_ampersand(text,text) OWNER TO emf;
 
