@@ -81,9 +81,12 @@ public class Type2CostEquation implements CostEquation {
                 convertedDesignCapacity = designCapacity / 3.412;
             if (designCapacityUnitNumerator.equalsIgnoreCase("Btu")) 
                 convertedDesignCapacity = designCapacity / 3.412 / 1000000.0;
-            if (designCapacityUnitNumerator.equalsIgnoreCase("hp")
-                    || designCapacityUnitNumerator.equalsIgnoreCase("BLRHP")) 
-                convertedDesignCapacity = designCapacity / 1341.02;
+            if (designCapacityUnitNumerator.equalsIgnoreCase("hp")) 
+                convertedDesignCapacity = designCapacity * 0.000746;
+            if (designCapacityUnitNumerator.equalsIgnoreCase("BLRHP")) 
+                convertedDesignCapacity = designCapacity * 0.000981;
+            if (designCapacityUnitNumerator.equalsIgnoreCase("ft3")) 
+                convertedDesignCapacity = designCapacity * 0.000981;
 
             //convert denominator unit, if missing ASSUME per hr
             if (designCapacityUnitDenominator.equalsIgnoreCase("") || designCapacityUnitDenominator.equalsIgnoreCase("hr")
