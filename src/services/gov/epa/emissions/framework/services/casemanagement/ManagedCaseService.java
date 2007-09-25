@@ -2132,7 +2132,6 @@ public class ManagedCaseService {
             User user = job.getUser();
             message.setCaseId(job.getCaseId());
             message.setJobId(job.getId());
-            message.setReceivedTime(new Date());
             String status = message.getStatus();
             String jobStatus = job.getRunstatus().getName();
             String lastMsg = message.getMessage();
