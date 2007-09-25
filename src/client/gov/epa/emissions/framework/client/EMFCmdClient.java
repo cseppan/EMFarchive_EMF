@@ -100,8 +100,8 @@ public class EMFCmdClient {
         int logInterval = (logIntervalIndex < 0) ? 0 : Integer.parseInt(args.get(++logIntervalIndex));
         int resendTimes = (resendTimesIndex < 0) ? 1 : Integer.parseInt(args.get(++resendTimesIndex));
         String loggerDir = System.getenv("EMF_LOGGERDIR");
-        String jobName = System.getenv("EMF_JOBNAME");
-        String caseName = System.getenv("CASE");
+        String jobName = createSafeName(System.getenv("EMF_JOBNAME"));
+        String caseName = createSafeName(System.getenv("CASE"));
         String logFile = loggerDir + File.separator + jobName + "_" + caseName + "_" + jobkey + ".csv";
 
         if (execPath.startsWith("-") || period.startsWith("-") || message.startsWith("-") || status.startsWith("-"))
@@ -293,12 +293,28 @@ public class EMFCmdClient {
         try {
             msg.setExecModifiedDate((fields[8] == null || fields[8].trim().isEmpty()) ? null : EmfDateFormat
                     .parse_MM_DD_YYYY_HH_mm(fields[8]));
+            msg.setReceivedTime(new Date(Long.parseLong(fields[9])));
         } catch (Exception e) {
             e.printStackTrace();
             return msg;
         }
 
         return msg;
+    }
+    
+    private static String createSafeName(String name) {
+        if (name == null)
+            return name;
+        
+        String safeName = name.trim();
+        
+        for (int i = 0; i < safeName.length(); i++) {
+            if (!Character.isLetterOrDigit(safeName.charAt(i))) {
+                safeName = safeName.replace(safeName.charAt(i), '_');
+            }
+        }
+
+        return safeName;
     }
 
 }
