@@ -132,4 +132,9 @@ public interface CaseService {
     JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException;
 
     int recordJobMessage(JobMessage[] msgs, String[] keys) throws EmfException;
+    
+    String restoreTaskManagers() throws EmfException;
+
+    String printStatusCaseJobTaskManager() throws EmfException;
+
  }

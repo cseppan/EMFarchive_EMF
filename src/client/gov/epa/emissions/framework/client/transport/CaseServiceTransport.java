@@ -679,4 +679,18 @@ public class CaseServiceTransport implements CaseService {
         return (int[]) call.requestResponse(new Object[] { new Integer(caseId), names });
     }
 
+    public String restoreTaskManagers() throws EmfException {
+        EmfCall call = call();
+        call.setOperation("restoreTaskManagers");
+        call.setStringReturnType();
+        return (String) call.requestResponse(new Object[] { });
+    }
+
+    public String printStatusCaseJobTaskManager() throws EmfException {
+        EmfCall call = call();
+        call.setOperation("printStatusCaseJobTaskManager");
+        call.setStringReturnType();
+        return (String) call.requestResponse(new Object[] { });
+    }
+
 }

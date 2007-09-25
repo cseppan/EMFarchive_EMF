@@ -39,4 +39,6 @@ public interface ExImService extends EMFService {
 
     void exportDatasetidsWithOverwrite(User user, Integer[] datasetIds, String folder, String purpose) throws EmfException;
     
+    String printStatusCaseJobTaskManager() throws EmfException;
+
 }

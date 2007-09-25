@@ -210,6 +210,7 @@ public class ExportTask extends Task {
     // statusServices.add(endStatus);
     // }
 
+    
     @Override
     protected void finalize() throws Throwable {
         taskCount--;
@@ -220,6 +221,14 @@ public class ExportTask extends Task {
 
     public File getFile() {
         return file;
+    }
+
+    public EmfDataset getDataset() {
+        return dataset;
+    }
+
+    public Version getVersion() {
+        return version;
     }
 
 }

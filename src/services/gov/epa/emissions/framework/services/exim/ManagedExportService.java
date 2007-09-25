@@ -402,6 +402,10 @@ public class ManagedExportService {
         }
     }
 
+    public String printStatusCaseJobTaskManager() throws EmfException {
+        return TaskManagerFactory.getExportTaskManager().getStatusOfWaitAndRunTable();
+    }
+
     @Override
     protected void finalize() throws Throwable {
         svcCount--;

@@ -1416,6 +1416,7 @@ public class ManagedCaseService {
                 // now get the Case (called jobCase since case is a reserved word in Java) using
                 // the caseId sent in from the GUI
                 Case jobCase = this.getCase(caseId);
+                cjt.setCaseName(jobCase.getName());
 
                 String purpose = "Used by " + caseJob.getName() + " of Case " + jobCase.getName();
                 if (DebugLevels.DEBUG_6)
@@ -1944,7 +1945,7 @@ public class ManagedCaseService {
         }
         if (caseObj.getEmissionsYear() != null) {
             sbuf.append(shellSetenv("BASE_YEAR", caseObj.getEmissionsYear().getName())); // Should base year ==
-                                                                                            // emissions year ????
+            // emissions year ????
         }
         // sbuf.append(shellSetenv("BASE_YEAR", String.valueOf(caseObj.getBaseYear())));
         if (caseObj.getFutureYear() != 0) { // CHECK: should it be included if == 0 ???
@@ -2147,6 +2148,7 @@ public class ManagedCaseService {
                     job.setRunCompletionDate(new Date());
                     // Notify CaseJobTaskManager that the job status has changed to Completed or Failed
                     TaskManagerFactory.getCaseJobTaskManager(sessionFactory).callBackFromJobRunServer();
+
                 } else {
                     // status is running - set running date
                     job.setRunStartDate(new Date());
@@ -2222,6 +2224,19 @@ public class ManagedCaseService {
     public void finalize() throws Throwable {
         this.session = null;
         super.finalize();
+    }
+
+    public String restoreTaskManagers() throws EmfException {
+        String mesg;
+        // FIXME: Remove after debug
+        mesg = "Dummy Restore Status Message";
+        if (false)
+            throw new EmfException();
+        return mesg;
+    }
+
+    public String printStatusCaseJobTaskManager() throws EmfException {
+        return TaskManagerFactory.getCaseJobTaskManager(sessionFactory).getStatusOfWaitAndRunTable();
     }
 
 }

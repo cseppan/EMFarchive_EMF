@@ -40,6 +40,8 @@ public class CaseJobTask extends Task {
     private String jobName = null;
 
     private int caseId;
+    
+    private String caseName;
 
     private String exportTaskSubmitterId = null;
 
@@ -325,6 +327,14 @@ public class CaseJobTask extends Task {
            return 1;
        }
        return 0;
+    }
+
+    public String getCaseName() {
+        return caseName;
+    }
+
+    public void setCaseName(String caseName) {
+        this.caseName = caseName;
     }
 
 

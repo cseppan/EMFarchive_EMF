@@ -141,5 +141,11 @@ public class ExImServiceTransport implements ExImService {
         call.request(new Object[] { user, datasetids, folder, purpose });
     }
 
+    public String printStatusCaseJobTaskManager() throws EmfException {
+        call.setOperation("printStatusCaseJobTaskManager");
+        call.setStringReturnType();
+        return (String) call.requestResponse(new Object[] { });
+    }
+
 
 }

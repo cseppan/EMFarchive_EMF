@@ -478,4 +478,13 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getJobIds(caseId, jobNames);
     }
 
+    public String restoreTaskManagers()  throws EmfException {
+        
+        return getCaseService().restoreTaskManagers();
+    }
+
+    public String printStatusCaseJobTaskManager() throws EmfException {
+        return getCaseService().printStatusCaseJobTaskManager() ;
+    }
+
 }

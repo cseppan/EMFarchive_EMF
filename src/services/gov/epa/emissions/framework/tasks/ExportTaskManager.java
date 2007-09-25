@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.tasks;
 
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.exim.ExportTask;
 
 import java.util.ArrayList;
@@ -417,4 +418,78 @@ System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     }
 
+    
+    private String createStatusMessage() throws EmfException {
+        try{
+            StringBuffer sbuf = new StringBuffer();
+            Iterator<Task> iter;
+            String labels;
+
+            Collection<Task> waitingTasks = waitTable.values();
+            Collection<Task> runningTasks = runTable.values();
+            
+            labels = "=======================================\n";
+            sbuf.append(labels);
+            labels = "Status of the ExportTaskManager\n\n";
+            sbuf.append(labels);
+            labels = "Tasks in the Wait Table\n";
+            sbuf.append(labels);
+            labels = "UserId\tDatasetName\tVersion\n";
+            sbuf.append(labels);
+
+            if (waitingTasks.size()==0){
+                labels = "There are no tasks in the ExportTaskManager WaitTable\n";
+                sbuf.append(labels);
+                
+            }else{
+                iter = waitingTasks.iterator();
+
+                while (iter.hasNext()) {
+                    ExportTask et = (ExportTask) iter.next();
+                    String etStatus = et.getUser().getId() + "\t" + et.getDataset().getName() + "\t" + et.getVersion().getVersion() + "\n";
+                    sbuf.append(etStatus);
+                }            
+            }
+
+            labels = "=======================================\n";
+            sbuf.append(labels);
+            labels = "Tasks in the ExportTaskManager RunTable\n";
+            sbuf.append(labels);
+            labels = "UserId\tDatasetName\tVersion\n";
+            sbuf.append(labels);
+
+            if (waitingTasks.size()==0){
+                labels = "There are no tasks in the ExportTaskManager RunTable\n";
+                sbuf.append(labels);
+                
+            }else{
+
+                iter = runningTasks.iterator();
+                while (iter.hasNext()) {
+                    ExportTask et = (ExportTask) iter.next();
+                    String etStatus = et.getUser().getId() + "\t" + et.getDataset().getName() + "\t" + et.getVersion().getVersion() + "\n";
+                    sbuf.append(etStatus);
+                }            
+                
+            }
+            
+            labels = "=======================================\n";
+            sbuf.append(labels);
+            
+            return sbuf.toString();
+            
+        }catch(Exception ex){
+            ex.printStackTrace();
+            throw new EmfException("System error in ExportTaskManager" + ex.getMessage());
+        }
+    }
+
+    public String getStatusOfWaitAndRunTable() throws EmfException {
+        String mesg;
+
+        mesg = createStatusMessage();
+        return mesg;
+    }
+
+    
 }

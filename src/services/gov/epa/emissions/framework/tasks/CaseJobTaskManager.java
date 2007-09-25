@@ -211,23 +211,24 @@ public class CaseJobTaskManager implements TaskManager {
                 synchronized (runTable) {
                     cjt = (CaseJobTask) runTable.get(taskId);
 
-                    if (!(cjt == null)){
+                    if (!(cjt == null)) {
                         System.out.println("Details of CJT: " + cjt.getJobName());
                         runTable.remove(taskId);
                     }
                 }
-                
-                if (cjt == null){
-                    //CaseJobTask was null because it was not a running job therefore get from waitTable
-                    System.out.println("CaseJobTask was null because it was not a running job therefore get from waitTable");
-                    synchronized(waitTable){
+
+                if (cjt == null) {
+                    // CaseJobTask was null because it was not a running job therefore get from waitTable
+                    System.out
+                            .println("CaseJobTask was null because it was not a running job therefore get from waitTable");
+                    synchronized (waitTable) {
                         cjt = (CaseJobTask) waitTable.get(taskId);
                         System.out.println("Details of CJT: " + cjt.getJobName());
                         System.out.println("CaseJobTask Id for failed exports = " + cjt.getJobId());
                         System.out.println("CaseJobTask Id for failed exports = " + cjt.getTaskId());
                         System.out.println("Size of the waitTable before remove: " + waitTable.size());
                         waitTable.remove(taskId);
-                        System.out.println("Size of the waitTable after remove: " + waitTable.size());                        
+                        System.out.println("Size of the waitTable after remove: " + waitTable.size());
                     }
                 }
             }
@@ -661,12 +662,12 @@ public class CaseJobTaskManager implements TaskManager {
                         JobRunStatus jrs = dcj.getRunstatus();
                         String status = null;
 
-                        if (jrs == null){
-                            status="Failed";
-                        }else{
+                        if (jrs == null) {
+                            status = "Failed";
+                        } else {
                             status = jrs.getName();
                         }
-                        
+
                         if (DebugLevels.DEBUG_9)
                             System.out.println("dependent job status: " + status);
 
@@ -753,5 +754,79 @@ public class CaseJobTaskManager implements TaskManager {
     public static synchronized void callBackFromJobRunServer() throws EmfException {
         System.out.println("EMF CMD CLIENT SENT A COMPLETED or FAILED STATUS BACK FROM THE RUNNING JOB.");
         processTaskQueue();
+    }
+
+    public String getStatusOfWaitAndRunTable() throws EmfException {
+        String mesg;
+
+        mesg = createStatusMessage();
+        return mesg;
+    }
+
+    private String createStatusMessage() throws EmfException {
+        try{
+            StringBuffer sbuf = new StringBuffer();
+            Iterator<Task> iter;
+            String labels;
+
+            Collection<Task> waitingTasks = waitTable.values();
+            Collection<Task> runningTasks = runTable.values();
+            
+            labels = "=======================================\n";
+            sbuf.append(labels);
+            labels = "Status of the CaseJobTaskManager\n\n";
+            sbuf.append(labels);
+            labels = "Tasks in the Wait Table\n";
+            sbuf.append(labels);
+            labels = "JobId\tJobName\tCaseId\tCaseName\tUserId\tReady?\n";
+            sbuf.append(labels);
+
+            if (waitingTasks.size()==0){
+                labels = "There are no tasks in the CaseJobTaskManager WaitTable\n";
+                sbuf.append(labels);
+                
+            }else{
+                iter = waitingTasks.iterator();
+
+                while (iter.hasNext()) {
+                    CaseJobTask cjt = (CaseJobTask) iter.next();
+                    String cjtStatus = cjt.getJobId() + "\t" + cjt.getJobName() + "\t" + cjt.getCaseId() + "\t"
+                            + cjt.getCaseName() + "\t" + cjt.getUser().getId() + "\t" + cjt.isReady() + "\n";
+                    sbuf.append(cjtStatus);
+                }            
+            }
+
+            labels = "=======================================\n";
+            sbuf.append(labels);
+            labels = "Tasks in the CaseJobTaskManager RunTable\n";
+            sbuf.append(labels);
+            labels = "JobId\tJobName\tCaseId\tCaseName\tUserId\n";
+            sbuf.append(labels);
+
+            if (waitingTasks.size()==0){
+                labels = "There are no tasks in the CaseJobTaskManager RunTable\n";
+                sbuf.append(labels);
+                
+            }else{
+
+                iter = runningTasks.iterator();
+                while (iter.hasNext()) {
+                    CaseJobTask cjt = (CaseJobTask) iter.next();
+                    String cjtStatus = cjt.getJobId() + "\t" + cjt.getJobName() + "\t" + cjt.getCaseId() + "\t"
+                            + cjt.getCaseName() + "\t" + cjt.getUser().getId()+"\n";
+                    sbuf.append(cjtStatus);
+                }
+                
+            }
+            
+            labels = "=======================================\n";
+            sbuf.append(labels);
+            
+            return sbuf.toString();
+            
+        }catch(Exception ex){
+            ex.printStackTrace();
+            throw new EmfException("System error in CaseJobTaskManager" + ex.getMessage());
+        }
     }
 }
