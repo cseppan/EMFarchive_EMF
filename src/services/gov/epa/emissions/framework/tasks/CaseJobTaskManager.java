@@ -278,7 +278,15 @@ public class CaseJobTaskManager implements TaskManager {
             System.out.println("after getJobId is the CJT null? " + (cjt == null));
 
             caseJob = caseDAO.getCaseJob(jid);
-            String currentJobStatus = caseJob.getRunstatus().getName();
+            JobRunStatus jrs = caseJob.getRunstatus();
+            
+            String currentJobStatus;
+            
+            if (jrs==null){
+                currentJobStatus="Failed";
+            }else{
+                currentJobStatus=jrs.getName();
+            }
 
             System.out.println("For JOB NAME= " + caseJob.getName() + "Incoming status flag= " + status
                     + ", Current database jobstatus= " + caseJob.getRunstatus().getName());
