@@ -27,8 +27,10 @@ public class JobMessagesTableData extends ChangeableTableData {
     }
 
     public String[] columns() {
-        return new String[] {"Job", "Exec. Path", "Exec. Name", "Period", "Message",  
-                "Message Type", "Status", "Remote User", "Exec. Mod. Date", "Received Date"};
+        return new String[] { "Job", "Exec. Name", "Period", "Type", "Message", "Status",
+                 "Remote User", "Received Date", "Exec. Mod. Date", "Exec. Path" };
+//        return new String[] {"Job", "Exec. Path", "Exec. Name", "Period", "Message",  
+//                "Message Type", "Status", "Remote User", "Exec. Mod. Date", "Received Date"};
     }
 
     public Class getColumnClass(int col) {
@@ -55,11 +57,12 @@ public class JobMessagesTableData extends ChangeableTableData {
 
     private Row row(JobMessage msg) {
         return new ViewableRow(msg,
-                new Object[] { getJob(msg), msg.getExecPath(), msg.getExecName(),
-                msg.getPeriod(), msg.getMessage(), msg.getMessageType(),
+                new Object[] { getJob(msg), msg.getExecName(),
+                msg.getPeriod(), msg.getMessageType(), msg.getMessage(), 
                 msg.getStatus(), msg.getRemoteUser(), 
+                EmfDateFormat.format_YYYY_MM_DD_HH_MM_ss_SS(msg.getReceivedTime()),
                 EmfDateFormat.format_YYYY_MM_DD_HH_MM(msg.getExecModifiedDate()),
-                EmfDateFormat.format_YYYY_MM_DD_HH_MM_ss_SS(msg.getReceivedTime())});
+                msg.getExecPath()});
     }
     
     private String getJob(JobMessage msg) {
