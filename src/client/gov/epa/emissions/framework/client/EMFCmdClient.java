@@ -99,9 +99,9 @@ public class EMFCmdClient {
         String type = (typeIndex < 0) ? "" : args.get(++typeIndex);
         int logInterval = (logIntervalIndex < 0) ? 0 : Integer.parseInt(args.get(++logIntervalIndex));
         int resendTimes = (resendTimesIndex < 0) ? 1 : Integer.parseInt(args.get(++resendTimesIndex));
-        String loggerDir = System.getProperty("EMF_LOGGERDIR");
-        String jobName = System.getProperty("EMF_JOBNAME");
-        String caseName = System.getProperty("CASE");
+        String loggerDir = System.getenv("EMF_LOGGERDIR");
+        String jobName = System.getenv("EMF_JOBNAME");
+        String caseName = System.getenv("CASE");
         String logFile = loggerDir + File.separator + jobName + "_" + caseName + "_" + jobkey + ".csv";
 
         if (execPath.startsWith("-") || period.startsWith("-") || message.startsWith("-") || status.startsWith("-"))
@@ -121,8 +121,6 @@ public class EMFCmdClient {
 
         if (loggerDir == null || loggerDir.isEmpty())
             sendMessage(args, jobkey, jobMsg);
-        else if (!status.isEmpty())
-            sendLogs(args, logInterval, resendTimes, logFile, jobkey, jobMsg, true);
         else
             writeToLogger(args, logFile, logInterval, resendTimes, jobkey, jobMsg);
     }
@@ -161,17 +159,17 @@ public class EMFCmdClient {
             if (lineCount >= sentLines) {
                 msgs.add(extractJobMsg(line));
                 keys.add(extractJobkey(line));
-                
+
                 if (start == 0)
                     start = getTime(line);
-                
+
                 end = getTime(line);
             }
         }
 
         br.close();
 
-        if (now || ((end - start)/1000 > logInterval)) {
+        if (now || ((end - start) / 1000 > logInterval)) {
             resend(args, resendTimes, msgs, keys);
             try {
                 rewriteSentLinesNumber(++lineCount, logfile, logfile + ".tmp");
@@ -191,9 +189,9 @@ public class EMFCmdClient {
             String cmd3 = "TYPE \"" + tmpfile + "\" > \"" + logfile + "\"";
             cmd = new String[] { "cmd.exe", "/C", cmd1 + " & " + cmd2 + " & " + cmd3 };
         } else {
-            String cmd1 = "echo #" + lineCount + " > " + tmpfile;
-            String cmd2 = "grep -v \"^#\" " + logfile + " >> " + tmpfile;
-            String cmd3 = "cat " + tmpfile + " > " + logfile;
+            String cmd1 = "echo #" + lineCount + " > \"" + tmpfile + "\"";
+            String cmd2 = "grep -v \"^#\" \"" + logfile + "\" >> \"" + tmpfile + "\"";
+            String cmd3 = "cat \"" + tmpfile + "\" > \"" + logfile + "\"";
             cmd = new String[] { "sh", "-c", cmd1 + ";" + cmd2 + ";" + cmd3 };
         }
 
@@ -225,7 +223,11 @@ public class EMFCmdClient {
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(logFile, true)));
         writeLogs(writer, jobMsg, jobkey, logFileExisted);
         writer.close();
-        sendLogs(args, logInterval, resendTimes, logFile, jobkey, jobMsg, false);
+
+        if (jobMsg.getStatus() == null || jobMsg.getStatus().isEmpty())
+            sendLogs(args, logInterval, resendTimes, logFile, jobkey, jobMsg, false);
+        else
+            sendLogs(args, logInterval, resendTimes, logFile, jobkey, jobMsg, true);
     }
 
     private static void writeLogs(PrintWriter writer, JobMessage jobMsg, String jobkey, boolean logFileExisted) {
@@ -289,7 +291,8 @@ public class EMFCmdClient {
         msg.setRemoteUser(fields[7]);
 
         try {
-            msg.setExecModifiedDate(EmfDateFormat.parse_MM_DD_YYYY_HH_mm(fields[8]));
+            msg.setExecModifiedDate((fields[8] == null || fields[8].trim().isEmpty()) ? null : EmfDateFormat
+                    .parse_MM_DD_YYYY_HH_mm(fields[8]));
         } catch (Exception e) {
             e.printStackTrace();
             return msg;
