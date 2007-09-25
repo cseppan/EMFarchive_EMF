@@ -27,7 +27,7 @@ public class CSCountyRecordReader {
         if (tokens.length - 1 < fipsColIndex) 
             throw new ImporterException("Missing FIPs column.");
         
-        String fips = tokens[fipsColIndex];
+        String fips = tokens[fipsColIndex].replaceAll("\"", "");
 
         return fips;
     }
