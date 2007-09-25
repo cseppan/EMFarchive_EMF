@@ -189,7 +189,7 @@ public class EMFCmdClient {
             String cmd3 = "TYPE \"" + tmpfile + "\" > \"" + logfile + "\"";
             cmd = new String[] { "cmd.exe", "/C", cmd1 + " & " + cmd2 + " & " + cmd3 };
         } else {
-            String cmd1 = "echo #" + lineCount + " > \"" + tmpfile + "\"";
+            String cmd1 = "echo \\#" + lineCount + " > \"" + tmpfile + "\"";
             String cmd2 = "grep -v \"^#\" \"" + logfile + "\" >> \"" + tmpfile + "\"";
             String cmd3 = "cat \"" + tmpfile + "\" > \"" + logfile + "\"";
             cmd = new String[] { "sh", "-c", cmd1 + ";" + cmd2 + ";" + cmd3 };
