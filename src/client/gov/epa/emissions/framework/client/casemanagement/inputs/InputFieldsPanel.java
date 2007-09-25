@@ -129,7 +129,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
         if (type != null && ds != null)
             dataset.setSelectedItem(input.getDataset());
-        
+
         dataset.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 fillVersions((EmfDataset) dataset.getSelectedItem());
@@ -141,7 +141,10 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
         version = new ComboBox(new Version[] { input.getVersion() });
         fillVersions(input.getDataset());
-        // version.setEnabled(false);
+        
+        if (input.getVersion() != null)
+            version.setSelectedItem(input.getVersion());
+        
         changeablesList.addChangeable(version);
         version.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Version:", version, panel);
