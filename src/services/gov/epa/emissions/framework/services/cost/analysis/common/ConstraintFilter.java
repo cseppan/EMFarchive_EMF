@@ -58,13 +58,13 @@ public class ConstraintFilter {
         return (EfficiencyRecord[]) records.toArray(new EfficiencyRecord[0]);
     }
 
-    public EfficiencyRecord[] filterByMinCostPerTon(EfficiencyRecord[] efficiencyRecords) {
+    public EfficiencyRecord[] filterByMinCostPerTon(EfficiencyRecord[] efficiencyRecords) throws EmfException {
         //return all eff records, if there is no constraint to filter on...
         if (minCostPerTon == null) return efficiencyRecords;
         
         List records = new ArrayList();
         for (int i = 0; i < efficiencyRecords.length; i++) {
-            if (efficiencyRecords[i].getCostPerTon() < minCostPerTon)
+            if (efficiencyRecords[i].getCostPerTon() * costYearTable.factor(efficiencyRecords[i].getCostYear()) < minCostPerTon)
                 records.add(efficiencyRecords[i]);
         }
         return (EfficiencyRecord[]) records.toArray(new EfficiencyRecord[0]);
