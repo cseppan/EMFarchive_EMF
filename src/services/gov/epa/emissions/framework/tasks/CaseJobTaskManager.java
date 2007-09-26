@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Timer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -54,6 +55,8 @@ public class CaseJobTaskManager implements TaskManager {
     private static Hashtable<String, Task> runTable = new Hashtable<String, Task>();
 
     private static Hashtable<String, Task> waitTable = new Hashtable<String, Task>();
+
+    private static Timer timer;
 
     public static synchronized int getSizeofTaskQueue() {
         return taskQueue.size();
@@ -279,13 +282,13 @@ public class CaseJobTaskManager implements TaskManager {
 
             caseJob = caseDAO.getCaseJob(jid);
             JobRunStatus jrs = caseJob.getRunstatus();
-            
+
             String currentJobStatus;
-            
-            if (jrs==null){
-                currentJobStatus="Failed";
-            }else{
-                currentJobStatus=jrs.getName();
+
+            if (jrs == null) {
+                currentJobStatus = "Failed";
+            } else {
+                currentJobStatus = jrs.getName();
             }
 
             System.out.println("For JOB NAME= " + caseJob.getName() + "Incoming status flag= " + status
@@ -760,26 +763,45 @@ public class CaseJobTaskManager implements TaskManager {
      * There was a change in the status of a waiting job so process the Queue
      */
     public static synchronized void callBackFromJobRunServer() throws EmfException {
-        System.out.println("EMF CMD CLIENT SENT A COMPLETED or FAILED STATUS BACK FROM THE RUNNING JOB.");
-        processTaskQueue();
+        if (DebugLevels.DEBUG_9)
+            System.out.println("EMF CMD CLIENT SENT A COMPLETED or FAILED STATUS BACK FROM THE RUNNING JOB.");
+        try {
+            int timeWait = 10; // Set the time delay to 8 seconds
+            timer = new Timer();
+
+            if (DebugLevels.DEBUG_9)
+                System.out.println("Set timer and waiting for " + timeWait + " seconds before processing the queue");
+
+            timer.schedule(new WaitDelay(), timeWait * 1000);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new EmfException("Error in callback received from the Job Run Server");
+        }
     }
 
-    public String getStatusOfWaitAndRunTable() throws EmfException {
+    public static synchronized String getStatusOfWaitAndRunTable() throws EmfException {
+        if (DebugLevels.DEBUG_9)
+            System.out.println("CaseJobTaskManger::getStatusOfWaitAndRunTable");
+
         String mesg;
 
         mesg = createStatusMessage();
+
+        if (DebugLevels.DEBUG_9)
+            System.out.println("CaseJobTaskManger::getStatusOfWaitAndRunTable Returning the message: " + mesg);
+
         return mesg;
     }
 
-    private String createStatusMessage() throws EmfException {
-        try{
+    private static synchronized String createStatusMessage() throws EmfException {
+        try {
             StringBuffer sbuf = new StringBuffer();
             Iterator<Task> iter;
             String labels;
 
             Collection<Task> waitingTasks = waitTable.values();
             Collection<Task> runningTasks = runTable.values();
-            
+
             labels = "=======================================\n";
             sbuf.append(labels);
             labels = "Status of the CaseJobTaskManager\n\n";
@@ -789,11 +811,11 @@ public class CaseJobTaskManager implements TaskManager {
             labels = "JobId\tJobName\tCaseId\tCaseName\tUserId\tReady?\n";
             sbuf.append(labels);
 
-            if (waitingTasks.size()==0){
+            if (waitingTasks.size() == 0) {
                 labels = "There are no tasks in the CaseJobTaskManager WaitTable\n";
                 sbuf.append(labels);
-                
-            }else{
+
+            } else {
                 iter = waitingTasks.iterator();
 
                 while (iter.hasNext()) {
@@ -801,7 +823,7 @@ public class CaseJobTaskManager implements TaskManager {
                     String cjtStatus = cjt.getJobId() + "\t" + cjt.getJobName() + "\t" + cjt.getCaseId() + "\t"
                             + cjt.getCaseName() + "\t" + cjt.getUser().getId() + "\t" + cjt.isReady() + "\n";
                     sbuf.append(cjtStatus);
-                }            
+                }
             }
 
             labels = "=======================================\n";
@@ -811,28 +833,28 @@ public class CaseJobTaskManager implements TaskManager {
             labels = "JobId\tJobName\tCaseId\tCaseName\tUserId\n";
             sbuf.append(labels);
 
-            if (waitingTasks.size()==0){
+            if (waitingTasks.size() == 0) {
                 labels = "There are no tasks in the CaseJobTaskManager RunTable\n";
                 sbuf.append(labels);
-                
-            }else{
+
+            } else {
 
                 iter = runningTasks.iterator();
                 while (iter.hasNext()) {
                     CaseJobTask cjt = (CaseJobTask) iter.next();
                     String cjtStatus = cjt.getJobId() + "\t" + cjt.getJobName() + "\t" + cjt.getCaseId() + "\t"
-                            + cjt.getCaseName() + "\t" + cjt.getUser().getId()+"\n";
+                            + cjt.getCaseName() + "\t" + cjt.getUser().getId() + "\n";
                     sbuf.append(cjtStatus);
                 }
-                
+
             }
-            
+
             labels = "=======================================\n";
             sbuf.append(labels);
-            
+
             return sbuf.toString();
-            
-        }catch(Exception ex){
+
+        } catch (Exception ex) {
             ex.printStackTrace();
             throw new EmfException("System error in CaseJobTaskManager" + ex.getMessage());
         }
