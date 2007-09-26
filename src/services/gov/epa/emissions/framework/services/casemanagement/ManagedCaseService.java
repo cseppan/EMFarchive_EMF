@@ -2146,8 +2146,6 @@ public class ManagedCaseService {
                 if (!(status.equalsIgnoreCase("Running"))) {
                     // status is Completed or Failed - set completion date
                     job.setRunCompletionDate(new Date());
-                    // Notify CaseJobTaskManager that the job status has changed to Completed or Failed
-                    TaskManagerFactory.getCaseJobTaskManager(sessionFactory).callBackFromJobRunServer();
 
                 } else {
                     // status is running - set running date
@@ -2162,6 +2160,14 @@ public class ManagedCaseService {
                 throw new EmfException("Remote user doesn't match the user who runs the job.");
 
             dao.add(message);
+
+            if (!status.isEmpty() && !jobStatus.equalsIgnoreCase(status)) {
+                if (!(status.equalsIgnoreCase("Running"))) {
+                    // Notify CaseJobTaskManager that the job status has changed to Completed or Failed
+                    TaskManagerFactory.getCaseJobTaskManager(sessionFactory).callBackFromJobRunServer();
+                }
+
+            }
 
             return 0;
         } catch (Exception e) {
@@ -2227,27 +2233,30 @@ public class ManagedCaseService {
     }
 
     public String restoreTaskManagers() throws EmfException {
-        if (DebugLevels.DEBUG_9) System.out.println("ManagedCaseService::restoreTaskManagers");
+        if (DebugLevels.DEBUG_9)
+            System.out.println("ManagedCaseService::restoreTaskManagers");
 
         String mesg;
         Collection<PersistedWaitTask> allTasks = null;
-        try{
+        try {
             allTasks = dao.getPersistedWaitTasks();
-            if (DebugLevels.DEBUG_9) System.out.println("ManagedCaseService::restoreTaskManagers Number of persisted tasks in table= " + allTasks.size());
+            if (DebugLevels.DEBUG_9)
+                System.out.println("ManagedCaseService::restoreTaskManagers Number of persisted tasks in table= "
+                        + allTasks.size());
+            dao.removeAll();
 
-            
-            
-            //get the collections of persisted waittasks to be restored on startup
+            // get the collections of persisted waittasks to be restored on startup
             // FIXME: Remove after debug
+
             mesg = "Number of persisted tasks in table= " + allTasks.size();
-            
+
             return mesg;
 
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             throw new EmfException("System problems: Database Access");
         }
-        
+
     }
 
     public String printStatusCaseJobTaskManager() throws EmfException {

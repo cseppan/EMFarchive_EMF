@@ -766,7 +766,7 @@ public class CaseJobTaskManager implements TaskManager {
         if (DebugLevels.DEBUG_9)
             System.out.println("EMF CMD CLIENT SENT A COMPLETED or FAILED STATUS BACK FROM THE RUNNING JOB.");
         try {
-            int timeWait = 10; // Set the time delay to 8 seconds
+            int timeWait = 10; // Set the time delay to 10 seconds
             timer = new Timer();
 
             if (DebugLevels.DEBUG_9)
