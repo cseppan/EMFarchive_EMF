@@ -254,14 +254,14 @@ public class RemoteCommand {
 
             if (errorLevel > 0) {
                 // error in local command
-                throw new EmfException("ERROR in executing local command: " + localCmd);
+                throw new EmfException("ERROR executing local command: " + localCmd);
             }
 
             return p.getInputStream();
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("ERROR in executing local command: " + localCmd);
-            throw new EmfException("ERROR in executing local command: " + e.getMessage());
+            throw new EmfException("ERROR executing local command: " + e.getMessage());
         }
     }
 
