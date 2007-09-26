@@ -479,7 +479,6 @@ public class CaseServiceImpl implements CaseService {
     }
 
     public String restoreTaskManagers()  throws EmfException {
-        
         return getCaseService().restoreTaskManagers();
     }
 

@@ -32,6 +32,7 @@ import gov.epa.emissions.framework.tasks.TaskSubmitter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -2226,12 +2227,27 @@ public class ManagedCaseService {
     }
 
     public String restoreTaskManagers() throws EmfException {
+        if (DebugLevels.DEBUG_9) System.out.println("ManagedCaseService::restoreTaskManagers");
+
         String mesg;
-        // FIXME: Remove after debug
-        mesg = "Dummy Restore Status Message";
-        if (false)
-            throw new EmfException();
-        return mesg;
+        Collection<PersistedWaitTask> allTasks = null;
+        try{
+            allTasks = dao.getPersistedWaitTasks();
+            if (DebugLevels.DEBUG_9) System.out.println("ManagedCaseService::restoreTaskManagers Number of persisted tasks in table= " + allTasks.size());
+
+            
+            
+            //get the collections of persisted waittasks to be restored on startup
+            // FIXME: Remove after debug
+            mesg = "Number of persisted tasks in table= " + allTasks.size();
+            
+            return mesg;
+
+        }catch(Exception ex){
+            ex.printStackTrace();
+            throw new EmfException("System problems: Database Access");
+        }
+        
     }
 
     public String printStatusCaseJobTaskManager() throws EmfException {

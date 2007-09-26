@@ -19,6 +19,7 @@ import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -599,6 +600,25 @@ public class CaseDAO {
         }
 
         return ids;
+    }
+
+    //Simulated database table below
+    ArrayList<PersistedWaitTask> allTasks = new ArrayList<PersistedWaitTask>();
+    
+    public Collection<PersistedWaitTask> getPersistedWaitTasks() {
+        if (DebugLevels.DEBUG_9) System.out.println("CaseDAO::getPersistedWaitTasks");
+        
+        PersistedWaitTask task1 = new PersistedWaitTask(19,109, 22, 1);
+        PersistedWaitTask task2 = new PersistedWaitTask(12,133, 21, 12);
+        PersistedWaitTask task3 = new PersistedWaitTask(19,109, 22, 1);
+
+        allTasks.add(task1);
+        allTasks.add(task2);
+        allTasks.add(task3);
+        
+        if (DebugLevels.DEBUG_9) System.out.println("CaseDAO::getPersistedWaitTasks returned num of tasks= " + allTasks.size());
+        
+        return allTasks;
     }
 
 }
