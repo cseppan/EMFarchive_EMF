@@ -27,7 +27,7 @@
 
 	<one-to-one 
 		name="constraint" 
-		class="gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint"/>
+		class="gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint" cascade="save-update"/>
 
 	<many-to-one cascade="save-update"
             name="region" 
