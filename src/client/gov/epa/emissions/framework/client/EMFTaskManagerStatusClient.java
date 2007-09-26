@@ -50,6 +50,9 @@ public class EMFTaskManagerStatusClient {
             caseService = serviceLocator.caseService();
             eximService = serviceLocator.eximService();
             
+            String restoreStatus = caseService.restoreTaskManagers();
+            System.out.println(restoreStatus);
+            
             String caseJobTaskManagerStatus = caseService.printStatusCaseJobTaskManager();
             System.out.println(caseJobTaskManagerStatus);
      
