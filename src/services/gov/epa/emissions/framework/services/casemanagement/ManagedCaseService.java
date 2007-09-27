@@ -2243,7 +2243,7 @@ public class ManagedCaseService {
             if (DebugLevels.DEBUG_9)
                 System.out.println("ManagedCaseService::restoreTaskManagers Number of persisted tasks in table= "
                         + allTasks.size());
-            dao.removeAll();
+            //dao.removeAll();
 
             // get the collections of persisted waittasks to be restored on startup
             // FIXME: Remove after debug
