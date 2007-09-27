@@ -46,6 +46,12 @@ public class UserDAO {
         return (User) list.get(0);
     }
 
+    public User get(int userId, Session session) {
+        Criterion criterion = Restrictions.eq("id", userId);
+        User user = (User) facade.load(User.class, criterion, session);
+        return user;
+    }
+
     public boolean contains(String username, Session session) {
         return get(username, session) != null;
     }

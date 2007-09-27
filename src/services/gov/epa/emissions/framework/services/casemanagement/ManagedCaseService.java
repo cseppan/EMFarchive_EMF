@@ -11,6 +11,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
+import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
@@ -32,7 +33,6 @@ import gov.epa.emissions.framework.tasks.TaskSubmitter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -2078,7 +2078,7 @@ public class ManagedCaseService {
         String defaultAbbrev = "case" + job.getCaseId();
         String caseAbbrev = (caseObj.getAbbreviation() == null) ? defaultAbbrev : caseObj.getAbbreviation().getName();
 
-        // Test ouput directory to place job script
+        // Test output directory to place job script
         String outputFileDir = caseObj.getOutputFileDir();
         if ((outputFileDir == null) || (outputFileDir.equals(""))) {
             throw new EmfException("Output job script directory must be set to run job: " + job.getName());
@@ -2237,26 +2237,176 @@ public class ManagedCaseService {
             System.out.println("ManagedCaseService::restoreTaskManagers");
 
         String mesg;
-        Collection<PersistedWaitTask> allTasks = null;
+        List distinctUserIds = null;
+        List waitTasksForUser = null;
+
         try {
-            allTasks = dao.getPersistedWaitTasks();
-            if (DebugLevels.DEBUG_9)
-                System.out.println("ManagedCaseService::restoreTaskManagers Number of persisted tasks in table= "
-                        + allTasks.size());
-            //dao.removeAll();
+            ArrayList userIds = (ArrayList) dao.getDistinctUsersOfPersistedWaitTasks();
+            mesg = "Total number of persisted wait tasks retored: " + userIds.size();
+            distinctUserIds = getDistinctUserIds(userIds);
 
-            // get the collections of persisted waittasks to be restored on startup
-            // FIXME: Remove after debug
+            Iterator iter = distinctUserIds.iterator();
+            while (iter.hasNext()) {
 
-            mesg = "Number of persisted tasks in table= " + allTasks.size();
+                // get the user id
+                int uid = ((IntegerHolder) iter.next()).getUserId();
+
+                // acquire all the CaseJobTasks for this uid
+                // List allCJTsForUser = getCaseJobTasksForUser(uid);
+
+                resubmitPersistedTasksForUser(uid);
+
+            }
 
             return mesg;
-
         } catch (Exception ex) {
             ex.printStackTrace();
-            throw new EmfException("System problems: Database Access");
+            throw new EmfException("System problems: Database access failed");
         }
 
+    }
+
+    private void resubmitPersistedTasksForUser(int uid) throws EmfException {
+        if (DebugLevels.DEBUG_9)
+            System.out.println("Start ManagedCaseService::resubmitPersistedTasksForUser uid= " + uid);
+        Integer[] jobIds = null;
+        int caseId=-9;
+        User user = getUser(uid);
+        
+        if (DebugLevels.DEBUG_9)
+            System.out.println("Incoming userid= " + uid + " acquired userName= " + user.getName());
+  
+        // Get All persisted wait jobs for this user
+        List allPersistedTasks = getPersistedTasksForUser(uid);
+        if (allPersistedTasks==null){
+            if (DebugLevels.DEBUG_9)System.out.println("allPersistedTasks is null WHY?" );
+            
+        }else{
+            if (DebugLevels.DEBUG_9)System.out.println("Size of list returned from Persist wait table= " + allPersistedTasks.size());
+            jobIds = new Integer[allPersistedTasks.size()];
+
+            for (int i=0; i<allPersistedTasks.size();i++){
+                PersistedWaitTask pwTask= (PersistedWaitTask) allPersistedTasks.get(i);
+                if (caseId==-9){
+                    caseId=pwTask.getCaseId();
+                }    
+                jobIds[i]=new Integer(pwTask.getJobId());
+                
+                //Task has been acquired so delete from persisted wait task table
+                dao.removePersistedTasks(pwTask);
+            }
+            
+            if (DebugLevels.DEBUG_9)System.out.println("After the loop jobId array of ints size= " + jobIds.length);
+            if (DebugLevels.DEBUG_9)System.out.println("After the loop CaseId= " + caseId);
+            
+        }
+
+        if (allGood(user,jobIds,caseId)){
+            if (DebugLevels.DEBUG_9)System.out.println("ManagedCaseService::resubmitPersistedTasksForUser Everything is good so resubmit");
+            this.submitJobs(jobIds, caseId, user);                        
+        }else{
+            throw new EmfException("Failed to restore persisted wait tasks for user= " + user.getName());
+        }
+              
+        if (DebugLevels.DEBUG_9)
+            System.out.println("End ManagedCaseService::resubmitPersistedTasksForUser uid= " + uid);
+    }
+ 
+    private boolean allGood(User user, Integer[] jobIds, int caseId) {
+        boolean allGewd = false;
+        
+        if ((caseId != -9) && (user != null) && (jobIds !=null) && (jobIds.length>0)){
+            allGewd=true;
+        }
+        if (DebugLevels.DEBUG_9)
+            System.out.println("END ManagedCaseService::allGood status= " + allGewd);
+        
+        return allGewd;
+    }
+
+    private User getUser(int uid) throws EmfException {
+        Session session = this.sessionFactory.getSession();
+        User user = null;
+        try {
+            UserDAO userDAO = new UserDAO();
+            user = userDAO.get(uid, session);
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new EmfException("System Problems: Database access error");
+
+        } finally {
+            session.clear();
+            session.close();
+        }
+        
+        return user;
+    }
+
+    private List getPersistedTasksForUser(int uid) throws EmfException {
+        Session session = this.sessionFactory.getSession();
+        List allPersistTasks= null;
+        
+        try {
+            UserDAO userDAO = new UserDAO();
+            User user = userDAO.get(uid, session);
+            allPersistTasks = dao.getPersistedWaitTasksByUser(uid);
+            String statMsg;
+
+            if (allPersistTasks != null) {
+                statMsg = allPersistTasks.size() + " elements List returned of persisted wait tasks for user= " + uid;
+            } else {
+                statMsg = "Empty list of elements for user= " + uid;
+
+            }
+
+            if (DebugLevels.DEBUG_9)
+                System.out.println(statMsg);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new EmfException("System Problems: Database access error");
+
+        } finally {
+            session.clear();
+            session.close();
+        }
+
+        return allPersistTasks;
+    }
+
+    private List getCaseJobTasksForUser(int uid) throws EmfException {
+        Session session = this.sessionFactory.getSession();
+
+        try {
+            UserDAO userDAO = new UserDAO();
+            User user = userDAO.get(uid, session);
+            if (DebugLevels.DEBUG_9)
+                System.out.println("Incoming userid= " + uid + " acquired userName= " + user.getName());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new EmfException("System Problems: Database access error");
+
+        } finally {
+            session.clear();
+            session.close();
+        }
+
+        return null;
+    }
+
+    private ArrayList getDistinctUserIds(List userIds) {
+        ArrayList distUid = new ArrayList();
+
+        Iterator iter = userIds.iterator();
+        while (iter.hasNext()) {
+            IntegerHolder intHold = (IntegerHolder) iter.next();
+            intHold.setId(0);
+            if (!distUid.contains(intHold)) {
+                distUid.add(intHold);
+            }
+        }
+
+        return distUid;
     }
 
     public String printStatusCaseJobTaskManager() throws EmfException {

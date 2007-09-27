@@ -14,18 +14,6 @@ import org.hibernate.criterion.Restrictions;
 
 public class HibernateFacade {
 
-//    public void add(Object obj, Session session) {
-//        Transaction tx = null;
-//        try {
-//            tx = session.beginTransaction();
-//            session.save(obj);
-//            tx.commit();
-//        } catch (HibernateException e) {
-//            tx.rollback();
-//            throw e;
-//        }
-//    }
-
     public Serializable add(Object obj, Session session) {
         Transaction tx = null;
         Serializable id;
@@ -350,6 +338,35 @@ public class HibernateFacade {
             tx.rollback();
             throw e;
         }
+    }
+
+    public List getDistinctForColumn(Class clazz, Criterion[] criterions, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria criteria = session.createCriteria(clazz);
+            for (int i = 0; i < criterions.length; i++)
+                criteria.add(criterions[i]);
+
+            tx.commit();
+            return criteria.list();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    public void deleteTask(Object object, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.delete(object);
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+ 
     }
 
 }

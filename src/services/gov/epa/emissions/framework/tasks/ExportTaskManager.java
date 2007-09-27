@@ -119,9 +119,6 @@ public class ExportTaskManager implements TaskManager {
         if (DebugLevels.DEBUG_9)
             System.out.println("Initial # of jobs in Thread Pool: " + threadPool.getPoolSize());
 
-        if (DebugLevels.DEBUG_9)
-            System.out.println("Timer started: ");
-
     }
 
     public synchronized void callBackFromThread(String taskId, String submitterId, String status, String mesg) {

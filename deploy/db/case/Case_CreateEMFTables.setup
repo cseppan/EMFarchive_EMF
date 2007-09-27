@@ -329,3 +329,17 @@ CREATE TABLE cases.job_dependencies
 )
 WITHOUT OIDS;
 -- cases.job_dependencies
+
+
+-- DROP TABLE cases.taskmanager_persist;
+
+CREATE TABLE cases.taskmanager_persist
+(
+  id serial NOT NULL,
+  job_id integer NOT NULL,
+  case_id integer NOT NULL,
+  user_id integer NOT NULL,
+  CONSTRAINT taskmanager_persist_pkey PRIMARY KEY (id)
+) 
+WITHOUT OIDS;
+ALTER TABLE cases.taskmanager_persist OWNER TO emf;

@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.CaseJobTask;
+import gov.epa.emissions.framework.services.casemanagement.PersistedWaitTask;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.DependentJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
@@ -217,6 +218,13 @@ public class CaseJobTaskManager implements TaskManager {
                     if (!(cjt == null)) {
                         System.out.println("Details of CJT: " + cjt.getJobName());
                         runTable.remove(taskId);
+                        if (DebugLevels.DEBUG_0)System.out.println("updateRunStatus Before remove from runTable on completed or failed job in thread");
+
+                        // Now remove the task from the persisted wait table
+                           caseDAO.removePersistedTask(new PersistedWaitTask(cjt.getJobId(), cjt.getCaseId(), cjt
+                                   .getUser().getId()));
+                           if (DebugLevels.DEBUG_0)System.out.println("updateRunStatus After remove from runTable on completed or failed job in thread");
+
                     }
                 }
 
@@ -231,7 +239,14 @@ public class CaseJobTaskManager implements TaskManager {
                         System.out.println("CaseJobTask Id for failed exports = " + cjt.getTaskId());
                         System.out.println("Size of the waitTable before remove: " + waitTable.size());
                         waitTable.remove(taskId);
-                        System.out.println("Size of the waitTable after remove: " + waitTable.size());
+                        if (DebugLevels.DEBUG_0)System.out.println("updateRunStatus Before remove from runTable on completed or failed job in thread");
+
+                        // Now remove the task from the persisted wait table
+                           caseDAO.removePersistedTask(new PersistedWaitTask(cjt.getJobId(), cjt.getCaseId(), cjt
+                                   .getUser().getId()));
+                           if (DebugLevels.DEBUG_0)System.out.println("updateRunStatus After remove from runTable on completed or failed job in thread");
+                        if (DebugLevels.DEBUG_9)
+                            System.out.println("Size of the waitTable after remove: " + waitTable.size());
                     }
                 }
             }
@@ -241,27 +256,44 @@ public class CaseJobTaskManager implements TaskManager {
             if (status.equals("export failed")) {
                 System.out.println("CaseJobTaskManager::updateRunStatus:  export failed");
                 synchronized (waitTable) {
-                    System.out.println("Export Failed");
+                    if (DebugLevels.DEBUG_9)
+                        System.out.println("Export Failed");
                     cjt = (CaseJobTask) waitTable.get(taskId);
-                    System.out.println("Details of CJT: " + cjt.getJobName());
-                    System.out.println("CaseJobTask Id for failed exports = " + cjt.getJobId());
-                    System.out.println("CaseJobTask Id for failed exports = " + cjt.getTaskId());
-                    System.out.println("Size of the waitTable before remove: " + waitTable.size());
+                    if (DebugLevels.DEBUG_9)
+                        System.out.println("Details of CJT: " + cjt.getJobName());
+                    if (DebugLevels.DEBUG_9)
+                        System.out.println("CaseJobTask Id for failed exports = " + cjt.getJobId());
+                    if (DebugLevels.DEBUG_9)
+                        System.out.println("CaseJobTask Id for failed exports = " + cjt.getTaskId());
+                    if (DebugLevels.DEBUG_9)
+                        System.out.println("Size of the waitTable before remove: " + waitTable.size());
                     waitTable.remove(taskId);
-                    System.out.println("Size of the waitTable after remove: " + waitTable.size());
+                    if (DebugLevels.DEBUG_0)System.out.println("updateRunStatus Before remove from runTable on completed or failed job in thread");
+
+                    // Now remove the task from the persisted wait table
+                       caseDAO.removePersistedTask(new PersistedWaitTask(cjt.getJobId(), cjt.getCaseId(), cjt
+                               .getUser().getId()));
+                       if (DebugLevels.DEBUG_0)System.out.println("updateRunStatus After remove from runTable on completed or failed job in thread");
+                    if (DebugLevels.DEBUG_9)
+                        System.out.println("CJTM::updateRunStatus return from removedPersistedTasks 3 (exportFailed)");
+                    if (DebugLevels.DEBUG_9)
+                        System.out.println("Size of the waitTable after remove: " + waitTable.size());
                 }
             }
 
             if (status.equals("export succeeded")) {
-                System.out.println("CaseJobTaskManager::updateRunStatus:  export success");
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("CaseJobTaskManager::updateRunStatus:  export success");
                 synchronized (waitTable) {
                     cjt = (CaseJobTask) waitTable.get(taskId);
-                    System.out.println("Details of CJT: " + cjt.getJobName());
+                    if (DebugLevels.DEBUG_9)
+                        System.out.println("Details of CJT: " + cjt.getJobName());
                 }
             }
 
             if (DebugLevels.DEBUG_9)
-                System.out.println("CJTM::updateRunStatus is casejobtask null? " + (cjt == null));
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("CJTM::updateRunStatus is casejobtask null? " + (cjt == null));
 
             // if this was a forced failed due to dependencies failing the casejobtask needs to come from
             // the wait queue since cjt will be null
@@ -272,11 +304,13 @@ public class CaseJobTaskManager implements TaskManager {
             //                
             // }
 
-            System.out.println("Before getJobId is the CJT null? " + (cjt == null));
+            if (DebugLevels.DEBUG_9)
+                System.out.println("Before getJobId is the CJT null? " + (cjt == null));
 
             // update the run status in the Case_CaseJobs
             int jid = cjt.getJobId();
-            System.out.println("Before getJobId jid= " + jid);
+            if (DebugLevels.DEBUG_9)
+                System.out.println("Before getJobId jid= " + jid);
 
             System.out.println("after getJobId is the CJT null? " + (cjt == null));
 
@@ -291,18 +325,21 @@ public class CaseJobTaskManager implements TaskManager {
                 currentJobStatus = jrs.getName();
             }
 
-            System.out.println("For JOB NAME= " + caseJob.getName() + "Incoming status flag= " + status
-                    + ", Current database jobstatus= " + caseJob.getRunstatus().getName());
+            if (DebugLevels.DEBUG_9)
+                System.out.println("For JOB NAME= " + caseJob.getName() + "Incoming status flag= " + status
+                        + ", Current database jobstatus= " + caseJob.getRunstatus().getName());
 
             if (DebugLevels.DEBUG_9)
-                System.out.println("In CaseJobTaskManager::updateRunStatus for jobId= " + jid
-                        + " Is the CaseJob null? " + (caseJob == null));
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("In CaseJobTaskManager::updateRunStatus for jobId= " + jid
+                            + " Is the CaseJob null? " + (caseJob == null));
 
             boolean toUpdate = false;
 
             if (status.equals("completed") && (currentJobStatus.equalsIgnoreCase("Waiting"))) {
-                System.out
-                        .println("CaseJobTaskManager::updateRunStatus:  thread Status is completed current=Waiting set jobStatus=Submitted");
+                if (DebugLevels.DEBUG_9)
+                    System.out
+                            .println("CaseJobTaskManager::updateRunStatus:  thread Status is completed current=Waiting set jobStatus=Submitted");
                 jobStatus = "Submitted";
                 caseJob.setIdInQueue(cjt.getQId());
                 caseJob.setRunStartDate(new Date());
@@ -310,21 +347,24 @@ public class CaseJobTaskManager implements TaskManager {
             }
 
             if (status.equals("failed")) {
-                System.out.println("CaseJobTaskManager::updateRunStatus:  jobStatus is Failed jobStatus=Failed");
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("CaseJobTaskManager::updateRunStatus:  jobStatus is Failed jobStatus=Failed");
                 jobStatus = "Failed";
                 caseJob.setRunCompletionDate(new Date());
                 toUpdate = true;
             }
 
             if (status.equals("export succeeded")) {
-                System.out.println("CaseJobTaskManager::updateRunStatus:  export Succeeded jobStatus=Waiting");
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("CaseJobTaskManager::updateRunStatus:  export Succeeded jobStatus=Waiting");
                 jobStatus = "Waiting";
                 caseJob.setRunStartDate(new Date());
                 toUpdate = true;
             }
 
             if (status.equals("export failed")) {
-                System.out.println("CaseJobTaskManager::updateRunStatus:  export FAILED jobStatus=FAILED");
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("CaseJobTaskManager::updateRunStatus:  export FAILED jobStatus=FAILED");
                 jobStatus = "Failed";
                 caseJob.setRunStartDate(new Date());
                 toUpdate = true;
@@ -337,10 +377,12 @@ public class CaseJobTaskManager implements TaskManager {
 
             }
         } catch (Exception e) {
-            System.out.println("^^^^^^^^^^^^^^");
+            if (DebugLevels.DEBUG_9)
+                System.out.println("^^^^^^^^^^^^^^");
             e.printStackTrace();
 
-            System.out.println("^^^^^^^^^^^^^^");
+            if (DebugLevels.DEBUG_9)
+                System.out.println("^^^^^^^^^^^^^^");
             throw new EmfException(e.getMessage());
         }
     }
@@ -434,6 +476,12 @@ public class CaseJobTaskManager implements TaskManager {
                             } else {
                                 synchronized (waitTable) {
                                     waitTable.put(nextTask.getTaskId(), nextTask);
+
+                                    // create a persisted wait task
+                                    PersistedWaitTask pwTask = new PersistedWaitTask(nextTask.getJobId(), nextTask
+                                            .getCaseId(), nextTask.getUser().getId());
+                                    // Register the newly added waitTask to the persisted wait Task Table
+                                    caseDAO.addPersistedTask(pwTask);
                                 }// synchronized
                             }
 
@@ -504,7 +552,8 @@ public class CaseJobTaskManager implements TaskManager {
                     System.out
                             .println("&&&&& In CaseJobTaskManager::processQueue run a waitTasks the type of TASK object: "
                                     + tsk.getClass().getName());
-                System.out.println(tsk.taskId);
+                if (DebugLevels.DEBUG_9)
+                    System.out.println(tsk.taskId);
 
                 if (DebugLevels.DEBUG_0)
                     System.out.println("Is the caseJobTask null? " + (tsk == null));
@@ -523,6 +572,7 @@ public class CaseJobTaskManager implements TaskManager {
                     // remove from waitTable
                     synchronized (waitTable) {
                         waitTable.remove(tsk.getTaskId());
+
                     }// synchronized (wait Table)
 
                     // add to runTable
@@ -566,8 +616,9 @@ public class CaseJobTaskManager implements TaskManager {
     public static void callBackFromExportJobSubmitter(String cjtId, String status, String mesg) throws EmfException {
         CaseJobTask cjt = null;
 
-        System.out.println("CaseJobTaskManager::callBackFromExportJobSubmitter for caseJobTask= " + cjtId + " status= "
-                + status + " and message= " + mesg);
+        if (DebugLevels.DEBUG_9)
+            System.out.println("CaseJobTaskManager::callBackFromExportJobSubmitter for caseJobTask= " + cjtId
+                    + " status= " + status + " and message= " + mesg);
         synchronized (waitTable) {
             if (DebugLevels.DEBUG_9)
                 System.out.println("Size of the wait Table: " + waitTable.size());
@@ -802,7 +853,7 @@ public class CaseJobTaskManager implements TaskManager {
             Collection<Task> waitingTasks = waitTable.values();
             Collection<Task> runningTasks = runTable.values();
 
-            labels = "=======================================\n";
+            labels = "\n=======================================\n";
             sbuf.append(labels);
             labels = "Status of the CaseJobTaskManager\n\n";
             sbuf.append(labels);

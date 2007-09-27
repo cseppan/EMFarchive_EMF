@@ -19,7 +19,6 @@ import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -487,6 +486,7 @@ public class CaseDAO {
     }
 
     public List<CaseParameter> getCaseParameters(int caseId, Session session) {
+
         Criterion crit = Restrictions.eq("caseID", new Integer(caseId));
 
         return hibernateFacade.get(CaseParameter.class, crit, session);
@@ -532,12 +532,11 @@ public class CaseDAO {
         return (CaseInput) hibernateFacade.load(CaseInput.class, crit, session);
     }
 
-
-//    private boolean loopDepends(int jid, DependentJob job) {
-//        boolean loopDetected = false;
-//
-//        return loopDetected;
-//    }
+    // private boolean loopDepends(int jid, DependentJob job) {
+    // boolean loopDetected = false;
+    //
+    // return loopDetected;
+    // }
 
     public String[] getAllValidJobs(int jobId) {
         List<String> validJobNames = new ArrayList<String>();
@@ -602,23 +601,104 @@ public class CaseDAO {
         return ids;
     }
 
-    //Simulated database table below
-    ArrayList<PersistedWaitTask> allTasks = new ArrayList<PersistedWaitTask>();
-    
-    public Collection<PersistedWaitTask> getPersistedWaitTasks() {
-        if (DebugLevels.DEBUG_9) System.out.println("CaseDAO::getPersistedWaitTasks");
-        
-        PersistedWaitTask task1 = new PersistedWaitTask(19,109, 22, 1);
-        PersistedWaitTask task2 = new PersistedWaitTask(12,133, 21, 12);
-        PersistedWaitTask task3 = new PersistedWaitTask(19,109, 22, 1);
+    public synchronized List getPersistedWaitTasksByUser(int userId) {
+        if (DebugLevels.DEBUG_9)
+            System.out.println("CaseDAO::getPersistedWaitTasks Start method");
 
-        allTasks.add(task1);
-        allTasks.add(task2);
-        allTasks.add(task3);
+        Session session = sessionFactory.getSession();
+
+        try {
+            Criterion crit = Restrictions.eq("userId", new Integer(userId));
+            return hibernateFacade.get(PersistedWaitTask.class, crit, session);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            session.clear();
+            session.close();
+        }
+
+        if (DebugLevels.DEBUG_9)
+            System.out.println("CaseDAO::getPersistedWaitTasks End method");
+        return null;
+    }
+
+    public List getDistinctUsersOfPersistedWaitTasks() {
+        Session session = sessionFactory.getSession();
+        List userIds = null;
+
+        try {
+            String sql = "select id,user_id from cases.taskmanager_persist";
+
+            userIds = session.createSQLQuery(sql).addEntity(IntegerHolder.class).list();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return userIds;
+    }
+
+    public void removePersistedTasks(PersistedWaitTask pwTask) {
+        if (DebugLevels.DEBUG_9)
+            System.out.println("CaseDAO::removePersistedTasks BEFORE num of tasks is pwTask null " + (pwTask==null));
+
+        Session session = sessionFactory.getSession();
+
+        try {
+            session.clear();
+            hibernateFacade.delete(pwTask, session);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            session.close();
+        }
         
-        if (DebugLevels.DEBUG_9) System.out.println("CaseDAO::getPersistedWaitTasks returned num of tasks= " + allTasks.size());
+        if (DebugLevels.DEBUG_9)
+            System.out.println("CaseDAO::removePersistedTasks AFTER num of tasks= ");
+    }
+
+    public void addPersistedTask(PersistedWaitTask persistedWaitTask) {
+        if (DebugLevels.DEBUG_9)
+            System.out.println("CaseDAO::addPersistedTask BEFORE num of tasks= ");
+        Session session = sessionFactory.getSession();
+
+        try {
+            hibernateFacade.add(persistedWaitTask, session);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            session.close();
+        }
         
-        return allTasks;
+        if (DebugLevels.DEBUG_9)
+            System.out.println("CaseDAO::addPersistedTask AFTER num of tasks= ");
+        
+    }
+
+    public void removePersistedTask(PersistedWaitTask persistedWaitTask) {
+        if (DebugLevels.DEBUG_9)
+            System.out.println("CaseDAO::removePersistedTask (from CJTM) BEFORE num of tasks is pwTask null " + (persistedWaitTask==null));
+
+        Session session = sessionFactory.getSession();
+
+        try {
+            session.clear();
+            Criterion crit1 = Restrictions.eq("userId", new Integer(persistedWaitTask.getUserId()));
+            Criterion crit2 = Restrictions.eq("caseId", new Integer(persistedWaitTask.getCaseId()));
+            Criterion crit3 = Restrictions.eq("jobId", new Integer(persistedWaitTask.getJobId()));
+            Object object = hibernateFacade.load(PersistedWaitTask.class, new Criterion[] { crit1, crit2, crit3 }, session);
+
+            hibernateFacade.deleteTask(object, session);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            session.close();
+        }
+        
+        if (DebugLevels.DEBUG_9)
+            System.out.println("CaseDAO::removePersistedTasks  (from CJTM) AFTER num of tasks= ");
+        
     }
 
 }
