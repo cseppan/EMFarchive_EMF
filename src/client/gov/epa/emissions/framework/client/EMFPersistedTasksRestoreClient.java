@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.exim.ExImService;
 
-public class EMFTaskManagerStatusClient {
+public class EMFPersistedTasksRestoreClient {
     private static final String DEFAULT_URL = "http://localhost:8080/emf/services";// default
 
 //    private static UserService userAdmin;
@@ -49,7 +49,10 @@ public class EMFTaskManagerStatusClient {
 
             caseService = serviceLocator.caseService();
             eximService = serviceLocator.eximService();
-                       
+            
+            String restoreStatus = caseService.restoreTaskManagers();
+            System.out.println(restoreStatus);
+            
             String caseJobTaskManagerStatus = caseService.printStatusCaseJobTaskManager();
             System.out.println(caseJobTaskManagerStatus);
      
