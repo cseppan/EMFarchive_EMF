@@ -117,7 +117,7 @@ public class ControlMeasuresImporter implements Importer {
             } finally {
                 //
             }
-            setDetailStatus("Creating and daving aggregated efficiency records to the database\n");
+            setDetailStatus("Creating and saving aggregated efficiency records to the database\n");
             aerDAO.updateAggregateEfficiencyRecords(measures, dbServer);
             setStatus("Finished reading efficiency record file");
             setDetailStatus("Finished reading efficiency record file\n");
