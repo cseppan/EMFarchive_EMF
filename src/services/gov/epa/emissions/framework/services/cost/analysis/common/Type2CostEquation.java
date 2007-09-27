@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 import gov.epa.emissions.framework.services.cost.EquationTypeVariable;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 
 public class Type2CostEquation implements CostEquation {
 
@@ -19,8 +21,11 @@ public class Type2CostEquation implements CostEquation {
 //    private Double incAnnCostMultiplier;
 //    private Double incAnnCostExponent;
     private boolean hasAllVariables = true;
-    
-    public Type2CostEquation(double discountRate) {
+    private CostYearTable costYearTable;
+    private int costYear;
+   
+    public Type2CostEquation(CostYearTable costYearTable, double discountRate) {
+        this.costYearTable = costYearTable;
         this.discountRate = discountRate / 100;     
     }
 
@@ -33,6 +38,7 @@ public class Type2CostEquation implements CostEquation {
                 designCapacityUnitDenominator);
         this.reducedEmission=emissionReduction;
         this.capRecFactor=getCapRecFactor();
+        this.costYear = bestMeasureEffRecord.measure().getCostYear();
         //populate variables for use with the equations
         populateVariables();
     }
@@ -134,34 +140,34 @@ public class Type2CostEquation implements CostEquation {
             hasAllVariables = false;
     }
 
-    public Double getAnnualCost() {
+    public Double getAnnualCost() throws EmfException {
         if (!hasAllVariables
                 || designCapacity == null 
                 || designCapacity == 0.0) return null;
-        return annCostMultiplier * Math.pow(designCapacity, annCostExponent);
+        return costYearTable.factor(costYear) * annCostMultiplier * Math.pow(designCapacity, annCostExponent);
     }
 
-    public Double getCapitalCost() {
+    public Double getCapitalCost() throws EmfException {
         if (!hasAllVariables
                 || designCapacity == null 
                 || designCapacity == 0.0) return null;
-        return capCostMultiplier * Math.pow(designCapacity, capCostExponent);
+        return costYearTable.factor(costYear) * capCostMultiplier * Math.pow(designCapacity, capCostExponent);
     }
 
-    public Double getOperationMaintenanceCost() {
+    public Double getOperationMaintenanceCost() throws EmfException {
         if (getAnnualCost() == null 
                 || getCapitalCost() == null
                 || capRecFactor == null) return null;
         return getAnnualCost() - (getCapitalCost() * capRecFactor);
     }
     
-    public Double getAnnualizedCapitalCost() { 
+    public Double getAnnualizedCapitalCost() throws EmfException { 
         Double capitalCost = getCapitalCost();
         if (capitalCost == null || capRecFactor == null) return null;
         return capitalCost * capRecFactor;
     }
 
-    public Double getComputedCPT() {
+    public Double getComputedCPT() throws EmfException {
         Double totalCost=getAnnualCost();
         if (totalCost==null || reducedEmission == 0.0) return null; 
         return totalCost/reducedEmission;

@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost.analysis.common;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 
 import java.text.DecimalFormat;
 
@@ -15,11 +16,13 @@ public class RecordGeneratorFactory {
     
     private CostEquationFactory costEquationsFactory;
 
-    public RecordGeneratorFactory(DatasetType datasetType, ControlStrategyResult result, DecimalFormat decFormat, double discountRate, boolean useCostEquation) {
+    public RecordGeneratorFactory(CostYearTable costYearTable,
+            DatasetType datasetType, ControlStrategyResult result, DecimalFormat decFormat, double discountRate, boolean useCostEquation) {
         this.datasetType = datasetType;
         this.result = result;
         this.decFormat = decFormat;
-        this.costEquationsFactory = new CostEquationFactory(useCostEquation, discountRate);
+        this.costEquationsFactory = new CostEquationFactory(costYearTable, 
+                useCostEquation, discountRate);
     }
 
     public RecordGenerator getRecordGenerator() {

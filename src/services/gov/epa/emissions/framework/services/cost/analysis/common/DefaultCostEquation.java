@@ -11,7 +11,7 @@ public class DefaultCostEquation implements CostEquation {
     
     private Double annulizedCCost;
     private Double annualCost;
-   
+
     public DefaultCostEquation(double discountRate) {
         this.discountRate = discountRate / 100;
     }

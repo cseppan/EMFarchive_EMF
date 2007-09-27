@@ -1,5 +1,8 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
+
 
 public class Type4CostEquation implements CostEquation {
 
@@ -8,8 +11,11 @@ public class Type4CostEquation implements CostEquation {
     private Double minStackFlowRate;
     private double emissionReduction;
     private Double capRecFactor;
-    
-    public Type4CostEquation(double discountRate) {
+    private CostYearTable costYearTable;
+    private int costYear;
+
+    public Type4CostEquation(CostYearTable costYearTable, double discountRate) {
+        this.costYearTable = costYearTable;
         this.discountRate = discountRate / 100;
     }
 
@@ -19,26 +25,27 @@ public class Type4CostEquation implements CostEquation {
         this.minStackFlowRate = minStackFlowRate;
         this.emissionReduction=emissionReduction;
         this.capRecFactor=getCapRecFactor();
+        this.costYear = bestMeasureEffRecord.measure().getCostYear();
     }
 
-    public Double getAnnualCost() {
+    public Double getAnnualCost() throws EmfException {
         Double capitalCost = getCapitalCost();
         Double operationMaintenanceCost = getOperationMaintenanceCost();
         if (capRecFactor == null || capitalCost == null || operationMaintenanceCost == null) return null;
         return capitalCost * capRecFactor + operationMaintenanceCost;
     }
 
-    public Double getCapitalCost() {
+    public Double getCapitalCost() throws EmfException {
         if (minStackFlowRate == null || minStackFlowRate == 0.0) return null;
-        return 990000 + (9.836 * minStackFlowRate);
+        return costYearTable.factor(costYear) * (990000 + (9.836 * minStackFlowRate));
     }  
     
-    public Double getOperationMaintenanceCost() {
+    public Double getOperationMaintenanceCost() throws EmfException {
         if (minStackFlowRate == null || minStackFlowRate == 0.0) return null;
-        return 75800 + (12.82 * minStackFlowRate);
+        return costYearTable.factor(costYear) * (75800 + (12.82 * minStackFlowRate));
     }
     
-    public Double getAnnualizedCapitalCost() { 
+    public Double getAnnualizedCapitalCost() throws EmfException { 
         Double capitalCost = getCapitalCost();
         if (capitalCost == null || capRecFactor == null) return null;
         return capitalCost * capRecFactor;
@@ -59,7 +66,7 @@ public class Type4CostEquation implements CostEquation {
 //        return null;
 //    }
 
-    public Double getComputedCPT() {
+    public Double getComputedCPT() throws EmfException {
         Double totalCost=getAnnualCost();
         if (totalCost==null || emissionReduction == 0.0) return null; 
         return totalCost/emissionReduction;

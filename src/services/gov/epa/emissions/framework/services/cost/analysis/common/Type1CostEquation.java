@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 import gov.epa.emissions.framework.services.cost.EquationTypeVariable;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 
 public class Type1CostEquation implements CostEquation {
 
@@ -20,8 +22,11 @@ public class Type1CostEquation implements CostEquation {
 //    private Double incCapCostExponent;
 //    private Double incAnnCostMultiplier;
 //    private Double incAnnCostExponent;
-    
-    public Type1CostEquation(double discountRate) {
+    private int costYear;
+    private CostYearTable costYearTable;
+
+    public Type1CostEquation(CostYearTable costYearTable, double discountRate) {
+        this.costYearTable = costYearTable;
         this.discountRate = discountRate / 100;     
     }
 
@@ -31,6 +36,7 @@ public class Type1CostEquation implements CostEquation {
         this.boilerCapacity = boilerCapacity;
         this.reducedEmission=emissionReduction;
         this.capRecFactor=getCapRecFactor();
+        this.costYear = bestMeasureEffRecord.measure().getCostYear();
         //populate variables for use with the equations
         populateVariables();
     }
@@ -66,21 +72,21 @@ public class Type1CostEquation implements CostEquation {
         }
     }
 
-    public Double getAnnualCost() {
+    public Double getAnnualCost() throws EmfException {
         if (boilerCapacity == null 
                 || capCostMultiplier == 0.0 || capCostMultiplier== null
                 || omCostMultiFixed == 0.0 || omCostMultiFixed ==null
                 || omCostMultiVariable == 0.0 || omCostMultiVariable == null
                 || scalingFactorExponent == null) return null;
-        return getAnnualizedCapitalCost()+ getOperationMaintenanceCost();
+        return getAnnualizedCapitalCost() + getOperationMaintenanceCost();
     }
 
-    public Double getCapitalCost() {
+    public Double getCapitalCost() throws EmfException {
         Double scallFactor=getScallingFactor();
         if (boilerCapacity == null 
                 || capCostMultiplier == 0.0 || capCostMultiplier== null
                 || scallFactor==0.0         || scallFactor== null) return null;
-        return capCostMultiplier * boilerCapacity*scallFactor*1000;
+        return costYearTable.factor(costYear) * capCostMultiplier * boilerCapacity*scallFactor*1000;
     }
 
     public Double getScallingFactor() {
@@ -93,12 +99,12 @@ public class Type1CostEquation implements CostEquation {
         return Math.pow(scalingFactorSize, scalingFactorExponent);
     }
 
-    public Double getOperationMaintenanceCost() {
+    public Double getOperationMaintenanceCost() throws EmfException {
         Double omCostFixed=getOperationMaintenanceCostFixed();
         Double omCostvariable=getOperationMaintenanceCostVariable();
         if (omCostFixed == null 
                 || omCostvariable == null) return null;
-        return omCostFixed+omCostvariable;
+        return costYearTable.factor(costYear) * (omCostFixed+omCostvariable);
     }
     
     public Double getOperationMaintenanceCostFixed(){
@@ -107,20 +113,20 @@ public class Type1CostEquation implements CostEquation {
         return omCostMultiFixed*boilerCapacity*1000;
     }
     
-    public Double getOperationMaintenanceCostVariable(){
+    public Double getOperationMaintenanceCostVariable() throws EmfException {
         if (boilerCapacity == null 
         || capacityFactor == 0.0 || capacityFactor== null
         || omCostMultiVariable == 0.0 || omCostMultiVariable== null) return null;
-        return omCostMultiVariable*boilerCapacity*capacityFactor*8760 ;
+        return costYearTable.factor(costYear) * omCostMultiVariable*boilerCapacity*1000*capacityFactor*8760/1000 ;
     }
     
-    public Double getAnnualizedCapitalCost() { 
+    public Double getAnnualizedCapitalCost() throws EmfException { 
         Double capitalCost = getCapitalCost();
         if (capitalCost == null || capRecFactor == null) return null;
-        return capitalCost * capRecFactor;
+        return costYearTable.factor(costYear) * capitalCost * capRecFactor;
     }
 
-    public Double getComputedCPT() {
+    public Double getComputedCPT() throws EmfException {
         Double totalCost=getAnnualCost();
         if (totalCost==null || reducedEmission == 0.0) return null; 
         return totalCost/reducedEmission;

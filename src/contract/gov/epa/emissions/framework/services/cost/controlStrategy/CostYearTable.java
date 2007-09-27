@@ -11,6 +11,8 @@ public class CostYearTable implements Serializable {
 
     private int targetYear;
 
+    public static int REFERENCE_COST_YEAR = 2006;
+
     private DoubleList gdpValues;
 
     private int startYear;
@@ -43,6 +45,13 @@ public class CostYearTable implements Serializable {
 
     public double factor(int year) throws EmfException {
         double yearGdp = gdpValue(year);
+        double targetYearGdp = gdpValue(targetYear);
+        return targetYearGdp / yearGdp;
+
+    }
+
+    public double factor(int targetYear, int referenceCostYear) throws EmfException {
+        double yearGdp = gdpValue(referenceCostYear);
         double targetYearGdp = gdpValue(targetYear);
         return targetYearGdp / yearGdp;
 

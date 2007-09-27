@@ -83,7 +83,7 @@ public class CMEfficiencyImporter {
             addStatus("Failed to import control measure efficiency records, " + cmEfficiencyReader.getErrorCount() + " errors were found.");
             throw new ImporterException("Failed to import control measure efficiency records, " + cmEfficiencyReader.getErrorCount() + " errors were found.");
         }
-        addStatus("Finished reading segment of Efficiency file - " + recordParseCount + " lines read");
+        addStatus("Finished reading segment of Efficiency file - " + recordParseCount + " lines read, saving efficiency records to the database");
         return (EfficiencyRecord[]) effRecs.toArray(new EfficiencyRecord[0]);
     }
 

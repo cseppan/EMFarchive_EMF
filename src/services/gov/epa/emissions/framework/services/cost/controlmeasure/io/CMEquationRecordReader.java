@@ -59,6 +59,8 @@ public class CMEquationRecordReader {
             //now add equation settings...
             if (equationTypeVariables.length > 0) {
                 if (constraintCheck(tokens[0], equationType, sb)){
+                    //set equation cost year
+                    cm.setCostYear(Integer.parseInt(tokens[12]));
                     for (int i = 0; i < equationTypeVariables.length; i++) {
 
                         EquationTypeVariable equationTypeVariable = equationTypeVariables[i];

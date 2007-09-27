@@ -21,7 +21,7 @@ public class ConstraintFilter {
     private CostYearTable costYearTable;
     
     private EfficiencyRecordUtil efficiencyRecordUtil;
-
+    
     public ConstraintFilter(ControlStrategyConstraint constraint, CostYearTable costYearTable) {
         if (constraint != null) {
             this.maxControlEfficiency = constraint.getMaxControlEfficiency();
@@ -64,7 +64,9 @@ public class ConstraintFilter {
         
         List records = new ArrayList();
         for (int i = 0; i < efficiencyRecords.length; i++) {
-            if (efficiencyRecords[i].getCostPerTon() * costYearTable.factor(efficiencyRecords[i].getCostYear()) < minCostPerTon)
+            //convert cost to year system wide reference cost year (i.e.,2006)
+            if (efficiencyRecords[i].getCostPerTon() == null 
+                    || efficiencyRecords[i].getCostPerTon() * costYearTable.factor(CostYearTable.REFERENCE_COST_YEAR, efficiencyRecords[i].getCostYear()) < minCostPerTon)
                 records.add(efficiencyRecords[i]);
         }
         return (EfficiencyRecord[]) records.toArray(new EfficiencyRecord[0]);
@@ -94,10 +96,12 @@ public class ConstraintFilter {
         
         List records = new ArrayList();
         for (int i = 0; i < efficiencyRecords.length; i++) {
-            if (efficiencyRecordUtil.calculateEmissionReduction(controlMeasure, efficiencyRecords[i], 
+            if (efficiencyRecords[i].getCostPerTon() == null 
+                    || efficiencyRecordUtil.calculateEmissionReduction(controlMeasure, efficiencyRecords[i], 
                     invenControlEfficiency, invenRulePenetration, 
                     invenRuleEffectiveness, invenAnnualEmissions) *
-                    efficiencyRecordUtil.adjustedCostPerTon(efficiencyRecords[i], costYearTable) < minAnnCost)
+                    efficiencyRecords[i].getCostPerTon() * 
+                    costYearTable.factor(CostYearTable.REFERENCE_COST_YEAR, efficiencyRecords[i].getCostYear()) < minAnnCost)
                 records.add(efficiencyRecords[i]);
         }
         return (EfficiencyRecord[]) records.toArray(new EfficiencyRecord[0]);

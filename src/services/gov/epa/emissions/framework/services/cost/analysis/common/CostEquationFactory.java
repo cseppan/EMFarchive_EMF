@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
 import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 
 public class CostEquationFactory {
 
@@ -14,16 +15,17 @@ public class CostEquationFactory {
     private Type2CostEquation type2CostEquation;
     private Type1CostEquation type1CostEquation;
     
-    public CostEquationFactory(boolean useCostEquations, double discountRate) {
+    public CostEquationFactory(CostYearTable costYearTable,
+            boolean useCostEquations, double discountRate) {
         this.useCostEquations = useCostEquations;
         this.defaultCostEquations = new DefaultCostEquation(discountRate);
-        this.type8CostEquation = new Type8CostEquation(discountRate);
-        this.type6CostEquation = new Type6CostEquation(discountRate);
-        this.type5CostEquation = new Type5CostEquation(discountRate);
-        this.type4CostEquation = new Type4CostEquation(discountRate);
-        this.type3CostEquation = new Type3CostEquation(discountRate);
-        this.type2CostEquation = new Type2CostEquation(discountRate);
-        this.type1CostEquation = new Type1CostEquation(discountRate);
+        this.type8CostEquation = new Type8CostEquation(costYearTable, discountRate);
+        this.type6CostEquation = new Type6CostEquation(costYearTable, discountRate);
+        this.type5CostEquation = new Type5CostEquation(costYearTable, discountRate);
+        this.type4CostEquation = new Type4CostEquation(costYearTable, discountRate);
+        this.type3CostEquation = new Type3CostEquation(costYearTable, discountRate);
+        this.type2CostEquation = new Type2CostEquation(costYearTable, discountRate);
+        this.type1CostEquation = new Type1CostEquation(costYearTable, discountRate);
     }
 
     public CostEquation getCostEquation(String pollutantName, double reducedEmission, 

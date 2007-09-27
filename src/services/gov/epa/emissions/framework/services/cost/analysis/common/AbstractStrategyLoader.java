@@ -143,7 +143,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         this.pointDatasetType = inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)")
             || inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL CoST Point Inventory (PTINV)");
         //get the record generator appropriate for the input/output Dataset
-        this.recordGenerator = new RecordGeneratorFactory(inputDataset.getDatasetType(), result, decFormat, controlStrategy.getDiscountRate(), controlStrategy.getUseCostEquations()).getRecordGenerator();
+        this.recordGenerator = new RecordGeneratorFactory(costYearTable, inputDataset.getDatasetType(), result, decFormat, controlStrategy.getDiscountRate(), controlStrategy.getUseCostEquations()).getRecordGenerator();
         //get the OptimizedQuery, really just a batch of resultsets
         OptimizedQuery optimizedQuery = sourceQuery(controlStrategyInputDataset);
         //get the OptimizedTableModifier so we can batch insert output
@@ -273,6 +273,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
             + " order by scc, fips" 
             + (pointDatasetType ? ", plantid, pointid, stackid, segment" : "" ) 
             + ", sort desc, poll ";
+        System.err.println(query);
         try {
             return datasource.optimizedQuery(query, batchSize);
         } catch (SQLException e) {

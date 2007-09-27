@@ -92,13 +92,11 @@ public class ControlMeasuresImporter implements Importer {
             //import equation file
             runEquation(controlMeasures);
             measures = controlMeasures();
-            setDetailStatus("Saving measure and SCC information to the database");
+            setDetailStatus("Saving measure and SCC information to the database\n");
             saveMeasureAndSCCs(measures, user);
             //this is needed so we know what the Ids are for the saved measures
             updateControlMeasuresMap(measures);
             setStatus("Started reading efficiency record file");
-            setDetailStatus("Started reading efficiency record file");
-            setDetailStatus("Saving efficiency records to the database");
             modifier.start();
             //process 20000 eff rec at a time...
             while (!isLastEfficiencyRecord()) {
@@ -119,14 +117,15 @@ public class ControlMeasuresImporter implements Importer {
             } finally {
                 //
             }
+            setDetailStatus("Creating and daving aggregated efficiency records to the database\n");
             aerDAO.updateAggregateEfficiencyRecords(measures, dbServer);
             setStatus("Finished reading efficiency record file");
-            setDetailStatus("Finished reading efficiency record file");
+            setDetailStatus("Finished reading efficiency record file\n");
             
         } catch (Exception e) {
             logError("Failed to import all control measures", e);
             setStatus("Failed to import all control measures, see the import control measures status field for more detailed information on the failure: " + e.getMessage());
-            setDetailStatus("Failed to import all control measures, see the import control measures status field for more detailed information on the failure: " + e.getMessage());
+            setDetailStatus("Failed to import all control measures, see the import control measures status field for more detailed information on the failure: " + e.getMessage() + "\n");
             throw new ImporterException("Failed to import all control measures: " + e.getMessage());
         } finally {
             try {
@@ -137,8 +136,8 @@ public class ControlMeasuresImporter implements Importer {
                 //
             }
         }
-        setStatus("Finished importing control measures");
-        setDetailStatus("Finished importing control measures\n");
+        setStatus("Completed importing " + measures.length + " control measures");
+        setDetailStatus("Completed importing " + measures.length + " control measures\n");
     }
 
     public ControlMeasure[] controlMeasures() {
@@ -224,7 +223,6 @@ public class ControlMeasuresImporter implements Importer {
         Date date = new Date();
         List messages = new ArrayList(); 
         int cmId = 0;
-        int count = 0;
         for (int i = 0; i < measures.length; i++) {
             Session session = sessionFactory.getSession();
             measures[i].setCreator(user);
@@ -239,9 +237,7 @@ public class ControlMeasuresImporter implements Importer {
             } catch (Exception e) {
                 messages.add(e.getMessage() + "\n");
 //              throw new EmfException(e.getMessage() + " " + e.getMessage() + " " + measures[i].getName() + " " + measures[i].getAbbreviation());
-            } finally {
-                count++;
-            }
+            } 
 //            if ( i % 20 == 0 ) { //20, same as the JDBC batch size
 //                //flush a batch of inserts and release memory:
 //                session.flush();
@@ -255,7 +251,6 @@ public class ControlMeasuresImporter implements Importer {
             setDetailStatus(messages);
             throw new ImporterException("error(s) were encountered reading the summary or SCC file.");
         }
-        addCompletedStatus(count, "control measures");
     }
 
 //    public void saveEfficiencyRecordsViaHibernateStatelessSession(EfficiencyRecord[] efficiencyRecords) {
@@ -356,10 +351,6 @@ public class ControlMeasuresImporter implements Importer {
 //            setStatus((String)messages.get(i));
 //        }
 //    }
-
-    private void addCompletedStatus(int noOfMeasures, String what) {
-        setStatus("Completed importing " + noOfMeasures + " " + what);
-    }
 
     private void logError(String messge, Exception e) {
         log.error(messge, e);

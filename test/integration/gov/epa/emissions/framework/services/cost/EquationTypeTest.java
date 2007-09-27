@@ -32,7 +32,7 @@ public class EquationTypeTest extends ServiceTestCase {
 //    private BestMeasureEffRecord bestMeasureEffRecord;
     
     public void testEquationType6() throws Exception {
-        Type6CostEquation type6 = new Type6CostEquation(discountRate);
+        Type6CostEquation type6 = new Type6CostEquation(getCostYearTable(2000), discountRate);
         
         type6.setUp(reducedEmission, buildBestMeasureEffRecord(15, 0.2), minStackFlowRate);
         
@@ -75,7 +75,7 @@ public class EquationTypeTest extends ServiceTestCase {
     }
 
     public void testEquationType5() throws Exception {
-        Type5CostEquation type5 = new Type5CostEquation(discountRate);
+        Type5CostEquation type5 = new Type5CostEquation(getCostYearTable(2000), discountRate);
         
         type5.setUp(reducedEmission, buildBestMeasureEffRecord(15, 0.2), minStackFlowRate);
         
@@ -115,7 +115,7 @@ public class EquationTypeTest extends ServiceTestCase {
     }
     
     public void testEquationType4() throws Exception {
-        Type4CostEquation type4 = new Type4CostEquation(discountRate);
+        Type4CostEquation type4 = new Type4CostEquation(getCostYearTable(2000), discountRate);
         
         type4.setUp(reducedEmission, buildBestMeasureEffRecord(15, 0.2), minStackFlowRate);
         
@@ -156,7 +156,7 @@ public class EquationTypeTest extends ServiceTestCase {
     }
     
     public void testEquationType3() throws Exception {
-        Type3CostEquation type3 = new Type3CostEquation(discountRate);
+        Type3CostEquation type3 = new Type3CostEquation(getCostYearTable(2000), discountRate);
         
         type3.setUp(reducedEmission, buildBestMeasureEffRecord(15, 0.2), minStackFlowRate);
         
@@ -197,7 +197,7 @@ public class EquationTypeTest extends ServiceTestCase {
     }
     
     public void testEquationType3large() throws Exception {
-        Type3CostEquation type3 = new Type3CostEquation(discountRate);
+        Type3CostEquation type3 = new Type3CostEquation(getCostYearTable(2000), discountRate);
         
 //        type3.setUpTest(reducedEmission, 15, 0.2, bestMeasureEffRecord, 1028000.0);
         
@@ -269,7 +269,7 @@ public class EquationTypeTest extends ServiceTestCase {
       
     
     public void testEquationType2() throws Exception {
-        Type2CostEquation type2 = new Type2CostEquation(discountRate);
+        Type2CostEquation type2 = new Type2CostEquation(getCostYearTable(2000), discountRate);
         
         Double designCapacity = 150.0;
         
@@ -319,7 +319,7 @@ public class EquationTypeTest extends ServiceTestCase {
     }
    
     public void testEquationType1() throws Exception {
-        Type1CostEquation type1 = new Type1CostEquation(discountRate);
+        Type1CostEquation type1 = new Type1CostEquation(getCostYearTable(2000), discountRate);
         
         Double designCapacity = 150.0;
         
@@ -374,7 +374,7 @@ public class EquationTypeTest extends ServiceTestCase {
     }
     
     public void testEquationType8() throws Exception {
-        Type8CostEquation type8 = new Type8CostEquation(discountRate);
+        Type8CostEquation type8 = new Type8CostEquation(getCostYearTable(2000), discountRate);
         
 //        Double designCapacity = 150.0;
         
@@ -426,7 +426,7 @@ public class EquationTypeTest extends ServiceTestCase {
     }
     
     public void testEquationType8Default() throws Exception {
-        Type8CostEquation type8 = new Type8CostEquation(discountRate);
+        Type8CostEquation type8 = new Type8CostEquation(getCostYearTable(2000), discountRate);
         
 //        Double designCapacity = 150.0;
         
@@ -482,6 +482,7 @@ public class EquationTypeTest extends ServiceTestCase {
         
         ControlMeasure measure=new ControlMeasure();
         measure.setEquipmentLife(equipmentLife);
+        measure.setCostYear(2000);
         EfficiencyRecord efficiencyRecord=new EfficiencyRecord();
         efficiencyRecord.setCapRecFactor(capRecFactor);
         efficiencyRecord.setCapitalAnnualizedRatio(6.0);
@@ -506,6 +507,7 @@ public class EquationTypeTest extends ServiceTestCase {
         return new ControlMeasureEquation(new EquationType(typeName), new EquationTypeVariable(variableName),
                 variableValue);
     }
+    
     private CostYearTable getCostYearTable(int targetYear) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {

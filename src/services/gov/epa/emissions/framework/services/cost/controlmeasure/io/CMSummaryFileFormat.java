@@ -9,8 +9,12 @@ public class CMSummaryFileFormat implements CMFileFormat {
     }
 
     private String[] createCols() {
-        String[] cols = { "CMName", "CMAbbreviation", "MajorPoll", "ControlTechnology", "SourceGroup", "Sector",
-                "Class", "EquipLife", "NEIDeviceCode", "DateReviewed", "DataSource", "Description", };
+        String[] cols = { "CMName", "CMAbbreviation", 
+                "MajorPoll", "ControlTechnology", 
+                "SourceGroup", "Sector",
+                "Class", "EquipLife", 
+                "NEIDeviceCode", "DateReviewed", 
+                "DataSource", "Description", };
         return cols;
     }
 

@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 import gov.epa.emissions.framework.services.cost.EquationTypeVariable;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 
 public class Type8CostEquation implements CostEquation {
 
@@ -16,8 +18,11 @@ public class Type8CostEquation implements CostEquation {
     private Double defaultOperMaintCPTFactor;
     private Double defaultAnnualizedCPTFactor;
     private boolean hasAllVariables = true;
-    
-    public Type8CostEquation(double discountRate) {
+    private CostYearTable costYearTable;
+    private int costYear;
+
+    public Type8CostEquation(CostYearTable costYearTable, double discountRate) {
+        this.costYearTable = costYearTable;
         this.discountRate = discountRate / 100;     
     }
 
@@ -28,6 +33,7 @@ public class Type8CostEquation implements CostEquation {
         this.stackFlowRate = stackFlowRate;
         this.reducedEmission=emissionReduction;
         this.capRecFactor=getCapRecFactor();
+        this.costYear = bestMeasureEffRecord.measure().getCostYear();
         //populate variables for use with the equations
         populateVariables();
     }
@@ -59,7 +65,7 @@ public class Type8CostEquation implements CostEquation {
             hasAllVariables = false;
     }
 
-    public Double getAnnualCost() {
+    public Double getAnnualCost() throws EmfException {
         Double capitalCost = getCapitalCost();
         if (!hasAllVariables
                 || capitalCost == null 
@@ -67,42 +73,41 @@ public class Type8CostEquation implements CostEquation {
                 || capRecFactor == null) return null;
         //stack flow rate is greater than or equal 5 cfm
         if (stackFlowRate >= 5)
-            return capitalCost * capRecFactor + 0.04 * capitalCost
+            return costYearTable.factor(costYear) * (capitalCost * capRecFactor + 0.04 * capitalCost)
                 + getOperationMaintenanceCost();
         //stack flow rate is less than 5 cfm
-        
-        return defaultAnnualizedCPTFactor * reducedEmission;
+        return costYearTable.factor(costYear) * defaultAnnualizedCPTFactor * reducedEmission;
     }
 
-    public Double getCapitalCost() {
+    public Double getCapitalCost() throws EmfException {
         if (!hasAllVariables
                 || stackFlowRate == null 
                 || stackFlowRate == 0.0) return null;
         //stack flow rate is greater than or equal 5 cfm
         if (stackFlowRate >= 5)
-            return capCostFactor * stackFlowRate;
+            return costYearTable.factor(costYear) * capCostFactor * stackFlowRate;
         //stack flow rate is less than 5 cfm
-        return defaultCapitalCPTFactor * reducedEmission;
+        return costYearTable.factor(costYear) * defaultCapitalCPTFactor * reducedEmission;
     }
 
-    public Double getOperationMaintenanceCost() {
+    public Double getOperationMaintenanceCost() throws EmfException {
         if (!hasAllVariables
                 || stackFlowRate == null 
                 || stackFlowRate == 0.0) return null;
         //stack flow rate is greater than or equal 5 cfm
         if (stackFlowRate >= 5)
-            return operMaintCostFactor * stackFlowRate;
+            return costYearTable.factor(costYear) * operMaintCostFactor * stackFlowRate;
         //stack flow rate is less than 5 cfm
-        return defaultOperMaintCPTFactor * reducedEmission;
+        return costYearTable.factor(costYear) * defaultOperMaintCPTFactor * reducedEmission;
     }
     
-    public Double getAnnualizedCapitalCost() { 
+    public Double getAnnualizedCapitalCost() throws EmfException { 
         Double capitalCost = getCapitalCost();
         if (capitalCost == null || capRecFactor == null) return null;
         return capitalCost * capRecFactor;
     }
 
-    public Double getComputedCPT() {
+    public Double getComputedCPT() throws EmfException {
         Double totalCost=getAnnualCost();
         if (totalCost==null || reducedEmission == 0.0) return null; 
         return totalCost/reducedEmission;
