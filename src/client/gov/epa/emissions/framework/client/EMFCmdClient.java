@@ -118,6 +118,7 @@ public class EMFCmdClient {
         jobMsg.setPeriod(period);
         jobMsg.setRemoteUser(System.getProperty("user.name"));
         jobMsg.setExecModifiedDate(execFile.exists() ? new Date(execFile.lastModified()) : null);
+        jobMsg.setReceivedTime(new Date());
 
         if (loggerDir == null || loggerDir.isEmpty())
             sendMessage(args, jobkey, jobMsg);
