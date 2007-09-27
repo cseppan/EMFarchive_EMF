@@ -24,6 +24,7 @@ public class EMFCmdClient {
     private static ServiceLocator serviceLocator;
 
     public static void main(String[] args) throws Exception {
+        System.out.println("EMF command line client initialized at: " + new Date());
         List<String> options = new ArrayList<String>();
         options.addAll(Arrays.asList(args));
 
@@ -212,9 +213,14 @@ public class EMFCmdClient {
     }
 
     private static void send(List<String> args, JobMessage[] msgs, String[] keys) throws Exception {
-        System.out.println("Starting EMF Command Client");
-        getService(args).recordJobMessage(msgs, keys);
-        System.out.println("Exiting EMF Command Client");
+        try {
+            System.out.println("EMF Command Client starts sending messages at: " + new Date());
+            getService(args).recordJobMessage(msgs, keys);
+            System.out.println("EMF Command Client exits successfully at: " + new Date());
+        } catch (RuntimeException e) {
+            System.out.println("EMF Command Client encounters problem at: " + new Date() +
+                    "\nThe error was: " + e.getMessage());
+        }
     }
 
     private static void writeToLogger(List<String> args, String logFile, int logInterval, int resendTimes,
