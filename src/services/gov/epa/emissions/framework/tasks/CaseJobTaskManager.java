@@ -808,7 +808,7 @@ public class CaseJobTaskManager implements TaskManager {
             sbuf.append(labels);
             labels = "Tasks in the Wait Table\n";
             sbuf.append(labels);
-            labels = "JobId\tJobName\tCaseId\tCaseName\tUserId\tReady?\n";
+            labels = "JobId,JobName,CaseId,CaseName,UserId,Ready?\n";
             sbuf.append(labels);
 
             if (waitingTasks.size() == 0) {
@@ -820,8 +820,8 @@ public class CaseJobTaskManager implements TaskManager {
 
                 while (iter.hasNext()) {
                     CaseJobTask cjt = (CaseJobTask) iter.next();
-                    String cjtStatus = cjt.getJobId() + "\t" + cjt.getJobName() + "\t" + cjt.getCaseId() + "\t"
-                            + cjt.getCaseName() + "\t" + cjt.getUser().getId() + "\t" + cjt.isReady() + "\n";
+                    String cjtStatus = cjt.getJobId() + "," + cjt.getJobName() + "," + cjt.getCaseId() + ","
+                            + cjt.getCaseName() + "," + cjt.getUser().getId() + "," + cjt.isReady() + "\n";
                     sbuf.append(cjtStatus);
                 }
             }
@@ -830,7 +830,7 @@ public class CaseJobTaskManager implements TaskManager {
             sbuf.append(labels);
             labels = "Tasks in the CaseJobTaskManager RunTable\n";
             sbuf.append(labels);
-            labels = "JobId\tJobName\tCaseId\tCaseName\tUserId\n";
+            labels = "JobId,JobName,CaseId,CaseName,UserId\n";
             sbuf.append(labels);
 
             if (waitingTasks.size() == 0) {
@@ -842,8 +842,8 @@ public class CaseJobTaskManager implements TaskManager {
                 iter = runningTasks.iterator();
                 while (iter.hasNext()) {
                     CaseJobTask cjt = (CaseJobTask) iter.next();
-                    String cjtStatus = cjt.getJobId() + "\t" + cjt.getJobName() + "\t" + cjt.getCaseId() + "\t"
-                            + cjt.getCaseName() + "\t" + cjt.getUser().getId() + "\n";
+                    String cjtStatus = cjt.getJobId() + "," + cjt.getJobName() + "," + cjt.getCaseId() + ","
+                            + cjt.getCaseName() + "," + cjt.getUser().getId() + "\n";
                     sbuf.append(cjtStatus);
                 }
 

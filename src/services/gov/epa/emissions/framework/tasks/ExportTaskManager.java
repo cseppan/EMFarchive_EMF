@@ -434,7 +434,7 @@ System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             sbuf.append(labels);
             labels = "Tasks in the Wait Table\n";
             sbuf.append(labels);
-            labels = "UserId\tDatasetName\tVersion\n";
+            labels = "UserId,DatasetNamevVersion\n";
             sbuf.append(labels);
 
             if (waitingTasks.size()==0){
@@ -446,7 +446,7 @@ System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
                 while (iter.hasNext()) {
                     ExportTask et = (ExportTask) iter.next();
-                    String etStatus = et.getUser().getId() + "\t" + et.getDataset().getName() + "\t" + et.getVersion().getVersion() + "\n";
+                    String etStatus = et.getUser().getId() + "," + et.getDataset().getName() + "," + et.getVersion().getVersion() + "\n";
                     sbuf.append(etStatus);
                 }            
             }
@@ -455,7 +455,7 @@ System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             sbuf.append(labels);
             labels = "Tasks in the ExportTaskManager RunTable\n";
             sbuf.append(labels);
-            labels = "UserId\tDatasetName\tVersion\n";
+            labels = "UserId,DatasetName,Version\n";
             sbuf.append(labels);
 
             if (waitingTasks.size()==0){
@@ -467,7 +467,7 @@ System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 iter = runningTasks.iterator();
                 while (iter.hasNext()) {
                     ExportTask et = (ExportTask) iter.next();
-                    String etStatus = et.getUser().getId() + "\t" + et.getDataset().getName() + "\t" + et.getVersion().getVersion() + "\n";
+                    String etStatus = et.getUser().getId() + "," + et.getDataset().getName() + "," + et.getVersion().getVersion() + "\n";
                     sbuf.append(etStatus);
                 }            
                 
