@@ -117,7 +117,7 @@ public class Type1CostEquation implements CostEquation {
         if (boilerCapacity == null 
         || capacityFactor == 0.0 || capacityFactor== null
         || omCostMultiVariable == 0.0 || omCostMultiVariable== null) return null;
-        return costYearTable.factor(costYear) * omCostMultiVariable*boilerCapacity*1000*capacityFactor*8760/1000 ;
+        return costYearTable.factor(costYear) * omCostMultiVariable*boilerCapacity*capacityFactor*8760 ;
     }
     
     public Double getAnnualizedCapitalCost() throws EmfException { 
