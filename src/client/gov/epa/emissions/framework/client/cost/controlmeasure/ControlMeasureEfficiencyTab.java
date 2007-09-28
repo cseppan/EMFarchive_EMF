@@ -380,7 +380,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
 
         layoutGenerator.addWidgetPair(recordLimitPanel(), rowFilterPanel(), panel2);
 
-        widgetLayout(1, 2, 5, 5, 4, 4, layoutGenerator, panel2);
+        widgetLayout(1, 2, 10, 5, 10, 4, layoutGenerator, panel2);
         container2.add(panel2, BorderLayout.NORTH);
 
         
@@ -433,7 +433,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         JPanel textFieldContainer = new JPanel(new BorderLayout());
         JPanel container = new JPanel(new BorderLayout());
 
-        recordLimit = new TextField("recordLimit", 10);
+        recordLimit = new TextField("recordLimit", 7);
         recordLimit.setToolTipText(_recordLimit + "");
         recordLimit.setText(_recordLimit + "");
 
@@ -465,10 +465,10 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         JPanel labelContainer = new JPanel(new BorderLayout());
         JPanel container = new JPanel(new BorderLayout());
 
-        rowFilter = new TextArea("rowFilter", "", 25, 2);
+        rowFilter = new TextArea("rowFilter", "", 24, 2);
         rowFilter.setToolTipText(_rowFilter);
         ScrollableComponent scrollPane = new ScrollableComponent(rowFilter);
-        scrollPane.setPreferredSize(new Dimension(400, 35));
+        scrollPane.setPreferredSize(new Dimension(380, 35));
         Label label = new Label("Row Filter ");
 
         labelContainer.add(label, BorderLayout.NORTH);
