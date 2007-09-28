@@ -12,6 +12,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,9 +81,6 @@ public class EMFCmdClient {
                 + "\n\t-t --msg_type\tMessage type: i (info), e (error), w (warning)");
     }
 
-    /**
-     * 
-     */
     private static void run(List<String> args) throws Exception {
         int keyIndex = args.indexOf("-k");
         int execIndex = args.indexOf("-x");
@@ -120,7 +118,7 @@ public class EMFCmdClient {
         jobMsg.setRemoteUser(System.getProperty("user.name"));
         jobMsg.setExecModifiedDate(execFile.exists() ? new Date(execFile.lastModified()) : null);
         jobMsg.setReceivedTime(new Date());
-
+        
         if (loggerDir == null || loggerDir.isEmpty())
             sendMessage(args, jobkey, jobMsg);
         else
@@ -128,15 +126,20 @@ public class EMFCmdClient {
     }
 
     private static void sendMessage(List<String> args, String jobkey, JobMessage jobMsg) throws Exception {
+        int exitValue = 0;
+        
         try {
             send(args, new JobMessage[] { jobMsg }, new String[] { jobkey });
         } catch (Exception exc) {
+            exitValue = 1;
             System.out.println("Exception starting client: " + exc.getMessage());
             throw exc;
+        } finally {
+            System.exit(exitValue);
         }
     }
 
-    private static void sendLogs(List<String> args, int logInterval, int resendTimes, String logfile, String jobkey,
+    private static void sendLogs(List<String> args, int logInterval, int resendTimes, String logfile, String logAsistFile, String jobkey,
             JobMessage jobMsg, boolean now) throws Exception {
         List<JobMessage> msgs = new ArrayList<JobMessage>();
         List<String> keys = new ArrayList<String>();
@@ -150,9 +153,12 @@ public class EMFCmdClient {
             return;
         }
 
-        BufferedReader br = new BufferedReader(new FileReader(logFile));
-        String line = br.readLine().trim();
-        long sentLines = Long.parseLong(line.substring(1));
+        BufferedReader asistFileReader = new BufferedReader(new FileReader(logAsistFile));
+        long sentLines = Long.parseLong(asistFileReader.readLine().trim());
+        asistFileReader.close();
+        
+        BufferedReader br = new BufferedReader(new FileReader(logfile));
+        String line = br.readLine();
         long lineCount = 1;
 
         while ((line = br.readLine()) != null) {
@@ -173,32 +179,16 @@ public class EMFCmdClient {
 
         if (now || ((end - start) / 1000 > logInterval)) {
             resend(args, resendTimes, msgs, keys);
-            try {
-                rewriteSentLinesNumber(++lineCount, logfile, logfile + ".tmp");
-            } finally {
-                new File(logfile + ".tmp").delete();
-            }
+            rewriteSentLinesNumber(++lineCount, logAsistFile);
         }
+
+        System.exit(0);
     }
 
-    private static void rewriteSentLinesNumber(long lineCount, String logfile, String tmpfile) throws Exception {
-        String[] cmd = null;
-        String os = System.getProperty("os.name").toUpperCase();
-
-        if (os.startsWith("WINDOWS")) {
-            String cmd1 = "ECHO #" + lineCount + " > \"" + tmpfile + "\"";
-            String cmd2 = "FIND /V \"#\" < \"" + logfile + "\" >> \"" + tmpfile + "\"";
-            String cmd3 = "TYPE \"" + tmpfile + "\" > \"" + logfile + "\"";
-            cmd = new String[] { "cmd.exe", "/C", cmd1 + " & " + cmd2 + " & " + cmd3 };
-        } else {
-            String cmd1 = "echo \\#" + lineCount + " > \"" + tmpfile + "\"";
-            String cmd2 = "grep -v \"^#\" \"" + logfile + "\" >> \"" + tmpfile + "\"";
-            String cmd3 = "cat \"" + tmpfile + "\" > \"" + logfile + "\"";
-            cmd = new String[] { "sh", "-c", cmd1 + ";" + cmd2 + ";" + cmd3 };
-        }
-
-        Process p = Runtime.getRuntime().exec(cmd);
-        p.waitFor();
+    private static void rewriteSentLinesNumber(long lineCount, String logAsistFile) throws Exception {
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(logAsistFile)));
+        writer.println(lineCount);
+        writer.close();
     }
 
     private static void resend(List<String> args, int resendTimes, List<JobMessage> msgs, List<String> keys) {
@@ -214,30 +204,32 @@ public class EMFCmdClient {
 
     private static void send(List<String> args, JobMessage[] msgs, String[] keys) throws Exception {
         try {
-            System.out.println("EMF Command Client starts sending messages at: " + new Date());
+            System.out.println("EMF Command Client starts sending messages to server at: " + new Date());
             getService(args).recordJobMessage(msgs, keys);
             System.out.println("EMF Command Client exits successfully at: " + new Date());
-        } catch (RuntimeException e) {
-            System.out.println("EMF Command Client encounters problem at: " + new Date() +
-                    "\nThe error was: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("EMF Command Client encounters problem at: " + new Date() + "\nThe error was: "
+                    + e.getMessage());
+            throw new Exception(e.getMessage());
         }
     }
 
     private static void writeToLogger(List<String> args, String logFile, int logInterval, int resendTimes,
             String jobkey, JobMessage jobMsg) throws Exception {
         boolean logFileExisted = new File(logFile).exists();
+        String logAsistFile = logFile + ".ast";
 
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(logFile, true)));
-        writeLogs(writer, jobMsg, jobkey, logFileExisted);
+        writeLogs(writer, logAsistFile, jobMsg, jobkey, logFileExisted);
         writer.close();
 
-        if (jobMsg.getStatus() == null || jobMsg.getStatus().isEmpty())
-            sendLogs(args, logInterval, resendTimes, logFile, jobkey, jobMsg, false);
-        else
-            sendLogs(args, logInterval, resendTimes, logFile, jobkey, jobMsg, true);
+        if (jobMsg.getStatus() == null || jobMsg.getStatus().isEmpty()) {
+            sendLogs(args, logInterval, resendTimes, logFile, logAsistFile, jobkey, jobMsg, false);
+        } else
+            sendLogs(args, logInterval, resendTimes, logFile, logAsistFile, jobkey, jobMsg, true);
     }
 
-    private static void writeLogs(PrintWriter writer, JobMessage jobMsg, String jobkey, boolean logFileExisted) {
+    private static void writeLogs(PrintWriter writer, String logAsistFile, JobMessage jobMsg, String jobkey, boolean logFileExisted) throws IOException {
         String msg = jobkey;
         msg += "," + jobMsg.getExecName();
         msg += "," + jobMsg.getExecPath();
@@ -250,7 +242,10 @@ public class EMFCmdClient {
         msg += "," + new Date().getTime();
 
         if (!logFileExisted) {
-            writer.println("#3"); // line number to start extract job messages and send
+            PrintWriter asistWriter = new PrintWriter(new BufferedWriter(new FileWriter(logAsistFile)));
+            asistWriter.println("2"); // line number to start extract job messages and send
+            asistWriter.close();
+            
             writer.println("job key, exec name,exec path,message,"
                     + "message type,status,period,user,last mod date,log time(ms)");
         }
@@ -308,13 +303,13 @@ public class EMFCmdClient {
 
         return msg;
     }
-    
+
     private static String createSafeName(String name) {
         if (name == null)
             return name;
-        
+
         String safeName = name.trim();
-        
+
         for (int i = 0; i < safeName.length(); i++) {
             if (!Character.isLetterOrDigit(safeName.charAt(i))) {
                 safeName = safeName.replace(safeName.charAt(i), '_');
