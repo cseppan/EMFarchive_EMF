@@ -2238,7 +2238,6 @@ public class ManagedCaseService {
 
         String mesg;
         List distinctUserIds = null;
-        List waitTasksForUser = null;
 
         try {
             ArrayList userIds = (ArrayList) dao.getDistinctUsersOfPersistedWaitTasks();
@@ -2348,8 +2347,6 @@ public class ManagedCaseService {
         List allPersistTasks= null;
         
         try {
-            UserDAO userDAO = new UserDAO();
-            User user = userDAO.get(uid, session);
             allPersistTasks = dao.getPersistedWaitTasksByUser(uid);
             String statMsg;
 
@@ -2374,25 +2371,25 @@ public class ManagedCaseService {
         return allPersistTasks;
     }
 
-    private List getCaseJobTasksForUser(int uid) throws EmfException {
-        Session session = this.sessionFactory.getSession();
-
-        try {
-            UserDAO userDAO = new UserDAO();
-            User user = userDAO.get(uid, session);
-            if (DebugLevels.DEBUG_9)
-                System.out.println("Incoming userid= " + uid + " acquired userName= " + user.getName());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new EmfException("System Problems: Database access error");
-
-        } finally {
-            session.clear();
-            session.close();
-        }
-
-        return null;
-    }
+//    private List getCaseJobTasksForUser(int uid) throws EmfException {
+//        Session session = this.sessionFactory.getSession();
+//
+//        try {
+//            UserDAO userDAO = new UserDAO();
+//            User user = userDAO.get(uid, session);
+//            if (DebugLevels.DEBUG_9)
+//                System.out.println("Incoming userid= " + uid + " acquired userName= " + user.getName());
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//            throw new EmfException("System Problems: Database access error");
+//
+//        } finally {
+//            session.clear();
+//            session.close();
+//        }
+//
+//        return null;
+//    }
 
     private ArrayList getDistinctUserIds(List userIds) {
         ArrayList distUid = new ArrayList();
