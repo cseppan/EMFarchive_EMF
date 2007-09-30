@@ -291,7 +291,9 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         String title = "Warning";
 
         if (presenter.jobsUsed(jobs)) {
-            int selection1 = showDialog("Selected job(s) used by case inputs or parameters.\n Are you sure you want to remove the selected job(s)?", title);
+            int selection1 = showDialog(
+                  "Selected job(s) are used by case inputs or parameters.\n "+
+                  "Are you sure you want to remove the selected job(s)?", title);
 
             if (selection1 != JOptionPane.YES_OPTION)
                 return;
@@ -345,10 +347,10 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             }
             
             if (msg.equalsIgnoreCase("CANCEL"))
-                setMessage("One or more selected jobs in process. Quit running jobs.");
+                setMessage("One or more of the selected jobs is already running.");
             
             if (msg.equalsIgnoreCase("WARNING")) {
-                int option = showDialog("Are you sure to rerun the selected job(s)?", "Warning");
+                int option = showDialog("Are you sure you want to rerun the selected job(s)?", "Warning");
                 if (option == JOptionPane.YES_OPTION)
                     proceedRunningJobs(jobs);
             }
