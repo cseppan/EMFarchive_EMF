@@ -25,14 +25,25 @@ public class ObjectChooser extends JDialog {
     private ListWidget allObjectsListwidget;
 
     private ListWidget selectedListWidget;
-
-    public ObjectChooser(Object[] allObjects, ListWidget selectedList, EmfConsole parentConsole) {
+    
+    public ObjectChooser(String typeOfObject, Object[] allObjects, ListWidget selectedList, 
+            EmfConsole parentConsole) {
         super(parentConsole);
         super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
         
-        String className = (allObjects == null || allObjects.length == 0) ? ".Object" : allObjects[0].getClass().getName();
-        int dot = className.lastIndexOf('.');
-        setTitle("Select " + className.substring(dot + 1));
+        String title = "Select ";
+        
+        if (typeOfObject == null)
+        {
+           String className = (allObjects == null || allObjects.length == 0) ? ".Object" : allObjects[0].getClass().getName();
+           int dot = className.lastIndexOf('.');
+           title += className.substring(dot + 1)+"s";
+        }
+        else
+        {
+           title += typeOfObject;
+        }
+        setTitle(title);
         this.allObjects = allObjects;
         this.selectedListWidget = selectedList;
     }

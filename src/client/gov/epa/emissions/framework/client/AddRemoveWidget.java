@@ -86,7 +86,7 @@ public class AddRemoveWidget extends JPanel {
     }
 
     private void addObjects() {
-        ObjectChooser objectSelector = new ObjectChooser(allObjects, objectsList, parentConsole);
+        ObjectChooser objectSelector = new ObjectChooser("Jobs", allObjects, objectsList, parentConsole);
         objectSelector.display();
     }
 
