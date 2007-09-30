@@ -161,16 +161,3 @@ where name = 'Summarize by Control Technology and Pollutant'
 update emf.dataset_types set exporter_classname='gov.epa.emissions.commons.io.external.ExternalFilesExporter' 
 where external='TRUE';
 
-
--- 9/28/2007: add persistance for task manager wait queue
-
-CREATE TABLE cases.taskmanager_persist
-(
-  id serial NOT NULL,
-  job_id integer NOT NULL,
-  case_id integer NOT NULL,
-  user_id integer NOT NULL,
-  CONSTRAINT taskmanager_persist_pkey PRIMARY KEY (id)
-) 
-WITHOUT OIDS;
-ALTER TABLE cases.taskmanager_persist OWNER TO emf;

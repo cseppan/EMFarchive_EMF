@@ -101,3 +101,17 @@ WITHOUT OIDS;
 -- 9/18/2007 change the q_id column to string type
 ALTER TABLE cases.cases_casejobs DROP COLUMN q_id;
 ALTER TABLE cases.cases_casejobs ADD COLUMN q_id VARCHAR(255);
+
+
+-- 9/28/2007: add persistance for task manager wait queue
+
+CREATE TABLE cases.taskmanager_persist
+(
+  id serial NOT NULL,
+  job_id integer NOT NULL,
+  case_id integer NOT NULL,
+  user_id integer NOT NULL,
+  CONSTRAINT taskmanager_persist_pkey PRIMARY KEY (id)
+) 
+WITHOUT OIDS;
+ALTER TABLE cases.taskmanager_persist OWNER TO emf;
