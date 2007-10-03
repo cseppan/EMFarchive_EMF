@@ -13,6 +13,8 @@ public class QAServiceTransport implements QAService {
     private CallFactory callFactory;
 
     private DataMappings mappings;
+    
+    private EmfCall call;
 
     public QAServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
@@ -20,7 +22,10 @@ public class QAServiceTransport implements QAService {
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createCall("QA Service");
+        if (call == null)
+            call = callFactory.createSessionEnabledCall("QA Service");
+        
+        return call;
     }
 
     public QAStep[] getQASteps(EmfDataset dataset) throws EmfException {

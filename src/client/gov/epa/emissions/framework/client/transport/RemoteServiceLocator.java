@@ -27,6 +27,8 @@ public class RemoteServiceLocator implements ServiceLocator {
     
     private CaseService caseService;
     
+    private QAService qaService;
+    
     public RemoteServiceLocator(String baseUrl) throws Exception {
         this.baseUrl = baseUrl;
         editCall = this.createSessionEnabledCall("DataEditor Service", baseUrl
@@ -53,7 +55,10 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
 
     public QAService qaService() {
-        return new QAServiceTransport(baseUrl + "/gov.epa.emf.services.qa.QAService");
+        if (qaService == null)
+            qaService = new QAServiceTransport(baseUrl + "/gov.epa.emf.services.qa.QAService");
+        
+        return qaService;
     }
 
     public DataCommonsService dataCommonsService() {

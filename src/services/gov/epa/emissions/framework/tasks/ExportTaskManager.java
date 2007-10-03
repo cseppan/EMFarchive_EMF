@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class ExportTaskManager implements TaskManager {
     private static Log log = LogFactory.getLog(ExportTaskManager.class);
+
     private static ExportTaskManager ref;
     private static int refCount = 0;
 
