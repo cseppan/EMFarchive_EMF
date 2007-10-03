@@ -48,7 +48,7 @@
 	<service name="gov.epa.emf.services.basic.UserService" provider="java:RPC"
 		style="RPC" use="encoded">
 		<parameter name="allowedMethods" value="*"/>
-		<parameter name="scope" value="request"/>
+		<parameter name="scope" value="application"/>
 		<parameter name="className"
 			value="gov.epa.emissions.framework.services.basic.UserServiceImpl"/>
 	</service>
@@ -88,7 +88,7 @@
 	<service name="gov.epa.emf.services.data.DataService" provider="java:RPC"
 		style="RPC" use="encoded">
 		<parameter name="allowedMethods" value="*"/>
-		<parameter name="scope" value="session"/>
+		<parameter name="scope" value="application"/>
 		<parameter name="className"
 			value="gov.epa.emissions.framework.services.data.DataServiceImpl"/>
 	</service>
