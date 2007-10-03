@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class RemoteCopy implements Runnable {
+public class RemoteCopy {
 
     private String program;
 
@@ -31,15 +31,12 @@ public class RemoteCopy implements Runnable {
 
     private String localFile;
 
-    private Thread checkStatus;
-
     public RemoteCopy(UserPreference pref, User user) throws EmfException {
         os = System.getProperty("os.name");
         this.program = pref.remoteCopyProgram();
         this.tempDir = pref.localTempDir();
         this.host = System.getProperty("emf.remote.host");
         this.userName = user.getUsername();
-        this.checkStatus = new Thread(this);
         checkParameters();
     }
 
@@ -102,9 +99,14 @@ public class RemoteCopy implements Runnable {
     private void execute(String command) throws EmfException {
         String[] cmds = getCommands(command);
         BufferedReader reader = null;
+        Thread killCopyProcess = new Thread(new Runnable(){
+            public void run() {
+                killRemoteCopyProcess();
+            }
+        });
 
         try {
-            checkStatus.start();
+            killCopyProcess.start();
             Process process = Runtime.getRuntime().exec(cmds);
             errorLevel = process.waitFor();
 
@@ -172,7 +174,10 @@ public class RemoteCopy implements Runnable {
         }
     }
 
-    public void run() {
+    public void killRemoteCopyProcess() {
+        if (host.equalsIgnoreCase("localhost")) 
+            return;
+        
         String[] cmd = null;
         String msg = null;
 
