@@ -342,7 +342,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         modRegions = new Regions(session.dataCommonsService().getRegions());
         modRegionsCombo = new ComboBox(modRegions.names());
 
-        String name = caseObj.getModelingRegion() != null ? caseObj.getModelingRegion().getName() : "";
+        String name = caseObj.getModelingRegion() != null ? caseObj.getModelingRegion().getName() : null;
         modRegionsCombo.setSelectedItem(name);
         modRegionsCombo.setPreferredSize(defaultDimension);
 
@@ -365,7 +365,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         controlRegions = new Regions(session.dataCommonsService().getRegions());
         controlRegionsCombo = new ComboBox(controlRegions.names());
 
-        String name = caseObj.getControlRegion() != null ? caseObj.getControlRegion().getName() : "";
+        String name = caseObj.getControlRegion() != null ? caseObj.getControlRegion().getName() : null;
         controlRegionsCombo.setSelectedItem(name);
         controlRegionsCombo.setPreferredSize(defaultDimension);
 
