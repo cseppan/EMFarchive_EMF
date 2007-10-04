@@ -82,7 +82,7 @@ public class QAServiceImpl implements QAService {
         RunQAStep runner = new RunQAStep(new QAStep[] { step }, user, dbServer, sessionFactory);
         try {
             threadPool.execute(new GCEnforcerTask("Running QA Steps", runner));
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             LOG.error("Error running in qa step-" + step.getName(), e);
             throw new EmfException("Error running in qa step-" + step.getName() + ":" + e.getMessage());
         }
