@@ -416,3 +416,11 @@ create aggregate public.concatenate_with_ampersand (
   stype = text
 );
 ALTER aggregate public.concatenate_with_ampersand(text) OWNER TO emf;
+
+
+
+
+-- 10/4/2007 - DCD fixes issue with aggreagte function NEEDED TO HANDLE Smoke Format
+CREATE OR REPLACE FUNCTION join_with_ampersand(text, text) RETURNS text AS
+$BODY$select $1||'&'||$2$BODY$
+LANGUAGE 'sql' IMMUTABLE STRICT;
