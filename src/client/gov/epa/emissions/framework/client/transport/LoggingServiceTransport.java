@@ -9,6 +9,8 @@ public class LoggingServiceTransport implements LoggingService {
     private CallFactory callFactory;
 
     private DataMappings mappings;
+    
+    private EmfCall call;
 
     public LoggingServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
@@ -16,7 +18,10 @@ public class LoggingServiceTransport implements LoggingService {
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createCall("User Service");
+        if (call == null)
+            call = callFactory.createSessionEnabledCall("User Service");
+        
+        return call;
     }
 
     public AccessLog[] getAccessLogs(int datasetid) throws EmfException {

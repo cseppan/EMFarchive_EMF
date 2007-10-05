@@ -29,6 +29,12 @@ public class RemoteServiceLocator implements ServiceLocator {
     
     private QAService qaService;
     
+    private UserService userService;
+    
+    private LoggingService loggingService;
+    
+    private DataCommonsService dataCommonsService;
+    
     public RemoteServiceLocator(String baseUrl) throws Exception {
         this.baseUrl = baseUrl;
         editCall = this.createSessionEnabledCall("DataEditor Service", baseUrl
@@ -39,7 +45,10 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
 
     public UserService userService() {
-        return new UserServiceTransport(baseUrl + "/gov.epa.emf.services.basic.UserService");
+        if (userService == null)
+            userService = new UserServiceTransport(baseUrl + "/gov.epa.emf.services.basic.UserService");
+        
+        return userService;
     }
 
     public ExImService eximService() {
@@ -51,7 +60,10 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
 
     public LoggingService loggingService() {
-        return new LoggingServiceTransport(baseUrl + "/gov.epa.emf.services.basic.LoggingService");
+        if (loggingService == null)
+            loggingService = new LoggingServiceTransport(baseUrl + "/gov.epa.emf.services.basic.LoggingService");
+        
+        return loggingService;
     }
 
     public QAService qaService() {
@@ -62,7 +74,10 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
 
     public DataCommonsService dataCommonsService() {
-        return new DataCommonsServiceTransport(baseUrl + "/gov.epa.emf.services.data.DataCommonsService");
+        if (dataCommonsService == null)
+            dataCommonsService = new DataCommonsServiceTransport(baseUrl + "/gov.epa.emf.services.data.DataCommonsService");
+        
+        return dataCommonsService;
     }
 
     public DataEditorService dataEditorService() {

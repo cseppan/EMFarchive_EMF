@@ -8,10 +8,19 @@ public class UserServiceTransport implements UserService {
     private CallFactory callFactory;
 
     private DataMappings mappings;
+    
+    private EmfCall call;
 
     public UserServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
         mappings = new DataMappings();
+    }
+    
+    private EmfCall call() throws EmfException {
+        if (call == null)
+            call =  callFactory.createSessionEnabledCall("User Service");
+        
+        return call;
     }
 
     public void authenticate(String username, String password) throws EmfException {
@@ -44,10 +53,6 @@ public class UserServiceTransport implements UserService {
         call.setReturnType(mappings.user());
 
         return (User) call.requestResponse(new Object[] { user });
-    }
-
-    private EmfCall call() throws EmfException {
-        return callFactory.createCall("User Service");
     }
 
     public void updateUser(User user) throws EmfException {

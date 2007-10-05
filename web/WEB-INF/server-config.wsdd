@@ -56,7 +56,7 @@
 	<service name="gov.epa.emf.services.basic.LoggingService" provider="java:RPC"
 		style="RPC" use="encoded">
 		<parameter name="allowedMethods" value="*"/>
-		<parameter name="scope" value="request"/>
+		<parameter name="scope" value="session"/>
 		<parameter name="className"
 			value="gov.epa.emissions.framework.services.basic.LoggingServiceImpl"/>
 	</service>
@@ -96,7 +96,7 @@
 	<service name="gov.epa.emf.services.data.DataCommonsService" provider="java:RPC"
 		style="RPC" use="encoded">
 		<parameter name="allowedMethods" value="*"/>
-		<parameter name="scope" value="request"/>
+		<parameter name="scope" value="session"/>
 		<parameter name="className"
 			value="gov.epa.emissions.framework.services.data.DataCommonsServiceImpl"/>
 	</service>

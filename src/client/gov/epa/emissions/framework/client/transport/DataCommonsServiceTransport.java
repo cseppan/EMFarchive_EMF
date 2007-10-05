@@ -22,6 +22,8 @@ public class DataCommonsServiceTransport implements DataCommonsService {
     private DataMappings mappings;
 
     private CallFactory callFactory;
+    
+    private EmfCall call;
 
     public DataCommonsServiceTransport(String endPoint) {
         callFactory = new CallFactory(endPoint);
@@ -29,7 +31,10 @@ public class DataCommonsServiceTransport implements DataCommonsService {
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createCall("DataCommons Service");
+        if (call == null)
+            call = callFactory.createSessionEnabledCall("DataCommons Service");
+        
+        return call;
     }
 
     public Country[] getCountries() throws EmfException {
