@@ -149,8 +149,10 @@ public class ManagedExportService {
                 name = name.replace(name.charAt(i), '_');
             }
         }
+        
+        String versionString = (version.isFinalVersion() ? "" : "_nf") + "_v" + +version.getVersion();
 
-        return prefix + name + "_" + date.toLowerCase() + "_v" + +version.getVersion() + suffix;
+        return prefix + name + "_" + date.toLowerCase() + versionString + suffix;
     }
 
     public synchronized String exportForJob(User user, List<CaseInput> inputs, String cjtId, String purpose,
