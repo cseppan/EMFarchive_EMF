@@ -137,8 +137,8 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     }
 
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Parameter", "Sector", "Program"};
-        return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
+        String[] columnNames = { "Order", "Envt. Var.", "Sector", "Parameter"};
+        return new SortCriteria(columnNames, new boolean[] { true, true, true, true }, new boolean[] { false, false, false, false });
     }
 
     private JPanel controlPanel(final EditParametersTabPresenter presenter) {

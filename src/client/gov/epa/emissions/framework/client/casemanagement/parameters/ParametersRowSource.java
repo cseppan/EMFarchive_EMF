@@ -18,10 +18,11 @@ public class ParametersRowSource implements RowSource {
     }
 
     public Object[] values() {
-        return new Object[] { getParameterName(parameter), getSectorName(parameter), getJob(parameter),
-                getProgramName(parameter), getEnvtVarName(parameter), parameter.getValue(),
+        return new Object[] { getParameterName(parameter), getOrder(parameter),   
+                getEnvtVarName(parameter), getSectorName(parameter), getJob(parameter),
+                getProgramName(parameter), parameter.getValue(),
                 getValueType(parameter), isRequired(parameter), isShow(parameter), 
-                getOrder(parameter), parameter.getNotes(), parameter.getPurpose()};  
+                parameter.getNotes(), parameter.getPurpose()};  
     }
     
     private Float getOrder(CaseParameter parameter) {

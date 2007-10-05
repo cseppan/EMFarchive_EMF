@@ -28,12 +28,13 @@ public class ParametersTableData extends ChangeableTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Parameter", "Sector", "Job", "Program", "Envt. Var.", "Value", "Type",
-                "Reqd?", "Show?", "Order", "Notes", "Purpose" };
+        return new String[] { "Parameter", "Order", "Envt. Var.", "Sector", 
+                "Job", "Program", "Value", "Type",
+                "Reqd?", "Show?", "Notes", "Purpose" };
     }
 
     public Class getColumnClass(int col) {
-        if (col == 9)
+        if (col == 1)
             return Float.class;
         
         return String.class;
