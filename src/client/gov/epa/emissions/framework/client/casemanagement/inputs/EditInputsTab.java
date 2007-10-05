@@ -164,7 +164,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
     }
 
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Sector", "Program", "Input" };
+        String[] columnNames = { "Envt. Var.", "Sector", "Input" };
         return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
     }
 
