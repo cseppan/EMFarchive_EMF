@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.casemanagement.jobs;
 
 import java.io.Serializable;
 
-public class Host implements Serializable {
+public class Host implements Serializable, Comparable<Host> {
 
     private int id;
     
@@ -55,6 +55,10 @@ public class Host implements Serializable {
 
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public int compareTo(Host o) {
+        return name.compareTo(o.getName());
     }
     
 }

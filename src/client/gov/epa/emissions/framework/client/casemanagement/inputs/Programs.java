@@ -2,22 +2,23 @@ package gov.epa.emissions.framework.client.casemanagement.inputs;
 
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
+import gov.epa.emissions.framework.services.casemanagement.CaseService;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Programs {
 
-    private List list;
+    private List<CaseProgram> list;
 
     private EmfSession session;
 
     public Programs(EmfSession session, CaseProgram[] pgrograms) {
         this.session = session;
-        this.list = new ArrayList(Arrays.asList(pgrograms));
+        this.list = Arrays.asList(pgrograms);
+        Collections.sort(list);
     }
 
     public CaseProgram get(Object selected) throws EmfException {
@@ -29,11 +30,11 @@ public class Programs {
             return null;
         
         int index = list.indexOf(selected);
-        return (CaseProgram) list.get(index);
+        return list.get(index);
     }
 
     public CaseProgram[] getAll() {
-        return (CaseProgram[]) list.toArray(new CaseProgram[0]);
+        return list.toArray(new CaseProgram[0]);
     }
 
     private CaseProgram addNewProgram(Object selected) throws EmfException {
@@ -46,9 +47,10 @@ public class Programs {
         if (index == -1) {// new input name
             CaseProgram persistName = persistName(name);
             list.add(persistName);
+            Collections.sort(list);
             return persistName;
         }
-        return (CaseProgram) list.get(index);
+        return list.get(index);
     }
 
     private CaseProgram persistName(CaseProgram name) throws EmfException {

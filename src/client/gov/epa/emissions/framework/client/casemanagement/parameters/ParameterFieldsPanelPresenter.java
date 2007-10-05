@@ -21,6 +21,7 @@ import gov.epa.emissions.framework.services.editor.DataEditorService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -32,22 +33,19 @@ public class ParameterFieldsPanelPresenter {
     private ParameterFieldsPanelView view;
 
     private CaseParameterNames caseParameterNames;
-    
+
     private CaseParameterEnvtVars caseParameterEnvtVars;
-    
+
     private Programs programs;
 
     private int caseId;
-    
+
     public static final String ALL_FOR_SECTOR = "All jobs for sector";
 
-    public ParameterFieldsPanelPresenter(int caseId, ParameterFieldsPanelView inputFields, EmfSession session) throws EmfException {
+    public ParameterFieldsPanelPresenter(int caseId, ParameterFieldsPanelView inputFields, EmfSession session) {
         this.session = session;
         this.view = inputFields;
         this.caseId = caseId;
-        this.caseParameterNames = new CaseParameterNames(session, getParameterNames());
-        this.caseParameterEnvtVars = new CaseParameterEnvtVars(session, getEnvtVars());
-        this.programs = new Programs(session, getPrograms());
     }
 
     public void display(CaseParameter param, JComponent container) throws EmfException {
@@ -55,28 +53,38 @@ public class ParameterFieldsPanelPresenter {
         view.display(param, container);
     }
 
-    public CaseParameterNames getCaseParameterNames() {
+    public synchronized CaseParameterNames getCaseParameterNames() throws EmfException {
+        if (caseParameterNames == null)
+            caseParameterNames = new CaseParameterNames(session, getParameterNames());
+
         return caseParameterNames;
     }
 
-    public CaseParameterEnvtVars getCaseParameterEnvtVars() {
+    public synchronized CaseParameterEnvtVars getCaseParameterEnvtVars() throws EmfException {
+        if (caseParameterEnvtVars == null)
+            caseParameterEnvtVars = new CaseParameterEnvtVars(session, getEnvtVars());
+
         return this.caseParameterEnvtVars;
     }
 
-    public Programs getCasePrograms() {
-        return this.programs;
+    public Programs getCasePrograms() throws EmfException {
+        if (programs == null)
+            programs = new Programs(session, getPrograms());
+        
+        return programs;
     }
-    
+
     public ParameterName[] getParameterNames() throws EmfException {
         return caseService().getParameterNames();
     }
 
     public Sector[] getSectors() throws EmfException {
-        List list = new ArrayList();
+        List<Sector> list = new ArrayList<Sector>();
         list.add(new Sector("All sectors", "All sectors"));
         list.addAll(Arrays.asList(dataCommonsService().getSectors()));
+        Collections.sort(list);
 
-        return (Sector[]) list.toArray(new Sector[0]);
+        return list.toArray(new Sector[0]);
     }
 
     public CaseProgram[] getPrograms() throws EmfException {
@@ -95,10 +103,10 @@ public class ParameterFieldsPanelPresenter {
         List<CaseJob> jobs = new ArrayList<CaseJob>();
         jobs.add(new CaseJob(ALL_FOR_SECTOR));
         jobs.addAll(Arrays.asList(caseService().getCaseJobs(caseId)));
-        
+
         return jobs.toArray(new CaseJob[0]);
     }
-    
+
     public DatasetType[] getDSTypes() throws EmfException {
         return dataCommonsService().getDatasetTypes();
     }
@@ -135,7 +143,7 @@ public class ParameterFieldsPanelPresenter {
     }
 
     public void doSave() throws EmfException {
-        //view.setFields();
+        // view.setFields();
         session.caseService().updateCaseParameter(session.user(), view.setFields());
     }
 
@@ -161,16 +169,19 @@ public class ParameterFieldsPanelPresenter {
 
     public int getJobIndex(int caseJobID) throws EmfException {
         CaseJob[] jobs = session.caseService().getCaseJobs(caseId);
-        
+
         for (int i = 0; i < jobs.length; i++)
             if (jobs[i].getId() == caseJobID)
                 return i + 1; // because of the default "All jobs" job is not in db
-        
+
         return 0;
     }
 
     public ValueType[] getValueTypes() throws EmfException {
-        return session.caseService().getValueTypes();
+        List<ValueType> list = Arrays.asList(session.caseService().getValueTypes());
+        Collections.sort(list);
+        
+        return list.toArray(new ValueType[0]);
     }
 
 }

@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.casemanagement.parameters;
 
 import java.io.Serializable;
 
-public class ValueType implements Serializable {
+public class ValueType implements Serializable, Comparable<ValueType> {
 
     private int id;
     
@@ -46,4 +46,9 @@ public class ValueType implements Serializable {
     public int hashCode() {
         return name.hashCode();
     }
+    
+    public int compareTo(ValueType other) {
+        return name.compareTo((other).getName());
+    }
+
 }

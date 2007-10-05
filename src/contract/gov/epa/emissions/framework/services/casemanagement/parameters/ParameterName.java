@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.services.casemanagement.parameters;
 import java.io.Serializable;
 
 
-public class ParameterName implements Serializable {
+public class ParameterName implements Serializable, Comparable {
 
     private int id;
     
@@ -46,5 +46,9 @@ public class ParameterName implements Serializable {
 
     public String toString() {
         return getName();
+    }
+    
+    public int compareTo(Object other) {
+        return name.compareTo(((ParameterName) other).getName());
     }
 }

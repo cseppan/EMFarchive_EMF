@@ -5,8 +5,8 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class CaseParameterNames {
@@ -17,7 +17,8 @@ public class CaseParameterNames {
 
     public CaseParameterNames(EmfSession session, ParameterName[] paramNames) {
         this.session = session;
-        this.list = new ArrayList<ParameterName>(Arrays.asList(paramNames));
+        this.list = Arrays.asList(paramNames);
+        Collections.sort(this.list);
     }
 
     public ParameterName get(Object selected) throws EmfException {
@@ -46,6 +47,7 @@ public class CaseParameterNames {
         if (index == -1) {// new input name
             ParameterName persistName = persistName(name);
             list.add(persistName);
+            Collections.sort(this.list);
             return persistName;
         }
         return list.get(index);

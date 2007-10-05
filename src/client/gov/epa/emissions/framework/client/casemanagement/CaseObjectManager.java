@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.casemanagement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import gov.epa.emissions.commons.data.DatasetType;
@@ -171,12 +172,16 @@ public class CaseObjectManager {
         return addSubDir(subDir);
     }
     
+    @SuppressWarnings("unchecked")
     public synchronized InputName [] getInputNames() throws EmfException
     {
         if (inputNames == null)
             inputNames = caseService.getInputNames();
         
-        return inputNames;
+        List<InputName> inputs = Arrays.asList(inputNames);
+        Collections.sort(inputs);
+        
+        return inputs.toArray(new InputName[0]);
     }
         
     public synchronized InputName addInputName(InputName inputName) throws EmfException
@@ -184,6 +189,8 @@ public class CaseObjectManager {
         InputName newVar = caseService.addCaseInputName(inputName);
         // refresh the cache when a new one is added
         inputNames = caseService.getInputNames();
+        List<InputName> inputs = Arrays.asList(inputNames);
+        Collections.sort(inputs);
 
         return newVar;
     }
@@ -217,7 +224,10 @@ public class CaseObjectManager {
         if (inputEnvtVars == null)
             inputEnvtVars = caseService.getInputEnvtVars();
         
-        return inputEnvtVars;
+        List<InputEnvtVar> inputVars = Arrays.asList(inputEnvtVars);
+        Collections.sort(inputVars);
+        
+        return inputVars.toArray(new InputEnvtVar[0]);
     }
         
     public synchronized InputEnvtVar addInputEnvtVar(InputEnvtVar inputEnvtVar) throws EmfException
@@ -225,6 +235,8 @@ public class CaseObjectManager {
         InputEnvtVar newVar = caseService.addInputEnvtVar(inputEnvtVar);
         // refresh the cache when a new one is added
         inputEnvtVars = caseService.getInputEnvtVars();
+        List<InputEnvtVar> inputVars = Arrays.asList(inputEnvtVars);
+        Collections.sort(inputVars);
 
         return newVar;
     }
@@ -256,15 +268,21 @@ public class CaseObjectManager {
     public synchronized CaseProgram [] getPrograms() throws EmfException
     {
         if (programs == null)
-          programs = caseService.getPrograms();     
+          programs = caseService.getPrograms();
         
-        return programs;
+        List<CaseProgram> caseProgs = Arrays.asList(programs);
+        Collections.sort(caseProgs);
+        
+        return caseProgs.toArray(new CaseProgram[0]);
     }
         
     public synchronized CaseProgram addProgram(CaseProgram program) throws EmfException
     {
         CaseProgram newProgram = caseService.addProgram(program);
         programs = caseService.getPrograms();
+        List<CaseProgram> caseProgs = Arrays.asList(programs);
+        Collections.sort(caseProgs);
+        
         return newProgram;
     }
     

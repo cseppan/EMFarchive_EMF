@@ -5,8 +5,8 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Hosts {
@@ -17,7 +17,8 @@ public class Hosts {
 
     public Hosts(EmfSession session, Host[] hosts) {
         this.session = session;
-        this.list = new ArrayList<Host>(Arrays.asList(hosts));
+        this.list = Arrays.asList(hosts);
+        Collections.sort(list);
     }
 
     public Host get(Object selected) throws EmfException {
@@ -46,6 +47,7 @@ public class Hosts {
         if (index == -1) {// new input name
             Host persistName = persistName(name);
             list.add(persistName);
+            Collections.sort(list);
             return persistName;
         }
         return list.get(index);

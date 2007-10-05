@@ -10,10 +10,6 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
-//import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
-//import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
-//import gov.epa.emissions.framework.services.casemanagement.InputName;
-//import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -25,13 +21,10 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 
 public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
@@ -80,21 +73,18 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
         inputName = new EditableComboBox(presenter.getInputNames());
         inputName.setSelectedItem(input.getInputName());
-        addPopupMenuListener(inputName, "inputnames");
         changeablesList.addChangeable(inputName);
         inputName.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Input Name:", inputName, panel);
 
         program = new EditableComboBox(presenter.getPrograms());
         program.setSelectedItem(input.getProgram());
-        addPopupMenuListener(program, "programs");
         changeablesList.addChangeable(program);
         program.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
         envtVar = new EditableComboBox(presenter.getEnvtVars());
         envtVar.setSelectedItem(input.getEnvtVars());
-        addPopupMenuListener(envtVar, "envtvars");
         changeablesList.addChangeable(envtVar);
         envtVar.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Envt. Variable:", envtVar, panel);
@@ -105,13 +95,11 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         } else {
             sector.setSelectedItem(input.getSector());
         }
-        addPopupMenuListener(sector, "sectors");
         changeablesList.addChangeable(sector);
         sector.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
 
         dsType = new ComboBox(presenter.getDSTypes());
-        addPopupMenuListener(dsType, "dstypes");
         dsType.setSelectedItem(input.getDatasetType());
         dsType.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -163,7 +151,6 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
         subDir = new EditableComboBox(presenter.getSubdirs());
         subDir.setSelectedItem(input.getSubdirObj());
-        addPopupMenuListener(subDir, "subdirs");
         changeablesList.addChangeable(subDir);
         subDir.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Subdirectory:", subDir, panel);
@@ -184,52 +171,6 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
                 10, 10);// xPad, yPad
 
         container.add(panel);
-    }
-
-    private void addPopupMenuListener(final JComboBox box, final String toget) {
-        box.addPopupMenuListener(new PopupMenuListener() {
-            public void popupMenuCanceled(PopupMenuEvent event) {
-                // NOTE Auto-generated method stub
-            }
-
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent event) {
-                // NOTE Auto-generated method stub
-            }
-
-            public void popupMenuWillBecomeVisible(PopupMenuEvent event) {
-                try {
-                    box.setModel(new DefaultComboBoxModel(getAllObjects(toget)));
-                    box.revalidate();
-                    refresh();
-                } catch (Exception e) {
-                    messagePanel.setError(e.getMessage());
-                }
-            }
-        });
-    }
-
-    protected Object[] getAllObjects(String toget) throws EmfException {
-        if (toget.equals("dstypes"))
-            return presenter.getDSTypes();
-
-        else if (toget.equals("inputnames"))
-            return presenter.getInputNames();
-
-        else if (toget.equals("programs"))
-            return presenter.getPrograms();
-
-        else if (toget.equals("envtvars"))
-            return presenter.getEnvtVars();
-
-        else if (toget.equals("sectors"))
-            return presenter.getSectors();
-
-        else if (toget.equals("subdirs"))
-            return presenter.getSubdirs();
-
-        else
-            throw new EmfException("Unknown object type: " + toget);
-
     }
 
     private void setJob() throws EmfException {
@@ -398,10 +339,6 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             throw new EmfException("Please specify a program.");
 
         setFields();
-    }
-
-    private void refresh() {
-        super.revalidate();
     }
 
 }

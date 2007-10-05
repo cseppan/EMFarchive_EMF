@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.data.DataCommonsService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -43,15 +44,16 @@ public class JobFieldsPanelPresenter {
         view.display(caseObj, job, container);
     }
 
-    public Sector[] getSectors() throws EmfException {
+    public synchronized Sector[] getSectors() throws EmfException {
         List<Sector> list = new ArrayList<Sector>();
         list.add(new Sector("All sectors", "All sectors"));
         list.addAll(Arrays.asList(dataCommonsService().getSectors()));
+        Collections.sort(list);
 
         return list.toArray(new Sector[0]);
     }
 
-    public Host[] getHosts() throws EmfException {
+    public synchronized Host[] getHosts() throws EmfException {
         if (hosts == null) {
             Host[] hostarray = caseService().getHosts();
             this.hosts = new Hosts(session, hostarray);
@@ -61,14 +63,14 @@ public class JobFieldsPanelPresenter {
         return hosts.getAll();
     }
 
-    public Host getHost(Object host) throws EmfException {
+    public synchronized Host getHost(Object host) throws EmfException {
         if (hosts == null)
             this.hosts = new Hosts(session, caseService().getHosts());
         
         return hosts.get(host);
     }
 
-    public JobRunStatus[] getRunStatuses() throws EmfException {
+    public synchronized JobRunStatus[] getRunStatuses() throws EmfException {
         JobRunStatus[] statuses = caseService().getJobRunStatuses();
         JobRunStatus[] sorted = new JobRunStatus[statuses.length];
 
