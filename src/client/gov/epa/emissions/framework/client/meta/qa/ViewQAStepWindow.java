@@ -73,6 +73,8 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     private TextField who;
 
     private TextArea comments;
+    
+    private TextField tableName;
 
     private ComboBox status;
 
@@ -88,7 +90,11 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
 
     private JTextField exportFolder;
 
-    private QAStepResult qaStepResult;
+    private JLabel creationStatusLabel;
+    
+    private JLabel creationDateLabel;
+    
+    private JCheckBox currentTable;
 
     private EmfConsole parentConsole;
 
@@ -103,7 +109,6 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset, User user,
             String versionName) {
         this.step = step;
-        this.qaStepResult = qaStepResult;
         this.user = user;
         this.qaPrograms = new QAPrograms(null, programs);
         super.setLabel(super.getTitle() + ": " + step.getName() + " - " + dataset.getName() + " (v" + step.getVersion()
@@ -168,23 +173,23 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
 
         String table = stepResult.getTable();
         table = (table == null) ? "" : table;
-        TextField tableName = new TextField("tableName", table, 20);
+        tableName = new TextField("tableName", table, 20);
         tableName.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Ouput Name:", tableName, panel);
 
-        JLabel creationStatusLabel = new JLabel();
+        creationStatusLabel = new JLabel();
         String tableCreationStatus = stepResult.getTableCreationStatus();
         creationStatusLabel.setText((tableCreationStatus != null) ? tableCreationStatus : "");
         layoutGenerator.addLabelWidgetPair("Run Status:", creationStatusLabel, panel);
 
-        JLabel creationDateLabel = new JLabel();
+        creationDateLabel = new JLabel();
         Date tableCreationDate = stepResult.getTableCreationDate();
         String creationDate = (tableCreationDate != null) ? EmfDateFormat.format_MM_DD_YYYY_HH_mm(tableCreationDate)
                 : "";
         creationDateLabel.setText(creationDate);
         layoutGenerator.addLabelWidgetPair("Run Date:", creationDateLabel, panel);
 
-        JCheckBox currentTable = new JCheckBox();
+        currentTable = new JCheckBox();
         currentTable.setEnabled(false);
         currentTable.setSelected(stepResult.isCurrentTable());
         layoutGenerator.addLabelWidgetPair("Current Output?", currentTable, panel);
@@ -426,9 +431,11 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
 
     protected void doExport() {
         try {
+            QAStepResult result = presenter.getStepResult(step);
+            resetRunStatus(result);
             messagePanel.setMessage("Started Export. Please monitor the Status window "
                     + "to track your export request.");
-            presenter.doExport(step, qaStepResult, exportFolder.getText());
+            presenter.doExport(step, result, exportFolder.getText());
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -448,6 +455,8 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     }
     
     private void viewResults() throws EmfException {
+        resetRunStatus(presenter.getStepResult(step));
+        
         String exportDir = exportFolder.getText();
 
         if (exportDir == null || exportDir.trim().isEmpty())
@@ -483,6 +492,17 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     public void displayResultsTable(String qaStepName, String exportedFileName) {
         AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QAStep \"" + qaStepName + "\" results ", new Dimension(500, 500), desktopManager, parentConsole);
         app.display(new String[] { exportedFileName });
+    }
+    
+    private void resetRunStatus(QAStepResult result) {
+        who.setText(step.getWho());
+        date.setText(DATE_FORMATTER.format(step.getDate()));
+        status.setSelectedItem(step.getStatus());
+        tableName.setText(result == null ? "" : result.getTable());
+        creationStatusLabel.setText(result == null ? "" : result.getTableCreationStatus());
+        creationDateLabel.setText(EmfDateFormat.format_MM_DD_YYYY_HH_mm(result == null ? null : result.getTableCreationDate()));
+        currentTable.setSelected(result == null ? false : result.isCurrentTable());
+        super.revalidate();
     }
 
 }

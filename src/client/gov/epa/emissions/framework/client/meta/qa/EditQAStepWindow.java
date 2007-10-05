@@ -603,7 +603,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 Thread.sleep(factor * 5000);
                 qaStepResult = presenter.getStepResult(step);
                 ++factor;
-
+                
                 if (factor > 3 && qaStepResult == null) { //if no result in 35 seconds, assume something wrong
                     messagePanel.setError("There must be errors in running QA step " + step.getName() + ". Please check the Status window.");
                     return;
@@ -614,14 +614,16 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                     return;
                 }
             }
-
-            resetRunStatus(presenter.getStepResult(step));
         } catch (Exception e) {
             messagePanel.setError(e.getMessage());
-            throw new RuntimeException(e);
         } finally {
             setCursor(Cursor.getDefaultCursor());
             saveButton.setEnabled(true);
+            try {
+                resetRunStatus(presenter.getStepResult(step));
+            } catch (EmfException e2) {
+                messagePanel.setError(e2.getMessage());
+            }
         }
     }
 
@@ -835,10 +837,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         who.setText(step.getWho());
         date.setText(DATE_FORMATTER.format(step.getDate()));
         status.setSelectedItem(step.getStatus());
-        tableName.setText(result.getTable());
-        creationStatusLabel.setText(result.getTableCreationStatus());
-        creationDateLabel.setText(EmfDateFormat.format_MM_DD_YYYY_HH_mm(result.getTableCreationDate()));
-        currentTable.setSelected(result.isCurrentTable());
+        tableName.setText(result == null ? "" : result.getTable());
+        creationStatusLabel.setText(result == null ? "" : result.getTableCreationStatus());
+        creationDateLabel.setText(EmfDateFormat.format_MM_DD_YYYY_HH_mm(result == null ? null : result.getTableCreationDate()));
+        currentTable.setSelected(result == null ? false : result.isCurrentTable());
         super.revalidate();
     }
 

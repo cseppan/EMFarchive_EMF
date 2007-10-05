@@ -148,11 +148,8 @@ public class SQLQAProgramRunner implements QAProgramRunner {
 
     protected String getExistedTableName(QAStep qaStep) {
         QAStepResult result = getResult(qaStep);
-
-        if (result != null && result.getTable() != null)
-            return result.getTable();
         
-        return null;
+        return (result != null) ? result.getTable() : null;
     }
 
     private QAStepResult getResult(QAStep qaStep) {

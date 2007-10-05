@@ -54,12 +54,17 @@ public class QADAO {
         Criterion c1 = Restrictions.eq("datasetId", new Integer(step.getDatasetId()));
         Criterion c2 = Restrictions.eq("version", new Integer(step.getVersion()));
         Criterion c3 = Restrictions.eq("qaStepId", new Integer(step.getId()));
-        Criterion[] criterions1 = { c1, c2, c3 };
-        Criterion[] criterions = criterions1;
+        Criterion[] criterions =  { c1, c2, c3 };
         List list = hibernateFacade.get(QAStepResult.class, criterions, session);
+        
         if (!list.isEmpty())
             return (QAStepResult) list.get(0);
+        
         return null;
+    }
+    
+    public void removeQAStepResult(QAStepResult stepResult, Session session) {
+        hibernateFacade.remove(stepResult, session);
     }
 
     public void updateQAStepResult(QAStepResult result, Session session) {

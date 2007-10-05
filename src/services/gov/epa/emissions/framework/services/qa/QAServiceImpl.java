@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.qa;
 import java.util.Date;
 
 import gov.epa.emissions.commons.data.QAProgram;
+import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
@@ -72,12 +73,13 @@ public class QAServiceImpl implements QAService {
             session.close();
         }
     }
-    
+
     public void runQAStep(QAStep step, User user) throws EmfException {
         updateResultStatus(step, "In process");
         updateWitoutCheckingConstraints(new QAStep[] { step });
         checkRestrictions(step);
         EmfDbServer dbServer = dbServer();
+        removeQAResultTable(step, dbServer);
 
         RunQAStep runner = new RunQAStep(new QAStep[] { step }, user, dbServer, sessionFactory);
         try {
@@ -87,15 +89,43 @@ public class QAServiceImpl implements QAService {
             throw new EmfException("Error running in qa step-" + step.getName() + ":" + e.getMessage());
         }
     }
-    
-    private void updateResultStatus(QAStep qaStep, String status) {
+
+    private void removeQAResultTable(QAStep step, EmfDbServer dbServer) throws EmfException {
         Session session = sessionFactory.getSession();
+
         try {
-            QAStepResult result = dao.qaStepResult(qaStep, session);
+            QAStepResult result = dao.qaStepResult(step, session);
             
             if (result == null)
                 return;
             
+            String table = result.getTable();
+            
+            if (table != null && !table.trim().isEmpty()) {
+                TableCreator tableCreator = new TableCreator(dbServer.getEmissionsDatasource());
+                
+                if (tableCreator.exists(table.trim())) {
+                    tableCreator.drop(table.trim());
+                }
+            }
+            
+            dao.removeQAStepResult(result, session);
+        } catch (Exception e) {
+            LOG.error("Cannot drop result table for QA step: " + step.getName(), e);
+            throw new EmfException("Cannot drop result table for QA step: " + step.getName());
+        } finally {
+            session.close();
+        }
+    }
+
+    private void updateResultStatus(QAStep qaStep, String status) {
+        Session session = sessionFactory.getSession();
+        try {
+            QAStepResult result = dao.qaStepResult(qaStep, session);
+
+            if (result == null)
+                return;
+
             result.setTableCreationStatus(status);
             dao.updateQAStepResult(result, session);
         } finally {
@@ -116,11 +146,12 @@ public class QAServiceImpl implements QAService {
     }
 
     private void checkRestrictions(QAStep step) throws EmfException {
-        QAProgram program = step.getProgram(); 
-        if (program == null) throw new EmfException("Please specify a runnable QA program before running (e.g., SQL)");
+        QAProgram program = step.getProgram();
+        if (program == null)
+            throw new EmfException("Please specify a runnable QA program before running (e.g., SQL)");
         String runClassName = program.getRunClassName();
         if ((runClassName == null) || (runClassName.trim().length() == 0))
-            throw new EmfException("The program "+program.getName()+" cannot currently be run in the EMF");
+            throw new EmfException("The program " + program.getName() + " cannot currently be run in the EMF");
     }
 
     private EmfDbServer dbServer() throws EmfException {

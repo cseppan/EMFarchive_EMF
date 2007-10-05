@@ -36,7 +36,6 @@ public class RunQAStep implements Runnable {
             task.run();
         } catch (EmfException e) {
             logError("Could not run all QA steps", e);
-            throw new RuntimeException(e);
         } finally {
             disconnect(dbServer);
         }
