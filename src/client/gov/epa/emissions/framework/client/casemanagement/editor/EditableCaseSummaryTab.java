@@ -319,7 +319,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         String name = caseObj.getProject() != null ? caseObj.getProject().getName() : "";
         projectsCombo.setSelectedItem(name);
         projectsCombo.setPreferredSize(defaultDimension);
-
         changeablesList.addChangeable(projectsCombo);
 
         return projectsCombo;
