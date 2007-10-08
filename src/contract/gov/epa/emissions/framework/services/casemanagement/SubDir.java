@@ -51,7 +51,7 @@ public class SubDir implements Serializable, Comparable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((SubDir) other).getName());
+        return name.compareToIgnoreCase(((SubDir) other).getName());
     }
 
 }

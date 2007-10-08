@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
 
     private String svcLabel = null;
 
-    public String myTag() {
+    public synchronized String myTag() {
         if (svcLabel == null) {
             svcCount++;
             this.svcLabel = "#" + svcCount + "-" + getClass().getName() + "-" + new Date().getTime();
@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
             System.out.println(">>>> " + myTag());
     }
 
-    public void authenticate(String username, String password) throws EmfException {
+    public synchronized void authenticate(String username, String password) throws EmfException {
         try {
             LOG.warn("User " + username + " tried to login to the EMF service. " + new Date());
             User user = getUser(username);
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public User getUser(String username) throws EmfException {
+    public synchronized User getUser(String username) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             User user = dao.get(username, session);
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public User[] getUsers() throws EmfException {
+    public synchronized User[] getUsers() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List all = dao.all(session);
@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public User createUser(User user) throws EmfException {
+    public synchronized User createUser(User user) throws EmfException {
         User existingUser = this.getUser(user.getUsername());
         if (existingUser != null) {
             throw new EmfException("Could not create new user. The username '" + user.getUsername()
@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void updateUser(User user) throws EmfException {
+    public synchronized void updateUser(User user) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             dao.update(user, session);
@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void deleteUser(User user) throws EmfException {
+    public synchronized void deleteUser(User user) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             dao.remove(user, session);
@@ -136,7 +136,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public User obtainLocked(User owner, User object) throws EmfException {
+    public synchronized User obtainLocked(User owner, User object) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             User locked = dao.obtainLocked(owner, object, session);
@@ -150,7 +150,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public User releaseLocked(User object) throws EmfException {
+    public synchronized User releaseLocked(User object) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             User released = dao.releaseLocked(object, session);
@@ -164,7 +164,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public String getEmfVersion() throws EmfException {
+    public synchronized String getEmfVersion() throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -179,7 +179,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    protected void finalize() throws Throwable {
+    protected synchronized void finalize() throws Throwable {
         this.sessionFactory = null;
         super.finalize();
     }

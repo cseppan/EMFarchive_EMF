@@ -48,7 +48,7 @@ public class ParameterEnvVar implements Serializable, Comparable {
     }
     
     public int compareTo(Object other) {
-        return name.compareTo(((ParameterEnvVar) other).getName());
+        return name.compareToIgnoreCase(((ParameterEnvVar) other).getName());
     }
 
 }

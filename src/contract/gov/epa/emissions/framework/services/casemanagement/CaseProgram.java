@@ -51,6 +51,6 @@ public class CaseProgram implements Serializable, Comparable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((CaseProgram) other).getName());
+        return name.compareToIgnoreCase(((CaseProgram) other).getName());
     }
 }

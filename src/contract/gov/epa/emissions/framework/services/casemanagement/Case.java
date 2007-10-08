@@ -129,7 +129,7 @@ public class Case implements Comparable, Lockable, Serializable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((Case) other).getName());
+        return name.compareToIgnoreCase(((Case) other).getName());
     }
 
     public void setAbbreviation(Abbreviation abbreviation) {

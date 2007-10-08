@@ -122,7 +122,7 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
         
         String thisJob = this.name;
         String otherJob = other.getName();
-        return thisJob.compareTo(otherJob);
+        return thisJob.compareToIgnoreCase(otherJob);
     }
     
     public int hashCode() {

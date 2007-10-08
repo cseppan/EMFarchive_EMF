@@ -51,6 +51,6 @@ public class CaseCategory implements Comparable, Serializable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((CaseCategory) other).getName());
+        return name.compareToIgnoreCase(((CaseCategory) other).getName());
     }
 }

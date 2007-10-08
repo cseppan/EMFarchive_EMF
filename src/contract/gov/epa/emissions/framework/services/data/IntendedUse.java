@@ -54,7 +54,7 @@ public class IntendedUse implements Comparable, Serializable {
     }
 
     public int compareTo(Object o) {
-        return name.compareTo(((IntendedUse) o).getName());
+        return name.compareToIgnoreCase(((IntendedUse) o).getName());
     }
 
 }

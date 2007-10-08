@@ -36,7 +36,12 @@ public class QAServiceImpl implements QAService {
         this.threadPool = createThreadPool();
     }
 
-    private PooledExecutor createThreadPool() {
+    public QAServiceImpl(HibernateSessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+        dao = new QADAO();
+    }
+    
+    private synchronized PooledExecutor createThreadPool() {
         PooledExecutor threadPool = new PooledExecutor(20);
         threadPool.setMinimumPoolSize(1);
         threadPool.setKeepAliveTime(1000 * 60 * 3);// terminate after 3 (unused) minutes
@@ -44,12 +49,7 @@ public class QAServiceImpl implements QAService {
         return threadPool;
     }
 
-    public QAServiceImpl(HibernateSessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-        dao = new QADAO();
-    }
-
-    public QAStep[] getQASteps(EmfDataset dataset) throws EmfException {
+    public synchronized QAStep[] getQASteps(EmfDataset dataset) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             QAStep[] results = dao.steps(dataset, session);
@@ -62,7 +62,7 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    public QAProgram[] getQAPrograms() throws EmfException {
+    public synchronized QAProgram[] getQAPrograms() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             return dao.getQAPrograms(session);
@@ -74,7 +74,7 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    public void runQAStep(QAStep step, User user) throws EmfException {
+    public synchronized void runQAStep(QAStep step, User user) throws EmfException {
         updateResultStatus(step, "In process");
         updateWitoutCheckingConstraints(new QAStep[] { step });
         checkRestrictions(step);
@@ -90,7 +90,7 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    private void removeQAResultTable(QAStep step, EmfDbServer dbServer) throws EmfException {
+    private synchronized void removeQAResultTable(QAStep step, EmfDbServer dbServer) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -118,7 +118,7 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    private void updateResultStatus(QAStep qaStep, String status) {
+    private synchronized void updateResultStatus(QAStep qaStep, String status) {
         Session session = sessionFactory.getSession();
         try {
             QAStepResult result = dao.qaStepResult(qaStep, session);
@@ -133,7 +133,7 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    public void exportQAStep(QAStep step, User user, String dirName) throws EmfException {
+    public synchronized void exportQAStep(QAStep step, User user, String dirName) throws EmfException {
         EmfDbServer dbServer = dbServer();
         try {
             ExportQAStep exportQATask = new ExportQAStep(step, dbServer, user, sessionFactory, threadPool);
@@ -145,7 +145,7 @@ public class QAServiceImpl implements QAService {
 
     }
 
-    private void checkRestrictions(QAStep step) throws EmfException {
+    private synchronized void checkRestrictions(QAStep step) throws EmfException {
         QAProgram program = step.getProgram();
         if (program == null)
             throw new EmfException("Please specify a runnable QA program before running (e.g., SQL)");
@@ -154,7 +154,7 @@ public class QAServiceImpl implements QAService {
             throw new EmfException("The program " + program.getName() + " cannot currently be run in the EMF");
     }
 
-    private EmfDbServer dbServer() throws EmfException {
+    private synchronized EmfDbServer dbServer() throws EmfException {
         EmfDbServer dbServer = null;
         try {
             dbServer = new EmfDbServer();
@@ -165,12 +165,12 @@ public class QAServiceImpl implements QAService {
         return dbServer;
     }
 
-    public void updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException {
+    public synchronized void updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException {
         updateIds(steps);
         updateSteps(steps);
     }
 
-    private void updateIds(QAStep[] steps) throws EmfException {
+    private synchronized void updateIds(QAStep[] steps) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.updateQAStepsIds(steps, session);
@@ -183,7 +183,7 @@ public class QAServiceImpl implements QAService {
 
     }
 
-    private void updateSteps(QAStep[] steps) throws EmfException {
+    private synchronized void updateSteps(QAStep[] steps) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.update(steps, session);
@@ -195,7 +195,7 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    public void update(QAStep step) throws EmfException {
+    public synchronized void update(QAStep step) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             if (dao.exists(step, session)) {
@@ -211,7 +211,7 @@ public class QAServiceImpl implements QAService {
 
     }
 
-    public QAStepResult getQAStepResult(QAStep step) throws EmfException {
+    public synchronized QAStepResult getQAStepResult(QAStep step) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             QAStepResult qaStepResult = dao.qaStepResult(step, session);
@@ -226,7 +226,7 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    private boolean isCurrentTable(QAStepResult qaStepResult, Session session) {
+    private synchronized boolean isCurrentTable(QAStepResult qaStepResult, Session session) {
         Version version = new Versions().get(qaStepResult.getDatasetId(), qaStepResult.getVersion(), session);
         Date versionDate = version.getLastModifiedDate();
         Date date = qaStepResult.getTableCreationDate();
@@ -240,7 +240,7 @@ public class QAServiceImpl implements QAService {
 
     }
 
-    public QAProgram addQAProgram(QAProgram program) throws EmfException {
+    public synchronized QAProgram addQAProgram(QAProgram program) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             return dao.addQAProgram(program, session);

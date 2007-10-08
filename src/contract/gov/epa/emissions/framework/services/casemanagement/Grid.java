@@ -51,6 +51,6 @@ public class Grid implements Serializable, Comparable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((Grid) other).getName());
+        return name.compareToIgnoreCase(((Grid) other).getName());
     }
 }

@@ -51,6 +51,6 @@ public class MeteorlogicalYear implements Comparable, Serializable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((MeteorlogicalYear) other).getName());
+        return name.compareToIgnoreCase(((MeteorlogicalYear) other).getName());
     }
 }

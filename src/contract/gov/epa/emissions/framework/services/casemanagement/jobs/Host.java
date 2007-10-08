@@ -58,7 +58,7 @@ public class Host implements Serializable, Comparable<Host> {
     }
 
     public int compareTo(Host o) {
-        return name.compareTo(o.getName());
+        return name.compareToIgnoreCase(o.getName());
     }
     
 }

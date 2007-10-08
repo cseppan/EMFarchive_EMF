@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.casemanagement.jobs;
 
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.CaseObjectManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
@@ -10,12 +11,6 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.DependentJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
-import gov.epa.emissions.framework.services.data.DataCommonsService;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import javax.swing.JComponent;
 
@@ -25,11 +20,11 @@ public class JobFieldsPanelPresenter {
 
     private JobFieldsPanelView view;
 
-    private Hosts hosts;
-
     private EditJobsTabPresenter parentPresenter;
 
     private Case caseObj;
+    
+    private CaseObjectManager caseObjectManager = null;
 
     public JobFieldsPanelPresenter(JobFieldsPanelView jobFields, EmfSession session,
             EditJobsTabPresenter parentPresenter, Case caseObj) {
@@ -37,6 +32,7 @@ public class JobFieldsPanelPresenter {
         this.view = jobFields;
         this.parentPresenter = parentPresenter;
         this.caseObj = caseObj;
+        this.caseObjectManager = CaseObjectManager.getCaseObjectManager(session);
     }
 
     public void display(CaseJob job, JComponent container) throws EmfException {
@@ -45,59 +41,19 @@ public class JobFieldsPanelPresenter {
     }
 
     public synchronized Sector[] getSectors() throws EmfException {
-        List<Sector> list = new ArrayList<Sector>();
-        list.add(new Sector("All sectors", "All sectors"));
-        list.addAll(Arrays.asList(dataCommonsService().getSectors()));
-        Collections.sort(list);
-
-        return list.toArray(new Sector[0]);
+        return caseObjectManager.getSectorsWithAll();
     }
 
     public synchronized Host[] getHosts() throws EmfException {
-        if (hosts == null) {
-            Host[] hostarray = caseService().getHosts();
-            this.hosts = new Hosts(session, hostarray);
-            return hostarray;
-        }
-        
-        return hosts.getAll();
+        return caseObjectManager.getJobHosts();
     }
 
-    public synchronized Host getHost(Object host) throws EmfException {
-        if (hosts == null)
-            this.hosts = new Hosts(session, caseService().getHosts());
-        
-        return hosts.get(host);
+    public synchronized Host getHost(Object selected) throws EmfException {
+        return caseObjectManager.getOrAddHost(selected);
     }
-
+    
     public synchronized JobRunStatus[] getRunStatuses() throws EmfException {
-        JobRunStatus[] statuses = caseService().getJobRunStatuses();
-        JobRunStatus[] sorted = new JobRunStatus[statuses.length];
-
-        for (int i = 0; i < statuses.length; i++) {
-            String status = statuses[i].getName().toUpperCase();
-
-            if (status.startsWith("NOT START"))
-                sorted[0] = statuses[i];
-            else if (status.startsWith("EXPORT"))
-                sorted[1] = statuses[i];
-            else if (status.startsWith("SUBMIT"))
-                sorted[2] = statuses[i];
-            else if (status.startsWith("RUN"))
-                sorted[3] = statuses[i];
-            else if (status.startsWith("COMPLET"))
-                sorted[4] = statuses[i];
-            else if (status.startsWith("QUALITY"))
-                sorted[5] = statuses[i];
-            else if (status.startsWith("FAIL"))
-                sorted[6] = statuses[i];
-        }
-
-        return sorted;
-    }
-
-    private DataCommonsService dataCommonsService() {
-        return session.dataCommonsService();
+        return caseObjectManager.getJobRunStatuses();
     }
 
     private CaseService caseService() {

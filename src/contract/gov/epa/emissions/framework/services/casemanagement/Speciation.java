@@ -51,6 +51,6 @@ public class Speciation implements Comparable, Serializable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((Speciation) other).getName());
+        return name.compareToIgnoreCase(((Speciation) other).getName());
     }
 }

@@ -37,7 +37,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return call;
     }
 
-    public Country[] getCountries() throws EmfException {
+    public synchronized Country[] getCountries() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getCountries");
@@ -46,7 +46,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Country[]) call.requestResponse(new Object[] {});
     }
 
-    public Sector[] getSectors() throws EmfException {
+    public synchronized Sector[] getSectors() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getSectors");
@@ -55,7 +55,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Sector[]) call.requestResponse(new Object[] {});
     }
 
-    public Keyword[] getKeywords() throws EmfException {
+    public synchronized Keyword[] getKeywords() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getKeywords");
@@ -64,7 +64,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Keyword[]) call.requestResponse(new Object[] {});
     }
 
-    public Sector obtainLockedSector(User owner, Sector sector) throws EmfException {
+    public synchronized Sector obtainLockedSector(User owner, Sector sector) throws EmfException {
         EmfCall call = call();
 
         call.addParam("owner", mappings.user());
@@ -75,7 +75,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Sector) call.requestResponse(new Object[] { owner, sector });
     }
 
-    public Sector updateSector(Sector sector) throws EmfException {
+    public synchronized Sector updateSector(Sector sector) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateSector");
@@ -85,7 +85,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Sector) call.requestResponse(new Object[] { sector });
     }
 
-    public Sector releaseLockedSector(Sector sector) throws EmfException {
+    public synchronized Sector releaseLockedSector(Sector sector) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("releaseLockedSector");
@@ -95,7 +95,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Sector) call.requestResponse(new Object[] { sector });
     }
 
-    public DatasetType[] getDatasetTypes() throws EmfException {
+    public synchronized DatasetType[] getDatasetTypes() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getDatasetTypes");
@@ -104,7 +104,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (DatasetType[]) call.requestResponse(new Object[] {});
     }
 
-    public DatasetType getDatasetType(String name) throws EmfException {
+    public synchronized DatasetType getDatasetType(String name) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getDatasetType");
@@ -114,7 +114,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (DatasetType) call.requestResponse(new Object[] { name });
     }
 
-    public DatasetType obtainLockedDatasetType(User owner, DatasetType type) throws EmfException {
+    public synchronized DatasetType obtainLockedDatasetType(User owner, DatasetType type) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("obtainLockedDatasetType");
@@ -125,7 +125,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (DatasetType) call.requestResponse(new Object[] { owner, type });
     }
 
-    public DatasetType updateDatasetType(DatasetType type) throws EmfException {
+    public synchronized DatasetType updateDatasetType(DatasetType type) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateDatasetType");
@@ -135,7 +135,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (DatasetType) call.requestResponse(new Object[] { type });
     }
 
-    public DatasetType releaseLockedDatasetType(User owner, DatasetType type) throws EmfException {
+    public synchronized DatasetType releaseLockedDatasetType(User owner, DatasetType type) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("releaseLockedDatasetType");
@@ -146,7 +146,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (DatasetType) call.requestResponse(new Object[] { owner, type });
     }
 
-    public Status[] getStatuses(String username) throws EmfException {
+    public synchronized Status[] getStatuses(String username) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getStatuses");
@@ -156,7 +156,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Status[]) call.requestResponse(new Object[] { username });
     }
 
-    public Project[] getProjects() throws EmfException {
+    public synchronized Project[] getProjects() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getProjects");
@@ -165,7 +165,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Project[]) call.requestResponse(new Object[] {});
     }
 
-    public Region[] getRegions() throws EmfException {
+    public synchronized Region[] getRegions() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getRegions");
@@ -174,7 +174,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Region[]) call.requestResponse(new Object[] {});
     }
 
-    public IntendedUse[] getIntendedUses() throws EmfException {
+    public synchronized IntendedUse[] getIntendedUses() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getIntendedUses");
@@ -183,7 +183,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (IntendedUse[]) call.requestResponse(new Object[] {});
     }
 
-    public void addRegion(Region region) throws EmfException {
+    public synchronized void addRegion(Region region) throws EmfException {
         EmfCall call = call();
 
         call.addParam("region", mappings.region());
@@ -193,7 +193,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { region });
     }
 
-    public void addProject(Project project) throws EmfException {
+    public synchronized void addProject(Project project) throws EmfException {
         EmfCall call = call();
 
         call.addParam("project", mappings.project());
@@ -203,7 +203,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { project });
     }
 
-    public void addIntendedUse(IntendedUse intendedUse) throws EmfException {
+    public synchronized void addIntendedUse(IntendedUse intendedUse) throws EmfException {
         EmfCall call = call();
 
         call.addParam("intendeduse", mappings.intendeduse());
@@ -213,7 +213,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { intendedUse });
     }
 
-    public void addSector(Sector sector) throws EmfException {
+    public synchronized void addSector(Sector sector) throws EmfException {
         EmfCall call = call();
 
         call.addParam("sector", mappings.sector());
@@ -223,7 +223,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { sector });
     }
 
-    public void addDatasetType(DatasetType type) throws EmfException {
+    public synchronized void addDatasetType(DatasetType type) throws EmfException {
         EmfCall call = call();
 
         call.addParam("type", mappings.datasetType());
@@ -233,7 +233,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { type });
     }
 
-    public Note[] getNotes(int datasetId) throws EmfException {
+    public synchronized Note[] getNotes(int datasetId) throws EmfException {
         EmfCall call = call();
 
         call.addIntegerParam("datasetId");
@@ -243,7 +243,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Note[]) call.requestResponse(new Object[] { new Integer(datasetId) });
     }
 
-    public void addNote(Note note) throws EmfException {
+    public synchronized void addNote(Note note) throws EmfException {
         EmfCall call = call();
 
         call.addParam("note", mappings.note());
@@ -253,7 +253,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { note });
     }
 
-    public void addNotes(Note[] notes) throws EmfException {
+    public synchronized void addNotes(Note[] notes) throws EmfException {
         EmfCall call = call();
 
         call.addParam("notes", mappings.notes());
@@ -263,7 +263,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { notes });
     }
 
-    public NoteType[] getNoteTypes() throws EmfException {
+    public synchronized NoteType[] getNoteTypes() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getNoteTypes");
@@ -272,7 +272,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (NoteType[]) call.requestResponse(new Object[] {});
     }
 
-    public Revision[] getRevisions(int datasetId) throws EmfException {
+    public synchronized Revision[] getRevisions(int datasetId) throws EmfException {
         EmfCall call = call();
 
         call.addIntegerParam("datasetId");
@@ -282,7 +282,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Revision[]) call.requestResponse(new Object[] { new Integer(datasetId) });
     }
 
-    public void addRevision(Revision revision) throws EmfException {
+    public synchronized void addRevision(Revision revision) throws EmfException {
         EmfCall call = call();
 
         call.addParam("revision", mappings.revision());
@@ -292,7 +292,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { revision });
     }
 
-    public Pollutant[] getPollutants() throws EmfException {
+    public synchronized Pollutant[] getPollutants() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getPollutants");
@@ -301,7 +301,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Pollutant[]) call.requestResponse(new Object[] {});
     }
 
-    public void addPollutant(Pollutant pollutant) throws EmfException {
+    public synchronized void addPollutant(Pollutant pollutant) throws EmfException {
         EmfCall call = call();
 
         call.addParam("pollutant", mappings.pollutant());
@@ -311,7 +311,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { pollutant });
     }
 
-    public SourceGroup[] getSourceGroups() throws EmfException {
+    public synchronized SourceGroup[] getSourceGroups() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getSourceGroups");
@@ -320,7 +320,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (SourceGroup[]) call.requestResponse(new Object[] {});
     }
 
-    public void addSourceGroup(SourceGroup sourcegrp) throws EmfException {
+    public synchronized void addSourceGroup(SourceGroup sourcegrp) throws EmfException {
         EmfCall call = call();
 
         call.addParam("sourcegrp", mappings.sourceGroup());
@@ -330,7 +330,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { sourcegrp });
     }
 
-    public EmfFileInfo createNewFolder(String folder, String subfolder) throws EmfException {
+    public synchronized EmfFileInfo createNewFolder(String folder, String subfolder) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("createNewFolder");
@@ -341,7 +341,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (EmfFileInfo)call.requestResponse(new Object[] { folder, subfolder });
     }
 
-    public EmfFileInfo getDefaultDir() throws EmfException {
+    public synchronized EmfFileInfo getDefaultDir() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getDefaultDir");
@@ -350,7 +350,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (EmfFileInfo)call.requestResponse(new Object[] {});
     }
 
-    public EmfFileInfo getHomeDir() throws EmfException {
+    public synchronized EmfFileInfo getHomeDir() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getHomeDir");
@@ -359,7 +359,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (EmfFileInfo)call.requestResponse(new Object[] {});
     }
 
-    public EmfFileInfo[] getRoots() throws EmfException {
+    public synchronized EmfFileInfo[] getRoots() throws EmfException {
         EmfCall call = call();
         
         call.setOperation("getRoots");
@@ -368,7 +368,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (EmfFileInfo[])call.requestResponse(new Object[] {});
     }
 
-    public boolean isFileSystemRoot(EmfFileInfo fileInfo) throws EmfException {
+    public synchronized boolean isFileSystemRoot(EmfFileInfo fileInfo) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("isFileSystemRoot");
@@ -378,7 +378,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Boolean)call.requestResponse(new Object[] { fileInfo });
     }
 
-    public boolean isRoot(EmfFileInfo fileInfo) throws EmfException {
+    public synchronized boolean isRoot(EmfFileInfo fileInfo) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("isRoot");
@@ -388,7 +388,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Boolean)call.requestResponse(new Object[] { fileInfo });
     }
 
-    public EmfFileInfo getChild(EmfFileInfo file, String child) throws EmfException {
+    public synchronized EmfFileInfo getChild(EmfFileInfo file, String child) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("getChild");
@@ -399,7 +399,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (EmfFileInfo)call.requestResponse(new Object[] { file, child });
     }
 
-    public EmfFileInfo getParentDirectory(EmfFileInfo file) throws EmfException {
+    public synchronized EmfFileInfo getParentDirectory(EmfFileInfo file) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("getParent");
@@ -409,7 +409,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (EmfFileInfo)call.requestResponse(new Object[] { file });
     }
 
-    public EmfFileInfo[] getSubdirs(EmfFileInfo dir) throws EmfException {
+    public synchronized EmfFileInfo[] getSubdirs(EmfFileInfo dir) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("getSubdirs");
@@ -420,7 +420,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (EmfFileInfo[])call.requestResponse(new Object[] { dir });
     }
 
-    public EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir, String filter) throws EmfException {
+    public synchronized EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir, String filter) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("getEmfFileInfos");

@@ -37,12 +37,16 @@ import java.util.Date;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
@@ -101,7 +105,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     private AddRemoveWidget dependentJobsList;
 
     private static String lastPath = "";
-
+    
     public JobFieldsPanel(boolean edit, MessagePanel messagePanel, ManageChangeables changeablesList,
             EmfConsole parent, EmfSession session) {
         this.edit = edit;
@@ -229,20 +233,23 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("<html>Depends on:<br><br><br></html>", jobDependencyPanel(), panel);
 
         sector = new ComboBox(presenter.getSectors());
-        sector.setSelectedItem(job.getSector() == null ? new Sector("All sectors", "All sectors") : job.getSector());
         sector.setPrototypeDisplayValue(comboWidth);
+        sector.setSelectedItem(job.getSector() == null ? sector.getItemAt(0) : job.getSector());
+        addPopupMenuListener(sector, "sectors");
         changeablesList.addChangeable(sector);
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
 
         host = new EditableComboBox(presenter.getHosts());
-        host.setSelectedItem(job.getHost());
         host.setPrototypeDisplayValue(comboWidth);
+        host.setSelectedItem(job.getHost());
+        addPopupMenuListener(host, "hosts");
         changeablesList.addChangeable(host);
         layoutGenerator.addLabelWidgetPair("Host:", host, panel);
         
         status = new ComboBox(presenter.getRunStatuses());
-        status.setSelectedItem(job.getRunstatus());
         status.setPrototypeDisplayValue(comboWidth);
+        status.setSelectedItem(job.getRunstatus());
+        addPopupMenuListener(status, "status");
         changeablesList.addChangeable(status);
         layoutGenerator.addLabelWidgetPair("Run Status:", status, panel);
 
@@ -252,6 +259,41 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
                 10, 10);// xPad, yPad
 
         return panel;
+    }
+
+    private void addPopupMenuListener(final JComboBox box, final String toget) {
+        box.addPopupMenuListener(new PopupMenuListener() {
+            public void popupMenuCanceled(PopupMenuEvent event) {
+                // NOTE Auto-generated method stub
+            }
+
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent event) {
+                // NOTE Auto-generated method stub
+            }
+
+            public void popupMenuWillBecomeVisible(PopupMenuEvent event) {
+                try {
+                    Object selected = box.getSelectedItem();
+                    box.setModel(new DefaultComboBoxModel(getAllObjects(toget)));
+                    box.setSelectedItem(selected);
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
+            }
+        });
+    }
+
+    protected Object[] getAllObjects(String toget) throws EmfException {
+        if (toget.equals("hosts"))
+            return presenter.getHosts();
+
+        if (toget.equals("sectors"))
+            return presenter.getSectors();
+
+        if (toget.equals("status"))
+            return presenter.getRunStatuses();
+
+        return null;
     }
 
     private JPanel getFolderChooserPanel(final JTextField dir, final String title) {

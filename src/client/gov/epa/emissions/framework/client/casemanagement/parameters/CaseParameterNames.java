@@ -46,8 +46,8 @@ public class CaseParameterNames {
         int index = list.indexOf(name);
         if (index == -1) {// new input name
             ParameterName persistName = persistName(name);
-            list.add(persistName);
-            Collections.sort(this.list);
+            list = Arrays.asList(session.caseService().getParameterNames());
+            Collections.sort(list);
             return persistName;
         }
         return list.get(index);

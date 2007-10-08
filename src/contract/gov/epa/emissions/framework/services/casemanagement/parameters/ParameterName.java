@@ -49,6 +49,6 @@ public class ParameterName implements Serializable, Comparable {
     }
     
     public int compareTo(Object other) {
-        return name.compareTo(((ParameterName) other).getName());
+        return name.compareToIgnoreCase(((ParameterName) other).getName());
     }
 }

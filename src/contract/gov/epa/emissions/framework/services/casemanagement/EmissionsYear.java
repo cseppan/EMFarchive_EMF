@@ -51,6 +51,6 @@ public class EmissionsYear implements Comparable, Serializable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((EmissionsYear) other).getName());
+        return name.compareToIgnoreCase(((EmissionsYear) other).getName());
     }
 }

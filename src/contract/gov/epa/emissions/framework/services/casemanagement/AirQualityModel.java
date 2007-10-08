@@ -51,6 +51,6 @@ public class AirQualityModel implements Comparable, Serializable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((AirQualityModel) other).getName());
+        return name.compareToIgnoreCase(((AirQualityModel) other).getName());
     }
 }

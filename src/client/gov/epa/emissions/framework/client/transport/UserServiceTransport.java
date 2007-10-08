@@ -23,7 +23,7 @@ public class UserServiceTransport implements UserService {
         return call;
     }
 
-    public void authenticate(String username, String password) throws EmfException {
+    public synchronized void authenticate(String username, String password) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("authenticate");
@@ -34,7 +34,7 @@ public class UserServiceTransport implements UserService {
         call.request(new Object[] { username, password });
     }
 
-    public User getUser(String username) throws EmfException {
+    public synchronized User getUser(String username) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getUser");
@@ -45,7 +45,7 @@ public class UserServiceTransport implements UserService {
         return (User) call.requestResponse(params);
     }
 
-    public User createUser(User user) throws EmfException {
+    public synchronized User createUser(User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("createUser");
@@ -55,7 +55,7 @@ public class UserServiceTransport implements UserService {
         return (User) call.requestResponse(new Object[] { user });
     }
 
-    public void updateUser(User user) throws EmfException {
+    public synchronized void updateUser(User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateUser");
@@ -65,7 +65,7 @@ public class UserServiceTransport implements UserService {
         call.request(new Object[] { user });
     }
 
-    public void deleteUser(User user) throws EmfException {
+    public synchronized void deleteUser(User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("deleteUser");
@@ -75,7 +75,7 @@ public class UserServiceTransport implements UserService {
         call.request(new Object[] { user });
     }
 
-    public User[] getUsers() throws EmfException {
+    public synchronized User[] getUsers() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getUsers");
@@ -84,7 +84,7 @@ public class UserServiceTransport implements UserService {
         return (User[]) call.requestResponse(new Object[0]);
     }
 
-    public User obtainLocked(User owner, User object) throws EmfException {
+    public synchronized User obtainLocked(User owner, User object) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("obtainLocked");
@@ -96,7 +96,7 @@ public class UserServiceTransport implements UserService {
         return (User) call.requestResponse(params);
     }
 
-    public User releaseLocked(User object) throws EmfException {
+    public synchronized User releaseLocked(User object) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("releaseLocked");
@@ -106,7 +106,7 @@ public class UserServiceTransport implements UserService {
         return (User) call.requestResponse(new Object[] { object });
     }
 
-    public String getEmfVersion() throws EmfException {
+    public synchronized String getEmfVersion() throws EmfException {
         EmfCall call = call();
         
         call.setOperation("getEmfVersion");

@@ -50,6 +50,6 @@ public class Abbreviation implements Comparable, Serializable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((Abbreviation) other).getName());
+        return name.compareToIgnoreCase(((Abbreviation) other).getName());
     }
 }

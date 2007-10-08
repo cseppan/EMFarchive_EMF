@@ -51,6 +51,6 @@ public class InputName implements Serializable, Comparable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((InputName) other).getName());
+        return name.compareToIgnoreCase(((InputName) other).getName());
     }
 }

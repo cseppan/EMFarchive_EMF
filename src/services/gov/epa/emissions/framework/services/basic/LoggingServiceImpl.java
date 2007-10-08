@@ -25,7 +25,7 @@ public class LoggingServiceImpl implements LoggingService {
         dao = new LoggingDAO();
     }
 
-    public void setAccessLog(AccessLog accesslog) throws EmfException {
+    public synchronized void setAccessLog(AccessLog accesslog) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             dao.insertAccessLog(accesslog,session);
@@ -38,7 +38,7 @@ public class LoggingServiceImpl implements LoggingService {
 
     }
 
-    public AccessLog[] getAccessLogs(int datasetid) throws EmfException {
+    public synchronized AccessLog[] getAccessLogs(int datasetid) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List allLogs = dao.getAccessLogs(datasetid, session);
@@ -52,7 +52,7 @@ public class LoggingServiceImpl implements LoggingService {
 
     }
 
-    public String getLastExportedFileName(int datasetId) throws EmfException {
+    public synchronized String getLastExportedFileName(int datasetId) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             String fileName = dao.getLastExportedFileName(datasetId, session);

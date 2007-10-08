@@ -24,7 +24,7 @@ public class LoggingServiceTransport implements LoggingService {
         return call;
     }
 
-    public AccessLog[] getAccessLogs(int datasetid) throws EmfException {
+    public synchronized AccessLog[] getAccessLogs(int datasetid) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getAccessLogs");
@@ -34,7 +34,7 @@ public class LoggingServiceTransport implements LoggingService {
         return (AccessLog[]) call.requestResponse(new Object[] { new Integer(datasetid) });
     }
 
-    public String getLastExportedFileName(int datasetId) throws EmfException {
+    public synchronized String getLastExportedFileName(int datasetId) throws EmfException {
         EmfCall call = call();
        
         call.setOperation("getLastExportedFileName");

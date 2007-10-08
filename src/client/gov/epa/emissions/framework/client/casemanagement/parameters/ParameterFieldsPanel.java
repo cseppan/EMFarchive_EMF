@@ -13,16 +13,19 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
-import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.Dimension;
 
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanelView {
 
@@ -55,9 +58,12 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
     private TextArea purpose;
 
     private TextField order;
-    
+
+    private MessagePanel messagePanel;
+
     public ParameterFieldsPanel(MessagePanel messagePanel, ManageChangeables changeablesList) {
         this.changeablesList = changeablesList;
+        this.messagePanel = messagePanel;
     }
 
     public void display(CaseParameter param, JComponent container) throws EmfException {
@@ -67,20 +73,22 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         String width = EmptyStrings.create(65);
         Dimension preferredSize = new Dimension(20, 30);
 
-        ParameterName[] parameterNames = presenter.getCaseParameterNames().getAll();
-        parameterName = new EditableComboBox(parameterNames);
+        parameterName = new EditableComboBox(presenter.getParameterNames());
+        addPopupMenuListener(parameterName, "parameternames");
         parameterName.setSelectedItem(param.getParameterName());
         changeablesList.addChangeable(parameterName);
         parameterName.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Parameter Name:", parameterName, panel);
 
-        program = new EditableComboBox(presenter.getCasePrograms().getAll());
+        program = new EditableComboBox(presenter.getPrograms());
+        addPopupMenuListener(program, "programs");
         program.setSelectedItem(param.getProgram());
         changeablesList.addChangeable(program);
         program.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
-        envtVar = new EditableComboBox(presenter.getCaseParameterEnvtVars().getAll());
+        envtVar = new EditableComboBox(presenter.getEnvtVars());
+        addPopupMenuListener(envtVar, "envtvars");
         envtVar.setSelectedItem(param.getEnvVar());
         changeablesList.addChangeable(envtVar);
         envtVar.setPrototypeDisplayValue(width);
@@ -88,17 +96,19 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
 
         varTypes = new ComboBox(presenter.getValueTypes());
         varTypes.setSelectedItem(param.getType());
+        addPopupMenuListener(varTypes, "vartypes");
         changeablesList.addChangeable(varTypes);
         varTypes.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Type:", varTypes, panel);
-        
+
         envValue = new TextField("value", param.getValue(), 20);
         envValue.setPreferredSize(preferredSize);
         changeablesList.addChangeable(envValue);
         layoutGenerator.addLabelWidgetPair("Value:", envValue, panel);
-        
+
         sector = new ComboBox(presenter.getSectors());
-        sector.setSelectedItem(param.getSector() == null ? new Sector("All sectors", "All sectors") : param.getSector());
+        sector.setSelectedItem(param.getSector() == null ? sector.getItemAt(0) : param.getSector());
+        addPopupMenuListener(sector, "sectors");
         changeablesList.addChangeable(sector);
         sector.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
@@ -107,24 +117,24 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         changeablesList.addChangeable(jobs);
         jobs.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Job:", jobs, panel);
-        
+
         purpose = new TextArea("purpose", param.getPurpose());
         changeablesList.addChangeable(purpose);
         ScrollableComponent scrolpane = new ScrollableComponent(purpose);
         scrolpane.setPreferredSize(new Dimension(224, 80));
         layoutGenerator.addLabelWidgetPair("Purpose:", scrolpane, panel);
-       
-        order = new TextField("order", param.getOrder()+"", 20);
+
+        order = new TextField("order", param.getOrder() + "", 20);
         order.setPreferredSize(preferredSize);
         changeablesList.addChangeable(order);
         layoutGenerator.addLabelWidgetPair("Order:", order, panel);
-        
+
         show = new CheckBox("");
         changeablesList.addChangeable(show);
-        
+
         required = new CheckBox("");
         changeablesList.addChangeable(required);
-        
+
         JPanel checkBoxPanel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layout = new SpringLayoutGenerator();
         JPanel showPanel = new JPanel();
@@ -135,7 +145,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         layout.addWidgetPair(required, showPanel, checkBoxPanel);
         layout.makeCompactGrid(checkBoxPanel, 1, 2, 0, 0, 0, 0);
         layoutGenerator.addLabelWidgetPair("Required?", checkBoxPanel, panel);
-        
+
         notes = new TextArea("notes", param.getNotes());
         changeablesList.addChangeable(notes);
         ScrollableComponent notes_scrollpane = new ScrollableComponent(notes);
@@ -150,14 +160,53 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         populateFields(parameter);
         container.add(panel);
     }
-    
+
+    private void addPopupMenuListener(final JComboBox box, final String toget) {
+        box.addPopupMenuListener(new PopupMenuListener() {
+            public void popupMenuCanceled(PopupMenuEvent event) {
+                // NOTE Auto-generated method stub
+            }
+
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent event) {
+                // NOTE Auto-generated method stub
+            }
+
+            public void popupMenuWillBecomeVisible(PopupMenuEvent event) {
+                try {
+                    Object selected = box.getSelectedItem();
+                    box.setModel(new DefaultComboBoxModel(getAllObjects(toget)));
+                    box.setSelectedItem(selected);
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
+            }
+        });
+    }
+
+    protected Object[] getAllObjects(String toget) throws EmfException {
+        if (toget.equals("parameternames"))
+            return presenter.getParameterNames();
+
+        if (toget.equals("programs"))
+            return presenter.getPrograms();
+
+        if (toget.equals("envtvars"))
+            return presenter.getEnvtVars();
+
+        if (toget.equals("vartypes"))
+            return presenter.getValueTypes();
+
+        if (toget.equals("sectors"))
+            return presenter.getSectors();
+
+        return null;
+    }
+
     private void setJob(CaseParameter param) throws EmfException {
         jobs = new ComboBox(presenter.getCaseJobs());
-        int selected = presenter.getJobIndex(param.getJobId());
-        if (selected > 0)
-            jobs.setSelectedIndex(selected);
+        jobs.setSelectedIndex(presenter.getJobIndex(param.getJobId()));
     }
-    
+
     private void populateFields(CaseParameter param) {
         required.setSelected(param.isRequired());
         show.setSelected(param.isShow());
@@ -171,12 +220,12 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         parameter.setRequired(required.isSelected());
         parameter.setShow(show.isSelected());
         updateJob();
-        parameter.setType((ValueType)varTypes.getSelectedItem());
+        parameter.setType((ValueType) varTypes.getSelectedItem());
         parameter.setValue(envValue.getText() == null ? "" : envValue.getText().trim());
         parameter.setPurpose(purpose.getText());
         parameter.setNotes(notes.getText());
         parameter.setOrder(Float.parseFloat(order.getText()));
-        
+
         return parameter;
     }
 
@@ -185,14 +234,8 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
 
         if (job == null)
             return;
-        
-        if (((CaseJob) job).getName().equalsIgnoreCase(
-                ParameterFieldsPanelPresenter.ALL_FOR_SECTOR)) {
-            parameter.setJobId(0);
-            return;
-        }
 
-        parameter.setJobId(((CaseJob) job).getId());
+        parameter.setJobId(presenter.getJobId((CaseJob) job));
     }
 
     private void updateParameterName() throws EmfException {
@@ -242,7 +285,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
 
         if (selectedProg == null || selectedProg.toString().trim().equals(""))
             throw new EmfException("Please specify a program.");
-        
+
         try {
             Float.parseFloat(order.getText());
         } catch (NumberFormatException e) {

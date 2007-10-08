@@ -143,7 +143,7 @@ public class CaseParameter implements Serializable, Comparable {
     }
     
     public int compareTo(Object other) {
-        return getName().compareTo(((CaseParameter) other).getName());
+        return getName().compareToIgnoreCase(((CaseParameter) other).getName());
     }
 
     public String getNotes() {

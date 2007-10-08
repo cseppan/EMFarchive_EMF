@@ -51,7 +51,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         dao = new DataCommonsDAO();
     }
 
-    public Keyword[] getKeywords() throws EmfException {
+    public synchronized Keyword[] getKeywords() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List keywords = dao.getKeywords(session);
@@ -64,7 +64,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Country[] getCountries() throws EmfException {
+    public synchronized Country[] getCountries() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List countries = dao.getCountries(session);
@@ -77,7 +77,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Sector[] getSectors() throws EmfException {
+    public synchronized Sector[] getSectors() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List sectors = dao.getSectors(session);
@@ -90,7 +90,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Sector obtainLockedSector(User owner, Sector sector) throws EmfException {
+    public synchronized Sector obtainLockedSector(User owner, Sector sector) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             Sector lockedSector = dao.obtainLockedSector(owner, sector, session);
@@ -104,7 +104,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Sector updateSector(Sector sector) throws EmfException {
+    public synchronized Sector updateSector(Sector sector) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
@@ -121,7 +121,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Sector releaseLockedSector(Sector sector) throws EmfException {
+    public synchronized Sector releaseLockedSector(Sector sector) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             Sector released = dao.releaseLockedSector(sector, session);
@@ -136,7 +136,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public DatasetType[] getDatasetTypes() throws EmfException {
+    public synchronized DatasetType[] getDatasetTypes() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List list = dao.getDatasetTypes(session);
@@ -149,7 +149,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public DatasetType getDatasetType(String name) throws EmfException {
+    public synchronized DatasetType getDatasetType(String name) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             return dao.getDatasetType(name, session);
@@ -161,7 +161,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public DatasetType obtainLockedDatasetType(User user, DatasetType type) throws EmfException {
+    public synchronized DatasetType obtainLockedDatasetType(User user, DatasetType type) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             DatasetType locked = dao.obtainLockedDatasetType(user, type, session);
@@ -174,7 +174,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public DatasetType updateDatasetType(DatasetType type) throws EmfException {
+    public synchronized DatasetType updateDatasetType(DatasetType type) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
@@ -191,7 +191,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public DatasetType releaseLockedDatasetType(User user, DatasetType type) throws EmfException {
+    public synchronized DatasetType releaseLockedDatasetType(User user, DatasetType type) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             DatasetType locked = dao.releaseLockedDatasetType(type, session);
@@ -204,7 +204,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Status[] getStatuses(String username) throws EmfException {
+    public synchronized Status[] getStatuses(String username) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List statuses = dao.getStatuses(username, session);
@@ -217,7 +217,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Project[] getProjects() throws EmfException {
+    public synchronized Project[] getProjects() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List projects = dao.getProjects(session);
@@ -230,7 +230,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public void addProject(Project project) throws EmfException {
+    public synchronized void addProject(Project project) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
@@ -245,7 +245,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Region[] getRegions() throws EmfException {
+    public synchronized Region[] getRegions() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List regions = dao.getRegions(session);
@@ -258,7 +258,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public void addRegion(Region region) throws EmfException {
+    public synchronized void addRegion(Region region) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
@@ -273,7 +273,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public IntendedUse[] getIntendedUses() throws EmfException {
+    public synchronized IntendedUse[] getIntendedUses() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List regions = dao.getIntendedUses(session);
@@ -286,7 +286,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public void addIntendedUse(IntendedUse intendedUse) throws EmfException {
+    public synchronized void addIntendedUse(IntendedUse intendedUse) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
@@ -301,7 +301,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public void addCountry(Country country) throws EmfException {
+    public synchronized void addCountry(Country country) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
@@ -316,7 +316,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public void addDatasetType(DatasetType type) throws EmfException {
+    public synchronized void addDatasetType(DatasetType type) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
@@ -331,7 +331,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public void addSector(Sector sector) throws EmfException {
+    public synchronized void addSector(Sector sector) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
@@ -346,7 +346,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Note[] getNotes(int datasetId) throws EmfException {
+    public synchronized Note[] getNotes(int datasetId) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List notes = dao.getNotes(datasetId, session);
@@ -359,7 +359,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public void addNote(Note note) throws EmfException {
+    public synchronized void addNote(Note note) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
@@ -374,13 +374,13 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public void addNotesB(Note[] notes) throws EmfException {
+    public synchronized void addNotesB(Note[] notes) throws EmfException {
         for (int i = 0; i < notes.length; i++) {
             this.addNote(notes[i]);
         }
     }
 
-    public void addNotes(Note[] notes) throws EmfException {
+    public synchronized void addNotes(Note[] notes) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
@@ -400,7 +400,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     }
 
-    public NoteType[] getNoteTypes() throws EmfException {
+    public synchronized NoteType[] getNoteTypes() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List notetypes = dao.getNoteTypes(session);
@@ -413,7 +413,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Revision[] getRevisions(int datasetId) throws EmfException {
+    public synchronized Revision[] getRevisions(int datasetId) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List revisions = dao.getRevisions(datasetId, session);
@@ -426,7 +426,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public void addRevision(Revision revision) throws EmfException {
+    public synchronized void addRevision(Revision revision) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
@@ -438,7 +438,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Pollutant[] getPollutants() throws EmfException {
+    public synchronized Pollutant[] getPollutants() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List pollutants = dao.getPollutants(session);
@@ -451,7 +451,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public void addPollutant(Pollutant pollutant) throws EmfException {
+    public synchronized void addPollutant(Pollutant pollutant) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
@@ -466,7 +466,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public SourceGroup[] getSourceGroups() throws EmfException {
+    public synchronized SourceGroup[] getSourceGroups() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List sourcegrp = dao.getSourceGroups(session);
@@ -479,7 +479,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public void addSourceGroup(SourceGroup sourcegrp) throws EmfException {
+    public synchronized void addSourceGroup(SourceGroup sourcegrp) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
@@ -494,7 +494,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public File[] getFiles(File[] dir) throws EmfException {
+    public synchronized File[] getFiles(File[] dir) throws EmfException {
         try {
             if (dir[0] == null) {
                 EmfServerFileSystemView fsv = new EmfServerFileSystemView();
@@ -508,7 +508,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public EmfFileInfo createNewFolder(String folder, String subfolder) throws EmfException {
+    public synchronized EmfFileInfo createNewFolder(String folder, String subfolder) throws EmfException {
         try {
             if (folder == null || folder.trim().isEmpty())
                 return null;
@@ -533,7 +533,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public EmfFileInfo getDefaultDir() throws EmfException {
+    public synchronized EmfFileInfo getDefaultDir() throws EmfException {
         try {
             //NOTE: FileSystemView doesn't work well on Linux platform
             EmfServerFileSystemView fsv = new EmfServerFileSystemView();
@@ -544,7 +544,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public EmfFileInfo getHomeDir() throws EmfException {
+    public synchronized EmfFileInfo getHomeDir() throws EmfException {
         try {
             EmfServerFileSystemView fsv = new EmfServerFileSystemView();
             return EmfFileSerializer.convert(fsv.getHomeDirectory());
@@ -554,7 +554,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public EmfFileInfo[] getRoots() throws EmfException {
+    public synchronized EmfFileInfo[] getRoots() throws EmfException {
         try {
             EmfServerFileSystemView fsv = new EmfServerFileSystemView();
             File[] roots = fsv.getRoots();
@@ -565,7 +565,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    private EmfFileInfo[] getFileInfos(File[] roots) throws IOException {
+    private synchronized EmfFileInfo[] getFileInfos(File[] roots) throws IOException {
         EmfFileInfo[] infos = new EmfFileInfo[roots.length];
 
         for (int i = 0; i < infos.length; i++)
@@ -574,7 +574,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         return infos;
     }
 
-    public boolean isRoot(EmfFileInfo fileInfo) throws EmfException {
+    public synchronized boolean isRoot(EmfFileInfo fileInfo) throws EmfException {
         try {
             EmfServerFileSystemView fsv = new EmfServerFileSystemView();
             return fsv.isRoot(EmfFileSerializer.convert(fileInfo));
@@ -583,7 +583,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public boolean isFileSystemRoot(EmfFileInfo fileInfo) throws EmfException {
+    public synchronized boolean isFileSystemRoot(EmfFileInfo fileInfo) throws EmfException {
         try {
             EmfServerFileSystemView fsv = new EmfServerFileSystemView();
             return fsv.isFileSystemRoot(EmfFileSerializer.convert(fileInfo));
@@ -592,7 +592,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public EmfFileInfo getChild(EmfFileInfo file, String child) throws EmfException {
+    public synchronized EmfFileInfo getChild(EmfFileInfo file, String child) throws EmfException {
         try {
             EmfServerFileSystemView fsv = new EmfServerFileSystemView();
             File childFile = fsv.getChild(EmfFileSerializer.convert(file), child);
@@ -602,7 +602,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public EmfFileInfo getParentDirectory(EmfFileInfo file) throws EmfException {
+    public synchronized EmfFileInfo getParentDirectory(EmfFileInfo file) throws EmfException {
         try {
             EmfServerFileSystemView fsv = new EmfServerFileSystemView();
             File parentFile = fsv.getParentDirectory(EmfFileSerializer.convert(file));
@@ -612,7 +612,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public EmfFileInfo[] getSubdirs(EmfFileInfo dir) throws EmfException {
+    public synchronized EmfFileInfo[] getSubdirs(EmfFileInfo dir) throws EmfException {
         try {
             EmfFileInfo gooddir = correctEmptyDir(dir);
             if (currentDirectory != null && gooddir.getAbsolutePath().equals(currentDirectory.getAbsolutePath())) {
@@ -630,7 +630,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    private EmfFileInfo correctEmptyDir(EmfFileInfo dir) throws IOException {
+    private synchronized EmfFileInfo correctEmptyDir(EmfFileInfo dir) throws IOException {
         boolean resetPath = false;
 
         if (dir == null || dir.getAbsolutePath() == null || dir.getAbsolutePath().trim().equals(""))
@@ -658,7 +658,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         return dir;
     }
 
-    private void listDirsAndFiles(File[] files, File cur, String filter) throws IOException {
+    private synchronized void listDirsAndFiles(File[] files, File cur, String filter) throws IOException {
         List<EmfFileInfo> subdirsOfCurDir = new ArrayList<EmfFileInfo>();
         List<EmfFileInfo> filesOfCurDir = new ArrayList<EmfFileInfo>();
         EmfFileInfo curInfo = EmfFileSerializer.convert(cur);
@@ -696,7 +696,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         this.subdirs = subdirsOfCurDir.toArray(new EmfFileInfo[0]);
     }
 
-    public EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir, String filter) throws EmfException {
+    public synchronized EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir, String filter) throws EmfException {
         try {
             EmfFileInfo gooddir = correctEmptyDir(dir);
             if (currentDirectory != null && gooddir.getAbsolutePath().equals(currentDirectory.getAbsolutePath())) {
@@ -714,7 +714,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
     
-    private EmfFileInfo[] getFileinfosFromPattern(EmfFileInfo[] fileInfos, String pattern) throws EmfException {
+    private synchronized EmfFileInfo[] getFileinfosFromPattern(EmfFileInfo[] fileInfos, String pattern) throws EmfException {
         try {
             if (pattern == null || fileInfos.length == 0)
                 return fileInfos;

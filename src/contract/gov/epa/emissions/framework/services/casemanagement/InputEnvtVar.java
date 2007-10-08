@@ -51,6 +51,6 @@ public class InputEnvtVar implements Serializable, Comparable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((InputEnvtVar) other).getName());
+        return name.compareToIgnoreCase(((InputEnvtVar) other).getName());
     }
 }

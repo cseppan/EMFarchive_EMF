@@ -51,6 +51,6 @@ public class GridResolution implements Serializable, Comparable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((GridResolution) other).getName());
+        return name.compareToIgnoreCase(((GridResolution) other).getName());
     }
 }

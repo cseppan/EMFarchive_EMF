@@ -48,7 +48,7 @@ public class ValueType implements Serializable, Comparable<ValueType> {
     }
     
     public int compareTo(ValueType other) {
-        return name.compareTo((other).getName());
+        return name.compareToIgnoreCase((other).getName());
     }
 
 }

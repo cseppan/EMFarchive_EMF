@@ -80,7 +80,7 @@ public class CaseInput implements Serializable, Comparable {
     }
 
     public int compareTo(Object other) {
-        return getName().compareTo(((CaseInput) other).getName());
+        return getName().compareToIgnoreCase(((CaseInput) other).getName());
     }
 
     public EmfDataset getDataset() {

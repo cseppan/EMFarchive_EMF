@@ -28,7 +28,7 @@ public class QAServiceTransport implements QAService {
         return call;
     }
 
-    public QAStep[] getQASteps(EmfDataset dataset) throws EmfException {
+    public synchronized QAStep[] getQASteps(EmfDataset dataset) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getQASteps");
@@ -39,7 +39,7 @@ public class QAServiceTransport implements QAService {
         return (QAStep[]) call.requestResponse(params);
     }
 
-    public void updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException {
+    public synchronized void updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateWitoutCheckingConstraints");
@@ -49,7 +49,7 @@ public class QAServiceTransport implements QAService {
         call.request(new Object[] { steps });
     }
 
-    public QAProgram[] getQAPrograms() throws EmfException {
+    public synchronized QAProgram[] getQAPrograms() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getQAPrograms");
@@ -58,7 +58,7 @@ public class QAServiceTransport implements QAService {
         return (QAProgram[]) call.requestResponse(new Object[] {});
     }
 
-    public void runQAStep(QAStep step, User user) throws EmfException {
+    public synchronized void runQAStep(QAStep step, User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("runQAStep");
@@ -70,7 +70,7 @@ public class QAServiceTransport implements QAService {
 
     }
 
-    public void exportQAStep(QAStep step, User user, String dirName) throws EmfException {
+    public synchronized void exportQAStep(QAStep step, User user, String dirName) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("exportQAStep");
@@ -82,7 +82,7 @@ public class QAServiceTransport implements QAService {
         call.request(new Object[] { step, user, dirName });
     }
 
-    public QAStepResult getQAStepResult(QAStep step) throws EmfException {
+    public synchronized QAStepResult getQAStepResult(QAStep step) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getQAStepResult");
@@ -93,7 +93,7 @@ public class QAServiceTransport implements QAService {
 
     }
 
-    public void update(QAStep step) throws EmfException {
+    public synchronized void update(QAStep step) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("update");
@@ -104,7 +104,7 @@ public class QAServiceTransport implements QAService {
 
     }
 
-    public QAProgram addQAProgram(QAProgram program) throws EmfException {
+    public synchronized QAProgram addQAProgram(QAProgram program) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("addQAProgram");
