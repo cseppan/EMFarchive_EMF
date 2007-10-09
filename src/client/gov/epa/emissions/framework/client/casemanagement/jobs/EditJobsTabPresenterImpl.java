@@ -1,8 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
@@ -10,6 +8,12 @@ import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 import javax.swing.JComponent;
 
@@ -43,10 +47,13 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         dialog.display();
     }
 
-    public void addNewJob(CaseJob job) throws EmfException {
+    public CaseJob addNewJob(CaseJob job) throws EmfException {
         job.setCaseId(caseObj.getId());
-        view.addJob(service().addCaseJob(job));
+        CaseJob newJob = service().addCaseJob(job);
+        view.addJob(newJob);
         refreshView();
+
+        return newJob;
     }
 
     private CaseService service() {
@@ -88,6 +95,19 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         presenter.display(job);
     }
 
+    public void copyJob(CaseJob job, EditCaseJobView jobEditor) throws Exception {
+        CaseJob newJob = (CaseJob) DeepCopy.copy(job);
+        newJob.setName(getUniqueNewName("Copy of " + job.getName()));
+        newJob.setJobkey(null); // jobkey supposedly generated when it is run
+        newJob.setRunstatus(null);
+        newJob.setRunLog(null);
+        newJob.setRunStartDate(null);
+        newJob.setRunCompletionDate(null);
+
+        EditJobPresenter presenter = new EditCaseJobPresenterImpl(jobEditor, view, this, session);
+        presenter.display(addNewJob(newJob));
+    }
+
     public CaseJob[] getCaseJobs() throws EmfException {
         return service().getCaseJobs(caseObj.getId());
     }
@@ -106,8 +126,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
         for (int i = 0; i < jobs.length; i++) {
             if (jobs[i].getExecutable() == null)
-                throw new EmfException("Job " + jobs[i].getName() 
-                        + " doesn't have a valid executable file.");
+                throw new EmfException("Job " + jobs[i].getName() + " doesn't have a valid executable file.");
             jobIds[i] = new Integer(jobs[i].getId());
         }
 
@@ -118,44 +137,86 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         List<String> ok = new ArrayList<String>();
         List<String> cancel = new ArrayList<String>();
         List<String> warning = new ArrayList<String>();
-        
+
         for (int i = 0; i < jobs.length; i++) {
             String status = service().getCaseJob(jobs[i].getId()).getRunstatus().getName();
-            
+
             if (status == null || status.trim().isEmpty())
                 ok.add(status);
-            
+
             if (status != null && status.equalsIgnoreCase("Not Started"))
                 ok.add(status);
-            
+
             if (status != null && status.equalsIgnoreCase("Quality Assured"))
                 ok.add(status);
-                
+
             if (status != null && status.equalsIgnoreCase("Completed"))
                 warning.add(status);
-                    
+
             if (status != null && status.equalsIgnoreCase("Failed"))
                 warning.add(status);
-                        
+
             if (status != null && status.equalsIgnoreCase("Running"))
                 cancel.add(status);
-                            
+
             if (status != null && status.equalsIgnoreCase("Submitted"))
                 cancel.add(status);
-                                
+
             if (status != null && status.equalsIgnoreCase("Exporting"))
                 cancel.add(status);
 
             if (status != null && status.equalsIgnoreCase("Waiting"))
                 cancel.add(status);
         }
-        
+
         if (ok.size() == jobs.length)
             return "OK";
-        
+
         if (cancel.size() > 0)
             return "CANCEL";
-        
+
         return "WARNING";
+    }
+
+    private String getUniqueNewName(String name) throws Exception {
+        List<String> names = new ArrayList<String>();
+
+        List<CaseJob> allJobs = Arrays.asList(view.caseJobs());
+
+        for (Iterator<CaseJob> iter = allJobs.iterator(); iter.hasNext();) {
+            CaseJob job = iter.next();
+            if (job.getName().startsWith(name)) {
+                names.add(job.getName());
+            }
+        }
+
+        if (names.size() == 0)
+            return name;
+
+        return name + " " + getSequence(name, names);
+    }
+
+    private int getSequence(String stub, List<String> names) {
+        int sequence = names.size() + 1;
+        String integer = "";
+
+        try {
+            for (Iterator<String> iter = names.iterator(); iter.hasNext();) {
+                integer = iter.next().substring(stub.length()).trim();
+
+                if (!integer.isEmpty()) {
+                    int temp = Integer.parseInt(integer);
+
+                    if (temp == sequence)
+                        ++sequence;
+                    else if (temp > sequence)
+                        sequence = temp + 1;
+                }
+            }
+
+            return sequence;
+        } catch (Exception e) {
+            return Math.abs(new Random().nextInt());
+        }
     }
 }

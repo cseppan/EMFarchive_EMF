@@ -35,22 +35,18 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
         super.center();
     }
 
-    public void display(int caseId) {
-        doDisplay();
-    }
-
-    private void doDisplay() {
+    public void display(int caseId, CaseInput newInput) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        panel.add(inputPanel());
+        panel.add(inputPanel(newInput));
         panel.add(buttonsPanel());
 
         super.getContentPane().add(panel);
         super.display();
     }
 
-    private JPanel inputPanel() {
+    private JPanel inputPanel(CaseInput newInput) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -59,7 +55,7 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
         this.inputFieldsPanel = new InputFieldsPanel(messagePanel, this);
 
         try {
-            presenter.doAddInputFields(panel, inputFieldsPanel);
+            presenter.doAddInputFields(panel, inputFieldsPanel, newInput);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

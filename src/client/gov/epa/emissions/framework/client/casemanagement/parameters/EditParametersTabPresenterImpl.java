@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.parameters;
 
+import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
@@ -30,9 +31,9 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
         view.refresh();
     }
 
-    public void addNewParameterDialog(NewCaseParameterView dialog) {
+    public void addNewParameterDialog(NewCaseParameterView dialog, CaseParameter newParam) {
         dialog.register(this);
-        dialog.display(caseObj.getId());
+        dialog.display(caseObj.getId(), newParam);
     }
 
     public void addNewParameter(CaseParameter param) throws EmfException {
@@ -53,6 +54,11 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
     public void editParameter(CaseParameter param, EditCaseParameterView parameterEditor) throws EmfException {
         EditCaseParameterPresenter editInputPresenter = new EditCaseParameterPresenterImpl(caseObj.getId(), parameterEditor, view, session);
         editInputPresenter.display(param);
+    }
+    
+    public void copyParameter(NewCaseParameterDialog dialog, CaseParameter param) throws Exception {
+        CaseParameter newParam = (CaseParameter) DeepCopy.copy(param);
+        addNewParameterDialog(dialog, newParam);
     }
 
     public void addParameterFields(CaseParameter newParameter, JComponent container, ParameterFieldsPanelView parameterFields) throws EmfException {

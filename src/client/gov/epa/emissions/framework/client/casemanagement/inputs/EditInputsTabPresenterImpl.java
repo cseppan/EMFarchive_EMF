@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
+import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
@@ -38,9 +39,9 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         view.refresh();
     }
 
-    public void addNewInputDialog(NewInputView dialog) {
+    public void addNewInputDialog(NewInputView dialog, CaseInput newInput) {
         dialog.register(this);
-        dialog.display(caseObj.getId());
+        dialog.display(caseObj.getId(), newInput);
     }
 
     public void addNewInput(CaseInput input) throws EmfException {
@@ -67,13 +68,15 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
                 session);
         editInputPresenter.display(input);
     }
+    
+    public void copyInput(CaseInput input, NewInputView dialog) throws Exception {
+        CaseInput newInput = (CaseInput) DeepCopy.copy(input);
+        addNewInputDialog(dialog, newInput);
+    }
 
-    public void doAddInputFields(JComponent container, InputFieldsPanelView inputFields) throws EmfException {
-        CaseInput newInput = new CaseInput();
+    public void doAddInputFields(JComponent container, InputFieldsPanelView inputFields, CaseInput newInput) throws EmfException {
         newInput.setId(view.numberOfRecord());
-        newInput.setRequired(true);
-        newInput.setShow(true);
-
+        
         InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj.getId(), inputFields,
                 session);
         inputFieldsPresenter.display(newInput, container);
@@ -112,5 +115,5 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     public void exportCaseInputsWithOverwrite(List<CaseInput> inputList, String purpose) throws EmfException {
         doExport(inputList, true, purpose);
     }
-
+    
 }

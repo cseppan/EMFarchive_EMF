@@ -2,13 +2,14 @@ package gov.epa.emissions.framework.client.casemanagement.inputs;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
-import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
@@ -40,6 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -251,13 +253,10 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         edit.setMargin(insets);
         container.add(edit);
 
-        Button copy = new CopyButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                //
-            }
-        });
+        String message = "You have asked to copy too many inputs. Do you wish to proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+        SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(presenter), selectModel, confirmDialog);
         copy.setMargin(insets);
-        copy.setEnabled(false);
         container.add(copy);
 
         Button view = new ViewButton("View Dataset", new AbstractAction() {
@@ -292,10 +291,26 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         return panel;
     }
 
+    private Action copyAction(final EditInputsTabPresenter localPresenter) {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    clearMessage();
+                    copyInputs(localPresenter);
+                } catch (Exception ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        };
+    }
+    
     protected void doNewInput(EditInputsTabPresenter presenter) {
         NewInputDialog view = new NewInputDialog(parentConsole);
         try {
-            presenter.addNewInputDialog(view);
+            CaseInput newInput = new CaseInput();
+            newInput.setRequired(true);
+            newInput.setShow(true);
+            presenter.addNewInputDialog(view, newInput);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -334,6 +349,23 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             String title = input.getName() + "(" + input.getId() + ")(" + caseObj.getName() + ")";
             EditCaseInputView inputEditor = new EditCaseInputWindow(title, desktopManager);
             presenter.doEditInput(input, inputEditor);
+        }
+    }
+
+    private void copyInputs(EditInputsTabPresenter presenter) throws Exception {
+        List inputs = getSelectedInputs();
+        
+        if (inputs.size() == 0) {
+            messagePanel.setMessage("Please select input(s) to copy.");
+            return;
+        }
+        
+        for (Iterator iter = inputs.iterator(); iter.hasNext();) {
+            CaseInput input = (CaseInput) iter.next();
+            NewInputDialog view = new NewInputDialog(parentConsole);
+            view.setModal(false);
+            view.setLocationByPlatform(true);
+            presenter.copyInput(input, view);
         }
     }
 
@@ -435,46 +467,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
         return datasetList;
     }
-
-    // private Version[] getSelectedDatasetVersions() {
-    // List list = getSelectedInputs();
-    // List versionList = new ArrayList();
-    //
-    // for (int i = 0; i < list.size(); i++) {
-    // Version version = ((CaseInput) list.get(i)).getVersion();
-    // if (version != null)
-    // versionList.add(version);
-    // }
-    //
-    // return (Version[]) versionList.toArray(new Version[0]);
-    // }
-
-    // private String[] getSelectedInputSubdirs() {
-    // List list = getSelectedInputs();
-    // List<String> subDirList = new ArrayList<String>();
-    // String defaultExportDir = session.preferences().outputFolder();
-    // if (!inputDir.getText().equals(""))
-    // defaultExportDir = inputDir.getText();
-    //        
-    // String separator = getFileSeparator(defaultExportDir);
-    //
-    // for (int i = 0; i < list.size(); i++) {
-    // SubDir subdir = ((CaseInput) list.get(i)).getSubdirObj();
-    // if (subdir != null)
-    // subDirList.add(defaultExportDir + separator + subdir.getName());
-    // else
-    // subDirList.add(defaultExportDir);
-    // }
-    //
-    // return subDirList.toArray(new String[0]);
-    // }
-
-    // private String getFileSeparator(String folder) {
-    // if (folder.trim().charAt(0) == '/')
-    // return "/";
-    //
-    // return "\\";
-    // }
 
     public void addInput(CaseInput note) {
         tableData.add(note);

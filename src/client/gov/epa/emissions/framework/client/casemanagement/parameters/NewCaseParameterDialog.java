@@ -23,8 +23,6 @@ public class NewCaseParameterDialog extends Dialog implements NewCaseParameterVi
 
     private boolean shouldCreate;
     
-    private CaseParameter newParameter;
-
     private EditParametersTabPresenterImpl presenter;
 
     private MessagePanel messagePanel;
@@ -36,24 +34,20 @@ public class NewCaseParameterDialog extends Dialog implements NewCaseParameterVi
         super.setSize(new Dimension(450, 550));
         super.setSize(new Dimension(450, 550));
         super.center();
-        
-        this.newParameter = new CaseParameter();
-        newParameter.setShow(true);
-        newParameter.setRequired(true);
     }
 
-    public void display(int caseId) {
+    public void display(int caseId, CaseParameter newParam) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        panel.add(parameterPanel());
+        panel.add(parameterPanel(newParam));
         panel.add(buttonsPanel());
 
         super.getContentPane().add(panel);
         super.display();
     }
 
-    private JPanel parameterPanel() {
+    private JPanel parameterPanel(CaseParameter newParam) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -62,7 +56,7 @@ public class NewCaseParameterDialog extends Dialog implements NewCaseParameterVi
         this.parameterFieldsPanel = new ParameterFieldsPanel(messagePanel, this);
 
         try {
-            presenter.addParameterFields(newParameter, panel, parameterFieldsPanel);
+            presenter.addParameterFields(newParam, panel, parameterFieldsPanel);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

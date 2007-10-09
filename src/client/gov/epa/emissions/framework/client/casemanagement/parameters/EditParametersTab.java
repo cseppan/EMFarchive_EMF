@@ -1,10 +1,11 @@
 package gov.epa.emissions.framework.client.casemanagement.parameters;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ConfirmDialog;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
-import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -27,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -137,8 +139,9 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     }
 
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Order", "Envt. Var.", "Sector", "Parameter"};
-        return new SortCriteria(columnNames, new boolean[] { true, true, true, true }, new boolean[] { false, false, false, false });
+        String[] columnNames = { "Order", "Envt. Var.", "Sector", "Parameter" };
+        return new SortCriteria(columnNames, new boolean[] { true, true, true, true }, new boolean[] { false, false,
+                false, false });
     }
 
     private JPanel controlPanel(final EditParametersTabPresenter presenter) {
@@ -181,13 +184,10 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         edit.setMargin(insets);
         container.add(edit);
 
-        Button copy = new CopyButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                //
-            }
-        });
+        String message = "You have asked to copy too many parameters. Do you wish to proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+        SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(presenter), selectModel, confirmDialog);
         copy.setMargin(insets);
-        copy.setEnabled(false);
         container.add(copy);
 
         final JCheckBox showAll = new JCheckBox("Show All", false);
@@ -206,10 +206,26 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         return panel;
     }
 
+    private Action copyAction(final EditParametersTabPresenter localPresenter) {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    clearMessage();
+                    copyParameters(localPresenter);
+                } catch (Exception ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        };
+    }
+
     protected void doNewInput(EditParametersTabPresenter presenter) {
         NewCaseParameterDialog view = new NewCaseParameterDialog(parentConsole);
         try {
-            presenter.addNewParameterDialog(view);
+            CaseParameter newParameter = new CaseParameter();
+            newParameter.setShow(true);
+            newParameter.setRequired(true);
+            presenter.addNewParameterDialog(view, newParameter);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -248,6 +264,23 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             String title = param.getName() + "(" + param.getId() + ")(" + caseObj.getName() + ")";
             EditCaseParameterView parameterEditor = new EditCaseParameterWindow(title, desktopManager);
             presenter.editParameter(param, parameterEditor);
+        }
+    }
+
+    private void copyParameters(EditParametersTabPresenter presenter) throws Exception {
+        List params = getSelectedParameters();
+
+        if (params.size() == 0) {
+            messagePanel.setMessage("Please select parameter(s) to copy.");
+            return;
+        }
+
+        for (Iterator iter = params.iterator(); iter.hasNext();) {
+            CaseParameter param = (CaseParameter) iter.next();
+            NewCaseParameterDialog view = new NewCaseParameterDialog(parentConsole);
+            view.setModal(false);
+            view.setLocationByPlatform(true);
+            presenter.copyParameter(view, param);
         }
     }
 

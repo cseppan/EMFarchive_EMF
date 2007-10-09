@@ -8,7 +8,7 @@ public interface EditParametersTabPresenter extends CaseEditorTabPresenter {
 
     void display() throws EmfException;
     
-    void addNewParameterDialog(NewCaseParameterView view) throws EmfException;
+    void addNewParameterDialog(NewCaseParameterView view, CaseParameter param) throws EmfException;
     
     void addNewParameter(CaseParameter input) throws EmfException;
 
@@ -19,4 +19,7 @@ public interface EditParametersTabPresenter extends CaseEditorTabPresenter {
     CaseParameter[] getCaseParameters(int caseId) throws EmfException;
 
     void removeParameters(CaseParameter[] params) throws EmfException;
+
+    void copyParameter(NewCaseParameterDialog view, CaseParameter param) throws Exception;
+
 }

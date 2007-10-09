@@ -1,13 +1,14 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
-import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.commons.gui.buttons.RunButton;
@@ -35,6 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -242,14 +244,11 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         });
         edit.setMargin(insets);
         container.add(edit);
-
-        Button copy = new CopyButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                //
-            }
-        });
+        
+        String message = "You have asked to copy too many jobs. Do you wish to proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+        SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(), selectModel, confirmDialog);
         copy.setMargin(insets);
-        copy.setEnabled(false);
         container.add(copy);
 
         Button run = new RunButton(new AbstractAction() {
@@ -269,6 +268,20 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         panel.add(container, BorderLayout.WEST);
 
         return panel;
+    }
+    
+    private Action copyAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    clearMessage();
+                    copyJobs();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        };
     }
 
     private void addNewJob() {
@@ -328,6 +341,22 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             String title = job.getName() + "(" + job.getId() + ")(" + caseObj.getName() + ")";
             EditCaseJobView jobEditor = new EditCaseJobWindow(title, desktopManager, parentConsole, session);
             presenter.editJob(job, jobEditor);
+        }
+    }
+
+    private void copyJobs() throws Exception {
+        List jobs = getSelectedJobs();
+        
+        if (jobs.size() == 0) {
+            messagePanel.setMessage("Please select job(s) to copy.");
+            return;
+        }
+        
+        for (Iterator iter = jobs.iterator(); iter.hasNext();) {
+            CaseJob job = (CaseJob) iter.next();
+            String title = "Copy of " + job.getName() + "(" + job.getId() + ")(" + caseObj.getName() + ")";
+            EditCaseJobView jobEditor = new EditCaseJobWindow(title, desktopManager, parentConsole, session);
+            presenter.copyJob(job, jobEditor);
         }
     }
 

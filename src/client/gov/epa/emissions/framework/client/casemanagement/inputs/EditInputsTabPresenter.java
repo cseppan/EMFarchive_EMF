@@ -12,7 +12,7 @@ public interface EditInputsTabPresenter extends CaseEditorTabPresenter {
 
     void display() throws EmfException;
     
-    void addNewInputDialog(NewInputView view) throws EmfException;
+    void addNewInputDialog(NewInputView view, CaseInput input) throws EmfException;
     
     void addNewInput(CaseInput input) throws EmfException;
 
@@ -32,4 +32,6 @@ public interface EditInputsTabPresenter extends CaseEditorTabPresenter {
     void removeInputs(CaseInput[] inputs) throws EmfException;
     
     CaseInput[] getCaseInput(int caseId) throws EmfException;
+
+    void copyInput(CaseInput input, NewInputView dialog) throws Exception;
 }
