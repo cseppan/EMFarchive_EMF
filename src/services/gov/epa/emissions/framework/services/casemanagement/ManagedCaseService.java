@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
@@ -1692,22 +1693,34 @@ public class ManagedCaseService {
         EmfDataset dataset = input.getDataset();
         InputEnvtVar envvar = input.getEnvtVars();
         SubDir subdir = input.getSubdirObj();
-        // check if dataset or env variable is null, if so e
+        String fullPath = null;
+        String setenvLine = null;
+       
+        // check if dataset is null, if so exception
         if (dataset == null) {
             throw new EmfException("Input (" + input.getName() + ") must have a dataset");
         }
 
-        // Create a full path to the input file
-        String fullPath = expSvc.getCleanDatasetName(input.getDataset(), input.getVersion());
-        if ((subdir != null) && !(subdir.toString()).equals("")) {
-            fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + input.getSubdirObj()
-                    + System.getProperty("file.separator") + fullPath;
+        // check for external dataset
+        if (dataset.isExternal()) {
+            // set the full path to the first external file in the dataset
+            ExternalSource[] externalDatasets = dataset.getExternalSources();
+            if (externalDatasets.length == 0) {
+                throw new EmfException("Input (" + input.getName() + ") must have at least 1 external dataset");
+            }
+            fullPath = externalDatasets[0].getDatasource();
         } else {
-            fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + fullPath;
+            // internal dataset
+            // Create a full path to the input file
+            fullPath = expSvc.getCleanDatasetName(input.getDataset(), input.getVersion());
+            if ((subdir != null) && !(subdir.toString()).equals("")) {
+                fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + input.getSubdirObj()
+                        + System.getProperty("file.separator") + fullPath;
+            } else {
+                fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + fullPath;
+            }
         }
-
-        String setenvLine = null;
-        if (envvar == null) {
+         if (envvar == null) {
             // if no environmental variable, just created a commented
             // line w/ input name = fullPath
             setenvLine = this.runComment + " " + input.getName() + " = " + fullPath + eolString;
@@ -2019,7 +2032,7 @@ public class ManagedCaseService {
         // print executable
         sbuf.append(eolString);
         sbuf.append(this.runComment + " job executable" + eolString);
-        sbuf.append("$EMF_CLIENT -k $EMF_JOBKEY -x " + execFull + " -m \"Running top level script\"" + eolString);
+        sbuf.append("$EMF_CLIENT -k $EMF_JOBKEY -x " + execFull + " -m \"Running top level script for job: " + jobName + "\"" + eolString);
         sbuf.append(execFullArgs);
 
         // add a test of the status and send info through the
