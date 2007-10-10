@@ -193,14 +193,14 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { region });
     }
 
-    public synchronized void addProject(Project project) throws EmfException {
+    public synchronized Project addProject(Project project) throws EmfException {
         EmfCall call = call();
 
         call.addParam("project", mappings.project());
         call.setOperation("addProject");
-        call.setVoidReturnType();
+        call.setReturnType(mappings.project());
 
-        call.request(new Object[] { project });
+        return (Project)call.requestResponse(new Object[] { project });
     }
 
     public synchronized void addIntendedUse(IntendedUse intendedUse) throws EmfException {

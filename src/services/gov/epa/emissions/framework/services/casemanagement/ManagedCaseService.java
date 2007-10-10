@@ -203,6 +203,21 @@ public class ManagedCaseService {
             session.close();
         }
     }
+    
+    public Abbreviation addAbbreviation(Abbreviation abbr) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            dao.add(abbr, session);
+            return (Abbreviation)dao.load(Abbreviation.class, abbr.getName(), session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Cannot add case abbreviation " + abbr.getName(), e);
+            throw new EmfException("Cannot add case abbreviation " + abbr.getName() + e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
 
     public AirQualityModel[] getAirQualityModels() throws EmfException {
         Session session = sessionFactory.getSession();
@@ -231,6 +246,21 @@ public class ManagedCaseService {
             session.close();
         }
     }
+    
+    public synchronized CaseCategory addCaseCategory(CaseCategory element) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(element, session);
+            return (CaseCategory) dao.load(CaseCategory.class, element.getName(), session);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            log.error("Could not add CaseCategory: " + element, e);
+            throw new EmfException("Could not add CaseCategory: " + element);
+        } finally {
+            session.close();
+        }
+    }
+
 
     public EmissionsYear[] getEmissionsYears() throws EmfException {
         Session session = sessionFactory.getSession();

@@ -44,6 +44,10 @@ public interface CaseService {
 
     void addCase(User owner, Case element) throws EmfException;
 
+    CaseCategory addCaseCategory(CaseCategory element) throws EmfException;
+    
+    Abbreviation addAbbreviation(Abbreviation abbr) throws EmfException;
+
     void removeCase(Case element) throws EmfException;
 
     Case obtainLocked(User owner, Case element) throws EmfException;
@@ -136,5 +140,6 @@ public interface CaseService {
     String restoreTaskManagers() throws EmfException;
 
     String printStatusCaseJobTaskManager() throws EmfException;
+
 
  }

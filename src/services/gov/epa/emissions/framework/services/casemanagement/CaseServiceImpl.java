@@ -108,6 +108,10 @@ public class CaseServiceImpl implements CaseService {
     public Abbreviation[] getAbbreviations() throws EmfException {
         return getCaseService().getAbbreviations();
     }
+    
+    public Abbreviation addAbbreviation(Abbreviation abbr) throws EmfException {
+        return getCaseService().addAbbreviation(abbr);
+    }
 
     public AirQualityModel[] getAirQualityModels() throws EmfException {
         return getCaseService().getAirQualityModels();
@@ -115,6 +119,10 @@ public class CaseServiceImpl implements CaseService {
 
     public CaseCategory[] getCaseCategories() throws EmfException {
         return getCaseService().getCaseCategories();
+    }
+    
+    public CaseCategory addCaseCategory(CaseCategory element) throws EmfException {
+        return getCaseService().addCaseCategory(element);
     }
 
     public EmissionsYear[] getEmissionsYears() throws EmfException {

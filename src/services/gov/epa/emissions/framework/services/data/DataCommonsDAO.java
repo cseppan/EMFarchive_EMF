@@ -260,5 +260,10 @@ public class DataCommonsDAO {
     public boolean canUpdate(DatasetType datasetType, Session session) {
         return datasetTypesDAO.canUpdate(datasetType, session);
     }
+    
+    public Object load(Class clazz, String name, Session session) {
+        Criterion criterion = Restrictions.eq("name", name);
+        return hibernateFacade.load(clazz, criterion, session);
+    }
 
 }

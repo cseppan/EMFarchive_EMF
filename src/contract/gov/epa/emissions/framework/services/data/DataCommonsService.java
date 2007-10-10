@@ -21,7 +21,7 @@ public interface DataCommonsService {
     // Projects
     Project[] getProjects() throws EmfException;
 
-    void addProject(Project project) throws EmfException;
+    Project addProject(Project project) throws EmfException;
 
     // intended use
     IntendedUse[] getIntendedUses() throws EmfException;

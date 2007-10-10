@@ -230,18 +230,20 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public synchronized void addProject(Project project) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
+    public synchronized Project addProject(Project project) throws EmfException {
+        Session session = sessionFactory.getSession();
 
+        try {
             if (dao.nameUsed(project.getName(), Project.class, session))
                 throw new EmfException("Project name already in use");
 
             dao.add(project, session);
-            session.close();
+            return (Project) dao.load(Project.class, project.getName(), session);
         } catch (RuntimeException e) {
             LOG.error("Could not add new Project", e);
             throw new EmfException("Project name already in use");
+        } finally {
+            session.close();
         }
     }
 

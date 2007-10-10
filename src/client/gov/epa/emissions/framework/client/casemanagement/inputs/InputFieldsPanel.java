@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
+import gov.epa.emissions.commons.gui.EmptyStrings;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfException;
@@ -72,7 +73,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         this.input = input;
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        String width = "To make the combobox a bit wider ...............................";
+        String width = EmptyStrings.create(100);
 
         inputName = new EditableComboBox(presenter.getInputNames());
         inputName.setSelectedItem(input.getInputName());

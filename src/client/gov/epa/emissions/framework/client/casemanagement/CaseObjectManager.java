@@ -6,11 +6,16 @@ import java.util.Collections;
 import java.util.List;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
+import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
@@ -64,6 +69,16 @@ public class CaseObjectManager {
     private List<ParameterName> parameterNames;
 
     private List<ValueType> parameterValueTypes;
+    
+    private List<CaseCategory> categoies;
+    
+    private List<Abbreviation> abbreviations;
+    
+    private List<Project> projects;
+    
+    private List<Region> regions;
+    
+    private List<ModelToRun> modelToRuns;
 
     // up to here
 
@@ -462,5 +477,168 @@ public class CaseObjectManager {
         }
 
         return parameterValueTypes.toArray(new ValueType[0]);
+    }
+
+    public synchronized CaseCategory[] getCaseCategories() throws EmfException {
+        if (categoies == null) {
+            categoies = Arrays.asList(caseService.getCaseCategories());
+            Collections.sort(categoies);
+        }
+        
+        return categoies.toArray(new CaseCategory[0]);
+    }
+    
+    public synchronized CaseCategory addCaseCategory(CaseCategory cat) throws EmfException {
+        CaseCategory newCateg = caseService.addCaseCategory(cat);
+
+        // refresh the cache when a new one is added
+        categoies = Arrays.asList(caseService.getCaseCategories());
+        Collections.sort(categoies);
+
+        return newCateg;
+    }
+
+    public synchronized CaseCategory getOrAddCaseCategory(Object selected) throws EmfException {
+        if (selected == null)
+            return null;
+
+        CaseCategory category = null;
+        if (selected instanceof String) {
+            category = new CaseCategory(selected.toString());
+        } else if (selected instanceof CaseCategory) {
+            category = (CaseCategory) selected;
+        }
+        
+        this.getCaseCategories(); // make sure category have been retrieved
+
+        if (categoies.contains(category))
+            return categoies.get(categoies.indexOf(category));
+
+        // the category was not found in the list
+        return addCaseCategory(category);
+    }
+    
+    public synchronized Abbreviation[] getAbbreviations() throws EmfException {
+        if (abbreviations == null) {
+            abbreviations = Arrays.asList(caseService.getAbbreviations());
+            Collections.sort(abbreviations);
+        }
+        
+        return abbreviations.toArray(new Abbreviation[0]);
+    }
+    
+    public synchronized Abbreviation addAbbreviation(Abbreviation abbr) throws EmfException {
+        Abbreviation newAbbr = caseService.addAbbreviation(abbr);
+        
+        // refresh the cache when a new one is added
+        abbreviations = Arrays.asList(caseService.getAbbreviations());
+        Collections.sort(abbreviations);
+        
+        return newAbbr;
+    }
+    
+    public synchronized Abbreviation getOrAddAbbreviation(Object selected) throws EmfException {
+        if (selected == null)
+            return null;
+        
+        Abbreviation abbr = null;
+        if (selected instanceof String) {
+            abbr = new Abbreviation(selected.toString());
+        } else if (selected instanceof Abbreviation) {
+            abbr = (Abbreviation) selected;
+        }
+        
+        this.getAbbreviations(); // make sure abbreviation have been retrieved
+        
+        if (abbreviations.contains(abbr))
+            return abbreviations.get(abbreviations.indexOf(abbr));
+        
+        // the abbreviation was not found in the list
+        return addAbbreviation(abbr);
+    }
+    
+    public synchronized Project[] getProjects() throws EmfException {
+        if (projects == null) {
+            projects = Arrays.asList(dataCommonsService.getProjects());
+            Collections.sort(projects);
+        }
+        
+        return projects.toArray(new Project[0]);
+    }
+    
+    public synchronized Project addProject(Project proj) throws EmfException {
+        Project newProject = dataCommonsService.addProject(proj);
+        
+        projects = Arrays.asList(dataCommonsService.getProjects());
+        Collections.sort(projects);
+        
+        return newProject;
+    }
+    
+    public synchronized Project getOrAddProject(Object selected) throws EmfException {
+        if (selected == null)
+            return null;
+        
+        Project proj = null;
+        if (selected instanceof String) {
+            proj = new Project(selected.toString());
+        } else if (selected instanceof Project) {
+            proj = (Project) selected;
+        }
+        
+        this.getProjects(); // make sure project have been retrieved
+        
+        if (projects.contains(proj))
+            return projects.get(projects.indexOf(proj));
+        
+        // the project was not found in the list
+        return addProject(proj);
+    }
+    
+    public synchronized Region[] getRegions() throws EmfException {
+        if (regions == null) {
+            regions = Arrays.asList(dataCommonsService.getRegions());
+            Collections.sort(regions);
+        }
+        
+        return regions.toArray(new Region[0]);
+    }
+
+    public synchronized ModelToRun[] getModelToRuns() throws EmfException {
+        if (modelToRuns == null) {
+            modelToRuns = Arrays.asList(caseService.getModelToRuns());
+            Collections.sort(modelToRuns);
+        }
+        
+        return modelToRuns.toArray(new ModelToRun[0]);
+    }
+    
+    public synchronized ModelToRun addModelToRun(ModelToRun model) throws EmfException {
+        ModelToRun newModel = caseService.addModelToRun(model);
+        
+        modelToRuns = Arrays.asList(caseService.getModelToRuns());
+        Collections.sort(modelToRuns);
+        
+        return newModel;
+    }
+    
+    public synchronized ModelToRun getOrAddModelToRun(Object selected) throws EmfException {
+        if (selected == null)
+            return null;
+        
+        ModelToRun model = null;
+        if (selected instanceof String) {
+            model = new ModelToRun(selected.toString());
+        } else if (selected instanceof ModelToRun) {
+            model = (ModelToRun) selected;
+        }
+        
+        this.getModelToRuns(); // make sure models have been retrieved
+        
+        if (modelToRuns.contains(model))
+            return modelToRuns.get(modelToRuns.indexOf(model));
+        
+        // the model was not found in the list
+        return addModelToRun(model);
     }
 }

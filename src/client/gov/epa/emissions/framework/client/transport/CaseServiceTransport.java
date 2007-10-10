@@ -71,6 +71,16 @@ public class CaseServiceTransport implements CaseService {
 
         return (Abbreviation[]) call.requestResponse(new Object[] {});
     }
+    
+    public synchronized Abbreviation addAbbreviation(Abbreviation abbr) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("addAbbreviation");
+        call.addParam("abbr", caseMappings.abbreviation());
+        call.setReturnType(caseMappings.abbreviation());
+        
+        return (Abbreviation) call.requestResponse(new Object[]{abbr});
+    }
 
     public synchronized AirQualityModel[] getAirQualityModels() throws EmfException {
         EmfCall call = call();
@@ -89,6 +99,17 @@ public class CaseServiceTransport implements CaseService {
 
         return (CaseCategory[]) call.requestResponse(new Object[] {});
     }
+    
+    public synchronized CaseCategory addCaseCategory(CaseCategory element) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("addCaseCategory");
+        call.addParam("element", caseMappings.caseCategory());
+        call.setReturnType(caseMappings.caseCategory());
+        
+        return (CaseCategory) call.requestResponse(new Object[] {element});
+    }
+
 
     public synchronized EmissionsYear[] getEmissionsYears() throws EmfException {
         EmfCall call = call();

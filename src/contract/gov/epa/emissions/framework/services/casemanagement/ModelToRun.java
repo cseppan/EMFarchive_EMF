@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.casemanagement;
 
 import java.io.Serializable;
 
-public class ModelToRun implements Serializable {
+public class ModelToRun implements Serializable, Comparable<ModelToRun> {
     private int id;
 
     private String name;
@@ -49,7 +49,8 @@ public class ModelToRun implements Serializable {
         return getName();
     }
 
-    public int compareTo(Object other) {
-        return name.compareTo(((ModelToRun) other).getName());
+    public int compareTo(ModelToRun other) {
+        return name.compareToIgnoreCase((other).getName());
     }
+
 }
