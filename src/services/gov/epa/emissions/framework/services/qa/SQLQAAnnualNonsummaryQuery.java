@@ -71,8 +71,8 @@ public class SQLQAAnnualNonsummaryQuery {
              allDatasetNames.add(tokenizer2.nextToken());
             }
         
-       String annualQueryPrefix = "select te.fipsst, te.poll, te.scc, sum(mo_emis) as ann_emis from \n";
-       String annualQuerySuffix = " as te group by te.fipsst, te.poll, te.scc order by te.fipsst, te.poll, te.scc";
+       String annualQueryPrefix = "select te.fips, te.scc, te.poll, sum(mo_emis) as ann_emis from \n";
+       String annualQuerySuffix = " as te group by te.fips, te.scc, te.poll order by te.fips, te.scc, te.poll";
 
         for (int j = 0; j < allDatasetNames.size(); j++) {
             //Check for month name and year name here
@@ -83,7 +83,7 @@ public class SQLQAAnnualNonsummaryQuery {
             try {
             dataset = getDataset(allDatasetNames.get(j).toString().trim());
             } catch(EmfException ex){
-                throw new EmfException("The dataset name " + allDatasetNames.get(j).toString().trim() + " is not valid");
+                throw new EmfException("The dataset named " + allDatasetNames.get(j).toString().trim() + " does not exist");
             }
             
             // New String Tokenizers for the StartDate and StopDate values.
@@ -217,7 +217,7 @@ public class SQLQAAnnualNonsummaryQuery {
         junQuery + julQuery + augQuery + sepQuery + octQuery + novQuery + decQuery + ")" + annualQuerySuffix;
         
         //Use pattern matching to remove the last and unrequired union all from the query
-        String fullQuery = fullQuery1.replaceAll("poll, scc  union all...as te", "poll, scc ) as te");
+        String fullQuery = fullQuery1.replaceAll("scc, poll  union all...as te", "scc, poll ) as te");
         
         //System.out.println("The final query is : " + fullQuery);
 
@@ -227,11 +227,11 @@ public class SQLQAAnnualNonsummaryQuery {
 
         private String createMonthlyQuery(int daysInMonth, ArrayList datasetNames) throws EmfException
 {
-           String monthlyQueryPrefix = "select substr(fips, 1, 2) as fipsst, poll, scc, sum( avd_emis * ";
+           String monthlyQueryPrefix = "select fips, scc, poll, sum( avd_emis * ";
 
            String monthlyQueryMiddle = ") as mo_emis from\n $DATASET_TABLE[\"";
            
-           String monthlyQuerySuffix = "\", 1] m group by substr(fips, 1, 2), poll, scc ";
+           String monthlyQuerySuffix = "\", 1] m group by fips, scc, poll ";
 
            String fullMonthlyQuery = "";
            
@@ -283,8 +283,8 @@ public class SQLQAAnnualNonsummaryQuery {
             try {
                 return dao.getDataset(sessionFactory.getSession(), dsName);
             } catch (Exception ex) {
-                ex.printStackTrace();
-                throw new EmfException("The dataset name " + dsName + " is not valid");
+                //ex.printStackTrace();
+                throw new EmfException("The dataset named" + dsName + " does not exist");
             }
         }
 }
