@@ -71,8 +71,6 @@ public class SQLQAAnnualNonsummaryQuery {
              allDatasetNames.add(tokenizer2.nextToken());
             }
         
-       String annualQueryPrefix = "select te.fips, te.scc, te.poll, sum(mo_emis) as ann_emis from \n";
-       String annualQuerySuffix = " as te group by te.fips, te.scc, te.poll order by te.fips, te.scc, te.poll";
 
         for (int j = 0; j < allDatasetNames.size(); j++) {
             //Check for month name and year name here
@@ -175,43 +173,60 @@ public class SQLQAAnnualNonsummaryQuery {
         // for that month.  The results can be stored in a String array.  If no datasets exist 
         // for a given month, that string must be empty.
         
+        // Calculate the total days of the year for adv_emis
+        int totalDays = 0;
         
         if (janDatasetNames.size() > 0) {
             janQuery = createMonthlyQuery(31, janDatasetNames);
+            totalDays += 31;
         }
         if (febDatasetNames.size() > 0) {
-            febQuery = createMonthlyQuery(28, febDatasetNames);
+            febQuery = createMonthlyQuery(28, febDatasetNames); //FIXME: consider leap years
+            totalDays += 28;
         }
         if (marDatasetNames.size() > 0) {
             marQuery = createMonthlyQuery(31, marDatasetNames);
+            totalDays += 31;
         }
         if (aprDatasetNames.size() > 0) {
             aprQuery = createMonthlyQuery(30, aprDatasetNames);
+            totalDays += 30;
         }
         if (mayDatasetNames.size() > 0) {
             mayQuery = createMonthlyQuery(31, mayDatasetNames);
+            totalDays += 31;
         }
         if (junDatasetNames.size() > 0) {
             junQuery = createMonthlyQuery(30, junDatasetNames);
+            totalDays += 30;
         }
         if (julDatasetNames.size() > 0) {
             julQuery = createMonthlyQuery(31, julDatasetNames);
+            totalDays += 31;
         }
         if (augDatasetNames.size() > 0) {
             augQuery = createMonthlyQuery(31, augDatasetNames);
+            totalDays += 31;
         }
         if (sepDatasetNames.size() > 0) {
             sepQuery = createMonthlyQuery(30, sepDatasetNames);
+            totalDays += 30;
         }
         if (octDatasetNames.size() > 0) {
             octQuery = createMonthlyQuery(31, octDatasetNames);
+            totalDays += 31;
         }
         if (novDatasetNames.size() > 0) {
             novQuery = createMonthlyQuery(30, novDatasetNames);
+            totalDays += 30;
         }
         if (decDatasetNames.size() > 0) {
             decQuery = createMonthlyQuery(31, decDatasetNames);
+            totalDays += 31;
         }
+        
+        String annualQueryPrefix = "select te.fips, te.scc, te.poll, sum(mo_emis) as ann_emis, sum(mo_emis)/" + totalDays + " as avd_emis from \n";
+        String annualQuerySuffix = " as te group by te.fips, te.scc, te.poll order by te.fips, te.scc, te.poll";
         
         String fullQuery1 = annualQueryPrefix + "(" + janQuery + febQuery + marQuery + aprQuery + mayQuery + 
         junQuery + julQuery + augQuery + sepQuery + octQuery + novQuery + decQuery + ")" + annualQuerySuffix;
