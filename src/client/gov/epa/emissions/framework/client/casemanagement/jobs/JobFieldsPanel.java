@@ -62,7 +62,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
     private TextArea purpose;
 
-    private TextField jobNo;
+    private TextField jobOrder;
 
     private TextField version;
 
@@ -100,7 +100,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
     private Case caseObj;
 
-    private TextField jobOrder;
+    private TextField oldJobOrder;
     
     private AddRemoveWidget dependentJobsList;
 
@@ -197,17 +197,19 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         changeablesList.addChangeable(args);
         layoutGenerator.addLabelWidgetPair("Arguments:", args, panel);
 
-        jobNo = new TextField("jobNo", job.getJobNo() + "", 12);
-        jobNo.setMaximumSize(new Dimension(300, 15));
-        changeablesList.addChangeable(jobNo);
-        layoutGenerator.addLabelWidgetPair("Job Number:", jobNo, panel);
-        jobNo.setToolTipText("A number that makes this job unique for the "
-                + "given case (used to specify dependencies between jobs)");
-
-        jobOrder = new TextField("jobOrder", job.getOrder() + "", 12);
+        jobOrder = new TextField("jobOrder", job.getJobNo() + "", 12);
         jobOrder.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(jobOrder);
+        // AME: Used what was job number for Job order, since we don't use the order or 
+        // number for dependencies, and jobNo was a float, while job order was int
         layoutGenerator.addLabelWidgetPair("Job Order:", jobOrder, panel);
+        jobOrder.setToolTipText("The order in which this job should be displayed in the table.");
+
+        // temporarily leave this there
+        oldJobOrder = new TextField("oldJobOrder", job.getOrder() + "", 12);
+//        jobOrder.setMaximumSize(new Dimension(300, 15));
+//        changeablesList.addChangeable(jobOrder);
+//        layoutGenerator.addLabelWidgetPair("Job Order:", jobOrder, panel);
 
         qoption = new TextField("qoption", job.getQueOptions(), 12);
         qoption.setMaximumSize(new Dimension(300, 15));
@@ -219,7 +221,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("User:", userLabel, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -393,8 +395,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             path.setText(jobPath + getFileSeparator(jobPath) + ((exec == null) ? "" : exec.getName()));
 
         args.setText(job.getArgs());
-        jobNo.setText(job.getJobNo() + "");
-        jobOrder.setText(job.getOrder() + "");
+        jobOrder.setText(job.getJobNo() + "");
+        oldJobOrder.setText(job.getOrder() + "");
         this.qoption.setText(job.getQueOptions());
         this.version.setText(job.getVersion() + "");
 
@@ -413,8 +415,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     public CaseJob setFields() throws EmfException {
         job.setName(name.getText().trim());
         job.setPurpose(purpose.getText().trim());
-        job.setJobNo(Float.parseFloat(jobNo.getText().trim()));
-        job.setOrder(Integer.parseInt(jobOrder.getText().trim()));
+        job.setJobNo(Float.parseFloat(jobOrder.getText().trim()));
+        job.setOrder(Integer.parseInt(oldJobOrder.getText().trim()));
         job.setArgs(args.getText().trim());
         setPathNExecutable();
         setHost();
@@ -517,7 +519,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             throw new EmfException("Please specify an absolute path for executable file.");
 
         try {
-            Float.parseFloat(jobNo.getText().trim());
+            Float.parseFloat(jobOrder.getText().trim());
         } catch (NumberFormatException e) {
             throw new EmfException("Please enter a floating point number into the Job Number field.");
         }

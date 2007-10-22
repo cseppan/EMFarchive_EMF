@@ -201,8 +201,9 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     }
 
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Sector", "Name", "Executable" };
-        return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
+        String[] columnNames = { "Order", "Sector", "Name", "Executable" };
+        return new SortCriteria(columnNames, new boolean[] { 
+                true, true, true, true }, new boolean[] { false, false, false, false });
     }
 
     private JPanel controlPanel() {
