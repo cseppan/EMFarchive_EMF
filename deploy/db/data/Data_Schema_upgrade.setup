@@ -161,3 +161,7 @@ where name = 'Summarize by Control Technology and Pollutant'
 update emf.dataset_types set exporter_classname='gov.epa.emissions.commons.io.external.ExternalFilesExporter' 
 where external='TRUE';
 
+-- To add two new qa programs
+insert into emf.qa_programs values(DEFAULT,'Average Day to Annual State Summary','gov.epa.emissions.framework.services.qa.SQLAnnualQueryRunner');
+insert into emf.qa_programs values(DEFAULT,'Average day to Annual Inventory','gov.epa.emissions.framework.services.qa.SQLQAAnnualNonsummaryQueryRunner');
+
