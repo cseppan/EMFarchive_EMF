@@ -8,9 +8,10 @@ public class EditableQAStepTemplateRowSource implements RowSource {
 
     private QAStepTemplate source;
 
-    private Boolean selected;
+    private Boolean selected = Boolean.FALSE;
 
     public EditableQAStepTemplateRowSource(QAStepTemplate source) {
+        if (source == null) throw new IllegalArgumentException("QA template source is null");
         this.source = source;
         this.selected = Boolean.FALSE;
     }
