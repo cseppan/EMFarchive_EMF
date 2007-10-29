@@ -716,15 +716,9 @@ public class SQLQueryParser {
         // Determine whether the alias value exists or not. If it does, isolate it.
         // If it does not, throw an exception.
         
-        //System.out.println("first char: " + suffix.charAt(0));
-        //System.out.println("second char: " + suffix.charAt(1));
-//        if (suffix.charAt(0) == ' ' && suffix.charAt(0) != ')' && suffix.charAt(1) != ',' 
-//            && suffix.charAt(1) != ')' && (suffix.charAt(2) == ' ' || suffix.charAt(2) == ','))
-        if (suffix.charAt(0) == ' ' && suffix.charAt(1) != ',' 
-            && suffix.charAt(1) != ')' && (!Character.isLetter(suffix.charAt(2))))
+        if (Character.isSpaceChar(suffix.charAt(0)) && Character.isLetter(suffix.charAt(1))
+            && suffix.charAt(1) != ')' && (!Character.isLetterOrDigit(suffix.charAt(2))))
         {
-//            aliasValue = suffix.substring(0, 2);
-//            aliasValue = aliasValue.trim();
             aliasValue = suffix.charAt(1) + "";
         } else if ((suffix.charAt(0) == ')') || (suffix.charAt(1) == ')')) {
             aliasValue = null;
