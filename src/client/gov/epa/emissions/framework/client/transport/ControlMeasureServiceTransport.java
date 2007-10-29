@@ -18,6 +18,8 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
     private CallFactory callFactory;
 
     private DataMappings mappings;
+    
+    private EmfCall call;
 
     public ControlMeasureServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
@@ -25,7 +27,10 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createCall("ControlMeasureService");
+        if (call == null)
+            call = callFactory.createSessionEnabledCall("ControlMeasureService");
+        
+        return call;
     }
 
     public ControlMeasure[] getMeasures() throws EmfException {

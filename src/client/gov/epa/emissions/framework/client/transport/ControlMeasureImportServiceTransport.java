@@ -10,6 +10,8 @@ public class ControlMeasureImportServiceTransport implements ControlMeasureImpor
     private CallFactory callFactory;
 
     private DataMappings mappings;
+    
+    private EmfCall call;
 
     public ControlMeasureImportServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
@@ -17,7 +19,10 @@ public class ControlMeasureImportServiceTransport implements ControlMeasureImpor
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createCall("ControlMeasureService");
+        if (call == null)
+            call = callFactory.createSessionEnabledCall("ControlMeasureService");
+        
+        return call;
     }
 
     public void importControlMeasures(String folderPath, String[] fileNames, User user) throws EmfException {

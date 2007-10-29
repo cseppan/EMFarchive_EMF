@@ -120,7 +120,7 @@
 	<service name="gov.epa.emf.services.cost.ControlMeasureService" provider="java:RPC"
 		style="RPC" use="encoded">
 		<parameter name="allowedMethods" value="*"/>
-		<parameter name="scope" value="request"/>
+		<parameter name="scope" value="session"/>
 		<parameter name="className"
 			value="gov.epa.emissions.framework.services.cost.ControlMeasureServiceImpl"/>
 	</service>
@@ -128,7 +128,7 @@
 	<service name="gov.epa.emissions.framework.services.cost.ControlStrategyService" provider="java:RPC"
 		style="RPC" use="encoded">
 		<parameter name="allowedMethods" value="*"/>
-		<parameter name="scope" value="request"/>
+		<parameter name="scope" value="session"/>
 		<parameter name="className"
 			value="gov.epa.emissions.framework.services.cost.ControlStrategyServiceImpl"/>
 	</service>
@@ -136,7 +136,7 @@
 	<service name="gov.epa.emf.services.cost.controlmeasure.ControlMeasureImportService" provider="java:RPC"
 		style="RPC" use="encoded">
 		<parameter name="allowedMethods" value="*"/>
-		<parameter name="scope" value="request"/>
+		<parameter name="scope" value="session"/>
 		<parameter name="className"
 			value="gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureImportServiceImpl"/>
 	</service>
@@ -144,7 +144,7 @@
 	<service name="gov.epa.emf.services.cost.controlmeasure.ControlMeasureExportService" provider="java:RPC"
 		style="RPC" use="encoded">
 		<parameter name="allowedMethods" value="*"/>
-		<parameter name="scope" value="request"/>
+		<parameter name="scope" value="session"/>
 		<parameter name="className"
 			value="gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureExportServiceImpl"/>
 	</service>

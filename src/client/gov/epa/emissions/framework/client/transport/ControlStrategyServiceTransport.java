@@ -13,6 +13,8 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
     private CallFactory callFactory;
 
     private DataMappings mappings;
+    
+    private EmfCall call;
 
     public ControlStrategyServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
@@ -20,7 +22,10 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createCall("ControlStrategy Service");
+        if (call == null)
+            call = callFactory.createSessionEnabledCall("ControlStrategy Service");
+        
+        return call;
     }
 
     public ControlStrategy[] getControlStrategies() throws EmfException {

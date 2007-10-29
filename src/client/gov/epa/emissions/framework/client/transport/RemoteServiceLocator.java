@@ -35,6 +35,14 @@ public class RemoteServiceLocator implements ServiceLocator {
     
     private DataCommonsService dataCommonsService;
     
+    private ControlMeasureService controlMeasureService;
+    
+    private ControlStrategyService controlStrategyService;
+    
+    private ControlMeasureImportService controlMeasureImportService;
+    
+    private ControlMeasureExportService controlMeasureExportService;
+    
     public RemoteServiceLocator(String baseUrl) throws Exception {
         this.baseUrl = baseUrl;
         editCall = this.createSessionEnabledCall("DataEditor Service", baseUrl
@@ -96,19 +104,31 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
     
     public ControlMeasureService controlMeasureService() {
-        return new ControlMeasureServiceTransport(baseUrl + "/gov.epa.emf.services.cost.ControlMeasureService");
+        if (controlMeasureService == null)
+            controlMeasureService = new ControlMeasureServiceTransport(baseUrl + "/gov.epa.emf.services.cost.ControlMeasureService");
+        
+        return controlMeasureService;
     }
     
     public ControlStrategyService controlStrategyService() {
-        return new ControlStrategyServiceTransport(baseUrl + "/gov.epa.emissions.framework.services.cost.ControlStrategyService");
+        if (controlStrategyService == null)
+            controlStrategyService = new ControlStrategyServiceTransport(baseUrl + "/gov.epa.emissions.framework.services.cost.ControlStrategyService");
+        
+        return controlStrategyService;
     }
     
     public ControlMeasureImportService controlMeasureImportService() {
-        return new ControlMeasureImportServiceTransport(baseUrl + "/gov.epa.emf.services.cost.controlmeasure.ControlMeasureImportService");
+        if (controlMeasureImportService == null)
+            controlMeasureImportService = new ControlMeasureImportServiceTransport(baseUrl + "/gov.epa.emf.services.cost.controlmeasure.ControlMeasureImportService");
+        
+        return controlMeasureImportService;
     }
 
     public ControlMeasureExportService controlMeasureExportService() {
-        return new ControlMeasureExportServiceTransport(baseUrl + "/gov.epa.emf.services.cost.controlmeasure.ControlMeasureExportService");
+        if (controlMeasureExportService == null)
+            controlMeasureExportService = new ControlMeasureExportServiceTransport(baseUrl + "/gov.epa.emf.services.cost.controlmeasure.ControlMeasureExportService");
+        
+        return controlMeasureExportService;
     }
     
     /*

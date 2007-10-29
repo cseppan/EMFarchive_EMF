@@ -10,6 +10,8 @@ public class ControlMeasureExportServiceTransport implements ControlMeasureExpor
     private CallFactory callFactory;
 
     private DataMappings mappings;
+    
+    private EmfCall call;
 
     public ControlMeasureExportServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
@@ -17,7 +19,10 @@ public class ControlMeasureExportServiceTransport implements ControlMeasureExpor
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createCall("ControlMeasureExportService");
+        if (call == null)
+            call = callFactory.createSessionEnabledCall("ControlMeasureExportService");
+        
+        return call;
     }
 
     public void exportControlMeasures(String folderPath, String prefix, int[] controlMeasureIds, User user)
