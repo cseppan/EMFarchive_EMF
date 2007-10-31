@@ -1,0 +1,163 @@
+CMName,CMAbbreviation,MajorPoll,ControlTechnology,SourceGroup,Sector,Class,EquipLife,NEIDeviceCode,DateReviewed,DataSource,Description
+Chemical Additives to Waste;Cattle Feedlots,ACHMADDBFL,NH3,Chemical Additives to Waste,Cattle Feedlots,AG,Known,,,2000,1|2|82,
+Chemical Additives to Waste;Poultry Operations,ACHMADDCHK,NH3,Chemical Additives to Waste,Poultry Operations,AG,Known,,,1999,1|2|82|83,
+Chemical Additives to Waste;Hog Operations,ACHMADDHOG,NH3,Chemical Additives to Waste,Hog Operations,AG,Known,,,1999,1|2|82,
+Emergent Control; Dairy,AEMRGDIARY,NH3,Emergent Control,Dairy Operations,AG,Emerging,,,2006,84,
+Emergent Control; Swine,AEMRGHOG,NH3,Emergent Control,Hog Operations,AG,Emerging,,,2006,84,
+Seasonal Ban (Ozone Season Daily Only) (base year = 1996);Agricultural Burning,NEPABURN96,NOx,Seasonal Ban (Ozone Season Daily Only),Agricultural Burning,NONPT,Known,,,1997,1|2|6,
+Episodic Ban (Daily Only) (base year = 1996);Open Burning,NEPOBRUN96,NOx,Episodic Ban (Daily Only),Open Burning,NONPT,Known,,,1996,1|2|6|80,
+"LNB; Water Heater, Space Heater - Natural Gas",NLNBSPWHNG,NOX,LNB,"Water Heater, Space Heater - Natural Gas",NONPT,Known,,,2006,2,
+LNB (1997 AQMD) (base year = 2003);Commercial/Institutional - NG,NLNCMNGC03,NOx,LNB (1997 AQMD),Commercial/Institutional - NG,NONPT,Known,,,,1,
+LNB (1997 AQMD) (base year = 2003);Residential NG,NLNRSNGC03,NOx,LNB (1997 AQMD),Residential NG,NONPT,Known,,,,1,
+RACT to 25 tpy (LNB) (base year = 1996);Industrial Coal Combustion,NR25COL96,NOx,RACT to 25 tpy (LNB),Industrial Coal Combustion,NONPT,Known,10,,1998,1|2|5|80,
+RACT to 25 tpy (LNB) (base year = 1996);Industrial NG Combustion,NR25NGC96,NOx,RACT to 25 tpy (LNB),Industrial NG Combustion,NONPT,Known,10,,1998,1|2|5|80,
+RACT to 25 tpy (LNB) (base year = 1996);Industrial Oil Combustion,NR25OIL96,NOx,RACT to 25 tpy (LNB),Industrial Oil Combustion,NONPT,Known,10,,1998,1|2|5|80,
+RACT to 50 tpy (LNB) (base year = 1996);Industrial Coal Combustion,NR50COL96,NOx,RACT to 50 tpy (LNB),Industrial Coal Combustion,NONPT,Known,10,,1998,1|2|5|80,
+RACT to 50 tpy (LNB) (base year = 1996);Industrial NG Combustion,NR50NGC96,NOx,RACT to 50 tpy (LNB),Industrial NG Combustion,NONPT,Known,10,,1998,1|2|5|80,
+RACT to 50 tpy (LNB) (base year = 1996);Industrial Oil Combustion,NR50OIL96,NOx,RACT to 50 tpy (LNB),Industrial Oil Combustion,NONPT,Known,10,,1998,1|2|5|80,
+SCR; Internal Combustion Engines - Gas,NSCRICGS,NOX,SCR,Internal Combustion Engines - Gas,NONPT,Known,,,2006,90,
+SCR (base year = 1996);Diesel Locomotives,NSCRLOCO96,NOx,SCR,Diesel Locomotives,ALM,Known,,,2004,1|2|79,
+Water heater replacement (base year = 1999);Commercial/Institutional - NG,NWHCMNGC99,NOx,Water heater replacement,Commercial/Institutional - NG,NONPT,Known,13,,1997,1|2|6|80|81,
+Water heater replacement (base year = 1999);Residential NG,NWHRSNGC99,NOx,Water heater replacement,Residential NG,NONPT,Known,13,,1997,1|2|6|80|81,
+Water heater + LNB Space heaters (base year = 1999);Commercial/Institutional - NG,NWLCMNGC99,NOx,Water heater + LNB Space heaters,Commercial/Institutional - NG,NONPT,Known,20,,1997,1|2|6|38,
+Water heater + LNB Space heaters (base year = 1999);Residential NG,NWLRSNGC99,NOx,Water heater + LNB Space heaters,Residential NG,NONPT,Known,20,,1997,1|2|6|38,
+"Whole Field, Propaning, Stack;Agricultural Burning",PAGBU,PM10,Bale Stack/Propane Burning,Agricultural Burning,NONPT,Known,,,1998,1|2|3|4|5,
+Soil Conservation;Agricultural Tilling,PAGTL,PM10,Soil Conservation Plans,Agricultural Tilling,NONPT,Known,,,1997,1|2|6|7,
+Watering;Beef Cattle Feedlots (Dust Kickup),PCATFWAT,PM10,Watering,Beef Cattle Feedlots,NONPT,Known,10,,1998,1|2|14|15,
+Substitute chipping for burning; Household burning,PCHIPHB,PM2_5,Substitute chipping for burning,Household burning,PTFIRE,Emerging,,,,91,Uses state-level emission reduction and control cost data
+Substitute chipping for burning; Open burning,PCHIPOB,PM2_5,Substitute chipping for burning,Open burning,PTFIRE,Emerging,,,,91,Uses state-level emission reduction and control cost data
+Catalytic Oxidizer;Commercial Cooking (Charbroiling) - 1,PCHRBCAOX1,PM10,Catalytic Oxidizer,Conveyorized Charbroilers,NONPT,Known,10,,2005,1|2|21|22,
+Catalytic Oxidizer;Commercial Cooking (Charbroiling) - 2,PCHRBCAOX2,PM10,Catalytic Oxidizer,Conveyorized Charbroilers,NONPT,Known,10,,2005,1|2|21|22,
+ESP;Commercial Cooking (Charbroiling),PCHRBESP,PM10,ESP for Commercial Cooking,Conveyorized Charbroilers,NONPT,Known,,,2006,1|2|23,
+ESP;Commercial Cooking -- large underfired grilling operations,PCHRBESPSM,PM10,ESP,Commercial Cooking -- large underfired grilling operations,NONPT,Known,,,2006,2,
+"Dust Control Plan;Residential, Industrial, Commercial, Institutional, Road Construction",PCONWATCHM,PM10,Dust Control Plan,Construction Activities,AFDUST,Known,,,1997,1|2|6|16|17,
+Fireplace Inserts; Home Heating,PFIRINSHH,PM2_5,Fireplace Inserts,Home Heating,NONPT,Emerging,,,,91,Increasing the assumed adoption rate can take place by increasing the rate of housing stock turnover and assuming NSPS-compliant wood stoves are installed in place of older conventional wood stoves at the time of turnover.
+HDD Nonroad Engine Retrofit;Off-Highway Diesel Vehicles,PHDDRETRO,PM10,HDD Nonroad Engine Retrofit,Nonroad Heavy Duty Diesel,NONROAD,Known,,,1997,1|2|3,
+Substitution of landfilling for open burning; Open Burns,PLNDFILBRN,PM10,Substitution of landfilling for open burning,Open Burning,NONPT,Emerging,,,2006,84,
+Fuel Moisture Content;Prescribed Forest Burns,PPRBRNFULM,PM10,Increase Fuel Moisture,Prescribed Burning,PTFIRE,Known,,,1997,1|2|3|18|19,
+Vacuum Sweeping;Paved Roads (UnKnown 1),PPVAC110,PM10,Vacuum Sweeping,Paved Road,AFDUST,Known,8,,1999,1|2|12|13,
+Vacuum Sweeping;Paved Roads (UnKnown 2),PPVAC130,PM10,Vacuum Sweeping,Paved Road,AFDUST,Known,8,,1999,1|2|12|13,
+Vacuum Sweeping;Paved Roads (UnKnown 3),PPVAC150,PM10,Vacuum Sweeping,Paved Road,AFDUST,Known,8,,1999,1|2|12|13,
+Vacuum Sweeping;Paved Roads (UnKnown 4),PPVAC170,PM10,Vacuum Sweeping,Paved Road,AFDUST,Known,8,,1999,1|2|12|13,
+Vacuum Sweeping;Paved Roads (UnKnown 5),PPVAC190,PM10,Vacuum Sweeping,Paved Road,AFDUST,Known,8,,1999,1|2|12|13,
+Vacuum Sweeping;Paved Roads (UnKnown 6),PPVAC210,PM10,Vacuum Sweeping,Paved Road,AFDUST,Known,8,,1999,1|2|12|13,
+Vacuum Sweeping;Paved Roads (UnKnown 7),PPVAC230,PM10,Vacuum Sweeping,Paved Road,AFDUST,Known,8,,1999,1|2|12|13,
+Vacuum Sweeping;Paved Roads (UnKnown 8),PPVAC250,PM10,Vacuum Sweeping,Paved Road,AFDUST,Known,8,,1999,1|2|12|13,
+Vacuum Sweeping;Paved Roads (UnKnown 9),PPVAC270,PM10,Vacuum Sweeping,Paved Road,AFDUST,Known,8,,1999,1|2|12|13,
+Vacuum Sweeping;Paved Roads (UnKnown 10),PPVAC290,PM10,Vacuum Sweeping,Paved Road,AFDUST,Known,8,,1999,1|2|12|13,
+Vacuum Sweeping;Paved Roads (UnKnown 11),PPVAC310,PM10,Vacuum Sweeping,Paved Road,AFDUST,Known,8,,1999,1|2|12|13,
+Vacuum Sweeping;Paved Roads (UnKnown 12),PPVAC330,PM10,Vacuum Sweeping,Paved Road,AFDUST,Known,8,,1999,1|2|12|13,
+"Advisory Program;Wood Burning Fireplaces, Stoves",PRESWDEDAD,PM10,Education and Advisory Program,Residential Wood Combustion,NONPT,Known,,,1997,1|2|6,
+NSPS Compliant Stove;Wood Burning Fireplaces - 1,PRESWDSTV1,PM10,NSPS Compliant Wood Stove,Residential Wood Combustion,NONPT,Known,,,2005,1|2|20,
+NSPS Compliant Stove;Wood Burning Fireplaces - 2,PRESWDSTV2,PM10,NSPS Compliant Wood Stove,Residential Wood Combustion,NONPT,Known,,,2005,1|2|20,
+Chemical Stabilization;Unpaved Roads (UnKnown 1),PUCHS150,PM10,Chemical Stabilization,Unpaved Road,AFDUST,Known,,,1997,1|2|4|8|10,
+Chemical Stabilization;Unpaved Roads (UnKnown 2),PUCHS170,PM10,Chemical Stabilization,Unpaved Road,AFDUST,Known,,,1997,1|2|4|8|10,
+Chemical Stabilization;Unpaved Roads (UnKnown 3),PUCHS190,PM10,Chemical Stabilization,Unpaved Road,AFDUST,Known,,,1997,1|2|4|8|10,
+Chemical Stabilization;Unpaved Roads (UnKnown 4),PUCHS210,PM10,Chemical Stabilization,Unpaved Road,AFDUST,Known,,,1997,1|2|4|8|10,
+Hot Asphalt Paving;Unpaved Roads (UnKnown 1),PUHAP270,PM10,Hot Asphalt Paving,Unpaved Road,AFDUST,Known,40,,1999,1|2|4,
+Hot Asphalt Paving;Unpaved Roads (UnKnown 2),PUHAP290,PM10,Hot Asphalt Paving,Unpaved Road,AFDUST,Known,40,,1999,1|2|4,
+Hot Asphalt Paving;Unpaved Roads (UnKnown 3),PUHAP310,PM10,Hot Asphalt Paving,Unpaved Road,AFDUST,Known,40,,1999,1|2|4,
+Hot Asphalt Paving;Unpaved Roads (UnKnown 4),PUHAP330,PM10,Hot Asphalt Paving,Unpaved Road,AFDUST,Known,40,,1999,1|2|4,
+Chemical Additives to Waste;Residential Distillate Oil Combustion,SCHMADDHOM,SO2,Chemical Additives to Waste,Residential Nonpoint Source,NONPT,Known,,,,1,
+Fuel Switching; Stationary Source Fuel Combusion,SFUELSFC,SO2,Fuel Switching,Stationary Source Fuel Combusion,NONPT,Emerging,,,,91,"This control transfers a home-heating oil fuel control to industrial boilers by substituting “red dye” distillate oil for high-sulfur fuel. Distillate has 500 ppm versus 2,500 to 3,000 ppm for high-sulfur diesel."
+Low Sulfur Fuel; Residential Heating (heating oil),SLSFRESHET,SO2,Low Sulfur Fuel,Residential Heating,NONPT,Known,,,2006,89,
+MACT;Aircraft Surface Coating,VAIRCMACT,VOC,MACT,Aircraft Surface Coating,NONPT,Known,,,1998,1|2|59|60,
+Reformulation-Process Modification;Aircraft Surface Coating,VAIRCOTC,VOC,Reformulation-Process Modification,Aircraft Surface Coating,NONPT,Emerging,,,2005,1|2|43
+Reformulation (Fed Rule);Architectural Coatings,VARCTAIMFR,VOC,Reformulation (Fed Rule),Architectural Coatings,NONPT,Known,,,1998,1|2|9|24|25
+Reformulation (OTC Rule);Architectural Coatings,VARCTAIMOT,VOC,Reformulation (OTC Rule),Architectural Coatings,NONPT,Emerging,,,2005,1|2|30|31
+Reformulation (Phase I);Architectural Coatings,VARCTSCPH1,VOC,Reformulation (Phase I),Architectural Coatings,NONPT,Known,,,1999,1|2|25|26|27
+Reformulation (Phase II);Architectural Coatings,VARCTSCPH2,VOC,Reformulation (Phase II),Architectural Coatings,NONPT,Known,,,1996,1|2|28|29
+Reformulation (Phase III);Architectural Coatings,VARCTSCPH3,VOC,Reformulation (Phase III),Architectural Coatings,NONPT,Known,,,1996,1|2|13
+Reformulation;Aerosol Paints,VARPTTIER2,VOC,Reformulation,Aerosol Paints,NONPT,Known,,,,1
+Reformulation-Process Modification;Cutback Asphalt,VASPHREFRM,VOC,Reformulation-Process Modification,Cutback Asphalt,NONPT,Known,,,1997,1|2|72
+BARCT;Automobile Refinishing,VATRFBARCT,VOC,BARCT,Automobile Refinishing,NONPT,Known,,,1994,1|2|47
+Reformulation;Automobile Refinishing,VATRFFR1,VOC,Reformulation,Automobile Refinishing,NONPT,Known,,,1998,1|2|5|46
+Reformulation-Process Modification (Fed Rule);Automobile Refinishing,VATRFFR2,VOC,Reformulation-Process Modification (Fed Rule),Automobile Refinishing,NONPT,Known,,,1994,1|2|48|49|50
+Reformulation-Process Modification (OTC Rule);Automobile Refinishing,VATRFOTC,VOC,Reformulation-Process Modification (OTC Rule),Automobile Refinishing,NONPT,Emerging,,,2005,1|2|43
+Incineration;Bakery Products,VBAKEINC,VOC,Incineration,Bakery Products,NONPT,Known,10,,1997,1|2|67|68|69|70|71
+MACT;Cold Cleaning,VCLDMACT,VOC,MACT,Cold Cleaning,NONPT,Known,,,2005,1|2|14|39|40
+Reformulation-Process Modification (OTC Rule);Cold Cleaning,VCLDOTC,VOC,Reformulation-Process Modification (OTC Rule),Cold Cleaning,NONPT,Known,,,2005,1|2|42|43
+Reformulation-Process Modification;Cold Cleaning,VCLDS1122A,VOC,Reformulation-Process Modification,Cold Cleaning,NONPT,Known,,,1997,1|2|38|41
+Process Modification;Cold Cleaning,VCLDS1122B,VOC,Process Modification,Cold Cleaning,NONPT,Known,,,1997,1|2|38|41
+Reformulation (ARB Phase I);Consumer Adhesives,VCSADARB1,VOC,Reformulation (ARB Phase I),Consumer Adhesives,NONPT,Known,,,1999,1|2|58
+Reformulation (ARB Phase II);Consumer Adhesives,VCSADARB2,VOC,Reformulation (ARB Phase II),Consumer Adhesives,NONPT,Emerging,,,1999,1
+Reformulation (Fed Rule);Consumer Adhesives,VCSADFR,VOC,Reformulation (Fed Rule),Consumer Adhesives,NONPT,Known,,,1999,1|2|52|53|55
+Reformulation (OTC Rule);Consumer Adhesives,VCSADOTC,VOC,Reformulation (OTC Rule),Consumer Adhesives,NONPT,Known,,,2005,1|2|31|57
+Reformulation (ARB Phase I);Consumer Solvents,VCSOLVARB1,VOC,Reformulation (ARB Phase I),Consumer Solvents,NONPT,Known,,,1999,1|2|58
+Reformulation (ARB Phase II);Consumer Solvents,VCSOLVARB2,VOC,Reformulation (ARB Phase II),Consumer Solvents,NONPT,Emerging,,,1999,1
+Reformulation (Fed Rule);Consumer Solvents,VCSOLVFR,VOC,Reformulation (Fed Rule),Consumer Solvents,NONPT,Known,,,1999,1|2|52|53|54|55|56
+Reformulation (OTC Rule);Consumer Solvents,VCSOLVOTC,VOC,Reformulation (OTC Rule),Consumer Solvents,NONPT,Known,,,2005,1|2|31|57
+MACT;Dry Cleaning  - Perchloroethyl,VDCPERMACT,VOC,MACT,Dry Cleaning  - Perchloroethyl,NONPT,Known,,,,1
+MACT;Open Top Degreasing,VDEGMACT,VOC,MACT,Open Top Degreasing,NONPT,Known,,,1998,1|2|14|39|40
+Reformulation-Process Modification;Open Top Degreasing,VDEGS1122A,VOC,Reformulation-Process Modification,Open Top Degreasing,NONPT,Known,,,1997,1|2|38|41
+Process Modification;Open Top Degreasing,VDEGS1122B,VOC,Process Modification,Open Top Degreasing,NONPT,Known,,,1997,1|2|38|41
+Diesel Retrofit  - Diesel Oxidation Catalysts;Class 6 & 7 HDDVs,VDEOXCAT67,VOC,Diesel Retrofit  - Diesel Oxidation Catalysts,Class 6 & 7 HDDVs,ON-ROAD,Known,,,2006,86|87|88
+Diesel Retrofit  - Diesel Oxidation Catalysts;Class 8B HDDVs,VDEOXCATHD,VOC,Diesel Retrofit  - Diesel Oxidation Catalysts,Class 8B HDDVs,ON-ROAD,Known,,,2006,86|87|88
+Diesel Retrofit  - Diesel Oxidation Catalysts;School Bus,VDEOXCATSB,VOC,Diesel Retrofit  - Diesel Oxidation Catalysts,School Bus,ON-ROAD,Known,,,2006,86|87|88
+Diesel Retrofit - Catalyzed Diesel Particulate Filters;Class 6 & 7 HDDVs,VDEPFCAT67,VOC,Diesel Retrofit - Catalyzed Diesel Particulate Filters,Class 6 & 7 HDDVs,ON-ROAD,Known,,,2006,86|87|88
+Diesel Retrofit - Catalyzed Diesel Particulate Filters;Class 8B HDDVs,VDEPFCATHD,VOC,Diesel Retrofit - Catalyzed Diesel Particulate Filters,Class 8B HDDVs,ON-ROAD,Known,,,2006,86|87|88
+Diesel Retrofit - Catalyzed Diesel Particulate Filters;School Bus,VDEPFCATSB,VOC,Diesel Retrofit - Catalyzed Diesel Particulate Filters,School Bus,ON-ROAD,Known,,,2006,86|87|88
+MACT;Electrical/Electronic Coating,VEECTMACT,VOC,MACT,Electrical/Electronic Coating,NONPT,Known,,,1997,1|2|32
+Reformulation-Process Modification;Electrical/Electronic Coating,VEECTS1164,VOC,Reformulation-Process Modification,Electrical/Electronic Coating,NONPT,Known,,,1997,1|2|6|7|47|64|65
+Process Modification;SOCMI Fugitives,VFUGEQMAN1,VOC,Process Modification,SOCMI Fugitives,NONPT,Known,,,,1
+Process Modification;Petroleum Refinery Fugitives,VFUGEQMAN2,VOC,Process Modification,Petroleum Refinery Fugitives,NONPT,Known,,,,1
+Equipment Modification;Portable Gasoline Containers,VFULCNTOTC,VOC,Equipment Modification,Portable Gasoline Containers,NONPT,Emerging,,,2005,1|2|43
+RACT;Graphic Arts,VGARTRACT,VOC,RACT,Graphic Arts,NONPT,Known,,,1999,1|2|78
+Eliminate Long Duration Idling with Mobile Idle Reduction Technologies; Class 8 HDDV,VIDLEMOD,VOC,Eliminate Long Duration Idling with Mobile Idle Reduction Technologies,Class 8 HDDVs,ON-ROAD,Known,,,2006,85|86
+Reformulation;Adhesives - Industrial,VINADS1168,VOC,Reformulation,Adhesives - Industrial,NONPT,Known,,,1997,1|2|6|37|38
+Reformulation (Fed Rule);Industrial Maintenance Coating,VINCTAIMFR,VOC,Reformulation (Fed Rule),Industrial Maintenance Coating,NONPT,Known,,,1997,1|2|9|24|25
+Reformulation (Phase I);Industrial Maintenance Coating,VINCTSCPH1,VOC,Reformulation (Phase I),Industrial Maintenance Coating,NONPT,Known,,,1999,1|2|25|26|27
+Reformulation (Phase II);Industrial Maintenance Coating,VINCTSCPH2,VOC,Reformulation (Phase II),Industrial Maintenance Coating,NONPT,Known,,,1996,1|2|28|29
+Reformulation (Phase III);Industrial Maintenance Coating,VINCTSCPH3,VOC,Reformulation (Phase III),Industrial Maintenance Coating,NONPT,Known,,,1996,1|2|13
+Incineration;Marine Surface Coating,VMARCINC,VOC,Incineration,Marine Surface Coating,NONPT,Known,,,1998,1|2|14
+MACT;Marine Surface Coating,VMARCMACT,VOC,MACT,Marine Surface Coating,NONPT,Known,,,1998,1|2|5|61|62|63
+Reformulation-Process Modification;Marine Surface Coating,VMARCOTC,VOC,Reformulation-Process Modification,Marine Surface Coating,NONPT,Emerging,,,2005,1|2|43
+Process Modification;Metal Coil & Can Coating,VMCCCBAQMD,VOC,Process Modification,Metal Coil & Can Coating,NONPT,Known,,,1999,1|2|33
+Incineration;Metal Coil & Can Coating,VMCCCINC,VOC,Incineration,Metal Coil & Can Coating,NONPT,Known,,,1998,1|2|14
+MACT;Metal Coil & Can Coating,VMCCCMACT,VOC,MACT,Metal Coil & Can Coating,NONPT,Known,,,1997,1|2|32
+"MACT;Machn, Electric, Railroad Ctng",VMERCMACT,VOC,MACT,"Machn, Electric, Railroad Ctng",NONPT,Known,,,1997,1|2|6|51
+"Reformulation-Process Modification (OTC Rule);Machn, Electric, Railroad Ctng",VMERCOTC,VOC,Reformulation-Process Modification (OTC Rule),"Machn, Electric, Railroad Ctng",NONPT,Emerging,,,2005,1|2|43
+"Reformulation-Process Modification;Machn, Electric, Railroad Ctng",VMERCS1107,VOC,Reformulation-Process Modification,"Machn, Electric, Railroad Ctng",NONPT,Known,,,1994,1|2|38|45
+Intermodal - shift of transportation of goods from truck to rail transport; Class 8 HDDV,VMODESHIFT,VOC,Intermodal - shift of transportation of goods from truck to rail transport,Class 8 HDDVs,ON-ROAD,Known,,,2006,85
+"MACT;Metal Furn, Appliances, Parts",VMTFNMACT,VOC,MACT,"Metal Furn, Appliances, Parts",NONPT,Known,,,1997,1|2|32|44
+"Reformulation-Process Modification;Metal Furn, Appliances, Parts",VMTFNS1107,VOC,Reformulation-Process Modification,"Metal Furn, Appliances, Parts",NONPT,Known,,,1996,1|2|38|45
+Incineration;Motor Vehicle Coating,VMVCTINC,VOC,Incineration,Motor Vehicle Coating,NONPT,Known,,,1998,1|2|14
+MACT;Motor Vehicle Coating,VMVCTMACT,VOC,MACT,Motor Vehicle Coating,NONPT,Known,,,1998,1|2|46|66
+Reformulation;Nonroad - Gas(2-stroke)-Rec Eq,VNRFG60001,VOC,Reformulation,Nonroad - Gas(2-stroke)-Rec Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(2-stroke)-Const Eq,VNRFG60002,VOC,Reformulation,Nonroad - Gas(2-stroke)-Const Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(2-stroke)-Ind Eq,VNRFG60003,VOC,Reformulation,Nonroad - Gas(2-stroke)-Ind Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(2-stroke)-Lawn-Garden Eq,VNRFG60004,VOC,Reformulation,Nonroad - Gas(2-stroke)-Lawn-Garden Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(2-stroke)-Com Eq,VNRFG60006,VOC,Reformulation,Nonroad - Gas(2-stroke)-Com Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(2-stroke)-Log Eq,VNRFG60007,VOC,Reformulation,Nonroad - Gas(2-stroke)-Log Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(2-stroke)-Airport Eq,VNRFG60008,VOC,Reformulation,Nonroad - Gas(2-stroke)-Airport Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(4-stroke)-Rec Eq,VNRFG65001,VOC,Reformulation,Nonroad - Gas(4-stroke)-Rec Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(4-stroke)-Const Eq,VNRFG65002,VOC,Reformulation,Nonroad - Gas(4-stroke)-Const Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(4-stroke)-Ind Eq,VNRFG65003,VOC,Reformulation,Nonroad - Gas(4-stroke)-Ind Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(4-stroke)-Lawn-Garden Eq,VNRFG65004,VOC,Reformulation,Nonroad - Gas(4-stroke)-Lawn-Garden Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(4-stroke)-Ag Eq,VNRFG65005,VOC,Reformulation,Nonroad - Gas(4-stroke)-Ag Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(4-stroke)-Com Eq,VNRFG65006,VOC,Reformulation,Nonroad - Gas(4-stroke)-Com Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(4-stroke)-Log Eq,VNRFG65007,VOC,Reformulation,Nonroad - Gas(4-stroke)-Log Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(4-stroke)-Airport Eq,VNRFG65008,VOC,Reformulation,Nonroad - Gas(4-stroke)-Airport Eq,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(2-stroke)-Pleasure Craft,VNRFG82005,VOC,Reformulation,Nonroad - Gas(2-stroke)-Pleasure Craft,NONROAD,Known,,,1997,1|2|6
+Reformulation;Nonroad - Gas(4-stroke)-Pleasure Craft,VNRFG82010,VOC,Reformulation,Nonroad - Gas(4-stroke)-Pleasure Craft,NONROAD,Known,,,1997,1|2|6
+Process Modification;Oil and Natural Gas Production,VOGSEQMAN,VOC,Process Modification,Oil and Natural Gas Production,NONPT,Known,,,1996,1|2
+Incineration;Paper Surface Coating,VPACTINC,VOC,Incineration,Paper Surface Coating,NONPT,Known,,,1998,1|2|5
+Reformulation;Pesticide Application,VPESTFR,VOC,Reformulation,Pesticide Application,NONPT,Known,,,1999,1|2|74|75
+Reformulation-Process Modification;Rubber/Plastics Mfg,VRBPLS1145,VOC,Reformulation-Process Modification,Rubber/Plastics Mfg,NONPT,Known,,,1996,1|2|38
+LPV Relief Valve;Stage II Service Stations,VSTGIILPV1,VOC,LPV Relief Valve,Stage II Service Stations,NONPT,Known,10,,1999,1|2|76|77
+LPV Relief Valve;Stage II Service Stations - Underground Tanks,VSTGIILPV2,VOC,LPV Relief Valve,Stage II Service Stations - Underground Tanks,NONPT,Known,10,,1999,1|2|76|77
+Gas Recovery;Municipal Solid Waste Landfill,VSWASRECOV,VOC,Gas Recovery,Municipal Solid Waste Landfill,NONPT,Known,,,1999,1|2|72
+Reformulation (Fed Rule);Traffic Markings,VTMAIMFR,VOC,Reformulation (Fed Rule),Traffic Markings,NONPT,Known,,,1997,1|2|9|24|25
+Reformulation (Phase I);Traffic Markings,VTMSCPH1,VOC,Reformulation (Phase I),Traffic Markings,NONPT,Known,,,1996,1|2|25|26|27
+Reformulation (Phase II);Traffic Markings,VTMSCPH2,VOC,Reformulation (Phase II),Traffic Markings,NONPT,Known,,,1996,1|2|28|29
+Reformulation (Phase III);Traffic Markings,VTMSCPH3,VOC,Reformulation (Phase III),Traffic Markings,NONPT,Known,,,1996,1|2|13
+Eliminate Long Duration Idling with Truck Stop Electrification; Class 8 HDDV,VTRKSTPELE,VOC,Eliminate Long Duration Idling with Truck Stop Electrification,Class 8 HDDVs,ON-ROAD,Known,,,2006,85|86
+Add-On Controls;Wood Furniture Surface Coating,VWDCTADDON,VOC,Add-On Controls,Wood Furniture Surface Coating,NONPT,Known,10,,1999,1|2|13|36
+CTG;Wood Furniture Surface Coating,VWDCTCTG,VOC,CTG,Wood Furniture Surface Coating,NONPT,Known,,,1999,1|2|36
+Incineration;Wood Product Surface Coating,VWDCTINC,VOC,Incineration,Wood Product Surface Coating,NONPT,Known,,,1999,1
+MACT;Wood Product Surface Coating,VWDCTMACT1,VOC,MACT,Wood Product Surface Coating,NONPT,Known,,,1997,1|2|32|34
+MACT;Wood Furniture Surface Coating,VWDCTMACT2,VOC,MACT,Wood Furniture Surface Coating,NONPT,Known,,,1997,1|2|14
+Reformulation;Wood Product Surface Coating,VWDCTS1104,VOC,Reformulation,Wood Product Surface Coating,NONPT,Known,,,1999,1|2|27|35
+Reduced Solvent Utilization1,VSOLUTIL1,VOC,Solvent Utilization,Coating; Arts; Miscellaneous,AREA,Known,,,,Section 183(e) CTG for Group III Source Categories – Aug 2007
+Reduced Solvent Utilization2,VSOLUTIL2,VOC,Solvent Utilization,Coating; Arts,AREA,Known,,,,Section 183(e) CTG for Group III Source Categories – Aug 2007
+Reduced Solvent Utilization3,VSOLUTIL3,VOC,Solvent Utilization,Coating; Arts,AREA,Known,,,,Section 183(e) CTG for Group III Source Categories – Aug 2007
