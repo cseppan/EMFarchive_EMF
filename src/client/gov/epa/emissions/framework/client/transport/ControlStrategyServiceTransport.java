@@ -28,7 +28,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return call;
     }
 
-    public ControlStrategy[] getControlStrategies() throws EmfException {
+    public synchronized ControlStrategy[] getControlStrategies() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getControlStrategies");
@@ -37,7 +37,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (ControlStrategy[]) call.requestResponse(new Object[] {});
     }
 
-    public int addControlStrategy(ControlStrategy element) throws EmfException {
+    public synchronized int addControlStrategy(ControlStrategy element) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("addControlStrategy");
@@ -47,7 +47,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (Integer) call.requestResponse(new Object[] { element });
     }
 
-    public ControlStrategy obtainLocked(User owner, ControlStrategy element) throws EmfException {
+    public synchronized ControlStrategy obtainLocked(User owner, ControlStrategy element) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("obtainLocked");
@@ -69,7 +69,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
 //        call.request(new Object[] { locked });
 //    }
 
-    public void releaseLocked(int id) throws EmfException {
+    public synchronized void releaseLocked(int id) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("releaseLocked");
@@ -79,7 +79,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.request(new Object[] { new Integer(id) });
     }
 
-    public ControlStrategy updateControlStrategy(ControlStrategy element) throws EmfException {
+    public synchronized ControlStrategy updateControlStrategy(ControlStrategy element) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateControlStrategy");
@@ -89,7 +89,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (ControlStrategy) call.requestResponse(new Object[] { element });
     }
 
-    public ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException {
+    public synchronized ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateControlStrategyWithLock");
@@ -110,7 +110,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
 //        call.request(new Object[] { elements, user });
 //    }
 
-    public void removeControlStrategies(int[] ids, User user) throws EmfException {
+    public synchronized void removeControlStrategies(int[] ids, User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("removeControlStrategies");
@@ -121,7 +121,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.request(new Object[] { ids, user });
     }
 
-    public void runStrategy(User user, ControlStrategy strategy) throws EmfException {
+    public synchronized void runStrategy(User user, ControlStrategy strategy) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("runStrategy");
@@ -132,7 +132,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.request(new Object[] { user, strategy });
     }
 
-    public StrategyType[] getStrategyTypes() throws EmfException {
+    public synchronized StrategyType[] getStrategyTypes() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getStrategyTypes");
@@ -141,7 +141,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (StrategyType[]) call.requestResponse(new Object[] {});
     }
 
-    public void stopRunStrategy() throws EmfException {
+    public synchronized void stopRunStrategy() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("stopRunStrategy");
@@ -150,7 +150,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.request(new Object[] {});
     }
 
-    public void createInventory(User user, ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
+    public synchronized void createInventory(User user, ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("createInventory");
@@ -163,7 +163,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
 
     }
 
-    public ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId) throws EmfException {
+    public synchronized ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("controlStrategyResults");
@@ -176,7 +176,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
                 new Integer(inputDatasetId) });
     }
 
-    public String controlStrategyRunStatus(int id) throws EmfException {
+    public synchronized String controlStrategyRunStatus(int id) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("controlStrategyRunStatus");
@@ -187,7 +187,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (String) call.requestResponse(new Object[] { new Integer(id) });
     }
 
-    public ControlMeasureClass[] getControlMeasureClasses(int controlStrategyId) throws EmfException {
+    public synchronized ControlMeasureClass[] getControlMeasureClasses(int controlStrategyId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getControlMeasureClasses");
@@ -197,7 +197,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (ControlMeasureClass[]) call.requestResponse(new Object[] { new Integer(controlStrategyId) });
     }
 
-    public int isDuplicateName(String name) throws EmfException {
+    public synchronized int isDuplicateName(String name) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("isDuplicateName");
@@ -206,7 +206,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (Integer) call.requestResponse(new Object[] { new String(name) });
     }
 
-    public int copyControlStrategy(int id, User creator) throws EmfException {
+    public synchronized int copyControlStrategy(int id, User creator) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("copyControlStrategy");
@@ -216,7 +216,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (Integer) call.requestResponse(new Object[] { new Integer(id), creator });
     }
 
-    public ControlStrategy getById(int id) throws EmfException {
+    public synchronized ControlStrategy getById(int id) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getById");
@@ -225,7 +225,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (ControlStrategy) call.requestResponse(new Object[] { new Integer(id) });
     }
 
-    public ControlStrategyResult[] getControlStrategyResults(int controlStrategyId) throws EmfException {
+    public synchronized ControlStrategyResult[] getControlStrategyResults(int controlStrategyId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getControlStrategyResults");

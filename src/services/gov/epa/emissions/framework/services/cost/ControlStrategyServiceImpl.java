@@ -41,7 +41,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         init(sessionFactory, dbServerFactory);
     }
 
-    private void init(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
+    private synchronized void init(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
         dao = new ControlStrategyDAO();
@@ -49,13 +49,13 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 
     }
 
-    protected void finalize() throws Throwable {
+    protected synchronized void finalize() throws Throwable {
         threadPool.shutdownAfterProcessingCurrentlyQueuedTasks();
         threadPool.awaitTerminationAfterShutdown();
         super.finalize();
     }
 
-    private PooledExecutor createThreadPool() {
+    private synchronized PooledExecutor createThreadPool() {
         PooledExecutor threadPool = new PooledExecutor(20);
         threadPool.setMinimumPoolSize(1);
         threadPool.setKeepAliveTime(1000 * 60 * 3);// terminate after 3 (unused) minutes
@@ -63,7 +63,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         return threadPool;
     }
 
-    public ControlStrategy[] getControlStrategies() throws EmfException {
+    public synchronized ControlStrategy[] getControlStrategies() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List cs = dao.all(session);
@@ -76,7 +76,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public int addControlStrategy(ControlStrategy element) throws EmfException {
+    public synchronized int addControlStrategy(ControlStrategy element) throws EmfException {
         Session session = sessionFactory.getSession();
         int csId;
         try {
@@ -91,7 +91,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         return csId;
     }
 
-    public ControlStrategy obtainLocked(User owner, ControlStrategy element) throws EmfException {
+    public synchronized ControlStrategy obtainLocked(User owner, ControlStrategy element) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             ControlStrategy locked = dao.obtainLocked(owner, element, session);
@@ -124,7 +124,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 //        }
 //    }
 
-    public void releaseLocked(int id) throws EmfException {
+    public synchronized void releaseLocked(int id) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.releaseLocked(id, session);
@@ -138,7 +138,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public ControlStrategy updateControlStrategy(ControlStrategy element) throws EmfException {
+    public synchronized ControlStrategy updateControlStrategy(ControlStrategy element) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             if (!dao.canUpdate(element, session))
@@ -155,7 +155,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException {
+    public synchronized ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             if (!dao.canUpdate(element, session))
@@ -188,7 +188,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 //        }
 //    }
 
-    public void removeControlStrategies(int[] ids, User user) throws EmfException {
+    public synchronized void removeControlStrategies(int[] ids, User user) throws EmfException {
         Session session = sessionFactory.getSession();
         String exception = "";
         try {
@@ -217,7 +217,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    private void remove(ControlStrategy element) throws EmfException {
+    private synchronized void remove(ControlStrategy element) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
 
@@ -239,7 +239,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public void runStrategy(User user, ControlStrategy strategy) {
+    public synchronized void runStrategy(User user, ControlStrategy strategy) {
         StrategyFactory factory = new StrategyFactory(batchSize());
         try {
             RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, dbServerFactory, threadPool);
@@ -249,11 +249,11 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public void stopRunStrategy() {
+    public synchronized void stopRunStrategy() {
         // TODO:
     }
 
-    public StrategyType[] getStrategyTypes() throws EmfException {
+    public synchronized StrategyType[] getStrategyTypes() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List st = dao.getAllStrategyTypes(session);
@@ -266,7 +266,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    private int batchSize() {
+    private synchronized int batchSize() {
         Session session = sessionFactory.getSession();
         try {
             EmfProperty property = new EmfPropertiesDAO().getProperty("export-batch-size", session);
@@ -276,7 +276,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public void createInventory(User user, ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
+    public synchronized void createInventory(User user, ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
         try {
             ControlStrategyInventoryOutputTask task= new ControlStrategyInventoryOutputTask(user, controlStrategy, 
                     controlStrategyInputDataset, sessionFactory, 
@@ -298,7 +298,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 //        }
 //    }
 
-    public ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId) throws EmfException {
+    public synchronized ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             ControlStrategyResult controlStrategyResult = dao.getControlStrategyResult(controlStrategyId, inputDatasetId, 
@@ -312,7 +312,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public String controlStrategyRunStatus(int id) throws EmfException {
+    public synchronized String controlStrategyRunStatus(int id) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             return dao.controlStrategyRunStatus(id, session);
@@ -325,7 +325,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     }
 
     //returns control strategy Id for the given name
-    public int isDuplicateName(String name) throws EmfException {
+    public synchronized int isDuplicateName(String name) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             ControlStrategy cs = dao.getByName(name, session);
@@ -338,7 +338,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public int copyControlStrategy(int id, User creator) throws EmfException {
+    public synchronized int copyControlStrategy(int id, User creator) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             //get cs to copy
@@ -382,11 +382,11 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    private boolean isDuplicate(String name) throws EmfException {
+    private synchronized boolean isDuplicate(String name) throws EmfException {
         return (isDuplicateName(name) != 0);
     }
 
-    public ControlStrategy getById(int id) throws EmfException {
+    public synchronized ControlStrategy getById(int id) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             return dao.getById(id, session);
@@ -398,7 +398,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public ControlStrategyResult[] getControlStrategyResults(int controlStrategyId) throws EmfException {
+    public synchronized ControlStrategyResult[] getControlStrategyResults(int controlStrategyId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List all = dao.getControlStrategyResults(controlStrategyId, session);

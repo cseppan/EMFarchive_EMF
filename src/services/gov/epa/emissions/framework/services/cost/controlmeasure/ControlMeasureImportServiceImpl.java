@@ -38,7 +38,7 @@ public class ControlMeasureImportServiceImpl implements ControlMeasureImportServ
         this.dbServerFactory = dbServerFactory;
     }
 
-    public void importControlMeasures(String folderPath, String[] fileNames, User user) throws EmfException {
+    public synchronized void importControlMeasures(String folderPath, String[] fileNames, User user) throws EmfException {
         try {
             CMImportTask importTask = new CMImportTask(new File(folderPath), fileNames, user, sessionFactory, dbServerFactory);
             threadPool.execute(new GCEnforcerTask("Import control measures from files: " + fileNames[0] + ", etc.", importTask));
@@ -48,7 +48,7 @@ public class ControlMeasureImportServiceImpl implements ControlMeasureImportServ
         }
     }
 
-    public Status[] getImportStatus(User user) throws EmfException {
+    public synchronized Status[] getImportStatus(User user) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List controlMeasureImportStatuses = dataCommonsDAO.getControlMeasureImportStatuses(user.getUsername(),
@@ -62,7 +62,7 @@ public class ControlMeasureImportServiceImpl implements ControlMeasureImportServ
         }
     }
     
-    public void removeImportStatuses(User user) throws EmfException {
+    public synchronized void removeImportStatuses(User user) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dataCommonsDAO.removeStatuses(user.getUsername(), "CMImportDetailMsg", session);
@@ -74,13 +74,13 @@ public class ControlMeasureImportServiceImpl implements ControlMeasureImportServ
         }
     }
     
-    public void finalize() throws Throwable {
+    public synchronized void finalize() throws Throwable {
         threadPool.shutdownAfterProcessingCurrentlyQueuedTasks();
         threadPool.awaitTerminationAfterShutdown();
         super.finalize();
     }
     
-    private PooledExecutor createThreadPool() {
+    private synchronized PooledExecutor createThreadPool() {
         PooledExecutor threadPool = new PooledExecutor(20);
         threadPool.setMinimumPoolSize(1);
         threadPool.setKeepAliveTime(1000 * 60 * 3);// terminate after 3 (unused) minutes

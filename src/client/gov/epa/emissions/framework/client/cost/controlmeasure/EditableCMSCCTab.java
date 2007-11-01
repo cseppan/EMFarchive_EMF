@@ -27,7 +27,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView, CMSCCTab, Runnable {
+public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView, CMSCCTab {
 
     private SCCTableData tableData;
 
@@ -46,7 +46,6 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
     private ManageChangeables changeables;
 
     private Scc[] sccs = {};
-    private volatile Thread populateThread;
     private ControlMeasure measure;
     private ControlMeasurePresenter controlMeasurePresenter;
 
@@ -65,11 +64,15 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
         this.controlMeasurePresenter = controlMeasurePresenter;
         mainPanel = new JPanel(new BorderLayout());
         doLayout(measure, changeables);
-        this.populateThread = new Thread(this);
+        Thread populateThread = new Thread(new Runnable(){
+            public void run() {
+                retrieveSccs();
+            }
+        });
         populateThread.start();
     }
 
-    public void run() {
+    public void retrieveSccs() {
         if (measure.getId() != 0) {
             try {
                 messagePanel.setMessage("Please wait while retrieving all SCCs...");
@@ -87,7 +90,6 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
                 messagePanel.setError("Cannot retrieve all SCCs.");
             }
         }
-        this.populateThread = null;
     }
 
     private void doLayout(ControlMeasure measure, ManageChangeables changeables) {

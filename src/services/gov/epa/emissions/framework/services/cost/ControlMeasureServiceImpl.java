@@ -53,7 +53,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
 
-    public ControlMeasure[] getMeasures() throws EmfException {
+    public synchronized ControlMeasure[] getMeasures() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List all = dao.all(session);
@@ -67,7 +67,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
     
-    public ControlMeasure[] getMeasures(Pollutant pollutant) throws EmfException {
+    public synchronized ControlMeasure[] getMeasures(Pollutant pollutant) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List all = dao.getControlMeasures(pollutant, session);
@@ -80,7 +80,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public int addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
+    public synchronized int addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             return dao.add(measure, sccs, session);
@@ -92,7 +92,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public void removeMeasure(int controlMeasureId) throws EmfException {
+    public synchronized void removeMeasure(int controlMeasureId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.remove(controlMeasureId, session);
@@ -104,7 +104,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public int copyMeasure(int controlMeasureId, User creator) throws EmfException {
+    public synchronized int copyMeasure(int controlMeasureId, User creator) throws EmfException {
         Session session = sessionFactory.getSession();
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
@@ -118,7 +118,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public ControlMeasure obtainLockedMeasure(User owner, int controlMeasureId) throws EmfException {
+    public synchronized ControlMeasure obtainLockedMeasure(User owner, int controlMeasureId) throws EmfException {
         Session session = null;
         try {
             session = sessionFactory.getSession();
@@ -136,7 +136,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public ControlMeasure getMeasure(int controlMeasureId) throws EmfException {
+    public synchronized ControlMeasure getMeasure(int controlMeasureId) throws EmfException {
         Session session = null;
         try {
             session = sessionFactory.getSession();
@@ -166,7 +166,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
 //        }
 //    }
 
-    public void releaseLockedControlMeasure(int id) throws EmfException {
+    public synchronized void releaseLockedControlMeasure(int id) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.releaseLocked(id, session);
@@ -178,7 +178,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public ControlMeasure updateMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
+    public synchronized ControlMeasure updateMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             ControlMeasure updated = dao.update(measure, sccs, session);
@@ -191,7 +191,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public Scc[] getSccsWithDescriptions(int controlMeasureId) throws EmfException {
+    public synchronized Scc[] getSccsWithDescriptions(int controlMeasureId) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
             Scc[] sccs = dao.getSccsWithDescriptions(controlMeasureId, dbServer);
@@ -204,7 +204,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public Scc[] getSccs(int controlMeasureId) throws EmfException {
+    public synchronized Scc[] getSccs(int controlMeasureId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             Scc[] sccs = dao.getSccs(controlMeasureId, session);
@@ -217,7 +217,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public ControlTechnology[] getControlTechnologies() throws EmfException {
+    public synchronized ControlTechnology[] getControlTechnologies() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List all = controlTechnologiesDAO.getAll(session);
@@ -231,7 +231,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public CostYearTable getCostYearTable(int targetYear) throws EmfException {
+    public synchronized CostYearTable getCostYearTable(int targetYear) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
             CostYearTableReader reader = new CostYearTableReader(dbServer, targetYear);
@@ -244,7 +244,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    private void close(DbServer dbServer) throws EmfException {
+    private synchronized void close(DbServer dbServer) throws EmfException {
         try {
             if (dbServer != null)
                 dbServer.disconnect();
@@ -255,7 +255,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public ControlMeasureClass[] getMeasureClasses() throws EmfException {
+    public synchronized ControlMeasureClass[] getMeasureClasses() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List all = dao.allCMClasses(session);
@@ -268,7 +268,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public ControlMeasureClass getMeasureClass(String name) throws EmfException {
+    public synchronized ControlMeasureClass getMeasureClass(String name) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             return dao.getCMClass(session, name);
@@ -280,7 +280,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public LightControlMeasure[] getLightControlMeasures() throws EmfException {
+    public synchronized LightControlMeasure[] getLightControlMeasures() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List all = dao.getLightControlMeasures(session);
@@ -293,7 +293,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException {
+    public synchronized EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List all = dao.getEfficiencyRecords(controlMeasureId, session);
@@ -306,7 +306,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter) throws EmfException {
+    public synchronized EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
             return dao.getEfficiencyRecords(controlMeasureId, recordLimit, filter, dbServer);
@@ -321,7 +321,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
+    public synchronized int addEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
         Session session = sessionFactory.getSession();
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
@@ -335,7 +335,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
+    public synchronized void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
         Session session = sessionFactory.getSession();
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
@@ -349,7 +349,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public void removeEfficiencyRecord(int efficiencyRecordId) throws EmfException {
+    public synchronized void removeEfficiencyRecord(int efficiencyRecordId) throws EmfException {
         Session session = sessionFactory.getSession();
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
@@ -363,7 +363,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public ControlMeasure[] getSummaryControlMeasures() throws EmfException {
+    public synchronized ControlMeasure[] getSummaryControlMeasures() throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
             return dao.getSummaryControlMeasures(dbServer);
@@ -378,7 +378,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public ControlMeasure[] getSummaryControlMeasures(int majorPollutantId) throws EmfException {
+    public synchronized ControlMeasure[] getSummaryControlMeasures(int majorPollutantId) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
             return dao.getSummaryControlMeasures(majorPollutantId, dbServer);
@@ -393,7 +393,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public EquationType[] getEquationTypes() throws EmfException {
+    public synchronized EquationType[] getEquationTypes() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List all = dao.getEquationTypes(session);

@@ -25,17 +25,17 @@ public class ControlMeasureExportServiceTransport implements ControlMeasureExpor
         return call;
     }
 
-    public void exportControlMeasures(String folderPath, String prefix, int[] controlMeasureIds, User user)
+    public synchronized void exportControlMeasures(String folderPath, String prefix, int[] controlMeasureIds, User user)
             throws EmfException {
         doExport("exportControlMeasures", folderPath, prefix, controlMeasureIds, user);
     }
 
-    public void exportControlMeasuresWithOverwrite(String folderPath, String prefix, int[] controlMeasureIds,
+    public synchronized void exportControlMeasuresWithOverwrite(String folderPath, String prefix, int[] controlMeasureIds,
             User user) throws EmfException {
         doExport("exportControlMeasuresWithOverwrite", folderPath, prefix, controlMeasureIds, user);
     }
 
-    private void doExport(String operation, String folderPath, String prefix, int[] controlMeasureIds,
+    private synchronized void doExport(String operation, String folderPath, String prefix, int[] controlMeasureIds,
             User user) throws EmfException {
         EmfCall call = call();
 
@@ -49,7 +49,7 @@ public class ControlMeasureExportServiceTransport implements ControlMeasureExpor
         call.request(new Object[] { folderPath, prefix, controlMeasureIds, user });
     }
 
-    public Status[] getExportStatus(User user) throws EmfException {
+    public synchronized Status[] getExportStatus(User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getExportStatus");

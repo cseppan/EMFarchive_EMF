@@ -25,7 +25,7 @@ public class ControlMeasureImportServiceTransport implements ControlMeasureImpor
         return call;
     }
 
-    public void importControlMeasures(String folderPath, String[] fileNames, User user) throws EmfException {
+    public synchronized void importControlMeasures(String folderPath, String[] fileNames, User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("importControlMeasures");
@@ -38,7 +38,7 @@ public class ControlMeasureImportServiceTransport implements ControlMeasureImpor
         call.request(new Object[] { folderPath, fileNames, user });
     }
 
-    public Status[] getImportStatus(User user) throws EmfException {
+    public synchronized Status[] getImportStatus(User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getImportStatus");
@@ -49,7 +49,7 @@ public class ControlMeasureImportServiceTransport implements ControlMeasureImpor
         return (Status[]) call.requestResponse(new Object[] { user });
     }
 
-    public void removeImportStatuses(User user) throws EmfException {
+    public synchronized void removeImportStatuses(User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("removeImportStatuses");

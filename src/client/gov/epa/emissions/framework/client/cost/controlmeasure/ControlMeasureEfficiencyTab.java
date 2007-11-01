@@ -39,7 +39,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasureEfficiencyTabView, Runnable {
+public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasureEfficiencyTabView {
 
     private SortFilterSelectModel selectModel;
 
@@ -62,7 +62,6 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     private EmfSession session;
     
     private EfficiencyRecord[] efficiencyRecords = {};
-    private volatile Thread populateThread;
     private ControlMeasureService cmService;
     private ControlMeasurePresenter controlMeasurePresenter;
 
@@ -97,11 +96,15 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         doLayout(measure);
         
         cmService = session.controlMeasureService();
-        this.populateThread = new Thread(this);
+        Thread populateThread = new Thread(new Runnable(){
+            public void run() {
+                retrieveEffRecords();
+            }
+        });
         populateThread.start();
     } //end of ControlMeasureEfficiencyTab Constructor
 
-    public void run() {
+    public void retrieveEffRecords() {
         try {
             if (measure.getId() != 0) {
                 messagePanel.setMessage("Please wait while retrieving all efficiency records...");
@@ -115,7 +118,6 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
             messagePanel.setError("Cannot retrieve all efficiency records.  " + e.getMessage());
         } finally  {
             setCursor(Cursor.getDefaultCursor());
-            this.populateThread = null;
         }
     }
 
@@ -555,7 +557,11 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
         }
         _rowFilter = rowFilter.getText();
         updateMainPanel(new EfficiencyRecord[] {});
-        this.populateThread = new Thread(this);
+        Thread populateThread = new Thread(new Runnable(){
+            public void run() {
+                retrieveEffRecords();
+            }
+        });
         populateThread.start();
     }
 

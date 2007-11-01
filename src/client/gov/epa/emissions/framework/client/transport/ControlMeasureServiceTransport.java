@@ -33,7 +33,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return call;
     }
 
-    public ControlMeasure[] getMeasures() throws EmfException {
+    public synchronized ControlMeasure[] getMeasures() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getMeasures");
@@ -42,7 +42,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (ControlMeasure[]) call.requestResponse(new Object[] {});
     }
     
-    public ControlMeasure[] getMeasures(Pollutant pollutant) throws EmfException {
+    public synchronized ControlMeasure[] getMeasures(Pollutant pollutant) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getMeasures");
@@ -52,7 +52,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (ControlMeasure[]) call.requestResponse(new Object[] { pollutant });
     }
 
-    public int addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
+    public synchronized int addMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("addMeasure");
@@ -63,7 +63,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (Integer)call.requestResponse(new Object[] { measure, sccs });
     }
 
-    public void removeMeasure(int controlMeasureId) throws EmfException {
+    public synchronized void removeMeasure(int controlMeasureId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("removeMeasure");
@@ -73,7 +73,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         call.request(new Object[] { new Integer(controlMeasureId) });
     }
 
-    public int copyMeasure(int controlMeasureId, User creator) throws EmfException {
+    public synchronized int copyMeasure(int controlMeasureId, User creator) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("copyMeasure");
@@ -84,7 +84,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (Integer)call.requestResponse(new Object[] { new Integer(controlMeasureId), creator });
     }
 
-    public ControlMeasure obtainLockedMeasure(User owner, int controlMeasureId) throws EmfException {
+    public synchronized ControlMeasure obtainLockedMeasure(User owner, int controlMeasureId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("obtainLockedMeasure");
@@ -105,7 +105,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
 //        return (ControlMeasure) call.requestResponse(new Object[] { locked });
 //    }
 
-    public void releaseLockedControlMeasure(int controlMeasureId) throws EmfException {
+    public synchronized void releaseLockedControlMeasure(int controlMeasureId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("releaseLockedControlMeasure");
@@ -115,7 +115,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         call.requestResponse(new Object[] { new Integer(controlMeasureId) });
     }
 
-    public ControlMeasure updateMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
+    public synchronized ControlMeasure updateMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateMeasure");
@@ -126,7 +126,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (ControlMeasure) call.requestResponse(new Object[] { measure, sccs });
     }
 
-    public Scc[] getSccsWithDescriptions(int controlMeasureId) throws EmfException {
+    public synchronized Scc[] getSccsWithDescriptions(int controlMeasureId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getSccsWithDescriptions");
@@ -138,7 +138,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return sccs;
     }
 
-    public Scc[] getSccs(int controlMeasureId) throws EmfException {
+    public synchronized Scc[] getSccs(int controlMeasureId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getSccs");
@@ -150,7 +150,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return sccs;
     }
 
-    public ControlTechnology[] getControlTechnologies() throws EmfException {
+    public synchronized ControlTechnology[] getControlTechnologies() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getControlTechnologies");
@@ -161,7 +161,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return technologies;
     }
 
-    public CostYearTable getCostYearTable(int targetYear) throws EmfException {
+    public synchronized CostYearTable getCostYearTable(int targetYear) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getCostYearTable");
@@ -172,7 +172,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (CostYearTable) call.requestResponse(new Object[] { new Integer(targetYear) });
     }
     
-    public ControlMeasureClass[] getMeasureClasses() throws EmfException {
+    public synchronized ControlMeasureClass[] getMeasureClasses() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getMeasureClasses");
@@ -181,7 +181,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (ControlMeasureClass[]) call.requestResponse(new Object[] { });
     }
 
-    public ControlMeasureClass getMeasureClass(String name) throws EmfException {
+    public synchronized ControlMeasureClass getMeasureClass(String name) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getMeasureClass");
@@ -191,7 +191,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (ControlMeasureClass) call.requestResponse(new Object[] { name });
     }
 
-    public LightControlMeasure[] getLightControlMeasures() throws EmfException {
+    public synchronized LightControlMeasure[] getLightControlMeasures() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getLightControlMeasures");
@@ -200,7 +200,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (LightControlMeasure[]) call.requestResponse(new Object[] { });
     }
 
-    public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException {
+    public synchronized EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getEfficiencyRecords");
@@ -210,7 +210,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (EfficiencyRecord[]) call.requestResponse(new Object[] { new Integer(controlMeasureId) });
     }
 
-    public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter) throws EmfException {
+    public synchronized EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getEfficiencyRecords");
@@ -222,7 +222,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (EfficiencyRecord[]) call.requestResponse(new Object[] { new Integer(controlMeasureId), new Integer(recordLimit), filter });
     }
 
-    public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
+    public synchronized int addEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("addEfficiencyRecord");
@@ -232,7 +232,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (Integer) call.requestResponse(new Object[] { efficiencyRecord });
     }
 
-    public void removeEfficiencyRecord(int efficiencyRecordId) throws EmfException {
+    public synchronized void removeEfficiencyRecord(int efficiencyRecordId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("removeEfficiencyRecord");
@@ -242,7 +242,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         call.requestResponse(new Object[] { new Integer(efficiencyRecordId) });
     }
 
-    public void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
+    public synchronized void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateEfficiencyRecord");
@@ -252,7 +252,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         call.requestResponse(new Object[] { efficiencyRecord });
     }
 
-    public ControlMeasure[] getSummaryControlMeasures() throws EmfException {
+    public synchronized ControlMeasure[] getSummaryControlMeasures() throws EmfException {
 //        System.out.println(new Date().toString() + " start transport.getSummaryControlMeasures");
         try {
             EmfCall call = call();
@@ -265,7 +265,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         }
     }
 
-    public ControlMeasure[] getSummaryControlMeasures(int majorPollutantId) throws EmfException {
+    public synchronized ControlMeasure[] getSummaryControlMeasures(int majorPollutantId) throws EmfException {
 //        System.out.println(new Date().toString() + " start transport.getSummaryControlMeasures");
         try {
             EmfCall call = call();
@@ -279,7 +279,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         }
     }
 
-    public ControlMeasure getMeasure(int controlMeasureId) throws EmfException {
+    public synchronized ControlMeasure getMeasure(int controlMeasureId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getMeasure");
@@ -289,7 +289,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (ControlMeasure) call.requestResponse(new Object[] { new Integer(controlMeasureId) });
     }
 
-    public EquationType[] getEquationTypes() throws EmfException {
+    public synchronized EquationType[] getEquationTypes() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getEquationTypes");
