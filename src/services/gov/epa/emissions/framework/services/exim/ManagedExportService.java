@@ -114,15 +114,23 @@ public class ManagedExportService {
         return file;
     }
 
-    private boolean isExportable(EmfDataset dataset, Services services, User user) {
+    private boolean isExportable(EmfDataset dataset, Version version, Services services, User user) {
         DatasetType datasetType = dataset.getDatasetType();
+        String message = null;
+
+        if (dataset.isLocked(user) || !version.isFinalVersion())
+            message = "The dataset " + dataset.getName() + " is being edited and the version is not final -- not exported.";
 
         if ((datasetType.getExporterClassName().equals("")) || (datasetType.getExporterClassName() == null)) {
-            String message = "The exporter for dataset type '" + datasetType + " is not supported";
+            message = "The exporter for dataset type '" + datasetType + " is not supported";
+        }
+
+        if (message != null) {
             Status status = status(user, message);
             services.getStatus().add(status);
             return false;
         }
+
         return true;
     }
 
@@ -149,7 +157,7 @@ public class ManagedExportService {
                 name = name.replace(name.charAt(i), '_');
             }
         }
-        
+
         String versionString = (version.isFinalVersion() ? "" : "_nf") + "_v" + +version.getVersion();
 
         return prefix + name + "_" + date.toLowerCase() + versionString + suffix;
@@ -198,13 +206,13 @@ public class ManagedExportService {
             File toSubDir = null;
             if (DebugLevels.DEBUG_9)
                 System.out.println("FULL PATH= " + fullPath);
-         
+
             toSubDir = new File(fullPath);
             if (!toSubDir.exists()) {
                 toSubDir.mkdirs();
             }
 
-            if (isExportable(dataset, services, user)) {
+            if (isExportable(dataset, version, services, user)) {
                 try {
                     ExportTask tsk = createExportTask(user, purpose, true, toSubDir, dataset, version);
 
@@ -226,14 +234,14 @@ public class ManagedExportService {
             System.out.println("Before exportTaskSubmitter.addTasksToSubmitter # of elements in eximTasks array= "
                     + eximTasks.size());
 
-//        Iterator iter2 = eximTasks.iterator();
-//        while (iter2.hasNext()) {
-//            Task tsk = (Task) iter2.next();
-//            if (DebugLevels.DEBUG_9)
-//                System.out
-//                        .println("&&&&& In ManagedExportService::exportForJob the types of TASK objects in eximTasks: "
-//                                + tsk.getClass().getName());
-//        }
+        // Iterator iter2 = eximTasks.iterator();
+        // while (iter2.hasNext()) {
+        // Task tsk = (Task) iter2.next();
+        // if (DebugLevels.DEBUG_9)
+        // System.out
+        // .println("&&&&& In ManagedExportService::exportForJob the types of TASK objects in eximTasks: "
+        // + tsk.getClass().getName());
+        // }
 
         // All eximTasks have been created...so add to the submitter
         exportJobTaskSubmitter.addTasksToSubmitter(eximTasks);
@@ -308,7 +316,7 @@ public class ManagedExportService {
                 Version version = versions[i];
 
                 // FIXME: Investigate if services reference needs to be unique for each dataset in this call
-                if (isExportable(dataset, services, user)) {
+                if (isExportable(dataset, version, services, user)) {
                     ExportTask tsk = createExportTask(user, purpose, overwrite, path, dataset, version);
 
                     eximTasks.add(tsk);
