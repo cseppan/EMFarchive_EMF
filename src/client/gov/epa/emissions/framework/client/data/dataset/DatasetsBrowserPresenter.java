@@ -35,7 +35,6 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
     public void doDisplay(DatasetsBrowserView view) throws EmfException {
         this.view = view;
         view.observe(this);
-
         view.display(new EmfDataset[0]);
     }
 

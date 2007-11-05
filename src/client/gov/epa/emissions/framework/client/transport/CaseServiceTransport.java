@@ -147,15 +147,15 @@ public class CaseServiceTransport implements CaseService {
         return (Speciation[]) call.requestResponse(new Object[] {});
     }
 
-    public synchronized void addCase(User user, Case element) throws EmfException {
+    public synchronized Case addCase(User user, Case element) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("addCase");
         call.addParam("user", dataMappings.user());
         call.addParam("element", caseMappings.caseObject());
-        call.setVoidReturnType();
+        call.setReturnType(caseMappings.caseObject());
 
-        call.request(new Object[] { user, element });
+        return (Case)call.requestResponse(new Object[] { user, element });
     }
 
     public synchronized void removeCase(Case element) throws EmfException {
@@ -712,6 +712,15 @@ public class CaseServiceTransport implements CaseService {
         call.setOperation("printStatusCaseJobTaskManager");
         call.setStringReturnType();
         return (String) call.requestResponse(new Object[] { });
+    }
+
+    public synchronized Case[] getCases(CaseCategory category) throws EmfException {
+        EmfCall call = call();
+        call.setOperation("getCases");
+        call.addParam("category", caseMappings.caseCategory());
+        call.setReturnType(caseMappings.cases());
+        
+        return (Case[]) call.requestResponse(new Object[]{ category });
     }
 
 }

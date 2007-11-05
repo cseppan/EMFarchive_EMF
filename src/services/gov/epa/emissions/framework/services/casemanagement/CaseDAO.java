@@ -641,7 +641,7 @@ public class CaseDAO {
 
     public void removePersistedTasks(PersistedWaitTask pwTask) {
         if (DebugLevels.DEBUG_9)
-            System.out.println("CaseDAO::removePersistedTasks BEFORE num of tasks is pwTask null " + (pwTask==null));
+            System.out.println("CaseDAO::removePersistedTasks BEFORE num of tasks is pwTask null " + (pwTask == null));
 
         Session session = sessionFactory.getSession();
 
@@ -653,7 +653,7 @@ public class CaseDAO {
         } finally {
             session.close();
         }
-        
+
         if (DebugLevels.DEBUG_9)
             System.out.println("CaseDAO::removePersistedTasks AFTER num of tasks= ");
     }
@@ -670,15 +670,16 @@ public class CaseDAO {
         } finally {
             session.close();
         }
-        
+
         if (DebugLevels.DEBUG_9)
             System.out.println("CaseDAO::addPersistedTask AFTER num of tasks= ");
-        
+
     }
 
     public void removePersistedTask(PersistedWaitTask persistedWaitTask) {
         if (DebugLevels.DEBUG_9)
-            System.out.println("CaseDAO::removePersistedTask (from CJTM) BEFORE num of tasks is pwTask null " + (persistedWaitTask==null));
+            System.out.println("CaseDAO::removePersistedTask (from CJTM) BEFORE num of tasks is pwTask null "
+                    + (persistedWaitTask == null));
 
         Session session = sessionFactory.getSession();
 
@@ -687,7 +688,8 @@ public class CaseDAO {
             Criterion crit1 = Restrictions.eq("userId", new Integer(persistedWaitTask.getUserId()));
             Criterion crit2 = Restrictions.eq("caseId", new Integer(persistedWaitTask.getCaseId()));
             Criterion crit3 = Restrictions.eq("jobId", new Integer(persistedWaitTask.getJobId()));
-            Object object = hibernateFacade.load(PersistedWaitTask.class, new Criterion[] { crit1, crit2, crit3 }, session);
+            Object object = hibernateFacade.load(PersistedWaitTask.class, new Criterion[] { crit1, crit2, crit3 },
+                    session);
 
             hibernateFacade.deleteTask(object, session);
         } catch (Exception ex) {
@@ -695,10 +697,26 @@ public class CaseDAO {
         } finally {
             session.close();
         }
-        
+
         if (DebugLevels.DEBUG_9)
             System.out.println("CaseDAO::removePersistedTasks  (from CJTM) AFTER num of tasks= ");
+
+    }
+
+    public Case[] getCases(CaseCategory category) {
+        Session session = sessionFactory.getSession();
+        List cases = null;
+
+        try {
+            Criterion crit = Restrictions.eq("caseCategory", category);
+            cases = hibernateFacade.get(Case.class, crit, session);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
         
+        return cases == null ? null : (Case[])cases.toArray(new Case[0]);
     }
 
 }

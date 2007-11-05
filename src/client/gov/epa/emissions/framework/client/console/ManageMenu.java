@@ -233,11 +233,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
 
     private void doManageCases(final EmfConsole parent, final MessagePanel messagePanel) {
         CaseManagerView view = new CaseManagerWindow(session, parent, desktopManager);
-        try {
-            presenter.doDisplayCases(view);
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
+        presenter.doDisplayCases(view);
     }
 
     private void doDisplayControlMeasures(final EmfConsole parent) throws EmfException {

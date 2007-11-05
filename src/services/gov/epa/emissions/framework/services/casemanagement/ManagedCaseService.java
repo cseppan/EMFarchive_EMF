@@ -175,6 +175,10 @@ public class ManagedCaseService {
         }
     }
 
+    public Case[] getCases(CaseCategory category) {
+        return dao.getCases(category);
+    }
+
     public CaseJob getCaseJob(int jobId) throws EmfException {
         Session session = sessionFactory.getSession();
 
@@ -203,13 +207,13 @@ public class ManagedCaseService {
             session.close();
         }
     }
-    
+
     public Abbreviation addAbbreviation(Abbreviation abbr) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             dao.add(abbr, session);
-            return (Abbreviation)dao.load(Abbreviation.class, abbr.getName(), session);
+            return (Abbreviation) dao.load(Abbreviation.class, abbr.getName(), session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Cannot add case abbreviation " + abbr.getName(), e);
@@ -246,7 +250,7 @@ public class ManagedCaseService {
             session.close();
         }
     }
-    
+
     public synchronized CaseCategory addCaseCategory(CaseCategory element) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -260,7 +264,6 @@ public class ManagedCaseService {
             session.close();
         }
     }
-
 
     public EmissionsYear[] getEmissionsYears() throws EmfException {
         Session session = sessionFactory.getSession();
@@ -332,14 +335,14 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized void addCase(User user, Case element) throws EmfException {
+    public synchronized Case addCase(User user, Case element) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.add(element, session);
             Case loaded = (Case) dao.load(Case.class, element.getName(), session);
             Case locked = dao.obtainLocked(user, loaded, session);
             locked.setAbbreviation(new Abbreviation(loaded.getId() + ""));
-            dao.update(locked, session);
+            return dao.update(locked, session);
         } catch (RuntimeException e) {
             e.printStackTrace();
             log.error("Could not add Case: " + element, e);
@@ -1725,7 +1728,7 @@ public class ManagedCaseService {
         SubDir subdir = input.getSubdirObj();
         String fullPath = null;
         String setenvLine = null;
-       
+
         // check if dataset is null, if so exception
         if (dataset == null) {
             throw new EmfException("Input (" + input.getName() + ") must have a dataset");
@@ -1750,7 +1753,7 @@ public class ManagedCaseService {
                 fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + fullPath;
             }
         }
-         if (envvar == null) {
+        if (envvar == null) {
             // if no environmental variable, just created a commented
             // line w/ input name = fullPath
             setenvLine = this.runComment + " " + input.getName() + " = " + fullPath + eolString;
@@ -2062,7 +2065,8 @@ public class ManagedCaseService {
         // print executable
         sbuf.append(eolString);
         sbuf.append(this.runComment + " job executable" + eolString);
-        sbuf.append("$EMF_CLIENT -k $EMF_JOBKEY -x " + execFull + " -m \"Running top level script for job: " + jobName + "\"" + eolString);
+        sbuf.append("$EMF_CLIENT -k $EMF_JOBKEY -x " + execFull + " -m \"Running top level script for job: " + jobName
+                + "\"" + eolString);
         sbuf.append(execFullArgs);
 
         // add a test of the status and send info through the
@@ -2312,57 +2316,62 @@ public class ManagedCaseService {
         if (DebugLevels.DEBUG_9)
             System.out.println("Start ManagedCaseService::resubmitPersistedTasksForUser uid= " + uid);
         Integer[] jobIds = null;
-        int caseId=-9;
+        int caseId = -9;
         User user = getUser(uid);
-        
+
         if (DebugLevels.DEBUG_9)
             System.out.println("Incoming userid= " + uid + " acquired userName= " + user.getName());
-  
+
         // Get All persisted wait jobs for this user
         List allPersistedTasks = getPersistedTasksForUser(uid);
-        if (allPersistedTasks==null){
-            if (DebugLevels.DEBUG_9)System.out.println("allPersistedTasks is null WHY?" );
-            
-        }else{
-            if (DebugLevels.DEBUG_9)System.out.println("Size of list returned from Persist wait table= " + allPersistedTasks.size());
+        if (allPersistedTasks == null) {
+            if (DebugLevels.DEBUG_9)
+                System.out.println("allPersistedTasks is null WHY?");
+
+        } else {
+            if (DebugLevels.DEBUG_9)
+                System.out.println("Size of list returned from Persist wait table= " + allPersistedTasks.size());
             jobIds = new Integer[allPersistedTasks.size()];
 
-            for (int i=0; i<allPersistedTasks.size();i++){
-                PersistedWaitTask pwTask= (PersistedWaitTask) allPersistedTasks.get(i);
-                if (caseId==-9){
-                    caseId=pwTask.getCaseId();
-                }    
-                jobIds[i]=new Integer(pwTask.getJobId());
-                
-                //Task has been acquired so delete from persisted wait task table
+            for (int i = 0; i < allPersistedTasks.size(); i++) {
+                PersistedWaitTask pwTask = (PersistedWaitTask) allPersistedTasks.get(i);
+                if (caseId == -9) {
+                    caseId = pwTask.getCaseId();
+                }
+                jobIds[i] = new Integer(pwTask.getJobId());
+
+                // Task has been acquired so delete from persisted wait task table
                 dao.removePersistedTasks(pwTask);
             }
-            
-            if (DebugLevels.DEBUG_9)System.out.println("After the loop jobId array of ints size= " + jobIds.length);
-            if (DebugLevels.DEBUG_9)System.out.println("After the loop CaseId= " + caseId);
-            
+
+            if (DebugLevels.DEBUG_9)
+                System.out.println("After the loop jobId array of ints size= " + jobIds.length);
+            if (DebugLevels.DEBUG_9)
+                System.out.println("After the loop CaseId= " + caseId);
+
         }
 
-        if (allGood(user,jobIds,caseId)){
-            if (DebugLevels.DEBUG_9)System.out.println("ManagedCaseService::resubmitPersistedTasksForUser Everything is good so resubmit");
-            this.submitJobs(jobIds, caseId, user);                        
-        }else{
+        if (allGood(user, jobIds, caseId)) {
+            if (DebugLevels.DEBUG_9)
+                System.out.println("ManagedCaseService::resubmitPersistedTasksForUser Everything is good so resubmit");
+            this.submitJobs(jobIds, caseId, user);
+        } else {
             throw new EmfException("Failed to restore persisted wait tasks for user= " + user.getName());
         }
-              
+
         if (DebugLevels.DEBUG_9)
             System.out.println("End ManagedCaseService::resubmitPersistedTasksForUser uid= " + uid);
     }
- 
+
     private boolean allGood(User user, Integer[] jobIds, int caseId) {
         boolean allGewd = false;
-        
-        if ((caseId != -9) && (user != null) && (jobIds !=null) && (jobIds.length>0)){
-            allGewd=true;
+
+        if ((caseId != -9) && (user != null) && (jobIds != null) && (jobIds.length > 0)) {
+            allGewd = true;
         }
         if (DebugLevels.DEBUG_9)
             System.out.println("END ManagedCaseService::allGood status= " + allGewd);
-        
+
         return allGewd;
     }
 
@@ -2372,7 +2381,7 @@ public class ManagedCaseService {
         try {
             UserDAO userDAO = new UserDAO();
             user = userDAO.get(uid, session);
-            
+
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new EmfException("System Problems: Database access error");
@@ -2381,14 +2390,14 @@ public class ManagedCaseService {
             session.clear();
             session.close();
         }
-        
+
         return user;
     }
 
     private List getPersistedTasksForUser(int uid) throws EmfException {
         Session session = this.sessionFactory.getSession();
-        List allPersistTasks= null;
-        
+        List allPersistTasks = null;
+
         try {
             allPersistTasks = dao.getPersistedWaitTasksByUser(uid);
             String statMsg;
@@ -2414,25 +2423,25 @@ public class ManagedCaseService {
         return allPersistTasks;
     }
 
-//    private List getCaseJobTasksForUser(int uid) throws EmfException {
-//        Session session = this.sessionFactory.getSession();
-//
-//        try {
-//            UserDAO userDAO = new UserDAO();
-//            User user = userDAO.get(uid, session);
-//            if (DebugLevels.DEBUG_9)
-//                System.out.println("Incoming userid= " + uid + " acquired userName= " + user.getName());
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//            throw new EmfException("System Problems: Database access error");
-//
-//        } finally {
-//            session.clear();
-//            session.close();
-//        }
-//
-//        return null;
-//    }
+    // private List getCaseJobTasksForUser(int uid) throws EmfException {
+    // Session session = this.sessionFactory.getSession();
+    //
+    // try {
+    // UserDAO userDAO = new UserDAO();
+    // User user = userDAO.get(uid, session);
+    // if (DebugLevels.DEBUG_9)
+    // System.out.println("Incoming userid= " + uid + " acquired userName= " + user.getName());
+    // } catch (Exception ex) {
+    // ex.printStackTrace();
+    // throw new EmfException("System Problems: Database access error");
+    //
+    // } finally {
+    // session.clear();
+    // session.close();
+    // }
+    //
+    // return null;
+    // }
 
     private ArrayList getDistinctUserIds(List userIds) {
         ArrayList distUid = new ArrayList();

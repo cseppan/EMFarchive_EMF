@@ -42,7 +42,7 @@ public interface CaseService {
 
     Case[] getCases() throws EmfException;
 
-    void addCase(User owner, Case element) throws EmfException;
+    Case addCase(User owner, Case element) throws EmfException;
 
     CaseCategory addCaseCategory(CaseCategory element) throws EmfException;
     
@@ -141,5 +141,6 @@ public interface CaseService {
 
     String printStatusCaseJobTaskManager() throws EmfException;
 
+    Case[] getCases(CaseCategory category) throws EmfException;
 
  }

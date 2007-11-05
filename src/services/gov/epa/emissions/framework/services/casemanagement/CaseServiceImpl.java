@@ -89,8 +89,8 @@ public class CaseServiceImpl implements CaseService {
         return this.caseService;
     }
 
-    public void addCase(User user, Case element) throws EmfException {
-        getCaseService().addCase(user, element);
+    public Case addCase(User user, Case element) throws EmfException {
+        return getCaseService().addCase(user, element);
     }
 
     public void removeCase(Case caseObj) throws EmfException {
@@ -492,6 +492,10 @@ public class CaseServiceImpl implements CaseService {
 
     public String printStatusCaseJobTaskManager() throws EmfException {
         return getCaseService().printStatusCaseJobTaskManager() ;
+    }
+
+    public Case[] getCases(CaseCategory category) {
+        return getCaseService().getCases(category);
     }
 
 }

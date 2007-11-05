@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
@@ -16,6 +17,7 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
@@ -26,12 +28,18 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -53,8 +61,14 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private EmfConsole parentConsole;
 
     private List cases;
+    
+    private List<CaseCategory> categories;
+    
+    private CaseCategory selectedCategory;
 
     private EmfSession session;
+
+    private ComboBox categoriesBox;
 
     public CaseManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Case Manager", new Dimension(700, 400), desktopManager);
@@ -70,8 +84,8 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         this.presenter = presenter;
     }
 
-    public void display(Case[] cases) {
-        doLayout(cases);
+    public void display() {
+        doLayout(new Case[0]);
         super.display();
     }
 
@@ -80,17 +94,56 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         super.refreshLayout();
     }
 
-    public void doRefresh() throws EmfException {
-        presenter.doRefresh();
-    }
-
     private void doLayout(Case[] cases) {
+        messagePanel = new SingleLineMessagePanel();
+        
+        try {
+            getAllCategories();
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+        
+        createCategoriesComboBox();
         tableData = new CasesTableData(cases);
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
         SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
 
         createLayout(layout, sortFilterSelectPanel);
+    }
+    
+    private void getAllCategories() throws EmfException {
+        this.categories = new ArrayList<CaseCategory>();
+        categories.add(new CaseCategory("All"));
+        categories.addAll(Arrays.asList(presenter.getCategories()));
+    }
+
+    private void createCategoriesComboBox() {
+        categoriesBox = new ComboBox("Select one", categories.toArray(new CaseCategory[0]));
+        
+        if (selectedCategory != null)
+            categoriesBox.setSelectedItem(selectedCategory);
+        
+        categoriesBox.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                CaseCategory category = getSelectedCategory();
+                try {
+                    if (category == null) {
+                        refresh(new Case[0]);
+                        return;
+                    }
+                    
+                    refresh(presenter.getCases(category));
+                } catch (EmfException e1) {
+                    messagePanel.setError("Could not retrieve all cases with -- " + category.getName());
+                }
+            }
+        });
+    }
+
+    private CaseCategory getSelectedCategory() {
+        this.selectedCategory = (CaseCategory) categoriesBox.getSelectedItem();
+        return selectedCategory;
     }
 
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
@@ -106,13 +159,25 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     }
 
     private JPanel createTopPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-
-        messagePanel = new SingleLineMessagePanel();
-        panel.add(messagePanel, BorderLayout.CENTER);
-
+        JPanel msgRefreshPanel = new JPanel(new BorderLayout());
+        msgRefreshPanel.add(messagePanel, BorderLayout.CENTER);
         Button button = new RefreshButton(this, "Refresh Cases", messagePanel);
-        panel.add(button, BorderLayout.EAST);
+        msgRefreshPanel.add(button, BorderLayout.EAST);
+
+        JPanel panel = new JPanel(new GridLayout(2, 1));
+        panel.add(msgRefreshPanel);
+        panel.add(getCategoryPanel("Show Cases of Category:", categoriesBox));
+
+        return panel;
+    }
+    
+    private JPanel getCategoryPanel(String label, JComboBox box) {
+        JPanel panel = new JPanel(new BorderLayout(5, 2));
+        JLabel jlabel = new JLabel(label);
+        jlabel.setHorizontalAlignment(JLabel.RIGHT);
+        panel.add(jlabel, BorderLayout.WEST);
+        panel.add(box, BorderLayout.CENTER);
+        panel.setBorder(BorderFactory.createEmptyBorder(3, 150, 5, 150));
 
         return panel;
     }
@@ -303,6 +368,17 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
     private void clearMsgPanel() {
         messagePanel.clear();
+    }
+
+    public void doRefresh() throws EmfException {
+        refresh(presenter.getCases(getSelectedCategory()));
+    }
+
+    public void addNewCaseToTableData(Case newCase) {
+        List<Case> cases = new ArrayList<Case>();
+        cases.addAll(Arrays.asList(tableData.sources()));
+        cases.add(newCase);
+        refresh(cases.toArray(new Case[0]));
     }
 
 }

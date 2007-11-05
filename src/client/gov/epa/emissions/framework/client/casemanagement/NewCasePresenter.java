@@ -41,9 +41,9 @@ public class NewCasePresenter {
         newCase.setLastModifiedBy(session.user());
         newCase.setLastModifiedDate(new Date());
         
-        service().addCase(session.user(), newCase);
+        Case loaded = service().addCase(session.user(), newCase);
         closeView();
-        managerPresenter.doRefresh();
+        managerPresenter.addNewCaseToTableData(loaded);
     }
 
     private boolean isDuplicate(Case newCase) throws EmfException {

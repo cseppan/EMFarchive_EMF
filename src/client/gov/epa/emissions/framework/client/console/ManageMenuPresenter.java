@@ -53,7 +53,7 @@ public class ManageMenuPresenter {
         presenter.doDisplay();
     }
 
-    public void doDisplayCases(CaseManagerView view) throws EmfException {
+    public void doDisplayCases(CaseManagerView view) {
         new CaseManagerPresenterImpl(session, view).display();
     }
     

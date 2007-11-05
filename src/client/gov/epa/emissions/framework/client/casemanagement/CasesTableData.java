@@ -12,8 +12,8 @@ import java.util.List;
 public class CasesTableData extends AbstractTableData {
     private List rows;
 
-    public CasesTableData(Case[] types) {
-        this.rows = createRows(types);
+    public CasesTableData(Case[] cases) {
+        this.rows = createRows(cases);
     }
 
     public String[] columns() {
@@ -46,11 +46,11 @@ public class CasesTableData extends AbstractTableData {
     }
 
 
-    private List createRows(Case[] types) {
+    private List createRows(Case[] cases) {
         List rows = new ArrayList();
 
-        for (int i = 0; i < types.length; i++) 
-            rows.add(row(types[i]));
+        for (int i = 0; i < cases.length; i++) 
+            rows.add(row(cases[i]));
 
         return rows;
     }

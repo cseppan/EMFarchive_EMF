@@ -1,15 +1,16 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
-import java.util.Date;
-
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenterImpl;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+
+import java.util.Date;
 
 public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPresenter {
 
@@ -22,9 +23,9 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
         this.view = view;
     }
 
-    public void display() throws EmfException {
-        view.display(service().getCases());
+    public void display() {
         view.observe(this);
+        view.display();
     }
 
     private CaseService service() {
@@ -46,6 +47,10 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
     public void doNew(NewCaseView view) {
         NewCasePresenter presenter = new NewCasePresenter(session, view, this);
         presenter.doDisplay();
+    }
+    
+    public void addNewCaseToTableData(Case newCase) {
+        view.addNewCaseToTableData(newCase);
     }
 
     public void doSaveCopiedCase(Case newCase, String templateused) throws EmfException {
@@ -81,5 +86,19 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
 
     public void doCopyCases(int[] caseIds) throws EmfException {
         service().copyCaseObject(caseIds, session.user());
+    }
+
+    public CaseCategory[] getCategories() throws EmfException {
+        return service().getCaseCategories();
+    }
+
+    public Case[] getCases(CaseCategory category) throws EmfException {
+        if (category == null)
+            return new Case[0];
+        
+        if (category.getName().equals("All"))
+            return service().getCases();
+        
+        return service().getCases(category);
     }
 }
