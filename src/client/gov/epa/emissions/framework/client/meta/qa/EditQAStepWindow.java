@@ -478,11 +478,15 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         Button export = exportButton();
         panel.add(export);
+        
+        Button refresh = refreshButton();
+        panel.add(refresh);
+        
         return panel;
     }
 
     private Button viewResultsButton() {
-        return new Button("View Results", new AbstractAction() {
+        Button view = new Button("View Results", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clear();
                 try {
@@ -492,6 +496,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 }
             }
         });
+        
+        view.setMnemonic('V');
+        return view;
     }
 
     private Button runButton() {
@@ -500,13 +507,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 try {
                     checkDatasets();
                     clear();
-                    Thread runThread = new Thread(new Runnable() {
-                        public void run() {
-                            startRun();
-                        }
-                    });
-                    runThread.start();
-                } catch (EmfException ex) {
+                    runQAStep();
+                } catch (Exception ex) {
                     messagePanel.setError(ex.getMessage());
                 }
             }
@@ -588,43 +590,25 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 doExport();
             }
         });
+        export.setMnemonic('x');
+        
         return export;
     }
-
-    public void startRun() {
-        try {
-            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            runQAStep();
-            Thread.sleep(5000);
-            int factor = 1;
-            qaStepResult = presenter.getStepResult(step);
-
-            while (qaStepResult == null || qaStepResult.getTableCreationStatus().equalsIgnoreCase("In process")) {
-                Thread.sleep(factor * 5000);
-                qaStepResult = presenter.getStepResult(step);
-                ++factor;
-                
-                if (factor > 3 && qaStepResult == null) { //if no result in 35 seconds, assume something wrong
-                    messagePanel.setError("There must be errors in running QA step " + step.getName() + ". Please check the Status window.");
-                    return;
-                }
-                
-                if (factor > 20) { // if no result in 17.5 minutes, assume something wrong, this is NOT a standard timeout
-                    messagePanel.setError("Could not get QA step result for " + step.getName() + ".");
-                    return;
+    
+    private Button refreshButton() {
+        Button refresh = new Button("Refresh", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    clear();
+                    resetRunStatus(presenter.getStepResult(step));
+                } catch (Exception ex) {
+                    messagePanel.setError(ex.getMessage());
                 }
             }
-        } catch (Exception e) {
-            messagePanel.setError(e.getMessage());
-        } finally {
-            setCursor(Cursor.getDefaultCursor());
-            saveButton.setEnabled(true);
-            try {
-                resetRunStatus(presenter.getStepResult(step));
-            } catch (EmfException e2) {
-                messagePanel.setError(e2.getMessage());
-            }
-        }
+        });
+        refresh.setMnemonic('R');
+
+        return refresh;
     }
 
     private Button setButton() {
@@ -822,7 +806,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     protected void runQAStep() throws EmfException {
-        messagePanel.setMessage("Started Run. Please monitor the Status window " + "to track your run request.");
+        messagePanel
+                .setMessage("Started Run. Please monitor the Status window and click Refresh button to track your run request.");
         status.setSelectedItem("In Progress");
         date.setValue(new Date());
         who.setText(presenter.userName());
@@ -834,13 +819,19 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     private void resetRunStatus(QAStepResult result) {
+        if (result == null)
+            return;
+        
+        saveButton.setEnabled(true);
         who.setText(step.getWho());
         date.setText(DATE_FORMATTER.format(step.getDate()));
         status.setSelectedItem(step.getStatus());
-        tableName.setText(result == null ? "" : result.getTable());
-        creationStatusLabel.setText(result == null ? "" : result.getTableCreationStatus());
-        creationDateLabel.setText(EmfDateFormat.format_MM_DD_YYYY_HH_mm(result == null ? null : result.getTableCreationDate()));
-        currentTable.setSelected(result == null ? false : result.isCurrentTable());
+        tableName.setText(result.getTable());
+        creationStatusLabel.setText(result.getTableCreationStatus());
+        creationDateLabel.setText(EmfDateFormat.format_MM_DD_YYYY_HH_mm(result
+                .getTableCreationDate()));
+        currentTable.setSelected(result.isCurrentTable());
+        qaStepResult = result;
         super.revalidate();
     }
 

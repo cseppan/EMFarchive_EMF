@@ -123,7 +123,6 @@ public class EditQAStepPresenter {
     private String exportedQAStepFilePath(String exportDir, QAStepResult qaStepResult) {
         String separator = (exportDir.charAt(0) == '/') ? "/" : "\\";
         return exportDir + separator + qaStepResult.getTable() + ".csv"; // this is how exported file name was
-                                                                            // created
     }
 
     public QAStepResult getStepResult(QAStep step) throws EmfException {
