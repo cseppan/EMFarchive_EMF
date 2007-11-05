@@ -137,6 +137,7 @@ insert INTO emf.keywords VALUES (DEFAULT, 'EXPORT_PREFIX');
 insert INTO emf.keywords VALUES (DEFAULT, 'EXPORT_SUFFIX');
 insert INTO emf.keywords VALUES (DEFAULT, 'REPLACES_DATASET');
 insert INTO emf.keywords VALUES (DEFAULT, 'REPLACED_BY_DATASET');
+insert INTO emf.keywords VALUES (DEFAULT, 'EXPORT_COLUMN_LABEL');
 -- emf.keywords
 --
 

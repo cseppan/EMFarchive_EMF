@@ -171,3 +171,6 @@ insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, na
 select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by State, SCC, and Control Technology', 1, 'select e.fipsst, ct.name as Control_Technology, e.scc, avg(e.Ann_Cost_per_Ton) as avg_cost_per_ton, sum(e.Annual_Cost) as Annual_Cost, sum(e.Final_emissions) as Final_emissions, sum(e.Emis_Reduction) as Emis_Reduction, sum(e.Inv_emissions) as Inv_emissions from $TABLE[1] e inner join emf.control_measures cm on cm.id = e.cm_id inner join emf.control_technologies ct on ct.id = cm.control_technology group by e.fipsst, e.scc, ct.name order by e.fipsst, e.scc, ct.name', false, 1, ''
 from emf.dataset_types dt
 where name = 'Control Strategy Detailed Result'; 
+
+-- 11/5/2007 add one key word for csv file header line control
+insert INTO emf.keywords VALUES (DEFAULT, 'EXPORT_COLUMN_LABEL');

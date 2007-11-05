@@ -384,6 +384,18 @@ public class EmfDataset implements Dataset, Lockable {
 
         return "#";
     }
+    
+    public boolean getCSVHeaderLineSetting() {
+        KeyVal[] keyvals = getKeyVals();
+        for (int i = 0; i < keyvals.length; i++) {
+            String keyword = keyvals[i].getKeyword().getName();
+            String value = keyvals[i].getValue();
+            if (keyword.equalsIgnoreCase(csv_header_line))
+                return (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes")) ? true : false;
+        }
+
+        return true;
+    }
 
     public boolean isExternal() {
         return getInternalSources().length == 0;
