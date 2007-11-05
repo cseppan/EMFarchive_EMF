@@ -273,7 +273,6 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
             + " order by scc, fips" 
             + (pointDatasetType ? ", plantid, pointid, stackid, segment" : "" ) 
             + ", sort desc, poll ";
-        System.err.println(query);
         try {
             return datasource.optimizedQuery(query, batchSize);
         } catch (SQLException e) {
