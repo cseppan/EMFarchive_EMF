@@ -9,14 +9,11 @@ public class RetrieveBestEffRecord {
 
     private EfficiencyRecordUtil efficiencyRecordUtil;
 
-    private double tollerance;
-
     private CostYearTable costYearTable;
 
     public RetrieveBestEffRecord(CostYearTable costYearTable) {
         this.costYearTable = costYearTable;
         this.efficiencyRecordUtil = new EfficiencyRecordUtil();
-        this.tollerance = 1e-5;
     }
 
     public EfficiencyRecord findBestEfficiencyRecord(ControlMeasure controlMeasure, EfficiencyRecord[] ers) throws EmfException {
@@ -48,12 +45,13 @@ public class RetrieveBestEffRecord {
         if (record == null) 
             return bestRecord;
         
-        double diff = efficiencyRecordUtil.effectiveReduction(controlMeasure, record)
-                - efficiencyRecordUtil.effectiveReduction(bestControlMeasure, bestRecord);
-        if (diff > tollerance) {
+        double red1 = efficiencyRecordUtil.effectiveReduction(controlMeasure, record);
+        double red2 = efficiencyRecordUtil.effectiveReduction(bestControlMeasure, bestRecord);
+
+        if (red1 > red2) {
             return record;
         }
-        if (diff < tollerance)
+        if (red1 < red2)
             return bestRecord;
 
         return compareCost(record, bestRecord);
@@ -63,11 +61,9 @@ public class RetrieveBestEffRecord {
         double cost = efficiencyRecordUtil.adjustedCostPerTon(record, costYearTable);
         double maxCost = efficiencyRecordUtil.adjustedCostPerTon(maxRecord, costYearTable);
 
-        double diff = cost - maxCost;
-
-        if (diff >= tollerance) {
-            return record;
+        if (cost >= maxCost) {
+            return maxRecord;
         }
-        return maxRecord;
+        return record;
     }
 }
