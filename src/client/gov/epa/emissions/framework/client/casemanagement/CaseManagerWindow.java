@@ -94,6 +94,11 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         super.refreshLayout();
     }
 
+    public void refreshWithLastCategory() throws EmfException {
+        doLayout(presenter.getCases(selectedCategory));
+        super.refreshLayout();
+    }
+
     private void doLayout(Case[] cases) {
         messagePanel = new SingleLineMessagePanel();
         

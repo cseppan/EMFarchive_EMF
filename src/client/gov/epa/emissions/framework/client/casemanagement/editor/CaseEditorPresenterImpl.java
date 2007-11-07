@@ -101,7 +101,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         caseObj.setLastModifiedBy(session.user());
         caseObj.setLastModifiedDate(new Date());
         service().updateCase(caseObj);
-        managerPresenter.doRefresh();
+        managerPresenter.refreshWithLastCategory();
     }
 
     private void saveTabs() throws EmfException {

@@ -40,6 +40,10 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
         view.refresh(service().getCases());
     }
 
+    public void doRefresh(CaseCategory category) throws EmfException {
+        view.refresh(getCases(category));
+    }
+
     public void doClose() {
         view.disposeView();
     }
@@ -100,5 +104,9 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
             return service().getCases();
         
         return service().getCases(category);
+    }
+
+    public void refreshWithLastCategory() throws EmfException {
+        view.refreshWithLastCategory();
     }
 }
