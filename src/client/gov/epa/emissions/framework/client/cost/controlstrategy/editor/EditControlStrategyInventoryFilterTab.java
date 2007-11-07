@@ -188,7 +188,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
                     editControlStrategyPresenter.getDatasetType("ORL CoST Point Inventory (PTINV)")
                 });
         try {
-            presenter.display();
+            presenter.display(null);
             EmfDataset[] inputDatasets = presenter.getDatasets();
             ControlStrategyInputDataset[] controlStrategyInputDatasets = new ControlStrategyInputDataset[inputDatasets.length];
             for (int i = 0; i < inputDatasets.length; i++) {

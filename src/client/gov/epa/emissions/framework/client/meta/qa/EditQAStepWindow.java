@@ -478,10 +478,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         Button export = exportButton();
         panel.add(export);
-        
+
         Button refresh = refreshButton();
         panel.add(refresh);
-        
+
         return panel;
     }
 
@@ -496,7 +496,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 }
             }
         });
-        
+
         view.setMnemonic('V');
         return view;
     }
@@ -591,10 +591,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             }
         });
         export.setMnemonic('x');
-        
+
         return export;
     }
-    
+
     private Button refreshButton() {
         Button refresh = new Button("Refresh", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -633,16 +633,27 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         // with the warning message to also show up. When data in window is invalid, a new window still
         // pops up, but with a different warning message.
         // Also change the window name to EditQASetArgumentsWindow
+        inputDatasets.clear();
+        inputInvDatasets.clear();
         String programSwitches = "";
         String nextDataset = "";
         programSwitches = programArguments.getText();
 
         if (!(programSwitches.equals(""))) {
-            int index1 = programSwitches.indexOf(invTableTag);
+            int invTableIndex = programSwitches.indexOf(invTableTag);
 
-            if (programSwitches.substring(0, 12).equals("-inventories") && index1 != -1) {
-                String inventoriesToken = programSwitches.substring(0, index1);
-                String invtableToken = programSwitches.substring(index1 + invTableTag.length());
+            if (programSwitches.substring(0, 12).equals("-inventories")) {
+                String inventoriesToken = null;
+                
+                if (invTableIndex > 0)
+                    inventoriesToken = programSwitches.substring(0, invTableIndex);
+                
+                if (invTableIndex == 0)
+                    inventoriesToken = "";
+                
+                if (invTableIndex < 0)
+                    inventoriesToken = programSwitches;
+                
                 StringTokenizer tokenizer2 = new StringTokenizer(inventoriesToken);
                 tokenizer2.nextToken();
                 int i = 0;
@@ -659,6 +670,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
                 inputDatasetsArray = new EmfDataset[inputDatasets.size()];
                 inputDatasets.toArray(inputDatasetsArray);
+                
+                String invtableToken = invTableIndex < 0 ? "" : programSwitches.substring(invTableIndex + invTableTag.length());
                 StringTokenizer tokenizer3 = new StringTokenizer(invtableToken);
                 int j = 0;
 
@@ -667,6 +680,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                         inputInvDatasets.add(presenter.getDataset(tokenizer3.nextToken().trim()));
                         j++;
                     } catch (EmfException ex) {
+                        ex.printStackTrace();
                         messagePanel.setError("The inventory table dataset is invalid");
                     }
                 }
@@ -679,9 +693,6 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
                 presenter.display(origDataset, step);
 
-                inputDatasets.clear();
-                inputInvDatasets.clear();
-
                 for (int m = 0; m < inputDatasetsArray.length; m++)
                     inputDatasetsArray[m] = null;
 
@@ -691,13 +702,15 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, session);
                 EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
                 presenter.display(origDataset, step);
-                messagePanel.setError("The data in the Program Arguments window is invalid");
+                // messagePanel.setError("The data in the Program Arguments window is invalid");
             }
         } else {
             EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, session);
             EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
             presenter.display(origDataset, step);
-            messagePanel.setError("The Program Arguments window is blank");
+
+            if (programSwitches == null || programSwitches.trim().equals(""))
+                messagePanel.setError("The Program Arguments window is blank");
         }
     }
 
@@ -705,6 +718,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         // When there is no data in window, set button causes new window to pop up,
         // with the warning message to also show up. When data in window is invalid, a new window still
         // pops up, but with a different warning message.
+        inputDatasets.clear();
         String programSwitches = "";
         StringTokenizer tokenizer2;
         String nextDataset = "";
@@ -749,13 +763,15 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, session);
                 EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
                 presenter.display(origDataset, step);
-                messagePanel.setError("The data in the Program Arguments window is invalid");
+                // messagePanel.setError("The data in the Program Arguments window is invalid");
             }
         } else {
             EditQANonsummaryEmissionsWindow view = new EditQANonsummaryEmissionsWindow(desktopManager, session);
             EditQANonsummaryEmissionsPresenter presenter = new EditQANonsummaryEmissionsPresenter(view, this);
             presenter.display(origDataset, step);
-            messagePanel.setError("The Program Arguments window is blank");
+
+            if (programSwitches == null || programSwitches.trim().equals(""))
+                messagePanel.setError("The Program Arguments window is blank");
         }
     }
 
@@ -764,7 +780,6 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         EditQAArgumentsWindow view = new EditQAArgumentsWindow(desktopManager, argumentsText);
         EditQAArgumentsPresenter presenter = new EditQAArgumentsPresenter(view, this);
         presenter.display();
-        view.display(origDataset, step);
     }
 
     public void updateArgumentsTextArea(String text) {
@@ -821,15 +836,14 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private void resetRunStatus(QAStepResult result) {
         if (result == null)
             return;
-        
+
         saveButton.setEnabled(true);
         who.setText(step.getWho());
         date.setText(DATE_FORMATTER.format(step.getDate()));
         status.setSelectedItem(step.getStatus());
         tableName.setText(result.getTable());
         creationStatusLabel.setText(result.getTableCreationStatus());
-        creationDateLabel.setText(EmfDateFormat.format_MM_DD_YYYY_HH_mm(result
-                .getTableCreationDate()));
+        creationDateLabel.setText(EmfDateFormat.format_MM_DD_YYYY_HH_mm(result.getTableCreationDate()));
         currentTable.setSelected(result.isCurrentTable());
         qaStepResult = result;
         super.revalidate();

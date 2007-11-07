@@ -7,11 +7,11 @@ public class EditQAEmissionsPresenter {
     
     private EditQAEmissionsView view;
     
-    private EditQAStepView view2;
+    private EditQAStepView editQAStepView;
         
     public EditQAEmissionsPresenter(EditQAEmissionsView view, EditQAStepView view2) {
         this.view = view;
-        this.view2 = view2;
+        this.editQAStepView = view2;
     }
 
     public void display(EmfDataset dataset, QAStep qaStep) {
@@ -20,7 +20,7 @@ public class EditQAEmissionsPresenter {
     }
     
     public void updateDatasets(Object [] datasets, Object [] invDatasets) {
-        view2.updateDatasets(datasets, invDatasets);
+        editQAStepView.updateDatasets(datasets, invDatasets);
     }
    
 }

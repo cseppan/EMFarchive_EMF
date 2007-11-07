@@ -7,6 +7,8 @@ public interface InputDatasetSelectionView {
 
     void display(DatasetType[] datasetTypes);
 
+    void display(DatasetType[] datasetTypes, DatasetType defaultType);
+
     void observe(InputDatasetSelectionPresenter presenter);
 
     void refreshDatasets(EmfDataset[] datasets);

@@ -67,6 +67,11 @@ public class AddRemoveDatasetWidget extends JPanel {
         
     }
    
+   private DatasetType getDatasetType(int index) {
+       Object[] types = getDatasets();
+       return (types == null || types.length == 0) ? null : ((EmfDataset)types[index]).getDatasetType();
+   }
+   
     private void setupLayout(ManageChangeables changeables) {
         
         this.datasetsList = new ListWidget(new EmfDataset[0]);
@@ -132,7 +137,7 @@ public class AddRemoveDatasetWidget extends JPanel {
             // to that of the datasets retrived from the presenter.
             InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, changeables);
             InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypeList.toArray(new DatasetType[0]));
-            presenter.display();
+            presenter.display(getDatasetType(0));
             setDatasets(presenter.getDatasets());
 
         } catch (Exception e) {

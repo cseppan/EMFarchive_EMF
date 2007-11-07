@@ -109,7 +109,7 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) 
     private JPanel emisinv() {
         datasetWidget = new AddRemoveDatasetWidget(this, parentConsole, session);
         datasetWidget.setPreferredSize(new Dimension(350,250));
-        if(!(datasets==null) && (datasets.length > 0))
+        if(datasets != null && datasets.length > 0)
             datasetWidget.setDatasetsFromStepWindow(datasets);
         return datasetWidget;
     }
@@ -189,7 +189,7 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) 
             }
             InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, this);
             InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypeList.toArray(new DatasetType[0]));
-            presenter.display();
+            presenter.display(null);
             setDatasets(presenter.getDatasets());
         } catch (Exception e) {
              messagePanel.setError(e.getMessage());

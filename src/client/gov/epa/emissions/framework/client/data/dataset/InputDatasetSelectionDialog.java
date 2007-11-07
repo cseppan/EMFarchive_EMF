@@ -47,11 +47,15 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     }
 
     public void display(DatasetType[] datasetTypes) {
+        display(datasetTypes, null);
+    }
+    
+    public void display(DatasetType[] datasetTypes, DatasetType defaultType) {
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout(5, 5));
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.add(buildDatasetTypeCombo(datasetTypes), BorderLayout.NORTH);
+        panel.add(buildDatasetTypeCombo(datasetTypes, defaultType), BorderLayout.NORTH);
         panel.add(buildDatasetsPanel(), BorderLayout.CENTER);
         panel.add(buttonPanel(), BorderLayout.SOUTH);
         contentPane.add(panel);
@@ -77,10 +81,10 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
         return datasets;
     }
 
-    private JPanel buildDatasetTypeCombo(DatasetType[] datasetTypes) {
+    private JPanel buildDatasetTypeCombo(DatasetType[] datasetTypes, DatasetType defaultType) {
         JPanel panel = new JPanel(new BorderLayout());
-        datasetTypeCombo = new ComboBox("Choose an dataset type", datasetTypes);
-
+        datasetTypeCombo = new ComboBox("Choose a dataset type", datasetTypes);
+        datasetTypeCombo.setSelectedItem(defaultType);
         datasetTypeCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -141,4 +145,5 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     public void observe(InputDatasetSelectionPresenter presenter) {
         this.presenter = presenter;
     }
+
 }

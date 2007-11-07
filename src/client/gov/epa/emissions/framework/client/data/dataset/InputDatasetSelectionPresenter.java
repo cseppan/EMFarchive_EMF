@@ -24,7 +24,7 @@ public class InputDatasetSelectionPresenter {
         this.view = view;
     }
 
-    public void display() throws Exception {
+    public void display(DatasetType defaultType) throws Exception {
         view.observe(this);
 
         //get data...
@@ -34,7 +34,7 @@ public class InputDatasetSelectionPresenter {
         else
             datasetTypes = datasetTypesToInclude;
 
-        view.display(datasetTypes);
+        view.display(datasetTypes, defaultType);
     }
     
     public void refreshDatasets(DatasetType datasetType) throws EmfException {
