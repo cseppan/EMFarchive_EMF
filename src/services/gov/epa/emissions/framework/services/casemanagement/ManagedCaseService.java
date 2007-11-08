@@ -39,6 +39,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -2460,6 +2461,36 @@ public class ManagedCaseService {
 
     public String printStatusCaseJobTaskManager() throws EmfException {
         return TaskManagerFactory.getCaseJobTaskManager(sessionFactory).getStatusOfWaitAndRunTable();
+    }
+
+    public synchronized String validateJobs(Integer[] jobIDs) throws EmfException {
+        List<CaseInput> allInputs = new ArrayList<CaseInput>();
+        
+        for (Integer id : jobIDs) {
+            CaseJob job = this.getCaseJob(id.intValue());
+            allInputs.addAll(this.getAllJobInputs(job));
+        }
+        
+        TreeSet<CaseInput> set = new TreeSet<CaseInput>(allInputs);
+        List<CaseInput> uniqueInputs = new ArrayList<CaseInput>(set);
+            
+        return listNonFinalInputs(uniqueInputs);
+    }
+
+    private String listNonFinalInputs(List<CaseInput> inputs) {
+        String inputsList = "";
+        String lineSeparator = System.getProperty("line.separator");
+        
+        for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
+            CaseInput input = iter.next();
+            String dataset = input.getDataset().getName();
+            Version version = input.getVersion();
+            
+            if (!version.isFinalVersion())
+                inputsList += "Input: " + input.getName() + ";  Dataset: " + dataset + lineSeparator;
+        }
+        
+        return inputsList;
     }
 
 }

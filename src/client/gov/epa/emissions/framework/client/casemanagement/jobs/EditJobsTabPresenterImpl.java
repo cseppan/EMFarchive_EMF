@@ -219,4 +219,13 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
             return Math.abs(new Random().nextInt());
         }
     }
+
+    public String validateJobs(CaseJob[] jobs) throws EmfException {
+        List<Integer> ids = new ArrayList<Integer>();
+        
+        for (CaseJob job : jobs)
+            ids.add(new Integer(job.getId()));
+        
+        return service().validateJobs(ids.toArray(new Integer[0]));
+    }
 }

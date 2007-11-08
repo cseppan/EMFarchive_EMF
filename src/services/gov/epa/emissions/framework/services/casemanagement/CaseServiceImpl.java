@@ -498,4 +498,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getCases(category);
     }
 
+    public String validateJobs(Integer[] jobIDs) throws EmfException {
+        return getCaseService().validateJobs(jobIDs);
+    }
+
 }

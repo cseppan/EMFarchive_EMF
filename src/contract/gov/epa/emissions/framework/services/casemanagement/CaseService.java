@@ -142,5 +142,7 @@ public interface CaseService {
     String printStatusCaseJobTaskManager() throws EmfException;
 
     Case[] getCases(CaseCategory category) throws EmfException;
+    
+    String validateJobs(Integer[] jobIDs) throws EmfException;
 
  }

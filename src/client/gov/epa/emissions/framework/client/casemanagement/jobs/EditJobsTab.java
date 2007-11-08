@@ -202,8 +202,8 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Order", "Sector", "Name", "Executable" };
-        return new SortCriteria(columnNames, new boolean[] { 
-                true, true, true, true }, new boolean[] { false, false, false, false });
+        return new SortCriteria(columnNames, new boolean[] { true, true, true, true }, new boolean[] { false, false,
+                false, false });
     }
 
     private JPanel controlPanel() {
@@ -245,7 +245,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         });
         edit.setMargin(insets);
         container.add(edit);
-        
+
         String message = "You have asked to copy too many jobs. Do you wish to proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
         SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(), selectModel, confirmDialog);
@@ -270,7 +270,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
         return panel;
     }
-    
+
     private Action copyAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
@@ -305,9 +305,8 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         String title = "Warning";
 
         if (presenter.jobsUsed(jobs)) {
-            int selection1 = showDialog(
-                  "Selected job(s) are used by case inputs or parameters.\n "+
-                  "Are you sure you want to remove the selected job(s)?", title);
+            int selection1 = showDialog("Selected job(s) are used by case inputs or parameters.\n "
+                    + "Are you sure you want to remove the selected job(s)?", title);
 
             if (selection1 != JOptionPane.YES_OPTION)
                 return;
@@ -347,12 +346,12 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
     private void copyJobs() throws Exception {
         List jobs = getSelectedJobs();
-        
+
         if (jobs.size() == 0) {
             messagePanel.setMessage("Please select job(s) to copy.");
             return;
         }
-        
+
         for (Iterator iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = (CaseJob) iter.next();
             String title = "Copy of " + job.getName() + "(" + job.getId() + ")(" + caseObj.getName() + ")";
@@ -371,24 +370,46 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
         try {
             String msg = presenter.getJobsStatus(jobs);
+            int option = JOptionPane.NO_OPTION;
+            String lineSeparator = System.getProperty("line.separator");
 
             if (msg.equalsIgnoreCase("OK")) {
-                proceedRunningJobs(jobs);
-            }
-            
-            if (msg.equalsIgnoreCase("CANCEL"))
-                setMessage("One or more of the selected jobs is already running.");
-            
-            if (msg.equalsIgnoreCase("WARNING")) {
-                int option = showDialog("Are you sure you want to rerun the selected job(s)?", "Warning");
+                option = validateJobs(jobs, option, lineSeparator);
+                
                 if (option == JOptionPane.YES_OPTION)
                     proceedRunningJobs(jobs);
+                
+                return;
             }
+
+            if (msg.equalsIgnoreCase("CANCEL")) {
+                setMessage("One or more of the selected jobs is already running.");
+                return;
+            }
+
+            if (msg.equalsIgnoreCase("WARNING"))
+                option = showDialog("Are you sure you want to rerun the selected job(s)?", "Warning");
+
+            if (option == JOptionPane.YES_OPTION) {
+                option = validateJobs(jobs, option, lineSeparator);
+            }
+
+            if (option == JOptionPane.YES_OPTION)
+                proceedRunningJobs(jobs);
         } catch (Exception e) {
             throw e;
         } finally {
             setCursor(Cursor.getDefaultCursor());
         }
+    }
+
+    private int validateJobs(CaseJob[] jobs, int option, String lineSeparator) throws EmfException {
+        String validationMsg = presenter.validateJobs(jobs);
+
+        if (!validationMsg.isEmpty())
+            option = showDialog("The Selected job" + (jobs.length > 1 ? "s have " : " has ") + "non-final input datasets:" + lineSeparator + validationMsg
+                    + lineSeparator + "Are you sure to run the selected job(s)?", "Warning");
+        return option;
     }
 
     private void proceedRunningJobs(CaseJob[] jobs) throws Exception {
@@ -402,7 +423,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     private List<CaseJob> getSelectedJobs() {
         return (List<CaseJob>) selectModel.selected();
     }
-    
+
     private int showDialog(String msg, String title) {
         return JOptionPane.showConfirmDialog(parentConsole, msg, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);

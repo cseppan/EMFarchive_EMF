@@ -723,4 +723,13 @@ public class CaseServiceTransport implements CaseService {
         return (Case[]) call.requestResponse(new Object[]{ category });
     }
 
+    public String validateJobs(Integer[] jobIDs) throws EmfException {
+        EmfCall call = call();
+        call.setOperation("validateJobs");
+        call.addParam("jobIDs", caseMappings.casejobIds());
+        call.setStringReturnType();
+        
+        return (String) call.requestResponse(new Object[] {jobIDs});
+    }
+
 }
