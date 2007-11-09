@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -44,24 +45,36 @@ public class CaseServiceTest2 extends ServiceTestCase {
         System.gc();
     }
 
-    private Case newCase() {
+    private Case newCase(String name, CaseCategory category, boolean insert) {
+        session.clear();
+
+        if (name == null)
+            name = "test" + Math.random();
+
+        if (insert && category != null) {
+            add(category);
+            category = (CaseCategory) load(CaseCategory.class, category.getName());
+        }
+
         // create a new case and set the name and export top dir
-        Case element = new Case("test" + Math.random());
+        Case element = new Case(name);
         element.setInputFileDir("/home/azubrow/smoke_emf_training/2002/smoke");
+        element.setCaseCategory(category);
 
         // adds the element to the db and then reloads it from the db
         // ensures that it has an id
         add(element);
         return (Case) load(Case.class, element.getName());
     }
-    
-    private CaseJob newCaseJob(Case caseObj, String jobkey, User user) {
+
+    private CaseJob newCaseJob(Case caseObj, String jobkey, User user, String status) {
         CaseJob element = new CaseJob("test" + Math.random());
         element.setCaseId(caseObj.getId());
         element.setJobkey(jobkey);
         element.setUser(user);
+        element.setRunstatus(loadJobRunStatus(status));
         add(element);
-        
+
         return element;
     }
 
@@ -73,6 +86,13 @@ public class CaseServiceTest2 extends ServiceTestCase {
         CaseDAO DAO = new CaseDAO();
         session.clear();
         return (CaseInput) DAO.loadCaseInput(input, session);
+    }
+
+    private JobRunStatus loadJobRunStatus(String status) {
+        CaseDAO DAO = new CaseDAO();
+        session.clear();
+
+        return DAO.getJobRunStatuse(status, session);
     }
 
     private CaseJob loadNewCaseJob(CaseJob job, Case caseObj) {
@@ -88,7 +108,7 @@ public class CaseServiceTest2 extends ServiceTestCase {
 
     public void testShouldReleaseLockedCase() throws EmfException {
         User owner = userService.getUser("emf");
-        Case element = newCase();
+        Case element = newCase(null, null, false);
 
         try {
             Case locked = service.obtainLocked(owner, element);
@@ -104,7 +124,7 @@ public class CaseServiceTest2 extends ServiceTestCase {
 
     public void testShouldCopyACaseWithCaseInputs() throws Exception {
         User owner = userService.getUser("emf");
-        Case element = newCase();
+        Case element = newCase(null, null, false);
         Case copied = null;
         CaseInput cpdInput1 = null;
         CaseInput cpdInput2 = null;
@@ -163,35 +183,35 @@ public class CaseServiceTest2 extends ServiceTestCase {
         /**
          * Tests the Case run job on the server side
          */
-        
-        Case caseObj = newCase();
+
+        Case caseObj = newCase(null, null, false);
         CaseJob job = new CaseJob();
         EmfDataset[] datasets = null;
         CaseInput[] inputs = null;
         InputName[] inNames = null;
-//        Sector sector = null;
+        // Sector sector = null;
         CaseProgram program = null;
         Executable execVal = null;
         SubDir subDirObj = null;
-        
+
         try {
             // Create a new user, case, job, and executable
             User user = userService.getUser("emf");
-            
+
             // Create a new executable and synch w/ db
             execVal = new Executable();
             execVal.setName("smk_onroad_test.csh");
             add(execVal);
             execVal = (Executable) load(Executable.class, execVal.getName());
-            
+
             // Set job name, executable names and path and add to job
             job.setName("job_test1");
             job.setPath("/home/azubrow/tmp");
-//            job.setExecutable(new Executable[] { execVal });
+            // job.setExecutable(new Executable[] { execVal });
             job.setExecutable(execVal);
 
             // Create EMF datasets -- metadata only
-            datasets = loadMetaDatasets();
+            datasets = loadMetaDatasets(2);
 
             // create case inputs and input names for each dataset
             inputs = new CaseInput[datasets.length];
@@ -199,18 +219,17 @@ public class CaseServiceTest2 extends ServiceTestCase {
 
             // clears stale tables from db
             session.clear();
-           
 
             // new sub dir and synch w/ db
             subDirObj = new SubDir();
             subDirObj.setName("ge_dat/v3");
             add(subDirObj);
             subDirObj = (SubDir) load(SubDir.class, subDirObj.getName());
-           
+
             // Need new sector and program for input
-//            sector = new Sector("", "test sector one");
-//            add(sector);
-//            sector = (Sector) load(Sector.class, sector.getName());
+            // sector = new Sector("", "test sector one");
+            // add(sector);
+            // sector = (Sector) load(Sector.class, sector.getName());
             program = new CaseProgram("test case program2");
             add(program);
             program = (CaseProgram) load(CaseProgram.class, program.getName());
@@ -231,7 +250,7 @@ public class CaseServiceTest2 extends ServiceTestCase {
                 // populate case input
                 inputs[i].setInputName(inNames[i]);
                 inputs[i].setDataset(datasets[i]);
-                inputs[i].setVersion(newVersion(datasets[i]));
+                inputs[i].setVersion(newVersion(datasets[i], 0, true));
                 inputs[i].setDatasetType(datasets[i].getDatasetType());
                 inputs[i].setProgram(program);
                 inputs[i].setSector(datasets[i].getSectors()[0]);
@@ -252,7 +271,7 @@ public class CaseServiceTest2 extends ServiceTestCase {
             // update everything to db
             job = loadNewCaseJob(job, caseObj);
 
-            service.submitJob(job, user,caseObj);
+            service.submitJob(job, user, caseObj);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -260,9 +279,7 @@ public class CaseServiceTest2 extends ServiceTestCase {
 
         } finally {
             /*
-             * Clean up db-
-             * Order matters, clean up tables that reference
-             * other tables first.
+             * Clean up db- Order matters, clean up tables that reference other tables first.
              */
             for (CaseInput input : inputs) {
                 Version tmpVersion = input.getVersion();
@@ -278,7 +295,7 @@ public class CaseServiceTest2 extends ServiceTestCase {
             for (EmfDataset dataset : datasets) {
                 remove(dataset);
             }
-//            remove(sector);
+            // remove(sector);
             remove(job);
             remove(execVal);
             remove(caseObj);
@@ -286,7 +303,156 @@ public class CaseServiceTest2 extends ServiceTestCase {
         }
     }
 
-    private EmfDataset[] loadMetaDatasets() throws EmfException {
+    public void testShouldDetectNonFinalVersionInputDatasets() throws Exception {
+        Case caseObj = newCase(null, null, false);
+        CaseJob job = new CaseJob();
+        EmfDataset[] datasets = null;
+        CaseInput[] inputs = null;
+        InputName[] inNames = null;
+        CaseProgram program = null;
+        SubDir subDirObj = null;
+
+        try {
+            job.setName("job_test1");
+            job.setPath("C:\\temp");
+            datasets = loadMetaDatasets(5);
+            job.setSector(datasets[0].getSectors()[0]);
+            job = loadNewCaseJob(job, caseObj);
+            inputs = new CaseInput[datasets.length];
+            inNames = new InputName[datasets.length];
+            session.clear();
+            subDirObj = new SubDir();
+            subDirObj.setName("ge_dat/v3");
+            add(subDirObj);
+            subDirObj = (SubDir) load(SubDir.class, subDirObj.getName());
+            program = new CaseProgram("test case program2");
+            add(program);
+            program = (CaseProgram) load(CaseProgram.class, program.getName());
+
+            for (int i = 0; i < datasets.length; i++) {
+                inputs[i] = new CaseInput();
+                inNames[i] = new InputName(datasets[i].getName() + "test");
+                add(inNames[i]);
+                inNames[i] = (InputName) load(InputName.class, inNames[i].getName());
+
+                // populate case input
+                inputs[i].setInputName(inNames[i]);
+                inputs[i].setDataset(datasets[i]);
+                Version version = null;
+
+                if (i < 2)
+                    version = newVersion(datasets[i], 0, true);
+                else
+                    version = newVersion(datasets[i], 1, false);
+                
+                inputs[i].setVersion(version);
+                inputs[i].setDatasetType(datasets[i].getDatasetType());
+                inputs[i].setProgram(program);
+                inputs[i].setSector(datasets[i].getSectors()[0]);
+                inputs[i].setSubdirObj(subDirObj);
+                inputs[i].setCaseID(caseObj.getId());
+                inputs[i].setCaseJobID(job.getId());
+                add(inputs[i]);
+                inputs[i] = loadCaseInput(inputs[i]);
+            }
+            
+            String lineSeparator = System.getProperty("line.separator");
+            String validationMsg = service.validateJobs(new Integer[]{new Integer(job.getId())});
+            String expectedMsg = "Input: test2test;  Dataset: test2" + lineSeparator +
+                    "Input: test3test;  Dataset: test3" + lineSeparator +
+                    "Input: test4test;  Dataset: test4" + lineSeparator;
+                
+            assertEquals(expectedMsg, validationMsg);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            for (CaseInput input : inputs) {
+                Version tmpVersion = input.getVersion();
+                remove(input);
+                remove(tmpVersion);
+            }
+            remove(program);
+            remove(subDirObj);
+            for (InputName inName : inNames) {
+                remove(inName);
+            }
+
+            for (EmfDataset dataset : datasets) {
+                remove(dataset);
+            }
+            remove(job);
+            remove(caseObj);
+        }
+    }
+
+    public void testShouldAddJobMessagesAsSent() throws EmfException {
+        String jobkey = "xy120jkj;lkj324@#$";
+        String status = "Not Started";
+        User user = userService.getUser("emf");
+        Case caseObj = (Case) load(Case.class, newCase(null, null, false).getName());
+        CaseJob job = (CaseJob) load(CaseJob.class, newCaseJob(caseObj, jobkey, user, status).getName());
+        JobMessage msg = new JobMessage();
+        msg.setCaseId(caseObj.getId());
+        msg.setJobId(job.getId());
+        msg.setRemoteUser(user.getUsername());
+        msg.setStatus(status);
+        msg.setMessage("Test persistance of JobMessage object.");
+
+        try {
+            service.recordJobMessage(msg, jobkey);
+            JobMessage[] msgs = service.getJobMessages(caseObj.getId(), job.getId());
+            assertEquals(1, msgs.length);
+            assertEquals("emf", msgs[0].getRemoteUser());
+            assertEquals(job.getId(), msgs[0].getJobId());
+            assertEquals(caseObj.getId(), msgs[0].getCaseId());
+            assertEquals("Test persistance of JobMessage object.", msgs[0].getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dropAll(JobMessage.class);
+            dropAll(CaseJob.class);
+            dropAll(Case.class);
+        }
+
+    }
+
+    public void testShouldSelectCaseByCategories() {
+        CaseCategory category1 = new CaseCategory("one");
+        CaseCategory category2 = new CaseCategory("two");
+        CaseCategory category3 = new CaseCategory("three");
+        CaseCategory category4 = new CaseCategory("four");
+
+        Case caseOne = newCase("case one", category1, true);
+        Case caseTwo = newCase("case two", category2, true);
+        Case caseThree = newCase("case three", category3, true);
+        Case caseFour = newCase("case four", category4, true);
+        Case caseFive = newCase("case five", category4, false);
+        Case caseSix = newCase("case six", category4, false);
+
+        try {
+            Case[] typeOneCase = service.getCases(category1);
+            Case[] typeTwoCase = service.getCases(category2);
+            Case[] typeThreeCase = service.getCases(category3);
+            Case[] typeFourCase = service.getCases(category4);
+
+            assertEquals(typeOneCase.length, 1);
+            assertEquals(typeTwoCase.length, 1);
+            assertEquals(typeThreeCase.length, 1);
+            assertEquals(typeFourCase.length, 3);
+
+            assertEquals(caseOne.getName(), typeOneCase[0].getName());
+            assertEquals(caseTwo.getName(), typeTwoCase[0].getName());
+            assertEquals(caseThree.getName(), typeThreeCase[0].getName());
+            assertEquals(caseFour.getName(), typeFourCase[0].getName());
+            assertEquals(caseFive.getName(), typeFourCase[1].getName());
+            assertEquals(caseSix.getName(), typeFourCase[2].getName());
+        } finally {
+            dropAll(Case.class);
+            dropAll(CaseCategory.class);
+        }
+    }
+
+    private EmfDataset[] loadMetaDatasets(int numOfDatasets) throws EmfException {
         /**
          * This loads some test datasets into the EMF-test db
          * 
@@ -295,18 +461,25 @@ public class CaseServiceTest2 extends ServiceTestCase {
          */
 
         // Dataset array for returns
-        EmfDataset[] datasets = new EmfDataset[2];
+        EmfDataset[] datasets = new EmfDataset[numOfDatasets];
 
         // sectors
         Sector sectorOR = (Sector) load(Sector.class, "On Road");
 
         // Create metadata for new dataset of specific type
-        datasets[0] = newDataset("mbinv_onroad", "ORL Onroad Inventory (MBINV)" );
-        datasets[0].setSectors(new Sector[] {sectorOR});
+        datasets[0] = newDataset("mbinv_onroad", "ORL Onroad Inventory (MBINV)");
+        datasets[0].setSectors(new Sector[] { sectorOR });
 
         // Create metadata for new dataset of specific type
         datasets[1] = newDataset("mcodes", "Mobile Source Codes (Line-based)");
-        datasets[1].setSectors(new Sector[] {sectorOR});
+        datasets[1].setSectors(new Sector[] { sectorOR });
+
+        if (numOfDatasets > 2) {
+            for (int i = 2; i < numOfDatasets; i++) {
+                datasets[i] = newDataset("test" + i, "ORL Onroad Inventory (MBINV)");
+                datasets[i].setSectors(new Sector[] { sectorOR });
+            }
+        }
 
         return datasets;
     }
@@ -351,16 +524,16 @@ public class CaseServiceTest2 extends ServiceTestCase {
         return (EmfDataset) load(EmfDataset.class, dataset.getName());
     }
 
-    private Version newVersion(EmfDataset dataset) {
+    private Version newVersion(EmfDataset dataset, int versionNum, boolean isFinal) {
         /**
          * Associates dataset id w/ a new version adds version to db and returns new version
          */
         // Create version db
         Version version = new Version();
         version.setDatasetId(dataset.getId());
-        version.setVersion(0);
+        version.setVersion(versionNum);
         version.setPath("");
-        version.setFinalVersion(true);
+        version.setFinalVersion(isFinal);
         Date lastModifiedDate = new Date(); // initialized to now
         version.setLastModifiedDate(lastModifiedDate);
 
@@ -399,40 +572,6 @@ public class CaseServiceTest2 extends ServiceTestCase {
         return null;
     }
 
-    // private Dataset[] loadDataExamples() throws Exception {
-    // /**
-    // * Loads the data into datasets for job and case examples
-    // */
-    // // setting up server info
-    // DbServer localDbServer = dbSetup.getNewPostgresDbServerInstance();
-    // SqlDataTypes sqlDataTypes = localDbServer.getSqlDataTypes();
-    //
-    // // Create a list for future dataset
-    // List datasetLst = new ArrayList();
-    //        
-    // // create a particular dataset ORL
-    // Dataset dataset = new SimpleDataset();
-    // dataset.setName("testOnroadOrl");
-    // dataset.setId(Math.abs(new Random().nextInt()));
-    //        
-    // // Setup version
-    // Version version = new Version();
-    // version.setVersion(0);
-    //
-    // // loads the data
-    // File file = new File("test/data/orl/nc", "small-onroad.txt");
-    // Importer orlImporter = new ORLOnRoadImporter(file.getParentFile(), new String[] { file.getName() }, dataset,
-    // localDbServer, sqlDataTypes, new VersionedDataFormatFactory(version, dataset));
-    // // VersionedImporter importer = new VersionedImporter(orlImporter, dataset, localDbServer,
-    // lastModifiedDate(file.getParentFile(),file.getName()));
-    // VersionedImporter importer = new VersionedImporter(orlImporter, dataset, localDbServer, new Date());
-    // importer.run();
-    //
-    // // add new dataset to the list
-    // datasetLst.add(dataset);
-    //
-    // }
-
     public Object load(Class clazz, String className) {
         /**
          * loads the abstract class through hibernate from db need to pass class name (type) and recast the return
@@ -451,36 +590,6 @@ public class CaseServiceTest2 extends ServiceTestCase {
             tx.rollback();
             throw e;
         }
-    }
-    
-    public void testShouldAddJobMessagesAsSent() throws EmfException {
-        String jobkey = "xy120jkj;lkj324@#$";
-        User user = userService.getUser("emf");
-        Case caseObj = (Case)load(Case.class, newCase().getName());
-        CaseJob job = (CaseJob)load(CaseJob.class, newCaseJob(caseObj, jobkey, user).getName());
-        JobMessage msg = new JobMessage();
-        msg.setCaseId(caseObj.getId());
-        msg.setJobId(job.getId());
-        msg.setRemoteUser(user.getUsername());
-        msg.setMessage("Test persistance of JobMessage object.");
-        
-        try {
-            service.recordJobMessage(msg, jobkey);
-            JobMessage[] msgs = service.getJobMessages(caseObj.getId(), job.getId());
-            assertEquals(1, msgs.length);
-            assertEquals("emf", msgs[0].getRemoteUser());
-            assertEquals(job.getId(), msgs[0].getJobId());
-            assertEquals(caseObj.getId(), msgs[0].getCaseId());
-            assertEquals("Test persistance of JobMessage object.", msgs[0].getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            dropAll(JobMessage.class);
-            dropAll(CaseJob.class);
-            dropAll(Case.class);
-        }
-        
-        
     }
 
 }

@@ -396,6 +396,11 @@ public class CaseDAO {
     public List<JobRunStatus> getJobRunStatuses(Session session) {
         return hibernateFacade.getAll(JobRunStatus.class, Order.asc("name"), session);
     }
+    
+    public JobRunStatus getJobRunStatuse(String status, Session session) {
+        Criterion crit = Restrictions.eq("name", status);
+        return (JobRunStatus) hibernateFacade.load(JobRunStatus.class, crit, session);
+    }
 
     public JobRunStatus getJobRunStatuse(String status) {
         if (DebugLevels.DEBUG_9)
