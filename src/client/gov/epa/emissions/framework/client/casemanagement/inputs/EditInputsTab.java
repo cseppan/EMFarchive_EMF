@@ -450,10 +450,12 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
     }
 
     private int checkOverWrite() {
-        String title = "Message";
-        String message = "Would you like to remove previously exported files prior to export?";
-        return JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
+//        String title = "Message";
+//        String message = "Would you like to remove previously exported files prior to export?";
+//        return JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+//                JOptionPane.QUESTION_MESSAGE);
+        //FIXME: Temporal setting till gets back from Marc on this policy 11/09/2007 Qun
+        return JOptionPane.YES_OPTION;
     }
 
     private List<EmfDataset> getSelectedDatasets(List inputlist) {
