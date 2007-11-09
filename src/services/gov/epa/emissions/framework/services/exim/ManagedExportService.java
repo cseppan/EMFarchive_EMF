@@ -118,7 +118,7 @@ public class ManagedExportService {
         DatasetType datasetType = dataset.getDatasetType();
         String message = null;
 
-        if (dataset.isLocked(user) || !version.isFinalVersion())
+        if (version.isLocked() && !version.isFinalVersion())
             message = "The dataset " + dataset.getName() + " is being edited and the version is not final -- not exported.";
 
         if ((datasetType.getExporterClassName().equals("")) || (datasetType.getExporterClassName() == null)) {
