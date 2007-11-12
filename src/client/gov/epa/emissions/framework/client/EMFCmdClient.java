@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client;
 import gov.epa.emissions.commons.io.importer.CommaDelimitedTokenizer;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
@@ -38,7 +39,12 @@ public class EMFCmdClient {
             displayHelp();
             return;
         }
-
+        
+        if (options.contains("-f")) {
+            runFromFile(options);
+            return;
+        }
+            
         if (!options.contains("-k")) {
             System.out.println("Please specify required options '-k'.");
             displayHelp();
@@ -72,13 +78,16 @@ public class EMFCmdClient {
     }
 
     private static void displayHelp() {
-        System.out.println("Usage\njava " + EMFClient.class.getName() + " [url] [options]\n"
+        System.out.println("Usage:\njava " + EMFClient.class.getName() + " [url] [options]\n"
                 + "\n\turl: location of EMF Services. Defaults to " + DEFAULT_URL + "\n" + "\n\toptions:\n"
                 + "\n\t-h --help\tShow this help message and exit" + "\n\t-k --jobkey\tJob key code"
                 + "\n\t-x --execPath\tFull path to script or executable" + "\n\t-p --period\tEMF period"
                 + "\n\t-m --message\tText of message"
                 + "\n\t-s --status\tStatus, acceptable values: 'Submitted', 'Running', 'Failed', or 'Completed'"
                 + "\n\t-t --msg_type\tMessage type: i (info), e (error), w (warning)");
+
+        System.out.println("\nOr:\toptions:\n"
+                + "\n\t-f --file\tSend job messages directly from this file\n");
     }
 
     private static void run(List<String> args) throws Exception {
@@ -118,16 +127,27 @@ public class EMFCmdClient {
         jobMsg.setRemoteUser(System.getProperty("user.name"));
         jobMsg.setExecModifiedDate(execFile.exists() ? new Date(execFile.lastModified()) : null);
         jobMsg.setReceivedTime(new Date());
-        
+
         if (loggerDir == null || loggerDir.isEmpty())
             sendMessage(args, jobkey, jobMsg);
         else
             writeToLogger(args, logFile, logInterval, resendTimes, jobkey, jobMsg);
     }
 
+    private static void runFromFile(List<String> args) throws Exception {
+        int resendTimesIndex = args.indexOf("-r");
+        int msgFileIndex = args.indexOf("-f");
+        int resendTimes = (resendTimesIndex < 0) ? 1 : Integer.parseInt(args.get(++resendTimesIndex));
+        String msgFile = (msgFileIndex < 0) ? "" : args.get(++msgFileIndex).trim();
+        
+        if (!msgFile.isEmpty()) {
+            sendLogsFromFile(args, resendTimes, msgFile);
+        } 
+    }
+
     private static void sendMessage(List<String> args, String jobkey, JobMessage jobMsg) throws Exception {
         int exitValue = 0;
-        
+
         try {
             send(args, new JobMessage[] { jobMsg }, new String[] { jobkey });
         } catch (Exception exc) {
@@ -139,8 +159,8 @@ public class EMFCmdClient {
         }
     }
 
-    private static void sendLogs(List<String> args, int logInterval, int resendTimes, String logfile, String logAsistFile, String jobkey,
-            JobMessage jobMsg, boolean now) throws Exception {
+    private static void sendLogs(List<String> args, int logInterval, int resendTimes, String logfile,
+            String logAsistFile, String jobkey, JobMessage jobMsg, boolean now) throws Exception {
         List<JobMessage> msgs = new ArrayList<JobMessage>();
         List<String> keys = new ArrayList<String>();
         long start = 0;
@@ -156,7 +176,7 @@ public class EMFCmdClient {
         BufferedReader asistFileReader = new BufferedReader(new FileReader(logAsistFile));
         long sentLines = Long.parseLong(asistFileReader.readLine().trim());
         asistFileReader.close();
-        
+
         BufferedReader br = new BufferedReader(new FileReader(logfile));
         String line = br.readLine();
         long lineCount = 1;
@@ -177,11 +197,62 @@ public class EMFCmdClient {
 
         br.close();
 
-        if (now || ((end - start) / 1000 > logInterval)) {
-            resend(args, resendTimes, msgs, keys);
-            rewriteSentLinesNumber(++lineCount, logAsistFile);
+        try {
+            if (now || ((end - start) / 1000 > logInterval))
+                resend(args, resendTimes, msgs, keys);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            System.exit(1);
         }
 
+        rewriteSentLinesNumber(++lineCount, logAsistFile);
+        System.exit(0);
+    }
+
+    private static void sendLogsFromFile(List<String> args, int resendTimes, String logfile) throws Exception {
+        List<JobMessage> msgs = new ArrayList<JobMessage>();
+        List<String> keys = new ArrayList<String>();
+        File logFile = new File(logfile);
+        String logAsistFile = logFile + ".ast";
+        File logAsistant = new File(logAsistFile);
+
+        if (!logFile.exists()) {
+            System.out.println("Specified log file: " + logfile + " doesn't exist.");
+            return;
+        }
+
+        if (!logAsistant.exists()) {
+            System.out.println("Specified log asistant file: " + logAsistFile + " doesn't exist.");
+            return;
+        }
+
+        BufferedReader asistFileReader = new BufferedReader(new FileReader(logAsistant));
+        long sentLines = Long.parseLong(asistFileReader.readLine().trim());
+        asistFileReader.close();
+
+        BufferedReader br = new BufferedReader(new FileReader(logfile));
+        String line = br.readLine();
+        long lineCount = 1;
+
+        while ((line = br.readLine()) != null) {
+            ++lineCount;
+
+            if (lineCount >= sentLines) {
+                msgs.add(extractJobMsg(line));
+                keys.add(extractJobkey(line));
+            }
+        }
+
+        br.close();
+
+        try {
+            resend(args, resendTimes, msgs, keys);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            System.exit(1);
+        }
+
+        rewriteSentLinesNumber(++lineCount, logAsistFile);
         System.exit(0);
     }
 
@@ -191,13 +262,14 @@ public class EMFCmdClient {
         writer.close();
     }
 
-    private static void resend(List<String> args, int resendTimes, List<JobMessage> msgs, List<String> keys) {
+    private static void resend(List<String> args, int resendTimes, List<JobMessage> msgs, List<String> keys) throws EmfException {
         while (resendTimes > 0) {
             try {
                 send(args, msgs.toArray(new JobMessage[0]), keys.toArray(new String[0]));
                 resendTimes = 0;
             } catch (Exception e) {
                 --resendTimes;
+                throw new EmfException("Error in sending job messages.");
             }
         }
     }
@@ -229,7 +301,8 @@ public class EMFCmdClient {
             sendLogs(args, logInterval, resendTimes, logFile, logAsistFile, jobkey, jobMsg, true);
     }
 
-    private static void writeLogs(PrintWriter writer, String logAsistFile, JobMessage jobMsg, String jobkey, boolean logFileExisted) throws IOException {
+    private static void writeLogs(PrintWriter writer, String logAsistFile, JobMessage jobMsg, String jobkey,
+            boolean logFileExisted) throws IOException {
         String msg = jobkey;
         msg += "," + jobMsg.getExecName();
         msg += "," + jobMsg.getExecPath();
@@ -245,7 +318,7 @@ public class EMFCmdClient {
             PrintWriter asistWriter = new PrintWriter(new BufferedWriter(new FileWriter(logAsistFile)));
             asistWriter.println("2"); // line number to start extract job messages and send
             asistWriter.close();
-            
+
             writer.println("job key, exec name,exec path,message,"
                     + "message type,status,period,user,last mod date,log time(ms)");
         }
