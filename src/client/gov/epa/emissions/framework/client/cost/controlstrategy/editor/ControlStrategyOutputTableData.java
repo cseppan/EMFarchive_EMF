@@ -39,11 +39,11 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
         EmfDataset outputDataset = (EmfDataset) result.getDetailedResultDataset();
         EmfDataset controlledInvDataset = (EmfDataset) result.getControlledInventoryDataset();
         ControlStrategyInputDataset controlStrategyInputDataset = getControlStrategyInputDataset(result.getInputDatasetId());
-        Object[] values = { result.getInputDataset().getName(), controlStrategyInputDataset != null ? controlStrategyInputDataset.getVersion() : result.getInputDataset().getDefaultVersion(), 
+        Object[] values = { result.getInputDataset().getName(), result.getRecordCount() == null ? 0 : result.getRecordCount(), controlStrategyInputDataset != null ? controlStrategyInputDataset.getVersion() : result.getInputDataset().getDefaultVersion(), 
                 outputDataset.getName(), controlledInvDataset == null ? "" : controlledInvDataset.getName(), 
                 result.getRunStatus(), result.getTotalCost(), 
                 result.getTotalReduction(), format(result.getStartTime()),
-                format(result.getCompletionTime()), result.getRecordCount() == null ? 0 : result.getRecordCount() };
+                format(result.getCompletionTime()) };
         return values;
     }
 
@@ -59,18 +59,18 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Input Inventory", "Input Version", 
+        return new String[] { "Input Inventory", "Record Count", "Input Version", 
                 "Detailed Result", "Controlled Inventory", 
                 "Status", "Total Cost", 
                 "Total Reduction", "Start Time", 
-                "Completion Time", "Record Count" };
+                "Completion Time" };
     }
 
     public Class getColumnClass(int col) {
-        if (col == 1 || col == 9)
+        if (col == 2 || col == 1)
             return Integer.class;
 
-        if (col == 5 || col == 6)
+        if (col == 6 || col == 7)
             return Double.class;
 
         return String.class;
