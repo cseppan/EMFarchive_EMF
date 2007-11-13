@@ -267,7 +267,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     public void save(EmfDataset dataset) {
         messagePanel.clear();
         
-        dataset.setName(name.getText());
+        dataset.setName(name.getText().trim());
         dataset.setDescription(description.getText());
         updateProject();
         dataset.setStartDateTime(startDateTime.value());

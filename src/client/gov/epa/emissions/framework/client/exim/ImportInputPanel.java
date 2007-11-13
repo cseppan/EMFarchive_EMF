@@ -284,7 +284,7 @@ public class ImportInputPanel extends JPanel {
     }
 
     public String datasetName() {
-        return name.getText();
+        return name.getText().trim();
     }
 
     public void setMessage(String message) {
