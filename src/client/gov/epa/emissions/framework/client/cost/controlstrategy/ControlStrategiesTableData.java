@@ -29,15 +29,15 @@ public class ControlStrategiesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Last Modified", "Region", 
+        return new String[] { "Name", "Last Modified", "Run Status", "Region", 
                 "Target Pollutant", "Total Cost", "Reduction", 
                 "Project", "Strategy Type", "Cost Year", 
-                "Inv. Year", "Run Status", "Completion Date", 
+                "Inv. Year", "Completion Date", 
                 "Creator" };
     }
 
     public Class getColumnClass(int col) {
-        if (col == 4 || col == 5)
+        if (col == 6 || col == 5)
             return Double.class;
 
         return String.class;
@@ -55,10 +55,10 @@ public class ControlStrategiesTableData extends AbstractTableData {
         List rows = new ArrayList();
         for (int i = 0; i < controlStrategies.length; i++) {
             ControlStrategy element = controlStrategies[i];
-            Object[] values = { element.getName(), format(element.getLastModifiedDate()), region(element),
+            Object[] values = { element.getName(), format(element.getLastModifiedDate()), element.getRunStatus(), region(element),
                     element.getTargetPollutant(), getTotalCost(element.getId()), getReduction(element.getId()), 
                     project(element), analysisType(element), costYear(element), 
-                    "" + (element.getInventoryYear() != 0 ? element.getInventoryYear() : ""), element.getRunStatus(), format(element.getCompletionDate()), 
+                    "" + (element.getInventoryYear() != 0 ? element.getInventoryYear() : ""), format(element.getCompletionDate()), 
                     element.getCreator().getName() };
             Row row = new ViewableRow(element, values);
             rows.add(row);
