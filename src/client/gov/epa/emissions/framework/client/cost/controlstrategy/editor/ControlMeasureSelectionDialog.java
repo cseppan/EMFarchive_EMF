@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.client.meta.EmfImageTool;
 import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.TrackableSortFilterSelectModel;
+import gov.epa.emissions.framework.ui.YesNoDialog;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
@@ -78,17 +79,27 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 add();
-                setVisible(false);
-                dispose();
-            }
+               }
         };
     }
 
     private void add() {
         List selected = selectModel.selected();
+        
+        // prevent from closing window without selecting items
+        if (selected.size()==0){
+            String message = "Would you like to close without selecting any measures?";
+            YesNoDialog dialog = new YesNoDialog(this, "Close", message);
+            if (dialog.confirm()){
+                setVisible(false);
+                dispose();
+            }
+            return; 
+        }
         LightControlMeasure[] cms = (LightControlMeasure[]) selected.toArray(new LightControlMeasure[0]);
         presenter.doAdd(cms);
-
+        setVisible(false);
+        dispose();
     }
 
     public void observe(ControlMeasureSelectionPresenter presenter) {
