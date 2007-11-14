@@ -54,6 +54,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     
     private EditControlStrategyMeasuresTab measuresTabView;
 
+    private EditControlStrategyOutputTabView outputTabView;
+
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
         super("Edit Control Strategy", new Dimension(700, 580), desktopManager);
 //        this.setMinimumSize(new Dimension(700, 300));
@@ -189,10 +191,10 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 //    }
     
     private JPanel outputPanel(ControlStrategyResult[] controlStrategyResults) {
-        EditControlStrategyOutputTabView view = new EditControlStrategyOutputTab(controlStrategy,
+        outputTabView = new EditControlStrategyOutputTab(controlStrategy,
                 controlStrategyResults, messagePanel, desktopManager, parentConsole, session);
-        this.presenter.set(view);
-        return (JPanel) view;
+        this.presenter.set(outputTabView);
+        return (JPanel) outputTabView;
     }
 
     private JPanel createErrorTab(String message) {
@@ -279,7 +281,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                     enableButtons(false);
                     controlStrategy.setStartDate(new Date());
                     presenter.setResults(controlStrategy);
-                    presenter.runStrategy();
+                    presenter.runStrategy(outputTabView.getExportFolder());
                     messagePanel
                             .setMessage("Running strategy. Monitor the status window for progress, and refresh this window after completion to see results");
                 } catch (EmfException e) {

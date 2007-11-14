@@ -31,18 +31,25 @@ public class RunControlStrategy {
 
     private DbServerFactory dbServerFactory;
 
-    public RunControlStrategy(StrategyFactory factory, HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory, PooledExecutor threadPool) {
+    private String exportDirectory;
+    
+    public RunControlStrategy(StrategyFactory factory, HibernateSessionFactory sessionFactory, 
+            DbServerFactory dbServerFactory, PooledExecutor threadPool,
+            String exportDirectory) {
         this.factory = factory;
         this.sessionFactory = sessionFactory;
         this.threadPool = threadPool;
         this.dbServerFactory = dbServerFactory;
+        this.exportDirectory = exportDirectory;
         this.services = services();
     }
 
     public void run(User user, ControlStrategy controlStrategy, ControlStrategyService service) throws EmfException {
         currentLimitations(controlStrategy);
         try {
-            Strategy strategy = factory.create(controlStrategy, user, sessionFactory, dbServerFactory);
+            Strategy strategy = factory.create(controlStrategy, user, 
+                    sessionFactory, dbServerFactory,
+                    exportDirectory);
             StrategyTask task = new StrategyTask(strategy, user, services, service);
             threadPool.execute(new GCEnforcerTask("Run Strategy: " + controlStrategy.getName(), task));
         } catch (Exception e) {

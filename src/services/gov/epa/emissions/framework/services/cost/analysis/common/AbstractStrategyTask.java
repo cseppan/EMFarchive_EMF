@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
+import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
@@ -40,13 +41,17 @@ public abstract class AbstractStrategyTask implements Strategy {
     
     private StatusDAO statusDAO;
 
+    private String exportDirectory;
+    
     public AbstractStrategyTask(ControlStrategy controlStrategy, User user, 
-            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) throws EmfException {
+            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory,
+            String exportDirectory) throws EmfException {
         this.controlStrategy = controlStrategy;
         this.dbServer = dbServerFactory.getDbServer();
         this.datasource = dbServer.getEmissionsDatasource();
         this.sessionFactory = sessionFactory;
         this.user = user;
+        this.exportDirectory = exportDirectory;
         this.statusDAO = new StatusDAO(sessionFactory);
         //setup the strategy run
         setup();
@@ -93,9 +98,9 @@ public abstract class AbstractStrategyTask implements Strategy {
     protected void saveControlStrategyResult(ControlStrategyResult strategyResult) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            runQASteps(strategyResult);
             ControlStrategyDAO dao = new ControlStrategyDAO();
             dao.updateControlStrategyResult(strategyResult, session);
+            runQASteps(strategyResult);
         } catch (RuntimeException e) {
             throw new EmfException("Could not save control strategy results: " + e.getMessage());
         } finally {
@@ -177,7 +182,11 @@ public abstract class AbstractStrategyTask implements Strategy {
 
     protected void runSummaryQASteps(EmfDataset dataset, int version) throws EmfException {
         QAStepTask qaTask = new QAStepTask(dataset, version, user, sessionFactory, dbServer);
-        qaTask.runSummaryQASteps(qaTask.getDefaultSummaryQANames());
+        //11/14/07 DCD instead of running the default qa steps specified in the property table, lets run all qa step templates...
+        QAStepTemplate[] qaStepTemplates = dataset.getDatasetType().getQaStepTemplates();
+        String[] qaStepTemplateNames = new String[qaStepTemplates.length];
+        for (int i = 0; i < qaStepTemplates.length; i++) qaStepTemplateNames[i] = qaStepTemplates[i].getName();
+        qaTask.runSummaryQAStepsAndExport(qaStepTemplateNames, exportDirectory);
     }
 
     protected void disconnectDbServer() throws EmfException {

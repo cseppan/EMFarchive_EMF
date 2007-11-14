@@ -262,7 +262,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     
     protected void runStrategy(ControlStrategy strategy) throws EmfException {
         MaxEmsRedStrategy strategyTask = new MaxEmsRedStrategy(strategy, emfUser(), dbServerFactory,
-                new Integer(500), sessionFactory);
+                new Integer(500), sessionFactory, getExportDirectory());
         strategyTask.run();
     }
     
@@ -271,5 +271,14 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(emfUser(), strategy,
                 controlStrategyInputDataset, sessionFactory, dbServerFactory);
         output.create();
+    }
+    
+    private String getExportDirectory() {
+        // TBD: make this use the new temp dir
+        String tempDir = System.getProperty("IMPORT_EXPORT_TEMP_DIR");
+
+        if (tempDir == null || tempDir.isEmpty())
+            tempDir = System.getProperty("java.io.tmpdir");
+        return tempDir;
     }
 }

@@ -239,10 +239,13 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public synchronized void runStrategy(User user, ControlStrategy strategy) {
+    public synchronized void runStrategy(User user, ControlStrategy strategy,
+            String exportDirectory) {
         StrategyFactory factory = new StrategyFactory(batchSize());
         try {
-            RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, dbServerFactory, threadPool);
+            RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, 
+                    dbServerFactory, threadPool,
+                    exportDirectory);
             runStrategy.run(user, strategy, this);
         } catch (Exception e) {
             //

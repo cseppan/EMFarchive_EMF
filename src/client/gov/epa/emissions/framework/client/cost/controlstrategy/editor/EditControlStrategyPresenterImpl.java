@@ -143,8 +143,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         summaryTabView.stopRun();
     }
 
-    public void runStrategy() throws EmfException {
-        service().runStrategy(session.user(), controlStrategy);
+    public void runStrategy(String exportDirectory) throws EmfException {
+        service().runStrategy(session.user(), controlStrategy, exportDirectory);
     }
 
     public void doRefresh() throws EmfException {

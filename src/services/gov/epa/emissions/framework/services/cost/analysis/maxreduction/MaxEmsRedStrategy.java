@@ -13,9 +13,10 @@ public class MaxEmsRedStrategy extends AbstractStrategyTask {
     
     public MaxEmsRedStrategy(ControlStrategy controlStrategy, User user, 
             DbServerFactory dbServerFactory, Integer batchSize,
-            HibernateSessionFactory sessionFactory) throws EmfException {
+            HibernateSessionFactory sessionFactory, String exportDirectory) throws EmfException {
         super(controlStrategy, user, 
-                dbServerFactory, sessionFactory);
+                dbServerFactory, sessionFactory,
+                exportDirectory);
         this.loader = new StrategyLoader(user, dbServerFactory, 
                 sessionFactory, controlStrategy, 
                 batchSize);

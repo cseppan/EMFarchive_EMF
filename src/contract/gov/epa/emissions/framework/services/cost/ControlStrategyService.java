@@ -29,7 +29,7 @@ public interface ControlStrategyService extends EMFService {
     
     ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException;
     
-    void runStrategy (User user, ControlStrategy strategy) throws EmfException;
+    void runStrategy (User user, ControlStrategy strategy, String exportDirectory) throws EmfException;
     
     void stopRunStrategy() throws EmfException;
 

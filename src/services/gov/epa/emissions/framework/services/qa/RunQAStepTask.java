@@ -14,6 +14,8 @@ import java.util.Date;
 
 import org.hibernate.Session;
 
+//import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
+
 public class RunQAStepTask {
 
     private QAStep[] qasteps;
@@ -26,13 +28,35 @@ public class RunQAStepTask {
 
     private DbServer dbServer;
 
-    public RunQAStepTask(QAStep[] qaStep, User user, DbServer dbServer, HibernateSessionFactory sessionFactory) {
+//    private PooledExecutor threadPool;
+
+    private String exportDirectory;
+    
+    public RunQAStepTask(QAStep[] qaStep, User user, 
+            DbServer dbServer, HibernateSessionFactory sessionFactory,
+            String exportDirectory) {
+        this(qaStep, user, 
+            dbServer, sessionFactory);
+//        this.threadPool = createThreadPool();
+        this.exportDirectory = exportDirectory;
+    }
+
+    public RunQAStepTask(QAStep[] qaStep, User user, 
+            DbServer dbServer, HibernateSessionFactory sessionFactory) {
         this.qasteps = qaStep;
         this.user = user;
         this.dbServer = dbServer;
         this.sessionFactory = sessionFactory;
         this.statusDao = new StatusDAO(sessionFactory);
     }
+
+//    private synchronized PooledExecutor createThreadPool() {
+//        PooledExecutor threadPool = new PooledExecutor(20);
+//        threadPool.setMinimumPoolSize(1);
+//        threadPool.setKeepAliveTime(1000 * 60 * 3);// terminate after 3 (unused) minutes
+//
+//        return threadPool;
+//    }
 
     public void run() throws EmfException {
         QAStep qaStep = null;
@@ -56,6 +80,12 @@ public class RunQAStepTask {
         QAProgramRunner runQAProgram = qaProgramRunner(qaStep);
         runQAProgram.run();
         complete(suffix, qaStep);
+
+        if (exportDirectory != null && exportDirectory.trim().length() != 0) {
+//            ExportQAStep exportQATask = new ExportQAStep(qaStep, dbServer, user, sessionFactory, threadPool);
+//            exportQATask.export(exportDirectory);
+        }
+    
     }
 
     private QAProgramRunner qaProgramRunner(QAStep step) throws EmfException {

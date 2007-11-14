@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.services.qa;
 
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
@@ -27,7 +27,7 @@ public class ExportQAStep {
 
     private PooledExecutor threadPool;
 
-    private EmfDbServer dbServer;
+    private DbServer dbServer;
 
     private HibernateSessionFactory sessionFactory;
 
@@ -35,7 +35,7 @@ public class ExportQAStep {
 
     private static Log LOG = LogFactory.getLog(ExportQAStep.class);
 
-    public ExportQAStep(QAStep step, EmfDbServer dbServer, User user, HibernateSessionFactory sessionFactory,
+    public ExportQAStep(QAStep step, DbServer dbServer, User user, HibernateSessionFactory sessionFactory,
             PooledExecutor threadPool) {
         this.step = step;
         this.dbServer = dbServer;

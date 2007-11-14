@@ -25,7 +25,7 @@ public interface EditControlStrategyPresenter {
 
     void set(ControlStrategyConstraintsTabView view);
 
-    void runStrategy() throws EmfException;
+    void runStrategy(String exportDirectory) throws EmfException;
 
     void setResults(ControlStrategy controlStrategy);
 

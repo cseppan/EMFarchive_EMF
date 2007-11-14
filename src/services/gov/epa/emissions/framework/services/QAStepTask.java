@@ -67,6 +67,12 @@ public class QAStepTask {
         runQASteps(summarySteps);
     }
 
+    public void runSummaryQAStepsAndExport(String[] qaStepNames, String exportDirectory) throws EmfException {
+        QAStepTemplate[] summaryTemplates = loadQASummaryTemplates(qaStepNames);
+        QAStep[] summarySteps = addQASteps(summaryTemplates, dataset, version);
+        runQAStepsAndExport(summarySteps, exportDirectory);
+    }
+
     private QAStepTemplate[] loadQASummaryTemplates(String[] qaStepNames) throws EmfException {
         QAStepTemplate[] summaryTemplates = getSummaryTemplates(qaStepNames);
         if (summaryTemplates.length < qaStepNames.length)
@@ -78,6 +84,18 @@ public class QAStepTask {
     private void runQASteps(QAStep[] summarySteps) throws EmfException {
         try {
             RunQAStepTask runner = new RunQAStepTask(removeUpToDateSteps(summarySteps), user, dbServer, sessionFactory);
+            runner.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException("Can't run summary QASteps: " + e.getMessage());
+        }
+    }
+
+    private void runQAStepsAndExport(QAStep[] summarySteps, String exportDirectory) throws EmfException {
+        try {
+            RunQAStepTask runner = new RunQAStepTask(removeUpToDateSteps(summarySteps), user, 
+                    dbServer, sessionFactory, 
+                    exportDirectory);
             runner.run();
         } catch (Exception e) {
             e.printStackTrace();

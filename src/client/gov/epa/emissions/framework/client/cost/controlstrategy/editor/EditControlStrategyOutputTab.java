@@ -377,6 +377,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             this.folder.setText(recentfolder);
     }
 
+    public String getExportFolder() {
+        return this.folder.getText();
+    }
     public void displayAnalyzeTable(String controlStrategyName, String[] fileNames) {
         AnalysisEngineTableApp app = new AnalysisEngineTableApp("Analyze Control Strategy: " + controlStrategyName, new Dimension(500, 500), desktopManager, parentConsole);
         app.display(fileNames);
