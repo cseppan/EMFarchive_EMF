@@ -24,7 +24,7 @@ public class EMFCmdClient {
 
     private static ServiceLocator serviceLocator;
 
-    private static boolean DEBUG = true;
+    private static boolean DEBUG = false;
 
     public synchronized static void main(String[] args) throws Exception {
         if (DEBUG)
