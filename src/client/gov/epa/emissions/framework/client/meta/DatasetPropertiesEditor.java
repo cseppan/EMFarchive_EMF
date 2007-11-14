@@ -48,15 +48,17 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private EditableKeywordsTab keywordsTab;
 
+    private JTabbedPane tabbedPane;
+
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties Editor", new Dimension(700, 550), desktopManager);
         this.session = session;
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
+        this.tabbedPane = new JTabbedPane();
     }
 
     private JTabbedPane createTabbedPane(EmfDataset dataset, Version[] versions, MessagePanel messagePanel) {
-        JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
 
         tabbedPane.addTab("Summary", createSummaryTab(dataset, versions, messagePanel));
@@ -253,6 +255,10 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         } catch (EmfException e) {
             showError(e.getMessage());
         }
+    }
+
+    public void setDefaultTab(int index) {
+        this.tabbedPane.setSelectedIndex(index);
     }
 
 }

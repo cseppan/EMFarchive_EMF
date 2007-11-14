@@ -49,7 +49,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private TextField name;
 
     private TextArea description;
-    
+
     private DoubleTextField discountRate;
 
     private EditableComboBox projectsCombo;
@@ -77,21 +77,20 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private JLabel startDate, completionDate, costValue, emissionReductionValue;
 
     private ComboBox strategyTypeCombo;
-    
-    private JCheckBox useCostEquationCheck; 
+
+    private JCheckBox useCostEquationCheck;
 
     private ControlStrategyResult[] controlStrategyResults;
 
     private DecimalFormat decFormat;
-    
+
     private CostYearTable costYearTable;
-    
+
     private NumberFieldVerifier verifier;
-    
-    public EditControlStrategySummaryTab(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults,
-            EmfSession session, ManageChangeables changeablesList, MessagePanel messagePanel, EmfConsole parentConsole,
-            CostYearTable costYearTable)
-            throws EmfException {
+
+    public EditControlStrategySummaryTab(ControlStrategy controlStrategy,
+            ControlStrategyResult[] controlStrategyResults, EmfSession session, ManageChangeables changeablesList,
+            MessagePanel messagePanel, EmfConsole parentConsole, CostYearTable costYearTable) throws EmfException {
         super.setName("summary");
         this.controlStrategy = controlStrategy;
         this.controlStrategyResults = controlStrategyResults;
@@ -101,8 +100,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         this.parentConsole = parentConsole;
         this.decFormat = new DecimalFormat("0.###E0");
         this.costYearTable = costYearTable;
-        this.verifier= new NumberFieldVerifier("Summary tab: ");
-        
+        this.verifier = new NumberFieldVerifier("Summary tab: ");
+
         setLayout();
     }
 
@@ -117,7 +116,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private JPanel createmMainSection() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
-        //panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Name:", name(), panel);
@@ -143,7 +142,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         return strategyTypeCombo;
     }
-    
+
     private JPanel createLowerSection() throws EmfException {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(getBorderedPanel(createLowerLeftSection(), "Parameters"), BorderLayout.WEST);
@@ -171,7 +170,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutants(), panel);
         layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate(), panel);
         layoutGenerator.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), panel);
-        
+
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
                 5, 5, // initialX, initialY
@@ -181,19 +180,18 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private DoubleTextField discountRate() {
-         discountRate= new DoubleTextField("discount rate", 1, 20, 10);
-          discountRate.setValue((controlStrategy.getDiscountRate()));
-          discountRate.setToolTipText("This value is only used for point sources");
-          changeablesList.addChangeable(discountRate);
+        discountRate = new DoubleTextField("discount rate", 1, 20, 10);
+        discountRate.setValue((controlStrategy.getDiscountRate()));
+        discountRate.setToolTipText("This value is only used for point sources");
+        changeablesList.addChangeable(discountRate);
         return discountRate;
     }
-    
+
     private JCheckBox useCostEquation() {
-        
+
         useCostEquationCheck = new JCheckBox(" ", null, controlStrategy.getUseCostEquations());
         return useCostEquationCheck;
     }
-
 
     private IntTextField costYearTextField() {
         costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 10);
@@ -203,7 +201,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private IntTextField inventoryYearTextField() {
         inventoryYear = new IntTextField("Inventory year", 0, Integer.MAX_VALUE, 10);
-        if (controlStrategy.getInventoryYear() != 0) 
+        if (controlStrategy.getInventoryYear() != 0)
             inventoryYear.setValue(controlStrategy.getInventoryYear());
         return inventoryYear;
     }
@@ -263,7 +261,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         return majorPollutant;
     }
-    
+
     private Pollutant[] getAllPollutants(EmfSession session) throws EmfException {
         return session.dataCommonsService().getPollutants();
     }
@@ -312,8 +310,9 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setDescription(description.getText());
         updateProject();
 
-//        isDatasetSelected(controlStrategy);
-        controlStrategy.setCostYear(new YearValidation("Cost Year").value(costYear.getText(), costYearTable.getStartYear(), costYearTable.getEndYear()));
+        // isDatasetSelected(controlStrategy);
+        controlStrategy.setCostYear(new YearValidation("Cost Year").value(costYear.getText(), costYearTable
+                .getStartYear(), costYearTable.getEndYear()));
         controlStrategy.setInventoryYear(new YearValidation("Inventory Year").value(inventoryYear.getText()));
         updateRegion();
         controlStrategy.setTargetPollutant(checkMajorPollutant());
@@ -323,7 +322,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setUseCostEquations(useCostEquationCheck.isSelected());
     }
 
-
     private double checkDiscountRate() throws EmfException {
         // check to see that it's not empty
         if (discountRate.getText().trim().length() == 0)
@@ -331,12 +329,12 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         double value = verifier.parseDouble(discountRate.getText());
 
-        //make sure the number makes sense...
-        if (value < 1 || value > 20){
+        // make sure the number makes sense...
+        if (value < 1 || value > 20) {
             throw new EmfException("Enter the Discount Rate as a percent between 1 and 20 (e.g., 7% is entered as 7)");
         }
         return value;
-        
+
     }
 
     private StrategyType checkStrategyType() throws EmfException {
@@ -354,11 +352,11 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return pollutant;
     }
 
-//    private void isDatasetSelected(ControlStrategy controlStrategy) throws EmfException {
-//        if (controlStrategy.getControlStrategyInputDatasets().length == 0) {
-//            throw new EmfException("Please select a dataset");
-//        }
-//    }
+    // private void isDatasetSelected(ControlStrategy controlStrategy) throws EmfException {
+    // if (controlStrategy.getControlStrategyInputDatasets().length == 0) {
+    // throw new EmfException("Please select a dataset");
+    // }
+    // }
 
     private void updateRegion() {
         Object selected = regionsCombo.getSelectedItem();
@@ -369,7 +367,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
                 controlStrategy.setRegion(region);
             }
         } else if (selected instanceof Region) {
-            controlStrategy.setRegion((Region)selected);
+            controlStrategy.setRegion((Region) selected);
         }
     }
 
@@ -386,7 +384,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
                 controlStrategy.setProject(project);
             }
         } else if (selected instanceof Project) {
-            controlStrategy.setProject((Project)selected);
+            controlStrategy.setProject((Project) selected);
         }
     }
 
@@ -409,24 +407,29 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         updateSummaryResultPanel(controlStrategy, controlStrategyResults);
     }
 
-    private void updateSummaryResultPanel(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
-        updateStartDate(controlStrategy);
+    private void updateSummaryResultPanel(ControlStrategy controlStrategy,
+            ControlStrategyResult[] controlStrategyResults) {
         if (controlStrategyResults == null || controlStrategyResults.length == 0) {
+            updateStartDate(controlStrategy);
             updateSummaryPanelValuesExceptStartDate("", "", "");
             return;
         }
-        ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(
-                controlStrategyResults);
+        ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
         String runStatus = summary.getRunStatus();
         String completionTime = runStatus.indexOf("Failed") == -1 ? summary.getCompletionTime() : "Failed";
+        String startTime = runStatus.indexOf("Failed") == -1 ? summary.getStartTime() : "Failed";
+        updateStartDate(startTime);
         updateSummaryPanelValuesExceptStartDate(completionTime, "" + summary.getStrategyTotalCost(), ""
                 + summary.getStrategyTotalReduction());
     }
 
+    private void updateStartDate(String startTime) {
+        startDate.setText(startTime);
+    }
+
     private void updateStartDate(ControlStrategy controlStrategy) {
         String startDateString = EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(controlStrategy.getStartDate());
-        startDate.setText((startDateString == null ? "Not started" : startDateString) + " by "
-                + controlStrategy.getCreator().getName());
+        startDate.setText((startDateString == null ? "Not started" : startDateString));
     }
 
     private void updateSummaryPanelValuesExceptStartDate(String closeDate, String cost, String emisReduction) {
@@ -434,5 +437,5 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         costValue.setText(cost.length() == 0 ? "" : decFormat.format(new Double(cost)));
         emissionReductionValue.setText(emisReduction.length() == 0 ? "" : decFormat.format(new Double(emisReduction)));
     }
-    
+
 }

@@ -13,5 +13,7 @@ public interface DatasetPropertiesEditorView extends ManagedView {
     void showError(String message);
 
     void notifyLockFailure(EmfDataset dataset);
+    
+    void setDefaultTab(int index);
 
 }

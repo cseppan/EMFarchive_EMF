@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesEditor;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
@@ -55,7 +56,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
 //    private CheckBox inventoryCheckBox;
 
-    private Button createButton;
+    private Button createButton, editButton;
     
     private EmfSession session;
 
@@ -275,8 +276,10 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         Button exportButton = new ExportButton(exportAction());
         Button analysisButton = new Button("Analyze", analysisAction());
         Button view = new ViewButton("View", viewAction());
+        editButton = new Button("Edit", editAction());
         createButton = new Button("Create", createOutputAction());
         createButton.setEnabled(false);
+//        editButton.setEnabled(false);
         
         detailButton = new JRadioButton("Detailed Result");
         detailButton.addActionListener(radioButtonAction());
@@ -286,7 +289,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         contInvButton = new JRadioButton("Controlled Inventory");
         contInvButton.addActionListener(radioButtonAction());
         
-        //Create logical relationship btween JradioButtons 
+        //Create logical relationship between JradioButtons 
         buttonGroup = new ButtonGroup();
         buttonGroup.add(invButton);     
         buttonGroup.add(detailButton);
@@ -299,6 +302,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel buttonPanel = new JPanel();
         mainPanel.add(radioPanel, BorderLayout.NORTH);
+        buttonPanel.add(editButton);
         buttonPanel.add(exportButton);
         buttonPanel.add(analysisButton);
         buttonPanel.add(view);
@@ -308,15 +312,46 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         return mainPanel;
     }
     
+    private Action editAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    doDisplayPropertiesEditor();
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
+            }       
+        };
+    }
+    
+    private void doDisplayPropertiesEditor() throws EmfException {
+        ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
+        if (controlStrategyResults.length == 0) {
+            messagePanel.setError("Please select at least one item.");
+            return;
+        }
+
+        int counter = 0;
+        for (int i = 0; i < controlStrategyResults.length; i++) {
+            DatasetPropertiesEditor view = new DatasetPropertiesEditor(session, parentConsole, desktopManager);
+            
+            if (buttonGroup.getSelection().equals(detailButton.getModel())) {
+                presenter.doDisplayPropertiesEditor(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
+                counter++;
+            } 
+        }
+
+    }
     private Action radioButtonAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 if (buttonGroup.getSelection().equals(invButton.getModel()) ||buttonGroup.getSelection().equals(detailButton.getModel()) ){
                     createButton.setEnabled(false);
-                    
+//                    editButton.setEnabled(false);
                 }
                 else
-                    createButton.setEnabled(true);   
+                    createButton.setEnabled(true);
+                   // editButton.setEnabled(true);
             }
         };
     }
@@ -423,6 +458,10 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private ControlStrategyResult[] getSelectedDatasets() {
         return selectModel.selected().toArray(new ControlStrategyResult[0]);
+    }
+
+    public void clearMsgPanel() {
+        this.messagePanel.clear();
     }
 
 }

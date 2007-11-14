@@ -14,4 +14,6 @@ public interface EditControlStrategyOutputTabView extends EditControlStrategyTab
 
     void displayAnalyzeTable(String controlStrategyName, String[] fileNames);
     
+    void clearMsgPanel();
+    
 }
