@@ -74,7 +74,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     protected EmfConsole parentConsole;
 
-    private JLabel startDate, completionDate, costValue, emissionReductionValue;
+    private JLabel startDate, completionDate, user, costValue, emissionReductionValue;
 
     private ComboBox strategyTypeCombo;
 
@@ -278,6 +278,9 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         panel.setBorder(BorderFactory.createTitledBorder("Results"));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
+        user = new JLabel("");
+        user.setBackground(Color.white);
+        
         startDate = new JLabel("");
         startDate.setBackground(Color.white);
 
@@ -294,10 +297,11 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         layoutGenerator.addLabelWidgetPair("Start Date:", startDate, panel);
         layoutGenerator.addLabelWidgetPair("Completion Date:", completionDate, panel);
+        layoutGenerator.addLabelWidgetPair("User:", user, panel);
         layoutGenerator.addLabelWidgetPair("Total Annualized Cost:", costValue, panel);
         layoutGenerator.addLabelWidgetPair("Target Poll. Reduction:", emissionReductionValue, panel);
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -395,7 +399,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     public void setRunMessage(ControlStrategy controlStrategy) {
         messagePanel.clear();
         updateStartDate(controlStrategy);
-        updateSummaryPanelValuesExceptStartDate("Running", "", "");
+        updateSummaryPanelValuesExceptStartDate("", "Running", "", "");
     }
 
     public void stopRun() {
@@ -411,15 +415,17 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
             ControlStrategyResult[] controlStrategyResults) {
         if (controlStrategyResults == null || controlStrategyResults.length == 0) {
             updateStartDate(controlStrategy);
-            updateSummaryPanelValuesExceptStartDate("", "", "");
+            updateSummaryPanelValuesExceptStartDate("", "", "", "");
             return;
         }
         ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
         String runStatus = summary.getRunStatus();
         String completionTime = runStatus.indexOf("Failed") == -1 ? summary.getCompletionTime() : "Failed";
-        String startTime = runStatus.indexOf("Failed") == -1 ? summary.getStartTime() : "Failed";
+        String userName = controlStrategy.getCreator().getName();
+//        String userName= summary.getUser().getName()== null ? summary.getUser().getName() : "";
+        String startTime = summary.getStartTime() == null? summary.getStartTime(): "";
         updateStartDate(startTime);
-        updateSummaryPanelValuesExceptStartDate(completionTime, "" + summary.getStrategyTotalCost(), ""
+        updateSummaryPanelValuesExceptStartDate(userName, "" + completionTime, "" + summary.getStrategyTotalCost(), ""
                 + summary.getStrategyTotalReduction());
     }
 
@@ -432,8 +438,9 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         startDate.setText((startDateString == null ? "Not started" : startDateString));
     }
 
-    private void updateSummaryPanelValuesExceptStartDate(String closeDate, String cost, String emisReduction) {
+    private void updateSummaryPanelValuesExceptStartDate(String userName, String closeDate, String cost, String emisReduction) {
         completionDate.setText(closeDate);
+        user.setText(userName);
         costValue.setText(cost.length() == 0 ? "" : decFormat.format(new Double(cost)));
         emissionReductionValue.setText(emisReduction.length() == 0 ? "" : decFormat.format(new Double(emisReduction)));
     }

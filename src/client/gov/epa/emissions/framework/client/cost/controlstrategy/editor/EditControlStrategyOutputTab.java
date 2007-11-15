@@ -106,6 +106,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                 } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
                     if (controlStrategyResults[i].getControlledInventoryDataset() != null)
                         datasetList.add((EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
+                    else
+                        messagePanel.setError("Please create controled inventory first.");
                 }
             }
             presenter.doExport(datasetList.toArray(new EmfDataset[0]), folder.getText());
@@ -128,6 +130,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                 else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
                     if (controlStrategyResults[i].getControlledInventoryDataset() != null)
                         datasetList.add((EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
+                    else
+                        messagePanel.setError("Please create controled inventory first.");
                 }
             }
             presenter.doAnalyze(controlStrategy.getName(), datasetList.toArray(new EmfDataset[0]));
@@ -302,10 +306,10 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel buttonPanel = new JPanel();
         mainPanel.add(radioPanel, BorderLayout.NORTH);
+        buttonPanel.add(view);
         buttonPanel.add(editButton);
         buttonPanel.add(exportButton);
         buttonPanel.add(analysisButton);
-        buttonPanel.add(view);
         buttonPanel.add(createButton);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         
@@ -316,7 +320,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         return new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 try {
-                    doDisplayPropertiesEditor();
+                    edit();
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
                 }
@@ -324,7 +328,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         };
     }
     
-    private void doDisplayPropertiesEditor() throws EmfException {
+    private void edit() throws EmfException {
         ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
         if (controlStrategyResults.length == 0) {
             messagePanel.setError("Please select at least one item.");
@@ -334,14 +338,27 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         int counter = 0;
         for (int i = 0; i < controlStrategyResults.length; i++) {
             DatasetPropertiesEditor view = new DatasetPropertiesEditor(session, parentConsole, desktopManager);
-            
-            if (buttonGroup.getSelection().equals(detailButton.getModel())) {
+
+            if (buttonGroup.getSelection().equals(invButton.getModel())) {
+                presenter.doDisplayPropertiesEditor(view, getInputDataset(controlStrategyResults[i].getInputDatasetId()));
+                counter++;
+            } 
+            else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
                 presenter.doDisplayPropertiesEditor(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
                 counter++;
             } 
+            else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
+                if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
+                    presenter.doDisplayPropertiesEditor(view, (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
+                    counter++;
+                }
+                else
+                    messagePanel.setError("Please create controled inventory first.");
+            }
         }
-
     }
+
+    
     private Action radioButtonAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -430,31 +447,34 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             messagePanel.setError("Please select at least one item.");
             return;
         }
-
-        int counter = 0;
+         
         for (int i = 0; i < controlStrategyResults.length; i++) {
             DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
             if (buttonGroup.getSelection().equals(invButton.getModel())) {
                 presenter.doDisplayPropertiesView(view, getInputDataset(controlStrategyResults[i].getInputDatasetId()));
-                counter++;
+
             } 
             else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
                 presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
-                counter++;
+
             } 
             else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
                 if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
                     presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
-                    counter++;
+
                 }
+                else
+                    messagePanel.setError("Please create controled inventory first.");
             }
+ 
         }
         
-        if (counter == 0) {
-            messagePanel.setError("Please select at least one item.");
-            return;
-        }
+//        if (counter == 0) {
+//            messagePanel.setError("Please select at least one item.");
+//            return;
+//        }
     }
+    
 
     private ControlStrategyResult[] getSelectedDatasets() {
         return selectModel.selected().toArray(new ControlStrategyResult[0]);

@@ -89,7 +89,7 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
         // prevent from closing window without selecting items
         if (selected.size()==0){
             String message = "Would you like to close without selecting any measures?";
-            YesNoDialog dialog = new YesNoDialog(this, "Close", message);
+            YesNoDialog dialog = new YesNoDialog(this, "No measures selected", message);
             if (dialog.confirm()){
                 setVisible(false);
                 dispose();

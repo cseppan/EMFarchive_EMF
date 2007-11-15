@@ -111,7 +111,7 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         view.clearMsgPanel();
         PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(detailedResultDataset, editor, session);
         presenter.doDisplay();
-        editor.setDefaultTab(7);
+//        editor.setDefaultTab(7);
     }
     
 }

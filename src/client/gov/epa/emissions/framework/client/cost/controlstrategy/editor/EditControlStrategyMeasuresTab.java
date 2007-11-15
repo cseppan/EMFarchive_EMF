@@ -86,7 +86,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
     public void display(ControlStrategy strategy) throws EmfException {
         this.allClasses = presenter.getAllClasses();
         this.classes = presenter.getControlMeasureClasses();
-        mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel = new JPanel(new BorderLayout(5, 5));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setupLayout(changeablesList);
     }
@@ -99,9 +99,9 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
             messagePanel.setError(e.getMessage());
         }
 
-        this.setLayout(new BorderLayout(10, 10));
+        this.setLayout(new BorderLayout(5, 5));
         // this.setBorder(BorderFactory.createEmptyBorder(50,50,0,300));
-        this.add(createClassesPanel(changeables), BorderLayout.WEST);
+        this.add(createClassesPanel(changeables), BorderLayout.NORTH);
         // mainPanel.add(new JLabel("Measures to Include:"), BorderLayout.NORTH);
         buildSortFilterPanel();
         // mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
@@ -259,7 +259,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         changeables.addChangeable(classesList);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 0));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 100, 0, 300));
         JLabel label = new JLabel("Classes to Include:");
         JScrollPane scrollPane = new JScrollPane(classesList);
         scrollPane.setPreferredSize(new Dimension(20, 100));
