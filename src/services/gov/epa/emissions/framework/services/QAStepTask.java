@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.data.QAStepTemplate;
-import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
@@ -35,15 +34,15 @@ public class QAStepTask {
 
     private int version;
 
-    private DbServer dbServer;
+    private DbServerFactory dbServerFactory;
 
     public QAStepTask(EmfDataset dataset, int version, User user, HibernateSessionFactory sessionFactory,
-            DbServer dbServer) {
+            DbServerFactory dbServerFactory) {
         this.sessionFactory = sessionFactory;
         this.dataset = dataset;
         this.user = user;
         this.version = version;
-        this.dbServer = dbServer;
+        this.dbServerFactory = dbServerFactory;
     }
 
     private QAStepTemplate[] getSummaryTemplates(String[] summaryQAStepNames) {
@@ -83,7 +82,8 @@ public class QAStepTask {
 
     private void runQASteps(QAStep[] summarySteps) throws EmfException {
         try {
-            RunQAStepTask runner = new RunQAStepTask(removeUpToDateSteps(summarySteps), user, dbServer, sessionFactory);
+            RunQAStepTask runner = new RunQAStepTask(removeUpToDateSteps(summarySteps), user, 
+                    dbServerFactory, sessionFactory);
             runner.run();
         } catch (Exception e) {
             e.printStackTrace();
@@ -94,8 +94,8 @@ public class QAStepTask {
     private void runQAStepsAndExport(QAStep[] summarySteps, String exportDirectory) throws EmfException {
         try {
             RunQAStepTask runner = new RunQAStepTask(removeUpToDateSteps(summarySteps), user, 
-                    dbServer, sessionFactory, 
-                    exportDirectory);
+                    dbServerFactory, sessionFactory, 
+                    exportDirectory, false);
             runner.run();
         } catch (Exception e) {
             e.printStackTrace();

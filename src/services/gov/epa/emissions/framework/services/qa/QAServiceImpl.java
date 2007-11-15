@@ -1,19 +1,20 @@
 package gov.epa.emissions.framework.services.qa;
 
-import java.util.Date;
-
 import gov.epa.emissions.commons.data.QAProgram;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfDbServer;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,17 +28,24 @@ public class QAServiceImpl implements QAService {
 
     private HibernateSessionFactory sessionFactory;
 
+    private DbServerFactory dbServerFactory;
+
     private QADAO dao;
 
     private PooledExecutor threadPool;
 
     public QAServiceImpl() {
-        this(HibernateSessionFactory.get());
-        this.threadPool = createThreadPool();
+        this(HibernateSessionFactory.get(), DbServerFactory.get());
     }
 
     public QAServiceImpl(HibernateSessionFactory sessionFactory) {
+        this(sessionFactory, DbServerFactory.get());
+    }
+    
+    public QAServiceImpl(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
         this.sessionFactory = sessionFactory;
+        this.dbServerFactory = dbServerFactory;
+        this.threadPool = createThreadPool();
         dao = new QADAO();
     }
     
@@ -78,10 +86,11 @@ public class QAServiceImpl implements QAService {
         updateResultStatus(step, "In process");
         updateWitoutCheckingConstraints(new QAStep[] { step });
         checkRestrictions(step);
-        EmfDbServer dbServer = dbServer();
+        DbServer dbServer = dbServerFactory.getDbServer();
         removeQAResultTable(step, dbServer);
 
-        RunQAStep runner = new RunQAStep(new QAStep[] { step }, user, dbServer, sessionFactory);
+        RunQAStep runner = new RunQAStep(new QAStep[] { step }, user, 
+                dbServerFactory, sessionFactory);
         try {
             threadPool.execute(new GCEnforcerTask("Running QA Steps", runner));
         } catch (Exception e) {
@@ -90,7 +99,7 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    private synchronized void removeQAResultTable(QAStep step, EmfDbServer dbServer) throws EmfException {
+    private synchronized void removeQAResultTable(QAStep step, DbServer dbServer) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -134,15 +143,13 @@ public class QAServiceImpl implements QAService {
     }
 
     public synchronized void exportQAStep(QAStep step, User user, String dirName) throws EmfException {
-        EmfDbServer dbServer = dbServer();
         try {
-            ExportQAStep exportQATask = new ExportQAStep(step, dbServer, user, sessionFactory, threadPool);
+            ExportQAStep exportQATask = new ExportQAStep(step, dbServerFactory, user, sessionFactory, threadPool);
             exportQATask.export(dirName);
         } catch (Exception e) {
             LOG.error("Could not export QA step", e);
             throw new EmfException("Could not export QA step: " + e.getMessage());
         }
-
     }
 
     private synchronized void checkRestrictions(QAStep step) throws EmfException {
@@ -152,17 +159,6 @@ public class QAServiceImpl implements QAService {
         String runClassName = program.getRunClassName();
         if ((runClassName == null) || (runClassName.trim().length() == 0))
             throw new EmfException("The program " + program.getName() + " cannot currently be run in the EMF");
-    }
-
-    private synchronized EmfDbServer dbServer() throws EmfException {
-        EmfDbServer dbServer = null;
-        try {
-            dbServer = new EmfDbServer();
-        } catch (Exception e) {
-            LOG.error("Could not get a connection", e);
-            throw new EmfException("Could not get a connection-" + e.getMessage());
-        }
-        return dbServer;
     }
 
     public synchronized void updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException {

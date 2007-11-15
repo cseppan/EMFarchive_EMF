@@ -9,10 +9,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 public class ControlStrategy implements Lockable, Serializable {
 
@@ -40,7 +37,7 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private Date completionDate;
 
-    private List controlStrategyInputDatasets;
+    private ControlStrategyInputDataset[] controlStrategyInputDatasets = new ControlStrategyInputDataset[] {};
 
     private Pollutant targetPollutant;
 
@@ -50,9 +47,9 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private String filter;
 
-    private List controlMeasureClasses;
+    private ControlMeasureClass[] controlMeasureClasses = new ControlMeasureClass[] {};
 
-    private List controlMeasures;
+    private ControlStrategyMeasure[] controlMeasures = new ControlStrategyMeasure[] {};
 
     private String countyFile;
 
@@ -64,9 +61,9 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public ControlStrategy() {
         this.lock = new Mutex();
-        this.controlStrategyInputDatasets = new ArrayList();
-        this.controlMeasureClasses = new ArrayList();
-        this.controlMeasures = new ArrayList();
+//        this.controlStrategyInputDatasets = new ArrayList();
+//        this.controlMeasureClasses = new ArrayList();
+//        this.controlMeasures = new ArrayList();
     }
 
     public ControlStrategy(String name) {
@@ -112,11 +109,11 @@ public class ControlStrategy implements Lockable, Serializable {
     }
 
     public ControlStrategyInputDataset[] getControlStrategyInputDatasets() {
-        return (ControlStrategyInputDataset[]) controlStrategyInputDatasets.toArray(new ControlStrategyInputDataset[0]);
+        return controlStrategyInputDatasets;//(ControlStrategyInputDataset[]) controlStrategyInputDatasets.toArray(new ControlStrategyInputDataset[0]);
     }
 
     public void setControlStrategyInputDatasets(ControlStrategyInputDataset[] inputDatasets) {
-        this.controlStrategyInputDatasets = Arrays.asList(inputDatasets);
+        this.controlStrategyInputDatasets = inputDatasets;//Arrays.asList(inputDatasets);
     }
 
     public String getDescription() {
@@ -252,19 +249,19 @@ public class ControlStrategy implements Lockable, Serializable {
     }
 
     public void setControlMeasureClasses(ControlMeasureClass[] controlMeasureClasses) {
-        this.controlMeasureClasses =  (controlMeasureClasses != null) ? Arrays.asList(controlMeasureClasses) : new ArrayList();
+        this.controlMeasureClasses = controlMeasureClasses;//(controlMeasureClasses != null) ? Arrays.asList(controlMeasureClasses) : new ArrayList();
     }
 
     public ControlMeasureClass[] getControlMeasureClasses() {
-        return (ControlMeasureClass[])controlMeasureClasses.toArray(new ControlMeasureClass[0]);
+        return controlMeasureClasses;//(ControlMeasureClass[])controlMeasureClasses.toArray(new ControlMeasureClass[0]);
     }
 
     public void setControlMeasures(ControlStrategyMeasure[] controlMeasures) {
-        this.controlMeasures =  (controlMeasures != null) ? Arrays.asList(controlMeasures) : new ArrayList();
+        this.controlMeasures = controlMeasures;// (controlMeasures != null) ? Arrays.asList(controlMeasures) : new ArrayList();
     }
 
     public ControlStrategyMeasure[] getControlMeasures() {
-        return (ControlStrategyMeasure[])controlMeasures.toArray(new ControlStrategyMeasure[0]);
+        return controlMeasures;//(ControlStrategyMeasure[])controlMeasures.toArray(new ControlStrategyMeasure[0]);
     }
 
     public void setCountyFile(String countyFile) {

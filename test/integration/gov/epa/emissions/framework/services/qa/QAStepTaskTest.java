@@ -57,7 +57,7 @@ public class QAStepTaskTest extends ServiceTestCase {
         EmfDataset dataset = newDataset(tableName, "");
         User user = userDAO.get("emf", session);
 
-        QAStepTask qaTask = new QAStepTask(dataset, 0, user, sessionFactory(), dbServer());
+        QAStepTask qaTask = new QAStepTask(dataset, 0, user, sessionFactory(), dbServerFactory());
         String[] summaryQANames = qaTask.getDefaultSummaryQANames();
 
         assertEquals(4, summaryQANames.length);
@@ -77,7 +77,7 @@ public class QAStepTaskTest extends ServiceTestCase {
         addVersionZeroEntryToVersionsTable(inputDataset, dbserver.getEmissionsDatasource());
 
         try {
-            QAStepTask qaTask = new QAStepTask(inputDataset, 0, userDAO.get("emf", session), sessionFactory(), dbserver);
+            QAStepTask qaTask = new QAStepTask(inputDataset, 0, userDAO.get("emf", session), sessionFactory(), dbServerFactory());
             String[] summaryQANames = qaTask.getDefaultSummaryQANames();
             qaTask.runSummaryQASteps(summaryQANames);
         } finally {

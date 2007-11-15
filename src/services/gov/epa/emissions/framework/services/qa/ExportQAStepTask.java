@@ -4,10 +4,15 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
@@ -28,28 +33,45 @@ public class ExportQAStepTask implements Runnable {
 
     private Log log = LogFactory.getLog(ExportQAStepTask.class);
 
-    private Exporter exporter;
-
     private File file;
 
-    private DbServer dbServer;
-
     private HibernateSessionFactory sessionFactory;
+    
+    private DbServerFactory dbServerFactory;
 
-    public ExportQAStepTask(File file, Exporter exporter, DbServer dbServer, QAStep qaStep, User user,
-            HibernateSessionFactory sessionFactory) {
-        this.file = file;
-        this.exporter = exporter;
-        this.dbServer = dbServer;
+    private QAStepResult result;
+    
+    private String dirName;
+    
+    private boolean verboseStatusLogging = true;
+
+    public ExportQAStepTask(String dirName, QAStep qaStep, 
+            User user, HibernateSessionFactory sessionFactory, 
+            DbServerFactory dbServerFactory) {
+        this.dirName = dirName;
         this.qastep = qaStep;
         this.user = user;
         this.sessionFactory = sessionFactory;
+        this.dbServerFactory = dbServerFactory;
         this.statusDao = new StatusDAO(sessionFactory);
     }
 
-    public void run() {
+    public ExportQAStepTask(String dirName, QAStep qaStep, 
+            User user, HibernateSessionFactory sessionFactory, 
+            DbServerFactory dbServerFactory, boolean verboseStatusLogging) {
+        this(dirName, qaStep, 
+                user, sessionFactory, 
+                dbServerFactory);
+        this.verboseStatusLogging = verboseStatusLogging;
+    }
+
+    public void run() {        
         String suffix = "";
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
+            getStepResult();
+            file = exportFile(dirName);
+            Exporter exporter = new DatabaseTableCSVExporter(result.getTable(), dbServer.getEmissionsDatasource(), batchSize(sessionFactory));
             suffix = suffix();
             prepare(suffix);
             exporter.export(file);
@@ -72,12 +94,13 @@ public class ExportQAStepTask implements Runnable {
     }
 
     private void prepare(String suffixMsg) {
-        setStatus("Started exporting QA step '" + qastep.getName() + "'" + suffixMsg);
-
+        if (verboseStatusLogging)
+            setStatus("Started exporting QA step '" + qastep.getName() + "'" + suffixMsg);
     }
 
     private void complete(String suffixMsg) {
-        setStatus("Completed exporting QA step '" + qastep.getName() + "'" + suffixMsg);
+        if (verboseStatusLogging)
+            setStatus("Completed exporting QA step '" + qastep.getName() + "'" + suffixMsg);
     }
 
     private void logError(String message, Exception e) {
@@ -120,4 +143,42 @@ public class ExportQAStepTask implements Runnable {
         }
     }
 
+    private void getStepResult() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            result = new QADAO().qaStepResult(qastep, session);
+            if (result == null || result.getTable() == null)
+                throw new EmfException("You have to first run the QA Step before export");
+        } finally {
+            session.close();
+        }
+    }
+
+    private File exportFile(String dirName) throws EmfException {
+        return new File(validateDir(dirName), fileName());
+    }
+
+    private String fileName() {
+        return result.getTable() + ".csv";
+    }
+
+    private File validateDir(String dirName) throws EmfException {
+        File file = new File(dirName);
+
+        if (!file.exists() || !file.isDirectory()) {
+            log.error("Folder " + dirName + " does not exist");
+            throw new EmfException("Folder does not exist: " + dirName);
+        }
+        return file;
+    }
+
+    private int batchSize(HibernateSessionFactory sessionFactory) {
+        Session session = sessionFactory.getSession();
+        try {
+            EmfProperty property = new EmfPropertiesDAO().getProperty("export-batch-size", session);
+            return Integer.parseInt(property.getValue());
+        } finally {
+            session.close();
+        }
+    }
 }

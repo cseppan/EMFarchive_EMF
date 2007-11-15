@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.qa;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
@@ -14,7 +15,7 @@ import java.util.Date;
 
 import org.hibernate.Session;
 
-//import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
+import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
 public class RunQAStepTask {
 
@@ -26,37 +27,40 @@ public class RunQAStepTask {
 
     private HibernateSessionFactory sessionFactory;
 
-    private DbServer dbServer;
+    private DbServerFactory dbServerFactory;
 
-//    private PooledExecutor threadPool;
+    private PooledExecutor threadPool;
 
     private String exportDirectory;
-    
+
+    private boolean verboseStatusLogging = true;
+
     public RunQAStepTask(QAStep[] qaStep, User user, 
-            DbServer dbServer, HibernateSessionFactory sessionFactory,
-            String exportDirectory) {
+            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory,
+            String exportDirectory, boolean verboseStatusLogging) {
         this(qaStep, user, 
-            dbServer, sessionFactory);
-//        this.threadPool = createThreadPool();
+            dbServerFactory, sessionFactory);
         this.exportDirectory = exportDirectory;
+        this.verboseStatusLogging = verboseStatusLogging;
     }
 
     public RunQAStepTask(QAStep[] qaStep, User user, 
-            DbServer dbServer, HibernateSessionFactory sessionFactory) {
+            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
         this.qasteps = qaStep;
         this.user = user;
-        this.dbServer = dbServer;
+        this.dbServerFactory = dbServerFactory;
         this.sessionFactory = sessionFactory;
         this.statusDao = new StatusDAO(sessionFactory);
+        this.threadPool = createThreadPool();
     }
 
-//    private synchronized PooledExecutor createThreadPool() {
-//        PooledExecutor threadPool = new PooledExecutor(20);
-//        threadPool.setMinimumPoolSize(1);
-//        threadPool.setKeepAliveTime(1000 * 60 * 3);// terminate after 3 (unused) minutes
-//
-//        return threadPool;
-//    }
+    private synchronized PooledExecutor createThreadPool() {
+        PooledExecutor threadPool = new PooledExecutor(20);
+        threadPool.setMinimumPoolSize(1);
+        threadPool.setKeepAliveTime(1000 * 60 * 3);// terminate after 3 (unused) minutes
+
+        return threadPool;
+    }
 
     public void run() throws EmfException {
         QAStep qaStep = null;
@@ -77,19 +81,36 @@ public class RunQAStepTask {
     private void runSteps(QAStep qaStep) throws EmfException {
         String suffix = suffix(qaStep);
         prepare(suffix, qaStep);
-        QAProgramRunner runQAProgram = qaProgramRunner(qaStep);
-        runQAProgram.run();
+        DbServer dbServer = dbServerFactory.getDbServer();
+        try {
+            QAProgramRunner runQAProgram = qaProgramRunner(qaStep, dbServer);
+            runQAProgram.run();
+        } finally {
+            close(dbServer);
+        }
         complete(suffix, qaStep);
 
         if (exportDirectory != null && exportDirectory.trim().length() != 0) {
-//            ExportQAStep exportQATask = new ExportQAStep(qaStep, dbServer, user, sessionFactory, threadPool);
-//            exportQATask.export(exportDirectory);
+            ExportQAStep exportQATask = new ExportQAStep(qaStep, dbServerFactory, 
+                    user, sessionFactory, 
+                    threadPool, verboseStatusLogging);
+            exportQATask.export(exportDirectory);
         }
     
     }
 
-    private QAProgramRunner qaProgramRunner(QAStep step) throws EmfException {
-        RunQAProgramFactory factory = new RunQAProgramFactory(step, dbServer, sessionFactory);
+    private void close(DbServer dbServer) throws EmfException {
+        try {
+            if (dbServer != null)
+                dbServer.disconnect();
+        } catch (Exception e) {
+            throw new EmfException("Could not close database connection." + e.getMessage());
+        }
+    }
+
+    private QAProgramRunner qaProgramRunner(QAStep step, DbServer dbServer) throws EmfException {
+        RunQAProgramFactory factory = new RunQAProgramFactory(step, dbServer, 
+                sessionFactory);
         try {
             return factory.create();
         } catch (EmfException e) {
@@ -98,11 +119,13 @@ public class RunQAStepTask {
     }
 
     private void prepare(String suffixMsg, QAStep qastep) {
-        setStatus("Started running QA step '" + qastep.getName() + suffixMsg);
+        if (verboseStatusLogging)
+            setStatus("Started running QA step '" + qastep.getName() + suffixMsg);
     }
 
     private void complete(String suffixMsg, QAStep qastep) {
-        setStatus("Completed running QA step '" + qastep.getName() + suffixMsg);
+        if (verboseStatusLogging)
+            setStatus("Completed running QA step '" + qastep.getName() + suffixMsg);
     }
 
     private void setStatus(String message) {
@@ -138,5 +161,4 @@ public class RunQAStepTask {
             session.close();
         }
     }
-
 }

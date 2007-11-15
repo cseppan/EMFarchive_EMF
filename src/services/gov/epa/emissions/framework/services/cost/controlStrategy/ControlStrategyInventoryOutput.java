@@ -42,6 +42,8 @@ public class ControlStrategyInventoryOutput {
 
     private HibernateSessionFactory sessionFactory;
 
+    private DbServerFactory dbServerFactory;
+
     private DbServer dbServer;
 
     private EmfDataset inputDataset;
@@ -56,6 +58,7 @@ public class ControlStrategyInventoryOutput {
         this.inputDataset = controlStrategyInputDataset.getInputDataset();
         this.user = user;
         this.sessionFactory = sessionFactory;
+        this.dbServerFactory = dbServerFactory;
         this.dbServer = dbServerFactory.getDbServer();
         this.tableFormat = new FileFormatFactory(dbServer).tableFormat(inputDataset.getDatasetType());
         this.creator = new DatasetCreator("ControlledInventory_", "CSINVEN_", 
@@ -115,7 +118,7 @@ public class ControlStrategyInventoryOutput {
             ControlStrategyResult result = getControlStrategyResult();
             EmfDataset controlledDataset = (EmfDataset) result.getControlledInventoryDataset();
             QAStepTask qaTask = new QAStepTask(controlledDataset, controlledDataset.getDefaultVersion(), user,
-                    sessionFactory, dbServer);
+                    sessionFactory, dbServerFactory);
             qaTask.runSummaryQASteps(qaTask.getDefaultSummaryQANames());
         } catch (Exception e) {
             e.printStackTrace();

@@ -31,6 +31,8 @@ public abstract class AbstractStrategyTask implements Strategy {
 
     protected HibernateSessionFactory sessionFactory;
 
+    protected DbServerFactory dbServerFactory;
+
     protected DbServer dbServer;
 
     protected User user;
@@ -47,6 +49,7 @@ public abstract class AbstractStrategyTask implements Strategy {
             DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory,
             String exportDirectory) throws EmfException {
         this.controlStrategy = controlStrategy;
+        this.dbServerFactory = dbServerFactory;
         this.dbServer = dbServerFactory.getDbServer();
         this.datasource = dbServer.getEmissionsDatasource();
         this.sessionFactory = sessionFactory;
@@ -181,7 +184,7 @@ public abstract class AbstractStrategyTask implements Strategy {
     }
 
     protected void runSummaryQASteps(EmfDataset dataset, int version) throws EmfException {
-        QAStepTask qaTask = new QAStepTask(dataset, version, user, sessionFactory, dbServer);
+        QAStepTask qaTask = new QAStepTask(dataset, version, user, sessionFactory, dbServerFactory);
         //11/14/07 DCD instead of running the default qa steps specified in the property table, lets run all qa step templates...
         QAStepTemplate[] qaStepTemplates = dataset.getDatasetType().getQaStepTemplates();
         String[] qaStepTemplateNames = new String[qaStepTemplates.length];
