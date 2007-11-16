@@ -82,7 +82,7 @@ public class ImportService {
 
             isNameUnique(dataset.getName());
             Importer importer = importerFactory.createVersioned(dataset, path, fileNames);
-            ImportTask eximTask = new ImportTask(dataset, fileNames, importer, user, services, sessionFactory);
+            ImportTask eximTask = new ImportTask(dataset, fileNames, importer, user, services, null, sessionFactory);
 
             threadPool.execute(new GCEnforcerTask("Import of Dataset: " + dataset.getName(), eximTask));
         } catch (Exception e) {

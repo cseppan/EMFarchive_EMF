@@ -24,5 +24,9 @@ public class TaskManagerFactory {
     public static synchronized CaseJobTaskManager getCaseJobTaskManager(HibernateSessionFactory sessionFactory){
         return CaseJobTaskManager.getCaseJobTaskManager(sessionFactory);
     }
+
+    public static synchronized ImportTaskManager getImportTaskManager() {
+        return ImportTaskManager.getImportTaskManager();
+    }
 	
 }

@@ -42,7 +42,7 @@ public class DatasetDAO {
     private HibernateFacade hibernateFacade;
     
     private DbServerFactory dbServerFactory;
-
+    
     public DatasetDAO() {
         lockingScheme = new LockingScheme();
         hibernateFacade = new HibernateFacade();
@@ -52,7 +52,7 @@ public class DatasetDAO {
         this();
         this.dbServerFactory = dbServerFactory;
     }
-    
+
     public boolean exists(int id, Class clazz, Session session) {
         return hibernateFacade.exists(id, clazz, session);
     }
@@ -293,11 +293,7 @@ public class DatasetDAO {
         if (!continueToRename(dataset, oldDataset))
             return;
         
-        DbServer dbServer;
-        if (dbServerFactory == null)
-            dbServer = new EmfDbServer();
-        else
-            dbServer = dbServerFactory.getDbServer();
+        DbServer dbServer = getDbServer();
 
         try {
             renameTable(dataset, oldDataset, dbServer);
@@ -339,10 +335,7 @@ public class DatasetDAO {
         DbServer dbServer = null;
 
         try {
-            if (dbServerFactory == null)
-                dbServer = new EmfDbServer();
-            else
-                dbServer = dbServerFactory.getDbServer();
+            dbServer = getDbServer();
             Datasource datasource = dbServer.getEmfDatasource();
             Connection connection = datasource.getConnection();
             Statement statement = connection.createStatement();
@@ -360,6 +353,16 @@ public class DatasetDAO {
         }
 
         return nameexists;
+    }
+
+    private DbServer getDbServer() throws Exception {
+        DbServer dbServer;
+        if (dbServerFactory == null)
+            dbServer = new EmfDbServer();
+        else
+            dbServer = dbServerFactory.getDbServer();
+        
+        return dbServer;
     }
 
 }

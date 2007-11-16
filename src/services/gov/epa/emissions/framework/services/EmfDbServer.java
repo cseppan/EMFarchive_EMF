@@ -23,11 +23,19 @@ public class EmfDbServer implements DbServer {
     private PostgresDbServer dbServer;
 
     public EmfDbServer() throws Exception {
-        DataSource datasource = new DataSourceFactory().get();
-        dbServer = new PostgresDbServer(datasource.getConnection(), EmfDbServer.EMF_REFERENCE_SCHEMA,
-                EmfDbServer.EMF_EMISSIONS_SCHEMA,EmfDbServer.EMF_EMF_SCHEMA);
+        this(null);
     }
 
+    public EmfDbServer(DbServerFactory dbServerFactory) throws Exception {
+        if (dbServerFactory != null)
+            dbServer = (PostgresDbServer)dbServerFactory.getDbServer();
+        else {
+            DataSource datasource = new DataSourceFactory().get();
+            dbServer = new PostgresDbServer(datasource.getConnection(), EmfDbServer.EMF_REFERENCE_SCHEMA,
+                    EmfDbServer.EMF_EMISSIONS_SCHEMA,EmfDbServer.EMF_EMF_SCHEMA);
+        }
+            
+    }
 
     public Datasource getEmissionsDatasource() {
         return dbServer.getEmissionsDatasource();

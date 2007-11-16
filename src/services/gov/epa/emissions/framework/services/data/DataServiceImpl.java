@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -24,8 +25,12 @@ public class DataServiceImpl implements DataService {
     }
 
     public DataServiceImpl(HibernateSessionFactory sessionFactory) {
+        this(null, sessionFactory);
+    }
+
+    public DataServiceImpl(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
-        dao = new DatasetDAO();
+        dao = new DatasetDAO(dbServerFactory);
     }
 
     public EmfDataset[] getDatasets() throws EmfException {

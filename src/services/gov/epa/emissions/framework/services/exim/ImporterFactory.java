@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
@@ -21,19 +22,23 @@ import org.apache.commons.logging.LogFactory;
 public class ImporterFactory {
     private static Log log = LogFactory.getLog(ImporterFactory.class);
 
-    //private DbServer dbServer;
-    
     private DbServer newDBInstance;
 
     private SqlDataTypes sqlDataTypes;
+    
+    private DbServerFactory dbServerFactory;
 
-    public ImporterFactory(DbServer dbServer, SqlDataTypes sqlDataTypes) {
-       //this.dbServer = dbServer;
+    public ImporterFactory(SqlDataTypes sqlDataTypes) {
+       this(null, sqlDataTypes);
+    }
+
+   public ImporterFactory(DbServerFactory dbServerFactory, SqlDataTypes sqlDataTypes) {
+        this.dbServerFactory = dbServerFactory;
         this.sqlDataTypes = sqlDataTypes;
     }
 
     public Importer createVersioned(EmfDataset dataset, File folder, String[] fileNames) throws Exception {
-        newDBInstance = new EmfDbServer();
+        newDBInstance = new EmfDbServer(dbServerFactory);
         Importer importer = create(dataset, folder, fileNames);
         return new VersionedImporter(importer, dataset, newDBInstance, lastModifiedDate(folder, fileNames));
     }

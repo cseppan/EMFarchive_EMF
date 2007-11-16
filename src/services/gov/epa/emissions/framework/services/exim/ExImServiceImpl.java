@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.EmfServiceImpl;
@@ -20,8 +21,6 @@ import javax.sql.DataSource;
 
 import org.hibernate.Session;
 
-import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
-
 public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     private static int svcCount = 0;
 
@@ -36,17 +35,11 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         return "For label: " + svcLabel + " # of active objects of this type= " + svcCount;
     }
 
-    private PooledExecutor threadPool;
+    private ManagedImportService managedImportService;
 
-
-// Comment out the next line when TaskManagedImportService is completed and tested
-    private ImportService importService;
-// This will be the task managed import service 
-// Uncomment the next line when TaskManagedImportService is completed and tested    
-//    private TaskManagedImportService importService;
-
-    // private ExportService exportService;
     private ManagedExportService exportService;
+    
+    private DbServerFactory dbServerFactory;
 
     public ExImServiceImpl() throws Exception {
         super("ExIm Service");
@@ -57,9 +50,6 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     }
 
     protected void finalize() throws Throwable {
-        threadPool.shutdownAfterProcessingCurrentlyQueuedTasks();
-        threadPool.awaitTerminationAfterShutdown();
-
         svcCount--;
         if (DebugLevels.DEBUG_4)
             System.out.println(">>>> Destroying object: " + myTag());
@@ -67,33 +57,24 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     }
 
     public ExImServiceImpl(DataSource datasource, DbServer dbServer, HibernateSessionFactory sessionFactory) {
+        this(null, datasource, dbServer, sessionFactory);
+    }
+
+    public ExImServiceImpl(DbServerFactory dbServerFactory, DataSource datasource, DbServer dbServer, HibernateSessionFactory sessionFactory) {
         super(datasource, dbServer);
+        this.dbServerFactory = dbServerFactory;
         init(dbServer, sessionFactory);
         myTag();
         if (DebugLevels.DEBUG_4)
             System.out.println(myTag());
-
+        
     }
 
     private void init(DbServer dbServer, HibernateSessionFactory sessionFactory) {
-        threadPool = createThreadPool();
-
         setProperties(sessionFactory);
-
-        // Use the TaskManagedExport Service instead of the old ad-hoc thread pool ExportService
-        // exportService = new ExportService(dbServer, threadPool, sessionFactory);
         exportService = new ManagedExportService(dbServer, sessionFactory);
-
-        ImporterFactory importerFactory = new ImporterFactory(dbServer, dbServer.getSqlDataTypes());
-        importService = new ImportService(importerFactory, sessionFactory, threadPool);
-    }
-
-    private PooledExecutor createThreadPool() {
-        PooledExecutor threadPool = new PooledExecutor(20);
-        threadPool.setMinimumPoolSize(1);
-        threadPool.setKeepAliveTime(1000 * 60 * 3);// terminate after 3 (unused) minutes
-
-        return threadPool;
+        ImporterFactory importerFactory = new ImporterFactory(dbServerFactory, dbServer.getSqlDataTypes());
+        managedImportService = new ManagedImportService(dbServerFactory, importerFactory, sessionFactory);
     }
 
     private void setProperties(HibernateSessionFactory sessionFactory) {
@@ -132,17 +113,29 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             System.out.println("In ExImServiceImpl:exportDatasetsWithOverwrite() SUBMITTERID= " + submitterId);
     }
 
-    public void importDatasets(User user, String folderPath, String[] filenames, DatasetType datasetType) {
-        importService.importDatasets(user, folderPath, filenames, datasetType);
+    public void importDatasets(User user, String folderPath, String[] filenames, DatasetType datasetType) throws EmfException {
+        try {
+            String submitterID = managedImportService.importDatasetsForClient(user, folderPath, filenames, datasetType);
+            if (DebugLevels.DEBUG_4)
+                System.out.println("In ExImServiceImpl:importDatasets() SUBMITTERID = " + submitterID);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
     }
 
     public void importDataset(User user, String folderPath, String[] filenames, DatasetType datasetType,
             String datasetName) throws EmfException {
-        importService.importDataset(user, folderPath, filenames, datasetType, datasetName);
+        try {
+            String submitterID = managedImportService.importDatasetForClient(user, folderPath, filenames, datasetType, datasetName);
+            if (DebugLevels.DEBUG_4)
+                System.out.println("In ExImServiceImpl:importDataset() SUBMITTERID = " + submitterID);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
     }
 
     public String[] getFilenamesFromPattern(String folder, String pattern) throws EmfException {
-        return importService.getFilenamesFromPattern(folder, pattern);
+        return managedImportService.getFilenamesFromPattern(folder, pattern);
     }
 
     public Version getVersion(Dataset dataset, int version) throws EmfException {

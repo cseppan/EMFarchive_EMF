@@ -2,25 +2,36 @@ package gov.epa.emissions.framework.services.exim;
 
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.Services;
-import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
-
-import java.util.Date;
+import gov.epa.emissions.framework.tasks.DebugLevels;
+import gov.epa.emissions.framework.tasks.ImportTaskManager;
+import gov.epa.emissions.framework.tasks.Task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 
-public class ImportTask implements Runnable {
+public class ImportTask extends Task {
+    
+    @Override
+    public boolean isEquivalent(Task task) { //NOTE: needs to verify definition of equality
+        ImportTask importTask = (ImportTask) task;
+        
+        if (this.dataset.getName().equals(importTask.getDataset().getName()) && 
+                this.importer.getClass().equals(importTask.getImporter().getClass())){
+            return true;
+        }
+        
+        return false;
+    }
 
     private static Log log = LogFactory.getLog(ImportTask.class);
-
-    private User user;
 
     private Importer importer;
 
@@ -30,22 +41,37 @@ public class ImportTask implements Runnable {
 
     private HibernateSessionFactory sessionFactory;
 
-    private Services services;
-    
     private double numSeconds;
+    
+    private DatasetDAO dao;
 
     public ImportTask(EmfDataset dataset, String[] files, Importer importer, User user, Services services,
-            HibernateSessionFactory sessionFactory) {
+            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
+        super();
+        createId();
+        
+        if (DebugLevels.DEBUG_1)
+            System.out.println(">>>> " + createId());
+        
         this.user = user;
         this.files = files;
         this.dataset = dataset;
-        this.services = services;
+        this.statusServices = services.getStatus();
         this.sessionFactory = sessionFactory;
-
+        this.dao = new DatasetDAO(dbServerFactory);
         this.importer = importer;
     }
 
     public void run() {
+        if (DebugLevels.DEBUG_1)
+            System.out.println(">>## ImportTask:run() " + taskId + " for dataset: " + this.dataset.getName());
+        if (DebugLevels.DEBUG_1)
+            System.out.println("Task#" + taskId + " RUN @@@@@ THREAD ID: " + Thread.currentThread().getId());
+
+        if (DebugLevels.DEBUG_1)
+            if (DebugLevels.DEBUG_1)
+                System.out.println("Task# " + taskId + " running");
+        
         Session session = null;
         try {
             long startTime = System.currentTimeMillis();
@@ -55,11 +81,11 @@ public class ImportTask implements Runnable {
             prepare(session);
             importer.run();
             numSeconds = (System.currentTimeMillis() - startTime)/1000;
-            complete(session);
+            complete(session, "Imported");
         } catch (Exception e) {
             // this doesn't give the full path for some reason
             logError("Failed to import file(s) : " + filesList(), e);
-            setStatus("Failed to import dataset " + dataset.getName() + ". Reason: " + e.getMessage());
+            setStatus("failed", "Failed to import dataset " + dataset.getName() + ". Reason: " + e.getMessage());
             removeDataset(dataset);
         } finally {
             if (session != null)
@@ -74,8 +100,8 @@ public class ImportTask implements Runnable {
         addDataset(dataset, session);
     }
 
-    private void complete(Session session) {
-        dataset.setStatus("Imported");
+    private void complete(Session session, String status) {
+        dataset.setStatus(status);
         //dataset.setModifiedDateTime(new Date()); //last mod time has been set when creted
 
         updateDataset(dataset, session);
@@ -93,12 +119,11 @@ public class ImportTask implements Runnable {
     }
 
     void addDataset(EmfDataset dataset, Session session) throws EmfException {
-        DatasetDAO dao = new DatasetDAO();
-        
         try {
             if (dao.datasetNameUsed(dataset.getName()))
                 throw new EmfException("The selected Dataset name is already in use");
         } catch (Exception e) {
+            e.printStackTrace();
             throw new EmfException(e.getMessage() == null ? "" : e.getMessage());
         }
 
@@ -106,7 +131,6 @@ public class ImportTask implements Runnable {
     }
 
     void updateDataset(EmfDataset dataset, Session session) {
-        DatasetDAO dao = new DatasetDAO();
         try {
             dao.updateWithoutLocking(dataset, session);
         } catch (Exception e) {
@@ -115,7 +139,6 @@ public class ImportTask implements Runnable {
     }
 
     void removeDataset(EmfDataset dataset) {
-        DatasetDAO dao = new DatasetDAO();
         try {
             Session session = sessionFactory.getSession();
             dao.remove(dataset, session);
@@ -126,29 +149,38 @@ public class ImportTask implements Runnable {
     }
 
     private void addStartStatus() {
-        setStatus("Started import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] from "+
+        setStatus("started", "Started import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] from "+
                 files[0]);
     }
 
     private void addCompletedStatus() {
         String message = "Completed import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] " 
                + " in " + numSeconds+" seconds from "+ files[0]; //TODO: add batch size to message once available
-        setStatus(message);
-        System.out.println(message);
+        setStatus("completed", message);
     }
 
-    private void setStatus(String message) {
-        Status endStatus = new Status();
-        endStatus.setUsername(user.getUsername());
-        endStatus.setType("Import");
-        endStatus.setMessage(message);
-        endStatus.setTimestamp(new Date());
-
-        services.getStatus().add(endStatus);
+    private void setStatus(String status, String message) {
+        ImportTaskManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(), message);
     }
 
     private void logError(String messge, Exception e) {
         log.error(messge, e);
+    }
+    
+    public EmfDataset getDataset() {
+        return this.dataset;
+    }
+    
+    public Importer getImporter() {
+        return this.importer;
+    }
+    
+    @Override
+    protected void finalize() throws Throwable {
+        taskCount--;
+        if (DebugLevels.DEBUG_1)
+            System.out.println(">>>> Destroying object: " + createId());
+        super.finalize();
     }
 
 }

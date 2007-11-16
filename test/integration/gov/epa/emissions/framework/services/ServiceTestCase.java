@@ -38,8 +38,6 @@ public abstract class ServiceTestCase extends TestCase {
 
     protected DbServerFactory dbServerFactory;
 
-//    protected DbServer dbServer;
-//
     protected HibernateSessionFactory sessionFactory;
 
     protected Session session;
@@ -47,7 +45,6 @@ public abstract class ServiceTestCase extends TestCase {
     final protected void setUp() throws Exception {
         this.dbSetup = new EmfDatabaseSetup(config());
         this.dbServerFactory = new DbServerFactory(dbSetup);
-//        this.dbServer = this.dbServerFactory.getDbServer();
         this.sessionFactory = sessionFactory();
         this.session = this.sessionFactory.getSession();
         doSetUp();
@@ -86,7 +83,6 @@ public abstract class ServiceTestCase extends TestCase {
     final protected void tearDown() throws Exception {
         doTearDown();
         session.close();
-//        dbServer.disconnect();
         dbSetup.tearDown();
     }
 
