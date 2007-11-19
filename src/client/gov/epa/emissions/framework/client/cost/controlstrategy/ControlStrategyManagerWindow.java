@@ -21,6 +21,7 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -120,10 +121,15 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
         SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-
+        sortFilterSelectPanel.sort(sortCriteria());
         createLayout(layout, sortFilterSelectPanel);
     }
-
+    
+    private SortCriteria sortCriteria() {
+        String[] columnNames = { "Name" };
+        return new SortCriteria(columnNames, new boolean[] { true }, new boolean[] { true });
+    }
+    
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
         layout.removeAll();
         layout.setLayout(new BorderLayout());
