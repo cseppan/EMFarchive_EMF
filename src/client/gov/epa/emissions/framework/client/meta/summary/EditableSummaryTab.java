@@ -216,9 +216,9 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // name
-        name = new TextField("name", 25);
+        name = new TextField("name", 51);
         name.setText(dataset.getName());
-        name.setMaximumSize(new Dimension(300, 15));
+        name.setPreferredSize(new Dimension(575, 20));
         changeablesList.addChangeable(name);
 
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
