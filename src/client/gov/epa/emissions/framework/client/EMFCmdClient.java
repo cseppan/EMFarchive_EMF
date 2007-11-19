@@ -27,11 +27,15 @@ public class EMFCmdClient {
     private static boolean DEBUG = false;
 
     public synchronized static void main(String[] args) throws Exception {
-        if (DEBUG)
-            System.out.println("EMF command line client initialized at: " + new Date());
-
         List<String> options = new ArrayList<String>();
         options.addAll(Arrays.asList(args));
+        
+        if (options.contains("-D")) {
+            DEBUG = true;
+        }
+        
+        if (DEBUG)
+            System.out.println("EMF command line client initialized at: " + new Date());
 
         if (args.length <= 1) {
             displayHelp();
@@ -220,7 +224,7 @@ public class EMFCmdClient {
         List<JobMessage> msgs = new ArrayList<JobMessage>();
         List<String> keys = new ArrayList<String>();
         File logFile = new File(logfile);
-        String logAsistFile = logFile + ".ast";
+        String logAsistFile = logfile + ".ast";
         File logAsistant = new File(logAsistFile);
         writeInitialAsistFile(logAsistant);
 
