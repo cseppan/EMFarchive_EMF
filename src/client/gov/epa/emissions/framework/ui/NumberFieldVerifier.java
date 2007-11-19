@@ -44,7 +44,7 @@ public class NumberFieldVerifier {
 
             return Double.parseDouble(text);
         } catch (NumberFormatException ex) {
-            throw new EmfException(message + " should be a double.");
+            throw new EmfException(message + " should be a number.");
         }
 
     }
