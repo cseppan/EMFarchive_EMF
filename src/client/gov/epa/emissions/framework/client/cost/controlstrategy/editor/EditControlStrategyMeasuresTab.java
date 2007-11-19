@@ -19,6 +19,8 @@ import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.mims.analysisengine.table.sort.SortCriteria;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -116,7 +118,13 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 //        changeablesList.addChangeable(sortFilterSelectModel);
         SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parent, sortFilterSelectModel);
         sortFilterSelectionPanel.setPreferredSize(new Dimension(550, 300));
+        sortFilterSelectionPanel.sort(sortCriteria());
         return sortFilterSelectionPanel;
+    }
+
+    private SortCriteria sortCriteria() {
+        String[] columnNames = {"Order", "Name" };
+        return new SortCriteria(columnNames, new boolean[] {true, true }, new boolean[] { true, true });
     }
 
     private JPanel buttonPanel() {
@@ -316,15 +324,15 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         this.presenter = presenter;
     }
 
-    public void add(LightControlMeasure[] measures) {
+    public void add(LightControlMeasure[] measures, double rule, double rulePenetration, double ruleEffective) {
         if (measures.length > 0 ) {
             ControlStrategyMeasure[] strategyMeasures = new ControlStrategyMeasure[measures.length];
             for (int i = 0; i < measures.length; i++) {
                 ControlStrategyMeasure csm = new ControlStrategyMeasure(measures[i]);
                 //default rule pen and eff to 100%, and order to 1
-                csm.setRulePenetration(Double.valueOf(100));
-                csm.setRuleEffectiveness(Double.valueOf(100));
-                csm.setApplyOrder(Double.valueOf(1));
+                csm.setRulePenetration(Double.valueOf(rulePenetration));
+                csm.setRuleEffectiveness(Double.valueOf(ruleEffective));
+                csm.setApplyOrder(Double.valueOf(rule));
                 strategyMeasures[i] = csm;
             }
             tableData.add(strategyMeasures);
