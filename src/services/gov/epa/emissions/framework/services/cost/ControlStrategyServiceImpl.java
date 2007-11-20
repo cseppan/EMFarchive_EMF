@@ -362,7 +362,12 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             coppied.setName(name);
             coppied.setCreator(creator);
             coppied.setLastModifiedDate(new Date());
-
+            coppied.setRunStatus("Not started");
+            if (coppied.isLocked()){
+                coppied.setLockDate(null);
+                coppied.setLockOwner(null);
+            }
+                       
             dao.add(coppied, session);
             int csId = coppied.getId();
 //FIXME:  something is not right with the hibernate mapping, constraint should be added automatically.
