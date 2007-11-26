@@ -53,6 +53,8 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
     private JPanel mainPanel;
 
+    private JPanel classesPanel;
+
     private SingleLineMessagePanel messagePanel;
 
     private EmfTableModel tableModel;
@@ -103,13 +105,17 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
         this.setLayout(new BorderLayout(5, 5));
         // this.setBorder(BorderFactory.createEmptyBorder(50,50,0,300));
-        this.add(createClassesPanel(changeables), BorderLayout.NORTH);
+        classesPanel = createClassesPanel(changeables);
+        this.add(classesPanel, BorderLayout.NORTH);
         // mainPanel.add(new JLabel("Measures to Include:"), BorderLayout.NORTH);
         buildSortFilterPanel();
         // mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
         this.add(mainPanel, BorderLayout.CENTER);
         // disable class filter since there are measures selected
-        if (sortFilterSelectModel.getRowCount() > 0) classesList.setEnabled(false);
+        if (sortFilterSelectModel.getRowCount() > 0) 
+            classesPanel.setVisible(false);//classesList.setVisible(false);
+        else
+            classesPanel.setVisible(true);//classesList.setVisible(false);
     }
 
     private SortFilterSelectionPanel sortFilterPanel() {
@@ -199,6 +205,11 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 remove();
+
+                if (sortFilterSelectModel.getRowCount() > 0) 
+                    classesPanel.setVisible(false);
+                else
+                    classesPanel.setVisible(true);
             }
         };
     }
@@ -251,7 +262,6 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
     }
 
     private JPanel createClassesPanel(ManageChangeables changeables) {
-
         // get all measure classes and cs classes
         // and add default "ALL" to both lists
         List allClassesList = new ArrayList(Arrays.asList(allClasses));
@@ -340,7 +350,11 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
             buildSortFilterPanel();
 
             // disable class filter since there are measures selected
-            if (sortFilterSelectModel.getRowCount() > 0) classesList.setEnabled(false);
+//            if (sortFilterSelectModel.getRowCount() > 0) classesList.setEnabled(false);
+            if (sortFilterSelectModel.getRowCount() > 0) 
+                classesPanel.setVisible(false);
+            else
+                classesPanel.setVisible(true);
         }
     }
 
