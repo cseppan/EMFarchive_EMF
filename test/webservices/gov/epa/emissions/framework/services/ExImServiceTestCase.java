@@ -44,6 +44,16 @@ public abstract class ExImServiceTestCase extends ServiceTestCase {
         return null;
     }
 
+    protected DatasetType getDatasetType(String type) throws Exception {
+        DatasetType[] types = commonsService.getDatasetTypes();
+        for (int i = 0; i < types.length; i++) {
+            if (types[i].getName().startsWith(type))
+                return types[i];
+        }
+        
+        return null;
+    }
+
     protected void doTearDown() throws Exception {
         //ExImDbUpdate dbUpdate = new ExImDbUpdate();
         dropAll(InternalSource.class);
