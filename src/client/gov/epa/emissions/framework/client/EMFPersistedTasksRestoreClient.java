@@ -27,7 +27,7 @@ public class EMFPersistedTasksRestoreClient {
     private static void displayHelp() {
         System.out
                 .println("Usage\njava "
-                        + EMFClient.class.getName()
+                        + EMFPersistedTasksRestoreClient.class.getName()
                         + " [url]"
                         + "\n\turl - location of EMF Services. Defaults to "
                         + DEFAULT_URL
