@@ -56,7 +56,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
 //    private CheckBox inventoryCheckBox;
 
-    private Button createButton, editButton;
+    private Button analysisButton, view, exportButton, createButton, editButton;
     
     private EmfSession session;
 
@@ -267,7 +267,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         ControlStrategyOutputTableData tableData = new ControlStrategyOutputTableData(controlStrategyInputDatasets, controlStrategyResults);
         EmfTableModel model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
-
+        if (selectModel.getRowCount() == 1) selectModel.setValueAt(true, 0, 0);
         SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         sortFilterSelectionPanel.setPreferredSize(new Dimension(625, 200));
 
@@ -277,9 +277,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     private JPanel buttonPanel() {
-        Button exportButton = new ExportButton(exportAction());
-        Button analysisButton = new Button("Analyze", analysisAction());
-        Button view = new ViewButton("View", viewAction());
+        exportButton = new ExportButton(exportAction());
+        analysisButton = new Button("Analyze", analysisAction());
+        view = new ViewButton("View", viewAction());
         editButton = new Button("Edit", editAction());
         createButton = new Button("Create", createOutputAction());
         createButton.setEnabled(false);
@@ -352,9 +352,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                     presenter.doDisplayPropertiesEditor(view, (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
                     counter++;
                 }
-                else
-                    messagePanel.setError("Please create controled inventory first.");
-            }
+//                else
+//                    messagePanel.setError("Please create controlled inventory first.");
+           }
         }
     }
 
@@ -364,11 +364,31 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             public void actionPerformed(ActionEvent e) {
                 if (buttonGroup.getSelection().equals(invButton.getModel()) ||buttonGroup.getSelection().equals(detailButton.getModel()) ){
                     createButton.setEnabled(false);
+                    view.setEnabled(true);
+                    analysisButton.setEnabled(true);
+                    exportButton.setEnabled(true);
+                    editButton.setEnabled(true);
+                    
 //                    editButton.setEnabled(false);
                 }
-                else
-                    createButton.setEnabled(true);
-                   // editButton.setEnabled(true);
+                else if (buttonGroup.getSelection().equals(contInvButton.getModel())){
+                    ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
+                    if(controlStrategyResults.length == 0 || controlStrategyResults[0].getControlledInventoryDataset() == null){
+                        createButton.setEnabled(true);
+                        //if (getControlledInventoryDataset() == null){                     
+                        view.setEnabled(false);
+                        analysisButton.setEnabled(false);
+                        exportButton.setEnabled(false);                  
+                        editButton.setEnabled(false);
+                    }
+                    else {
+                        createButton.setEnabled(true);                
+                        view.setEnabled(true);
+                        analysisButton.setEnabled(true);
+                        exportButton.setEnabled(true);                  
+                        editButton.setEnabled(true);
+                    }
+                }
             }
         };
     }
@@ -463,8 +483,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                     presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
 
                 }
-                else
-                    messagePanel.setError("Please create controled inventory first.");
+//                else
+//                    messagePanel.setError("Please create controlled inventory first.");
             }
  
         }
