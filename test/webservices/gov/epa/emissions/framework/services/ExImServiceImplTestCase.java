@@ -85,7 +85,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
         dropTables(localdataset.getInternalSources());
     }
 
-    public void ttestImportMultipleOrlNonPoint() throws Exception {
+    public void testImportMultipleOrlNonPoint() throws Exception {
         DataService dataService = new DataServiceImpl(dbServerFactory, sessionFactory);
         User user = userService.getUser("emf");
 
@@ -100,7 +100,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
             
         try {
             eximService.importDatasets(user, repository.getAbsolutePath(), files, dataset.getDatasetType());
-            Thread.sleep(120000); // so that import thread has enough time to run
+            Thread.sleep(300000); // so that import thread has enough time to run
 
             imported = dataService.getDatasets();
             assertEquals(filename1, imported[0].getName());
@@ -117,6 +117,42 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
             sources[2] = imported[2].getInternalSources()[0];
             sources[3] = imported[3].getInternalSources()[0];
 
+            dropTables(sources);
+        }
+    }
+
+    public void testImportMultipleLineBasedDatasets() throws Exception {
+        DataService dataService = new DataServiceImpl(dbServerFactory, sessionFactory);
+        User user = userService.getUser("emf");
+        
+        File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
+        String filename1 = "small-nonpoint1.txt";
+        String filename2 = "small-nonpoint2.txt";
+        String filename3 = "small-nonpoint3.txt";
+        String filename4 = "small-nonpoint4.txt";
+        
+        String[] files = new String[] { filename1, filename2, filename3, filename4 };
+        EmfDataset[] imported = null;
+        
+        try {
+            eximService.importDatasets(user, repository.getAbsolutePath(), files, getDatasetType("Text file (Line-based)"));
+            Thread.sleep(10000); // so that import thread has enough time to run
+            
+            imported = dataService.getDatasets();
+            assertEquals(filename1, imported[0].getName());
+            assertEquals(filename2, imported[1].getName());
+            assertEquals(filename3, imported[2].getName());
+            assertEquals(filename4, imported[3].getName());
+            assertEquals(4, imported.length);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            InternalSource[] sources = new InternalSource[4];
+            sources[0] = imported[0].getInternalSources()[0];
+            sources[1] = imported[1].getInternalSources()[0];
+            sources[2] = imported[2].getInternalSources()[0];
+            sources[3] = imported[3].getInternalSources()[0];
+            
             dropTables(sources);
         }
     }
