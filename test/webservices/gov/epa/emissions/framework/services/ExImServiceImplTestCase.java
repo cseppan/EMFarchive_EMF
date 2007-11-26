@@ -17,6 +17,8 @@ import gov.epa.emissions.framework.services.exim.ExImServiceImpl;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExImServiceImplTestCase extends ExImServiceTestCase {
 
@@ -85,6 +87,8 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
         dropTables(localdataset.getInternalSources());
     }
 
+    //NOTE: Worked on Linux platform but hung on Widows platform for the next two cases.
+    
     public void testImportMultipleOrlNonPoint() throws Exception {
         DataService dataService = new DataServiceImpl(dbServerFactory, sessionFactory);
         User user = userService.getUser("emf");
@@ -97,25 +101,30 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
 
         String[] files = new String[] { filename1, filename2, filename3, filename4 };
         EmfDataset[] imported = null;
-            
+
         try {
             eximService.importDatasets(user, repository.getAbsolutePath(), files, dataset.getDatasetType());
-            Thread.sleep(300000); // so that import thread has enough time to run
+            Thread.sleep(240000); // so that import thread has enough time to run
 
             imported = dataService.getDatasets();
-            assertEquals(filename1, imported[0].getName());
-            assertEquals(filename2, imported[1].getName());
-            assertEquals(filename3, imported[2].getName());
-            assertEquals(filename4, imported[3].getName());
+            List<String> importedNames = new ArrayList<String>();
+
+            for (int i = 0; i < imported.length; i++)
+                importedNames.add(imported[i].getName());
+
+            assertTrue(importedNames.contains(filename1));
+            assertTrue(importedNames.contains(filename2));
+            assertTrue(importedNames.contains(filename3));
+            assertTrue(importedNames.contains(filename4));
             assertEquals(4, imported.length);
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
-            InternalSource[] sources = new InternalSource[4];
-            sources[0] = imported[0].getInternalSources()[0];
-            sources[1] = imported[1].getInternalSources()[0];
-            sources[2] = imported[2].getInternalSources()[0];
-            sources[3] = imported[3].getInternalSources()[0];
+            InternalSource[] sources = new InternalSource[imported.length];
+
+            for (int i = 0; i < sources.length; i++) {
+                sources[i] = imported[i].getInternalSources()[0];
+            }
 
             dropTables(sources);
         }
@@ -136,23 +145,28 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
         
         try {
             eximService.importDatasets(user, repository.getAbsolutePath(), files, getDatasetType("Text file (Line-based)"));
-            Thread.sleep(10000); // so that import thread has enough time to run
+            Thread.sleep(240000); // so that import thread has enough time to run
             
             imported = dataService.getDatasets();
-            assertEquals(filename1, imported[0].getName());
-            assertEquals(filename2, imported[1].getName());
-            assertEquals(filename3, imported[2].getName());
-            assertEquals(filename4, imported[3].getName());
+            List<String> importedNames = new ArrayList<String>();
+
+            for (int i = 0; i < imported.length; i++)
+                importedNames.add(imported[i].getName());
+
+            assertTrue(importedNames.contains(filename1));
+            assertTrue(importedNames.contains(filename2));
+            assertTrue(importedNames.contains(filename3));
+            assertTrue(importedNames.contains(filename4));
             assertEquals(4, imported.length);
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
-            InternalSource[] sources = new InternalSource[4];
-            sources[0] = imported[0].getInternalSources()[0];
-            sources[1] = imported[1].getInternalSources()[0];
-            sources[2] = imported[2].getInternalSources()[0];
-            sources[3] = imported[3].getInternalSources()[0];
-            
+            InternalSource[] sources = new InternalSource[imported.length];
+
+            for (int i = 0; i < sources.length; i++) {
+                sources[i] = imported[i].getInternalSources()[0];
+            }
+
             dropTables(sources);
         }
     }
@@ -174,7 +188,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
 
         EmfDataset[] imported = dataService.getDatasets();
         assertEquals(filename, imported[0].getName());
-        
+
         Version version = new Version();
         version.setDatasetId(imported[0].getId());
 
@@ -188,7 +202,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
                 outputFile.getAbsolutePath(), "Exporting NonPoint file");
 
         Thread.sleep(2000);// wait, until the export is complete
-        
+
         dropTables(imported[0].getInternalSources());
     }
 
@@ -209,10 +223,9 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
 
         EmfDataset[] imported = dataService.getDatasets();
         assertEquals(filename, imported[0].getName());
-        
+
         Version version = new Version();
         version.setDatasetId(imported[0].getId());
-
 
         // export
         File outputFile = new File(System.getProperty("java.io.tmpdir"));
@@ -225,7 +238,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
 
         // FIXME: verify the exported file exists
         Thread.sleep(2000);// wait, until the export is complete
-        
+
         dropTables(imported[0].getInternalSources());
     }
 
