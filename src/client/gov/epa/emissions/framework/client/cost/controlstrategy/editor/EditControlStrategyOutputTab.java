@@ -267,7 +267,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         ControlStrategyOutputTableData tableData = new ControlStrategyOutputTableData(controlStrategyInputDatasets, controlStrategyResults);
         EmfTableModel model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
-        if (selectModel.getRowCount() == 1) selectModel.setValueAt(true, 0, 0);
+//        if (selectModel.getRowCount() == 1) selectModel.setValueAt(true, 0, 0);
         SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         sortFilterSelectionPanel.setPreferredSize(new Dimension(625, 200));
 
