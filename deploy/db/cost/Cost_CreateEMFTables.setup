@@ -233,6 +233,8 @@ CREATE TABLE emf.control_strategy_measures
   rule_effectiveness double precision,
   rule_penetration double precision,
   apply_order double precision,
+  region_dataset_id integer,
+  region_dataset_version integer,
   UNIQUE (control_strategy_id,control_measure_id) 
 ) 
 WITHOUT OIDS;

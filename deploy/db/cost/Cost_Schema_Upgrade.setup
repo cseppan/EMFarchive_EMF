@@ -424,3 +424,11 @@ ALTER aggregate public.concatenate_with_ampersand(text) OWNER TO emf;
 CREATE OR REPLACE FUNCTION join_with_ampersand(text, text) RETURNS text AS
 $BODY$select $1||'&'||$2$BODY$
 LANGUAGE 'sql' IMMUTABLE STRICT;
+
+
+
+-- 11/27/07 - DCD added new columns to control strategy measure table for region dataset
+ALTER TABLE emf.control_strategy_measures ADD COLUMN region_dataset_id integer;
+ALTER TABLE emf.control_strategy_measures ADD COLUMN region_dataset_version integer;
+
+
