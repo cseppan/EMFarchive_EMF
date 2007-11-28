@@ -95,7 +95,9 @@
 		    <property name="ruleEffectiveness" column="rule_effectiveness" type="double"/>
 	        <property name="rulePenetration" column="rule_penetration" type="double"/>
 	        <property name="applyOrder" column="apply_order" type="double" not-null="true"/>
+	        <property name="regionDatasetVersion" column="region_dataset_version" type="integer"/>
         	<many-to-one name="controlMeasure" class="gov.epa.emissions.framework.services.cost.LightControlMeasure" column="control_measure_id" not-null="true" cascade="none"/>
+        	<many-to-one name="regionDataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="region_dataset_id" cascade="none"/>
     	</composite-element>
 	</array>
 
