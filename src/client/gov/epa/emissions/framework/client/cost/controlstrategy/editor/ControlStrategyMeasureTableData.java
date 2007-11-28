@@ -30,17 +30,17 @@ public class ControlStrategyMeasureTableData extends AbstractTableData {
     private Row row(ControlStrategyMeasure csm) {
         LightControlMeasure cm = csm.getControlMeasure();
         Object[] values = { cm.getAbbreviation(), 
-                csm.getApplyOrder() != null ? csm.getApplyOrder() : Double.NaN,
-                        csm.getRuleEffectiveness() != null ? csm.getRuleEffectiveness() : Double.NaN,
-                                csm.getRulePenetration() != null ? csm.getRulePenetration() : Double.NaN,  
-                                        cm.getName(), 
-        };
+        csm.getApplyOrder() != null ? csm.getApplyOrder() : Double.NaN,
+        csm.getRuleEffectiveness() != null ? csm.getRuleEffectiveness() : Double.NaN,
+        csm.getRulePenetration() != null ? csm.getRulePenetration() : Double.NaN,  
+        cm.getName(), csm.getRegionDataset()!= null ? csm.getRegionDataset(): null, 
+        csm.getRegionDatasetVersion()!= null ? csm.getRegionDatasetVersion(): null};
         return new ViewableRow(csm, values);
     }
 
     public String[] columns() {
         return new String[] { "Abbrev", "Order", 
-                "RE", "RP", "Name"};
+                "RE", "RP", "Name", "Region", "Version"};
     }
 
     public Class getColumnClass(int col) {

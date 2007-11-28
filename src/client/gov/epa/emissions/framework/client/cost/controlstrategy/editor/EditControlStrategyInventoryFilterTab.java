@@ -71,6 +71,8 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     
     private EditControlStrategyPresenter editControlStrategyPresenter;
     
+ //   private NumberFieldVerifier verifier;
+    
     public EditControlStrategyInventoryFilterTab(ControlStrategy controlStrategy, ManageChangeables changeablesList, 
             MessagePanel messagePanel, EmfConsole parentConsole, 
             EmfSession session, DesktopManager desktopManager,
@@ -151,16 +153,16 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             public void actionPerformed(ActionEvent event) {
                 try {
                     setVersionAction();
-                } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
-                }
+                } catch (NumberFormatException e){
+                    messagePanel.setError("Should be a number ");
+                } 
             }
         });
-        editButton.setEnabled(false);
+//        editButton.setEnabled(false);
         panel.add(editButton);
         Button removeButton = new BorderlessButton("Remove", new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                removeAction();
+            public void actionPerformed(ActionEvent event) {           
+                    removeAction();
             }
         });
         panel.add(removeButton);
@@ -203,17 +205,42 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         }
     }
 
-    private void setVersionAction() throws EmfException {
-        //
-        if (1 == 2) throw new EmfException("");
-//        ControlMeasureSelectionView view = new ControlMeasureSelectionDialog(parent, changeablesList);
-//        ControlMeasureSelectionPresenter presenter = new ControlMeasureSelectionPresenter(this, view, session,
-//                this.presenter.getAllControlMeasures());
-//        try {
-//            presenter.display(view);
-//        } catch (Exception exp) {
-//            messagePanel.setError(exp.getMessage());
-//        }
+    private void setVersionAction() throws NumberFormatException{
+        messagePanel.clear();
+        //get selected items
+        ControlStrategyInputDataset[] selectedDatasets = (sortFilterSelectModel.selected()).toArray(new ControlStrategyInputDataset[0]);
+        //get all measures
+        ControlStrategyInputDataset[] datasets = tableData.sources();
+
+        if (selectedDatasets.length == 0) {
+            messagePanel.setError("Please select an items that you want to update.");
+            return;
+        }
+
+        String inputValue = JOptionPane.showInputDialog("Please input a version number ", "1");
+        
+        if (inputValue != null) {
+            //validate value
+            Integer version = validateVersion(inputValue);
+            //only update items that have been selected
+            for (int i = 0; i < selectedDatasets.length; i++) {
+                for (int j = 0; j < datasets.length; j++) {
+                    if (selectedDatasets[i].equals(datasets[j])) {
+                        datasets[j].setVersion(version);
+                    }
+                }
+            }
+            //repopulate the tabe data
+            tableData = new ControlStrategyInputDatasetTableData(datasets);
+            //rebuild the sort filter panelControlStrategyInputDatasetTableData
+            buildSortFilterPanel();
+        }
+    }
+
+    private Integer validateVersion(String inputValue) throws NumberFormatException{
+        if (inputValue == null || inputValue.trim().length() == 0) return null;
+//        int value = verifier.parseInteger(inputValue);
+        return Integer.parseInt(inputValue);
     }
 
     protected void removeAction() {

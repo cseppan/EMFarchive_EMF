@@ -421,7 +421,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
         String runStatus = summary.getRunStatus();
         String completionTime = runStatus.indexOf("Failed") == -1 ? summary.getCompletionTime() : "Failed";
-        String userName = controlStrategy.getCreator().getName();
+        String userName =controlStrategy.getCreator().getName();
 //        String userName= summary.getUser().getName()== null ? summary.getUser().getName() : "";
         String startTime = summary.getStartTime() == null? summary.getStartTime(): "";
         updateStartDate(startTime);
