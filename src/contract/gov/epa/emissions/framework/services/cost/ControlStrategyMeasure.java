@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.framework.services.data.EmfDataset;
+
 import java.io.Serializable;
 
 public class ControlStrategyMeasure implements Serializable {
@@ -15,6 +17,10 @@ public class ControlStrategyMeasure implements Serializable {
     private Double rulePenetration;
 
     private Double applyOrder = 1.0;
+
+    private EmfDataset regionDataset;
+
+    private Integer regionDatasetVersion;
 
     public ControlStrategyMeasure() {
         //
@@ -85,5 +91,21 @@ public class ControlStrategyMeasure implements Serializable {
 
     public Double getApplyOrder() {
         return applyOrder;
+    }
+
+    public void setRegionDataset(EmfDataset regionDataset) {
+        this.regionDataset = regionDataset;
+    }
+
+    public EmfDataset getRegionDataset() {
+        return regionDataset;
+    }
+
+    public void setRegionDatasetVersion(Integer regionDatasetVersion) {
+        this.regionDatasetVersion = regionDatasetVersion;
+    }
+
+    public Integer getRegionDatasetVersion() {
+        return regionDatasetVersion;
     }
 }
