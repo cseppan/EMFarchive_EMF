@@ -37,7 +37,8 @@ public class StrategyLoaderv2 extends AbstractStrategyLoader {
                 controlStrategy, sessionFactory);
         SccControlMeasuresMap map = mapGenerator.create();
         retrieveMeasure = new RetrieveBestMeasureEffRecord(map, costYearTable, 
-                controlStrategy);
+                controlStrategy, dbServer,
+                sessionFactory);
         //call the abstract method to do the work...
         return super.loadStrategyResult(controlStrategyInputDataset);
     }

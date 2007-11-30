@@ -1,15 +1,18 @@
 package gov.epa.emissions.framework.services.cost.analysis.maxreduction;
 
 import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.analysis.common.BestMeasureEffRecord;
 import gov.epa.emissions.framework.services.cost.analysis.common.EfficiencyRecordUtil;
+import gov.epa.emissions.framework.services.cost.analysis.common.RegionFilter;
 import gov.epa.emissions.framework.services.cost.analysis.common.RetrieveBestEffRecord;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.SccControlMeasuresMap;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 public class RetrieveBestMeasureEffRecord {
 
@@ -27,13 +30,17 @@ public class RetrieveBestMeasureEffRecord {
     
     private EfficiencyRecordUtil effRecordUtil;
     
+    private RegionFilter regionFilter;
+    
     public RetrieveBestMeasureEffRecord(SccControlMeasuresMap map, CostYearTable costYearTable,
-            ControlStrategy controlStrategy) {
+            ControlStrategy controlStrategy, DbServer dbServer, 
+            HibernateSessionFactory sessionFactory) {
         this.map = map;
         this.costYearTable = costYearTable;
         this.controlStrategy = controlStrategy;
         this.retrieveBestEffRecord = new RetrieveBestEffRecord(costYearTable);
         this.effRecordUtil = new EfficiencyRecordUtil();
+        this.regionFilter = new RegionFilter(dbServer, sessionFactory);
     }
 
     //gets the best measure for the target pollutant
@@ -44,12 +51,14 @@ public class RetrieveBestMeasureEffRecord {
         this.fips = fips;
         MaxEmsRedControlMeasureMap reduction = new MaxEmsRedControlMeasureMap(costYearTable);
         for (int i = 0; i < controlMeasures.length; i++) {
-            EfficiencyRecord record = findBestEfficiencyRecordForTargetPollutant(controlMeasures[i], fips, 
-                    controlStrategy.getInventoryYear(), invenControlEfficiency, 
-                    invenRulePenetration, invenRuleEffectiveness, 
-                    invenAnnualEmissions);
-            if (record != null) {
-                reduction.add(controlMeasures[i], record);
+            if (regionFilter.filter(controlMeasures[i], fips)) {
+                EfficiencyRecord record = findBestEfficiencyRecordForTargetPollutant(controlMeasures[i], fips, 
+                        controlStrategy.getInventoryYear(), invenControlEfficiency, 
+                        invenRulePenetration, invenRuleEffectiveness, 
+                        invenAnnualEmissions);
+                if (record != null) {
+                    reduction.add(controlMeasures[i], record);
+                }
             }
         }
 
@@ -64,12 +73,14 @@ public class RetrieveBestMeasureEffRecord {
         this.fips = fips;
         MaxEmsRedControlMeasureMap reduction = new MaxEmsRedControlMeasureMap(costYearTable);
         for (int i = 0; i < controlMeasures.length; i++) {
-            EfficiencyRecord record = findBestEfficiencyRecordForTargetPollutant(controlMeasures[i], fips, 
-                    controlStrategy.getInventoryYear(), invenControlEfficiency, 
-                    invenRulePenetration, invenRuleEffectiveness, 
-                    invenAnnualEmissions);
-            if (record != null) {
-                reduction.add(controlMeasures[i], record);
+            if (regionFilter.filter(controlMeasures[i], fips)) {
+                EfficiencyRecord record = findBestEfficiencyRecordForTargetPollutant(controlMeasures[i], fips, 
+                        controlStrategy.getInventoryYear(), invenControlEfficiency, 
+                        invenRulePenetration, invenRuleEffectiveness, 
+                        invenAnnualEmissions);
+                if (record != null) {
+                    reduction.add(controlMeasures[i], record);
+                }
             }
         }
         /*MaxEmsRedControlMeasure */maxMeasure = reduction.findBestMeasure();
@@ -107,6 +118,7 @@ public class RetrieveBestMeasureEffRecord {
             int inventoryYear, double invenControlEfficiency, 
             double invenRulePenetration, double invenRuleEffectiveness, 
             double invenAnnualEmissions) throws EmfException {
+        
         EfficiencyRecord[] efficiencyRecords = effRecordUtil.pollutantFilter(measure.getEfficiencyRecords(), controlStrategy.getTargetPollutant());
         efficiencyRecords = effRecordUtil.minMaxEmisFilter(efficiencyRecords, invenAnnualEmissions);
         efficiencyRecords = effRecordUtil.localeFilter(efficiencyRecords, fips);
