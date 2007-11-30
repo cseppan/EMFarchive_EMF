@@ -4,38 +4,28 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
 
-public class ControlMeasureSelectionPresenter {
+public class ControlMeasureEditPresenter{
 
-    private ControlMeasureTableData tableData;
     private EditControlStrategyMeasuresTab parentView;
-    private LightControlMeasure[] controlMeasures;
     private EmfSession session;
 
-    public ControlMeasureSelectionPresenter(EditControlStrategyMeasuresTab parentView, ControlMeasureSelectionView view, 
-            EmfSession session, LightControlMeasure[] controlMeasures) {
+    public ControlMeasureEditPresenter(EditControlStrategyMeasuresTab parentView, ControlMeasureEditView view, 
+            EmfSession session) {
         this.parentView = parentView;
-        this.controlMeasures = controlMeasures;
         this.session = session;
     }
 
-    public void display(ControlMeasureSelectionView view) throws Exception {
+    public void display(ControlMeasureEditView view) throws Exception {
         view.observe(this);
-        this.tableData = new ControlMeasureTableData(controlMeasures);
-        view.display(tableData);
+        view.display();
 
     }
 
-
-    public void doAdd(LightControlMeasure[] cms, double rule, double rulePenetration, double ruleEffective, EmfDataset ds, Integer ver) {
-        parentView.add(cms, rule, rulePenetration, ruleEffective, ds, ver);
-        
-    }
 
     public EmfDataset[] getDatasets(DatasetType type) throws EmfException
     {
@@ -69,5 +59,12 @@ public class ControlMeasureSelectionPresenter {
     private DataEditorService dataEditorService() {
         return session.dataEditorService();
     }
+
+    public void doAdd(Double rule, Double rulePenetration, Double ruleEffective, EmfDataset ds, Integer ver) {
+        parentView.add(rule, rulePenetration, ruleEffective, ds, ver);
+        
+    }
+
+
 
 }

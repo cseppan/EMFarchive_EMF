@@ -33,11 +33,12 @@ public class ControlStrategyMeasureTableData extends AbstractTableData {
         csm.getApplyOrder() != null ? csm.getApplyOrder() : Double.NaN,
         csm.getRuleEffectiveness() != null ? csm.getRuleEffectiveness() : Double.NaN,
         csm.getRulePenetration() != null ? csm.getRulePenetration() : Double.NaN,  
-        cm.getName(), csm.getRegionDataset()!= null ? csm.getRegionDataset(): null, 
+        cm.getName(), csm.getRegionDataset()!=null? csm.getRegionDataset().getName(): null, 
         csm.getRegionDatasetVersion()!= null ? csm.getRegionDatasetVersion(): null};
         return new ViewableRow(csm, values);
     }
 
+   
     public String[] columns() {
         return new String[] { "Abbrev", "Order", 
                 "RE", "RP", "Name", "Region", "Version"};

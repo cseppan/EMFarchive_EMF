@@ -1,11 +1,11 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
-import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -15,9 +15,9 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyMeasure;
 import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.ListWidget;
-import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
@@ -75,7 +75,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
     // private JPanel sortFilterPanelContainer = new JPanel();
 
-    private NumberFieldVerifier verifier;
+//    private NumberFieldVerifier verifier;
 
     public EditControlStrategyMeasuresTab(ControlStrategy controlStrategy, ManageChangeables changeablesList,
             SingleLineMessagePanel messagePanel, EmfConsole parentConsole, EmfSession session) {
@@ -84,7 +84,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         this.messagePanel = messagePanel;
         this.parent = parentConsole;
         this.session = session;
-        this.verifier = new NumberFieldVerifier("");
+ //       this.verifier = new NumberFieldVerifier("");
     }
 
     public void display(ControlStrategy strategy) throws EmfException {
@@ -137,49 +137,35 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         JPanel panel = new JPanel();
         if (presenter.getAllControlMeasures().length == 0)
             addButton.setEnabled(false);
-        addButton.setMargin(new Insets(2, 2, 2, 2));
+        addButton.setMargin(new Insets(2, 5, 2, 5));
         panel.add(addButton);
+        Button editButton = new EditButton(editAction());
+        editButton.setMargin(new Insets(2, 5, 2, 5));
+        panel.add(editButton);
         Button removeButton = new RemoveButton(removeAction());
-        removeButton.setMargin(new Insets(2, 2, 2, 2));
+        removeButton.setMargin(new Insets(2, 5, 2, 5));
         panel.add(removeButton);
-
-        Button rpButton = new BorderlessButton("Set RP %", new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    setRulePenetration();
-                } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
-                }
-            }
-        });
-        panel.add(rpButton);
-
-        Button reButton = new BorderlessButton("Set RE %", new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    setRuleEffectiveness();
-                } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
-                }
-            }
-        });
-        panel.add(reButton);
-
-        Button orderButton = new BorderlessButton("Set Order", new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    setApplyOrder();
-                } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
-                }
-            }
-        });
-        panel.add(orderButton);
 
         JPanel container = new JPanel(new BorderLayout());
         container.add(panel, BorderLayout.LINE_START);
 
         return container;
+    }
+
+    private Action editAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
+              //get selected items
+              ControlStrategyMeasure[] selectedMeasures = (sortFilterSelectModel.selected()).toArray(new ControlStrategyMeasure[0]);
+              
+              if (selectedMeasures.length == 0) {
+                  messagePanel.setMessage("Please select an items that you want to edit.");
+                  return;
+              }
+              propertySetView();
+            }
+        };
     }
 
     private Action addAction() {
@@ -190,6 +176,15 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         };
     }
 
+    private void propertySetView() {
+        ControlMeasureEditView view = new ControlMeasureEditDialog(parent);
+        ControlMeasureEditPresenter presenter = new ControlMeasureEditPresenter(this, view, session);
+        try {
+            presenter.display(view);
+        } catch (Exception exp) {
+            messagePanel.setError(exp.getMessage());
+        }
+    }
     private void selectionView() {
         ControlMeasureSelectionView view = new ControlMeasureSelectionDialog(parent, changeablesList);
         ControlMeasureSelectionPresenter presenter = new ControlMeasureSelectionPresenter(this, view, session,
@@ -334,7 +329,8 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         this.presenter = presenter;
     }
 
-    public void add(LightControlMeasure[] measures, double rule, double rulePenetration, double ruleEffective) {
+    public void add(LightControlMeasure[] measures, double rule, double rulePenetration, double ruleEffective, EmfDataset ds, Integer ver) {
+        messagePanel.clear();
         if (measures.length > 0 ) {
             ControlStrategyMeasure[] strategyMeasures = new ControlStrategyMeasure[measures.length];
             for (int i = 0; i < measures.length; i++) {
@@ -343,6 +339,8 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
                 csm.setRulePenetration(Double.valueOf(rulePenetration));
                 csm.setRuleEffectiveness(Double.valueOf(ruleEffective));
                 csm.setApplyOrder(Double.valueOf(rule));
+                csm.setRegionDataset(ds);
+                csm.setRegionDatasetVersion(ver);
                 strategyMeasures[i] = csm;
             }
             tableData.add(strategyMeasures);
@@ -358,124 +356,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         }
     }
 
-    private void setRulePenetration() throws EmfException {
-        messagePanel.clear();
-        //get selected items
-        ControlStrategyMeasure[] selectedMeasures = (sortFilterSelectModel.selected()).toArray(new ControlStrategyMeasure[0]);
-        //get all measures
-        ControlStrategyMeasure[] measures = tableData.sources();
 
-        if (selectedMeasures.length == 0) {
-            messagePanel.setError("Please select an items that you want to update.");
-            return;
-        }
-
-        String inputValue = JOptionPane.showInputDialog("Please input a rule penetration", "");
-
-        if (inputValue != null) {
-            //validate value
-            Double value = validateRulePenetration(inputValue);
-            //only update items that have been selected
-            for (int i = 0; i < selectedMeasures.length; i++) {
-                for (int j = 0; j < measures.length; j++) {
-                    if (selectedMeasures[i].equals(measures[j])) {
-                        measures[j].setRulePenetration(value); 
-                    }
-                }
-            }
-            //repopulate the tabe data
-            tableData = new ControlStrategyMeasureTableData(measures);
-            //rebuild the sort filter panel
-            buildSortFilterPanel();
-        }
-    }
-    
-    private void setRuleEffectiveness() throws EmfException {
-        messagePanel.clear();
-        //get selected items
-        ControlStrategyMeasure[] selectedMeasures = (sortFilterSelectModel.selected()).toArray(new ControlStrategyMeasure[0]);
-        //get all measures
-        ControlStrategyMeasure[] measures = tableData.sources();
-
-        if (selectedMeasures.length == 0) {
-            messagePanel.setError("Please select an items that you want to update.");
-            return;
-        }
-
-        String inputValue = JOptionPane.showInputDialog("Please input a rule effectiveness", "");
-
-        if (inputValue != null) {
-            //validate value
-            Double value = validateRuleEffectiveness(inputValue);
-            //only update items that have been selected
-            for (int i = 0; i < selectedMeasures.length; i++) {
-                for (int j = 0; j < measures.length; j++) {
-                    if (selectedMeasures[i].equals(measures[j])) {
-                        measures[j].setRuleEffectiveness(value); 
-                    }
-                }
-            }
-            //repopulate the tabe data
-            tableData = new ControlStrategyMeasureTableData(measures);
-            //rebuild the sort filter panel
-            buildSortFilterPanel();
-        }
-    }
-    
-    private void setApplyOrder() throws EmfException {
-        messagePanel.clear();
-        //get selected items
-        ControlStrategyMeasure[] selectedMeasures = (sortFilterSelectModel.selected()).toArray(new ControlStrategyMeasure[0]);
-        //get all measures
-        ControlStrategyMeasure[] measures = tableData.sources();
-
-        if (selectedMeasures.length == 0) {
-            messagePanel.setError("Please select an items that you want to update.");
-            return;
-        }
-
-        String inputValue = JOptionPane.showInputDialog("Please input an apply order", "1");
-
-        if (inputValue != null) {
-            //validate value
-            double value = validateApplyOrder(inputValue);
-            //only update items that have been selected
-            for (int i = 0; i < selectedMeasures.length; i++) {
-                for (int j = 0; j < measures.length; j++) {
-                    if (selectedMeasures[i].equals(measures[j])) {
-                        measures[j].setApplyOrder(value); 
-                    }
-                }
-            }
-            //repopulate the tabe data
-            tableData = new ControlStrategyMeasureTableData(measures);
-            //rebuild the sort filter panel
-            buildSortFilterPanel();
-        }
-    }
-    
-    private Double validateRuleEffectiveness(String ruleEffectiveness) throws EmfException {
-        if (ruleEffectiveness == null || ruleEffectiveness.trim().length() == 0) return null;
-        double value = verifier.parseDouble(ruleEffectiveness);
-        if (value <= 0 || value > 100)
-            throw new EmfException(
-                    "Enter the Rule Effectiveness as a percent between 0 and 100. Eg: 1 = 1%.  0.01 = 0.01%");
-        return new Double(value);
-    }
-
-    private Double validateRulePenetration(String rulePenetration) throws EmfException {
-        if (rulePenetration == null || rulePenetration.trim().length() == 0) return null;
-        double value = verifier.parseDouble(rulePenetration);
-        if (value <= 0 || value > 100)
-            throw new EmfException(
-                    "Enter the Rule Penetration as a percent between 0 and 100. Eg: 1 = 1%.  0.01 = 0.01%");
-        return new Double(value);
-    }
-
-    private Double validateApplyOrder(String applyOrder) throws EmfException {
-        double value = verifier.parseDouble(applyOrder);
-        return value;
-    }
 
     public void startControlMeasuresRefresh() {
         addButton.setEnabled(false);
@@ -484,4 +365,35 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
     public void endControlMeasuresRefresh() {
         addButton.setEnabled(true);
     }
+
+    public void add(Double order, Double rulePenetration, Double ruleEffective, EmfDataset ds, Integer ver) {
+        messagePanel.clear();
+      //get selected items
+      ControlStrategyMeasure[] selectedMeasures = (sortFilterSelectModel.selected()).toArray(new ControlStrategyMeasure[0]);
+      //get all measures
+      ControlStrategyMeasure[] measures = tableData.sources();
+
+      //only update items that have been selected
+      for (int i = 0; i < selectedMeasures.length; i++) {
+          for (int j = 0; j < measures.length; j++) {
+              if (selectedMeasures[i].equals(measures[j])) {
+                  if (!order.equals(Double.NaN))  
+                      measures[j].setApplyOrder(Double.valueOf(order));
+                  if (!rulePenetration.equals(Double.NaN))  
+                      measures[j].setRulePenetration(Double.valueOf(rulePenetration));
+                  if (!ruleEffective.equals(Double.NaN)) 
+                      measures[j].setRuleEffectiveness(Double.valueOf(ruleEffective));
+                  if (ds!=null){
+                      measures[j].setRegionDataset(ds);
+                      measures[j].setRegionDatasetVersion(ver);
+                  }
+              }
+          }
+      }
+      //repopulate the tabe data
+      tableData = new ControlStrategyMeasureTableData(measures);
+      //rebuild the sort filter panel
+      buildSortFilterPanel();
+    }
+        
 }

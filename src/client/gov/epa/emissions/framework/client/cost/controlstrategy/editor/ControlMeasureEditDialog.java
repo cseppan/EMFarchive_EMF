@@ -2,22 +2,16 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.ComboBox;
-import gov.epa.emissions.commons.gui.ManageChangeables;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.EmfImageTool;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.DoubleTextField;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
-import gov.epa.emissions.framework.ui.TrackableSortFilterSelectModel;
-import gov.epa.emissions.framework.ui.YesNoDialog;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
@@ -36,52 +30,46 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class ControlMeasureSelectionDialog extends JDialog implements ControlMeasureSelectionView {
-
-    private TrackableSortFilterSelectModel selectModel;
+public class ControlMeasureEditDialog extends JDialog implements ControlMeasureEditView {
 
     private EmfConsole parent;
 
-    private ControlMeasureSelectionPresenter presenter;
+    private ControlMeasureEditPresenter presenter;
     
     private SingleLineMessagePanel messagePanel;
     
-    private ManageChangeables changeables;  
+ //   private ManageChangeables changeables;  
     
     private DoubleTextField rule, rPenetration, rEffective;
     private NumberFieldVerifier verifier;
     
     private ComboBox version, dataset;
 
-    public ControlMeasureSelectionDialog(EmfConsole parent, ManageChangeables changeables) {
+    public ControlMeasureEditDialog(EmfConsole parent) {
         super(parent);
         super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
         this.verifier= new NumberFieldVerifier("Measure properties: ");
         this.parent = parent;
-        this.changeables = changeables;
+ //       this.changeables = changeables;
     }
 
-    public void display(ControlMeasureTableData tableData) {
-        EmfTableModel tableModel = new EmfTableModel(tableData);
-        selectModel = new TrackableSortFilterSelectModel(tableModel);
-        changeables.addChangeable(selectModel);
-        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parent, selectModel);
+    public void display() {
         
         messagePanel = new SingleLineMessagePanel();
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout(5, 10));
         contentPane.add(messagePanel, BorderLayout.PAGE_START);
-        contentPane.add(panel, BorderLayout.CENTER);
+  
         try {
-            contentPane.add(createLowerSection(), BorderLayout.SOUTH);
+            contentPane.add(createLowerSection(), BorderLayout.CENTER);
         } catch (EmfException e) {
             // NOTE Auto-generated catch block
             e.printStackTrace();
         }
 
-        setTitle("Select Control Measures");
+        setTitle("Control Strategy Measures Editor");
         this.pack();
-        this.setSize(700,600);
+        this.setSize(700,220);
         this.setLocation(ScreenUtils.getPointToCenter(parent));
         this.setVisible(true);
     }
@@ -136,10 +124,6 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
                     5, 5, // initialX, initialY
                     5, 10);// xPad, yPad
 
-//        } catch (EmfException e) {
-//            // NOTE Auto-generated catch block
-//            e.printStackTrace();
-//        }
         return panel;
     }
 
@@ -197,19 +181,19 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
     }
     private DoubleTextField ruleField() {
         rule = new DoubleTextField("Set Order", 1, 100, 10);
-        rule.setValue(1);
+        rule.setText("");
         return rule;
     }
     
     private DoubleTextField rPField() {
         rPenetration = new DoubleTextField("Set RP %", 1, 100, 10);
-        rPenetration.setValue(100);
+        rPenetration.setText("");
         return rPenetration;
     }
     
     private DoubleTextField rEField() {
         rEffective = new DoubleTextField("Set RE %", 1, 100, 10);
-        rEffective.setValue(100);
+        rEffective.setText("");
         return rEffective;
     }
 
@@ -245,36 +229,22 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
 
     private void add() throws EmfException {
         messagePanel.clear();
-        List selected = selectModel.selected();
-        
-        // prevent from closing window without selecting items
-        if (selected.size()==0){
-            String message = "Would you like to close without selecting any measures?";
-            YesNoDialog dialog = new YesNoDialog(this, "No measures selected", message);
-            if (dialog.confirm()){
-                setVisible(false);
-                dispose();
-            }
-            return; 
-        }
-        LightControlMeasure[] cms = (LightControlMeasure[]) selected.toArray(new LightControlMeasure[0]);
         EmfDataset ds =(EmfDataset) dataset.getSelectedItem();
         if (ds.getId() == 0) {
             ds = null;
         }
         Version ver = (ds !=null ? (Version) version.getSelectedItem(): null);
         Integer verValue = (ver !=null? ver.getVersion(): null);
- 
-        presenter.doAdd(cms, checkNumber(rule), checkNumber(rPenetration), checkNumber(rEffective), ds, verValue);
+        presenter.doAdd(checkNumber(rule), checkNumber(rPenetration), checkNumber(rEffective), ds, verValue);
         setVisible(false);
         dispose();
     }
 
-    private double checkNumber(DoubleTextField value) throws EmfException{
+    private Double checkNumber(DoubleTextField value) throws EmfException{
         if (value.getText().trim().length() == 0){
-            throw new EmfException(value.getName()+":  Enter a number between 1 and 100");
+            return Double.NaN;
         }
-        double value1 = verifier.parseDouble(value.getText());
+        Double value1 = verifier.parseDouble(value);
 
         // make sure the number makes sense...
         if (value1 < 1 || value1 > 100) {
@@ -284,7 +254,7 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
 
     }
 
-    public void observe(ControlMeasureSelectionPresenter presenter) {
+    public void observe(ControlMeasureEditPresenter presenter) {
         this.presenter = presenter;
     }
 
