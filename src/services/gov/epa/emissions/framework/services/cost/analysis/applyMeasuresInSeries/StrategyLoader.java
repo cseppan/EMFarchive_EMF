@@ -43,7 +43,8 @@ public class StrategyLoader extends AbstractStrategyLoader {
                 sessionFactory, controlStrategy, 
                 batchSize);
         this.retrieveBestMeasureEffRecords = new RetrieveBestMeasureEffRecords(controlStrategy, costYearTable);
-        this.retrieveBestMeasures = new RetrieveBestMeasures(controlStrategy, costYearTable);
+        this.retrieveBestMeasures = new RetrieveBestMeasures(controlStrategy, costYearTable,
+                dbServer, sessionFactory);
     }
 
     public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {
@@ -107,14 +108,21 @@ public class StrategyLoader extends AbstractStrategyLoader {
                 sourceCount = resultSet.getInt("Record_Id");
                 poll = pollutants.getPollutant(resultSet.getString("poll"));
                 targetPollutant = poll.equals(controlStrategy.getTargetPollutant());
-
+                
+                currentTime = System.currentTimeMillis();
+                
                 //for a new source get a list of best measures for the strat target pollutant
                 if (newSource) {
 //                    sccMeasureMap = mapGenerator.create(scc);
-                    if (newScc)
+                    if (newScc) {
+                        currentTime = System.currentTimeMillis();
                         sccMeasures = mapGenerator.create(scc).getControlMeasures(scc);
+                        getSourceMeasuresTime += System.currentTimeMillis() - currentTime;
+                        currentTime = System.currentTimeMillis();
+                    }
 
                     if (newFips && targetPollutant) {
+                        currentTime = System.currentTimeMillis();
                         sourceMeasures = retrieveBestMeasures.findTargetPollutantBestMeasures(sccMeasures, fips, 
                             resultSet.getDouble("CEFF"), !pointDatasetType ? resultSet.getDouble("RPEN") : 100, 
                             resultSet.getDouble("REFF"), resultSet.getDouble("ANN_EMIS"));
@@ -134,6 +142,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
                     : retrieveBestMeasureEffRecords.findCobenefitPollutantBestMeasureEffRecords(sourceMeasures, fips, 
                             poll, resultSet.getDouble("ANN_EMIS"));
 
+                matchTime += System.currentTimeMillis() - currentTime;
 //for (BestMeasureEffRecord l : bestMeasureEffRecordList)
 //    System.err.println(targetPollutant + " " + scc + " " + fips + " " + (l.adjustedCostPerTon() == null ? -1 : l.adjustedCostPerTon()) + ": " + l.measure().getAbbreviation() + ": " + l.efficiencyRecord().getPollutant() + ": " + l.efficiencyRecord().getLocale() + ": " + l.efficiencyRecord().getCostPerTon() + ": " + l.measure().getApplyOrder());
 
@@ -151,7 +160,9 @@ public class StrategyLoader extends AbstractStrategyLoader {
                         sourceEmis -= recordGenerator.reducedEmission();
                         if (poll.equals(controlStrategy.getTargetPollutant()))
                             totalReduction += recordGenerator.reducedEmission();
+                        currentTime = System.currentTimeMillis();
                         insertRecord(record, modifier);
+                        insertSourceTime += System.currentTimeMillis() - currentTime;
                     } catch (SQLException e) {
                         e.printStackTrace();
                         throw new EmfException("Error in processing record for source record: " + sourceCount + ". Exception: " + e.getMessage());
