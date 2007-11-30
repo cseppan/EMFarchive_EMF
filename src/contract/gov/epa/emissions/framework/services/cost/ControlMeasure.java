@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.AggregatedPollutantEfficiencyRecord;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -68,6 +69,10 @@ public class ControlMeasure implements Lockable, Serializable {
     private Double applyOrder;
 
     private List equations = new ArrayList();
+
+    private EmfDataset regionDataset;
+
+    private Integer regionDatasetVersion;
 
     public ControlMeasure() {
         this.lock = new Mutex();
@@ -350,5 +355,21 @@ public class ControlMeasure implements Lockable, Serializable {
 
     public ControlMeasureEquation[] getEquations() {
         return (ControlMeasureEquation[]) equations.toArray(new ControlMeasureEquation[0]);
+    }
+
+    public void setRegionDataset(EmfDataset regionDataset) {
+        this.regionDataset = regionDataset;
+    }
+
+    public EmfDataset getRegionDataset() {
+        return regionDataset;
+    }
+
+    public void setRegionDatasetVersion(Integer regionDatasetVersion) {
+        this.regionDatasetVersion = regionDatasetVersion;
+    }
+
+    public Integer getRegionDatasetVersion() {
+        return regionDatasetVersion;
     }
 }
