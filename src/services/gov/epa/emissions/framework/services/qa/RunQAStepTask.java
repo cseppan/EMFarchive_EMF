@@ -82,19 +82,27 @@ public class RunQAStepTask {
         String suffix = suffix(qaStep);
         prepare(suffix, qaStep);
         DbServer dbServer = dbServerFactory.getDbServer();
+        long startTime;
+        long endTime;
         try {
+            startTime = System.currentTimeMillis();
             QAProgramRunner runQAProgram = qaProgramRunner(qaStep, dbServer);
             runQAProgram.run();
+            endTime = System.currentTimeMillis();
+            System.out.println("Ran QA step, " + qaStep.getName() + ", in " + ((endTime - startTime) / (1000))  + " secs");
         } finally {
             close(dbServer);
         }
         complete(suffix, qaStep);
 
         if (exportDirectory != null && exportDirectory.trim().length() != 0) {
+            startTime = System.currentTimeMillis();
             ExportQAStep exportQATask = new ExportQAStep(qaStep, dbServerFactory, 
                     user, sessionFactory, 
                     threadPool, verboseStatusLogging);
             exportQATask.export(exportDirectory);
+            endTime = System.currentTimeMillis();
+            System.out.println("Eexported QA step, " + qaStep.getName() + ", in " + ((endTime - startTime) / (1000))  + " secs");
         }
     
     }

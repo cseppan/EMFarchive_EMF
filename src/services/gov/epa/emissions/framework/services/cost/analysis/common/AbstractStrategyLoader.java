@@ -101,6 +101,16 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
 
     protected boolean newSource;
 
+    protected long matchTime;
+    
+    protected long insertSourceTime;
+
+    protected long getSourceTime;
+    
+    protected long getSourceMeasuresTime;
+    
+    protected long currentTime;
+    
     public AbstractStrategyLoader(User user, DbServerFactory dbServerFactory, 
             HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
             int batchSize) throws EmfException {
@@ -150,21 +160,39 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         modifier = dataModifier(emissionTableName(result.getDetailedResultDataset()));
         try {
             modifier.start();
-            while (optimizedQuery.execute()) {
+            long startTime;
+            long endTime;
+            startTime = System.currentTimeMillis();
+            boolean hasSources = optimizedQuery.execute();
+            endTime = System.currentTimeMillis();
+            getSourceTime += endTime - startTime;
+            System.out.println("Get batch of sources for strategy, in " + ((endTime - startTime) / (1000))  + " secs");
+            while (hasSources) {
                 ResultSet resultSet = optimizedQuery.getResultSet();
                 doBatchInsert(resultSet);
                 resultSet.close();
+                startTime = System.currentTimeMillis();
+                hasSources = optimizedQuery.execute();
+                endTime = System.currentTimeMillis();
+                getSourceTime += endTime - startTime;
+                System.out.println("Get batch of sources for strategy, in " + ((endTime - startTime) / (1000))  + " secs");
             }
         } catch(Exception ex) {
             ex.printStackTrace();
             result.setRunStatus("Failed: " + ex.getMessage());
         } finally {
+            currentTime = System.currentTimeMillis();
             modifier.finish();
+            insertSourceTime += System.currentTimeMillis() - currentTime;
             modifier.close();
             optimizedQuery.close();
         }
         result.setTotalCost(totalCost);
         result.setTotalReduction(totalReduction);
+        System.out.println("Total time to get all sources = " + (getSourceTime / (1000))  + " secs");
+        System.out.println("Total time to get measures for sources = " + (getSourceMeasuresTime / (1000))  + " secs");
+        System.out.println("Total time to match sources to measures = " + (matchTime / (1000))  + " secs");
+        System.out.println("Total time to insert results = " + (insertSourceTime / (1000))  + " secs");
         return result;
     }
 
