@@ -32,7 +32,7 @@ SCR; Solid Waste Disp;Gov;Other Incin;Sludge,NDSNCRSWIN,NOx,SCR,Solid Waste Disp
 Diesel Particulate Filter; Internal Combustion Engines,PDPFICE,PM2_5,Diesel Particulate Filter,Internal Combustion Engines,PTNONIPM,Emerging,,,,39,Applies diesel particulate filter retrofits to stationary internal combustion engines.
 ESP; Oil fired boiler,PESPOFBOIL,PM2_5,ESP,Oil fired boiler,PTNONIPM,Emerging,,,,39,
 Venturi scrubber; Catalytic cracking units,PVENTCCU,PM2_5,Venturi scrubber,Catalytic cracking units,PTNONIPM,Emerging,,,,39,
-Fuel Switching; External Combustion Boilers2,SFUELSWECB,SO2,Fuel Switching,External Combustion Boilers2,PTNONIPM,Emerging,,,,39,"This control transfers a home-heating oil fuel control to industrial boilers by substituting ﾓred dyeﾔ distillate oil for high-sulfur fuel. Distillate has 500 ppm versus 2,500 to 3,000 ppm for high-sulfur diesel."
+Fuel Switching; External Combustion Boilers2,SFUELSWECB,SO2,Fuel Switching,External Combustion Boilers2,PTNONIPM,Emerging,,,,39,"This control transfers a home-heating oil fuel control to industrial boilers by substituting red dye distillate oil for high-sulfur fuel. Distillate has 500 ppm versus 2,500 to 3,000 ppm for high-sulfur diesel."
 Low Sulfur Fuel; ICI Boilers (distillate oil),SLSFICB,SO2,Low Sulfur Fuel,ICI Boilers,PTNONIPM,Emerging,,,2006,27, 
 AF RATIO; Internal Combustion Engines - Gas,NAFRICGS,NOx,AF RATIO,Internal Combustion Engines - Gas,PTNONIPM,Known,15,,2006,1,Abbreviation was N0224
 AF + IR; Internal Combustion Engines - Gas,NAFRIICGS,NOx,AF + IR,Internal Combustion Engines - Gas,PTNONIPM,Known,15,,2006,1|35,Abbreviation was N0227
@@ -172,7 +172,7 @@ SCR; ICI Boilers – Coke2,NSCRIBCK,NOx,SCR,ICI Boilers – Coke2,PTNONIPM,Known
 SCR; ICI Boilers - Coal,NSCRIBCOAL,NOx,SCR,ICI Boilers - Coal,PTNONIPM,Known,20,,2003,26|36, 
 SCR; ICI Boilers - Coal/Wall,NSCRIBCW,NOx,SCR,ICI Boilers - Coal/Wall,PTNONIPM,Known,20,,2006,1,Abbreviation was N0114
 SCR; ICI Boilers - Distillate Oil,NSCRIBDO,NOx,SCR,ICI Boilers - Distillate Oil,PTNONIPM,Known,20,,2006,1,Abbreviation was N0163
-SCR; ICI Boilers – LPG2,NSCRIBLP,NOx,SCR,ICI Boilers – LPG2,PTNONIPM,Known,20,,2006,1,Abbreviation was N0433
+SCR; ICI Boilers - LPG2,NSCRIBLP,NOx,SCR,ICI Boilers - LPG2,PTNONIPM,Known,20,,2006,1,Abbreviation was N0433
 SCR; ICI Boilers - Liquid Waste2,NSCRIBLW,NOx,SCR,ICI Boilers - Liquid Waste2,PTNONIPM,Known,20,,2006,1,Abbreviation was N0453
 SCR; ICI Boilers - Natural Gas,NSCRIBNG,NOx,SCR,ICI Boilers - Natural Gas,PTNONIPM,Known,20,,2006,1,Abbreviation was N0174
 SCR; ICI Boilers - Process Gas2,NSCRIBPG,NOx,SCR,ICI Boilers - Process Gas2,PTNONIPM,Known,20,,2006,1,Abbreviation was N0414
@@ -182,7 +182,7 @@ SCR;ICI Boilers - Oil,NSCRICBO,NOx,SCR,ICI Boilers - Oil,PTNONIPM,Known,20,,2006
 "SCR; IC Engines - Gas, Diesel, LPG",NSCRICGD,NOx,SCR,IC Engines - Gas/ Diesel/ LPG,PTNONIPM,Known,15,,2006,1,Abbreviation was N0464
 SCR; Internal Combustion Engines - Gas,NSCRICGS,NOx,SCR,Internal Combustion Engines - Gas,PTNONIPM,Known,20,,2006,1|33|36,Abbreviation was N02212
 SCR; Internal Combustion Engines - Oil,NSCRICOL,NOx,SCR,Internal Combustion Engines - Oil,PTNONIPM,Known,15,,2006,1,Abbreviation was N0214
-SCR; Iron & Steel Mills – Annealing2,NSCRISAN,NOx,SCR,Iron & Steel Mills – Annealing2,PTNONIPM,Known,10,,2006,1,Abbreviation was N0365
+SCR; Iron & Steel Mills - Annealing2,NSCRISAN,NOx,SCR,Iron & Steel Mills - Annealing2,PTNONIPM,Known,10,,2006,1,Abbreviation was N0365
 SCR + LNB; Gas Turbines - Natural Gas,NSCRLGTNG,NOx,SCR + LNB,Gas Turbines - Natural Gas,PTNONIPM,Known,15,,2006,1,Abbreviation was N0244
 SCR; Nitric Acid Manufacturing2,NSCRNAMF,NOx,SCR,Nitric Acid Manufacturing2,PTNONIPM,Known,10,,2006,1,Abbreviation was N0292
 SCR; Natural Gas Prod; Compressors,NSCRNGCP,NOx,SCR,Natural Gas Prod; Compressors,PTNONIPM,Known,15,,2006,1,Abbreviation was N08012
@@ -234,16 +234,16 @@ SNCR; Indust. Incinerators,NSNCRIDIN,NOx,SNCR,Indust. Incinerators,PTNONIPM,Know
 SNCR; Iron & Steel Mills - Annealing,NSNCRISAN,NOx,SNCR,Iron & Steel Mills - Annealing,PTNONIPM,Known,10,,2006,1,Abbreviation was N0363
 SNCR; Municipal Waste Combustors,NSNCRMWCB,NOx,SNCR,Municipal Waste Combustors,PTNONIPM,Known,20,,2006,1,Abbreviation was N0381
 SNCR; Medical Waste Incinerators,NSNCRMWIN,NOx,SNCR,Medical Waste Incinerators,PTNONIPM,Known,20,,2006,1,Abbreviation was N0391
-SNCR; Nitric Acid Manufacturing,NSNCRNAMF,NOx,SNCR,Nitric Acid Manufacturing,PTNONIPM,Known,10,,2006,1,Abbreviation was N0293
+NSCR; Nitric Acid Manufacturing,NSNCRNAMF,NOx,NSCR,Nitric Acid Manufacturing,PTNONIPM,Known,10,,2006,1,Abbreviation was N0293
 SNCR; Process Heaters - Distillate Oil,NSNCRPHDO,NOx,SNCR,Process Heaters - Distillate Oil,PTNONIPM,Known,15,,2006,1,Abbreviation was N0253
 SNCR; Process Heaters - LPG,NSNCRPHLP,NOx,SNCR,Process Heaters - LPG,PTNONIPM,Known,15,,2006,1,Abbreviation was N0483
 SNCR; Process Heaters - Natural Gas,NSNCRPHNG,NOx,SNCR,Process Heaters - Natural Gas,PTNONIPM,Known,15,,2006,1,Abbreviation was N0273
 SNCR; Process Heaters - Other Fuel,NSNCRPHOF,NOx,SNCR,Process Heaters - Other Fuel,PTNONIPM,Known,15,,2006,1,Abbreviation was N0493
 SNCR; Process Heaters - Process Gas,NSNCRPHPG,NOx,SNCR,Process Heaters - Process Gas,PTNONIPM,Known,15,,2006,1,Abbreviation was N0473
 SNCR; Process Heaters - Residual Oil,NSNCRPHRO,NOx,SNCR,Process Heaters - Residual Oil,PTNONIPM,Known,15,,2006,1,Abbreviation was N0263
-"SNCR; Rich Burn IC Engines - Gas, Diesel, LPG",NSNCRRBGD,NOx,SNCR,Rich Burn IC Engines - Gas/ Diesel/ LPG,PTNONIPM,Known,15,,2006,1,Abbreviation was N0465
-SNCR; Rich Burn Internal Combustion Engines -,NSNCRRBIC,NOx,SNCR,Rich Burn Internal Combustion Engines -,PTNONIPM,Known,15,,2006,1,Abbreviation was N0215
-SNCR; Rich Burn Internal Combustion Engines (2),NSNCRRBIC2,NOx,SNCR,Rich Burn Internal Combustion Engines -,PTNONIPM,Known,15,,2006,1|37,Abbreviation was N02213NSCR
+"NSCR; Rich Burn IC Engines - Gas, Diesel, LPG",NSNCRRBGD,NOx,NSCR,Rich Burn IC Engines - Gas/ Diesel/ LPG,PTNONIPM,Known,15,,2006,1,Abbreviation was N0465
+NSCR; Rich Burn Internal Combustion Engines -,NSNCRRBIC,NOx,NSCR,Rich Burn Internal Combustion Engines -,PTNONIPM,Known,15,,2006,1,Abbreviation was N0215
+NSCR; Rich Burn Internal Combustion Engines (2),NSNCRRBIC2,NOx,NSCR,Rich Burn Internal Combustion Engines -,PTNONIPM,Known,15,,2006,1|37,Abbreviation was N02213NSCR
 SNCR; Space Heaters - Distillate Oil,NSNCRSHDO,NOx,SNCR,Space Heaters - Distillate Oil,PTNONIPM,Known,20,,2006,1,Abbreviation was N0544
 SNCR; Space Heaters - Natural Gas,NSNCRSHNG,NOx,SNCR,Space Heaters - Natural Gas,PTNONIPM,Known,20,,2006,1,Abbreviation was N0555
 SNCR; Sulfate Pulping - Recovery Furnaces,NSNCRSPRF,NOx,SNCR,Sulfate Pulping - Recovery Furnaces,PTNONIPM,Known,20,,2006,1,Abbreviation was N0615
@@ -496,16 +496,16 @@ SCR; Utility Boiler - Oil-Gas/Tangential,NSCR_UBOT,NOx,SCR,Utility Boiler - Oil-
 SNCR; Utility Boiler - Cyclone,NSNCRUBCY,NOx,SNCR,Utility Boiler - Cyclone,PTIPM,Known,20,,2006,1,N00701
 NGR; Utility Boiler - Cyclone,NNGR_UBCY,NOx,NGR,Utility Boiler - Cyclone,PTIPM,Known,20,,2006,1,N00702
 SCR; Utility Boiler - Cyclone,NSCR_UBCY,NOx,SCR,Utility Boiler - Cyclone,PTIPM,Known,20,,2006,1,N00703
-LNB; Utility Boiler – Bit Coal/Wall,NLNBUUBCW,NOx,LNB,Utility Boiler - Coal/Wall,PTIPM,Known,15,,2006,1,N00901
-LNBO; Utility Boiler – Bit Coal/Wall,NLNBOUBCW,NOx,LNBO,Utility Boiler - Coal/Wall,PTIPM,Known,15,,2006,1,N00902
-LNC1; Utility Boiler – Bit Coal/Tangential,NLNC1UBCT,NOx,LNC1,Utility Boiler - Coal/Tangential,PTIPM,Known,15,,2006,1,N00903
-LNC2; Utility Boiler – Bit Coal/Tangential,NLNC2UBCT,NOx,LNC2,Utility Boiler - Coal/Tangential,PTIPM,Known,15,,2006,1,N00904
-LNC3; Utility Boiler – Bit Coal/Tangential,NLNC3UBCT,NOx,LNC3,Utility Boiler - Coal/Tangential,PTIPM,Known,15,,2006,1,N00905
-LNB; Utility Boiler – Subbit Coal/Wall,NLNBUUBCW2,NOx,LNB,Utility Boiler – Coal/Wall2,PTIPM,Known,15,,2006,1,N00906
-LNBO; Utility Boiler – Subbit Coal/Wall,NLNBOUBCW2,NOx,LNBO,Utility Boiler – Coal/Wall2,PTIPM,Known,15,,2006,1,N00907
-LNC1; Utility Boiler – Subbit Coal/Tangential,NLNC1UBCT2,NOx,LNC1,Utility Boiler – Coal/Tangential1,PTIPM,Known,15,,2006,1,N00908
-LNC2; Utility Boiler – Subbit Coal/Tangential,NLNC2UBCT2,NOx,LNC2,Utility Boiler – Coal/Tangential2,PTIPM,Known,15,,2006,1,N00909
-LNC3; Utility Boiler – Subbit Coal/Tangential,NLNC3UBCT2,NOx,LNC3,Utility Boiler – Coal/Tangential3,PTIPM,Known,15,,2006,1,N00910
+LNB; Utility Boiler - Bit Coal/Wall,NLNBUUBCW,NOx,LNB,Utility Boiler - Coal/Wall,PTIPM,Known,15,,2006,1,N00901
+LNBO; Utility Boiler - Bit Coal/Wall,NLNBOUBCW,NOx,LNBO,Utility Boiler - Coal/Wall,PTIPM,Known,15,,2006,1,N00902
+LNC1; Utility Boiler - Bit Coal/Tangential,NLNC1UBCT,NOx,LNC1,Utility Boiler - Coal/Tangential,PTIPM,Known,15,,2006,1,N00903
+LNC2; Utility Boiler - Bit Coal/Tangential,NLNC2UBCT,NOx,LNC2,Utility Boiler - Coal/Tangential,PTIPM,Known,15,,2006,1,N00904
+LNC3; Utility Boiler - Bit Coal/Tangential,NLNC3UBCT,NOx,LNC3,Utility Boiler - Coal/Tangential,PTIPM,Known,15,,2006,1,N00905
+LNB; Utility Boiler - Subbit Coal/Wall,NLNBUUBCW2,NOx,LNB,Utility Boiler - Coal/Wall2,PTIPM,Known,15,,2006,1,N00906
+LNBO; Utility Boiler - Subbit Coal/Wall,NLNBOUBCW2,NOx,LNBO,Utility Boiler - Coal/Wall2,PTIPM,Known,15,,2006,1,N00907
+LNC1; Utility Boiler - Subbit Coal/Tangential,NLNC1UBCT2,NOx,LNC1,Utility Boiler - Coal/Tangential1,PTIPM,Known,15,,2006,1,N00908
+LNC2; Utility Boiler - Subbit Coal/Tangential,NLNC2UBCT2,NOx,LNC2,Utility Boiler - Coal/Tangential2,PTIPM,Known,15,,2006,1,N00909
+LNC3; Utility Boiler - Subbit Coal/Tangential,NLNC3UBCT2,NOx,LNC3,Utility Boiler - Coal/Tangential3,PTIPM,Known,15,,2006,1,N00910
 Dry ESP-Wire Plate Type; Utility Boilers - Coal,PDESPWPUBC,PM10,Dry ESP-Wire Plate Type,Utility Boilers - Coal,PTIPM,Known,,,2006,1,PUDESP
 Dry ESP-Wire Plate Type; Utility Boilers - Oil,PDESPWPUBO,PM10,Dry ESP-Wire Plate Type,Utility Boilers - Oil,PTIPM,Known,,,2006,1,PUDESP
 Fabric Filter (Mech. Shaker Type); Utility Boilers - Coal,PFFMSUBC,PM10,Fabric Filter (Mech. Shaker Type),Utility Boilers - Coal,PTIPM,Known,,,2006,1,PUMECH
@@ -553,8 +553,8 @@ Repowering to Natural Gas; Utility Boilers - Coal Fired,SRPNGUBCF,SO2,Repowering
 Fuel Switch - High to Low S Content; Utility Boilers - High Sulfur Content,SFWHLUBHS,SO2,Fuel Switch - High to Low S Content,Utility Boilers - High Sulfur Content,PTIPM,Known,,,2006,1,SUT-S
 FGD Wet Scrubber; Utility Boilers - Very High Sulfur Conte,SFGDWUBVHS,SO2,FGD Wet Scrubber,Utility Boilers - Very High Sulfur Conte,PTIPM,Known,15,,2006,1,SUT-VH
 Coal Washing; Utility Boilers - Coal Fired,SCWSHUBCF,SO2,Coal Washing,Utility Boilers - Coal Fired,PTIPM,Known,,,2006,1,SUT-W
-FGD; By-Product Coke Manufacturing (Coke Oven Plants),SFGDSCMOC,SO2,Coke Oven Gas Desulfurization                                  ,By-Product Coke Manufacturing (Coke Oven Plants),PTNONIPM,Known,15,,2006,1,S1201A
-Reduced Evaporation; Printing/Publishing,VREEVPRPU,VOC,Petroleum and Solvent Evaporation,Printing/Publishing,POINT,Known,,,,Section 183(e) CTG for Group III Source Categories – Aug 2007,
-Reduced Evaporation; Surface Coating Operations; Large Appliances,VREEVSCOL,VOC,Petroleum and Solvent Evaporation,Surface Coating Operations,POINT,Known,,,,Section 183(e) CTG for Group III Source Categories – Aug 2007,
-Reduced Evaporation; Surface Coating Operations; Metal Furniture Operation,VREEVSCOM,VOC,Petroleum and Solvent Evaporation,Surface Coating Operations,POINT,Known,,,,Section 183(e) CTG for Group III Source Categories – Aug 2007,
-Reduced Evaporation; Surface Coating Operations; Paper Coating,VREEVSCOP,VOC,Petroleum and Solvent Evaporation,Surface Coating Operations,POINT,Known,,,,Section 183(e) CTG for Group III Source Categories – Aug 2007,
+FGD; By-Product Coke Manufacturing (Coke Oven Plants),SFGDSCMOC,SO2,Coke Oven Gas Desulfurization,By-Product Coke Manufacturing (Coke Oven Plants),PTNONIPM,Known,15,,2006,1,S1201A
+Reduced Evaporation; Printing/Publishing,VREEVPRPU,VOC,Petroleum and Solvent Evaporation,Printing/Publishing,POINT,Known,,,,Section 183(e) CTG for Group III Source Categories - Aug 2007,
+Reduced Evaporation; Surface Coating Operations; Large Appliances,VREEVSCOL,VOC,Petroleum and Solvent Evaporation,Surface Coating Operations,POINT,Known,,,,Section 183(e) CTG for Group III Source Categories - Aug 2007,
+Reduced Evaporation; Surface Coating Operations; Metal Furniture Operation,VREEVSCOM,VOC,Petroleum and Solvent Evaporation,Surface Coating Operations,POINT,Known,,,,Section 183(e) CTG for Group III Source Categories - Aug 2007,
+Reduced Evaporation; Surface Coating Operations; Paper Coating,VREEVSCOP,VOC,Petroleum and Solvent Evaporation,Surface Coating Operations,POINT,Known,,,,Section 183(e) CTG for Group III Source Categories - Aug 2007,
