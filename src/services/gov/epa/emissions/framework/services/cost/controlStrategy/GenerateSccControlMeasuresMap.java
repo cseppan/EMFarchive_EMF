@@ -111,6 +111,8 @@ public class GenerateSccControlMeasuresMap {
                     measure.setRuleEffectiveness(controlStrategyMeasure.getRuleEffectiveness());
                     measure.setRulePenetration(controlStrategyMeasure.getRulePenetration());
                     measure.setApplyOrder(controlStrategyMeasure.getApplyOrder());
+                    measure.setRegionDataset(controlStrategyMeasure.getRegionDataset());
+                    measure.setRegionDatasetVersion(controlStrategyMeasure.getRegionDatasetVersion());
                 }
             }
 
