@@ -699,6 +699,77 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 //        }
 //    }
 
+    public void testShouldRunMaxEmsRedStrategyWithOnRoadDataAndMeasureRegionFilter() throws Exception {
+        ControlStrategy strategy = null;
+        ControlStrategyInputDataset inputDataset = setInputDataset("ORL nonpoint");
+        EmfDataset regionDataset = getRegionDataset();
+        
+        ResultSet rs = null;
+        Connection cn = null;
+        try {
+            ControlStrategyMeasure[] controlStrategyMeasures = new ControlStrategyMeasure[2];
+            ControlStrategyMeasure controlStrategyMeasure = new ControlStrategyMeasure((LightControlMeasure)load(LightControlMeasure.class, "Bale Stack/Propane Burning; Agricultural Burning"));
+            controlStrategyMeasure.setRulePenetration(75.0);
+            controlStrategyMeasure.setRuleEffectiveness(100.0);
+            controlStrategyMeasure.setApplyOrder(1.0);
+            controlStrategyMeasure.setRegionDataset(regionDataset);
+            controlStrategyMeasure.setRegionDatasetVersion(0);
+            controlStrategyMeasures[0] = controlStrategyMeasure;
+            controlStrategyMeasure = new ControlStrategyMeasure((LightControlMeasure)load(LightControlMeasure.class, "ESP for Commercial Cooking; Conveyorized Charbroilers"));
+            controlStrategyMeasure.setRulePenetration(75.0);
+            controlStrategyMeasure.setRuleEffectiveness(100.0);
+            controlStrategyMeasure.setApplyOrder(1.0);
+            controlStrategyMeasure.setRegionDataset(regionDataset);
+            controlStrategyMeasure.setRegionDatasetVersion(0);
+            controlStrategyMeasures[1] = controlStrategyMeasure;
+            
+//            LightControlMeasure[] cmsa = {(LightControlMeasure)load(LightControlMeasure.class, "Bale Stack/Propane Burning; Agricultural Burning"), 
+//                    (LightControlMeasure)load(LightControlMeasure.class, "ESP for Commercial Cooking; Conveyorized Charbroilers")};
+            strategy = controlStrategy(inputDataset, "CS_test_case__" + Math.round(Math.random() * 1000), pm10Pollutant(), controlStrategyMeasures);
+
+            runStrategy(strategy);
+
+            //get detailed result dataset
+            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            Dataset detailedResultDataset = result.getDetailedResultDataset();
+            String tableName = detailedResultDataset.getInternalSources()[0].getTable();
+
+            cn = dbServer().getEmissionsDatasource().getConnection();
+            Statement stmt = cn.createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY);
+
+            //make sure 15 records come back...
+            rs = stmt.executeQuery("SELECT count(*) FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName);
+            rs.next();
+            assertTrue("make sure there are 2 records in the summary results." + rs.getInt(1), rs.getInt(1) == 2);
+
+            //make sure inv entry has the right numbers...
+            //check SCC = 2302002100 FIPS = 37013 POLL = PM10 inv entry
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
+                    + " where scc = '2302002100' and fips = '37013' and poll='PM10'");
+            rs.next();
+            assertTrue("SCC = 2302002100 FIPS = 37013 reduction = 13.88 poll = PM10" + rs.getDouble("percent_reduction"), Math.abs(rs.getDouble("percent_reduction") - 13.88)/13.88 < percentDiff);
+            assertTrue("SCC = 2302002100 FIPS = 37013 annual cost = 12530000 poll = PM10" + rs.getDouble("annual_cost"), Math.abs(rs.getDouble("annual_cost") - 12530000)/12530000 < percentDiff);
+            assertTrue("SCC = 2302002100 FIPS = 37013 emis reduction = 1804 poll = PM10", Math.abs(rs.getDouble("emis_reduction") - 1804)/1804 < percentDiff);
+
+            //check SCC = 2801500000 FIPS = 37029 POLL = PM10 inv entry
+            rs = stmt.executeQuery("SELECT * FROM "+ EmfDbServer.EMF_EMISSIONS_SCHEMA + "." + tableName 
+                    + " where scc = '2801500000' and fips = '37015' and poll='PM10'");
+            assertTrue("dont find a record, fips not in the region file, SCC = 2801500000 FIPS = 37015 poll = PM10", !rs.next());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) rs.close();
+            if (cn != null) cn.close();
+            dropTables(strategy);
+            removeData();
+            //drop input dataset table
+            dropTable(regionDataset.getInternalSources()[0].getTable(), dbServer.getEmissionsDatasource());
+        }
+    }
+
     private void dropTables(ControlStrategy strategy) throws Exception {
         if (strategy != null) {
             for (int i = 0; i < strategy.getControlStrategyInputDatasets().length; i++) {

@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.TableModifier;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.csv.CSVImporter;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
@@ -73,6 +74,23 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         return controlStrategyInputDataset;
     }
 
+    protected EmfDataset getRegionDataset() throws Exception {
+        EmfDataset inputDataset = new EmfDataset();
+        inputDataset.setName("test" + Math.round(Math.random() * 1000) % 1000);
+        inputDataset.setCreator(emfUser().getUsername());
+        inputDataset.setDatasetType(getDatasetType("List of Counties (CSV)"));//orlNonpointDatasetType());
+
+        add(inputDataset);
+        session.flush();
+        inputDataset = (EmfDataset) load(EmfDataset.class, inputDataset.getName());
+
+        inputDataset = addRegionDataset(inputDataset);
+        
+        addVersionZeroEntryToVersionsTable(inputDataset, dbServer.getEmissionsDatasource());
+        inputDataset = (EmfDataset) load(EmfDataset.class, inputDataset.getName());
+        return inputDataset;
+    }
+
     private DatasetType getDatasetType(String type) {
         DatasetType ds = null;
         if (type.equalsIgnoreCase("ORL nonpoint")) 
@@ -83,6 +101,8 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
             ds = (DatasetType) load(DatasetType.class, "ORL Onroad Inventory (MBINV)");
         else if (type.equalsIgnoreCase("ORL Nonroad"))
             ds = (DatasetType) load(DatasetType.class, "ORL Nonroad Inventory (ARINV)");
+        else if (type.equalsIgnoreCase("List of Counties (CSV)"))
+            ds = (DatasetType) load(DatasetType.class, "List of Counties (CSV)");
         return ds;
     }
 
@@ -208,6 +228,21 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         File folder = new File("test/data/orl/nc");
         String[] fileNames = { "arinv.nonroad.nti99d_NC-with-matching_values.txt" };
         ORLNonRoadImporter importer = new ORLNonRoadImporter(folder, fileNames, inputDataset, dbServer, sqlDataTypes,
+                new VersionedDataFormatFactory(version, inputDataset));
+        importer.run();
+        add(inputDataset);
+        session.flush();
+        return (EmfDataset) load(EmfDataset.class, inputDataset.getName());
+    }
+
+    private EmfDataset addRegionDataset(EmfDataset inputDataset) throws ImporterException {
+        Version version = new Version();
+        version.setVersion(0);
+        version.setDatasetId(inputDataset.getId());
+
+        File folder = new File("test/data/cost/regionFile");
+        String[] fileNames = { "regions.csv" };
+        CSVImporter importer = new CSVImporter(folder, fileNames, inputDataset, dbServer, sqlDataTypes,
                 new VersionedDataFormatFactory(version, inputDataset));
         importer.run();
         add(inputDataset);
