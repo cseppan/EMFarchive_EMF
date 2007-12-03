@@ -81,7 +81,6 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         int csId;
         try {
             csId = dao.add(element, session);
-            session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add Control Strategy: " + element, e);
             throw new EmfException("Could not add Control Strategy: " + element);
@@ -230,7 +229,6 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             }
 
             dao.remove(element, session);
-            session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not remove control strategy: " + element, e);
             throw new EmfException("Could not remove control strategy: " + element.getName());
