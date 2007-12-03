@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.cost.controlstrategy.ControlStrategiesManagerPresenter;
 import gov.epa.emissions.framework.services.EmfException;
@@ -8,6 +9,7 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -197,5 +199,13 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     public DatasetType getDatasetType(String name) throws EmfException {
         return session.dataCommonsService().getDatasetType(name);
+    }
+    
+    public Version[] getVersions(EmfDataset dataset) throws EmfException 
+    {
+        if (dataset == null) {
+            return new Version[0];
+        }
+        return session.dataEditorService().getVersions(dataset.getId());
     }
 }

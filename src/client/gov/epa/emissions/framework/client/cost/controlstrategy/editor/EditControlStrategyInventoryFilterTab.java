@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
@@ -71,8 +72,6 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     
     private EditControlStrategyPresenter editControlStrategyPresenter;
     
- //   private NumberFieldVerifier verifier;
-    
     public EditControlStrategyInventoryFilterTab(ControlStrategy controlStrategy, ManageChangeables changeablesList, 
             MessagePanel messagePanel, EmfConsole parentConsole, 
             EmfSession session, DesktopManager desktopManager,
@@ -94,23 +93,13 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         panel.add(createMiddleSection(controlStrategy), BorderLayout.CENTER);
         
         setLayout(new BorderLayout(5, 5));
-//        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(panel,BorderLayout.SOUTH);
         // mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
         mainPanel = new JPanel(new BorderLayout(10, 10));
         buildSortFilterPanel();
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         this.add(mainPanel, BorderLayout.CENTER);
-//        add(createInputDatasetsPanel(controlStrategy.getInputDatasets()), BorderLayout.SOUTH);
     }
-
-//    private JPanel createInputDatasetsPanel(EmfDataset[] inputDatasets) {
-//        inputDatasetsTableData = new EditableInputDatasetTableData(controlStrategy.getInputDatasets());
-//        inputDatasetsPanel = new ControlStrategyInputDatasetsPanel(inputDatasetsTableData, changeablesList, parentConsole);
-//        inputDatasetsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-//
-//        return inputDatasetsPanel;
-//    }
 
     private void buildSortFilterPanel() {
         mainPanel.removeAll();
@@ -120,11 +109,6 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         panel.add(sfpanel, BorderLayout.CENTER);
         panel.add(buttonPanel(), BorderLayout.SOUTH);
         mainPanel.add(panel);
-
-        // SortFilterSelectionPanel panel = sortFilterPanel();
-        // sortFilterPanelContainer.removeAll();
-        // sortFilterPanelContainer.add(panel);
-        // mainPanel.add(sortFilterPanelContainer);
     }
 
     private SortFilterSelectionPanel sortFilterPanel() {
@@ -151,14 +135,9 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         panel.add(addButton);
         Button editButton = new BorderlessButton("Set Version", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
                     setVersionAction();
-                } catch (NumberFormatException e){
-                    messagePanel.setError("Should be a number ");
-                } 
             }
         });
-//        editButton.setEnabled(false);
         panel.add(editButton);
         Button removeButton = new BorderlessButton("Remove", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {           
@@ -205,29 +184,38 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         }
     }
 
-    private void setVersionAction() throws NumberFormatException{
+    private void setVersionAction(){
         messagePanel.clear();
-        //get selected items
-        ControlStrategyInputDataset[] selectedDatasets = (sortFilterSelectModel.selected()).toArray(new ControlStrategyInputDataset[0]);
-        //get all measures
-        ControlStrategyInputDataset[] datasets = tableData.sources();
-
-        if (selectedDatasets.length == 0) {
-            messagePanel.setError("Please select an items that you want to update.");
+        //get selected item
+        List selected = sortFilterSelectModel.selected();
+        if (selected.size() != 1) {
+            messagePanel.setError("Please select single item that you want to update.");
             return;
         }
+        ControlStrategyInputDataset[] controlStrategyInputDatasets = (ControlStrategyInputDataset[]) selected.toArray(new ControlStrategyInputDataset[0]);
 
-        String inputValue = JOptionPane.showInputDialog("Please input a version number ", "1");
+        EmfDataset dataset=controlStrategyInputDatasets[0].getInputDataset();
+        //get all measures
+        //ControlStrategyInputDataset[] datasets =tableData.sources();
+        //get versions of selected item
+        EmfConsole console=this.parentConsole; 
+        CSInventoryEditDialog dialog=new CSInventoryEditDialog(console, dataset, editControlStrategyPresenter, this);
+        dialog.run();
         
-        if (inputValue != null) {
+    }
+    
+    public void editVersion(Version version, EmfDataset dataset) {
+        messagePanel.clear();
+        //get all measures
+        ControlStrategyInputDataset[] datasets =tableData.sources();
+        //get versions of selected item
+        if (version != null) {
             //validate value
-            Integer version = validateVersion(inputValue);
-            //only update items that have been selected
-            for (int i = 0; i < selectedDatasets.length; i++) {
-                for (int j = 0; j < datasets.length; j++) {
-                    if (selectedDatasets[i].equals(datasets[j])) {
-                        datasets[j].setVersion(version);
-                    }
+            System.out.println("version  "+ version.getVersion());
+            //only update items that have been selected          
+            for (int j = 0; j < datasets.length; j++) {
+                if (dataset.equals(datasets[j].getInputDataset())) {
+                    datasets[j].setVersion(version.getVersion());
                 }
             }
             //repopulate the tabe data
@@ -235,14 +223,8 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             //rebuild the sort filter panelControlStrategyInputDatasetTableData
             buildSortFilterPanel();
         }
+        
     }
-
-    private Integer validateVersion(String inputValue) throws NumberFormatException{
-        if (inputValue == null || inputValue.trim().length() == 0) return null;
-//        int value = verifier.parseInteger(inputValue);
-        return Integer.parseInt(inputValue);
-    }
-
     protected void removeAction() {
         messagePanel.clear();
         List selected = sortFilterSelectModel.selected();
@@ -378,4 +360,5 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     public void refresh(ControlStrategyResult[] controlStrategyResults) {
         // do nothing
     }
+
 }
