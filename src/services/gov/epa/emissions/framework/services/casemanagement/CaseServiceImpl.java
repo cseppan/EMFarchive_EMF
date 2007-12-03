@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
@@ -40,6 +41,8 @@ public class CaseServiceImpl implements CaseService {
     private HibernateSessionFactory sessionFactory;
 
     private DbServer dbServer;
+    
+    private DbServerFactory dbFactory;
 
     private ManagedCaseService caseService;
 
@@ -56,6 +59,7 @@ public class CaseServiceImpl implements CaseService {
     public CaseServiceImpl(HibernateSessionFactory sessionFactory, DbServerFactory dbFactory) {
         this.sessionFactory = sessionFactory;
         this.dbServer = dbFactory.getDbServer();
+        this.dbFactory = dbFactory;
         if (DebugLevels.DEBUG_0) System.out.println("CaseServiceImpl::getCaseService  Is dBServer null? " + (dbServer == null));
         if (DebugLevels.DEBUG_0) System.out.println("CaseServiceImpl::getCaseService  Is sessionFactory null? " + (sessionFactory == null));
 
@@ -79,7 +83,7 @@ public class CaseServiceImpl implements CaseService {
         if (caseService == null) {
             try {
 
-                caseService = new ManagedCaseService(dbServer, sessionFactory);
+                caseService = new ManagedCaseService(dbFactory, sessionFactory);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -500,6 +504,18 @@ public class CaseServiceImpl implements CaseService {
 
     public String validateJobs(Integer[] jobIDs) throws EmfException {
         return getCaseService().validateJobs(jobIDs);
+    }
+
+    public CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException {
+        return getCaseService().getCaseOutputs(caseId, jobId);
+    }
+
+    public void registerOutput(CaseOutput output, String jobKey) throws EmfException {
+        getCaseService().registerOutput(output, jobKey);
+    }
+
+    public void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
+        getCaseService().registerOutputs(outputs, jobKeys);
     }
 
 }

@@ -22,6 +22,7 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
@@ -63,6 +64,7 @@ public class CaseMappings extends Mappings {
         bean(call, ParameterName.class, parameterName());
         bean(call, CaseParameter.class, caseParameter());
         bean(call, JobMessage.class, jobMessage());
+        bean(call, CaseOutput.class, caseOutput());
         bean(call, DependentJob.class, dependentJob());
         
         bean(call, Mutex.class, mutex());
@@ -93,6 +95,7 @@ public class CaseMappings extends Mappings {
         array(call, ParameterName[].class, parameterNames());
         array(call, CaseParameter[].class, caseParameters());
         array(call, JobMessage[].class, jobMessages());
+        array(call, CaseOutput[].class, caseOutputs());
         array(call, DependentJob[].class, dependentJobs());
     }
 
@@ -306,5 +309,13 @@ public class CaseMappings extends Mappings {
 
     public QName dependentJobs() {
         return qname("DependentJobs");
+    }
+    
+    public QName caseOutput() {
+        return qname("CaseOutput");
+    }
+    
+    public QName caseOutputs() {
+        return qname("CaseOutputs");
     }
 }

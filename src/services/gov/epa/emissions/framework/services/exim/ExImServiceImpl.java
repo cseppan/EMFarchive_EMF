@@ -73,7 +73,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     private void init(DbServer dbServer, HibernateSessionFactory sessionFactory) {
         setProperties(sessionFactory);
         exportService = new ManagedExportService(dbServer, sessionFactory);
-        ImporterFactory importerFactory = new ImporterFactory(dbServerFactory, dbServer.getSqlDataTypes());
+        ImporterFactory importerFactory = new ImporterFactory(dbServerFactory);
         managedImportService = new ManagedImportService(dbServerFactory, importerFactory, sessionFactory);
     }
 

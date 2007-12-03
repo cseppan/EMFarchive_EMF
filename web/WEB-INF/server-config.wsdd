@@ -615,6 +615,15 @@
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter[]"
 		innerType="ns1:CaseParameter"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput"
+		qname="ns1:CaseOutput" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:CaseOutputs" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput[]"
+		innerType="ns1:CaseOutput"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
 	<!-- ================================================================= -->
 	

@@ -27,18 +27,19 @@ public class ImporterFactory {
     private SqlDataTypes sqlDataTypes;
     
     private DbServerFactory dbServerFactory;
-
-    public ImporterFactory(SqlDataTypes sqlDataTypes) {
-       this(null, sqlDataTypes);
+    
+    public ImporterFactory() {
+       this(null);
     }
-
-   public ImporterFactory(DbServerFactory dbServerFactory, SqlDataTypes sqlDataTypes) {
+    
+    public ImporterFactory(DbServerFactory dbServerFactory) {
         this.dbServerFactory = dbServerFactory;
-        this.sqlDataTypes = sqlDataTypes;
     }
 
     public Importer createVersioned(EmfDataset dataset, File folder, String[] fileNames) throws Exception {
-        newDBInstance = new EmfDbServer(dbServerFactory);
+        this.newDBInstance = new EmfDbServer(dbServerFactory);
+        this.sqlDataTypes = newDBInstance.getSqlDataTypes();
+        
         Importer importer = create(dataset, folder, fileNames);
         return new VersionedImporter(importer, dataset, newDBInstance, lastModifiedDate(folder, fileNames));
     }

@@ -23,8 +23,7 @@ public class ImportTask extends Task {
     public boolean isEquivalent(Task task) { //NOTE: needs to verify definition of equality
         ImportTask importTask = (ImportTask) task;
         
-        if (this.dataset.getName().equals(importTask.getDataset().getName()) && 
-                this.importer.getClass().equals(importTask.getImporter().getClass())){
+        if (this.dataset.getName().equalsIgnoreCase(importTask.getDataset().getName())){
             return true;
         }
         
@@ -33,17 +32,17 @@ public class ImportTask extends Task {
 
     private static Log log = LogFactory.getLog(ImportTask.class);
 
-    private Importer importer;
+    protected Importer importer;
 
-    private EmfDataset dataset;
+    protected EmfDataset dataset;
 
-    private String[] files;
+    protected String[] files;
 
-    private HibernateSessionFactory sessionFactory;
+    protected HibernateSessionFactory sessionFactory;
 
-    private double numSeconds;
+    protected double numSeconds;
     
-    private DatasetDAO dao;
+    protected DatasetDAO dao;
 
     public ImportTask(EmfDataset dataset, String[] files, Importer importer, User user, Services services,
             DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
@@ -94,13 +93,13 @@ public class ImportTask extends Task {
         }
     }
 
-    private void prepare(Session session) throws EmfException {
+    protected void prepare(Session session) throws EmfException {
         addStartStatus();
         dataset.setStatus("Started import");
         addDataset(dataset, session);
     }
 
-    private void complete(Session session, String status) {
+    protected void complete(Session session, String status) {
         dataset.setStatus(status);
         //dataset.setModifiedDateTime(new Date()); //last mod time has been set when creted
 
@@ -108,7 +107,7 @@ public class ImportTask extends Task {
         addCompletedStatus();
     }
 
-    private String filesList() {
+    protected String filesList() {
         StringBuffer fileList = new StringBuffer(files[0]);
 
         if (files.length > 1)
@@ -118,7 +117,7 @@ public class ImportTask extends Task {
         return fileList.toString();
     }
 
-    void addDataset(EmfDataset dataset, Session session) throws EmfException {
+    protected void addDataset(EmfDataset dataset, Session session) throws EmfException {
         try {
             if (dao.datasetNameUsed(dataset.getName()))
                 throw new EmfException("The selected Dataset name is already in use");
@@ -130,7 +129,7 @@ public class ImportTask extends Task {
         dao.add(dataset, session);
     }
 
-    void updateDataset(EmfDataset dataset, Session session) {
+    protected void updateDataset(EmfDataset dataset, Session session) {
         try {
             dao.updateWithoutLocking(dataset, session);
         } catch (Exception e) {
@@ -138,7 +137,7 @@ public class ImportTask extends Task {
         }
     }
 
-    void removeDataset(EmfDataset dataset) {
+    protected void removeDataset(EmfDataset dataset) {
         try {
             Session session = sessionFactory.getSession();
             dao.remove(dataset, session);
@@ -148,22 +147,22 @@ public class ImportTask extends Task {
         }
     }
 
-    private void addStartStatus() {
+    protected void addStartStatus() {
         setStatus("started", "Started import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] from "+
                 files[0]);
     }
 
-    private void addCompletedStatus() {
+    protected void addCompletedStatus() {
         String message = "Completed import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] " 
                + " in " + numSeconds+" seconds from "+ files[0]; //TODO: add batch size to message once available
         setStatus("completed", message);
     }
 
-    private void setStatus(String status, String message) {
+    protected void setStatus(String status, String message) {
         ImportTaskManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(), message);
     }
 
-    private void logError(String messge, Exception e) {
+    protected void logError(String messge, Exception e) {
         log.error(messge, e);
     }
     

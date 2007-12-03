@@ -8,12 +8,16 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.basic.UserServiceImpl;
+import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExImService;
 import gov.epa.emissions.framework.services.exim.ExImServiceImpl;
+import gov.epa.emissions.framework.services.exim.ManagedImportService;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -37,6 +41,9 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
         dropAll(InternalSource.class);
         dropAll(Version.class);
         dropAll(EmfDataset.class);
+        dropAll(CaseOutput.class);
+        dropAll(CaseJob.class);
+        dropAll(Case.class);
     }
 
     private void dropTables(InternalSource[] sources) throws Exception, SQLException {
@@ -171,6 +178,74 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
         }
     }
 
+    public void testImportCaseOutput() throws Exception {
+        ManagedImportService importService = new ManagedImportService(dbServerFactory, sessionFactory);
+        
+        DataService dataService = new DataServiceImpl(dbServerFactory, sessionFactory);
+        User user = userService.getUser("emf");
+        
+        File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
+        String filename = "small-nonpoint1.txt";
+        
+        Case caseObj = newCase("Test case output case");
+        CaseJob job = newCaseJob(caseObj, "Test_Job_Key", user);
+        
+        CaseOutput output = new CaseOutput("Case Ouput Test");
+        
+        output.setDatasetType("Text file (Line-based)");
+        output.setCaseId(caseObj.getId());
+        output.setJobId(job.getId());
+        output.setPath(repository.getAbsolutePath());
+        output.setDatasetFile(filename);
+        output.setDatasetName(filename);
+        output.setMessage("Test Registering Case Output");
+        
+        EmfDataset[] imported = null;
+        
+        try {
+            importService.importDatasetForCaseOutput(user, output);
+            Thread.sleep(10000); // so that import thread has enough time to run
+            
+            imported = dataService.getDatasets();
+            
+            assertEquals(filename, imported[0].getName());
+            assertEquals(1, imported.length);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            InternalSource[] sources = new InternalSource[imported.length];
+            
+            for (int i = 0; i < sources.length; i++) {
+                sources[i] = imported[i].getInternalSources()[0];
+            }
+            
+            dropTables(sources);
+        }
+    }
+
+    public void testImportCaseOutputShouldFail() {
+        ManagedImportService importService = new ManagedImportService(dbServerFactory, sessionFactory);
+        
+        File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
+        String filename = "small-nonpoint1.txt";
+        
+        CaseOutput output = new CaseOutput("Case Ouput Test");
+        output.setDatasetType("xxx"); //no such dataset type 
+        output.setCaseId(0);
+        output.setJobId(0);
+        output.setPath(repository.getAbsolutePath());
+        output.setDatasetFile(filename);
+        output.setDatasetName(filename);
+        output.setMessage("Test Registering Case Output");
+        
+        try {
+            User user = userService.getUser("emf");
+            importService.importDatasetForCaseOutput(user, output);
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Dataset type: xxx does not exist"));
+        } 
+    }
+
     public void testExportWithOverwrite() throws Exception {
         DataService dataService = new DataServiceImpl(dbServerFactory, sessionFactory);
         User user = userService.getUser("emf");
@@ -240,6 +315,34 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
         Thread.sleep(2000);// wait, until the export is complete
 
         dropTables(imported[0].getInternalSources());
+    }
+    
+    private Case newCase(String name) {
+        session.clear();
+        Case element = new Case(name);
+        add(element);
+        return (Case) load(Case.class, element.getName());
+    }
+    
+    private CaseJob newCaseJob(Case caseObj, String jobkey, User user) {
+        CaseJob element = new CaseJob("test" + Math.random());
+        element.setCaseId(caseObj.getId());
+        element.setJobkey(jobkey);
+        element.setUser(user);
+        add(element);
+
+        return loadNewCaseJob(element, caseObj);
+    }
+    
+    private CaseJob loadNewCaseJob(CaseJob job, Case caseObj) {
+        /**
+         * Takes a new job that and adds case ID and adds to db
+         */
+        // adds the element to the db and then reloads it from the db
+        // ensures that it has an id
+        job.setCaseId(caseObj.getId());
+        add(job);
+        return (CaseJob) load(CaseJob.class, job.getName());
     }
 
 }

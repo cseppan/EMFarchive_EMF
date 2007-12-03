@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
@@ -133,9 +134,12 @@ public interface CaseService {
     
     // For command line client
     int recordJobMessage(JobMessage message, String jobKey) throws EmfException;
-    JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException;
-
     int recordJobMessage(JobMessage[] msgs, String[] keys) throws EmfException;
+    JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException;
+    
+    void registerOutput(CaseOutput output, String jobKey) throws EmfException;
+    void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException;
+    CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException;
     
     String restoreTaskManagers() throws EmfException;
 

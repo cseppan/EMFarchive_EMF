@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.io.generic.GenericExporterToString;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
@@ -18,6 +19,7 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
@@ -25,6 +27,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.exim.ManagedExportService;
+import gov.epa.emissions.framework.services.exim.ManagedImportService;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.CaseJobSumitter;
 import gov.epa.emissions.framework.tasks.DebugLevels;
@@ -66,9 +69,13 @@ public class ManagedCaseService {
 
     private HibernateSessionFactory sessionFactory = null;
 
-    private DbServer dbServer = null;
+    private DbServer dbServer = null; // Redundent with the dbFactory. Needs to be removed later.
+
+    private DbServerFactory dbFactory;
 
     private User user;
+
+    private ManagedImportService importService;
 
     private String eolString = System.getProperty("line.separator");
 
@@ -99,8 +106,9 @@ public class ManagedCaseService {
     // return session;
     // }
 
-    public ManagedCaseService(DbServer dbServer, HibernateSessionFactory sessionFactory) {
-        this.dbServer = dbServer;
+    public ManagedCaseService(DbServerFactory dbFactory, HibernateSessionFactory sessionFactory) {
+        this.dbFactory = dbFactory;
+        this.dbServer = dbFactory.getDbServer();
         this.sessionFactory = sessionFactory;
         this.dao = new CaseDAO(sessionFactory);
 
@@ -143,6 +151,21 @@ public class ManagedCaseService {
         }
 
         return exportService;
+    }
+
+    private synchronized ManagedImportService getImportService() throws EmfException {
+        log.info("ManagedCaseService::getImportService");
+
+        if (importService == null) {
+            try {
+                importService = new ManagedImportService(dbFactory, sessionFactory);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new EmfException(e.getMessage());
+            }
+        }
+
+        return importService;
     }
 
     // ***************************************************************************
@@ -2173,10 +2196,7 @@ public class ManagedCaseService {
     // for command line client
     public int recordJobMessage(JobMessage message, String jobKey) throws EmfException {
         try {
-            CaseJob job = dao.getCaseJob(jobKey);
-
-            if (job == null)
-                throw new EmfException("No jobs found associated with job key: " + jobKey);
+            CaseJob job = getJobFromKey(jobKey);
 
             User user = job.getUser();
             message.setCaseId(job.getCaseId());
@@ -2223,6 +2243,14 @@ public class ManagedCaseService {
             log.error(e.getMessage());
             throw new EmfException(e.getMessage());
         }
+    }
+
+    private CaseJob getJobFromKey(String jobKey) throws EmfException {
+        CaseJob job = dao.getCaseJob(jobKey);
+
+        if (job == null)
+            throw new EmfException("No jobs found associated with job key: " + jobKey);
+        return job;
     }
 
     public JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException {
@@ -2424,26 +2452,6 @@ public class ManagedCaseService {
         return allPersistTasks;
     }
 
-    // private List getCaseJobTasksForUser(int uid) throws EmfException {
-    // Session session = this.sessionFactory.getSession();
-    //
-    // try {
-    // UserDAO userDAO = new UserDAO();
-    // User user = userDAO.get(uid, session);
-    // if (DebugLevels.DEBUG_9)
-    // System.out.println("Incoming userid= " + uid + " acquired userName= " + user.getName());
-    // } catch (Exception ex) {
-    // ex.printStackTrace();
-    // throw new EmfException("System Problems: Database access error");
-    //
-    // } finally {
-    // session.clear();
-    // session.close();
-    // }
-    //
-    // return null;
-    // }
-
     private ArrayList getDistinctUserIds(List userIds) {
         ArrayList distUid = new ArrayList();
 
@@ -2465,32 +2473,72 @@ public class ManagedCaseService {
 
     public synchronized String validateJobs(Integer[] jobIDs) throws EmfException {
         List<CaseInput> allInputs = new ArrayList<CaseInput>();
-        
+
         for (Integer id : jobIDs) {
             CaseJob job = this.getCaseJob(id.intValue());
             allInputs.addAll(this.getAllJobInputs(job));
         }
-        
+
         TreeSet<CaseInput> set = new TreeSet<CaseInput>(allInputs);
         List<CaseInput> uniqueInputs = new ArrayList<CaseInput>(set);
-            
+
         return listNonFinalInputs(uniqueInputs);
     }
 
     private String listNonFinalInputs(List<CaseInput> inputs) {
         String inputsList = "";
         String lineSeparator = System.getProperty("line.separator");
-        
+
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = iter.next();
             String dataset = input.getDataset().getName();
             Version version = input.getVersion();
-            
+
             if (!version.isFinalVersion())
                 inputsList += "Input: " + input.getName() + ";  Dataset: " + dataset + lineSeparator;
         }
-        
+
         return inputsList;
+    }
+
+    public CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        List<CaseOutput> outputs = null;
+
+        try {
+            if (jobId == 0)
+                outputs = dao.getCaseOutputs(caseId, session);
+            else
+                outputs = dao.getCaseOutputs(caseId, jobId, session);
+
+            return outputs.toArray(new CaseOutput[0]);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+
+    public void registerOutput(CaseOutput output, String jobKey) throws EmfException {
+        CaseJob job = getJobFromKey(jobKey);
+        output.setCaseId(job.getCaseId());
+        output.setJobId(job.getId());
+
+        getImportService().importDatasetForCaseOutput(job.getUser(), output);
+    }
+
+    public void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
+        CaseJob job = null;
+        
+        for (int i = 0; i < outputs.length; i++) {
+            job = getJobFromKey(jobKeys[i]);
+            outputs[i].setCaseId(job.getCaseId());
+            outputs[i].setJobId(job.getId());
+        }
+
+        getImportService().importDatasetsForCaseOutput(job.getUser(), outputs);
     }
 
 }

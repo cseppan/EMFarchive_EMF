@@ -23,6 +23,7 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
@@ -730,6 +731,39 @@ public class CaseServiceTransport implements CaseService {
         call.setStringReturnType();
         
         return (String) call.requestResponse(new Object[] {jobIDs});
+    }
+
+    public synchronized CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException {
+        EmfCall call = call();
+        call.setOperation("getCaseOutputs");
+        call.addIntegerParam("caseId");
+        call.addIntegerParam("jobId");
+        call.setReturnType(caseMappings.caseOutputs());
+        
+        return (CaseOutput[])call.requestResponse(new Object[]{new Integer(caseId), new Integer(jobId)});
+    }
+
+    public synchronized void registerOutput(CaseOutput output, String jobKey) throws EmfException {
+        EmfCall call = call();
+        call.setOperation("registerOutput");
+        call.addParam("output", caseMappings.caseOutput());
+        call.addStringParam("jobKey");
+        call.setVoidReturnType();
+        call.setTimeOut(20000); //set time out in milliseconds to terminate if service doesn't response
+        
+        call.request(new Object[]{output, jobKey});
+    }
+
+    public synchronized void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("registerOutputs");
+        call.addParam("outputs", caseMappings.caseOutputs());
+        call.addParam("jobKeys", caseMappings.strings());
+        call.setIntegerReturnType();
+        call.setTimeOut(20000); //set time out in milliseconds to terminate if service doesn't response
+        
+        call.request(new Object[]{ outputs, jobKeys });
     }
 
 }

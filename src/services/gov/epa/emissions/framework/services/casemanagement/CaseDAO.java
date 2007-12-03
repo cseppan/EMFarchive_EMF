@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
@@ -59,6 +60,44 @@ public class CaseDAO {
         } finally {
             session.close();
         }
+    }
+
+    public void add(CaseOutput output) {
+        Session session = sessionFactory.getSession();
+        try {
+            hibernateFacade.add(output, session);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+
+    public void updateCaseOutput(CaseOutput output) {
+        Session session = sessionFactory.getSession();
+        try {
+            hibernateFacade.updateOnly(output, session);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+    
+    public boolean caseOutputNameUsed(String outputName) {
+        Session session = sessionFactory.getSession();
+        List outputs = null;
+        
+        try {
+            Criterion criterion = Restrictions.eq("name", outputName);
+            outputs =  hibernateFacade.get(CaseOutput.class, criterion, session);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        
+        return (outputs != null && outputs.size() > 0);
     }
 
     public void add(Executable exe, Session session) {
@@ -722,6 +761,19 @@ public class CaseDAO {
         }
         
         return cases == null ? null : (Case[])cases.toArray(new Case[0]);
+    }
+
+    public List<CaseOutput> getCaseOutputs(int caseId, Session session) {
+        Criterion crit = Restrictions.eq("caseId", new Integer(caseId));
+
+        return hibernateFacade.get(CaseOutput.class, crit, session);
+    }
+
+    public List<CaseOutput> getCaseOutputs(int caseId, int jobId, Session session) {
+        Criterion crit1 = Restrictions.eq("caseId", new Integer(caseId));
+        Criterion crit2 = Restrictions.eq("jobId", new Integer(jobId));
+
+        return hibernateFacade.get(CaseOutput.class, new Criterion[] { crit1, crit2 }, session);
     }
 
 }

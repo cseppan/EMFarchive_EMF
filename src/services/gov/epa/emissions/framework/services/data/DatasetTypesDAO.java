@@ -43,7 +43,7 @@ public class DatasetTypesDAO {
     public DatasetType get(String name, Session session) {
         Criterion criterion = Restrictions.eq("name", name);
         List list = hibernateFacade.get(DatasetType.class, criterion, session);
-        return (DatasetType) list.get(0);
+        return (list == null || list.size() == 0) ? null : (DatasetType) list.get(0);
     }
 
     public void add(DatasetType datasetType, Session session) {

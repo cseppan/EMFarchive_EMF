@@ -343,3 +343,18 @@ CREATE TABLE cases.taskmanager_persist
 ) 
 WITHOUT OIDS;
 ALTER TABLE cases.taskmanager_persist OWNER TO emf;
+
+-- cases.outputs
+CREATE TABLE cases.outputs
+(
+  id SERIAL PRIMARY KEY,
+  case_id int4 NOT NULL REFERENCES cases.cases(id),
+  job_id int4 NOT NULL REFERENCES cases.cases_casejobs(id),
+  dataset_id int4 DEFAULT 0,
+  name varchar(255) NOT NULL,
+  exec_name varchar(255),
+  message text,
+  status varchar(64)
+)
+WITHOUT OIDS;
+-- cases.outputs
