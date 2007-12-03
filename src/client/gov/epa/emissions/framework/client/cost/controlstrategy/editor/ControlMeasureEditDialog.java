@@ -32,7 +32,7 @@ import javax.swing.SpringLayout;
 
 public class ControlMeasureEditDialog extends JDialog implements ControlMeasureEditView {
 
-    private EmfConsole parent;
+//    private EmfConsole parent;
 
     private ControlMeasureEditPresenter presenter;
     
@@ -49,8 +49,7 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
         super(parent);
         super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
         this.verifier= new NumberFieldVerifier("Measure properties: ");
-        this.parent = parent;
- //       this.changeables = changeables;
+//        this.parent = parent;
     }
 
     public void display() {
@@ -70,7 +69,7 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
         setTitle("Control Strategy Measures Editor");
         this.pack();
         this.setSize(700,220);
-        this.setLocation(ScreenUtils.getPointToCenter(parent));
+        this.setLocation(ScreenUtils.getPointToCenter(this));
         this.setVisible(true);
     }
    

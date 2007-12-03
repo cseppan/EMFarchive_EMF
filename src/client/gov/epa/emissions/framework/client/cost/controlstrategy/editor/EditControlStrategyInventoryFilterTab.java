@@ -186,20 +186,17 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
     private void setVersionAction(){
         messagePanel.clear();
-        //get selected item
+        //get a single selected item
         List selected = sortFilterSelectModel.selected();
         if (selected.size() != 1) {
-            messagePanel.setError("Please select single item that you want to update.");
+            messagePanel.setMessage("Please select a single item to update.");
             return;
         }
         ControlStrategyInputDataset[] controlStrategyInputDatasets = (ControlStrategyInputDataset[]) selected.toArray(new ControlStrategyInputDataset[0]);
 
         EmfDataset dataset=controlStrategyInputDatasets[0].getInputDataset();
-        //get all measures
-        //ControlStrategyInputDataset[] datasets =tableData.sources();
-        //get versions of selected item
-        EmfConsole console=this.parentConsole; 
-        CSInventoryEditDialog dialog=new CSInventoryEditDialog(console, dataset, editControlStrategyPresenter, this);
+        //Show select version dialog
+        CSInventoryEditDialog dialog=new CSInventoryEditDialog(parentConsole, dataset, editControlStrategyPresenter, this);
         dialog.run();
         
     }
