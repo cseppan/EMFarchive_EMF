@@ -17,9 +17,11 @@ import gov.epa.emissions.framework.services.EmfException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class EmfDataset implements Dataset, Lockable {
 
@@ -459,4 +461,141 @@ public class EmfDataset implements Dataset, Lockable {
         return true;
     }
 
+    public int applicableMonth() throws EmfException {
+
+        //code was copied from SQLQAAnnualQuery.java class
+        
+        //Check for month name and year name here
+        
+        //String year = "";
+        int month = -1;
+        
+        
+        // The names and/or properties of the dataset are to be checked to determine year and month that 
+        // the dataset is for. If there is more than one file for a month, it must be put in its own list
+        // with other such files.
+        
+        // New String Tokenizers for the StartDate and StopDate values.
+        // They are compared to determine if they fall in the same month.
+        int startYear = -1;
+        int startMonth = -1;
+        int stopYear = -1;
+        int stopMonth = -1;
+        Calendar cal = Calendar.getInstance();
+        if (startDateTime != null) {
+            cal.setTime(startDateTime);
+            startYear = cal.YEAR;
+            startMonth = cal.MONTH;
+        }
+
+        if (endDateTime != null) {
+            cal.setTime(endDateTime);
+            stopYear = cal.YEAR;
+            stopMonth = cal.MONTH;
+        }
+        
+        // New String Tokenizer to parse the dataset names to find month values.
+        StringTokenizer tokenizer7 = new StringTokenizer(name, "_");
+        String month2 = "";
+        while (tokenizer7.hasMoreTokens()) {
+            String unsure = tokenizer7.nextToken();
+            if(unsure.equalsIgnoreCase("jan")||
+               unsure.equalsIgnoreCase("feb")||
+               unsure.equalsIgnoreCase("mar")||
+               unsure.equalsIgnoreCase("apr")||
+               unsure.equalsIgnoreCase("may")||
+               unsure.equalsIgnoreCase("jun")||
+               unsure.equalsIgnoreCase("jul")||
+               unsure.equalsIgnoreCase("aug")||
+               unsure.equalsIgnoreCase("sep")||
+               unsure.equalsIgnoreCase("oct")||
+               unsure.equalsIgnoreCase("nov")||
+               unsure.equalsIgnoreCase("dec")) {
+            month2 = unsure;
+            }
+        }
+        
+        if(startMonth == stopMonth && startYear == stopYear) {
+            month = startMonth;
+            //System.out.println("The month of the dataset from startMonth is: " + month);
+        } else if (!(month2.equals(""))){
+            if (month2.equalsIgnoreCase("jan") || month2.equalsIgnoreCase("january") || month2.equals("01"))
+                month = cal.JANUARY;
+            else if (month2.equalsIgnoreCase("feb") || month2.equalsIgnoreCase("february") || month2.equals("02"))
+                month = cal.FEBRUARY;
+            else if (month2.equalsIgnoreCase("mar") || month2.equalsIgnoreCase("march") || month2.equals("03"))
+                month = cal.MARCH;
+            else if (month2.equalsIgnoreCase("apr") || month2.equalsIgnoreCase("april") || month2.equals("04"))
+                month = cal.APRIL;
+            else if (month2.equalsIgnoreCase("may") || month2.equals("05"))
+                month = cal.MAY;
+            else if (month2.equalsIgnoreCase("jun") || month2.equalsIgnoreCase("june") || month2.equals("06"))
+                month = cal.JUNE;
+            else if (month2.equalsIgnoreCase("jul") || month2.equalsIgnoreCase("july") || month2.equals("07"))
+                month = cal.JULY;
+            else if (month2.equalsIgnoreCase("aug") || month2.equalsIgnoreCase("august") || month2.equals("08"))
+                month = cal.AUGUST;
+            else if (month2.equalsIgnoreCase("sep") || month2.equalsIgnoreCase("september") || month2.equals("09"))
+                month = cal.SEPTEMBER;
+            else if (month2.equalsIgnoreCase("oct") || month2.equalsIgnoreCase("october") || month2.equals("10"))
+                month = cal.OCTOBER;
+            else if (month2.equalsIgnoreCase("nov") || month2.equalsIgnoreCase("november") || month2.equals("11"))
+                month = cal.NOVEMBER;
+            else if (month2.equalsIgnoreCase("dec") || month2.equalsIgnoreCase("december") || month2.equals("12"))
+                month = cal.DECEMBER;
+            //System.out.println("The month of the dataset from month2 is: " + month);
+        }else {
+            throw new EmfException("The dataset covers more than one month.");
+        }
+        // Then the file or files must be put into the appropriate method call to create a monthly 
+        // query for them.
+        
+        //System.out.println("The dataset is :" + allDatasetNames.get(j).toString());
+        
+        //Add exceptions for case where month value not found
+        
+        return month;
+    }
+
+//    public Integer getApplicableYear() throws EmfException {
+//
+//        //code was copied from SQLQAAnnualQuery.java class
+//        
+//        //Check for month name and year name here
+//        
+//        Integer year = null;
+//        
+//        
+//        // The names and/or properties of the dataset are to be checked to determine year and month that 
+//        // the dataset is for. If there is more than one file for a month, it must be put in its own list
+//        // with other such files.
+//        
+//        // New String Tokenizers for the StartDate and StopDate values.
+//        // They are compared to determine if they fall in the same month.
+//        
+//        StringTokenizer tokenizer5 = new StringTokenizer(startDateTime.toString());
+//        
+//        String yearMonthDay = tokenizer5.nextToken();
+//        StringTokenizer tokenizer8 = new StringTokenizer(yearMonthDay, "-");
+//        
+//        String startYear = tokenizer8.nextToken();
+//        String startMonth = tokenizer8.nextToken();
+//        
+//        StringTokenizer tokenizer6 = new StringTokenizer(endDateTime.toString());
+//        
+//        String yearMonthDay2 = tokenizer6.nextToken();
+//        StringTokenizer tokenizer9 = new StringTokenizer(yearMonthDay2, "-");
+//        
+//        String stopYear = tokenizer9.nextToken();
+//        String stopMonth = tokenizer9.nextToken();
+//        
+//        if(startMonth.equals(stopMonth) && startYear.equals(stopYear)) {
+//            year = Integer.parseInt(startYear);
+//            //System.out.println("The month of the dataset from startMonth is: " + month);
+//            //System.out.println("The month of the dataset from month2 is: " + month);
+//        }else {
+//            throw new EmfException("The dataset covers more than one month.");
+//        }
+//        return year;
+//    }
 }

@@ -125,7 +125,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
                         currentTime = System.currentTimeMillis();
                         sourceMeasures = retrieveBestMeasures.findTargetPollutantBestMeasures(sccMeasures, fips, 
                             resultSet.getDouble("CEFF"), !pointDatasetType ? resultSet.getDouble("RPEN") : 100, 
-                            resultSet.getDouble("REFF"), resultSet.getDouble("ANN_EMIS"));
+                            resultSet.getDouble("REFF"), getEmission(resultSet.getDouble("ANN_EMIS"), resultSet.getDouble("AVD_EMIS")));
                     } else {
                         sourceMeasures = sccMeasures;
                     }
@@ -138,9 +138,9 @@ public class StrategyLoader extends AbstractStrategyLoader {
                     targetPollutant 
                     ? retrieveBestMeasureEffRecords.findTargetPollutantBestMeasureEffRecords(sourceMeasures, fips, 
                             resultSet.getDouble("CEFF"), !pointDatasetType ? resultSet.getDouble("RPEN") : 100, 
-                            !pointDatasetType ? resultSet.getDouble("REFF") : resultSet.getFloat("CEFF") > 0 && resultSet.getFloat("REFF") == 0 ? 100 : resultSet.getFloat("REFF"), resultSet.getDouble("ANN_EMIS"))
+                            !pointDatasetType ? resultSet.getDouble("REFF") : resultSet.getFloat("CEFF") > 0 && resultSet.getFloat("REFF") == 0 ? 100 : resultSet.getFloat("REFF"), getEmission(resultSet.getDouble("ANN_EMIS"), resultSet.getDouble("AVD_EMIS")))
                     : retrieveBestMeasureEffRecords.findCobenefitPollutantBestMeasureEffRecords(sourceMeasures, fips, 
-                            poll, resultSet.getDouble("ANN_EMIS"));
+                            poll, getEmission(resultSet.getDouble("ANN_EMIS"), resultSet.getDouble("AVD_EMIS")));
 
                 matchTime += System.currentTimeMillis() - currentTime;
 //for (BestMeasureEffRecord l : bestMeasureEffRecordList)
@@ -150,7 +150,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
                     continue;
 
                 int listSize = bestMeasureEffRecordList.size();
-                double sourceEmis = resultSet.getDouble("ANN_EMIS");
+                double sourceEmis = getEmission(resultSet.getDouble("ANN_EMIS"), resultSet.getDouble("AVD_EMIS"));
                 for (int i = 0; i < listSize; i++) {
                     BestMeasureEffRecord bestMeasureEffRecord = bestMeasureEffRecordList.get(i);
                     try {

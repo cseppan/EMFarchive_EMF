@@ -17,6 +17,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.DateUtil;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
@@ -111,6 +112,8 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     
     protected long currentTime;
     
+    protected int daysInMonth = 31; //useful only if inventory is monthly based and not yearly.
+
     public AbstractStrategyLoader(User user, DbServerFactory dbServerFactory, 
             HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
             int batchSize) throws EmfException {
@@ -146,7 +149,8 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         sourceStackId = "";
         sourceSegment = "";
         newSource = false;
-
+        daysInMonth = getDaysInMonth(inputDataset.applicableMonth());
+        
         //setup result
         ControlStrategyResult result = createStrategyResult(inputDataset);
         //set class level variable if inputdataset is a point type
@@ -291,6 +295,32 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return recordCount;
     }
     
+    public boolean inventoryHasTargetPollutant(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
+        String versionedQuery = new VersionedQuery(version(controlStrategyInputDataset)).query();
+
+        String query = "SELECT 1 as Found "
+            + " FROM " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()) 
+            + " where " + versionedQuery
+            + " and poll = '" + controlStrategy.getTargetPollutant().getName() + "'";
+        ResultSet rs = null;
+        try {
+            rs = datasource.query().executeQuery(query);
+            while (rs.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    //
+                }
+        }
+        return false;
+    }
+
     private OptimizedQuery sourceQuery(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
         String versionedQuery = new VersionedQuery(version(controlStrategyInputDataset)).query();
 
@@ -367,4 +397,11 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return datasource.getName() + "." + table;
     }
 
+    private int getDaysInMonth(int month) {
+        return month != - 1 ? DateUtil.daysInMonth(controlStrategy.getInventoryYear(), month) : 31;
+    }
+    
+    protected double getEmission(double annEmis, double avdEmis) {
+        return annEmis != 0.0 ? annEmis : avdEmis * daysInMonth;
+    }
 }

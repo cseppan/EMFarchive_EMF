@@ -10,6 +10,8 @@ public interface StrategyLoader {
 //    void doBatchInsert(ResultSet resultSet) throws Exception;
 
     public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset inputDataset) throws Exception;
+    
+    public boolean inventoryHasTargetPollutant(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException;
 
     public void disconnectDbServer() throws EmfException;
 

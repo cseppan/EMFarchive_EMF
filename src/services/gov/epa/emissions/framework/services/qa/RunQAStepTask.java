@@ -102,7 +102,7 @@ public class RunQAStepTask {
                     threadPool, verboseStatusLogging);
             exportQATask.export(exportDirectory);
             endTime = System.currentTimeMillis();
-            System.out.println("Eexported QA step, " + qaStep.getName() + ", in " + ((endTime - startTime) / (1000))  + " secs");
+            System.out.println("Exported QA step, " + qaStep.getName() + ", in " + ((endTime - startTime) / (1000))  + " secs");
         }
     
     }

@@ -72,20 +72,24 @@ public abstract class AbstractStrategyTask implements Strategy {
             //process/load each input dataset
             ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy.getControlStrategyInputDatasets();
             for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
-                ControlStrategyResult result = new ControlStrategyResult();
-                try {
-                    result = loader.loadStrategyResult(controlStrategyInputDatasets[i]);
-                    recordCount = loader.getRecordCount();
-                    result.setRecordCount(recordCount);
-                    status = "Completed.";
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    status = "Failed. Error processing input dataset: " + controlStrategyInputDatasets[i].getInputDataset().getName() + ". " + result.getRunStatus();
-                } finally {
-                    result.setCompletionTime(new Date());
-                    result.setRunStatus(status);
-                    saveControlStrategyResult(result);
-                    addStatus(controlStrategyInputDatasets[i]);
+                if (loader.inventoryHasTargetPollutant(controlStrategyInputDatasets[i])) {
+                    ControlStrategyResult result = new ControlStrategyResult();
+                    try {
+                        result = loader.loadStrategyResult(controlStrategyInputDatasets[i]);
+                        recordCount = loader.getRecordCount();
+                        result.setRecordCount(recordCount);
+                        status = "Completed.";
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        status = "Failed. Error processing input dataset: " + controlStrategyInputDatasets[i].getInputDataset().getName() + ". " + result.getRunStatus();
+                    } finally {
+                        result.setCompletionTime(new Date());
+                        result.setRunStatus(status);
+                        saveControlStrategyResult(result);
+                        addStatus(controlStrategyInputDatasets[i]);
+                    }
+                } else {
+                    setStatus("Error processing input dataset: " + controlStrategyInputDatasets[i].getInputDataset().getName() + ". Target pollutant is not in the inventory.");
                 }
             }
         } catch (Exception e) {

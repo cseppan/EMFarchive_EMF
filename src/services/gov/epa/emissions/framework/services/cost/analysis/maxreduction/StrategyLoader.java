@@ -94,22 +94,22 @@ public class StrategyLoader extends AbstractStrategyLoader {
                         bestMeasureEffRecord = retrieveMeasure.findBestMaxEmsRedMeasure(scc, fips, 
                                 poll, resultSet.getDouble("CEFF"), 
                                 resultSet.getDouble("RPEN"), resultSet.getDouble("REFF"), 
-                                resultSet.getDouble("ANN_EMIS"));
+                                getEmission(resultSet.getDouble("ANN_EMIS"), resultSet.getDouble("AVD_EMIS")));
                     } else {
                         bestMeasureEffRecord = retrieveMeasure.findBestMaxEmsRedMeasure(scc, fips, 
                                 poll, resultSet.getDouble("CEFF"), 
                                 100, resultSet.getFloat("CEFF") > 0 && resultSet.getFloat("REFF") == 0 ? 100 : resultSet.getFloat("REFF"), 
-                                resultSet.getDouble("ANN_EMIS"));
+                                getEmission(resultSet.getDouble("ANN_EMIS"), resultSet.getDouble("AVD_EMIS")));
                     }
                 //find best efficiency record for source and cobenefit pollutant, measure was already determined above from the first pass...
                 } else {
-                    bestMeasureEffRecord = retrieveMeasure.getMaxEmsRedMeasureForCobenefitPollutant(poll, resultSet.getDouble("ANN_EMIS"));
+                    bestMeasureEffRecord = retrieveMeasure.getMaxEmsRedMeasureForCobenefitPollutant(poll, getEmission(resultSet.getDouble("ANN_EMIS"), resultSet.getDouble("AVD_EMIS")));
                 }
                 if (bestMeasureEffRecord == null)
                     continue;
                 try {
                     Record record = recordGenerator.getRecord(resultSet, bestMeasureEffRecord, 
-                            resultSet.getDouble("ANN_EMIS"), true, 
+                            getEmission(resultSet.getDouble("ANN_EMIS"), resultSet.getDouble("AVD_EMIS")), true, 
                             true);
                     
                     totalCost += recordGenerator.totalCost() != null ? recordGenerator.totalCost() : 0.0;
