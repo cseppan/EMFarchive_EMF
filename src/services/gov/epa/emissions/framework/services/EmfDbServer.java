@@ -20,15 +20,16 @@ public class EmfDbServer implements DbServer {
 
     public static final String EMF_CASE_SCHEMA = "cases";
 
-    private PostgresDbServer dbServer;
+    private DbServer dbServer;
 
     public EmfDbServer() throws Exception {
         this(null);
     }
 
+    //NOTE: this constructor is setup only for junit test purpose
     public EmfDbServer(DbServerFactory dbServerFactory) throws Exception {
         if (dbServerFactory != null)
-            dbServer = (PostgresDbServer)dbServerFactory.getDbServer();
+            dbServer = dbServerFactory.getDbServer();
         else {
             DataSource datasource = new DataSourceFactory().get();
             dbServer = new PostgresDbServer(datasource.getConnection(), EmfDbServer.EMF_REFERENCE_SCHEMA,
