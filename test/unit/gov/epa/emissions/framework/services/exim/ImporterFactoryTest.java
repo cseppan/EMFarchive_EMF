@@ -20,7 +20,7 @@ public class ImporterFactoryTest extends MockObjectTestCase {
         Mock types = mock(SqlDataTypes.class);
         types.stubs().method(ANYTHING).withAnyArguments().will(returnValue(""));
 
-        ImporterFactory factory = new ImporterFactory((SqlDataTypes) types.proxy());
+        ImporterFactory factory = new ImporterFactory();
 
         DatasetType datasetType = new DatasetType();
         datasetType.setImporterClassName(ORLOnRoadImporter.class.getName());
@@ -37,7 +37,7 @@ public class ImporterFactoryTest extends MockObjectTestCase {
         Mock sqlTypes = mock(SqlDataTypes.class);
         sqlTypes.stubs().method(ANYTHING).withAnyArguments().will(returnValue(""));
         
-        ImporterFactory factory = new ImporterFactory((SqlDataTypes) sqlTypes.proxy());
+        ImporterFactory factory = new ImporterFactory();
 
         DatasetType datasetType = new DatasetType();
         datasetType.setImporterClassName(TemporalProfileImporter.class.getName());
