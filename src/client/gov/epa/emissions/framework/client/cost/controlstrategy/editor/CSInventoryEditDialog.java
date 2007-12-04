@@ -1,5 +1,4 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
-
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
@@ -17,7 +16,6 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -71,34 +69,20 @@ public class CSInventoryEditDialog extends JDialog {
     
     private JPanel createPropertySection() throws EmfException{
         JPanel panel = new JPanel(new SpringLayout());
- 
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
- 
-            versionCombo =new ComboBox(new Version[0]);           
-            versionCombo.setSize(300,15);
-            fillVersions(dataset);
- 
-            layoutGenerator.addLabelWidgetPair("Version:", versionCombo, panel);
-            layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-                    55, 5, // initialX, initialY
-                    5, 10);// xPad, yPad
 
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        Version[] versions = presenter.getVersions(dataset);
+        versionCombo =new ComboBox(versions);           
+ //       versionCombo.setSize(new Dimension(200,10));
+        versionCombo.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
+
+        layoutGenerator.addLabelWidgetPair("Version:", versionCombo, panel);
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+                55, 15, // initialX, initialY
+                5, 15);// xPad, yPad
         return panel;
     }
 
-    
-    private void fillVersions(EmfDataset dataset) throws EmfException{
-        versionCombo.setEnabled(true);
-
-        Version[] versions = presenter.getVersions(dataset);
-        versionCombo.removeAllItems();
-        versionCombo.setModel(new DefaultComboBoxModel(versions));
-        versionCombo.revalidate();
-        if (versions.length > 0)
-            versionCombo.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
-
-    }
-    
     private int getDefaultVersionIndex(Version[] versions, EmfDataset dataset) {
         int defaultversion = dataset.getDefaultVersion();
 

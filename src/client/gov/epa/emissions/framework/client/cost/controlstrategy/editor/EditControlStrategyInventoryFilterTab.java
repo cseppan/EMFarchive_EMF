@@ -208,7 +208,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         //get versions of selected item
         if (version != null) {
             //validate value
-            System.out.println("version  "+ version.getVersion());
+            
             //only update items that have been selected          
             for (int j = 0; j < datasets.length; j++) {
                 if (dataset.equals(datasets[j].getInputDataset())) {

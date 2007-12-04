@@ -24,8 +24,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -105,10 +103,9 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
         panel.setBorder(BorderFactory.createTitledBorder("Regions"));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
             EmfDataset[] datasets = presenter.getDatasets( presenter.getDatasetType("List of Counties (CSV)") );         
-            dataset = new ComboBox(new EmfDataset[0]);
+            dataset = new ComboBox("Not selected", datasets);
             Dimension size= new Dimension(300, 10);
             dataset.setPreferredSize(size);
-            fillDatasets(datasets);
 
             dataset.addActionListener(new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
@@ -136,26 +133,9 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
                     5, 5, // initialX, initialY
                     5, 10);// xPad, yPad
 
-//        } catch (EmfException e) {
-//            // NOTE Auto-generated catch block
-//            e.printStackTrace();
-//        }
         return panel;
     }
 
-    private void fillDatasets(EmfDataset[] ds) {
-        List list = new ArrayList();
-        EmfDataset blank = new EmfDataset();
-        blank.setName("Not selected");
-        list.add(blank);
-        list.addAll(Arrays.asList(ds));
-        EmfDataset[] datasets = (EmfDataset[]) list.toArray(new EmfDataset[0]);
-
-        dataset.removeAllItems();
-        dataset.setModel(new DefaultComboBoxModel(datasets));
-        dataset.revalidate();
-        dataset.setEnabled(true);
-    }
     
     private void fillVersions(EmfDataset dataset) throws EmfException{
         version.setEnabled(true);
