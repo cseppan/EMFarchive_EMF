@@ -2225,7 +2225,7 @@ public class ManagedCaseService {
             dao.updateCaseJob(job);
 
             if (!user.getUsername().equalsIgnoreCase(message.getRemoteUser()))
-                throw new EmfException("Remote user doesn't match the user who runs the job.");
+                throw new EmfException("Error in recording job messages: Remote user doesn't match the user who runs the job.");
 
             dao.add(message);
 
@@ -2241,7 +2241,7 @@ public class ManagedCaseService {
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
-            throw new EmfException(e.getMessage());
+            throw new EmfException("Error in recording job messages: " + e.getMessage());
         }
     }
 
@@ -2249,7 +2249,7 @@ public class ManagedCaseService {
         CaseJob job = dao.getCaseJob(jobKey);
 
         if (job == null)
-            throw new EmfException("No jobs found associated with job key: " + jobKey);
+            throw new EmfException("Error in recording job messages: No jobs found associated with job key: " + jobKey);
         return job;
     }
 
@@ -2522,23 +2522,33 @@ public class ManagedCaseService {
     }
 
     public void registerOutput(CaseOutput output, String jobKey) throws EmfException {
-        CaseJob job = getJobFromKey(jobKey);
-        output.setCaseId(job.getCaseId());
-        output.setJobId(job.getId());
+        try {
+            CaseJob job = getJobFromKey(jobKey);
+            output.setCaseId(job.getCaseId());
+            output.setJobId(job.getId());
 
-        getImportService().importDatasetForCaseOutput(job.getUser(), output);
+            getImportService().importDatasetForCaseOutput(job.getUser(), output);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException("Error in registering output: " + e.getMessage());
+        }
     }
 
     public void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
-        CaseJob job = null;
-        
-        for (int i = 0; i < outputs.length; i++) {
-            job = getJobFromKey(jobKeys[i]);
-            outputs[i].setCaseId(job.getCaseId());
-            outputs[i].setJobId(job.getId());
-        }
+        try {
+            CaseJob job = null;
+            
+            for (int i = 0; i < outputs.length; i++) {
+                job = getJobFromKey(jobKeys[i]);
+                outputs[i].setCaseId(job.getCaseId());
+                outputs[i].setJobId(job.getId());
+            }
 
-        getImportService().importDatasetsForCaseOutput(job.getUser(), outputs);
+            getImportService().importDatasetsForCaseOutput(job.getUser(), outputs);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException("Error in registering output: " + e.getMessage());
+        }
     }
 
 }

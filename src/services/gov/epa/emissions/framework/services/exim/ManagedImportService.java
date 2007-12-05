@@ -217,13 +217,17 @@ public class ManagedImportService {
     }
 
     private synchronized void addOutputTasks(User user, CaseOutput output, Services services) throws Exception {
-        File path = validatePath(output.getPath());
-        EmfDataset dataset = createDataset(output.getPath(), output.getDatasetFile(), output.getDatasetFile(), user,
-                getDsType(output.getDatasetType()));
+        String separator = File.separator;
+        String fullPath = output.getDatasetFile();
+        String folder = fullPath.substring(0, fullPath.lastIndexOf(separator));
+        String file = fullPath.substring(fullPath.lastIndexOf(separator)+1);
+        
+        File path = validatePath(folder);
+        EmfDataset dataset = createDataset(folder, file, file, user, getDsType(output.getDatasetType()));
         isNameUnique(dataset.getName());
 
-        Importer importer = importerFactory.createVersioned(dataset, path, new String[] { output.getDatasetFile() });
-        ImportCaseOutputTask task = new ImportCaseOutputTask(output, dataset, new String[] { output.getDatasetFile() }, importer, user, services,
+        Importer importer = importerFactory.createVersioned(dataset, path, new String[] { file });
+        ImportCaseOutputTask task = new ImportCaseOutputTask(output, dataset, new String[] { file }, importer, user, services,
                 dbServerFactory, sessionFactory);
 
         importTasks.add(task);
