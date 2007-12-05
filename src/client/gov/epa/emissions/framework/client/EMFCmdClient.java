@@ -365,6 +365,7 @@ public class EMFCmdClient {
                 send(args, msgs.toArray(new JobMessage[0]), keys.toArray(new String[0]), outputs
                         .toArray(new CaseOutput[0]));
                 resendTimes = 0;
+                errorString = "";
             } catch (Exception e) {
                 --resendTimes;
                 errorString += e.getMessage();
@@ -385,16 +386,7 @@ public class EMFCmdClient {
             System.out.println("EMF command client sent " + msgs.length + " messages successfully.");
 
             CaseOutput[] nonEmptyOutputs = getNonEmptyOutputs(outputs);
-
-            if (nonEmptyOutputs.length > 1) {
-                service.registerOutputs(nonEmptyOutputs, keys);
-                System.out.println("EMF command client registered " + outputs.length + " outputs successfully.");
-            }
-
-            if (nonEmptyOutputs.length == 1) {
-                service.registerOutput(nonEmptyOutputs[0], keys[0]);
-                System.out.println("EMF command client registered one output successfully.");
-            }
+            registerOutputs(keys, outputs, service, nonEmptyOutputs);
 
             if (DEBUG)
                 System.out.println("EMF Command Client exits successfully at: " + new Date());
@@ -402,6 +394,27 @@ public class EMFCmdClient {
             System.out.println("EMF Command Client encounters problem at: " + new Date() + "\nThe error was: "
                     + e.getMessage());
             throw new Exception(e.getMessage());
+        }
+    }
+
+    private synchronized static void registerOutputs(String[] keys, CaseOutput[] outputs, CaseService service, CaseOutput[] nonEmptyOutputs) {
+        if (nonEmptyOutputs.length > 1) {
+            try {
+                service.registerOutputs(nonEmptyOutputs, keys);
+                if (DEBUG)
+                    System.out.println("EMF command client registered " + outputs.length + " outputs successfully.");
+            } catch (Exception e) {
+                System.out.println("Error in registering outputs: " + e.getMessage());
+            }
+        }
+
+        if (nonEmptyOutputs.length == 1) {
+            try {
+                service.registerOutput(nonEmptyOutputs[0], keys[0]);
+                System.out.println("EMF command client registered one output successfully.");
+            } catch (Exception e) {
+                System.out.println("Error in registering outputs: " + e.getMessage());
+            }
         }
     }
 

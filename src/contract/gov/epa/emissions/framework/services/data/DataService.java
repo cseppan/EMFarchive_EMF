@@ -12,6 +12,8 @@ public interface DataService {
     
     EmfDataset getDataset(Integer datasetId) throws EmfException;
 
+    String[] getDatasetValues(Integer datasetId) throws EmfException;
+
     EmfDataset getDataset(String datasetName) throws EmfException;
 
     EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException;

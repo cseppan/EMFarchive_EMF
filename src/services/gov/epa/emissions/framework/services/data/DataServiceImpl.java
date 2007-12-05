@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class DataServiceImpl implements DataService {
         dao = new DatasetDAO(dbServerFactory);
     }
 
-    public EmfDataset[] getDatasets() throws EmfException {
+    public synchronized EmfDataset[] getDatasets() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List datasets = dao.allNonDeleted(session);
@@ -46,7 +47,7 @@ public class DataServiceImpl implements DataService {
         }
     }
     
-    public EmfDataset getDataset(Integer datasetId) throws EmfException {
+    public synchronized EmfDataset getDataset(Integer datasetId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             EmfDataset dataset = dao.getDataset(session, datasetId.intValue());
@@ -59,7 +60,7 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    public EmfDataset getDataset(String datasetName) throws EmfException {
+    public synchronized EmfDataset getDataset(String datasetName) throws EmfException {
         Session session = sessionFactory.getSession();
         
         try {
@@ -74,7 +75,7 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    public EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
+    public synchronized EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             EmfDataset locked = dao.obtainLocked(owner, dataset, session);
@@ -89,7 +90,7 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    public EmfDataset releaseLockedDataset(EmfDataset locked) throws EmfException {
+    public synchronized EmfDataset releaseLockedDataset(EmfDataset locked) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             EmfDataset released = dao.releaseLocked(locked, session);
@@ -105,7 +106,7 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    public EmfDataset updateDataset(EmfDataset dataset) throws EmfException {
+    public synchronized EmfDataset updateDataset(EmfDataset dataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             DatasetType type = dataset.getDatasetType();
@@ -126,7 +127,7 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    public EmfDataset[] getDatasets(DatasetType datasetType) throws EmfException {
+    public synchronized EmfDataset[] getDatasets(DatasetType datasetType) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List datasets = dao.getDatasets(session, datasetType);
@@ -139,7 +140,7 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    public void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException {
+    public synchronized void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException {
         String prefix = "DELETED_" + new Date().getTime() + "_";
         
         try {
@@ -158,7 +159,7 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    private boolean isRemovable(EmfDataset[] datasets, User owner) throws EmfException {
+    private synchronized boolean isRemovable(EmfDataset[] datasets, User owner) throws EmfException {
         for (int i = 0; i < datasets.length; i++) {
             checkUser(datasets[i], owner);
             checkCase(datasets[i]);
@@ -168,7 +169,7 @@ public class DataServiceImpl implements DataService {
         return true;
     }
 
-    private void checkUser(EmfDataset dataset, User owner) throws EmfException {
+    private synchronized void checkUser(EmfDataset dataset, User owner) throws EmfException {
         if (!owner.isAdmin() && !dataset.getCreator().equalsIgnoreCase(owner.getUsername())) {
             releaseLockedDataset(dataset);
             throw new EmfException("Cannot delete \"" + dataset.getName()
@@ -177,16 +178,29 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    private void checkCase(EmfDataset dataset) throws EmfException {
+    private synchronized void checkCase(EmfDataset dataset) throws EmfException {
         Session session = sessionFactory.getSession();
         if (dao.isUsedByCases(session, dataset))
             throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is used by a case.");
     }
 
-    private void checkControlStrategy(EmfDataset dataset) throws EmfException {
+    private synchronized void checkControlStrategy(EmfDataset dataset) throws EmfException {
         Session session = sessionFactory.getSession();
         if (dao.isUsedByControlStrategies(session, dataset))
             throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is use by a control strategy.");
+    }
+
+    public synchronized String[] getDatasetValues(Integer datasetId) throws EmfException {
+        EmfDataset dataset = getDataset(datasetId);
+        List<String> values = new ArrayList<String>();
+        
+        values.add("name," + dataset.getName());
+        values.add("datasetType," + dataset.getDatasetTypeName());
+        values.add("creator," + dataset.getCreator());
+        values.add("createdDateTime," + dataset.getCreatedDateTime());
+        values.add("status," + dataset.getStatus());
+        
+        return values.toArray(new String[0]);
     }
 
 }

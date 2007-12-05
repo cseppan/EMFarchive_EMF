@@ -33,6 +33,8 @@ public class RemoteServiceLocator implements ServiceLocator {
     
     private LoggingService loggingService;
     
+    private DataService dataService;
+    
     private DataCommonsService dataCommonsService;
     
     private ControlMeasureService controlMeasureService;
@@ -64,7 +66,10 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
 
     public DataService dataService() {
-        return new DataServiceTransport(baseUrl + "/gov.epa.emf.services.data.DataService");
+        if (dataService == null)
+            dataService = new DataServiceTransport(baseUrl + "/gov.epa.emf.services.data.DataService");
+        
+        return dataService;
     }
 
     public LoggingService loggingService() {

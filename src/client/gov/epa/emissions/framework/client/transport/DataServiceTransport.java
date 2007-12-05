@@ -10,6 +10,8 @@ public class DataServiceTransport implements DataService {
     private CallFactory callFactory;
 
     private DataMappings mappings;
+    
+    private EmfCall call;
 
     public DataServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
@@ -17,10 +19,13 @@ public class DataServiceTransport implements DataService {
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createCall("Data Service");
+        if (call == null)
+            call = callFactory.createSessionEnabledCall("Data Service");
+        
+        return call;
     }
 
-    public EmfDataset[] getDatasets() throws EmfException {
+    public synchronized EmfDataset[] getDatasets() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getDatasets");
@@ -29,7 +34,7 @@ public class DataServiceTransport implements DataService {
         return (EmfDataset[]) call.requestResponse(new Object[] {});
     }
 
-    public EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
+    public synchronized EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("obtainLockedDataset");
@@ -40,7 +45,7 @@ public class DataServiceTransport implements DataService {
         return (EmfDataset) call.requestResponse(new Object[] { owner, dataset });
     }
 
-    public EmfDataset updateDataset(EmfDataset dataset) throws EmfException {
+    public synchronized EmfDataset updateDataset(EmfDataset dataset) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateDataset");
@@ -50,7 +55,7 @@ public class DataServiceTransport implements DataService {
         return (EmfDataset) call.requestResponse(new Object[] { dataset });
     }
 
-    public EmfDataset releaseLockedDataset(EmfDataset locked) throws EmfException {
+    public synchronized EmfDataset releaseLockedDataset(EmfDataset locked) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("releaseLockedDataset");
@@ -60,7 +65,7 @@ public class DataServiceTransport implements DataService {
         return (EmfDataset) call.requestResponse(new Object[] { locked });
     }
 
-    public EmfDataset[] getDatasets(DatasetType datasetType) throws EmfException {
+    public synchronized EmfDataset[] getDatasets(DatasetType datasetType) throws EmfException {
 
         EmfCall call = call();
 
@@ -72,7 +77,7 @@ public class DataServiceTransport implements DataService {
     
     }
 
-    public void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException {
+    public synchronized void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("deleteDatasets");
@@ -83,7 +88,7 @@ public class DataServiceTransport implements DataService {
         call.request(new Object[] { owner, datasets });
     }
 
-    public EmfDataset getDataset(Integer datasetId) throws EmfException {
+    public synchronized EmfDataset getDataset(Integer datasetId) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("getDataset");
@@ -93,7 +98,7 @@ public class DataServiceTransport implements DataService {
         return (EmfDataset)call.requestResponse(new Object[]{ datasetId });
     }
 
-    public EmfDataset getDataset(String datasetName) throws EmfException {
+    public synchronized EmfDataset getDataset(String datasetName) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("getDataset");
@@ -101,6 +106,16 @@ public class DataServiceTransport implements DataService {
         call.setReturnType(mappings.dataset());
         
         return (EmfDataset)call.requestResponse(new Object[]{ datasetName });
+    }
+
+    public synchronized String[] getDatasetValues(Integer datasetId) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getDatasetValues");
+        call.addParam("datasetId", mappings.integer());
+        call.setStringArrayReturnType();
+        
+        return (String[])call.requestResponse(new Object[]{ datasetId });
     }
 
 }
