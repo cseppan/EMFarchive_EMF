@@ -25,4 +25,8 @@ public class EditableCaseParameterTabPresenterImpl implements EditableCaseParame
         view.save(caseObj);
     }
 
+    public Case getCaseObj() {
+        return this.caseObj;
+    }
+
 }

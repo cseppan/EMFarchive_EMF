@@ -73,5 +73,9 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
     public void removeParameters(CaseParameter[] params) throws EmfException {
         service().removeCaseParameters(params);
     }
+    
+    public Case getCaseObj() {
+        return this.caseObj;
+    }
 
 }

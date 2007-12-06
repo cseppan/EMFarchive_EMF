@@ -36,19 +36,19 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     private Case caseObj;
 
     private List presenters;
-    
+
     private EditInputsTabPresenter inputPresenter;
 
     private EditJobsTabPresenter jobsPresenter;
 
     private EditParametersTabPresenter parametersPresenter;
-    
+
     private EditOutputsTabPresenter outputPresenter;
-    
+
     private EditableCaseSummaryTabPresenter summaryPresenter;
 
     private ShowHistoryTabPresenter historyPresenter;
-    
+
     private boolean inputsLoaded = false;
 
     private boolean jobsLoaded = false;
@@ -56,7 +56,9 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     private boolean parameterLoaded = false;
 
     private boolean historyLoaded = false;
-    
+
+    private boolean outputsLoaded = false;
+
     public CaseEditorPresenterImpl(Case caseObj, EmfSession session, CaseEditorView view,
             CaseManagerPresenter managerPresenter) {
         this.caseObj = caseObj;
@@ -94,10 +96,10 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
 
     void updateCase() throws EmfException {
         saveTabs();
-        
+
         if (isDuplicate(caseObj))
             throw new EmfException("Duplicate name - '" + caseObj.getName() + "'.");
-        
+
         caseObj.setLastModifiedBy(session.user());
         caseObj.setLastModifiedDate(new Date());
         service().updateCase(caseObj);
@@ -126,31 +128,30 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     }
 
     public void set(EditableCaseSummaryTabView summaryView) {
-        summaryPresenter = new EditableCaseSummaryTabPresenterImpl(caseObj,
-                summaryView);
+        summaryPresenter = new EditableCaseSummaryTabPresenterImpl(caseObj, summaryView);
         presenters.add(summaryPresenter);
     }
 
     public void set(EditInputsTabView inputsView) {
         inputPresenter = new EditInputsTabPresenterImpl(session, inputsView, caseObj);
         presenters.add(inputPresenter);
-   }
+    }
 
     public void set(EditJobsTabView jobsView) {
         jobsPresenter = new EditJobsTabPresenterImpl(session, jobsView, caseObj);
         presenters.add(jobsPresenter);
     }
-    
-    public void set(EditOutputsTabView OutputsView) throws EmfException {
+
+    public void set(EditOutputsTabView OutputsView) {
         outputPresenter = new EditOutputsTabPresenterImpl(session, OutputsView, caseObj);
-        outputPresenter.display();
         presenters.add(outputPresenter);
     }
 
-    public void doExport(User user, String dirName, String purpose, boolean overWrite, Case caseToExport) throws EmfException {
+    public void doExport(User user, String dirName, String purpose, boolean overWrite, Case caseToExport)
+            throws EmfException {
         service().export(user, mapToRemote(dirName), purpose, overWrite, caseToExport.getId());
     }
-    
+
     private String mapToRemote(String dir) {
         return session.preferences().mapLocalOutputPathToRemote(dir);
     }
@@ -158,7 +159,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     public void doSaveWithoutClose() throws EmfException {
         updateCase();
         managerPresenter.doRefresh();
-        
+
         caseObj = service().obtainLocked(session.user(), caseObj); // get lock after release it
         if (!caseObj.isLocked(session.user())) {// view mode, locked by another user
             closeView();
@@ -170,7 +171,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         parametersPresenter = new EditParametersTabPresenterImpl(session, parameterview, caseObj);
         presenters.add(parametersPresenter);
     }
-    
+
     public void set(ShowHistoryTabView caseHistoryView) {
         historyPresenter = new ShowHistoryTabPresenter(session, caseHistoryView, caseObj);
         presenters.add(parametersPresenter);
@@ -195,6 +196,11 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         if (!historyLoaded && tabTitle.equalsIgnoreCase("History")) {
             historyPresenter.display();
             historyLoaded = true;
+        }
+
+        if (!outputsLoaded && tabTitle.equalsIgnoreCase("Outputs")) {
+            outputPresenter.display();
+            outputsLoaded = true;
         }
     }
 

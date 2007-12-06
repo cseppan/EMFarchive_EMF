@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.casemanagement.outputs;
 
-import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.ui.ChangeableTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -13,22 +15,19 @@ public class OutputsTableData extends ChangeableTableData {
 
     private List rows;
 
-    private List showables;
+    private CaseOutput[] values;
     
-    private List notShows;
+    private EmfSession session;
 
-    private CaseInput[] values;
-
-    public OutputsTableData(CaseInput[] values) {
-        this.showables = new ArrayList();
-        this.notShows = new ArrayList();
+    public OutputsTableData(CaseOutput[] values, EmfSession session) throws EmfException {
         this.values = values;
+        this.session = session;
         this.rows = createRows(values);
     }
 
     public String[] columns() {
-        return new String[] { "Output", "Sector", "Program", "Dataset Name", "DS Type", "Envt. Var.", "Reqd?", "Avail?",
-                "Register?", "Sub Dir" };
+        return new String[] { "Output name", "Job", "Sector", "Dataset Name",
+        		"Dataset Type", "Import Status","Creator", "Creation Date", "Exec Name"};
     }
 
     public Class getColumnClass(int col) {
@@ -39,120 +38,77 @@ public class OutputsTableData extends ChangeableTableData {
         return rows;
     }
 
-    public void add(CaseInput input) {
-        addShowList(input);
-        rows.add(row(input));
-        notifyChanges();
+    public void add(CaseOutput output) throws EmfException {
+        Row row=row(output);
+        if (!rows.contains(row)){
+            rows.add(row);
+            notifyChanges();
+            refresh();
+        }
+        return;
     }
 
-    private void addShowList(CaseInput input) {
-        if (input.isShow())
-            showables.add(row(input));
-        else
-            notShows.add(row(input));
-    }
-
-    private List createRows(CaseInput[] values) {
+    private List createRows(CaseOutput[] values) throws EmfException {
         List rows = new ArrayList();
-        
         for (int i = 0; i < values.length; i++) {
             rows.add(row(values[i]));
-            addShowList(values[i]);
         }
-
         return rows;
     }
 
-    private Row row(CaseInput input) {
-        return new ViewableRow(new OutputsRowSource(input));
+    private Row row(CaseOutput output) throws EmfException{
+        return new ViewableRow(new OutputsRowSource(output, session));
     }
 
     public boolean isEditable(int col) {
-        return true;
+        return false;
     }
 
-    public CaseInput[] getValues() {
+    public CaseOutput[] getValues() {
         return values;
     }
     
-    private void removeFromList(CaseInput input, List list) {
+    private void removeFromList(CaseOutput output, List list) {
         for (Iterator iter = list.iterator(); iter.hasNext();) {
             ViewableRow row = (ViewableRow) iter.next();
-            CaseInput source = (CaseInput) row.source();
-            if (source == input)
+            CaseOutput source = (CaseOutput) row.source();
+            if (source == output)
                 list.remove(row);
-            
             return;
         }
     }
     
-    public void remove(CaseInput[] values) {
+    public void remove(CaseOutput[] values) throws EmfException {
         for (int i = 0; i < values.length; i++)
             removeFromList(values[i], rows);
-        
-        for (int i = 0; i < values.length; i++)
-            removeFromList(values[i], showables);
-        
-        for (int i = 0; i < values.length; i++)
-            removeFromList(values[i], notShows);
+        refresh();
     }
 
 
-    public void refreshShowables() { //FIXME: needs to be modified to show showables while
-        CaseInput[] inputs = sources(); //keep the notShows record
-        clearLists();
-        this.rows = createRows(inputs);
+    public void refresh() throws EmfException {
+        CaseOutput[] outputs = sources();
+        this.rows = createRows(outputs);
     }
 
-    public void refresh() {
-        CaseInput[] inputs = sources();
-        clearLists();
-        this.rows = createRows(inputs);
-    }
-
-    public CaseInput[] sources() {
+    public CaseOutput[] sources() {
         List sources = sourcesList();
-        return (CaseInput[]) sources.toArray(new CaseInput[0]);
+        return (CaseOutput[]) sources.toArray(new CaseOutput[0]);
     }
 
-    public CaseInput[] showSources() {
-        List sources = showSourcesList();
-        return (CaseInput[]) sources.toArray(new CaseInput[0]);
+    public CaseOutput[] showSources() {
+        List sources = sourcesList();
+        return (CaseOutput[]) sources.toArray(new CaseOutput[0]);
     }
     
     private List sourcesList() {
         List sources = new ArrayList();
-        List total = getTotal();
         
-        for (Iterator iter = total.iterator(); iter.hasNext();) {
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
             ViewableRow row = (ViewableRow) iter.next();
             sources.add(row.source());
         }
 
         return sources;
-    }
-
-    private List getTotal() {
-        List total = new ArrayList();
-        total.addAll(showables);
-        total.addAll(notShows);
-        
-        return total;
-    }
-
-    private List showSourcesList() {
-        List sources = new ArrayList();
-        for (Iterator iter = showables.iterator(); iter.hasNext();) {
-            ViewableRow row = (ViewableRow) iter.next();
-            sources.add(row.source());
-        }
-        
-        return sources;
-    }
-    
-    private void clearLists() {
-        this.showables.clear();
-        this.notShows.clear();
     }
 
 }

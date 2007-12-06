@@ -116,4 +116,8 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         doExport(inputList, true, purpose);
     }
     
+    public Case getCaseObj() {
+        return this.caseObj;
+    }
+    
 }

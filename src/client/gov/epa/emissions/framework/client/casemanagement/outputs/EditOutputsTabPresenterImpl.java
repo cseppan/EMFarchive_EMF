@@ -3,6 +3,9 @@ package gov.epa.emissions.framework.client.casemanagement.outputs;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 
 public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
 
@@ -28,4 +31,19 @@ public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
             throw new EmfException("");
     }
 
+    public CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException {
+        return service().getCaseOutputs(caseId, jobId);
+    }
+
+    private CaseService service() {
+        return session.caseService();
+    }
+
+    public CaseJob[] getCaseJobs() throws EmfException {
+        return service().getCaseJobs(caseObj.getId());
+    }
+
+    public Case getCaseObj() {
+        return this.caseObj;
+    }
 }

@@ -20,5 +20,9 @@ public class EditableCaseSummaryTabPresenterImpl implements EditableCaseSummaryT
         caseObj.setLastModifiedDate(new Date());
         view.save(caseObj);
     }
+    
+    public Case getCaseObj() {
+        return this.caseObj;
+    }
 
 }

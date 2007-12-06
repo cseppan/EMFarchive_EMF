@@ -130,7 +130,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     
     private JPanel createOutputTab() {
         try {
-            EditOutputsTab view = new EditOutputsTab(parentConsole, this, messagePanel, desktopManager);
+            EditOutputsTab view = new EditOutputsTab(parentConsole, this, messagePanel, desktopManager, session);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
