@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement.outputs;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
@@ -10,10 +11,12 @@ import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -23,16 +26,22 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
 
 public class EditOutputsTab extends JPanel implements EditOutputsTabView, RefreshObserver {
 
     private EmfConsole parentConsole;
 
     private EditOutputsTabPresenter presenter;
+    
+    private MessagePanel messagePanel;
 
     private OutputsTableData tableData;
 
@@ -42,9 +51,15 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
 
     private JPanel tablePanel;
     
+    private Case caseObj;
+    
     private EmfSession session; 
     
-//    private ComboBox jobCombo;
+    private ComboBox jobCombo;
+    
+    private List<CaseJob> caseJobs; 
+    
+    private CaseJob selectedJob;
 
     public EditOutputsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager, EmfSession session) {
@@ -52,59 +67,81 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
         this.parentConsole = parentConsole;
         this.changeables = changeables;
         this.session=session; 
-
+        this.messagePanel=messagePanel;
+ 
         super.setLayout(new BorderLayout());
     }
 
-    public void display(Case caseObj, EditOutputsTabPresenter presenter, EmfSession session) {
+//    public void observe(EditOutputsTabPresenter presenter) {
+//        this.presenter = presenter;
+//    }
+    
+    public void display() {
         super.removeAll();
         CaseOutput[] outputs = new CaseOutput[0];
         try {
-            outputs = presenter.getCaseOutputs(caseObj.getId(), 0);
+            getAllJobs();
         } catch (EmfException e) {
-            // NOTE Auto-generated catch block
-            e.printStackTrace();
+            messagePanel.setError(e.getMessage());
         }
         try {
             super.add(createLayout(outputs, presenter, parentConsole), BorderLayout.CENTER);
         } catch (EmfException e) {
-            // NOTE Auto-generated catch block
-            e.printStackTrace();
+            messagePanel.setMessage(e.getMessage());
         }
-        this.presenter = presenter;
+//        this.caseObj=caseObj;
     }
 
-    private void doRefresh(CaseOutput[] outputs) {
+    private void doRefresh(CaseOutput[] outputs) throws EmfException {
+        selectedJob=(CaseJob) jobCombo.getSelectedItem();
         super.removeAll();
-        try {
-            super.add(createLayout(outputs, presenter, parentConsole), BorderLayout.CENTER);
-        } catch (EmfException e) {
-            // NOTE Auto-generated catch block
-            e.printStackTrace();
-        }
+        super.add(createLayout(outputs, presenter, parentConsole), BorderLayout.CENTER);
     }
 
     private JPanel createLayout(CaseOutput[] outputs, EditOutputsTabPresenter presenter, EmfConsole parentConsole) throws EmfException {
         JPanel layout = new JPanel(new BorderLayout());
-//        layout.add(createTopPanel(), BorderLayout.NORTH);
+        layout.add(createTopPanel(), BorderLayout.NORTH);
         layout.add(tablePanel(outputs, parentConsole), BorderLayout.CENTER);
         layout.add(controlPanel(presenter), BorderLayout.PAGE_END);
 
         return layout;
     }
-
-//    private JPanel createTopPanel() throws EmfException {
-//        JPanel panel = new JPanel(new SpringLayout());
-//        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-//        CaseJob[] caseJobs=presenter.getCaseJobs();
-////        CaseJob[] caseJobs=presenter.getCaseOutputs(0, 0);
-//        jobCombo=new ComboBox("Select One", caseJobs);  
-//        layoutGenerator.addLabelWidgetPair("Jobs: ", jobCombo, panel);
-//layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-//        5, 5, // initialX, initialY
-//        5, 5);// xPad, yPad
-//        return null;
-//    }
+    
+    private void getAllJobs() throws EmfException {
+        this.caseJobs = new ArrayList<CaseJob>();
+        caseJobs.add(new CaseJob("All"));
+        caseJobs.addAll(Arrays.asList(presenter.getCaseJobs()));
+    }
+    
+    private JPanel createTopPanel() {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        jobCombo=new ComboBox("Select One", caseJobs.toArray(new CaseJob[0]));
+        jobCombo.setPreferredSize(new Dimension(300,20));
+        if (selectedJob!=null)
+            jobCombo.setSelectedItem(selectedJob);
+            
+        jobCombo.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                CaseJob job=(CaseJob) jobCombo.getSelectedItem();
+                try {
+                    if (job == null) {
+                        jobCombo.setSelectedItem(job);
+                        doRefresh(new CaseOutput[0]);
+                        return;
+                    }
+                    doRefresh(presenter.getCaseOutputs(caseObj.getId(),job.getId()));
+                } catch (EmfException e1) {
+                    messagePanel.setError("Could not retrieve all outputs with -- " + job.getName());
+                }
+            }
+        });
+        layoutGenerator.addLabelWidgetPair("Job: ", jobCombo, panel);
+layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+        150, 15, // initialX, initialY
+        5, 15);// xPad, yPad
+        return panel;
+    }
 
     private JPanel tablePanel(CaseOutput[] outputs, EmfConsole parentConsole) throws EmfException {
         tableData = new OutputsTableData(outputs, session);
@@ -156,7 +193,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
         view.setEnabled(false);
         container.add(view);
         
-        Button remove = new RemoveButton("Delete", new AbstractAction() {
+        Button remove = new RemoveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 //
             }
@@ -180,13 +217,17 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
         return panel;
     }
 
-    public void refresh() {
+    public void refresh() throws EmfException {
         doRefresh(tableData.sources());
     }
 
     public void doRefresh() throws EmfException {
-        if (false)
-            throw new EmfException("under construction...");
+        doRefresh(tableData.sources());
+    }
+
+    public void observe(EditOutputsTabPresenterImpl presenter) {
+        this.presenter = presenter;
+        this.caseObj=presenter.getCaseObj();
     }
 
 }

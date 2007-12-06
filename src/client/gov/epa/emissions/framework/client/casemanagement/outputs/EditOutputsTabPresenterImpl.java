@@ -22,7 +22,8 @@ public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
     }
 
     public void display() {
-        view.display(caseObj, this, session);
+        view.observe(this);
+        view.display();
     }
 
     public void doSave() throws EmfException {
