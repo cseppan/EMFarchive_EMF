@@ -27,6 +27,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -119,7 +120,7 @@ public class ManagedImportService {
 
         try {
             for (int i = 0; i < filenames.length; i++)
-                addTasks(folderPath, path, filenames[i], filenames[i], user, datasetType, services);
+                addTasks(folderPath, path, new String[] { filenames[i] }, filenames[i], user, datasetType, services);
 
             addTasksToSubmitter(importClientSubmitter);
         } catch (Exception e) {
@@ -136,7 +137,7 @@ public class ManagedImportService {
         Services services = services();
 
         try {
-            addTasks(folderPath, path, filenames[0], datasetName, user, datasetType, services);
+            addTasks(folderPath, path, filenames, datasetName, user, datasetType, services);
             addTasksToSubmitter(importClientSubmitter);
         } catch (Exception e) {
             setErrorMsgs(folderPath, e);
@@ -204,30 +205,60 @@ public class ManagedImportService {
             log.error("ERROR starting to import to folder: " + folderPath, e);
     }
 
-    private synchronized void addTasks(String folder, File path, String filename, String dsName, User user,
+    private synchronized void addTasks(String folder, File path, String[] filenames, String dsName, User user,
             DatasetType dsType, Services services) throws Exception {
-        EmfDataset dataset = createDataset(folder, filename, dsName, user, dsType);
+        EmfDataset dataset = createDataset(folder, filenames[0], dsName, user, dsType);
         isNameUnique(dataset.getName());
 
-        Importer importer = importerFactory.createVersioned(dataset, path, new String[] { filename });
-        ImportTask task = new ImportTask(dataset, new String[] { filename }, importer, user, services, dbServerFactory,
-                sessionFactory);
+        Importer importer = importerFactory.createVersioned(dataset, path, filenames);
+        ImportTask task = new ImportTask(dataset, filenames, importer, user, services, dbServerFactory, sessionFactory);
 
         importTasks.add(task);
     }
 
     private synchronized void addOutputTasks(User user, CaseOutput output, Services services) throws Exception {
         String separator = File.separator;
+        String folder = output.getPath();
+        String pattern = output.getPattern();
         String fullPath = output.getDatasetFile();
-        String folder = fullPath.substring(0, fullPath.lastIndexOf(separator));
-        String file = fullPath.substring(fullPath.lastIndexOf(separator)+1);
-        
+        String datasetName = output.getDatasetName();
+        String[] files = null;
+
+        if ((folder == null || folder.trim().isEmpty()) && (fullPath == null || fullPath.trim().isEmpty()))
+            throw new Exception("Error in registering output: Please specify files to register case outputs.");
+
+        if (folder == null || folder.trim().isEmpty())
+            folder = fullPath.substring(0, fullPath.lastIndexOf(separator));
+
+        if (fullPath != null && !fullPath.trim().isEmpty())
+            files = new String[] { fullPath.substring(fullPath.lastIndexOf(separator) + 1) };
+        else
+            files = getFilenamesFromPattern(folder, pattern);
+
         File path = validatePath(folder);
-        EmfDataset dataset = createDataset(folder, file, file, user, getDsType(output.getDatasetType()));
+        DatasetType type = getDsType(output.getDatasetType());
+
+        if (files.length > type.getMaxFiles())
+            throw new EmfException("Error in registering output: Number of files(" 
+                    + files.length + ") exceeds limit of dataset type " + type.getName() + ".");
+        
+        if (files.length > 1 && !type.isExternal())
+            for (int i = 0; i < files.length; i++)
+                createOutputTask(type, datasetName, user, output, services, new String[] { files[i] }, path);
+        else
+            createOutputTask(type, datasetName, user, output, services, files, path);
+    }
+
+    private void createOutputTask(DatasetType type, String datasetName, User user, CaseOutput output, Services services, String[] files,
+            File path) throws Exception {
+        if (datasetName == null || datasetName.trim().isEmpty())
+            datasetName = files[0];
+        
+        EmfDataset dataset = createDataset(path.getAbsolutePath(), files[0], datasetName, user, type);
         isNameUnique(dataset.getName());
 
-        Importer importer = importerFactory.createVersioned(dataset, path, new String[] { file });
-        ImportCaseOutputTask task = new ImportCaseOutputTask(output, dataset, new String[] { file }, importer, user, services,
+        Importer importer = importerFactory.createVersioned(dataset, path, files);
+        ImportCaseOutputTask task = new ImportCaseOutputTask(output, dataset, files, importer, user, services,
                 dbServerFactory, sessionFactory);
 
         importTasks.add(task);
@@ -238,14 +269,18 @@ public class ManagedImportService {
         DatasetType type = dao.get(datasetType, sessionFactory.getSession());
 
         if (type == null)
-            throw new EmfException("Dataset type: " + datasetType + " does not exist.");
+            throw new EmfException("Error in registering output: Dataset type: " + datasetType + " does not exist.");
 
         return type;
     }
 
-    public synchronized String importDatasetsForCaseOutput(User user, CaseOutput[] outputs) {
-        // wait to fill
-        return "Test_Import_Case_Output_Datasets_with_managed_import_service_" + new Date();
+    public synchronized String[] importDatasetsForCaseOutput(User user, CaseOutput[] outputs) throws EmfException {
+        List<String> submitterIds = new ArrayList<String>();
+        
+        for (CaseOutput output : outputs)
+            submitterIds.add(importDatasetForCaseOutput(user, output));
+        
+        return submitterIds.toArray(new String[0]);
     }
 
     public synchronized String importDatasetForCaseOutput(User user, CaseOutput output) throws EmfException {
@@ -254,7 +289,7 @@ public class ManagedImportService {
 
         registerSubmitter(FOR_OUTPUT, fileFolder, files);
         Services services = services();
-        
+
         try {
             addOutputTasks(user, output, services);
             addTasksToSubmitter(importCaseOutputSubmitter);

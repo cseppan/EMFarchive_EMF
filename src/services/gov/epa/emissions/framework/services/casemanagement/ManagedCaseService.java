@@ -2521,7 +2521,7 @@ public class ManagedCaseService {
         }
     }
 
-    public void registerOutput(CaseOutput output, String jobKey) throws EmfException {
+    public synchronized void registerOutput(CaseOutput output, String jobKey) throws EmfException {
         try {
             CaseJob job = getJobFromKey(jobKey);
             output.setCaseId(job.getCaseId());
@@ -2534,7 +2534,7 @@ public class ManagedCaseService {
         }
     }
 
-    public void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
+    public synchronized void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
         try {
             CaseJob job = null;
             
