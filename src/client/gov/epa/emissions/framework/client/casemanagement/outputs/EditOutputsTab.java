@@ -85,24 +85,24 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
             messagePanel.setError(e.getMessage());
         }
         try {
-            super.add(createLayout(outputs, presenter, parentConsole), BorderLayout.CENTER);
+            super.add(createLayout(outputs), BorderLayout.CENTER);
         } catch (EmfException e) {
             messagePanel.setMessage(e.getMessage());
         }
-//        this.caseObj=caseObj;
     }
 
     private void doRefresh(CaseOutput[] outputs) throws EmfException {
         selectedJob=(CaseJob) jobCombo.getSelectedItem();
         super.removeAll();
-        super.add(createLayout(outputs, presenter, parentConsole), BorderLayout.CENTER);
+        super.add(createLayout(outputs), BorderLayout.CENTER);
+        super.revalidate();
     }
 
-    private JPanel createLayout(CaseOutput[] outputs, EditOutputsTabPresenter presenter, EmfConsole parentConsole) throws EmfException {
+    private JPanel createLayout(CaseOutput[] outputs) throws EmfException {
         JPanel layout = new JPanel(new BorderLayout());
         layout.add(createTopPanel(), BorderLayout.NORTH);
         layout.add(tablePanel(outputs, parentConsole), BorderLayout.CENTER);
-        layout.add(controlPanel(presenter), BorderLayout.PAGE_END);
+        layout.add(controlPanel(), BorderLayout.PAGE_END);
 
         return layout;
     }
@@ -162,7 +162,7 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         return scrollPane;
     }
 
-    private JPanel controlPanel(final EditOutputsTabPresenter presenter) {
+    private JPanel controlPanel() {
         JPanel container = new JPanel();
         Insets insets = new Insets(1, 2, 1, 2);
 
