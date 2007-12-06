@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
@@ -39,6 +40,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
 
     protected void doTearDown() throws Exception {
         dropAll(InternalSource.class);
+        dropAll(ExternalSource.class);
         dropAll(Version.class);
         dropAll(EmfDataset.class);
         dropAll(CaseOutput.class);
@@ -65,13 +67,30 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
 
         eximService.importDatasets(user, repository.getAbsolutePath(), new String[] { filename }, dataset
                 .getDatasetType());
-        Thread.sleep(2000); // so that import thread has enough time to run
+        Thread.sleep(20000); // so that import thread has enough time to run
 
         EmfDataset[] imported = dataService.getDatasets();
         EmfDataset localdataset = imported[0];
         assertEquals(filename, imported[0].getName());
         assertEquals(1, imported.length);
 
+        dropTables(localdataset.getInternalSources());
+    }
+
+    public void testImportAnExternalDataset() throws Exception {
+        DataService dataService = new DataServiceImpl(dbServerFactory, sessionFactory);
+        User user = userService.getUser("emf");
+        
+        File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
+        String[] files = new String[] { "file1", "file2", "file3", "file4" };
+        eximService.importDataset(user, repository.getAbsolutePath(), files, getDatasetType("External File (External)"), files[0]);
+        Thread.sleep(60000); // so that import thread has enough time to run
+        
+        EmfDataset[] imported = dataService.getDatasets();
+        EmfDataset localdataset = imported[0];
+        assertEquals(files[0], imported[0].getName());
+        assertEquals(1, imported.length);
+        
         dropTables(localdataset.getInternalSources());
     }
 
@@ -210,6 +229,75 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
             
             assertEquals(filename, imported[0].getName());
             assertEquals(1, imported.length);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            dropTables(imported[0].getInternalSources());
+        }
+    }
+    
+    public void testImportExternalTypeCaseOutput() throws Exception {
+        ManagedImportService importService = new ManagedImportService(dbServerFactory, sessionFactory);
+        
+        DataService dataService = new DataServiceImpl(dbServerFactory, sessionFactory);
+        User user = userService.getUser("emf");
+        
+        File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
+        
+        Case caseObj = newCase("Test case output case");
+        CaseJob job = newCaseJob(caseObj, "Test_Job_Key", user);
+        
+        CaseOutput output = new CaseOutput("Case Ouput Test");
+        
+        output.setDatasetType("External File (External)");
+        output.setCaseId(caseObj.getId());
+        output.setJobId(job.getId());
+        output.setPath(repository.getAbsolutePath());
+        output.setPattern("*");
+        output.setMessage("Test Registering Case Output");
+        
+        EmfDataset[] imported = null;
+        
+        try {
+            importService.importDatasetForCaseOutput(user, output);
+            Thread.sleep(2000); // so that import thread has enough time to run
+            
+            imported = dataService.getDatasets();
+            
+            assertEquals(1, imported.length);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } 
+    }
+ 
+    public void testImportMultipleCaseOutputs() throws Exception {
+        ManagedImportService importService = new ManagedImportService(dbServerFactory, sessionFactory);
+        
+        DataService dataService = new DataServiceImpl(dbServerFactory, sessionFactory);
+        User user = userService.getUser("emf");
+        
+        File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
+        
+        Case caseObj = newCase("Test case output case");
+        CaseJob job = newCaseJob(caseObj, "Test_Job_Key", user);
+        
+        CaseOutput output = new CaseOutput("Case Ouput Test");
+        
+        output.setDatasetType("Text file (Line-based)");
+        output.setCaseId(caseObj.getId());
+        output.setJobId(job.getId());
+        output.setPath(repository.getAbsolutePath());
+        output.setPattern("small-non*.txt");
+        output.setMessage("Test Registering Case Output");
+        
+        EmfDataset[] imported = null;
+        
+        try {
+            importService.importDatasetForCaseOutput(user, output);
+            Thread.sleep(180000); // so that import thread has enough time to run
+            
+            imported = dataService.getDatasets();
+            assertEquals(4, imported.length);
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
