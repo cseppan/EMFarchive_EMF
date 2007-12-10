@@ -225,7 +225,7 @@ public class ManagedImportService {
         String[] files = null;
 
         if ((folder == null || folder.trim().isEmpty()) && (fullPath == null || fullPath.trim().isEmpty()))
-            throw new Exception("Error in registering output: Please specify files to register case outputs.");
+            throw new Exception("Error registering output: Please specify files to register case outputs.");
 
         if (folder == null || folder.trim().isEmpty())
             folder = fullPath.substring(0, fullPath.lastIndexOf(separator));
@@ -239,8 +239,8 @@ public class ManagedImportService {
         DatasetType type = getDsType(output.getDatasetType());
 
         if (files.length > type.getMaxFiles())
-            throw new EmfException("Error in registering output: Number of files(" 
-                    + files.length + ") exceeds limit of dataset type " + type.getName() + ".");
+            throw new EmfException("Error registering output: Number of files (" 
+                    + files.length + ") exceeds limit for dataset type " + type.getName() + ".");
         
         if (files.length > 1 && !type.isExternal())
             for (int i = 0; i < files.length; i++)
@@ -269,7 +269,7 @@ public class ManagedImportService {
         DatasetType type = dao.get(datasetType, sessionFactory.getSession());
 
         if (type == null)
-            throw new EmfException("Error in registering output: Dataset type: " + datasetType + " does not exist.");
+            throw new EmfException("Error registering output: Dataset type '" + datasetType + "' does not exist.");
 
         return type;
     }

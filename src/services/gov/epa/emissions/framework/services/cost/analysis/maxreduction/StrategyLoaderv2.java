@@ -116,7 +116,7 @@ public class StrategyLoaderv2 extends AbstractStrategyLoader {
                         totalReduction += recordGenerator.reducedEmission();
                     insertRecord(record, modifier);
                 } catch (SQLException e) {
-                    throw new EmfException("Error in processing record for source record: " + sourceCount + ". Exception: " + e.getMessage());
+                    throw new EmfException("Error processing record for source record: " + sourceCount + ". Exception: " + e.getMessage());
                 }
             }
         } finally {

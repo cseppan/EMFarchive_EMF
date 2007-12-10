@@ -213,7 +213,7 @@ public class RemoteCommand {
                 String errorTitle = "stderr from (" + hostname + "): " + remoteCmd;
                 logStderr(errorTitle, p.getErrorStream());
 
-                throw new EmfException("ERROR in executing remote command: " + executeCmd);
+                throw new EmfException("ERROR executing remote command: " + executeCmd);
 
             }
 
@@ -221,8 +221,8 @@ public class RemoteCommand {
 
         } catch (Exception e) {
             e.printStackTrace();
-            LOG.error("ERROR in executing remote command: " + executeCmd);
-            throw new EmfException("ERROR in executing remote command: " + e.getMessage());
+            LOG.error("ERROR executing remote command: " + executeCmd);
+            throw new EmfException("ERROR executing remote command: " + e.getMessage());
         }
     }
 

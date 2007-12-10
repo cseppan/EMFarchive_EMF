@@ -2225,7 +2225,7 @@ public class ManagedCaseService {
             dao.updateCaseJob(job);
 
             if (!user.getUsername().equalsIgnoreCase(message.getRemoteUser()))
-                throw new EmfException("Error in recording job messages: Remote user doesn't match the user who runs the job.");
+                throw new EmfException("Error recording job messages: Remote user doesn't match the user who runs the job.");
 
             dao.add(message);
 
@@ -2241,7 +2241,7 @@ public class ManagedCaseService {
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
-            throw new EmfException("Error in recording job messages: " + e.getMessage());
+            throw new EmfException("Error recording job messages: " + e.getMessage());
         }
     }
 
@@ -2249,7 +2249,7 @@ public class ManagedCaseService {
         CaseJob job = dao.getCaseJob(jobKey);
 
         if (job == null)
-            throw new EmfException("Error in recording job messages: No jobs found associated with job key: " + jobKey);
+            throw new EmfException("Error recording job messages: No jobs found associated with job key: " + jobKey);
         return job;
     }
 
@@ -2530,7 +2530,7 @@ public class ManagedCaseService {
             getImportService().importDatasetForCaseOutput(job.getUser(), output);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new EmfException("Error in registering output: " + e.getMessage());
+            throw new EmfException("Error registering output: " + e.getMessage());
         }
     }
 
@@ -2547,7 +2547,7 @@ public class ManagedCaseService {
             getImportService().importDatasetsForCaseOutput(job.getUser(), outputs);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new EmfException("Error in registering output: " + e.getMessage());
+            throw new EmfException("Error registering output: " + e.getMessage());
         }
     }
 

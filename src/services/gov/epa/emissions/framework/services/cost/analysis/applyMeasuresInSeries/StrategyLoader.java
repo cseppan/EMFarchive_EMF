@@ -165,7 +165,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
                         insertSourceTime += System.currentTimeMillis() - currentTime;
                     } catch (SQLException e) {
                         e.printStackTrace();
-                        throw new EmfException("Error in processing record for source record: " + sourceCount + ". Exception: " + e.getMessage());
+                        throw new EmfException("Error processing record for source record: " + sourceCount + ". Exception: " + e.getMessage());
                     }
                 }
             }

@@ -466,7 +466,7 @@ public class CaseServiceImpl implements CaseService {
         int returnVal = 0;
         
         if (msgs.length != keys.length)
-            throw new EmfException("Error in recording job messages: No. of job messages doesn't match No. of job keys.");
+            throw new EmfException("Error recording job messages: No. of job messages doesn't match No. of job keys.");
         
         for(int i = 0; i < msgLength; i++)
             returnVal = recordJobMessage(msgs[i], keys[i]);
