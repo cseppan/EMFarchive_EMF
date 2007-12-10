@@ -1,7 +1,10 @@
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.DbUpdate;
@@ -197,6 +200,59 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
         }
     }
 
+    public void testImportMultipleLineBasedDatasetsWithNameCorrections() throws Exception {
+        DataService dataService = new DataServiceImpl(dbServerFactory, sessionFactory);
+        User user = userService.getUser("emf");
+        
+        File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
+        String filename1 = "small-nonpoint1.txt";
+        String filename2 = "small-nonpoint2.txt";
+        String filename3 = "small-nonpoint3.txt";
+        String filename4 = "small-nonpoint4.txt";
+        
+        String[] files = new String[] { filename1, filename2, filename3, filename4 };
+        EmfDataset[] imported = null;
+        
+        KeyVal prefixVal = new KeyVal((Keyword)load(Keyword.class, "EXPORT_PREFIX"), "small-");
+        KeyVal suffixVal = new KeyVal((Keyword)load(Keyword.class, "EXPORT_SUFFIX"), ".txt");
+        DatasetType type = getDatasetType("Text file (Line-based)");
+        type.addKeyVal(prefixVal);
+        type.addKeyVal(suffixVal);
+        
+        try {
+            eximService.importDatasets(user, repository.getAbsolutePath(), files, type);
+            Thread.sleep(240000); // so that import thread has enough time to run
+            
+            imported = dataService.getDatasets();
+            List<String> importedNames = new ArrayList<String>();
+            
+            for (int i = 0; i < imported.length; i++) {
+                importedNames.add(imported[i].getName());
+                System.out.println("dataset name" + i + ": " + imported[i].getName());
+            }
+            
+            assertFalse(importedNames.contains(filename1));
+            assertTrue(importedNames.contains("nonpoint1"));
+            assertFalse(importedNames.contains(filename2));
+            assertTrue(importedNames.contains("nonpoint2"));
+            assertFalse(importedNames.contains(filename3));
+            assertTrue(importedNames.contains("nonpoint3"));
+            assertFalse(importedNames.contains(filename4));
+            assertTrue(importedNames.contains("nonpoint4"));
+            assertEquals(4, imported.length);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            InternalSource[] sources = new InternalSource[imported.length];
+            
+            for (int i = 0; i < sources.length; i++) {
+                sources[i] = imported[i].getInternalSources()[0];
+            }
+            
+            dropTables(sources);
+        }
+    }
+
     public void testImportCaseOutput() throws Exception {
         ManagedImportService importService = new ManagedImportService(dbServerFactory, sessionFactory);
         
@@ -232,6 +288,51 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {
+            dropTables(imported[0].getInternalSources());
+        }
+    }
+
+    public void testImportCaseOutputWithNameCorrections() throws Exception {
+        ManagedImportService importService = new ManagedImportService(dbServerFactory, sessionFactory);
+        
+        DataService dataService = new DataServiceImpl(dbServerFactory, sessionFactory);
+        User user = userService.getUser("emf");
+        
+        File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
+        String filename = "small-nonpoint1.txt";
+        
+        Case caseObj = newCase("Test case output case");
+        CaseJob job = newCaseJob(caseObj, "Test_Job_Key", user);
+        
+        CaseOutput output = new CaseOutput("Case Ouput Test");
+        
+        output.setDatasetType("Text file (Line-based)");
+        output.setCaseId(caseObj.getId());
+        output.setJobId(job.getId());
+        output.setPath(repository.getAbsolutePath());
+        output.setDatasetFile(filename);
+        output.setDatasetName(filename);
+        output.setMessage("Test Registering Case Output");
+        
+        EmfDataset[] imported = null;
+        
+        try {
+            //Dataset type "Text file (Line-based)" has id# 12
+            //KeyWord "EXPORT_PREFIX" has id# 5
+            //KeyWord "EXPORT_SUFFIX" has id# 6
+            dbServer.getEmfDatasource().query().execute("insert into emf.dataset_types_keywords values (DEFAULT,12,0,5,'small-')");
+            dbServer.getEmfDatasource().query().execute("insert into emf.dataset_types_keywords values (DEFAULT,12,1,6,'.txt')");
+            importService.importDatasetForCaseOutput(user, output);
+            Thread.sleep(10000); // so that import thread has enough time to run
+            
+            imported = dataService.getDatasets();
+            
+            assertEquals("nonpoint1", imported[0].getName());
+            assertEquals(1, imported.length);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            dbServer.getEmfDatasource().query().execute("delete from emf.dataset_types_keywords");
             dropTables(imported[0].getInternalSources());
         }
     }
