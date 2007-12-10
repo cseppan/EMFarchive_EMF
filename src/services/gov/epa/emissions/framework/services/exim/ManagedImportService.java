@@ -226,7 +226,8 @@ public class ManagedImportService {
         String[] files = null;
 
         if ((folder == null || folder.trim().isEmpty()) && (fullPath == null || fullPath.trim().isEmpty()))
-            throw new Exception("Error registering output: Please specify files to register case outputs.");
+            throw new Exception("Error registering output: Please specify files to register case output "+
+                    output.getName());
 
         if (folder == null || folder.trim().isEmpty())
             folder = fullPath.substring(0, fullPath.lastIndexOf(separator));
@@ -239,7 +240,8 @@ public class ManagedImportService {
         File path = validatePath(folder);
         DatasetType type = getDsType(output.getDatasetType());
 
-        if (files.length > type.getMaxFiles())
+        // Need to handle the case when the number of files allowed is unlimited
+        if ((type.getMaxFiles() != -1) && (files.length > type.getMaxFiles()))
             throw new EmfException("Error registering output: Number of files (" 
                     + files.length + ") exceeds limit for dataset type " + type.getName() + ".");
         
