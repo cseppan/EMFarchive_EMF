@@ -220,10 +220,10 @@ public class EMFCmdClient {
         } catch (Exception exc) {
             String errorString = exc.getMessage();
 
-            if (errorString != null && errorString.contains("Error in registering output"))
+            if (errorString != null && errorString.contains("Error registering output"))
                 exitValue = 2;
 
-            if (errorString != null && errorString.contains("Error in recording job messages"))
+            if (errorString != null && errorString.contains("Error recording job messages"))
                 exitValue = 1;
 
             if (DEBUG)
@@ -285,7 +285,7 @@ public class EMFCmdClient {
         if (DEBUG)
             System.out.println("EMF command line client exited.");
 
-        if (errorString != null && errorString.contains("Error in registering output"))
+        if (errorString != null && errorString.contains("Error registering output"))
             System.exit(2);
 
         if (errorString != null)
@@ -341,7 +341,7 @@ public class EMFCmdClient {
             rewriteSentLinesNumber(++lineCount, logAsistFile);
         }
 
-        if (errorString != null && errorString.contains("Error in registering output"))
+        if (errorString != null && errorString.contains("Error registering output"))
             System.exit(2);
 
         if (errorString != null)
@@ -404,7 +404,7 @@ public class EMFCmdClient {
                 if (DEBUG)
                     System.out.println("EMF command client registered " + outputs.length + " outputs successfully.");
             } catch (Exception e) {
-                System.out.println("Error in registering outputs: " + e.getMessage());
+                System.out.println("Error registering outputs: " + e.getMessage());
             }
         }
 
@@ -413,7 +413,7 @@ public class EMFCmdClient {
                 service.registerOutput(nonEmptyOutputs[0], keys[0]);
                 System.out.println("EMF command client registered one output successfully.");
             } catch (Exception e) {
-                System.out.println("Error in registering outputs: " + e.getMessage());
+                System.out.println("Error registering outputs: " + e.getMessage());
             }
         }
     }
