@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.exim;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
@@ -91,7 +92,7 @@ public class ManagedImportService {
         return services;
     }
 
-    private File validatePath(String folderPath) throws EmfException {
+    private synchronized File validatePath(String folderPath) throws EmfException {
         File file = new File(folderPath);
 
         if (!file.exists() || !file.isDirectory()) {
@@ -249,7 +250,7 @@ public class ManagedImportService {
             createOutputTask(type, datasetName, user, output, services, files, path);
     }
 
-    private void createOutputTask(DatasetType type, String datasetName, User user, CaseOutput output, Services services, String[] files,
+    private synchronized void createOutputTask(DatasetType type, String datasetName, User user, CaseOutput output, Services services, String[] files,
             File path) throws Exception {
         if (datasetName == null || datasetName.trim().isEmpty())
             datasetName = files[0];
@@ -264,7 +265,7 @@ public class ManagedImportService {
         importTasks.add(task);
     }
 
-    private DatasetType getDsType(String datasetType) throws EmfException {
+    private synchronized DatasetType getDsType(String datasetType) throws EmfException {
         DatasetTypesDAO dao = new DatasetTypesDAO();
         DatasetType type = dao.get(datasetType, sessionFactory.getSession());
 
@@ -301,12 +302,12 @@ public class ManagedImportService {
         return importCaseOutputSubmitter.getSubmitterId();
     }
 
-    private EmfDataset createDataset(String folder, String filename, String datasetName, User user,
+    private synchronized EmfDataset createDataset(String folder, String filename, String datasetName, User user,
             DatasetType datasetType) {
         EmfDataset dataset = new EmfDataset();
         File file = new File(folder, filename);
 
-        dataset.setName(datasetName);
+        dataset.setName(getCorrectedDSName(datasetName, datasetType));
         dataset.setCreator(user.getUsername());
         dataset.setDatasetType(datasetType);
         dataset.setCreatedDateTime(new Date());
@@ -314,6 +315,35 @@ public class ManagedImportService {
         dataset.setAccessedDateTime(new Date());
 
         return dataset;
+    }
+
+    private synchronized String getCorrectedDSName(String datasetName, DatasetType datasetType) {
+        KeyVal[] keyVals =  datasetType.getKeyVals();
+        
+        if (keyVals == null || keyVals.length == 0)
+            return datasetName;
+        
+        String prefix = null;
+        String suffix = null;
+        
+        for (KeyVal keyval : keyVals) {
+            if (keyval.getName().equalsIgnoreCase("EXPORT_PREFIX"))
+                prefix = keyval.getValue();
+            
+            if (keyval.getName().equalsIgnoreCase("EXPORT_SUFFIX"))
+                suffix = keyval.getValue();
+            
+            if (prefix != null && suffix != null)
+                break;
+        }
+            
+        if (prefix != null && datasetName.startsWith(prefix))
+            datasetName = datasetName.substring(prefix.length());
+
+        if (suffix != null && datasetName.endsWith(suffix))
+            datasetName = datasetName.substring(0, datasetName.length() - suffix.length());
+            
+        return datasetName;
     }
 
     public synchronized String[] getFilenamesFromPattern(String folder, String pattern) throws EmfException {
