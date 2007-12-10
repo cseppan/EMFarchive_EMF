@@ -12,7 +12,7 @@ public class CaseOutput implements Serializable, Comparable<CaseOutput> {
     
     private int datasetId;
     
-    private String name;
+    private String name = ""; // make sure it's empty, not null
     
     private String datasetFile;
     
@@ -159,10 +159,28 @@ public class CaseOutput implements Serializable, Comparable<CaseOutput> {
     }
     
     public boolean isEmpty() {
-        return empty;
+        boolean result = true;
+        String[] fields = new String[] {
+                datasetType,
+                datasetName,
+                path,
+                datasetFile,
+                pattern,
+                name
+        };
+        
+        for (String field : fields) {
+            if (field != null && !field.trim().isEmpty()) {
+                result = false;
+                break;
+            }
+        }
+        setEmpty(result);
+        return result;
     }
 
-    public void setEmpty(boolean empty) {
+    private void setEmpty(boolean empty) {
+        // this should never be called, so it's private
         this.empty = empty;
     }
 
