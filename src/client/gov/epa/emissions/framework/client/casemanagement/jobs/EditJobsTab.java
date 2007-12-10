@@ -364,7 +364,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
 
         if (jobs.length == 0) {
-            messagePanel.setMessage("Please select job(s) to run.");
+            messagePanel.setMessage("Please select one or more jobs to run.");
             return;
         }
 
@@ -406,9 +406,12 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     private int validateJobs(CaseJob[] jobs, int option, String lineSeparator) throws EmfException {
         String validationMsg = presenter.validateJobs(jobs);
 
-        if (!validationMsg.isEmpty())
-            option = showDialog("The Selected job" + (jobs.length > 1 ? "s have " : " has ") + "non-final input datasets:" + lineSeparator + validationMsg
-                    + lineSeparator + "Are you sure to run the selected job(s)?", "Warning");
+        if (validationMsg.isEmpty())
+            //  there are no nonfinal dataset versions used, so return yes
+            return JOptionPane.YES_OPTION;  
+          
+        option = showDialog("The Selected job" + (jobs.length > 1 ? "s have " : " has ") + "non-final input datasets:" + lineSeparator + validationMsg
+                 + lineSeparator + "Are you sure to run the selected job(s)?", "Warning");
         return option;
     }
 
