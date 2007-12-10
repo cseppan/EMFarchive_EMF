@@ -1999,7 +1999,7 @@ public class ManagedCaseService {
         }
         // Need to have quotes around model name b/c could be more than one word
         if (caseObj.getModel() != null) {
-            String modelName = '"' + caseObj.getModel().getName() + '"';
+            String modelName = addQuotes(caseObj.getModel().getName());
             sbuf.append(shellSetenv("MODEL_LABEL", modelName));
         }
         if (caseObj.getGrid() != null) {
@@ -2009,10 +2009,10 @@ public class ManagedCaseService {
             sbuf.append(shellSetenv("EMF_GRID", caseObj.getGridResolution().getName()));
         }
         if (caseObj.getAirQualityModel() != null) {
-            sbuf.append(shellSetenv("EMF_AQM", caseObj.getAirQualityModel().getName()));
+            sbuf.append(shellSetenv("EMF_AQM", addQuotes(caseObj.getAirQualityModel().getName())));
         }
         if (caseObj.getSpeciation() != null) {
-            sbuf.append(shellSetenv("EMF_SPC", caseObj.getSpeciation().getName()));
+            sbuf.append(shellSetenv("EMF_SPC", addQuotes(caseObj.getSpeciation().getName())));
         }
         if (caseObj.getEmissionsYear() != null) {
             sbuf.append(shellSetenv("BASE_YEAR", caseObj.getEmissionsYear().getName())); // Should base year ==
@@ -2024,11 +2024,11 @@ public class ManagedCaseService {
         }
         // Need to have quotes around start and end date b/c could be more than one word 'DD/MM/YYYY HH:MM'
         if (caseObj.getStartDate() != null) {
-            String startString = '"' + caseObj.getStartDate().toString() + '"';
+            String startString = addQuotes(caseObj.getStartDate().toString());
             sbuf.append(shellSetenv("EPI_STDATE_TIME", startString));
         }
         if (caseObj.getEndDate() != null) {
-            String endString = '"' + caseObj.getEndDate().toString() + '"';
+            String endString = addQuotes(caseObj.getEndDate().toString());
             sbuf.append(shellSetenv("EPI_ENDATE_TIME", endString));
         }
 
@@ -2107,6 +2107,10 @@ public class ManagedCaseService {
         return sbuf.toString();
 
     }// /end of createJobFileContent()
+
+    private String addQuotes(String evName) {
+        return '"' + evName + '"';
+    }
 
     private String getJobFileHeader(CaseInput headerInput) throws EmfException {
         /**
