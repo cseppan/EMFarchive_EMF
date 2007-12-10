@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.services.casemanagement.jobs;
 import java.util.Date;
 
 public class JobMessage {
+    
+    // Q: why isn't the key part of the message?
 
     private int id;
     
@@ -131,10 +133,12 @@ public class JobMessage {
     }
     
     public boolean isEmpty() {
-        return empty;
+        boolean result = status.isEmpty() && message.isEmpty() && period.isEmpty();
+        setEmpty(result);
+        return result;
     }
 
-    public void setEmpty(boolean empty) {
+    private void setEmpty(boolean empty) {
         this.empty = empty;
     }
     
