@@ -39,8 +39,12 @@ public class ImportCaseOutputTask extends ImportTask {
             DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
         super(dataset, files, importer, user, services, dbServerFactory, sessionFactory);
         
-        if (DebugLevels.DEBUG_1)
+//        if (DebugLevels.DEBUG_1)
+//        {
             System.out.println(">>>> " + createId());
+            System.out.println("Output="+output.getName()+";dataset="+dataset.getName()+";#files="+files.length+
+                    ";file[0]="+files[0]);
+//        }
         
         this.output = output;
         this.caseDAO = new CaseDAO(sessionFactory);
