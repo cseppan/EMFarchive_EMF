@@ -209,7 +209,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
                     try {
                         copySelectedStrategy();
                     } catch (EmfException excp) {
-                        messagePanel.setError("Error in copying control strategies: " + excp.getMessage());
+                        messagePanel.setError("Error copying control strategies: " + excp.getMessage());
                     }
             }
         });
