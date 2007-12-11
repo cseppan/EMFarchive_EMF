@@ -353,9 +353,17 @@ public class ManagedImportService {
             FilePatternMatcher fpm = new FilePatternMatcher(directory, pattern);
             String[] allFilesInFolder = directory.list();
             String[] fileNamesForImport = fpm.matchingNames(allFilesInFolder);
+            
             if (fileNamesForImport.length > 0)
                 return fileNamesForImport;
 
+            if (DebugLevels.DEBUG_0) {
+                System.out.println("ManagedImportService: File patterns passed: " + pattern);
+                
+                for (String file : fileNamesForImport)
+                    System.out.println("ManagedImportService: File matched from the pattern: " + file);
+            }
+            
             throw new EmfException("No files found for pattern '" + pattern + "'");
         } catch (ImporterException e) {
             throw new EmfException("Cannot apply pattern.");
