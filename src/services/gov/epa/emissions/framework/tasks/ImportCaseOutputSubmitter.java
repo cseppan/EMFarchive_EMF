@@ -16,7 +16,7 @@ public class ImportCaseOutputSubmitter extends ImportSubmitter {
     }
 
     public synchronized void callbackFromTaskManager(String taskId, String status, String mesg) {
-//        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0)
             System.out
                     .println(">>>>>>>> ImportCaseOutputSubmitter::callbackFromTaskManager id= " + submitterId
                             + " got callback from TaskManager for Task: " + taskId + " status= " + status

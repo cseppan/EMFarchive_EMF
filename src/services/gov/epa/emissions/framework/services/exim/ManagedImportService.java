@@ -263,7 +263,7 @@ public class ManagedImportService {
         ImportCaseOutputTask task = new ImportCaseOutputTask(output, dataset, files, importer, user, services,
                 dbServerFactory, sessionFactory);
 
-        System.out.println("\nADDING IMPORT TASK FOR DATASET: "+datasetName+";files[0]="+files[0]);
+        //System.out.println("\nADDING IMPORT TASK FOR DATASET: "+datasetName+";files[0]="+files[0]);
         importTasks.add(task);
     }
 
