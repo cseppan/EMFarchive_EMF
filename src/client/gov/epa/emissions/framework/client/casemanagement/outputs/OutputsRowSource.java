@@ -7,22 +7,22 @@ import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.ui.RowSource;
 
 public class OutputsRowSource implements RowSource {
-    private CaseOutput output;
+    private CaseOutput source;
 
     private EmfSession session;
 
     private String[] datasetValues;
 
     public OutputsRowSource(CaseOutput source, EmfSession session) throws EmfException {
-        this.output = source;
+        this.source = source;
         this.session = session;
-        this.datasetValues = getDatasetValues(output, session);
+        this.datasetValues = getDatasetValues(source, session);
     }
 
     public Object[] values() {
-        return new Object[] { getOutputName(output), getJobName(output), getSector(output), getDatasetProperty("name"),
-                getDatasetProperty("datasetType"), getStatus(output), getDatasetProperty("creator"),
-                getDatasetProperty("createdDateTime"), getExecName(output) };
+        return new Object[] { getOutputName(source), getJobName(source), getSector(source), getDatasetProperty("name"),
+                getDatasetProperty("datasetType"), getStatus(source), getDatasetProperty("creator"),
+                getDatasetProperty("createdDateTime"), getExecName(source) };
     }
 
     private Object getExecName(CaseOutput output) {
@@ -40,7 +40,6 @@ public class OutputsRowSource implements RowSource {
             if (values.startsWith(property))
                 value = values.substring(values.indexOf(",") + 1);
         }
-
         return value;
     }
 
@@ -73,8 +72,7 @@ public class OutputsRowSource implements RowSource {
     }
 
     public Object source() {
-        // NOTE Auto-generated method stub
-        return null;
+        return source;
     }
 
     public void validate(int rowNumber) throws EmfException {

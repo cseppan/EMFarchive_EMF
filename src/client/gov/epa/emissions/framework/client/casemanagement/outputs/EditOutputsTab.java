@@ -202,29 +202,28 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
             }
         });
         remove.setMargin(insets);
-        remove.setEnabled(false);
+ //       remove.setEnabled(false);
         container.add(remove);
 
-        Button Edit = new EditButton(new AbstractAction() {
+        Button edit = new EditButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 //
             }
         });
-        Edit.setMargin(insets);
-        Edit.setEnabled(false);
-        container.add(Edit);
+        edit.setMargin(insets);
+        edit.setEnabled(false);
+        container.add(edit);
         
         Button view = new ViewButton("View Dataset", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    doDisplayOutputDatasetsPropertiesViewer();
+                    displayOutputDatasetsPropertiesViewer();
                 } catch (EmfException e1) {
                     messagePanel.setMessage(e1.getMessage());
                 }
             }
         });
         view.setMargin(insets);
-        view.setEnabled(false);
         container.add(view);
         
         Button export = new ExportButton(new AbstractAction() {
@@ -241,39 +240,24 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         return panel;
     }
 
-    protected void doDisplayOutputDatasetsPropertiesViewer() throws EmfException {
+    protected void displayOutputDatasetsPropertiesViewer() throws EmfException {
         messagePanel.clear();
         List selected = selectModel.selected();
         if (selected.size() == 0) {
             throw new EmfException ("Please select one or more outputs to view.");
         }
         for (int i=0; i<selected.size(); i++) {
-            int id=((CaseOutput) selected.get(i)).getDatasetId();
+            CaseOutput output = (CaseOutput) selected.get(i);
+            if (output==null){ 
+                throw new EmfException("Output is null "); 
+            }
+            int id=output.getDatasetId();
             EmfDataset dataset = presenter.getDataset(id);
             PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
             DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
             presenter.doDisplay(view);
         }
     }
-
-//    private List<EmfDataset> getSelectedDatasets(List outputlist) throws EmfException {
-//        List<EmfDataset> datasetList = new ArrayList<EmfDataset>();
-//        if (outputlist.size()==0)
-//            return null;
-//        messagePanel.setError("dataset id is : " + ((CaseOutput)outputlist.get(0)).toString());
-//        for (int i = 0; i < outputlist.size(); i++) {
-//            int id=((CaseOutput) outputlist.get(i)).getDatasetId();
-//            if ( id==0){
-//                String ids=(id==0? "null": "not null "+id);
-//                messagePanel.setError("dataset id is ---- " + ids);
-//                return null;
-//            }
-//            EmfDataset dataset = presenter.getDataset(id);
-//            if (dataset != null)
-//                datasetList.add(dataset);
-//        }
-//        return datasetList;
-//    }
 
     private void removeSelectedOutput() throws EmfException {
         messagePanel.clear();
@@ -288,21 +272,15 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         String message = "Are you sure you want to remove the selected output(s)?";
         int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
-
-        if (selection == JOptionPane.NO_OPTION) {
-            return;
-        }
-
-        messagePanel.setMessage("Please wait while removing cases...");
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        
         if (selection == JOptionPane.YES_OPTION) {
             tableData.remove(selected);
             refresh();
             presenter.doRemove(selected);
         }
-         clearMessage();
-        setCursor(Cursor.getDefaultCursor());
-        messagePanel.setMessage("Finished removing outputs.");
+//         clearMessage();
+//        setCursor(Cursor.getDefaultCursor());
+//        messagePanel.setMessage("Finished removing outputs.");
     }
     public void refresh(){
         // note that this will get called when the case is save

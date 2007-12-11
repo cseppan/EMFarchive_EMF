@@ -21,6 +21,7 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
 
 public class CaseServiceImpl implements CaseService {
     private static Log log = LogFactory.getLog(CaseServiceImpl.class);
@@ -29,6 +30,8 @@ public class CaseServiceImpl implements CaseService {
 
     private String svcLabel = null;
 
+    private CaseDAO dao;
+    
     public String myTag() {
         if (svcLabel == null) {
             svcCount++;
@@ -60,6 +63,7 @@ public class CaseServiceImpl implements CaseService {
         this.sessionFactory = sessionFactory;
         this.dbServer = dbFactory.getDbServer();
         this.dbFactory = dbFactory;
+        this.dao=new CaseDAO();
         if (DebugLevels.DEBUG_0) System.out.println("CaseServiceImpl::getCaseService  Is dBServer null? " + (dbServer == null));
         if (DebugLevels.DEBUG_0) System.out.println("CaseServiceImpl::getCaseService  Is sessionFactory null? " + (sessionFactory == null));
 
@@ -523,6 +527,25 @@ public class CaseServiceImpl implements CaseService {
 
     public void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
         getCaseService().registerOutputs(outputs, jobKeys);
+    }
+
+    public synchronized Case updateCaseWithLock(Case caseObj) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            if (!dao.canUpdate(caseObj, session))
+                throw new EmfException("Case name already in use");
+
+            Case caseWithLock = dao.updateWithLock(caseObj, session);
+
+            return caseWithLock;
+//            return dao.getById(csWithLock.getId(), session);
+        } catch (RuntimeException e) {
+            log.error("Could not update Case: " + caseObj, e);
+            throw new EmfException("Could not update Case: " + caseObj);
+        } finally {
+            session.close();
+        }
+        
     }
 
 }

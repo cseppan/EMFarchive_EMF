@@ -151,4 +151,6 @@ public interface CaseService {
     
     String validateJobs(Integer[] jobIDs) throws EmfException;
 
+    Case updateCaseWithLock(Case caseObj) throws EmfException;
+
  }

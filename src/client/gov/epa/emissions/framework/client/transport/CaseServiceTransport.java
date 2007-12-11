@@ -777,4 +777,13 @@ public class CaseServiceTransport implements CaseService {
         call.request(new Object[]{ outputs, jobKeys });
     }
 
+    public Case updateCaseWithLock(Case caseObj) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("updateCaseWithLock");
+        call.addParam("caseObj", caseMappings.caseObject());
+        call.setReturnType(caseMappings.caseObject());
+
+        return (Case) call.requestResponse(new Object[] { caseObj });
+    }
 }

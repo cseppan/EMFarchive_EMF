@@ -780,4 +780,13 @@ public class CaseDAO {
         return hibernateFacade.get(CaseOutput.class, new Criterion[] { crit1, crit2 }, session);
     }
 
-}
+    public Case updateWithLock(Case caseObj, Session session) throws EmfException {
+        return (Case) lockingScheme.renewLockOnUpdate(caseObj, current(caseObj, session), session);
+    }
+
+    public boolean canUpdate(Case caseObj, Session session) {
+        // NOTE Auto-generated method stub
+        return false;
+    }
+
+ }

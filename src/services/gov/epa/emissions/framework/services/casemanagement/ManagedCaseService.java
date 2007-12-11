@@ -2561,10 +2561,16 @@ public class ManagedCaseService {
     }
 
     public void removeCaseOutputs(CaseOutput[] outputs) throws EmfException {
-        
-        // NOTE Auto-generated method stub
-        if (false)
-            throw new EmfException("under construction...");
-    }
+        Session session = sessionFactory.getSession();
 
+        try {
+            dao.removeCaseOutputs(outputs, session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not remove case input " + outputs[0].getName() + " etc.\n" + e.getMessage());
+            throw new EmfException("Could not remove case input " + outputs[0].getName() + " etc.");
+        } finally {
+            session.close();
+        }
+    }
 }
