@@ -139,7 +139,7 @@ public interface CaseService {
     int recordJobMessage(JobMessage[] msgs, String[] keys) throws EmfException;
     JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException;
     
-    void registerOutput(CaseOutput output, String jobKey) throws EmfException;
+//    void registerOutput(CaseOutput output, String jobKey) throws EmfException;
     void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException;
     CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException;
     

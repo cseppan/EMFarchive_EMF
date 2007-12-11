@@ -410,7 +410,7 @@ public class EMFCmdClient {
     }
 
     private synchronized static void registerOutputs(String[] keys, CaseService service, CaseOutput[] nonEmptyOutputs) {
-        if (nonEmptyOutputs.length > 1) {
+        if (nonEmptyOutputs.length >= 1) {
             try {
                 System.out.println("Registering "+nonEmptyOutputs.length+" outputs");
                 for (int i = 0; i < nonEmptyOutputs.length; i++)
@@ -429,17 +429,17 @@ public class EMFCmdClient {
             }
         }
 
-        if (nonEmptyOutputs.length == 1) {
-            try {
-                service.registerOutput(nonEmptyOutputs[0], keys[0]);
-                System.out.println("EMF command client registered one output successfully.");
-            } catch (Exception e) {
-                if (e.getMessage().startsWith("Error registering"))
-                   System.out.println(e.getMessage());
-                else
-                   System.out.println("Error registering outputs: " + e.getMessage());
-            }
-        }
+//        if (nonEmptyOutputs.length == 1) {
+//            try {
+//                service.registerOutput(nonEmptyOutputs[0], keys[0]);
+//                System.out.println("EMF command client registered one output successfully.");
+//            } catch (Exception e) {
+//                if (e.getMessage().startsWith("Error registering"))
+//                   System.out.println(e.getMessage());
+//                else
+//                   System.out.println("Error registering outputs: " + e.getMessage());
+//            }
+//        }
     }
 
     private synchronized static JobMessage[] getNonEmptyMsgs(JobMessage[] msgs, String [] keys, ArrayList keyArray) {

@@ -115,7 +115,7 @@ public class ManagedImportService {
 
     public synchronized String importDatasetsForClient(User user, String folderPath, String[] filenames,
             DatasetType datasetType) throws EmfException {
-        registerSubmitter(FOR_CLIENT, folderPath, filenames);
+        registerSubmitter(FOR_CLIENT, folderPath, filenames); //initialies importClientSubmitter
         File path = validatePath(folderPath);
         Services services = services();
 
@@ -241,9 +241,9 @@ public class ManagedImportService {
         DatasetType type = getDsType(output.getDatasetType());
 
         if (files.length > 1 && !type.isExternal())
-            for (int i = 0; i < files.length; i++)
+            for (int i = 0; i < files.length; i++) // here we're making multiple datasets
                 createOutputTask(type, datasetName, user, output, services, new String[] { files[i] }, path);
-        else
+        else  // this is to make one dataset
             createOutputTask(type, datasetName, user, output, services, files, path);
     }
 
@@ -263,6 +263,7 @@ public class ManagedImportService {
         ImportCaseOutputTask task = new ImportCaseOutputTask(output, dataset, files, importer, user, services,
                 dbServerFactory, sessionFactory);
 
+        System.out.println("\nADDING IMPORT TASK FOR DATASET: "+datasetName+";files[0]="+files[0]);
         importTasks.add(task);
     }
 
@@ -279,19 +280,21 @@ public class ManagedImportService {
     public synchronized String[] importDatasetsForCaseOutput(User user, CaseOutput[] outputs) throws EmfException {
         List<String> submitterIds = new ArrayList<String>();
         
+        // here the files and path are for informational purposes (printing) only
+        String[] files = new String[] { outputs[0].getDatasetFile() };        
+        registerSubmitter(FOR_OUTPUT, outputs[0].getPath(), files);
+        
+        Services services = services();
+        
         for (CaseOutput output : outputs)
-            submitterIds.add(importDatasetForCaseOutput(user, output));
+            submitterIds.add(importDatasetForCaseOutput(user, output, services));
         
         return submitterIds.toArray(new String[0]);
     }
 
-    public synchronized String importDatasetForCaseOutput(User user, CaseOutput output) throws EmfException {
+    public synchronized String importDatasetForCaseOutput(User user, CaseOutput output, Services services) throws EmfException {
         String fileFolder = output.getPath();
-        String[] files = new String[] { output.getDatasetFile() };
-
-        registerSubmitter(FOR_OUTPUT, fileFolder, files);
-        Services services = services();
-
+ 
         try {
             addOutputTasks(user, output, services);
             addTasksToSubmitter(importCaseOutputSubmitter);
@@ -303,7 +306,22 @@ public class ManagedImportService {
         return importCaseOutputSubmitter.getSubmitterId();
     }
 
-    private synchronized EmfDataset createDataset(String folder, String filename, String datasetName, User user,
+    public synchronized String importDatasetForCaseOutput(User user, CaseOutput output) throws EmfException {
+        String fileFolder = output.getPath();
+        Services services = services();
+ 
+        try {
+            addOutputTasks(user, output, services);
+            addTasksToSubmitter(importCaseOutputSubmitter);
+        } catch (Exception e) {
+            setErrorMsgs(fileFolder, e);
+            throw new EmfException(e.getMessage());
+        }
+
+        return importCaseOutputSubmitter.getSubmitterId();
+    }
+
+   private synchronized EmfDataset createDataset(String folder, String filename, String datasetName, User user,
             DatasetType datasetType) {
         EmfDataset dataset = new EmfDataset();
         File file = new File(folder, filename);
@@ -369,5 +387,10 @@ public class ManagedImportService {
             throw new EmfException("Cannot apply pattern.");
         }
     }
+    
+    public String printStatusImportTaskManager() throws EmfException {
+        return TaskManagerFactory.getImportTaskManager().getStatusOfWaitAndRunTable();
+    }
+
 
 }

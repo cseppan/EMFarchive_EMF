@@ -56,9 +56,12 @@ public class EMFPersistedTasksRestoreClient {
             String caseJobTaskManagerStatus = caseService.printStatusCaseJobTaskManager();
             System.out.println(caseJobTaskManagerStatus);
      
-            String exportTaskManagerStatus = eximService.printStatusCaseJobTaskManager();
+            String exportTaskManagerStatus = eximService.printStatusExportTaskManager();
             System.out.println(exportTaskManagerStatus);
             
+            String importTaskManagerStatus = eximService.printStatusImportTaskManager();
+            System.out.println(importTaskManagerStatus);
+
         } catch (Exception exc) {
             System.out.println("Exception starting client: " + exc.getMessage());
             exc.printStackTrace();

@@ -412,7 +412,7 @@ public class ManagedExportService {
         }
     }
 
-    public String printStatusCaseJobTaskManager() throws EmfException {
+    public String printStatusExportTaskManager() throws EmfException {
         return TaskManagerFactory.getExportTaskManager().getStatusOfWaitAndRunTable();
     }
 

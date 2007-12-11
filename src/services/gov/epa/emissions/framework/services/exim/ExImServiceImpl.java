@@ -283,8 +283,12 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         exportDatasetidsWithOverwrite(user, datasetIds, null, folder, purpose);
     }
 
-    public String printStatusCaseJobTaskManager() throws EmfException {
-        return exportService.printStatusCaseJobTaskManager() ;
+    public String printStatusExportTaskManager() throws EmfException {
+        return exportService.printStatusExportTaskManager() ;
+    }
+
+    public String printStatusImportTaskManager() throws EmfException {
+        return managedImportService.printStatusImportTaskManager() ;
     }
 
 

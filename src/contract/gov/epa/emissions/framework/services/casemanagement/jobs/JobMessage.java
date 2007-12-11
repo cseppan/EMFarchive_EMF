@@ -4,8 +4,6 @@ import java.util.Date;
 
 public class JobMessage {
     
-    // Q: why isn't the key part of the message?
-
     private int id;
     
     private int caseId;

@@ -521,9 +521,9 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getCaseOutputs(caseId, jobId);
     }
 
-    public void registerOutput(CaseOutput output, String jobKey) throws EmfException {
-        getCaseService().registerOutput(output, jobKey);
-    }
+//    public void registerOutput(CaseOutput output, String jobKey) throws EmfException {
+//        getCaseService().registerOutput(output, jobKey);
+//    }
 
     public void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
         getCaseService().registerOutputs(outputs, jobKeys);
