@@ -240,11 +240,6 @@ public class ManagedImportService {
         File path = validatePath(folder);
         DatasetType type = getDsType(output.getDatasetType());
 
-        // Need to handle the case when the number of files allowed is unlimited
-        if ((type.getMaxFiles() != -1) && (files.length > type.getMaxFiles()))
-            throw new EmfException("Error registering output: Number of files (" 
-                    + files.length + ") exceeds limit for dataset type " + type.getName() + ".");
-        
         if (files.length > 1 && !type.isExternal())
             for (int i = 0; i < files.length; i++)
                 createOutputTask(type, datasetName, user, output, services, new String[] { files[i] }, path);
@@ -256,6 +251,10 @@ public class ManagedImportService {
             File path) throws Exception {
         if (datasetName == null || datasetName.trim().isEmpty())
             datasetName = files[0];
+        
+        if (files.length > type.getMaxFiles() && type.getMaxFiles() != -1)
+            throw new EmfException("Error registering output: Number of files (" 
+                    + files.length + ") exceeds limit for dataset type " + type.getName() + ".");
         
         EmfDataset dataset = createDataset(path.getAbsolutePath(), files[0], datasetName, user, type);
         isNameUnique(dataset.getName());
