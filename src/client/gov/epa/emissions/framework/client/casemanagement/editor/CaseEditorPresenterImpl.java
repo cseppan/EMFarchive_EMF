@@ -104,7 +104,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         caseObj.setLastModifiedDate(new Date());
 //        service().updateCase(caseObj);
         caseObj=service().updateCaseWithLock(caseObj);
-        managerPresenter.refreshWithLastCategory();
+//        managerPresenter.refreshWithLastCategory();
      
     }
 
@@ -205,5 +205,4 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
             outputsLoaded = true;
         }
     }
-
 }
