@@ -13,13 +13,16 @@ public class OutputsRowSource implements RowSource {
 
     private String[] datasetValues;
 
-    public OutputsRowSource(CaseOutput source, EmfSession session) throws EmfException {
+    public OutputsRowSource(CaseOutput source, EmfSession session) {
         this.source = source;
         this.session = session;
         this.datasetValues = getDatasetValues(source, session);
     }
 
     public Object[] values() {
+        if (datasetValues == null)
+            return null;
+        
         return new Object[] { getOutputName(source), getJobName(source), getSector(source), getDatasetProperty("name"),
                 getDatasetProperty("datasetType"), getStatus(source), getDatasetProperty("creator"),
                 getDatasetProperty("createdDateTime"), getExecName(source) };
@@ -80,7 +83,15 @@ public class OutputsRowSource implements RowSource {
         throw new EmfException("Under construction.");
     }
 
-    private String[] getDatasetValues(CaseOutput output, EmfSession session) throws EmfException {
-        return session.dataService().getDatasetValues(new Integer(output.getDatasetId()));
+    private String[] getDatasetValues(CaseOutput output, EmfSession session) {
+        String[] values = null;
+        
+        try {
+            values = session.dataService().getDatasetValues(new Integer(output.getDatasetId()));
+        } catch (Exception e) {
+            return null;
+        }
+        
+        return values;
     }
 }

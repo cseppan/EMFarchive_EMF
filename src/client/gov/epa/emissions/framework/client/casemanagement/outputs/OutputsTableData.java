@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.outputs;
 
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.ui.ChangeableTableData;
 import gov.epa.emissions.framework.ui.Row;
@@ -16,18 +15,18 @@ public class OutputsTableData extends ChangeableTableData {
     private List rows;
 
     private CaseOutput[] values;
-    
+
     private EmfSession session;
 
-    public OutputsTableData(CaseOutput[] values, EmfSession session) throws EmfException {
+    public OutputsTableData(CaseOutput[] values, EmfSession session) {
         this.values = values;
         this.session = session;
         this.rows = createRows(values);
     }
 
     public String[] columns() {
-        return new String[] { "Output name", "Job", "Sector", "Dataset Name",
-        		"Dataset Type", "Import Status","Creator", "Creation Date", "Exec Name"};
+        return new String[] { "Output name", "Job", "Sector", "Dataset Name", "Dataset Type", "Import Status",
+                "Creator", "Creation Date", "Exec Name" };
     }
 
     public Class getColumnClass(int col) {
@@ -38,9 +37,9 @@ public class OutputsTableData extends ChangeableTableData {
         return rows;
     }
 
-    public void add(CaseOutput output) throws EmfException {
-        Row row=row(output);
-        if (!rows.contains(row)){
+    public void add(CaseOutput output) {
+        Row row = row(output);
+        if (!rows.contains(row)) {
             rows.add(row);
             notifyChanges();
             refresh();
@@ -48,16 +47,24 @@ public class OutputsTableData extends ChangeableTableData {
         return;
     }
 
-    private List createRows(CaseOutput[] values) throws EmfException {
+    private List createRows(CaseOutput[] values) {
         List rows = new ArrayList();
         for (int i = 0; i < values.length; i++) {
-            rows.add(row(values[i]));
+            Row row = row(values[i]);
+
+            if (row != null)
+                rows.add(row);
         }
         return rows;
     }
 
-    private Row row(CaseOutput output) throws EmfException{
-        return new ViewableRow(new OutputsRowSource(output, session));
+    private Row row(CaseOutput output) {
+        OutputsRowSource source = new OutputsRowSource(output, session);
+
+        if (source.values() == null)
+            return null;
+
+        return new ViewableRow(source);
     }
 
     public boolean isEditable(int col) {
@@ -67,7 +74,7 @@ public class OutputsTableData extends ChangeableTableData {
     public CaseOutput[] getValues() {
         return values;
     }
-    
+
     private void removeFromList(CaseOutput output, List list) {
         for (Iterator iter = list.iterator(); iter.hasNext();) {
             ViewableRow row = (ViewableRow) iter.next();
@@ -77,15 +84,14 @@ public class OutputsTableData extends ChangeableTableData {
             return;
         }
     }
-    
-    public void remove(CaseOutput[] values) throws EmfException {
+
+    public void remove(CaseOutput[] values) {
         for (int i = 0; i < values.length; i++)
             removeFromList(values[i], rows);
         refresh();
     }
 
-
-    public void refresh() throws EmfException {
+    public void refresh() {
         CaseOutput[] outputs = sources();
         this.rows = createRows(outputs);
     }
@@ -99,10 +105,10 @@ public class OutputsTableData extends ChangeableTableData {
         List sources = sourcesList();
         return (CaseOutput[]) sources.toArray(new CaseOutput[0]);
     }
-    
+
     private List sourcesList() {
         List sources = new ArrayList();
-        
+
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             ViewableRow row = (ViewableRow) iter.next();
             sources.add(row.source());

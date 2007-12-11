@@ -93,14 +93,10 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
-        try {
-            super.add(createLayout(outputs), BorderLayout.CENTER);
-        } catch (EmfException e) {
-            messagePanel.setMessage(e.getMessage());
-        }
+        super.add(createLayout(outputs), BorderLayout.CENTER);
     }
 
-    private void doRefresh(CaseOutput[] outputs) throws EmfException{
+    private void doRefresh(CaseOutput[] outputs){
         messagePanel.clear();
         selectedJob=(CaseJob) jobCombo.getSelectedItem();
         super.removeAll();
@@ -108,7 +104,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
         super.revalidate();
     }
 
-    private JPanel createLayout(CaseOutput[] outputs) throws EmfException{
+    private JPanel createLayout(CaseOutput[] outputs){
         JPanel layout = new JPanel(new BorderLayout());
         layout.add(createTopPanel(), BorderLayout.NORTH);
         layout.add(tablePanel(outputs, parentConsole), BorderLayout.CENTER);
@@ -132,21 +128,17 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
             
         jobCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                CaseJob job=(CaseJob) jobCombo.getSelectedItem();
+                
                 try {
-                    CaseJob job=(CaseJob) jobCombo.getSelectedItem();
                     if (job == null){
                         doRefresh(new CaseOutput[0]);
                         return; 
                     }
                     CaseOutput[] outputs=presenter.getCaseOutputs(caseObj.getId(),job.getId());
-                    if (outputs.length==0) {
-                        doRefresh(new CaseOutput[0]);
-                        return;
-                    }
                     doRefresh(outputs);
-                } catch (EmfException e1) {
- //                   display();
-                    messagePanel.setError("Could not retrieve all outputs with -- " );
+                } catch (EmfException exc) {
+                    messagePanel.setError("Could not retrieve all outputs for job " + (job != null ? job.getName() : job) + ".");
                 }
             }
         });
@@ -157,7 +149,7 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         return panel;
     }
 
-    private JPanel tablePanel(CaseOutput[] outputs, EmfConsole parentConsole) throws EmfException{
+    private JPanel tablePanel(CaseOutput[] outputs, EmfConsole parentConsole){
         tableData = new OutputsTableData(outputs, session);
         changeables.addChangeable(tableData);
         selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
