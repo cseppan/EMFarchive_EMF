@@ -248,11 +248,18 @@ public class CaseDAO {
     private Case current(Case caze, Session session) {
         return (Case) hibernateFacade.current(caze.getId(), Case.class, session);
     }
-
+    
+    private Case current(int id, Class clazz, Session session) {
+        return (Case) hibernateFacade.current(id, clazz, session);
+    }
     public boolean caseInputExists(CaseInput input, Session session) {
         Criterion[] criterions = uniqueCaseInputCriteria(input);
 
         return hibernateFacade.exists(CaseInput.class, criterions, session);
+    }
+    
+    public boolean exists(int id, Class clazz, Session session) {
+        return hibernateFacade.exists(id, clazz, session);
     }
 
     private Criterion[] uniqueCaseInputCriteria(CaseInput input) {
@@ -785,8 +792,21 @@ public class CaseDAO {
     }
 
     public boolean canUpdate(Case caseObj, Session session) {
-        // NOTE Auto-generated method stub
-        return false;
-    }
+        if (!exists(caseObj.getId(), Case.class, session)) {
+            return false;
+        }
 
+        Case current = current(caseObj.getId(), Case.class, session);
+
+        session.clear();// clear to flush current
+
+        if (current.getName().equals(caseObj.getName()))
+            return true;
+
+        return !nameUsed(caseObj.getName(), Case.class, session);
+    }
+    
+    public boolean nameUsed(String name, Class clazz, Session session) {
+        return hibernateFacade.nameUsed(name, clazz, session);
+    }
  }
