@@ -2560,4 +2560,11 @@ public class ManagedCaseService {
         }
     }
 
+    public void removeCaseOutputs(CaseOutput[] outputs) throws EmfException {
+        
+        // NOTE Auto-generated method stub
+        if (false)
+            throw new EmfException("under construction...");
+    }
+
 }

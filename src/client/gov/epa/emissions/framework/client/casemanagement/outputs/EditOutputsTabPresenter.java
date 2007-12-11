@@ -1,9 +1,11 @@
 package gov.epa.emissions.framework.client.casemanagement.outputs;
 
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorTabPresenter;
+import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public interface EditOutputsTabPresenter extends CaseEditorTabPresenter {
 
@@ -12,6 +14,10 @@ public interface EditOutputsTabPresenter extends CaseEditorTabPresenter {
     CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException;
     
     CaseJob[] getCaseJobs()throws EmfException;
-    
 
-}
+    void doRemove(CaseOutput[] outputs) throws EmfException;
+
+    void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset);
+    
+    EmfDataset getDataset(int id) throws EmfException;
+}   

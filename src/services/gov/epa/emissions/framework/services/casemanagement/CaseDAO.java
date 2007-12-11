@@ -228,6 +228,10 @@ public class CaseDAO {
     public void removeCaseInputs(CaseInput[] inputs, Session session) {
         hibernateFacade.remove(inputs, session);
     }
+    
+    public void removeCaseOutputs(CaseOutput[] outputs, Session session) {
+        hibernateFacade.remove(outputs, session);
+    }
 
     public Case obtainLocked(User owner, Case element, Session session) {
         return (Case) lockingScheme.getLocked(owner, current(element, session), session);

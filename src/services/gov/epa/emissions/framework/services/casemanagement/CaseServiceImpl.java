@@ -225,6 +225,10 @@ public class CaseServiceImpl implements CaseService {
     public void removeCaseInputs(CaseInput[] inputs) throws EmfException {
         getCaseService().removeCaseInputs(inputs);
     }
+    
+    public void removeCaseOutputs(CaseOutput[] outputs) throws EmfException {
+        getCaseService().removeCaseOutputs(outputs);
+    }
 
     public CaseInput[] getCaseInputs(int caseId) throws EmfException {
         return getCaseService().getCaseInputs(caseId);

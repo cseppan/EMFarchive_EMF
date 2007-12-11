@@ -91,7 +91,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
 
     public void doSave() throws EmfException {
         updateCase();
-        closeView();
+//        closeView();
     }
 
     void updateCase() throws EmfException {
@@ -104,6 +104,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         caseObj.setLastModifiedDate(new Date());
         service().updateCase(caseObj);
         managerPresenter.refreshWithLastCategory();
+     
     }
 
     private void saveTabs() throws EmfException {

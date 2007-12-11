@@ -30,8 +30,6 @@ public class JobMessage {
     
     private Date receivedTime;
     
-    private boolean empty;
-    
     public JobMessage() {
         // needed for hibernate and axis serialization 
     }
@@ -134,12 +132,7 @@ public class JobMessage {
     
     public boolean isEmpty() {
         boolean result = status.isEmpty() && message.isEmpty() && period.isEmpty();
-        setEmpty(result);
         return result;
     }
 
-    private void setEmpty(boolean empty) {
-        this.empty = empty;
-    }
-    
 }

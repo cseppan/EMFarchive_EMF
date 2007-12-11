@@ -10,5 +10,7 @@ public interface EditOutputsTabView {
     void refresh() throws EmfException;
 
     void observe(EditOutputsTabPresenterImpl editOutputsTabPresenterImpl);
+
+    void clearMessage();
     
 }

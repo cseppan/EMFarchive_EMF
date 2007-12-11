@@ -252,9 +252,11 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private void doSave() {
         try {
             presenter.doSave();
+            messagePanel
+            .setMessage("Case was saved successfully.");
             resetChanges();
         } catch (EmfException e) {
-            showError("Please check abbreviation uniqueness. " + e.getMessage());
+            showError(e.getMessage());
         }
     }
 

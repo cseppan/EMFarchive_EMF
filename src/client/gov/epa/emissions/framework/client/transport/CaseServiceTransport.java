@@ -369,6 +369,17 @@ public class CaseServiceTransport implements CaseService {
 
         call.request(new Object[] { inputs });
     }
+    
+    public synchronized void removeCaseOutputs(CaseOutput[] outputs) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("removeCaseOutputs");
+        call.addParam("outputs", caseMappings.caseOutputs());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { outputs });
+    }
+
 
     public synchronized CaseInput[] getCaseInputs(int caseId) throws EmfException {
         EmfCall call = call();

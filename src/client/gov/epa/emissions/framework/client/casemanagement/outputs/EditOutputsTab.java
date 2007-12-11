@@ -14,15 +14,19 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
+import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -31,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
@@ -59,7 +64,10 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
     
     private List<CaseJob> caseJobs; 
     
-    private CaseJob selectedJob;
+    private CaseJob selectedJob=null;
+    
+    private DesktopManager desktopManager;
+
 
     public EditOutputsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager, EmfSession session) {
@@ -67,6 +75,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
         this.parentConsole = parentConsole;
         this.changeables = changeables;
         this.session=session; 
+        this.desktopManager=desktopManager;
         this.messagePanel=messagePanel;
  
         super.setLayout(new BorderLayout());
@@ -91,19 +100,19 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
         }
     }
 
-    private void doRefresh(CaseOutput[] outputs) throws EmfException {
+    private void doRefresh(CaseOutput[] outputs) throws EmfException{
+        messagePanel.clear();
         selectedJob=(CaseJob) jobCombo.getSelectedItem();
         super.removeAll();
         super.add(createLayout(outputs), BorderLayout.CENTER);
         super.revalidate();
     }
 
-    private JPanel createLayout(CaseOutput[] outputs) throws EmfException {
+    private JPanel createLayout(CaseOutput[] outputs) throws EmfException{
         JPanel layout = new JPanel(new BorderLayout());
         layout.add(createTopPanel(), BorderLayout.NORTH);
         layout.add(tablePanel(outputs, parentConsole), BorderLayout.CENTER);
         layout.add(controlPanel(), BorderLayout.PAGE_END);
-
         return layout;
     }
     
@@ -123,16 +132,21 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
             
         jobCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                CaseJob job=(CaseJob) jobCombo.getSelectedItem();
                 try {
-                    if (job == null) {
-                        jobCombo.setSelectedItem(job);
+                    CaseJob job=(CaseJob) jobCombo.getSelectedItem();
+                    if (job == null){
+                        doRefresh(new CaseOutput[0]);
+                        return; 
+                    }
+                    CaseOutput[] outputs=presenter.getCaseOutputs(caseObj.getId(),job.getId());
+                    if (outputs.length==0) {
                         doRefresh(new CaseOutput[0]);
                         return;
                     }
-                    doRefresh(presenter.getCaseOutputs(caseObj.getId(),job.getId()));
+                    doRefresh(outputs);
                 } catch (EmfException e1) {
-                    messagePanel.setError("Could not retrieve all outputs with -- " + job.getName());
+ //                   display();
+                    messagePanel.setError("Could not retrieve all outputs with -- " );
                 }
             }
         });
@@ -143,11 +157,10 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         return panel;
     }
 
-    private JPanel tablePanel(CaseOutput[] outputs, EmfConsole parentConsole) throws EmfException {
+    private JPanel tablePanel(CaseOutput[] outputs, EmfConsole parentConsole) throws EmfException{
         tableData = new OutputsTableData(outputs, session);
         changeables.addChangeable(tableData);
         selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
-
         tablePanel = new JPanel(new BorderLayout());
         tablePanel.add(createSortFilterPanel(parentConsole), BorderLayout.CENTER);
 
@@ -165,6 +178,9 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
     private JPanel controlPanel() {
         JPanel container = new JPanel();
         Insets insets = new Insets(1, 2, 1, 2);
+        
+//        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
+//        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
 
         Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -174,6 +190,20 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         add.setMargin(insets);
         add.setEnabled(false);
         container.add(add);
+        
+        Button remove = new RemoveButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
+                try {
+                    removeSelectedOutput();
+                } catch (EmfException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        remove.setMargin(insets);
+        remove.setEnabled(false);
+        container.add(remove);
 
         Button Edit = new EditButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -186,21 +216,16 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         
         Button view = new ViewButton("View Dataset", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //
+                try {
+                    doDisplayOutputDatasetsPropertiesViewer();
+                } catch (EmfException e1) {
+                    messagePanel.setMessage(e1.getMessage());
+                }
             }
         });
         view.setMargin(insets);
         view.setEnabled(false);
         container.add(view);
-        
-        Button remove = new RemoveButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                //
-            }
-        });
-        remove.setMargin(insets);
-        remove.setEnabled(false);
-        container.add(remove);
         
         Button export = new ExportButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -213,21 +238,125 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
-
         return panel;
     }
 
-    public void refresh() throws EmfException {
-        doRefresh(tableData.sources());
+    protected void doDisplayOutputDatasetsPropertiesViewer() throws EmfException {
+        messagePanel.clear();
+        List selected = selectModel.selected();
+        if (selected.size() == 0) {
+            throw new EmfException ("Please select one or more outputs to view.");
+        }
+        for (int i=0; i<selected.size(); i++) {
+            int id=((CaseOutput) selected.get(i)).getDatasetId();
+            EmfDataset dataset = presenter.getDataset(id);
+            PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
+            DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
+            presenter.doDisplay(view);
+        }
+    }
+
+//    private List<EmfDataset> getSelectedDatasets(List outputlist) throws EmfException {
+//        List<EmfDataset> datasetList = new ArrayList<EmfDataset>();
+//        if (outputlist.size()==0)
+//            return null;
+//        messagePanel.setError("dataset id is : " + ((CaseOutput)outputlist.get(0)).toString());
+//        for (int i = 0; i < outputlist.size(); i++) {
+//            int id=((CaseOutput) outputlist.get(i)).getDatasetId();
+//            if ( id==0){
+//                String ids=(id==0? "null": "not null "+id);
+//                messagePanel.setError("dataset id is ---- " + ids);
+//                return null;
+//            }
+//            EmfDataset dataset = presenter.getDataset(id);
+//            if (dataset != null)
+//                datasetList.add(dataset);
+//        }
+//        return datasetList;
+//    }
+
+    private void removeSelectedOutput() throws EmfException {
+        messagePanel.clear();
+        CaseOutput[] selected =selectModel.selected().toArray(new CaseOutput[0]);
+
+        if (selected.length==0) {
+            messagePanel.setMessage("Please select one or more outputs to remove.");
+            return;
+        }
+
+        String title = "Warning";
+        String message = "Are you sure you want to remove the selected output(s)?";
+        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (selection == JOptionPane.NO_OPTION) {
+            return;
+        }
+
+        messagePanel.setMessage("Please wait while removing cases...");
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        if (selection == JOptionPane.YES_OPTION) {
+            tableData.remove(selected);
+            refresh();
+            presenter.doRemove(selected);
+        }
+         clearMessage();
+        setCursor(Cursor.getDefaultCursor());
+        messagePanel.setMessage("Finished removing outputs.");
+    }
+    public void refresh(){
+        // note that this will get called when the case is save
+        try {
+            if (tableData != null) // it's still null if you've never displayed this tab
+                doRefresh(tableData.sources());
+        } catch (Exception e) {
+            messagePanel.setError("Cannot refresh current tab. " + e.getMessage());
+        }
     }
 
     public void doRefresh() throws EmfException {
-        doRefresh(tableData.sources());
+        try {
+            kickPopulateThread();
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
     }
+
 
     public void observe(EditOutputsTabPresenterImpl presenter) {
         this.presenter = presenter;
         this.caseObj=presenter.getCaseObj();
     }
+    
+    private void kickPopulateThread() {
+        Thread populateThread = new Thread(new Runnable() {
+            public void run() {
+                retrieveOutputs();
+            }
+        });
+        populateThread.start();
+    }
+    
+    private synchronized void retrieveOutputs() {
+        try {
+            messagePanel.setMessage("Please wait while retrieving all outputs...");
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            if ( selectedJob == null){
+                clearMessage();
+                setCursor(Cursor.getDefaultCursor());
+            }
+            else {
+                doRefresh(presenter.getCaseOutputs(caseObj.getId(), selectedJob.getId()));
+                messagePanel.clear();
+                setCursor(Cursor.getDefaultCursor());
+            }
+        } catch (Exception e) {
+            messagePanel.setError("Cannot retrieve all outputs.");
+            setCursor(Cursor.getDefaultCursor());
+        }
+    }
 
+    public void clearMessage() {
+        messagePanel.clear();
+    }
 }
