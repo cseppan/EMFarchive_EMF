@@ -1797,8 +1797,13 @@ public class ManagedCaseService {
          * Note: this could be bash or tcsh format, could easily modify for other languages, for example python, perl,
          * etc.
          */
-        String setenvLine = this.runSet + " " + envvariable + this.runEq + envvalue + this.runTerminator;
-        return setenvLine + eolString;
+        String setenvLine;
+        if (envvalue.indexOf(' ') >= 0)
+            setenvLine = this.runSet + " " + envvariable + this.runEq + addQuotes(envvalue) + this.runTerminator;
+        else
+            setenvLine = this.runSet + " " + envvariable + this.runEq + envvalue + this.runTerminator;
+           
+       return setenvLine + eolString;
 
     }
 
