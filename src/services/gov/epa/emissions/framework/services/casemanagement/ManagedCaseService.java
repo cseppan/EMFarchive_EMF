@@ -2004,7 +2004,7 @@ public class ManagedCaseService {
         }
         // Need to have quotes around model name b/c could be more than one word
         if (caseObj.getModel() != null) {
-            String modelName = addQuotes(caseObj.getModel().getName());
+            String modelName = caseObj.getModel().getName();
             sbuf.append(shellSetenv("MODEL_LABEL", modelName));
         }
         if (caseObj.getGrid() != null) {
@@ -2014,10 +2014,10 @@ public class ManagedCaseService {
             sbuf.append(shellSetenv("EMF_GRID", caseObj.getGridResolution().getName()));
         }
         if (caseObj.getAirQualityModel() != null) {
-            sbuf.append(shellSetenv("EMF_AQM", addQuotes(caseObj.getAirQualityModel().getName())));
+            sbuf.append(shellSetenv("EMF_AQM", caseObj.getAirQualityModel().getName()));
         }
         if (caseObj.getSpeciation() != null) {
-            sbuf.append(shellSetenv("EMF_SPC", addQuotes(caseObj.getSpeciation().getName())));
+            sbuf.append(shellSetenv("EMF_SPC", caseObj.getSpeciation().getName()));
         }
         if (caseObj.getEmissionsYear() != null) {
             sbuf.append(shellSetenv("BASE_YEAR", caseObj.getEmissionsYear().getName())); // Should base year ==
@@ -2029,11 +2029,11 @@ public class ManagedCaseService {
         }
         // Need to have quotes around start and end date b/c could be more than one word 'DD/MM/YYYY HH:MM'
         if (caseObj.getStartDate() != null) {
-            String startString = addQuotes(caseObj.getStartDate().toString());
+            String startString = caseObj.getStartDate().toString();
             sbuf.append(shellSetenv("EPI_STDATE_TIME", startString));
         }
         if (caseObj.getEndDate() != null) {
-            String endString = addQuotes(caseObj.getEndDate().toString());
+            String endString = caseObj.getEndDate().toString();
             sbuf.append(shellSetenv("EPI_ENDATE_TIME", endString));
         }
 
