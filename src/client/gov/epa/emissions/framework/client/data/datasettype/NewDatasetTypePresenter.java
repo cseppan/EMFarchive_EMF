@@ -27,7 +27,7 @@ public class NewDatasetTypePresenter {
         mapImport.put("CSV File", "gov.epa.emissions.commons.io.csv.CSVImporter");
         mapImport.put("Line-based File", "gov.epa.emissions.commons.io.generic.LineImporter");
         mapImport.put("SMOKE Report File", "gov.epa.emissions.commons.io.other.SMKReportImporter");
-        mapExport.put("External File", "");
+        mapExport.put("External File", "gov.epa.emissions.commons.io.external.ExternalFilesExporter");
         mapExport.put("CSV File", "gov.epa.emissions.commons.io.csv.CSVExporter");
         mapExport.put("Line-based File", "gov.epa.emissions.commons.io.generic.LineExporter");
         mapExport.put("SMOKE Report File", "gov.epa.emissions.commons.io.other.SMKReportExporter");
