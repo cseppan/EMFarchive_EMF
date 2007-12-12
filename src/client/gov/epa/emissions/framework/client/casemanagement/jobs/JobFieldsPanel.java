@@ -541,7 +541,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
     private void showRemind() throws EmfException {
         String title = "Warning";
-        String message = "A similar job already existed for this case. Are you sure want to add another one?";
+        String message = "A similar job already exists for this case. Are you sure want to add another one?";
         int selection = JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 

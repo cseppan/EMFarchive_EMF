@@ -155,7 +155,7 @@ public class RemoteCopy {
             return "Please check temporary folder permission/existance specified in the preference file (EMFPrefs.txt).";
 
         if (errorString.contains("not recognized as an internal or external command"))
-            return "Please check the ssh program specified in the preference file (EMFPrefs.txt).";
+            return "Please check the remote copy program specified in the preference file (EMFPrefs.txt).";
 
         if (errorString.contains("disconnected") || errorString.contains("connection refused"))
             return "Please check your network connection or ssh connection.";
