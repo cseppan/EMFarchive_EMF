@@ -521,7 +521,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             File subdir = new File(folder, subfolder);
             
             if (subdir.exists())
-                throw new EmfException("Subfolder " + subfolder + " already existed.");
+                throw new EmfException("Subfolder " + subfolder + " already exists.");
             
             if (subdir.mkdirs()) {
                 subdir.setWritable(true, false);

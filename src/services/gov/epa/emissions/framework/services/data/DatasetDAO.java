@@ -343,7 +343,7 @@ public class DatasetDAO {
 
             while (resultSet.next())
                 if (resultSet.getString(1).trim().equalsIgnoreCase(name.trim())) {
-                    LOG.warn("dataset name: " + name + " already existed.");
+                    LOG.warn("dataset name: " + name + " already exists.");
                     nameexists = true;
                     break;
                 }
