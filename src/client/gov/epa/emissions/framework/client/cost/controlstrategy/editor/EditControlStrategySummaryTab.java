@@ -399,7 +399,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     public void setRunMessage(ControlStrategy controlStrategy) {
         messagePanel.clear();
         updateStartDate(controlStrategy);
-        updateSummaryPanelValuesExceptStartDate("", "Running", "", "");
+        updateSummaryPanelValuesExceptStartDate("Running", "", "", "");
     }
 
     public void stopRun() {
@@ -423,10 +423,10 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         String completionTime = runStatus.indexOf("Failed") == -1 ? summary.getCompletionTime() : "Failed";
         String userName =controlStrategy.getCreator().getName();
 //        String userName= summary.getUser().getName()== null ? summary.getUser().getName() : "";
-        String startTime = summary.getStartTime() == null? summary.getStartTime(): "";
+        String startTime = summary.getStartTime() != null? summary.getStartTime(): "";
         updateStartDate(startTime);
-        updateSummaryPanelValuesExceptStartDate(userName, "" + completionTime, "" + summary.getStrategyTotalCost(), ""
-                + summary.getStrategyTotalReduction());
+        updateSummaryPanelValuesExceptStartDate(""+completionTime, "" + userName , "" + summary.getStrategyTotalCost(), 
+                ""+ summary.getStrategyTotalReduction());
     }
 
     private void updateStartDate(String startTime) {
@@ -438,7 +438,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         startDate.setText((startDateString == null ? "Not started" : startDateString));
     }
 
-    private void updateSummaryPanelValuesExceptStartDate(String userName, String closeDate, String cost, String emisReduction) {
+    private void updateSummaryPanelValuesExceptStartDate(String closeDate, String userName,  String cost, String emisReduction) {
         completionDate.setText(closeDate);
         user.setText(userName);
         costValue.setText(cost.length() == 0 ? "" : decFormat.format(new Double(cost)));
