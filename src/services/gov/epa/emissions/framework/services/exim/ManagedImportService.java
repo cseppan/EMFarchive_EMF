@@ -16,11 +16,13 @@ import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.ImportCaseOutputSubmitter;
 import gov.epa.emissions.framework.tasks.ImportCaseOutputTask;
 import gov.epa.emissions.framework.tasks.ImportClientSubmitter;
+import gov.epa.emissions.framework.tasks.ImportSubmitter;
 import gov.epa.emissions.framework.tasks.TaskManagerFactory;
 import gov.epa.emissions.framework.tasks.TaskSubmitter;
 
@@ -42,9 +44,9 @@ public class ManagedImportService {
 
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MMddyy_HHmmss");
 
-    private TaskSubmitter importClientSubmitter = null;
+    private ImportSubmitter importClientSubmitter = null;
 
-    private TaskSubmitter importCaseOutputSubmitter = null;
+    private ImportSubmitter importCaseOutputSubmitter = null;
 
     private ArrayList<Runnable> importTasks = new ArrayList<Runnable>();
 
@@ -102,15 +104,9 @@ public class ManagedImportService {
         return file;
     }
 
-    private synchronized void isNameUnique(String name) throws Exception {
+    private synchronized boolean isNameUnique(String name) throws Exception {
         DatasetDAO dao = new DatasetDAO(dbServerFactory);
-        boolean nameUsed = dao.datasetNameUsed(name);
-
-        if (nameUsed) {
-            // AME: no need to log this as an error
-            // log.error("Dataset name " + dataset.getName() + " is already used");
-            throw new EmfException("Dataset name is already used");
-        }
+        return dao.datasetNameUsed(name);
     }
 
     public synchronized String importDatasetsForClient(User user, String folderPath, String[] filenames,
@@ -150,7 +146,7 @@ public class ManagedImportService {
     private synchronized void registerSubmitter(String task, String folderPath, String[] filenames) {
         // The service instance (one per session) will have only one submitter for the type of service
         // Here the TaskManagerImportService has one reference to the ImportClientSubmitter
-        TaskSubmitter submitter = null;
+        ImportSubmitter submitter = null;
 
         if (task.equals(FOR_CLIENT)) {
             if (importClientSubmitter == null)
@@ -209,7 +205,9 @@ public class ManagedImportService {
     private synchronized void addTasks(String folder, File path, String[] filenames, String dsName, User user,
             DatasetType dsType, Services services) throws Exception {
         EmfDataset dataset = createDataset(folder, filenames[0], dsName, user, dsType);
-        isNameUnique(dataset.getName());
+        
+        if (isNameUnique(dataset.getName()))
+            dataset.setName(dataset.getName() + "_" + EmfDateFormat.format_yyyy_MM_dd_HHmmssSS(new Date()));
 
         Importer importer = importerFactory.createVersioned(dataset, path, filenames);
         ImportTask task = new ImportTask(dataset, filenames, importer, user, services, dbServerFactory, sessionFactory);
