@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.tasks;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.basic.StatusDAO;
 
 public class ImportCaseOutputSubmitter extends ImportSubmitter {
 
@@ -23,22 +22,22 @@ public class ImportCaseOutputSubmitter extends ImportSubmitter {
                             + " message= " + mesg);
 
         User user = null;
-        StatusDAO statusServices = null;
+        //StatusDAO statusServices = null;
         Task task = null;
 
         task = submittedTable.get(taskId).getImportTask();
         user = task.getUser();
-        statusServices = task.getStatusServices();
+        //statusServices = task.getStatusServices();
         
         if (DebugLevels.DEBUG_0) {
             System.out.println("!!!ImportCaseOutputSubmitter: User: " + user);
             System.out.println("!!!ImportCaseOutputSubmitter: Task: " + task.getSubmitterId());
-            System.out.println("!!!ImportCaseOutputSubmitter: statusDAO: " + statusServices);
+            //System.out.println("!!!ImportCaseOutputSubmitter: statusDAO: " + statusServices);
         }
 
         // FIXME: After moving this code to ImportJobSubmitter only write out failed importtask messages here
         // Set the status in the EMF Status messages table corresponding the callback message received
-        this.setStatus(user, statusServices, mesg);
+        //this.setStatus(user, statusServices, mesg);
 
         if (DebugLevels.DEBUG_0) {
             System.out.println("!!!ImportCaseOutputSubmitter: passed setStatus()");
