@@ -115,16 +115,20 @@ public abstract class ImportSubmitter implements TaskSubmitter {
         // NOTE Auto-generated method stub
 
     }
-
+    
     public synchronized int getTaskCount() {
         return this.submittedTable.size();
     }
 
     public synchronized void deregisterSubmitterFromRunManager(TaskSubmitter ts) {
-        ImportTaskManager.deregisterSubmitter(ts);
+        ImportTaskManager.deregisterSubmitter((ImportSubmitter)ts);
     }
 
     protected synchronized void setStatus(User user, StatusDAO statusServices, String message) {
+        if (DebugLevels.DEBUG_10)
+            System.out.println("Import submitter " + this.submitterId + " setting status " 
+                    + "; Message: " + message + "; On thread " + Thread.currentThread().getId());
+        
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());
         endStatus.setType("Import");

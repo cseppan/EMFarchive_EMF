@@ -159,6 +159,10 @@ public class ImportTask extends Task {
     }
 
     protected void setStatus(String status, String message) {
+        if (DebugLevels.DEBUG_10)
+            System.out.println("Import task (id: " + taskId + ") in submitter " + this.submitterId + " setting status " 
+                    + status + "; Message: " + message + "; On thread " + Thread.currentThread().getId());
+            
         ImportTaskManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(), message);
     }
 
