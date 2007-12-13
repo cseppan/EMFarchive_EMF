@@ -24,6 +24,8 @@ public class ImportTaskManager implements TaskManager {
     private static ImportTaskManager ref;
 
     private static int refCount = 0;
+    
+    private static int processQueueCount = 0;
 
     private final int poolSize = 4;
 
@@ -31,7 +33,7 @@ public class ImportTaskManager implements TaskManager {
 
     private final long keepAliveTime = 60;
 
-    private static ArrayList<TaskSubmitter> submitters = new ArrayList<TaskSubmitter>();
+    private static ArrayList<ImportSubmitter> submitters = new ArrayList<ImportSubmitter>();
 
     private static ThreadPoolExecutor threadPool = null;
 
@@ -73,11 +75,11 @@ public class ImportTaskManager implements TaskManager {
         taskQueue.removeAll(tasks);
     }
 
-    public synchronized void registerTaskSubmitter(TaskSubmitter ts) {
+    public synchronized void registerTaskSubmitter(ImportSubmitter ts) {
         submitters.add(ts);
     }
 
-    public static synchronized void deregisterSubmitter(TaskSubmitter ts) {
+    public static synchronized void deregisterSubmitter(ImportSubmitter ts) {
         if (DebugLevels.DEBUG_1)
             System.out.println("DeREGISTERED SUBMITTER: " + ts.getSubmitterId() + " Confirm task count= "
                     + ts.getTaskCount());
@@ -133,6 +135,9 @@ public class ImportTaskManager implements TaskManager {
     }
 
     public static synchronized void processTaskQueue() {
+        if (DebugLevels.DEBUG_10)
+            System.out.println("<<<>>>ImportTaskManager: processTaskQueue() called " + ++processQueueCount + " times.");
+        
         int threadsAvail = -99;
         try {
             if (DebugLevels.DEBUG_9) {
@@ -310,9 +315,9 @@ public class ImportTaskManager implements TaskManager {
                     + " completed with status= " + status + " and message= " + mesg);
         }
         
-        Iterator<TaskSubmitter> iter = submitters.iterator();
+        Iterator<ImportSubmitter> iter = submitters.iterator();
         while (iter.hasNext()) {
-            TaskSubmitter submitter = iter.next();
+            ImportSubmitter submitter = iter.next();
             if (submitterId.equals(submitter.getSubmitterId())) {
                 if (DebugLevels.DEBUG_9)
                     System.out.println(">>@@ Found a submitter in the taskmanager collection of submitters");
@@ -332,6 +337,8 @@ public class ImportTaskManager implements TaskManager {
             System.out.println("Size of RUN TABLE: " + runTable.size());
         }
 
+        ImportSubmitter submitter = getCurrentSubmitter(submitterId);
+        
         if (status.equals("started")) {
             if (DebugLevels.DEBUG_9)
                 System.out.println("%%%% ImportTaskManager reports that Task# " + taskId
@@ -351,17 +358,10 @@ public class ImportTaskManager implements TaskManager {
             }
         }
         
-        Iterator<TaskSubmitter> iter = submitters.iterator();
+        submitter.callbackFromTaskManager(taskId, status, mesg);
         
-        while (iter.hasNext()) {
-            TaskSubmitter submitter = iter.next();
-            if (submitterId.equals(submitter.getSubmitterId())) {
-                if (DebugLevels.DEBUG_9)
-                    System.out.println("@@##@@ Found a submitter in the taskmanager collection of submitters: "
-                            + submitter.getSubmitterId());
-                submitter.callbackFromTaskManager(taskId, status, mesg);
-            }
-        }
+        if (submitter.getTaskCount() == 0)
+            submitter.deregisterSubmitterFromRunManager(submitter);
 
         // done with the call back ... so process the two tables and task queue
         processTaskQueue();
@@ -369,6 +369,22 @@ public class ImportTaskManager implements TaskManager {
         if (DebugLevels.DEBUG_9)
             System.out.println("*** END ImportTaskManager::callBackFromThread() *** " + new Date());
 
+    }
+    
+    private static synchronized ImportSubmitter getCurrentSubmitter(String submitterId) {
+        Iterator<ImportSubmitter> iter = submitters.iterator();
+        
+        while (iter.hasNext()) {
+            ImportSubmitter submitter = iter.next();
+            if (submitterId.equals(submitter.getSubmitterId())) {
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("@@##@@ Found a submitter in the taskmanager collection of submitters: "
+                            + submitter.getSubmitterId());
+                return submitter;
+            }
+        }
+        
+        return null;
     }
 
     private String createStatusMessage() throws EmfException {
