@@ -38,6 +38,7 @@ import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.Date;
 
 import org.hibernate.Session;
 
@@ -218,8 +219,8 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         result.setDetailedResultDataset(createResultDataset(inputDataset));
         
         result.setStrategyResultType(getDetailedStrategyResultType());
- //       result.setStartTime(new Date());
-        result.setStartTime(controlStrategy.getStartDate());
+        result.setStartTime(new Date());
+ //       result.setStartTime(controlStrategy.getStartDate()==null? (new Date()):controlStrategy.getStartDate());
         result.setRunStatus("Start processing dataset");
 
         //persist result
