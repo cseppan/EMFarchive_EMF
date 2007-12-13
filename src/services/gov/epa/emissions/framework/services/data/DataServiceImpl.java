@@ -46,7 +46,7 @@ public class DataServiceImpl implements DataService {
             throw new EmfException("Could not get all Datasets");
         }
     }
-    
+
     public synchronized EmfDataset getDataset(Integer datasetId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -62,10 +62,10 @@ public class DataServiceImpl implements DataService {
 
     public synchronized EmfDataset getDataset(String datasetName) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             EmfDataset dataset = dao.getDataset(session, datasetName);
-            
+
             return dataset;
         } catch (RuntimeException e) {
             LOG.error("Could not get dataset " + datasetName, e);
@@ -114,16 +114,16 @@ public class DataServiceImpl implements DataService {
             if (!dao.canUpdate(dataset, session))
                 throw new EmfException("The Dataset name is already in use");
 
-            if ( type != null && type.getTablePerDataset() > 1)
+            if (type != null && type.getTablePerDataset() > 1)
                 LOG.info("Renaming emission tables for dataset " + dataset.getName() + " is not allowed.");
-            
+
             EmfDataset released = dao.update(dataset, session);
             session.close();
 
             return released;
         } catch (Exception e) {
-            LOG.error("Could not update Dataset: " + dataset.getName()+" "+e.getMessage(), e);
-            throw new EmfException("Could not update Dataset: "+e.getMessage());
+            LOG.error("Could not update Dataset: " + dataset.getName() + " " + e.getMessage(), e);
+            throw new EmfException("Could not update Dataset: " + e.getMessage());
         }
     }
 
@@ -142,11 +142,11 @@ public class DataServiceImpl implements DataService {
 
     public synchronized void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException {
         String prefix = "DELETED_" + new Date().getTime() + "_";
-        
+
         try {
             if (isRemovable(datasets, owner)) {
                 for (int i = 0; i < datasets.length; i++) {
-                    if(datasets[i].getStatus().equalsIgnoreCase("Deleted"))
+                    if (datasets[i].getStatus().equalsIgnoreCase("Deleted"))
                         continue;
                     datasets[i].setName(prefix + datasets[i].getName());
                     datasets[i].setStatus("Deleted");
@@ -191,15 +191,20 @@ public class DataServiceImpl implements DataService {
     }
 
     public synchronized String[] getDatasetValues(Integer datasetId) throws EmfException {
-        EmfDataset dataset = getDataset(datasetId);
+        EmfDataset dataset = null;
         List<String> values = new ArrayList<String>();
-        
-        values.add("name," + dataset.getName());
-        values.add("datasetType," + dataset.getDatasetTypeName());
-        values.add("creator," + dataset.getCreator());
-        values.add("createdDateTime," + dataset.getCreatedDateTime());
-        values.add("status," + dataset.getStatus());
-        
+
+        if (datasetId == null || datasetId.intValue() == 0)
+            dataset = new EmfDataset();
+        else
+            dataset = getDataset(datasetId);
+
+        values.add("name," + (dataset.getName() == null ? "" : dataset.getName()));
+        values.add("datasetType," + (dataset.getDatasetTypeName() == null ? "" : dataset.getDatasetTypeName()));
+        values.add("creator," + (dataset.getCreator() == null ? "" : dataset.getCreator()));
+        values.add("createdDateTime," + (dataset.getCreatedDateTime() == null ? "" : dataset.getCreatedDateTime()));
+        values.add("status," + (dataset.getStatus() == null ? "" : dataset.getStatus()));
+
         return values.toArray(new String[0]);
     }
 

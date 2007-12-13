@@ -66,6 +66,8 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
     
     private CaseJob selectedJob=null;
     
+    private CaseOutput selectedOutput;
+    
     private DesktopManager desktopManager;
 
 
@@ -210,8 +212,9 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
             public void actionPerformed(ActionEvent e) {
                 try {
                     displayOutputDatasetsPropertiesViewer();
-                } catch (EmfException e1) {
-                    messagePanel.setMessage(e1.getMessage());
+                } catch (Exception e1) {
+                    messagePanel.setError("Could not get dataset for output " + selectedOutput.getName() + "." 
+                            + (e1.getMessage() == null ? "" : e1.getMessage()));
                 }
             }
         });
@@ -235,15 +238,18 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
     protected void displayOutputDatasetsPropertiesViewer() throws EmfException {
         messagePanel.clear();
         List selected = selectModel.selected();
+        
         if (selected.size() == 0) {
-            throw new EmfException ("Please select one or more outputs to view.");
+            messagePanel.setMessage("Please select one or more outputs to view.");
+            return;
         }
+        
         for (int i=0; i<selected.size(); i++) {
-            CaseOutput output = (CaseOutput) selected.get(i);
-            if (output==null){ 
+            selectedOutput = (CaseOutput) selected.get(i);
+            if (selectedOutput == null){ 
                 throw new EmfException("Output is null "); 
             }
-            int id=output.getDatasetId();
+            int id = selectedOutput.getDatasetId();
             EmfDataset dataset = presenter.getDataset(id);
             PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
             DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
