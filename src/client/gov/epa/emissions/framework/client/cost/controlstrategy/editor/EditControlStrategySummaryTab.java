@@ -423,7 +423,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         String completionTime = runStatus.indexOf("Failed") == -1 ? summary.getCompletionTime() : "Failed";
         String userName =controlStrategy.getCreator().getName();
 //        String userName= summary.getUser().getName()== null ? summary.getUser().getName() : "";
-        String startTime = summary.getStartTime() != null? summary.getStartTime(): "";
+        String startTime = summary.getStartTime()== null ||summary.getStartTime().trim()==""? "":summary.getStartTime();
+//        String startTime = controlStrategy.getStartDate();
         updateStartDate(startTime);
         updateSummaryPanelValuesExceptStartDate(""+completionTime, "" + userName , "" + summary.getStrategyTotalCost(), 
                 ""+ summary.getStrategyTotalReduction());
@@ -435,7 +436,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private void updateStartDate(ControlStrategy controlStrategy) {
         String startDateString = EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(controlStrategy.getStartDate());
-        startDate.setText((startDateString == null ? "Not started" : startDateString));
+        startDate.setText((startDateString == null ||startDateString.trim()=="" ? "Not started" : startDateString));
     }
 
     private void updateSummaryPanelValuesExceptStartDate(String closeDate, String userName,  String cost, String emisReduction) {
