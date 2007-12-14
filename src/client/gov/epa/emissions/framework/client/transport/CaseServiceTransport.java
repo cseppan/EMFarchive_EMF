@@ -370,11 +370,13 @@ public class CaseServiceTransport implements CaseService {
         call.request(new Object[] { inputs });
     }
     
-    public synchronized void removeCaseOutputs(CaseOutput[] outputs) throws EmfException {
+    public synchronized void removeCaseOutputs(User user, CaseOutput[] outputs, boolean deleteDataset) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("removeCaseOutputs");
+        call.addParam("user", dataMappings.user());
         call.addParam("outputs", caseMappings.caseOutputs());
+        call.addBooleanParameter("deleteDataset");
         call.setVoidReturnType();
 
         call.request(new Object[] { outputs });
@@ -786,4 +788,5 @@ public class CaseServiceTransport implements CaseService {
 
         return (Case) call.requestResponse(new Object[] { caseObj });
     }
+
 }

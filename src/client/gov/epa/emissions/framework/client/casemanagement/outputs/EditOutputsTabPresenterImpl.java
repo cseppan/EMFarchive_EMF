@@ -53,7 +53,7 @@ public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
 
 
     public void doRemove(CaseOutput[] outputs) throws EmfException {
-       service().removeCaseOutputs(outputs);
+       service().removeCaseOutputs(session.user(), outputs, true);
     }
     
     public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) {

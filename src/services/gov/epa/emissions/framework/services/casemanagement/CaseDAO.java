@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParame
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
@@ -83,20 +84,20 @@ public class CaseDAO {
             session.close();
         }
     }
-    
+
     public boolean caseOutputNameUsed(String outputName) {
         Session session = sessionFactory.getSession();
         List outputs = null;
-        
+
         try {
             Criterion criterion = Restrictions.eq("name", outputName);
-            outputs =  hibernateFacade.get(CaseOutput.class, criterion, session);
+            outputs = hibernateFacade.get(CaseOutput.class, criterion, session);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             session.close();
         }
-        
+
         return (outputs != null && outputs.size() > 0);
     }
 
@@ -228,9 +229,14 @@ public class CaseDAO {
     public void removeCaseInputs(CaseInput[] inputs, Session session) {
         hibernateFacade.remove(inputs, session);
     }
-    
-    public void removeCaseOutputs(CaseOutput[] outputs, Session session) {
-        hibernateFacade.remove(outputs, session);
+
+    public void removeCaseOutputs(CaseOutput[] outputs, boolean removeDatasets, Session session) {
+        try {
+            if (removeDatasets)
+                removeDatasetsOnOutput(session, outputs);
+        } finally {
+            hibernateFacade.remove(outputs, session);
+        }
     }
 
     public Case obtainLocked(User owner, Case element, Session session) {
@@ -248,16 +254,17 @@ public class CaseDAO {
     private Case current(Case caze, Session session) {
         return (Case) hibernateFacade.current(caze.getId(), Case.class, session);
     }
-    
+
     private Case current(int id, Class clazz, Session session) {
         return (Case) hibernateFacade.current(id, clazz, session);
     }
+
     public boolean caseInputExists(CaseInput input, Session session) {
         Criterion[] criterions = uniqueCaseInputCriteria(input);
 
         return hibernateFacade.exists(CaseInput.class, criterions, session);
     }
-    
+
     public boolean exists(int id, Class clazz, Session session) {
         return hibernateFacade.exists(id, clazz, session);
     }
@@ -446,7 +453,7 @@ public class CaseDAO {
     public List<JobRunStatus> getJobRunStatuses(Session session) {
         return hibernateFacade.getAll(JobRunStatus.class, Order.asc("name"), session);
     }
-    
+
     public JobRunStatus getJobRunStatuse(String status, Session session) {
         Criterion crit = Restrictions.eq("name", status);
         return (JobRunStatus) hibernateFacade.load(JobRunStatus.class, crit, session);
@@ -770,8 +777,8 @@ public class CaseDAO {
         } finally {
             session.close();
         }
-        
-        return cases == null ? null : (Case[])cases.toArray(new Case[0]);
+
+        return cases == null ? null : (Case[]) cases.toArray(new Case[0]);
     }
 
     public List<CaseOutput> getCaseOutputs(int caseId, Session session) {
@@ -805,8 +812,16 @@ public class CaseDAO {
 
         return !nameUsed(caseObj.getName(), Case.class, session);
     }
-    
+
     public boolean nameUsed(String name, Class clazz, Session session) {
         return hibernateFacade.nameUsed(name, clazz, session);
     }
- }
+
+    private void removeDatasetsOnOutput(Session session, CaseOutput[] outputs) {
+        DatasetDAO dsDao = new DatasetDAO();
+
+        for (CaseOutput output : outputs) {
+            dsDao.remove(dsDao.getDataset(session, output.getDatasetId()), session);
+        }
+    }
+}

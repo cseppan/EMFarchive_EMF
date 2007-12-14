@@ -230,8 +230,8 @@ public class CaseServiceImpl implements CaseService {
         getCaseService().removeCaseInputs(inputs);
     }
     
-    public void removeCaseOutputs(CaseOutput[] outputs) throws EmfException {
-        getCaseService().removeCaseOutputs(outputs);
+    public void removeCaseOutputs(User user, CaseOutput[] outputs, boolean removeDatasets) throws EmfException {
+        getCaseService().removeCaseOutputs(user, outputs, removeDatasets);
     }
 
     public CaseInput[] getCaseInputs(int caseId) throws EmfException {
@@ -528,7 +528,7 @@ public class CaseServiceImpl implements CaseService {
     public void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
         getCaseService().registerOutputs(outputs, jobKeys);
     }
-
+    
     public synchronized Case updateCaseWithLock(Case caseObj) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
