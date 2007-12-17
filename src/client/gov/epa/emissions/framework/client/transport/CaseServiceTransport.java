@@ -794,4 +794,14 @@ public class CaseServiceTransport implements CaseService {
         
     }
 
+    public void removeMessages(User user, JobMessage[] msgs) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("removeMessages");
+        call.addParam("user", dataMappings.user());
+        call.addParam("msgs", caseMappings.jobMessages());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, msgs });
+    }
 }
