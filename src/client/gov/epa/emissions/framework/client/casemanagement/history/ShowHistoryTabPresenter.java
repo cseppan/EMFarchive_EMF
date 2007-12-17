@@ -64,8 +64,13 @@ public class ShowHistoryTabPresenter {
         return this.caseObj;
     }
 
-    public JobMessage[] getJobMessages(int caseId) throws EmfException {
-        return service().getJobMessages(caseId, 0);
+    public JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException {
+        return service().getJobMessages(caseId, jobId);
+    }
+
+    public void doRemove(JobMessage[] msgs) throws EmfException{
+        service().removeMessages(session.user(), msgs);
+        
     }
 
 }
