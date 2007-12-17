@@ -32,7 +32,7 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
     private InputFieldsPanel inputFieldsPanel;
     
     public EditCaseInputWindow(String title, DesktopManager desktopManager) {
-        super("Edit Case Input", new Dimension(550, 520), desktopManager);
+        super("Edit Case Input", new Dimension(610, 520), desktopManager);
         super.setLabel(super.getTitle() + ": " + title);
     }
 

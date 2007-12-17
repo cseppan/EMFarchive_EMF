@@ -73,7 +73,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         this.input = input;
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        String width = EmptyStrings.create(100);
+        String width = EmptyStrings.create(150);
 
         inputName = new EditableComboBox(presenter.getInputNames());
         inputName.setSelectedItem(input.getInputName());
