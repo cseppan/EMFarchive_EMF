@@ -292,14 +292,14 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
-        String messageDS = "Would you like to discard dataset also?";
+        String messageDS = "Would you also like to delete the Datasets"+"\n associated with these Outputs?";
         String titleDS = "Discard dataset?";
         if (selection == JOptionPane.YES_OPTION) {
-            YesNoDialog dialog = new YesNoDialog(this, titleDS, messageDS);
+            YesNoDialog dialog = new YesNoDialog(parentConsole, titleDS, messageDS);
             boolean deleteDS=dialog.confirm();
             tableData.remove(selected);
-            refresh();
             presenter.doRemove(selected,deleteDS);
+            doRefresh();
         }
 //         clearMessage();
 //        setCursor(Cursor.getDefaultCursor());

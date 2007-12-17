@@ -9,15 +9,16 @@ import gov.epa.emissions.framework.ui.RowSource;
 public class OutputsRowSource implements RowSource {
     private CaseOutput source;
 
-    private EmfSession session;
-
     private String[] datasetValues;
+    
+    private CaseJob job; 
 
     public OutputsRowSource(CaseOutput source, EmfSession session) {
         this.source = source;
-        this.session = session;
         this.datasetValues = getDatasetValues(source, session);
+        this.job = getCaseJob(source, session);
     }
+
 
     public Object[] values() {
         if (datasetValues == null)
@@ -52,21 +53,16 @@ public class OutputsRowSource implements RowSource {
 
     private String getJobName(CaseOutput output) {
         String jobName = null;
-
-        try {
-            CaseJob job = session.caseService().getCaseJob(output.getJobId());
-
-            if (job != null)
-                jobName = job.getName();
-        } catch (EmfException e) {
-            e.printStackTrace();
-        }
-        
+        if (job != null)
+            jobName = job.getName();
         return jobName;
     }
 
     private String getSector(CaseOutput output) {
-        return "";
+        String sectorName=null; 
+        if (job != null)
+        sectorName=job.getSector().getName();
+        return sectorName;
     }
 
     public void setValueAt(int column, Object val) {
@@ -93,5 +89,14 @@ public class OutputsRowSource implements RowSource {
         }
         
         return values;
+    }
+    
+   private CaseJob getCaseJob(CaseOutput output, EmfSession session) {
+        try {
+            job =session.caseService().getCaseJob(output.getJobId());
+        } catch (EmfException e) {
+            return null; 
+        }
+        return job;
     }
 }

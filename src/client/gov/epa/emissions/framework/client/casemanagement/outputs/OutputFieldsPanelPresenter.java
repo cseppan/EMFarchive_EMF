@@ -48,10 +48,6 @@ public class OutputFieldsPanelPresenter{
         return caseObjectManager.getSectorsWithAll();
     }
 
-    public CaseProgram[] getPrograms() throws EmfException {
-         return caseObjectManager.getPrograms();
-    }
-
     public CaseJob[] getCaseJobs() throws EmfException 
     {
         return caseObjectManager.getCaseJobsWithAll(caseId);
@@ -149,5 +145,15 @@ public class OutputFieldsPanelPresenter{
             if (datasets[i].getName().trim().equalsIgnoreCase(ds.trim()))
                 return i+1; // because of the default "All jobs" job is not in db
         return 0;
+    }
+
+    public Sector getJobSector(Integer jobId){
+        Sector sec=null; 
+        try {
+            sec=session.caseService().getCaseJob(jobId).getSector();
+        } catch (EmfException e) {
+            return null; 
+        }
+        return sec; 
     }    
 }
