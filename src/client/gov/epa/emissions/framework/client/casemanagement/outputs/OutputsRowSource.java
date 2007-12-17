@@ -26,8 +26,19 @@ public class OutputsRowSource implements RowSource {
         
         return new Object[] { getOutputName(source), getJobName(source), getSector(source), getDatasetProperty("name"),
                 getDatasetProperty("datasetType"), getStatus(source), getDatasetProperty("creator"),
-                getDatasetProperty("createdDateTime"), getExecName(source) };
+                getDatasetProperty("createdDateTime"), getExecName(source), getMessage(source) };
     }
+
+    private String getMessage(CaseOutput source) {
+        String msg=null;
+        String message=source.getMessage();
+        if(message.length()>20) {
+            msg=message.substring(0,19);
+            return msg;
+        }
+        return message;
+    }
+
 
     private Object getExecName(CaseOutput output) {
         return output.getExecName() != null ? output.getExecName() : "";

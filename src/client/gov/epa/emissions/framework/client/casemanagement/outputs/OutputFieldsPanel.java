@@ -23,13 +23,10 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 
 public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
 
@@ -84,6 +81,11 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         CaseJob[] jobArray = presenter.getCaseJobs();
         jobCombo= new ComboBox(jobArray);
         jobCombo.setSelectedIndex(presenter.getJobIndex(output.getJobId(), jobArray));
+        jobCombo.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                updateSectorName((CaseJob)jobCombo.getSelectedItem());
+            }
+        });
         changeablesList.addChangeable(jobCombo);
         jobCombo.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Job:", jobCombo, panel);
@@ -91,13 +93,13 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         DatasetType[] dsTypeArray = presenter.getDSTypes();
         dsTypeCombo = new ComboBox(dsTypeArray);
         String datasetType=getDatasetProperty("datasetType");
-        addPopupMenuListener(dsTypeCombo, "dstypes");
+//        addPopupMenuListener(dsTypeCombo, "dstypes");
         DatasetType type = presenter.getDatasetType(datasetType);
         dsTypeCombo.setSelectedItem(type);
         dsTypeCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 fillDatasets((DatasetType) dsTypeCombo.getSelectedItem());
-                updateLabels((EmfDataset) datasetCombo.getItemAt(0));
+                updateLabels(null);
             }
         });
         changeablesList.addChangeable(dsTypeCombo);
@@ -124,7 +126,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         creationDate=new JLabel("");
         program=new JLabel("");
         status = new JLabel("");
-        updateSectorName(output);
+        updateSectorName((CaseJob)jobCombo.getSelectedItem());
         updateLabels((EmfDataset) datasetCombo.getSelectedItem());
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
         layoutGenerator.addLabelWidgetPair("Creation Date:", creationDate, panel);
@@ -141,12 +143,11 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     }
 
     protected void updateLabels(EmfDataset selectedItem) {
-        Integer id=selectedItem.getId();
         String dateText="";
         String programText="";
         String statusText ="";
-        if (id!=0 && id!=null){
-            datasetValues=presenter.getDatasetValues(id);
+        if (selectedItem !=null ){
+            datasetValues=presenter.getDatasetValues(new Integer(selectedItem.getId()));
             dateText=getDatasetProperty("createdDateTime");
             programText=output.getExecName();
             statusText=getDatasetProperty("status");
@@ -156,9 +157,9 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         status.setText(statusText);
 
     }
-    protected void updateSectorName(CaseOutput output) {
+    protected void updateSectorName(CaseJob job) {
         String sectorText="";
-        Sector sector1=presenter.getJobSector(new Integer(output.getJobId()));
+        Sector sector1=job.getSector();
         if (sector1!=null)
             sectorText=sector1.getName();
         
@@ -175,40 +176,6 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         return descScrollableTextArea;
     }
     
-
-    private void addPopupMenuListener(final JComboBox box, final String toget) {
-        box.addPopupMenuListener(new PopupMenuListener() {
-            public void popupMenuCanceled(PopupMenuEvent event) {
-                // NOTE Auto-generated method stub
-            }
-
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent event) {
-                // NOTE Auto-generated method stub
-            }
-
-            public void popupMenuWillBecomeVisible(PopupMenuEvent event) {
-                try {
-                    Object selected = box.getSelectedItem();
-                    box.setModel(new DefaultComboBoxModel(getAllObjects(toget)));
-                    box.setSelectedItem(selected);
-                } catch (Exception e) {
-                    messagePanel.setError(e.getMessage());
-                }
-            }
-        });
-    }
-
-    protected Object[] getAllObjects(String toget) throws EmfException {
-        if (toget.equals("dstypes"))
-            return presenter.getDSTypes();
-
-        else if (toget.equals("sectors"))
-            return presenter.getSectors();
-
-        else
-            throw new EmfException("Unknown object type: " + toget);
-
-    }
 
     private void fillDatasets( DatasetType type) {
         try {

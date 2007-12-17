@@ -26,7 +26,7 @@ public class OutputsTableData extends ChangeableTableData {
 
     public String[] columns() {
         return new String[] { "Output name", "Job", "Sector", "Dataset Name", "Dataset Type", "Import Status",
-                "Creator", "Creation Date", "Exec Name" };
+                "Creator", "Creation Date", "Exec Name", "Message" };
     }
 
     public Class getColumnClass(int col) {
