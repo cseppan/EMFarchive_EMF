@@ -81,7 +81,7 @@ public class ImportCaseOutputTask extends ImportTask {
         addDataset(dataset, session);
     }
 
-    private void addCaseOutput(CaseOutput output) {
+    private void addCaseOutput(CaseOutput localOutput) {
 //        try {
 //            if (caseDAO.caseOutputNameUsed(output.getName()))
 //                throw new EmfException("The selected case output name is already in use");
@@ -90,8 +90,8 @@ public class ImportCaseOutputTask extends ImportTask {
 //            throw new EmfException(e.getMessage() == null ? "" : e.getMessage());
 //        }
         
-        output.setMessage("Registering case output for " + dataset.getName() + " of type " + output.getDatasetType());
-        caseDAO.add(output);
+        localOutput.setMessage("Registering case output for " + dataset.getName() + " of type " + output.getDatasetType());
+        this.output = caseDAO.add(localOutput);
     }
 
     private void updateCaseOutput(String status, String message) {

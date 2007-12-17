@@ -104,7 +104,7 @@ public class ManagedImportService {
         return file;
     }
 
-    private synchronized boolean isNameUnique(String name) throws Exception {
+    private synchronized boolean isNameUsed(String name) throws Exception {
         DatasetDAO dao = new DatasetDAO(dbServerFactory);
         return dao.datasetNameUsed(name);
     }
@@ -205,10 +205,6 @@ public class ManagedImportService {
     private synchronized void addTasks(String folder, File path, String[] filenames, String dsName, User user,
             DatasetType dsType, Services services) throws Exception {
         EmfDataset dataset = createDataset(folder, filenames[0], dsName, user, dsType);
-        
-        if (isNameUnique(dataset.getName()))
-            dataset.setName(dataset.getName() + "_" + EmfDateFormat.format_yyyy_MM_dd_HHmmssSS(new Date()));
-
         Importer importer = importerFactory.createVersioned(dataset, path, filenames);
         ImportTask task = new ImportTask(dataset, filenames, importer, user, services, dbServerFactory, sessionFactory);
 
@@ -255,8 +251,6 @@ public class ManagedImportService {
                     + files.length + ") exceeds limit for dataset type " + type.getName() + ".");
         
         EmfDataset dataset = createDataset(path.getAbsolutePath(), files[0], datasetName, user, type);
-        isNameUnique(dataset.getName());
-
         Importer importer = importerFactory.createVersioned(dataset, path, files);
         ImportCaseOutputTask task = new ImportCaseOutputTask(output, dataset, files, importer, user, services,
                 dbServerFactory, sessionFactory);
@@ -304,27 +298,16 @@ public class ManagedImportService {
         return importCaseOutputSubmitter.getSubmitterId();
     }
 
-    public synchronized String importDatasetForCaseOutput(User user, CaseOutput output) throws EmfException {
-        String fileFolder = output.getPath();
-        Services services = services();
- 
-        try {
-            addOutputTasks(user, output, services);
-            addTasksToSubmitter(importCaseOutputSubmitter);
-        } catch (Exception e) {
-            setErrorMsgs(fileFolder, e);
-            throw new EmfException(e.getMessage());
-        }
-
-        return importCaseOutputSubmitter.getSubmitterId();
-    }
-
    private synchronized EmfDataset createDataset(String folder, String filename, String datasetName, User user,
-            DatasetType datasetType) {
+            DatasetType datasetType) throws Exception {
         EmfDataset dataset = new EmfDataset();
         File file = new File(folder, filename);
+        String name = getCorrectedDSName(datasetName, datasetType);
+        
+        if (isNameUsed(name))
+            name += "_" + EmfDateFormat.format_yyyy_MM_dd_HHmmssSS(new Date());
 
-        dataset.setName(getCorrectedDSName(datasetName, datasetType));
+        dataset.setName(name);
         dataset.setCreator(user.getUsername());
         dataset.setDatasetType(datasetType);
         dataset.setCreatedDateTime(new Date());

@@ -10,6 +10,8 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.casemanagement.Case;
@@ -278,7 +280,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
         EmfDataset[] imported = null;
         
         try {
-            importService.importDatasetForCaseOutput(user, output);
+            importService.importDatasetForCaseOutput(user, output, services());
             Thread.sleep(10000); // so that import thread has enough time to run
             
             imported = dataService.getDatasets();
@@ -322,7 +324,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
             //KeyWord "EXPORT_SUFFIX" has id# 6
             dbServer.getEmfDatasource().query().execute("insert into emf.dataset_types_keywords values (DEFAULT,12,0,5,'small-')");
             dbServer.getEmfDatasource().query().execute("insert into emf.dataset_types_keywords values (DEFAULT,12,1,6,'.txt')");
-            importService.importDatasetForCaseOutput(user, output);
+            importService.importDatasetForCaseOutput(user, output, services());
             Thread.sleep(10000); // so that import thread has enough time to run
             
             imported = dataService.getDatasets();
@@ -360,7 +362,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
         EmfDataset[] imported = null;
         
         try {
-            importService.importDatasetForCaseOutput(user, output);
+            importService.importDatasetForCaseOutput(user, output, services());
             Thread.sleep(2000); // so that import thread has enough time to run
             
             imported = dataService.getDatasets();
@@ -394,7 +396,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
         EmfDataset[] imported = null;
         
         try {
-            importService.importDatasetForCaseOutput(user, output);
+            importService.importDatasetForCaseOutput(user, output, services());
             Thread.sleep(180000); // so that import thread has enough time to run
             
             imported = dataService.getDatasets();
@@ -429,9 +431,9 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
         
         try {
             User user = userService.getUser("emf");
-            importService.importDatasetForCaseOutput(user, output);
+            importService.importDatasetForCaseOutput(user, output, services());
         } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Dataset type: xxx does not exist"));
+            assertTrue(e.getMessage().contains("Dataset type 'xxx' does not exist"));
         } 
     }
 
@@ -532,6 +534,15 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
         job.setCaseId(caseObj.getId());
         add(job);
         return (CaseJob) load(CaseJob.class, job.getName());
+    }
+    
+    private Services services() {
+        Services services = new Services();
+        services.setLoggingService(new LoggingServiceImpl(sessionFactory));
+        services.setStatusService(new StatusDAO(sessionFactory));
+        services.setDataService(new DataServiceImpl(sessionFactory));
+
+        return services;
     }
 
 }

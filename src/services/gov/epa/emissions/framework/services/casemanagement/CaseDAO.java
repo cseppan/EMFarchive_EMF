@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterE
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
@@ -63,26 +64,47 @@ public class CaseDAO {
         }
     }
 
-    public void add(CaseOutput output) {
+    public CaseOutput add(CaseOutput output) {
         Session session = sessionFactory.getSession();
+        CaseOutput toReturn = null;
+       
         try {
+            CaseOutput existed = getCaseOutput(output, session);
+            
+            if (existed != null) {
+                removeDatasetsOnOutput(session, new CaseOutput[] { existed });
+                existed.setMessage(output.getMessage());
+                existed.setStatus(output.getStatus());
+                existed.setExecName(output.getExecName());
+                existed.setDatasetId(output.getDatasetId());
+                return updateCaseOutput(existed);
+            }
+
             hibernateFacade.add(output, session);
+            toReturn = getCaseOutput(output, session);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
             session.close();
         }
+        
+        return toReturn;
     }
 
-    public void updateCaseOutput(CaseOutput output) {
+    public CaseOutput updateCaseOutput(CaseOutput output) {
         Session session = sessionFactory.getSession();
+        CaseOutput toReturn = null;
+        
         try {
             hibernateFacade.updateOnly(output, session);
+            toReturn = getCaseOutput(output, session);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
             session.close();
         }
+        
+        return toReturn;
     }
 
     public boolean caseOutputNameUsed(String outputName) {
@@ -230,7 +252,7 @@ public class CaseDAO {
         hibernateFacade.remove(inputs, session);
     }
 
-    public void removeCaseOutputs(CaseOutput[] outputs, boolean removeDatasets, Session session) {
+    public void removeCaseOutputs(CaseOutput[] outputs, boolean removeDatasets, Session session) throws EmfException {
         try {
             if (removeDatasets)
                 removeDatasetsOnOutput(session, outputs);
@@ -781,6 +803,14 @@ public class CaseDAO {
         return cases == null ? null : (Case[]) cases.toArray(new Case[0]);
     }
 
+    public CaseOutput getCaseOutput(CaseOutput output, Session session) {
+        Criterion crit1 = Restrictions.eq("caseId", new Integer(output.getCaseId()));
+        Criterion crit2 = Restrictions.eq("jobId", new Integer(output.getJobId()));
+        Criterion crit3 = Restrictions.eq("name", output.getName());
+        
+        return (CaseOutput) hibernateFacade.load(CaseOutput.class, new Criterion[] { crit1, crit2, crit3 }, session);
+    }
+
     public List<CaseOutput> getCaseOutputs(int caseId, Session session) {
         Criterion crit = Restrictions.eq("caseId", new Integer(caseId));
 
@@ -817,11 +847,14 @@ public class CaseDAO {
         return hibernateFacade.nameUsed(name, clazz, session);
     }
 
-    private void removeDatasetsOnOutput(Session session, CaseOutput[] outputs) {
+    private void removeDatasetsOnOutput(Session session, CaseOutput[] outputs) throws EmfException {
         DatasetDAO dsDao = new DatasetDAO();
 
         for (CaseOutput output : outputs) {
-            dsDao.remove(dsDao.getDataset(session, output.getDatasetId()), session);
+            EmfDataset dataset = dsDao.getDataset(session, output.getDatasetId());
+
+            if (dataset != null)
+                dsDao.remove(dataset, session);
         }
     }
 }
