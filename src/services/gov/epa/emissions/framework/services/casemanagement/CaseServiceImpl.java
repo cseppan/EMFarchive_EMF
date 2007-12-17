@@ -230,8 +230,8 @@ public class CaseServiceImpl implements CaseService {
         getCaseService().removeCaseInputs(inputs);
     }
     
-    public void removeCaseOutputs(User user, CaseOutput[] outputs, boolean removeDatasets) throws EmfException {
-        getCaseService().removeCaseOutputs(user, outputs, removeDatasets);
+    public void removeCaseOutputs(User user, CaseOutput[] outputs, boolean deleteDataset) throws EmfException {
+        getCaseService().removeCaseOutputs(user, outputs, deleteDataset);
     }
 
     public CaseInput[] getCaseInputs(int caseId) throws EmfException {
@@ -546,6 +546,11 @@ public class CaseServiceImpl implements CaseService {
             session.close();
         }
         
+    }
+
+    public void updateCaseOutput(User user, CaseOutput output) {
+        getCaseService().updateCaseOutput(user, output);
+      return;  
     }
 
 }

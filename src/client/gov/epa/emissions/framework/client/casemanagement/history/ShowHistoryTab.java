@@ -1,10 +1,15 @@
 package gov.epa.emissions.framework.client.casemanagement.history;
 
+import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -14,9 +19,16 @@ import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
 
 public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, RefreshObserver {
     private EmfConsole parentConsole;
@@ -30,10 +42,16 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
     private SortFilterSelectModel selectModel;
 
     private JPanel tablePanel;
-    
+
     private MessagePanel messagePanel;
 
     private EmfSession session;
+
+    private ComboBox jobCombo;
+
+    private List<CaseJob> caseJobs; 
+
+    private CaseJob selectedJob=null;
 
     public ShowHistoryTab(EmfConsole parentConsole, MessagePanel messagePanel, EmfSession session) {
         super.setName("showCaseHistoryTab");
@@ -48,7 +66,11 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
 
         this.caseId = caseId;
         this.presenter = presenter;
-
+        try {
+            getAllJobs();
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
         try {
             super.add(createLayout(new JobMessage[0], parentConsole), BorderLayout.CENTER);
         } catch (Exception e) {
@@ -88,9 +110,47 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
 
     private JPanel createLayout(JobMessage[] msgs, EmfConsole parentConsole) throws Exception {
         final JPanel layout = new JPanel(new BorderLayout());
+        layout.add(createTopPanel(), BorderLayout.NORTH);
         layout.add(tablePanel(msgs, parentConsole), BorderLayout.CENTER);
-
+        layout.add(controlPanel(), BorderLayout.PAGE_END);
         return layout;
+    }
+    
+    private void getAllJobs() throws EmfException {
+        this.caseJobs = new ArrayList<CaseJob>();
+        caseJobs.add(new CaseJob("All"));
+        caseJobs.addAll(Arrays.asList(presenter.getCaseJobs()));
+    }
+    
+    private JPanel createTopPanel() {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        jobCombo=new ComboBox("Select One", caseJobs.toArray(new CaseJob[0]));
+        jobCombo.setPreferredSize(new Dimension(300,20));
+        if (selectedJob!=null)
+            jobCombo.setSelectedItem(selectedJob);
+            
+        jobCombo.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                CaseJob job=(CaseJob) jobCombo.getSelectedItem();
+                
+                try {
+                    if (job == null){
+                        doRefresh();
+                        return; 
+                    }
+//                    JobMessage[] msgs=presenter.getJobMessages(caseId);
+                    doRefresh();
+                } catch (EmfException exc) {
+                    messagePanel.setError("Could not retrieve all outputs for job " + (job != null ? job.getName() : job) + ".");
+                }
+            }
+        });
+        layoutGenerator.addLabelWidgetPair("Job: ", jobCombo, panel);
+layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+        150, 15, // initialX, initialY
+        5, 15);// xPad, yPad
+        return panel;
     }
 
     private JPanel tablePanel(JobMessage[] msgs, EmfConsole parentConsole) {
@@ -117,6 +177,25 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
         return new SortCriteria(columnNames, new boolean[] {false}, new boolean[] {false});
     }
 
+    private JPanel controlPanel() {
+        JPanel container = new JPanel();
+        Insets insets = new Insets(1, 2, 1, 2);
+        
+//        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
+//        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+
+        Button remove = new RemoveButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                //
+            }
+        });
+        remove.setMargin(insets);
+        remove.setEnabled(false);
+        container.add(remove);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(container, BorderLayout.WEST);
+        return panel;
+    }
     public int numberOfRecord() {
         return tableData.sources().length;
     }

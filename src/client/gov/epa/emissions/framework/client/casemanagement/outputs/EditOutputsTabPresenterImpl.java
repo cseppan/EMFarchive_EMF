@@ -52,8 +52,8 @@ public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
     }
 
 
-    public void doRemove(CaseOutput[] outputs) throws EmfException {
-       service().removeCaseOutputs(session.user(), outputs, true);
+    public void doRemove(CaseOutput[] outputs, boolean deleteDataset) throws EmfException {
+       service().removeCaseOutputs(session.user(), outputs, deleteDataset);
     }
     
     public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) {
@@ -66,5 +66,11 @@ public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
     public EmfDataset getDataset(int id) throws EmfException{
         return session.dataService().getDataset(id);
         
+    }
+
+    public void editOutput(CaseOutput output, EditCaseOutputView outputEditor) throws EmfException {
+        EditOutputPresenter editOutputPresenter = new EditCaseOutputPresenterImpl(caseObj.getId(), outputEditor, view,
+                session);
+        editOutputPresenter.display(output);
     }
 }

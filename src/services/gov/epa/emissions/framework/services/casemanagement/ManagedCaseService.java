@@ -2566,11 +2566,11 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized void removeCaseOutputs(User user, CaseOutput[] outputs, boolean removeDatasets) throws EmfException {
+    public synchronized void removeCaseOutputs(User user, CaseOutput[] outputs, boolean removeDataset) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
-            dao.removeCaseOutputs(outputs, removeDatasets, session);
+            dao.removeCaseOutputs(outputs, removeDataset, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not remove case output " + outputs[0].getName() + " etc.\n" + e.getMessage());
@@ -2579,5 +2579,32 @@ public class ManagedCaseService {
             session.close();
         }
     }
+
+    public void updateCaseOutput(User user2, CaseOutput output) {
+ //       Session session = sessionFactory.getSession();
+
+//        try {
+//            CaseInput loaded = (CaseInput) dao.loadCaseOutput(output, session);
+//
+//            if (loaded != null && loaded.getId() != output.getId())
+//                throw new EmfException("Case input uniqueness check failed (" + loaded.getId() + "," + input.getId()
+//                        + ")");
+//
+//            // Clear the cached information. To update a case
+//            // FIXME: Verify the session.clear()
+//            session.clear();
+//            dao.updateCaseOutput(output, session);
+//            // setStatus(user, "Saved input " + input.getName() + " to database.", "Save Input");
+//        } catch (RuntimeException e) {
+//            e.printStackTrace();
+//            log.error("Could not update case input: " + output.getName() + ".\n" + e);
+//            throw new EmfException("Could not update case input: " + output.getName() + ".");
+//        } finally {
+//            session.close();
+//        }
+        
+    }
+
+
 
 }

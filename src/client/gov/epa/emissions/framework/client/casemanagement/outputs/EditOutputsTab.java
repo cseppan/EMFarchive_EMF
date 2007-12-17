@@ -24,6 +24,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.YesNoDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -32,6 +33,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -201,11 +203,16 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
 
         Button edit = new EditButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //
+                try {
+                    clearMessage();
+                    editOutput();
+                } catch (EmfException e1) {
+                    messagePanel.setError(e1.getMessage());
+                }
             }
         });
         edit.setMargin(insets);
-        edit.setEnabled(false);
+//        edit.setEnabled(false);
         container.add(edit);
         
         Button view = new ViewButton("View Dataset", new AbstractAction() {
@@ -233,6 +240,20 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
         return panel;
+    }
+
+    protected void editOutput() throws EmfException {
+        List outputs = selectModel.selected();
+        if (outputs.size() == 0) {
+            messagePanel.setMessage("Please select output(s) to edit.");
+            return;
+        }
+        for (Iterator iter = outputs.iterator(); iter.hasNext();) {
+            CaseOutput output = (CaseOutput) iter.next();
+            String title = output.getName() + " (" + caseObj.getName() + ")";
+            EditCaseOutputView outputEditor = new EditCaseOutputWindow(title, desktopManager);
+            presenter.editOutput(output, outputEditor);
+        }
     }
 
     protected void displayOutputDatasetsPropertiesViewer() throws EmfException {
@@ -270,11 +291,15 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         String message = "Are you sure you want to remove the selected output(s)?";
         int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
-        
+
+        String messageDS = "Would you like to discard dataset also?";
+        String titleDS = "Discard dataset?";
         if (selection == JOptionPane.YES_OPTION) {
+            YesNoDialog dialog = new YesNoDialog(this, titleDS, messageDS);
+            boolean deleteDS=dialog.confirm();
             tableData.remove(selected);
             refresh();
-            presenter.doRemove(selected);
+            presenter.doRemove(selected,deleteDS);
         }
 //         clearMessage();
 //        setCursor(Cursor.getDefaultCursor());

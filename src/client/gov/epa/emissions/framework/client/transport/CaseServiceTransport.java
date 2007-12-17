@@ -379,7 +379,7 @@ public class CaseServiceTransport implements CaseService {
         call.addBooleanParameter("deleteDataset");
         call.setVoidReturnType();
 
-        call.request(new Object[] { outputs });
+        call.request(new Object[] { user, outputs, deleteDataset});
     }
 
 
@@ -787,6 +787,11 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.caseObject());
 
         return (Case) call.requestResponse(new Object[] { caseObj });
+    }
+
+    public void updateCaseOutput(User user, CaseOutput setFields) {
+        // NOTE Auto-generated method stub
+        
     }
 
 }

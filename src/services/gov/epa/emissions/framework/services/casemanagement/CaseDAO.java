@@ -295,7 +295,7 @@ public class CaseDAO {
 
         return hibernateFacade.load(CaseInput.class, criterions, session);
     }
-
+    
     public List getCaseInputs(int caseId, Session session) {
         Criterion crit = Restrictions.eq("caseID", new Integer(caseId));
 

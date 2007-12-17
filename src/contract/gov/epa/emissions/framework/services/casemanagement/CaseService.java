@@ -153,4 +153,6 @@ public interface CaseService {
 
     Case updateCaseWithLock(Case caseObj) throws EmfException;
 
+    void updateCaseOutput(User user, CaseOutput setFields) throws EmfException;
+
  }
