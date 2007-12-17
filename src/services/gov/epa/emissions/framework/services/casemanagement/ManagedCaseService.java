@@ -2580,7 +2580,7 @@ public class ManagedCaseService {
         }
     }
 
-    public void updateCaseOutput(User user2, CaseOutput output) {
+    public void updateCaseOutput(User user, CaseOutput output) {
  //       Session session = sessionFactory.getSession();
 
 //        try {
@@ -2605,6 +2605,19 @@ public class ManagedCaseService {
         
     }
 
+    public void removeMessages(User user, JobMessage[] msgs) throws EmfException{
+        Session session = sessionFactory.getSession();
 
+        try {
+            dao.removeJobMessages(msgs,session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not remove case output " + msgs[0].getMessage() + " etc.\n" + e.getMessage());
+            throw new EmfException("Could not remove case messages " + msgs[0].getMessage());
+        } finally {
+            session.close();
+        }
+        
+    }
 
 }

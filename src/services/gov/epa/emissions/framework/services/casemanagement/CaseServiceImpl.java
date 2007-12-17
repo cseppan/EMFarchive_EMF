@@ -553,4 +553,9 @@ public class CaseServiceImpl implements CaseService {
       return;  
     }
 
+    public void removeMessages(User user, JobMessage[] msgs) throws EmfException {
+        getCaseService().removeMessages(user, msgs);
+        
+    }
+
 }

@@ -155,4 +155,6 @@ public interface CaseService {
 
     void updateCaseOutput(User user, CaseOutput setFields) throws EmfException;
 
+    void removeMessages(User user, JobMessage[] msgs)throws EmfException;
+
  }

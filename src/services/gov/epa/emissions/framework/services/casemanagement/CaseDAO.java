@@ -857,4 +857,9 @@ public class CaseDAO {
                 dsDao.remove(dataset, session);
         }
     }
+
+    public void removeJobMessages(JobMessage[] msgs, Session session) {
+        hibernateFacade.remove(msgs, session);
+        
+    }
 }
