@@ -182,6 +182,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         return new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 doDisplayPropertiesEditor();
+                presenter.doClose();
             }
         };
     }
