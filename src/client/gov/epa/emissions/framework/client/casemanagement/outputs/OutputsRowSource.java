@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.outputs;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
@@ -66,13 +67,15 @@ public class OutputsRowSource implements RowSource {
         String jobName = null;
         if (job != null)
             jobName = job.getName();
-        return jobName;
+        return jobName==null? "": jobName;
     }
 
     private String getSector(CaseOutput output) {
         String sectorName=null; 
-        if (job != null)
-        sectorName=job.getSector().getName();
+        if (job != null){
+            Sector sec=job.getSector();
+            sectorName= (sec==null? "":sec.getName());
+        }
         return sectorName;
     }
 
@@ -105,6 +108,7 @@ public class OutputsRowSource implements RowSource {
    private CaseJob getCaseJob(CaseOutput output, EmfSession session) {
         try {
             job =session.caseService().getCaseJob(output.getJobId());
+            
         } catch (EmfException e) {
             return null; 
         }

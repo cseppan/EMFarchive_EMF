@@ -81,19 +81,18 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         CaseJob[] jobArray = presenter.getCaseJobs();
         jobCombo= new ComboBox(jobArray);
         jobCombo.setSelectedIndex(presenter.getJobIndex(output.getJobId(), jobArray));
+        changeablesList.addChangeable(jobCombo);
+        jobCombo.setPrototypeDisplayValue(width);
         jobCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 updateSectorName((CaseJob)jobCombo.getSelectedItem());
             }
         });
-        changeablesList.addChangeable(jobCombo);
-        jobCombo.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Job:", jobCombo, panel);
 
         DatasetType[] dsTypeArray = presenter.getDSTypes();
         dsTypeCombo = new ComboBox(dsTypeArray);
         String datasetType=getDatasetProperty("datasetType");
-//        addPopupMenuListener(dsTypeCombo, "dstypes");
         DatasetType type = presenter.getDatasetType(datasetType);
         dsTypeCombo.setSelectedItem(type);
         dsTypeCombo.addActionListener(new AbstractAction() {
@@ -127,7 +126,10 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         program=new JLabel("");
         status = new JLabel("");
         updateSectorName((CaseJob)jobCombo.getSelectedItem());
-        updateLabels((EmfDataset) datasetCombo.getSelectedItem());
+        if(type==null) 
+            updateLabels(null);
+        else 
+            updateLabels((EmfDataset) datasetCombo.getSelectedItem());
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
         layoutGenerator.addLabelWidgetPair("Creation Date:", creationDate, panel);
         layoutGenerator.addLabelWidgetPair("Exec name:", program, panel);
@@ -148,7 +150,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         String statusText ="";
         if (selectedItem !=null ){
             datasetValues=presenter.getDatasetValues(new Integer(selectedItem.getId()));
-            dateText=getDatasetProperty("createdDateTime");
+            dateText=getDatasetProperty("createdDateTime").substring(0, 16);
             programText=output.getExecName();
             statusText=getDatasetProperty("status");
         }
@@ -198,41 +200,29 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
  
     public CaseOutput setFields() {
         updateOutputName();
-//        updateDatasetType();
         updateJob();
         updateDataset();
+        updateMessage();
         return output;
     }
 
     private void updateJob() {
-        Object job = jobCombo.getSelectedItem();
-
-        if (job == null)
-            return;
-        if (((CaseJob) job).getName().equalsIgnoreCase(OutputFieldsPanelPresenter.ALL_FOR_SECTOR)) {
+        CaseJob job = (CaseJob) jobCombo.getSelectedItem();
+        if (job==null || job.getName().equalsIgnoreCase(OutputFieldsPanelPresenter.ALL_FOR_SECTOR)) {
             output.setJobId(0);
             return;
         }
-
-        output.setJobId(((CaseJob) job).getId());
+        output.setJobId(job.getId());
     }
 
     private void updateOutputName() {
         output.setName(outputName.getText().trim());
     }
-
- 
-//    private void updateDatasetType() {
-//        DatasetType selected = (DatasetType) dsTypeCombo.getSelectedItem();
-//
-//        if (selected.getName().equalsIgnoreCase("All sectors")) {
-//            output.setDatasetType(null);
-//            return;
-//        }
-//
-//        output.setDatasetType(selected);
-//    }
-
+    
+    private void updateMessage() {
+        output.setMessage(message.getText());
+    }
+    
     private void updateDataset() {
         EmfDataset selected = (EmfDataset) datasetCombo.getSelectedItem();
         if (selected != null && selected.getName().equalsIgnoreCase("Not selected")) {
@@ -252,9 +242,10 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     }
 
     public void validateFields() throws EmfException {
-        if (outputName.getText().trim() == "")
+        if (outputName.getText().trim().equalsIgnoreCase(""))
             throw new EmfException("Please specify an output name.");
-        
+        if (jobCombo.getSelectedItem()==null)
+            throw new EmfException("Please choose a valid job.");
     }
 
     private String getDatasetProperty(String property) {

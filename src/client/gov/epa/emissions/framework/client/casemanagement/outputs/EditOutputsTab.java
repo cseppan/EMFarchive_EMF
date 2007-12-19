@@ -307,12 +307,9 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
     }
     public void refresh(){
         // note that this will get called when the case is save
-        try {
-            if (tableData != null) // it's still null if you've never displayed this tab
+            if (tableData != null) {// it's still null if you've never displayed this tab
                 doRefresh(tableData.sources());
-        } catch (Exception e) {
-            messagePanel.setError("Cannot refresh current tab. " + e.getMessage());
-        }
+            }
     }
 
     public void doRefresh() throws EmfException {

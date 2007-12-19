@@ -83,10 +83,12 @@ public class EditCaseOutputWindow extends DisposableInteralFrame implements Edit
             doValidateFields();
             //doCheckDuplicate();
             presenter.doSave();
-            disposeView();
+//            disposeView();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
+            return;
         }
+        disposeView();
     }
 
     private void clearMessage() {

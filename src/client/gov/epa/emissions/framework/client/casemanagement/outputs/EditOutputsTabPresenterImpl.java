@@ -31,8 +31,11 @@ public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
 
     public void doSave() throws EmfException {
         // NOTE Auto-generated method stub
-        if (false)
-            throw new EmfException("");
+        try{
+            view.refresh();
+        }catch (Exception e) {
+            throw new EmfException("Cannot save output tab");
+        }
     }
 
     public CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException {

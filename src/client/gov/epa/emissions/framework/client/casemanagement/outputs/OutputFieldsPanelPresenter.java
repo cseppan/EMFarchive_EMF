@@ -143,7 +143,7 @@ public class OutputFieldsPanelPresenter{
         if (ds.trim()=="") return 0;
         for (int i = 0; i < datasets.length; i++)
             if (datasets[i].getName().trim().equalsIgnoreCase(ds.trim()))
-                return i+1; // because of the default "All jobs" job is not in db
+                return i+1; // because of the default "not selected" job is in db
         return 0;
     }
 
