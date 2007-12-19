@@ -789,8 +789,15 @@ public class CaseServiceTransport implements CaseService {
         return (Case) call.requestResponse(new Object[] { caseObj });
     }
 
-    public void updateCaseOutput(User user, CaseOutput setFields) {
-        // NOTE Auto-generated method stub
+    public void updateCaseOutput(User user, CaseOutput output) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("updateCaseOutput");
+        call.addParam("user", dataMappings.user());
+        call.addParam("output", caseMappings.caseOutput());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, output });
         
     }
 
