@@ -2580,28 +2580,28 @@ public class ManagedCaseService {
         }
     }
 
-    public void updateCaseOutput(User user, CaseOutput output) {
- //       Session session = sessionFactory.getSession();
+    public void updateCaseOutput(User user, CaseOutput output) throws EmfException {
+        Session session = sessionFactory.getSession();
 
-//        try {
-//            CaseInput loaded = (CaseInput) dao.loadCaseOutput(output, session);
-//
-//            if (loaded != null && loaded.getId() != output.getId())
-//                throw new EmfException("Case input uniqueness check failed (" + loaded.getId() + "," + input.getId()
-//                        + ")");
-//
-//            // Clear the cached information. To update a case
-//            // FIXME: Verify the session.clear()
-//            session.clear();
-//            dao.updateCaseOutput(output, session);
-//            // setStatus(user, "Saved input " + input.getName() + " to database.", "Save Input");
-//        } catch (RuntimeException e) {
-//            e.printStackTrace();
-//            log.error("Could not update case input: " + output.getName() + ".\n" + e);
-//            throw new EmfException("Could not update case input: " + output.getName() + ".");
-//        } finally {
-//            session.close();
-//        }
+        try {
+            CaseOutput loaded = (CaseOutput) dao.loadCaseOutput(output, session);
+
+            if (loaded != null && loaded.getId() != output.getId())
+                throw new EmfException("Case output uniqueness check failed (" + loaded.getId() + "," + output.getId()
+                        + ")");
+
+            // Clear the cached information. To update a case
+            // FIXME: Verify the session.clear()
+            session.clear();
+            dao.updateCaseOutput(output, session);
+            // setStatus(user, "Saved input " + input.getName() + " to database.", "Save Input");
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            log.error("Could not update case output: " + output.getName() + ".\n" + e);
+            throw new EmfException("Could not update case output: " + output.getName() + ".");
+        } finally {
+            session.close();
+        }
         
     }
 

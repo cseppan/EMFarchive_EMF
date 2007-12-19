@@ -858,6 +858,29 @@ public class CaseDAO {
         }
     }
 
+    public Object loadCaseOutput(CaseOutput output, Session session) {
+        Criterion[] criterions = uniqueCaseOutputCriteria(output);
+
+        return hibernateFacade.load(CaseOutput.class, criterions, session);
+    }
+    private Criterion[] uniqueCaseOutputCriteria(CaseOutput output) {
+        Integer caseID = new Integer(output.getCaseId());
+        String inputname = output.getName();
+        Integer datasetID = new Integer(output.getDatasetId());
+        Integer jobID = new Integer(output.getJobId());
+
+        Criterion c1 = Restrictions.eq("caseId", caseID);
+        Criterion c2 = Restrictions.eq("name", inputname);
+        Criterion c3 = (datasetID == null) ? Restrictions.isNull("datasetId") : Restrictions.eq("datasetId", datasetID);
+        Criterion c4 = Restrictions.eq("jobId", jobID);
+
+        return new Criterion[] { c1, c2, c3, c4 };
+    }
+    
+    public void updateCaseOutput(CaseOutput output, Session session) {
+        hibernateFacade.updateOnly(output, session);
+    }
+    
     public void removeJobMessages(JobMessage[] msgs, Session session) {
         hibernateFacade.remove(msgs, session);
         

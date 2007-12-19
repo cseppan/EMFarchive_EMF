@@ -548,7 +548,7 @@ public class CaseServiceImpl implements CaseService {
         
     }
 
-    public void updateCaseOutput(User user, CaseOutput output) {
+    public void updateCaseOutput(User user, CaseOutput output) throws EmfException {
         getCaseService().updateCaseOutput(user, output);
       return;  
     }
