@@ -153,7 +153,7 @@ public interface CaseService {
 
     Case updateCaseWithLock(Case caseObj) throws EmfException;
 
-    void updateCaseOutput(User user, CaseOutput setFields) throws EmfException;
+    void updateCaseOutput(User user, CaseOutput output) throws EmfException;
 
     void removeMessages(User user, JobMessage[] msgs)throws EmfException;
 
