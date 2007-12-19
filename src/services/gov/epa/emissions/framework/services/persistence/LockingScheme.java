@@ -81,7 +81,7 @@ public class LockingScheme {
     }
 
     private void doUpdate(Lockable target, Lockable current, Session session) throws EmfException {
-        if (!current.isLocked(target.getLockOwner()))
+        if (target.getLockOwner() == null || !current.isLocked(target.getLockOwner()))
             throw new EmfException("Cannot update without owning lock");
 
         session.clear();// clear 'loaded' locked object - to make way for updated object

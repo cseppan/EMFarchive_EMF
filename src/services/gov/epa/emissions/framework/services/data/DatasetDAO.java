@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -110,7 +111,7 @@ public class DatasetDAO {
             hibernateFacade.updateOnly(dataset, session);
         }
     }
-
+    
     public synchronized void remove(EmfDataset dataset, Session session) throws EmfException {
         String datasetName = dataset.getName();
         
@@ -120,6 +121,45 @@ public class DatasetDAO {
         try {
             removeEmissionTable(dataset, session);
             hibernateFacade.remove(dataset, session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException("Could not remove dataset " + datasetName + ". Reason: " + e.getMessage());
+        }
+    }
+
+    public synchronized void remove(User user, EmfDataset dataset, Session session) throws EmfException {
+        // NOTE: method to be modified to really remove dataset. It is only rename it for now.
+
+        String datasetName = dataset.getName();
+
+        if (dataset.isLocked())
+            throw new EmfException("Could not remove dataset " + datasetName + ". It is locked by "
+                    + dataset.getLockOwner());
+
+        if (isUsedByCases(session, dataset))
+            throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is used by a case.");
+
+        if (isUsedByControlStrategies(session, dataset))
+            throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is use by a control strategy.");
+
+        String prefix = "DELETED_" + new Date().getTime() + "_";
+
+        try {
+            if (dataset.getStatus().equalsIgnoreCase("Deleted"))
+                return;
+
+            dataset.setName(prefix + datasetName);
+            dataset.setStatus("Deleted");
+
+            DatasetType type = dataset.getDatasetType();
+
+            if (!canUpdate(dataset, session))
+                throw new EmfException("The Dataset name is already in use: " + dataset.getName());
+
+            if (type != null && type.getTablePerDataset() > 1)
+                LOG.info("Renaming emission tables for dataset " + dataset.getName() + " is not allowed.");
+
+            update(obtainLocked(user, dataset, session), session);
         } catch (Exception e) {
             e.printStackTrace();
             throw new EmfException("Could not remove dataset " + datasetName + ". Reason: " + e.getMessage());
@@ -312,7 +352,7 @@ public class DatasetDAO {
         }
     }
 
-    private synchronized void removeEmissionTable(EmfDataset dataset, Session session) throws Exception {
+    public synchronized void removeEmissionTable(EmfDataset dataset, Session session) throws Exception {
         EmfDataset oldDataset = getDataset(session, dataset.getId());
         DbServer dbServer = getDbServer();
 
@@ -344,20 +384,23 @@ public class DatasetDAO {
         Datasource datasource = dbServer.getEmissionsDatasource();
         InternalSource[] sources = dataset.getInternalSources();
         DataTable table = new DataTable(oldDataset, datasource);
-        String oldTableName = oldDataset.getInternalSources()[0].getTable();
+        InternalSource[] oldSources = oldDataset.getInternalSources();
+        String oldTableName = (oldSources == null) ? "" : oldSources[0].getTable();
         String newTableName = table.createName(dataset.getName());
 
-        sources[0].setTable(newTableName);
+        if (sources != null && sources.length > 0)
+            sources[0].setTable(newTableName);
+        
         table.rename(oldTableName, newTableName);
     }
 
     private synchronized void removeTable(EmfDataset oldDataset, DbServer dbServer) throws Exception {
         Datasource datasource = dbServer.getEmissionsDatasource();
         InternalSource[] sources = oldDataset.getInternalSources();
-        
+
         if (sources == null || sources.length == 0)
             return;
-        
+
         DataTable table = new DataTable(oldDataset, datasource);
 
         for (int i = 0; i < sources.length; i++) {

@@ -655,7 +655,7 @@ public class CaseServiceTransport implements CaseService {
         call.addParam("message", caseMappings.jobMessage());
         call.addStringParam("jobKey");
         call.setIntegerReturnType();
-        call.setTimeOut(20000); //set time out in milliseconds to terminate if service doesn't response
+        call.setTimeOut(40000); //set time out in milliseconds to terminate if service doesn't response
         
         return (Integer)call.requestResponse(new Object[]{ message, jobKey });
     }
@@ -667,7 +667,7 @@ public class CaseServiceTransport implements CaseService {
         call.addParam("msgs", caseMappings.jobMessages());
         call.addParam("keys", caseMappings.strings());
         call.setIntegerReturnType();
-        call.setTimeOut(20000); //set time out in milliseconds to terminate if service doesn't response
+        call.setTimeOut(40000); //set time out in milliseconds to terminate if service doesn't response
         
         return (Integer)call.requestResponse(new Object[]{ msgs, keys });
     }
@@ -762,7 +762,7 @@ public class CaseServiceTransport implements CaseService {
         call.addParam("output", caseMappings.caseOutput());
         call.addStringParam("jobKey");
         call.setVoidReturnType();
-        call.setTimeOut(20000); //set time out in milliseconds to terminate if service doesn't response
+        call.setTimeOut(40000); //set time out in milliseconds to terminate if service doesn't response
         
         call.request(new Object[]{output, jobKey});
     }
@@ -774,7 +774,7 @@ public class CaseServiceTransport implements CaseService {
         call.addParam("outputs", caseMappings.caseOutputs());
         call.addParam("jobKeys", caseMappings.strings());
         call.setIntegerReturnType();
-        call.setTimeOut(20000); //set time out in milliseconds to terminate if service doesn't response
+        call.setTimeOut(40000); //set time out in milliseconds to terminate if service doesn't response
         
         call.request(new Object[]{ outputs, jobKeys });
     }

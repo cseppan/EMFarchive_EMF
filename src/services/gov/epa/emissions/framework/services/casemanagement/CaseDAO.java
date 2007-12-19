@@ -64,7 +64,7 @@ public class CaseDAO {
         }
     }
 
-    public CaseOutput add(CaseOutput output) {
+    public CaseOutput add(User user, CaseOutput output) {
         Session session = sessionFactory.getSession();
         CaseOutput toReturn = null;
        
@@ -72,7 +72,7 @@ public class CaseDAO {
             CaseOutput existed = getCaseOutput(output, session);
             
             if (existed != null) {
-                removeDatasetsOnOutput(session, new CaseOutput[] { existed });
+                removeDatasetsOnOutput(user, session, new CaseOutput[] { existed });
                 existed.setMessage(output.getMessage());
                 existed.setStatus(output.getStatus());
                 existed.setExecName(output.getExecName());
@@ -252,10 +252,10 @@ public class CaseDAO {
         hibernateFacade.remove(inputs, session);
     }
 
-    public void removeCaseOutputs(CaseOutput[] outputs, boolean removeDatasets, Session session) throws EmfException {
+    public void removeCaseOutputs(User user, CaseOutput[] outputs, boolean removeDatasets, Session session) throws EmfException {
         try {
             if (removeDatasets)
-                removeDatasetsOnOutput(session, outputs);
+                removeDatasetsOnOutput(user, session, outputs);
         } finally {
             hibernateFacade.remove(outputs, session);
         }
@@ -847,14 +847,14 @@ public class CaseDAO {
         return hibernateFacade.nameUsed(name, clazz, session);
     }
 
-    private void removeDatasetsOnOutput(Session session, CaseOutput[] outputs) throws EmfException {
+    private void removeDatasetsOnOutput(User user, Session session, CaseOutput[] outputs) throws EmfException {
         DatasetDAO dsDao = new DatasetDAO();
 
         for (CaseOutput output : outputs) {
             EmfDataset dataset = dsDao.getDataset(session, output.getDatasetId());
 
             if (dataset != null)
-                dsDao.remove(dataset, session);
+                dsDao.remove(user, dataset, session);
         }
     }
 

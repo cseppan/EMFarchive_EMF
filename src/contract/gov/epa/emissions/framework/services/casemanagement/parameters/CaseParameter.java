@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 
 import java.io.Serializable;
 
-public class CaseParameter implements Serializable, Comparable {
+public class CaseParameter implements Serializable, Comparable<CaseParameter> {
 
     private int id;
     
@@ -142,9 +142,17 @@ public class CaseParameter implements Serializable, Comparable {
         return false;
     }
     
-    public int compareTo(Object other) {
-        return getName().compareToIgnoreCase(((CaseParameter) other).getName());
+//    public int compareTo(Object other) {
+//        return getName().compareToIgnoreCase(((CaseParameter) other).getName());
+//    }
+    
+    public int compareTo(CaseParameter other) {
+        Float otherOrder = new Float (other.getOrder());
+        Float thisOrder = new Float(getOrder());
+        
+        return thisOrder.compareTo(otherOrder);
     }
+    
 
     public String getNotes() {
         return notes;

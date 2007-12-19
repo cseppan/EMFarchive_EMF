@@ -251,6 +251,10 @@ public class ManagedImportService {
                     + files.length + ") exceeds limit for dataset type " + type.getName() + ".");
         
         EmfDataset dataset = createDataset(path.getAbsolutePath(), files[0], datasetName, user, type);
+        
+        if (output.getName() == null || output.getName().trim().isEmpty())
+            output.setName(dataset.getName());
+        
         Importer importer = importerFactory.createVersioned(dataset, path, files);
         ImportCaseOutputTask task = new ImportCaseOutputTask(output, dataset, files, importer, user, services,
                 dbServerFactory, sessionFactory);

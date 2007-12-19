@@ -37,6 +37,7 @@ import gov.epa.emissions.framework.tasks.TaskSubmitter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -1689,6 +1690,7 @@ public class ManagedCaseService {
         try {
             List<CaseParameter> parameters = dao.getJobParameters(caseId, jobId, sector, session);
             // return an array of all type CaseParameter
+            Collections.sort(parameters);
             return parameters.toArray(new CaseParameter[0]);
         } catch (Exception e) {
             e.printStackTrace();
@@ -2570,7 +2572,7 @@ public class ManagedCaseService {
         Session session = sessionFactory.getSession();
 
         try {
-            dao.removeCaseOutputs(outputs, removeDataset, session);
+            dao.removeCaseOutputs(user, outputs, removeDataset, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not remove case output " + outputs[0].getName() + " etc.\n" + e.getMessage());

@@ -550,7 +550,6 @@ public class CaseServiceImpl implements CaseService {
 
     public void updateCaseOutput(User user, CaseOutput output) throws EmfException {
         getCaseService().updateCaseOutput(user, output);
-      return;  
     }
 
     public void removeMessages(User user, JobMessage[] msgs) throws EmfException {

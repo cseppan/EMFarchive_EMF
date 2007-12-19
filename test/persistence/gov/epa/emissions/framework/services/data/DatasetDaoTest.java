@@ -117,8 +117,9 @@ public class DatasetDaoTest extends ServiceTestCase {
 
     public void testShouldRemoveDatasetFromDatabaseOnRemove() throws Exception {
         EmfDataset dataset = newDataset("dataset-dao-test");
-
-        dao.remove(dataset, session);
+        User owner = userDAO.get("emf", session);
+        
+        dao.remove(owner, dataset, session);
         EmfDataset result = (EmfDataset) load(EmfDataset.class, dataset.getName());
 
         assertNull("Should be removed from the database on 'remove'", result);

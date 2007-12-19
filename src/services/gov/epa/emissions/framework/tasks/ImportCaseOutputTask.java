@@ -64,7 +64,6 @@ public class ImportCaseOutputTask extends ImportTask {
         } catch (Exception e) {
             // this doesn't give the full path for some reason
             logError("Failed to import file(s) : " + filesList(), e);
-            setStatus("failed", "Failed to import dataset " + dataset.getName() + ". Reason: " + e.getMessage());
             removeDataset(dataset);
             updateCaseOutput("Failed", "Registering case output " + dataset.getName() + " of type " + output.getDatasetType() + " failed.");
         } finally {
@@ -76,9 +75,11 @@ public class ImportCaseOutputTask extends ImportTask {
 
     protected void prepare(Session session) throws EmfException {
         addStartStatus();
-        addCaseOutput(output);
         dataset.setStatus("Started import");
         addDataset(dataset, session);
+        this.dataset = dao.getDataset(session, dataset.getName());
+        output.setDatasetId(dataset.getId());
+        addCaseOutput(output);
     }
 
     private void addCaseOutput(CaseOutput localOutput) {
@@ -91,22 +92,31 @@ public class ImportCaseOutputTask extends ImportTask {
 //        }
         
         localOutput.setMessage("Registering case output for " + dataset.getName() + " of type " + output.getDatasetType());
-        this.output = caseDAO.add(localOutput);
+        this.output = caseDAO.add(this.user, localOutput);
     }
 
     private void updateCaseOutput(String status, String message) {
         output.setStatus(status);
         output.setMessage(message);
         caseDAO.updateCaseOutput(output);
+        setStatus(status, message);
     }
 
     protected void complete(Session session, String status) {
         dataset.setStatus(status);
         //dataset.setModifiedDateTime(new Date()); //last mod time has been set when creted
-        output.setDatasetId(dataset.getId());
+        //output.setDatasetId(dataset.getId());
         updateDataset(dataset, session);
         updateCaseOutput(status, "Case output registered successfully.");
         addCompletedStatus();
+    }
+    
+    protected void setStatus(String status, String message) {
+        if (DebugLevels.DEBUG_10)
+            System.out.println("Import task (id: " + taskId + ") in submitter " + this.submitterId + " setting status " 
+                    + status + "; Message: " + message + "; On thread " + Thread.currentThread().getId());
+            
+        ImportTaskManager.callBackFromThread(this.taskId, this.submitterId, status, Thread.currentThread().getId(), message);
     }
 
 }
