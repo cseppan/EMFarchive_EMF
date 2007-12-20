@@ -46,7 +46,7 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
     
     private ManageChangeables changeables;  
     
-    private DoubleTextField rule, rPenetration, rEffective;
+    private DoubleTextField applyOrder, rPenetration, rEffective;
     private NumberFieldVerifier verifier;
     
     private ComboBox version, dataset;
@@ -165,7 +165,7 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
         panel.setBorder(BorderFactory.createTitledBorder("Measure Properties"));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Set Order:", ruleField(), panel);
+        layoutGenerator.addLabelWidgetPair("Set Order:", applyOrderField(), panel);
         layoutGenerator.addLabelWidgetPair("Set RP %:", rPField(), panel);
         layoutGenerator.addLabelWidgetPair("Set RE %:", rEField(), panel);
         // Lay out the panel.
@@ -175,21 +175,21 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
 
         return panel;
     }
-    private DoubleTextField ruleField() {
-        rule = new DoubleTextField("Set Order", 1, 100, 10);
-        rule.setValue(1);
-        return rule;
+    private DoubleTextField applyOrderField() {
+        applyOrder = new DoubleTextField("Set Order", 10);
+        applyOrder.setValue(1);
+        return applyOrder;
     }
     
     private DoubleTextField rPField() {
         rPenetration = new DoubleTextField("Set RP %", 1, 100, 10);
-        rPenetration.setValue(100);
+        rPenetration.setText("");
         return rPenetration;
     }
     
     private DoubleTextField rEField() {
         rEffective = new DoubleTextField("Set RE %", 1, 100, 10);
-        rEffective.setValue(100);
+        rEffective.setText("");
         return rEffective;
     }
 
@@ -239,20 +239,20 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
         }
         LightControlMeasure[] cms = (LightControlMeasure[]) selected.toArray(new LightControlMeasure[0]);
         EmfDataset ds =(EmfDataset) dataset.getSelectedItem();
-        if (ds.getId() == 0) {
+        if (ds == null || ds.getId() == 0) {
             ds = null;
         }
         Version ver = (ds !=null ? (Version) version.getSelectedItem(): null);
         Integer verValue = (ver !=null? ver.getVersion(): null);
  
-        presenter.doAdd(cms, checkNumber(rule), checkNumber(rPenetration), checkNumber(rEffective), ds, verValue);
+        presenter.doAdd(cms, validateApplyOrder(applyOrder), validatePercentage(rPenetration), validatePercentage(rEffective), ds, verValue);
         setVisible(false);
         dispose();
     }
 
-    private double checkNumber(DoubleTextField value) throws EmfException{
+    private Double validatePercentage(DoubleTextField value) throws EmfException{
         if (value.getText().trim().length() == 0){
-            throw new EmfException(value.getName()+":  Enter a number between 1 and 100");
+            return null;
         }
         double value1 = verifier.parseDouble(value.getText());
 
@@ -261,7 +261,13 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
             throw new EmfException(value.getName()+":  Enter a number between 1 and 100");
         }
         return value1;
+    }
 
+    private Double validateApplyOrder(DoubleTextField value) throws EmfException{
+        if (value.getText().trim().length() == 0){
+            throw new EmfException(value.getName()+ ":  Enter a number");
+        }
+        return verifier.parseDouble(value.getText());
     }
 
     public void observe(ControlMeasureSelectionPresenter presenter) {

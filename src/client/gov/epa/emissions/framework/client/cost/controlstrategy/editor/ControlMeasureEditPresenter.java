@@ -23,9 +23,7 @@ public class ControlMeasureEditPresenter{
     public void display(ControlMeasureEditView view) throws Exception {
         view.observe(this);
         view.display();
-
     }
-
 
     public EmfDataset[] getDatasets(DatasetType type) throws EmfException
     {
@@ -60,11 +58,7 @@ public class ControlMeasureEditPresenter{
         return session.dataEditorService();
     }
 
-    public void doAdd(Double rule, Double rulePenetration, Double ruleEffective, EmfDataset ds, Integer ver) {
-        parentView.add(rule, rulePenetration, ruleEffective, ds, ver);
-        
+    public void doEdit(Double applyOrder, Double rulePenetration, Double ruleEffective, EmfDataset ds, Integer ver) {
+        parentView.edit(applyOrder, rulePenetration, ruleEffective, ds, ver);
     }
-
-
-
 }

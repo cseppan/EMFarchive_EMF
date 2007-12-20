@@ -32,8 +32,10 @@ public class ControlMeasureSelectionPresenter {
     }
 
 
-    public void doAdd(LightControlMeasure[] cms, double rule, double rulePenetration, double ruleEffective, EmfDataset ds, Integer ver) {
-        parentView.add(cms, rule, rulePenetration, ruleEffective, ds, ver);
+    public void doAdd(LightControlMeasure[] cms, Double applyOrder, Double rulePenetration, Double ruleEffective, EmfDataset ds, Integer ver) {
+        parentView.add(cms, applyOrder, 
+                rulePenetration, ruleEffective, 
+                ds, ver);
         
     }
 

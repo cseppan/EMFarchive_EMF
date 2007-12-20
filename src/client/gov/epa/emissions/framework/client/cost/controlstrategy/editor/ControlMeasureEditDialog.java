@@ -18,6 +18,9 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -37,7 +40,7 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
     
  //   private ManageChangeables changeables;  
     
-    private DoubleTextField rule, rPenetration, rEffective;
+    private DoubleTextField applyOrder, rPenetration, rEffective;
     private NumberFieldVerifier verifier;
     
     private ComboBox version, dataset;
@@ -88,8 +91,13 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Regions"));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-            EmfDataset[] datasets = presenter.getDatasets( presenter.getDatasetType("List of Counties (CSV)") );         
-            dataset = new ComboBox("Not selected", datasets);
+            List<EmfDataset> datasetList = new ArrayList<EmfDataset>();
+            EmfDataset[] datasets = presenter.getDatasets( presenter.getDatasetType("List of Counties (CSV)") );
+            EmfDataset blankDataset = new EmfDataset();
+            blankDataset.setName("None");
+            datasetList.add(blankDataset);
+            datasetList.addAll(Arrays.asList(datasets));
+            dataset = new ComboBox("Not selected", datasetList.toArray());
             Dimension size= new Dimension(300, 10);
             dataset.setPreferredSize(size);
 
@@ -125,6 +133,7 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
     private void fillVersions(EmfDataset dataset) throws EmfException{
         version.setEnabled(true);
 
+        if (dataset != null && dataset.getName().equals("None")) dataset = null;
         Version[] versions = presenter.getVersions(dataset);
         version.removeAllItems();
         version.setModel(new DefaultComboBoxModel(versions));
@@ -150,7 +159,7 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
         panel.setBorder(BorderFactory.createTitledBorder("Measure Properties"));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Set Order:", ruleField(), panel);
+        layoutGenerator.addLabelWidgetPair("Set Order:", applyOrderField(), panel);
         layoutGenerator.addLabelWidgetPair("Set RP %:", rPField(), panel);
         layoutGenerator.addLabelWidgetPair("Set RE %:", rEField(), panel);
         // Lay out the panel.
@@ -160,10 +169,10 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
 
         return panel;
     }
-    private DoubleTextField ruleField() {
-        rule = new DoubleTextField("Set Order", 1, 100, 10);
-        rule.setText("");
-        return rule;
+    private DoubleTextField applyOrderField() {
+        applyOrder = new DoubleTextField("Set Order", 10);
+        applyOrder.setText("");
+        return applyOrder;
     }
     
     private DoubleTextField rPField() {
@@ -199,7 +208,7 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    add();
+                    edit();
                 } catch (EmfException e1) {
                     // NOTE Auto-generated catch block
                     messagePanel.setError(e1.getMessage());
@@ -208,31 +217,37 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
         };
     }
 
-    private void add() throws EmfException {
+    private void edit() throws EmfException {
         messagePanel.clear();
         EmfDataset ds =(EmfDataset) dataset.getSelectedItem();
-        if (ds.getId() == 0) {
+        if (ds == null) {
             ds = null;
         }
         Version ver = (ds !=null ? (Version) version.getSelectedItem(): null);
         Integer verValue = (ver !=null? ver.getVersion(): null);
-        presenter.doAdd(checkNumber(rule), checkNumber(rPenetration), checkNumber(rEffective), ds, verValue);
+        presenter.doEdit(validateApplyOrder(applyOrder), validatePercentage(rPenetration), validatePercentage(rEffective), ds, verValue);
         setVisible(false);
         dispose();
     }
 
-    private Double checkNumber(DoubleTextField value) throws EmfException{
+    private Double validatePercentage(DoubleTextField value) throws EmfException{
         if (value.getText().trim().length() == 0){
-            return Double.NaN;
+            return null;
         }
-        Double value1 = verifier.parseDouble(value);
+        double value1 = verifier.parseDouble(value.getText());
 
         // make sure the number makes sense...
         if (value1 < 1 || value1 > 100) {
             throw new EmfException(value.getName()+":  Enter a number between 1 and 100");
         }
         return value1;
+    }
 
+    private Double validateApplyOrder(DoubleTextField value) throws EmfException{
+        if (value.getText().trim().length() == 0){
+            return null;
+        }
+        return verifier.parseDouble(value.getText());
     }
 
     public void observe(ControlMeasureEditPresenter presenter) {

@@ -329,16 +329,16 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         this.presenter = presenter;
     }
 
-    public void add(LightControlMeasure[] measures, double rule, double rulePenetration, double ruleEffective, EmfDataset ds, Integer ver) {
+    public void add(LightControlMeasure[] measures, Double applyOrder, Double rulePenetration, Double ruleEffective, EmfDataset ds, Integer ver) {
         messagePanel.clear();
         if (measures.length > 0 ) {
             ControlStrategyMeasure[] strategyMeasures = new ControlStrategyMeasure[measures.length];
             for (int i = 0; i < measures.length; i++) {
                 ControlStrategyMeasure csm = new ControlStrategyMeasure(measures[i]);
                 //default rule pen and eff to 100%, and order to 1
-                csm.setRulePenetration(Double.valueOf(rulePenetration));
-                csm.setRuleEffectiveness(Double.valueOf(ruleEffective));
-                csm.setApplyOrder(Double.valueOf(rule));
+                csm.setRulePenetration(rulePenetration);
+                csm.setRuleEffectiveness(ruleEffective);
+                csm.setApplyOrder(applyOrder);
                 csm.setRegionDataset(ds);
                 csm.setRegionDatasetVersion(ver);
                 strategyMeasures[i] = csm;
@@ -366,7 +366,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         addButton.setEnabled(true);
     }
 
-    public void add(Double order, Double rulePenetration, Double ruleEffective, EmfDataset ds, Integer ver) {
+    public void edit(Double applyOrder, Double rulePenetration, Double ruleEffective, EmfDataset ds, Integer ver) {
         messagePanel.clear();
       //get selected items
       ControlStrategyMeasure[] selectedMeasures = (sortFilterSelectModel.selected()).toArray(new ControlStrategyMeasure[0]);
@@ -377,15 +377,17 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
       for (int i = 0; i < selectedMeasures.length; i++) {
           for (int j = 0; j < measures.length; j++) {
               if (selectedMeasures[i].equals(measures[j])) {
-                  if (!order.equals(Double.NaN))  
-                      measures[j].setApplyOrder(Double.valueOf(order));
-                  if (!rulePenetration.equals(Double.NaN))  
-                      measures[j].setRulePenetration(Double.valueOf(rulePenetration));
-                  if (!ruleEffective.equals(Double.NaN)) 
-                      measures[j].setRuleEffectiveness(Double.valueOf(ruleEffective));
+                  if (applyOrder != null) measures[j].setApplyOrder(applyOrder);
+                  if (rulePenetration != null) measures[j].setRulePenetration(rulePenetration);
+                  if (ruleEffective != null) measures[j].setRuleEffectiveness(ruleEffective);
                   if (ds!=null){
-                      measures[j].setRegionDataset(ds);
-                      measures[j].setRegionDatasetVersion(ver);
+                      if (ds.getName().equals("None")){
+                          measures[j].setRegionDataset(null);
+                          measures[j].setRegionDatasetVersion(null);
+                      } else {
+                          measures[j].setRegionDataset(ds);
+                          measures[j].setRegionDatasetVersion(ver);
+                      }
                   }
               }
           }
