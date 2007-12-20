@@ -56,11 +56,11 @@ public class CMEquationRecordReader {
             EquationTypeVariable[] equationTypeVariables = equationType.getEquationTypeVariables();
             //get rid of original settings
             cm.setEquations(new ControlMeasureEquation[] {});
+            //set equation cost year
+            cm.setCostYear(Integer.parseInt(tokens[12]));
             //now add equation settings...
             if (equationTypeVariables.length > 0) {
                 if (constraintCheck(tokens[0], equationType, sb)){
-                    //set equation cost year
-                    cm.setCostYear(Integer.parseInt(tokens[12]));
                     for (int i = 0; i < equationTypeVariables.length; i++) {
 
                         EquationTypeVariable equationTypeVariable = equationTypeVariables[i];
