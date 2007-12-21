@@ -244,7 +244,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     public void validateFields() throws EmfException {
         if (outputName.getText().trim().equalsIgnoreCase(""))
             throw new EmfException("Please specify an output name.");
-        if (jobCombo.getSelectedItem()==null)
+        if (((CaseJob)jobCombo.getSelectedItem()).getId()==0)
             throw new EmfException("Please choose a valid job.");
     }
 

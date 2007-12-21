@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement.outputs;
 
+import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
+
 
 public interface EditOutputsTabView {
     
@@ -10,5 +12,7 @@ public interface EditOutputsTabView {
     void observe(EditOutputsTabPresenterImpl editOutputsTabPresenterImpl);
 
     void clearMessage();
+
+    void addOutput(CaseOutput addCaseOutput);
     
 }

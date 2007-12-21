@@ -186,6 +186,10 @@ public class CaseDAO {
     public void add(CaseInput object, Session session) {
         addObject(object, session);
     }
+    
+    public void add(CaseOutput object, Session session) {
+        addObject(object, session);
+    }
 
     public void add(Host object, Session session) {
         addObject(object, session);
@@ -881,6 +885,12 @@ public class CaseDAO {
         Criterion c4 = Restrictions.eq("jobId", jobID);
 
         return new Criterion[] { c1, c2, c3, c4 };
+    }
+    
+    public boolean caseOutputExists(CaseOutput output, Session session) {
+        Criterion[] criterions = uniqueCaseOutputCriteria(output);
+
+        return hibernateFacade.exists(CaseOutput.class, criterions, session);
     }
 
     public void updateCaseOutput(CaseOutput output, Session session) {

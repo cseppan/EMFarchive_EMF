@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.exim.ExportPresenter;
+import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.qa.EditableQATabView;
@@ -29,5 +31,7 @@ public interface PropertiesEditorPresenter {
     void set(RevisionsTabView view) throws EmfException;
 
     EmfSession getSession();
+
+    void doExport(ExportWindow view, ExportPresenter presenter);
 
 }

@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.casemanagement.inputs;
+package gov.epa.emissions.framework.client.casemanagement.outputs;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.Changeable;
@@ -7,7 +7,7 @@ import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.ui.Dialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -19,43 +19,43 @@ import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-public class NewInputDialog extends Dialog implements NewInputView, ManageChangeables {
+public class NewOutputDialog extends Dialog implements NewOutputView, ManageChangeables {
 
     protected boolean shouldCreate;
 
-    protected EditInputsTabPresenterImpl presenter;
+    protected EditOutputsTabPresenterImpl presenter;
 
     private MessagePanel messagePanel;
 
-    private InputFieldsPanel inputFieldsPanel;
+    private OutputFieldsPanel OutputFieldsPanel;
     
-    public NewInputDialog(EmfConsole parent) {
-        super("Add input to case", parent);
+    public NewOutputDialog(EmfConsole parent) {
+        super("Add Output to case", parent);
         super.setSize(new Dimension(610, 520));
         super.center();
     }
 
-    public void display(int caseId, CaseInput newInput) {
+    public void display(int caseId, CaseOutput newOutput) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        panel.add(inputPanel(newInput));
+        panel.add(OutputPanel(newOutput));
         panel.add(buttonsPanel());
 
         super.getContentPane().add(panel);
         super.display();
     }
 
-    private JPanel inputPanel(CaseInput newInput) {
+    private JPanel OutputPanel(CaseOutput newOutput) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.inputFieldsPanel = new InputFieldsPanel(messagePanel, this);
+        this.OutputFieldsPanel = new OutputFieldsPanel(messagePanel, this);
 
         try {
-            presenter.doAddInputFields(panel, inputFieldsPanel, newInput);
+            presenter.doAddOutputFields(panel, OutputFieldsPanel, newOutput);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -68,7 +68,7 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
         Button ok = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    addNewInput();
+                    addNewOutput();
                 } catch (EmfException exc) {
                     messagePanel.setError(exc.getMessage());
                 }
@@ -79,7 +79,7 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
 
         Button cancel = new CancelButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                shouldCreate = false;
+//                shouldCreate = false;
                 close();
             }
         });
@@ -88,33 +88,28 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
         return panel;
     }
 
-    private void addNewInput() throws EmfException {
+    private void addNewOutput() throws EmfException {
         doValidateFields();
-        shouldCreate = true;
-        presenter.addNewInput(input());
+//        shouldCreate = true;
+        presenter.addNewOutput(Output());
         close();
     }
 
-    public boolean shouldCreate() {
-        return shouldCreate;
+//    public boolean shouldCreate() {
+//        return shouldCreate;
+//    }
+
+    public CaseOutput Output() {
+            OutputFieldsPanel.setFields();
+        return OutputFieldsPanel.getOutput();
     }
 
-    public CaseInput input() {
-        try {
-            inputFieldsPanel.setFields();
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
-
-        return inputFieldsPanel.getInput();
-    }
-
-    public void register(Object presenter) {
-        this.presenter = (EditInputsTabPresenterImpl) presenter;
+    public void observe(Object presenter) {
+        this.presenter = (EditOutputsTabPresenterImpl) presenter;
     }
     
     private void doValidateFields() throws EmfException {
-        inputFieldsPanel.validateFields();
+        OutputFieldsPanel.validateFields();
     }
     
     public void addChangeable(Changeable changeable) {

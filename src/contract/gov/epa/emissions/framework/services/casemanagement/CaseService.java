@@ -142,6 +142,7 @@ public interface CaseService {
 //    void registerOutput(CaseOutput output, String jobKey) throws EmfException;
     void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException;
     CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException;
+    CaseOutput addCaseOutput(CaseOutput output) throws EmfException;
     
     String restoreTaskManagers() throws EmfException;
 

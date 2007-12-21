@@ -292,7 +292,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             return;
         }
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
-            DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
+            DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
             EmfDataset dataset = (EmfDataset) iter.next();
             presenter.doDisplayPropertiesView(view, dataset);
         }

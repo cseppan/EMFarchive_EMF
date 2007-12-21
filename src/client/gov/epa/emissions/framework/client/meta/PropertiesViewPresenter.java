@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.exim.ExportPresenter;
+import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.meta.info.InfoTabPresenter;
 import gov.epa.emissions.framework.client.meta.info.InfoTabView;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTabPresenter;
@@ -39,7 +41,6 @@ public class PropertiesViewPresenter {
     public void doDisplay(PropertiesView view) {
         this.view = view;
         view.observe(this);
-
         view.display(dataset);
     }
 
@@ -101,6 +102,12 @@ public class PropertiesViewPresenter {
         VersionedDataWindow versionsView = new VersionedDataWindow(parentConsole, desktopManager);
         VersionedDataPresenter presenter = new VersionedDataPresenter(dataset, session);
         presenter.display(versionsView);
+    }
+
+    public void doExport(ExportWindow exportView, ExportPresenter presenter) {
+        view.clearMessage();
+        presenter.display(exportView);
+        
     }
 
 }

@@ -10,6 +10,8 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
+import javax.swing.JComponent;
+
 public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
 
     private Case caseObj;
@@ -75,5 +77,24 @@ public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
         EditOutputPresenter editOutputPresenter = new EditCaseOutputPresenterImpl(caseObj.getId(), outputEditor, view,
                 session);
         editOutputPresenter.display(output);
+    }
+    
+    public void addNewOutputDialog(NewOutputView dialog, CaseOutput newOutput) {
+        dialog.observe(this);
+        dialog.display(caseObj.getId(), newOutput);
+    }
+
+    public void addNewOutput(CaseOutput output) throws EmfException {
+        output.setCaseId(caseObj.getId());
+        view.addOutput(service().addCaseOutput(output));
+        view.refresh();
+    }
+    
+    public void doAddOutputFields(JComponent container, OutputFieldsPanelView outputFields, CaseOutput newOutput) throws EmfException {
+ //       newOutput.setId(view.numberOfRecord());
+        
+        OutputFieldsPanelPresenter outputFieldsPresenter = new OutputFieldsPanelPresenter(caseObj.getId(), outputFields,
+                session);
+        outputFieldsPresenter.display(newOutput, container);
     }
 }

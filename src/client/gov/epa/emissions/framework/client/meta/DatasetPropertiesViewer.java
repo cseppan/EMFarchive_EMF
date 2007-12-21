@@ -2,9 +2,14 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.exim.ExportPresenter;
+import gov.epa.emissions.framework.client.exim.ExportPresenterImpl;
+import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.meta.info.InfoTab;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTab;
@@ -38,20 +43,26 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     private EmfConsole parentConsole;
 
     private DesktopManager desktopManager;
+    
+    private EmfSession session;
+    
+    private EmfDataset dataset;
 
-    public DatasetPropertiesViewer(EmfConsole parentConsole, DesktopManager desktopManager) {
+    public DatasetPropertiesViewer(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties View", new Dimension(700, 500), desktopManager);
         this.parentConsole = parentConsole;
+        this.session=session;
         this.desktopManager = desktopManager;
     }
 
     public void display(EmfDataset dataset) {
         super.setTitle("Dataset Properties View: " + dataset.getName());
         super.setName("datasetPropertiesView:" + dataset.getId());
+        this.dataset=dataset; 
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.PAGE_START);
-        panel.add(createTabbedPane(dataset), BorderLayout.CENTER);
+        panel.add(createTabbedPane(), BorderLayout.CENTER);
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         super.getContentPane().add(panel);
@@ -59,7 +70,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         super.display();
     }
 
-    private JTabbedPane createTabbedPane(EmfDataset dataset) {
+    private JTabbedPane createTabbedPane() {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
 
@@ -163,6 +174,13 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         left.add(data);
 
         JPanel right = new JPanel();
+        Button exportButton = new ExportButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                exportDataset(dataset);
+            }
+        });
+        exportButton.setToolTipText("Export dataset");
+        right.add(exportButton);
         Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
@@ -176,6 +194,16 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         panel.add(right, BorderLayout.LINE_END);
 
         return panel;
+    }
+
+    private void exportDataset(EmfDataset dataset) {
+        EmfDataset[] emfDatasets = {dataset};
+
+        ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager, parentConsole, session);
+        getDesktopPane().add(exportView);
+
+        ExportPresenter exportPresenter = new ExportPresenterImpl(session);
+        presenter.doExport(exportView, exportPresenter);
     }
 
     private Action editPropertyAction() {

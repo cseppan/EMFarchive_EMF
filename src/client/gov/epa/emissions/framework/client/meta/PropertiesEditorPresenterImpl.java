@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.exim.ExportPresenter;
+import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
@@ -124,5 +126,9 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
 
     public EmfSession getSession() {
         return this.session;
+    }
+    
+    public void doExport(ExportWindow exportView, ExportPresenter presenter) {
+        presenter.display(exportView);
     }
 }

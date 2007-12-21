@@ -811,4 +811,15 @@ public class CaseServiceTransport implements CaseService {
 
         call.request(new Object[] { user, msgs });
     }
+
+    public CaseOutput addCaseOutput(CaseOutput output) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("addCaseOutput");
+        call.addParam("output", caseMappings.caseOutput());
+        call.setReturnType(caseMappings.caseOutput());
+
+        return (CaseOutput) call.requestResponse(new Object[] { output });
+
+    }
 }

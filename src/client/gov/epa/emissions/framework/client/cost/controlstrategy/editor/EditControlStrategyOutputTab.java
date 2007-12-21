@@ -469,7 +469,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         }
          
         for (int i = 0; i < controlStrategyResults.length; i++) {
-            DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
+            DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
             if (buttonGroup.getSelection().equals(invButton.getModel())) {
                 presenter.doDisplayPropertiesView(view, getInputDataset(controlStrategyResults[i].getInputDatasetId()));
 

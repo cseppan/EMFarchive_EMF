@@ -2605,4 +2605,22 @@ public class ManagedCaseService {
         
     }
 
+    public CaseOutput addCaseOutput(CaseOutput output) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        if (dao.caseOutputExists(output, session))
+            throw new EmfException("The combination of 'Output Name'and 'Job' should be unique.");
+
+        try {
+            dao.add(output, session);
+            return (CaseOutput) dao.loadCaseOutput(output, session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not add new case output '" + output.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new case output '" + output.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
 }

@@ -376,7 +376,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             return;
         }
         for (Iterator<EmfDataset> iter = datasets.iterator(); iter.hasNext();) {
-            DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
+            DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
             EmfDataset dataset = iter.next();
             presenter.doDisplayPropertiesView(view, dataset);
         }

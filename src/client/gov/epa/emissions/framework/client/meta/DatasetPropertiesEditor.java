@@ -3,11 +3,15 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.exim.ExportPresenter;
+import gov.epa.emissions.framework.client.exim.ExportPresenterImpl;
+import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.meta.info.InfoTab;
 import gov.epa.emissions.framework.client.meta.info.InfoTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTab;
@@ -49,6 +53,8 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private EditableKeywordsTab keywordsTab;
 
     private JTabbedPane tabbedPane;
+    
+    private EmfDataset dataset;
 
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties Editor", new Dimension(700, 550), desktopManager);
@@ -170,6 +176,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     public void display(EmfDataset dataset, Version[] versions) {
         super.setTitle("Dataset Properties Editor: " + dataset.getName());
         super.setName("datasetPropertiesEditor:" + dataset.getId());
+        this.dataset=dataset;
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 
@@ -199,6 +206,14 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
             }
         });
         buttonsPanel.add(save);
+        
+        Button exportButton = new ExportButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                exportDataset(dataset);
+            }
+        });
+        exportButton.setToolTipText("Export dataset");
+        buttonsPanel.add(exportButton);
 
         Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -259,6 +274,16 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     public void setDefaultTab(int index) {
         this.tabbedPane.setSelectedIndex(index);
+    }
+    
+    private void exportDataset(EmfDataset dataset) {
+        EmfDataset[] emfDatasets = {dataset};
+
+        ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager, parentConsole, session);
+        getDesktopPane().add(exportView);
+
+        ExportPresenter exportPresenter = new ExportPresenterImpl(session);
+        presenter.doExport(exportView, exportPresenter);
     }
 
 }

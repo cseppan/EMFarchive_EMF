@@ -180,11 +180,11 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
 
         Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //
+                clearMessage();
+                doNewOutput(presenter);
             }
         });
         add.setMargin(insets);
-        add.setEnabled(false);
         container.add(add);
         
         Button remove = new RemoveButton(new AbstractAction() {
@@ -241,7 +241,15 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         panel.add(container, BorderLayout.WEST);
         return panel;
     }
-
+    protected void doNewOutput(EditOutputsTabPresenter presenter) {
+        NewOutputDialog view = new NewOutputDialog(parentConsole);
+        try {
+            CaseOutput newOutput = new CaseOutput();
+            presenter.addNewOutputDialog(view, newOutput);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
     protected void editOutput() throws EmfException {
         List outputs = selectModel.selected();
         if (outputs.size() == 0) {
@@ -273,7 +281,7 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
             int id = selectedOutput.getDatasetId();
             EmfDataset dataset = presenter.getDataset(id);
             PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
-            DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
+            DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
             presenter.doDisplay(view);
         }
     }
@@ -356,5 +364,14 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
 
     public void clearMessage() {
         messagePanel.clear();
+    }
+
+    public void addOutput(CaseOutput addCaseOutput) {
+        tableData.add(addCaseOutput);
+        selectModel.refresh();
+
+        tablePanel.removeAll();
+        tablePanel.add(createSortFilterPanel(parentConsole));
+        
     }
 }

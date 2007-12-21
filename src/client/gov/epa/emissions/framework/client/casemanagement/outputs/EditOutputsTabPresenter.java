@@ -20,6 +20,8 @@ public interface EditOutputsTabPresenter extends CaseEditorTabPresenter {
     void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset);
     
     EmfDataset getDataset(int id) throws EmfException;
+    
+    void addNewOutputDialog(NewOutputView view, CaseOutput output) throws EmfException;
 
     void editOutput(CaseOutput output, EditCaseOutputView outputEditor) throws EmfException;
 }   

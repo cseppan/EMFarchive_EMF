@@ -553,4 +553,8 @@ public class CaseServiceImpl implements CaseService {
         
     }
 
+    public CaseOutput addCaseOutput(CaseOutput output) throws EmfException {
+            return getCaseService().addCaseOutput(output);
+    }
+
 }
