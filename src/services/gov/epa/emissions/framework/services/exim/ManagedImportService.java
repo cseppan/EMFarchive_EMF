@@ -174,7 +174,7 @@ public class ManagedImportService {
     }
 
     private synchronized void addTasksToSubmitter(TaskSubmitter submitter) {
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_11)
             System.out.println("Before importTaskSubmitter.addTasksToSubmitter # of elements in importTasks array= "
                     + importTasks.size());
 
@@ -212,7 +212,6 @@ public class ManagedImportService {
     }
 
     private synchronized void addOutputTasks(User user, CaseOutput output, Services services) throws Exception {
-        String separator = File.separator;
         String folder = output.getPath();
         String pattern = output.getPattern();
         String fullPath = output.getDatasetFile();
@@ -223,13 +222,16 @@ public class ManagedImportService {
             throw new Exception("Error registering output: Please specify files to register case output "+
                     output.getName());
 
-        if (folder == null || folder.trim().isEmpty())
-            folder = fullPath.substring(0, fullPath.lastIndexOf(separator));
 
-        if (fullPath != null && !fullPath.trim().isEmpty())
-            files = new String[] { fullPath.substring(fullPath.lastIndexOf(separator) + 1) };
-        else
+        if (fullPath != null && !fullPath.trim().isEmpty()) {
+            // get folder from full path
+            File singleFile = new File(fullPath);
+            folder = singleFile.getParent();
+            files = new String[] { singleFile.getName() };
+        } else {
+            // get files from pattern and folder
             files = getFilenamesFromPattern(folder, pattern);
+        }
 
         File path = validatePath(folder);
         DatasetType type = getDsType(output.getDatasetType());
@@ -250,17 +252,32 @@ public class ManagedImportService {
             throw new EmfException("Error registering output: Number of files (" 
                     + files.length + ") exceeds limit for dataset type " + type.getName() + ".");
         
+        CaseOutput localOuput = createNewCaseOutput(output);
         EmfDataset dataset = createDataset(path.getAbsolutePath(), files[0], datasetName, user, type);
+        boolean nameSpecified = (localOuput.getName() != null && !localOuput.getName().trim().isEmpty());
         
-        if (output.getName() == null || output.getName().trim().isEmpty())
-            output.setName(dataset.getName());
+        if (!nameSpecified)
+            localOuput.setName(dataset.getName());
+        
+        if (DebugLevels.DEBUG_11) {
+            System.out.println("Output name before create import task: " + (localOuput == null ? "" : output.getName()));
+            System.out.println("Dataset name before create import task: " + dataset.getName());
+        }
         
         Importer importer = importerFactory.createVersioned(dataset, path, files);
-        ImportCaseOutputTask task = new ImportCaseOutputTask(output, dataset, files, importer, user, services,
+        ImportCaseOutputTask task = new ImportCaseOutputTask(localOuput, dataset, files, importer, user, services,
                 dbServerFactory, sessionFactory);
-
+        
         //System.out.println("\nADDING IMPORT TASK FOR DATASET: "+datasetName+";files[0]="+files[0]);
         importTasks.add(task);
+    }
+    
+    private synchronized CaseOutput createNewCaseOutput(CaseOutput oldOutput) {
+        CaseOutput newOutput = new CaseOutput(oldOutput.getName());
+        newOutput.setCaseId(oldOutput.getCaseId());
+        newOutput.setJobId(oldOutput.getJobId());
+        
+        return newOutput;
     }
 
     private synchronized DatasetType getDsType(String datasetType) throws EmfException {
@@ -295,6 +312,7 @@ public class ManagedImportService {
             addOutputTasks(user, output, services);
             addTasksToSubmitter(importCaseOutputSubmitter);
         } catch (Exception e) {
+            e.printStackTrace();
             setErrorMsgs(fileFolder, e);
             throw new EmfException(e.getMessage());
         }
@@ -360,7 +378,7 @@ public class ManagedImportService {
             if (fileNamesForImport.length > 0)
                 return fileNamesForImport;
 
-            if (DebugLevels.DEBUG_0) {
+            if (DebugLevels.DEBUG_11) {
                 System.out.println("ManagedImportService: File patterns passed: " + pattern);
                 
                 for (String file : fileNamesForImport)

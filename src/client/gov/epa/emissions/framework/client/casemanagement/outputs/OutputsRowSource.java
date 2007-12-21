@@ -31,12 +31,11 @@ public class OutputsRowSource implements RowSource {
     }
 
     private String getMessage(CaseOutput source) {
-        String msg=null;
-        String message=source.getMessage();
-        if(message.length()>20) {
-            msg=message.substring(0,19);
-            return msg;
-        }
+        String message = source.getMessage();
+        
+        if(message != null && message.length() > 50)
+            return message.substring(0,49);
+        
         return message;
     }
 
@@ -56,6 +55,7 @@ public class OutputsRowSource implements RowSource {
             if (values.startsWith(property))
                 value = values.substring(values.indexOf(",") + 1);
         }
+        
         return value;
     }
 

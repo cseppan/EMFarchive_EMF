@@ -7,8 +7,8 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.exim.ImportTask;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import org.apache.commons.logging.Log;
@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 
-public class ImportCaseOutputTask extends ImportTask {
+public class ImportCaseOutputTask extends Task {
     
     @Override
     public boolean isEquivalent(Task task) { //NOTE: needs to verify definition of equality
@@ -28,29 +28,54 @@ public class ImportCaseOutputTask extends ImportTask {
         
         return false;
     }
-
-    protected static Log log = LogFactory.getLog(ImportCaseOutputTask.class);
     
-    private CaseDAO caseDAO;
+    private static Log log = LogFactory.getLog(ImportCaseOutputTask.class);
 
+    protected Importer importer;
+
+    protected EmfDataset dataset;
+    
     private CaseOutput output;
+
+    protected String[] files;
+
+    protected HibernateSessionFactory sessionFactory;
+
+    protected double numSeconds;
+    
+    protected DatasetDAO datasetDao;
+    
+    private CaseDAO caseDao;
 
     public ImportCaseOutputTask(CaseOutput output, EmfDataset dataset, String[] files, Importer importer, User user, Services services,
             DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
-        super(dataset, files, importer, user, services, dbServerFactory, sessionFactory);
+        super();
+        createId();
         
         if (DebugLevels.DEBUG_1)
-        {
             System.out.println(">>>> " + createId());
-            System.out.println("Output="+output.getName()+";dataset="+dataset.getName()+";#files="+files.length+
-                    ";file[0]="+files[0]);
-        }
         
+        this.user = user;
+        this.files = files;
+        this.dataset = dataset;
         this.output = output;
-        this.caseDAO = new CaseDAO(sessionFactory);
+        this.statusServices = services.getStatus();
+        this.sessionFactory = sessionFactory;
+        this.datasetDao = new DatasetDAO(dbServerFactory);
+        this.caseDao = new CaseDAO(sessionFactory);
+        this.importer = importer;
     }
 
     public void run() {
+        if (DebugLevels.DEBUG_1)
+            System.out.println(">>## ImportTask:run() " + taskId + " for dataset: " + this.dataset.getName());
+        if (DebugLevels.DEBUG_1)
+            System.out.println("Task#" + taskId + " RUN @@@@@ THREAD ID: " + Thread.currentThread().getId());
+
+        if (DebugLevels.DEBUG_1)
+            if (DebugLevels.DEBUG_1)
+                System.out.println("Task# " + taskId + " running");
+        
         Session session = null;
         try {
             long startTime = System.currentTimeMillis();
@@ -64,8 +89,13 @@ public class ImportCaseOutputTask extends ImportTask {
         } catch (Exception e) {
             // this doesn't give the full path for some reason
             logError("Failed to import file(s) : " + filesList(), e);
+            setStatus("failed", "Failed to import dataset " + dataset.getName() + ". Reason: " + e.getMessage());
             removeDataset(dataset);
-            updateCaseOutput("Failed", "Registering case output " + dataset.getName() + " of type " + output.getDatasetType() + " failed.");
+            try {
+                caseDao.removeCaseOutputs(user, new CaseOutput[]{output}, true, session);
+            } catch (EmfException e1) {
+                e1.printStackTrace();
+            }
         } finally {
             if (session != null)
                 session.flush();
@@ -75,48 +105,103 @@ public class ImportCaseOutputTask extends ImportTask {
 
     protected void prepare(Session session) throws EmfException {
         addStartStatus();
+        caseDao.add(user, output, session);
         dataset.setStatus("Started import");
         addDataset(dataset, session);
-        this.dataset = dao.getDataset(session, dataset.getName());
-        output.setDatasetId(dataset.getId());
-        addCaseOutput(output);
-    }
-
-    private void addCaseOutput(CaseOutput localOutput) {
-//        try {
-//            if (caseDAO.caseOutputNameUsed(output.getName()))
-//                throw new EmfException("The selected case output name is already in use");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new EmfException(e.getMessage() == null ? "" : e.getMessage());
-//        }
-        
-        localOutput.setMessage("Registering case output for " + dataset.getName() + " of type " + output.getDatasetType());
-        this.output = caseDAO.add(this.user, localOutput);
-    }
-
-    private void updateCaseOutput(String status, String message) {
-        output.setStatus(status);
-        output.setMessage(message);
-        caseDAO.updateCaseOutput(output);
-        setStatus(status, message);
     }
 
     protected void complete(Session session, String status) {
+        String message = "Case output " + output.getName() + " registered successfully.";
+        
         dataset.setStatus(status);
-        //dataset.setModifiedDateTime(new Date()); //last mod time has been set when creted
-        //output.setDatasetId(dataset.getId());
         updateDataset(dataset, session);
-        updateCaseOutput(status, "Case output registered successfully.");
+        updateOutput(session, status, message);
         addCompletedStatus();
     }
-    
+
+    private void updateOutput(Session session, String status, String message) {
+        output.setDatasetId(datasetDao.getDataset(session, dataset.getName()).getId());
+        output.setStatus(status);
+        output.setMessage(message);
+        caseDao.updateCaseOutput(output, session);
+    }
+
+    protected String filesList() {
+        StringBuffer fileList = new StringBuffer(files[0]);
+
+        if (files.length > 1)
+            for (int i = 1; i < files.length; i++)
+                fileList.append(", " + files[i]);
+
+        return fileList.toString();
+    }
+
+    protected void addDataset(EmfDataset dataset, Session session) throws EmfException {
+        try {
+            if (datasetDao.datasetNameUsed(dataset.getName()))
+                throw new EmfException("The selected Dataset name is already in use");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException(e.getMessage() == null ? "" : e.getMessage());
+        }
+
+        datasetDao.add(dataset, session);
+    }
+
+    protected void updateDataset(EmfDataset dataset, Session session) {
+        try {
+            datasetDao.updateWithoutLocking(dataset, session);
+        } catch (Exception e) {
+            logError("Could not update Dataset - " + dataset.getName(), e);
+        }
+    }
+
+    protected void removeDataset(EmfDataset dataset) {
+        try {
+            Session session = sessionFactory.getSession();
+            datasetDao.remove(dataset, session);
+            session.close();
+        } catch (Exception e) {
+            logError("Could not get remove Dataset - " + dataset.getName(), e);
+        }
+    }
+
+    protected void addStartStatus() {
+        setStatus("started", "Started import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] from "+
+                files[0] + output.getName() + " " + caseDao.toString());
+    }
+
+    protected void addCompletedStatus() {
+        String message = "Completed import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] " 
+               + " in " + numSeconds + " seconds from "+ files[0]; //TODO: add batch size to message once available
+        setStatus("completed", message);
+    }
+
     protected void setStatus(String status, String message) {
-        if (DebugLevels.DEBUG_10)
-            System.out.println("Import task (id: " + taskId + ") in submitter " + this.submitterId + " setting status " 
-                    + status + "; Message: " + message + "; On thread " + Thread.currentThread().getId());
-            
-        ImportTaskManager.callBackFromThread(this.taskId, this.submitterId, status, Thread.currentThread().getId(), message);
+        output.setStatus(status);
+        output.setMessage(message);
+        
+        ImportTaskManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(), message);
+    }
+
+    protected void logError(String messge, Exception e) {
+        log.error(messge, e);
+    }
+    
+    public EmfDataset getDataset() {
+        return this.dataset;
+    }
+    
+    public Importer getImporter() {
+        return this.importer;
+    }
+    
+    @Override
+    protected void finalize() throws Throwable {
+        taskCount--;
+        if (DebugLevels.DEBUG_1)
+            System.out.println(">>>> Destroying object: " + createId());
+        super.finalize();
     }
 
 }

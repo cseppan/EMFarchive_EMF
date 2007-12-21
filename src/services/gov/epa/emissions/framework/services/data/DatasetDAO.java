@@ -42,9 +42,9 @@ public class DatasetDAO {
     private LockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
-
+    
     private DbServerFactory dbServerFactory;
-
+    
     public DatasetDAO() {
         lockingScheme = new LockingScheme();
         hibernateFacade = new HibernateFacade();
@@ -111,22 +111,11 @@ public class DatasetDAO {
             hibernateFacade.updateOnly(dataset, session);
         }
     }
-    
-    public synchronized void remove(EmfDataset dataset, Session session) throws EmfException {
-        String datasetName = dataset.getName();
-        
-        if (dataset.isLocked())
-            throw new EmfException("Could not remove dataset " + datasetName + ". It is locked by " + dataset.getLockOwner());
-        
-        try {
-            removeEmissionTable(dataset, session);
-            hibernateFacade.remove(dataset, session);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new EmfException("Could not remove dataset " + datasetName + ". Reason: " + e.getMessage());
-        }
-    }
 
+    public void remove(EmfDataset dataset, Session session) {
+        hibernateFacade.remove(dataset, session);
+    }
+    
     public synchronized void remove(User user, EmfDataset dataset, Session session) throws EmfException {
         // NOTE: method to be modified to really remove dataset. It is only rename it for now.
 
@@ -264,10 +253,10 @@ public class DatasetDAO {
     public long getDatasetRecordsNumber(DbServer dbServer, Session session, EmfDataset dataset, Version version)
             throws SQLException {
         DatasetType type = dataset.getDatasetType();
-
+        
         if (type.getExporterClassName().endsWith("ExternalFilesExporter"))
             return dataset.getExternalSources().length;
-
+            
         Datasource datasource = dbServer.getEmissionsDatasource();
         InternalSource source = dataset.getInternalSources()[0];
         String qualifiedTable = datasource.getName() + "." + source.getTable();
@@ -296,8 +285,8 @@ public class DatasetDAO {
         String versions = versionsList(version, session);
         String deleteClause = createDeleteClause(versions);
 
-        String whereClause = " WHERE dataset_id = " + version.getDatasetId() + " AND version IN (" + versions + ")"
-                + deleteClause;
+        String whereClause = " WHERE dataset_id = " + version.getDatasetId() + " AND version IN (" + versions
+                + ")" + deleteClause;
 
         return whereClause;
     }
@@ -309,13 +298,15 @@ public class DatasetDAO {
         // e.g.: delete_version NOT SIMILAR TO '(6|6,%|%,6,%|%,6)'
         while (tokenizer.hasMoreTokens()) {
             String version = tokenizer.nextToken();
-            if (!version.equals("0")) {
+            if (!version.equals("0"))
+            {    
                 String regex = "(" + version + "|" + version + ",%|%," + version + ",%|%," + version + ")";
-                if (buffer.length() == 0) {
+                if (buffer.length() == 0)
+                {
                     buffer.append(" AND ");
                 }
                 buffer.append(" delete_versions NOT SIMILAR TO '" + regex + "'");
-
+    
                 if (tokenizer.hasMoreTokens())
                     buffer.append(" AND ");
             }
@@ -337,27 +328,16 @@ public class DatasetDAO {
         return result.toString();
     }
 
-    private synchronized void renameEmissionTable(EmfDataset dataset, Session session) throws Exception {
+    private void renameEmissionTable(EmfDataset dataset, Session session) throws Exception {
         EmfDataset oldDataset = getDataset(session, dataset.getId());
 
         if (!continueToRename(dataset, oldDataset))
             return;
-
+        
         DbServer dbServer = getDbServer();
 
         try {
             renameTable(dataset, oldDataset, dbServer);
-        } finally {
-            dbServer.disconnect();
-        }
-    }
-
-    public synchronized void removeEmissionTable(EmfDataset dataset, Session session) throws Exception {
-        EmfDataset oldDataset = getDataset(session, dataset.getId());
-        DbServer dbServer = getDbServer();
-
-        try {
-            removeTable(oldDataset, dbServer);
         } finally {
             dbServer.disconnect();
         }
@@ -379,34 +359,15 @@ public class DatasetDAO {
         return true;
     }
 
-    private synchronized void renameTable(EmfDataset dataset, EmfDataset oldDataset, DbServer dbServer)
-            throws ImporterException {
+    private void renameTable(EmfDataset dataset, EmfDataset oldDataset, DbServer dbServer) throws ImporterException {
         Datasource datasource = dbServer.getEmissionsDatasource();
         InternalSource[] sources = dataset.getInternalSources();
         DataTable table = new DataTable(oldDataset, datasource);
-        InternalSource[] oldSources = oldDataset.getInternalSources();
-        String oldTableName = (oldSources == null) ? "" : oldSources[0].getTable();
+        String oldTableName = oldDataset.getInternalSources()[0].getTable();
         String newTableName = table.createName(dataset.getName());
 
-        if (sources != null && sources.length > 0)
-            sources[0].setTable(newTableName);
-        
+        sources[0].setTable(newTableName);
         table.rename(oldTableName, newTableName);
-    }
-
-    private synchronized void removeTable(EmfDataset oldDataset, DbServer dbServer) throws Exception {
-        Datasource datasource = dbServer.getEmissionsDatasource();
-        InternalSource[] sources = oldDataset.getInternalSources();
-
-        if (sources == null || sources.length == 0)
-            return;
-
-        DataTable table = new DataTable(oldDataset, datasource);
-
-        for (int i = 0; i < sources.length; i++) {
-            String oldTableName = sources[i].getTable();
-            table.drop(oldTableName);
-        }
     }
 
     public boolean datasetNameUsed(String name) throws Exception {
@@ -441,7 +402,7 @@ public class DatasetDAO {
             dbServer = new EmfDbServer();
         else
             dbServer = dbServerFactory.getDbServer();
-
+        
         return dbServer;
     }
 

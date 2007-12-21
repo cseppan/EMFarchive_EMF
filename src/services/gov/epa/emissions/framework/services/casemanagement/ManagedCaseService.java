@@ -2532,23 +2532,6 @@ public class ManagedCaseService {
         }
     }
 
-    // delete this in favor of next one
-//    public synchronized void registerOutput(CaseOutput output, String jobKey) throws EmfException {
-//        // Qun: Why do we still have this method when we're using the other one?  Do we need both?
-//        try {
-//            CaseJob job = getJobFromKey(jobKey);
-//            output.setCaseId(job.getCaseId());
-//            output.setJobId(job.getId());
-//
-//            getImportService().importDatasetForCaseOutput(job.getUser(), output);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            if (e.getMessage().startsWith("Error registering output"))
-//                throw new EmfException(e.getMessage());
-//            throw new EmfException("Error registering output: " + e.getMessage());
-//        }
-//    }
-
     public synchronized void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
         try {
             CaseJob job = null;

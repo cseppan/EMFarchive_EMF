@@ -64,37 +64,36 @@ public class CaseDAO {
         }
     }
 
-    public CaseOutput add(User user, CaseOutput output) {
-        Session session = sessionFactory.getSession();
+    public CaseOutput add(User user, CaseOutput output, Session session) {
         CaseOutput toReturn = null;
-       
+        Session localSession = sessionFactory.getSession();
+
         try {
-            CaseOutput existed = getCaseOutput(output, session);
-            
-            if (existed != null) {
-                removeDatasetsOnOutput(user, session, new CaseOutput[] { existed });
-                existed.setMessage(output.getMessage());
-                existed.setStatus(output.getStatus());
-                existed.setExecName(output.getExecName());
-                existed.setDatasetId(output.getDatasetId());
-                return updateCaseOutput(existed);
+            CaseOutput existed = getCaseOutput(output, localSession);
+
+            if (DebugLevels.DEBUG_11) {
+                System.out.println("Is output existed? " + (existed == null));
+                System.out.println("Output to check: " + output.getName() + " case id: " + output.getCaseId() + " jobid: " + output.getJobId());
             }
+            
+            if (existed != null)
+                removeCaseOutputs(user, new CaseOutput[] { existed }, true, localSession);
 
             hibernateFacade.add(output, session);
             toReturn = getCaseOutput(output, session);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
-            session.close();
+            localSession.close();
         }
-        
+
         return toReturn;
     }
 
     public CaseOutput updateCaseOutput(CaseOutput output) {
         Session session = sessionFactory.getSession();
         CaseOutput toReturn = null;
-        
+
         try {
             hibernateFacade.updateOnly(output, session);
             toReturn = getCaseOutput(output, session);
@@ -103,8 +102,13 @@ public class CaseDAO {
         } finally {
             session.close();
         }
-        
+
         return toReturn;
+    }
+
+    public CaseOutput updateCaseOutput(Session session, CaseOutput output) {
+        hibernateFacade.updateOnly(output, session);
+        return getCaseOutput(output, session);
     }
 
     public boolean caseOutputNameUsed(String outputName) {
@@ -252,7 +256,8 @@ public class CaseDAO {
         hibernateFacade.remove(inputs, session);
     }
 
-    public void removeCaseOutputs(User user, CaseOutput[] outputs, boolean removeDatasets, Session session) throws EmfException {
+    public void removeCaseOutputs(User user, CaseOutput[] outputs, boolean removeDatasets, Session session)
+            throws EmfException {
         try {
             if (removeDatasets)
                 removeDatasetsOnOutput(user, session, outputs);
@@ -317,7 +322,7 @@ public class CaseDAO {
 
         return hibernateFacade.load(CaseInput.class, criterions, session);
     }
-    
+
     public List getCaseInputs(int caseId, Session session) {
         Criterion crit = Restrictions.eq("caseID", new Integer(caseId));
 
@@ -807,7 +812,7 @@ public class CaseDAO {
         Criterion crit1 = Restrictions.eq("caseId", new Integer(output.getCaseId()));
         Criterion crit2 = Restrictions.eq("jobId", new Integer(output.getJobId()));
         Criterion crit3 = Restrictions.eq("name", output.getName());
-        
+
         return (CaseOutput) hibernateFacade.load(CaseOutput.class, new Criterion[] { crit1, crit2, crit3 }, session);
     }
 
@@ -863,6 +868,7 @@ public class CaseDAO {
 
         return hibernateFacade.load(CaseOutput.class, criterions, session);
     }
+
     private Criterion[] uniqueCaseOutputCriteria(CaseOutput output) {
         Integer caseID = new Integer(output.getCaseId());
         String inputname = output.getName();
@@ -876,13 +882,13 @@ public class CaseDAO {
 
         return new Criterion[] { c1, c2, c3, c4 };
     }
-    
+
     public void updateCaseOutput(CaseOutput output, Session session) {
         hibernateFacade.updateOnly(output, session);
     }
-    
+
     public void removeJobMessages(JobMessage[] msgs, Session session) {
         hibernateFacade.remove(msgs, session);
-        
+
     }
 }

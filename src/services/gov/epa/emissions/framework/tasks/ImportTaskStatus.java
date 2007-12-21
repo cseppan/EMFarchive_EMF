@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.tasks;
 
-import gov.epa.emissions.framework.services.exim.ImportTask;
 
 /**
  * This class holds the status of each import task in the import submitter or import task manager
@@ -13,13 +12,13 @@ public class ImportTaskStatus implements TaskStatus{
     private String fullImportPath = null;
     private String submitterId = null;
     private String threadId = null;
-    private ImportTask importTask = null;
+    private Task importTask = null;
 
-    public ImportTask getImportTask() {
+    public Task getImportTask() {
         return importTask;
     }
 
-    public void setImportTask(ImportTask importTask) {
+    public void setImportTask(Task importTask) {
         this.importTask = importTask;
     }
 

@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.tasks;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
-import gov.epa.emissions.framework.services.exim.ImportTask;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,7 +41,7 @@ public abstract class ImportSubmitter implements TaskSubmitter {
     }
 
     private synchronized void addTaskToSubmitter(Runnable task) {
-        ImportTask tsk = (ImportTask) task;
+        Task tsk = (Task) task;
 
         // populate the submittedTable with an ImportTaskStatus object that also holds a reference to the task object
         ImportTaskStatus ets = new ImportTaskStatus(tsk.getTaskId(), tsk.getSubmitterId());

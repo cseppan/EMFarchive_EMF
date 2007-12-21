@@ -1,8 +1,6 @@
 package gov.epa.emissions.framework.tasks;
 
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.exim.ImportTask;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -24,7 +22,7 @@ public class ImportTaskManager implements TaskManager {
     private static ImportTaskManager ref;
 
     private static int refCount = 0;
-    
+
     private static int processQueueCount = 0;
 
     private final int poolSize = 4;
@@ -61,7 +59,7 @@ public class ImportTaskManager implements TaskManager {
     public synchronized void shutDown() {
         if (DebugLevels.DEBUG_1)
             System.out.println("Shutdown called on Task Manager");
-        
+
         taskQueue.clear();
         threadPoolQueue.clear();
         threadPool.shutdownNow();
@@ -83,7 +81,7 @@ public class ImportTaskManager implements TaskManager {
         if (DebugLevels.DEBUG_1)
             System.out.println("DeREGISTERED SUBMITTER: " + ts.getSubmitterId() + " Confirm task count= "
                     + ts.getTaskCount());
-        
+
         submitters.remove(ts);
     }
 
@@ -104,7 +102,7 @@ public class ImportTaskManager implements TaskManager {
     public static synchronized ImportTaskManager getImportTaskManager() {
         if (ref == null)
             ref = new ImportTaskManager();
-        
+
         return ref;
     }
 
@@ -114,7 +112,7 @@ public class ImportTaskManager implements TaskManager {
         log.info("ImportTaskManager");
         refCount++;
         threadPool = new ThreadPoolExecutor(poolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS, threadPoolQueue);
-        
+
         if (DebugLevels.DEBUG_9) {
             System.out.println("Import Task Manager created @@@@@ THREAD ID: " + Thread.currentThread().getId());
             System.out.println("Task Manager created refCount= " + refCount);
@@ -137,7 +135,7 @@ public class ImportTaskManager implements TaskManager {
     public static synchronized void processTaskQueue() {
         if (DebugLevels.DEBUG_10)
             System.out.println("<<<>>>ImportTaskManager: processTaskQueue() called " + ++processQueueCount + " times.");
-        
+
         int threadsAvail = -99;
         try {
             if (DebugLevels.DEBUG_9) {
@@ -170,12 +168,12 @@ public class ImportTaskManager implements TaskManager {
             while (iter.hasNext()) {
                 // number of threads available before inspecting the waiting list
                 threadsAvail = threadPool.getCorePoolSize() - runTable.size();
-                
+
                 if (DebugLevels.DEBUG_9)
                     System.out.println("Number of threads available before waiting list-table: " + threadsAvail);
 
                 if (threadsAvail > 0) {
-                    ImportTask tsk = (ImportTask) iter.next();
+                    Task tsk = iter.next();
                     if (DebugLevels.DEBUG_9)
                         System.out
                                 .println("&&&&& In ImportTaskManager::processQueue threadsAvail so pop a task to run the type of TASK objects coming in are: "
@@ -215,21 +213,21 @@ public class ImportTaskManager implements TaskManager {
 
             if (DebugLevels.DEBUG_9)
                 System.out.println("SIZE OF TASKQUEUE: " + getSizeofTaskQueue());
-            
+
             boolean done = false;
-            
+
             while (!done) {
                 if (taskQueue.size() == 0) {
                     if (DebugLevels.DEBUG_9)
                         System.out.println("#tasks in taskQueue == 0?? Breaking out of taskQueue TEST loop: ");
                     done = true;
                 } else {
-                    
+
                     if (DebugLevels.DEBUG_9)
                         System.out.println("Before Peak into taskQueue: " + taskQueue.size());
-                    
+
                     if (taskQueue.peek() != null) {
-                        
+
                         if (DebugLevels.DEBUG_9)
                             System.out.println("Peak into taskQueue has an object in head: " + taskQueue.size());
 
@@ -240,16 +238,16 @@ public class ImportTaskManager implements TaskManager {
                                 System.out.println("Task Class Name: " + tp.getClass().getName());
 
                             Task tt = (Task) taskQueue.take();
-                            ImportTask nextTask = (ImportTask) tt;
+                            Task nextTask = tt;
                             threadsAvail = threadPool.getCorePoolSize() - runTable.size();
 
-                            if (DebugLevels.DEBUG_9){
+                            if (DebugLevels.DEBUG_9) {
                                 System.out.println("Task Class Name: " + tt.getClass().getName());
                                 System.out.println("Processing the PBQ taskId: " + tt.getTaskId());
                                 System.out.println("Processing the PBQ submitterId: " + tt.getSubmitterId());
                                 System.out.println("Number of threads available before taskQueue PDQ: " + threadsAvail);
                             }
-                            
+
                             if (threadsAvail == 0) {
                                 waitTable.put(nextTask.getTaskId(), nextTask);
                             } else {
@@ -282,21 +280,21 @@ public class ImportTaskManager implements TaskManager {
         } catch (ConcurrentModificationException cmex) {
             // do nothing
             log.info("Java is complaining about a ConcurrentModificationException again");
-            
+
             if (DebugLevels.DEBUG_9)
                 System.out.println("Java is complaining about a ConcurrentModificationException again");
         }
     }
 
-    private static synchronized boolean notEqualsToAnyRunTask(ImportTask tsk) {
+    private static synchronized boolean notEqualsToAnyRunTask(Task tsk) {
         if (DebugLevels.DEBUG_9)
             System.out.println("SIZE OF RUN list-table: " + runTable.size());
 
         Collection<Task> runTasks = runTable.values();
         Iterator<Task> iter = runTasks.iterator();
-        
+
         while (iter.hasNext()) {
-            ImportTask runTask = (ImportTask) iter.next();
+            Task runTask = iter.next();
             if (DebugLevels.DEBUG_9)
                 System.out.println("In ImportTaskManager::notEqualsToAnyRunTask " + " importTask is of type= "
                         + tsk.getClass().getName() + " and runTask if of type= " + runTask.getClass().getName());
@@ -314,7 +312,7 @@ public class ImportTaskManager implements TaskManager {
             System.out.println("%%%% ImportTaskManager reports that Task# " + taskId + " for submitter= " + submitterId
                     + " completed with status= " + status + " and message= " + mesg);
         }
-        
+
         Iterator<ImportSubmitter> iter = submitters.iterator();
         while (iter.hasNext()) {
             ImportSubmitter submitter = iter.next();
@@ -326,7 +324,7 @@ public class ImportTaskManager implements TaskManager {
         }
         processTaskQueue();
     }
-    
+
     public static synchronized void callBackFromThread(String taskId, String submitterId, String status, long id,
             String mesg) {
         if (DebugLevels.DEBUG_9) {
@@ -338,7 +336,7 @@ public class ImportTaskManager implements TaskManager {
         }
 
         ImportSubmitter submitter = getCurrentSubmitter(submitterId);
-        
+
         if (status.equals("started")) {
             if (DebugLevels.DEBUG_9)
                 System.out.println("%%%% ImportTaskManager reports that Task# " + taskId
@@ -346,9 +344,9 @@ public class ImportTaskManager implements TaskManager {
                         + status + " and message= " + mesg);
 
         } else {
-//          remove from waitTable
+            // remove from waitTable
             runTable.remove(taskId);
-            
+
             if (DebugLevels.DEBUG_9) {
                 System.out.println("%%%% ImportTaskManager reports that Task# " + taskId + " that ran in thread#: "
                         + id + " for submitter= " + submitterId + " completed with status= " + status
@@ -357,11 +355,26 @@ public class ImportTaskManager implements TaskManager {
                 System.out.println("SIZE OF RUN TABLE AFTER REMOVE= " + runTable.size());
             }
         }
+
+        if (DebugLevels.DEBUG_10)
+            System.out.println("Submitter: " + submitterId + " now is null? " + (submitter == null));
         
-        submitter.callbackFromTaskManager(taskId, status, mesg);
-        
-        if (submitter.getTaskCount() == 0)
+        try {
+            submitter.callbackFromTaskManager(taskId, status, mesg);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+
+        if (submitter.getTaskCount() == 0) {
+            if (DebugLevels.DEBUG_10)
+                System.out.println("Submitter " + submitter.getSubmitterId() + " is deregistering itself. ");
+            
             submitter.deregisterSubmitterFromRunManager(submitter);
+            
+            if (DebugLevels.DEBUG_10)
+                System.out.println("After deregistering itself, the number of submitters in import task manager: "
+                        + submitters.size());
+        }
 
         // done with the call back ... so process the two tables and task queue
         processTaskQueue();
@@ -370,20 +383,24 @@ public class ImportTaskManager implements TaskManager {
             System.out.println("*** END ImportTaskManager::callBackFromThread() *** " + new Date());
 
     }
-    
+
     private static synchronized ImportSubmitter getCurrentSubmitter(String submitterId) {
         Iterator<ImportSubmitter> iter = submitters.iterator();
-        
+
         while (iter.hasNext()) {
             ImportSubmitter submitter = iter.next();
             if (submitterId.equals(submitter.getSubmitterId())) {
-                if (DebugLevels.DEBUG_9)
+                if (DebugLevels.DEBUG_10) {
+                    System.out.println("Number of submitters in import task manager: " + submitters.size());
+                    System.out.println("current submitter id: " + submitterId + " registered submitter id: "
+                            + submitter.getSubmitterId());
                     System.out.println("@@##@@ Found a submitter in the taskmanager collection of submitters: "
                             + submitter.getSubmitterId());
+                }
                 return submitter;
             }
         }
-        
+
         return null;
     }
 
@@ -413,8 +430,8 @@ public class ImportTaskManager implements TaskManager {
                 iter = waitingTasks.iterator();
 
                 while (iter.hasNext()) {
-                    ImportTask et = (ImportTask) iter.next();
-                    String etStatus = et.getUser().getId() + "," + et.getDataset().getName() + "\n";
+                    Task et = iter.next();
+                    String etStatus = et.getUser().getId() + "," + et.getTaskId() + "\n";
                     sbuf.append(etStatus);
                 }
             }
@@ -434,8 +451,8 @@ public class ImportTaskManager implements TaskManager {
 
                 iter = runningTasks.iterator();
                 while (iter.hasNext()) {
-                    ImportTask et = (ImportTask) iter.next();
-                    String etStatus = et.getUser().getId() + "," + et.getDataset().getName() + "\n";
+                    Task et = iter.next();
+                    String etStatus = et.getUser().getId() + "," + et.getTaskId() + "\n";
                     sbuf.append(etStatus);
                 }
 
