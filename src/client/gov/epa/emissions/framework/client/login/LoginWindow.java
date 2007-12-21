@@ -76,7 +76,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
 
     public void display() {
         try {
-            System.out.println("Verifying version");
+            System.out.println("Verifying server version is "+EMF_VERSION);
             if (!presenter.checkEmfVersion(EMF_VERSION) && toUpdate() == JOptionPane.YES_OPTION)
                 disposeView();
             else
