@@ -253,11 +253,12 @@ public class ManagedImportService {
                     + files.length + ") exceeds limit for dataset type " + type.getName() + ".");
         
         CaseOutput localOuput = createNewCaseOutput(output);
-        EmfDataset dataset = createDataset(path.getAbsolutePath(), files[0], datasetName, user, type);
         boolean nameSpecified = (localOuput.getName() != null && !localOuput.getName().trim().isEmpty());
         
         if (!nameSpecified)
-            localOuput.setName(dataset.getName());
+            localOuput.setName(datasetName);
+        
+        EmfDataset dataset = createDataset(path.getAbsolutePath(), files[0], datasetName, user, type);
         
         if (DebugLevels.DEBUG_11) {
             System.out.println("Output name before create import task: " + (localOuput == null ? "" : output.getName()));
