@@ -1800,12 +1800,14 @@ public class ManagedCaseService {
          * etc.
          */
         String setenvLine;
-        if (envvalue.indexOf(' ') >= 0)
-            setenvLine = this.runSet + " " + envvariable + this.runEq + addQuotes(envvalue) + this.runTerminator;
-        else
+        
+        // add quotes to value, if they are not already there
+        if (envvalue.indexOf('"') >= 0)
             setenvLine = this.runSet + " " + envvariable + this.runEq + envvalue + this.runTerminator;
-           
-       return setenvLine + eolString;
+        else
+            setenvLine = this.runSet + " " + envvariable + this.runEq + addQuotes(envvalue) + this.runTerminator;
+
+        return setenvLine + eolString;
 
     }
 
@@ -2236,7 +2238,8 @@ public class ManagedCaseService {
             dao.updateCaseJob(job);
 
             if (!user.getUsername().equalsIgnoreCase(message.getRemoteUser()))
-                throw new EmfException("Error recording job messages: Remote user doesn't match the user who runs the job.");
+                throw new EmfException(
+                        "Error recording job messages: Remote user doesn't match the user who runs the job.");
 
             dao.add(message);
 
@@ -2535,7 +2538,7 @@ public class ManagedCaseService {
     public synchronized void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
         try {
             CaseJob job = null;
-            
+
             for (int i = 0; i < outputs.length; i++) {
                 job = getJobFromKey(jobKeys[i]);
                 outputs[i].setCaseId(job.getCaseId());
@@ -2547,11 +2550,12 @@ public class ManagedCaseService {
             e.printStackTrace();
             if (e.getMessage().startsWith("Error registering output"))
                 throw new EmfException(e.getMessage());
-           throw new EmfException("Error registering output: " + e.getMessage());
+            throw new EmfException("Error registering output: " + e.getMessage());
         }
     }
 
-    public synchronized void removeCaseOutputs(User user, CaseOutput[] outputs, boolean removeDataset) throws EmfException {
+    public synchronized void removeCaseOutputs(User user, CaseOutput[] outputs, boolean removeDataset)
+            throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -2587,14 +2591,14 @@ public class ManagedCaseService {
         } finally {
             session.close();
         }
-        
+
     }
 
-    public void removeMessages(User user, JobMessage[] msgs) throws EmfException{
+    public void removeMessages(User user, JobMessage[] msgs) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
-            dao.removeJobMessages(msgs,session);
+            dao.removeJobMessages(msgs, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not remove case output " + msgs[0].getMessage() + " etc.\n" + e.getMessage());
@@ -2602,7 +2606,7 @@ public class ManagedCaseService {
         } finally {
             session.close();
         }
-        
+
     }
 
     public CaseOutput addCaseOutput(CaseOutput output) throws EmfException {
