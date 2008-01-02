@@ -132,7 +132,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         else 
             datasetLabels((EmfDataset) datasetCombo.getSelectedItem());
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
-        layoutGenerator.addLabelWidgetPair("Creater:", datasetCreater, panel);
+        layoutGenerator.addLabelWidgetPair("Creator:", datasetCreater, panel);
         layoutGenerator.addLabelWidgetPair("Creation Date:", datasetCreationDate, panel);
         layoutGenerator.addLabelWidgetPair("Exec name:", program, panel);
         layoutGenerator.addLabelWidgetPair("Status:", status, panel);
