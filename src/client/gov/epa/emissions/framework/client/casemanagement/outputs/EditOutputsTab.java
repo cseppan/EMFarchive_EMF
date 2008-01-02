@@ -190,11 +190,7 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         Button remove = new RemoveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 messagePanel.clear();
-                try {
                     removeSelectedOutput();
-                } catch (EmfException e1) {
-                    e1.printStackTrace();
-                }
             }
         });
         remove.setMargin(insets);
@@ -286,7 +282,7 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         }
     }
 
-    private void removeSelectedOutput() throws EmfException {
+    private void removeSelectedOutput(){
         messagePanel.clear();
         CaseOutput[] selected =selectModel.selected().toArray(new CaseOutput[0]);
 
@@ -306,10 +302,18 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
             YesNoDialog dialog = new YesNoDialog(parentConsole, titleDS, messageDS);
             boolean deleteDS=dialog.confirm();
             tableData.remove(selected);
-            presenter.doRemove(selected,deleteDS);
-            doRefresh();
+            try {
+                presenter.doRemove(selected,deleteDS);
+                messagePanel.setMessage(selected.length
+                        + " outputs have been removed. Please Refresh to see the revised list of Outputs.");
+            }catch (EmfException e){
+                messagePanel.setError(e.getMessage());
+            }
+//            finally{
+//                doRefresh();
+//            }
         }
-//         clearMessage();
+//        clearMessage();
 //        setCursor(Cursor.getDefaultCursor());
 //        messagePanel.setMessage("Finished removing outputs.");
     }

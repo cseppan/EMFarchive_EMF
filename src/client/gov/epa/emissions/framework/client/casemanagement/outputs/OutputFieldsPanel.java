@@ -40,7 +40,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     
     private JLabel sector;
     
-    private JLabel creationDate; 
+    private JLabel datasetCreationDate, datasetCreater; 
     
     private JLabel program;
 
@@ -77,7 +77,6 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
 //        outputName.setMaximumSize(new Dimension(200, 20));
         changeablesList.addChangeable(outputName);
         layoutGenerator.addLabelWidgetPair("Output Name:", outputName, panel);
-
         CaseJob[] jobArray = presenter.getCaseJobs();
         jobCombo= new ComboBox(jobArray);
         jobCombo.setSelectedIndex(presenter.getJobIndex(output.getJobId(), jobArray));
@@ -98,7 +97,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         dsTypeCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 fillDatasets((DatasetType) dsTypeCombo.getSelectedItem());
-                updateLabels(null);
+                datasetLabels(null);
             }
         });
         changeablesList.addChangeable(dsTypeCombo);
@@ -114,7 +113,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
             datasetCombo.setSelectedIndex(presenter.getDatasetIndex(dsName, datasets));
         datasetCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                updateLabels((EmfDataset) datasetCombo.getSelectedItem());
+                datasetLabels((EmfDataset) datasetCombo.getSelectedItem());
             }
         });
         changeablesList.addChangeable(datasetCombo);
@@ -122,43 +121,55 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("Dataset:", datasetCombo, panel);
         
         sector=new JLabel("");
-        creationDate=new JLabel("");
+        datasetCreationDate=new JLabel("");
+        datasetCreater=new JLabel("");
         program=new JLabel("");
         status = new JLabel("");
         updateSectorName((CaseJob)jobCombo.getSelectedItem());
+        outputLabels(); 
         if(type==null) 
-            updateLabels(null);
+            datasetLabels(null);
         else 
-            updateLabels((EmfDataset) datasetCombo.getSelectedItem());
+            datasetLabels((EmfDataset) datasetCombo.getSelectedItem());
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
-        layoutGenerator.addLabelWidgetPair("Creation Date:", creationDate, panel);
+        layoutGenerator.addLabelWidgetPair("Creater:", datasetCreater, panel);
+        layoutGenerator.addLabelWidgetPair("Creation Date:", datasetCreationDate, panel);
         layoutGenerator.addLabelWidgetPair("Exec name:", program, panel);
         layoutGenerator.addLabelWidgetPair("Status:", status, panel);
         layoutGenerator.addLabelWidgetPair("Message:", message(), panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 9, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 10, 2, // rows, cols
                 10, 10, // initialX, initialY
                 10, 10);// xPad, yPad
 
         container.add(panel);
     }
 
-    protected void updateLabels(EmfDataset selectedItem) {
+    private void datasetLabels(EmfDataset selectedItem) {
         String dateText="";
-        String programText="";
-        String statusText ="";
+        String createrText="";
         if (selectedItem !=null ){
             datasetValues=presenter.getDatasetValues(new Integer(selectedItem.getId()));
             dateText=getDatasetProperty("createdDateTime").substring(0, 16);
-            programText=output.getExecName();
-            statusText=getDatasetProperty("status");
+            createrText=getDatasetProperty("creator");
         }
-        creationDate.setText(dateText);
+        datasetCreationDate.setText(dateText);
+        datasetCreater.setText(createrText);
+    }
+    
+    private void outputLabels() {
+        String programText="";
+        String statusText ="";
+        if (output !=null ){
+            programText=output.getExecName();
+            statusText=output.getStatus();
+        }
         program.setText(programText);
         status.setText(statusText);
 
     }
+    
     protected void updateSectorName(CaseJob job) {
         String sectorText="";
         Sector sector1=job.getSector();
