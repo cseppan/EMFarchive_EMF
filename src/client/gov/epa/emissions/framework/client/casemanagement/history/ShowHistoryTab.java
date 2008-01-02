@@ -22,7 +22,6 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -106,6 +105,11 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
     }
 
     private void refreshTab(JobMessage[] msgs) throws Exception {
+        try {
+            getAllJobs();
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
         selectedJob=(CaseJob) jobCombo.getSelectedItem();
         super.removeAll();
         super.add(createLayout(msgs, parentConsole), BorderLayout.CENTER);
@@ -122,7 +126,8 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
     private void getAllJobs() throws EmfException {
         this.caseJobs = new ArrayList<CaseJob>();
         caseJobs.add(new CaseJob("All"));
-        caseJobs.addAll(Arrays.asList(presenter.getCaseJobs()));
+        caseJobs.addAll(presenter.getCaseJobs());
+//        Collections.sort(caseJobs);
     }
     
     private JPanel createTopPanel() {

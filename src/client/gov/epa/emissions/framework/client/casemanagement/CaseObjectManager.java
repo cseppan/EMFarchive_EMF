@@ -1,20 +1,17 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
-import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
-import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
+import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
@@ -24,11 +21,11 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterE
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
-//import gov.epa.emissions.framework.services.data.DataService;
-//import gov.epa.emissions.framework.services.editor.DataEditorService;
-import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.casemanagement.inputs.CaseJobNameComparator;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class CaseObjectManager {
 
@@ -165,11 +162,12 @@ public class CaseObjectManager {
         }
         // otherwise, get a new list
         List<CaseJob> jobs = new ArrayList<CaseJob>();
-        jobs.add(allJobsForSector);
         jobs.addAll(Arrays.asList(caseService.getCaseJobs(caseId)));
         // sort the Case Jobs before sending them to the ComboBox
+        Collections.sort(jobs);
+        jobs.add(0, allJobsForSector);
         jobsForLastCaseId = jobs.toArray(new CaseJob[jobs.size()]);
-        Arrays.sort(jobsForLastCaseId, new CaseJobNameComparator());
+//        Arrays.sort(jobsForLastCaseId, new CaseJobNameComparator());
         lastCaseId = caseId;
         return jobsForLastCaseId;
     }

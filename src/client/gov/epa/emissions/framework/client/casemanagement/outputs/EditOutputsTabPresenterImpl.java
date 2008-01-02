@@ -1,5 +1,10 @@
 package gov.epa.emissions.framework.client.casemanagement.outputs;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
@@ -48,10 +53,15 @@ public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
         return session.caseService();
     }
 
-    public CaseJob[] getCaseJobs() throws EmfException {
-        return service().getCaseJobs(caseObj.getId());
+    public List<CaseJob> getCaseJobs() throws EmfException {
+        CaseJob[] caseJobs=service().getCaseJobs(caseObj.getId());
+        List<CaseJob> jobs= new ArrayList<CaseJob>();
+        jobs.addAll(Arrays.asList(caseJobs));
+        Collections.sort(jobs);
+        return jobs; 
+ //       return service().getCaseJobs(caseObj.getId());
     }
-
+    
     public Case getCaseObj() {
         return this.caseObj;
     }

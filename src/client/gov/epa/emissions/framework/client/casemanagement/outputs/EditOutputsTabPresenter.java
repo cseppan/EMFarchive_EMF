@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement.outputs;
 
+import java.util.List;
+
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorTabPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.services.EmfException;
@@ -13,7 +15,7 @@ public interface EditOutputsTabPresenter extends CaseEditorTabPresenter {
     
     CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException;
     
-    CaseJob[] getCaseJobs()throws EmfException;
+    List<CaseJob> getCaseJobs()throws EmfException;
 
     void doRemove(CaseOutput[] outputs, boolean deleteDataset) throws EmfException;
 

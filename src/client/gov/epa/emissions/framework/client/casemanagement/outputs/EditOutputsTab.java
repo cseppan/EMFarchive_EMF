@@ -32,7 +32,6 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -102,6 +101,11 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
 
     private void doRefresh(CaseOutput[] outputs){
         messagePanel.clear();
+        try {
+            getAllJobs();
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
         selectedJob=(CaseJob) jobCombo.getSelectedItem();
         super.removeAll();
         super.add(createLayout(outputs), BorderLayout.CENTER);
@@ -119,7 +123,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
     private void getAllJobs() throws EmfException {
         this.caseJobs = new ArrayList<CaseJob>();
         caseJobs.add(new CaseJob("All"));
-        caseJobs.addAll(Arrays.asList(presenter.getCaseJobs()));
+        caseJobs.addAll(presenter.getCaseJobs());
     }
     
     private JPanel createTopPanel() {
