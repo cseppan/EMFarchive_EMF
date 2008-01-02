@@ -260,12 +260,12 @@ public class CaseDAO {
         hibernateFacade.remove(inputs, session);
     }
 
-    public void removeCaseOutputs(User user, CaseOutput[] outputs, boolean removeDatasets, Session session)
-            throws EmfException {
+    public void removeCaseOutputs(User user, CaseOutput[] outputs, boolean deleteDataset, Session session) throws EmfException
+   {
         try {
-            if (removeDatasets)
+            if (deleteDataset)
                 removeDatasetsOnOutput(user, session, outputs);
-        } finally {
+        }finally {
             hibernateFacade.remove(outputs, session);
         }
     }
@@ -862,8 +862,14 @@ public class CaseDAO {
         for (CaseOutput output : outputs) {
             EmfDataset dataset = dsDao.getDataset(session, output.getDatasetId());
 
-            if (dataset != null)
-                dsDao.remove(user, dataset, session);
+            if (dataset != null){
+                try{
+                    dsDao.remove(user, dataset, session);
+                }catch (EmfException e){
+                    System.out.println(e.getMessage());
+                    throw new EmfException(e.getMessage());
+                }
+            }
         }
     }
 

@@ -2554,16 +2554,16 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized void removeCaseOutputs(User user, CaseOutput[] outputs, boolean removeDataset)
-            throws EmfException {
+    public synchronized void removeCaseOutputs(User user, CaseOutput[] outputs, boolean deleteDataset) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
-            dao.removeCaseOutputs(user, outputs, removeDataset, session);
+            dao.removeCaseOutputs(user, outputs, deleteDataset, session);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("Could not remove case output " + outputs[0].getName() + " etc.\n" + e.getMessage());
-            throw new EmfException("Could not remove case output " + outputs[0].getName() + " etc.");
+//            log.error("Could not remove case output " + outputs[0].getName() + " etc.\n" + e.getMessage());
+//            throw new EmfException("Could not remove case output " + outputs[0].getName() + " etc.");
+            throw new EmfException(e.getMessage());
         } finally {
             session.close();
         }
