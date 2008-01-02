@@ -77,7 +77,7 @@ public interface CaseService {
     
     void removeCaseInputs(CaseInput[] inputs) throws EmfException;
     
-    void removeCaseOutputs(User user, CaseOutput[] outputs, boolean removeDatasets) throws EmfException;
+    void removeCaseOutputs(User user, CaseOutput[] outputs, boolean deleteDataset) throws EmfException;
     
     CaseInput[] getCaseInputs(int caseId) throws EmfException;
     
