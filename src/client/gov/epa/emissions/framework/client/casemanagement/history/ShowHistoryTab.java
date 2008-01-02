@@ -105,12 +105,13 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
     }
 
     private void refreshTab(JobMessage[] msgs) throws Exception {
-        try {
-            getAllJobs();
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
+        messagePanel.clear();
         selectedJob=(CaseJob) jobCombo.getSelectedItem();
+//        try {
+//            getAllJobs();
+//        } catch (EmfException e) {
+//            messagePanel.setError(e.getMessage());
+//        }
         super.removeAll();
         super.add(createLayout(msgs, parentConsole), BorderLayout.CENTER);
     }
