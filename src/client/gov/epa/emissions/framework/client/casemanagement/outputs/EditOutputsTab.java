@@ -32,6 +32,7 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -123,7 +124,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
     private void getAllJobs() throws EmfException {
         this.caseJobs = new ArrayList<CaseJob>();
         caseJobs.add(new CaseJob("All"));
-        caseJobs.addAll(presenter.getCaseJobs());
+        caseJobs.addAll(Arrays.asList(presenter.getCaseJobs()));
     }
     
     private JPanel createTopPanel() {

@@ -22,6 +22,7 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -134,7 +135,7 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
     private void getAllJobs() throws EmfException {
         this.caseJobs = new ArrayList<CaseJob>();
         caseJobs.add(new CaseJob("All"));
-        caseJobs.addAll(presenter.getCaseJobs());
+        caseJobs.addAll(Arrays.asList(presenter.getCaseJobs()));
     }
     
     private JPanel createTopPanel() {

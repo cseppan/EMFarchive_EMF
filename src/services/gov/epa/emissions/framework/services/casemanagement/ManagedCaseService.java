@@ -1149,7 +1149,7 @@ public class ManagedCaseService {
 
         try {
             List<CaseJob> jobs = dao.getCaseJobs(caseId, session);
-
+            Collections.sort(jobs);
             return jobs.toArray(new CaseJob[0]);
         } catch (Exception e) {
             e.printStackTrace();
