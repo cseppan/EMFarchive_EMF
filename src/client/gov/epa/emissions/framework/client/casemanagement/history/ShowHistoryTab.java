@@ -80,21 +80,28 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
   //      kickPopulateThread(new JobMessage[0]);
     }
 
-    private void kickPopulateThread(final JobMessage[] msgs) {
+    private void kickPopulateThread() {
         Thread populateThread = new Thread(new Runnable() {
             public void run() {
-                retrieveJobMsgs(msgs);
+                retrieveJobMsgs();
             }
         });
         populateThread.start();
     }
 
-    public synchronized void retrieveJobMsgs(JobMessage[] msgs) {
+    public synchronized void retrieveJobMsgs() {
         try {
             messagePanel.setMessage("Please wait while retrieving all case histories...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            refreshTab(msgs);
-            messagePanel.clear();
+            if (selectedJob == null || selectedJob.getName().equalsIgnoreCase("Select one")){
+                doRefresh(new JobMessage[0]);
+                clearMessage();
+                super.revalidate();
+                return; 
+            }
+            JobMessage[] msgs=presenter.getJobMessages(caseId, selectedJob.getId());
+            doRefresh(msgs);
+            clearMessage();
             super.revalidate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,17 +111,17 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
         }
     }
 
-    private void refreshTab(JobMessage[] msgs) throws Exception {
-        messagePanel.clear();
-        selectedJob=(CaseJob) jobCombo.getSelectedItem();
-//        try {
-//            getAllJobs();
-//        } catch (EmfException e) {
-//            messagePanel.setError(e.getMessage());
-//        }
-        super.removeAll();
-        super.add(createLayout(msgs, parentConsole), BorderLayout.CENTER);
-    }
+//    private void refreshTab(JobMessage[] msgs) throws Exception {
+//        messagePanel.clear();
+//        selectedJob=(CaseJob) jobCombo.getSelectedItem();
+////        try {
+////            getAllJobs();
+////        } catch (EmfException e) {
+////            messagePanel.setError(e.getMessage());
+////        }
+//        super.removeAll();
+//        super.add(createLayout(msgs, parentConsole), BorderLayout.CENTER);
+//    }
 
     private JPanel createLayout(JobMessage[] msgs, EmfConsole parentConsole) throws Exception {
         final JPanel layout = new JPanel(new BorderLayout());
@@ -128,7 +135,6 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
         this.caseJobs = new ArrayList<CaseJob>();
         caseJobs.add(new CaseJob("All"));
         caseJobs.addAll(presenter.getCaseJobs());
-//        Collections.sort(caseJobs);
     }
     
     private JPanel createTopPanel() {
@@ -136,30 +142,31 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         jobCombo=new ComboBox("Select One", caseJobs.toArray(new CaseJob[0]));
         jobCombo.setPreferredSize(new Dimension(300,20));
+        
         if (selectedJob!=null){
             jobCombo.setSelectedItem(selectedJob);
         }
         jobCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                selectedJob=(CaseJob) jobCombo.getSelectedItem();
-                
-                try {
-                    if (selectedJob == null){
-                        doRefresh(new JobMessage[0]);
-                        return; 
-                    }
-                    JobMessage[] msgs=presenter.getJobMessages(caseId, selectedJob.getId());
-                    doRefresh(msgs);
-                } catch (EmfException exc) {
-                    messagePanel.setError("Could not retrieve all historys for job " );
-                }
+                selectedJob=getSelectedJob();
+                retrieveJobMsgs();
             }
         });
+        
         layoutGenerator.addLabelWidgetPair("Job: ", jobCombo, panel);
 layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         150, 15, // initialX, initialY
         5, 15);// xPad, yPad
         return panel;
+    }
+    
+    private CaseJob getSelectedJob() {
+        Object selected = jobCombo.getSelectedItem();
+
+        if (selected == null)
+            return new CaseJob("Select one");
+
+        return (CaseJob) selected;
     }
 
     private JPanel tablePanel(JobMessage[] msgs, EmfConsole parentConsole) {
@@ -190,14 +197,11 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         JPanel container = new JPanel();
         Insets insets = new Insets(1, 2, 1, 2);
         
-//        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
-//        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
-
         Button remove = new RemoveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     removeSelectedHistory();
-                } catch (EmfException e1) {
+                } catch (Exception e1) {
                     messagePanel.setError("Can't remove messages");
                 }
             }
@@ -209,8 +213,8 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         return panel;
     }
     
-    protected void removeSelectedHistory() throws EmfException {
-        messagePanel.clear();
+    protected void removeSelectedHistory() throws Exception {
+        clearMessage();
         JobMessage[] selected =selectModel.selected().toArray(new JobMessage[0]);
 
         if (selected.length==0) {
@@ -224,7 +228,7 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
 
         if (selection == JOptionPane.YES_OPTION) {
             tableData.remove(selected);
-            doRefresh();
+            doRefresh(tableData.sources());
             presenter.doRemove(selected);
         }
     }
@@ -237,21 +241,16 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         messagePanel.clear();
     }
 
-    public void doRefresh(JobMessage[] msgs) throws EmfException {
-        try {
-            kickPopulateThread(msgs);
-        } catch (Exception e) {
-            throw new EmfException(e.getMessage());
-        }
-
+    public void doRefresh(JobMessage[] msgs) throws Exception {
+        super.removeAll();
+        super.add(createLayout(msgs, parentConsole), BorderLayout.CENTER);
     }
 
-    public void doRefresh() {
+    public void doRefresh() throws EmfException {
         try {
-            if (tableData != null) // it's still null if you've never displayed this tab
-                doRefresh(tableData.sources());
+            kickPopulateThread();
         } catch (Exception e) {
-            messagePanel.setError("Cannot refresh current tab. " + e.getMessage());
+            throw new EmfException(e.getMessage());
         }
     }
 
