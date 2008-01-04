@@ -93,8 +93,8 @@ public class DataAccessorImpl implements DataAccessor {
 
             return result;
         } catch (Exception e) {
-            LOG.error("Failed to get a count of total number of records", e);
-            throw new EmfException("Failed to get a count of total number of records");
+            LOG.error("Failed to get a count of total number of records for dsID "+token.datasetId(), e);
+            throw new EmfException("Failed to get a count of total number of records for dsID "+token.datasetId());
         }
     }
 
