@@ -139,6 +139,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         List<String> warning = new ArrayList<String>();
 
         for (int i = 0; i < jobs.length; i++) {
+            System.out.println("Getting status of jobs from server");
             String status = service().getCaseJob(jobs[i].getId()).getRunstatus().getName();
 
             if (status == null || status.trim().isEmpty())
@@ -226,6 +227,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         for (CaseJob job : jobs)
             ids.add(new Integer(job.getId()));
         
+        System.out.println("Validating input datasets of jobs");
         return service().validateJobs(ids.toArray(new Integer[0]));
     }
 }
