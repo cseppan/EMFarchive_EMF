@@ -369,6 +369,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
 
         try {
+            messagePanel.setMessage("Checking status of selected jobs");
             String msg = presenter.getJobsStatus(jobs);
             int option = JOptionPane.NO_OPTION;
             String lineSeparator = System.getProperty("line.separator");
@@ -404,6 +405,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     }
 
     private int validateJobs(CaseJob[] jobs, int option, String lineSeparator) throws EmfException {
+        messagePanel.setMessage("Validating input dataset versions for selected jobs");       
         String validationMsg = presenter.validateJobs(jobs);
 
         if (validationMsg.isEmpty())
@@ -411,7 +413,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             return JOptionPane.YES_OPTION;  
           
         option = showDialog("The Selected job" + (jobs.length > 1 ? "s have " : " has ") + "non-final input datasets:" + lineSeparator + validationMsg
-                 + lineSeparator + "Are you sure to run the selected job(s)?", "Warning");
+                 + lineSeparator + "Are you sure you would like to run the selected job(s)?", "Warning");
         return option;
     }
 
