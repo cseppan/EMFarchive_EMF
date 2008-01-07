@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
+import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -277,7 +278,22 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         tableData = new EmfFileTableData(infos);
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
-        return new SortFilterSelectionPanel(parent, selectModel);
+        return createSortFilterPanel(parent);
+//        return new SortFilterSelectionPanel(parent, selectModel);
+    }
+    
+    private JPanel createSortFilterPanel(Component parent) {
+        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parent, selectModel);
+        sortFilterPanel.sort(sortCriteria());
+        return sortFilterPanel;
+//        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
+//        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
+//        return scrollPane;
+    }
+    
+    private SortCriteria sortCriteria() {
+        String[] columnNames = { "Name"};
+        return new SortCriteria(columnNames, new boolean[] { true }, new boolean[] { false});
     }
 
     private JScrollPane subdirListWidgit(EmfFileInfo[] files) {
