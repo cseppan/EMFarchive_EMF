@@ -67,8 +67,8 @@ public class DatasetDAO {
         return hibernateFacade.nameUsed(name, clazz, session); // case insensitive comparison
     }
 
-    public EmfDataset current(int id, Class clazz, Session session) {
-        return (EmfDataset) hibernateFacade.current(id, clazz, session);
+    public Object current(int id, Class clazz, Session session) {
+        return hibernateFacade.current(id, clazz, session);
     }
 
     public boolean canUpdate(EmfDataset dataset, Session session) throws Exception {
@@ -80,7 +80,7 @@ public class DatasetDAO {
             throw new EmfException("Dataset with id=" + id + " does not exist.");
         }
 
-        EmfDataset current = current(id, EmfDataset.class, session);
+        EmfDataset current = (EmfDataset) current(id, EmfDataset.class, session);
         session.clear();// clear to flush current
         if (current.getName().equals(newName))
             return true;
@@ -218,7 +218,7 @@ public class DatasetDAO {
     }
 
     private EmfDataset current(EmfDataset dataset, Session session) {
-        return current(dataset.getId(), EmfDataset.class, session);
+        return (EmfDataset)current(dataset.getId(), EmfDataset.class, session);
     }
 
     public List getDatasets(Session session, DatasetType datasetType) {
@@ -466,6 +466,14 @@ public class DatasetDAO {
             dbServer = dbServerFactory.getDbServer();
 
         return dbServer;
+    }
+    
+    public void updateVersionNReleaseLock(Version target, Session session) throws EmfException {
+        lockingScheme.releaseLockOnUpdate(target, (Version)current(target.getId(), Version.class, session), session);
+    }
+    
+    public Version obtainLockOnVersion(User user, int id, Session session) {
+        return (Version)lockingScheme.getLocked(user, (Version)current(id, Version.class, session), session);
     }
 
 }

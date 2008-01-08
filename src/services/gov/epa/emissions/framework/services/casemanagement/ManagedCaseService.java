@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.io.generic.GenericExporterToString;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
@@ -204,6 +205,24 @@ public class ManagedCaseService {
         return dao.getCases(category);
     }
 
+    public Version[] getLaterVersions(EmfDataset dataset, Version version) throws EmfException {
+        Versions versions=new Versions(); 
+        Session session = sessionFactory.getSession();
+        
+        try {
+            int id=dataset.getId();
+            Version[] vers=versions.getLaterVersions(id, version, session);
+            System.out.println("There are " + vers.length + " later versions for dataset: " + dataset.getName());
+            return vers;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get versions for dataset: " + dataset.getName() + ".\n" + e.getMessage());
+            throw new EmfException("Could not get versions for dataset: " + dataset.getName() + ".\n");
+        } finally {
+            session.close();
+        }
+    }
+    
     public CaseJob getCaseJob(int jobId) throws EmfException {
         Session session = sessionFactory.getSession();
 
@@ -2512,6 +2531,51 @@ public class ManagedCaseService {
                 inputsList += "Input: " + input.getName() + ";  Dataset: " + dataset + lineSeparator;
         }
 
+        return inputsList;
+    }
+    
+    public synchronized String validateInputDatasets(Integer[] jobIDs) throws EmfException {
+        List<CaseInput> allInputs = new ArrayList<CaseInput>();
+        for (Integer id : jobIDs) {
+            CaseJob job = this.getCaseJob(id.intValue());
+            allInputs.addAll(this.getAllJobInputs(job));
+        }
+
+        TreeSet<CaseInput> set = new TreeSet<CaseInput>(allInputs);
+        List<CaseInput> uniqueInputs = new ArrayList<CaseInput>(set);
+        
+        return listInputsMsg(uniqueInputs);
+    }
+
+    private String listInputsMsg(List<CaseInput> inputs) throws EmfException   {
+        String inputsList = "";
+        String lineSeparator = System.getProperty("line.separator");
+
+        for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
+            CaseInput input = iter.next();
+            EmfDataset dataset=input.getDataset();
+            
+            if (dataset==null)
+                inputsList += "Input: " + input.getName()+ " has no dataset";
+            
+            else {
+                String datasetName = input.getDataset().getName();
+                Version version = input.getVersion();
+                if (version==null)
+                    throw new EmfException("input version is null");
+ //               System.out.println("current version  " + version.getVersion());
+                Version[] laterVersions=getLaterVersions(dataset, version);
+ //               System.out.println("There are " + laterVersions.length + " in list");
+                
+                inputsList += "Input name  : " + input.getName() + ";  "+lineSeparator
+                            + "Dataset name: " + datasetName + lineSeparator;
+                for(Version ver:laterVersions){
+                    inputsList +="    Version " +ver.getVersion()+" :" + ver.getName() + ",  " 
+                    + ",  " + (ver.getCreator()==null? " " :ver.getCreator().getName())
+                    +(ver.isFinalVersion()? "Final ": "Not Final")+ lineSeparator;
+                }
+            }
+        }
         return inputsList;
     }
 

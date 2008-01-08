@@ -96,14 +96,10 @@ public class ShowHistoryTab extends JPanel implements ShowHistoryTabView, Refres
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             if (selectedJob == null || selectedJob.getName().equalsIgnoreCase("Select one")){
                 doRefresh(new JobMessage[0]);
-                clearMessage();
-                super.revalidate();
                 return; 
             }
             JobMessage[] msgs=presenter.getJobMessages(caseId, selectedJob.getId());
             doRefresh(msgs);
-            clearMessage();
-            super.revalidate();
         } catch (Exception e) {
             e.printStackTrace();
             messagePanel.setError("Cannot retrieve all case histories. " + e.getMessage());
@@ -245,9 +241,12 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
     public void doRefresh(JobMessage[] msgs) throws Exception {
         super.removeAll();
         super.add(createLayout(msgs, parentConsole), BorderLayout.CENTER);
+        super.revalidate();
+        clearMessage();
     }
 
     public void doRefresh() throws EmfException {
+        // note that this will get called when the case is save
         try {
             kickPopulateThread();
         } catch (Exception e) {

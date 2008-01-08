@@ -230,4 +230,13 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         System.out.println("Validating input datasets of jobs");
         return service().validateJobs(ids.toArray(new Integer[0]));
     }
+    
+    public String validateInputDatasets(CaseJob[] jobs) throws EmfException {
+        List<Integer> ids = new ArrayList<Integer>();
+        
+        for (CaseJob job : jobs)
+            ids.add(new Integer(job.getId()));
+        
+        return service().validateInputDatasets(ids.toArray(new Integer[0]));
+    }
 }

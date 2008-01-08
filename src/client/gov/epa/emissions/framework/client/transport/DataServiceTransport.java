@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataService;
@@ -116,6 +117,27 @@ public class DataServiceTransport implements DataService {
         call.setStringArrayReturnType();
         
         return (String[])call.requestResponse(new Object[]{ datasetId });
+    }
+
+    public Version obtainedLockOnVersion(User user, int id) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("obtainedLockOnVersion");
+        call.addParam("user", mappings.user());
+        call.addParam("id", mappings.integer());
+        call.setReturnType(mappings.version());
+
+        return (Version) call.requestResponse(new Object[] { user, id});
+    }
+
+    public void updateVersionNReleaseLock(Version locked) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("updateVersionNReleaseLock");
+        call.addParam("locked", mappings.version());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { locked });
     }
 
 }

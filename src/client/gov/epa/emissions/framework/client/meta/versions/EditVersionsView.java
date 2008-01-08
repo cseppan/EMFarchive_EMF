@@ -12,4 +12,7 @@ public interface EditVersionsView {
     void reload(Version[] versions);
 
     void display(Version[] versions, InternalSource[] sources);
+
+    void notifyLockFailure(Version version);
+
 }

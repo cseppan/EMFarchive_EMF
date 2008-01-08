@@ -100,8 +100,8 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
         JPanel labelPanel = new JPanel();
         labelPanel.setLayout(new BorderLayout());
         try {
-        defaultVersion = new JLabel("  Default Version:  " + presenter.getDatasetNameString());
-        labelPanel.add(defaultVersion, BorderLayout.LINE_START);
+            defaultVersion = new JLabel("  Default Version:  " + presenter.getDatasetNameString());
+            labelPanel.add(defaultVersion, BorderLayout.LINE_START);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

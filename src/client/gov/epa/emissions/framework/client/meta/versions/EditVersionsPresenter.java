@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.data.editor.DataEditorPresenter;
 import gov.epa.emissions.framework.client.data.editor.DataEditorPresenterImpl;
@@ -8,6 +9,7 @@ import gov.epa.emissions.framework.client.data.editor.DataEditorView;
 import gov.epa.emissions.framework.client.data.viewer.DataView;
 import gov.epa.emissions.framework.client.data.viewer.DataViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
@@ -36,12 +38,16 @@ public class EditVersionsPresenter {
     private DataEditorService editorService() {
         return session.dataEditorService();
     }
+    
+    private DataService dataService() {
+        return session.dataService();
+    }
 
     public void doNew(Version base, String name) throws EmfException {
         Version derived = editorService().derive(base, session.user(), name);
         view.add(derived);
     }
-
+    
     public void doView(Version version, String table, DataView view) throws EmfException {
         if (!version.isFinalVersion())
             throw new EmfException("Cannot view a Version that is not Final. Please choose edit for Version "+
@@ -85,4 +91,24 @@ public class EditVersionsPresenter {
     public EmfSession getSession(){
         return session;
     }
+
+    public void doChangeVersionName(Version version) throws EmfException {
+        dataService().updateVersionNReleaseLock(version);
+        reload(dataset);
+    }
+
+    private User getUser() {
+        return session.user();
+    }
+    
+    public Version getLockedVersion(Version version) throws EmfException {
+        Version locked = dataService().obtainedLockOnVersion(getUser(), version.getId());
+        if (!locked.isLocked(getUser())) {// view mode, locked by another user
+            view.notifyLockFailure(version);
+            return null;
+        }
+
+        return locked;
+    }
 }
+

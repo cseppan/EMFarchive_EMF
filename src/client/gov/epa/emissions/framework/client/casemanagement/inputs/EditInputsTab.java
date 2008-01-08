@@ -517,5 +517,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             throw new EmfException(e.getMessage());
         }
     }
+    
+    
 
 }

@@ -176,7 +176,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
 
     public void set(ShowHistoryTabView caseHistoryView) {
         historyPresenter = new ShowHistoryTabPresenter(session, caseHistoryView, caseObj);
-        presenters.add(parametersPresenter);
+//        presenters.add(parametersPresenter);
     }
 
     public void doLoad(String tabTitle) throws EmfException {

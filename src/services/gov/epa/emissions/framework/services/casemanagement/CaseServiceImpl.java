@@ -516,6 +516,16 @@ public class CaseServiceImpl implements CaseService {
     public String validateJobs(Integer[] jobIDs) throws EmfException {
         return getCaseService().validateJobs(jobIDs);
     }
+    
+    public String validateInputDatasets(Integer[] jobIDs) throws EmfException {
+        try{
+            return getCaseService().validateInputDatasets(jobIDs);
+        }catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new EmfException(e.getMessage());
+        }
+    }
 
     public CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException {
         return getCaseService().getCaseOutputs(caseId, jobId);

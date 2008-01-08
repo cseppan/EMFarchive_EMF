@@ -3,9 +3,11 @@ package gov.epa.emissions.framework.client.casemanagement.jobs;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
@@ -235,8 +237,8 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
         Button edit = new EditButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                clearMessage();
                 try {
-                    clearMessage();
                     editJobs();
                 } catch (EmfException ex) {
                     messagePanel.setError(ex.getMessage());
@@ -265,6 +267,20 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         run.setMargin(insets);
         container.add(run);
 
+        Button validate = new Button("Validate", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    clearMessage();
+                    validateJobDatasets();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        });
+        validate.setMargin(insets);
+        container.add(validate);
+        
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
 
@@ -323,9 +339,13 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     }
 
     private void removeSelectedJobs(CaseJob[] jobs) throws EmfException {
+        try{
+            presenter.removeJobs(jobs);
+        }catch (EmfException e){
+            throw new EmfException(e.getMessage());
+        }
         tableData.remove(jobs);
         refresh();
-        presenter.removeJobs(jobs);
     }
 
     private void editJobs() throws EmfException {
@@ -360,6 +380,17 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
     }
 
+    private void validateJobDatasets() throws EmfException{
+        CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
+        String lineSeparator = System.getProperty("line.separator");
+        if (jobs.length == 0) {
+            messagePanel.setMessage("Please select one or more jobs to run.");
+            return;
+        } 
+        
+        showMessageDialog(message(jobs, lineSeparator), "Warning");
+    }
+    
     private void runJobs() throws Exception {
         CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
 
@@ -369,7 +400,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
 
         try {
-            messagePanel.setMessage("Checking status of selected jobs");
             String msg = presenter.getJobsStatus(jobs);
             int option = JOptionPane.NO_OPTION;
             String lineSeparator = System.getProperty("line.separator");
@@ -405,7 +435,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     }
 
     private int validateJobs(CaseJob[] jobs, int option, String lineSeparator) throws EmfException {
-        messagePanel.setMessage("Validating input dataset versions for selected jobs");       
         String validationMsg = presenter.validateJobs(jobs);
 
         if (validationMsg.isEmpty())
@@ -413,7 +442,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             return JOptionPane.YES_OPTION;  
           
         option = showDialog("The Selected job" + (jobs.length > 1 ? "s have " : " has ") + "non-final input datasets:" + lineSeparator + validationMsg
-                 + lineSeparator + "Are you sure you would like to run the selected job(s)?", "Warning");
+                 + lineSeparator + "Are you sure to run the selected job(s)?", "Warning");
         return option;
     }
 
@@ -432,6 +461,20 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     private int showDialog(String msg, String title) {
         return JOptionPane.showConfirmDialog(parentConsole, msg, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
+    }
+    
+    private void showMessageDialog(Object msg, String title) {
+        JOptionPane.showMessageDialog(parentConsole, msg, title, JOptionPane.WARNING_MESSAGE);
+    }
+    
+    private ScrollableComponent message(CaseJob[] jobs, String lineSeparator) throws EmfException {
+        String validationMsg = presenter.validateInputDatasets(jobs);
+        
+        TextArea message = new TextArea("message", validationMsg, 40, 10 );
+        message.setEditable(false);
+        ScrollableComponent descScrollableTextArea = new ScrollableComponent(message);
+        descScrollableTextArea.setMinimumSize(new Dimension(200, 20));
+        return descScrollableTextArea;
     }
 
     public void refresh() {

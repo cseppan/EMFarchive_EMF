@@ -3,8 +3,6 @@ package gov.epa.emissions.framework.client.meta.versions;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
-//import gov.epa.emissions.commons.gui.ConfirmDialog;
-//import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
@@ -13,18 +11,12 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.editor.DataEditor;
 import gov.epa.emissions.framework.client.data.viewer.DataViewer;
-//import gov.epa.emissions.framework.client.meta.DatasetPropertiesEditor;
-//import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
-//import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenterImpl;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
-//import gov.epa.emissions.framework.ui.EmfDatasetTableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
-//import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
-//import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Insets;
@@ -33,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
-//import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -143,6 +134,24 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         if (dataset.getInternalSources().length == 0) {
             newButton.setEnabled(false);
         }
+        
+        Button editButton = new EditButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    doEdit();
+                } catch (EmfException e1) {
+                    messagePanel.setError(e1.getMessage());
+                    e1.printStackTrace();
+                }
+            }
+        });
+        editButton.setToolTipText("Create a new version");
+        editButton.setMargin(new Insets(2, 2, 2, 2));
+        panel.add(editButton);
+        if (dataset.getInternalSources().length == 0) {
+            editButton.setEnabled(false);
+        }
+        
         Button markFinal = new Button("Mark Final", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doMarkFinal(tableData.selected());
@@ -209,6 +218,36 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             }
         }
     }
+    
+    protected void doEdit() throws EmfException {
+        clear();
+        Version[] selectedVersions= tableData.selected();
+ 
+        if (selectedVersions.length>1 || selectedVersions.length==0 ){
+            messagePanel.setMessage("Please select one version only");
+            return; 
+         }
+        
+        Version lockedVersion = presenter.getLockedVersion(selectedVersions[0]);
+        if (lockedVersion==null)
+            return;
+        
+        EditVersionDialog dialog = new EditVersionDialog(dataset, lockedVersion, tableData.getValues(), parentConsole);
+        dialog.run();
+        
+        if (dialog.shouldChange()) {
+            try {
+                presenter.doChangeVersionName(dialog.getVersion());
+            } catch (EmfException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+                messagePanel.setError(e.getMessage());
+            }
+ //           reload(tableData.getValues());
+        }
+
+    }
+    
 
     protected void doMarkFinal(Version[] versions) {
         clear();
@@ -342,6 +381,11 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             tables.add(sources[i].getTable());
 
         return (String[]) tables.toArray(new String[0]);
+    }
+    
+    public void notifyLockFailure(Version version) {
+        clear();
+        messagePanel.setError("Cannot obtain a lock for version \"" + version.getName() + "\".");
     }
 
 }

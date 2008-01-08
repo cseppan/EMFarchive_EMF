@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -206,6 +207,31 @@ public class DataServiceImpl implements DataService {
         values.add("status," + (dataset.getStatus() == null ? "" : dataset.getStatus()));
 
         return values.toArray(new String[0]);
+    }
+
+    public Version obtainedLockOnVersion(User user, int id) throws EmfException {
+        Session session = this.sessionFactory.getSession();
+        
+        try {
+            return dao.obtainLockOnVersion(user, id, session);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+
+    public void updateVersionNReleaseLock(Version locked) throws EmfException {
+        Session session = this.sessionFactory.getSession();
+        
+        try {
+            dao.updateVersionNReleaseLock(locked, session);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+        
     }
 
 }
