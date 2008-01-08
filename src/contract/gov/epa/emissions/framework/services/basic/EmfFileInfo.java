@@ -274,7 +274,7 @@ public class EmfFileInfo implements Serializable, Comparable<EmfFileInfo> {
     
 
     public int compareTo(EmfFileInfo info) {
-        return this.name.compareTo(info.getName());
+        return this.name.compareToIgnoreCase(info.getName());
     }
 
 }
