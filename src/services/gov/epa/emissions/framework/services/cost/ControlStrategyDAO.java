@@ -33,8 +33,8 @@ public class ControlStrategyDAO {
         addObject(element, session);
     }
 
-    public void add(ControlStrategyResult element, Session session) {
-        addObject(element, session);
+    public int add(ControlStrategyResult element, Session session) {
+        return addObject(element, session);
     }
 
     private int addObject(Object obj, Session session) {
@@ -127,10 +127,18 @@ public class ControlStrategyDAO {
         return null;
     }
 
-    public ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId, Session session) {
+    public ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId, 
+            int detailedResultDatasetId, Session session) {
         Criterion critControlStrategyId = Restrictions.eq("controlStrategyId", controlStrategyId);
         Criterion critInputDatasetId = Restrictions.eq("inputDatasetId", inputDatasetId);
-        return (ControlStrategyResult)hibernateFacade.load(ControlStrategyResult.class, new Criterion[] {critControlStrategyId, critInputDatasetId}, 
+        Criterion critDetailedResultDatasetId = Restrictions.eq("detailedResultDataset.id", detailedResultDatasetId);
+        return (ControlStrategyResult)hibernateFacade.load(ControlStrategyResult.class, new Criterion[] {critControlStrategyId, critInputDatasetId, critDetailedResultDatasetId}, 
+                session);
+    }
+
+    public ControlStrategyResult getControlStrategyResult(int id, Session session) {
+        Criterion critId = Restrictions.eq("id", id);
+        return (ControlStrategyResult)hibernateFacade.load(ControlStrategyResult.class, new Criterion[] {critId}, 
                 session);
     }
 

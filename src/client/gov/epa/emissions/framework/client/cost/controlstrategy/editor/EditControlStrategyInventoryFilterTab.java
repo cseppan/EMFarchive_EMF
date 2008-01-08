@@ -4,12 +4,11 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.TextArea;
-import gov.epa.emissions.commons.gui.TextField;
-import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -20,14 +19,11 @@ import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionView
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.basic.EmfFileInfo;
-import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
-import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -38,15 +34,15 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 public class EditControlStrategyInventoryFilterTab extends JPanel implements EditControlStrategyTabView {
 
-    private TextField countyFileTextField;
+//    private TextField countyFileTextField;
     
     private TextArea filter;
     
@@ -72,10 +68,12 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     
     private EditControlStrategyPresenter editControlStrategyPresenter;
     
+    private ComboBox version, dataset;
+    
     public EditControlStrategyInventoryFilterTab(ControlStrategy controlStrategy, ManageChangeables changeablesList, 
             MessagePanel messagePanel, EmfConsole parentConsole, 
             EmfSession session, DesktopManager desktopManager,
-            EditControlStrategyPresenter editControlStrategyPresenter) {
+            EditControlStrategyPresenter editControlStrategyPresenter) throws EmfException {
         super.setName("csFilter");
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
@@ -87,7 +85,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         doLayout(controlStrategy.getControlStrategyInputDatasets());
     }
 
-    private void doLayout(ControlStrategyInputDataset[] controlStrategyInputDatasets) {
+    private void doLayout(ControlStrategyInputDataset[] controlStrategyInputDatasets) throws EmfException {
         tableData = new ControlStrategyInputDatasetTableData(controlStrategyInputDatasets);
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(createMiddleSection(controlStrategy), BorderLayout.CENTER);
@@ -222,6 +220,30 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         }
         
     }
+
+    private void fillVersions(EmfDataset dataset) throws EmfException{
+        version.setEnabled(true);
+
+        if (dataset != null && dataset.getName().equals("None")) dataset = null;
+        Version[] versions = editControlStrategyPresenter.getVersions(dataset);
+        version.removeAllItems();
+        version.setModel(new DefaultComboBoxModel(versions));
+        version.revalidate();
+        if (versions.length > 0)
+            version.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
+
+    }
+    
+    private int getDefaultVersionIndex(Version[] versions, EmfDataset dataset) {
+        int defaultversion = dataset.getDefaultVersion();
+
+        for (int i = 0; i < versions.length; i++)
+            if (defaultversion == versions[i].getVersion())
+                return i;
+
+        return 0;
+    }
+ 
     protected void removeAction() {
         messagePanel.clear();
         List selected = sortFilterSelectModel.selected();
@@ -265,7 +287,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     }
 
 
-    private JPanel createMiddleSection(ControlStrategy controlStrategy) {
+    private JPanel createMiddleSection(ControlStrategy controlStrategy) throws EmfException {
         JPanel middlePanel = new JPanel(new SpringLayout());
         middlePanel.setBorder(new Border("Filters"));
 
@@ -273,7 +295,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         if (value == null)
             value = "";
         
-        filter = new TextArea("filter", value, 40, 4);
+        filter = new TextArea("filter", value, 40, 3);
         filter.setToolTipText("Enter a filter that could be entered as a SQL where clause (e.g., ANN_EMIS>5000 and SCC like '30300%')");
         JScrollPane scrollPane = new JScrollPane(filter);
         changeablesList.addChangeable(filter);
@@ -283,67 +305,61 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 //        layoutGenerator.addLabelWidgetPair("Inventory Dataset:", datasetPanel(), middlePanel);
 //        layoutGenerator.addLabelWidgetPair("Dataset Version:", versionPanel(), middlePanel);
         layoutGenerator.addLabelWidgetPair("Inventory Filter:", scrollPane, middlePanel);
-        layoutGenerator.addLabelWidgetPair("County File:", countyFilePanel(), middlePanel);
 
-        layoutGenerator.makeCompactGrid(middlePanel, 2, 2, // rows, cols
+        EmfDataset[] datasets = editControlStrategyPresenter.getDatasets( editControlStrategyPresenter.getDatasetType("List of Counties (CSV)") );
+
+        dataset = new ComboBox("Not selected", datasets);
+        Dimension size= new Dimension(300, 10);
+        dataset.setPreferredSize(size);
+        dataset.setToolTipText("Browse to find a CSV file with a column named FIPS that lists the counties to which the strategy should apply");
+
+        dataset.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    fillVersions((EmfDataset) dataset.getSelectedItem());
+                } catch (EmfException e1) {
+                    // NOTE Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+
+        version =new ComboBox(new Version[0]);           
+        version.setPreferredSize(size);
+        try {
+            fillVersions((EmfDataset) dataset.getSelectedItem());
+        } catch (EmfException e1) {
+            // NOTE Auto-generated catch block
+            e1.printStackTrace();
+        }
+        
+        layoutGenerator.addLabelWidgetPair("County Dataset:", dataset, middlePanel);
+        layoutGenerator.addLabelWidgetPair("County Dataset Version:", version, middlePanel);
+
+        layoutGenerator.makeCompactGrid(middlePanel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
+                10, 5);// xPad, yPad
 
         return middlePanel;
     }
     
-    private JPanel countyFilePanel() {
-        countyFileTextField = new TextField("countyFile", 40);
-        countyFileTextField.setToolTipText("Browse to find a CSV file with a column named FIPS that lists the counties to which the strategy should apply");
-        countyFileTextField.setText(controlStrategy.getCountyFile());
-        changeablesList.addChangeable(countyFileTextField);
-
-        return getFileChooserPanel(countyFileTextField, "TITLE");
-    }
-    
-    private JPanel getFileChooserPanel(final JTextField dir, final String title) {
-        Button browseButton = new BrowseButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent arg0) {
-                messagePanel.clear();
-                selectFile();
-            }
-        });
-        JPanel folderPanel = new JPanel(new BorderLayout(2,0));
-        folderPanel.add(dir, BorderLayout.LINE_START);
-        folderPanel.add(browseButton, BorderLayout.LINE_END);
-
-        return folderPanel;
-    }
-
-    private void selectFile() {
-        EmfFileInfo initDir = new EmfFileInfo(session.preferences().inputFolder(), true, true);
-        
-        EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(session.dataCommonsService()));
-        chooser.setTitle("Select files containing counties to include in strategy");
-        chooser.setDirectoryAndFileMode();
-        
-        int option = chooser.showDialog(parentConsole, "Select a file");
-
-        EmfFileInfo[] files = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedFiles() : null;
-//        EmfFileInfo dir = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;
-//        
-        if (files == null || files.length == 0)
-            return;
-
-        if (files.length > 1) {
-            messagePanel.setError("Choose only one county file.");
-        } else {
-            countyFileTextField.setText(files[0].getAbsolutePath());
-        }
-    }
-
     public void save(ControlStrategy controlStrategy) throws EmfException {
         String value = filter.getText().trim();
         if (value.length() > 255)
             throw new EmfException("Filter Tab: The length of the sql filter should not exceed 255 characters.");
 
         controlStrategy.setFilter(value);
-        controlStrategy.setCountyFile(countyFileTextField.getText().trim());
+//        controlStrategy.setCountyFile(countyFileTextField.getText().trim());
+        EmfDataset ds =(EmfDataset) dataset.getSelectedItem();
+        if (ds == null) {
+            ds = null;
+        }
+        controlStrategy.setCountyDataset(ds);
+        Version ver = (ds !=null ? (Version) version.getSelectedItem(): null);
+        Integer verValue = (ver !=null? ver.getVersion(): null);
+        controlStrategy.setCountyDatasetVersion(verValue);
+
+        
         ControlStrategyInputDataset[] inputDatasets = {};
         if (tableData != null) {
             inputDatasets = new ControlStrategyInputDataset[tableData.rows().size()];

@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
+import gov.epa.emissions.framework.services.cost.ControlMeasureMonth;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -20,7 +21,7 @@ import java.util.StringTokenizer;
 
 public class CMSummaryRecordReader {
 
-    private CMSummaryFileFormat fileFormat;
+    private CMFileFormat fileFormat;
 
     private Pollutants pollutants;
 
@@ -42,7 +43,7 @@ public class CMSummaryRecordReader {
 
     private int errorLimit = 100;
 
-    public CMSummaryRecordReader(CMSummaryFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) {
+    public CMSummaryRecordReader(CMFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) {
         this.fileFormat = fileFormat;
         this.cmAddImportStatus = new CMAddImportStatus(user, sessionFactory);
         pollutants = new Pollutants(sessionFactory);
@@ -83,7 +84,13 @@ public class CMSummaryRecordReader {
             deviceCode(cm, tokens[8], sb);
             dateReviewed(cm, tokens[9], sb);
             datasource(cm, tokens[10]);
-            description(cm, tokens[11]);
+            if (tokens.length > 12) {
+                month(cm, tokens[11], sb);
+                description(cm, tokens[12]);
+            } else {
+                month(cm, "", sb);
+                description(cm, tokens[11]);
+            }
         }
         if (sb.length() > 0) {
             errorCount++;
@@ -174,6 +181,29 @@ public class CMSummaryRecordReader {
         } catch (CMImporterException e) {
             sb.append(format(e.getMessage()));
         }
+    }
+
+    private void month(ControlMeasure cm, String months, StringBuffer sb) {
+        List<ControlMeasureMonth> monthList = new ArrayList<ControlMeasureMonth>();
+        if (months.length() == 0) {
+            ControlMeasureMonth month = new ControlMeasureMonth();
+            month.setMonth((short)0);
+            monthList.add(month);
+        } else {
+            StringTokenizer stringTokenizer = new StringTokenizer(months, "|");
+            while (stringTokenizer.hasMoreTokens()) {
+                short monthNo = Short.parseShort(stringTokenizer.nextToken());
+                if (monthNo >= 1 && monthNo <= 12) {
+                    ControlMeasureMonth month = new ControlMeasureMonth();
+                    month.setMonth(monthNo);
+                    monthList.add(month);
+                } else {
+                    sb.append(format("Unknown month, month must be between 1 and 12"));
+                    return;
+                }
+            }
+        }
+        cm.setMonths(monthList.toArray(new ControlMeasureMonth[0]));
     }
 
     private Sector[] getSectors(String name) throws CMImporterException {

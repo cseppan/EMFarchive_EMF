@@ -8,15 +8,12 @@ public class EditControlStrategySummaryTabPresenterImpl implements EditControlSt
 
     private EditControlStrategySummaryTabView view;
 
-    private ControlStrategy controlStrategy;
-
     public EditControlStrategySummaryTabPresenterImpl(ControlStrategy controlStrategy,
             EditControlStrategySummaryTabView view) {
-        this.controlStrategy = controlStrategy;
         this.view = view;
     }
 
-    public void doSave() throws EmfException {
+    public void doSave(ControlStrategy controlStrategy) throws EmfException {
         view.save(controlStrategy);
     }
 

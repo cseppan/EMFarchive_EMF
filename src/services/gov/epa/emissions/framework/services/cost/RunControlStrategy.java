@@ -33,6 +33,17 @@ public class RunControlStrategy {
 
     private String exportDirectory;
     
+    private boolean useSQLApproach;
+    
+    public RunControlStrategy(StrategyFactory factory, HibernateSessionFactory sessionFactory, 
+            DbServerFactory dbServerFactory, PooledExecutor threadPool,
+            String exportDirectory, boolean useSQLApproach) {
+        this(factory, sessionFactory, 
+                dbServerFactory, threadPool,
+                exportDirectory);
+        this.useSQLApproach = useSQLApproach;
+    }
+
     public RunControlStrategy(StrategyFactory factory, HibernateSessionFactory sessionFactory, 
             DbServerFactory dbServerFactory, PooledExecutor threadPool,
             String exportDirectory) {
@@ -49,7 +60,7 @@ public class RunControlStrategy {
         try {
             Strategy strategy = factory.create(controlStrategy, user, 
                     sessionFactory, dbServerFactory,
-                    exportDirectory);
+                    exportDirectory, useSQLApproach);
             StrategyTask task = new StrategyTask(strategy, user, services, service);
             threadPool.execute(new GCEnforcerTask("Run Strategy: " + controlStrategy.getName(), task));
         } catch (Exception e) {

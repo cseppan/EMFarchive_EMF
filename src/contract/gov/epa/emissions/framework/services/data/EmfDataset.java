@@ -499,22 +499,68 @@ public class EmfDataset implements Dataset, Lockable {
         String month2 = "";
         while (tokenizer7.hasMoreTokens()) {
             String unsure = tokenizer7.nextToken();
-            if(unsure.equalsIgnoreCase("jan")||
-               unsure.equalsIgnoreCase("feb")||
-               unsure.equalsIgnoreCase("mar")||
-               unsure.equalsIgnoreCase("apr")||
-               unsure.equalsIgnoreCase("may")||
-               unsure.equalsIgnoreCase("jun")||
-               unsure.equalsIgnoreCase("jul")||
-               unsure.equalsIgnoreCase("aug")||
-               unsure.equalsIgnoreCase("sep")||
-               unsure.equalsIgnoreCase("oct")||
-               unsure.equalsIgnoreCase("nov")||
-               unsure.equalsIgnoreCase("dec")) {
-            month2 = unsure;
+            if(unsure.equalsIgnoreCase("jan")||unsure.toLowerCase().startsWith("jan")) {
+                month2 = "jan";
+                break;
             }
-        }
-        
+            if(unsure.equalsIgnoreCase("feb")||unsure.toLowerCase().startsWith("feb"))
+            {
+                month2 = "feb";
+            break;
+            }
+            if(unsure.equalsIgnoreCase("mar")||unsure.toLowerCase().startsWith("mar"))
+            {
+                month2 = "mar";
+            break;
+            }
+            if(unsure.equalsIgnoreCase("apr")||unsure.toLowerCase().startsWith("apr"))
+            {
+                month2 = "apr";
+            break;
+            }
+            if(unsure.equalsIgnoreCase("may")||unsure.toLowerCase().startsWith("may"))
+            {
+                month2 = "may";
+            break;
+            }
+            if(unsure.equalsIgnoreCase("jun")||unsure.toLowerCase().startsWith("jun"))
+            {
+                month2 = "jun";
+            break;
+            }
+            if(unsure.equalsIgnoreCase("jul")||unsure.toLowerCase().startsWith("jul"))
+            {
+                month2 = "jul";
+            break;
+            }
+            if(unsure.equalsIgnoreCase("aug")||unsure.toLowerCase().startsWith("aug"))
+            {
+                month2 = "aug";
+            break;
+            }
+            if(unsure.equalsIgnoreCase("sep")||unsure.toLowerCase().startsWith("sep"))
+            {
+                month2 = "sep";
+            break;
+            }
+            if(unsure.equalsIgnoreCase("oct")||unsure.toLowerCase().startsWith("oct"))
+            {
+                month2 = "oct";
+            break;
+            }
+            if(unsure.equalsIgnoreCase("nov")||unsure.toLowerCase().startsWith("nov"))
+            {
+                month2 = "nov";
+            break;
+            }
+            if(unsure.equalsIgnoreCase("dec")||unsure.toLowerCase().startsWith("dec")) {
+                {
+                    month2 = "dec";
+                break;
+            }
+            }
+        }        
+    
         if(startMonth == stopMonth && startYear == stopYear) {
             month = startMonth;
             //System.out.println("The month of the dataset from startMonth is: " + month);
@@ -543,7 +589,7 @@ public class EmfDataset implements Dataset, Lockable {
                 month = cal.NOVEMBER;
             else if (month2.equalsIgnoreCase("dec") || month2.equalsIgnoreCase("december") || month2.equals("12"))
                 month = cal.DECEMBER;
-            //System.out.println("The month of the dataset from month2 is: " + month);
+            System.out.println("The month of the dataset from month2 is: " + month);
         }
         // Then the file or files must be put into the appropriate method call to create a monthly 
         // query for them.

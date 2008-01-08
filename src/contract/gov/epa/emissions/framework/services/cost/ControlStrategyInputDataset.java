@@ -6,10 +6,6 @@ import java.io.Serializable;
 
 public class ControlStrategyInputDataset implements Serializable {
 
-    private int id;
-
-    private long listindex;
-
     private EmfDataset inputDataset;
 
     private int version;
@@ -22,22 +18,6 @@ public class ControlStrategyInputDataset implements Serializable {
         this.inputDataset = inputDataset;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public long getListindex() {
-        return listindex;
-    }
-
-    public void setListindex(long listindex) {
-        this.listindex = listindex;
-    }
-
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof ControlStrategyInputDataset)) {
             return false;
@@ -45,8 +25,8 @@ public class ControlStrategyInputDataset implements Serializable {
 
         ControlStrategyInputDataset other = (ControlStrategyInputDataset) obj;
 
-        return ((inputDataset != null ? inputDataset.getId() : 0) 
-                == other.getInputDataset().getId());
+        return (inputDataset.getId() == other.getInputDataset().getId()) 
+            && (version == other.getVersion());
     }
 
     public int hashCode() {

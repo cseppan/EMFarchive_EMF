@@ -101,6 +101,15 @@ public class NonpointRecordGenerator implements RecordGenerator {
         tokens.add("" + (displayFinalEmissions ? decFormat.format(originalEmissions - reducedEmission) : 0)); // final emissions
         tokens.add("" + decFormat.format(reducedEmission));  // emissions reduction
         tokens.add("" + (displayOriginalEmissions ? decFormat.format(originalEmissions) : 0)); // inventory emissions 
+
+        tokens.add("1"); // inventory emissions 
+        tokens.add("" + (displayOriginalEmissions ? decFormat.format(originalEmissions) : 0)); // inventory emissions 
+        tokens.add("" + (displayFinalEmissions ? decFormat.format(originalEmissions - reducedEmission) : 0)); // final emissions
+//        Column applyOrder = new Column("Apply_Order", types.intType(), new IntegerFormatter(), "DEFAULT 1");
+//        Column inputEmissions = new Column("input_emis", types.realType(), new RealFormatter());
+//        Column outputEmissions = new Column("output_emis", types.realType(), new RealFormatter());
+
+
         
         tokens.add("" + fullFips.substring(fullFips.length()-5,2));  // FIPS state
         tokens.add("" + fullFips.substring(fullFips.length()-3));    // FIPS county - accounts for possible country code

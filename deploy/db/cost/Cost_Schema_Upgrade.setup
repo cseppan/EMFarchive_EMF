@@ -432,3 +432,39 @@ ALTER TABLE emf.control_strategy_measures ADD COLUMN region_dataset_id integer;
 ALTER TABLE emf.control_strategy_measures ADD COLUMN region_dataset_version integer;
 
 
+ALTER TABLE emf.control_strategies
+   ADD COLUMN county_dataset_id integer;
+
+ALTER TABLE emf.control_strategies
+   ADD COLUMN county_dataset_version integer;
+
+ALTER TABLE emf.control_strategies ADD CONSTRAINT fki_strategy_county_dataset FOREIGN KEY (county_dataset_id) REFERENCES emf.datasets (id)
+   ON UPDATE NO ACTION ON DELETE NO ACTION;
+CREATE INDEX fki_strategy_county_dataset ON emf.control_strategies(county_dataset_id);
+
+
+CREATE TABLE emf.control_measure_months
+(
+  id SERIAL PRIMARY KEY,
+  control_measure_id integer NOT NULL,
+  list_index integer,
+  "month" smallint,
+  CONSTRAINT control_measure_months_control_measure_id_fkey FOREIGN KEY (control_measure_id)
+      REFERENCES emf.control_measures (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT control_measure_months_control_measure_id_key UNIQUE (control_measure_id, "month")
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.control_measure_months OWNER TO emf;
+
+CREATE INDEX control_measure_months_measure_id
+  ON emf.control_measure_months
+  USING btree
+  (control_measure_id);
+
+CREATE INDEX control_measure_months_month
+  ON emf.control_measure_months
+  USING btree
+  ("month");
+
+

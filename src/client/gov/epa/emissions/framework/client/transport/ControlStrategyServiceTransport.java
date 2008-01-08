@@ -121,17 +121,33 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.request(new Object[] { ids, user });
     }
 
-    public synchronized void runStrategy(User user, ControlStrategy strategy,
+    public synchronized void runStrategy(User user, int controlStrategyId,
             String exportDirectory) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("runStrategy");
         call.addParam("user", mappings.user());
-        call.addParam("strategy", mappings.controlStrategy());
+        call.addIntegerParam("controlStrategyId");
         call.addStringParam("exportDirectory");
         call.setVoidReturnType();
 
-        call.request(new Object[] { user, strategy, exportDirectory });
+        call.request(new Object[] { user, new Integer(controlStrategyId), 
+                exportDirectory });
+    }
+
+    public synchronized void runStrategy(User user, int controlStrategyId,
+            String exportDirectory, boolean useSQLApproach) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("runStrategy");
+        call.addParam("user", mappings.user());
+        call.addIntegerParam("controlStrategyId");
+        call.addStringParam("exportDirectory");
+        call.addBooleanParameter("useSQLApproach");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, new Integer(controlStrategyId), 
+                exportDirectory, useSQLApproach });
     }
 
     public synchronized StrategyType[] getStrategyTypes() throws EmfException {
@@ -152,30 +168,20 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.request(new Object[] {});
     }
 
-    public synchronized void createInventory(User user, ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
+    public synchronized void createInventory(User user, ControlStrategy controlStrategy, 
+            ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("createInventory");
         call.addParam("user", mappings.user());
         call.addParam("controlStrategy", mappings.controlStrategy());
         call.addParam("controlStrategyInputDataset", mappings.controlStrategyInputDataset());
+        call.addParam("controlStrategyResult", mappings.controlStrategyResult());
         call.setVoidReturnType();
 
-        call.request(new Object[] { user, controlStrategy, controlStrategyInputDataset });
+        call.request(new Object[] { user, controlStrategy, 
+                controlStrategyInputDataset, controlStrategyResult });
 
-    }
-
-    public synchronized ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId) throws EmfException {
-        EmfCall call = call();
-
-        call.setOperation("controlStrategyResults");
-        call.addIntegerParam("controlStrategyId");
-        call.addIntegerParam("inputDatasetId");
-
-        call.setReturnType(mappings.controlStrategyResult());
-
-        return (ControlStrategyResult) call.requestResponse(new Object[] { new Integer(controlStrategyId), 
-                new Integer(inputDatasetId) });
     }
 
     public synchronized String controlStrategyRunStatus(int id) throws EmfException {

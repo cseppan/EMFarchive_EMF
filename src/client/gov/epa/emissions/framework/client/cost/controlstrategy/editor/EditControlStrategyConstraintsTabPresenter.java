@@ -35,7 +35,7 @@ public class EditControlStrategyConstraintsTabPresenter  implements EditControlS
         
     }
 
-    public void doSave() throws EmfException {
-        view.save(strategy);
+    public void doSave(ControlStrategy controlStrategy) throws EmfException {
+        view.save(controlStrategy);
     }
 }

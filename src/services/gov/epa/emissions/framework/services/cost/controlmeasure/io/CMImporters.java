@@ -65,10 +65,14 @@ public class CMImporters {
 
     private CMSummaryImporter createSummaryImporter() throws EmfException {
         CMSummaryFileFormat fileFormat = new CMSummaryFileFormat();
+        CMSummaryFileFormatv2 fileFormatv2 = new CMSummaryFileFormatv2();
         String[] cols = fileFormat.cols();
+        String[] colsv2 = fileFormatv2.cols();
         for (int i = 0; i < records.length; i++) {
             if (matches(cols, records[i].getTokens())) {
                 return new CMSummaryImporter(files[i], fileFormat, user, sessionFactory);
+            } else if (matches(colsv2, records[i].getTokens())) {
+                return new CMSummaryImporter(files[i], fileFormatv2, user, sessionFactory); 
             }
         }
 

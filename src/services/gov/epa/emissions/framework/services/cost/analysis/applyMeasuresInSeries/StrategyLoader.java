@@ -38,18 +38,29 @@ public class StrategyLoader extends AbstractStrategyLoader {
     
     public StrategyLoader(User user, DbServerFactory dbServerFactory, 
             HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
+            int batchSize, boolean useSQLApproach) throws EmfException {
+        super(user, dbServerFactory, 
+                sessionFactory, controlStrategy, 
+                batchSize, useSQLApproach);
+        this.retrieveBestMeasureEffRecords = new RetrieveBestMeasureEffRecords(controlStrategy, costYearTable, dbServer, sessionFactory);
+        this.retrieveBestMeasures = new RetrieveBestMeasures(controlStrategy, costYearTable,
+                dbServer, sessionFactory);
+    }
+
+    public StrategyLoader(User user, DbServerFactory dbServerFactory, 
+            HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
             int batchSize) throws EmfException {
         super(user, dbServerFactory, 
                 sessionFactory, controlStrategy, 
                 batchSize);
-        this.retrieveBestMeasureEffRecords = new RetrieveBestMeasureEffRecords(controlStrategy, costYearTable);
+        this.retrieveBestMeasureEffRecords = new RetrieveBestMeasureEffRecords(controlStrategy, costYearTable, dbServer, sessionFactory);
         this.retrieveBestMeasures = new RetrieveBestMeasures(controlStrategy, costYearTable,
                 dbServer, sessionFactory);
     }
 
     public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {
         this.mapGenerator = new GenerateSccControlMeasuresMap(dbServer, qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()), 
-                controlStrategy, sessionFactory);
+                controlStrategy, sessionFactory, super.getSourcePollutantList(controlStrategyInputDataset));
         newScc = false;
         newFips = false;
         targetPollutant = false;
@@ -123,9 +134,11 @@ public class StrategyLoader extends AbstractStrategyLoader {
 
                     if (newFips && targetPollutant) {
                         currentTime = System.currentTimeMillis();
+//assume no constraints for now
                         sourceMeasures = retrieveBestMeasures.findTargetPollutantBestMeasures(sccMeasures, fips, 
-                            resultSet.getDouble("CEFF"), !pointDatasetType ? resultSet.getDouble("RPEN") : 100, 
-                            resultSet.getDouble("REFF"), getEmission(resultSet.getDouble("ANN_EMIS"), resultSet.getDouble("AVD_EMIS")));
+                                resultSet.getDouble("CEFF"), !pointDatasetType ? resultSet.getDouble("RPEN") : 100, 
+                                resultSet.getDouble("REFF"), getEmission(resultSet.getDouble("ANN_EMIS"), resultSet.getDouble("AVD_EMIS")));
+//                        sourceMeasures = sccMeasures;
                     } else {
                         sourceMeasures = sccMeasures;
                     }
@@ -165,7 +178,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
                         insertSourceTime += System.currentTimeMillis() - currentTime;
                     } catch (SQLException e) {
                         e.printStackTrace();
-                        throw new EmfException("Error processing record for source record: " + sourceCount + ". Exception: " + e.getMessage());
+                        throw new EmfException("Error in processing record for source record: " + sourceCount + ". Exception: " + e.getMessage());
                     }
                 }
             }

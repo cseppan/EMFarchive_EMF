@@ -22,6 +22,17 @@ public class StrategyTask extends AbstractStrategyTask {
                 batchSize);
     }
 
+    public StrategyTask(ControlStrategy controlStrategy, User user, 
+            DbServerFactory dbServerFactory, Integer batchSize,
+            HibernateSessionFactory sessionFactory, String exportDirectory, Boolean useSQLApproach) throws EmfException {
+        super(controlStrategy, user, 
+                dbServerFactory, sessionFactory,
+                exportDirectory);
+        this.loader = new StrategyLoader(user, dbServerFactory, 
+                sessionFactory, controlStrategy, 
+                batchSize, useSQLApproach);
+    }
+
     public void run() throws EmfException {
         super.run(loader);
     }

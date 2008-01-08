@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.client.data.SourceGroups;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
+import gov.epa.emissions.framework.services.cost.ControlMeasureMonth;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -67,6 +68,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     private AddRemoveSectorWidget sectorsWidget;
 
+    private AddRemoveMonthWidget monthsWidget;
+    
     protected TextField dataSources;
 
     protected MessagePanel messagePanel;
@@ -127,6 +130,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         dateReviewed.setText(formatDateReviewed());
         dataSources.setText(getText(measure.getDataSouce()));
         sectorsWidget.setSectors(measure.getSectors());
+        monthsWidget.setMonths(measure.getMonths());
     }
 
     private String formatDateReviewed() {
@@ -257,6 +261,10 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
         layoutGenerator.addLabelWidgetPair("Sectors:", sectors(), panel);
 
+        deviceCode = new TextField("NEI Device code", 15);
+        changeablesList.addChangeable(deviceCode);
+        layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
+
 //        deviceCode = new TextField("NEI Device code", 15);
 //        changeablesList.addChangeable(deviceCode);
 //        layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
@@ -273,7 +281,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 //        layoutGenerator.addLabelWidgetPair("Data Sources:", dataSources, panel);
 
         layoutGenerator.addLabelWidgetPair("", tempPanel(20, 20), panel);
-        widgetLayout(5, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(6, 2, 5, 5, 10, 10, layoutGenerator, panel);
         container.add(panel, BorderLayout.NORTH);
         return container;
     }
@@ -292,10 +300,6 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         changeablesList.addChangeable(cmClass);
         layoutGenerator.addLabelWidgetPair("Class:", cmClass, panel);
 
-        deviceCode = new TextField("NEI Device code", 15);
-        changeablesList.addChangeable(deviceCode);
-        layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
-
         equipmentLife = new TextField("Equipment life", 15);
         changeablesList.addChangeable(equipmentLife);
         layoutGenerator.addLabelWidgetPair("Equipment life (yrs):", equipmentLife, panel);
@@ -307,6 +311,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         dataSources = new TextField("Data Sources:", 15);
         layoutGenerator.addLabelWidgetPair("Data Sources:", dataSources, panel);
 
+        layoutGenerator.addLabelWidgetPair("Months:", months(), panel);
+        
 //        try {
 //            allControlTechnologies = session.controlMeasureService().getControlTechnologies();
 //            controlTechnology = new EditableComboBox(allControlTechnologies);
@@ -342,6 +348,12 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         return sectorsWidget;
     }
 
+    private JPanel months() {
+        monthsWidget = new AddRemoveMonthWidget(getAllMonths(), changeablesList, parentConsole);
+        monthsWidget.setPreferredSize(new Dimension(150, 80));
+        return monthsWidget;
+    }
+
     private void widgetLayout(int rows, int cols, int initX, int initY, int xPad, int yPad,
             SpringLayoutGenerator layoutGenerator, JPanel panel) {
         // Lay out the panel.
@@ -371,6 +383,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         measure.setAbbreviation(abbreviation.getText());
         measure.setDataSouce(dataSources.getText());
         measure.setSectors(sectorsWidget.getSectors());
+        measure.setMonths(monthsWidget.getMonths());
         
         // save items modified in efficiency tab
     }
@@ -474,6 +487,16 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
             messagePanel.setError("Could not get all the sectors");
         }
         return null;
+    }
+
+    private ControlMeasureMonth[] getAllMonths() {
+        ControlMeasureMonth[] months = new ControlMeasureMonth[13];
+        for (int i = 0; i < 13; i++) {
+            ControlMeasureMonth month = new ControlMeasureMonth();
+            month.setMonth((short)i);
+            months[i] = month;
+        }
+        return months;
     }
 
     public void refresh(ControlMeasure measure) {

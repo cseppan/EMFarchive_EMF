@@ -12,7 +12,6 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.VersionedQuery;
-import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -26,19 +25,18 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
 import gov.epa.emissions.framework.services.cost.controlStrategy.DatasetCreator;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
-import gov.epa.emissions.framework.services.cost.controlStrategy.io.CSCountyFileFormat;
-import gov.epa.emissions.framework.services.cost.controlStrategy.io.CSCountyImporter;
 import gov.epa.emissions.framework.services.cost.controlmeasure.io.Pollutants;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.hibernate.Session;
 
@@ -114,6 +112,17 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     
     protected int daysInMonth = 31; //useful only if inventory is monthly based and not yearly.
 
+    private boolean useSQLApproach;
+    
+    public AbstractStrategyLoader(User user, DbServerFactory dbServerFactory, 
+            HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
+            int batchSize, boolean useSQLApproach) throws EmfException {
+        this(user, dbServerFactory, 
+                sessionFactory, controlStrategy, 
+                batchSize);
+        this.useSQLApproach = useSQLApproach;
+    }
+
     public AbstractStrategyLoader(User user, DbServerFactory dbServerFactory, 
             HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
             int batchSize) throws EmfException {
@@ -153,50 +162,58 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         
         //setup result
         ControlStrategyResult result = createStrategyResult(inputDataset);
-        //set class level variable if inputdataset is a point type
-        this.pointDatasetType = inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)")
-            || inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL CoST Point Inventory (PTINV)");
-        //get the record generator appropriate for the input/output Dataset
-        this.recordGenerator = new RecordGeneratorFactory(costYearTable, inputDataset.getDatasetType(), result, decFormat, controlStrategy.getDiscountRate(), controlStrategy.getUseCostEquations()).getRecordGenerator();
-        //get the OptimizedQuery, really just a batch of resultsets
-        OptimizedQuery optimizedQuery = sourceQuery(controlStrategyInputDataset);
-        //get the OptimizedTableModifier so we can batch insert output
-        modifier = dataModifier(emissionTableName(result.getDetailedResultDataset()));
-        try {
-            modifier.start();
-            long startTime;
-            long endTime;
-            startTime = System.currentTimeMillis();
-            boolean hasSources = optimizedQuery.execute();
-            endTime = System.currentTimeMillis();
-            getSourceTime += endTime - startTime;
-            System.out.println("Get batch of sources for strategy, in " + ((endTime - startTime) / (1000))  + " secs");
-            while (hasSources) {
-                ResultSet resultSet = optimizedQuery.getResultSet();
-                doBatchInsert(resultSet);
-                resultSet.close();
+        if (!useSQLApproach) {
+            
+            //set class level variable if inputdataset is a point type
+            this.pointDatasetType = inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)")
+                || inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL CoST Point Inventory (PTINV)");
+            //get the record generator appropriate for the input/output Dataset
+            this.recordGenerator = new RecordGeneratorFactory(costYearTable, inputDataset.getDatasetType(), result, decFormat, controlStrategy.getDiscountRate(), controlStrategy.getUseCostEquations()).getRecordGenerator();
+            //get the OptimizedQuery, really just a batch of resultsets
+            OptimizedQuery optimizedQuery = sourceQuery(controlStrategyInputDataset);
+            //get the OptimizedTableModifier so we can batch insert output
+            modifier = dataModifier(emissionTableName(result.getDetailedResultDataset()));
+            try {
+                modifier.start();
+                long startTime;
+                long endTime;
                 startTime = System.currentTimeMillis();
-                hasSources = optimizedQuery.execute();
+                boolean hasSources = optimizedQuery.execute();
                 endTime = System.currentTimeMillis();
                 getSourceTime += endTime - startTime;
                 System.out.println("Get batch of sources for strategy, in " + ((endTime - startTime) / (1000))  + " secs");
+                while (hasSources) {
+                    ResultSet resultSet = optimizedQuery.getResultSet();
+                    doBatchInsert(resultSet);
+                    resultSet.close();
+                    startTime = System.currentTimeMillis();
+                    hasSources = optimizedQuery.execute();
+                    endTime = System.currentTimeMillis();
+                    getSourceTime += endTime - startTime;
+                    System.out.println("Get batch of sources for strategy, in " + ((endTime - startTime) / (1000))  + " secs");
+                }
+            } catch(Exception ex) {
+                ex.printStackTrace();
+                result.setRunStatus("Failed: " + ex.getMessage());
+            } finally {
+                currentTime = System.currentTimeMillis();
+                modifier.finish();
+                insertSourceTime += System.currentTimeMillis() - currentTime;
+                modifier.close();
+                optimizedQuery.close();
             }
-        } catch(Exception ex) {
-            ex.printStackTrace();
-            result.setRunStatus("Failed: " + ex.getMessage());
-        } finally {
-            currentTime = System.currentTimeMillis();
-            modifier.finish();
-            insertSourceTime += System.currentTimeMillis() - currentTime;
-            modifier.close();
-            optimizedQuery.close();
+            result.setTotalCost(totalCost);
+            result.setTotalReduction(totalReduction);
+            System.out.println("Total time to get all sources = " + (getSourceTime / (1000))  + " secs");
+            System.out.println("Total time to get measures for sources = " + (getSourceMeasuresTime / (1000))  + " secs");
+            System.out.println("Total time to match sources to measures = " + (matchTime / (1000))  + " secs");
+            System.out.println("Total time to insert results = " + (insertSourceTime / (1000))  + " secs");
+        } else {
+            makeSureInventoryDatasetHasIndexes(controlStrategyInputDataset);
+            runStrategyUsingSQLApproach(controlStrategyInputDataset, result);
+            //still need to calculate the total cost and reduction...
+            setResultTotalCostTotalReductionAndCount(result);
         }
-        result.setTotalCost(totalCost);
-        result.setTotalReduction(totalReduction);
-        System.out.println("Total time to get all sources = " + (getSourceTime / (1000))  + " secs");
-        System.out.println("Total time to get measures for sources = " + (getSourceMeasuresTime / (1000))  + " secs");
-        System.out.println("Total time to match sources to measures = " + (matchTime / (1000))  + " secs");
-        System.out.println("Total time to insert results = " + (insertSourceTime / (1000))  + " secs");
         return result;
     }
 
@@ -220,7 +237,6 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         
         result.setStrategyResultType(getDetailedStrategyResultType());
         result.setStartTime(new Date());
- //       result.setStartTime(controlStrategy.getStartDate()==null? (new Date()):controlStrategy.getStartDate());
         result.setRunStatus("Start processing dataset");
 
         //persist result
@@ -299,10 +315,11 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     public boolean inventoryHasTargetPollutant(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
         String versionedQuery = new VersionedQuery(version(controlStrategyInputDataset)).query();
 
-        String query = "SELECT 1 as Found "
+        String query = "SELECT count(1) as Found "
             + " FROM " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()) 
             + " where " + versionedQuery
-            + " and poll = '" + controlStrategy.getTargetPollutant().getName() + "'";
+            + " and poll = '" + controlStrategy.getTargetPollutant().getName() + "' "
+            + getFilterForSourceQuery();
         ResultSet rs = null;
         try {
             rs = datasource.query().executeQuery(query);
@@ -320,6 +337,111 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
                 }
         }
         return false;
+    }
+
+    public void runStrategyUsingSQLApproach(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
+        String query = "SELECT public.create_strategy_detailed_result_table_indexes('" + emissionTableName(controlStrategyResult.getDetailedResultDataset()) + "');"
+        + "SELECT public.run_apply_measures_in_series_strategy("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ")";
+        System.out.println(query);
+        try {
+            datasource.query().execute(query);
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            //
+        }
+    }
+
+    public void makeSureInventoryDatasetHasIndexes(ControlStrategyInputDataset controlStrategyInputDataset) {
+        String query = "SELECT public.create_orl_table_indexes('" + emissionTableName(controlStrategyInputDataset.getInputDataset()) + "')";
+        try {
+            datasource.query().execute(query);
+        } catch (SQLException e) {
+            //supress all errors, the indexes might already be on the table...
+        } finally {
+            //
+        }
+    }
+    
+    public String[] getSourcePollutantList(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
+        String versionedQuery = new VersionedQuery(version(controlStrategyInputDataset)).query();
+        List<String> pollutants = new ArrayList<String>();
+        String query = "SELECT distinct poll "
+            + " FROM " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()) 
+            + " where " + versionedQuery
+            + getFilterForSourceQuery();
+        ResultSet rs = null;
+        try {
+            rs = datasource.query().executeQuery(query);
+            while (rs.next()) {
+                pollutants.add(rs.getString(1));
+            }
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    //
+                }
+        }
+        return pollutants.toArray(new String[0]);
+    }
+
+    private String getFilterFromRegionDataset() throws EmfException {
+        if (controlStrategy.getCountyDataset() == null) return "";
+        String sqlFilter = "";
+        String versionedQuery = new VersionedQuery(version(controlStrategy.getCountyDataset().getId(), controlStrategy.getCountyDatasetVersion())).query();
+        String query = "SELECT distinct fips "
+            + " FROM " + qualifiedEmissionTableName(controlStrategy.getCountyDataset()) 
+            + " where " + versionedQuery
+            + getFilterForSourceQuery();
+        ResultSet rs = null;
+        try {
+            rs = datasource.query().executeQuery(query);
+            while (rs.next()) {
+                if (sqlFilter.length() > 0) {
+                    sqlFilter += ",'" + rs.getString(1) + "'";
+                } else {
+                    sqlFilter = "'" + rs.getString(1) + "'";
+                }
+            }
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    //
+                }
+        }
+        return sqlFilter.length() > 0 ? " and fips in (" + sqlFilter + ")" : "" ;
+    }
+
+    private void setResultTotalCostTotalReductionAndCount(ControlStrategyResult controlStrategyResult) throws EmfException {
+        String query = "SELECT count(1) as record_count, sum(Annual_Cost) as total_cost, sum(case when poll = '" + controlStrategy.getTargetPollutant().getName() 
+            + "' then Emis_Reduction else null end) as total_reduction "
+            + " FROM " + qualifiedEmissionTableName(controlStrategyResult.getDetailedResultDataset());
+        ResultSet rs = null;
+        try {
+            rs = datasource.query().executeQuery(query);
+            while (rs.next()) {
+                recordCount = rs.getInt(1);
+                controlStrategyResult.setTotalCost(rs.getDouble(2));
+                controlStrategyResult.setTotalReduction(rs.getDouble(3));
+            }
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    //
+                }
+        }
     }
 
     private OptimizedQuery sourceQuery(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
@@ -341,45 +463,29 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
 
     private String getFilterForSourceQuery() throws EmfException {
         if (filterForSourceQuery == null) {
-            String sqlFilter = "";
+            String sqlFilter = getFilterFromRegionDataset();
             String filter = controlStrategy.getFilter();
-            String countyFile = controlStrategy.getCountyFile();
-
+            
             //get and build strategy filter...
             if (filter == null || filter.trim().length() == 0)
                 sqlFilter = "";
             else 
                 sqlFilter = " and (" + filter + ") "; 
 
-            //get and build county filter...
-            if (countyFile != null && countyFile.trim().length() > 0) {
-                CSCountyImporter countyImporter = new CSCountyImporter(new File(countyFile), 
-                        new CSCountyFileFormat());
-                String[] fips;
-                try {
-                    fips = countyImporter.run();
-                } catch (ImporterException e) {
-                    throw new EmfException(e.getMessage());
-                }
-                if (fips.length > 0) 
-                    sqlFilter += " and fips in (";
-                for (int i = 0; i < fips.length; i++) {
-                    sqlFilter += (i > 0 ? "," : "") + "'" 
-                        + fips[i] + "'";
-                }
-                if (fips.length > 0) 
-                    sqlFilter += ")";
-            }
             filterForSourceQuery = sqlFilter;
         }
         return filterForSourceQuery;
     }
 
     private Version version(ControlStrategyInputDataset controlStrategyInputDataset) {
+        return version(controlStrategyInputDataset.getInputDataset().getId(), controlStrategyInputDataset.getVersion());
+    }
+
+    private Version version(int datasetId, int version) {
         Session session = sessionFactory.getSession();
         try {
             Versions versions = new Versions();
-            return versions.get(controlStrategyInputDataset.getInputDataset().getId(), controlStrategyInputDataset.getVersion(), session);
+            return versions.get(datasetId, version, session);
         } finally {
             session.close();
         }
@@ -403,6 +509,6 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
     
     protected double getEmission(double annEmis, double avdEmis) {
-        return annEmis != 0.0 ? annEmis : avdEmis * daysInMonth;
+        return avdEmis == 0.0 ? annEmis : avdEmis * daysInMonth;
     }
 }

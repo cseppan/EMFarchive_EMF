@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -51,7 +52,11 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private ControlStrategyMeasure[] controlMeasures = new ControlStrategyMeasure[] {};
 
-    private String countyFile;
+//    private String countyFile;
+
+    private EmfDataset countyDataset;
+
+    private Integer countyDatasetVersion;
 
     private Mutex lock;
 
@@ -264,12 +269,28 @@ public class ControlStrategy implements Lockable, Serializable {
         return controlMeasures;//(ControlStrategyMeasure[])controlMeasures.toArray(new ControlStrategyMeasure[0]);
     }
 
-    public void setCountyFile(String countyFile) {
-        this.countyFile = countyFile;
+//    public void setCountyFile(String countyFile) {
+//        this.countyFile = countyFile;
+//    }
+//
+//    public String getCountyFile() {
+//        return countyFile;
+//    }
+
+    public void setCountyDataset(EmfDataset countyDataset) {
+        this.countyDataset = countyDataset;
     }
 
-    public String getCountyFile() {
-        return countyFile;
+    public EmfDataset getCountyDataset() {
+        return countyDataset;
+    }
+
+    public void setCountyDatasetVersion(Integer countyDatasetVersion) {
+        this.countyDatasetVersion = countyDatasetVersion;
+    }
+
+    public Integer getCountyDatasetVersion() {
+        return countyDatasetVersion;
     }
 
     public void setConstraint(ControlStrategyConstraint constraint) {

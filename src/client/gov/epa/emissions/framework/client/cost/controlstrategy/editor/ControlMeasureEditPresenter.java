@@ -58,7 +58,13 @@ public class ControlMeasureEditPresenter{
         return session.dataEditorService();
     }
 
-    public void doEdit(Double applyOrder, Double rulePenetration, Double ruleEffective, EmfDataset ds, Integer ver) {
-        parentView.edit(applyOrder, rulePenetration, ruleEffective, ds, ver);
+    public void doEdit(Double applyOrder, Double rulePenetration, 
+            boolean overrideRulePenetration, Double ruleEffective, 
+            boolean overrideRuleEffectiveness, EmfDataset ds, 
+            Integer ver) {
+        parentView.edit(applyOrder, rulePenetration, 
+                overrideRulePenetration, ruleEffective, 
+                overrideRuleEffectiveness, ds, 
+                ver);
     }
 }

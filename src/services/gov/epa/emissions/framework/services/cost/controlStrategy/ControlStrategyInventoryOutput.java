@@ -13,7 +13,8 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.QAStepTask;
+//import gov.epa.emissions.framework.services.QAStepTask;
+import gov.epa.emissions.framework.services.basic.DateUtil;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
@@ -42,23 +43,26 @@ public class ControlStrategyInventoryOutput {
 
     private HibernateSessionFactory sessionFactory;
 
-    private DbServerFactory dbServerFactory;
+//    private DbServerFactory dbServerFactory;
 
     private DbServer dbServer;
 
     private EmfDataset inputDataset;
     
     private ControlStrategyInputDataset controlStrategyInputDataset;
+
+    private ControlStrategyResult controlStrategyResult;
     
     public ControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
-            ControlStrategyInputDataset controlStrategyInputDataset, HibernateSessionFactory sessionFactory, 
-            DbServerFactory dbServerFactory) throws Exception {
+            ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult,
+            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) throws Exception {
         this.controlStrategy = controlStrategy;
         this.controlStrategyInputDataset = controlStrategyInputDataset;
+        this.controlStrategyResult = controlStrategyResult;
         this.inputDataset = controlStrategyInputDataset.getInputDataset();
         this.user = user;
         this.sessionFactory = sessionFactory;
-        this.dbServerFactory = dbServerFactory;
+//        this.dbServerFactory = dbServerFactory;
         this.dbServer = dbServerFactory.getDbServer();
         this.tableFormat = new FileFormatFactory(dbServer).tableFormat(inputDataset.getDatasetType());
         this.creator = new DatasetCreator("ControlledInventory_", "CSINVEN_", 
@@ -86,7 +90,7 @@ public class ControlStrategyInventoryOutput {
             e.printStackTrace();
             throw e;
         } finally {
-            setandRunQASteps();
+//            setandRunQASteps();
         }
         endStatus(statusServices);
         dbServer.disconnect();
@@ -103,7 +107,11 @@ public class ControlStrategyInventoryOutput {
         copyDataFromOriginalTable(inputTable, outputInventoryTableName, 
                 version(inputDataset, controlStrategyInputDataset.getVersion()), inputDataset, 
                 datasource);
-
+        
+        //create indexes on controlled inventory table, this will help speed updating the 
+        //table with the detailed result info
+        makeSureInventoryDatasetHasIndexes(inputDataset, datasource);
+                
         ControlStrategyResult result = getControlStrategyResult();
         updateDataWithDetailDatasetTable(outputInventoryTableName, detailDatasetTable(result), server
                 .getEmissionsDatasource());
@@ -113,18 +121,34 @@ public class ControlStrategyInventoryOutput {
         updateControlStrategyResults(result, dataset);
     }
 
-    private void setandRunQASteps() throws EmfException {
+    private void makeSureInventoryDatasetHasIndexes(EmfDataset inputDataset, Datasource datasource) {
+        String query = "SELECT public.create_orl_table_indexes('" + emissionTableName(inputDataset) + "')";
         try {
-            ControlStrategyResult result = getControlStrategyResult();
-            EmfDataset controlledDataset = (EmfDataset) result.getControlledInventoryDataset();
-            QAStepTask qaTask = new QAStepTask(controlledDataset, controlledDataset.getDefaultVersion(), user,
-                    sessionFactory, dbServerFactory);
-            qaTask.runSummaryQASteps(qaTask.getDefaultSummaryQANames());
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new EmfException(e.getMessage());
+            datasource.query().execute(query);
+        } catch (SQLException e) {
+            //supress all errors, the indexes might already be on the table...
+        } finally {
+            //
         }
     }
+    
+    private String emissionTableName(Dataset dataset) {
+        InternalSource[] internalSources = dataset.getInternalSources();
+        return internalSources[0].getTable();
+    }
+
+//    private void setandRunQASteps() throws EmfException {
+//        try {
+//            ControlStrategyResult result = getControlStrategyResult();
+//            EmfDataset controlledDataset = (EmfDataset) result.getControlledInventoryDataset();
+//            QAStepTask qaTask = new QAStepTask(controlledDataset, controlledDataset.getDefaultVersion(), user,
+//                    sessionFactory, dbServerFactory);
+//            qaTask.runSummaryQASteps(qaTask.getDefaultSummaryQANames());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            throw new EmfException(e.getMessage());
+//        }
+//    }
 
     private String description(EmfDataset inputDataset) {
         String startingDesc = inputDataset.getDescription();
@@ -143,8 +167,7 @@ public class ControlStrategyInventoryOutput {
         Session session = sessionFactory.getSession();
         try {
             ControlStrategyDAO dao = new ControlStrategyDAO();
-            ControlStrategyResult result = dao.getControlStrategyResult(controlStrategy.getId(), inputDataset.getId(),
-                    session);
+            ControlStrategyResult result = dao.getControlStrategyResult(controlStrategyResult.getId(), session);
             if (result == null)
                 throw new EmfException("You have to run the control strategy to create control inventory output");
             return result;
@@ -216,12 +239,21 @@ public class ControlStrategyInventoryOutput {
 
     }
 
+    private int getDaysInMonth(int month) {
+        return month != - 1 ? DateUtil.daysInMonth(controlStrategy.getInventoryYear(), month) : 31;
+    }
+    
     private String updateQuery(String outputTable, String detailResultTable, Datasource datasource) {
         boolean pointDatasetType = inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)");
         boolean costPointDatasetType = inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL CoST Point Inventory (PTINV)");
-        
+        int month = inputDataset.applicableMonth();
+        int noOfDaysInMonth = 31;
+        if (month != -1) {
+            noOfDaysInMonth = getDaysInMonth(month);
+        }
         String sql = "update " + qualifiedTable(outputTable, datasource) + " as o "
-            + "set ceff = case when ann_emis <> 0 then (1 - b.final_emissions / ann_emis) * 100 else 0 end, "
+            + "set ceff = case when " + (month != -1 ? "coalesce(avd_emis, ann_emis)" : "ann_emis") + " <> 0 then (1 - " + (month != -1 ? "b.final_emissions / " + noOfDaysInMonth + " / coalesce(avd_emis, ann_emis)" : "b.final_emissions / ann_emis") + ") * 100 else 0 end, "
+            + "avd_emis = b.final_emissions / " + (month != -1 ? noOfDaysInMonth : "365") + ", "
             + "ann_emis = b.final_emissions, "
             + "reff = 100 "
             + (!pointDatasetType && !costPointDatasetType? ", rpen = 100 " : " ")

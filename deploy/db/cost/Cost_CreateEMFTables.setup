@@ -14,6 +14,7 @@ CREATE INDEX pollutant_id
   ON emf.pollutants
   USING btree
   (id);
+ALTER TABLE emf.pollutants CLUSTER ON pollutant_id;
 -- emf.pollutants
 --
 -- emf.source_groups
@@ -39,6 +40,12 @@ CREATE TABLE emf.control_measure_classes
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.control_measure_classes OWNER TO emf;
+CREATE INDEX control_measure_classes_id
+  ON emf.control_measure_classes
+  USING btree
+  (id);
+ALTER TABLE emf.control_measure_classes CLUSTER ON control_measure_classes_id;
+
 -- emf.control_measure_classes
 
 -- emf control_technologies
@@ -82,6 +89,7 @@ CREATE INDEX measure_id
   ON emf.control_measures
   USING btree
   (id);
+ALTER TABLE emf.control_measures CLUSTER ON measure_id;
 -- emf.control_measures
 
 
@@ -139,6 +147,14 @@ CREATE TABLE emf.control_measure_efficiencyrecords
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.control_measure_efficiencyrecords OWNER TO emf;
+CREATE INDEX effrec_min_max_emis
+  ON emf.control_measure_efficiencyrecords
+  USING btree
+  (min_emis, max_emis);
+CREATE INDEX er_locale
+  ON emf.control_measure_efficiencyrecords
+  USING btree
+  (locale);
 CREATE INDEX er_measureid
   ON emf.control_measure_efficiencyrecords
   USING btree
@@ -146,8 +162,7 @@ CREATE INDEX er_measureid
 CREATE INDEX er_pollutantid
   ON emf.control_measure_efficiencyrecords
   USING btree
-  (pollutant_id);
-  
+  (pollutant_id);  
 -- emf.control_measure_efficiencyrecords
 
 -- emf control_measure_sectors
@@ -207,6 +222,11 @@ CREATE TABLE emf.control_strategies
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.control_strategies OWNER TO emf;
+CREATE INDEX control_strategies_id
+  ON emf.control_strategies
+  USING btree
+  (id);
+ALTER TABLE emf.control_strategies CLUSTER ON control_strategies_id;
 -- emf.control_strategies
 
 -- emf.control_strategy_classes
@@ -220,6 +240,15 @@ CREATE TABLE emf.control_strategy_classes
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.control_strategy_classes OWNER TO emf;
+CREATE INDEX control_strategy_classes_measure_class_id
+  ON emf.control_strategy_classes
+  USING btree
+  (control_measure_class_id);
+
+CREATE INDEX control_strategy_classes_strategy_id
+  ON emf.control_strategy_classes
+  USING btree
+  (control_strategy_id);
 -- emf.control_strategy_classes
 
 -- emf.control_strategy_measures
@@ -239,6 +268,15 @@ CREATE TABLE emf.control_strategy_measures
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.control_strategy_measures OWNER TO emf;
+CREATE INDEX control_strategy_measures_apply_order
+  ON emf.control_strategy_measures
+  USING btree
+  (apply_order);
+CREATE INDEX control_strategy_strategy_measure_id
+  ON emf.control_strategy_measures
+  USING btree
+  (control_strategy_id, control_measure_id);
+ALTER TABLE emf.control_strategy_measures CLUSTER ON control_strategy_strategy_measure_id;
 -- emf.control_strategy_measures
 
 -- emf.input_datasets_control_strategies
@@ -252,6 +290,15 @@ CREATE TABLE emf.input_datasets_control_strategies
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.input_datasets_control_strategies OWNER TO emf;
+CREATE INDEX input_datasets_control_strategies_dataset_id
+  ON emf.input_datasets_control_strategies
+  USING btree
+  (dataset_id);
+
+CREATE INDEX input_datasets_control_strategies_strat_id
+  ON emf.input_datasets_control_strategies
+  USING btree
+  (control_strategy_id);
 -- emf.datasets_control_strategies
 
 -- emf.strategy_result_types
@@ -284,6 +331,10 @@ CREATE TABLE emf.strategy_results
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.strategy_results OWNER TO emf;
+CREATE INDEX strategy_results_strat_id
+  ON emf.strategy_results
+  USING btree
+  (control_strategy_id);
 -- emf.strategy_results
 
 -- emf.aggregrated_efficiencyrecords
@@ -414,3 +465,227 @@ create aggregate public.concatenate_with_ampersand (
 );
 ALTER aggregate public.concatenate_with_ampersand(text) OWNER TO emf;
 
+CREATE TABLE emf.control_measure_months
+(
+  id SERIAL PRIMARY KEY,
+  control_measure_id integer NOT NULL,
+  list_index integer,
+  "month" smallint,
+  CONSTRAINT control_measure_months_control_measure_id_fkey FOREIGN KEY (control_measure_id)
+      REFERENCES emf.control_measures (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT control_measure_months_control_measure_id_key UNIQUE (control_measure_id, "month")
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.control_measure_months OWNER TO emf;
+
+CREATE INDEX control_measure_months_measure_id
+  ON emf.control_measure_months
+  USING btree
+  (control_measure_id);
+
+CREATE INDEX control_measure_months_month
+  ON emf.control_measure_months
+  USING btree
+  ("month");
+
+CREATE OR REPLACE FUNCTION public.get_dataset_month(dataset_id integer) RETURNS smallint AS $$
+DECLARE
+	dataset_name varchar(255) := '';
+	dataset_month smallint := 0;
+	start_year smallint := null;
+	start_month smallint := null;
+	stop_year smallint := null;
+	stop_month smallint := null;
+BEGIN
+
+	-- get the dataset information
+	select lower(ds.name),
+		EXTRACT(YEAR FROM ds.start_date_time),
+		EXTRACT(MONTH FROM ds.start_date_time),
+		EXTRACT(YEAR FROM ds.stop_date_time),
+		EXTRACT(MONTH FROM ds.stop_date_time)
+	from emf.datasets ds
+	where ds.id = dataset_id
+	into dataset_name,
+		start_year,
+		start_month,
+		stop_year,
+		stop_month;
+
+	-- look at the start and stop time...
+	IF start_month = stop_month and start_year = stop_year THEN
+		dataset_month := start_month;
+	-- look at the name to see if there is a date in it...
+	ELSE
+		IF position('jan' in dataset_name) > 0 or position('january' in dataset_name) > 0 THEN
+			dataset_month := 1;
+		ELSIF position('feb' in dataset_name) > 0 or position('february' in dataset_name) > 0 THEN
+			dataset_month := 2;
+		ELSIF position('mar' in dataset_name) > 0 or position('march' in dataset_name) > 0 THEN
+			dataset_month := 3;
+		ELSIF position('apr' in dataset_name) > 0 or position('april' in dataset_name) > 0 THEN
+			dataset_month := 4;
+		ELSIF position('may' in dataset_name) > 0 THEN
+			dataset_month := 5;
+		ELSIF position('jun' in dataset_name) > 0 or position('june' in dataset_name) > 0 THEN
+			dataset_month := 6;
+		ELSIF position('jul' in dataset_name) > 0 or position('july' in dataset_name) > 0 THEN
+			dataset_month := 7;
+		ELSIF position('aug' in dataset_name) > 0 or position('august' in dataset_name) > 0 THEN
+			dataset_month := 8;
+		ELSIF position('sep' in dataset_name) > 0 or position('september' in dataset_name) > 0 THEN
+			dataset_month := 9;
+		ELSIF position('oct' in dataset_name) > 0 or position('october' in dataset_name) > 0 THEN
+			dataset_month := 10;
+		ELSIF position('nov' in dataset_name) > 0 or position('november' in dataset_name) > 0 THEN
+			dataset_month := 11;
+		ELSIF position('dec' in dataset_name) > 0 or position('december' in dataset_name) > 0 THEN
+			dataset_month := 12;
+		END IF;
+	END IF;
+
+	-- return Zero if no month was found
+	RETURN dataset_month;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION public.multiply(double precision, double precision)
+  RETURNS double precision AS
+'select $1 * $2'
+  LANGUAGE 'sql' IMMUTABLE STRICT;
+ALTER FUNCTION public.multiply(double precision, double precision) OWNER TO emf;
+
+CREATE AGGREGATE public.times(
+  BASETYPE=float8,
+  SFUNC=multiply,
+  STYPE=float8
+);
+ALTER AGGREGATE public.times(float8) OWNER TO emf;
+
+CREATE OR REPLACE FUNCTION public.create_strategy_detailed_result_table_indexes(table_name character varying)
+  RETURNS void AS
+$BODY$
+DECLARE
+	index_name varchar(63) := '';
+BEGIN
+
+	-- create source_id btree index
+	IF length('source_id_' || table_name) >= 63 - 10 THEN
+		index_name := 'source_id_' || substr(table_name, 11, 63);
+	ELSE
+		index_name := 'source_id_' || table_name;
+	END IF;
+	execute 'CREATE INDEX ' || index_name || '
+			ON emissions.' || table_name || '
+			USING btree
+			(source_id)';
+
+	-- create record_id btree index
+	IF length('record_id' || table_name) >= 63 - 10 THEN
+		index_name := 'record_id_' || substr(table_name, 11, 63);
+	ELSE
+		index_name := 'record_id_' || table_name;
+	END IF;
+	execute 'CREATE INDEX ' || index_name || '
+			ON emissions.' || table_name || '
+			USING btree
+			(record_id)';
+
+	-- create fips btree index
+	IF length('fips_' || table_name) >= 63 - 5 THEN
+		index_name := 'fips_' || substr(table_name, 6, 63);
+	ELSE
+		index_name := 'fips_' || table_name;
+	END IF;
+	execute 'CREATE INDEX ' || index_name || '
+			ON emissions.' || table_name || '
+			USING btree
+			(fips)';
+
+	-- create poll btree index
+	IF length('poll_' || table_name) >= 63 - 5 THEN
+		index_name := 'poll_' || substr(table_name, 6, 63);
+	ELSE
+		index_name := 'poll_' || table_name;
+	END IF;
+	execute 'CREATE INDEX ' || index_name || '
+			ON emissions.' || table_name || '
+			USING btree
+			(poll)';
+
+	-- create scc btree index
+	IF length('scc_' || table_name) >= 63 - 4 THEN
+		index_name := 'scc_' || substr(table_name, 5, 63);
+	ELSE
+		index_name := 'scc_' || table_name;
+	END IF;
+	execute 'CREATE INDEX ' || index_name || '
+			ON emissions.' || table_name || '
+			USING btree
+			(scc)';
+
+	-- create cm_id btree index
+	IF length('cm_id_' || table_name) >= 63 - 6 THEN
+		index_name := 'cm_id_' || substr(table_name, 7, 63);
+	ELSE
+		index_name := 'cm_id_' || table_name;
+	END IF;
+	execute 'CREATE INDEX ' || index_name || '
+			ON emissions.' || table_name || '
+			USING btree
+			(cm_id)';
+
+END;
+$BODY$
+  LANGUAGE 'plpgsql' VOLATILE;
+ALTER FUNCTION public.create_strategy_detailed_result_table_indexes(table_name character varying) OWNER TO emf;
+
+CREATE OR REPLACE FUNCTION public.create_orl_table_indexes(table_name character varying)
+  RETURNS void AS
+$BODY$
+DECLARE
+	index_name varchar(63) := '';
+BEGIN
+
+--select 'ds_rep_mole_alm_20021105_36km_cmaq_cb05pm_2002ac_txt_2066644752',
+--	'fips_' || substr('ds_rep_mole_alm_20021105_36km_cmaq_cb05pm_2002ac_txt_2066644752', 6, 63), 
+--	length('fips_' || substr('ds_rep_mole_alm_20021105_36km_cmaq_cb05pm_2002ac_txt_2066644752', 6, 63))
+
+	-- create fips btree index
+	IF length('fips_' || table_name) >= 63 - 5 THEN
+		index_name := 'fips_' || substr(table_name, 6, 63);
+	ELSE
+		index_name := 'fips_' || table_name;
+	END IF;
+	execute 'CREATE INDEX ' || index_name || '
+			ON emissions.' || table_name || '
+			USING btree
+			(fips)';
+
+	-- create poll btree index
+	IF length('poll_' || table_name) >= 63 - 5 THEN
+		index_name := 'poll_' || substr(table_name, 6, 63);
+	ELSE
+		index_name := 'poll_' || table_name;
+	END IF;
+	execute 'CREATE INDEX ' || index_name || '
+			ON emissions.' || table_name || '
+			USING btree
+			(poll)';
+
+	-- create scc btree index
+	IF length('scc_' || table_name) >= 63 - 4 THEN
+		index_name := 'scc_' || substr(table_name, 5, 63);
+	ELSE
+		index_name := 'scc_' || table_name;
+	END IF;
+	execute 'CREATE INDEX ' || index_name || '
+			ON emissions.' || table_name || '
+			USING btree
+			(scc)';
+
+END;
+$BODY$
+  LANGUAGE 'plpgsql' VOLATILE;
+ALTER FUNCTION public.create_orl_table_indexes(table_name character varying) OWNER TO emf;

@@ -56,6 +56,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     private EditControlStrategyOutputTabView outputTabView;
 
+    private EditControlStrategySummaryTab summaryTabView;
+
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
         super("Edit Control Strategy", new Dimension(700, 580), desktopManager);
 //        this.setMinimumSize(new Dimension(700, 300));
@@ -139,10 +141,10 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     private JPanel createSummaryTab(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         try {
-            EditControlStrategySummaryTabView view = new EditControlStrategySummaryTab(controlStrategy,
+            summaryTabView = new EditControlStrategySummaryTab(controlStrategy,
                     controlStrategyResults, session, this, messagePanel, parentConsole, this.presenter.getCostYearTable());
-            this.presenter.set(view);
-            return (JPanel) view;
+            this.presenter.set(summaryTabView);
+            return summaryTabView;
         } catch (EmfException e) {
             showError("Could not load Summary Tab." + e.getMessage());
             return createErrorTab("Could not load Summary Tab." + e.getMessage());
@@ -151,13 +153,17 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
 
     private JPanel createInventoryFilterTab(ControlStrategy controlStrategy) {
-        EditControlStrategyTabView view = null;
-        view = new EditControlStrategyInventoryFilterTab(controlStrategy, this, 
-                messagePanel, parentConsole, 
-                session, desktopManager,
-                presenter);
-        this.presenter.set(view);
-        return (JPanel) view;
+        try {
+            EditControlStrategyTabView view = new EditControlStrategyInventoryFilterTab(controlStrategy, this, 
+                    messagePanel, parentConsole, 
+                    session, desktopManager,
+                    presenter);
+            this.presenter.set(view);
+            return (JPanel) view;
+        } catch (EmfException e) {
+            showError("Could not load inventory filter tab." + e.getMessage());
+            return createErrorTab("Could not load inventory filter tab." + e.getMessage());
+        }
     }
 
     private JPanel createAppliedMeasuresTab(ControlStrategy controlStrategy) {
@@ -281,7 +287,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                     enableButtons(false);
                     controlStrategy.setStartDate(new Date());
                     presenter.setResults(controlStrategy);
-                    presenter.runStrategy(outputTabView.getExportFolder());
+                    presenter.runStrategy(outputTabView.getExportFolder(), summaryTabView.useSQLApproachCheck.isSelected());
                     messagePanel
                             .setMessage("Running strategy. Monitor the status window for progress, and refresh this window after completion to see results");
                 } catch (EmfException e) {
@@ -369,10 +375,12 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
 
     public void startControlMeasuresRefresh() {
-        measuresTabView.startControlMeasuresRefresh();
+        if (measuresTabView != null)
+            measuresTabView.startControlMeasuresRefresh();
     }
 
     public void endControlMeasuresRefresh() {
-        measuresTabView.endControlMeasuresRefresh();
+        if (measuresTabView != null)
+            measuresTabView.endControlMeasuresRefresh();
     }
 }

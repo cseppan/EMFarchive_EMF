@@ -61,6 +61,44 @@ public class EfficiencyRecordUtil {
 //        return invenAnnualEmissions / invenControlEfficiency * invenEffectiveReduction;
     }
 
+    public EfficiencyRecord[] filter(EfficiencyRecord[] efficiencyRecords, Pollutant pollutant, 
+            String fips, int inventoryYear, 
+            double invenAnnualEmission) {
+        List records = new ArrayList();
+        Double minEmis;
+        Double maxEmis;
+        for (int i = 0; i < efficiencyRecords.length; i++) {
+
+            //check the pollutant
+            if (!efficiencyRecords[i].getPollutant().equals(pollutant)) 
+                break;
+            
+            //check the locale
+            if (!localeFilter.acceptLocale(efficiencyRecords[i].getLocale(), fips))
+                break;
+
+            //check the min max emission constraint
+            minEmis = efficiencyRecords[i].getMinEmis();
+            maxEmis = efficiencyRecords[i].getMaxEmis();
+            //if no min or max is specified, then include it in the arraylist...
+            if (minEmis == null && maxEmis != null)  {
+                if (!(invenAnnualEmission >= 0 && invenAnnualEmission <= maxEmis))
+                    break;
+            } else if (minEmis != null && maxEmis != null)  {
+                if (!(invenAnnualEmission >= minEmis && invenAnnualEmission <= maxEmis))
+                    break;
+            //assume maxEmis is infinitely big in this case...
+            } else if (minEmis != null && maxEmis == null)  {
+                if (!(invenAnnualEmission >= minEmis))
+                    break;
+            }
+            
+            records.add(efficiencyRecords[i]);
+        }
+        
+        return effectiveDateFilter(localeFilter.closestRecords(records), inventoryYear);
+    }
+
     public EfficiencyRecord[] effectiveDateFilter(EfficiencyRecord[] efficiencyRecords, int inventoryYear) {
         return new EffectiveDateFilter(efficiencyRecords, inventoryYear).filter();
     }

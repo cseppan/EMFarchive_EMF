@@ -17,8 +17,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 
-import org.hibernate.Session;
-
 //import org.hibernate.Session;
 
 public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrategyTestBase {
@@ -42,7 +40,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -109,7 +107,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -177,7 +175,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -244,7 +242,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -302,7 +300,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -358,7 +356,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -414,7 +412,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -483,13 +481,11 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
 
             runStrategy(strategy);
 
-            Session session = sessionFactory.getSession();
-
 //            session.flush();
 //            session.clear();
 
             //get detailed result dataset
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), session);
+            result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -536,10 +532,10 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < percentDiff);
 
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset);
+            createControlledInventory(strategy, inputDataset, result);
 
             //reload
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            result = getControlStrategyResult(strategy);
 
             tableName2 = 
                 result.getControlledInventoryDataset().getInternalSources()[0].getTable();
@@ -615,7 +611,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -662,10 +658,10 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs.close();
 
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset);
+            createControlledInventory(strategy, inputDataset, result);
 
             //reload
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            result = getControlStrategyResult(strategy);
 
             tableName2 = result.getControlledInventoryDataset().getInternalSources()[0].getTable();
             
@@ -713,7 +709,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             runStrategy(strategy);
 
             //get detailed result dataset
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -760,10 +756,10 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs.close();
 
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset);
+            createControlledInventory(strategy, inputDataset, result);
 
             //reload
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            result = getControlStrategyResult(strategy);
 
             tableName2 = result.getControlledInventoryDataset().getInternalSources()[0].getTable();
             
@@ -788,10 +784,10 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             
             
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset2);
+            createControlledInventory(strategy, inputDataset2, result);
 
             //reload
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[1].getInputDataset().getId(), sessionFactory.getSession());
+            result = getControlStrategyResult(strategy, 1);
 
             tableName2 = result.getControlledInventoryDataset().getInternalSources()[0].getTable();
             

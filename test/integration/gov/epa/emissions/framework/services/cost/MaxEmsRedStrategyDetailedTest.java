@@ -17,8 +17,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 
-import org.hibernate.Session;
-
 //import org.hibernate.Session;
 
 public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailedCase {
@@ -40,7 +38,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -105,7 +103,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -171,7 +169,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -236,7 +234,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -295,7 +293,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -349,7 +347,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -403,7 +401,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -470,13 +468,8 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 
             runStrategy(strategy);
 
-            Session session = sessionFactory.getSession();
-
-//            session.flush();
-//            session.clear();
-
             //get detailed result dataset
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), session);
+            result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -523,10 +516,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < percentDiff);
 
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset);
+            createControlledInventory(strategy, inputDataset, result);
 
             //reload
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            result = getControlStrategyResult(strategy);
 
             tableName2 = 
                 result.getControlledInventoryDataset().getInternalSources()[0].getTable();
@@ -600,7 +593,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             runStrategy(strategy);
 
             //get detailed result dataset
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 
@@ -648,10 +641,10 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
 
             //create the controlled inventory for this strategy run....
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset);
+            createControlledInventory(strategy, inputDataset, result);
 
             //reload
-            result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            result = getControlStrategyResult(strategy);
 
             tableName2 = result.getControlledInventoryDataset().getInternalSources()[0].getTable();
             
@@ -730,7 +723,7 @@ public class MaxEmsRedStrategyDetailedTest extends MaxEmsRedStrategyTestDetailed
             runStrategy(strategy);
 
             //get detailed result dataset
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getInputDataset().getId(), sessionFactory.getSession());
+            ControlStrategyResult result = getControlStrategyResult(strategy);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             String tableName = detailedResultDataset.getInternalSources()[0].getTable();
 

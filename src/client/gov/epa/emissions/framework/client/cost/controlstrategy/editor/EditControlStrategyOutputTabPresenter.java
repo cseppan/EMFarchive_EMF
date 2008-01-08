@@ -27,7 +27,7 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         this.view = view;
     }
 
-    public void doSave() {
+    public void doSave(ControlStrategy controlStrategy) {
         // NOTE Auto-generated method stub
 
     }
@@ -90,10 +90,11 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         return folder;
     }
 
-    public void doInventory(ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
+    public void doInventory(ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset,
+            ControlStrategyResult controlStrategyResult) throws EmfException {
         view.clearMsgPanel();
         session.controlStrategyService().createInventory(session.user(), controlStrategy, 
-                controlStrategyInputDataset);
+                controlStrategyInputDataset, controlStrategyResult);
     }
 
     public void doRefresh(ControlStrategyResult[] controlStrategyResults) {

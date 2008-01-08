@@ -366,7 +366,10 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         addButton.setEnabled(true);
     }
 
-    public void edit(Double applyOrder, Double rulePenetration, Double ruleEffective, EmfDataset ds, Integer ver) {
+    public void edit(Double applyOrder, Double rulePenetration, 
+            boolean overrideRulePenetration, Double ruleEffective, 
+            boolean overrideRuleEffectiveness, EmfDataset ds, 
+            Integer ver) {
         messagePanel.clear();
       //get selected items
       ControlStrategyMeasure[] selectedMeasures = (sortFilterSelectModel.selected()).toArray(new ControlStrategyMeasure[0]);
@@ -378,8 +381,14 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
           for (int j = 0; j < measures.length; j++) {
               if (selectedMeasures[i].equals(measures[j])) {
                   if (applyOrder != null) measures[j].setApplyOrder(applyOrder);
-                  if (rulePenetration != null) measures[j].setRulePenetration(rulePenetration);
-                  if (ruleEffective != null) measures[j].setRuleEffectiveness(ruleEffective);
+                  if (rulePenetration != null && !overrideRulePenetration) 
+                      measures[j].setRulePenetration(rulePenetration);
+                  else if (overrideRulePenetration)
+                      measures[j].setRulePenetration(null);
+                  if (ruleEffective != null && !overrideRuleEffectiveness) 
+                      measures[j].setRuleEffectiveness(ruleEffective);
+                  else if (overrideRuleEffectiveness)
+                      measures[j].setRuleEffectiveness(null);
                   if (ds!=null){
                       if (ds.getName().equals("None")){
                           measures[j].setRegionDataset(null);

@@ -187,7 +187,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                 ControlStrategyInputDataset controlStrategyInputDataset = null;
                 controlStrategyInputDataset = getControlStrategyInputDataset(controlStrategyResults[i].getInputDatasetId());
                 if (controlStrategyInputDataset != null)
-                    presenter.doInventory(controlStrategy, controlStrategyInputDataset);
+                    presenter.doInventory(controlStrategy, controlStrategyInputDataset,
+                            controlStrategyResults[i]);
             }
             messagePanel.setMessage(
                     "Creating controlled inventories. Watch the status window for progress and refresh this window after completion.");

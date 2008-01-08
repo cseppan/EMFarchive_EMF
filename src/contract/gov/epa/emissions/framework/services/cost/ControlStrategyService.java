@@ -29,13 +29,13 @@ public interface ControlStrategyService extends EMFService {
     
     ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException;
     
-    void runStrategy (User user, ControlStrategy strategy, String exportDirectory) throws EmfException;
+    void runStrategy (User user, int controlStrategyId, String exportDirectory) throws EmfException;
+    
+    void runStrategy (User user, int controlStrategyId, String exportDirectory, boolean useSQLApproach) throws EmfException;
     
     void stopRunStrategy() throws EmfException;
 
-    void createInventory(User user, ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException;
-    
-    ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId) throws EmfException;
+    void createInventory(User user, ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException;
     
     String controlStrategyRunStatus(int id) throws EmfException;
 

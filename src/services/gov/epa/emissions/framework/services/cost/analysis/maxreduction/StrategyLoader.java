@@ -25,6 +25,14 @@ public class StrategyLoader extends AbstractStrategyLoader {
 
     public StrategyLoader(User user, DbServerFactory dbServerFactory, 
             HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
+            int batchSize, boolean useSQLApproach) throws EmfException {
+        super(user, dbServerFactory, 
+                sessionFactory, controlStrategy, 
+                batchSize, useSQLApproach);
+    }
+
+    public StrategyLoader(User user, DbServerFactory dbServerFactory, 
+            HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
             int batchSize) throws EmfException {
         super(user, dbServerFactory, 
                 sessionFactory, controlStrategy, 
@@ -34,7 +42,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
     public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {
         //set up things that are specific for this strategy...
         GenerateSccControlMeasuresMap mapGenerator = new GenerateSccControlMeasuresMap(dbServer, qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()), 
-                controlStrategy, sessionFactory);
+                controlStrategy, sessionFactory, super.getSourcePollutantList(controlStrategyInputDataset));
         SccControlMeasuresMap map = mapGenerator.create();
         retrieveMeasure = new RetrieveBestMeasureEffRecord(map, costYearTable, 
                 controlStrategy, dbServer,
@@ -117,7 +125,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
                         totalReduction += recordGenerator.reducedEmission();
                     insertRecord(record, modifier);
                 } catch (SQLException e) {
-                    throw new EmfException("Error processing record for source record: " + sourceCount + ". Exception: " + e.getMessage());
+                    throw new EmfException("Error in processing record for source record: " + sourceCount + ". Exception: " + e.getMessage());
                 }
             }
         } finally {

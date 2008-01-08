@@ -26,7 +26,7 @@ public class CMSummaryImporter {
     private ArrayList abbreviations;
     
     
-    public CMSummaryImporter(File file, CMSummaryFileFormat fileFormat, User user,
+    public CMSummaryImporter(File file, CMFileFormat fileFormat, User user,
             HibernateSessionFactory sessionFactory) {
         this.file = file;
         this.user = user;

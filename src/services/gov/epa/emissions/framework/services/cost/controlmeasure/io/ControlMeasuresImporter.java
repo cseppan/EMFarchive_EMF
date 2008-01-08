@@ -59,6 +59,8 @@ public class ControlMeasuresImporter implements Importer {
     private DbServer dbServer;
     
     private AggregateEfficiencyRecordDAO aerDAO;
+    
+    private EfficiencyRecordGenerator generator;
 
     public ControlMeasuresImporter(File folder, String[] fileNames, User user, HibernateSessionFactory factory, DbServerFactory dbServerFactory)
             throws EmfException, ImporterException {
@@ -76,6 +78,7 @@ public class ControlMeasuresImporter implements Importer {
         this.effRecTableFormat = new EfficiencyRecordTableFormat(dbServer.getSqlDataTypes());
         this.datasource = dbServer.getEmfDatasource();
         this.modifier = dataModifier("control_measure_efficiencyrecords", datasource);
+        this.generator = new EfficiencyRecordGenerator();
     }
 
     public void run() throws ImporterException {
@@ -212,7 +215,6 @@ public class ControlMeasuresImporter implements Importer {
 
     private void doBatchInsert(EfficiencyRecord[] efficiencyRecords) throws EmfException {
         for (int i = 0; i < efficiencyRecords.length; i++) {
-            EfficiencyRecordGenerator generator = new EfficiencyRecordGenerator();
             Record record = generator.getRecord(efficiencyRecords[i]);
 //            log.error(efficiencyRecords[i].getCostPerTon());
             insertRecord(record, modifier);

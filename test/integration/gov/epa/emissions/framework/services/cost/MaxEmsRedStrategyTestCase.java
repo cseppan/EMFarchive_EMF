@@ -16,15 +16,12 @@ import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
-import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.File;
 import java.util.Date;
-
-import org.hibernate.Session;
 
 public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
 
@@ -155,17 +152,6 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
         record.setCostPerTon(cost);
         record.setCostYear(costYear);
         return record;
-    }
-
-    protected String detailResultDatasetTableName(ControlStrategy strategy) throws Exception {
-        Session session = sessionFactory().getSession();
-        try {
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), session);
-            Dataset detailedResultDataset = result.getDetailedResultDataset();
-            return detailedResultDataset.getInternalSources()[0].getTable();
-        } finally {
-            session.close();
-        }
     }
 
 }

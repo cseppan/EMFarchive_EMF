@@ -11,7 +11,6 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Session;
 
 public class ControlStrategyInventoryOutputTask implements Runnable {
 
@@ -27,12 +26,15 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
 
     private ControlStrategyInputDataset controlStrategyInputDataset;
     
+    private ControlStrategyResult controlStrategyResult;
+    
     public ControlStrategyInventoryOutputTask(User user, ControlStrategy controlStrategy,
-            ControlStrategyInputDataset controlStrategyInputDataset, HibernateSessionFactory sessionFactory, 
-            DbServerFactory dbServerFactory) {
+            ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult, 
+            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
         this.user = user;
         this.controlStrategy = controlStrategy;
         this.controlStrategyInputDataset = controlStrategyInputDataset;
+        this.controlStrategyResult = controlStrategyResult;
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
     }
@@ -40,8 +42,8 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
     public void run() {
         try {
             ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,
-                    controlStrategyInputDataset, sessionFactory, 
-                    dbServerFactory);
+                    controlStrategyInputDataset, controlStrategyResult, 
+                    sessionFactory, dbServerFactory);
             output.create();
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,12 +61,9 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
     }
 
     public boolean shouldProceed() throws EmfException {
-        Session session = sessionFactory.getSession();
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(controlStrategy.getId(), controlStrategyInputDataset.getInputDataset().getId(),
-                    session);
-            Dataset detailedResultDataset = result.getDetailedResultDataset();
+            Dataset detailedResultDataset = controlStrategyResult.getDetailedResultDataset();
             if (detailedResultDataset == null)
                 throw new EmfException("You should run the control strategy first before creating the inventory");
             String detailResultTableName = detailedResultDataset.getInternalSources()[0].getTable();
@@ -76,7 +75,6 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         } finally {
-            session.close();
             close(dbServer);
         }
         return true;

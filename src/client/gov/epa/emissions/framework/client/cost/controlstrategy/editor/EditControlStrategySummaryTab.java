@@ -78,7 +78,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private ComboBox strategyTypeCombo;
 
-    private JCheckBox useCostEquationCheck;
+    protected JCheckBox useCostEquationCheck, useSQLApproachCheck;
 
     private ControlStrategyResult[] controlStrategyResults;
 
@@ -193,6 +193,12 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return useCostEquationCheck;
     }
 
+    private JCheckBox useSQLApproach() {
+
+        useSQLApproachCheck = new JCheckBox(" ", null, true);
+        return useSQLApproachCheck;
+    }
+
     private IntTextField costYearTextField() {
         costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 10);
         costYear.setValue(controlStrategy.getCostYear());
@@ -300,8 +306,11 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         layoutGenerator.addLabelWidgetPair("User:", user, panel);
         layoutGenerator.addLabelWidgetPair("Total Annualized Cost:", costValue, panel);
         layoutGenerator.addLabelWidgetPair("Target Poll. Reduction:", emissionReductionValue, panel);
+
+        layoutGenerator.addLabelWidgetPair("Use SQL Approach:", useSQLApproach(), panel);
+        
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 

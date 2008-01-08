@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class StrategyDetailedResultTableFormat implements TableFormat {
+public class StrategySummaryResultTableFormat implements TableFormat {
     private SqlDataTypes types;
     
     private Column[] cols;
 
-    public StrategyDetailedResultTableFormat(SqlDataTypes types) {
+    public StrategySummaryResultTableFormat(SqlDataTypes types) {
         this.types = types;
         this.cols = createCols();
     }

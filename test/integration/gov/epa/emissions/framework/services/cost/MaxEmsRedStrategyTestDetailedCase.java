@@ -277,17 +277,34 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         return record;
     }
 
-    protected String detailResultDatasetTableName(ControlStrategy strategy) throws Exception {
-        Session session = sessionFactory.getSession();
+    protected String detailResultDatasetTableName(ControlStrategy strategy, int index) throws Exception {
         try {
-            ControlStrategyResult result = new ControlStrategyDAO().getControlStrategyResult(strategy.getId(), strategy.getControlStrategyInputDatasets()[0].getId(), session);
+            ControlStrategyResult result = getControlStrategyResult(strategy, index);
             Dataset detailedResultDataset = result.getDetailedResultDataset();
             return detailedResultDataset.getInternalSources()[0].getTable();
+        } finally {
+            //
+        }
+    }
+
+    protected String detailResultDatasetTableName(ControlStrategy strategy) throws Exception {
+        return detailResultDatasetTableName(strategy, 0);
+    }
+
+    protected ControlStrategyResult getControlStrategyResult(ControlStrategy controlStrategy, int index) {
+        Session session = sessionFactory.getSession();
+        try {
+//            return new ControlStrategyDAO().getControlStrategyResults(controlStrategy.getId(), session)[index];
+            return ((ControlStrategyResult[]) (new ControlStrategyDAO()).getControlStrategyResults(controlStrategy.getId(), session).toArray(new ControlStrategyResult[0]))[index];
         } finally {
             session.close();
         }
     }
-
+    
+    protected ControlStrategyResult getControlStrategyResult(ControlStrategy controlStrategy) {
+        return getControlStrategyResult(controlStrategy, 0);
+    }
+ 
     private void importControlMeasures() throws EmfException, Exception {
         File folder = new File("test/data/cost/controlMeasure");
         String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
@@ -301,10 +318,11 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         strategyTask.run();
     }
     
-    protected void createControlledInventory(ControlStrategy strategy, ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {
+    protected void createControlledInventory(ControlStrategy strategy, ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws Exception {
         //create the controlled inventory for this strategy run....
         ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(emfUser(), strategy,
-                controlStrategyInputDataset, sessionFactory, dbServerFactory);
+                controlStrategyInputDataset, controlStrategyResult,
+                sessionFactory, dbServerFactory);
         output.create();
     }
     

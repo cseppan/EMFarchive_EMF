@@ -35,8 +35,10 @@ public class GenerateSccControlMeasuresMap {
     
     private String controlMeasureFilterIds;
 
+    private String[] pollutants;
+
     public GenerateSccControlMeasuresMap(DbServer dbServer, String qualifiedEmissionTableName, ControlStrategy controlStrategy,
-            HibernateSessionFactory sessionFactory) {
+            HibernateSessionFactory sessionFactory, String[] pollutants) {
         this.emissionDatasource = dbServer.getEmissionsDatasource();
         this.emfDatasource = dbServer.getEmfDatasource();
         this.qualifiedEmissionTableName = qualifiedEmissionTableName;
@@ -45,6 +47,7 @@ public class GenerateSccControlMeasuresMap {
         //add additional class filter, if necessary, when selecting control measure for the calculations...
         this.classFilterIds = classIdList();
         this.controlMeasureFilterIds = controlMeasureIdList();
+        this.pollutants = pollutants;
     }
 
     public SccControlMeasuresMap create() throws EmfException {
@@ -97,8 +100,8 @@ public class GenerateSccControlMeasuresMap {
 
     private ControlMeasure controlMeasure(int id) {
         Session session = sessionFactory.getSession();
+        ControlMeasure measure = null;
         try {
-            ControlMeasure measure;
             ControlMeasureDAO dao = new ControlMeasureDAO();
             measure = dao.current(id, session);
 
@@ -116,15 +119,17 @@ public class GenerateSccControlMeasuresMap {
                 }
             }
 
-            EfficiencyRecord[] ers = (EfficiencyRecord[]) dao.getEfficiencyRecords(measure.getId(), session).toArray(new EfficiencyRecord[0]);
+//            EfficiencyRecord[] ers = (EfficiencyRecord[]) dao.getEfficiencyRecords(measure.getId(), session).toArray(new EfficiencyRecord[0]);
+            EfficiencyRecord[] ers = (EfficiencyRecord[]) dao.getEfficiencyRecords(measure.getId(), controlStrategy.getInventoryYear(), 
+                    pollutants, session).toArray(new EfficiencyRecord[0]);
             //no need to keep these in the hibernate cache
             session.clear();
 //            log.error("Measure = " + measure.getName() + " EfficiencyRecord length = " + ers.length);
             measure.setEfficiencyRecords(ers);
-            return measure;
         } finally {
             session.close();
         }
+        return measure;
     }
 
     private String query() {

@@ -384,6 +384,24 @@ public class ControlMeasureDAO {
         return hibernateFacade.get(EfficiencyRecord.class, c, session);
     }
 
+    public List getEfficiencyRecords(int controlMeasureId, int inventoryYear, 
+            String[] pollutants, Session session) {
+        String sql = "from EfficiencyRecord as e where e.controlMeasureId = :controlMeasureId and coalesce(date_part('year', e.effectiveDate), :inventoryYear) <= :inventoryYear";
+        if (pollutants.length> 0) {
+            sql += " and e.pollutant.name in (";
+            for (int i = 0; i < pollutants.length; i++) {
+                sql += (i > 0 ? "," : "") + "'" + pollutants[i] + "'";
+            }
+            sql += ")";
+        }
+//        System.out.println(sql);
+        Query query = session.createQuery(sql)
+            .setInteger("controlMeasureId", controlMeasureId)
+            .setInteger("inventoryYear", inventoryYear);
+        query.setCacheable(true);
+        return query.list();
+    }
+
     public EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter, DbServer dbServer) throws EmfException {
         try {
             RetrieveEfficiencyRecord retrieveEfficiencyRecord = new RetrieveEfficiencyRecord(controlMeasureId, dbServer);

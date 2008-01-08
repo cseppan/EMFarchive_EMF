@@ -26,7 +26,7 @@ public class GenerateSccControlMeasuresMapTest extends MaxEmsRedStrategyTestCase
             ControlMeasure cm2 = addControlMeasure("Control Measure 2", "CM2", sccs2(), new EfficiencyRecord[0]);
             ControlStrategy strategy = controlStrategy(inputDS, "CS1", pm10Pollutant());
             GenerateSccControlMeasuresMap createMap = new GenerateSccControlMeasuresMap(dbServer(),
-                    qualfiedTableName(emissionTableName(inputDS)), strategy, sessionFactory());
+                    qualfiedTableName(emissionTableName(inputDS)), strategy, sessionFactory(), new String[] {"NOX", "VOC"});
             SccControlMeasuresMap map = createMap.create();
             assertEquals("map size 9", 9, map.size());
             ControlMeasure[] measures = map.getControlMeasures("2294000000");

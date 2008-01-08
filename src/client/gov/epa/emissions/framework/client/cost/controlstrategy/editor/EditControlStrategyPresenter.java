@@ -29,6 +29,8 @@ public interface EditControlStrategyPresenter {
 
     void runStrategy(String exportDirectory) throws EmfException;
 
+    void runStrategy(String exportDirectory, boolean useSQLApproach) throws EmfException;
+
     void setResults(ControlStrategy controlStrategy);
 
     void stopRun() throws EmfException;
@@ -44,4 +46,6 @@ public interface EditControlStrategyPresenter {
     DatasetType getDatasetType(String name) throws EmfException;
     
     Version[] getVersions(EmfDataset dataset) throws EmfException; 
+
+    EmfDataset[] getDatasets(DatasetType type) throws EmfException;
 }

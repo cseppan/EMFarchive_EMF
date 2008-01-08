@@ -63,11 +63,13 @@
 	    	</composite-element>
 		</array>
 
-<!--		<set name="equationTypeSet" cascade="all, delete-orphan" inverse="true">
-	    	<key column="control_measure_id" not-null="true"/>-->
-<!--	    	<list-index column="list_index"/>-->
-<!--        	<one-to-many class="gov.epa.emissions.framework.services.cost.ControlMeasureEquationType"/>
-		</set>-->
+ 		<array name="months" table="control_measure_months">
+    		<key column="control_measure_id" not-null="true"/>
+    		<list-index column="list_index"/>
+	    	<composite-element class="gov.epa.emissions.framework.services.cost.ControlMeasureMonth">
+		        <property name="month" column="month" type="short"/>
+	    	</composite-element>
+  		</array>
 
     </class>
 </hibernate-mapping>

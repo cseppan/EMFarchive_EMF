@@ -87,7 +87,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     private void saveTabs() throws EmfException {
         for (Iterator iter = presenters.iterator(); iter.hasNext();) {
             EditControlStrategyTabPresenter element = (EditControlStrategyTabPresenter) iter.next();
-            element.doSave();
+            element.doSave(controlStrategy);
         }
     }
 
@@ -145,8 +145,12 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         summaryTabView.stopRun();
     }
 
+    public void runStrategy(String exportDirectory, boolean useSQLApproach) throws EmfException {
+        service().runStrategy(session.user(), controlStrategy.getId(), exportDirectory, useSQLApproach);
+    }
+
     public void runStrategy(String exportDirectory) throws EmfException {
-        service().runStrategy(session.user(), controlStrategy, exportDirectory);
+        service().runStrategy(session.user(), controlStrategy.getId(), exportDirectory);
     }
 
     public void doRefresh() throws EmfException {
@@ -208,4 +212,13 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         }
         return session.dataEditorService().getVersions(dataset.getId());
     }
+
+    public EmfDataset[] getDatasets(DatasetType type) throws EmfException
+    {
+            if (type == null)
+                return new EmfDataset[0];
+
+            return session.dataService().getDatasets(type);
+    }
+    
 }

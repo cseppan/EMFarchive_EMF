@@ -237,13 +237,28 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public synchronized void runStrategy(User user, ControlStrategy strategy,
-            String exportDirectory) {
+    public synchronized void runStrategy(User user, int controlStrategyId,
+            String exportDirectory) throws EmfException {
+        ControlStrategy strategy = getById(controlStrategyId);
         StrategyFactory factory = new StrategyFactory(batchSize());
         try {
             RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, 
                     dbServerFactory, threadPool,
                     exportDirectory);
+            runStrategy.run(user, strategy, this);
+        } catch (Exception e) {
+            //
+        }
+    }
+
+    public synchronized void runStrategy(User user, int controlStrategyId,
+            String exportDirectory, boolean useSQLApproach) throws EmfException {
+        ControlStrategy strategy = getById(controlStrategyId);
+        StrategyFactory factory = new StrategyFactory(batchSize());
+        try {
+            RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, 
+                    dbServerFactory, threadPool,
+                    exportDirectory, useSQLApproach);
             runStrategy.run(user, strategy, this);
         } catch (Exception e) {
             //
@@ -277,39 +292,17 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public synchronized void createInventory(User user, ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
+    public synchronized void createInventory(User user, ControlStrategy controlStrategy, 
+            ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
         try {
             ControlStrategyInventoryOutputTask task= new ControlStrategyInventoryOutputTask(user, controlStrategy, 
-                    controlStrategyInputDataset, sessionFactory, 
-                    dbServerFactory);
+                    controlStrategyInputDataset, controlStrategyResult, 
+                    sessionFactory, dbServerFactory);
             if(task.shouldProceed())
                 threadPool.execute(new GCEnforcerTask("Create Inventory: " + controlStrategy.getName(), task));
         } catch (Exception e) {
             LOG.error("Error running control strategy: " + controlStrategy.getName(), e);
             throw new EmfException(e.getMessage());
-        }
-    }
-
-//    private DbServer dbServer() throws EmfException {
-//        try {
-//            return new EmfDbServer();
-//        } catch (Exception e) {
-//            LOG.error("Could not get database connection: " + e.getMessage());
-//            throw new EmfException("Could not get database connection: " +e.getMessage());
-//        }
-//    }
-
-    public synchronized ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            ControlStrategyResult controlStrategyResult = dao.getControlStrategyResult(controlStrategyId, inputDatasetId, 
-                    session);
-            return controlStrategyResult;
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve ControlStrategy Result", e);
-            throw new EmfException("Could not retrieve ControlStrategy Result");
-        } finally {
-            session.close();
         }
     }
 

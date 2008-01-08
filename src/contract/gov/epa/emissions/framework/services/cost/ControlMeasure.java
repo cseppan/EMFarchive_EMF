@@ -59,7 +59,8 @@ public class ControlMeasure implements Lockable, Serializable {
     private List efficiencyRecords;
     private List aggregatedPollutantEfficiencyRecords;
 
-    private List sectors;
+    private Sector[] sectors = new Sector[] {};
+    
     private String lastModifiedBy;
 
     private Double ruleEffectiveness;
@@ -68,18 +69,20 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private Double applyOrder;
 
-    private List equations = new ArrayList();
+    private ControlMeasureEquation[] equations = new ControlMeasureEquation[] {};
 
     private EmfDataset regionDataset;
 
     private Integer regionDatasetVersion;
 
+    private ControlMeasureMonth[] months = new ControlMeasureMonth[] {};
+    
     public ControlMeasure() {
         this.lock = new Mutex();
         this.sccs = new ArrayList();
         this.efficiencyRecords = new ArrayList();
         this.aggregatedPollutantEfficiencyRecords = new ArrayList();
-        this.sectors = new ArrayList();
+//        this.sectors = new ArrayList();
 //        this.equationTypeList = new ArrayList();
 //        this.equationTypes = new ArrayList();
         
@@ -278,11 +281,11 @@ public class ControlMeasure implements Lockable, Serializable {
     }
 
     public Sector[] getSectors() {
-        return (Sector[]) sectors.toArray(new Sector[0]);
+        return sectors;//(Sector[]) sectors.toArray(new Sector[0]);
     }
 
     public void setSectors(Sector[] sectors) {
-        this.sectors = Arrays.asList(sectors);
+        this.sectors = sectors;//Arrays.asList(sectors);
     }
 
     public void addEfficiencyRecord(EfficiencyRecord efficiencyRecord) {
@@ -314,7 +317,10 @@ public class ControlMeasure implements Lockable, Serializable {
     }
 
     public void addSector(Sector sector) {
-        sectors.add(sector);
+        List<Sector> equationList = new ArrayList<Sector>();
+        equationList.addAll(Arrays.asList(sectors));
+        equationList.add(sector);
+        this.sectors = equationList.toArray(new Sector[0]);
     }
 
     //these properties will overide the efficiency record settings...
@@ -343,18 +349,22 @@ public class ControlMeasure implements Lockable, Serializable {
     }
 
     public void setEquations(ControlMeasureEquation[] equations) {
-        this.equations.removeAll(this.equations);
-        for (int i = 0; i < equations.length; i++) {
-            this.equations.add(equations[i]);
-        }
+        this.equations = equations;
+//        this.equations.removeAll(this.equations);
+//        for (int i = 0; i < equations.length; i++) {
+//            this.equations.add(equations[i]);
+//        }
     }
 
     public void addEquation(ControlMeasureEquation equation) {
-        this.equations.add(equation);
+        List<ControlMeasureEquation> equationList = new ArrayList<ControlMeasureEquation>();
+        equationList.addAll(Arrays.asList(equations));
+        equationList.add(equation);
+        this.equations = equationList.toArray(new ControlMeasureEquation[0]);
     }
 
     public ControlMeasureEquation[] getEquations() {
-        return (ControlMeasureEquation[]) equations.toArray(new ControlMeasureEquation[0]);
+        return equations;//(ControlMeasureEquation[]) equations.toArray(new ControlMeasureEquation[0]);
     }
 
     public void setRegionDataset(EmfDataset regionDataset) {
@@ -371,5 +381,13 @@ public class ControlMeasure implements Lockable, Serializable {
 
     public Integer getRegionDatasetVersion() {
         return regionDatasetVersion;
+    }
+
+    public ControlMeasureMonth[] getMonths() {
+        return months;
+    }
+
+    public void setMonths(ControlMeasureMonth[] months) {
+        this.months = months;
     }
 }
