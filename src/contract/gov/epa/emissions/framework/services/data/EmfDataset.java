@@ -61,23 +61,19 @@ public class EmfDataset implements Dataset, Lockable {
 
     private DatasetType datasetType;
 
-    private List internalSources;
+    private InternalSource[] internalSources = new InternalSource[]{};
 
-    private List externalSources;
+    private ExternalSource[] externalSources = new ExternalSource[]{};
 
-    private List keyValsList;
+    private KeyVal[] keyValsList = new KeyVal[]{};
 
-    private List sectorsList;
+    private Sector[] sectorsList = new Sector[]{};
 
     private int defaultVersion;
 
     private Mutex lock;
 
     public EmfDataset() {
-        internalSources = new ArrayList();
-        externalSources = new ArrayList();
-        keyValsList = new ArrayList();
-        sectorsList = new ArrayList();
         lock = new Mutex();
     }
 
@@ -244,55 +240,71 @@ public class EmfDataset implements Dataset, Lockable {
     }
 
     public InternalSource[] getInternalSources() {
-        return (InternalSource[]) this.internalSources.toArray(new InternalSource[0]);
+        return this.internalSources;
+//        return (InternalSource[]) this.internalSources.toArray(new InternalSource[0]);
     }
 
     public void setInternalSources(InternalSource[] internalSources) {
-        this.internalSources.clear();
-        this.internalSources.addAll(Arrays.asList(internalSources));
+        this.internalSources = internalSources;
+//        this.internalSources.clear();
+//        this.internalSources.addAll(Arrays.asList(internalSources));
     }
 
     public void addInternalSource(InternalSource source) {
-        this.internalSources.add(source);
+        List<InternalSource> internalSourceList = new ArrayList<InternalSource>();
+        internalSourceList.addAll(Arrays.asList(internalSources));
+        internalSourceList.add(source);
+        this.internalSources = internalSourceList.toArray(new InternalSource[0]);
     }
 
     public ExternalSource[] getExternalSources() {
-        return (ExternalSource[]) this.externalSources.toArray(new ExternalSource[0]);
+        return this.externalSources;
     }
 
     public void setExternalSources(ExternalSource[] externalSources) {
-        this.externalSources.clear();
-        this.externalSources.addAll(Arrays.asList(externalSources));
+//        this.externalSources.clear();
+//        this.externalSources.addAll(Arrays.asList(externalSources));
+        this.externalSources = externalSources;
     }
 
     public void addExternalSource(ExternalSource source) {
-        this.externalSources.add(source);
+        List<ExternalSource> sources = new ArrayList<ExternalSource>();
+        sources.addAll(Arrays.asList(this.externalSources));
+        sources.add(source);
+        
+        this.externalSources = sources.toArray(new ExternalSource[0]);
     }
 
     public void addSector(Sector sector) {
-        sectorsList.add(sector);
+        List<Sector> sectors = new ArrayList<Sector>();
+        sectors.addAll(Arrays.asList(this.sectorsList));
+        sectors.add(sector);
+        
+        this.sectorsList = sectors.toArray(new Sector[0]);
     }
 
     public Sector[] getSectors() {
-        return (Sector[]) sectorsList.toArray(new Sector[0]);
+        return this.sectorsList;
     }
 
     public void setSectors(Sector[] sectors) {
-        sectorsList.clear();
-        sectorsList.addAll(Arrays.asList(sectors));
+        this.sectorsList = sectors;
     }
 
     public void addKeyVal(KeyVal keyval) {
-        keyValsList.add(keyval);
+        List<KeyVal> keyVals = new ArrayList<KeyVal>();
+        keyVals.addAll(Arrays.asList(this.keyValsList));
+        keyVals.add(keyval);
+        
+        this.keyValsList = keyVals.toArray(new KeyVal[0]);
     }
 
     public KeyVal[] getKeyVals() {
-        return mergeKeyVals();
+        return this.keyValsList;//mergeKeyVals();
     }
 
     public void setKeyVals(KeyVal[] keyvals) {
-        keyValsList.clear();
-        keyValsList.addAll(Arrays.asList(keyvals));
+        this.keyValsList = keyvals;
     }
 
     public void setSummarySource(InternalSource summary) {
@@ -404,11 +416,11 @@ public class EmfDataset implements Dataset, Lockable {
     }
 
     public KeyVal[] mergeKeyVals() {
-        List result = new ArrayList();
-        result.addAll(keyValsList);
-
         if (datasetType == null)
-            return (KeyVal[]) result.toArray(new KeyVal[0]);
+            return keyValsList;
+        
+        List<KeyVal> result = new ArrayList<KeyVal>();
+        result.addAll(Arrays.asList(keyValsList));
 
         KeyVal[] datasetTypeKeyVals = datasetType.getKeyVals();
 
@@ -417,7 +429,7 @@ public class EmfDataset implements Dataset, Lockable {
                 result.add(datasetTypeKeyVals[i]);
             }
         }
-        return (KeyVal[]) result.toArray(new KeyVal[0]);
+        return result.toArray(new KeyVal[0]);
     }
 
     public boolean contains(List keyVals, KeyVal newKeyVal) {

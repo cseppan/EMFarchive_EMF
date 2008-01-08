@@ -25,9 +25,9 @@ public class ImportTaskManager implements TaskManager {
 
     private static int processQueueCount = 0;
 
-    private final int poolSize = 1; //reduced from 4 to 1 to remove the sessions out of synch issue
+    private final int poolSize = 4; //reduced from 4 to 1 to remove the sessions out of synch issue
 
-    private final int maxPoolSize = 1; //reduced from 4 to 1 to remove the sessions out of synch issue
+    private final int maxPoolSize = 4; //reduced from 4 to 1 to remove the sessions out of synch issue
 
     private final long keepAliveTime = 60;
 

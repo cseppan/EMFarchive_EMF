@@ -112,7 +112,7 @@ public class DataServiceImpl implements DataService {
             DatasetType type = dataset.getDatasetType();
 
             if (!dao.canUpdate(dataset, session))
-                throw new EmfException("The Dataset name is already in use");
+                throw new EmfException("The Dataset name " + dataset.getName() + " is already in use.");
 
             if (type != null && type.getTablePerDataset() > 1)
                 LOG.info("Renaming emission tables for dataset " + dataset.getName() + " is not allowed.");

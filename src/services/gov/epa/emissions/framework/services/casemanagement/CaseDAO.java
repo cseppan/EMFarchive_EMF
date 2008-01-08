@@ -71,11 +71,12 @@ public class CaseDAO {
         try {
             CaseOutput existed = getCaseOutput(output, localSession);
 
-            if (DebugLevels.DEBUG_11) {
+            if (DebugLevels.DEBUG_12) {
                 System.out.println("Is output existed? " + (existed == null));
-                System.out.println("Output to check: " + output.getName() + " case id: " + output.getCaseId() + " jobid: " + output.getJobId());
+                System.out.println("Output to check: " + output.getName() + " case id: " + output.getCaseId()
+                        + " jobid: " + output.getJobId());
             }
-            
+
             if (existed != null)
                 removeCaseOutputs(user, new CaseOutput[] { existed }, true, localSession);
 
@@ -186,7 +187,7 @@ public class CaseDAO {
     public void add(CaseInput object, Session session) {
         addObject(object, session);
     }
-    
+
     public void add(CaseOutput object, Session session) {
         addObject(object, session);
     }
@@ -260,12 +261,12 @@ public class CaseDAO {
         hibernateFacade.remove(inputs, session);
     }
 
-    public void removeCaseOutputs(User user, CaseOutput[] outputs, boolean deleteDataset, Session session) throws EmfException
-   {
+    public void removeCaseOutputs(User user, CaseOutput[] outputs, boolean deleteDataset, Session session)
+            throws EmfException {
         try {
             if (deleteDataset)
                 removeDatasetsOnOutput(user, session, outputs);
-        }finally {
+        } finally {
             hibernateFacade.remove(outputs, session);
         }
     }
@@ -859,14 +860,18 @@ public class CaseDAO {
     private void removeDatasetsOnOutput(User user, Session session, CaseOutput[] outputs) throws EmfException {
         DatasetDAO dsDao = new DatasetDAO();
 
+        session.clear();
+
         for (CaseOutput output : outputs) {
             EmfDataset dataset = dsDao.getDataset(session, output.getDatasetId());
 
-            if (dataset != null){
-                try{
+            if (dataset != null) {
+                try {
                     dsDao.remove(user, dataset, session);
-                }catch (EmfException e){
-                    System.out.println(e.getMessage());
+                } catch (EmfException e) {
+                    if (DebugLevels.DEBUG_12)
+                        System.out.println(e.getMessage());
+                    
                     throw new EmfException(e.getMessage());
                 }
             }
@@ -892,7 +897,7 @@ public class CaseDAO {
 
         return new Criterion[] { c1, c2, c3, c4 };
     }
-    
+
     public boolean caseOutputExists(CaseOutput output, Session session) {
         Criterion[] criterions = uniqueCaseOutputCriteria(output);
 

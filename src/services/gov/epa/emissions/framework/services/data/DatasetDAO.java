@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -42,9 +43,9 @@ public class DatasetDAO {
     private LockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
-    
+
     private DbServerFactory dbServerFactory;
-    
+
     public DatasetDAO() {
         lockingScheme = new LockingScheme();
         hibernateFacade = new HibernateFacade();
@@ -71,16 +72,20 @@ public class DatasetDAO {
     }
 
     public boolean canUpdate(EmfDataset dataset, Session session) throws Exception {
-        if (!exists(dataset.getId(), EmfDataset.class, session)) {
-            return false;
+        return canUpdate(dataset.getId(), dataset.getName(), session);
+    }
+
+    private boolean canUpdate(int id, String newName, Session session) throws Exception {
+        if (!exists(id, EmfDataset.class, session)) {
+            throw new EmfException("Dataset with id=" + id + " does not exist.");
         }
 
-        EmfDataset current = current(dataset.getId(), EmfDataset.class, session);
+        EmfDataset current = current(id, EmfDataset.class, session);
         session.clear();// clear to flush current
-        if (current.getName().equals(dataset.getName()))
+        if (current.getName().equals(newName))
             return true;
 
-        return !datasetNameUsed(dataset.getName());
+        return !datasetNameUsed(newName);
     }
 
     public boolean exists(String name, Session session) {
@@ -103,7 +108,7 @@ public class DatasetDAO {
 
     public void updateWithoutLocking(EmfDataset dataset, Session session) throws Exception {
         try {
-            renameEmissionTable(dataset, session);
+            renameEmissionTable(dataset, getDataset(session, dataset.getId()), session);
         } catch (Exception e) {
             LOG.info("Can not rename emission table: " + dataset.getInternalSources()[0].getTable());
         } finally {
@@ -113,17 +118,30 @@ public class DatasetDAO {
     }
 
     public void remove(EmfDataset dataset, Session session) {
+        if (DebugLevels.DEBUG_12)
+            System.out.println("dataset dao remove(dataset, session) called: " + dataset.getId() + " "
+                    + dataset.getName());
+
         hibernateFacade.remove(dataset, session);
     }
-    
-    public synchronized void remove(User user, EmfDataset dataset, Session session) throws EmfException {
+
+    public void remove(User user, EmfDataset dataset, Session session) throws EmfException {
         // NOTE: method to be modified to really remove dataset. It is only rename it for now.
+        if (dataset.getStatus().equalsIgnoreCase("Deleted"))
+            return;
 
         String datasetName = dataset.getName();
 
         if (dataset.isLocked())
             throw new EmfException("Could not remove dataset " + datasetName + ". It is locked by "
                     + dataset.getLockOwner());
+
+        if (DebugLevels.DEBUG_12) {
+            System.out.println("dataset dao remove(user, dataset, session) called: " + dataset.getId() + " "
+                    + datasetName);
+            System.out.println("Dataset status: " + dataset.getStatus() + " dataset retrieved null? "
+                    + (getDataset(session, dataset.getId()) == null));
+        }
 
         if (isUsedByCases(session, dataset))
             throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is used by a case.");
@@ -134,21 +152,27 @@ public class DatasetDAO {
         String prefix = "DELETED_" + new Date().getTime() + "_";
 
         try {
-            if (dataset.getStatus().equalsIgnoreCase("Deleted"))
-                return;
+            String newName = prefix + datasetName;
 
-            dataset.setName(prefix + datasetName);
-            dataset.setStatus("Deleted");
+            if (!canUpdate(dataset.getId(), newName, session)) // Check to see if the new name is available
+                throw new EmfException("The Dataset name is already in use: " + dataset.getName());
 
             DatasetType type = dataset.getDatasetType();
-
-            if (!canUpdate(dataset, session))
-                throw new EmfException("The Dataset name is already in use: " + dataset.getName());
 
             if (type != null && type.getTablePerDataset() > 1)
                 LOG.info("Renaming emission tables for dataset " + dataset.getName() + " is not allowed.");
 
-            update(obtainLocked(user, dataset, session), session);
+            EmfDataset locked = obtainLocked(user, dataset, session);
+
+            if (locked == null) {
+                LOG.info("Could not get lock on dataset " + dataset.getName() + " to remove it.");
+                return;
+            }
+
+            locked.setName(newName);
+            locked.setStatus("Deleted");
+
+            updateToRemove(locked, dataset, session);
         } catch (Exception e) {
             e.printStackTrace();
             throw new EmfException("Could not remove dataset " + datasetName + ". Reason: " + e.getMessage());
@@ -165,15 +189,32 @@ public class DatasetDAO {
 
     public EmfDataset update(EmfDataset locked, Session session) throws Exception {
         EmfDataset toReturn = null;
+
         try {
-            renameEmissionTable(locked, session);
+            renameEmissionTable(locked, getDataset(session, locked.getId()), session);
         } catch (Exception e) {
             LOG.error("Can not rename emission table: " + locked.getInternalSources()[0].getTable(), e);
         } finally { // to ignore if the rename fails
+            if (DebugLevels.DEBUG_12)
+                System.out.println("Update dataset " + locked.getName() + " with id: " + locked.getId());
+
             toReturn = (EmfDataset) lockingScheme.releaseLockOnUpdate(locked, current(locked, session), session);
         }
 
         return toReturn;
+    }
+
+    private void updateToRemove(EmfDataset locked, EmfDataset oldDataset, Session session) throws Exception {
+        try {
+            renameEmissionTable(locked, oldDataset, session);
+        } catch (Exception e) {
+            LOG.error("Can not rename emission table: " + locked.getInternalSources()[0].getTable(), e);
+        } finally { // to ignore if the rename fails
+            if (DebugLevels.DEBUG_12)
+                System.out.println("Update to remove " + locked.getName() + " with id: " + locked.getId());
+
+            lockingScheme.releaseLockOnUpdate(locked, current(locked, session), session);
+        }
     }
 
     private EmfDataset current(EmfDataset dataset, Session session) {
@@ -199,6 +240,7 @@ public class DatasetDAO {
     }
 
     public EmfDataset getDataset(Session session, int id) {
+        session.clear(); // to clear the cached objects in session if any
         Criterion statusCrit = Restrictions.ne("status", "Deleted"); // FIXME: to be deleted after dataset removed
         // from db
         Criterion idCrit = Restrictions.eq("id", new Integer(id));
@@ -208,6 +250,7 @@ public class DatasetDAO {
 
     public boolean isUsedByControlStrategies(Session session, EmfDataset dataset) {
         List strategies = hibernateFacade.getAll(ControlStrategy.class, session);
+
         if (strategies == null || strategies.isEmpty())
             return false;
 
@@ -222,7 +265,9 @@ public class DatasetDAO {
 
     public boolean isUsedByCases(Session session, EmfDataset dataset) {
         CaseDAO caseDao = new CaseDAO();
+
         List caseInputs = caseDao.getAllCaseInputs(session);
+
         if (caseInputs == null || caseInputs.isEmpty())
             return false;
 
@@ -253,10 +298,10 @@ public class DatasetDAO {
     public long getDatasetRecordsNumber(DbServer dbServer, Session session, EmfDataset dataset, Version version)
             throws SQLException {
         DatasetType type = dataset.getDatasetType();
-        
+
         if (type.getExporterClassName().endsWith("ExternalFilesExporter"))
             return dataset.getExternalSources().length;
-            
+
         Datasource datasource = dbServer.getEmissionsDatasource();
         InternalSource source = dataset.getInternalSources()[0];
         String qualifiedTable = datasource.getName() + "." + source.getTable();
@@ -285,8 +330,8 @@ public class DatasetDAO {
         String versions = versionsList(version, session);
         String deleteClause = createDeleteClause(versions);
 
-        String whereClause = " WHERE dataset_id = " + version.getDatasetId() + " AND version IN (" + versions
-                + ")" + deleteClause;
+        String whereClause = " WHERE dataset_id = " + version.getDatasetId() + " AND version IN (" + versions + ")"
+                + deleteClause;
 
         return whereClause;
     }
@@ -298,15 +343,13 @@ public class DatasetDAO {
         // e.g.: delete_version NOT SIMILAR TO '(6|6,%|%,6,%|%,6)'
         while (tokenizer.hasMoreTokens()) {
             String version = tokenizer.nextToken();
-            if (!version.equals("0"))
-            {    
+            if (!version.equals("0")) {
                 String regex = "(" + version + "|" + version + ",%|%," + version + ",%|%," + version + ")";
-                if (buffer.length() == 0)
-                {
+                if (buffer.length() == 0) {
                     buffer.append(" AND ");
                 }
                 buffer.append(" delete_versions NOT SIMILAR TO '" + regex + "'");
-    
+
                 if (tokenizer.hasMoreTokens())
                     buffer.append(" AND ");
             }
@@ -328,12 +371,22 @@ public class DatasetDAO {
         return result.toString();
     }
 
-    private void renameEmissionTable(EmfDataset dataset, Session session) throws Exception {
-        EmfDataset oldDataset = getDataset(session, dataset.getId());
+    private void renameEmissionTable(EmfDataset dataset, EmfDataset oldDataset, Session session) throws Exception {
+        if (DebugLevels.DEBUG_12) {
+            System.out.println("Check to rename. Dataset name: " + dataset.getName() + " Status: "
+                    + dataset.getStatus() + " id: " + dataset.getId());
+            System.out.println("Old dataset is null? " + (oldDataset == null));
+            System.out.println("Old dataset name: " + ((oldDataset == null) ? "" : oldDataset.getName()));
+            System.out.println("Old dataset status: " + ((oldDataset == null) ? "" : oldDataset.getStatus()));
+            System.out.println("Old dataset exists? " + exists(dataset.getId(), EmfDataset.class, session));
+        }
 
         if (!continueToRename(dataset, oldDataset))
             return;
-        
+
+        if (DebugLevels.DEBUG_12)
+            System.out.println("Dataset ok to rename.");
+
         DbServer dbServer = getDbServer();
 
         try {
@@ -344,17 +397,23 @@ public class DatasetDAO {
     }
 
     private boolean continueToRename(EmfDataset dataset, EmfDataset oldDataset) {
+        if (oldDataset == null) {
+            System.out.println("old data set is null");
+            return false;
+        }
+
         DatasetType type = dataset.getDatasetType();
         InternalSource[] sources = dataset.getInternalSources();
 
-        if (oldDataset == null)
+        if (dataset.getName().equalsIgnoreCase(oldDataset.getName())) {
+            System.out.println("new dataset has the same name");
             return false;
+        }
 
-        if (dataset.getName().equalsIgnoreCase(oldDataset.getName()))
+        if (sources == null || sources.length == 0 || type.getTablePerDataset() != 1) {
+            System.out.println("internal sources is null");
             return false;
-
-        if (sources == null || sources.length == 0 || type.getTablePerDataset() != 1)
-            return false;
+        }
 
         return true;
     }
@@ -365,7 +424,10 @@ public class DatasetDAO {
         DataTable table = new DataTable(oldDataset, datasource);
         String oldTableName = oldDataset.getInternalSources()[0].getTable();
         String newTableName = table.createName(dataset.getName());
-
+        
+        if (DebugLevels.DEBUG_12)
+            System.out.println("new table name: " + newTableName + " old table name:" + oldTableName);
+        
         sources[0].setTable(newTableName);
         table.rename(oldTableName, newTableName);
     }
@@ -402,7 +464,7 @@ public class DatasetDAO {
             dbServer = new EmfDbServer();
         else
             dbServer = dbServerFactory.getDbServer();
-        
+
         return dbServer;
     }
 

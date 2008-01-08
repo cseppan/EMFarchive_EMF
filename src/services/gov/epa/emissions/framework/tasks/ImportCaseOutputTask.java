@@ -97,9 +97,10 @@ public class ImportCaseOutputTask extends Task {
                 e1.printStackTrace();
             }
         } finally {
-            if (session != null)
+            if (session != null) {
                 session.flush();
                 session.close();
+            }
         }
     }
 
