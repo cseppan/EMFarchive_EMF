@@ -75,19 +75,20 @@ public class OutputsTableData extends ChangeableTableData {
         return values;
     }
 
-    private void removeFromList(CaseOutput output, List list) {
-        for (Iterator iter = list.iterator(); iter.hasNext();) {
+    private void removeFromList(CaseOutput output) {
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
             ViewableRow row = (ViewableRow) iter.next();
             CaseOutput source = (CaseOutput) row.source();
-            if (source == output)
-                list.remove(row);
-            return;
+            if (source == output) {
+                rows.remove(row);
+                return;
+            }
         }
     }
 
     public void remove(CaseOutput[] values) {
         for (int i = 0; i < values.length; i++)
-            removeFromList(values[i], rows);
+            removeFromList(values[i]);
         refresh();
     }
 

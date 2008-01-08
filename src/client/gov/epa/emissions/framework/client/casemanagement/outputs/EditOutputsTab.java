@@ -195,7 +195,7 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         Button remove = new RemoveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 messagePanel.clear();
-                    removeSelectedOutput();
+                removeSelectedOutput();
             }
         });
         remove.setMargin(insets);
@@ -307,6 +307,8 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
             YesNoDialog dialog = new YesNoDialog(parentConsole, titleDS, messageDS);
             boolean deleteDS=dialog.confirm();
             tableData.remove(selected);
+            refresh();
+            
             try {
                 presenter.doRemove(selected,deleteDS);
                 messagePanel.setMessage(selected.length

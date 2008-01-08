@@ -23,15 +23,23 @@ public class OutputsRowSource implements RowSource {
 
     public Object[] values() {
         if (datasetValues == null)
-            return null;
+            return new Object[] { getOutputName(source), getJobName(), getSector(), "",
+                "", "", "", "", getExecName(source), getMessage(source) };
         
-        return new Object[] { getOutputName(source), getJobName(source), getSector(source), getDatasetProperty("name"),
+        return new Object[] { getOutputName(source), getJobName(), getSector(), getDatasetProperty("name"),
                 getDatasetProperty("datasetType"), getStatus(source), getDatasetProperty("creator"),
                 getDatasetProperty("createdDateTime"), getExecName(source), getMessage(source) };
     }
 
     private String getMessage(CaseOutput source) {
         String message = source.getMessage();
+        
+        if (source.getDatasetId() > 0 && source.getStatus().contains("completed")
+                && datasetValues == null) {
+            message = "Dataset has been deleted.";
+            source.setStatus("");
+            source.setMessage(message);
+        }
         
         if(message != null && message.length() > 50)
             return message.substring(0,49);
@@ -63,14 +71,14 @@ public class OutputsRowSource implements RowSource {
         return output.getName() != null ? output.getName() : "";
     }
 
-    private String getJobName(CaseOutput output) {
+    private String getJobName() {
         String jobName = null;
         if (job != null)
             jobName = job.getName();
         return jobName==null? "": jobName;
     }
 
-    private String getSector(CaseOutput output) {
+    private String getSector() {
         String sectorName=null; 
         if (job != null){
             Sector sec=job.getSector();
@@ -80,17 +88,15 @@ public class OutputsRowSource implements RowSource {
     }
 
     public void setValueAt(int column, Object val) {
-        // NOTE Auto-generated method stub
-
+//      No Op
     }
 
     public Object source() {
         return source;
     }
 
-    public void validate(int rowNumber) throws EmfException {
-        // NOTE Auto-generated method stub
-        throw new EmfException("Under construction.");
+    public void validate(int rowNumber) {
+//      No Op
     }
 
     private String[] getDatasetValues(CaseOutput output, EmfSession session) {

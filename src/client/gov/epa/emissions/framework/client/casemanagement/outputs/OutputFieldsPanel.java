@@ -260,6 +260,9 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     }
 
     private String getDatasetProperty(String property) {
+        if (datasetValues == null)
+            return null;
+        
         String value = null;
 
         for (String values : datasetValues) {
