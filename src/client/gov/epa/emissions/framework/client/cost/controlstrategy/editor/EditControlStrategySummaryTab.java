@@ -35,6 +35,7 @@ import java.awt.Dimension;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -115,22 +116,36 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private JPanel createmMainSection() throws EmfException {
-        JPanel panel = new JPanel(new SpringLayout());
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        
+        JPanel panelTop = new JPanel(new SpringLayout());
         // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Name:", name(), panel);
-        layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description()), panel);
-        layoutGenerator.addLabelWidgetPair("Project:", projects(), panel);
-        layoutGenerator.addLabelWidgetPair("Creator:", creator(), panel);
-        layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
-        layoutGenerator.addLabelWidgetPair("Copied From:", new JLabel("   "), panel);
-        layoutGenerator.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), panel);
+        layoutGenerator.addLabelWidgetPair("Name:", name(), panelTop);
+        layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description()), panelTop);
+        
+        layoutGenerator.addLabelWidgetPair("Project:", projects(), panelTop);
+        layoutGenerator.addLabelWidgetPair("Creator:", creator(), panelTop);
+        layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panelTop);
+        layoutGenerator.addLabelWidgetPair("Copied From:", new JLabel("   "), panelTop);
+        layoutGenerator.makeCompactGrid(panelTop, 6, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
+        panel.add(panelTop);
+        
+        JPanel panelBottom = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator1 = new SpringLayoutGenerator();
+
+        layoutGenerator1.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), panelBottom);
+        layoutGenerator1.addLabelWidgetPair("Use SQL Approach:", useSQLApproach(), panelBottom);
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
+        layoutGenerator1.makeCompactGrid(panelBottom, 1, 4, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
+        panel.add(panelBottom);
         return panel;
     }
 
@@ -307,10 +322,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         layoutGenerator.addLabelWidgetPair("Total Annualized Cost:", costValue, panel);
         layoutGenerator.addLabelWidgetPair("Target Poll. Reduction:", emissionReductionValue, panel);
 
-        layoutGenerator.addLabelWidgetPair("Use SQL Approach:", useSQLApproach(), panel);
-        
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
