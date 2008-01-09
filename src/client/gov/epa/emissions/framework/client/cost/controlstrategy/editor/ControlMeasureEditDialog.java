@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ComboBox;
+import gov.epa.emissions.commons.gui.EmptyStrings;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -28,6 +29,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -50,11 +52,14 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
     private ComboBox version, dataset;
 
     private CheckBox rpOverride, reOverride;
+    
+    private int measureSize;
 
-    public ControlMeasureEditDialog(EmfConsole parent) {
+    public ControlMeasureEditDialog(EmfConsole parent, int measureSize) {
         super(parent);
         super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
         this.setModal(true);
+        this.measureSize=measureSize;
         this.verifier = new NumberFieldVerifier("Measure properties: ");
         // this.parent = parent;
     }
@@ -63,41 +68,40 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
 
         messagePanel = new SingleLineMessagePanel();
         Container contentPane = getContentPane();
-        contentPane.setLayout(new BorderLayout(5, 10));
+        contentPane.setLayout(new BorderLayout(5, 5));
         contentPane.add(messagePanel, BorderLayout.PAGE_START);
 
         try {
-            contentPane.add(createLowerSection(), BorderLayout.CENTER);
+            contentPane.add(createMiddleSection(), BorderLayout.CENTER);
+            contentPane.add(buttonPanel(), BorderLayout.SOUTH);
         } catch (EmfException e) {
             // NOTE Auto-generated catch block
             e.printStackTrace();
         }
 
-        setTitle("Control Strategy Measures Editor");
+        setTitle("Editing " + measureSize + " measure" + (measureSize>1? "s" : ""));
         this.pack();
-        this.setSize(700, 260);
+        this.setSize(new Dimension(350, 430));
+        this.setMinimumSize(new Dimension(350, 420));
         this.setLocation(ScreenUtils.getPointToCenter(this));
         this.setVisible(true);
     }
 
-    private JPanel createLowerSection() throws EmfException {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(createPropertySection(), BorderLayout.CENTER);
-        panel.add(buttonPanel(), BorderLayout.SOUTH);
+    private JPanel createMiddleSection() throws EmfException {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS) );
+       
+        panel.add(createRegionSection());
+        panel.add(createOrderSection());
+        panel.add(createRPSection());
+        panel.add(createRESection());
         return panel;
     }
 
-    private JPanel createPropertySection() throws EmfException {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(createPropertySectionRight(), BorderLayout.CENTER);
-        panel.add(createPropertySectionLeft(), BorderLayout.WEST);
-        return panel;
-    }
-
-    private JPanel createPropertySectionRight() throws EmfException {
-        JPanel outerPanel = new JPanel(new BorderLayout());
+    private JPanel createRegionSection() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Regions"));
+        
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         List<EmfDataset> datasetList = new ArrayList<EmfDataset>();
         EmfDataset[] datasets = presenter.getDatasets(presenter.getDatasetType("List of Counties (CSV)"));
@@ -106,8 +110,8 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
         datasetList.add(blankDataset);
         datasetList.addAll(Arrays.asList(datasets));
         dataset = new ComboBox("Not selected", datasetList.toArray());
-        Dimension size = new Dimension(300, 10);
-        dataset.setPreferredSize(size);
+//        Dimension size = new Dimension(300, 10);
+        dataset.setPrototypeDisplayValue(setWidth());
 
         dataset.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -122,7 +126,7 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
         layoutGenerator.addLabelWidgetPair("Dataset:", dataset, panel);
 
         version = new ComboBox(new Version[0]);
-        version.setPreferredSize(size);
+        version.setPrototypeDisplayValue(setWidth());
         try {
             fillVersions((EmfDataset) dataset.getSelectedItem());
         } catch (EmfException e1) {
@@ -133,10 +137,14 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
         layoutGenerator.addLabelWidgetPair("Version:", version, panel);
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
-                5, 10);// xPad, yPad
+                5, 5);// xPad, yPad
 
-        outerPanel.add(panel, BorderLayout.NORTH);
-        return outerPanel;
+        return panel;
+    }
+
+    private String setWidth() {
+        String width = EmptyStrings.create(80);
+        return width;
     }
 
     private void fillVersions(EmfDataset dataset) throws EmfException {
@@ -163,12 +171,25 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
         return 0;
     }
 
-    private JPanel createPropertySectionLeft() {
+    private JPanel createOrderSection() {
         JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(BorderFactory.createTitledBorder("Measure Properties"));
+        panel.setBorder(BorderFactory.createTitledBorder("Set Order"));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Set Order:", applyOrderField(), panel);
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 5);// xPad, yPad
+
+        return panel;
+    }
+    
+    private JPanel createRPSection() {
+        JPanel panel = new JPanel(new SpringLayout());
+        panel.setBorder(BorderFactory.createTitledBorder("Set Rule Penetration"));
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
         layoutGenerator.addLabelWidgetPair("Set RP %:", rPField(), panel);
         rpOverride = new CheckBox("");
         rpOverride.addItemListener(new ItemListener() {
@@ -181,6 +202,18 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
             }
         });
         layoutGenerator.addLabelWidgetPair("Use RP from measure:", rpOverride, panel);
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 5);// xPad, yPad
+
+        return panel;
+    }
+    private JPanel createRESection() {
+        JPanel panel = new JPanel(new SpringLayout());
+        panel.setBorder(BorderFactory.createTitledBorder("Set Rule Effectiveness"));
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
         layoutGenerator.addLabelWidgetPair("Set RE %:", rEField(), panel);
         reOverride = new CheckBox("");
         reOverride.addItemListener(new ItemListener() {
@@ -194,12 +227,13 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
         });
         layoutGenerator.addLabelWidgetPair("Use RE from measure:", reOverride, panel);
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 5);// xPad, yPad
 
         return panel;
     }
+
 
     private DoubleTextField applyOrderField() {
         applyOrder = new DoubleTextField("Set Order", 10);

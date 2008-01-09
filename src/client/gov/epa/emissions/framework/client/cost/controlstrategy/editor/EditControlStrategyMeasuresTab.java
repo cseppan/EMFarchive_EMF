@@ -158,12 +158,12 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
                 messagePanel.clear();
               //get selected items
               ControlStrategyMeasure[] selectedMeasures = (sortFilterSelectModel.selected()).toArray(new ControlStrategyMeasure[0]);
-              
-              if (selectedMeasures.length == 0) {
+              int measureSize =selectedMeasures.length;
+              if (measureSize == 0) {
                   messagePanel.setMessage("Please select an items that you want to edit.");
                   return;
               }
-              propertySetView();
+              propertySetView(measureSize);
             }
         };
     }
@@ -176,8 +176,8 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         };
     }
 
-    private void propertySetView() {
-        ControlMeasureEditView view = new ControlMeasureEditDialog(parent);
+    private void propertySetView(int measureSize) {
+        ControlMeasureEditView view = new ControlMeasureEditDialog(parent, measureSize);
         ControlMeasureEditPresenter presenter = new ControlMeasureEditPresenter(this, view, session);
         try {
             presenter.display(view);
