@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
+import gov.epa.emissions.commons.gui.EmptyStrings;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
@@ -295,22 +296,21 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         if (value == null)
             value = "";
         
-        filter = new TextArea("filter", value, 40, 3);
+        filter = new TextArea("filter", value, 40, 2);
         filter.setToolTipText("Enter a filter that could be entered as a SQL where clause (e.g., ANN_EMIS>5000 and SCC like '30300%')");
         JScrollPane scrollPane = new JScrollPane(filter);
         changeablesList.addChangeable(filter);
         
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-//        layoutGenerator.addLabelWidgetPair("Inventory Type:", datasetTypeCombo(controlStrategy), middlePanel);
-//        layoutGenerator.addLabelWidgetPair("Inventory Dataset:", datasetPanel(), middlePanel);
-//        layoutGenerator.addLabelWidgetPair("Dataset Version:", versionPanel(), middlePanel);
         layoutGenerator.addLabelWidgetPair("Inventory Filter:", scrollPane, middlePanel);
 
         EmfDataset[] datasets = editControlStrategyPresenter.getDatasets( editControlStrategyPresenter.getDatasetType("List of Counties (CSV)") );
-
+        String width = EmptyStrings.create(80);
+//        Dimension size=new Dimension(500, 13);
+        
         dataset = new ComboBox("Not selected", datasets);
-        Dimension size= new Dimension(300, 10);
-        dataset.setPreferredSize(size);
+        dataset.setPrototypeDisplayValue(width);
+//        dataset.setPrototypeDisplayValue(size);
         dataset.setToolTipText("Browse to find a CSV file with a column named FIPS that lists the counties to which the strategy should apply");
 
         dataset.addActionListener(new AbstractAction() {
@@ -325,7 +325,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         });
 
         version =new ComboBox(new Version[0]);           
-        version.setPreferredSize(size);
+        version.setPrototypeDisplayValue(width);
         try {
             fillVersions((EmfDataset) dataset.getSelectedItem());
         } catch (EmfException e1) {
