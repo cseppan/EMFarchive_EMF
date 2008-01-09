@@ -190,7 +190,6 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
         panel.setBorder(BorderFactory.createTitledBorder("Set Rule Penetration"));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Set RP %:", rPField(), panel);
         rpOverride = new CheckBox("");
         rpOverride.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
@@ -202,7 +201,8 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
             }
         });
         layoutGenerator.addLabelWidgetPair("Use RP from measure:", rpOverride, panel);
-        // Lay out the panel.
+        layoutGenerator.addLabelWidgetPair("Set RP %:", rPField(), panel);
+
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 5);// xPad, yPad
@@ -214,7 +214,6 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
         panel.setBorder(BorderFactory.createTitledBorder("Set Rule Effectiveness"));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Set RE %:", rEField(), panel);
         reOverride = new CheckBox("");
         reOverride.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
@@ -226,7 +225,8 @@ public class ControlMeasureEditDialog extends JDialog implements ControlMeasureE
             }
         });
         layoutGenerator.addLabelWidgetPair("Use RE from measure:", reOverride, panel);
-        // Lay out the panel.
+        layoutGenerator.addLabelWidgetPair("Set RE %:", rEField(), panel);
+
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 5);// xPad, yPad
