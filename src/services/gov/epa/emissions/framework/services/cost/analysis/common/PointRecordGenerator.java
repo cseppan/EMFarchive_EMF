@@ -19,11 +19,6 @@ public class PointRecordGenerator implements RecordGenerator {
     private double invenRulePenetration;
     private double invenRuleEffectiveness;
     private Double annualCost;
-    private boolean isCostPointDatasetType = false;
-    
-//    private double originalEmissions;
-//    private double finalEmissions;
-
     private DecimalFormat decFormat;
     private CostEquationFactory costEquationsFactory;
     
@@ -31,7 +26,6 @@ public class PointRecordGenerator implements RecordGenerator {
         this.strategyResult = result;
         this.decFormat = decFormat;
         this.costEquationsFactory = costEquationsFactory;
-        this.isCostPointDatasetType = datasetType.getName().equalsIgnoreCase("ORL CoST Point Inventory (PTINV)");
     }
 
     public Record getRecord(ResultSet resultSet, BestMeasureEffRecord maxCM, double originalEmissions,  boolean displayOriginalEmissions, boolean displayFinalEmissions) throws SQLException, EmfException {
@@ -60,14 +54,18 @@ public class PointRecordGenerator implements RecordGenerator {
         Double designCapacity = null;
         String designCapacityUnitNumerator = null;
         String designCapacityUnitDenominator = null;
-        if (isCostPointDatasetType) {
+        //these fields might not be in the table, yet these were added later, so if this is an older table,
+        //the table won't have them
+        try {
             designCapacity = resultSet.getDouble("design_capacity");
             if (resultSet.wasNull()) designCapacity = null;
             designCapacityUnitNumerator = resultSet.getString("design_capacity_unit_numerator");
             if (resultSet.wasNull()) designCapacityUnitNumerator = null;
             designCapacityUnitDenominator = resultSet.getString("design_capacity_unit_denominator");
             if (resultSet.wasNull()) designCapacityUnitDenominator = null;
-        } 
+        } catch (Exception e) {
+            //Do nothing, see remark above...
+        }
         CostEquation costEquations = costEquationsFactory.getCostEquation(resultSet.getString("poll"), reducedEmission, 
                 bestMeasureEffRecord, minStackFlowRate, 
                 designCapacity, designCapacityUnitNumerator,

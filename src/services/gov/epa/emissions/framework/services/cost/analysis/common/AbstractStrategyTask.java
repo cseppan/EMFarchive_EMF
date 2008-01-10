@@ -150,7 +150,7 @@ public abstract class AbstractStrategyTask implements Strategy {
         if (results.length > 0) {
             String sql = "INSERT INTO " + qualifiedEmissionTableName(summaryResult.getInputDataset()) + " (dataset_id, version, fips, scc, poll, Control_Technology, avg_ann_cost_per_ton, Annual_Cost, Emis_Reduction)" 
             + "select " + summaryResult.getInputDataset().getId() + ", 0, summary.fips, summary.scc, summary.poll, ct.name as Control_Technology, "
-            + "sum(summary.Annual_Cost) / sum(summary.Emis_Reduction) as avg_cost_per_ton, " 
+            + "case when sum(summary.Emis_Reduction) <> 0 then sum(summary.Annual_Cost) / sum(summary.Emis_Reduction) else null end as avg_cost_per_ton, " 
             + "sum(summary.Annual_Cost) as Annual_Cost, "
             + "sum(summary.Emis_Reduction) as Emis_Reduction " 
             + "from (";

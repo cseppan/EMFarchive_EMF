@@ -24,24 +24,28 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
 
     private DbServerFactory dbServerFactory;
     
-    private ControlStrategyResult controlStrategyResult;
+    private ControlStrategyResult[] controlStrategyResults;
     
     public ControlStrategyInventoryOutputTask(User user, ControlStrategy controlStrategy,
-            ControlStrategyResult controlStrategyResult, HibernateSessionFactory sessionFactory, 
+            ControlStrategyResult[] controlStrategyResults, HibernateSessionFactory sessionFactory, 
             DbServerFactory dbServerFactory) {
         this.user = user;
         this.controlStrategy = controlStrategy;
-        this.controlStrategyResult = controlStrategyResult;
+        this.controlStrategyResults = controlStrategyResults;
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
     }
 
     public void run() {
         try {
-            ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,
-                    controlStrategyResult, sessionFactory, 
-                    dbServerFactory);
-            output.create();
+            for (int i = 0; i < controlStrategyResults.length; i++) {
+                if (controlStrategyResults[i].getStrategyResultType().getName().equals("Detailed Strategy Result")) {
+                    ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,
+                            controlStrategyResults[i], sessionFactory, 
+                            dbServerFactory);
+                    output.create();
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("Could not create inventory output. " + e.getMessage());
@@ -60,14 +64,18 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
     public boolean shouldProceed() throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            Dataset detailedResultDataset = controlStrategyResult.getDetailedResultDataset();
-            if (detailedResultDataset == null)
-                throw new EmfException("You should run the control strategy first before creating the inventory");
-            String detailResultTableName = detailedResultDataset.getInternalSources()[0].getTable();
-            int totalRows = dbServer.getEmissionsDatasource().tableDefinition().totalRows(detailResultTableName);
-            if (totalRows == 0) {
-                throw new EmfException(
-                        "Control Strategy Result does not have any data in the table. Control inventory is not created");
+            for (int i = 0; i < controlStrategyResults.length; i++) {
+                if (controlStrategyResults[i].getStrategyResultType().getName().equals("Detailed Strategy Result")) {
+                    Dataset detailedResultDataset = controlStrategyResults[i].getDetailedResultDataset();
+                    if (detailedResultDataset == null)
+                        throw new EmfException("You should run the control strategy first before creating the inventory, input inventory - " + controlStrategyResults[i].getInputDataset().getName());
+                    String detailResultTableName = detailedResultDataset.getInternalSources()[0].getTable();
+                    int totalRows = dbServer.getEmissionsDatasource().tableDefinition().totalRows(detailResultTableName);
+                    if (totalRows == 0) {
+                        throw new EmfException(
+                                "Control Strategy Result does not have any data in the table. Control inventory is not created, input inventory - " + controlStrategyResults[i].getInputDataset().getName());
+                    }
+                }
             }
         } catch (Exception e) {
             throw new EmfException(e.getMessage());

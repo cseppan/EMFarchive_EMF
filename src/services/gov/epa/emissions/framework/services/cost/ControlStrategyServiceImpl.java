@@ -292,32 +292,14 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-//    public synchronized void createInventory(User user, ControlStrategy controlStrategy, 
-//            ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
-//        try {
-//            ControlStrategyInventoryOutputTask task= new ControlStrategyInventoryOutputTask(user, controlStrategy, 
-//                    controlStrategyInputDataset, controlStrategyResult, 
-//                    sessionFactory, dbServerFactory);
-//            if(task.shouldProceed())
-//                threadPool.execute(new GCEnforcerTask("Create Inventory: " + controlStrategy.getName(), task));
-//        } catch (Exception e) {
-//            LOG.error("Error running control strategy: " + controlStrategy.getName(), e);
-//            throw new EmfException(e.getMessage());
-//        }
-//    }
-
     public synchronized void createInventories(User user, ControlStrategy controlStrategy, 
             ControlStrategyResult[] controlStrategyResults) throws EmfException {
         try {
-            for (int i = 0; i < controlStrategyResults.length; i++) {
-                if (controlStrategyResults[i].getStrategyResultType().getName().equals("Detailed Strategy Result")) {
-                    ControlStrategyInventoryOutputTask task= new ControlStrategyInventoryOutputTask(user, controlStrategy, 
-                            controlStrategyResults[i], sessionFactory, 
-                            dbServerFactory);
-                    if(task.shouldProceed())
-                        threadPool.execute(new GCEnforcerTask("Create Inventory: " + controlStrategy.getName(), task));
-                }
-            }
+            ControlStrategyInventoryOutputTask task = new ControlStrategyInventoryOutputTask(user, controlStrategy, 
+                    controlStrategyResults, sessionFactory, 
+                    dbServerFactory);
+            if(task.shouldProceed())
+                threadPool.execute(new GCEnforcerTask("Create Inventories: " + controlStrategy.getName(), task));
         } catch (Exception e) {
             LOG.error("Error running control strategy: " + controlStrategy.getName(), e);
             throw new EmfException(e.getMessage());
