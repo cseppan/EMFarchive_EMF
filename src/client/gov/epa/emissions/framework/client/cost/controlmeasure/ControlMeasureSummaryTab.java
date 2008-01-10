@@ -490,11 +490,11 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     }
 
     private ControlMeasureMonth[] getAllMonths() {
-        ControlMeasureMonth[] months = new ControlMeasureMonth[13];
-        for (int i = 0; i < 13; i++) {
+        ControlMeasureMonth[] months = new ControlMeasureMonth[14];
+        for (int i = -1; i < 13; i++) {
             ControlMeasureMonth month = new ControlMeasureMonth();
             month.setMonth((short)i);
-            months[i] = month;
+            months[i + 1] = month;
         }
         return months;
     }

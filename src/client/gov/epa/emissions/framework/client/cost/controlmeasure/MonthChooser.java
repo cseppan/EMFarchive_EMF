@@ -96,18 +96,19 @@ public class MonthChooser extends JDialog {
     }
 
     private void addNewMonths(ControlMeasureMonth[] selected) {
-        //see if "All Months" was choosen, if so, ignore all the rest of the months...
+        //see if "All Months" or "None" was choosen, if so, ignore all the rest of the months...
         for (int i = 0; i < selected.length; i++) {
-            if (selected[i].getMonth() == 0) {
+            if (selected[i].getMonth() == 0 || selected[i].getMonth() == -1) {
                 monthsListWidget.removeAllElements();
                 monthsListWidget.addElement(selected[i]);
                 return;
             }
         }
-        //a month was choosen, so get rid of the "All Months" item
+        //a month was choosen, get rid of the "All Months" and "None" item(s)
         Object[] items = monthsListWidget.getAllElements();
         for (int i = 0; i < items.length; i++) {
-            if (((ControlMeasureMonth)items[i]).getMonth() == 0) {
+            if (((ControlMeasureMonth)items[i]).getMonth() == 0 
+                    || ((ControlMeasureMonth)items[i]).getMonth() == -1) {
                 monthsListWidget.removeElements(new Object[] {items[i]});
             }
         }
@@ -116,5 +117,4 @@ public class MonthChooser extends JDialog {
                 monthsListWidget.addElement(selected[i]);
         }
     }
-
 }

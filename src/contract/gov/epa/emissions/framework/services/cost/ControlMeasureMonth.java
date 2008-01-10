@@ -44,6 +44,9 @@ public class ControlMeasureMonth implements Serializable {
     public String toString() {
         String name = "";
         switch (this.month) {
+        case -1:
+            name = "None";
+            break;
         case 0:
             name = "All Months";
             break;

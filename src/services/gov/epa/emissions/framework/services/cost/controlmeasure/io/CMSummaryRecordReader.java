@@ -193,7 +193,15 @@ public class CMSummaryRecordReader {
             StringTokenizer stringTokenizer = new StringTokenizer(months, "|");
             while (stringTokenizer.hasMoreTokens()) {
                 short monthNo = Short.parseShort(stringTokenizer.nextToken());
-                if (monthNo >= 1 && monthNo <= 12) {
+                //monthNo = -1 -- means the measure is not applicable for any month
+                if (monthNo == -1) {
+                    ControlMeasureMonth month = new ControlMeasureMonth();
+                    month.setMonth(monthNo);
+                    //make sure you get rid of any months already added
+                    monthList.clear();
+                    monthList.add(month);
+                    break;
+                } else if (monthNo >= 1 && monthNo <= 12) {
                     ControlMeasureMonth month = new ControlMeasureMonth();
                     month.setMonth(monthNo);
                     monthList.add(month);
