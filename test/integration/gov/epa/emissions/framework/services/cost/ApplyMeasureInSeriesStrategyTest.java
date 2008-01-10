@@ -532,7 +532,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             assertTrue("SCC = 2801500000 FIPS = 37015 emis reduction = 8820", Math.abs(rs.getDouble("emis_reduction") - 8820)/8820 < percentDiff);
 
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset, result);
+            createControlledInventory(strategy, result);
 
             //reload
             result = getControlStrategyResult(strategy);
@@ -658,7 +658,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs.close();
 
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset, result);
+            createControlledInventory(strategy, result);
 
             //reload
             result = getControlStrategyResult(strategy);
@@ -756,7 +756,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             rs.close();
 
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset, result);
+            createControlledInventory(strategy, result);
 
             //reload
             result = getControlStrategyResult(strategy);
@@ -784,7 +784,7 @@ public class ApplyMeasureInSeriesStrategyTest extends ApplyMeasureInSeriesStrate
             
             
             //create the controlled inventory for this strategy run....
-            createControlledInventory(strategy, inputDataset2, result);
+            createControlledInventory(strategy, result);
 
             //reload
             result = getControlStrategyResult(strategy, 1);

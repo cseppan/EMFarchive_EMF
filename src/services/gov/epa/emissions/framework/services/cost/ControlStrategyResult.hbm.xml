@@ -9,7 +9,7 @@
 	  <generator class="identity"/>
  	</id>
 	<property name="controlStrategyId" column="control_strategy_id" type="integer" not-null="true" />
-	<property name="inputDatasetId" column="dataset_id" type="integer" not-null="true"  />
+	<property name="inputDatasetVersion" column="dataset_version" type="integer" not-null="true"  />
 	<property name="totalCost" column="total_cost" not-null="false"/>
 	<property name="totalReduction" column="total_reduction" type="double"  not-null="false" />
 	<property name="runStatus" column="run_status"	type="java.lang.String"	/>
@@ -21,14 +21,14 @@
 		 column="strategy_result_type_id" unique="true" not-null="true"/>
 	<many-to-one name="detailedResultDataset"
 		 class ="gov.epa.emissions.framework.services.data.EmfDataset"
-		 column="detailed_result_dataset_id" unique="true" not-null="true"/>
+		 column="detailed_result_dataset_id" unique="true" not-null="false"/>
     <many-to-one name="controlledInventoryDataset"
 		 class ="gov.epa.emissions.framework.services.data.EmfDataset"
 		 column="controlled_inven_dataset_id" unique="true" not-null="false"/>
 	<many-to-one
             name="inputDataset" 
             class="gov.epa.emissions.framework.services.data.EmfDataset"
-            column="dataset_id" unique="true" not-null="true" insert="false" update="false"/> 
+            column="dataset_id" not-null="true"/> 
 	
   </class> 
 </hibernate-mapping>  

@@ -33,7 +33,7 @@ public class ControlStrategyResultsTest extends ServiceTestCase {
 
         ControlStrategyResult result = new ControlStrategyResult();
         result.setControlStrategyId(element.getId());
-        result.setInputDatasetId(dataset.getId());
+        result.setInputDataset(dataset);
         result.setDetailedResultDataset(detailDataset);
         StrategyResultType detailedStrategyResultType = controlStrategydao.getDetailedStrategyResultType(session);
         result.setStrategyResultType(detailedStrategyResultType);

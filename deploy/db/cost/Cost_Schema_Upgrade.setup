@@ -467,4 +467,9 @@ CREATE INDEX control_measure_months_month
   USING btree
   ("month");
 
+ALTER TABLE emf.strategy_results ADD COLUMN dataset_version integer NOT NULL DEFAULT 0;
+ALTER TABLE emf.strategy_results
+   ALTER COLUMN detailed_result_dataset_id DROP NOT NULL;
+ALTER TABLE emf.strategy_results ALTER COLUMN detailed_result_dataset_id SET STATISTICS -1;
 
+insert into emf.strategy_result_types (name) select 'Strategy Summary';

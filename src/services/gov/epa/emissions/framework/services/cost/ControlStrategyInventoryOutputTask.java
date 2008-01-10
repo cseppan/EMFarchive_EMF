@@ -23,17 +23,14 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
     private HibernateSessionFactory sessionFactory;
 
     private DbServerFactory dbServerFactory;
-
-    private ControlStrategyInputDataset controlStrategyInputDataset;
     
     private ControlStrategyResult controlStrategyResult;
     
     public ControlStrategyInventoryOutputTask(User user, ControlStrategy controlStrategy,
-            ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult, 
-            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
+            ControlStrategyResult controlStrategyResult, HibernateSessionFactory sessionFactory, 
+            DbServerFactory dbServerFactory) {
         this.user = user;
         this.controlStrategy = controlStrategy;
-        this.controlStrategyInputDataset = controlStrategyInputDataset;
         this.controlStrategyResult = controlStrategyResult;
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
@@ -42,8 +39,8 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
     public void run() {
         try {
             ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,
-                    controlStrategyInputDataset, controlStrategyResult, 
-                    sessionFactory, dbServerFactory);
+                    controlStrategyResult, sessionFactory, 
+                    dbServerFactory);
             output.create();
         } catch (Exception e) {
             e.printStackTrace();

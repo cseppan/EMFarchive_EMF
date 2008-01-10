@@ -318,11 +318,11 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         strategyTask.run();
     }
     
-    protected void createControlledInventory(ControlStrategy strategy, ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws Exception {
+    protected void createControlledInventory(ControlStrategy strategy, ControlStrategyResult controlStrategyResult) throws Exception {
         //create the controlled inventory for this strategy run....
         ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(emfUser(), strategy,
-                controlStrategyInputDataset, controlStrategyResult,
-                sessionFactory, dbServerFactory);
+                controlStrategyResult, sessionFactory, 
+                dbServerFactory);
         output.create();
     }
     

@@ -118,13 +118,16 @@ public class ControlStrategyDAO {
     }
 
     public StrategyResultType getDetailedStrategyResultType(Session session) {
-        List all = hibernateFacade.getAll(StrategyResultType.class, Order.asc("name"), session);
-        for (int i = 0; i < all.size(); i++) {
-            StrategyResultType type = (StrategyResultType) all.get(i);
-            if (type.getName().equals("Detailed Strategy Result"))
-                return type;
-        }
-        return null;
+        return getStrategyResultType("Detailed Strategy Result", session);
+    }
+
+    public StrategyResultType getStrategyResultType(String name, Session session) {
+        Criterion critName = Restrictions.eq("name", name);
+        return (StrategyResultType)hibernateFacade.load(StrategyResultType.class, critName, session);
+    }
+
+    public StrategyResultType getSummaryStrategyResultType(Session session) {
+        return getStrategyResultType("Strategy Summary", session);
     }
 
     public ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId, 

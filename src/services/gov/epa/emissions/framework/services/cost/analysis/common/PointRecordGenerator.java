@@ -124,7 +124,7 @@ public class PointRecordGenerator implements RecordGenerator {
         tokens.add("" + resultSet.getString("naics")); // NAICS
         
         tokens.add("" + resultSet.getInt("Record_Id")); // sourceID from inventory
-        tokens.add("" + strategyResult.getInputDatasetId());    //inputDatasetID
+        tokens.add("" + strategyResult.getInputDataset().getId());    //inputDatasetID
         tokens.add("" + strategyResult.getControlStrategyId());
         tokens.add("" + bestMeasureEffRecord.measure().getId());   // control measureID
         tokens.add("" + comment);

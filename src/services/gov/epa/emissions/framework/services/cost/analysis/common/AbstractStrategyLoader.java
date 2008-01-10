@@ -161,7 +161,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         daysInMonth = getDaysInMonth(inputDataset.applicableMonth());
         
         //setup result
-        ControlStrategyResult result = createStrategyResult(inputDataset);
+        ControlStrategyResult result = createStrategyResult(inputDataset, controlStrategyInputDataset.getVersion());
         if (!useSQLApproach) {
             
             //set class level variable if inputdataset is a point type
@@ -229,10 +229,11 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
 
     }
     
-    private ControlStrategyResult createStrategyResult(EmfDataset inputDataset) throws EmfException {
+    private ControlStrategyResult createStrategyResult(EmfDataset inputDataset, int inputDatasetVersion) throws EmfException {
         ControlStrategyResult result = new ControlStrategyResult();
         result.setControlStrategyId(controlStrategy.getId());
-        result.setInputDatasetId(inputDataset.getId());
+        result.setInputDataset(inputDataset);
+        result.setInputDatasetVersion(inputDatasetVersion);
         result.setDetailedResultDataset(createResultDataset(inputDataset));
         
         result.setStrategyResultType(getDetailedStrategyResultType());

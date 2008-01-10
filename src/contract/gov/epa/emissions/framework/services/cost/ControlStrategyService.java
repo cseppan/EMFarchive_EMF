@@ -35,7 +35,10 @@ public interface ControlStrategyService extends EMFService {
     
     void stopRunStrategy() throws EmfException;
 
-    void createInventory(User user, ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException;
+//    void createInventory(User user, ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException;
+
+    void createInventories(User user, ControlStrategy controlStrategy, 
+            ControlStrategyResult[] controlStrategyResults) throws EmfException;
     
     String controlStrategyRunStatus(int id) throws EmfException;
 

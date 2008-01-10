@@ -6,6 +6,7 @@ insert into emf.strategy_types (name, description, default_sortorder, strategy_c
 
 -- emf.strategy_result_types
 insert into emf.strategy_result_types values(DEFAULT,'Detailed Strategy Result');
+insert into emf.strategy_result_types (name) select 'Strategy Summary';
 -- emf.strategy_result_types
 
 --emf.control_technologies

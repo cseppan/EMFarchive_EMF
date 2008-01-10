@@ -13,13 +13,11 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
-//import gov.epa.emissions.framework.services.QAStepTask;
 import gov.epa.emissions.framework.services.basic.DateUtil;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
-import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -49,17 +47,14 @@ public class ControlStrategyInventoryOutput {
 
     private EmfDataset inputDataset;
     
-    private ControlStrategyInputDataset controlStrategyInputDataset;
-
     private ControlStrategyResult controlStrategyResult;
     
     public ControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
-            ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult,
-            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) throws Exception {
+            ControlStrategyResult controlStrategyResult, HibernateSessionFactory sessionFactory, 
+            DbServerFactory dbServerFactory) throws Exception {
         this.controlStrategy = controlStrategy;
-        this.controlStrategyInputDataset = controlStrategyInputDataset;
         this.controlStrategyResult = controlStrategyResult;
-        this.inputDataset = controlStrategyInputDataset.getInputDataset();
+        this.inputDataset = controlStrategyResult.getInputDataset();
         this.user = user;
         this.sessionFactory = sessionFactory;
 //        this.dbServerFactory = dbServerFactory;
@@ -105,7 +100,7 @@ public class ControlStrategyInventoryOutput {
         String outputInventoryTableName = dataset.getInternalSources()[0].getTable();
         
         copyDataFromOriginalTable(inputTable, outputInventoryTableName, 
-                version(inputDataset, controlStrategyInputDataset.getVersion()), inputDataset, 
+                version(inputDataset, controlStrategyResult.getInputDatasetVersion()), inputDataset, 
                 datasource);
         
         //create indexes on controlled inventory table, this will help speed updating the 

@@ -12,8 +12,6 @@ public class ControlStrategyResult implements Serializable {
 
     private int controlStrategyId;
 
-    private int inputDatasetId;
-
     private double totalCost;
 
     private double totalReduction;
@@ -25,7 +23,9 @@ public class ControlStrategyResult implements Serializable {
     private Date startTime;
 
     private EmfDataset inputDataset;
-    
+
+    private int inputDatasetVersion;
+
     private Dataset detailedResultDataset;
     
     private Dataset controlledInventoryDataset;
@@ -69,14 +69,6 @@ public class ControlStrategyResult implements Serializable {
 
     public void setTotalCost(double totalCost) {
         this.totalCost = totalCost;
-    }
-
-    public int getInputDatasetId() {
-        return inputDatasetId;
-    }
-
-    public void setInputDatasetId(int datasetId) {
-        this.inputDatasetId = datasetId;
     }
 
     public double getTotalReduction() {
@@ -141,5 +133,13 @@ public class ControlStrategyResult implements Serializable {
 
     public void setRecordCount(Integer recordCount) {
         this.recordCount = recordCount;
+    }
+
+    public void setInputDatasetVersion(int inputDatasetVersion) {
+        this.inputDatasetVersion = inputDatasetVersion;
+    }
+
+    public int getInputDatasetVersion() {
+        return inputDatasetVersion;
     }
 }

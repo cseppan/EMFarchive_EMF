@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
-import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.AbstractTableData;
@@ -14,10 +13,7 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
 
     private List rows;
 
-    private ControlStrategyInputDataset[] controlStrategyInputDatasets;
-
-    public ControlStrategyOutputTableData(ControlStrategyInputDataset[] controlStrategyInputDatasets, ControlStrategyResult[] controlStrategyResults) {
-        this.controlStrategyInputDatasets = controlStrategyInputDatasets;
+    public ControlStrategyOutputTableData(ControlStrategyResult[] controlStrategyResults) {
         this.rows = createRows(controlStrategyResults);
     }
 
@@ -38,24 +34,14 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
     private Object[] values(ControlStrategyResult result) {
         EmfDataset outputDataset = (EmfDataset) result.getDetailedResultDataset();
         EmfDataset controlledInvDataset = (EmfDataset) result.getControlledInventoryDataset();
-        ControlStrategyInputDataset controlStrategyInputDataset = getControlStrategyInputDataset(result.getInputDatasetId());
-        Object[] values = { result.getInputDataset().getName(), result.getRecordCount() == null ? 0 : result.getRecordCount(), controlStrategyInputDataset != null ? controlStrategyInputDataset.getVersion() : result.getInputDataset().getDefaultVersion(), 
-                outputDataset.getName(), controlledInvDataset == null ? "" : controlledInvDataset.getName(), 
-                result.getRunStatus(), result.getTotalCost(), 
-                result.getTotalReduction(), format(result.getStartTime()),
+        EmfDataset inputDataset = result.getInputDataset();
+        boolean stratSummary = result.getStrategyResultType().getName().equals("Strategy Summary");
+        Object[] values = { !stratSummary ? result.getInputDataset().getName() : "Strategy Summary", result.getRecordCount() == null ? 0 : result.getRecordCount(), inputDataset != null ? result.getInputDatasetVersion() : new Integer(0), 
+                outputDataset != null ? outputDataset.getName() : "", controlledInvDataset == null ? "" : controlledInvDataset.getName(), 
+                result.getRunStatus(), !stratSummary ? result.getTotalCost() : Double.NaN, 
+                !stratSummary ? result.getTotalReduction() : Double.NaN, format(result.getStartTime()),
                 format(result.getCompletionTime()) };
         return values;
-    }
-
-    private ControlStrategyInputDataset getControlStrategyInputDataset(int datasetId) {
-        ControlStrategyInputDataset inputDataset = null;
-        for (int j = 0; j < controlStrategyInputDatasets.length; j++) {
-            if (controlStrategyInputDatasets[j].getInputDataset().getId() == datasetId) {
-                inputDataset = controlStrategyInputDatasets[j];
-                break;
-            }
-        }
-        return inputDataset;
     }
 
     public String[] columns() {

@@ -9,7 +9,6 @@ import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
-import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExImService;
@@ -90,11 +89,10 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         return folder;
     }
 
-    public void doInventory(ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset,
-            ControlStrategyResult controlStrategyResult) throws EmfException {
+    public void doInventory(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) throws EmfException {
         view.clearMsgPanel();
-        session.controlStrategyService().createInventory(session.user(), controlStrategy, 
-                controlStrategyInputDataset, controlStrategyResult);
+        session.controlStrategyService().createInventories(session.user(), controlStrategy, 
+                controlStrategyResults);
     }
 
     public void doRefresh(ControlStrategyResult[] controlStrategyResults) {
@@ -114,5 +112,4 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         presenter.doDisplay();
 //        editor.setDefaultTab(7);
     }
-    
 }
