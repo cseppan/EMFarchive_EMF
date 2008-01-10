@@ -241,13 +241,10 @@ public class EmfDataset implements Dataset, Lockable {
 
     public InternalSource[] getInternalSources() {
         return this.internalSources;
-//        return (InternalSource[]) this.internalSources.toArray(new InternalSource[0]);
     }
 
     public void setInternalSources(InternalSource[] internalSources) {
         this.internalSources = internalSources;
-//        this.internalSources.clear();
-//        this.internalSources.addAll(Arrays.asList(internalSources));
     }
 
     public void addInternalSource(InternalSource source) {
@@ -262,8 +259,6 @@ public class EmfDataset implements Dataset, Lockable {
     }
 
     public void setExternalSources(ExternalSource[] externalSources) {
-//        this.externalSources.clear();
-//        this.externalSources.addAll(Arrays.asList(externalSources));
         this.externalSources = externalSources;
     }
 
@@ -300,7 +295,7 @@ public class EmfDataset implements Dataset, Lockable {
     }
 
     public KeyVal[] getKeyVals() {
-        return this.keyValsList;//mergeKeyVals();
+        return this.keyValsList;
     }
 
     public void setKeyVals(KeyVal[] keyvals) {
@@ -352,7 +347,7 @@ public class EmfDataset implements Dataset, Lockable {
     }
 
     public boolean getInlineCommentSetting() {
-        KeyVal[] keyvals = getKeyVals();
+        KeyVal[] keyvals = mergeKeyVals();
         for (int i = 0; i < keyvals.length; i++) {
             String keyword = keyvals[i].getKeyword().getName();
             String value = keyvals[i].getValue();
@@ -364,7 +359,7 @@ public class EmfDataset implements Dataset, Lockable {
     }
 
     public boolean getHeaderCommentsSetting() {
-        KeyVal[] keyvals = getKeyVals();
+        KeyVal[] keyvals = mergeKeyVals();
         for (int i = 0; i < keyvals.length; i++) {
             String keyword = keyvals[i].getKeyword().getName();
             String value = keyvals[i].getValue();
@@ -376,7 +371,7 @@ public class EmfDataset implements Dataset, Lockable {
     }
 
     public String getInlineCommentChar() {
-        KeyVal[] keyvals = getKeyVals();
+        KeyVal[] keyvals = mergeKeyVals();
         for (int i = 0; i < keyvals.length; i++) {
             String keyword = keyvals[i].getKeyword().getName();
             String value = keyvals[i].getValue();
@@ -388,7 +383,7 @@ public class EmfDataset implements Dataset, Lockable {
     }
 
     public String getHeaderCommentChar() {
-        KeyVal[] keyvals = getKeyVals();
+        KeyVal[] keyvals = mergeKeyVals();
         for (int i = 0; i < keyvals.length; i++) {
             String keyword = keyvals[i].getKeyword().getName();
             String value = keyvals[i].getValue();
@@ -400,7 +395,7 @@ public class EmfDataset implements Dataset, Lockable {
     }
     
     public boolean getCSVHeaderLineSetting() {
-        KeyVal[] keyvals = getKeyVals();
+        KeyVal[] keyvals = mergeKeyVals();
         for (int i = 0; i < keyvals.length; i++) {
             String keyword = keyvals[i].getKeyword().getName();
             String value = keyvals[i].getValue();

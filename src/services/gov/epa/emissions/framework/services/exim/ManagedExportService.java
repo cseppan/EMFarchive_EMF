@@ -137,7 +137,8 @@ public class ManagedExportService {
     public String getCleanDatasetName(EmfDataset dataset, Version version) {
         String name = dataset.getName();
         String prefix = "", suffix = "";
-        KeyVal[] keyvals = dataset.getKeyVals();
+//        KeyVal[] keyvals = dataset.getKeyVals(); // only gets KeyVals from dataset itself
+        KeyVal[] keyvals = dataset.mergeKeyVals(); // this function is not equal to getKeyVals() anymore
         String date = EmfDateFormat.format_ddMMMyyyy(version.getLastModifiedDate());
 
         for (int i = 0; i < keyvals.length; i++) {
