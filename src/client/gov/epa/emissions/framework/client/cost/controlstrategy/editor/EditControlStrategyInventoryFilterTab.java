@@ -310,8 +310,9 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         
         dataset = new ComboBox("Not selected", datasets);
         dataset.setPrototypeDisplayValue(width);
+        if (controlStrategy.getCountyDataset() != null) dataset.setSelectedItem(controlStrategy.getCountyDataset());
 //        dataset.setPrototypeDisplayValue(size);
-        dataset.setToolTipText("Browse to find a CSV file with a column named FIPS that lists the counties to which the strategy should apply");
+//        dataset.setToolTipText("Browse to find a CSV file with a column named FIPS that lists the counties to which the strategy should apply");
 
         dataset.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -332,6 +333,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             // NOTE Auto-generated catch block
             e1.printStackTrace();
         }
+        if (controlStrategy.getCountyDataset() != null) version.setSelectedItem(controlStrategy.getCountyDatasetVersion());
         
         layoutGenerator.addLabelWidgetPair("County Dataset:", dataset, middlePanel);
         layoutGenerator.addLabelWidgetPair("County Dataset Version:", version, middlePanel);

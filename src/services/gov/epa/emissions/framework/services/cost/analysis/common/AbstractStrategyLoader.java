@@ -231,7 +231,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         }
 
     }
-    
+
     private ControlStrategyResult createStrategyResult(EmfDataset inputDataset, int inputDatasetVersion) throws EmfException {
         ControlStrategyResult result = new ControlStrategyResult();
         result.setControlStrategyId(controlStrategy.getId());
@@ -419,35 +419,34 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return pollutants.toArray(new String[0]);
     }
 
-    private String getFilterFromRegionDataset() throws EmfException {
+    private String getFilterFromRegionDataset() {
         if (controlStrategy.getCountyDataset() == null) return "";
         String sqlFilter = "";
         String versionedQuery = new VersionedQuery(version(controlStrategy.getCountyDataset().getId(), controlStrategy.getCountyDatasetVersion())).query();
         String query = "SELECT distinct fips "
             + " FROM " + qualifiedEmissionTableName(controlStrategy.getCountyDataset()) 
-            + " where " + versionedQuery
-            + getFilterForSourceQuery();
-        ResultSet rs = null;
-        try {
-            rs = datasource.query().executeQuery(query);
-            while (rs.next()) {
-                if (sqlFilter.length() > 0) {
-                    sqlFilter += ",'" + rs.getString(1) + "'";
-                } else {
-                    sqlFilter = "'" + rs.getString(1) + "'";
-                }
-            }
-        } catch (SQLException e) {
-            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
-        } finally {
-            if (rs != null)
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    //
-                }
-        }
-        return sqlFilter.length() > 0 ? " and fips in (" + sqlFilter + ")" : "" ;
+            + " where " + versionedQuery;
+//        ResultSet rs = null;
+//        try {
+//            rs = datasource.query().executeQuery(query);
+//            while (rs.next()) {
+//                if (sqlFilter.length() > 0) {
+//                    sqlFilter += ",'" + rs.getString(1) + "'";
+//                } else {
+//                    sqlFilter = "'" + rs.getString(1) + "'";
+//                }
+//            }
+//        } catch (SQLException e) {
+//            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+//        } finally {
+//            if (rs != null)
+//                try {
+//                    rs.close();
+//                } catch (SQLException e) {
+//                    //
+//                }
+//        }
+        return sqlFilter.length() > 0 ? " and fips in (" + query + ")" : "" ;
     }
 
     private void setResultTotalCostTotalReductionAndCount(ControlStrategyResult controlStrategyResult) throws EmfException {
@@ -491,7 +490,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         }
     }
 
-    private String getFilterForSourceQuery() throws EmfException {
+    private String getFilterForSourceQuery() {
         if (filterForSourceQuery == null) {
             String sqlFilter = getFilterFromRegionDataset();
             String filter = controlStrategy.getFilter();

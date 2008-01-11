@@ -26,7 +26,7 @@
 	<property name="useCostEquations" column="use_cost_equations" type="boolean" not-null="false"/>
 
     <property name="countyDatasetVersion" column="county_dataset_version" type="integer"/>
-	<many-to-one name="countyDataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="county_dataset_id" cascade="none"/>
+	<many-to-one name="countyDataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="county_dataset_id"/>
 
 	<one-to-one 
 		name="constraint" 
