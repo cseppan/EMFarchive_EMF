@@ -187,6 +187,14 @@ CREATE TABLE emf.control_measure_sectors
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.control_measure_sectors OWNER TO emf;
+CREATE INDEX control_measure_sectors_measure_id
+  ON emf.control_measure_sectors
+  USING btree
+  (control_measure_id);  
+CREATE INDEX control_measure_sectors_sector_id
+  ON emf.control_measure_sectors
+  USING btree
+  (sector_id);  
 -- emf control_measure_sectors
 
 -- emf.strategy_types
@@ -202,6 +210,9 @@ CREATE TABLE emf.strategy_types
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.strategy_types OWNER TO emf;
+CREATE INDEX strategy_types_id
+   ON emf.strategy_types (id);
+ALTER TABLE emf.strategy_types CLUSTER ON strategy_types_id;
 -- emf.strategy_types
 
 
@@ -238,6 +249,10 @@ CREATE INDEX control_strategies_id
   USING btree
   (id);
 ALTER TABLE emf.control_strategies CLUSTER ON control_strategies_id;
+CREATE INDEX fki_strategy_county_dataset
+  ON emf.control_strategies
+  USING btree
+  (county_dataset_id);
 -- emf.control_strategies
 
 -- emf.control_strategy_classes
@@ -283,11 +298,14 @@ CREATE INDEX control_strategy_measures_apply_order
   ON emf.control_strategy_measures
   USING btree
   (apply_order);
-CREATE INDEX control_strategy_strategy_measure_id
+CREATE INDEX control_strategy_strategy_id
   ON emf.control_strategy_measures
   USING btree
-  (control_strategy_id, control_measure_id);
-ALTER TABLE emf.control_strategy_measures CLUSTER ON control_strategy_strategy_measure_id;
+  (control_strategy_id);
+CREATE INDEX control_strategy_measure_id
+  ON emf.control_strategy_measures
+  USING btree
+  (control_measure_id);
 -- emf.control_strategy_measures
 
 -- emf.input_datasets_control_strategies
@@ -320,6 +338,11 @@ CREATE TABLE emf.strategy_result_types
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.strategy_result_types OWNER TO emf;
+CREATE INDEX strategy_result_types_id
+  ON emf.strategy_result_types
+  USING btree
+  (id);
+ALTER TABLE emf.strategy_result_types CLUSTER ON strategy_result_types_id;
 -- emf.strategy_result_types
 
 -- emf.strategy_results
@@ -412,6 +435,9 @@ CREATE TABLE emf.equation_types
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.equation_types OWNER TO emf;
+CREATE INDEX equation_types_id
+   ON emf.equation_types (id);
+ALTER TABLE emf.equation_types CLUSTER ON equation_types_id;
 
 CREATE TABLE emf.equation_type_variables
 (
@@ -429,6 +455,15 @@ CREATE TABLE emf.equation_type_variables
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.equation_type_variables OWNER TO emf;
+CREATE INDEX equation_type_variables_equation_type_id
+  ON emf.equation_type_variables
+  USING btree
+  (equation_type_id);
+CREATE INDEX equation_type_variables_id
+  ON emf.equation_type_variables
+  USING btree
+  (id);
+ALTER TABLE emf.equation_type_variables CLUSTER ON equation_type_variables_id;
 
 CREATE TABLE emf.control_measure_equations
 (
