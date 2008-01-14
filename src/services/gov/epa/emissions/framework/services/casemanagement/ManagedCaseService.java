@@ -1968,7 +1968,6 @@ public class ManagedCaseService {
         sbuf.append(shellSetenv("EMF_JOBID", String.valueOf(jobId)));
         sbuf.append(shellSetenv("EMF_JOBNAME", jobName));
         sbuf.append(shellSetenv("EMF_USER", user.getUsername()));
-        //sbuf.append(shellSetenv("EMF_SCRIPTDIR", job.getPath()));
         sbuf.append(shellSetenv("EMF_SCRIPTDIR", caseObj.getOutputFileDir()));
         // name of this job script (works for csh and bash)
         // another way is get job script name as input to this method
