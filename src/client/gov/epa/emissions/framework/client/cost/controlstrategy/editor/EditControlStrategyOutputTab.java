@@ -34,6 +34,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
@@ -67,6 +68,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private ButtonGroup buttonGroup;
 
+    private boolean creatingControlledInventories;
+
     public EditControlStrategyOutputTab(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults,
             MessagePanel messagePanel, DesktopManager desktopManager, EmfConsole parentConsole, EmfSession session) {
         super.setName("output");
@@ -79,6 +82,12 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     private void setLayout(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
+//        //this is called for both the load and refresh window process, so i'll set the boolean flag here...
+//        for (int i = 0; i < controlStrategyResults.length; i++) {
+//            if (controlStrategyResults[i].getControlledInventoryDataset() != null) 
+//            hasControlledInventories = true;
+//        }
+        
         setLayout(new BorderLayout());
         removeAll();
         add(outputPanel(controlStrategy, controlStrategyResults));
@@ -193,7 +202,32 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             if (controlStrategyResults.length == 1 && controlStrategyResults[0].getStrategyResultType().getName().equals("Strategy Summary")) {
                 return;
             }
+            //see if cont inv are already being created...
+            if (creatingControlledInventories) {
+                String title = "Warning";
+                String message = "Are you sure you want to create controlled inventories, there are controlled inventories that are already being created?";
+                int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
+
+                if (selection != JOptionPane.YES_OPTION) {
+                    return;
+                }
+            }
+//            //see if cont inv have already being created...
+//            if (creatingControlledInventories) {
+//                String title = "Warning";
+//                String message = "Are you sure you want to create controlled inventories, there are controlled inventories that are already being created?";
+//                int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+//                        JOptionPane.QUESTION_MESSAGE);
+//
+//                if (selection != JOptionPane.YES_OPTION) {
+//                    return;
+//                }
+//            }
             presenter.doInventory(controlStrategy, controlStrategyResults);
+            //flag to make sure the user doesn't click the button twice...
+            creatingControlledInventories = true;
+            
 //            for (int i = 0; i < controlStrategyResults.length; i++) {
 //                ControlStrategyInputDataset controlStrategyInputDataset = null;
 //                controlStrategyInputDataset = getControlStrategyInputDataset(controlStrategyResults[i].getInputDatasetId());

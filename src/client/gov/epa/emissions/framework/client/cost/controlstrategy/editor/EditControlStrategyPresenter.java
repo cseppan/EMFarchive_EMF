@@ -48,4 +48,6 @@ public interface EditControlStrategyPresenter {
     Version[] getVersions(EmfDataset dataset) throws EmfException; 
 
     EmfDataset[] getDatasets(DatasetType type) throws EmfException;
+
+    boolean hasResults();
 }

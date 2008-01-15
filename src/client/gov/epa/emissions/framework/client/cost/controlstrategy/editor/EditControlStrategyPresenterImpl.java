@@ -40,6 +40,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     
     private boolean inputsLoaded = false;
     
+    private boolean hasResults = false;
+    
     public EditControlStrategyPresenterImpl(ControlStrategy controlStrategy, EmfSession session, 
             EditControlStrategyView view, ControlStrategiesManagerPresenter controlStrategiesManagerPresenter) {
         this.controlStrategy = controlStrategy;
@@ -59,6 +61,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
             return;
         }
         ControlStrategyResult[] controlStrategyResults = getResult();
+        if (controlStrategyResults!= null && controlStrategyResults.length > 0) hasResults = true;
         view.display(controlStrategy, controlStrategyResults);
     }
 
@@ -220,5 +223,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
             return session.dataService().getDatasets(type);
     }
-    
+
+    public boolean hasResults() {
+        return this.hasResults;
+    }
 }

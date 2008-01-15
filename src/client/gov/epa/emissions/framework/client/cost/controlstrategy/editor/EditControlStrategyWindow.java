@@ -29,6 +29,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
@@ -283,6 +284,18 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         return new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
+                    //check to see if really want to run strategy, we don't to overwrite if its already been run...
+                    if (presenter.hasResults()) {
+                        String title = "Warning";
+                        String message = "Are you sure you want to run the strategy again, this strategy has already been run in the past?";
+                        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE);
+
+                        if (selection != JOptionPane.YES_OPTION) {
+                            return;
+                        }
+                    }
+
                     save();
                     enableButtons(false);
                     controlStrategy.setStartDate(new Date());

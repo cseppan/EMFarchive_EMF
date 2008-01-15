@@ -168,6 +168,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                 + "on ct.id = cm.control_technology "
                 + "group by summary.fips, summary.scc, summary.poll, ct.name "
                 + "order by summary.fips, summary.scc, summary.poll, ct.name";
+            System.out.println( sql );
             try {
                 datasource.query().execute(sql);
             } catch (SQLException e) {
