@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.transport;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.LoggingService;
 import gov.epa.emissions.framework.services.basic.UserService;
+import gov.epa.emissions.framework.services.casemanagement.CaseAssistService;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
@@ -26,6 +27,8 @@ public class RemoteServiceLocator implements ServiceLocator {
     private EmfCall eximCall;
     
     private CaseService caseService;
+    
+    private CaseAssistService caseAsistService;
     
     private QAService qaService;
     
@@ -106,6 +109,13 @@ public class RemoteServiceLocator implements ServiceLocator {
             caseService = new CaseServiceTransport(baseUrl + "/gov.epa.emissions.framework.services.casemanagement.CaseService");
         
         return caseService;
+    }
+
+    public CaseAssistService caseAssistService() {
+        if (caseAsistService == null)
+            caseAsistService = new CaseAssistServiceTransport(baseUrl + "/gov.epa.emissions.framework.services.casemanagement.CaseAssistService");
+        
+        return caseAsistService;
     }
     
     public ControlMeasureService controlMeasureService() {

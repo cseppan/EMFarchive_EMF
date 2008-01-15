@@ -76,6 +76,14 @@
 		<parameter name="className"
 			value="gov.epa.emissions.framework.services.casemanagement.CaseServiceImpl"/>
 	</service>
+
+	<service name="gov.epa.emissions.framework.services.casemanagement.CaseAssistService" provider="java:RPC"
+		style="RPC" use="encoded">
+		<parameter name="allowedMethods" value="*"/>
+		<parameter name="scope" value="Request"/>
+		<parameter name="className"
+			value="gov.epa.emissions.framework.services.casemanagement.CaseAssistServiceImpl"/>
+	</service>
 	
 	<service name="gov.epa.emf.services.qa.QAService" provider="java:RPC"
 		style="RPC" use="encoded">

@@ -468,7 +468,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             // this assumes that the server and client are running on the same platform
             return File.separatorChar;
         }
-        if (path.charAt(0) == '/')
+        
+        if (path.contains("/"))
             return '/';
 
         return '\\';

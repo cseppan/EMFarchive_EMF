@@ -1446,18 +1446,19 @@ public class ManagedCaseService {
 
                 cjt.setSubmitterId(caseJobSubmitterId);
 
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("before getJobFileName");
+
+                String jobFileName = this.getJobFileName(caseJob);
+
+
                 if (DebugLevels.DEBUG_6)
                     System.out.println("setJobFileContent");
 
                 if (DebugLevels.DEBUG_9)
                     System.out.println("before setJobFileContent");
 
-                cjt.setJobFileContent(this.createJobFileContent(caseJob, user, expSvc));
-
-                if (DebugLevels.DEBUG_9)
-                    System.out.println("before getJobFileName");
-
-                String jobFileName = this.getJobFileName(caseJob);
+                cjt.setJobFileContent(this.createJobFileContent(caseJob, user, jobFileName, expSvc));
 
                 cjt.setJobFile(jobFileName);
                 cjt.setLogFile(this.getLog(jobFileName));
@@ -1855,7 +1856,7 @@ public class ManagedCaseService {
         return setenvLine;
     }
 
-    public synchronized String createJobFileContent(CaseJob job, User user, ManagedExportService expSvc)
+    public synchronized String createJobFileContent(CaseJob job, User user, String jobFileName, ManagedExportService expSvc)
             throws EmfException {
         // String jobContent="";
         String jobFileHeader = "";
@@ -1968,10 +1969,9 @@ public class ManagedCaseService {
         sbuf.append(shellSetenv("EMF_JOBID", String.valueOf(jobId)));
         sbuf.append(shellSetenv("EMF_JOBNAME", jobName));
         sbuf.append(shellSetenv("EMF_USER", user.getUsername()));
+        // name of this job script and script directory
         sbuf.append(shellSetenv("EMF_SCRIPTDIR", caseObj.getOutputFileDir()));
-        // name of this job script (works for csh and bash)
-        // another way is get job script name as input to this method
-        sbuf.append(shellSetenv("EMF_SCRIPTNAME", "$0"));
+        sbuf.append(shellSetenv("EMF_SCRIPTNAME", jobFileName));
 
         // Generate and get a unique job key, add it to the job,
         // update the db, and write it to the script
@@ -2509,12 +2509,18 @@ public class ManagedCaseService {
     }
 
     public synchronized String validateJobs(Integer[] jobIDs) throws EmfException {
+        if (DebugLevels.DEBUG_14)
+            System.out.println("Start validating jobs on server side. " +  new Date());
+        
         List<CaseInput> allInputs = new ArrayList<CaseInput>();
 
         for (Integer id : jobIDs) {
             CaseJob job = this.getCaseJob(id.intValue());
             allInputs.addAll(this.getAllJobInputs(job));
         }
+        
+        if (DebugLevels.DEBUG_14)
+            System.out.println("Finished validating jobs on server side. " +  new Date());
 
         TreeSet<CaseInput> set = new TreeSet<CaseInput>(allInputs);
         List<CaseInput> uniqueInputs = new ArrayList<CaseInput>(set);
@@ -2526,6 +2532,9 @@ public class ManagedCaseService {
         String inputsList = "";
         String lineSeparator = System.getProperty("line.separator");
 
+        if (DebugLevels.DEBUG_14)
+            System.out.println("Start listing non-final inputs. " +  new Date());
+        
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = iter.next();
             String dataset = input.getDataset().getName();
@@ -2535,6 +2544,9 @@ public class ManagedCaseService {
                 inputsList += "Input: " + input.getName() + ";  Dataset: " + dataset + lineSeparator;
         }
 
+        if (DebugLevels.DEBUG_14)
+            System.out.println("Finished listing non-final inputs. " +  new Date());
+        
         return inputsList;
     }
     

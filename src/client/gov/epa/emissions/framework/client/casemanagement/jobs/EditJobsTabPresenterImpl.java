@@ -130,16 +130,19 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
             jobIds[i] = new Integer(jobs[i].getId());
         }
 
+        System.out.println("Start running jobs");
         service().runJobs(jobIds, caseObj.getId(), session.user());
+        System.out.println("Finished running jobs");
     }
 
     public String getJobsStatus(CaseJob[] jobs) throws EmfException {
         List<String> ok = new ArrayList<String>();
         List<String> cancel = new ArrayList<String>();
         List<String> warning = new ArrayList<String>();
-
+        
+        System.out.println("Getting status of jobs from server");
+        
         for (int i = 0; i < jobs.length; i++) {
-            System.out.println("Getting status of jobs from server");
             String status = service().getCaseJob(jobs[i].getId()).getRunstatus().getName();
 
             if (status == null || status.trim().isEmpty())
@@ -169,6 +172,8 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
             if (status != null && status.equalsIgnoreCase("Waiting"))
                 cancel.add(status);
         }
+        
+        System.out.println("Finished getting jobs status from server");
 
         if (ok.size() == jobs.length)
             return "OK";
@@ -228,7 +233,10 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
             ids.add(new Integer(job.getId()));
         
         System.out.println("Validating input datasets of jobs");
-        return service().validateJobs(ids.toArray(new Integer[0]));
+        String msg = service().validateJobs(ids.toArray(new Integer[0]));
+        System.out.println("Finished validating case jobs.");
+        
+        return msg;
     }
     
     public String validateInputDatasets(CaseJob[] jobs) throws EmfException {

@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
-import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -31,7 +30,7 @@ public class CaseServiceImpl implements CaseService {
     private String svcLabel = null;
 
     private CaseDAO dao;
-    
+
     public String myTag() {
         if (svcLabel == null) {
             svcCount++;
@@ -43,8 +42,8 @@ public class CaseServiceImpl implements CaseService {
 
     private HibernateSessionFactory sessionFactory;
 
-    private DbServer dbServer;
-    
+    // private DbServer dbServer;
+
     private DbServerFactory dbFactory;
 
     private ManagedCaseService caseService;
@@ -61,11 +60,13 @@ public class CaseServiceImpl implements CaseService {
 
     public CaseServiceImpl(HibernateSessionFactory sessionFactory, DbServerFactory dbFactory) {
         this.sessionFactory = sessionFactory;
-        this.dbServer = dbFactory.getDbServer();
+        // this.dbServer = dbFactory.getDbServer();
         this.dbFactory = dbFactory;
-        this.dao=new CaseDAO();
-        if (DebugLevels.DEBUG_0) System.out.println("CaseServiceImpl::getCaseService  Is dBServer null? " + (dbServer == null));
-        if (DebugLevels.DEBUG_0) System.out.println("CaseServiceImpl::getCaseService  Is sessionFactory null? " + (sessionFactory == null));
+        this.dao = new CaseDAO();
+        // if (DebugLevels.DEBUG_0) System.out.println("CaseServiceImpl::getCaseService Is dBServer null? " + (dbServer
+        // == null));
+        if (DebugLevels.DEBUG_0)
+            System.out.println("CaseServiceImpl::getCaseService  Is sessionFactory null? " + (sessionFactory == null));
 
         myTag();
         if (DebugLevels.DEBUG_0)
@@ -76,8 +77,9 @@ public class CaseServiceImpl implements CaseService {
     @Override
     protected void finalize() throws Throwable {
         this.sessionFactory = null;
-        this.dbServer.disconnect();
-        dbServer=null;
+        // this.dbServer.disconnect();
+        // dbServer=null;
+        System.out.println("CaseServiceImpl class finalize() called.");
         super.finalize();
     }
 
@@ -116,7 +118,7 @@ public class CaseServiceImpl implements CaseService {
     public Abbreviation[] getAbbreviations() throws EmfException {
         return getCaseService().getAbbreviations();
     }
-    
+
     public Abbreviation addAbbreviation(Abbreviation abbr) throws EmfException {
         return getCaseService().addAbbreviation(abbr);
     }
@@ -128,7 +130,7 @@ public class CaseServiceImpl implements CaseService {
     public CaseCategory[] getCaseCategories() throws EmfException {
         return getCaseService().getCaseCategories();
     }
-    
+
     public CaseCategory addCaseCategory(CaseCategory element) throws EmfException {
         return getCaseService().addCaseCategory(element);
     }
@@ -184,7 +186,8 @@ public class CaseServiceImpl implements CaseService {
     public void export(User user, String dirName, String purpose, boolean overWrite, int caseId) throws EmfException {
         if (false)
             throw new EmfException("");
-        if (DebugLevels.DEBUG_6) System.out.println("Called CaseServiceImpl::export() caseId= " + caseId);
+        if (DebugLevels.DEBUG_6)
+            System.out.println("Called CaseServiceImpl::export() caseId= " + caseId);
 
         // getCaseService().exportInputsForCase(user, dirName, purpose, overWrite, caseId);
     }
@@ -229,7 +232,7 @@ public class CaseServiceImpl implements CaseService {
     public void removeCaseInputs(CaseInput[] inputs) throws EmfException {
         getCaseService().removeCaseInputs(inputs);
     }
-    
+
     public void removeCaseOutputs(User user, CaseOutput[] outputs, boolean deleteDataset) throws EmfException {
         getCaseService().removeCaseOutputs(user, outputs, deleteDataset);
     }
@@ -282,21 +285,31 @@ public class CaseServiceImpl implements CaseService {
      * The String re
      */
     public String runJobs(Integer[] jobIds, int caseId, User user) throws EmfException {
-        try{
-        if (DebugLevels.DEBUG_0)
-            System.out.println("CaseServiceImpl::runJobs called at  " + new Date());
-        if (DebugLevels.DEBUG_0)
-            System.out.println("Called CaseServiceImpl::runJobs with Integer[] jobIds size of array= " + jobIds.length);
-        if (DebugLevels.DEBUG_0)
-            System.out.println("runJobs for caseId=" + caseId + " and submitted by User= " + user.getUsername());
-        for (int i = 0; i < jobIds.length; i++) {
+        try {
             if (DebugLevels.DEBUG_0)
-                System.out.println(i + ": " + jobIds[i]);
-        }
-        if (DebugLevels.DEBUG_6) System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        // submit the list of CaseJobs to the ManagedService
-        return getCaseService().submitJobs(jobIds, caseId, user);
-        }catch(Exception e){
+                System.out.println("CaseServiceImpl::runJobs called at  " + new Date());
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Called CaseServiceImpl::runJobs with Integer[] jobIds size of array= "
+                        + jobIds.length);
+            if (DebugLevels.DEBUG_0)
+                System.out.println("runJobs for caseId=" + caseId + " and submitted by User= " + user.getUsername());
+            for (int i = 0; i < jobIds.length; i++) {
+                if (DebugLevels.DEBUG_0)
+                    System.out.println(i + ": " + jobIds[i]);
+            }
+            if (DebugLevels.DEBUG_6)
+                System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+            // submit the list of CaseJobs to the ManagedService
+            if (DebugLevels.DEBUG_14)
+                System.out.println("Start submitting jobs. " +  new Date());
+            
+            String msg = getCaseService().submitJobs(jobIds, caseId, user);
+            
+            if (DebugLevels.DEBUG_14)
+                System.out.println("Jobs submitted. " +  new Date());
+            
+            return msg;
+        } catch (Exception e) {
             e.printStackTrace();
             throw new EmfException(e.getMessage());
         }
@@ -347,13 +360,16 @@ public class CaseServiceImpl implements CaseService {
     }
 
     public void exportCaseInputs(User user, Integer[] caseInputIds, String purpose) throws EmfException {
-        if (DebugLevels.DEBUG_0) System.out.println("CaseServiceImpl::exportCaseInputs Total inputs size for export= " + caseInputIds.length);
+        if (DebugLevels.DEBUG_0)
+            System.out
+                    .println("CaseServiceImpl::exportCaseInputs Total inputs size for export= " + caseInputIds.length);
         getCaseService().exportCaseInputs(user, caseInputIds, purpose);
     }
 
     public void exportCaseInputsWithOverwrite(User user, Integer[] caseInputIds, String purpose) throws EmfException {
-        if (DebugLevels.DEBUG_0) System.out.println("CaseServiceImpl::exportCaseInputsWithOverwrite Total inputs size for export= "
-                + caseInputIds.length);
+        if (DebugLevels.DEBUG_0)
+            System.out.println("CaseServiceImpl::exportCaseInputsWithOverwrite Total inputs size for export= "
+                    + caseInputIds.length);
         getCaseService().exportCaseInputsWithOverwrite(user, caseInputIds, purpose);
 
     }
@@ -460,7 +476,8 @@ public class CaseServiceImpl implements CaseService {
         //
         // }
 
-        if (DebugLevels.DEBUG_0) System.out.println("Called CaseServiceImpl::runJobs with CaseJob[] size of CaseJobs= " + jobs.length);
+        if (DebugLevels.DEBUG_0)
+            System.out.println("Called CaseServiceImpl::runJobs with CaseJob[] size of CaseJobs= " + jobs.length);
         System.out.println("Called CaseServiceImpl::runJobs with CaseJob[] size of CaseJobs= " + jobs.length);
     }
 
@@ -468,20 +485,19 @@ public class CaseServiceImpl implements CaseService {
     public int recordJobMessage(JobMessage message, String jobKey) throws EmfException {
         return getCaseService().recordJobMessage(message, jobKey);
     }
-    
+
     public int recordJobMessage(JobMessage[] msgs, String[] keys) throws EmfException {
         int msgLength = msgs.length;
         int returnVal = 0;
-        
-        if (msgs.length != keys.length)
-        {
-            throw new EmfException("Error recording job messages: Number of job messages ("+
-                    msgs.length+") doesn't match number of job keys (" + keys.length+")");
+
+        if (msgs.length != keys.length) {
+            throw new EmfException("Error recording job messages: Number of job messages (" + msgs.length
+                    + ") doesn't match number of job keys (" + keys.length + ")");
         }
-        
-        for(int i = 0; i < msgLength; i++)
+
+        for (int i = 0; i < msgLength; i++)
             returnVal = recordJobMessage(msgs[i], keys[i]);
-        
+
         return returnVal;
     }
 
@@ -501,12 +517,12 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getJobIds(caseId, jobNames);
     }
 
-    public String restoreTaskManagers()  throws EmfException {
+    public String restoreTaskManagers() throws EmfException {
         return getCaseService().restoreTaskManagers();
     }
 
     public String printStatusCaseJobTaskManager() throws EmfException {
-        return getCaseService().printStatusCaseJobTaskManager() ;
+        return getCaseService().printStatusCaseJobTaskManager();
     }
 
     public Case[] getCases(CaseCategory category) {
@@ -514,13 +530,24 @@ public class CaseServiceImpl implements CaseService {
     }
 
     public String validateJobs(Integer[] jobIDs) throws EmfException {
-        return getCaseService().validateJobs(jobIDs);
+        if (DebugLevels.DEBUG_14)
+            System.out.println("Start validating jobs. " + new Date());
+        String msg = getCaseService().validateJobs(jobIDs);
+        if (DebugLevels.DEBUG_14)
+            System.out.println("Finished validating jobs. " + new Date());
+
+        return msg;
     }
-    
+
     public String validateInputDatasets(Integer[] jobIDs) throws EmfException {
-        try{
-            return getCaseService().validateInputDatasets(jobIDs);
-        }catch (Exception e) {
+        try {
+            if (DebugLevels.DEBUG_14)
+                System.out.println("Start validating input datasets. " + new Date());
+            String msg = getCaseService().validateInputDatasets(jobIDs);
+            if (DebugLevels.DEBUG_14)
+                System.out.println("Finished validating input datasets. " + new Date());
+            return msg;
+        } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
             throw new EmfException(e.getMessage());
@@ -534,7 +561,7 @@ public class CaseServiceImpl implements CaseService {
     public void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
         getCaseService().registerOutputs(outputs, jobKeys);
     }
-    
+
     public synchronized Case updateCaseWithLock(Case caseObj) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -544,14 +571,14 @@ public class CaseServiceImpl implements CaseService {
             Case caseWithLock = dao.updateWithLock(caseObj, session);
 
             return caseWithLock;
-//            return dao.getById(csWithLock.getId(), session);
+            // return dao.getById(csWithLock.getId(), session);
         } catch (RuntimeException e) {
             log.error("Could not update Case: " + caseObj, e);
             throw new EmfException("Could not update Case: " + caseObj);
         } finally {
             session.close();
         }
-        
+
     }
 
     public void updateCaseOutput(User user, CaseOutput output) throws EmfException {
@@ -560,11 +587,11 @@ public class CaseServiceImpl implements CaseService {
 
     public void removeMessages(User user, JobMessage[] msgs) throws EmfException {
         getCaseService().removeMessages(user, msgs);
-        
+
     }
 
     public CaseOutput addCaseOutput(CaseOutput output) throws EmfException {
-            return getCaseService().addCaseOutput(output);
+        return getCaseService().addCaseOutput(output);
     }
 
 }

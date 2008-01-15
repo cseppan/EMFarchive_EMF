@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client;
 import gov.epa.emissions.commons.io.importer.CommaDelimitedTokenizer;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.services.casemanagement.CaseAssistService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
@@ -383,13 +383,13 @@ public class EMFCmdClient {
             if (DEBUG)
                 System.out.println("EMF Command Client starts sending messages to server at: " + new Date());
 
-            CaseService service = getService(args);
+            CaseAssistService service = getService(args);
             ArrayList keyArrayList = new ArrayList();
             JobMessage[] nonEmptyMessages = getNonEmptyMsgs(msgs, keys, keyArrayList);
             String [] nonEmptyKeys = new String[nonEmptyMessages.length];
             keyArrayList.toArray(nonEmptyKeys);
             
-            service.recordJobMessage(nonEmptyMessages, nonEmptyKeys); // just need to send nonEmptykeys here
+            service.recordJobMessages(nonEmptyMessages, nonEmptyKeys); // just need to send nonEmptykeys here
             System.out.println("EMF command client sent " + nonEmptyMessages.length + " messages successfully.");
 
             ArrayList outputKeyArrayList = new ArrayList();
@@ -409,7 +409,7 @@ public class EMFCmdClient {
         }
     }
 
-    private synchronized static void registerOutputs(String[] keys, CaseService service, CaseOutput[] nonEmptyOutputs) {
+    private synchronized static void registerOutputs(String[] keys, CaseAssistService service, CaseOutput[] nonEmptyOutputs) {
         if (nonEmptyOutputs.length >= 1) {
             try {
                 System.out.println("Registering "+nonEmptyOutputs.length+" outputs");
@@ -428,18 +428,6 @@ public class EMFCmdClient {
                    System.out.println("Error registering outputs: " + e.getMessage());
             }
         }
-
-//        if (nonEmptyOutputs.length == 1) {
-//            try {
-//                service.registerOutput(nonEmptyOutputs[0], keys[0]);
-//                System.out.println("EMF command client registered one output successfully.");
-//            } catch (Exception e) {
-//                if (e.getMessage().startsWith("Error registering"))
-//                   System.out.println(e.getMessage());
-//                else
-//                   System.out.println("Error registering outputs: " + e.getMessage());
-//            }
-//        }
     }
 
     private synchronized static JobMessage[] getNonEmptyMsgs(JobMessage[] msgs, String [] keys, ArrayList keyArray) {
@@ -529,7 +517,7 @@ public class EMFCmdClient {
         return;
     }
 
-    private synchronized static CaseService getService(List<String> args) throws Exception {
+    private synchronized static CaseAssistService getService(List<String> args) throws Exception {
         String url = DEFAULT_URL;
 
         if (!args.get(0).startsWith("-"))
@@ -538,7 +526,7 @@ public class EMFCmdClient {
         if (serviceLocator == null)
             serviceLocator = new RemoteServiceLocator(url);
 
-        return serviceLocator.caseService();
+        return serviceLocator.caseAssistService();
     }
 
     private synchronized static long getTime(String line) {
