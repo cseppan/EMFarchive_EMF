@@ -106,6 +106,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         super.setLayout(new BorderLayout());
         super.add(createOverviewSection(), BorderLayout.PAGE_START);
         super.add(createAttributeSection(), BorderLayout.CENTER);
+        super.add(createSectorMonthSection(), BorderLayout.PAGE_END);
         this.verifier = new NumberFieldVerifier("Summary tab: ");
     }
 
@@ -143,7 +144,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     private JPanel createOverviewSection() {
         JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addWidgetPair(createLeftOverview(), createRightOverview(), panel);
@@ -167,7 +168,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         descPane.setPreferredSize(new Dimension(300, 65));//50));
         layoutGenerator.addLabelWidgetPair("Description:", descPane, panel);
 
-        widgetLayout(2, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(2, 2, 5, 5, 5, 5, layoutGenerator, panel);
         return panel;
     }
 
@@ -181,12 +182,6 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
         creator = new JLabel(session.user().getName());
         layoutGenerator.addLabelWidgetPair("Creator:", creator, panel);
-
-        // AME: Moved temporarily to improve symmetry
-        // lastModifiedTime = new JLabel("");
-        // layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
-//        JPanel tempPanel = tempPanel(50, 20);
-//        layoutGenerator.addLabelWidgetPair("", tempPanel, panel);
 
         lastModifiedTime = new TextField("Last Modified Time", 15);
         changeablesList.addChangeable(lastModifiedTime);
@@ -204,24 +199,39 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         lastModifiedBy.setBorder(BorderFactory.createEmptyBorder());
         layoutGenerator.addLabelWidgetPair("Last Modified By:", lastModifiedBy, panel);
 
-        widgetLayout(4, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(4, 2, 5, 5, 5, 5, layoutGenerator, panel);
 
         return panel;
     }
 
-    private JPanel tempPanel(int width, int height) {
-        JPanel tempPanel = new JPanel();
-        tempPanel.setPreferredSize(new Dimension(width, height));
-        return tempPanel;
-    }
+//    private JPanel tempPanel(int width, int height) {
+//        JPanel tempPanel = new JPanel();
+//        tempPanel.setPreferredSize(new Dimension(width, height));
+//        return tempPanel;
+//    }
 
+//    private JPanel createAttributeSection() {
+//
+//        JPanel container = new JPanel(new BorderLayout());
+////        container.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+//
+//        container.add(createLeftPanel(), BorderLayout.WEST);
+//        container.add(createRightPanel(), BorderLayout.EAST);
+//
+//        return container;
+//    }
+    
     private JPanel createAttributeSection() {
+        JPanel panel = new JPanel(new SpringLayout());
+        panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
 
-        JPanel container = new JPanel(new BorderLayout());
-        container.add(createLeftPanel(), BorderLayout.WEST);
-        container.add(createRightPanel(), BorderLayout.EAST);
+  //    panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        return container;
+        layoutGenerator.addWidgetPair(createLeftPanel(), createRightPanel(), panel);
+        widgetLayout(1, 2, 5, 5, 5, 5, layoutGenerator, panel);
+
+        return panel;
     }
 
     private JPanel createLeftPanel() {
@@ -259,29 +269,14 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         changeablesList.addChangeable(sourceGroup);
         layoutGenerator.addLabelWidgetPair("Source Group:", sourceGroup, panel);
 
-        layoutGenerator.addLabelWidgetPair("Sectors:", sectors(), panel);
-
-        deviceCode = new TextField("NEI Device code", 15);
+        deviceCode = new TextField("NEI Device code", 20);
         changeablesList.addChangeable(deviceCode);
         layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
+        
+//       layoutGenerator.addLabelWidgetPair("Sectors:", sectors(), panel);
 
-//        deviceCode = new TextField("NEI Device code", 15);
-//        changeablesList.addChangeable(deviceCode);
-//        layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
-//
-//        equipmentLife = new TextField("Equipment life", 15);
-//        changeablesList.addChangeable(equipmentLife);
-//        layoutGenerator.addLabelWidgetPair("Equipment life (yrs):", equipmentLife, panel);
-//
-//        dateReviewed = new TextField("Date Reviewed", 15);
-//        changeablesList.addChangeable(dateReviewed);
-//        layoutGenerator.addLabelWidgetPair("Date Reviewed:", dateReviewed, panel);
-//
-//        dataSources = new TextField("Data Sources:", 15);
-//        layoutGenerator.addLabelWidgetPair("Data Sources:", dataSources, panel);
-
-        layoutGenerator.addLabelWidgetPair("", tempPanel(20, 20), panel);
-        widgetLayout(6, 2, 5, 5, 10, 10, layoutGenerator, panel);
+//        layoutGenerator.addLabelWidgetPair("", tempPanel(20, 20), panel);
+        widgetLayout(4, 2, 5, 5, 5, 5, layoutGenerator, panel);
         container.add(panel, BorderLayout.NORTH);
         return container;
     }
@@ -311,40 +306,49 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         dataSources = new TextField("Data Sources:", 15);
         layoutGenerator.addLabelWidgetPair("Data Sources:", dataSources, panel);
 
-        layoutGenerator.addLabelWidgetPair("Months:", months(), panel);
+ //       layoutGenerator.addLabelWidgetPair("Months:", months(), panel);
         
-//        try {
-//            allControlTechnologies = session.controlMeasureService().getControlTechnologies();
-//            controlTechnology = new EditableComboBox(allControlTechnologies);
-//            controlTechnology.setPreferredSize(new Dimension(250, 25));
-//        } catch (EmfException e) {
-//            messagePanel.setError("Could not retrieve all Control Technologies");
-//        }
-//        changeablesList.addChangeable(controlTechnology);
-//        layoutGenerator.addLabelWidgetPair("Control Technology:", controlTechnology, panel);
-//
-//        try {
-//            allSourceGroups = session.dataCommonsService().getSourceGroups();
-//            sourceGroup = new EditableComboBox(allSourceGroups);
-//            sourceGroup.setPreferredSize(new Dimension(250, 25));
-//        } catch (EmfException e) {
-//            messagePanel.setError("Could not retrieve Source Groups");
-//        }
-//
-//        changeablesList.addChangeable(sourceGroup);
-//        layoutGenerator.addLabelWidgetPair("Source Group:", sourceGroup, panel);
-//
-//        layoutGenerator.addLabelWidgetPair("Sectors:", sectors(), panel);
-
-        widgetLayout(5, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(4, 2, 5, 5, 5, 7, layoutGenerator, panel);
 
         container.add(panel, BorderLayout.NORTH);
         return container;
     }
+    
+    
+    private JPanel createSectorMonthSection() {
+        JPanel panel = new JPanel(new SpringLayout());
+        panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        layoutGenerator.addWidgetPair(createSector(), createMonth(), panel);
+        widgetLayout(1, 2, 5, 5, 5, 5, layoutGenerator, panel);
+
+        return panel;
+    }
+    
+    private JPanel createSector() {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        layoutGenerator.addLabelWidgetPair("Sectors: ", sectors(), panel);
+
+        widgetLayout(1, 2, 5, 5, 5, 5, layoutGenerator, panel);
+        return panel;
+    }
+    
+    private JPanel createMonth() {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        layoutGenerator.addLabelWidgetPair("Months: ", months(), panel);
+
+        widgetLayout(1, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        return panel;
+    }
 
     private JPanel sectors() {
         sectorsWidget = new AddRemoveSectorWidget(getAllSectors(), changeablesList, parentConsole);
-        sectorsWidget.setPreferredSize(new Dimension(220, 80));
+        sectorsWidget.setPreferredSize(new Dimension(250, 80));
         return sectorsWidget;
     }
 
@@ -514,6 +518,6 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     public void viewOnly() {
         sectorsWidget.viewOnly();
-        
+        monthsWidget.viewOnly();
     }
 }
