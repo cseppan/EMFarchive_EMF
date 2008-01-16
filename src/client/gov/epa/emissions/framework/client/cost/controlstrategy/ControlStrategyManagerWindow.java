@@ -126,8 +126,8 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     }
     
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Name" };
-        return new SortCriteria(columnNames, new boolean[] { true }, new boolean[] { true });
+        String[] columnNames = { "Last Modified" };
+        return new SortCriteria(columnNames, new boolean[] { false }, new boolean[] { true });
     }
     
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
