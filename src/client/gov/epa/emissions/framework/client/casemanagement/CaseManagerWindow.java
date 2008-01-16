@@ -61,9 +61,9 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private EmfConsole parentConsole;
 
     private List cases;
-    
+
     private List<CaseCategory> categories;
-    
+
     private CaseCategory selectedCategory;
 
     private EmfSession session;
@@ -101,13 +101,13 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
     private void doLayout(Case[] cases) {
         messagePanel = new SingleLineMessagePanel();
-        
+
         try {
             getAllCategories();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
-        
+
         createCategoriesComboBox();
         tableData = new CasesTableData(cases);
         model = new EmfTableModel(tableData);
@@ -116,7 +116,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
         createLayout(layout, sortFilterSelectPanel);
     }
-    
+
     private void getAllCategories() throws EmfException {
         this.categories = new ArrayList<CaseCategory>();
         categories.add(new CaseCategory("All"));
@@ -125,10 +125,10 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
     private void createCategoriesComboBox() {
         categoriesBox = new ComboBox("Select one", categories.toArray(new CaseCategory[0]));
-        
+
         if (selectedCategory != null)
             categoriesBox.setSelectedItem(selectedCategory);
-        
+
         categoriesBox.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 CaseCategory category = getSelectedCategory();
@@ -137,7 +137,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
                         refresh(new Case[0]);
                         return;
                     }
-                    
+
                     refresh(presenter.getCases(category));
                 } catch (EmfException e1) {
                     messagePanel.setError("Could not retrieve all cases with -- " + category.getName());
@@ -175,7 +175,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
         return panel;
     }
-    
+
     private JPanel getCategoryPanel(String label, JComboBox box) {
         JPanel panel = new JPanel(new BorderLayout(5, 2));
         JLabel jlabel = new JLabel(label);
@@ -316,25 +316,25 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
         messagePanel.setMessage("Please wait while removing cases...");
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        
-        for (Iterator iter = selected.iterator(); iter.hasNext();) {
-            Case element = (Case) iter.next();
-            try {
+        try {
+            for (Iterator iter = selected.iterator(); iter.hasNext();) {
+                Case element = (Case) iter.next();
                 presenter.doRemove(element);
                 doRefresh();
-            } catch (EmfException e) {
-                showError("Could not remove " + element + "." + e.getMessage());
             }
+        } catch (EmfException e) {
+            showError(e.getMessage());
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
         }
-        
+
         clearMsgPanel();
-        setCursor(Cursor.getDefaultCursor());
         messagePanel.setMessage("Finished removing cases.");
     }
 
     private void copySelectedCases() {
         cases = selected();
-        
+
         if (cases.isEmpty()) {
             messagePanel.setMessage("Please select one or more Cases");
             return;
