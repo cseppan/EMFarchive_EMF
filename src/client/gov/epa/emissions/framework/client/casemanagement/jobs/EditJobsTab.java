@@ -388,7 +388,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             return;
         } 
         
-        showMessageDialog(message(jobs, lineSeparator), "Warning");
+        showMessageDialog(message(jobs, lineSeparator), "Possible Issues with Datasets Selected for Job Inputs");
     }
     
     private void runJobs() throws Exception {
@@ -470,10 +470,10 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     private ScrollableComponent message(CaseJob[] jobs, String lineSeparator) throws EmfException {
         String validationMsg = presenter.validateInputDatasets(jobs);
         
-        TextArea message = new TextArea("message", validationMsg, 40, 10 );
+        TextArea message = new TextArea("message", validationMsg, 60, 20 );
         message.setEditable(false);
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(message);
-        descScrollableTextArea.setMinimumSize(new Dimension(200, 20));
+        descScrollableTextArea.setMinimumSize(new Dimension(350, 40));
         return descScrollableTextArea;
     }
 
