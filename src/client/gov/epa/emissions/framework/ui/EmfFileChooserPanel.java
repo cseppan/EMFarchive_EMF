@@ -206,8 +206,9 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
 
             public void actionPerformed(ActionEvent e) {
                 try {
-                    fsv.createNewFolder(currentDir.getAbsolutePath(), subfolder.getText());
-                    updateDirSelections(currentDir);
+                    EmfFileInfo newFolder = fsv.createNewFolder(currentDir.getAbsolutePath(), subfolder.getText());
+                    subfolder.setText("");
+                    updateDirSelections(newFolder);
                 } catch (Exception exc) {
                     messagePanel.setError(exc.getMessage());
                 }
