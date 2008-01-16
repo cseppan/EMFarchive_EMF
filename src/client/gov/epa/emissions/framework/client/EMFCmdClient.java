@@ -99,9 +99,7 @@ public class EMFCmdClient {
                 + "\n\t-t --msg_type\tMessage type: i (info), e (error), w (warning)"
                 + "\n\t-F single file to register as a dataset"
                 + "\n\t-D path to the directory where files to register as datasets"
-                + "\n\t-P pattern of the files to register as datasets" 
-                + "\n\t-T dataset type" 
-                + "\n\t-N dataset name"
+                + "\n\t-P pattern of the files to register as datasets" + "\n\t-T dataset type" + "\n\t-N dataset name"
                 + "\n\t-O output name (optional, default to dataset name)");
 
         System.out.println("\nOr:\toptions:\n" + "\n\t-f --file\tSend job messages directly from this file\n");
@@ -158,10 +156,6 @@ public class EMFCmdClient {
         jobMsg.setRemoteUser(System.getProperty("user.name"));
         jobMsg.setExecModifiedDate(execFile.exists() ? new Date(execFile.lastModified()) : null);
         jobMsg.setReceivedTime(new Date());
-        
-        // Qun: I moved this logic into the JobMessage object itself
-//        if (status.isEmpty() && message.isEmpty())
-//            jobMsg.setEmpty(true);
 
         CaseOutput output = new CaseOutput(outputName);
         output.setDatasetFile(outputFile);
@@ -169,39 +163,13 @@ public class EMFCmdClient {
         output.setPath(outputFolder);
         output.setDatasetType(outputType);
         output.setPattern(outputPattern);
-//        output = setOutputEmptyProp(output);
+        // output = setOutputEmptyProp(output);
 
         if (loggerDir == null || loggerDir.isEmpty())
             sendMessage(args, jobkey, jobMsg, output);
         else
             writeToLogger(args, logFile, logInterval, resendTimes, jobkey, jobMsg, output);
     }
-    
-    // Qun: I moved all this logic into the CaseOutput object
-//    private synchronized static CaseOutput setOutputEmptyProp(CaseOutput output) {
-//        boolean empty = true;
-//        
-//        String[] fields = new String[] {
-//                output.getDatasetType(),
-//                output.getDatasetName(),
-//                output.getPath(),
-//                output.getDatasetFile(),
-//                output.getPattern(),
-//                output.getName()
-//        };
-//        
-//        for (String field : fields) {
-//            if (field != null && !field.trim().isEmpty()) {
-//                empty = false;
-//                break;
-//            }
-//        }
-//        // Qun: Shouldn't the output itself decide if it's empty instead of doing it here???
-//        
-//        output.setEmpty(empty);
-//        
-//        return output;
-//    }
 
     private synchronized static void runFromFile(List<String> args) throws Exception {
         int resendTimesIndex = args.indexOf("-r");
@@ -222,7 +190,7 @@ public class EMFCmdClient {
             send(args, new JobMessage[] { jobMsg }, new String[] { jobkey }, new CaseOutput[] { output });
         } catch (Exception exc) {
             String errorString = exc.getMessage();
-            
+
             exitValue = getExitValue(errorString);
 
             if (DEBUG)
@@ -235,20 +203,19 @@ public class EMFCmdClient {
     }
 
     /* make a consistant exit value based on message contents */
-    private static int getExitValue(String errorString)
-    {
+    private static int getExitValue(String errorString) {
         if (errorString == null || (errorString.length() == 0))
             return 0;
-        
+
         if (errorString.contains("Error recording job messages"))
             return 1;
 
         if (errorString.contains("Error registering output"))
             return 2;
-        
-        return 3;  // unknown error string
+
+        return 3; // unknown error string
     }
-    
+
     private synchronized static void sendLogs(List<String> args, int logInterval, int resendTimes, String logfile,
             String logAsistFile, String jobkey, JobMessage jobMsg, CaseOutput output, boolean now) throws Exception {
         List<JobMessage> msgs = new ArrayList<JobMessage>();
@@ -264,10 +231,19 @@ public class EMFCmdClient {
             return;
         }
 
+        if (DEBUG)
+            System.out.println("EMF client starts reading log assistance file: " + logAsistFile + " " + new Date());
+
         BufferedReader asistFileReader = new BufferedReader(new FileReader(logAsistFile));
         long sentLines = Long.parseLong(asistFileReader.readLine().trim());
         asistFileReader.close();
+        
+        if (DEBUG)
+            System.out.println("EMF client starts reading log assistance file: " + logAsistFile + " " + new Date());
 
+        if (DEBUG)
+            System.out.println("EMF client starts reading log file: " + logfile + " " + new Date());
+        
         BufferedReader br = new BufferedReader(new FileReader(logfile));
         String line = br.readLine();
         long lineCount = 1;
@@ -288,6 +264,9 @@ public class EMFCmdClient {
         }
 
         br.close();
+        
+        if (DEBUG)
+            System.out.println("EMF client has finished reading log file: " + logfile + " " + new Date());
 
         String errorString = null;
 
@@ -322,10 +301,19 @@ public class EMFCmdClient {
             return;
         }
 
+        if (DEBUG)
+            System.out.println("EMF client starts reading log assistance file: " + logAsistFile + " " + new Date());
+
         BufferedReader asistFileReader = new BufferedReader(new FileReader(logAsistant));
         long sentLines = Long.parseLong(asistFileReader.readLine().trim());
         asistFileReader.close();
+        
+        if (DEBUG)
+            System.out.println("EMF client starts reading log assistance file: " + logAsistFile + " " + new Date());
 
+        if (DEBUG)
+            System.out.println("EMF client starts reading log file: " + logfile + " " + new Date());
+        
         BufferedReader br = new BufferedReader(new FileReader(logfile));
         String line = br.readLine();
         long lineCount = 1;
@@ -341,7 +329,10 @@ public class EMFCmdClient {
         }
 
         br.close();
-
+        
+        if (DEBUG)
+            System.out.println("EMF client has finished reading log file: " + logfile + " " + new Date());
+        
         String errorString = null;
 
         if (msgs.size() > 0) {
@@ -353,9 +344,15 @@ public class EMFCmdClient {
     }
 
     private synchronized static void rewriteSentLinesNumber(long lineCount, String logAsistFile) throws Exception {
+        if (DEBUG)
+            System.out.println("EMF client starts writing log assistance file: " + logAsistFile + " " + new Date());
+        
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(logAsistFile)));
         writer.println(lineCount);
         writer.close();
+        
+        if (DEBUG)
+            System.out.println("EMF client has finished writing log assistance file: " + logAsistFile + " " + new Date());
     }
 
     private synchronized static String resend(List<String> args, int resendTimes, List<JobMessage> msgs,
@@ -386,17 +383,19 @@ public class EMFCmdClient {
             CaseAssistService service = getService(args);
             ArrayList keyArrayList = new ArrayList();
             JobMessage[] nonEmptyMessages = getNonEmptyMsgs(msgs, keys, keyArrayList);
-            String [] nonEmptyKeys = new String[nonEmptyMessages.length];
+            String[] nonEmptyKeys = new String[nonEmptyMessages.length];
             keyArrayList.toArray(nonEmptyKeys);
-            
+
             service.recordJobMessages(nonEmptyMessages, nonEmptyKeys); // just need to send nonEmptykeys here
-            System.out.println("EMF command client sent " + nonEmptyMessages.length + " messages successfully.");
+            
+            if (DEBUG)
+                System.out.println("EMF command client sent " + nonEmptyMessages.length + " messages successfully.");
 
             ArrayList outputKeyArrayList = new ArrayList();
             CaseOutput[] nonEmptyOutputs = getNonEmptyOutputs(outputs, keys, outputKeyArrayList);
-            String [] nonEmptyOutputKeys = new String[outputKeyArrayList.size()];
+            String[] nonEmptyOutputKeys = new String[outputKeyArrayList.size()];
             outputKeyArrayList.toArray(nonEmptyOutputKeys);
-            
+
             registerOutputs(nonEmptyOutputKeys, service, nonEmptyOutputs);
 
             if (DEBUG)
@@ -409,35 +408,37 @@ public class EMFCmdClient {
         }
     }
 
-    private synchronized static void registerOutputs(String[] keys, CaseAssistService service, CaseOutput[] nonEmptyOutputs) {
+    private synchronized static void registerOutputs(String[] keys, CaseAssistService service,
+            CaseOutput[] nonEmptyOutputs) {
         if (nonEmptyOutputs.length >= 1) {
             try {
-                System.out.println("Registering "+nonEmptyOutputs.length+" outputs");
-                for (int i = 0; i < nonEmptyOutputs.length; i++)
-                {
-                    System.out.println("Output: "+nonEmptyOutputs[i].getName()+";"+nonEmptyOutputs[i].getDatasetFile()+
-                            nonEmptyOutputs[i].getPattern()+";"+nonEmptyOutputs[i].getPath());
+                if (DEBUG)
+                    System.out.println("Registering " + nonEmptyOutputs.length + " outputs");
+
+                for (int i = 0; i < nonEmptyOutputs.length; i++) {
+                    if (DEBUG)
+                        System.out.println("Output: " + nonEmptyOutputs[i].getName() + ";"
+                                + nonEmptyOutputs[i].getDatasetFile() + nonEmptyOutputs[i].getPattern() + ";"
+                                + nonEmptyOutputs[i].getPath());
                 }
                 service.registerOutputs(nonEmptyOutputs, keys);
                 if (DEBUG)
-                    System.out.println("EMF command client registered " + nonEmptyOutputs.length + " outputs successfully.");
+                    System.out.println("EMF command client registered " + nonEmptyOutputs.length
+                            + " outputs successfully.");
             } catch (Exception e) {
                 if (e.getMessage().startsWith("Error registering"))
-                   System.out.println(e.getMessage());
+                    System.out.println(e.getMessage());
                 else
-                   System.out.println("Error registering outputs: " + e.getMessage());
+                    System.out.println("Error registering outputs: " + e.getMessage());
             }
         }
     }
 
-    private synchronized static JobMessage[] getNonEmptyMsgs(JobMessage[] msgs, String [] keys, ArrayList keyArray) {
-        // Qun: Had to rework this so that it kept the keys in sync with the msgs - else the server threw an error
+    private synchronized static JobMessage[] getNonEmptyMsgs(JobMessage[] msgs, String[] keys, ArrayList keyArray) {
         ArrayList nonEmpty = new ArrayList();
 
-        for (int i = 0; i < msgs.length; i++)
-        {
-             if (!msgs[i].isEmpty())
-            {
+        for (int i = 0; i < msgs.length; i++) {
+            if (!msgs[i].isEmpty()) {
                 nonEmpty.add(msgs[i]);
                 keyArray.add(keys[i]);
             }
@@ -448,16 +449,14 @@ public class EMFCmdClient {
         return nonEmptyMsgs;
     }
 
-    private synchronized static CaseOutput[] getNonEmptyOutputs(CaseOutput[] outputs, String [] keys, ArrayList keyArray) {
+    private synchronized static CaseOutput[] getNonEmptyOutputs(CaseOutput[] outputs, String[] keys, ArrayList keyArray) {
         List<CaseOutput> all = new ArrayList<CaseOutput>();
 
-        for (int i = 0; i < outputs.length; i++)
-        {
-           if (!outputs[i].isEmpty())
-           {
-               all.add(outputs[i]);
-               keyArray.add(keys[i]);
-           }
+        for (int i = 0; i < outputs.length; i++) {
+            if (!outputs[i].isEmpty()) {
+                all.add(outputs[i]);
+                keyArray.add(keys[i]);
+            }
         }
         return all.toArray(new CaseOutput[0]);
     }
@@ -467,9 +466,13 @@ public class EMFCmdClient {
         boolean logFileExisted = new File(logFile).exists();
         String logAsistFile = logFile + ".ast";
 
+        if (DEBUG)
+            System.out.println("EMF Command Client starts writing messages to log file: " + logFile + " " + new Date());
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(logFile, true)));
         writeLogs(writer, logAsistFile, jobMsg, jobkey, output, logFileExisted);
         writer.close();
+        if (DEBUG)
+            System.out.println("Finished writing messages to log file: " + logFile + " " + new Date());
 
         if (jobMsg.getStatus() == null || jobMsg.getStatus().isEmpty()) {
             sendLogs(args, logInterval, resendTimes, logFile, logAsistFile, jobkey, jobMsg, output, false);
@@ -497,7 +500,15 @@ public class EMFCmdClient {
         record += "," + output.getName();
 
         if (!logFileExisted) {
+            if (DEBUG)
+                System.out.println("EMF Command Client starts writing messages to log assistance file: " + logAsistFile
+                        + " " + new Date());
+
             writeInitialAsistFile(new File(logAsistFile));
+
+            if (DEBUG)
+                System.out.println("EMF Command Client starts writing messages to log assistance file: " + logAsistFile
+                        + " " + new Date());
 
             writer.println("job key,exec name,exec path,message,"
                     + "message type,status,period,user,last mod date,log time(ms),"
@@ -555,12 +566,6 @@ public class EMFCmdClient {
         msg.setStatus(fields[5]);
         msg.setPeriod(fields[6]);
         msg.setRemoteUser(fields[7]);
-        
-        // Qun: Why are we setting a variable in the message instead of letting the message object 
-        //      apply these criteria to decide if its empty??
-        // I've moved this logic into the JobMessage object - just call isEm;pty to get it
-//        if (msg.getStatus().isEmpty() && msg.getMessage().isEmpty() && msg.getPeriod().isEmpty())
-//            msg.setEmpty(true);
 
         try {
             msg.setExecModifiedDate((fields[8] == null || fields[8].trim().isEmpty()) ? null : EmfDateFormat
@@ -577,16 +582,7 @@ public class EMFCmdClient {
     private synchronized static CaseOutput extractOutput(String line) throws Exception {
         CommaDelimitedTokenizer tokenizer = new CommaDelimitedTokenizer();
         String[] fields = tokenizer.tokens(line);
-        
-        // Qun: All object related to whether the output is empty is now in the output object
-//        boolean empty = true;
-//        for (String field : fields) {
-//            if (field != null && !field.trim().isEmpty()) {
-//                empty = false;
-//                break;
-//            }
-//        }
-//
+
         CaseOutput output = new CaseOutput();
         output.setDatasetFile(fields[10]);
         output.setPath(fields[11]);
@@ -594,7 +590,7 @@ public class EMFCmdClient {
         output.setDatasetType(fields[13]);
         output.setDatasetName(fields[14]);
         output.setName(fields[15]);
-//        output.setEmpty(empty);
+        // output.setEmpty(empty);
 
         return output;
     }

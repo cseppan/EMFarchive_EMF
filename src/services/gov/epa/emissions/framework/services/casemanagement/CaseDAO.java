@@ -22,6 +22,7 @@ import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -80,8 +81,14 @@ public class CaseDAO {
             if (existed != null)
                 removeCaseOutputs(user, new CaseOutput[] { existed }, true, localSession);
 
+            if (DebugLevels.DEBUG_14)
+                System.out.println("CaseDAO starts adding case output " + output.getName() + " " + new Date());
+            
             hibernateFacade.add(output, session);
             toReturn = getCaseOutput(output, session);
+            
+            if (DebugLevels.DEBUG_14)
+                System.out.println("CaseDAO starts adding case output " + toReturn.getName() + " " + new Date());
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {

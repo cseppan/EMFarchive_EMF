@@ -206,13 +206,16 @@ public class ManagedCaseService {
     }
 
     public Version[] getLaterVersions(EmfDataset dataset, Version version) throws EmfException {
-        Versions versions=new Versions(); 
+        Versions versions = new Versions();
         Session session = sessionFactory.getSession();
-        
+
         try {
-            int id=dataset.getId();
-            Version[] vers=versions.getLaterVersions(id, version, session);
-            System.out.println("There are " + vers.length + " later versions for dataset: " + dataset.getName());
+            int id = dataset.getId();
+            Version[] vers = versions.getLaterVersions(id, version, session);
+
+            if (DebugLevels.DEBUG_14)
+                System.out.println("There are " + vers.length + " later versions for dataset: " + dataset.getName());
+
             return vers;
         } catch (Exception e) {
             e.printStackTrace();
@@ -222,7 +225,7 @@ public class ManagedCaseService {
             session.close();
         }
     }
-    
+
     public CaseJob getCaseJob(int jobId) throws EmfException {
         Session session = sessionFactory.getSession();
 
@@ -1451,7 +1454,6 @@ public class ManagedCaseService {
 
                 String jobFileName = this.getJobFileName(caseJob);
 
-
                 if (DebugLevels.DEBUG_6)
                     System.out.println("setJobFileContent");
 
@@ -1820,7 +1822,7 @@ public class ManagedCaseService {
          * etc.
          */
         String setenvLine;
-        
+
         // add quotes to value, if they are not already there
         if (envvalue.indexOf('"') >= 0)
             setenvLine = this.runSet + " " + envvariable + this.runEq + envvalue + this.runTerminator;
@@ -1856,8 +1858,8 @@ public class ManagedCaseService {
         return setenvLine;
     }
 
-    public synchronized String createJobFileContent(CaseJob job, User user, String jobFileName, ManagedExportService expSvc)
-            throws EmfException {
+    public synchronized String createJobFileContent(CaseJob job, User user, String jobFileName,
+            ManagedExportService expSvc) throws EmfException {
         // String jobContent="";
         String jobFileHeader = "";
 
@@ -2510,17 +2512,17 @@ public class ManagedCaseService {
 
     public synchronized String validateJobs(Integer[] jobIDs) throws EmfException {
         if (DebugLevels.DEBUG_14)
-            System.out.println("Start validating jobs on server side. " +  new Date());
-        
+            System.out.println("Start validating jobs on server side. " + new Date());
+
         List<CaseInput> allInputs = new ArrayList<CaseInput>();
 
         for (Integer id : jobIDs) {
             CaseJob job = this.getCaseJob(id.intValue());
             allInputs.addAll(this.getAllJobInputs(job));
         }
-        
+
         if (DebugLevels.DEBUG_14)
-            System.out.println("Finished validating jobs on server side. " +  new Date());
+            System.out.println("Finished validating jobs on server side. " + new Date());
 
         TreeSet<CaseInput> set = new TreeSet<CaseInput>(allInputs);
         List<CaseInput> uniqueInputs = new ArrayList<CaseInput>(set);
@@ -2533,8 +2535,8 @@ public class ManagedCaseService {
         String lineSeparator = System.getProperty("line.separator");
 
         if (DebugLevels.DEBUG_14)
-            System.out.println("Start listing non-final inputs. " +  new Date());
-        
+            System.out.println("Start listing non-final inputs. " + new Date());
+
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = iter.next();
             String dataset = input.getDataset().getName();
@@ -2545,11 +2547,11 @@ public class ManagedCaseService {
         }
 
         if (DebugLevels.DEBUG_14)
-            System.out.println("Finished listing non-final inputs. " +  new Date());
-        
+            System.out.println("Finished listing non-final inputs. " + new Date());
+
         return inputsList;
     }
-    
+
     public synchronized String validateInputDatasets(Integer[] jobIDs) throws EmfException {
         List<CaseInput> allInputs = new ArrayList<CaseInput>();
         for (Integer id : jobIDs) {
@@ -2559,40 +2561,47 @@ public class ManagedCaseService {
 
         TreeSet<CaseInput> set = new TreeSet<CaseInput>(allInputs);
         List<CaseInput> uniqueInputs = new ArrayList<CaseInput>(set);
-        
+
         return listInputsMsg(uniqueInputs);
     }
 
-    private String listInputsMsg(List<CaseInput> inputs) throws EmfException   {
-        String inputsList = "";
-        String lineSeparator = System.getProperty("line.separator");
+    private String listInputsMsg(List<CaseInput> inputs) throws EmfException {
+        StringBuffer inputsList = new StringBuffer("");
+        String header = "Later dataset versions exist for selected inputs.";
+        String header2 = "No new versions exist for selected inputs.";
+        boolean laterVersionExists = false;
 
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = iter.next();
-            EmfDataset dataset=input.getDataset();
-            
-            if (dataset==null)
-                inputsList += "Input: " + input.getName()+ " has no dataset";
-            
+            String inputName = input.getName();
+            EmfDataset dataset = input.getDataset();
+
+            if (dataset == null)
+                inputsList.append("Input: " + inputName + " has no dataset\n");
             else {
                 String datasetName = input.getDataset().getName();
                 Version version = input.getVersion();
-                if (version==null)
-                    throw new EmfException("input version is null");
- //               System.out.println("current version  " + version.getVersion());
-                Version[] laterVersions=getLaterVersions(dataset, version);
- //               System.out.println("There are " + laterVersions.length + " in list");
+
+                if (version == null) {
+                    inputsList.append("Input: " + inputName + " hasn't set dataset version\n");
+                    continue;
+                }
+
+                Version[] laterVersions = getLaterVersions(dataset, version);
+
+                if (laterVersions.length > 0)
+                    inputsList.append("Input name: " + inputName + ";  " + "Dataset name: " + datasetName + "\n");
                 
-                inputsList += "Input name  : " + input.getName() + ";  "+lineSeparator
-                            + "Dataset name: " + datasetName + lineSeparator;
-                for(Version ver:laterVersions){
-                    inputsList +="    Version " +ver.getVersion()+" :" + ver.getName() + ",  " 
-                    + ",  " + (ver.getCreator()==null? " " :ver.getCreator().getName())
-                    +(ver.isFinalVersion()? "Final ": "Not Final")+ lineSeparator;
+                for (Version ver : laterVersions) {
+                    inputsList.append("    Version " + ver.getVersion() + ": " + ver.getName() + ",  "
+                            + (dataset.getCreator() == null ? "" : dataset.getCreator()) + ", "
+                            + (ver.isFinalVersion() ? "Final" : "Not Final") + "\n");
+                    laterVersionExists = true;
                 }
             }
         }
-        return inputsList;
+
+        return (laterVersionExists) ? header + "\n\n" + inputsList.toString() : header2 + "\n\n" + inputsList.toString();
     }
 
     public CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException {
@@ -2634,15 +2643,16 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized void removeCaseOutputs(User user, CaseOutput[] outputs, boolean deleteDataset) throws EmfException {
+    public synchronized void removeCaseOutputs(User user, CaseOutput[] outputs, boolean deleteDataset)
+            throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
             dao.removeCaseOutputs(user, outputs, deleteDataset, session);
         } catch (Exception e) {
             e.printStackTrace();
-//            log.error("Could not remove case output " + outputs[0].getName() + " etc.\n" + e.getMessage());
-//            throw new EmfException("Could not remove case output " + outputs[0].getName() + " etc.");
+            // log.error("Could not remove case output " + outputs[0].getName() + " etc.\n" + e.getMessage());
+            // throw new EmfException("Could not remove case output " + outputs[0].getName() + " etc.");
             throw new EmfException(e.getMessage());
         } finally {
             session.close();
