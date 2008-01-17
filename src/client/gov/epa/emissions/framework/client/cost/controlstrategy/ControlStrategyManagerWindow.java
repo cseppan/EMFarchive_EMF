@@ -24,6 +24,7 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -52,10 +53,14 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     private JPanel layout;
 
     private MessagePanel messagePanel;
+    
+    private String threadAction;
 
     private EmfConsole parentConsole;
 
     private EmfSession session;
+    
+    private Button refreshButton, copyButton, removeButton;
     
     private EditControlStrategyView[] editControlStrategyViews = {};
 
@@ -79,22 +84,58 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         doLayout(controlStrategies, this.session);
         super.display();
         //refresh control measures...
-        this.populateThread = new Thread(this);
-        populateThread.start();
+        doRefresh();
     }
 
     public void run() {
-        try {
-            presenter.loadControlMeasures();
-        } catch (Exception e) {
-            messagePanel.setError("Cannot retrieve all control measures.");
+        if (this.threadAction == "refresh") {
+            try {
+                setButton(false);
+                messagePanel.setMessage("Please wait while retrieving control strategies...");
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                presenter.doRefresh();
+                messagePanel.clear();
+            } catch (Exception e1) {
+                messagePanel.setError("Cannot retrieve control strategies.  " + e1.getMessage());
+            } finally  {
+                setButton(true);
+                setCursor(Cursor.getDefaultCursor());
+                this.populateThread = null;
+            }
+        } else if (this.threadAction == "copy") {
+            try {
+                setButton(false);
+                messagePanel.setMessage("Please wait while copying control strategies...");
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                copySelectedStrategy();
+                this.populateThread = null;
+                doRefresh();
+                messagePanel.clear();
+            } catch (Exception e2) {
+                messagePanel.setError("Cannot copy control strategies.  " + e2.getMessage());
+            } finally  {
+                setButton(true);
+                setCursor(Cursor.getDefaultCursor());
+                this.populateThread = null;
+            }
+        }else if (this.threadAction == "remove") {
+            try {
+                setButton(false);
+                messagePanel.setMessage("Please wait while removing control strategies...");
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                removeStrategies();
+                this.populateThread = null;
+                doRefresh();
+                messagePanel.clear();
+            } catch (Exception e3) {
+                messagePanel.setError("Cannot remove control strategies.  " + e3.getMessage());
+            } finally  {
+                setButton(true);
+                setCursor(Cursor.getDefaultCursor());
+                this.populateThread = null;
+            }
         }
-        //refresh Edit Control Strategy windows...
-        for (int i = 0; i < editControlStrategyViews.length; i++) {
-            EditControlStrategyView view = editControlStrategyViews[i];
-            view.endControlMeasuresRefresh();
-        }
-        this.populateThread = null;
+        
     }
 
     public void refresh(ControlStrategy[] controlStrategies) throws EmfException {
@@ -108,14 +149,45 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
             }
         }
         //refresh control measures...
+        refreshCM();
+    }
+    
+    public void refreshCM(){
+        try {
+            presenter.loadControlMeasures();
+        } catch (Exception e) {
+            messagePanel.setError("Cannot retrieve all control measures.");
+            //refresh Edit Control Strategy windows...
+            for (int i = 0; i < editControlStrategyViews.length; i++) {
+                EditControlStrategyView view = editControlStrategyViews[i];
+                view.endControlMeasuresRefresh();
+            }
+        }
+    }
+
+    public void setButton(boolean boo){
+        removeButton.setEnabled(boo);
+        copyButton.setEnabled(boo);
+        refreshButton.setEnabled(boo);
+    }
+    public void doRefresh() {
+        this.threadAction = "refresh";
         this.populateThread = new Thread(this);
-        populateThread.start();
+        this.populateThread.start();
+    }
+    
+    public void doCopy() {
+        this.threadAction = "copy";
+        this.populateThread = new Thread(this);
+        this.populateThread.start();
     }
 
-    public void doRefresh() throws EmfException {
-        presenter.doRefresh();
+    public void doRemove() {
+        this.threadAction = "remove";
+        this.populateThread = new Thread(this);
+        this.populateThread.start();
     }
-
+    
     private void doLayout(ControlStrategy[] controlStrategies, EmfSession session) throws EmfException {
         tableData = new ControlStrategiesTableData(controlStrategies, session);
         model = new EmfTableModel(tableData);
@@ -148,8 +220,8 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.CENTER);
 
-        Button button = new RefreshButton(this, "Refresh Cases", messagePanel);
-        panel.add(button, BorderLayout.EAST);
+        refreshButton = new RefreshButton(this, "Refresh Cases", messagePanel);
+        panel.add(refreshButton, BorderLayout.EAST);
 
         return panel;
     }
@@ -193,24 +265,16 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         });
         crudPanel.add(newButton);
 
-        Button removeButton = new RemoveButton(new AbstractAction() {
+        removeButton = new RemoveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    doRemove();
-                } catch (EmfException exception) {
-                    messagePanel.setError(exception.getMessage());
-                }
+                doRemove();
             }
         });
         crudPanel.add(removeButton);
         
-        Button copyButton = new CopyButton(new AbstractAction() {
+        copyButton = new CopyButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                    try {
-                        copySelectedStrategy();
-                    } catch (EmfException excp) {
-                        messagePanel.setError("Error copying control strategies: " + excp.getMessage());
-                    }
+                    doCopy();
             }
         });
         crudPanel.add(copyButton);
@@ -265,7 +329,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         }
     }
     
-    protected void doRemove() throws EmfException {
+    protected void removeStrategies() throws EmfException {
         messagePanel.clear();
         ControlStrategy[] records = (ControlStrategy[])selected().toArray(new ControlStrategy[0]);
 
@@ -288,14 +352,11 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
                 presenter.doRemove(ids);
             } catch (EmfException ex) {
                 throw ex;
-            } finally {
-                doRefresh();
             }
         }
     }
     
-    private void copySelectedStrategy() throws EmfException {
-        boolean error = false;
+    private void copySelectedStrategy() {
         messagePanel.clear();
         List strategies = selected();
         if (strategies.isEmpty()) {
@@ -313,11 +374,8 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
 //                presenter.doSaveCopiedStrategies(coppied, element.getName());
             } catch (Exception e) {
                 messagePanel.setError(e.getMessage());
-                error = true;
             }
         }
-        
-        if (!error) doRefresh();
     }
 
     private List selected() {
