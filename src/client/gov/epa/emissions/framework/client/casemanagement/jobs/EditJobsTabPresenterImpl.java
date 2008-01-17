@@ -227,16 +227,25 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     }
 
     public String validateJobs(CaseJob[] jobs) throws EmfException {
+        String ls = System.getProperty("line.separator");
         List<Integer> ids = new ArrayList<Integer>();
         
         for (CaseJob job : jobs)
             ids.add(new Integer(job.getId()));
         
         System.out.println("Validating input datasets of jobs");
-        String msg = service().validateJobs(ids.toArray(new Integer[0]));
+        String nonFinalMsg = service().validateJobs(ids.toArray(new Integer[0]));
+        String laterVersionMsg = service().validateInputDatasets(ids.toArray(new Integer[0]));
         System.out.println("Finished validating case jobs.");
         
-        return msg;
+        if (nonFinalMsg.isEmpty() && laterVersionMsg.toUpperCase().contains("NO NEW VERSIONS EXIST"))
+            return "";
+        
+        if (!nonFinalMsg.isEmpty())
+            nonFinalMsg = border(80, "*") + ls + "The selected job" + (jobs.length > 1 ? "s have " : " has ") 
+            + "non-final dataset versions:" + ls + ls + nonFinalMsg;
+        
+        return nonFinalMsg + border(80, "*") + ls + laterVersionMsg + border(80, "*");
     }
     
     public String validateInputDatasets(CaseJob[] jobs) throws EmfException {
@@ -246,5 +255,14 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
             ids.add(new Integer(job.getId()));
         
         return service().validateInputDatasets(ids.toArray(new Integer[0]));
+    }
+    
+    private String border(int num, String symbl) {
+        StringBuffer sb = new StringBuffer();
+        
+        for (int i = 0; i < num; i++)
+            sb.append(symbl);
+        
+        return sb.toString();
     }
 }

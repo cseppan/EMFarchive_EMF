@@ -419,7 +419,8 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             }
 
             if (msg.equalsIgnoreCase("WARNING"))
-                option = showDialog("Are you sure you want to rerun the selected job(s)?", "Warning");
+                option = showDialog("Are you sure you want to rerun the selected job" 
+                        + (jobs.length > 1 ? "s" : "") + "?", "Warning");
 
             if (option == JOptionPane.YES_OPTION) {
                 option = validateJobs(jobs, option, lineSeparator);
@@ -434,15 +435,15 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
     }
 
-    private int validateJobs(CaseJob[] jobs, int option, String lineSeparator) throws EmfException {
+    private int validateJobs(CaseJob[] jobs, int option, String ls) throws EmfException {
         String validationMsg = presenter.validateJobs(jobs);
 
         if (validationMsg.isEmpty())
             //  there are no nonfinal dataset versions used, so return yes
             return JOptionPane.YES_OPTION;  
           
-        option = showDialog("The Selected job" + (jobs.length > 1 ? "s have " : " has ") + "non-final input datasets:" + lineSeparator + validationMsg
-                 + lineSeparator + "Are you sure to run the selected job(s)?", "Warning");
+        option = showDialog(validationMsg + ls + "Are you sure to run the selected job" + 
+                (jobs.length > 1 ? "s" : "") + "?", "Warning");
         return option;
     }
 

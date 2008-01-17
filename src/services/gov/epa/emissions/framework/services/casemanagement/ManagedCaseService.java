@@ -2567,7 +2567,9 @@ public class ManagedCaseService {
 
     private String listInputsMsg(List<CaseInput> inputs) throws EmfException {
         StringBuffer inputsList = new StringBuffer("");
-        String header = "Inputs using Datasets that have Later Versions Available: ";
+        
+        //NOTE: if change headers msg here, please also change the client side
+        String header = "Inputs using datasets that have later versions available: ";
         String header2 = "No new versions exist for selected inputs.";
         boolean laterVersionExists = false;
 
@@ -2593,9 +2595,9 @@ public class ManagedCaseService {
                     inputsList.append("Input name: " + inputName + ";    " + "Dataset name: " + datasetName + "\n");
                 
                 for (Version ver : laterVersions) {
-                    inputsList.append("    Version " + ver.getVersion() + ": " + ver.getName() + ",  "
+                    inputsList.append("    Version " + ver.getVersion() + ":   " + ver.getName() + ", "
                             + (dataset.getCreator() == null ? "" : dataset.getCreator()) + ", "
-                            + (ver.isFinalVersion() ? "Final" : "Not Final") + "\n");
+                            + (ver.isFinalVersion() ? "Final" : "Non-final") + "\n");
                     laterVersionExists = true;
                 }
             }
