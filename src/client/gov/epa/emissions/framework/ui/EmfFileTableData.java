@@ -16,7 +16,7 @@ public class EmfFileTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Size", "Type", "Date Modified", "Can Read", "Can Write", "Can Execute"};
+        return new String[] { "Name", "Date Modified", "Size", "Type", "Can Read", "Can Write", "Can Execute"};
     }
 
     public Class getColumnClass(int col) {
@@ -73,7 +73,7 @@ public class EmfFileTableData extends AbstractTableData {
     }
 
     private Object[] rowValues(EmfFileInfo info) {
-        Object[] values = { info.getName(), getSize(info), getType(info), getDate(info), info.canRead(),
+        Object[] values = { info.getName(), getDate(info), getSize(info), getType(info), info.canRead(),
                 info.canWrite(), info.canExecute() };
         return values;
     }
