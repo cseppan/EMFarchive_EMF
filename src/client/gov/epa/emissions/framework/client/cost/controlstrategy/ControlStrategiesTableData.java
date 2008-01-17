@@ -32,8 +32,7 @@ public class ControlStrategiesTableData extends AbstractTableData {
         return new String[] { "Name", "Last Modified", "Run Status", "Region", 
                 "Target Pollutant", "Total Cost", "Reduction", 
                 "Project", "Strategy Type", "Cost Year", 
-                "Inv. Year", "Completion Date", 
-                "Creator" };
+                "Inv. Year", "Creator" };
     }
 
     public Class getColumnClass(int col) {
@@ -58,7 +57,7 @@ public class ControlStrategiesTableData extends AbstractTableData {
             Object[] values = { element.getName(), format(element.getLastModifiedDate()), element.getRunStatus(), region(element),
                     element.getTargetPollutant(), getTotalCost(element.getId()), getReduction(element.getId()), 
                     project(element), analysisType(element), costYear(element), 
-                    "" + (element.getInventoryYear() != 0 ? element.getInventoryYear() : ""), format(element.getCompletionDate()), 
+                    "" + (element.getInventoryYear() != 0 ? element.getInventoryYear() : ""), 
                     element.getCreator().getName() };
             Row row = new ViewableRow(element, values);
             rows.add(row);
