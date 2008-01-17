@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 
@@ -255,14 +256,22 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             String exportDirectory, boolean useSQLApproach) throws EmfException {
         ControlStrategy strategy = getById(controlStrategyId);
         StrategyFactory factory = new StrategyFactory(batchSize());
-        try {
-            RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, 
-                    dbServerFactory, threadPool,
-                    exportDirectory, useSQLApproach);
-            runStrategy.run(user, strategy, this);
-        } catch (Exception e) {
-            //
+        
+        validatePath(exportDirectory);
+        RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, 
+                dbServerFactory, threadPool,
+                exportDirectory, useSQLApproach);
+        runStrategy.run(user, strategy, this);
+    }
+    
+    private File validatePath(String folderPath) throws EmfException {
+        File file = new File(folderPath);
+
+        if (!file.exists() || !file.isDirectory()) {
+            LOG.error("Folder " + folderPath + " does not exist");
+            throw new EmfException("Export folder does not exist: " + folderPath);
         }
+        return file;
     }
 
     public synchronized void stopRunStrategy() {
