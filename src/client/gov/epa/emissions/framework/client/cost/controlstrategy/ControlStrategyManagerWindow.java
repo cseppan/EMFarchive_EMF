@@ -96,9 +96,11 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
             view.endControlMeasuresRefresh();
         }
         this.populateThread = null;
+        setCursor(Cursor.getDefaultCursor());
     }
 
     public void refresh(ControlStrategy[] controlStrategies) throws EmfException {
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         doLayout(controlStrategies, this.session);
         super.refreshLayout();
         //refresh Edit Control Strategy windows...
