@@ -596,7 +596,6 @@ public class EmfDataset implements Dataset, Lockable {
                 month = cal.NOVEMBER;
             else if (month2.equalsIgnoreCase("dec") || month2.equalsIgnoreCase("december") || month2.equals("12"))
                 month = cal.DECEMBER;
-            System.out.println("The month of the dataset from month2 is: " + month);
         }
         // Then the file or files must be put into the appropriate method call to create a monthly 
         // query for them.

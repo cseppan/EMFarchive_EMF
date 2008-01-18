@@ -345,6 +345,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
 
     private void runStrategyUsingSQLApproach(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
         String query = "SELECT public.run_apply_measures_in_series_strategy("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
+//        String query = "SELECT public.run_apply_measures_in_series_strategy("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
 //SELECT public.create_strategy_detailed_result_table_indexes('" + emissionTableName(controlStrategyResult.getDetailedResultDataset()) + "');        
         System.out.println(System.currentTimeMillis() + " " + query);
         try {
@@ -357,7 +358,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     private void runStrategyUsingSQLApproach2(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
-        String query = "SELECT public.create_strategy_detailed_result_table_indexes('" + emissionTableName(controlStrategyResult.getDetailedResultDataset()) + "');analyze emissions." + emissionTableName(controlStrategyResult.getDetailedResultDataset()) + ";";
+        String query = "SET work_mem TO '128MB';SELECT public.create_strategy_detailed_result_table_indexes('" + emissionTableName(controlStrategyResult.getDetailedResultDataset()) + "');analyze emissions." + emissionTableName(controlStrategyResult.getDetailedResultDataset()) + ";";
         
         System.out.println(System.currentTimeMillis() + " " + query);
         try {

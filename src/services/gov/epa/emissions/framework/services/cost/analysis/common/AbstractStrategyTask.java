@@ -26,6 +26,7 @@ import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -133,6 +134,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                 //finalize the result, update completion time and run status...
                 summaryResult.setCompletionTime(new Date());
                 summaryResult.setRunStatus("Completed.");
+                setSummaryResultCount(summaryResult);
                 saveControlStrategySummaryResult(summaryResult);
                 runSummaryQASteps(summaryResult.getInputDataset(), 0);
             }
@@ -148,7 +150,7 @@ public abstract class AbstractStrategyTask implements Strategy {
 
     private void populateStrategySummaryResultDataset(ControlStrategyResult[] results, ControlStrategyResult summaryResult) throws EmfException {
         if (results.length > 0) {
-            String sql = "INSERT INTO " + qualifiedEmissionTableName(summaryResult.getInputDataset()) + " (dataset_id, version, fips, scc, poll, Control_Technology, avg_ann_cost_per_ton, Annual_Cost, Emis_Reduction)" 
+            String sql = "SET work_mem TO '512MB';INSERT INTO " + qualifiedEmissionTableName(summaryResult.getInputDataset()) + " (dataset_id, version, fips, scc, poll, Control_Technology, avg_ann_cost_per_ton, Annual_Cost, Emis_Reduction) " 
             + "select " + summaryResult.getInputDataset().getId() + ", 0, summary.fips, summary.scc, summary.poll, ct.name as Control_Technology, "
             + "case when sum(summary.Emis_Reduction) <> 0 then sum(summary.Annual_Cost) / sum(summary.Emis_Reduction) else null end as avg_cost_per_ton, " 
             + "sum(summary.Annual_Cost) as Annual_Cost, "
@@ -174,6 +176,27 @@ public abstract class AbstractStrategyTask implements Strategy {
             } catch (SQLException e) {
                 throw new EmfException("Error occured when inserting data to strategy summary table" + "\n" + e.getMessage());
             }
+        }
+    }
+
+    private void setSummaryResultCount(ControlStrategyResult controlStrategyResult) throws EmfException {
+        String query = "SELECT count(1) as record_count "
+            + " FROM " + qualifiedEmissionTableName(controlStrategyResult.getInputDataset());
+        ResultSet rs = null;
+        try {
+            rs = datasource.query().executeQuery(query);
+            while (rs.next()) {
+                controlStrategyResult.setRecordCount(rs.getInt(1));
+            }
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    //
+                }
         }
     }
 
@@ -241,7 +264,7 @@ public abstract class AbstractStrategyTask implements Strategy {
             ControlStrategyDAO dao = new ControlStrategyDAO();
             dao.updateControlStrategyResult(strategyResult, session);
             if (controlStrategyInputDatasetCount < 2) {
-                runQASteps(strategyResult);
+//                runQASteps(strategyResult);
             }
         } catch (RuntimeException e) {
             throw new EmfException("Could not save control strategy results: " + e.getMessage());

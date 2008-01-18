@@ -296,8 +296,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                         }
                     }
 
-                    save();
                     enableButtons(false);
+                    save();
                     controlStrategy.setStartDate(new Date());
                     presenter.setResults(controlStrategy);
                     presenter.runStrategy(outputTabView.getExportFolder(), summaryTabView.useSQLApproachCheck.isSelected());
