@@ -1,10 +1,14 @@
 package gov.epa.emissions.framework.services.cost;
 
+import java.util.Date;
+
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -38,13 +42,18 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
 
     public void run() {
         try {
+            int count = 0;
             for (int i = 0; i < controlStrategyResults.length; i++) {
                 if (controlStrategyResults[i].getStrategyResultType().getName().equals("Detailed Strategy Result")) {
                     ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,
                             controlStrategyResults[i], sessionFactory, 
                             dbServerFactory);
                     output.create();
+                    ++count;
                 }
+            }
+            if (count > 0) {
+                endStatus(new StatusDAO(sessionFactory));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,6 +68,22 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
         } catch (Exception e) {
             LOG.error("Could not close database connection." + e.getMessage());
         }
+    }
+
+    private void endStatus(StatusDAO statusServices) {
+        String start = "Finished creating controlled inventories using control strategy '" + controlStrategy.getName() + "'";
+        Status status = status(user, start);
+        statusServices.add(status);
+    }
+
+
+    private Status status(User user, String message) {
+        Status status = new Status();
+        status.setUsername(user.getUsername());
+        status.setType("Controlled Inventory");
+        status.setMessage(message);
+        status.setTimestamp(new Date());
+        return status;
     }
 
     public boolean shouldProceed() throws EmfException {
