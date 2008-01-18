@@ -149,7 +149,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.CENTER);
 
-        Button button = new RefreshButton(this, "Refresh Cases", messagePanel);
+        Button button = new RefreshButton(this, "Refresh Control Strategies", messagePanel);
         panel.add(button, BorderLayout.EAST);
 
         return panel;
@@ -316,7 +316,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
 //                coppied.setName("Copy of " + element.getName());
 //                presenter.doSaveCopiedStrategies(coppied, element.getName());
             } catch (Exception e) {
-                setCursor(Cursor.getDefaultCursor());
+//                setCursor(Cursor.getDefaultCursor());
                 messagePanel.setError(e.getMessage());
                 error = true;
             }
