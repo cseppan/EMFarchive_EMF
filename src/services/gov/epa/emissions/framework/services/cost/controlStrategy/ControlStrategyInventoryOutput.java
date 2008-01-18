@@ -89,6 +89,7 @@ public class ControlStrategyInventoryOutput {
         } finally {
 //            setandRunQASteps();
         }
+        endStatus(statusServices);
         dbServer.disconnect();
     }
 
@@ -100,31 +101,23 @@ public class ControlStrategyInventoryOutput {
         
         String outputInventoryTableName = dataset.getInternalSources()[0].getTable();
         
-if (1 == 0)
         copyDataFromOriginalTable(inputTable, outputInventoryTableName, 
                 version(inputDataset, controlStrategyResult.getInputDatasetVersion()), inputDataset, 
                 datasource);
         
         //create indexes on controlled inventory table, this will help speed updating the 
         //table with the detailed result info
-if (1 == 0)
         makeSureInventoryDatasetHasIndexes(inputDataset, datasource);
                 
         ControlStrategyResult result = getControlStrategyResult();
-        try {
-            createControlledInventory(dataset.getId(), inputTable, detailDatasetTable(result),
-                    outputInventoryTableName, version(inputDataset, controlStrategyResult.getInputDatasetVersion()),
-                    inputDataset, datasource);
-        } catch (Exception e) {
-            createControlledInventory(dataset.getId(), inputTable, detailDatasetTable(result),
-                    outputInventoryTableName, version(inputDataset, controlStrategyResult.getInputDatasetVersion()),
-                    inputDataset, datasource, true);
-        }        
-if (1 == 0)
+        System.out.println( copyDataFromOriginalTableQuery2(dataset.getId(), inputTable, 
+                detailDatasetTable(result), outputInventoryTableName,
+                version(inputDataset, controlStrategyResult.getInputDatasetVersion()), inputDataset, 
+                datasource));
+        
         updateDataWithDetailDatasetTable(outputInventoryTableName, detailDatasetTable(result), server
                 .getEmissionsDatasource());
 
-if (1 == 0)
         updateDatasetIdAndVersion(outputInventoryTableName, server.getEmissionsDatasource(), dataset.getId());
 
         updateControlStrategyResults(result, dataset);
@@ -300,28 +293,6 @@ if (1 == 0)
         }
     }
 
-    private void createControlledInventory(int datasetId, String inputTable, String detailResultTable, String outputTable, Version version,
-            Dataset dataset, Datasource datasource) throws EmfException {
-        createControlledInventory(datasetId, inputTable, 
-                detailResultTable, outputTable, 
-                version, dataset, 
-                datasource, false);
-    }
-
-    private void createControlledInventory(int datasetId, String inputTable, String detailResultTable, String outputTable, Version version,
-            Dataset dataset, Datasource datasource, boolean missingColumns) throws EmfException {
-        String query = copyDataFromOriginalTableQuery2(dataset.getId(), inputTable, 
-                detailResultTable, outputTable,
-                version(inputDataset, controlStrategyResult.getInputDatasetVersion()), inputDataset, 
-                datasource, missingColumns);
-        try {
-            datasource.query().execute(query);
-        } catch (SQLException e) {
-            throw new EmfException("Error occured when copying data from " + inputTable + " to "
-                    + outputTable + "\n" + e.getMessage());
-        }
-    }
-
     private String copyDataFromOriginalTableQuery(String inputTable, String outputTable, Version version,
             Dataset dataset, Datasource datasource) {
         String versionedQuery = new VersionedDatasetQuery(version, dataset).generate(qualifiedTable(inputTable,
@@ -330,53 +301,30 @@ if (1 == 0)
     }
 
     private String copyDataFromOriginalTableQuery2(int datasetId, String inputTable, String detailResultTable, String outputTable, Version version,
-            Dataset dataset, Datasource datasource, boolean missingColumns) {
+            Dataset dataset, Datasource datasource) {
         VersionedQuery versionedQuery = new VersionedQuery(version);
-        int month = inputDataset.applicableMonth();
-        int noOfDaysInMonth = 31;
-        if (month != -1) {
-            noOfDaysInMonth = getDaysInMonth(month);
-        }
-        String sql = "select ";
+        String sql = "select " + datasetId + " as dataset_id, 0 as version";
         String columnList = "";
         Column[] columns = tableFormat.cols();
         for (int i = 0; i < columns.length; i++) {
             String columnName = columns[i].name();
-            if (columnName.equalsIgnoreCase("record_id")) {
-                sql += "record_id";
-                columnList += "record_id";
-            } else if (columnName.equalsIgnoreCase("dataset_id")) {
-                sql += "," + datasetId + " as dataset_id";
-                columnList += ",dataset_id";
-            } else if (columnName.equalsIgnoreCase("delete_versions")) {
-                sql += ", '' as delete_versions";
-                columnList += "," + columnName;
+            if (columnName.equalsIgnoreCase("dataset_id")) {
+                sql += datasetId + " as dataset_id";
+                columnList += "dataset_id";
             } else if (columnName.equalsIgnoreCase("version")) {
                 sql += ", 0 as version";
                 columnList += "," + columnName;
-            } else if (columnName.equalsIgnoreCase("ceff")) {
-                sql += ", case when b.source_id is not null then case when " + (month != -1 ? "coalesce(avd_emis, ann_emis)" : "ann_emis") + " <> 0 then (1 - " + (month != -1 ? "b.final_emissions / " + noOfDaysInMonth + " / coalesce(avd_emis, ann_emis)" : "b.final_emissions / ann_emis") + ") * 100 else 0 end else ceff end as ceff";
-                columnList += "," + columnName;
-            } else if (columnName.equalsIgnoreCase("avd_emis")) {
-                sql += ", case when b.source_id is not null then b.final_emissions / " + (month != -1 ? noOfDaysInMonth : "365") + " else avd_emis end as avd_emis";
-                columnList += "," + columnName;
-            } else if (columnName.equalsIgnoreCase("ann_emis")) {
-                sql += ", case when b.source_id is not null then b.final_emissions else ann_emis end as ann_emis";
-                columnList += "," + columnName;
-            } else if (columnName.equalsIgnoreCase("reff")) {
-                sql += ", case when b.source_id is not null then 100 else reff end as reff";
-                columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("CONTROL_MEASURES")) {
-                sql += ", case when " + (!missingColumns ? "control_measures" : "null") + " is null or length(" + (!missingColumns ? "control_measures" : "null") + ") = 0 then cm_abbrev_list else " + (!missingColumns ? "control_measures" : "null") + " || '& ' || cm_abbrev_list end as CONTROL_MEASURES";
+                sql += ", case when control_measures is null or length(control_measures) = 0 then cm_abbrev_list else control_measures || '& ' || cm_abbrev_list end as CONTROL_MEASURES";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("PCT_REDUCTION")) {
-                sql += ", case when " + (!missingColumns ? "pct_reduction" : "null") + " is null or length(" + (!missingColumns ? "pct_reduction" : "null") + ") = 0 then percent_reduction_list else " + (!missingColumns ? "pct_reduction" : "null") + " || '& ' || percent_reduction_list end as PCT_REDUCTION";
+                sql += ", case when pct_reduction is null or length(pct_reduction) = 0 then percent_reduction_list else pct_reduction || '& ' || percent_reduction_list end as PCT_REDUCTION";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("CURRENT_COST")) {
                 sql += ", annual_cost as CURRENT_COST";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("CUMULATIVE_COST")) {
-                sql += ", case when " + (!missingColumns ? "cumulative_cost" : "null") + " is null and annual_cost is null then null else coalesce(" + (!missingColumns ? "cumulative_cost" : "null") + ", 0) + coalesce(annual_cost, 0) end as CUMULATIVE_COST";
+                sql += ", case when cumulative_cost is null and annual_cost is null then null else coalesce(cumulative_cost, 0) + coalesce(annual_cost, 0) end as CUMULATIVE_COST";
                 columnList += "," + columnName;
             } else {
                 sql += ", " + columnName;
@@ -390,19 +338,23 @@ if (1 == 0)
         + "sum(annual_cost) as annual_cost, "
         + "public.concatenate_with_ampersand(cm_abbrev) as cm_abbrev_list, "
         + "public.concatenate_with_ampersand(cast(percent_reduction as varchar)) as percent_reduction_list "
-        + "FROM (select source_id, final_emissions, annual_cost, cm_abbrev, percent_reduction "
-        + "        FROM " + qualifiedTable(detailResultTable, datasource)
-        + "        order by source_id, apply_order "
-        + "        ) tbl "
-        + "    group by source_id ) as b "
+        + "FROM " + qualifiedTable(detailResultTable, datasource) + " "
+        + "group by source_id "
+        + ") as b "
         + "on inv.record_id = b.source_id"
         + " WHERE " + versionedQuery.query();
-         
-        return "SET work_mem TO '256MB';INSERT INTO " + qualifiedTable(outputTable, datasource) + " (" + columnList + ") " + sql;
+
+        return "INSERT INTO (" + columnList + ")" + qualifiedTable(outputTable, datasource) + " " + sql;
     }
 
     private String qualifiedTable(String table, Datasource datasource) {
         return datasource.getName() + "." + table;
+    }
+
+    private void endStatus(StatusDAO statusServices) {
+        String end = "Finished creating a controlled inventory for strategy "+controlStrategy.getName();
+        Status status = status(user, end);
+        statusServices.add(status);
     }
 
     private void failStatus(StatusDAO statusServices, String message) {
@@ -413,8 +365,8 @@ if (1 == 0)
     }
 
     private void startStatus(StatusDAO statusServices) {
-        String start = "Creating controlled inventory of type '" + inputDataset.getDatasetType()
-                + "' using control strategy '" + controlStrategy.getName() + "' for dataset '" + inputDataset.getName() + "'";
+        String start = "Started creating controlled inventory of type '" + inputDataset.getDatasetType()
+                + "' using control strategy '" + controlStrategy.getName();
         Status status = status(user, start);
         statusServices.add(status);
     }
