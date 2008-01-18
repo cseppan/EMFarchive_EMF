@@ -288,14 +288,14 @@ public class ManagedExportService {
         }
 
         // FIXME: Verify at team meeting Test if subpath exists. If not create subpath
-        File toSubDir = null;
+//        File toSubDir = null;
         if (DebugLevels.DEBUG_9)
             System.out.println("FULL PATH= " + dirName);
 
-        toSubDir = new File(dirName);
-        if (!toSubDir.exists()) {
-            toSubDir.mkdirs();
-        }
+//        toSubDir = new File(dirName);
+//        if (!toSubDir.exists()) {
+//            toSubDir.mkdirs();
+//        }
 
         File path = validatePath(dirName);
 
