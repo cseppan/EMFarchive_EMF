@@ -67,10 +67,11 @@ public class StrategySummaryResultTableFormat implements TableFormat {
         Column annualCost = new Column("Annual_Cost", types.realType(), new RealFormatter());
         Column avgAnnualCostPerTon = new Column("Avg_Ann_Cost_per_Ton", types.realType(), new RealFormatter());
         Column emissionsReduction = new Column("Emis_Reduction", types.realType(), new RealFormatter());
+        Column comment = new Column("Comment", types.stringType(128), new StringFormatter(128));
 
         return new Column[] { fips, scc, 
                 pollutant, controlTechnology, 
                 annualCost, avgAnnualCostPerTon,
-                emissionsReduction };
+                emissionsReduction, comment };
     }
 }
