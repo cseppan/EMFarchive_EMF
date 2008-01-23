@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.commons.io.importer.CommaDelimitedTokenizer;
+import gov.epa.emissions.framework.client.login.LoginWindow;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.casemanagement.CaseAssistService;
@@ -24,9 +25,13 @@ public class EMFCmdClient {
 
     private static ServiceLocator serviceLocator;
 
-    private static boolean DEBUG = false;
+    private static boolean DEBUG = false; 
 
     public synchronized static void main(String[] args) throws Exception {
+        String debugString = System.getProperty("DEBUG_EMF_CLIENT");
+        if (debugString != null && debugString.equalsIgnoreCase("TRUE"))
+           DEBUG=true;
+        
         List<String> options = new ArrayList<String>();
         options.addAll(Arrays.asList(args));
 
@@ -35,7 +40,7 @@ public class EMFCmdClient {
         }
 
         if (DEBUG)
-            System.out.println("EMF command line client initialized at: " + new Date());
+            System.out.println("EMF command line client initialized on: " + new Date()+"; version ="+LoginWindow.EMF_VERSION);
 
         if (args.length <= 1) {
             displayHelp();
@@ -254,7 +259,11 @@ public class EMFCmdClient {
             if (lineCount >= sentLines) {
                 msgs.add(extractJobMsg(line));
                 keys.add(extractJobkey(line));
-                outputs.add(extractOutput(line));
+                CaseOutput newOutput = extractOutput(line);
+                //if (!outputs.contains(newOutput))
+                outputs.add(newOutput);
+                //else
+                //  System.out.println("Ignoring redundant output "+newOutput.getName());
 
                 if (start == 0)
                     start = getTime(line);
@@ -290,7 +299,7 @@ public class EMFCmdClient {
         String logAsistFile = logfile + ".ast";
         File logAsistant = new File(logAsistFile);
         writeInitialAsistFile(logAsistant);
-
+        
         if (!logFile.exists()) {
             System.out.println("Specified log file: " + logfile + " doesn't exist.");
             return;
@@ -324,7 +333,23 @@ public class EMFCmdClient {
             if (lineCount >= sentLines) {
                 msgs.add(extractJobMsg(line));
                 keys.add(extractJobkey(line));
-                outputs.add(extractOutput(line));
+                
+                // only add the output if it's not already there
+                CaseOutput nextOutput= extractOutput(line);
+                
+                outputs.add(nextOutput);
+//                if (!outputs.contains(nextOutput))
+//                {
+//                    //if (DEBUG)
+//                     //   System.out.println("Output is being added: " + nextOutput.getName() + " " + new Date());
+//                    outputs.add(nextOutput);
+//                }
+//                else
+//                    if (DEBUG)
+//                       System.out.println("Output is not unique and not added: " + nextOutput.getName() + " " + new Date());
+//                    System.out.println("Ignoring redundant output "+nextOutput.getName());
+
+
             }
         }
 
@@ -388,9 +413,9 @@ public class EMFCmdClient {
 
             service.recordJobMessages(nonEmptyMessages, nonEmptyKeys); // just need to send nonEmptykeys here
             
-            if (DEBUG)
+            if (DEBUG){
                 System.out.println("EMF command client sent " + nonEmptyMessages.length + " messages successfully.");
-
+            }
             ArrayList outputKeyArrayList = new ArrayList();
             CaseOutput[] nonEmptyOutputs = getNonEmptyOutputs(outputs, keys, outputKeyArrayList);
             String[] nonEmptyOutputKeys = new String[outputKeyArrayList.size()];
@@ -398,8 +423,10 @@ public class EMFCmdClient {
 
             registerOutputs(nonEmptyOutputKeys, service, nonEmptyOutputs);
 
-            if (DEBUG)
+            if (DEBUG){
+                System.out.println("EMF command client sent " + nonEmptyOutputs.length + " outputs successfully.");
                 System.out.println("EMF Command Client exited successfully on " + new Date());
+            }
         } catch (Exception e) {
             System.out.println("EMF Command Client encountered a problem on " + new Date() + "\nThe error was: "
                     + e.getMessage());
@@ -454,8 +481,20 @@ public class EMFCmdClient {
 
         for (int i = 0; i < outputs.length; i++) {
             if (!outputs[i].isEmpty()) {
-                all.add(outputs[i]);
-                keyArray.add(keys[i]);
+                // only add the output if it's not already there
+                CaseOutput nextOutput= outputs[i];
+
+                if (!all.contains(nextOutput))
+                {
+                    //if (DEBUG)
+                    //    System.out.println("Output is unique and is added: " + nextOutput.getName() + " " + new Date());
+                    all.add(nextOutput);
+                    keyArray.add(keys[i]);
+                }
+                else{
+                    //if (DEBUG)
+                    //    System.out.println("Ignoring redundant output "+nextOutput.getName());
+                }
             }
         }
         return all.toArray(new CaseOutput[0]);
