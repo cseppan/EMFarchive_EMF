@@ -61,4 +61,9 @@ public class EmfDbServer implements DbServer {
     public void disconnect() throws SQLException {
         dbServer.disconnect();
     }
+
+    public boolean isConnected() throws Exception{
+        // Check underlying db server connection
+        return dbServer.isConnected();
+    }
 }
