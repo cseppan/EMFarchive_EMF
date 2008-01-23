@@ -77,7 +77,7 @@ public class ImporterFactory {
     }
     
     public void closeDbConnection() throws Exception {
-        if (this.newDBInstance != null)
+        if ((this.newDBInstance != null) && (this.newDBInstance.isConnected())) 
             this.newDBInstance.disconnect();
     }
 }

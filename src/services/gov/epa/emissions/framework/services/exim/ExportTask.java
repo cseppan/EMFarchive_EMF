@@ -140,7 +140,8 @@ public class ExportTask extends Task {
             setErrorStatus(e, "");
         } finally {
             try {
-                if (dbServer != null)
+                //  check for isConnected before disconnecting
+                if ((dbServer != null) && (dbServer.isConnected()))
                     dbServer.disconnect();
             } catch (SQLException e) {
                 e.printStackTrace();
