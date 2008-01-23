@@ -22,7 +22,6 @@ import gov.epa.emissions.framework.tasks.ExportTaskManager;
 import gov.epa.emissions.framework.tasks.Task;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -143,7 +142,7 @@ public class ExportTask extends Task {
                 //  check for isConnected before disconnecting
                 if ((dbServer != null) && (dbServer.isConnected()))
                     dbServer.disconnect();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
