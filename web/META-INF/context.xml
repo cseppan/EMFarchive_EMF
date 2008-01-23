@@ -9,9 +9,9 @@
           password="emf"
           maxActive="100"
           maxIdle="30"
-          maxWait="-1"
+          maxWait="60000"
           removeAbandoned="true"
-          removeAbandonedTimeout="1"
+          removeAbandonedTimeout="5"
           logAbandoned="true"
           />
 </Context>
