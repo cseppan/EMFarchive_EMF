@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.services.exim;
 
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
-import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -16,8 +15,6 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.Date;
-
-import javax.sql.DataSource;
 
 import org.hibernate.Session;
 
@@ -39,14 +36,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     private ManagedExportService exportService;
     
-    private DbServerFactory dbServerFactory;
-
     public ExImServiceImpl() throws Exception {
-        super("ExIm Service");
-        init(dbServer, HibernateSessionFactory.get());
-        myTag();
-        if (DebugLevels.DEBUG_4)
-            System.out.println(">>>> " + myTag());
+        this(DbServerFactory.get(), HibernateSessionFactory.get());
     }
 
     protected void finalize() throws Throwable {
@@ -56,25 +47,18 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         super.finalize();
     }
 
-    public ExImServiceImpl(DataSource datasource, DbServer dbServer, HibernateSessionFactory sessionFactory) {
-        this(null, datasource, dbServer, sessionFactory);
-    }
-
-    public ExImServiceImpl(DbServerFactory dbServerFactory, DataSource datasource, DbServer dbServer, HibernateSessionFactory sessionFactory) {
-        super(datasource, dbServer);
-        this.dbServerFactory = dbServerFactory;
-        init(dbServer, sessionFactory);
-        myTag();
+    public ExImServiceImpl(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) throws Exception {
         if (DebugLevels.DEBUG_4)
             System.out.println(myTag());
         
+        init(dbServerFactory, sessionFactory);
+        myTag();
     }
 
-    private void init(DbServer dbServer, HibernateSessionFactory sessionFactory) {
+    private void init(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
         setProperties(sessionFactory);
-        exportService = new ManagedExportService(dbServer, sessionFactory);
-        ImporterFactory importerFactory = new ImporterFactory(dbServerFactory);
-        managedImportService = new ManagedImportService(dbServerFactory, importerFactory, sessionFactory);
+        exportService = new ManagedExportService(dbServerFactory, sessionFactory);
+        managedImportService = new ManagedImportService(dbServerFactory, sessionFactory);
     }
 
     private void setProperties(HibernateSessionFactory sessionFactory) {
@@ -105,12 +89,18 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     public void exportDatasetsWithOverwrite(User user, EmfDataset[] datasets, Version[] versions, String dirName,
             String purpose) throws EmfException {
-        if (DebugLevels.DEBUG_4)
-            System.out.println(">>## calling export datasets with overwrite in eximSvcImp: " + myTag()
-                    + " for datasets: " + datasets.toString());
-        String submitterId = exportService.exportForClient(user, datasets, versions, dirName, purpose, true);
-        if (DebugLevels.DEBUG_4)
-            System.out.println("In ExImServiceImpl:exportDatasetsWithOverwrite() SUBMITTERID= " + submitterId);
+        try {
+            if (DebugLevels.DEBUG_4)
+                System.out.println(">>## calling export datasets with overwrite in eximSvcImp: " + myTag()
+                        + " for datasets: " + datasets.toString());
+            String submitterId = exportService.exportForClient(user, datasets, versions, dirName, purpose, true);
+            if (DebugLevels.DEBUG_4)
+                System.out.println("In ExImServiceImpl:exportDatasetsWithOverwrite() SUBMITTERID= " + submitterId);
+        } catch (RuntimeException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+            throw new EmfException("Error exporting datasets. " + e.getMessage());
+        }
     }
 
     public void importDatasets(User user, String folderPath, String[] filenames, DatasetType datasetType) throws EmfException {
@@ -158,22 +148,28 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         // ar.add(rawDatasets[i]);
         // }
 
-        for (int i = 0; i < numOfDS; i++)
-            datasets[i] = ds.getDataset(new Integer(datasetIds[i]));
+        try {
+            for (int i = 0; i < numOfDS; i++)
+                datasets[i] = ds.getDataset(new Integer(datasetIds[i]));
 
-        // if Vservion[] is not specified, get the default versions from datasets themselves
-        if (versions == null) {
-            Version[] defaultVersions = new Version[numOfDS];
+            // if Vservion[] is not specified, get the default versions from datasets themselves
+            if (versions == null) {
+                Version[] defaultVersions = new Version[numOfDS];
 
-            for (int j = 0; j < numOfDS; j++)
-                defaultVersions[j] = getVersion(datasets[j], datasets[j].getDefaultVersion());
+                for (int j = 0; j < numOfDS; j++)
+                    defaultVersions[j] = getVersion(datasets[j], datasets[j].getDefaultVersion());
 
-            exportDatasets(user, datasets, defaultVersions, folder, purpose);
-            return;
+                exportDatasets(user, datasets, defaultVersions, folder, purpose);
+                return;
+            }
+
+            // Invoke the local method that uses the datasets
+            exportDatasets(user, datasets, versions, folder, purpose);
+        } catch (RuntimeException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+            throw new EmfException("Error exporting dataset. " + e.getMessage());
         }
-
-        // Invoke the local method that uses the datasets
-        exportDatasets(user, datasets, versions, folder, purpose);
     }
 
     // FIXME: DELETE AFTER MERGED CHANGES HAVE BEEN TESTED AND VERIFIED
@@ -273,7 +269,11 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     // Export NO overwrite using default dataset version
     public void exportDatasetids(User user, Integer[] datasetIds, String folder, String purpose) throws EmfException {
         // if Vservion[] is not specified, get the default versions from datasets themselves
+        //if (DebugLevels.DEBUG_4)
+            System.out.println("ExImService:exportDatasetids() called.");
         exportDatasetids(user, datasetIds, null, folder, purpose);
+        //if (DebugLevels.DEBUG_4)
+            System.out.println("ExImService:exportDatasetids() exited.");
     }
 
     // Export with overwrite using default dataset version

@@ -202,6 +202,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
             exportButton.setEnabled(false);
         } catch (EmfException e) {
+            e.printStackTrace();
             messagePanel.setError(e.getMessage());
         }
     }

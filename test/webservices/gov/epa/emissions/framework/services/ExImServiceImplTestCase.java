@@ -36,7 +36,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
 
     protected void doSetUp() throws Exception {
         dbServer = dbServerFactory.getDbServer();
-        ExImService eximService = new ExImServiceImpl(dbServerFactory, emf(), dbServer, sessionFactory);
+        ExImService eximService = new ExImServiceImpl(dbServerFactory, sessionFactory);
         UserService userService = new UserServiceImpl(sessionFactory);
         DataCommonsServiceImpl commonsService = new DataCommonsServiceImpl(sessionFactory);
 

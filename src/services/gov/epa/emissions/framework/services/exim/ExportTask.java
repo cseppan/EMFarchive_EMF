@@ -5,20 +5,24 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.ExportTaskManager;
 import gov.epa.emissions.framework.tasks.Task;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -53,16 +57,16 @@ public class ExportTask extends Task {
     
     private DatasetType type;
 
-    private Exporter exporter;
-
     private AccessLog accesslog;
 
     private HibernateSessionFactory sessionFactory;
 
     private Version version;
 
+    private DbServerFactory dbFactory;
+
     protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog,
-            Exporter exporter, HibernateSessionFactory sessionFactory, Version version) {
+            DbServerFactory dbFactory, HibernateSessionFactory sessionFactory, Version version) {
         super();
         createId();
         if (DebugLevels.DEBUG_1)
@@ -73,13 +77,16 @@ public class ExportTask extends Task {
         this.type = dataset.getDatasetType();
         this.statusServices = services.getStatus();
         this.loggingService = services.getLoggingService();
-        this.exporter = exporter;
+        this.dbFactory = dbFactory;
         this.accesslog = accesslog;
         this.sessionFactory = sessionFactory;
         this.version = version;
     }
 
     public void run() {
+        DbServer dbServer = this.dbFactory.getDbServer();
+        VersionedExporterFactory exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes(), batchSize());
+        
         if (DebugLevels.DEBUG_1)
             System.out.println(">>## ExportTask:run() " + createId() + " for datasetId: " + this.dataset.getId());
         if (DebugLevels.DEBUG_1)
@@ -97,6 +104,7 @@ public class ExportTask extends Task {
                         + " in " + accesslog.getTimereqrd() + " seconds.");
                 
             }else{
+                Exporter exporter = exporterFactory.create(dataset, version);
                 exporter.export(file);
                 accesslog.setEnddate(new Date());
                 accesslog.setLinesExported(exporter.getExportedLinesCount());
@@ -130,6 +138,13 @@ public class ExportTask extends Task {
 
         } catch (Exception e) {
             setErrorStatus(e, "");
+        } finally {
+            try {
+                if (dbServer != null)
+                    dbServer.disconnect();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -229,6 +244,21 @@ public class ExportTask extends Task {
 
     public Version getVersion() {
         return version;
+    }
+    
+    private int batchSize() {
+        Session session = sessionFactory.getSession();
+        try {
+            String batchSize = System.getProperty("EXPORT_BATCH_SIZE");
+
+            if (batchSize != null)
+                return Integer.parseInt(batchSize);
+
+            EmfProperty property = new EmfPropertiesDAO().getProperty("export-batch-size", session);
+            return Integer.parseInt(property.getValue());
+        } finally {
+            session.close();
+        }
     }
 
 }

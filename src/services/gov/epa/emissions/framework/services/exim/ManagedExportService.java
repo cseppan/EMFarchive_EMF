@@ -3,13 +3,11 @@ package gov.epa.emissions.framework.services.exim;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
-import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
-import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
@@ -22,7 +20,6 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.EmfDateFormat;
-import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.ExportClientSubmitter;
@@ -61,17 +58,25 @@ public class ManagedExportService {
 
     private ArrayList<Runnable> eximTasks = new ArrayList<Runnable>();
 
-    private VersionedExporterFactory exporterFactory;
-
     private HibernateSessionFactory sessionFactory;
 
-    public ManagedExportService(DbServer dbServer, HibernateSessionFactory sessionFactory) {
+    private DbServerFactory dbFactory;
+
+//    public ManagedExportService(DbServer dbServer, HibernateSessionFactory sessionFactory) {
+//        myTag();
+//        if (DebugLevels.DEBUG_9)
+//            System.out.println(">>>> " + myTag());
+//        this.sessionFactory = sessionFactory;
+//        this.exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes(), batchSize());
+//
+//    }
+
+    public ManagedExportService(DbServerFactory dbFactory, HibernateSessionFactory sessionFactory) {
         myTag();
         if (DebugLevels.DEBUG_9)
             System.out.println(">>>> " + myTag());
         this.sessionFactory = sessionFactory;
-        this.exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes(), batchSize());
-
+        this.dbFactory = dbFactory;
     }
 
     private File validateExportFile(File path, String fileName, boolean overwrite) throws EmfException {
@@ -372,12 +377,15 @@ public class ManagedExportService {
 
         Services services = services();
         File file = validateExportFile(path, getCleanDatasetName(dataset, version), overwrite);
-        Exporter exporter = exporterFactory.create(dataset, version);
+
         AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getId(), dataset.getAccessedDateTime(),
                 "Version " + version.getVersion(), purpose, file.getAbsolutePath());
         accesslog.setDatasetname(dataset.getName());
 
-        ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, exporter, sessionFactory,
+        if (DebugLevels.DEBUG_9)
+            System.out.println("ManagedExportService: right before creating export task: dbFactory null? " 
+                    + (dbFactory == null) + " dataset: " + dataset.getName());
+        ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, dbFactory, sessionFactory,
                 version);
         // eximTask.setSubmitterId(exportTaskSubmitter.getSubmitterId());
 
@@ -393,21 +401,6 @@ public class ManagedExportService {
             log.error("Retrieve version error - can't retrieve Version object for dataset: " + dataset.getName(), e);
             throw new EmfException("Retrieve version error - can't retrieve Version object for dataset: "
                     + dataset.getName() + " " + e.getMessage());
-        } finally {
-            session.close();
-        }
-    }
-
-    private int batchSize() {
-        Session session = sessionFactory.getSession();
-        try {
-            String batchSize = System.getProperty("EXPORT_BATCH_SIZE");
-
-            if (batchSize != null)
-                return Integer.parseInt(batchSize);
-
-            EmfProperty property = new EmfPropertiesDAO().getProperty("export-batch-size", session);
-            return Integer.parseInt(property.getValue());
         } finally {
             session.close();
         }

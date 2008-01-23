@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.tasks;
 
+import java.io.File;
+
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -9,11 +11,13 @@ import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.exim.ImporterFactory;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class ImportCaseOutputTask extends Task {
@@ -47,7 +51,11 @@ public class ImportCaseOutputTask extends Task {
     
     private CaseDAO caseDao;
 
-    public ImportCaseOutputTask(CaseOutput output, EmfDataset dataset, String[] files, Importer importer, User user, Services services,
+    private File path;
+
+    private DbServerFactory dbServerFactory;
+
+    public ImportCaseOutputTask(CaseOutput output, EmfDataset dataset, String[] files, File path, User user, Services services,
             DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
         super();
         createId();
@@ -57,13 +65,14 @@ public class ImportCaseOutputTask extends Task {
         
         this.user = user;
         this.files = files;
+        this.path = path;
         this.dataset = dataset;
         this.output = output;
         this.statusServices = services.getStatus();
+        this.dbServerFactory = dbServerFactory;
         this.sessionFactory = sessionFactory;
         this.datasetDao = new DatasetDAO(dbServerFactory);
         this.caseDao = new CaseDAO(sessionFactory);
-        this.importer = importer;
     }
 
     public void run() {
@@ -77,7 +86,9 @@ public class ImportCaseOutputTask extends Task {
                 System.out.println("Task# " + taskId + " running");
         
         Session session = null;
+        ImporterFactory importerFactory = new ImporterFactory(dbServerFactory);
         try {
+            Importer importer = importerFactory.createVersioned(dataset, path, files);
             long startTime = System.currentTimeMillis();
             session = sessionFactory.getSession();
             session.setFlushMode(FlushMode.NEVER);
@@ -97,9 +108,18 @@ public class ImportCaseOutputTask extends Task {
                 e1.printStackTrace();
             }
         } finally {
-            if (session != null) {
-                session.flush();
-                session.close();
+            try {
+                if (session != null) {
+                    session.flush();
+                    session.close();
+                }
+                
+                if (importerFactory != null)
+                    importerFactory.closeDbConnection();
+            } catch (HibernateException e1) {
+                log.error("Error closing hibernate session.", e1);
+            } catch (Exception e2) {
+                log.error("Error closing database connection.", e2);
             }
         }
     }

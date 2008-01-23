@@ -71,8 +71,6 @@ public class ManagedCaseService {
 
     private HibernateSessionFactory sessionFactory = null;
 
-    private DbServer dbServer = null; // Redundent with the dbFactory. Needs to be removed later.
-
     private DbServerFactory dbFactory;
 
     private User user;
@@ -110,7 +108,6 @@ public class ManagedCaseService {
 
     public ManagedCaseService(DbServerFactory dbFactory, HibernateSessionFactory sessionFactory) {
         this.dbFactory = dbFactory;
-        this.dbServer = dbFactory.getDbServer();
         this.sessionFactory = sessionFactory;
         this.dao = new CaseDAO(sessionFactory);
 
@@ -126,7 +123,6 @@ public class ManagedCaseService {
         log.info("ManagedCaseService");
         // log.info("exportTaskSubmitter: " + caseJobSubmitter);
         log.info("Session factory null? " + (sessionFactory == null));
-        log.info("dBServer null? " + (this.dbServer == null));
         log.info("User null? : " + (user == null));
 
     }
@@ -145,7 +141,7 @@ public class ManagedCaseService {
 
         if (exportService == null) {
             try {
-                exportService = new ManagedExportService(dbServer, sessionFactory);
+                exportService = new ManagedExportService(dbFactory, sessionFactory);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -2157,8 +2153,9 @@ public class ManagedCaseService {
         System.out.println("Version of EMF JOBHEADER : " + version.getVersion());
 
         // create an exporter to get the string
-        GenericExporterToString exporter = new GenericExporterToString(dataset, this.dbServer, this.dbServer
-                .getSqlDataTypes(), new VersionedDataFormatFactory(version, dataset), null);
+        DbServer dbServer = this.dbFactory.getDbServer();
+        GenericExporterToString exporter = new GenericExporterToString(dataset, dbServer, dbServer.getSqlDataTypes(),
+                new VersionedDataFormatFactory(version, dataset), null);
 
         // Get the string from the exporter
         try {
@@ -2169,6 +2166,14 @@ public class ManagedCaseService {
         } catch (Exception e) {
             e.printStackTrace();
             throw new EmfException(e.getMessage());
+        } finally {
+            try {
+                if (dbServer != null)
+                    dbServer.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new EmfException(e.getMessage());
+            }
         }
 
     }
@@ -2567,8 +2572,8 @@ public class ManagedCaseService {
 
     private String listInputsMsg(List<CaseInput> inputs) throws EmfException {
         StringBuffer inputsList = new StringBuffer("");
-        
-        //NOTE: if change headers msg here, please also change the client side
+
+        // NOTE: if change headers msg here, please also change the client side
         String header = "Inputs using datasets that have later versions available: ";
         String header2 = "No new versions exist for selected inputs.";
         boolean laterVersionExists = false;
@@ -2593,7 +2598,7 @@ public class ManagedCaseService {
 
                 if (laterVersions.length > 0)
                     inputsList.append("Input name: " + inputName + ";    " + "Dataset name: " + datasetName + "\n");
-                
+
                 for (Version ver : laterVersions) {
                     inputsList.append("    Version " + ver.getVersion() + ":   " + ver.getName() + ", "
                             + (dataset.getCreator() == null ? "" : dataset.getCreator()) + ", "
@@ -2603,7 +2608,8 @@ public class ManagedCaseService {
             }
         }
 
-        return (laterVersionExists) ? header + "\n\n" + inputsList.toString() : header2 + "\n\n" + inputsList.toString();
+        return (laterVersionExists) ? header + "\n\n" + inputsList.toString() : header2 + "\n\n"
+                + inputsList.toString();
     }
 
     public CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException {

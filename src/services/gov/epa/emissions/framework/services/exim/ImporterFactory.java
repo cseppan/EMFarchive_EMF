@@ -29,7 +29,7 @@ public class ImporterFactory {
     private DbServerFactory dbServerFactory;
     
     public ImporterFactory() {
-       this(null);
+       this(DbServerFactory.get());
     }
     
     public ImporterFactory(DbServerFactory dbServerFactory) {
@@ -74,5 +74,10 @@ public class ImporterFactory {
 
         Constructor importerConstructor = importerClass.getDeclaredConstructor(classParams);
         return (Importer) importerConstructor.newInstance(params);
+    }
+    
+    public void closeDbConnection() throws Exception {
+        if (this.newDBInstance != null)
+            this.newDBInstance.disconnect();
     }
 }

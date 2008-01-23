@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class EmfServiceImpl {
     private static Log LOG = LogFactory.getLog(EmfServiceImpl.class);
 
-    protected DbServer dbServer;
+    protected DbServer dbServer = null;
 
     protected DataSource datasource;
 
@@ -37,9 +37,18 @@ public abstract class EmfServiceImpl {
         this.datasource = datasource;
         this.dbServer = dbServer;
     }
+    
+    //Created for ExImServiceImpl
+    public EmfServiceImpl() throws Exception {
+        this.name = null;
+        this.datasource = null;
+        this.dbServer = null;
+    }
 
     protected void finalize() throws Throwable {
-        dbServer.disconnect();
+        if (dbServer != null)
+            dbServer.disconnect();
+
         new PerformanceMetrics().gc("Shutting down " + name + "(" + this.hashCode() + ")");
         if (DebugLevels.DEBUG_0)
             System.out.println("Shutting down  " + name + "(" + this.hashCode() + "): "

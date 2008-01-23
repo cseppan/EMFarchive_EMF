@@ -2,9 +2,9 @@ package gov.epa.emissions.framework.services.exim;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
-import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.Services;
@@ -32,15 +32,12 @@ public class ImportService {
 
     private PooledExecutor threadPool;
 
-    private ImporterFactory importerFactory;
-
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MMddyy_HHmmss");
 
     private Services services;
 
     public ImportService(ImporterFactory importerFactory, HibernateSessionFactory sessionFactory,
             PooledExecutor threadPool) {
-        this.importerFactory = importerFactory;
         this.sessionFactory = sessionFactory;
         this.threadPool = threadPool;
         this.services = services();
@@ -81,8 +78,7 @@ public class ImportService {
             File path = validatePath(folderPath);
 
             isNameUnique(dataset.getName());
-            Importer importer = importerFactory.createVersioned(dataset, path, fileNames);
-            ImportTask eximTask = new ImportTask(dataset, fileNames, importer, user, services, null, sessionFactory);
+            ImportTask eximTask = new ImportTask(dataset, fileNames, path, user, services, DbServerFactory.get(), sessionFactory);
 
             threadPool.execute(new GCEnforcerTask("Import of Dataset: " + dataset.getName(), eximTask));
         } catch (Exception e) {

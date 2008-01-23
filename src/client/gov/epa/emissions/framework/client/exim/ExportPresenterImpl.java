@@ -49,23 +49,32 @@ public class ExportPresenterImpl implements ExportPresenter {
      * Original code is preserved as comments in the method.
      */
     private void doExportInvoke(EmfDataset[] datasets, String folder, boolean overwrite, String purpose) throws EmfException {
-        ExImService services = session.eximService();
-        
-        Integer[] datasetIds = new Integer[datasets.length];
-        
-        for (int i = 0; i < datasets.length; i++)
-            datasetIds[i] = new Integer(datasets[i].getId());
-        
-        session.setMostRecentExportFolder(folder);
+        ExImService services;
+        try {
+            services = session.eximService();
+            Integer[] datasetIds = new Integer[datasets.length];
+            
+            for (int i = 0; i < datasets.length; i++)
+                datasetIds[i] = new Integer(datasets[i].getId());
+            
+            session.setMostRecentExportFolder(folder);
 
-        File dir = new File(folder);
-        if (dir.isDirectory())
-            lastFolder = folder;
+            File dir = new File(folder);
+            if (dir.isDirectory())
+                lastFolder = folder;
 
-        if (overwrite)
-            services.exportDatasetidsWithOverwrite(session.user(), datasetIds, folder, purpose);
-        else
-            services.exportDatasetids(session.user(), datasetIds, folder, purpose);
+            if (overwrite)
+                services.exportDatasetidsWithOverwrite(session.user(), datasetIds, folder, purpose);
+            else
+                services.exportDatasetids(session.user(), datasetIds, folder, purpose);
+        } catch (Exception e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+            System.out.println("Exporting datasets failed.");
+            throw new EmfException(e.getMessage());
+        }
+        
+ 
     }
 
     private String getDefaultFolder() {

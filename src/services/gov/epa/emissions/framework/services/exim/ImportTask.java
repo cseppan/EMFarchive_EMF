@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.exim;
 
+import java.io.File;
+
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -15,6 +17,7 @@ import gov.epa.emissions.framework.tasks.Task;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class ImportTask extends Task {
@@ -44,7 +47,11 @@ public class ImportTask extends Task {
     
     protected DatasetDAO dao;
 
-    public ImportTask(EmfDataset dataset, String[] files, Importer importer, User user, Services services,
+    private File path;
+
+    private DbServerFactory dbServerFactory;
+
+    public ImportTask(EmfDataset dataset, String[] files, File path, User user, Services services,
             DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
         super();
         createId();
@@ -56,9 +63,10 @@ public class ImportTask extends Task {
         this.files = files;
         this.dataset = dataset;
         this.statusServices = services.getStatus();
+        this.dbServerFactory = dbServerFactory;
         this.sessionFactory = sessionFactory;
         this.dao = new DatasetDAO(dbServerFactory);
-        this.importer = importer;
+        this.path = path;
     }
 
     public void run() {
@@ -72,7 +80,9 @@ public class ImportTask extends Task {
                 System.out.println("Task# " + taskId + " running");
         
         Session session = null;
+        ImporterFactory importerFactory = new ImporterFactory(dbServerFactory);
         try {
+            Importer importer = importerFactory.createVersioned(dataset, path, files);
             long startTime = System.currentTimeMillis();
             session = sessionFactory.getSession();
             session.setFlushMode(FlushMode.NEVER);
@@ -87,9 +97,19 @@ public class ImportTask extends Task {
             setStatus("failed", "Failed to import dataset " + dataset.getName() + ". Reason: " + e.getMessage());
             removeDataset(dataset);
         } finally {
-            if (session != null)
-                session.flush();
-                session.close();
+            try {
+                if (session != null) {
+                    session.flush();
+                    session.close();
+                }
+                
+                if (importerFactory != null)
+                    importerFactory.closeDbConnection();
+            } catch (HibernateException e1) {
+                log.error("Error closing hibernate session.", e1);
+            } catch (Exception e2) {
+                log.error("Error closing database connection.", e2);
+            }
         }
     }
 

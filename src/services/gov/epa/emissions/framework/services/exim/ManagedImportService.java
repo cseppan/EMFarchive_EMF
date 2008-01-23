@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.services.exim;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
-import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -40,8 +39,6 @@ public class ManagedImportService {
 
     private HibernateSessionFactory sessionFactory;
 
-    private ImporterFactory importerFactory;
-
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MMddyy_HHmmss");
 
     private ImportSubmitter importClientSubmitter = null;
@@ -70,19 +67,13 @@ public class ManagedImportService {
         return "For label: " + svcLabel + " # of active objects of this type= " + svcCount;
     }
 
-    public ManagedImportService(ImporterFactory importerFactory, HibernateSessionFactory sessionFactory) {
-        this(null, importerFactory, sessionFactory);
-    }
-
-    public ManagedImportService(DbServerFactory dbServerFactory, ImporterFactory importerFactory,
-            HibernateSessionFactory sessionFactory) {
-        this.dbServerFactory = dbServerFactory;
-        this.importerFactory = importerFactory;
-        this.sessionFactory = sessionFactory;
+    public ManagedImportService(HibernateSessionFactory sessionFactory) {
+        this(DbServerFactory.get(), sessionFactory);
     }
 
     public ManagedImportService(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
-        this(dbServerFactory, new ImporterFactory(dbServerFactory), sessionFactory);
+        this.sessionFactory = sessionFactory;
+        this.dbServerFactory = dbServerFactory;
     }
 
     private Services services() {
@@ -205,8 +196,7 @@ public class ManagedImportService {
     private synchronized void addTasks(String folder, File path, String[] filenames, String dsName, User user,
             DatasetType dsType, Services services) throws Exception {
         EmfDataset dataset = createDataset(folder, filenames[0], dsName, user, dsType);
-        Importer importer = importerFactory.createVersioned(dataset, path, filenames);
-        ImportTask task = new ImportTask(dataset, filenames, importer, user, services, dbServerFactory, sessionFactory);
+        ImportTask task = new ImportTask(dataset, filenames, path, user, services, dbServerFactory, sessionFactory);
 
         importTasks.add(task);
     }
@@ -265,8 +255,7 @@ public class ManagedImportService {
             System.out.println("Dataset name before create import task: " + dataset.getName());
         }
         
-        Importer importer = importerFactory.createVersioned(dataset, path, files);
-        ImportCaseOutputTask task = new ImportCaseOutputTask(localOuput, dataset, files, importer, user, services,
+        ImportCaseOutputTask task = new ImportCaseOutputTask(localOuput, dataset, files, path, user, services,
                 dbServerFactory, sessionFactory);
         
         //System.out.println("\nADDING IMPORT TASK FOR DATASET: "+datasetName+";files[0]="+files[0]);

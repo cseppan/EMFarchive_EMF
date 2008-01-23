@@ -55,7 +55,7 @@ public abstract class ServiceTestCase extends TestCase {
     protected void setProperties() throws Exception {
         DbServer dbServer = dbServerFactory.getDbServer();
         //this will set the properties...
-        new ExImServiceImpl(emf(), dbServer, sessionFactory);
+        new ExImServiceImpl(dbServerFactory, sessionFactory);
         dbServer.disconnect();
     }
     
