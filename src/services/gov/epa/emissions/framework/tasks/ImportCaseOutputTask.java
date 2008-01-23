@@ -109,7 +109,7 @@ public class ImportCaseOutputTask extends Task {
             }
         } finally {
             try {
-                if (session != null) {
+                if ((session != null) && (session.isConnected())){
                     session.flush();
                     session.close();
                 }
@@ -202,6 +202,12 @@ public class ImportCaseOutputTask extends Task {
         output.setStatus(status);
         output.setMessage(message);
         
+        System.out.println("ImportTaskManager = " + ImportTaskManager.getImportTaskManager());
+        System.out.println("taskId = " + taskId);
+        System.out.println("submitterId = " + submitterId);
+        System.out.println("status = " + status);
+        System.out.println("current thread = " + Thread.currentThread());
+        System.out.println("message = " + message);
         ImportTaskManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(), message);
     }
 
