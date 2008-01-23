@@ -39,6 +39,37 @@ public class CaseOutput implements Serializable, Comparable<CaseOutput> {
     public CaseOutput(String name) {
         this.name = name;
     }
+    
+    public boolean equals(Object obj)
+    {
+        // overriding equals 
+        
+        // normal tests for equal
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        
+        // additional tests specific to outputs
+        CaseOutput localOther = (CaseOutput)obj;
+        if (!this.name.equalsIgnoreCase(localOther.getName()))
+            return false;   
+        if (!this.datasetFile.equalsIgnoreCase(localOther.datasetFile))
+            return false;    
+        if (!this.path.equalsIgnoreCase(localOther.path))
+            return false;
+        if (!this.pattern.equalsIgnoreCase(localOther.pattern))
+            return false;
+        if (!this.datasetName.equalsIgnoreCase(localOther.datasetName))
+            return false;
+        if (!this.datasetType.equalsIgnoreCase(localOther.datasetType))
+            return false;
+       
+        // if got to hear return true
+        return true;
+    }
 
     public int compareTo(CaseOutput other) {
         return this.name.compareToIgnoreCase(other.getName());
