@@ -466,16 +466,17 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
         if (file.isDirectory()) {
             folder.setText(file.getAbsolutePath());
+            presenter.setLastFolder(file.getAbsolutePath());
         }
     }
 
     public void recentExportFolder(String recentfolder) {
         if (recentfolder != null)
-            this.folder.setText(recentfolder);
+            folder.setText(recentfolder);
     }
 
     public String getExportFolder() {
-        return this.folder.getText();
+        return folder.getText();
     }
     public void displayAnalyzeTable(String controlStrategyName, String[] fileNames) {
         AnalysisEngineTableApp app = new AnalysisEngineTableApp("Analyze Control Strategy: " + controlStrategyName, new Dimension(500, 500), desktopManager, parentConsole);

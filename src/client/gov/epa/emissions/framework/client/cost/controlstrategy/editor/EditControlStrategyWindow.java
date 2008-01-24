@@ -304,15 +304,15 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                         }
                     }
                     
-                    enableButtons(false);
                     save();
                     controlStrategy.setStartDate(new Date());
                     presenter.setResults(controlStrategy);
                     presenter.runStrategy(outputTabView.getExportFolder(), summaryTabView.useSQLApproachCheck.isSelected(), deleteResults);
                     messagePanel
                             .setMessage("Running strategy. Monitor the status window for progress, and refresh this window after completion to see results");
-
+                    enableButtons(false);
                 } catch (EmfException e) {
+                    enableButtons(true);
                     messagePanel.setError("Error running strategy: " + e.getMessage());
                 }
             }

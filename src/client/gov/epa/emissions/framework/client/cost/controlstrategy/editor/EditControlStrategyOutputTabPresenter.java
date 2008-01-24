@@ -20,6 +20,8 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
     private EmfSession session;
 
     private EditControlStrategyOutputTabView view;
+    
+    private static String lastFolder = null;
 
     public EditControlStrategyOutputTabPresenter(EmfSession session, EditControlStrategyOutputTabView view) {
         this.session = session;
@@ -66,18 +68,22 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
     }
 
     private void validateFolder(String folder) throws EmfException {
-        if (folder == null || folder.length() == 0) {
+        File dir = new File(folder);
+        if (!dir.isDirectory()) 
             throw new EmfException("Please specify a directory to export");
-        }
     }
 
     public void doDisplay() {
         view.observe(this);
         view.recentExportFolder(folder());
     }
+    
+    public void setLastFolder(String folder){
+        lastFolder = folder; 
+    }
+    
 
     private String folder() {
-        String lastFolder = session.getMostRecentExportFolder();
         return (lastFolder != null) ? lastFolder : defaultFolder();
     }
 
