@@ -31,7 +31,7 @@ public interface ControlStrategyService extends EMFService {
     
     void runStrategy (User user, int controlStrategyId, String exportDirectory) throws EmfException;
     
-    void runStrategy (User user, int controlStrategyId, String exportDirectory, boolean useSQLApproach) throws EmfException;
+    void runStrategy (User user, int controlStrategyId, String exportDirectory, boolean useSQLApproach, boolean deleteResults) throws EmfException;
     
     void stopRunStrategy() throws EmfException;
 
