@@ -22,6 +22,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -289,12 +290,17 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 //        if (selectModel.getRowCount() == 1) selectModel.setValueAt(true, 0, 0);
         SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         sortFilterSelectionPanel.setPreferredSize(new Dimension(625, 200));
+        sortFilterSelectionPanel.sort(sortCriteria());
 
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.add(sortFilterSelectionPanel);
         return tablePanel;
     }
 
+    private SortCriteria sortCriteria() {
+        String[] columnNames = { "Start Time" };
+        return new SortCriteria(columnNames, new boolean[] { false }, new boolean[] { false });
+    }
     private JPanel buttonPanel() {
         exportButton = new ExportButton(exportAction());
         analysisButton = new Button("Analyze", analysisAction());

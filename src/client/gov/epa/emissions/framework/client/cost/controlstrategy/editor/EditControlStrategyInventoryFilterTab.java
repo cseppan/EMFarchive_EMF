@@ -192,7 +192,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         //get a single selected item
         List selected = sortFilterSelectModel.selected();
         if (selected.size() != 1) {
-            messagePanel.setMessage("Please select a single item to update.");
+            messagePanel.setMessage("Please select a single item to set version.");
             return;
         }
         ControlStrategyInputDataset[] controlStrategyInputDatasets = (ControlStrategyInputDataset[]) selected.toArray(new ControlStrategyInputDataset[0]);

@@ -12,6 +12,7 @@ import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -55,7 +56,7 @@ public class CSInventoryEditDialog extends JDialog {
 
         setTitle("Set Version: " + dataset.getName());
         this.pack();
-        this.setSize(300,120);
+        this.setSize(450,120);
         this.setLocation(ScreenUtils.getPointToCenter(this));
         this.setVisible(true);
     }
@@ -74,6 +75,7 @@ public class CSInventoryEditDialog extends JDialog {
         Version[] versions = presenter.getVersions(dataset);
         versionCombo =new ComboBox(versions);           
  //       versionCombo.setSize(new Dimension(200,10));
+        versionCombo.setPreferredSize(new Dimension(300,15));
         versionCombo.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
 
         layoutGenerator.addLabelWidgetPair("Version:", versionCombo, panel);
