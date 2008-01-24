@@ -8,10 +8,14 @@ import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -237,6 +241,29 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             session.close();
         }
     }
+    
+    public synchronized void removeResultDatasets(Integer[] ids, User user) throws EmfException {
+        Session session = sessionFactory.getSession();
+        DatasetDAO dsDao = new DatasetDAO();
+        try {
+            for (Integer id : ids ) {
+                EmfDataset dataset = dsDao.getDataset(session, id);
+
+                if (dataset != null) {
+                    try {
+                        dsDao.remove(user, dataset, session);
+                    } catch (EmfException e) {
+                        if (DebugLevels.DEBUG_12)
+                            System.out.println(e.getMessage());
+                        
+                        throw new EmfException(e.getMessage());
+                    }
+                }
+            }
+        } finally {
+            session.close();
+        }
+    }
 
     public synchronized void runStrategy(User user, int controlStrategyId,
             String exportDirectory) throws EmfException {
@@ -253,10 +280,16 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     }
 
     public synchronized void runStrategy(User user, int controlStrategyId,
-            String exportDirectory, boolean useSQLApproach) throws EmfException {
+            String exportDirectory, boolean useSQLApproach, boolean deleteResults) throws EmfException {
         ControlStrategy strategy = getById(controlStrategyId);
-        StrategyFactory factory = new StrategyFactory(batchSize());
+        if (deleteResults){
+            Integer[] dsList=getRusultsDSId(controlStrategyId);
+            if (dsList !=null){
+                removeResultDatasets(dsList, user);
+            }
+        }
         
+        StrategyFactory factory = new StrategyFactory(batchSize());
         validatePath(exportDirectory);
         RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, 
                 dbServerFactory, threadPool,
@@ -264,6 +297,26 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         runStrategy.run(user, strategy, this);
     }
     
+    private Integer[] getRusultsDSId(int controlStrategyId) throws EmfException {
+        ControlStrategyResult[] results = getControlStrategyResults(controlStrategyId);
+        List<Integer> datasetLists = new ArrayList<Integer>();
+        if(results != null){
+            for (int i=0; i<results.length; i++){
+                if (results[i].getStrategyResultType().getName().equals("Detailed Strategy Result")) {
+                    if (results[i].getDetailedResultDataset() != null)
+                        datasetLists.add(results[i].getDetailedResultDataset().getId());
+                    if (results[i].getControlledInventoryDataset() != null)
+                        datasetLists.add( results[i].getControlledInventoryDataset().getId());
+                } else {
+                    datasetLists.add( results[i].getInputDataset().getId());
+                }
+            }
+        }
+        if (datasetLists.size()>0)
+            return datasetLists.toArray(new Integer[0]);
+        return null; 
+    }
+
     private File validatePath(String folderPath) throws EmfException {
         File file = new File(folderPath);
 
