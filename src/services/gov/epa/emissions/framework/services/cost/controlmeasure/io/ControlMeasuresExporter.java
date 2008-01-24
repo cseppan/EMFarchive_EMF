@@ -22,9 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import org.hibernate.Session;
 
@@ -114,30 +112,21 @@ public class ControlMeasuresExporter implements Exporter {
     }
     
     private String equationRecord(ControlMeasure measure, int size) {
-        String values[]= {" "," "," "," "," "," "," "," "," "," "," "," ", " " };
-        List<String> list=Arrays.asList(values);
-//        StringBuffer eString = new StringBuffer(12);
-//        for (int i=0; i<12; i++)
-//            eString[i]=new StringBuffer(" ");
-         
-        String name = measure.getAbbreviation();
-        list.set(0, name);
+        String equationRecord = ""; 
+        equationRecord += containDelimiter(measure.getAbbreviation())+ delimiter;
         
         ControlMeasureEquation cMequation[]=measure.getEquations();
         EquationType equationType=cMequation[0].getEquationType();
-        list.set(1, equationType.getName());
+        equationRecord += containDelimiter(equationType.getName())+ delimiter;
         
         for (int k=0; k< cMequation.length; k++){
             EquationTypeVariable typeVariable=cMequation[k].getEquationTypeVariable();
-            if (typeVariable!=null)
-                list.set(typeVariable.getFileColPosition()+1, cMequation[k].getValue()+"");         
+                equationRecord += (typeVariable==null ? "" : cMequation[k].getValue())+ delimiter;         
         }
-        list.set(size-1, measure.getCostYear()+"");
-        
-        String equationRecord = list.get(0) + delimiter;
-        for (int i=1; i<size-1; i++)
-            equationRecord += list.get(i) + delimiter; 
-        equationRecord += list.get(size-1); 
+        for (int i=cMequation.length+2; i<size-1; i++)
+            equationRecord += delimiter;
+ //       equationRecord += measure.getCostYear();
+        equationRecord += "2006";
         return equationRecord; 
     }
     
@@ -168,24 +157,29 @@ public class ControlMeasuresExporter implements Exporter {
     
     private String summaryRecord(ControlMeasure measure) {
         String name = measure.getName();
-        String summaryRecord = (name.indexOf(delimiter) < 0 ? name : ("\"" + name + "\"")) + delimiter;
-        summaryRecord += measure.getAbbreviation() + delimiter;
+        String summaryRecord = containDelimiter(name) + delimiter;
+        summaryRecord += containDelimiter(measure.getAbbreviation())+ delimiter;
         Pollutant majPollutant = measure.getMajorPollutant();
-        summaryRecord += (majPollutant == null ? "" : majPollutant.getName()) + delimiter;
+        summaryRecord += (majPollutant == null ? "" : containDelimiter(majPollutant.getName())) + delimiter;
         ControlTechnology ct = measure.getControlTechnology();
-        summaryRecord += (ct == null ? "" : ct.getName()) + delimiter;
+        summaryRecord += (ct == null ? "" : containDelimiter(ct.getName())) + delimiter;
         SourceGroup sg = measure.getSourceGroup();
-        summaryRecord += (sg == null ? "" : sg.getName()) + delimiter;
-        summaryRecord += formatSectors(measure.getSectors()) + delimiter;
+        summaryRecord += (sg == null ? "" : containDelimiter(sg.getName())) + delimiter;
+        summaryRecord += containDelimiter(formatSectors(measure.getSectors())) + delimiter;
         summaryRecord += measure.getCmClass() + delimiter;
         summaryRecord += measure.getEquipmentLife() + delimiter;
         summaryRecord += measure.getDeviceCode() + delimiter;
         Date dateRev = measure.getDateReviewed();
         summaryRecord += (dateRev == null ? "" : dateRev.toString()) + delimiter;
-        summaryRecord += measure.getDataSouce() + delimiter;
-        summaryRecord += measure.getDescription();
+        summaryRecord += containDelimiter(measure.getDataSouce()) + delimiter;
+        summaryRecord += containDelimiter(measure.getDescription());
         
         return summaryRecord;
+    }
+    
+    private String containDelimiter(String outString){
+        return (outString.indexOf(delimiter) < 0 ? outString : ("\"" + outString + "\""));
+    
     }
 
     private String formatSectors(Sector[] sectors) {
@@ -240,30 +234,30 @@ public class ControlMeasuresExporter implements Exporter {
     }
 
     private String efficiencyRecord(String abbreviation, EfficiencyRecord record) {
-        String efficiencyRecord = abbreviation + delimiter;
+        String efficiencyRecord = containDelimiter(abbreviation) + delimiter;
         Pollutant pollutant = record.getPollutant();
         efficiencyRecord += (pollutant == null ? "" : pollutant.getName()) + delimiter;
-        efficiencyRecord += record.getLocale() + delimiter;
+        efficiencyRecord += (record.getLocale() == null? "": record.getLocale())+ delimiter;
         Date effectiveDate = record.getEffectiveDate();
         efficiencyRecord += (effectiveDate == null ? "" : effectiveDate.toString()) + delimiter;
-        efficiencyRecord += record.getExistingMeasureAbbr() + delimiter;
+        efficiencyRecord += containDelimiter(record.getExistingMeasureAbbr())+ delimiter;
         efficiencyRecord += record.getExistingDevCode() + delimiter;
         Double minEmis = record.getMinEmis();
         efficiencyRecord += (minEmis == null ? "" : minEmis.toString()) + delimiter;
         Double maxEmis = record.getMaxEmis();
         efficiencyRecord += (maxEmis == null ? "" : maxEmis.toString()) + delimiter;
         efficiencyRecord += record.getEfficiency() + delimiter;
-        efficiencyRecord += record.getCostYear() + delimiter;
+        efficiencyRecord += (record.getCostYear()== null ? "" :record.getCostYear())+ delimiter;
         efficiencyRecord += (record.getCostPerTon() == null ? "" : record.getCostPerTon()) + delimiter;
         efficiencyRecord += record.getRuleEffectiveness() + delimiter;
         efficiencyRecord += record.getRulePenetration() + delimiter;
-        efficiencyRecord += record.getEquationType() + delimiter;
-        efficiencyRecord += record.getCapRecFactor() + delimiter;
-        efficiencyRecord += record.getDiscountRate() + delimiter;
-        efficiencyRecord += record.getCapitalAnnualizedRatio() + delimiter;
-        efficiencyRecord += record.getIncrementalCostPerTon() + delimiter;
+        efficiencyRecord += containDelimiter(record.getEquationType()) + delimiter;
+        efficiencyRecord += (record.getCapRecFactor()== null ? "" : record.getCapRecFactor())+ delimiter;
+        efficiencyRecord += (record.getDiscountRate() == null ? "" :record.getDiscountRate())+ delimiter;
+        efficiencyRecord += (record.getCapitalAnnualizedRatio()== null ? "" : record.getCapitalAnnualizedRatio())+ delimiter;
+        efficiencyRecord += (record.getIncrementalCostPerTon()== null ? "" : record.getIncrementalCostPerTon()) + delimiter;
         
-        efficiencyRecord += record.getDetail();
+        efficiencyRecord += containDelimiter(record.getDetail());
         
         return efficiencyRecord;
     }
@@ -319,16 +313,4 @@ public class ControlMeasuresExporter implements Exporter {
         return this.exportedLinesCount;
     }
     
-//    private EquationType[] getEquationTypes() throws EmfException {
-//        Session session = factory.getSession();
-//        try {
-//            List<EquationType> all = new ControlMeasureDAO().getEquationTypes(session);
-//            return all.toArray(new EquationType[0]);
-//        } catch (RuntimeException e) {
-//            throw new EmfException("Could not retrieve control measures Equation Types.");
-//        } finally {
-//            session.close();
-//        }
-//    }
-
 }
