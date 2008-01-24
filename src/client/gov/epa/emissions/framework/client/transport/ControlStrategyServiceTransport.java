@@ -136,7 +136,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
     }
 
     public synchronized void runStrategy(User user, int controlStrategyId,
-            String exportDirectory, boolean useSQLApproach) throws EmfException {
+            String exportDirectory, boolean useSQLApproach, boolean deleteResults) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("runStrategy");
@@ -144,10 +144,11 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.addIntegerParam("controlStrategyId");
         call.addStringParam("exportDirectory");
         call.addBooleanParameter("useSQLApproach");
+        call.addBooleanParameter("deleteResults");
         call.setVoidReturnType();
 
         call.request(new Object[] { user, new Integer(controlStrategyId), 
-                exportDirectory, useSQLApproach });
+                exportDirectory, useSQLApproach, deleteResults });
     }
 
     public synchronized StrategyType[] getStrategyTypes() throws EmfException {
