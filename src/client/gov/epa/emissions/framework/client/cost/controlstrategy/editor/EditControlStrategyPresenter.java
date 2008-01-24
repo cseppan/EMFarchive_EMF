@@ -29,7 +29,7 @@ public interface EditControlStrategyPresenter {
 
     void runStrategy(String exportDirectory) throws EmfException;
 
-    void runStrategy(String exportDirectory, boolean useSQLApproach) throws EmfException;
+    void runStrategy(String exportDirectory, boolean useSQLApproach, boolean deleteResults) throws EmfException;
 
     void setResults(ControlStrategy controlStrategy);
 
@@ -52,4 +52,5 @@ public interface EditControlStrategyPresenter {
     EmfDataset getDataset(int id) throws EmfException;
 
     boolean hasResults();
+    
 }

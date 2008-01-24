@@ -285,24 +285,33 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
             public void actionPerformed(ActionEvent event) {
                 try {
                     //check to see if really want to run strategy, we don't to overwrite if its already been run...
+                    boolean deleteResults = false; 
                     if (presenter.hasResults()) {
                         String title = "Warning";
-                        String message = "Are you sure you want to run the strategy again, this strategy has already been run in the past?";
-                        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+                        
+                        String message = "There are results available for this strategy. \n" + " Would you like to delete them before rerunning the strategy?";
+                        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_CANCEL_OPTION,
                                 JOptionPane.QUESTION_MESSAGE);
-
-                        if (selection != JOptionPane.YES_OPTION) {
+                        if (selection == JOptionPane.CANCEL_OPTION) {
                             return;
                         }
+                        else if (selection == JOptionPane.YES_OPTION){
+//                          runStrategyDeleteDataset(getDetailedResults());
+                            deleteResults = true; 
+                        }
+                        else if (selection == JOptionPane.NO_OPTION){
+                            deleteResults = false; 
+                        }
                     }
-
+                    
                     enableButtons(false);
                     save();
                     controlStrategy.setStartDate(new Date());
                     presenter.setResults(controlStrategy);
-                    presenter.runStrategy(outputTabView.getExportFolder(), summaryTabView.useSQLApproachCheck.isSelected());
+                    presenter.runStrategy(outputTabView.getExportFolder(), summaryTabView.useSQLApproachCheck.isSelected(), deleteResults);
                     messagePanel
                             .setMessage("Running strategy. Monitor the status window for progress, and refresh this window after completion to see results");
+
                 } catch (EmfException e) {
                     messagePanel.setError("Error running strategy: " + e.getMessage());
                 }
@@ -310,6 +319,40 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         };
     }
 
+//    private EmfDataset[]getDetailedResults(){
+//        List<EmfDataset> detailedDatasets=new ArrayList<EmfDataset>();
+//        ControlStrategyResult[] results=presenter.getControlStrategyResults();
+//        if(results.length==0 || results == null)
+//            return null;
+//        for (int i=0; i<results.length; i++){
+//            if (results[i].getDetailedResultDataset() != null)
+//                detailedDatasets.add((EmfDataset) results[i].getDetailedResultDataset());
+//            if (results[i].getControlledInventoryDataset() != null)
+//                detailedDatasets.add((EmfDataset) results[i].getControlledInventoryDataset());
+//        }
+//        return detailedDatasets.toArray(new EmfDataset[0]);
+//    }
+    
+//    private void runStrategyNotDeleteDataset() throws EmfException{
+//        enableButtons(false);
+//        save();
+//        controlStrategy.setStartDate(new Date());
+//        presenter.setResults(controlStrategy);
+//        presenter.runStrategy(outputTabView.getExportFolder(), summaryTabView.useSQLApproachCheck.isSelected());
+//        messagePanel
+//                .setMessage("Running strategy. Monitor the status window for progress, and refresh this window after completion to see results");
+//    }
+    
+//    private void runStrategyDeleteDataset(EmfDataset[] detailedResults) throws EmfException {
+//        enableButtons(false);
+//        save();
+//        controlStrategy.setStartDate(new Date());
+//        presenter.setResults(controlStrategy);
+//        presenter.runStrategy(outputTabView.getExportFolder(), summaryTabView.useSQLApproachCheck.isSelected());
+//        messagePanel
+//                .setMessage("Running strategy. Monitor the status window for progress, and refresh this window after completion to see results");
+//    }
+    
     private void enableButtons(boolean enable) {
         saveButton.setEnabled(enable);
         runButton.setEnabled(enable);

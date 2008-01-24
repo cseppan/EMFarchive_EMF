@@ -148,8 +148,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         summaryTabView.stopRun();
     }
 
-    public void runStrategy(String exportDirectory, boolean useSQLApproach) throws EmfException {
-        service().runStrategy(session.user(), controlStrategy.getId(), exportDirectory, useSQLApproach);
+    public void runStrategy(String exportDirectory, boolean useSQLApproach, boolean deleteResults) throws EmfException {
+        service().runStrategy(session.user(), controlStrategy.getId(), exportDirectory, useSQLApproach, deleteResults);
     }
 
     public void runStrategy(String exportDirectory) throws EmfException {
@@ -227,8 +227,9 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     public boolean hasResults() {
         return this.hasResults;
     }
-
+    
     public EmfDataset getDataset(int id) throws EmfException {
         return session.dataService().getDataset(id);
     }
+
 }
