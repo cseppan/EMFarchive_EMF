@@ -26,7 +26,6 @@ public class CMExportPresenter {
         this.view = view;
         view.observe(this);
         view.setMostRecentUsedFolder(getFolder());
-
         view.display();
     }
 
@@ -45,12 +44,14 @@ public class CMExportPresenter {
     private void doExport(int[] controlMeasureIds, String folder, boolean overwrite, String prefix) throws EmfException {
         ControlMeasureExportService service = session.controlMeasureExportService();
         
-        session.setMostRecentExportFolder(folder);
-
         File dir = new File(folder);
         if (dir.isDirectory())
             lastFolder = folder;
-
+        else 
+            throw new EmfException("Export folder does not exist: " + folder);
+        
+        session.setMostRecentExportFolder(folder);
+        
         if (overwrite)
             service.exportControlMeasuresWithOverwrite(folder, prefix, controlMeasureIds, session.user());
         else
