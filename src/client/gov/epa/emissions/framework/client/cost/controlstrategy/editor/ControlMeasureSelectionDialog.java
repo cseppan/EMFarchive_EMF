@@ -57,6 +57,7 @@ public class ControlMeasureSelectionDialog extends JDialog implements ControlMea
         this.verifier= new NumberFieldVerifier("Measure properties: ");
         this.parent = parent;
         this.changeables = changeables;
+        setModal(true);
     }
 
     public void display(ControlMeasureTableData tableData) {
