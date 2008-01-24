@@ -241,6 +241,10 @@ public class DatasetDAO {
         return hibernateFacade.get(EmfDataset.class, criterion, order, session);
     }
 
+    public List getDatasets(Session session, int datasetTypeId, String nameContains) {
+        return session.createQuery("select new EmfDataset( DS.id, DS.name, DS.defaultVersion, DS.datasetType.id, DS.datasetType.name) from EmfDataset as DS where DS.datasetType.id = " + datasetTypeId + " and lower(DS.name) like " + "'%" + nameContains.toLowerCase().trim() + "%' and DS.status <> 'Deleted' order by DS.name").list();
+    }
+
     public EmfDataset getDataset(Session session, String name) {
         Criterion statusCrit = Restrictions.ne("status", "Deleted"); // FIXME: to be deleted after dataset removed
         // from db

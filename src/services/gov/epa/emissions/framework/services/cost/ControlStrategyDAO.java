@@ -43,16 +43,36 @@ public class ControlStrategyDAO {
 
     // return ControlStrategies orderby name
     public List all(Session session) {
-        return hibernateFacade.getAll(ControlStrategy.class, Order.asc("name"), session);
+
+//        "Name", "Last Modified", "Run Status", "Region", 
+//        "Target Pollutant", "Total Cost", "Reduction", 
+//        "Project", "Strategy Type", "Cost Year", 
+//        "Inv. Year", "Creator"
+//        element.getName(), format(element.getLastModifiedDate()), element.getRunStatus(), region(element),
+//        element.getTargetPollutant(), getTotalCost(element.getId()), getReduction(element.getId()), 
+//        project(element), analysisType(element), costYear(element), 
+//        "" + (element.getInventoryYear() != 0 ? element.getInventoryYear() : ""), 
+//        element.getCreator().getName()
+        return session.createQuery("select new ControlStrategy(cS.id, cS.name, " +
+                "cS.lastModifiedDate, cS.runStatus, " +
+                "cS.region, cS.targetPollutant, " +
+                "cS.project, cS.strategyType, " +
+                "cS.costYear, cS.inventoryYear, " +
+                "cS.creator, (select sum(sR.totalCost) from ControlStrategyResult sR where sR.controlStrategyId = cS.id), (select sum(sR.totalReduction) from ControlStrategyResult sR where sR.controlStrategyId = cS.id)) from ControlStrategy cS left join cS.strategyType left join cS.region left join cS.project left join cS.region order by cS.name").list();
+        //return hibernateFacade.getAll(ControlStrategy.class, Order.asc("name"), session);
     }
 
     public List getAllStrategyTypes(Session session) {
         return hibernateFacade.getAll(StrategyType.class, Order.asc("name"), session);
     }
 
-    // TODO: gettig all the strategies to obtain the lock--- is it a good idea?
-    public ControlStrategy obtainLocked(User owner, ControlStrategy element, Session session) {
-        return (ControlStrategy) lockingScheme.getLocked(owner, current(element, session), session);
+//    // TODO: gettig all the strategies to obtain the lock--- is it a good idea?
+//    public ControlStrategy obtainLocked(User owner, ControlStrategy element, Session session) {
+//        return (ControlStrategy) lockingScheme.getLocked(owner, current(element, session), session);
+//    }
+//
+    public ControlStrategy obtainLocked(User owner, int id, Session session) {
+        return (ControlStrategy) lockingScheme.getLocked(owner, current(id, ControlStrategy.class, session), session);
     }
 
 //    public void releaseLocked(ControlStrategy locked, Session session) {

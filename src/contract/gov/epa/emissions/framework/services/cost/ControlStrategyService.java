@@ -19,7 +19,7 @@ public interface ControlStrategyService extends EMFService {
 
     void removeControlStrategies(int[] ids, User user) throws EmfException;
 
-    ControlStrategy obtainLocked(User owner, ControlStrategy element) throws EmfException;
+    ControlStrategy obtainLocked(User owner, int id) throws EmfException;
 
 //    void releaseLocked(ControlStrategy locked) throws EmfException;
 

@@ -2,11 +2,8 @@ package gov.epa.emissions.framework.client.cost.controlstrategy;
 
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
-import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
-import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -21,10 +18,10 @@ public class ControlStrategiesTableData extends AbstractTableData {
 
     private final static Double NAN_VALUE = new Double(Double.NaN);
     
-    private EmfSession session;
+//    private EmfSession session;
     
-    public ControlStrategiesTableData(ControlStrategy[] controlStrategies, EmfSession session) throws EmfException {
-        this.session = session;
+    public ControlStrategiesTableData(ControlStrategy[] controlStrategies, EmfSession session) {
+//        this.session = session;
         this.rows = createRows(controlStrategies);
     }
 
@@ -50,12 +47,12 @@ public class ControlStrategiesTableData extends AbstractTableData {
         return false;
     }
 
-    private List createRows(ControlStrategy[] controlStrategies) throws EmfException {
+    private List createRows(ControlStrategy[] controlStrategies) {
         List rows = new ArrayList();
         for (int i = 0; i < controlStrategies.length; i++) {
             ControlStrategy element = controlStrategies[i];
             Object[] values = { element.getName(), format(element.getLastModifiedDate()), element.getRunStatus(), region(element),
-                    element.getTargetPollutant(), getTotalCost(element.getId()), getReduction(element.getId()), 
+                    element.getTargetPollutant(), element.getTotalCost() != null ? element.getTotalCost() : NAN_VALUE /*getTotalCost(element.getId())*/, element.getTotalReduction() != null ? element.getTotalReduction() : NAN_VALUE /*getReduction(element.getId())*/, 
                     project(element), analysisType(element), costYear(element), 
                     "" + (element.getInventoryYear() != 0 ? element.getInventoryYear() : ""), 
                     element.getCreator().getName() };
@@ -66,34 +63,34 @@ public class ControlStrategiesTableData extends AbstractTableData {
         return rows;
     }
 
-    private Double getReduction(int controlStrategyId) throws EmfException {
-        ControlStrategyResultsSummary summary = getResultSummary(controlStrategyId);
-        if (summary == null)
-            return NAN_VALUE;
- 
-        return new Double(summary.getStrategyTotalReduction());
-    }
+//    private Double getReduction(int controlStrategyId) throws EmfException {
+//        ControlStrategyResultsSummary summary = getResultSummary(controlStrategyId);
+//        if (summary == null)
+//            return NAN_VALUE;
+// 
+//        return new Double(summary.getStrategyTotalReduction());
+//    }
+//
+//    private Double getTotalCost(int controlStrategyId) throws EmfException {
+//        ControlStrategyResultsSummary summary = getResultSummary(controlStrategyId);
+//        if (summary == null)
+//            return NAN_VALUE;
+//
+//        return new Double(summary.getStrategyTotalCost());
+//    }
+//
+//    private ControlStrategyResult[] getControlStrategyResults(int controlStrategyId) throws EmfException {
+//        return session.controlStrategyService().getControlStrategyResults(controlStrategyId);
+//    }
 
-    private Double getTotalCost(int controlStrategyId) throws EmfException {
-        ControlStrategyResultsSummary summary = getResultSummary(controlStrategyId);
-        if (summary == null)
-            return NAN_VALUE;
-
-        return new Double(summary.getStrategyTotalCost());
-    }
-
-    private ControlStrategyResult[] getControlStrategyResults(int controlStrategyId) throws EmfException {
-        return session.controlStrategyService().getControlStrategyResults(controlStrategyId);
-    }
-
-    private ControlStrategyResultsSummary getResultSummary(int controlStrategyId) throws EmfException {
-        ControlStrategyResult[] controlStrategyResults = getControlStrategyResults(controlStrategyId);
-        if (controlStrategyResults.length == 0)
-            return null;
-
-        return new ControlStrategyResultsSummary(controlStrategyResults);
-    }
-
+//    private ControlStrategyResultsSummary getResultSummary(int controlStrategyId) throws EmfException {
+//        ControlStrategyResult[] controlStrategyResults = getControlStrategyResults(controlStrategyId);
+//        if (controlStrategyResults.length == 0)
+//            return null;
+//
+//        return new ControlStrategyResultsSummary(controlStrategyResults);
+//    }
+//
     private String project(ControlStrategy element) {
         Project project = element.getProject();
         return project != null ? project.getName() : "";

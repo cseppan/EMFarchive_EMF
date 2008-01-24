@@ -88,7 +88,7 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
         datasetTypeCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    presenter.refreshDatasets((DatasetType) datasetTypeCombo.getSelectedItem());
+                    presenter.refreshDatasets((DatasetType) datasetTypeCombo.getSelectedItem(), "");
                 } catch (EmfException e1) {
                     // NOTE Auto-generated catch block
                 }

@@ -77,6 +77,16 @@ public class EmfDataset implements Dataset, Lockable {
         lock = new Mutex();
     }
 
+    //constructor is really only useful for reporting purposes, the datasettype should be a
+    //heavyweight object, not a light object like this...
+    public EmfDataset(int id, String name, int defaultVersion, int datasetTypeId, String datasetTypeName) {
+        this();
+        this.id = id;
+        this.name = name;
+        this.defaultVersion = defaultVersion;
+        this.datasetType = new DatasetType(datasetTypeId, datasetTypeName);
+    }
+
     public int getDefaultVersion() {
         return defaultVersion;
     }

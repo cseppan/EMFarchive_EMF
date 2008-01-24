@@ -64,6 +64,10 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private boolean useCostEquations;
 
+    private Double totalCost;
+    
+    private Double totalReduction;
+    
     public ControlStrategy() {
         this.lock = new Mutex();
 //        this.controlStrategyInputDatasets = new ArrayList();
@@ -75,6 +79,36 @@ public class ControlStrategy implements Lockable, Serializable {
         this();
         this.name = name;
     }
+
+    public ControlStrategy(int id, String name,
+            Date lastModifiedDate, String runStatus,
+            Region region, Pollutant targetPollutant,
+            Project project, StrategyType strategyType,
+            int costYear, int inventoryYear,
+            User creator, Double totalCost,
+            Double totalReduction) {
+        this();
+        this.id = id;
+        this.name = name;
+        this.lastModifiedDate = lastModifiedDate;
+        this.runStatus = runStatus;
+        this.region = region;
+        this.targetPollutant = targetPollutant;
+        this.project = project;
+        this.strategyType = strategyType;
+        this.costYear = costYear;
+        this.inventoryYear = inventoryYear;
+        this.creator = creator;
+        this.setTotalCost(totalCost);
+        this.setTotalReduction(totalReduction);
+    }
+
+//    ControlStrategy(cS.id, cS.name, " +
+//            "cS.lastModifiedDate, cS.runStatus, " +
+//            "cS.region, cs.targetPollutant, " +
+//            "cS.project, cS.strategyType, " +
+//            "cS.costYear, cS.inventoryYear, " +
+//            "cS.creator)" +
 
     public boolean equals(Object other) {
         if (other == null || !(other instanceof ControlStrategy))
@@ -311,5 +345,21 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public boolean getUseCostEquations() {
         return useCostEquations;
+    }
+
+    public void setTotalCost(Double totalCost) {
+        this.totalCost = totalCost;
+    }
+
+    public Double getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalReduction(Double totalReduction) {
+        this.totalReduction = totalReduction;
+    }
+
+    public Double getTotalReduction() {
+        return totalReduction;
     }
 }

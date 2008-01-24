@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.ui.Row;
 
@@ -22,7 +21,7 @@ public class ControlStrategiesTableDataTest extends TestCase {
 
     private ControlStrategy controlStrategy2;
 
-    protected void setUp() throws EmfException {
+    protected void setUp() {
         controlStrategy1 = new ControlStrategy();
         controlStrategy1.setName("name1");
         controlStrategy1.setRegion(new Region("region1"));

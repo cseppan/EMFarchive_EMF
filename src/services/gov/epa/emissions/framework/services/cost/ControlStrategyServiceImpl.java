@@ -91,17 +91,17 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         return csId;
     }
 
-    public synchronized ControlStrategy obtainLocked(User owner, ControlStrategy element) throws EmfException {
+    public synchronized ControlStrategy obtainLocked(User owner, int id) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            ControlStrategy locked = dao.obtainLocked(owner, element, session);
+            ControlStrategy locked = dao.obtainLocked(owner, id, session);
 
             return locked;
         } catch (RuntimeException e) {
             LOG
-                    .error("Could not obtain lock for Control Strategy: " + element + " by owner: "
+                    .error("Could not obtain lock for Control Strategy: id = " + id + " by owner: "
                             + owner.getUsername(), e);
-            throw new EmfException("Could not obtain lock for Control Strategy: " + element + " by owner: "
+            throw new EmfException("Could not obtain lock for Control Strategy: id = " + id + " by owner: "
                     + owner.getUsername());
         } finally {
             session.close();

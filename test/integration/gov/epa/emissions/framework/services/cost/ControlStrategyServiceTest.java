@@ -117,7 +117,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         ControlStrategy element = controlStrategy();
 
         try {
-            ControlStrategy locked = service.obtainLocked(owner, element);
+            ControlStrategy locked = service.obtainLocked(owner, element.getId());
             assertTrue("Should be locked by owner", locked.isLocked(owner));
 
             ControlStrategy loadedFromDb = load(element);// object returned directly from the table
@@ -132,7 +132,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         ControlStrategy element = controlStrategy();
 
         try {
-            ControlStrategy locked = service.obtainLocked(owner, element);
+            ControlStrategy locked = service.obtainLocked(owner, element.getId());
             service.releaseLocked(locked.getId());
             ControlStrategy released = (ControlStrategy) load(ControlStrategy.class,locked.getName());
             assertFalse("Should have released lock", released.isLocked());
@@ -149,7 +149,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         ControlStrategy element = controlStrategy();
         ControlStrategy released = null;
         try {
-            ControlStrategy locked = service.obtainLocked(owner, element);
+            ControlStrategy locked = service.obtainLocked(owner, element.getId());
 
             session.clear();
             ControlMeasureClass[] cmcs = cmService.getMeasureClasses();
@@ -199,7 +199,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         ControlStrategy element = controlStrategy();
         ControlStrategy csWithLock = null;
         try {
-            ControlStrategy locked = service.obtainLocked(owner, element);
+            ControlStrategy locked = service.obtainLocked(owner, element.getId());
 
             locked.setName("TEST");
             locked.setDescription("TEST control strategy");
@@ -228,7 +228,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         ControlStrategy released = null;
         ControlStrategy copied = null;
         try {
-            ControlStrategy locked = service.obtainLocked(owner, element);
+            ControlStrategy locked = service.obtainLocked(owner, element.getId());
 
             session.clear();
             ControlMeasureClass[] cmcs = cmService.getMeasureClasses();

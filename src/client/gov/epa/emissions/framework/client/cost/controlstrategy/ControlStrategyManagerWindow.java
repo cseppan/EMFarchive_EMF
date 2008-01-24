@@ -76,7 +76,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         this.presenter = presenter;
     }
 
-    public void display(ControlStrategy[] controlStrategies) throws EmfException {
+    public void display(ControlStrategy[] controlStrategies) {
         doLayout(controlStrategies, this.session);
         super.display();
         //refresh control measures...
@@ -99,7 +99,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         setCursor(Cursor.getDefaultCursor());
     }
 
-    public void refresh(ControlStrategy[] controlStrategies) throws EmfException {
+    public void refresh(ControlStrategy[] controlStrategies) {
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         doLayout(controlStrategies, this.session);
         super.refreshLayout();
@@ -119,7 +119,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         presenter.doRefresh();
     }
 
-    private void doLayout(ControlStrategy[] controlStrategies, EmfSession session) throws EmfException {
+    private void doLayout(ControlStrategy[] controlStrategies, EmfSession session) {
         tableData = new ControlStrategiesTableData(controlStrategies, session);
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);

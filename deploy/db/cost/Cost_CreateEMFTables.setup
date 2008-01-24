@@ -28,6 +28,15 @@ CREATE TABLE emf.source_groups
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.source_groups OWNER TO emf;
+CREATE INDEX source_groups_id
+  ON emf.source_groups
+  USING btree
+  (id);
+ALTER TABLE emf.source_groups CLUSTER ON source_groups_id;
+CREATE INDEX source_groups_name
+  ON emf.source_groups
+  USING btree
+  (name);
 -- emf.source_groups
 --
 
@@ -101,6 +110,10 @@ CREATE INDEX measure_id
 ALTER TABLE emf.control_measures CLUSTER ON measure_id;
 CREATE INDEX control_measures_control_technology
    ON emf.control_measures (control_technology);
+CREATE INDEX control_measures_source_group
+  ON emf.control_measures
+  USING btree
+  (source_group);
 -- emf.control_measures
 
 

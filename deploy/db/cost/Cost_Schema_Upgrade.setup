@@ -473,3 +473,19 @@ ALTER TABLE emf.strategy_results
 ALTER TABLE emf.strategy_results ALTER COLUMN detailed_result_dataset_id SET STATISTICS -1;
 
 insert into emf.strategy_result_types (name) select 'Strategy Summary';
+
+
+CREATE INDEX source_groups_id
+  ON emf.source_groups
+  USING btree
+  (id);
+ALTER TABLE emf.source_groups CLUSTER ON source_groups_id;
+CREATE INDEX source_groups_name
+  ON emf.source_groups
+  USING btree
+  (name);
+
+CREATE INDEX control_measures_source_group
+  ON emf.control_measures
+  USING btree
+  (source_group);

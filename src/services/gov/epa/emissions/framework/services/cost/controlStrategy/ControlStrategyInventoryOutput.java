@@ -340,6 +340,7 @@ if (1 == 0)
         String sql = "select ";
         String columnList = "";
         Column[] columns = tableFormat.cols();
+        //right before abbreviation, is an empty now...
         for (int i = 0; i < columns.length; i++) {
             String columnName = columns[i].name();
             if (columnName.equalsIgnoreCase("record_id")) {

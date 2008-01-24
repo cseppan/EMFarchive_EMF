@@ -146,7 +146,11 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         panel.add(removeButton);
         Button viewButton = new BorderlessButton("View", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                viewAction();
+                try {
+                    viewAction();
+                } catch (EmfException e) {
+                    messagePanel.setError("Error viewing dataset: " + e.getMessage());
+                }
             }
         });
         panel.add(viewButton);
@@ -271,7 +275,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         }
     }
 
-    protected void viewAction() {
+    protected void viewAction() throws EmfException {
         messagePanel.clear();
         List selected = sortFilterSelectModel.selected();
 
@@ -281,7 +285,8 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         }
 
         for (int i = 0; i < selected.size(); i++) {
-            PropertiesViewPresenter presenter = new PropertiesViewPresenter(((ControlStrategyInputDataset)selected.get(i)).getInputDataset(), session);
+            PropertiesViewPresenter presenter = new PropertiesViewPresenter(
+                    editControlStrategyPresenter.getDataset(((ControlStrategyInputDataset)selected.get(i)).getInputDataset().getId()), session);
             DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
             presenter.doDisplay(view);
         }

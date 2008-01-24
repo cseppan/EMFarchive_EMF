@@ -37,8 +37,8 @@ public class InputDatasetSelectionPresenter {
         view.display(datasetTypes, defaultType);
     }
     
-    public void refreshDatasets(DatasetType datasetType) throws EmfException {
-        view.refreshDatasets(session.dataService().getDatasets(datasetType));
+    public void refreshDatasets(DatasetType datasetType, String nameContaining) throws EmfException {
+        view.refreshDatasets(session.dataService().getDatasets(datasetType.getId(), nameContaining));
     }
 
     public EmfDataset[] getDatasets() {

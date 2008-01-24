@@ -91,7 +91,7 @@ public class DatasetCreator {
         addKeyVal(dataset, "COST_YEAR", controlStrategy.getCostYear() + "");
         addKeyVal(dataset, "STRATEGY_TYPE", controlStrategy.getStrategyType().getName());
         addKeyVal(dataset, "TARGET_POLLUTANT", controlStrategy.getTargetPollutant().getName());
-        addKeyVal(dataset, "REGION", controlStrategy.getRegion() != null ? controlStrategy.getRegion().getName() : "");
+        addKeyVal(dataset, "REGION", controlStrategy.getRegion() != null ? controlStrategy.getRegion().getName() : "Not Specified");
         addKeyVal(dataset, "STRATEGY_NAME", controlStrategy.getName());
         addKeyVal(dataset, "STRATEGY_ID", controlStrategy.getId()+"");
         addKeyVal(dataset, "STRATEGY_INVENTORY_NAME", inputDataset.getName());

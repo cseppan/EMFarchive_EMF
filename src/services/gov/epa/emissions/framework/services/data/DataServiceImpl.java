@@ -141,6 +141,19 @@ public class DataServiceImpl implements DataService {
         }
     }
 
+    public synchronized EmfDataset[] getDatasets(int datasetTypeId, String nameContaining) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List datasets = dao.getDatasets(session, datasetTypeId, nameContaining);
+            session.close();
+
+            return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Datasets for dataset type " + datasetTypeId, e);
+            throw new EmfException("Could not get all Datasets for dataset type " + datasetTypeId);
+        }
+    }
+
     public synchronized void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException {
         String prefix = "DELETED_" + new Date().getTime() + "_";
 

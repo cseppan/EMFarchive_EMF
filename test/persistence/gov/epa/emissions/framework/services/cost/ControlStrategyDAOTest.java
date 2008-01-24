@@ -49,7 +49,7 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
         
         EmfDataset dataset = dataset("detailed dataset");
         try {
-            ControlStrategy locked = dao.obtainLocked(owner, element, session);
+            ControlStrategy locked = dao.obtainLocked(owner, element.getId(), session);
             
             assertEquals(locked.getLockOwner(), owner.getUsername());
             locked.setName("TEST");

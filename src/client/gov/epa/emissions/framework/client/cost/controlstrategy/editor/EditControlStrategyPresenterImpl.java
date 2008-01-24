@@ -54,7 +54,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     public void doDisplay() throws EmfException {
         view.observe(this);
         
-        controlStrategy = service().obtainLocked(session.user(), controlStrategy);
+        controlStrategy = service().obtainLocked(session.user(), controlStrategy.getId());
         
         if (!controlStrategy.isLocked(session.user())) {// view mode, locked by another user
             view.notifyLockFailure(controlStrategy);
@@ -226,5 +226,9 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     public boolean hasResults() {
         return this.hasResults;
+    }
+
+    public EmfDataset getDataset(int id) throws EmfException {
+        return session.dataService().getDataset(id);
     }
 }

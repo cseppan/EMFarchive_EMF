@@ -282,6 +282,36 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
+    public void testGetDatasetsByNameContaining() throws Exception {
+        DatasetType datasetType1 = newDatasetType("type1");
+        DatasetType datasetType2 = newDatasetType("type2");
+        
+        EmfDataset dataset = newDataset("dataset-dao-test");
+        EmfDataset dataset2 = newDataset("test2");
+        EmfDataset dataset3 = newDataset("test3");
+        
+        dataset.setDatasetType(datasetType1);
+        dataset2.setDatasetType(datasetType1);
+        dataset3.setDatasetType(datasetType2);
+
+        dao.updateWithoutLocking(dataset, session);
+        dao.updateWithoutLocking(dataset2, session);
+        dao.updateWithoutLocking(dataset3, session);
+
+        try {
+            List list = dao.getDatasets(session, datasetType1.getId(), "test");
+
+            System.out.println(list.size());
+            System.out.println(((EmfDataset)list.get(1)).getName());
+        } finally {
+            remove(dataset);
+            remove(dataset2);
+            remove(dataset3);
+            remove(datasetType1);
+            remove(datasetType2);
+        }
+    }
+
     public void testShouldDetectWhetherUsedByControlStrategiesOrCases() {
         EmfDataset dataset = newDataset("dataset-dao-test");
         EmfDataset dataset2 = newDataset("test2");
@@ -314,7 +344,7 @@ public class DatasetDaoTest extends ServiceTestCase {
             remove(caseObj);
         }
     }
-
+    
     private EmfDataset newDataset(String name) {
         User owner = userDAO.get("emf", session);
 
