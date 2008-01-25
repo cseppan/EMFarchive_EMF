@@ -125,8 +125,7 @@ public class ControlMeasuresExporter implements Exporter {
         }
         for (int i=cMequation.length+2; i<size-1; i++)
             equationRecord += delimiter;
- //       equationRecord += measure.getCostYear();
-        equationRecord += "2006";
+        equationRecord += measure.getCostYear();
         return equationRecord; 
     }
     
