@@ -226,7 +226,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     public final void disconnectDbServer() throws EmfException {
         try {
             dbServer.disconnect();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new EmfException("Could not disconnect DbServer - " + e.getMessage());
         }
 

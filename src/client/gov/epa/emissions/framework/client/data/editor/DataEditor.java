@@ -7,13 +7,13 @@ import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteDialog;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.Revision;
@@ -290,7 +290,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     private String format(Date lockDate) {
-        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(lockDate);
+        return CustomDateFormat.format_YYYY_MM_DD_HH_MM(lockDate);
     }
 
     public void notifySaveFailure(String message) {

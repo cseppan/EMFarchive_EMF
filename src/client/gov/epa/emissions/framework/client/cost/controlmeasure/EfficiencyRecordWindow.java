@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -18,7 +19,6 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -358,7 +358,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     protected String formatEffectiveDate() {
         Date effectiveDate = record.getEffectiveDate();
-        return effectiveDate == null ? "" : EmfDateFormat.format_MM_DD_YYYY(effectiveDate);
+        return effectiveDate == null ? "" : CustomDateFormat.format_MM_DD_YYYY(effectiveDate);
     }
 
     private JPanel buttonsPanel() {
@@ -442,7 +442,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
                 record.setEffectiveDate(null);
                 return;
             }
-            record.setEffectiveDate(EmfDateFormat.parse_MMddyyyy(date));
+            record.setEffectiveDate(CustomDateFormat.parse_MMddyyyy(date));
         } catch (Exception e) {
             throw new EmfException("Please Correct the Date Format(MM/dd/yyyy) in Effective Date");
         }

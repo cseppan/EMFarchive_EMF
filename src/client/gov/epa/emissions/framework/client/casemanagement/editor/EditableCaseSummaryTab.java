@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.casemanagement.AirQualityModels;
@@ -20,7 +21,6 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
 import java.awt.BorderLayout;
@@ -524,7 +524,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
     
     private String format(Date date) {
-        return EmfDateFormat.format_MM_DD_YYYY_HH_mm(date);
+        return CustomDateFormat.format_MM_DD_YYYY_HH_mm(date);
     }
 
     private JLabel createLeftAlignedLabel(String name) {
@@ -575,7 +575,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
                 caseObj.setStartDate(null);
                 return;
             }
-            caseObj.setStartDate(EmfDateFormat.parse_MM_DD_YYYY_HH_mm(startDate.getText()));
+            caseObj.setStartDate(CustomDateFormat.parse_MM_DD_YYYY_HH_mm(startDate.getText()));
         } catch (ParseException e) {
             throw new EmfException("Please enter the Start Date in the correct format (MM/dd/yyyy HH:mm)");
         }
@@ -588,7 +588,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
                 caseObj.setEndDate(null);
                 return;
             }
-            caseObj.setEndDate(EmfDateFormat.parse_MM_DD_YYYY_HH_mm(endDate.getText()));
+            caseObj.setEndDate(CustomDateFormat.parse_MM_DD_YYYY_HH_mm(endDate.getText()));
         } catch (ParseException e) {
             throw new EmfException("Please enter the End Date in the correct format (MM/dd/yyyy HH:mm)");
         }

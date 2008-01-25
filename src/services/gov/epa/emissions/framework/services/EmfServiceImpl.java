@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.PerformanceMetrics;
 import gov.epa.emissions.commons.db.DbServer;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.persistence.DataSourceFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
@@ -30,7 +30,7 @@ public abstract class EmfServiceImpl {
         dbServer = new EmfDbServer();
         LOG.debug("Starting  " + name + "(" + this.hashCode() + ")");
         System.out.println("Starting  " + name + "(" + this.hashCode() + "): "
-                + EmfDateFormat.format_YYYY_MM_DD_HH_MM(new Date()));
+                + CustomDateFormat.format_YYYY_MM_DD_HH_MM(new Date()));
     }
 
     public EmfServiceImpl(DataSource datasource, DbServer dbServer) {
@@ -52,7 +52,7 @@ public abstract class EmfServiceImpl {
         new PerformanceMetrics().gc("Shutting down " + name + "(" + this.hashCode() + ")");
         if (DebugLevels.DEBUG_0)
             System.out.println("Shutting down  " + name + "(" + this.hashCode() + "): "
-                    + EmfDateFormat.format_YYYY_MM_DD_HH_MM(new Date()));
+                    + CustomDateFormat.format_YYYY_MM_DD_HH_MM(new Date()));
         super.finalize();
     }
 

@@ -9,7 +9,9 @@ import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import java.util.List;
 
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 public class SectorsDAO {
 
@@ -24,6 +26,15 @@ public class SectorsDAO {
 
     public List getAll(Session session) {
         return session.createCriteria(Sector.class).addOrder(Order.asc("name")).list();
+    }
+    
+    public Sector getSector(String name, Session session) {
+        Criterion criterion = Restrictions.eq("name", name);
+        return (Sector)hibernateFacade.load(Sector.class, criterion, session);
+    }
+    
+    public void addSector(Sector sector, Session session) {
+        hibernateFacade.add(sector, session);
     }
 
     public Sector obtainLocked(User user, Sector sector, Session session) {

@@ -13,6 +13,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.Label;
@@ -25,7 +26,6 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
@@ -54,7 +54,7 @@ import javax.swing.SpringLayout;
 
 public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepView {
     
-    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.PATTERN_yyyyMMddHHmm);
+    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(CustomDateFormat.PATTERN_yyyyMMddHHmm);
 
     private EditableComboBox program;
 
@@ -184,7 +184,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
 
         creationDateLabel = new JLabel();
         Date tableCreationDate = stepResult.getTableCreationDate();
-        String creationDate = (tableCreationDate != null) ? EmfDateFormat.format_MM_DD_YYYY_HH_mm(tableCreationDate)
+        String creationDate = (tableCreationDate != null) ? CustomDateFormat.format_MM_DD_YYYY_HH_mm(tableCreationDate)
                 : "";
         creationDateLabel.setText(creationDate);
         layoutGenerator.addLabelWidgetPair("Run Date:", creationDateLabel, panel);
@@ -500,7 +500,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         status.setSelectedItem(step.getStatus());
         tableName.setText(result == null ? "" : result.getTable());
         creationStatusLabel.setText(result == null ? "" : result.getTableCreationStatus());
-        creationDateLabel.setText(EmfDateFormat.format_MM_DD_YYYY_HH_mm(result == null ? null : result.getTableCreationDate()));
+        creationDateLabel.setText(CustomDateFormat.format_MM_DD_YYYY_HH_mm(result == null ? null : result.getTableCreationDate()));
         currentTable.setSelected(result == null ? false : result.isCurrentTable());
         super.revalidate();
     }

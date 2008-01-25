@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.QAProgram;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 
 import java.util.Date;
@@ -34,7 +34,7 @@ public class QAStepRowSourceTest extends TestCase {
         assertEquals(step.getOrder() + "", values[3] + "");
         assertEquals(step.getStatus(), values[4]);
 
-        assertEquals(EmfDateFormat.format_YYYY_MM_DD_HH_MM(step.getDate()), values[5]);
+        assertEquals(CustomDateFormat.format_YYYY_MM_DD_HH_MM(step.getDate()), values[5]);
 
         assertEquals(step.getWho(), values[6]);
         assertEquals(step.getComments(), values[7]);

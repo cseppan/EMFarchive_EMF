@@ -16,7 +16,6 @@ import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -87,7 +86,7 @@ public class ExportQAStepTask implements Runnable {
     private void disconnect(DbServer dbServer) {
         try {
             dbServer.disconnect();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             logError("Failed to close a connetion. " + qastep.getName(), e);
             setStatus("Failed to close a connetion. Reason: " + e.getMessage());
         }

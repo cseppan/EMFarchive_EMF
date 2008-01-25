@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.ui;
 
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -79,7 +79,7 @@ public class EmfFileTableData extends AbstractTableData {
     }
 
     private Object getDate(EmfFileInfo info) {
-        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(new Date(info.getLastModified()));
+        return CustomDateFormat.format_YYYY_MM_DD_HH_MM(new Date(info.getLastModified()));
     }
 
     private Object getType(EmfFileInfo info) {

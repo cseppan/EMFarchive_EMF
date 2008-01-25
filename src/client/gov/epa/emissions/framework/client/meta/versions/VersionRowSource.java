@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.ui.RowSource;
 
 import java.util.Date;
@@ -23,7 +23,7 @@ public class VersionRowSource implements RowSource {
     }
 
     private Object format(Date date) {
-        return date == null ? "N/A" : EmfDateFormat.format_YYYY_MM_DD_HH_MM(date);
+        return date == null ? "N/A" : CustomDateFormat.format_YYYY_MM_DD_HH_MM(date);
     }
 
     public void setValueAt(int column, Object val) {

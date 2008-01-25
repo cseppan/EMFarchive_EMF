@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.io.generic.GenericExporterToString;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
@@ -26,7 +27,6 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterE
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.exim.ManagedExportService;
 import gov.epa.emissions.framework.services.exim.ManagedImportService;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -2184,7 +2184,7 @@ public class ManagedCaseService {
          * 
          * Format: <jobname>_<case_abbrev>_<datestamp>.csh
          */
-        String dateStamp = EmfDateFormat.format_YYYYMMDDHHMMSS(new Date());
+        String dateStamp = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
         String jobName = job.getName().replace(" ", "_");
         Case caseObj = this.getCase(job.getCaseId());
 

@@ -4,10 +4,10 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -127,7 +127,7 @@ public class SQLQAProgramRunner implements QAProgramRunner {
 
     protected String tableName(QAStep qaStep) {
         //System.out.println("The input is:" + qaStep);
-        String formattedDate = EmfDateFormat.format_YYYYMMDDHHMMSS(new Date());
+        String formattedDate = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
         String table = "QA_DSID" + qaStep.getDatasetId() + "_V" + qaStep.getVersion() + "_"
                 + formattedDate;
         

@@ -1,11 +1,11 @@
 package gov.epa.emissions.framework.client.status;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.basic.Status;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
@@ -145,7 +145,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
     }
 
     public void update(Status[] statuses) {
-        messagePanel.setMessage("Last Update : " + EmfDateFormat.format_YYYY_MM_DD_HH_MM(new Date()), Color.GRAY);
+        messagePanel.setMessage("Last Update : " + CustomDateFormat.format_YYYY_MM_DD_HH_MM(new Date()), Color.GRAY);
         statusTableModel.refresh(statuses);
 
         super.revalidate();

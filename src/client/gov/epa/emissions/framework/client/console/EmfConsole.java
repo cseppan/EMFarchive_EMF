@@ -206,5 +206,13 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     public void clearMesagePanel() {
         messagePanel.clear();
     }
+    
+    public void logExitMessage() {
+        try {
+            session.userService().logExitMessage(session.user());
+        } catch (EmfException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

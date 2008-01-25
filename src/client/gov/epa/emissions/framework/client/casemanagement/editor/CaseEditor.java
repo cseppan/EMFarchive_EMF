@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.casemanagement.editor;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.history.ShowHistoryTab;
@@ -14,7 +15,6 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.ErrorPanel;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -233,7 +233,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     }
 
     private String format(Date lockDate) {
-        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(lockDate);
+        return CustomDateFormat.format_YYYY_MM_DD_HH_MM(lockDate);
     }
 
     public void windowClosing() {

@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.services.cost.data;
 
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 
 public class ControlStrategyResultsSummary {
 
@@ -44,7 +44,7 @@ public class ControlStrategyResultsSummary {
             }
         }
             
-        return EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(strategyResults[earliestStartIndex].getStartTime());
+        return CustomDateFormat.format_MM_DD_YYYY_HH_mm_ss(strategyResults[earliestStartIndex].getStartTime());
     }
     
     public String getCompletionTime() {
@@ -61,7 +61,7 @@ public class ControlStrategyResultsSummary {
             }
         }
         
-        return EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(strategyResults[latestCompletionIndex].getCompletionTime());
+        return CustomDateFormat.format_MM_DD_YYYY_HH_mm_ss(strategyResults[latestCompletionIndex].getCompletionTime());
     }
     
     public void setUser(User user) {

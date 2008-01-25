@@ -4,12 +4,12 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.editor.Revision;
 
 import java.awt.Dimension;
@@ -79,7 +79,7 @@ public class ViewRevisionWindow extends DisposableInteralFrame implements Revisi
     }
 
     private String format(Date date) {
-        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(date);
+        return CustomDateFormat.format_YYYY_MM_DD_HH_MM(date);
     }
 
     private JPanel buttonsPanel() {

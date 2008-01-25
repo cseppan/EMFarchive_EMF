@@ -1,10 +1,11 @@
 package gov.epa.emissions.framework.services.cost;
 
-import java.text.ParseException;
-
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.cost.analysis.common.EffectiveDateFilter;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
+
+import java.text.ParseException;
+
 import junit.framework.TestCase;
 
 public class EffectiveDateFilterTest extends TestCase {
@@ -39,7 +40,7 @@ public class EffectiveDateFilterTest extends TestCase {
     private EfficiencyRecord record(String year) throws ParseException {
         EfficiencyRecord record = new EfficiencyRecord();
         if (year != null)
-            record.setEffectiveDate(EmfDateFormat.parse_YYYY(year));
+            record.setEffectiveDate(CustomDateFormat.parse_YYYY(year));
         return record;
     }
 

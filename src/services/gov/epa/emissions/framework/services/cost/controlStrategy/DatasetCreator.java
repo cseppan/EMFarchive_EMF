@@ -11,6 +11,7 @@ import gov.epa.emissions.commons.db.TableModifier;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -18,7 +19,6 @@ import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.ArrayList;
@@ -160,7 +160,7 @@ public class DatasetCreator {
     }
 
     private String createResultDatasetName(EmfDataset inputDataset) {
-        String timestamp = EmfDateFormat.format_YYYYMMDDHHMMSS(new Date());
+        String timestamp = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
         String name = datasetNamePrefix + inputDataset.getId() 
             + "_V" + inputDataset.getDefaultVersion() 
             + "_" + timestamp;
@@ -181,7 +181,7 @@ public class DatasetCreator {
     }
     
     private String createTableName(EmfDataset inputDataset) {
-        String formattedDate = EmfDateFormat.format_YYYYMMDDHHMMSS(new Date());
+        String formattedDate = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
         String table = tablePrefix + inputDataset.getId() 
             + "_V" + inputDataset.getDefaultVersion() 
             + "_" + formattedDate;

@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,7 +41,7 @@ public class EffectiveDateFilter {
     }
 
     private int dateFilter(List records, EfficiencyRecord record, Date effectiveDate, int inventoryYear, int minDiff) {
-        int recordYear = Integer.parseInt(EmfDateFormat.format_YYYY(effectiveDate));
+        int recordYear = Integer.parseInt(CustomDateFormat.format_YYYY(effectiveDate));
         int diff = inventoryYear - recordYear;
         if (diff >= 0) {
             if (diff == minDiff) {

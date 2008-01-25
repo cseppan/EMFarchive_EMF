@@ -11,6 +11,7 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.AddRemoveWidget;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -23,7 +24,6 @@ import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -406,8 +406,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
         this.userLabel.setText(user == null ? "" : user.getName());
         this.queID.setText(job.getIdInQueue() == null ? "" : job.getIdInQueue());
-        this.start.setText(startDate == null ? "" : EmfDateFormat.format_MM_DD_YYYY_HH_mm(startDate));
-        this.complete.setText(completeDate == null ? "" : EmfDateFormat.format_MM_DD_YYYY_HH_mm(completeDate));
+        this.start.setText(startDate == null ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(startDate));
+        this.complete.setText(completeDate == null ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(completeDate));
         this.runNote.setText(job.getRunNotes());
         this.lastMsg.setText(job.getRunLog());
     }

@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.Dimension;
@@ -53,7 +53,7 @@ public class ViewUserWindow extends DisposableInteralFrame implements UserView {
         if (!user.isLocked())
             return "";
 
-        return "Locked by " + user.getLockOwner() + " at " + EmfDateFormat.format_MM_DD_YYYY_HH_mm(user.getLockDate());
+        return "Locked by " + user.getLockOwner() + " at " + CustomDateFormat.format_MM_DD_YYYY_HH_mm(user.getLockDate());
     }
 
     private ViewableUserProfilePanel createProfilePanel(User user) {

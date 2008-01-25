@@ -21,24 +21,24 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class ImportCaseOutputTask extends Task {
-    
+
     @Override
-    public boolean isEquivalent(Task task) { //NOTE: needs to verify definition of equality
+    public boolean isEquivalent(Task task) { // NOTE: needs to verify definition of equality
         ImportCaseOutputTask importTask = (ImportCaseOutputTask) task;
-        
-        if (this.dataset.getName().equalsIgnoreCase(importTask.getDataset().getName())){
+
+        if (this.dataset.getName().equalsIgnoreCase(importTask.getDataset().getName())) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     private static Log log = LogFactory.getLog(ImportCaseOutputTask.class);
 
     protected Importer importer;
 
     protected EmfDataset dataset;
-    
+
     private CaseOutput output;
 
     protected String[] files;
@@ -46,23 +46,23 @@ public class ImportCaseOutputTask extends Task {
     protected HibernateSessionFactory sessionFactory;
 
     protected double numSeconds;
-    
+
     protected DatasetDAO datasetDao;
-    
+
     private CaseDAO caseDao;
 
     private File path;
 
     private DbServerFactory dbServerFactory;
 
-    public ImportCaseOutputTask(CaseOutput output, EmfDataset dataset, String[] files, File path, User user, Services services,
-            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
+    public ImportCaseOutputTask(CaseOutput output, EmfDataset dataset, String[] files, File path, User user,
+            Services services, DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
         super();
         createId();
-        
+
         if (DebugLevels.DEBUG_1)
             System.out.println(">>>> " + createId());
-        
+
         this.user = user;
         this.files = files;
         this.path = path;
@@ -84,7 +84,7 @@ public class ImportCaseOutputTask extends Task {
         if (DebugLevels.DEBUG_1)
             if (DebugLevels.DEBUG_1)
                 System.out.println("Task# " + taskId + " running");
-        
+
         Session session = null;
         ImporterFactory importerFactory = new ImporterFactory(dbServerFactory);
         try {
@@ -92,10 +92,10 @@ public class ImportCaseOutputTask extends Task {
             long startTime = System.currentTimeMillis();
             session = sessionFactory.getSession();
             session.setFlushMode(FlushMode.NEVER);
-            
+
             prepare(session);
             importer.run();
-            numSeconds = (System.currentTimeMillis() - startTime)/1000;
+            numSeconds = (System.currentTimeMillis() - startTime) / 1000;
             complete(session, "Imported");
         } catch (Exception e) {
             // this doesn't give the full path for some reason
@@ -103,17 +103,17 @@ public class ImportCaseOutputTask extends Task {
             setStatus("failed", "Failed to import dataset " + dataset.getName() + ". Reason: " + e.getMessage());
             removeDataset(dataset);
             try {
-                caseDao.removeCaseOutputs(user, new CaseOutput[]{output}, true, session);
+                caseDao.removeCaseOutputs(user, new CaseOutput[] { output }, true, session);
             } catch (EmfException e1) {
                 e1.printStackTrace();
             }
         } finally {
             try {
-                if ((session != null) && (session.isConnected())){
+                if ((session != null) && (session.isConnected())) {
                     session.flush();
                     session.close();
                 }
-                
+
                 if (importerFactory != null)
                     importerFactory.closeDbConnection();
             } catch (HibernateException e1) {
@@ -133,7 +133,7 @@ public class ImportCaseOutputTask extends Task {
 
     protected void complete(Session session, String status) {
         String message = "Case output " + output.getName() + " registered successfully.";
-        
+
         dataset.setStatus(status);
         updateDataset(dataset, session);
         updateOutput(session, status, message);
@@ -188,41 +188,45 @@ public class ImportCaseOutputTask extends Task {
     }
 
     protected void addStartStatus() {
-        setStatus("started", "Started import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] from "+
-                files[0] + output.getName() + " " + caseDao.toString());
+        setStatus("started", "Started import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] from "
+                + files[0] + output.getName() + " " + caseDao.toString());
     }
 
     protected void addCompletedStatus() {
-        String message = "Completed import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] " 
-               + " in " + numSeconds + " seconds from "+ files[0]; //TODO: add batch size to message once available
+        String message = "Completed import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] "
+                + " in " + numSeconds + " seconds from " + files[0]; // TODO: add batch size to message once
+                                                                        // available
         setStatus("completed", message);
     }
 
     protected void setStatus(String status, String message) {
         output.setStatus(status);
         output.setMessage(message);
+
+        if (DebugLevels.DEBUG_4) {
+            System.out.println("ImportTaskManager = " + ImportTaskManager.getImportTaskManager());
+            System.out.println("taskId = " + taskId);
+            System.out.println("submitterId = " + submitterId);
+            System.out.println("status = " + status);
+            System.out.println("current thread = " + Thread.currentThread());
+            System.out.println("message = " + message);
+        }
         
-        System.out.println("ImportTaskManager = " + ImportTaskManager.getImportTaskManager());
-        System.out.println("taskId = " + taskId);
-        System.out.println("submitterId = " + submitterId);
-        System.out.println("status = " + status);
-        System.out.println("current thread = " + Thread.currentThread());
-        System.out.println("message = " + message);
         ImportTaskManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(), message);
     }
 
     protected void logError(String messge, Exception e) {
         log.error(messge, e);
     }
-    
+
     public EmfDataset getDataset() {
         return this.dataset;
     }
-    
+
     public Importer getImporter() {
         return this.importer;
     }
-    
+
     @Override
     protected void finalize() throws Throwable {
         taskCount--;

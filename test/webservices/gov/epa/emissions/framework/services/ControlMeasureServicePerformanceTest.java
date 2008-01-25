@@ -1,14 +1,14 @@
 package gov.epa.emissions.framework.services;
 
-import java.io.File;
-import java.util.Date;
-
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.ControlMeasureServiceImpl;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+
+import java.io.File;
+import java.util.Date;
 
 public class ControlMeasureServicePerformanceTest extends WebServicesTestCase {
     private static final String DEFAULT_URL = "http://localhost:8080/emf/services";// default
@@ -46,7 +46,7 @@ public class ControlMeasureServicePerformanceTest extends WebServicesTestCase {
     }
     
     protected void dumpMemory() {
-        System.out.println("date-"+EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(new Date())+", "+usedMemory() + " MB");
+        System.out.println("date-"+CustomDateFormat.format_MM_DD_YYYY_HH_mm_ss(new Date())+", "+usedMemory() + " MB");
         
     }
 

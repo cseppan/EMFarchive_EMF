@@ -9,7 +9,6 @@ import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -85,7 +84,7 @@ public class CMExportTask implements Runnable {
             selectedSccs.addAll(Arrays.asList(controlMeasureDao.getCMAbbrevAndSccs(measureIds[i], dbServer)));
             try {
                 dbServer.disconnect();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 throw new EmfException(e.getMessage());
             }
         return (String[])selectedSccs.toArray(new String[0]);

@@ -26,7 +26,17 @@ public class ImportCaseOutputSubmitter extends ImportSubmitter {
         StatusDAO statusServices = null;
         Task task = null;
 
-        task = submittedTable.get(taskId).getImportTask();
+        ImportTaskStatus ts = submittedTable.get(taskId);
+        
+        if (ts == null) { 
+            if (DebugLevels.DEBUG_0)
+                System.out.println("!!!ImportCaseOutputSubmitter: callbackFromTaskManger() returned with taskId: " 
+                        + taskId + " not searchable from submittedTable: " + submittedTable);
+            
+            return;
+        }
+        
+        task = ts.getImportTask();
         user = task.getUser();
         statusServices = task.getStatusServices();
         

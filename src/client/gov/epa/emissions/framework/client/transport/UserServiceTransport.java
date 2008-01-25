@@ -115,4 +115,14 @@ public class UserServiceTransport implements UserService {
         return (String) call.requestResponse(new Object[] { });
     }
 
+    public void logExitMessage(User user) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("logExitMessage");
+        call.addParam("user", mappings.user());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user });
+    }
+
 }

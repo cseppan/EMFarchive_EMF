@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -23,7 +24,6 @@ import gov.epa.emissions.framework.client.meta.revisions.RevisionsTab;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -245,7 +245,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private String format(Date lockDate) {
-        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(lockDate);
+        return CustomDateFormat.format_YYYY_MM_DD_HH_MM(lockDate);
     }
 
     public void windowClosing() {

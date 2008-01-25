@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.status;
 
 import gov.epa.emissions.commons.gui.TableHeader;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.basic.Status;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,7 +102,7 @@ public class StatusTableModel extends AbstractTableModel {
         public Row(Status status) {
             Column messageType = new Column(status.getType());
             Column message = new Column(status.getMessage());
-            Column timestamp = new Column(EmfDateFormat.format_YYYY_MM_DD_HH_MM(status.getTimestamp()));
+            Column timestamp = new Column(CustomDateFormat.format_YYYY_MM_DD_HH_MM(status.getTimestamp()));
 
             columns = new HashMap();
             columns.put(new Integer(0), messageType);

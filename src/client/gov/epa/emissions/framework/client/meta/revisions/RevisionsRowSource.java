@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.meta.revisions;
 
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.ui.RowSource;
 
@@ -20,7 +20,7 @@ public class RevisionsRowSource implements RowSource {
     }
 
     private Object format(Date date) {
-        return date == null ? "N/A" : EmfDateFormat.format_YYYY_MM_DD_HH_MM(date);
+        return date == null ? "N/A" : CustomDateFormat.format_YYYY_MM_DD_HH_MM(date);
     }
 
     public Object source() {

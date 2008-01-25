@@ -1,13 +1,13 @@
 package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.commons.io.importer.CommaDelimitedTokenizer;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.login.LoginWindow;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.casemanagement.CaseAssistService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -529,7 +529,7 @@ public class EMFCmdClient {
         record += "," + jobMsg.getStatus();
         record += "," + jobMsg.getPeriod();
         record += "," + jobMsg.getRemoteUser();
-        record += "," + EmfDateFormat.format_MM_DD_YYYY_HH_mm(jobMsg.getExecModifiedDate());
+        record += "," + CustomDateFormat.format_MM_DD_YYYY_HH_mm(jobMsg.getExecModifiedDate());
         record += "," + new Date().getTime();
         record += "," + output.getDatasetFile();
         record += "," + output.getPath();
@@ -607,7 +607,7 @@ public class EMFCmdClient {
         msg.setRemoteUser(fields[7]);
 
         try {
-            msg.setExecModifiedDate((fields[8] == null || fields[8].trim().isEmpty()) ? null : EmfDateFormat
+            msg.setExecModifiedDate((fields[8] == null || fields[8].trim().isEmpty()) ? null : CustomDateFormat
                     .parse_MM_DD_YYYY_HH_mm(fields[8]));
             msg.setReceivedTime(new Date(Long.parseLong(fields[9])));
         } catch (Exception e) {

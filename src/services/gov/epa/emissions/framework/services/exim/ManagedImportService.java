@@ -2,9 +2,14 @@ package gov.epa.emissions.framework.services.exim;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.data.Region;
+import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.io.CommonFileHeaderReader;
 import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.Services;
@@ -15,7 +20,10 @@ import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
+import gov.epa.emissions.framework.services.data.IntendedUsesDAO;
+import gov.epa.emissions.framework.services.data.ProjectsDAO;
+import gov.epa.emissions.framework.services.data.RegionsDAO;
+import gov.epa.emissions.framework.services.data.SectorsDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.ImportCaseOutputSubmitter;
@@ -33,6 +41,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 
 public class ManagedImportService {
     private static Log log = LogFactory.getLog(ManagedImportService.class);
@@ -102,7 +112,7 @@ public class ManagedImportService {
 
     public synchronized String importDatasetsForClient(User user, String folderPath, String[] filenames,
             DatasetType datasetType) throws EmfException {
-        registerSubmitter(FOR_CLIENT, folderPath, filenames); //initialies importClientSubmitter
+        registerSubmitter(FOR_CLIENT, folderPath, filenames); // initialies importClientSubmitter
         File path = validatePath(folderPath);
         Services services = services();
 
@@ -209,9 +219,8 @@ public class ManagedImportService {
         String[] files = null;
 
         if ((folder == null || folder.trim().isEmpty()) && (fullPath == null || fullPath.trim().isEmpty()))
-            throw new Exception("Error registering output: Please specify files to register case output "+
-                    output.getName());
-
+            throw new Exception("Error registering output: Please specify files to register case output "
+                    + output.getName());
 
         if (fullPath != null && !fullPath.trim().isEmpty()) {
             // get folder from full path
@@ -227,46 +236,49 @@ public class ManagedImportService {
         DatasetType type = getDsType(output.getDatasetType());
 
         if (files.length > 1 && !type.isExternal())
-            for (int i = 0; i < files.length; i++) // here we're making multiple datasets
+            for (int i = 0; i < files.length; i++)
+                // here we're making multiple datasets
                 createOutputTask(type, datasetName, user, output, services, new String[] { files[i] }, path);
-        else  // this is to make one dataset
+        else
+            // this is to make one dataset
             createOutputTask(type, datasetName, user, output, services, files, path);
     }
 
-    private synchronized void createOutputTask(DatasetType type, String datasetName, User user, CaseOutput output, Services services, String[] files,
-            File path) throws Exception {
+    private synchronized void createOutputTask(DatasetType type, String datasetName, User user, CaseOutput output,
+            Services services, String[] files, File path) throws Exception {
         if (datasetName == null || datasetName.trim().isEmpty())
             datasetName = files[0];
-        
+
         if (files.length > type.getMaxFiles() && type.getMaxFiles() != -1)
-            throw new EmfException("Error registering output: Number of files (" 
-                    + files.length + ") exceeds limit for dataset type " + type.getName() + ".");
-        
+            throw new EmfException("Error registering output: Number of files (" + files.length
+                    + ") exceeds limit for dataset type " + type.getName() + ".");
+
         CaseOutput localOuput = createNewCaseOutput(output);
         boolean nameSpecified = (localOuput.getName() != null && !localOuput.getName().trim().isEmpty());
-        
+
         if (!nameSpecified)
             localOuput.setName(datasetName);
-        
+
         EmfDataset dataset = createDataset(path.getAbsolutePath(), files[0], datasetName, user, type);
-        
+
         if (DebugLevels.DEBUG_11) {
-            System.out.println("Output name before create import task: " + (localOuput == null ? "" : output.getName()));
+            System.out
+                    .println("Output name before create import task: " + (localOuput == null ? "" : output.getName()));
             System.out.println("Dataset name before create import task: " + dataset.getName());
         }
-        
+
         ImportCaseOutputTask task = new ImportCaseOutputTask(localOuput, dataset, files, path, user, services,
                 dbServerFactory, sessionFactory);
-        
-        //System.out.println("\nADDING IMPORT TASK FOR DATASET: "+datasetName+";files[0]="+files[0]);
+
+        // System.out.println("\nADDING IMPORT TASK FOR DATASET: "+datasetName+";files[0]="+files[0]);
         importTasks.add(task);
     }
-    
+
     private synchronized CaseOutput createNewCaseOutput(CaseOutput oldOutput) {
         CaseOutput newOutput = new CaseOutput(oldOutput.getName());
         newOutput.setCaseId(oldOutput.getCaseId());
         newOutput.setJobId(oldOutput.getJobId());
-        
+
         return newOutput;
     }
 
@@ -282,22 +294,23 @@ public class ManagedImportService {
 
     public synchronized String[] importDatasetsForCaseOutput(User user, CaseOutput[] outputs) throws EmfException {
         List<String> submitterIds = new ArrayList<String>();
-        
+
         // here the files and path are for informational purposes (printing) only
-        String[] files = new String[] { outputs[0].getDatasetFile() };        
+        String[] files = new String[] { outputs[0].getDatasetFile() };
         registerSubmitter(FOR_OUTPUT, outputs[0].getPath(), files);
-        
+
         Services services = services();
-        
+
         for (CaseOutput output : outputs)
             submitterIds.add(importDatasetForCaseOutput(user, output, services));
-        
+
         return submitterIds.toArray(new String[0]);
     }
 
-    public synchronized String importDatasetForCaseOutput(User user, CaseOutput output, Services services) throws EmfException {
+    public synchronized String importDatasetForCaseOutput(User user, CaseOutput output, Services services)
+            throws EmfException {
         String fileFolder = output.getPath();
- 
+
         try {
             addOutputTasks(user, output, services);
             addTasksToSubmitter(importCaseOutputSubmitter);
@@ -310,14 +323,19 @@ public class ManagedImportService {
         return importCaseOutputSubmitter.getSubmitterId();
     }
 
-   private synchronized EmfDataset createDataset(String folder, String filename, String datasetName, User user,
+    private synchronized EmfDataset createDataset(String folder, String filename, String datasetName, User user,
             DatasetType datasetType) throws Exception {
         EmfDataset dataset = new EmfDataset();
         File file = new File(folder, filename);
+
+        CommonFileHeaderReader headerReader = new CommonFileHeaderReader(file);
+        headerReader.readHeader();
+        headerReader.close();
+
         String name = getCorrectedDSName(datasetName, datasetType);
-        
+
         if (isNameUsed(name))
-            name += "_" + EmfDateFormat.format_yyyy_MM_dd_HHmmssSS(new Date());
+            name += "_" + CustomDateFormat.format_yyyy_MM_dd_HHmmssSS(new Date());
 
         dataset.setName(name);
         dataset.setCreator(user.getUsername());
@@ -325,36 +343,75 @@ public class ManagedImportService {
         dataset.setCreatedDateTime(new Date());
         dataset.setModifiedDateTime(file.exists() ? new Date(file.lastModified()) : new Date());
         dataset.setAccessedDateTime(new Date());
+        dataset.setStartDateTime(headerReader.getStartDate());
+        dataset.setStopDateTime(headerReader.getEndDate());
+        dataset.setTemporalResolution(headerReader.getTemporalResolution());
+
+        return setDatasetProperties(dataset, headerReader.getRegion(), headerReader.getProject(), 
+                headerReader.getSector());
+    }
+
+    private synchronized EmfDataset setDatasetProperties(EmfDataset dataset, String region, String project,
+            String sector) {
+        SectorsDAO sectorsDao = new SectorsDAO();
+        ProjectsDAO projectsDao = new ProjectsDAO();
+        RegionsDAO regionsDao = new RegionsDAO();
+        IntendedUsesDAO intendedUsesDao = new IntendedUsesDAO();
+
+        Session session = sessionFactory.getSession();
+
+        try {
+            Project projectObj = projectsDao.getProject(project, session);
+            dataset.setProject((projectObj == null && project != null) ? projectsDao.addProject(new Project(project), session)
+                    : projectObj);
+
+            Region regionObj = regionsDao.getRegion(region, session);
+            dataset.setRegion((regionObj == null && region != null) ? regionsDao.addRegion(new Region(region), session) : regionObj);
+
+            Sector sectorObj = sectorsDao.getSector(sector, session);
+
+            if (sectorObj == null && sector != null && !sector.isEmpty())
+                log.error("Sector " + sector + " does not exist in sectors table.");
+            else
+                dataset.setSectors(new Sector[] { sectorObj });
+
+            dataset.setIntendedUse(intendedUsesDao.getIntendedUse("public", sessionFactory.getSession()));
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+        } finally {
+            session.close();
+        }
 
         return dataset;
     }
 
     private synchronized String getCorrectedDSName(String datasetName, DatasetType datasetType) {
-        KeyVal[] keyVals =  datasetType.getKeyVals();
-        
+        KeyVal[] keyVals = datasetType.getKeyVals();
+
         if (keyVals == null || keyVals.length == 0)
             return datasetName;
-        
+
         String prefix = null;
         String suffix = null;
-        
+
         for (KeyVal keyval : keyVals) {
             if (keyval.getName().equalsIgnoreCase("EXPORT_PREFIX"))
                 prefix = keyval.getValue();
-            
+
             if (keyval.getName().equalsIgnoreCase("EXPORT_SUFFIX"))
                 suffix = keyval.getValue();
-            
+
             if (prefix != null && suffix != null)
                 break;
         }
-            
+
         if (prefix != null && datasetName.startsWith(prefix))
             datasetName = datasetName.substring(prefix.length());
 
         if (suffix != null && datasetName.endsWith(suffix))
             datasetName = datasetName.substring(0, datasetName.length() - suffix.length());
-            
+
         return datasetName;
     }
 
@@ -364,26 +421,25 @@ public class ManagedImportService {
             FilePatternMatcher fpm = new FilePatternMatcher(directory, pattern);
             String[] allFilesInFolder = directory.list();
             String[] fileNamesForImport = fpm.matchingNames(allFilesInFolder);
-            
+
             if (fileNamesForImport.length > 0)
                 return fileNamesForImport;
 
             if (DebugLevels.DEBUG_11) {
                 System.out.println("ManagedImportService: File patterns passed: " + pattern);
-                
+
                 for (String file : fileNamesForImport)
                     System.out.println("ManagedImportService: File matched from the pattern: " + file);
             }
-            
+
             throw new EmfException("No files found for pattern '" + pattern + "'");
         } catch (ImporterException e) {
             throw new EmfException("Cannot apply pattern.");
         }
     }
-    
+
     public String printStatusImportTaskManager() throws EmfException {
         return TaskManagerFactory.getImportTaskManager().getStatusOfWaitAndRunTable();
     }
-
 
 }

@@ -54,8 +54,10 @@ public class UserServiceImpl implements UserService {
 
     public synchronized void authenticate(String username, String password) throws EmfException {
         try {
-            LOG.warn("User " + username + " tried to login to the EMF service. " + new Date());
             User user = getUser(username);
+            
+            LOG.warn("User " + user.getUsername() + " (" + user.getName() + ") tried to login to the EMF service. " + new Date());
+            
             if (user == null)
                 throw new AuthenticationException("User " + username + " does not exist");
 
@@ -182,6 +184,18 @@ public class UserServiceImpl implements UserService {
     protected synchronized void finalize() throws Throwable {
         this.sessionFactory = null;
         super.finalize();
+    }
+
+    public void logExitMessage(User user) {
+        LOG.warn("User " + user.getUsername() + " (" + user.getName() + ") logged out of the EMF service. " + new Date());
+        
+        try {
+            User existed = getUser(user.getUsername());
+            if (existed == null)
+                LOG.warn("User " + user.getName() + " does not exist");
+        } catch (Exception e) {
+            LOG.warn("Problem retrieving user: " + user.getUsername() + ". " + e.getMessage());
+        }
     }
 
     // public String getEmfVersion() throws EmfException {

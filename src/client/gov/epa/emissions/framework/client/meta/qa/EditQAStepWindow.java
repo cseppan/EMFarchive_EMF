@@ -15,6 +15,7 @@ import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.RunButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.Label;
@@ -27,7 +28,6 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
@@ -61,7 +61,7 @@ import javax.swing.SpringLayout;
 
 public class EditQAStepWindow extends DisposableInteralFrame implements EditQAStepView {
 
-    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.PATTERN_yyyyMMddHHmm);
+    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(CustomDateFormat.PATTERN_yyyyMMddHHmm);
 
     private EditableComboBox program;
 
@@ -223,7 +223,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         creationDateLabel = new JLabel();
         Date tableCreationDate = stepResult.getTableCreationDate();
-        String creationDate = (tableCreationDate != null) ? EmfDateFormat.format_MM_DD_YYYY_HH_mm(tableCreationDate)
+        String creationDate = (tableCreationDate != null) ? CustomDateFormat.format_MM_DD_YYYY_HH_mm(tableCreationDate)
                 : "";
         creationDateLabel.setText(creationDate);
         layoutGenerator.addLabelWidgetPair("Run Date:", creationDateLabel, panel);
@@ -843,7 +843,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         status.setSelectedItem(step.getStatus());
         tableName.setText(result.getTable());
         creationStatusLabel.setText(result.getTableCreationStatus());
-        creationDateLabel.setText(EmfDateFormat.format_MM_DD_YYYY_HH_mm(result.getTableCreationDate()));
+        creationDateLabel.setText(CustomDateFormat.format_MM_DD_YYYY_HH_mm(result.getTableCreationDate()));
         currentTable.setSelected(result.isCurrentTable());
         qaStepResult = result;
         super.revalidate();

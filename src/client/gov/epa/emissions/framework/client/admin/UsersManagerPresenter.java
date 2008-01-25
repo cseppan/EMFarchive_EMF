@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.UserService;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
 public class UsersManagerPresenter implements RefreshObserver {
@@ -54,7 +54,7 @@ public class UsersManagerPresenter implements RefreshObserver {
         userToDelete = service.obtainLocked(session.user(), userToDelete);
         if (!userToDelete.isLocked(session.user())) {// locked by another user
             String message = "Locked by " + userToDelete.getLockOwner() + " at "
-                    + EmfDateFormat.format_YYYY_MM_DD_HH_MM(userToDelete.getLockDate());
+                    + CustomDateFormat.format_YYYY_MM_DD_HH_MM(userToDelete.getLockDate());
             throw new EmfException(message);
         }
 

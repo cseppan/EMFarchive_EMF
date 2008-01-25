@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.revisions;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.editor.Revision;
 
 import java.util.Date;
@@ -29,7 +29,7 @@ public class RevisionsRowSourceTest extends TestCase {
         assertEquals(revision.getVersion(), ((Long) values[3]).longValue());
         assertEquals(revision.getCreator().getName(), values[4]);
 
-        assertEquals(EmfDateFormat.format_YYYY_MM_DD_HH_MM(revision.getDate()), values[5]);
+        assertEquals(CustomDateFormat.format_YYYY_MM_DD_HH_MM(revision.getDate()), values[5]);
     }
 
     public void testShouldTrackOriginalSource() {

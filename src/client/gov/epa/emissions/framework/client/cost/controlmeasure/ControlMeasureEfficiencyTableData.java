@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -65,7 +65,7 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
                 new Double(record.getCapitalAnnualizedRatio()!= null ? record.getCapitalAnnualizedRatio() : NAN_VALUE), 
                 new Double(record.getIncrementalCostPerTon()!= null ? record.getIncrementalCostPerTon() : NAN_VALUE),
                 record.getLastModifiedBy(), 
-                EmfDateFormat.format_MM_DD_YYYY_HH_mm(record.getLastModifiedTime()), 
+                CustomDateFormat.format_MM_DD_YYYY_HH_mm(record.getLastModifiedTime()), 
                 record.getDetail(), 
                 record.getExistingMeasureAbbr(),
                 new Integer(record.getExistingDevCode())
@@ -75,7 +75,7 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     private String effectiveDate(Date effectiveDate) {
-        return effectiveDate == null ? "" : EmfDateFormat.format_MM_DD_YYYY(effectiveDate);
+        return effectiveDate == null ? "" : CustomDateFormat.format_MM_DD_YYYY(effectiveDate);
     }
 
     private List createRows(EfficiencyRecord[] records) {

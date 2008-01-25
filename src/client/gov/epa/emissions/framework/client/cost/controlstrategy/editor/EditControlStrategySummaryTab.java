@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -21,7 +22,6 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.DoubleTextField;
 import gov.epa.emissions.framework.ui.IntTextField;
@@ -228,7 +228,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private JLabel lastModifiedDate() {
-        return createLeftAlignedLabel(EmfDateFormat.format_MM_DD_YYYY_HH_mm(controlStrategy.getLastModifiedDate()));
+        return createLeftAlignedLabel(CustomDateFormat.format_MM_DD_YYYY_HH_mm(controlStrategy.getLastModifiedDate()));
     }
 
     private JLabel creator() {
@@ -457,7 +457,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private void updateStartDate(ControlStrategy controlStrategy) {
-        String startDateString = EmfDateFormat.format_MM_DD_YYYY_HH_mm_ss(controlStrategy.getStartDate());
+        String startDateString = CustomDateFormat.format_MM_DD_YYYY_HH_mm_ss(controlStrategy.getStartDate());
         startDate.setText((startDateString == null ||startDateString.trim()=="" ? "Not started" : startDateString));
     }
 

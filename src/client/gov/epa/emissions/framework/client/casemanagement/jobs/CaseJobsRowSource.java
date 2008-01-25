@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.RowSource;
 
 public class CaseJobsRowSource implements RowSource {
@@ -66,11 +66,11 @@ public class CaseJobsRowSource implements RowSource {
     }
     
     private String getStartDate(CaseJob job) {
-        return (job.getRunStartDate() == null) ? "" : EmfDateFormat.format_YYYY_MM_DD_HH_MM(job.getRunStartDate());
+        return (job.getRunStartDate() == null) ? "" : CustomDateFormat.format_YYYY_MM_DD_HH_MM(job.getRunStartDate());
     }
 
     private String getCompleteDate(CaseJob job) {
-        return (job.getRunCompletionDate() == null) ? "" : EmfDateFormat.format_YYYY_MM_DD_HH_MM(job.getRunCompletionDate());
+        return (job.getRunCompletionDate() == null) ? "" : CustomDateFormat.format_YYYY_MM_DD_HH_MM(job.getRunCompletionDate());
     }
     
     private String getPurpose(CaseJob job) {

@@ -29,5 +29,7 @@ public interface UserService extends EMFService {
     User releaseLocked(User object) throws EmfException;
     
     String getEmfVersion() throws EmfException;
+    
+    void logExitMessage(User user) throws EmfException;
 
 }

@@ -335,7 +335,11 @@ public class DatasetDAO {
             throw new SQLException("Cannot get total records number on dataset: " + dataset.getName() + " Reason: "
                     + e.getMessage());
         } finally {
-            dbServer.disconnect();
+            try {
+                dbServer.disconnect();
+            } catch (Exception e) {
+                throw new SQLException(e.getMessage());
+            }
         }
 
         return totalCount;

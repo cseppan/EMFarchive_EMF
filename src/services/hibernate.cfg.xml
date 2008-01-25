@@ -26,7 +26,7 @@
 		<property name="c3p0.idle_test_period">10</property> <!-- seconds --> 
 		<property name="c3p0.max_size">100</property> 
 		<property name="c3p0.max_statements">0</property> 
-		<property name="c3p0.min_size">5</property> 
+		<property name="c3p0.min_size">30</property> 
 		<property name="c3p0.timeout">10</property> <!-- seconds --> 
 
 		<!-- Mappings : Data Management -->

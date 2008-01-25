@@ -6,16 +6,16 @@ import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.util.Date;
 import java.awt.Dimension;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -117,7 +117,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
     }
 
     private String formatDate(Date date) {
-        return EmfDateFormat.format_MM_DD_YYYY_HH_mm(date);
+        return CustomDateFormat.format_MM_DD_YYYY_HH_mm(date);
     }
 
     private JPanel createOverviewSection() {

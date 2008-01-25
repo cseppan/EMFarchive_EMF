@@ -5,11 +5,11 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.emissions.framework.ui.TableData;
@@ -73,7 +73,7 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
         if (!sector.isLocked())
             return "";
 
-        return "Locked by " + sector.getLockOwner() + " at " + EmfDateFormat.format_YYYY_MM_DD_HH_MM(sector.getLockDate());
+        return "Locked by " + sector.getLockOwner() + " at " + CustomDateFormat.format_YYYY_MM_DD_HH_MM(sector.getLockDate());
     }
 
     private JPanel createBasicDataPanel(Sector sector) {

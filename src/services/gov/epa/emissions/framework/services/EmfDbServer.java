@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.services;
 
-import java.sql.SQLException;
-
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
@@ -58,7 +56,7 @@ public class EmfDbServer implements DbServer {
         return dbServer.asciiToNumber(asciiColumn,precision);
     }
     
-    public void disconnect() throws SQLException {
+    public void disconnect() throws Exception {
         dbServer.disconnect();
     }
 

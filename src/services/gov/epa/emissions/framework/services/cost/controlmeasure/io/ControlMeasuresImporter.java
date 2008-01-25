@@ -133,7 +133,7 @@ public class ControlMeasuresImporter implements Importer {
         } finally {
             try {
                 dbServer.disconnect();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 // NOTE Auto-generated catch block
             } finally {
                 //

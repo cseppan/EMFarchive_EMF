@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
@@ -10,7 +11,6 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.services.cost.data.AggregatedPollutantEfficiencyRecord;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -164,7 +164,7 @@ public class ControlMeasureTableData extends AbstractTableData {
     }
 
     private Object getDateReviewed(ControlMeasure measure) {
-        return EmfDateFormat.format_MM_DD_YYYY(measure.getDateReviewed());
+        return CustomDateFormat.format_MM_DD_YYYY(measure.getDateReviewed());
     }
 
     private Object getSourceGroup(ControlMeasure measure) {
@@ -184,7 +184,7 @@ public class ControlMeasureTableData extends AbstractTableData {
     }
 
     private Object getLastModifiedTime(ControlMeasure measure) {
-        return EmfDateFormat.format_YYYY_MM_DD_HH_MM(measure.getLastModifiedTime());
+        return CustomDateFormat.format_YYYY_MM_DD_HH_MM(measure.getLastModifiedTime());
     }
 
     public boolean isEditable(int col) {

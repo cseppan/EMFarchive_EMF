@@ -13,6 +13,7 @@ import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.data.IntendedUses;
@@ -21,7 +22,6 @@ import gov.epa.emissions.framework.client.data.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -40,7 +40,7 @@ import javax.swing.SpringLayout;
 public class EditableSummaryTab extends JPanel implements EditableSummaryTabView {
 
     private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(
-            EmfDateFormat.PATTERN_MMddYYYY_HHmm);
+            CustomDateFormat.PATTERN_MMddYYYY_HHmm);
     
     private EmfDataset dataset;
 
@@ -54,7 +54,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private MessagePanel messagePanel;
 
-    private EditableComboBox intendedUseCombo;
+    private ComboBox intendedUseCombo;
 
     private ComboBox sectorsCombo;
 
@@ -127,14 +127,26 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private void setupIntendedUseCombo() throws EmfException {
         allIntendedUses = service.getIntendedUses();
-        intendedUseCombo = new EditableComboBox(allIntendedUses);
+        intendedUseCombo = new ComboBox(allIntendedUses);
         IntendedUse intendedUse = dataset.getIntendedUse();
+        
+        if (intendedUse == null)
+            intendedUse = getPublic(allIntendedUses);
+        
         intendedUseCombo.setSelectedItem(intendedUse);
         changeablesList.addChangeable(intendedUseCombo);
     }
 
+    private IntendedUse getPublic(IntendedUse[] allIntendedUses) {
+        for (IntendedUse use : allIntendedUses)
+            if (use.getName().equalsIgnoreCase("public"))
+                return use;
+        
+        return null;
+    }
+
     private String format(Date date) {
-        return EmfDateFormat.format_MM_DD_YYYY_HH_mm(date);
+        return CustomDateFormat.format_MM_DD_YYYY_HH_mm(date);
     }
 
     private JPanel createTimeSpaceSection() throws EmfException {

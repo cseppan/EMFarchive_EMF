@@ -37,7 +37,11 @@ public class EmfDatabaseSetup extends DatabaseSetup {
     }
 
     public void tearDown() throws SQLException {
-        super.tearDown();
+        try {
+            super.tearDown();
+        } catch (Exception e) {
+            throw new SQLException(e.getMessage());
+        }
     }
 
     private ConnectionParams params(Properties pref) {

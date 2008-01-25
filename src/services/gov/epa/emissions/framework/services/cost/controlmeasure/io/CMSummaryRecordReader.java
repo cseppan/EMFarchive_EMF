@@ -6,11 +6,11 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlMeasureMonth;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.text.ParseException;
@@ -273,11 +273,11 @@ public class CMSummaryRecordReader {
         if (date == null || date.trim().length() == 0)
             return;
         try {
-            Date dateReviewed = EmfDateFormat.parse_YYYY(date);
+            Date dateReviewed = CustomDateFormat.parse_YYYY(date);
             cm.setDateReviewed(dateReviewed);
         } catch (ParseException e) {
             try {
-                Date dateReviewed = EmfDateFormat.parse_MMddyyyy(date);
+                Date dateReviewed = CustomDateFormat.parse_MMddyyyy(date);
                 cm.setDateReviewed(dateReviewed);
             } catch (ParseException e2) {
                 sb.append(format("expected date format YYYY or MM/DD/YYYY, but was: " + date));

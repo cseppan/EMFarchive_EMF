@@ -12,7 +12,6 @@ import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -249,7 +248,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             if (dbServer != null)
                 dbServer.disconnect();
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             LOG.error("Could not close database server", e);
             throw new EmfException("Could not close database server");
         }

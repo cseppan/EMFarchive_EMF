@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.casemanagement.history;
 
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.ChangeableTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -60,8 +60,8 @@ public class JobMessagesTableData extends ChangeableTableData {
                 new Object[] { getJob(msg), msg.getExecName(),
                 msg.getPeriod(), msg.getMessageType(), msg.getMessage(), 
                 msg.getStatus(), msg.getRemoteUser(), 
-                EmfDateFormat.format_YYYY_MM_DD_HH_MM_ss_SS(msg.getReceivedTime()),
-                EmfDateFormat.format_YYYY_MM_DD_HH_MM(msg.getExecModifiedDate()),
+                CustomDateFormat.format_YYYY_MM_DD_HH_MM_ss_SS(msg.getReceivedTime()),
+                CustomDateFormat.format_YYYY_MM_DD_HH_MM(msg.getExecModifiedDate()),
                 msg.getExecPath()});
     }
     

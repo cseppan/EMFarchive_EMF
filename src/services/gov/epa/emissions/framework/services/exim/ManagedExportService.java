@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.Services;
@@ -19,7 +20,6 @@ import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.ExportClientSubmitter;
@@ -144,7 +144,7 @@ public class ManagedExportService {
         String prefix = "", suffix = "";
 //        KeyVal[] keyvals = dataset.getKeyVals(); // only gets KeyVals from dataset itself
         KeyVal[] keyvals = dataset.mergeKeyVals(); // this function is not equal to getKeyVals() anymore
-        String date = EmfDateFormat.format_ddMMMyyyy(version.getLastModifiedDate());
+        String date = CustomDateFormat.format_ddMMMyyyy(version.getLastModifiedDate());
 
         for (int i = 0; i < keyvals.length; i++) {
             prefix = keyvals[i].getKeyword().getName().equalsIgnoreCase("EXPORT_PREFIX") ? keyvals[i].getValue() : "";

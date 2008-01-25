@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.revisions;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.ui.Row;
 
@@ -83,7 +83,7 @@ public class RevisionsTableDataTest extends TestCase {
         assertEquals(revision0.getVersion(), ((Long) row.getValueAt(3)).longValue());
         assertEquals(revision0.getCreator().getName(), row.getValueAt(4));
 
-        assertEquals(EmfDateFormat.format_YYYY_MM_DD_HH_MM(revision0.getDate()), row.getValueAt(5));
+        assertEquals(CustomDateFormat.format_YYYY_MM_DD_HH_MM(revision0.getDate()), row.getValueAt(5));
     }
 
     public void testShouldReturnARowRepresentingANoteEntry() {

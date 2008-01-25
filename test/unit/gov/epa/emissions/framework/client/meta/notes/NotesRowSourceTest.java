@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
 
@@ -30,7 +30,7 @@ public class NotesRowSourceTest extends TestCase {
         assertEquals(note.getVersion(), ((Long)values[3]).longValue());
         assertEquals(note.getCreator().getName(), values[4]);
 
-        assertEquals(EmfDateFormat.format_YYYY_MM_DD_HH_MM(note.getDate()), values[5]);
+        assertEquals(CustomDateFormat.format_YYYY_MM_DD_HH_MM(note.getDate()), values[5]);
 
         assertEquals(note.getReferences(), values[6]);
         assertEquals(note.getDetails(), values[7]);

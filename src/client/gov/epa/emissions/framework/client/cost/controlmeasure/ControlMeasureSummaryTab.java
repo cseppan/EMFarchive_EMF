@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.casemanagement.editor.AddRemoveSectorWidget;
@@ -20,7 +21,6 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlMeasureMonth;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 
@@ -125,7 +125,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         deviceCode.setText(measure.getDeviceCode() + "");
         equipmentLife.setText(measure.getEquipmentLife() + "");
         if (modifiedTime != null)
-            lastModifiedTime.setText(EmfDateFormat.format_YYYY_MM_DD_HH_MM(modifiedTime));
+            lastModifiedTime.setText(CustomDateFormat.format_YYYY_MM_DD_HH_MM(modifiedTime));
         lastModifiedBy.setText(measure.getLastModifiedBy() + "");
         abbreviation.setText(getText(measure.getAbbreviation()));
         dateReviewed.setText(formatDateReviewed());
@@ -135,7 +135,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     }
 
     private String formatDateReviewed() {
-        return EmfDateFormat.format_MM_DD_YYYY(measure.getDateReviewed());
+        return CustomDateFormat.format_MM_DD_YYYY(measure.getDateReviewed());
     }
 
     private String getText(String value) {
@@ -399,7 +399,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
                 measure.setDateReviewed(null);
                 return;
             }
-            measure.setDateReviewed(EmfDateFormat.parse_MMddyyyy(date));
+            measure.setDateReviewed(CustomDateFormat.parse_MMddyyyy(date));
         } catch (Exception e) {
             throw new EmfException("Please Correct the Date Format(MM/dd/yyyy) in Date Reviewed");
         }
@@ -512,7 +512,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     }
 
     private void populateLastModifiedFields() {
-        lastModifiedTime.setText(EmfDateFormat.format_YYYY_MM_DD_HH_MM(new Date()));
+        lastModifiedTime.setText(CustomDateFormat.format_YYYY_MM_DD_HH_MM(new Date()));
         lastModifiedBy.setText(session.user().getName());
     }
 

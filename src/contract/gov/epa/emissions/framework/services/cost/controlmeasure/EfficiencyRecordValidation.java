@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure;
 
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 
 import java.util.Date;
 
@@ -21,7 +21,7 @@ public class EfficiencyRecordValidation {
             return null;
         }
         try {
-            return EmfDateFormat.parse_MMddyyyy(date);
+            return CustomDateFormat.parse_MMddyyyy(date);
         } catch (Exception e) {
             throw new EmfException("effective date format should be MM/dd/yyyy, value =" + date);
         }

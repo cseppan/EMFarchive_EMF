@@ -452,7 +452,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         presenter.runJobs(jobs);
         doRefresh(presenter.getCaseJobs());
-        setMessage("Finished summitting jobs to run.");
+        setMessage("Finished submitting jobs to run.");
     }
 
     private List<CaseJob> getSelectedJobs() {

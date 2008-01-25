@@ -18,6 +18,7 @@ public class ExitAndLogoutAction {
         if (confirm(message)) {
             if (desktopManager.closeAll()) {
                 emfConsole.disposeView();
+                emfConsole.logExitMessage();
                 return true;
             }
         }
@@ -29,6 +30,7 @@ public class ExitAndLogoutAction {
         if (confirm(message)) {
             if (desktopManager.closeAll()) {
                 emfConsole.disposeView();
+                emfConsole.logExitMessage();
                 System.exit(0);
             }
         }

@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -10,7 +11,6 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
-import gov.epa.emissions.framework.services.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -194,7 +194,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     public void notifyLockFailure(ControlMeasure measure) {
         String message = "Cannot edit Properties of ControlMeasure: " + measure.getName()
                 + System.getProperty("line.separator") + " as it was locked by User: " + measure.getLockOwner()
-                + "(at " + EmfDateFormat.format_YYYY_MM_DD_HH_MM(measure.getLockDate()) + ")";
+                + "(at " + CustomDateFormat.format_YYYY_MM_DD_HH_MM(measure.getLockDate()) + ")";
         InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
     }
