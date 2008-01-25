@@ -34,11 +34,15 @@ public class OutputsRowSource implements RowSource {
     private String getMessage(CaseOutput source) {
         String message = source.getMessage();
         
-        if (source.getDatasetId() > 0 && source.getStatus().contains("completed")
-                && datasetValues == null) {
+        if (source.getDatasetId() > 0)
+        {
+           if ((source.getStatus() != null) && source.getStatus().contains("completed")
+              && datasetValues == null) 
+           {
             message = "Dataset has been deleted.";
             source.setStatus("");
             source.setMessage(message);
+           }
         }
         
         if(message != null && message.length() > 50)
