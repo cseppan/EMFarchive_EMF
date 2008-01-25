@@ -442,7 +442,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             //  there are no nonfinal dataset versions used, so return yes
             return JOptionPane.YES_OPTION;  
           
-        option = showDialog(validationMsg + ls + "Are you sure to run the selected job" + 
+        option = showDialog(validationMsg + ls + "Do you still want to run the selected job" + 
                 (jobs.length > 1 ? "s" : "") + "?", "Warning");
         return option;
     }
