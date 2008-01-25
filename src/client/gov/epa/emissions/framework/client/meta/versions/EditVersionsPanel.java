@@ -135,7 +135,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             newButton.setEnabled(false);
         }
         
-        Button editButton = new EditButton(new AbstractAction() {
+        Button renameButton = new Button("Rename", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     doEdit();
@@ -145,11 +145,11 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
                 }
             }
         });
-        editButton.setToolTipText("Edit version name");
-        editButton.setMargin(new Insets(2, 2, 2, 2));
-        panel.add(editButton);
+        renameButton.setToolTipText("Change version name");
+        renameButton.setMargin(new Insets(2, 2, 2, 2));
+        panel.add(renameButton);
         if (dataset.getInternalSources().length == 0) {
-            editButton.setEnabled(false);
+            renameButton.setEnabled(false);
         }
         
         Button markFinal = new Button("Mark Final", new AbstractAction() {
