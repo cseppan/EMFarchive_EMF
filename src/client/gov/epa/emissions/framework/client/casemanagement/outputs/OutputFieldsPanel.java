@@ -212,12 +212,17 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     public CaseOutput setFields() {
         updateOutputName();
         updateJob();
+        updateDatasetType();
         updateDataset();
         updateMessage();
         return output;
     }
 
-    private void updateJob() {
+    private void updateDatasetType() {
+         output.setDatasetType(dsTypeCombo.getSelectedItem().toString());
+    }
+    
+   private void updateJob() {
         CaseJob job = (CaseJob) jobCombo.getSelectedItem();
         if (job==null || job.getName().equalsIgnoreCase(OutputFieldsPanelPresenter.ALL_FOR_SECTOR)) {
             output.setJobId(0);
@@ -253,6 +258,8 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     }
 
     public void validateFields() throws EmfException {
+        if (this.dsTypeCombo.getSelectedItem() == null)
+            throw new EmfException("Please select a dataset type for the output");
         if (outputName.getText().trim().equalsIgnoreCase(""))
             throw new EmfException("Please specify an output name.");
         if (((CaseJob)jobCombo.getSelectedItem()).getId()==0)
