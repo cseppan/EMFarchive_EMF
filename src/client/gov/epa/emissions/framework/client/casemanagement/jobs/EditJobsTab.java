@@ -280,7 +280,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         });
         validate.setMargin(insets);
         container.add(validate);
-        
+
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
 
@@ -339,9 +339,9 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     }
 
     private void removeSelectedJobs(CaseJob[] jobs) throws EmfException {
-        try{
+        try {
             presenter.removeJobs(jobs);
-        }catch (EmfException e){
+        } catch (EmfException e) {
             throw new EmfException(e.getMessage());
         }
         tableData.remove(jobs);
@@ -380,17 +380,22 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
     }
 
-    private void validateJobDatasets() throws EmfException{
+    private void validateJobDatasets() throws EmfException {
         CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
-        String lineSeparator = System.getProperty("line.separator");
+
         if (jobs.length == 0) {
             messagePanel.setMessage("Please select one or more jobs to run.");
             return;
-        } 
-        
-        showMessageDialog(message(jobs, lineSeparator), "Possible Issues with Datasets Selected for Job Inputs");
+        }
+
+        String validationMsg = presenter.validateInputDatasets(jobs);
+        int width = 50;
+        int height = validationMsg.length() / 50;
+        String title = "Possible Issues with Datasets Selected for Job Inputs";
+
+        showMessageDialog(createMsgScrollPane(validationMsg, width, height), title);
     }
-    
+
     private void runJobs() throws Exception {
         CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
 
@@ -405,11 +410,11 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             String lineSeparator = System.getProperty("line.separator");
 
             if (msg.equalsIgnoreCase("OK")) {
-                option = validateJobs(jobs, option, lineSeparator);
-                
+                option = validateJobs(jobs, lineSeparator);
+
                 if (option == JOptionPane.YES_OPTION)
                     proceedRunningJobs(jobs);
-                
+
                 return;
             }
 
@@ -419,11 +424,11 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             }
 
             if (msg.equalsIgnoreCase("WARNING"))
-                option = showDialog("Are you sure you want to rerun the selected job" 
-                        + (jobs.length > 1 ? "s" : "") + "?", "Warning");
+                option = showDialog("Are you sure you want to rerun the selected job" + (jobs.length > 1 ? "s" : "")
+                        + "?", "Warning");
 
             if (option == JOptionPane.YES_OPTION) {
-                option = validateJobs(jobs, option, lineSeparator);
+                option = validateJobs(jobs, lineSeparator);
             }
 
             if (option == JOptionPane.YES_OPTION)
@@ -435,16 +440,20 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
     }
 
-    private int validateJobs(CaseJob[] jobs, int option, String ls) throws EmfException {
+    private int validateJobs(CaseJob[] jobs, String ls) throws EmfException {
         String validationMsg = presenter.validateJobs(jobs);
 
         if (validationMsg.isEmpty())
-            //  there are no nonfinal dataset versions used, so return yes
-            return JOptionPane.YES_OPTION;  
-          
-        option = showDialog(validationMsg + ls + "Do you still want to run the selected job" + 
-                (jobs.length > 1 ? "s" : "") + "?", "Warning");
-        return option;
+            // there are no nonfinal dataset versions used, so return yes
+            return JOptionPane.YES_OPTION; 
+        
+        String finalMsg = validationMsg + ls + "Are you sure to run the selected job" + 
+                    (jobs.length > 1 ? "s" : "") + "?";
+        int width = 50;
+        int height = validationMsg.length() / 50;
+        ScrollableComponent msgArea = createMsgScrollPane(finalMsg, width, height);
+        
+        return showDialog(msgArea, "Warning");
     }
 
     private void proceedRunningJobs(CaseJob[] jobs) throws Exception {
@@ -459,22 +468,20 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         return (List<CaseJob>) selectModel.selected();
     }
 
-    private int showDialog(String msg, String title) {
+    private int showDialog(Object msg, String title) {
         return JOptionPane.showConfirmDialog(parentConsole, msg, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
     }
-    
+
     private void showMessageDialog(Object msg, String title) {
         JOptionPane.showMessageDialog(parentConsole, msg, title, JOptionPane.WARNING_MESSAGE);
     }
-    
-    private ScrollableComponent message(CaseJob[] jobs, String lineSeparator) throws EmfException {
-        String validationMsg = presenter.validateInputDatasets(jobs);
-        
-        TextArea message = new TextArea("message", validationMsg, 60, 20 );
+
+    private ScrollableComponent createMsgScrollPane(String msg, int width, int height) {
+        TextArea message = new TextArea("msgArea", msg, width, height);
         message.setEditable(false);
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(message);
-        descScrollableTextArea.setMinimumSize(new Dimension(350, 40));
+        //descScrollableTextArea.setMinimumSize(new Dimension(width * 3, height * 2));
         return descScrollableTextArea;
     }
 
