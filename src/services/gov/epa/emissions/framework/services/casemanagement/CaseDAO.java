@@ -70,7 +70,28 @@ public class CaseDAO {
         Session localSession = sessionFactory.getSession();
 
         try {
-            CaseOutput existed = getCaseOutput(output, localSession);
+            removeCaseOutputIfExists(user, output, localSession);
+            
+            if (DebugLevels.DEBUG_14)
+                System.out.println("CaseDAO starts adding case output " + output.getName() + " " + new Date());
+            
+            hibernateFacade.add(output, session);
+            toReturn = getCaseOutput(output, session);
+            
+            if (DebugLevels.DEBUG_14)
+                System.out.println("CaseDAO finished adding case output " + toReturn.getName() + " " + new Date());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            localSession.close();
+        }
+
+        return toReturn;
+    }
+    
+    public void removeCaseOutputIfExists(User user, CaseOutput output, Session session) {
+        try {
+            CaseOutput existed = getCaseOutput(output, session);
 
             if (DebugLevels.DEBUG_12) {
                 System.out.println("Is output existed? " + (existed == null));
@@ -79,23 +100,13 @@ public class CaseDAO {
             }
 
             if (existed != null)
-                removeCaseOutputs(user, new CaseOutput[] { existed }, true, localSession);
+                removeCaseOutputs(user, new CaseOutput[] { existed }, true, session);
 
             if (DebugLevels.DEBUG_14)
-                System.out.println("CaseDAO starts adding case output " + output.getName() + " " + new Date());
-            
-            hibernateFacade.add(output, session);
-            toReturn = getCaseOutput(output, session);
-            
-            if (DebugLevels.DEBUG_14)
-                System.out.println("CaseDAO starts adding case output " + toReturn.getName() + " " + new Date());
+                System.out.println("CaseDAO removed case output " + output.getName() + " " + new Date());
         } catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            localSession.close();
-        }
-
-        return toReturn;
+        } 
     }
 
     public CaseOutput updateCaseOutput(CaseOutput output) {

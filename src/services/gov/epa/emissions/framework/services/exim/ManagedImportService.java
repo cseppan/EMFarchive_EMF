@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
+import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
@@ -205,7 +206,7 @@ public class ManagedImportService {
 
     private synchronized void addTasks(String folder, File path, String[] filenames, String dsName, User user,
             DatasetType dsType, Services services) throws Exception {
-        EmfDataset dataset = createDataset(folder, filenames[0], dsName, user, dsType);
+        EmfDataset dataset = createDataset(folder, filenames[0], dsName, user, dsType, false, null);
         ImportTask task = new ImportTask(dataset, filenames, path, user, services, dbServerFactory, sessionFactory);
 
         importTasks.add(task);
@@ -259,7 +260,7 @@ public class ManagedImportService {
         if (!nameSpecified)
             localOuput.setName(datasetName);
 
-        EmfDataset dataset = createDataset(path.getAbsolutePath(), files[0], datasetName, user, type);
+        EmfDataset dataset = createDataset(path.getAbsolutePath(), files[0], datasetName, user, type, true, output);
 
         if (DebugLevels.DEBUG_11) {
             System.out
@@ -324,17 +325,27 @@ public class ManagedImportService {
     }
 
     private synchronized EmfDataset createDataset(String folder, String filename, String datasetName, User user,
-            DatasetType datasetType) throws Exception {
+            DatasetType datasetType, boolean forCaseOutput, CaseOutput output) throws Exception {
         EmfDataset dataset = new EmfDataset();
         File file = new File(folder, filename);
 
         CommonFileHeaderReader headerReader = new CommonFileHeaderReader(file);
-        headerReader.readHeader();
-        headerReader.close();
+
+        try {
+            headerReader.readHeader();
+        } catch (Exception e) {
+            log.error("Error reading import file " + file.getAbsolutePath() + ". " + e.getMessage());
+        } finally {
+            headerReader.close();
+        }
 
         String name = getCorrectedDSName(datasetName, datasetType);
+        boolean nameUsed = isNameUsed(name);
 
-        if (isNameUsed(name))
+        if (nameUsed && forCaseOutput)
+            nameUsed = !removeOldDataset(name, user, output);
+        
+        if (nameUsed)
             name += "_" + CustomDateFormat.format_yyyy_MM_dd_HHmmssSS(new Date());
 
         dataset.setName(name);
@@ -347,8 +358,23 @@ public class ManagedImportService {
         dataset.setStopDateTime(headerReader.getEndDate());
         dataset.setTemporalResolution(headerReader.getTemporalResolution());
 
-        return setDatasetProperties(dataset, headerReader.getRegion(), headerReader.getProject(), 
-                headerReader.getSector());
+        return setDatasetProperties(dataset, headerReader.getRegion(), headerReader.getProject(), headerReader
+                .getSector());
+    }
+
+    private synchronized boolean removeOldDataset(String datasetName, User user, CaseOutput output) {
+        CaseDAO dao = new CaseDAO();
+        Session session = sessionFactory.getSession();
+
+        try {
+            dao.removeCaseOutputIfExists(user, output, session);
+            return true;
+        } catch (Exception e) {
+            log.error("Error renaming dataset " + datasetName + ". ", e);
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
     private synchronized EmfDataset setDatasetProperties(EmfDataset dataset, String region, String project,
@@ -362,11 +388,12 @@ public class ManagedImportService {
 
         try {
             Project projectObj = projectsDao.getProject(project, session);
-            dataset.setProject((projectObj == null && project != null) ? projectsDao.addProject(new Project(project), session)
-                    : projectObj);
+            dataset.setProject((projectObj == null && project != null) ? projectsDao.addProject(new Project(project),
+                    session) : projectObj);
 
             Region regionObj = regionsDao.getRegion(region, session);
-            dataset.setRegion((regionObj == null && region != null) ? regionsDao.addRegion(new Region(region), session) : regionObj);
+            dataset.setRegion((regionObj == null && region != null) ? regionsDao.addRegion(new Region(region), session)
+                    : regionObj);
 
             Sector sectorObj = sectorsDao.getSector(sector, session);
 
