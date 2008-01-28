@@ -1,9 +1,11 @@
 package gov.epa.emissions.framework.tasks;
 
 import java.io.File;
+import java.util.Date;
 
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.Services;
@@ -128,7 +130,7 @@ public class ImportCaseOutputTask extends Task {
         addStartStatus();
         caseDao.add(user, output, session);
         dataset.setStatus("Started import");
-        addDataset(dataset, session);
+        addDataset(session);
     }
 
     protected void complete(Session session, String status) {
@@ -157,12 +159,15 @@ public class ImportCaseOutputTask extends Task {
         return fileList.toString();
     }
 
-    protected void addDataset(EmfDataset dataset, Session session) throws EmfException {
+    protected void addDataset(Session session) throws EmfException {
         try {
-            if (datasetDao.datasetNameUsed(dataset.getName()))
-                throw new EmfException("The selected Dataset name is already in use");
+            String name = dataset.getName();
+            
+            if (datasetDao.datasetNameUsed(name)) {
+                name +=  "_" + CustomDateFormat.format_yyyy_MM_dd_HHmmssSS(new Date());
+                dataset.setName(name);
+            }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new EmfException(e.getMessage() == null ? "" : e.getMessage());
         }
 
@@ -226,7 +231,7 @@ public class ImportCaseOutputTask extends Task {
     public Importer getImporter() {
         return this.importer;
     }
-
+    
     @Override
     protected void finalize() throws Throwable {
         taskCount--;

@@ -9,13 +9,11 @@ import gov.epa.emissions.commons.io.CommonFileHeaderReader;
 import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
-import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
@@ -124,6 +122,7 @@ public class ManagedImportService {
             addTasksToSubmitter(importClientSubmitter);
         } catch (Exception e) {
             setErrorMsgs(folderPath, e);
+            throw new EmfException(e.getMessage());
         }
 
         return importClientSubmitter.getSubmitterId();
@@ -140,6 +139,7 @@ public class ManagedImportService {
             addTasksToSubmitter(importClientSubmitter);
         } catch (Exception e) {
             setErrorMsgs(folderPath, e);
+            throw new EmfException(e.getMessage());
         }
 
         return importClientSubmitter.getSubmitterId();
@@ -206,7 +206,7 @@ public class ManagedImportService {
 
     private synchronized void addTasks(String folder, File path, String[] filenames, String dsName, User user,
             DatasetType dsType, Services services) throws Exception {
-        EmfDataset dataset = createDataset(folder, filenames[0], dsName, user, dsType, false, null);
+        EmfDataset dataset = createDataset(folder, filenames[0], dsName, user, dsType, false);
         ImportTask task = new ImportTask(dataset, filenames, path, user, services, dbServerFactory, sessionFactory);
 
         importTasks.add(task);
@@ -260,7 +260,7 @@ public class ManagedImportService {
         if (!nameSpecified)
             localOuput.setName(datasetName);
 
-        EmfDataset dataset = createDataset(path.getAbsolutePath(), files[0], datasetName, user, type, true, output);
+        EmfDataset dataset = createDataset(path.getAbsolutePath(), files[0], datasetName, user, type, true);
 
         if (DebugLevels.DEBUG_11) {
             System.out
@@ -325,9 +325,14 @@ public class ManagedImportService {
     }
 
     private synchronized EmfDataset createDataset(String folder, String filename, String datasetName, User user,
-            DatasetType datasetType, boolean forCaseOutput, CaseOutput output) throws Exception {
+            DatasetType datasetType, boolean forCaseOutput) throws Exception {
         EmfDataset dataset = new EmfDataset();
         File file = new File(folder, filename);
+
+        String name = getCorrectedDSName(datasetName, datasetType);
+
+        if (isNameUsed(name) && !forCaseOutput)
+            throw new Exception("Dataset name " + name + " has been used.");
 
         CommonFileHeaderReader headerReader = new CommonFileHeaderReader(file);
 
@@ -338,15 +343,6 @@ public class ManagedImportService {
         } finally {
             headerReader.close();
         }
-
-        String name = getCorrectedDSName(datasetName, datasetType);
-        boolean nameUsed = isNameUsed(name);
-
-        if (nameUsed && forCaseOutput)
-            nameUsed = !removeOldDataset(name, user, output);
-        
-        if (nameUsed)
-            name += "_" + CustomDateFormat.format_yyyy_MM_dd_HHmmssSS(new Date());
 
         dataset.setName(name);
         dataset.setCreator(user.getUsername());
@@ -360,21 +356,6 @@ public class ManagedImportService {
 
         return setDatasetProperties(dataset, headerReader.getRegion(), headerReader.getProject(), headerReader
                 .getSector());
-    }
-
-    private synchronized boolean removeOldDataset(String datasetName, User user, CaseOutput output) {
-        CaseDAO dao = new CaseDAO();
-        Session session = sessionFactory.getSession();
-
-        try {
-            dao.removeCaseOutputIfExists(user, output, session);
-            return true;
-        } catch (Exception e) {
-            log.error("Error renaming dataset " + datasetName + ". ", e);
-            return false;
-        } finally {
-            session.close();
-        }
     }
 
     private synchronized EmfDataset setDatasetProperties(EmfDataset dataset, String region, String project,
