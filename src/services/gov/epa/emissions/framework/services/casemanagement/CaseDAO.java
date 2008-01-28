@@ -65,31 +65,33 @@ public class CaseDAO {
         }
     }
 
-    public CaseOutput add(User user, CaseOutput output, Session session) {
-        CaseOutput toReturn = null;
-        Session localSession = sessionFactory.getSession();
+    public CaseOutput add(User user, CaseOutput output) {
+        Session session = sessionFactory.getSession();
 
         try {
-            removeCaseOutputIfExists(user, output, localSession);
+            removeCaseOutputIfExists(user, output);
             
             if (DebugLevels.DEBUG_14)
                 System.out.println("CaseDAO starts adding case output " + output.getName() + " " + new Date());
             
             hibernateFacade.add(output, session);
-            toReturn = getCaseOutput(output, session);
             
             if (DebugLevels.DEBUG_14)
-                System.out.println("CaseDAO finished adding case output " + toReturn.getName() + " " + new Date());
+                System.out.println("CaseDAO finished adding case output " + output.getName() + " " + new Date());
+            
+            return getCaseOutput(output, session);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
-            localSession.close();
+            session.close();
         }
 
-        return toReturn;
+        return null;
     }
     
-    public void removeCaseOutputIfExists(User user, CaseOutput output, Session session) {
+    public void removeCaseOutputIfExists(User user, CaseOutput output) {
+        Session session = sessionFactory.getSession();
+        
         try {
             CaseOutput existed = getCaseOutput(output, session);
 
@@ -106,7 +108,9 @@ public class CaseDAO {
                 System.out.println("CaseDAO removed case output " + output.getName() + " " + new Date());
         } catch (Exception ex) {
             ex.printStackTrace();
-        } 
+        } finally {
+            session.close();
+        }
     }
 
     public CaseOutput updateCaseOutput(CaseOutput output) {
@@ -145,7 +149,7 @@ public class CaseDAO {
 
         return (outputs != null && outputs.size() > 0);
     }
-
+    
     public void add(Executable exe, Session session) {
         addObject(exe, session);
     }
