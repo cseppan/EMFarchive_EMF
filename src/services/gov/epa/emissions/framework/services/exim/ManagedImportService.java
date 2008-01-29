@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.exim;
 
+import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Project;
@@ -15,6 +16,7 @@ import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
+import gov.epa.emissions.framework.services.data.CountriesDAO;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
@@ -355,15 +357,16 @@ public class ManagedImportService {
         dataset.setTemporalResolution(headerReader.getTemporalResolution());
 
         return setDatasetProperties(dataset, headerReader.getRegion(), headerReader.getProject(), headerReader
-                .getSector());
+                .getSector(), headerReader.getCountry());
     }
 
     private synchronized EmfDataset setDatasetProperties(EmfDataset dataset, String region, String project,
-            String sector) {
+            String sector, String country) {
         SectorsDAO sectorsDao = new SectorsDAO();
         ProjectsDAO projectsDao = new ProjectsDAO();
         RegionsDAO regionsDao = new RegionsDAO();
         IntendedUsesDAO intendedUsesDao = new IntendedUsesDAO();
+        CountriesDAO countriesDao = new CountriesDAO();
 
         Session session = sessionFactory.getSession();
 
@@ -375,6 +378,10 @@ public class ManagedImportService {
             Region regionObj = regionsDao.getRegion(region, session);
             dataset.setRegion((regionObj == null && region != null) ? regionsDao.addRegion(new Region(region), session)
                     : regionObj);
+
+            Country countryObj = countriesDao.getCountry(country, session);
+            dataset.setCountry((countryObj == null && country != null) ? countriesDao.addCountry(new Country(country),
+                    session) : countryObj);
 
             Sector sectorObj = sectorsDao.getSector(sector, session);
 
