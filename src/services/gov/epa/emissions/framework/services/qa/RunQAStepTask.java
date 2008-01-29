@@ -109,7 +109,7 @@ public class RunQAStepTask {
 
     private void close(DbServer dbServer) throws EmfException {
         try {
-            if (dbServer != null)
+            if (dbServer != null && dbServer.isConnected())
                 dbServer.disconnect();
         } catch (Exception e) {
             throw new EmfException("Could not close database connection." + e.getMessage());

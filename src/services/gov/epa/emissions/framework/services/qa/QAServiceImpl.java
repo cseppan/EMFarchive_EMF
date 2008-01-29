@@ -123,7 +123,14 @@ public class QAServiceImpl implements QAService {
             LOG.error("Cannot drop result table for QA step: " + step.getName(), e);
             throw new EmfException("Cannot drop result table for QA step: " + step.getName());
         } finally {
-            session.close();
+            try {
+                session.close();
+                
+                if (dbServer != null && dbServer.isConnected())
+                    dbServer.disconnect();
+            } catch (Exception e) {
+                throw new EmfException(e.getMessage());
+            }
         }
     }
 
