@@ -566,15 +566,18 @@ public class CaseServiceImpl implements CaseService {
         Session session = sessionFactory.getSession();
         try {
             if (!dao.canUpdate(caseObj, session))
-                throw new EmfException("Case name already in use");
+                throw new EmfException("the case name is already in use");
+            
+            if (dao.getAbbreviation(caseObj.getAbbreviation(), session) != null)
+                throw new EmfException("the same case abbreviation has been used by another case");
 
             Case caseWithLock = dao.updateWithLock(caseObj, session);
 
             return caseWithLock;
             // return dao.getById(csWithLock.getId(), session);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             log.error("Could not update Case: " + caseObj, e);
-            throw new EmfException("Could not update Case: " + caseObj);
+            throw new EmfException("Could not update Case: " + e.getMessage() + ".");
         } finally {
             session.close();
         }

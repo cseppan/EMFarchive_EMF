@@ -226,6 +226,12 @@ public class CaseDAO {
         return hibernateFacade.getAll(Abbreviation.class, Order.asc("name"), session);
     }
 
+    public Abbreviation getAbbreviation(Abbreviation abbr, Session session) {
+        Criterion criterion = Restrictions.eq("name", abbr.getName());
+        
+        return (Abbreviation)hibernateFacade.load(Abbreviation.class, criterion, session);
+    }
+
     public List getAirQualityModels(Session session) {
         return hibernateFacade.getAll(AirQualityModel.class, Order.asc("name"), session);
     }
