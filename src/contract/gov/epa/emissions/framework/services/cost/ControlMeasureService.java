@@ -63,9 +63,9 @@ public interface ControlMeasureService extends EMFService {
 
     void updateEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException;
 
-    ControlMeasure[] getSummaryControlMeasures(int majorPollutantId) throws EmfException;
+    ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, String whereFilter) throws EmfException;
     
-    ControlMeasure[] getSummaryControlMeasures() throws EmfException;
+    ControlMeasure[] getSummaryControlMeasures(String whereFilter) throws EmfException;
     
     EquationType[] getEquationTypes() throws EmfException;
     

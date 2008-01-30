@@ -4,5 +4,5 @@ public interface SCCSelectionView {
 
     void display(SCCTableData tableData);
 
-    void observe(SCCSelectionPresenter presenter);
+    void observe(Object presenter);
 }

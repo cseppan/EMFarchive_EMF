@@ -22,6 +22,7 @@ import gov.epa.emissions.framework.client.cost.controlmeasure.io.CMImportWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
+import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
@@ -77,6 +78,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private JPanel mainPanel;
 
     private Pollutant[] pollsFromDB;
+    
+    private Scc[] sccs=new Scc[] {}; 
 
     private String[] years = { "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006" };
 
@@ -95,9 +98,9 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private SelectableSortFilterWrapper table;
     
     public ControlMeasuresManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Control Measure Manager", new Dimension(855, 350), desktopManager);
+        super("Control Measure Manager", new Dimension(900, 350), desktopManager);
         super.setName("controlMeasures");
-        super.setMinimumSize(new Dimension(800, 250));
+        super.setMinimumSize(new Dimension(860, 250));
         this.session = session;
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
@@ -106,25 +109,22 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     public void run() {
         if (this.threadAction == "refresh") {
             try {
-                copyButton.setEnabled(false);
-                refreshButton.setEnabled(false);
+                setButton(false);
                 messagePanel.setMessage("Please wait while retrieving control measures...");
                 setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 refresh(new ControlMeasure[0]);
-                refresh(presenter.getControlMeasures(getSelectedMajorPollutant()));
+                refresh(presenter.getControlMeasures(getSelectedMajorPollutant(), sccs));
                 messagePanel.clear();
             } catch (Exception e) {
                 messagePanel.setError("Cannot retrieve control measures.  " + e.getMessage());
             } finally  {
-                copyButton.setEnabled(true);
-                refreshButton.setEnabled(true);
+                setButton(true);
                 setCursor(Cursor.getDefaultCursor());
                 this.populateThread = null;
             }
         } else if (this.threadAction == "copy") {
             try {
-                copyButton.setEnabled(false);
-                refreshButton.setEnabled(false);
+                setButton(false);
                 messagePanel.setMessage("Please wait while copying control measures...");
                 setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 copySelectedControlMeasures();
@@ -134,12 +134,47 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
             } catch (Exception e) {
                 messagePanel.setError("Cannot copy control measures.  " + e.getMessage());
             } finally  {
-                copyButton.setEnabled(true);
-                refreshButton.setEnabled(true);
+                setButton(true);
+                setCursor(Cursor.getDefaultCursor());
+                this.populateThread = null;
+            }
+        }else if (this.threadAction == "find") {
+            try {
+                setButton(false);
+                messagePanel.setMessage("Please wait while retrieving control measures...");
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                refresh(new ControlMeasure[0]);
+                refresh(presenter.getControlMeasures(getSelectedMajorPollutant(), sccs));
+                String sccMsg = sccs.length>0 ? "Retrieved measures for SCC: " + getScc(): ""; 
+                this.sccs = new Scc[] {};
+                messagePanel.clear();
+                messagePanel.setMessage(sccMsg);
+            } catch (Exception e) {
+                messagePanel.setError("Cannot retrieve control measures.  " + e.getMessage());
+            } finally  {
+                setButton(true);
                 setCursor(Cursor.getDefaultCursor());
                 this.populateThread = null;
             }
         }
+    }
+    
+    private String getScc(){
+        String sccMsg="";
+        if (sccs.length<5){
+            for (int i=0; i<sccs.length; i++)
+                sccMsg += sccs[i].getCode() + "  ";
+        }else{
+            for (int i=0; i<5; i++)
+                sccMsg += sccs[i].getCode() + "  ";
+            sccMsg += "...";
+        }
+        return sccMsg;
+    }
+    private void setButton(boolean b) {
+        copyButton.setEnabled(b);
+        refreshButton.setEnabled(b);
+
     }
 
     public void display(ControlMeasure[] measures) throws EmfException {
@@ -287,6 +322,9 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
         Button newControlMeasure = new NewButton(newControlMeasureAction());
         panel.add(newControlMeasure);
+        
+        Button find = new Button("Find", findAction());
+        panel.add(find);
 
         return panel;
     }
@@ -419,6 +457,25 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         return action;
     }
 
+    private Action findAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                findView();
+            }
+        };
+        return action;
+    }
+    
+    private void findView(){
+        SCCSelectionView view = new SCCFindDialog(parentConsole);
+        SCCFindPresenter presenter = new SCCFindPresenter(this, view);
+        try {
+            presenter.display(view);
+        } catch (Exception exp) {
+            messagePanel.setError(exp.getMessage());
+        }
+    }
+    
     protected void copySelectedControlMeasures() throws EmfException {
         messagePanel.clear();
         List cmList = getSelectedMeasures();
@@ -516,6 +573,13 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     public void doRefresh() {
         this.threadAction = "refresh";
+        this.populateThread = new Thread(this);
+        this.populateThread.start();
+    }
+    
+    public void doFind(Scc[] sccs) {
+        this.sccs=sccs; 
+        this.threadAction = "find";
         this.populateThread = new Thread(this);
         this.populateThread.start();
     }

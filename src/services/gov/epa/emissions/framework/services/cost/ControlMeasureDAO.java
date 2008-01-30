@@ -475,19 +475,19 @@ public class ControlMeasureDAO {
         updateAggregateEfficiencyRecords(efficiencyRecord.getControlMeasureId(), dbServer);
     }
 
-    public ControlMeasure[] getSummaryControlMeasures(DbServer dbServer) throws EmfException {
+    public ControlMeasure[] getSummaryControlMeasures(DbServer dbServer, String whereFilter) throws EmfException {
         try {
             RetrieveControlMeasure retrieveControlMeasure = new RetrieveControlMeasure(dbServer);
-            return retrieveControlMeasure.getControlMeasures();
+            return retrieveControlMeasure.getControlMeasures(whereFilter);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
     }
 
-    public ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, DbServer dbServer) throws EmfException {
+    public ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, DbServer dbServer, String whereFilter) throws EmfException {
         try {
             RetrieveControlMeasure retrieveControlMeasure = new RetrieveControlMeasure(dbServer);
-            return retrieveControlMeasure.getControlMeasures(majorPollutantId);
+            return retrieveControlMeasure.getControlMeasures(majorPollutantId, whereFilter);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }

@@ -362,10 +362,10 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public synchronized ControlMeasure[] getSummaryControlMeasures() throws EmfException {
+    public synchronized ControlMeasure[] getSummaryControlMeasures(String whereFilter) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            return dao.getSummaryControlMeasures(dbServer);
+            return dao.getSummaryControlMeasures(dbServer, whereFilter);
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve control measure efficiency records.", e);
             throw new EmfException("Could not retrieve control measures efficiency records.");
@@ -377,10 +377,10 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public synchronized ControlMeasure[] getSummaryControlMeasures(int majorPollutantId) throws EmfException {
+    public synchronized ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, String whereFilter) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            return dao.getSummaryControlMeasures(majorPollutantId, dbServer);
+            return dao.getSummaryControlMeasures(majorPollutantId, dbServer, whereFilter);
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve control measure efficiency records.", e);
             throw new EmfException("Could not retrieve control measures efficiency records.");

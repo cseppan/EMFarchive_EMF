@@ -252,28 +252,30 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         call.requestResponse(new Object[] { efficiencyRecord });
     }
 
-    public synchronized ControlMeasure[] getSummaryControlMeasures() throws EmfException {
+    public synchronized ControlMeasure[] getSummaryControlMeasures(String whereFilter) throws EmfException {
 //        System.out.println(new Date().toString() + " start transport.getSummaryControlMeasures");
         try {
             EmfCall call = call();
 
             call.setOperation("getSummaryControlMeasures");
+            call.addStringParam("whereFilter");
             call.setReturnType(mappings.controlMeasures());
-            return (ControlMeasure[]) call.requestResponse(new Object[] { });
+            return (ControlMeasure[]) call.requestResponse(new Object[] { whereFilter });
         } finally {
 //            System.out.println(new Date().toString() + " end transport.getSummaryControlMeasures");
         }
     }
 
-    public synchronized ControlMeasure[] getSummaryControlMeasures(int majorPollutantId) throws EmfException {
+    public synchronized ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, String whereFilter) throws EmfException {
 //        System.out.println(new Date().toString() + " start transport.getSummaryControlMeasures");
         try {
             EmfCall call = call();
 
             call.setOperation("getSummaryControlMeasures");
             call.addIntegerParam("majorPollutantId");
+            call.addStringParam("whereFilter");
             call.setReturnType(mappings.controlMeasures());
-            return (ControlMeasure[]) call.requestResponse(new Object[] { new Integer(majorPollutantId) });
+            return (ControlMeasure[]) call.requestResponse(new Object[] { new Integer(majorPollutantId), whereFilter });
         } finally {
 //            System.out.println(new Date().toString() + " end transport.getSummaryControlMeasures");
         }

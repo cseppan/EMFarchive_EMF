@@ -48,7 +48,7 @@ public class RetrieveSCC {
         List abbrevSccs = new ArrayList();
         try {
             while (rs.next()) {
-                abbrevSccs.add(rs.getString(1) + "," + rs.getString(2));
+                abbrevSccs.add("\"" + rs.getString(1)+"\"" + "," + rs.getString(2));
             }
         } finally {
             rs.close();

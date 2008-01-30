@@ -95,7 +95,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         record2.setLastModifiedTime(new Date());
         dao.addEfficiencyRecord(record2, session, dbServer());
 
-        ControlMeasure[] cms = dao.getSummaryControlMeasures(dbServer());
+        ControlMeasure[] cms = dao.getSummaryControlMeasures(dbServer(), "");
         assertEquals(1, cms.length);
         assertEquals(1, cms[0].getAggregatedPollutantEfficiencyRecords().length);
     }

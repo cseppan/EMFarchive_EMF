@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
-import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
@@ -8,7 +8,6 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.EmfImageTool;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.ui.EmfTableModel;
-import gov.epa.emissions.framework.ui.TrackableSortFilterSelectModel;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
@@ -21,28 +20,28 @@ import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
-public class SCCSelectionDialog extends JDialog implements SCCSelectionView {
+public class SCCFindDialog extends JDialog implements SCCSelectionView {
 
-    private TrackableSortFilterSelectModel selectModel;
+    private SortFilterSelectModel selectModel;
 
     private EmfConsole parent;
 
-    private SCCSelectionPresenter presenter;
+    private SCCFindPresenter presenter;
     
-    private ManageChangeables changeables;
+//    private ManageChangeables changeables;
 
-    public SCCSelectionDialog(EmfConsole parent, ManageChangeables changeables) {
+    public SCCFindDialog(EmfConsole parent) {
         super(parent);
         super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
         
         this.parent = parent;
-        this.changeables = changeables;
+//        this.changeables = changeables;
     }
 
     public void display(SCCTableData tableData) {
         EmfTableModel tableModel = new EmfTableModel(tableData);
-        selectModel = new TrackableSortFilterSelectModel(tableModel);
-        changeables.addChangeable(selectModel);
+        selectModel = new SortFilterSelectModel(tableModel);
+//        changeables.addChangeable(selectModel);
         SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parent, selectModel);
 
         Container contentPane = getContentPane();
@@ -87,12 +86,12 @@ public class SCCSelectionDialog extends JDialog implements SCCSelectionView {
     private void add() {
         List selected = selectModel.selected();
         Scc[] sccs = (Scc[]) selected.toArray(new Scc[0]);
-        presenter.doAdd(sccs);
+        presenter.doFind(sccs);
 
     }
 
     public void observe(Object presenter) {
-        this.presenter = (SCCSelectionPresenter)presenter;
+        this.presenter = (SCCFindPresenter) presenter;
     }
 
 }

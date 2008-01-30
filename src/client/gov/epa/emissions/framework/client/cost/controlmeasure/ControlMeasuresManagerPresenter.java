@@ -47,7 +47,7 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
 
     public void doRefresh() throws EmfException {
         view.clearMessage();
-        view.refresh(service().getSummaryControlMeasures());
+        view.refresh(service().getSummaryControlMeasures(""));
     }
 
     private ControlMeasureService service() {
@@ -145,9 +145,26 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
             return new ControlMeasure[0];
 
         if (pollutant.getName().equals("ALL"))
-            return service().getSummaryControlMeasures();
+            return service().getSummaryControlMeasures("");
 
-        return service().getSummaryControlMeasures(pollutant.getId());
+        return service().getSummaryControlMeasures(pollutant.getId(), "");
+    }
+    
+    public ControlMeasure[] getControlMeasures(Pollutant pollutant, Scc[] sccs) throws EmfException {
+        if (sccs.length==0 )
+            return getControlMeasures(pollutant);
+        
+        String scc="";
+        for (int i=0; i<sccs.length-1; i++)
+            scc +="'"+sccs[i].getCode()+"'" + ",";
+        scc +="'"+sccs[sccs.length-1].getCode()+"'";
+//        System.out.println(scc);
+        
+        String whereFilter = "cm.id in (select control_measures_id from emf.control_measure_sccs where name in (" + scc +")) " ;
+        if (pollutant.getName().equals("ALL") || pollutant.getName().equalsIgnoreCase("Select one"))
+            return service().getSummaryControlMeasures(whereFilter);
+        return service().getSummaryControlMeasures(pollutant.getId(), whereFilter);
+        
     }
 
     public CostYearTable getCostYearTable() {

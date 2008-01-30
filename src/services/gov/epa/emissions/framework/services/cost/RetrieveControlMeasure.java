@@ -22,10 +22,10 @@ public class RetrieveControlMeasure {
         this.dbServer = dbServer;
     }
 
-    public ControlMeasure[] getControlMeasures() throws SQLException {
+    public ControlMeasure[] getControlMeasures(String whereFilter) throws SQLException {
         ControlMeasure[] controlMeasures = {};
         try {
-            String sql = query();
+            String sql = query(whereFilter);
 //            log.error("exec query");
             ResultSet set = dbServer.getEmfDatasource().query().executeQuery(sql);
 //            log.error("populate measures from query");
@@ -38,10 +38,26 @@ public class RetrieveControlMeasure {
         return controlMeasures;
     }
 
-    public ControlMeasure[] getControlMeasures(int majorPollutantId) throws SQLException {
+//    public ControlMeasure[] getControlMeasures(int majorPollutantId) throws SQLException {
+//        ControlMeasure[] controlMeasures = {};
+//        try {
+//            String sql = query(majorPollutantId);
+////            log.error("exec query");
+//            ResultSet set = dbServer.getEmfDatasource().query().executeQuery(sql);
+////            log.error("populate measures from query");
+//            controlMeasures = values(set);
+////            log.error("done populate measures from query");
+//        } catch (SQLException e) {
+//            throw e;
+//        }
+//
+//        return controlMeasures;
+//    }
+
+    public ControlMeasure[] getControlMeasures(int majorPollutantId, String whereFilter) throws SQLException {
         ControlMeasure[] controlMeasures = {};
         try {
-            String sql = query(majorPollutantId);
+            String sql = query(majorPollutantId, whereFilter);
 //            log.error("exec query");
             ResultSet set = dbServer.getEmfDatasource().query().executeQuery(sql);
 //            log.error("populate measures from query");
@@ -115,7 +131,7 @@ public class RetrieveControlMeasure {
         return (ControlMeasure[]) cms.toArray(new ControlMeasure[0]);
     }
 
-    private String query() {
+    private String query(String whereFilter) {
 
         String query = "select cm.id, cm.name, " +
                 "cm.abbreviation, cm.description, " +
@@ -219,12 +235,15 @@ public class RetrieveControlMeasure {
                 "on p.id = aer.pollutant_id " +
                 "left outer join emf.pollutants mp " +
                 "on mp.id = cm.major_pollutant " +
-                "order by cm.name, cm.id, s.name, p.name";
+              //don't include filter if no sccs
+              (whereFilter.length() > 0 ? " where " + whereFilter : "") + 
+             //cm.id in (select control_measures_id from emf.control_measure_sccs where name in ('2000123213','SCC2','','','')) " + 
+                " order by cm.name, cm.id, s.name, p.name";
 //        log.error(query);
         return query;
     }
 
-    private String query(int majorPollutantId) {
+    private String query(int majorPollutantId, String whereFilter) {
 
         String query = "select cm.id, cm.name, " +
                 "cm.abbreviation, cm.description, " +
@@ -276,6 +295,7 @@ public class RetrieveControlMeasure {
                 "left outer join emf.pollutants mp " +
                 "on mp.id = cm.major_pollutant " +
                 "where cm.major_pollutant = " + majorPollutantId + " " +
+                (whereFilter.length() > 0 ? " and " + whereFilter : "") + 
                 "order by cm.name, cm.id/*, p.name*/";
 
         //Keep the sort order, this dictates how the list is built for the measure mgr!!!
@@ -330,8 +350,11 @@ public class RetrieveControlMeasure {
         "on p.id = aer.pollutant_id " +
         "left outer join emf.pollutants mp " +
         "on mp.id = cm.major_pollutant " +
-        "where cm.major_pollutant = " + majorPollutantId + " " +
-        "order by cm.name, cm.id, s.name, p.name";
+//        if (whereFilter.trim().equals("") )
+         "where cm.major_pollutant = " + majorPollutantId + " " +
+            //don't include filter if no sccs
+        (whereFilter.length() > 0 ? " and " + whereFilter : "") + 
+         " order by cm.name, cm.id, s.name, p.name";
 //        log.error(query);
 
         return query;
