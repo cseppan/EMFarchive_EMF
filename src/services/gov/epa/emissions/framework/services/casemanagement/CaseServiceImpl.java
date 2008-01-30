@@ -42,29 +42,19 @@ public class CaseServiceImpl implements CaseService {
 
     private HibernateSessionFactory sessionFactory;
 
-    // private DbServer dbServer;
-
     private DbServerFactory dbFactory;
 
     private ManagedCaseService caseService;
 
-    // all sectors and all jobs id in the case inputs tb
-    // private static Sector ALL_SECTORS = null;
-    //
-    // private static int ALL_JOB_ID = 0;
-
-    // FIXME: What is this next constructor for?
     public CaseServiceImpl() {
         this(HibernateSessionFactory.get(), DbServerFactory.get());
     }
 
     public CaseServiceImpl(HibernateSessionFactory sessionFactory, DbServerFactory dbFactory) {
         this.sessionFactory = sessionFactory;
-        // this.dbServer = dbFactory.getDbServer();
         this.dbFactory = dbFactory;
         this.dao = new CaseDAO();
-        // if (DebugLevels.DEBUG_0) System.out.println("CaseServiceImpl::getCaseService Is dBServer null? " + (dbServer
-        // == null));
+        
         if (DebugLevels.DEBUG_0)
             System.out.println("CaseServiceImpl::getCaseService  Is sessionFactory null? " + (sessionFactory == null));
 
@@ -77,9 +67,9 @@ public class CaseServiceImpl implements CaseService {
     @Override
     protected void finalize() throws Throwable {
         this.sessionFactory = null;
-        // this.dbServer.disconnect();
-        // dbServer=null;
-        System.out.println("CaseServiceImpl class finalize() called.");
+        this.dbFactory = null;
+        this.dao = null;
+        
         super.finalize();
     }
 
@@ -110,10 +100,6 @@ public class CaseServiceImpl implements CaseService {
     public Case[] getCases() throws EmfException {
         return getCaseService().getCases();
     }
-
-    // private Case getCase(int caseId) throws EmfException {
-    // return getCaseService().getCase(caseId);
-    // }
 
     public Abbreviation[] getAbbreviations() throws EmfException {
         return getCaseService().getAbbreviations();
@@ -181,15 +167,6 @@ public class CaseServiceImpl implements CaseService {
 
     public ModelToRun[] getModelToRuns() throws EmfException {
         return getCaseService().getModelToRuns();
-    }
-
-    public void export(User user, String dirName, String purpose, boolean overWrite, int caseId) throws EmfException {
-        if (false)
-            throw new EmfException("");
-        if (DebugLevels.DEBUG_6)
-            System.out.println("Called CaseServiceImpl::export() caseId= " + caseId);
-
-        // getCaseService().exportInputsForCase(user, dirName, purpose, overWrite, caseId);
     }
 
     public InputName addCaseInputName(InputName name) throws EmfException {
@@ -537,21 +514,6 @@ public class CaseServiceImpl implements CaseService {
             System.out.println("Finished validating jobs. " + new Date());
 
         return msg;
-    }
-
-    public String validateInputDatasets(Integer[] jobIDs) throws EmfException {
-        try {
-            if (DebugLevels.DEBUG_14)
-                System.out.println("Start validating input datasets. " + new Date());
-            String msg = getCaseService().validateInputDatasets(jobIDs);
-            if (DebugLevels.DEBUG_14)
-                System.out.println("Finished validating input datasets. " + new Date());
-            return msg;
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
-            throw new EmfException(e.getMessage());
-        }
     }
 
     public CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException {

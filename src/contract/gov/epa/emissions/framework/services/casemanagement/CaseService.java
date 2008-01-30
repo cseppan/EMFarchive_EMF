@@ -57,8 +57,6 @@ public interface CaseService {
 
     Case updateCase(Case element) throws EmfException;
     
-    void export(User user, String dirName, String purpose, boolean overWrite, int caseId) throws EmfException;
-
     InputName addCaseInputName(InputName name) throws EmfException;
 
     CaseProgram addProgram(CaseProgram program) throws EmfException;
@@ -152,8 +150,6 @@ public interface CaseService {
     
     String validateJobs(Integer[] jobIDs) throws EmfException;
     
-    String validateInputDatasets(Integer[] jobIDs) throws EmfException;
-
     Case updateCaseWithLock(Case caseObj) throws EmfException;
 
     void updateCaseOutput(User user, CaseOutput output) throws EmfException;

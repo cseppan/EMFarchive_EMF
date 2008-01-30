@@ -388,7 +388,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             return;
         }
 
-        String validationMsg = presenter.validateInputDatasets(jobs);
+        String validationMsg = presenter.validateJobs(jobs);
         int width = 50;
         int height = validationMsg.length() / 50;
         String title = "Possible Issues with Datasets Selected for Job Inputs";
@@ -447,13 +447,13 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             // there are no nonfinal dataset versions used, so return yes
             return JOptionPane.YES_OPTION; 
         
-        String finalMsg = validationMsg + ls + "Are you sure to run the selected job" + 
-                    (jobs.length > 1 ? "s" : "") + "?";
+        String finalMsg = validationMsg + ls + "ARE YOU SURE YOU WANT TO RUN THE SELECTED JOB" + 
+                    (jobs.length > 1 ? "S" : "") + "?";
         int width = 50;
         int height = validationMsg.length() / 50;
         ScrollableComponent msgArea = createMsgScrollPane(finalMsg, width, height);
         
-        return showDialog(msgArea, "Warning");
+        return showDialog(msgArea, "Confirm Running Jobs");
     }
 
     private void proceedRunningJobs(CaseJob[] jobs) throws Exception {

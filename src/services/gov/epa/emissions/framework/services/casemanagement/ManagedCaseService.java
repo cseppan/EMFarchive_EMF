@@ -821,7 +821,7 @@ public class ManagedCaseService {
         List<CaseInput> inputsSA = null; // inputs for specific sector and all jobs
         List<CaseInput> inputsAJ = null; // inputs for all sectors specific jobs
         List<CaseInput> inputsSJ = null; // inputs for specific sectors specific jobs
-        List<CaseInput> inputsAll = new ArrayList(); // all inputs
+        List<CaseInput> inputsAll = new ArrayList<CaseInput>(); // all inputs
         try {
 
             // Get case inputs (the datasets associated w/ the case)
@@ -2519,6 +2519,8 @@ public class ManagedCaseService {
         if (DebugLevels.DEBUG_14)
             System.out.println("Start validating jobs on server side. " + new Date());
 
+        String ls = System.getProperty("line.separator");
+
         List<CaseInput> allInputs = new ArrayList<CaseInput>();
 
         for (Integer id : jobIDs) {
@@ -2531,8 +2533,18 @@ public class ManagedCaseService {
 
         TreeSet<CaseInput> set = new TreeSet<CaseInput>(allInputs);
         List<CaseInput> uniqueInputs = new ArrayList<CaseInput>(set);
+        
+        String finalVersionMsg = listNonFinalInputs(uniqueInputs);
+        String laterVersionMsg = listInputsMsg(uniqueInputs);
+        String returnMsg = "";
+        
+        if (finalVersionMsg == null || finalVersionMsg.isEmpty())
+            returnMsg = laterVersionMsg;
+        else
+            returnMsg = border(80, "*") + ls + finalVersionMsg + ls + border(80, "*")
+                + ls + laterVersionMsg + border(80, "*");
 
-        return listNonFinalInputs(uniqueInputs);
+        return returnMsg;
     }
 
     private String listNonFinalInputs(List<CaseInput> inputs) {
@@ -2555,19 +2567,6 @@ public class ManagedCaseService {
             System.out.println("Finished listing non-final inputs. " + new Date());
 
         return inputsList;
-    }
-
-    public synchronized String validateInputDatasets(Integer[] jobIDs) throws EmfException {
-        List<CaseInput> allInputs = new ArrayList<CaseInput>();
-        for (Integer id : jobIDs) {
-            CaseJob job = this.getCaseJob(id.intValue());
-            allInputs.addAll(this.getAllJobInputs(job));
-        }
-
-        TreeSet<CaseInput> set = new TreeSet<CaseInput>(allInputs);
-        List<CaseInput> uniqueInputs = new ArrayList<CaseInput>(set);
-
-        return listInputsMsg(uniqueInputs);
     }
 
     private String listInputsMsg(List<CaseInput> inputs) throws EmfException {
@@ -2610,6 +2609,15 @@ public class ManagedCaseService {
 
         return (laterVersionExists) ? header + "\n\n" + inputsList.toString() : header2 + "\n\n"
                 + inputsList.toString();
+    }
+
+    private String border(int num, String symbl) {
+        StringBuffer sb = new StringBuffer();
+
+        for (int i = 0; i < num; i++)
+            sb.append(symbl);
+
+        return sb.toString();
     }
 
     public CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException {

@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
-import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenter;
 import gov.epa.emissions.framework.client.casemanagement.history.ShowHistoryTabPresenter;
@@ -35,7 +34,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
 
     private Case caseObj;
 
-    private List presenters;
+    private List<CaseEditorTabPresenter> presenters;
 
     private EditInputsTabPresenter inputPresenter;
 
@@ -65,7 +64,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         this.session = session;
         this.view = view;
         this.managerPresenter = managerPresenter;
-        presenters = new ArrayList();
+        presenters = new ArrayList<CaseEditorTabPresenter>();
     }
 
     public void doDisplay() throws EmfException {
@@ -91,7 +90,6 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
 
     public void doSave() throws EmfException {
         updateCase();
-//        closeView();
     }
 
     void updateCase() throws EmfException {
@@ -102,15 +100,12 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
 
         caseObj.setLastModifiedBy(session.user());
         caseObj.setLastModifiedDate(new Date());
-//        service().updateCase(caseObj);
         service().updateCaseWithLock(caseObj);
-//        managerPresenter.refreshWithLastCategory();
-     
     }
 
     private void saveTabs() throws EmfException {
-        for (Iterator iter = presenters.iterator(); iter.hasNext();) {
-            CaseEditorTabPresenter element = (CaseEditorTabPresenter) iter.next();
+        for (Iterator<CaseEditorTabPresenter> iter = presenters.iterator(); iter.hasNext();) {
+            CaseEditorTabPresenter element = iter.next();
             element.doSave();
         }
     }
@@ -149,15 +144,6 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         presenters.add(outputPresenter);
     }
 
-    public void doExport(User user, String dirName, String purpose, boolean overWrite, Case caseToExport)
-            throws EmfException {
-        service().export(user, mapToRemote(dirName), purpose, overWrite, caseToExport.getId());
-    }
-
-    private String mapToRemote(String dir) {
-        return session.preferences().mapLocalOutputPathToRemote(dir);
-    }
-
     public void doSaveWithoutClose() throws EmfException {
         updateCase();
         managerPresenter.doRefresh();
@@ -176,7 +162,6 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
 
     public void set(ShowHistoryTabView caseHistoryView) {
         historyPresenter = new ShowHistoryTabPresenter(session, caseHistoryView, caseObj);
-//        presenters.add(parametersPresenter);
     }
 
     public void doLoad(String tabTitle) throws EmfException {
