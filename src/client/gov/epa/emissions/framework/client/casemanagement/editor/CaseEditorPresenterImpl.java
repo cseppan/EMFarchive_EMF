@@ -103,7 +103,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         caseObj.setLastModifiedBy(session.user());
         caseObj.setLastModifiedDate(new Date());
 //        service().updateCase(caseObj);
-        caseObj=service().updateCaseWithLock(caseObj);
+        service().updateCaseWithLock(caseObj);
 //        managerPresenter.refreshWithLastCategory();
      
     }
