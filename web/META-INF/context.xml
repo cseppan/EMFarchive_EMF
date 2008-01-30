@@ -7,7 +7,7 @@
           url="jdbc:postgresql://localhost:5432/EMF?autoReconnect=true"
           username="emf"
           password="emf"
-          maxActive="100"
+          maxActive="92"
           maxIdle="30"
           maxWait="60000"
           removeAbandoned="true"
