@@ -113,11 +113,11 @@ public class ControlMeasuresExporter implements Exporter {
     
     private String equationRecord(ControlMeasure measure, int size) {
         String equationRecord = ""; 
-        equationRecord += containDelimiter(measure.getAbbreviation())+ delimiter;
+        equationRecord += addQuote(measure.getAbbreviation())+ delimiter;
         
         ControlMeasureEquation cMequation[]=measure.getEquations();
         EquationType equationType=cMequation[0].getEquationType();
-        equationRecord += containDelimiter(equationType.getName())+ delimiter;
+        equationRecord += addQuote(equationType.getName())+ delimiter;
         
         for (int k=0; k< cMequation.length; k++){
             EquationTypeVariable typeVariable=cMequation[k].getEquationTypeVariable();
@@ -156,28 +156,28 @@ public class ControlMeasuresExporter implements Exporter {
     
     private String summaryRecord(ControlMeasure measure) {
         String name = measure.getName();
-        String summaryRecord = containDelimiter(name) + delimiter;
-        summaryRecord += containDelimiter(measure.getAbbreviation())+ delimiter;
+        String summaryRecord = addQuote(name) + delimiter;
+        summaryRecord += addQuote(measure.getAbbreviation())+ delimiter;
         Pollutant majPollutant = measure.getMajorPollutant();
-        summaryRecord += (majPollutant == null ? "" : containDelimiter(majPollutant.getName())) + delimiter;
+        summaryRecord += (majPollutant == null ? "" : addQuote(majPollutant.getName())) + delimiter;
         ControlTechnology ct = measure.getControlTechnology();
-        summaryRecord += (ct == null ? "" : containDelimiter(ct.getName())) + delimiter;
+        summaryRecord += (ct == null ? "" : addQuote(ct.getName())) + delimiter;
         SourceGroup sg = measure.getSourceGroup();
-        summaryRecord += (sg == null ? "" : containDelimiter(sg.getName())) + delimiter;
-        summaryRecord += containDelimiter(formatSectors(measure.getSectors())) + delimiter;
+        summaryRecord += (sg == null ? "" : addQuote(sg.getName())) + delimiter;
+        summaryRecord += addQuote(formatSectors(measure.getSectors())) + delimiter;
         summaryRecord += measure.getCmClass() + delimiter;
         summaryRecord += measure.getEquipmentLife() + delimiter;
         summaryRecord += measure.getDeviceCode() + delimiter;
         Date dateRev = measure.getDateReviewed();
         summaryRecord += (dateRev == null ? "" : dateRev.toString()) + delimiter;
-        summaryRecord += containDelimiter(measure.getDataSouce()) + delimiter;
-        summaryRecord += containDelimiter(measure.getDescription());
+        summaryRecord += addQuote(measure.getDataSouce()) + delimiter;
+        summaryRecord += addQuote(measure.getDescription());
         
         return summaryRecord;
     }
     
-    private String containDelimiter(String outString){
-        return (outString.indexOf(delimiter) < 0 ? outString : ("\"" + outString + "\""));
+    private String addQuote(String outString){
+        return "\"" + outString + "\"";
     
     }
 
@@ -233,13 +233,13 @@ public class ControlMeasuresExporter implements Exporter {
     }
 
     private String efficiencyRecord(String abbreviation, EfficiencyRecord record) {
-        String efficiencyRecord = containDelimiter(abbreviation) + delimiter;
+        String efficiencyRecord = addQuote(abbreviation) + delimiter;
         Pollutant pollutant = record.getPollutant();
         efficiencyRecord += (pollutant == null ? "" : pollutant.getName()) + delimiter;
-        efficiencyRecord += (record.getLocale() == null? "": record.getLocale())+ delimiter;
+        efficiencyRecord += (record.getLocale() == null? "": addQuote(record.getLocale()))+ delimiter;
         Date effectiveDate = record.getEffectiveDate();
         efficiencyRecord += (effectiveDate == null ? "" : effectiveDate.toString()) + delimiter;
-        efficiencyRecord += containDelimiter(record.getExistingMeasureAbbr())+ delimiter;
+        efficiencyRecord += addQuote(record.getExistingMeasureAbbr())+ delimiter;
         efficiencyRecord += record.getExistingDevCode() + delimiter;
         Double minEmis = record.getMinEmis();
         efficiencyRecord += (minEmis == null ? "" : minEmis.toString()) + delimiter;
@@ -250,13 +250,13 @@ public class ControlMeasuresExporter implements Exporter {
         efficiencyRecord += (record.getCostPerTon() == null ? "" : record.getCostPerTon()) + delimiter;
         efficiencyRecord += record.getRuleEffectiveness() + delimiter;
         efficiencyRecord += record.getRulePenetration() + delimiter;
-        efficiencyRecord += containDelimiter(record.getEquationType()) + delimiter;
+        efficiencyRecord += addQuote(record.getEquationType()) + delimiter;
         efficiencyRecord += (record.getCapRecFactor()== null ? "" : record.getCapRecFactor())+ delimiter;
         efficiencyRecord += (record.getDiscountRate() == null ? "" :record.getDiscountRate())+ delimiter;
         efficiencyRecord += (record.getCapitalAnnualizedRatio()== null ? "" : record.getCapitalAnnualizedRatio())+ delimiter;
         efficiencyRecord += (record.getIncrementalCostPerTon()== null ? "" : record.getIncrementalCostPerTon()) + delimiter;
         
-        efficiencyRecord += containDelimiter(record.getDetail());
+        efficiencyRecord += addQuote(record.getDetail());
         
         return efficiencyRecord;
     }
