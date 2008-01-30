@@ -301,13 +301,13 @@ public class CaseServiceImpl implements CaseService {
                 System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
             // submit the list of CaseJobs to the ManagedService
             if (DebugLevels.DEBUG_14)
-                System.out.println("Start submitting jobs. " +  new Date());
-            
+                System.out.println("Start submitting jobs. " + new Date());
+
             String msg = getCaseService().submitJobs(jobIds, caseId, user);
-            
+
             if (DebugLevels.DEBUG_14)
-                System.out.println("Jobs submitted. " +  new Date());
-            
+                System.out.println("Jobs submitted. " + new Date());
+
             return msg;
         } catch (Exception e) {
             e.printStackTrace();
@@ -564,12 +564,16 @@ public class CaseServiceImpl implements CaseService {
 
     public synchronized Case updateCaseWithLock(Case caseObj) throws EmfException {
         Session session = sessionFactory.getSession();
+
         try {
             if (!dao.canUpdate(caseObj, session))
                 throw new EmfException("the case name is already in use");
-            
-            if (dao.getAbbreviation(caseObj.getAbbreviation(), session) != null)
-                throw new EmfException("the same case abbreviation has been used by another case");
+
+            Case caseWithSameAbbr = dao.getCaseFromAbbr(caseObj.getAbbreviation(), session);
+
+            if (caseWithSameAbbr != null && caseWithSameAbbr.getId() != caseObj.getId())
+                throw new EmfException("the same case abbreviation has been used by another case: "
+                        + caseWithSameAbbr.getName());
 
             Case caseWithLock = dao.updateWithLock(caseObj, session);
 
