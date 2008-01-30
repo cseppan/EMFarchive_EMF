@@ -120,7 +120,7 @@ public class ImportCaseOutputTask extends Task {
         }
     }
 
-    private void prepare() throws EmfException {
+    private void prepare() throws Exception {
         addStartStatus();
         caseDao.add(user, output);
         dataset.setStatus("Started import");

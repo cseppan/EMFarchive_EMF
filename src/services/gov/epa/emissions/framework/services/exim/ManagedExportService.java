@@ -62,15 +62,6 @@ public class ManagedExportService {
 
     private DbServerFactory dbFactory;
 
-//    public ManagedExportService(DbServer dbServer, HibernateSessionFactory sessionFactory) {
-//        myTag();
-//        if (DebugLevels.DEBUG_9)
-//            System.out.println(">>>> " + myTag());
-//        this.sessionFactory = sessionFactory;
-//        this.exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes(), batchSize());
-//
-//    }
-
     public ManagedExportService(DbServerFactory dbFactory, HibernateSessionFactory sessionFactory) {
         myTag();
         if (DebugLevels.DEBUG_9)

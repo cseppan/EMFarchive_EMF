@@ -65,7 +65,7 @@ public class CaseDAO {
         }
     }
 
-    public CaseOutput add(User user, CaseOutput output) {
+    public CaseOutput add(User user, CaseOutput output) throws Exception {
         Session session = sessionFactory.getSession();
 
         try {
@@ -82,11 +82,10 @@ public class CaseDAO {
             return getCaseOutput(output, session);
         } catch (Exception ex) {
             ex.printStackTrace();
+            throw new Exception("Problem adding case output: " + output.getName() + ". " + ex.getMessage());
         } finally {
             session.close();
         }
-
-        return null;
     }
     
     public void removeCaseOutputIfExists(User user, CaseOutput output) {
