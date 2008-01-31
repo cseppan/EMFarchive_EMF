@@ -324,6 +324,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         panel.add(newControlMeasure);
         
         Button find = new Button("Find", findAction());
+        find.setToolTipText("Find measures that apply to specific SCCs");
         panel.add(find);
 
         return panel;
