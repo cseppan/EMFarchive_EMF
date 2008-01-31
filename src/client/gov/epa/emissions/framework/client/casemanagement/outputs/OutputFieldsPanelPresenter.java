@@ -106,10 +106,6 @@ public class OutputFieldsPanelPresenter{
          session.caseService().updateCaseOutput(session.user(), view.setFields());
     }
 
-    public void doValidateFields() throws EmfException {
-        view.setFields(); // FIXME: should do more check here
-    }
-
     public CaseProgram getCaseProgram(Object selected) throws EmfException {
         return caseObjectManager.getOrAddProgram(selected);
     }

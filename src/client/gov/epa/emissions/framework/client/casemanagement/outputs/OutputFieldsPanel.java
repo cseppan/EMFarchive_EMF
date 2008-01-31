@@ -149,7 +149,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     private void datasetLabels(EmfDataset selectedItem) {
         String dateText="";
         String createrText="";
-        if (selectedItem !=null ){
+        if (selectedItem !=null  && !selectedItem.getName().equalsIgnoreCase("Not Selected") ){
             datasetValues=presenter.getDatasetValues(new Integer(selectedItem.getId()));
             dateText=getDatasetProperty("createdDateTime").substring(0, 16);
             createrText=getDatasetProperty("creator");
@@ -212,15 +212,16 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     public CaseOutput setFields() {
         updateOutputName();
         updateJob();
-        updateDatasetType();
+        output.setDatasetType(((DatasetType)dsTypeCombo.getSelectedItem()).getName());
+//        System.out.println(output.getDatasetType());
         updateDataset();
         updateMessage();
         return output;
     }
 
-    private void updateDatasetType() {
-         output.setDatasetType(dsTypeCombo.getSelectedItem().toString());
-    }
+//    private void updateDatasetType() {
+//         output.setDatasetType(dsTypeCombo.getSelectedItem().toString());
+//    }
     
    private void updateJob() {
         CaseJob job = (CaseJob) jobCombo.getSelectedItem();
