@@ -93,7 +93,16 @@ public class ControlMeasure implements Lockable, Serializable {
         this();
         this.name = name;
     }
-
+    public ControlMeasure(String name, String abbreviation, Pollutant majorPollutant, float avgCostPerTon, float avgEfficiency) {
+        this();
+        this.name = name;
+        this.abbreviation = name;
+        this.majorPollutant = majorPollutant;
+        this.getAggregatedPollutantEfficiencyRecords()[0].setAvgCostPerTon(avgCostPerTon);
+        this.getAggregatedPollutantEfficiencyRecords()[0].setAvgEfficiency(avgEfficiency);
+    }
+//    Name    Abbreviation    Pollutant   Avg CPT Avg CE  Min CE  Max CE  Min CPT Max CPT Avg Rule Eff.   Avg Rule Pen.   Control Technology  Source Group    Equipment Life  NEI Device Code Sectors Class   Last Modified Time  Last Modified By    Date Reviewed   Creator Data Source
+//    Dry ESP-Wire Plate Type;(PM10) Ferrous Metals Processing - Ferroalloy Production    PDESPMPFP   PM10    NaN 95.0    95.0    95.0    NaN NaN 100.0   100.0   Dry ESP-Wire Plate Type Ferrous Metals Processing - Ferroalloy Production   20.0    0   PTNONIPM    Known   2008/01/28 00:11    EMF User    01/01/2006  EMF User    1
     public float getAnnualizedCost() {
         return annualizedCost;
     }

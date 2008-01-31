@@ -7,9 +7,13 @@ import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.data.Pollutants;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 import gov.epa.emissions.framework.services.cost.EquationType;
+import gov.epa.emissions.framework.services.cost.EquationTypeVariable;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -48,10 +52,11 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
     private EditableEmfTableModel tableModel;
     private CMEquationsTableData tableData;
     private ManageChangeables changeables;
+    private Pollutants pollutants;
     
     public ControlMeasureEquationTab(ControlMeasure measure, EmfSession session, ManageChangeables changeables,
             MessagePanel messagePanel, EmfConsole parent,
-            ControlMeasurePresenter controlMeasurePresenter){
+            ControlMeasurePresenter controlMeasurePresenter) throws EmfException{
         
         this.mainPanel = new JPanel(new BorderLayout());
         this.parent = parent;
@@ -61,6 +66,7 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
         this.measure = measure;
         this.changeables = changeables;
         this.controlMeasurePresenter = controlMeasurePresenter;
+        this.pollutants = new Pollutants(controlMeasurePresenter.getPollutants());
      
 //       mainPanel = new JPanel(new BorderLayout());
         doLayout(measure);
@@ -127,23 +133,10 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
                         EquationType equationType = presenter.getEquationType();
     
                         if (equationType!=null){
-                            int n = equationType.getEquationTypeVariables().length;
-                            ControlMeasureEquation[] equations;
-                            //if equation type have variables...
-                            if (n > 0 ) {
-                                equations = new ControlMeasureEquation[n];
-                                for(int i = 0; i < n; i++){                              
-                                    ControlMeasureEquation equation = new ControlMeasureEquation(equationType, equationType.getEquationTypeVariables()[i], 
-                                            0.0);
-                                    equations[i] = equation;   
-                                }
-                            //if equation type doesn't have variables...
-                            } else {
-                                equations = new ControlMeasureEquation[1];
-                                ControlMeasureEquation equation = new ControlMeasureEquation(equationType);
-                                equations[0] = equation;   
-                            }
-                            updateMainPanel(equations);
+                            ControlMeasureEquation equation = new ControlMeasureEquation(equationType);
+                            equation.setPollutant(measure.getMajorPollutant());
+                            equation.setCostYear(CostYearTable.REFERENCE_COST_YEAR);
+                            updateMainPanel(new ControlMeasureEquation[] { equation });
                             tableModel.refresh(tableData);
                         }
                         
@@ -274,17 +267,72 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
 
 
 
-    public void save(ControlMeasure measure) {
+    public void save(ControlMeasure measure) throws EmfException {
         List<ControlMeasureEquation> equationList = new ArrayList<ControlMeasureEquation>();
-        ControlMeasureEquation[] equations = tableData.sources();
+        for (EquationTypeVariable equationTypeVariable : tableData.sources()) {
+            EquationType equationType = equationTypeVariable.getEquationType();
+            ControlMeasureEquation equation = new ControlMeasureEquation(equationType);
+            for (EquationTypeVariable equationTypeVariable2 : tableData.sources()) {
+                if (equationTypeVariable2.getName().equals("Cost Year")) {
+                    equation.setCostYear(Integer.parseInt((String)equationTypeVariable2.getValue()));
+                } else if (equationTypeVariable2.getName().equals("Pollutant")) {
+                    equation.setPollutant(pollutants.get((String)equationTypeVariable2.getValue()));
+                }
+            }
 
-        for (int i = 0; i < equations.length; i++) {
-            ControlMeasureEquation equation = equations[i];
-            equationList.add(equation);
+            int indexOfEquation = equationList.indexOf(equation);
+            if (indexOfEquation == -1) 
+                equationList.add(equation);
+            else
+                equation = equationList.get(indexOfEquation);
+            String value = (String)equationTypeVariable.getValue();
+            String variableName = equationTypeVariable.getName();
+            if (equationTypeVariable.getFileColPosition() == 1) {
+                equation.setValue1(getValue(variableName, value));
+            } else if (equationTypeVariable.getFileColPosition() == 2) {
+                equation.setValue2(getValue(variableName, value));
+            } else if (equationTypeVariable.getFileColPosition() == 3) {
+                equation.setValue3(getValue(variableName, value));
+            } else if (equationTypeVariable.getFileColPosition() == 4) {
+                equation.setValue4(getValue(variableName, value));
+            } else if (equationTypeVariable.getFileColPosition() == 5) {
+                equation.setValue5(getValue(variableName, value));
+            } else if (equationTypeVariable.getFileColPosition() == 6) {
+                equation.setValue6(getValue(variableName, value));
+            } else if (equationTypeVariable.getFileColPosition() == 7) {
+                equation.setValue7(getValue(variableName, value));
+            } else if (equationTypeVariable.getFileColPosition() == 8) {
+                equation.setValue8(getValue(variableName, value));
+            } else if (equationTypeVariable.getFileColPosition() == 9) {
+                equation.setValue9(getValue(variableName, value));
+            } else if (equationTypeVariable.getFileColPosition() == 10) {
+                equation.setValue10(getValue(variableName, value));
+            }
+//            if (indexOfEquation != 0) {
+//                equationList.remove(indexOfEquation);
+//            }
+//            equationList.add(equation);
         }
         measure.setEquations(equationList.toArray(new ControlMeasureEquation[0]));
     }
 
+    private Double getValue(String variableName, String value) throws EmfException {
+        if (value == null) return null;
+
+        //trim excess space
+        value = value.trim();
+
+        if (value.length() == 0) return null;
+
+        //store as double
+        Double dblValue = null;
+        try {
+            dblValue = Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            throw new EmfException(variableName + ", value must be a double number.");
+        }
+        return dblValue;
+    }
 }
 
 

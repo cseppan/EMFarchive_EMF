@@ -1,25 +1,29 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
-import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
+import gov.epa.emissions.framework.services.cost.EquationType;
+import gov.epa.emissions.framework.services.cost.EquationTypeVariable;
 import gov.epa.emissions.framework.ui.RowSource;
 
 public class EditableEquationVariableRowSource implements RowSource {
 
-    private ControlMeasureEquation equation;
+    private EquationTypeVariable variable;
+
+    private EquationType equationType;
 
     private Boolean selected;
     
-    private final static Double NAN_VALUE = new Double(Double.NaN);
-
-    public EditableEquationVariableRowSource(ControlMeasureEquation equation) {
-        this.equation = equation;
+//    private final static Double NAN_VALUE = new Double(Double.NaN);
+//
+    public EditableEquationVariableRowSource(EquationType equationType, EquationTypeVariable variable) {
+        this.equationType = equationType;
+        this.variable = variable;
         this.selected = Boolean.FALSE;
     }
 
     public Object[] values() {
-        Object[] values = {equation.getEquationType().getName(), 
-                equation.getEquationTypeVariable() != null ? equation.getEquationTypeVariable().getName() : "NO VARIABLES", 
-                equation.getValue()!= null ? equation.getValue() : NAN_VALUE };
+        Object[] values = {equationType.getName(), 
+                variable != null ? variable.getName() : "NO VARIABLES", 
+                variable.getValue()!= null ? variable.getValue() : "" };
         return values;
     }
 
@@ -33,7 +37,16 @@ public class EditableEquationVariableRowSource implements RowSource {
 //            break;
         case 2:
             //maybe add some logic if the value is non-numeric...
-            equation.setValue((Double) val);
+            variable.setValue(val + "");
+//            if (variable.getFileColPosition() > 0) {
+//                variable.setValue(val);
+//            } else {
+//                if (variable.getName().equals("Cost Year")) {
+//                    variable.setValue((Double) val);
+//                }else if (variable.getName().equals("Pollutant")) {
+//                    variable.setValue((Double) val);
+//                }
+//            }
             break;
         default:
             throw new RuntimeException("invalid column - " + column);
@@ -41,7 +54,7 @@ public class EditableEquationVariableRowSource implements RowSource {
     }
 
     public Object source() {
-        return equation;
+        return variable;
     }
 
     public boolean isSelected() {

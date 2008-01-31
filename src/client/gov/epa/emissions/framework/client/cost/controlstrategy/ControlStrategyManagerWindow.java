@@ -96,13 +96,13 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
             view.endControlMeasuresRefresh();
         }
         this.populateThread = null;
-        setCursor(Cursor.getDefaultCursor());
     }
 
     public void refresh(ControlStrategy[] controlStrategies) {
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         doLayout(controlStrategies, this.session);
         super.refreshLayout();
+        setCursor(Cursor.getDefaultCursor());
         //refresh Edit Control Strategy windows...
         for (int i = 0; i < editControlStrategyViews.length; i++) {
             EditControlStrategyView view = editControlStrategyViews[i];

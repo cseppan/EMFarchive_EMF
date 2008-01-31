@@ -112,8 +112,11 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     
     protected int daysInMonth = 31; //useful only if inventory is monthly based and not yearly.
 
-    private boolean useSQLApproach;
-    
+    protected int month = -1; //useful only if inventory is monthly based and not yearly.
+
+    protected boolean useSQLApproach;
+    protected String strategyType;
+
     public AbstractStrategyLoader(User user, DbServerFactory dbServerFactory, 
             HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
             int batchSize, boolean useSQLApproach) throws EmfException {
@@ -142,11 +145,18 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
                 sessionFactory, dbServerFactory,
                 datasource, keywords);
         this.costYearTable = new CostYearTableReader(dbServer, controlStrategy.getCostYear()).costYearTable();
+        this.strategyType = controlStrategy.getStrategyType().getName();
     }
 
     //call this to process the input and create the output in a batch fashion
     public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {
         EmfDataset inputDataset = controlStrategyInputDataset.getInputDataset();
+        //make sure inventory has indexes created...
+        makeSureInventoryDatasetHasIndexes(controlStrategyInputDataset);
+        //make sure inventory has the target pollutant, if not don't run
+        if (!inventoryHasTargetPollutant(controlStrategyInputDataset)) {
+            throw new EmfException("Error processing input dataset: " + controlStrategyInputDataset.getInputDataset().getName() + ". Target pollutant, " + controlStrategy.getTargetPollutant().getName() + ", is not in the inventory.");
+        }
         //reset counters
         recordCount = 0;
         totalCost = 0.0;
@@ -158,7 +168,8 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         sourceStackId = "";
         sourceSegment = "";
         newSource = false;
-        daysInMonth = getDaysInMonth(inputDataset.applicableMonth());
+        month = inputDataset.applicableMonth();
+        daysInMonth = getDaysInMonth(month);
         
         //setup result
         ControlStrategyResult result = createStrategyResult(inputDataset, controlStrategyInputDataset.getVersion());
@@ -209,10 +220,11 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
             System.out.println("Total time to match sources to measures = " + (matchTime / (1000))  + " secs");
             System.out.println("Total time to insert results = " + (insertSourceTime / (1000))  + " secs");
         } else {
-            makeSureInventoryDatasetHasIndexes(controlStrategyInputDataset);
             runStrategyUsingSQLApproach(controlStrategyInputDataset, result);
             runStrategyUsingSQLApproach2(controlStrategyInputDataset, result);
-            runStrategyUsingSQLApproach3(controlStrategyInputDataset, result);
+            if (strategyType.equals("Apply Measures In Series")) {
+                runStrategyUsingSQLApproach3(controlStrategyInputDataset, result);
+            }
             System.out.println(System.currentTimeMillis() + " done with");
             //still need to calculate the total cost and reduction...
             setResultTotalCostTotalReductionAndCount(result);
@@ -316,19 +328,20 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return recordCount;
     }
     
-    public boolean inventoryHasTargetPollutant(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
+    private boolean inventoryHasTargetPollutant(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
         String versionedQuery = new VersionedQuery(version(controlStrategyInputDataset)).query();
 
         String query = "SELECT count(1) as Found "
             + " FROM " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()) 
             + " where " + versionedQuery
             + " and poll = '" + controlStrategy.getTargetPollutant().getName() + "' "
-            + getFilterForSourceQuery();
+            + getFilterForSourceQuery() + " limit 1";
         ResultSet rs = null;
         try {
             rs = datasource.query().executeQuery(query);
             while (rs.next()) {
-                return true;
+                if (rs.getInt(1) > 0)
+                    return true;
             }
         } catch (SQLException e) {
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
@@ -344,7 +357,12 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     private void runStrategyUsingSQLApproach(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
-        String query = "SELECT public.run_apply_measures_in_series_strategy("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
+        String query = "";
+        if (strategyType.equals("Max Emissions Reduction")) {
+            query = "SELECT public.run_max_emis_red_strategy("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
+        } else if (strategyType.equals("Apply Measures In Series")) {
+            query = "SELECT public.run_apply_measures_in_series_strategy("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
+        }
 //        String query = "SELECT public.run_apply_measures_in_series_strategy("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
 //SELECT public.create_strategy_detailed_result_table_indexes('" + emissionTableName(controlStrategyResult.getDetailedResultDataset()) + "');        
         System.out.println(System.currentTimeMillis() + " " + query);
@@ -539,6 +557,6 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
     
     protected double getEmission(double annEmis, double avdEmis) {
-        return avdEmis == 0.0 ? annEmis : avdEmis * daysInMonth;
+        return month != - 1 ? (avdEmis == 0.0 ? annEmis : avdEmis * daysInMonth) : annEmis;
     }
 }

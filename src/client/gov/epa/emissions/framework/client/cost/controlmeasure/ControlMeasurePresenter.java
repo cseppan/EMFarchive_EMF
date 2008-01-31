@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 
@@ -24,4 +25,6 @@ public interface ControlMeasurePresenter {
     void set(ControlMeasureEquationTab equationTabView);
 
     void fireTracking();
+
+    Pollutant[] getPollutants() throws EmfException;
 }

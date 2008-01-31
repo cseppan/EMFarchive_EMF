@@ -11,8 +11,6 @@ public interface StrategyLoader {
 
     public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset inputDataset) throws Exception;
     
-    public boolean inventoryHasTargetPollutant(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException;
-
     public void disconnectDbServer() throws EmfException;
 
     public int getRecordCount();

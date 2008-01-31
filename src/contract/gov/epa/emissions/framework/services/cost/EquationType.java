@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.commons.data.Pollutant;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +15,10 @@ public class EquationType implements Serializable {
     private String description = "";
     
     private List equationTypeVariables;
+
+    private Pollutant pollutant;
+
+    private int costYear;
 
     public EquationType() {
         this.equationTypeVariables = new ArrayList();
@@ -54,7 +60,7 @@ public class EquationType implements Serializable {
 
         EquationType other = (EquationType) obj;
 
-        return (id == other.getId() || name.equalsIgnoreCase(other.getName()));
+        return (id == other.getId() || (name != null ? name : "").equalsIgnoreCase((other.getName() != null ? other.getName() : "")));
     }
 
     
@@ -75,5 +81,21 @@ public class EquationType implements Serializable {
 
     public void setEquationTypeVariables(EquationTypeVariable[] equationTypeVariables) {
         this.equationTypeVariables = Arrays.asList(equationTypeVariables);
+    }
+
+    public void setPollutant(Pollutant pollutant) {
+        this.pollutant = pollutant;
+    }
+
+    public Pollutant getPollutant() {
+        return pollutant;
+    }
+
+    public void setCostYear(int costYear) {
+        this.costYear = costYear;
+    }
+
+    public int getCostYear() {
+        return costYear;
     }
 }

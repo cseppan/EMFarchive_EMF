@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
@@ -110,6 +111,10 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
 
     public void fireTracking() {
         view.signalChanges();
+    }
+
+    public Pollutant[] getPollutants() throws EmfException {
+        return session.dataCommonsService().getPollutants();
     }
 
 }

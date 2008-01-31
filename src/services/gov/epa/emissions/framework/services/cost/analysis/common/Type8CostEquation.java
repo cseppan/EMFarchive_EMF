@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.services.cost.analysis.common;
 
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
-import gov.epa.emissions.framework.services.cost.EquationTypeVariable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 
 public class Type8CostEquation implements CostEquation {
@@ -41,21 +40,11 @@ public class Type8CostEquation implements CostEquation {
     private void populateVariables() {
         ControlMeasureEquation[] equations = bestMeasureEffRecord.measure().getEquations();
         for (int i = 0; i < equations.length; i++) {
-            EquationTypeVariable variable = equations[i].getEquationTypeVariable();
-            if (variable != null) {
-                String variableName = variable.getName();
-                if (variableName.equalsIgnoreCase("Typical Capital Control Cost Factor")) {
-                    capCostFactor = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("Typical O&M Control Cost Factor")) {
-                    operMaintCostFactor = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("Typical Default CPT Factor - Capital")) {
-                    defaultCapitalCPTFactor = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("Typical Default CPT Factor - O&M")) {
-                    defaultOperMaintCPTFactor = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("Typical Default CPT Factor - Annualized")) {
-                    defaultAnnualizedCPTFactor = equations[i].getValue();
-                }
-            }
+            capCostFactor = equations[i].getValue1();
+            operMaintCostFactor = equations[i].getValue2();
+            defaultCapitalCPTFactor = equations[i].getValue3();
+            defaultOperMaintCPTFactor = equations[i].getValue4();
+            defaultAnnualizedCPTFactor = equations[i].getValue5();
         }
         if (capCostFactor == null
                 || operMaintCostFactor == null

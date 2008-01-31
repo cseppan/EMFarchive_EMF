@@ -71,13 +71,18 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.PAGE_START);
-        panel.add(createTabbedPane(measure, messagePanel), BorderLayout.CENTER);
+        try {
+            panel.add(createTabbedPane(measure, messagePanel), BorderLayout.CENTER);
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         contentPane.add(panel);
     }
     
-    private JTabbedPane createTabbedPane(ControlMeasure measure, final MessagePanel messagePanel){
+    private JTabbedPane createTabbedPane(ControlMeasure measure, final MessagePanel messagePanel) throws EmfException{
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
         tabbedPane.addTab("Summary", createSummaryTab(measure, messagePanel));
@@ -94,7 +99,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
         return tabbedPane;
     }
 
-    private JPanel createEquationTab(ControlMeasure measure, MessagePanel messagePanel){
+    private JPanel createEquationTab(ControlMeasure measure, MessagePanel messagePanel) throws EmfException{
         controlMeasureEquationTabView=new ControlMeasureEquationTab(measure, session, this, messagePanel, parent, presenter); 
         presenter.set(controlMeasureEquationTabView);
         return controlMeasureEquationTabView;

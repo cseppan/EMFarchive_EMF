@@ -34,12 +34,15 @@ public class CMEquationRecordReader {
     
     private HibernateSessionFactory sessionFactory;
 
+    private Pollutants pollutants;
+
     public CMEquationRecordReader(CMEquationFileFormat fileFormat, User user, HibernateSessionFactory sessionFactory) throws EmfException {
         this.fileFormat = fileFormat;
         this.status = new CMAddImportStatus(user, sessionFactory);
         this.sessionFactory = sessionFactory;
         this.equationTypeMap = new EquationTypeMap(getEquationTypes());
         this.equList= new ArrayList();
+        this.pollutants = new Pollutants(sessionFactory);
     }
 
     public void parse(Map controlMeasures, Record record, int lineNo) throws ImporterException {
@@ -57,29 +60,49 @@ public class CMEquationRecordReader {
             //get rid of original settings
             cm.setEquations(new ControlMeasureEquation[] {});
             //set equation cost year
-            cm.setCostYear(Integer.parseInt(tokens[12]));
+            ControlMeasureEquation equation = new ControlMeasureEquation(equationType);
+            try {
+                equation.setPollutant(pollutants.getPollutant(tokens[2]));
+            } catch (CMImporterException e) {
+                sb.append(format(e.getMessage()));
+            }
+            equation.setCostYear(Integer.parseInt(tokens[3]));
             //now add equation settings...
             if (equationTypeVariables.length > 0) {
                 if (constraintCheck(tokens[0], equationType, sb)){
                     for (int i = 0; i < equationTypeVariables.length; i++) {
 
-                        EquationTypeVariable equationTypeVariable = equationTypeVariables[i];
-                        ControlMeasureEquation equation = new ControlMeasureEquation(equationType);
-                        equation.setEquationTypeVariable(equationTypeVariable);
                         try {
-                            Double value = Double.valueOf(tokens[equationTypeVariable.getFileColPosition() + 1]);
-                            equation.setValue(value);
+                            Double value = Double.valueOf(tokens[equationTypeVariables[i].getFileColPosition() + 3]);
+                            if (equationTypeVariables[i].getFileColPosition() == 1) { 
+                                equation.setValue1(value);
+                            } else if (equationTypeVariables[i].getFileColPosition() == 2) { 
+                                equation.setValue2(value);
+                            } else if (equationTypeVariables[i].getFileColPosition() == 3) { 
+                                equation.setValue3(value);
+                            } else if (equationTypeVariables[i].getFileColPosition() == 4) { 
+                                equation.setValue4(value);
+                            } else if (equationTypeVariables[i].getFileColPosition() == 5) { 
+                                equation.setValue5(value);
+                            } else if (equationTypeVariables[i].getFileColPosition() == 6) { 
+                                equation.setValue6(value);
+                            } else if (equationTypeVariables[i].getFileColPosition() == 7) { 
+                                equation.setValue7(value);
+                            } else if (equationTypeVariables[i].getFileColPosition() == 8) { 
+                                equation.setValue8(value);
+                            } else if (equationTypeVariables[i].getFileColPosition() == 9) { 
+                                equation.setValue9(value);
+                            } else if (equationTypeVariables[i].getFileColPosition() == 10) { 
+                                equation.setValue10(value);
+                            }
                         } catch (NumberFormatException e) {
-                            sb.append(format("variable value must be a number, column position = " + (equationTypeVariable.getFileColPosition() + 1) + ", value = " + tokens[equationTypeVariable.getFileColPosition() + 1]));
+                            sb.append(format("variable value must be a number, column position = " + (equationTypeVariables[i].getFileColPosition() + 1) + ", value = " + tokens[equationTypeVariables[i].getFileColPosition() + 1]));
                             break;
                         }
-                        cm.addEquation(equation);
                     }
+                    cm.addEquation(equation);
                 }
-            } else {
-                ControlMeasureEquation equation = new ControlMeasureEquation(equationType);
-                cm.addEquation(equation);
-            }
+            } 
 
         } else {
             sb.append(format("unknown equation type '" + tokens[1] + "'"));

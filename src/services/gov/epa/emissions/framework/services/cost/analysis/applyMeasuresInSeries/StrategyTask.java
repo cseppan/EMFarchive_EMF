@@ -24,7 +24,8 @@ public class StrategyTask extends AbstractStrategyTask {
 
     public StrategyTask(ControlStrategy controlStrategy, User user, 
             DbServerFactory dbServerFactory, Integer batchSize,
-            HibernateSessionFactory sessionFactory, String exportDirectory, Boolean useSQLApproach) throws EmfException {
+            HibernateSessionFactory sessionFactory, String exportDirectory, 
+            Boolean useSQLApproach) throws EmfException {
         super(controlStrategy, user, 
                 dbServerFactory, sessionFactory,
                 exportDirectory);

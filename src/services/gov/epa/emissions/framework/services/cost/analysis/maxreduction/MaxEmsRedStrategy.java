@@ -31,7 +31,7 @@ public class MaxEmsRedStrategy extends AbstractStrategyTask {
                 exportDirectory);
         this.loader = new StrategyLoader(user, dbServerFactory, 
                 sessionFactory, controlStrategy, 
-                batchSize);
+                batchSize, useSQLApproach);
     }
 
     public void run() throws EmfException {

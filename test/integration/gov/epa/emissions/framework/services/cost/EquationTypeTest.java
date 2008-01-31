@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.services.cost;
 
 
+import java.sql.SQLException;
+
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
@@ -502,8 +504,7 @@ public class EquationTypeTest extends ServiceTestCase {
     }
 
     private ControlMeasureEquation buildEquation(String typeName, String variableName, Double variableValue) {
-        return new ControlMeasureEquation(new EquationType(typeName), new EquationTypeVariable(variableName),
-                variableValue);
+        return new ControlMeasureEquation(new EquationType(typeName));
     }
     
     private CostYearTable getCostYearTable(int targetYear) throws EmfException {
@@ -516,7 +517,11 @@ public class EquationTypeTest extends ServiceTestCase {
         } finally {
             try {
                 dbServer.disconnect();
+            } catch (SQLException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
             } catch (Exception e) {
+                // NOTE Auto-generated catch block
                 e.printStackTrace();
             }
         }

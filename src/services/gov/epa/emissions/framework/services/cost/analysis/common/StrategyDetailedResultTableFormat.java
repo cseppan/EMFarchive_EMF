@@ -103,6 +103,7 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         Column inputDatasetId = new Column("Input_DS_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
         Column controlStrategyId = new Column("CS_Id", types.intType(), new IntegerFormatter());
         Column controlMeasureId = new Column("CM_Id", types.intType(), new IntegerFormatter());
+        Column equationType = new Column("equation_type", types.stringType(255), new StringFormatter(255));
         Column comment = new Column("Comment", types.stringType(128), new StringFormatter(128));
         
         return new Column[] { disable, controlMeasureAbbr, pollutant, scc, fips, plantId, pointId, stackId, segment, 
@@ -110,7 +111,7 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
                 controlEfficiency, rulePenetration, ruleEffectiveness, percentReduction, 
                 inventoryControlEfficiency, inventoryRulePenetration, inventoryRuleEffectiveness, finalEmissions, 
                 emissionsReduction, inventoryEmissions, applyOrder, inputEmissions, outputEmissions, fipsState, fipsCounty, 
-                sic, naics, sourceId, inputDatasetId, controlStrategyId, controlMeasureId, comment };
+                sic, naics, sourceId, inputDatasetId, controlStrategyId, controlMeasureId, equationType, comment };
     }
 
 }

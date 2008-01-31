@@ -43,10 +43,10 @@ public class StrategyLoader extends AbstractStrategyLoader {
         //set up things that are specific for this strategy...
         GenerateSccControlMeasuresMap mapGenerator = new GenerateSccControlMeasuresMap(dbServer, qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()), 
                 controlStrategy, sessionFactory, super.getSourcePollutantList(controlStrategyInputDataset));
-        SccControlMeasuresMap map = mapGenerator.create();
-        retrieveMeasure = new RetrieveBestMeasureEffRecord(map, costYearTable, 
+        SccControlMeasuresMap map = !useSQLApproach ? mapGenerator.create() : null;
+        retrieveMeasure = !useSQLApproach ? new RetrieveBestMeasureEffRecord(map, costYearTable, 
                 controlStrategy, dbServer,
-                sessionFactory);
+                sessionFactory) : null;
         //call the abstract method to do the work...
         return super.loadStrategyResult(controlStrategyInputDataset);
     }

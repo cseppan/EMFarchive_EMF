@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.services.cost.analysis.common;
 
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
-import gov.epa.emissions.framework.services.cost.EquationTypeVariable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 
 public class Type2CostEquation implements CostEquation {
@@ -111,17 +110,10 @@ public class Type2CostEquation implements CostEquation {
     private void populateVariables() {
         ControlMeasureEquation[] equations = bestMeasureEffRecord.measure().getEquations();
         for (int i = 0; i < equations.length; i++) {
-            EquationTypeVariable variable = equations[i].getEquationTypeVariable();
-            if (variable != null) {
-                String variableName = variable.getName();
-                if (variableName.equalsIgnoreCase("Capital Cost Multiplier")) {
-                    capCostMultiplier = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("Capital Cost Exponent")) {
-                    capCostExponent = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("Annual Cost Multiplier")) {
-                    annCostMultiplier = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("Annual Cost Exponent")) {
-                    annCostExponent = equations[i].getValue();
+            capCostMultiplier = equations[i].getValue1();
+            capCostExponent = equations[i].getValue2();
+            annCostMultiplier = equations[i].getValue3();
+            annCostExponent = equations[i].getValue4();
 //                } else if (variableName.equalsIgnoreCase("Incremental Capital Cost Multiplier")) {
 //                    incCapCostMultiplier = equations[i].getValue();
 //                } else if (variableName.equalsIgnoreCase("Incremental Capital Cost Exponent")) {
@@ -130,8 +122,6 @@ public class Type2CostEquation implements CostEquation {
 //                    incAnnCostMultiplier = equations[i].getValue();
 //                } else if (variableName.equalsIgnoreCase("Incremental Annual Cost Exponent")) {
 //                    incAnnCostExponent = equations[i].getValue();
-                }
-            }
         }
         if (capCostMultiplier == null
                 || capCostExponent == null

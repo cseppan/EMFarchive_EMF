@@ -57,9 +57,19 @@
 	    	<key column="control_measure_id" not-null="true"/>
 	    	<list-index column="list_index"/>
 	    	<composite-element class="gov.epa.emissions.framework.services.cost.ControlMeasureEquation">
-		        <property name="value" column="value" type="double"/>
 	        	<many-to-one name="equationType" class="gov.epa.emissions.framework.services.cost.EquationType" column="equation_type_id" not-null="true"/>
-	        	<many-to-one name="equationTypeVariable" class="gov.epa.emissions.framework.services.cost.EquationTypeVariable" column="equation_type_variable_id"/>
+        		<many-to-one name="pollutant" class="gov.epa.emissions.commons.data.Pollutant" column="pollutant_id" not-null="true"/> 
+		        <property name="costYear" column="cost_year" type="integer" not-null="true"/>
+		        <property name="value1" column="value1" type="double"/>
+		        <property name="value2" column="value2" type="double"/>
+		        <property name="value3" column="value3" type="double"/>
+		        <property name="value4" column="value4" type="double"/>
+		        <property name="value5" column="value5" type="double"/>
+		        <property name="value6" column="value6" type="double"/>
+		        <property name="value7" column="value7" type="double"/>
+		        <property name="value8" column="value8" type="double"/>
+		        <property name="value9" column="value9" type="double"/>
+		        <property name="value10" column="value10" type="double"/>
 	    	</composite-element>
 		</array>
 

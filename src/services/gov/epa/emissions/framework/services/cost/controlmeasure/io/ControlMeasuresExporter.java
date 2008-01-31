@@ -13,7 +13,6 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
 import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 import gov.epa.emissions.framework.services.cost.EquationType;
-import gov.epa.emissions.framework.services.cost.EquationTypeVariable;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -102,8 +101,8 @@ public class ControlMeasuresExporter implements Exporter {
         equationWriter.write(System.getProperty("line.separator"));
         
         for (int j = 0; j < controlMeasures.length; j++) {
-            if (controlMeasures[j].getEquations().length != 0) {
-                equationWriter.write(equationRecord(controlMeasures[j], fileFormat.cols().length));
+            for (ControlMeasureEquation equation : controlMeasures[j].getEquations()) {
+                equationWriter.write(equationRecord(controlMeasures[j], equation, fileFormat.cols().length));
                 equationWriter.write(System.getProperty("line.separator"));
             }
         }
@@ -111,21 +110,44 @@ public class ControlMeasuresExporter implements Exporter {
         equationWriter.close();
     }
     
-    private String equationRecord(ControlMeasure measure, int size) {
+    private String equationRecord(ControlMeasure measure, ControlMeasureEquation equation, int size) {
         String equationRecord = ""; 
         equationRecord += addQuote(measure.getAbbreviation())+ delimiter;
         
         ControlMeasureEquation cMequation[]=measure.getEquations();
         EquationType equationType=cMequation[0].getEquationType();
+		//add Equation Type
         equationRecord += addQuote(equationType.getName())+ delimiter;
-        
-        for (int k=0; k< cMequation.length; k++){
-            EquationTypeVariable typeVariable=cMequation[k].getEquationTypeVariable();
-                equationRecord += (typeVariable==null ? "" : cMequation[k].getValue())+ delimiter;         
+		//add Pollutant
+        equationRecord += addQuote(equation.getPollutant().getName())+ delimiter;
+		//add Cost Year
+        equationRecord += equation.getCostYear()+ delimiter;
+
+        for (int k=0; k< cMequation.length; k++) {
+            
+            Double value = null;
+            value = cMequation[k].getValue1();
+            equationRecord += (value==null ? "" : value)+ delimiter;         
+            value = cMequation[k].getValue2();
+            equationRecord += (value==null ? "" : value)+ delimiter;         
+            value = cMequation[k].getValue3();
+            equationRecord += (value==null ? "" : value)+ delimiter;         
+            value = cMequation[k].getValue4();
+            equationRecord += (value==null ? "" : value)+ delimiter;         
+            value = cMequation[k].getValue5();
+            equationRecord += (value==null ? "" : value)+ delimiter;         
+            value = cMequation[k].getValue6();
+            equationRecord += (value==null ? "" : value)+ delimiter;         
+            value = cMequation[k].getValue7();
+            equationRecord += (value==null ? "" : value)+ delimiter;         
+            value = cMequation[k].getValue8();
+            equationRecord += (value==null ? "" : value)+ delimiter;         
+            value = cMequation[k].getValue9();
+            equationRecord += (value==null ? "" : value)+ delimiter;         
+            value = cMequation[k].getValue10();
+            equationRecord += (value==null ? "" : value);         
         }
-        for (int i=cMequation.length+2; i<size-1; i++)
-            equationRecord += delimiter;
-        equationRecord += measure.getCostYear();
+        
         return equationRecord; 
     }
     

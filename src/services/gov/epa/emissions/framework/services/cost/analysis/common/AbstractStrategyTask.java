@@ -102,30 +102,29 @@ public abstract class AbstractStrategyTask implements Strategy {
             //process/load each input dataset
             ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy.getControlStrategyInputDatasets();
             for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
-                if (loader.inventoryHasTargetPollutant(controlStrategyInputDatasets[i])) {
-                    ControlStrategyResult result = new ControlStrategyResult();
-                    try {
-                        result = loader.loadStrategyResult(controlStrategyInputDatasets[i]);
-                        recordCount = loader.getRecordCount();
-                        result.setRecordCount(recordCount);
-                        status = "Completed.";
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        status = "Failed. Error processing input dataset: " + controlStrategyInputDatasets[i].getInputDataset().getName() + ". " + result.getRunStatus();
-                    } finally {
+                ControlStrategyResult result = null;
+                try {
+                    result = loader.loadStrategyResult(controlStrategyInputDatasets[i]);
+                    recordCount = loader.getRecordCount();
+                    result.setRecordCount(recordCount);
+                    status = "Completed.";
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    status = "Failed. Error processing input dataset: " + controlStrategyInputDatasets[i].getInputDataset().getName() + ". " + e.getMessage();
+                    setStatus(status);
+                } finally {
+                    if (result != null) {
                         result.setCompletionTime(new Date());
                         result.setRunStatus(status);
                         saveControlStrategyResult(result);
                         strategyResultList.add(result);
                         addStatus(controlStrategyInputDatasets[i]);
                     }
-                } else {
-                    setStatus("Error processing input dataset: " + controlStrategyInputDatasets[i].getInputDataset().getName() + ". Target pollutant is not in the inventory.");
                 }
             }
             
             //now create the summary detailed result based on the results from the strategy run...
-            if (controlStrategyInputDatasets.length > 0) {
+            if (strategyResultList.size() > 0) {
                 //create dataset and strategy summary result 
                 ControlStrategyResult summaryResult = createSummaryStrategyResult(controlStrategyInputDatasets[0].getInputDataset());
                 //now populate the summary result with data...
@@ -156,12 +155,16 @@ public abstract class AbstractStrategyTask implements Strategy {
             + "sum(summary.Annual_Cost) as Annual_Cost, "
             + "sum(summary.Emis_Reduction) as Emis_Reduction " 
             + "from (";
+            int count = 0;
             for (int i = 0; i < results.length; i++) {
-                String tableName = qualifiedEmissionTableName(results[i].getDetailedResultDataset());
-                sql += (i > 0 ? " union all " : "") 
-                    + "select e.fips, e.scc, e.poll, e.cm_id, sum(e.Annual_Cost) as Annual_Cost, sum(e.Emis_Reduction) as Emis_Reduction "
-                    + "from " + tableName + " e "
-                    + "group by e.fips, e.scc, e.poll, e.cm_id ";
+                if (results[i].getDetailedResultDataset() != null) {
+                    String tableName = qualifiedEmissionTableName(results[i].getDetailedResultDataset());
+                    sql += (count > 0 ? " union all " : "") 
+                        + "select e.fips, e.scc, e.poll, e.cm_id, sum(e.Annual_Cost) as Annual_Cost, sum(e.Emis_Reduction) as Emis_Reduction "
+                        + "from " + tableName + " e "
+                        + "group by e.fips, e.scc, e.poll, e.cm_id ";
+                    ++count;
+                }
             }
             sql += ") summary "
                 + "inner join emf.control_measures cm "
@@ -170,7 +173,6 @@ public abstract class AbstractStrategyTask implements Strategy {
                 + "on ct.id = cm.control_technology "
                 + "group by summary.fips, summary.scc, summary.poll, ct.name "
                 + "order by summary.fips, summary.scc, summary.poll, ct.name";
-            System.out.println( sql );
             try {
                 datasource.query().execute(sql);
             } catch (SQLException e) {

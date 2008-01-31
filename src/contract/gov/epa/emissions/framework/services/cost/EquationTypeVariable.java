@@ -7,13 +7,15 @@ public class EquationTypeVariable implements Serializable {
 
     private String name;
 
-    private int equationTypeId;
+    private EquationType equationType;
     
     private short fileColPosition;
 
     private String description;
     
     private long listindex;
+
+    private Object value;
 
     public long getListindex() {
         return listindex;
@@ -39,12 +41,12 @@ public class EquationTypeVariable implements Serializable {
         this.id = id;
     }
 
-    public int getEquationTypeId() {
-        return equationTypeId;
+    public EquationType getEquationType() {
+        return equationType;
     }
 
-    public void setEquationTypeId(int equationTypeId) {
-        this.equationTypeId = equationTypeId;
+    public void setEquationType(EquationType equationType) {
+        this.equationType = equationType;
     }
 
     public String getName() {
@@ -87,5 +89,13 @@ public class EquationTypeVariable implements Serializable {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
+    public Object getValue() {
+        return value;
     }
 }

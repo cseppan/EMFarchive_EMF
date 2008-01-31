@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.services.cost.analysis.common;
 
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
-import gov.epa.emissions.framework.services.cost.EquationTypeVariable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 
 public class Type1CostEquation implements CostEquation {
@@ -44,31 +43,20 @@ public class Type1CostEquation implements CostEquation {
     private void populateVariables() {
         ControlMeasureEquation[] equations = bestMeasureEffRecord.measure().getEquations();
         for (int i = 0; i < equations.length; i++) {
-            EquationTypeVariable variable = equations[i].getEquationTypeVariable();
-            if (variable != null) {
-                String variableName = variable.getName();
-                if (variableName.equalsIgnoreCase("Capital Cost Multiplier")) {
-                    capCostMultiplier = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("Fixed O&M Cost Multiplier")) {
-                    omCostMultiFixed = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("Variable O&M Cost Multiplier")) {
-                    omCostMultiVariable = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("Scaling Factor - Model Size (MW)")) {
-                    scalingFactorSize = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("Scaling Factor - Exponent")) {
-                    scalingFactorExponent = equations[i].getValue();
-                } else if (variableName.equalsIgnoreCase("Capacity Factor")) {
-                    capacityFactor = equations[i].getValue();
-//                } else if (variableName.equalsIgnoreCase("Incremental Capital Cost Multiplier")) {
-//                    incCapCostMultiplier = equations[i].getValue();
-//                } else if (variableName.equalsIgnoreCase("Incremental Capital Cost Exponent")) {
-//                    incCapCostExponent = equations[i].getValue();
-//                } else if (variableName.equalsIgnoreCase("Incremental Annual Cost Multiplier")) {
-//                    incAnnCostMultiplier = equations[i].getValue();
-//                } else if (variableName.equalsIgnoreCase("Incremental Annual Cost Exponent")) {
-//                    incAnnCostExponent = equations[i].getValue();
-                }
-            }
+            capCostMultiplier = equations[i].getValue1();
+            omCostMultiFixed = equations[i].getValue2();
+            omCostMultiVariable = equations[i].getValue3();
+            scalingFactorSize = equations[i].getValue4();
+            scalingFactorExponent = equations[i].getValue5();
+            capacityFactor = equations[i].getValue6();
+//                    } else if (variableName.equalsIgnoreCase("Incremental Capital Cost Multiplier")) {
+//                        incCapCostMultiplier = equations[i].getValue();
+//                    } else if (variableName.equalsIgnoreCase("Incremental Capital Cost Exponent")) {
+//                        incCapCostExponent = equations[i].getValue();
+//                    } else if (variableName.equalsIgnoreCase("Incremental Annual Cost Multiplier")) {
+//                        incAnnCostMultiplier = equations[i].getValue();
+//                    } else if (variableName.equalsIgnoreCase("Incremental Annual Cost Exponent")) {
+//                        incAnnCostExponent = equations[i].getValue();
         }
     }
 
