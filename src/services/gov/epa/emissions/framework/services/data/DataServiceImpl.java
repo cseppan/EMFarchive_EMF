@@ -36,16 +36,19 @@ public class DataServiceImpl implements DataService {
     }
 
     public synchronized EmfDataset[] getDatasets() throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
             List datasets = dao.allNonDeleted(session);
-            session.close();
 
             return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets", e);
             throw new EmfException("Could not get all Datasets");
         }
+        finally {
+            session.close();            
+        }
+        
     }
 
     public synchronized EmfDataset getDataset(Integer datasetId) throws EmfException {
@@ -77,10 +80,9 @@ public class DataServiceImpl implements DataService {
     }
 
     public synchronized EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            EmfDataset locked = dao.obtainLocked(owner, dataset, session);
-            session.close();
+       Session session = sessionFactory.getSession();
+       try {
+             EmfDataset locked = dao.obtainLocked(owner, dataset, session);
 
             return locked;
         } catch (RuntimeException e) {
@@ -88,14 +90,15 @@ public class DataServiceImpl implements DataService {
                     e);
             throw new EmfException("Could not obtain lock for Dataset: " + dataset.getName() + " by owner: "
                     + owner.getUsername());
+        } finally {
+            session.close();
         }
     }
 
     public synchronized EmfDataset releaseLockedDataset(EmfDataset locked) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
             EmfDataset released = dao.releaseLocked(locked, session);
-            session.close();
 
             return released;
         } catch (RuntimeException e) {
@@ -104,12 +107,14 @@ public class DataServiceImpl implements DataService {
                     e);
             throw new EmfException("Could not release lock for Dataset: " + locked.getName() + " by owner: "
                     + locked.getLockOwner());
+        } finally {
+            session.close();
         }
     }
 
     public synchronized EmfDataset updateDataset(EmfDataset dataset) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
             DatasetType type = dataset.getDatasetType();
 
             if (!dao.canUpdate(dataset, session))
@@ -119,38 +124,41 @@ public class DataServiceImpl implements DataService {
                 LOG.info("Renaming emission tables for dataset " + dataset.getName() + " is not allowed.");
 
             EmfDataset released = dao.update(dataset, session);
-            session.close();
-
+ 
             return released;
         } catch (Exception e) {
             LOG.error("Could not update Dataset: " + dataset.getName() + " " + e.getMessage(), e);
             throw new EmfException("Could not update Dataset: " + e.getMessage());
+        } finally {
+            session.close();
         }
     }
 
     public synchronized EmfDataset[] getDatasets(DatasetType datasetType) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
             List datasets = dao.getDatasets(session, datasetType);
-            session.close();
-
+ 
             return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets for dataset type " + datasetType, e);
             throw new EmfException("Could not get all Datasets for dataset type " + datasetType);
+        } finally {
+            session.close();
         }
     }
 
     public synchronized EmfDataset[] getDatasets(int datasetTypeId, String nameContaining) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
             List datasets = dao.getDatasets(session, datasetTypeId, nameContaining);
-            session.close();
 
             return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets for dataset type " + datasetTypeId, e);
             throw new EmfException("Could not get all Datasets for dataset type " + datasetTypeId);
+        } finally {
+            session.close();
         }
     }
 
@@ -195,13 +203,21 @@ public class DataServiceImpl implements DataService {
     private synchronized void checkCase(EmfDataset dataset) throws EmfException {
         Session session = sessionFactory.getSession();
         if (dao.isUsedByCases(session, dataset))
+        {
+            session.close();
             throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is used by a case.");
+        }
+        session.close();
     }
 
     private synchronized void checkControlStrategy(EmfDataset dataset) throws EmfException {
         Session session = sessionFactory.getSession();
         if (dao.isUsedByControlStrategies(session, dataset))
-            throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is use by a control strategy.");
+        {
+            session.close();
+            throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is used by a control strategy.");
+        }
+        session.close();
     }
 
     public synchronized String[] getDatasetValues(Integer datasetId) throws EmfException {
