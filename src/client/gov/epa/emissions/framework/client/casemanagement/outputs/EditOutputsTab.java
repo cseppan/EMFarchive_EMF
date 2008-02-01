@@ -25,6 +25,7 @@ import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.YesNoDialog;
+import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -170,10 +171,17 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
 
     private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
         SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-
+        sortFilterPanel.sort(sortCriteria());
+        
         JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
         sortFilterPanel.setPreferredSize(new Dimension(450, 60));
         return scrollPane;
+    }
+    
+    private SortCriteria sortCriteria() {
+        String[] columnNames = { "Sector", "Output name", "Job" };
+        return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false,
+                false });
     }
 
     private JPanel controlPanel() {

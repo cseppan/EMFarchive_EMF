@@ -92,6 +92,8 @@ public class EMFCmdClient {
         }
 
         run(options);
+        
+        System.exit(0);
     }
 
     private synchronized static void displayHelp() {
@@ -318,7 +320,7 @@ public class EMFCmdClient {
         asistFileReader.close();
         
         if (DEBUG)
-            System.out.println("EMF client starts reading log assistance file: " + logAsistFile + " " + new Date());
+            System.out.println("EMF client has finished reading log assistance file: " + logAsistFile + " " + new Date());
 
         if (DEBUG)
             System.out.println("EMF client starts reading log file: " + logfile + " " + new Date());
