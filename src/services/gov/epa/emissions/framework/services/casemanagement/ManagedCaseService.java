@@ -13,6 +13,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.basic.UserDAO;
@@ -29,6 +30,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ManagedExportService;
 import gov.epa.emissions.framework.services.exim.ManagedImportService;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.CaseJobSumitter;
 import gov.epa.emissions.framework.tasks.DebugLevels;
@@ -76,6 +78,8 @@ public class ManagedCaseService {
     private User user;
 
     private ManagedImportService importService;
+    
+    private ManagedExportService exportService;
 
     private String eolString = System.getProperty("line.separator");
 
@@ -124,7 +128,6 @@ public class ManagedCaseService {
         // log.info("exportTaskSubmitter: " + caseJobSubmitter);
         log.info("Session factory null? " + (sessionFactory == null));
         log.info("User null? : " + (user == null));
-
     }
 
     /**
@@ -137,7 +140,6 @@ public class ManagedCaseService {
 
     private synchronized ManagedExportService getExportService() {
         log.info("ManagedCaseService::getExportService");
-        ManagedExportService exportService = null;
 
         if (exportService == null) {
             try {
@@ -1512,9 +1514,12 @@ public class ManagedCaseService {
                 TaskManagerFactory.getCaseJobTaskManager(sessionFactory).addTask(cjt);
 
                 // pass the inputs to the exportService which uses an exportJobSubmitter to work with exportTaskManager
-                caseJobExportSubmitterId = expSvc
+                if (!this.doNotExportJobs())
+                    caseJobExportSubmitterId = expSvc
                         .exportForJob(user, inputs, cjt.getTaskId(), purpose, caseJob, jobCase);
-
+                else
+                    log.warn("ManagedCaseService: case jobs related datasets are not exported.");
+                
                 String runStatusExporting = "Exporting";
 
                 caseJob.setRunstatus(getJobRunStatus(runStatusExporting));
@@ -2168,11 +2173,10 @@ public class ManagedCaseService {
             throw new EmfException(e.getMessage());
         } finally {
             try {
-                if (dbServer != null)
+                if (dbServer != null && dbServer.isConnected())
                     dbServer.disconnect();
             } catch (Exception e) {
-                e.printStackTrace();
-                throw new EmfException(e.getMessage());
+                throw new EmfException("ManagedCaseService: error closing db server. " + e.getMessage());
             }
         }
 
@@ -2728,6 +2732,20 @@ public class ManagedCaseService {
             e.printStackTrace();
             log.error("Could not add new case output '" + output.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new case output '" + output.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+    
+    private boolean doNotExportJobs() {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            EmfProperty property = new EmfPropertiesDAO().getProperty("DO_NOT_EXPORT_JOBS", session);
+            String value = property.getValue();
+            return value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes");
+        } catch (Exception e) {
+            return false;//Default value for maxpool and poolsize
         } finally {
             session.close();
         }
