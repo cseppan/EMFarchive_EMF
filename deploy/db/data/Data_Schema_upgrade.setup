@@ -258,3 +258,5 @@ where name = 'Summarize by State, SCC, and Control Technology'
 		where name in ('Control Strategy Detailed Result')
 	);
 
+-- Update emf version 
+update emf.properties set value='v1.9 - 1/31/2008' where name='EMF-version';

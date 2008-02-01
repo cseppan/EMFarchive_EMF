@@ -37,8 +37,11 @@ insert into emf.properties values(DEFAULT, 'defaultQASummaries', 'Summarize by P
 insert into emf.properties values(DEFAULT, 'PM10-PRI-alias', 'PM10');
 insert into emf.properties values(DEFAULT, 'PM2_5-PRI-alias', 'PM2_5');
 insert into emf.properties values(DEFAULT, 'ImportExportTempDir', '');
+insert into emf.properties values(DEFAULT, 'NUMBER_OF_SIMULT_EXPORTS', '2');
+insert into emf.properties values(DEFAULT, 'SECONDS_TO_WAIT_AFTER_EXPORT', '2');
+insert into emf.properties values(DEFAULT, 'DO_NOT_EXPORT_JOBS', 'true');
 --update version each time EMF gets updated!
-insert into emf.properties values(DEFAULT, 'EMF-version', 'v1.9 - 6/22/2007');
+insert into emf.properties values(DEFAULT, 'EMF-version', 'v1.9 - 1/31/2008');
 
 --emf.properties
 -- DO NOT CHANGE THE ORDER OF THE DATASET TYPE
