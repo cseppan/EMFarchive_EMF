@@ -61,11 +61,11 @@ public class CaseAssistServiceImpl implements CaseAssistService {
     @Override
     protected void finalize() throws Throwable {
         this.sessionFactory = null;
-        
+
         if (DebugLevels.DEBUG_0)
             System.out.println("CaseAssistService: garbage collected. sessionFactory = null? "
                     + (sessionFactory == null));
-        
+
         super.finalize();
     }
 
@@ -75,7 +75,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
 
     public synchronized void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
         if (DebugLevels.DEBUG_14)
-            System.out.println("Start registering case outputs. " +  new Date());
+            System.out.println("Start registering case outputs. " + new Date());
         try {
             CaseJob job = null;
 
@@ -92,9 +92,9 @@ public class CaseAssistServiceImpl implements CaseAssistService {
                 throw new EmfException(e.getMessage());
             throw new EmfException("Error registering output: " + e.getMessage());
         }
-        
+
         if (DebugLevels.DEBUG_14)
-            System.out.println("Finished registering case outputs. " +  new Date());
+            System.out.println("Finished registering case outputs. " + new Date());
     }
 
     private synchronized ManagedImportService getImportService() throws EmfException {
@@ -134,7 +134,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
             message.setCaseId(job.getCaseId());
             message.setJobId(job.getId());
             String status = message.getStatus();
-            String jobStatus = job.getRunstatus().getName();
+            String jobStatus = (job.getRunstatus() == null) ? "" : job.getRunstatus().getName();
             String lastMsg = message.getMessage();
 
             if (lastMsg != null && !lastMsg.trim().isEmpty())
@@ -157,8 +157,8 @@ public class CaseAssistServiceImpl implements CaseAssistService {
             dao.updateCaseJob(job);
 
             if (!user.getUsername().equalsIgnoreCase(message.getRemoteUser()))
-                throw new EmfException(
-                        "Error recording job messages: Remote user doesn't match the user who runs the job.");
+                throw new EmfException("Error recording job messages: Remote user: " + message.getRemoteUser()
+                        + " doesn't match the user who runs the job (" + user.getUsername() + ").");
 
             dao.add(message);
 
@@ -167,14 +167,13 @@ public class CaseAssistServiceImpl implements CaseAssistService {
                     // Notify CaseJobTaskManager that the job status has changed to Completed or Failed
                     TaskManagerFactory.getCaseJobTaskManager(sessionFactory).callBackFromJobRunServer();
                 }
-
             }
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
             throw new EmfException("Error recording job messages: " + e.getMessage());
         }
-        
+
         if (DebugLevels.DEBUG_14)
             System.out.println("Finished record job message. " + message.getMessage() + " " + new Date());
     }
