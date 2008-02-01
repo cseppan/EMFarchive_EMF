@@ -10,8 +10,10 @@ import java.util.Iterator;
 public class ExportJobSubmitter extends ExportSubmitter {
 
     String caseJobTaskId = null;
+    
     private String caseJobName = null;
     
+    private boolean finished = false;
     
     public String getCaseJobTaskId() {
         return caseJobTaskId;
@@ -169,18 +171,23 @@ public class ExportJobSubmitter extends ExportSubmitter {
                 status = "failed";
             }
 
-                try {
+            try {
                 CaseJobTaskManager.callBackFromExportJobSubmitter(this.caseJobTaskId, status, message);
             } catch (EmfException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
+            } finally {
+                this.finished = true;
             }
         }
 
         if (DebugLevels.DEBUG_9)
             System.out.println(">>>>>>>> Submitter: " + submitterId + " EXITING callback from TaskManager for Task: "
                     + taskId + " status= " + status + " message= " + message);
-
+    }
+    
+    public synchronized boolean finished() {
+        return finished;
     }
 
 }
