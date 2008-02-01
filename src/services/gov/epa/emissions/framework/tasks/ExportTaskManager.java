@@ -1,7 +1,10 @@
 package gov.epa.emissions.framework.tasks;
 
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.exim.ExportTask;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,15 +20,18 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
 
 public class ExportTaskManager implements TaskManager {
     private static Log log = LogFactory.getLog(ExportTaskManager.class);
 
     private static ExportTaskManager ref;
     private static int refCount = 0;
+    
+    private static HibernateSessionFactory sessionFactory;
 
-    private final int poolSize = 4;
-    private final int maxPoolSize = 4;
+    private final int poolSize;
+    private final int maxPoolSize;
     private final long keepAliveTime = 60;
 
     private static ArrayList<TaskSubmitter> submitters = new ArrayList<TaskSubmitter>();
@@ -59,6 +65,7 @@ public class ExportTaskManager implements TaskManager {
         taskQueue.clear();
         threadPoolQueue.clear();
         threadPool.shutdownNow();
+        sessionFactory = null;
     }
 
     public synchronized void removeTask(Runnable task) {
@@ -104,22 +111,35 @@ public class ExportTaskManager implements TaskManager {
     // The constructor
     private ExportTaskManager() {
         super();
+        
+        sessionFactory = HibernateSessionFactory.get();
+        
+        if (DebugLevels.DEBUG_14)
+            System.out.println("*****HibernateSessionFactory in ExportTaskManager is null? " + (sessionFactory == null));
+        
+        this.poolSize = runningThreadSize();
+        this.maxPoolSize = poolSize;
+        
         log.info("ExportTaskManager");
+        log.warn("ExportTaskManager thread pool size: " + poolSize + ".");
+        
         if (DebugLevels.DEBUG_9)
             System.out.println("Export Task Manager created @@@@@ THREAD ID: " + Thread.currentThread().getId());
 
         refCount++;
+        
         if (DebugLevels.DEBUG_9)
             System.out.println("Task Manager created refCount= " + refCount);
         if (DebugLevels.DEBUG_9)
             System.out.println("Priority Blocking queue created? " + !(taskQueue == null));
 
         threadPool = new ThreadPoolExecutor(poolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS, threadPoolQueue);
+        
         if (DebugLevels.DEBUG_9)
             System.out.println("ThreadPool created? " + !(threadPool == null));
+        
         if (DebugLevels.DEBUG_9)
             System.out.println("Initial # of jobs in Thread Pool: " + threadPool.getPoolSize());
-
     }
 
     public synchronized void callBackFromThread(String taskId, String submitterId, String status, String mesg) {
@@ -488,6 +508,21 @@ System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         mesg = createStatusMessage();
         return mesg;
     }
-
+    
+    private int runningThreadSize() {
+        Session session = sessionFactory.getSession();
+        int value = 4;
+        
+        try {
+            EmfProperty property = new EmfPropertiesDAO().getProperty("NUMBER_OF_SIMULT_EXPORTS", session);
+            value = Integer.parseInt(property.getValue());
+        } catch (Exception e) {
+            return value;//Default value for maxpool and poolsize
+        } finally {
+            session.close();
+        }
+        
+        return value;
+    }
     
 }
