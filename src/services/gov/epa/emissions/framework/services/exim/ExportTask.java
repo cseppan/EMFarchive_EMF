@@ -37,11 +37,11 @@ public class ExportTask extends Task {
     public boolean isEquivalent(Task task) {
         ExportTask etsk = (ExportTask) task;
         boolean eq = false;
-        
-        if (this.file.getAbsolutePath().equals(etsk.getFile().getAbsolutePath())){
-            eq=true;
+
+        if (this.file.getAbsolutePath().equals(etsk.getFile().getAbsolutePath())) {
+            eq = true;
         }
-        
+
         // NOTE Auto-generated method stub
         return eq;
     }
@@ -53,7 +53,7 @@ public class ExportTask extends Task {
     private LoggingServiceImpl loggingService;
 
     private EmfDataset dataset;
-    
+
     private DatasetType type;
 
     private AccessLog accesslog;
@@ -84,8 +84,9 @@ public class ExportTask extends Task {
 
     public void run() {
         DbServer dbServer = this.dbFactory.getDbServer();
-        VersionedExporterFactory exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes(), batchSize());
-        
+        VersionedExporterFactory exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes(),
+                batchSize());
+
         if (DebugLevels.DEBUG_1)
             System.out.println(">>## ExportTask:run() " + createId() + " for datasetId: " + this.dataset.getId());
         if (DebugLevels.DEBUG_1)
@@ -98,31 +99,30 @@ public class ExportTask extends Task {
         try {
             setStartStatus();
             accesslog.setTimestamp(new Date());
-            if (file.exists()){
-                setStatus("completed", "FILE EXISTS: Completed export of " + dataset.getName() + " to " + file.getAbsolutePath()
-                        + " in " + accesslog.getTimereqrd() + " seconds.");
-                
-            }else{
+            if (file.exists()) {
+                setStatus("completed", "FILE EXISTS: Completed export of " + dataset.getName() + " to "
+                        + file.getAbsolutePath() + " in " + accesslog.getTimereqrd() + " seconds.");
+
+            } else {
                 Exporter exporter = exporterFactory.create(dataset, version);
                 exporter.export(file);
                 accesslog.setEnddate(new Date());
                 accesslog.setLinesExported(exporter.getExportedLinesCount());
                 printLogInfo(accesslog);
-                
+
                 if (!compareDatasetRecordsNumbers(accesslog))
                     return;
                 // updateDataset(dataset); //Disabled because of nothing updated during exporting
 
                 String msghead = "Completed export of " + dataset.getName();
                 String msgend = " in " + accesslog.getTimereqrd() + " seconds.";
-                
+
                 if (type.getExporterClassName().endsWith("ExternalFilesExporter")) {
                     setStatus("completed", msghead + msgend);
                     accesslog.setFolderPath("");
-                }
-                else 
+                } else
                     setStatus("completed", msghead + " to " + file.getAbsolutePath() + msgend);
-                
+
                 loggingService.setAccessLog(accesslog);
             }
 
@@ -131,20 +131,22 @@ public class ExportTask extends Task {
                         + " has completed processing making the callback to ExportTaskManager THREAD ID: "
                         + Thread.currentThread().getId());
 
-            //FIXME: Why was the callBack method commented out?
-//            ExportTaskManager.callBackFromThread(taskId, this.submitterId, "completed", "succefully in THREAD ID: "
-//             + Thread.currentThread().getId());
+            // FIXME: Why was the callBack method commented out?
+            // ExportTaskManager.callBackFromThread(taskId, this.submitterId, "completed", "succefully in THREAD ID: "
+            // + Thread.currentThread().getId());
 
         } catch (Exception e) {
             setErrorStatus(e, "");
         } finally {
             try {
-                //  check for isConnected before disconnecting
+                // check for isConnected before disconnecting
                 if ((dbServer != null) && (dbServer.isConnected()))
                     dbServer.disconnect();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            sleepAfterExport();
         }
     }
 
@@ -166,10 +168,17 @@ public class ExportTask extends Task {
 
         DatasetDAO datasetDao = new DatasetDAO();
         DbServer dbServer = new EmfDbServer();
+        long records = 0;
+
         Session session = sessionFactory.getSession();
 
-        long records = datasetDao.getDatasetRecordsNumber(dbServer, session, dataset, version);
-        session.close();
+        try {
+            records = datasetDao.getDatasetRecordsNumber(dbServer, session, dataset, version);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
 
         if (records != log.getLinesExported()) {
             setErrorStatus(null, "No. of records in database: " + records + ", but" + " exported "
@@ -200,7 +209,7 @@ public class ExportTask extends Task {
     private void setStartStatus() {
         if (type.getExporterClassName().endsWith("ExternalFilesExporter"))
             setStatus("started", "Started exporting " + dataset.getName());
-        else 
+        else
             setStatus("started", "Started exporting " + dataset.getName() + " to " + file.getAbsolutePath());
     }
 
@@ -225,7 +234,6 @@ public class ExportTask extends Task {
     // statusServices.add(endStatus);
     // }
 
-    
     @Override
     protected void finalize() throws Throwable {
         taskCount--;
@@ -245,7 +253,7 @@ public class ExportTask extends Task {
     public Version getVersion() {
         return version;
     }
-    
+
     private int batchSize() {
         Session session = sessionFactory.getSession();
         try {
@@ -259,6 +267,23 @@ public class ExportTask extends Task {
         } finally {
             session.close();
         }
+    }
+
+    private int sleepAfterExport() {
+        Session session = sessionFactory.getSession();
+        int value = 2;
+
+        try {
+            EmfProperty property = new EmfPropertiesDAO().getProperty("SECONDS_TO_WAIT_AFTER_EXPORT", session);
+            value = Integer.parseInt(property.getValue());
+        } catch (Exception e) {
+            return value; // Default value for maxpool and poolsize
+        } finally {
+            session.close();
+            log.warn("ExportTask sleeps " + value + " seconds after export.");
+        }
+
+        return value;
     }
 
 }
