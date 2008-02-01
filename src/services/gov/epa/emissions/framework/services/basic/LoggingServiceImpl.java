@@ -38,25 +38,26 @@ public class LoggingServiceImpl implements LoggingService {
     }
 
     public synchronized AccessLog[] getAccessLogs(int datasetid) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
             List allLogs = dao.getAccessLogs(datasetid, session);
-            session.close();
 
             return (AccessLog[]) allLogs.toArray(new AccessLog[allLogs.size()]);
         } catch (RuntimeException e) {
             LOG.error("Could not get all access logs", e);
             throw new EmfException("Could not get all access logs");
         }
+        finally {
+            session.close();          
+        }
 
     }
 
     public synchronized String getLastExportedFileName(int datasetId) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
             String fileName = dao.getLastExportedFileName(datasetId, session);
-            session.close();
-
+ 
             return fileName;
             
         } catch(EmfException e){
@@ -65,7 +66,9 @@ public class LoggingServiceImpl implements LoggingService {
             LOG.error("Could not get Last Exported File", e);
             throw new EmfException("Could not get all access logs");
         }
-
+        finally {
+            session.close();          
+        }
     }
 
 }
