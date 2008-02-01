@@ -461,6 +461,8 @@ public class CaseObjectManager {
                 sortedStatuses[5] = statuses[i];
             else if (status.startsWith("FAIL"))
                 sortedStatuses[6] = statuses[i];
+            else if (status.startsWith("WAIT"))
+                sortedStatuses[7] = statuses[i];
         }
 
         return sortedStatuses;
