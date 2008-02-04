@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.exim.ManagedImportService;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -130,11 +131,17 @@ public class CaseAssistServiceImpl implements CaseAssistService {
         try {
             CaseJob job = getJobFromKey(jobKey);
 
+            JobRunStatus statusObj = job.getRunstatus();
+
+            if (statusObj == null)
+                this.log.error("Job run status for job " + job.getName() + " is null. JobMessage: "
+                        + "message status -> " + message.getStatus() + ".");
+
             User user = job.getUser();
             message.setCaseId(job.getCaseId());
             message.setJobId(job.getId());
             String status = message.getStatus();
-            String jobStatus = (job.getRunstatus() == null) ? "" : job.getRunstatus().getName();
+            String jobStatus = (statusObj == null) ? "" : job.getRunstatus().getName();
             String lastMsg = message.getMessage();
 
             if (lastMsg != null && !lastMsg.trim().isEmpty())
