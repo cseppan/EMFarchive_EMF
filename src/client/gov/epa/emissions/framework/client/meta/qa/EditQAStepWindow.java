@@ -710,7 +710,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             presenter.display(origDataset, step);
 
             if (programSwitches == null || programSwitches.trim().equals(""))
-                messagePanel.setError("The Program Arguments window is blank");
+                messagePanel.setError(""); //The Program Arguments window is blank");
         }
     }
 
@@ -771,7 +771,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             presenter.display(origDataset, step);
 
             if (programSwitches == null || programSwitches.trim().equals(""))
-                messagePanel.setError("The Program Arguments window is blank");
+                messagePanel.setError(""); //The Program Arguments window is blank");
         }
     }
 

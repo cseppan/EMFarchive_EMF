@@ -60,7 +60,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
     private NewCustomQAStepPresenter presenter;
 
     public NewCustomQAStepWindow(DesktopManager desktopManager) {
-        super("Add Custom QA Step", new Dimension(550, 450), desktopManager);
+        super("Add Custom QA Step", new Dimension(550, 420), desktopManager);
     }
 
     public void display(EmfDataset dataset, QAProgram[] programs, Version[] versions, EditableQATabView tabView,EmfSession session) {
@@ -95,6 +95,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         program = new EditableComboBox(qaPrograms.names());
+        program.setPreferredSize(new Dimension(440,18));
         program.setSelectedItem("");
         program.setPrototypeDisplayValue("To make the combobox a bit wider");
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
