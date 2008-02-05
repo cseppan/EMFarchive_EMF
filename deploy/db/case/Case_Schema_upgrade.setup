@@ -130,3 +130,10 @@ CREATE TABLE cases.outputs
 )
 WITHOUT OIDS;
 -- cases.outputs
+
+-- 02/04/2008 add new columns to cases.cases_caseinputs and cases.cases_parameters
+ALTER TABLE cases.cases_caseinputs
+   ADD COLUMN last_modified_date timestamp without time zone;
+ALTER TABLE cases.cases_parameters
+   ADD COLUMN last_modified_date timestamp without time zone;
+   
