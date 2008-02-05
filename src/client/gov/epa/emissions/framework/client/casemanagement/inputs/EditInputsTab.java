@@ -92,7 +92,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         this.caseId = caseObj.getId();
         this.presenter = presenter;
         this.session = session;
-        this.inputDir = new TextField("inputdir", 30);
+        this.inputDir = new TextField("inputdir", 50);
         inputDir.setText(caseObj.getInputFileDir());
         this.changeables.addChangeable(inputDir);
 

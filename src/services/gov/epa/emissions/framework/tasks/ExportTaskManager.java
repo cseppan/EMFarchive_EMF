@@ -439,12 +439,11 @@ public class ExportTaskManager implements TaskManager {
             e.printStackTrace();
         }
 
-        if (submitter instanceof ExportJobSubmitter) {
+        if (submitter instanceof ExportJobSubmitter && ((ExportJobSubmitter) submitter).finished()) {
             if (DebugLevels.DEBUG_15)
                 System.out.println("ExportJobSubmitter " + submitter.getSubmitterId() + " is deregistering itself. ");
 
-            if (((ExportJobSubmitter) submitter).finished())
-                submitter.deregisterSubmitterFromRunManager(submitter);
+            submitter.deregisterSubmitterFromRunManager(submitter);
 
             if (DebugLevels.DEBUG_15)
                 System.out.println("After deregistering itself, the number of submitters in import task manager: "

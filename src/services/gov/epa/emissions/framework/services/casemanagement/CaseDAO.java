@@ -366,7 +366,7 @@ public class CaseDAO {
         return hibernateFacade.get(CaseInput.class, crit, session);
     }
 
-    public List getJobInputs(int caseId, int jobId, Sector sector, Session session) {
+    public List<CaseInput> getJobInputs(int caseId, int jobId, Sector sector, Session session) {
         /**
          * Gets inputs for a job. Selects on the following 3 criteria: caseId, jobId, sectorId
          */
@@ -512,6 +512,15 @@ public class CaseDAO {
         } finally {
             session.close();
         }
+    }
+ 
+    public void updateCaseJob(CaseJob job, Session session) throws Exception {
+        try {
+            hibernateFacade.updateOnly(job, session);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new Exception(ex.getMessage());
+        } 
     }
 
     public List<JobRunStatus> getJobRunStatuses(Session session) {

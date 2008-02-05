@@ -12,9 +12,9 @@ public class DebugLevels {
     public static final boolean DEBUG_7 = false;
     public static final boolean DEBUG_8 = false;
     public static final boolean DEBUG_9 = false;
-    public static final boolean DEBUG_10 = true; //to trace import start messages
-    public static final boolean DEBUG_11 = true; //to trace pattern matching of files
-    public static final boolean DEBUG_12 = true; //to trace DAO classes
-    public static final boolean DEBUG_14 = true; //to trace job run issues
+    public static final boolean DEBUG_10 = false; //to trace import start messages
+    public static final boolean DEBUG_11 = false; //to trace pattern matching of files
+    public static final boolean DEBUG_12 = false; //to trace DAO classes
+    public static final boolean DEBUG_14 = false; //to trace job run issues
     public static final boolean DEBUG_15 = true; //to trace export job submitter issues
 }

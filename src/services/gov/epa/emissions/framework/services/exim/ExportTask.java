@@ -6,13 +6,10 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
-import gov.epa.emissions.framework.services.EmfDbServer;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
-import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
@@ -63,6 +60,8 @@ public class ExportTask extends Task {
     private Version version;
 
     private DbServerFactory dbFactory;
+    
+    private int sleepAfterExport = 0;
 
     protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog,
             DbServerFactory dbFactory, HibernateSessionFactory sessionFactory, Version version) {
@@ -83,10 +82,10 @@ public class ExportTask extends Task {
     }
 
     public void run() {
-        DbServer dbServer = this.dbFactory.getDbServer();
-        VersionedExporterFactory exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes(),
-                batchSize());
-
+        DbServer dbServer = null;
+        Session session = sessionFactory.getSession();
+        this.sleepAfterExport = sleepAfterExport(session);
+        
         if (DebugLevels.DEBUG_1)
             System.out.println(">>## ExportTask:run() " + createId() + " for datasetId: " + this.dataset.getId());
         if (DebugLevels.DEBUG_1)
@@ -104,13 +103,16 @@ public class ExportTask extends Task {
                         + file.getAbsolutePath() + " in " + accesslog.getTimereqrd() + " seconds.");
 
             } else {
+                dbServer = this.dbFactory.getDbServer();
+                VersionedExporterFactory exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes(),
+                        batchSize(session));
                 Exporter exporter = exporterFactory.create(dataset, version);
                 exporter.export(file);
                 accesslog.setEnddate(new Date());
                 accesslog.setLinesExported(exporter.getExportedLinesCount());
                 printLogInfo(accesslog);
 
-                if (!compareDatasetRecordsNumbers(accesslog))
+                if (!compareDatasetRecordsNumbers(accesslog, session, dbServer))
                     return;
                 // updateDataset(dataset); //Disabled because of nothing updated during exporting
 
@@ -142,11 +144,14 @@ public class ExportTask extends Task {
                 // check for isConnected before disconnecting
                 if ((dbServer != null) && (dbServer.isConnected()))
                     dbServer.disconnect();
+                
+                session.close();
+                
+                Thread.sleep(this.sleepAfterExport * 1000);
+                log.warn("ExportTask sleeps " + sleepAfterExport + " seconds after export.");
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            sleepAfterExport();
         }
     }
 
@@ -159,7 +164,7 @@ public class ExportTask extends Task {
         // setStatus(info);
     }
 
-    private boolean compareDatasetRecordsNumbers(AccessLog log) throws Exception {
+    private boolean compareDatasetRecordsNumbers(AccessLog log, Session session, DbServer dbServer) throws Exception {
         String type = dataset.getDatasetType().getName();
         // COSTCY & A/M/PTPRO types temporarily disabled
         if (type.equalsIgnoreCase("Country, state, and county names and data (COSTCY)")
@@ -167,18 +172,13 @@ public class ExportTask extends Task {
             return true;
 
         DatasetDAO datasetDao = new DatasetDAO();
-        DbServer dbServer = new EmfDbServer();
         long records = 0;
-
-        Session session = sessionFactory.getSession();
 
         try {
             records = datasetDao.getDatasetRecordsNumber(dbServer, session, dataset, version);
         } catch (RuntimeException e) {
             e.printStackTrace();
-        } finally {
-            session.close();
-        }
+        } 
 
         if (records != log.getLinesExported()) {
             setErrorStatus(null, "No. of records in database: " + records + ", but" + " exported "
@@ -194,18 +194,6 @@ public class ExportTask extends Task {
         setStatus("failed", "Export failure. " + message + ((e == null) ? "" : e.getMessage()));
     }
 
-    void updateDataset(EmfDataset dataset) throws EmfException {
-        DatasetDAO dao = new DatasetDAO();
-        try {
-            Session session = sessionFactory.getSession();
-            dao.updateWithoutLocking(dataset, session);
-            session.close();
-        } catch (Exception e) {
-            log.error("Could not update Dataset - " + dataset.getName(), e);
-            throw new EmfException("Could not update Dataset - " + dataset.getName());
-        }
-    }
-
     private void setStartStatus() {
         if (type.getExporterClassName().endsWith("ExternalFilesExporter"))
             setStatus("started", "Started exporting " + dataset.getName());
@@ -214,25 +202,8 @@ public class ExportTask extends Task {
     }
 
     private void setStatus(String status, String message) {
-        Status endStatus = new Status();
-        endStatus.setUsername(user.getUsername());
-        endStatus.setType("Export");
-        endStatus.setMessage(message);
-        endStatus.setTimestamp(new Date());
-
         ExportTaskManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(), message);
-
     }
-
-    // private void setStatus(String message) {
-    // Status endStatus = new Status();
-    // endStatus.setUsername(user.getUsername());
-    // endStatus.setType("Export");
-    // endStatus.setMessage(message);
-    // endStatus.setTimestamp(new Date());
-    //
-    // statusServices.add(endStatus);
-    // }
 
     @Override
     protected void finalize() throws Throwable {
@@ -254,8 +225,7 @@ public class ExportTask extends Task {
         return version;
     }
 
-    private int batchSize() {
-        Session session = sessionFactory.getSession();
+    private int batchSize(Session session) throws Exception {
         try {
             String batchSize = System.getProperty("EXPORT_BATCH_SIZE");
 
@@ -264,13 +234,14 @@ public class ExportTask extends Task {
 
             EmfProperty property = new EmfPropertiesDAO().getProperty("export-batch-size", session);
             return Integer.parseInt(property.getValue());
-        } finally {
-            session.close();
+        } catch (Exception e) {
+            log.error("Error getting batch size for export. ", e);
+            throw new Exception(e.getMessage());
         }
+        
     }
 
-    private int sleepAfterExport() {
-        Session session = sessionFactory.getSession();
+    private int sleepAfterExport(Session session) {
         int value = 2;
 
         try {
@@ -278,11 +249,8 @@ public class ExportTask extends Task {
             value = Integer.parseInt(property.getValue());
         } catch (Exception e) {
             return value; // Default value for maxpool and poolsize
-        } finally {
-            session.close();
-            log.warn("ExportTask sleeps " + value + " seconds after export.");
-        }
-
+        } 
+            
         return value;
     }
 

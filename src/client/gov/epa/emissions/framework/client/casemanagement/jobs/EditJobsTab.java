@@ -83,7 +83,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
     public void display(EmfSession session, Case caseObj, EditJobsTabPresenter presenter) {
         super.removeAll();
-        this.outputDir = new TextField("outputdir", 30);
+        this.outputDir = new TextField("outputdir", 50);
         outputDir.setText(caseObj.getOutputFileDir());
         this.changeables.addChangeable(outputDir);
         this.caseObj = caseObj;

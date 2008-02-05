@@ -192,12 +192,14 @@ public class ImportCaseOutputTask extends Task {
     }
 
     protected void removeDataset(EmfDataset dataset) {
+        Session session = sessionFactory.getSession();
+        
         try {
-            Session session = sessionFactory.getSession();
             datasetDao.remove(dataset, session);
-            session.close();
         } catch (Exception e) {
             logError("Could not get remove Dataset - " + dataset.getName(), e);
+        } finally {
+            session.close();
         }
     }
 

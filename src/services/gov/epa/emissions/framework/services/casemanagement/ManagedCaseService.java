@@ -14,6 +14,7 @@ import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.basic.RemoteCommand;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.basic.UserDAO;
@@ -38,6 +39,7 @@ import gov.epa.emissions.framework.tasks.TaskManagerFactory;
 import gov.epa.emissions.framework.tasks.TaskSubmitter;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -78,7 +80,7 @@ public class ManagedCaseService {
     private User user;
 
     private ManagedImportService importService;
-    
+
     private ManagedExportService exportService;
 
     private String eolString = System.getProperty("line.separator");
@@ -199,6 +201,16 @@ public class ManagedCaseService {
         }
     }
 
+    private Case getCase(int caseId, Session session) throws EmfException {
+        try {
+            Case caseObj = dao.getCase(caseId, session);
+            return caseObj;
+        } catch (RuntimeException e) {
+            log.error("Could not get case from case id: " + caseId + ".", e);
+            throw new EmfException("Could not get case from case id: " + caseId + ".");
+        }
+    }
+
     public Case[] getCases(CaseCategory category) {
         return dao.getCases(category);
     }
@@ -235,6 +247,16 @@ public class ManagedCaseService {
             throw new EmfException("Could not get job for job id " + jobId + ".\n");
         } finally {
             session.close();
+        }
+    }
+
+    private CaseJob getCaseJob(int jobId, Session session) throws EmfException {
+        try {
+            return dao.getCaseJob(jobId, session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get job for job id " + jobId + ".\n" + e.getMessage());
+            throw new EmfException("Could not get job for job id " + jobId + ".\n");
         }
     }
 
@@ -759,10 +781,8 @@ public class ManagedCaseService {
     /**
      * Gets all the inputs for this job, selects based on: case ID, job ID, and sector
      */
-    private List<CaseInput> getJobInputs(int caseId, int jobId, Sector sector) throws EmfException {
+    private List<CaseInput> getJobInputs(int caseId, int jobId, Sector sector, Session session) throws EmfException {
         List<CaseInput> outInputs = new ArrayList<CaseInput>();
-
-        Session session = sessionFactory.getSession();
         EmfDataset cipDataset = null;
         String badCipName = null;
 
@@ -802,13 +822,10 @@ public class ManagedCaseService {
                     + e.getMessage());
             // throw new EmfException("Required dataset not set for Case Input name = " + badCipName);
             throw new EmfException(e.getMessage());
-
-        } finally {
-            session.close();
         }
     }
 
-    private List<CaseInput> getAllJobInputs(CaseJob job) throws EmfException {
+    private List<CaseInput> getAllJobInputs(CaseJob job, Session session) throws EmfException {
         /**
          * Gets all the inputs for a specific job
          */
@@ -828,20 +845,20 @@ public class ManagedCaseService {
 
             // Get case inputs (the datasets associated w/ the case)
             // All sectors, all jobs
-            inputsAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS);
+            inputsAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS, session);
 
             // Sector specific, all jobs
             Sector sector = job.getSector();
             if (sector != this.ALL_SECTORS) {
-                inputsSA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector);
+                inputsSA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector, session);
             }
 
             // All sectors, job specific
-            inputsAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS);
+            inputsAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS, session);
 
             // Specific sector and specific job
             if (sector != this.ALL_SECTORS) {
-                inputsSJ = this.getJobInputs(caseId, jobId, sector);
+                inputsSJ = this.getJobInputs(caseId, jobId, sector, session);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1401,6 +1418,12 @@ public class ManagedCaseService {
         CaseJobTask[] caseJobsTasksInSubmission = null;
         ArrayList<CaseJobTask> caseJobsTasksList = new ArrayList<CaseJobTask>();
 
+        if (DebugLevels.DEBUG_15) {
+            logNumDBConn("beginning of job submitter");
+        }
+
+        Session session = sessionFactory.getSession();
+
         try {
             String caseJobExportSubmitterId = null;
             String caseJobSubmitterId = caseJobSubmitter.getSubmitterId();
@@ -1414,12 +1437,17 @@ public class ManagedCaseService {
             // the casejjobtask unique id as the key to find the casejob
             for (Integer jobId : jobIds) {
                 int jid = jobId.intValue();
+                
+                if (DebugLevels.DEBUG_15) {
+                    logNumDBConn("beginning of job submitter loop (jobID: " + jid + ")");
+                }
+                
                 String jobKey = null;
 
                 if (DebugLevels.DEBUG_0)
                     System.out.println("The jobId= " + jid);
 
-                CaseJob caseJob = this.getCaseJob(jid);
+                CaseJob caseJob = this.getCaseJob(jid, session);
 
                 // NOTE: This is where the jobkey is generated and set in the CaseJob
                 jobKey = this.createJobKey(jid);
@@ -1435,6 +1463,10 @@ public class ManagedCaseService {
 
                 // FIXME: Is this still needed?????
                 // caseJob.setRunStartDate(new Date());
+                if (DebugLevels.DEBUG_15) {
+                    logNumDBConn("beginning of job task creation (jobID: " + jid + ")");
+                }
+                
                 CaseJobTask cjt = new CaseJobTask(jid, caseId, user);
                 cjt.setJobkey(jobKey);
                 cjt.setNumDepends(caseJob.getDependentJobs().length);
@@ -1450,7 +1482,7 @@ public class ManagedCaseService {
                 if (DebugLevels.DEBUG_9)
                     System.out.println("before getJobFileName");
 
-                String jobFileName = this.getJobFileName(caseJob);
+                String jobFileName = this.getJobFileName(caseJob, session);
 
                 if (DebugLevels.DEBUG_6)
                     System.out.println("setJobFileContent");
@@ -1458,8 +1490,12 @@ public class ManagedCaseService {
                 if (DebugLevels.DEBUG_9)
                     System.out.println("before setJobFileContent");
 
-                cjt.setJobFileContent(this.createJobFileContent(caseJob, user, jobFileName, expSvc));
+                cjt.setJobFileContent(this.createJobFileContent(caseJob, user, jobFileName, expSvc, session));
 
+                if (DebugLevels.DEBUG_15) {
+                    logNumDBConn("after creation of job file (jobID: " + jid + ")");
+                }
+                
                 cjt.setJobFile(jobFileName);
                 cjt.setLogFile(this.getLog(jobFileName));
                 cjt.setJobName(caseJob.getName());
@@ -1486,6 +1522,10 @@ public class ManagedCaseService {
             Arrays.sort(caseJobsTasksInSubmission);
 
             for (CaseJobTask cjt : caseJobsTasksInSubmission) {
+                
+                if (DebugLevels.DEBUG_15) {
+                    logNumDBConn("beginning of job task loop (jobID: " + cjt.getJobId() + ")");
+                }
 
                 // get the caseJob out of the hashtable
                 CaseJob caseJob = caseJobsTable.get(cjt.getTaskId());
@@ -1495,7 +1535,7 @@ public class ManagedCaseService {
 
                 // now get the Case (called jobCase since case is a reserved word in Java) using
                 // the caseId sent in from the GUI
-                Case jobCase = this.getCase(caseId);
+                Case jobCase = this.getCase(caseId, session);
                 cjt.setCaseName(jobCase.getName());
 
                 String purpose = "Used by " + caseJob.getName() + " of Case " + jobCase.getName();
@@ -1505,28 +1545,39 @@ public class ManagedCaseService {
                 if (DebugLevels.DEBUG_0)
                     System.out.println("caseId= " + caseId + " Is the Case for this job null? " + (jobCase == null));
 
-                List<CaseInput> inputs = getAllJobInputs(caseJob);
+                List<CaseInput> inputs = getAllJobInputs(caseJob, session);
 
                 if (DebugLevels.DEBUG_6)
                     System.out.println("Number of inputs for this job: " + inputs.size());
 
+                if (DebugLevels.DEBUG_15) {
+                    logNumDBConn("beginning of adding job task (jobID: " + cjt.getJobId() + ")");
+                }
+                
                 // send the casejobtask to the CJTM priority queue and then to wait queue
                 TaskManagerFactory.getCaseJobTaskManager(sessionFactory).addTask(cjt);
 
+                if (DebugLevels.DEBUG_15) {
+                    logNumDBConn("before submitting to export (jobID: " + cjt.getJobId() + ")");
+                }
                 // pass the inputs to the exportService which uses an exportJobSubmitter to work with exportTaskManager
-                if (!this.doNotExportJobs())
-                    caseJobExportSubmitterId = expSvc
-                        .exportForJob(user, inputs, cjt.getTaskId(), purpose, caseJob, jobCase);
+                if (!this.doNotExportJobs(session))
+                    caseJobExportSubmitterId = expSvc.exportForJob(user, inputs, cjt.getTaskId(), purpose, caseJob,
+                            jobCase);
                 else
                     log.warn("ManagedCaseService: case jobs related datasets are not exported.");
+
+                if (DebugLevels.DEBUG_15) {
+                    logNumDBConn("after submitted to export (jobID: " + cjt.getJobId() + ")");
+                }
                 
                 String runStatusExporting = "Exporting";
 
-                caseJob.setRunstatus(getJobRunStatus(runStatusExporting));
+                caseJob.setRunstatus(getJobRunStatus(runStatusExporting, session));
                 caseJob.setRunStartDate(new Date());
 
                 // Now update the casejob in the database
-                updateJob(caseJob);
+                updateJob(caseJob, session);
 
                 if (DebugLevels.DEBUG_6)
                     System.out.println("Added caseJobTask to collection");
@@ -1543,13 +1594,17 @@ public class ManagedCaseService {
         } catch (EmfException ex) {
             ex.printStackTrace();
             throw new EmfException(ex.getMessage());
-
+        } finally {
+            if (DebugLevels.DEBUG_15) {
+                logNumDBConn("finished job submission");
+            }
+            
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
-    private JobRunStatus getJobRunStatus(String runStatus) throws EmfException {
-
-        Session session = sessionFactory.getSession();
+    private JobRunStatus getJobRunStatus(String runStatus, Session session) throws EmfException {
         JobRunStatus jrStat = null;
 
         try {
@@ -1560,14 +1615,13 @@ public class ManagedCaseService {
             e.printStackTrace();
             log.error("Could not get job run status.\n" + e.getMessage());
             throw new EmfException("Could not get job run status.\n");
-        } finally {
-            session.close();
         }
     }
 
-    private synchronized void updateJob(CaseJob caseJob) throws EmfException {
+    private synchronized void updateJob(CaseJob caseJob, Session session) throws EmfException {
         try {
-            dao.updateCaseJob(caseJob);
+            dao.updateCaseJob(caseJob, session);
+            session.flush();
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
@@ -1673,7 +1727,6 @@ public class ManagedCaseService {
 
             getExportService().exportForClient(user, new EmfDataset[] { ds }, new Version[] { version }, exportDir,
                     purpose, true);
-
         }
 
     }
@@ -1703,12 +1756,10 @@ public class ManagedCaseService {
         }
     }
 
-    private CaseParameter[] getJobParameters(int caseId, int jobId, Sector sector) throws EmfException {
+    private CaseParameter[] getJobParameters(int caseId, int jobId, Sector sector, Session session) throws EmfException {
         /**
          * Gets all the parameters for this job, selects based on: case ID, job ID, and sector
          */
-        Session session = sessionFactory.getSession();
-
         // select the inputs based on 3 criteria
         try {
             List<CaseParameter> parameters = dao.getJobParameters(caseId, jobId, sector, session);
@@ -1721,8 +1772,6 @@ public class ManagedCaseService {
                     + e.getMessage());
             throw new EmfException("Could not get all parameters for case (id=" + caseId + "), job (id=" + jobId
                     + ").\n");
-        } finally {
-            session.close();
         }
     }
 
@@ -1860,7 +1909,7 @@ public class ManagedCaseService {
     }
 
     public synchronized String createJobFileContent(CaseJob job, User user, String jobFileName,
-            ManagedExportService expSvc) throws EmfException {
+            ManagedExportService expSvc, Session session) throws EmfException {
         // String jobContent="";
         String jobFileHeader = "";
 
@@ -1875,7 +1924,7 @@ public class ManagedCaseService {
          */
 
         // Some objects needed for accessing data
-        Case caseObj = this.getCase(job.getCaseId());
+        Case caseObj = this.getCase(job.getCaseId(), session);
         int caseId = job.getCaseId();
         int jobId = job.getId();
 
@@ -1899,7 +1948,7 @@ public class ManagedCaseService {
         // ExportService exports = new ExportService(dbServerlocal, this.threadPool, this.sessionFactory);
         // Get case inputs (the datasets associated w/ the case)
         // All sectors, all jobs
-        inputsAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS);
+        inputsAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS, session);
 
         // Exclude any inputs w/ environmental variable EMF_JOBHEADER
         List<CaseInput> exclInputs = this.excludeInputsEnv(inputsAA, "EMF_JOBHEADER");
@@ -1911,7 +1960,7 @@ public class ManagedCaseService {
         // Sector specific, all jobs
         Sector sector = job.getSector();
         if (sector != this.ALL_SECTORS) {
-            inputsSA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector);
+            inputsSA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector, session);
 
             // Exclude any inputs w/ environmental variable EMF_JOBHEADER
             exclInputs = this.excludeInputsEnv(inputsSA, "EMF_JOBHEADER");
@@ -1921,7 +1970,7 @@ public class ManagedCaseService {
         }
 
         // All sectors, job specific
-        inputsAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS);
+        inputsAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS, session);
 
         // Exclude any inputs w/ environmental variable EMF_JOBHEADER
         exclInputs = this.excludeInputsEnv(inputsAJ, "EMF_JOBHEADER");
@@ -1931,7 +1980,7 @@ public class ManagedCaseService {
 
         // Specific sector and specific job
         if (sector != this.ALL_SECTORS) {
-            inputsSJ = this.getJobInputs(caseId, jobId, sector);
+            inputsSJ = this.getJobInputs(caseId, jobId, sector, session);
 
             // Exclude any inputs w/ environmental variable EMF_JOBHEADER
             exclInputs = this.excludeInputsEnv(inputsSJ, "EMF_JOBHEADER");
@@ -2070,7 +2119,7 @@ public class ManagedCaseService {
         // All sectors, all jobs
         sbuf.append(eolString);
         sbuf.append(this.runComment + " Parameters -- all sectors, all jobs " + eolString);
-        CaseParameter[] parameters = this.getJobParameters(caseId, this.ALL_JOB_ID, this.ALL_SECTORS);
+        CaseParameter[] parameters = this.getJobParameters(caseId, this.ALL_JOB_ID, this.ALL_SECTORS, session);
         if (parameters != null) {
             for (CaseParameter param : parameters) {
                 sbuf.append(setenvParameter(param));
@@ -2082,7 +2131,7 @@ public class ManagedCaseService {
         if (sector != this.ALL_SECTORS) {
             sbuf.append(eolString);
             sbuf.append(this.runComment + " Parameters -- sectors (" + sector + "), all jobs " + eolString);
-            parameters = this.getJobParameters(caseId, this.ALL_JOB_ID, sector);
+            parameters = this.getJobParameters(caseId, this.ALL_JOB_ID, sector, session);
             if (parameters != null) {
                 for (CaseParameter param : parameters) {
                     sbuf.append(setenvParameter(param));
@@ -2092,7 +2141,7 @@ public class ManagedCaseService {
         // All sectors, specific job
         sbuf.append(eolString);
         sbuf.append(this.runComment + " Parameters -- all sectors, job: " + job + eolString);
-        parameters = this.getJobParameters(caseId, jobId, this.ALL_SECTORS);
+        parameters = this.getJobParameters(caseId, jobId, this.ALL_SECTORS, session);
         if (parameters != null) {
             for (CaseParameter param : parameters) {
                 sbuf.append(setenvParameter(param));
@@ -2102,7 +2151,7 @@ public class ManagedCaseService {
         if (sector != this.ALL_SECTORS) {
             sbuf.append(eolString);
             sbuf.append(this.runComment + " Parameters -- sectors (" + sector + "), job: " + job + eolString);
-            parameters = this.getJobParameters(caseId, jobId, sector);
+            parameters = this.getJobParameters(caseId, jobId, sector, session);
             if (parameters != null) {
                 for (CaseParameter param : parameters) {
                     sbuf.append(setenvParameter(param));
@@ -2182,7 +2231,7 @@ public class ManagedCaseService {
 
     }
 
-    private String getJobFileName(CaseJob job) throws EmfException {
+    private String getJobFileName(CaseJob job, Session session) throws EmfException {
         /*
          * Creates the File name that corresponds to the job script file name.
          * 
@@ -2190,7 +2239,7 @@ public class ManagedCaseService {
          */
         String dateStamp = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
         String jobName = job.getName().replace(" ", "_");
-        Case caseObj = this.getCase(job.getCaseId());
+        Case caseObj = this.getCase(job.getCaseId(), session);
 
         // Get case abbreviation, if no case abbreviation construct one from id
         String defaultAbbrev = "case" + job.getCaseId();
@@ -2524,12 +2573,20 @@ public class ManagedCaseService {
             System.out.println("Start validating jobs on server side. " + new Date());
 
         String ls = System.getProperty("line.separator");
+        Session session = sessionFactory.getSession();
 
         List<CaseInput> allInputs = new ArrayList<CaseInput>();
 
-        for (Integer id : jobIDs) {
-            CaseJob job = this.getCaseJob(id.intValue());
-            allInputs.addAll(this.getAllJobInputs(job));
+        try {
+            for (Integer id : jobIDs) {
+                CaseJob job = this.getCaseJob(id.intValue(), session);
+                allInputs.addAll(this.getAllJobInputs(job, session));
+            }
+        } catch (RuntimeException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            session.close();
         }
 
         if (DebugLevels.DEBUG_14)
@@ -2537,16 +2594,16 @@ public class ManagedCaseService {
 
         TreeSet<CaseInput> set = new TreeSet<CaseInput>(allInputs);
         List<CaseInput> uniqueInputs = new ArrayList<CaseInput>(set);
-        
+
         String finalVersionMsg = listNonFinalInputs(uniqueInputs);
         String laterVersionMsg = listInputsMsg(uniqueInputs);
         String returnMsg = "";
-        
+
         if (finalVersionMsg == null || finalVersionMsg.isEmpty())
             returnMsg = laterVersionMsg;
         else
-            returnMsg = border(80, "*") + ls + finalVersionMsg + ls + border(80, "*")
-                + ls + laterVersionMsg + border(80, "*");
+            returnMsg = border(80, "*") + ls + finalVersionMsg + ls + border(80, "*") + ls + laterVersionMsg
+                    + border(80, "*");
 
         return returnMsg;
     }
@@ -2736,19 +2793,22 @@ public class ManagedCaseService {
             session.close();
         }
     }
-    
-    private boolean doNotExportJobs() {
-        Session session = sessionFactory.getSession();
-        
+
+    private boolean doNotExportJobs(Session session) {
         try {
             EmfProperty property = new EmfPropertiesDAO().getProperty("DO_NOT_EXPORT_JOBS", session);
             String value = property.getValue();
             return value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes");
         } catch (Exception e) {
-            return false;//Default value for maxpool and poolsize
-        } finally {
-            session.close();
+            return false;// Default value for maxpool and poolsize
         }
+    }
+
+    private void logNumDBConn(String prefix) throws EmfException {
+        String logNumDBConnCmd = "ps aux | grep postgres | wc -l";
+        InputStream inStream = RemoteCommand.executeLocal(logNumDBConnCmd);
+
+        RemoteCommand.logStdout("Logged DB connections: " + prefix, inStream);
     }
 
 }
