@@ -73,15 +73,17 @@ public class UserServiceImpl implements UserService {
     }
 
     public synchronized User getUser(String username) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
         try {
-            Session session = sessionFactory.getSession();
             User user = dao.get(username, session);
-            session.close();
 
             return user;
         } catch (RuntimeException e) {
             LOG.error("Could not get User - " + username, e);
             throw new EmfException("Could not get User due to data access failure");
+        } finally {
+            session.close();
         }
     }
 
