@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.parameters;
 
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseObjectManager;
 import gov.epa.emissions.framework.services.EmfException;
@@ -19,10 +20,10 @@ public class ParametersRowSource implements RowSource {
     }
 
     public Object[] values() {
-        return new Object[] { getParameterName(parameter), getOrder(parameter), getEnvtVarName(parameter),
+        return new Object[] { getParameterName(parameter), getOrder(parameter),  getEnvtVarName(parameter),
                 getSectorName(parameter), getJob(parameter), getProgramName(parameter), parameter.getValue(),
-                getValueType(parameter), isRequired(parameter), isShow(parameter), parameter.getNotes(),
-                parameter.getPurpose() };
+                getValueType(parameter), isRequired(parameter), isShow(parameter), getLastModified(parameter), 
+                parameter.getNotes(), parameter.getPurpose() };
     }
 
     private Float getOrder(CaseParameter parameter) {
@@ -55,6 +56,10 @@ public class ParametersRowSource implements RowSource {
 
     private String isShow(CaseParameter input) {
         return (input == null) ? "" : input.isShow() + "";
+    }
+    
+    private String getLastModified(CaseParameter input) {
+        return (input.getLastModifiedDate() == null) ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(input.getLastModifiedDate());
     }
 
     private String getJob(CaseParameter param) {

@@ -17,6 +17,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.Dimension;
+import java.util.Date;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -219,6 +220,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         updateSector();
         parameter.setRequired(required.isSelected());
         parameter.setShow(show.isSelected());
+        parameter.setLastModifiedDate(new Date());
         updateJob();
         parameter.setType((ValueType) varTypes.getSelectedItem());
         parameter.setValue(envValue.getText() == null ? "" : envValue.getText().trim());

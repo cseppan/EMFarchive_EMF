@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -288,6 +289,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         updateSubdir();
         input.setRequired(required.isSelected());
         input.setShow(show.isSelected());
+        input.setLastModifiedDate(new Date());
         updateJob();
         return input;
     }

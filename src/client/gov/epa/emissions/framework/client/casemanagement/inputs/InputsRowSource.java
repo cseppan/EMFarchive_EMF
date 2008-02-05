@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
@@ -21,7 +22,7 @@ public class InputsRowSource implements RowSource {
         return new Object[] { getInputName(input), getEnvtVarName(input), getSectorName(input), 
                 getJob(input), getProgramName(input), getDatasetName(input), getVersion(input),
                 getQAStatus(input), getDSType(input), isRequired(input), isShow(input), 
-                getSubDir(input) };
+                getSubDir(input), getLastModifiedDate(input)};
     }
     
     private String getInputName(CaseInput input) {
@@ -66,6 +67,10 @@ public class InputsRowSource implements RowSource {
 
     private String getSubDir(CaseInput input) {
         return (input.getSubdirObj() == null) ? "" : input.getSubdirObj().toString();
+    }
+    
+    private String getLastModifiedDate(CaseInput input) {
+        return (input.getLastModifiedDate() == null) ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(input.getLastModifiedDate());
     }
     
     private String getJob(CaseInput input) {

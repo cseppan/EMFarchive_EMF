@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class CaseInput implements Serializable, Comparable {
     
@@ -36,6 +37,8 @@ public class CaseInput implements Serializable, Comparable {
     private String subdir;
     
     private SubDir subdirObj;
+    
+    private Date lastModifiedDate;
 
     /*
      * Default constructor needed for hibernate and axis serialization
@@ -197,6 +200,14 @@ public class CaseInput implements Serializable, Comparable {
 
     public void setCaseJobID(int caseJobID) {
         this.caseJobID = caseJobID;
+    }
+    
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
     }
 
 }

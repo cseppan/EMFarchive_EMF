@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class CaseParameter implements Serializable, Comparable<CaseParameter> {
 
@@ -34,6 +35,8 @@ public class CaseParameter implements Serializable, Comparable<CaseParameter> {
     private int jobId;
     
     private int caseID;
+    
+    private Date lastModifiedDate;
     
     public CaseParameter() {
         // NOTE Auto-generated constructor stub
@@ -196,6 +199,14 @@ public class CaseParameter implements Serializable, Comparable<CaseParameter> {
     
     public String toString() {
         return getName();
+    }
+    
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
     }
 
 }

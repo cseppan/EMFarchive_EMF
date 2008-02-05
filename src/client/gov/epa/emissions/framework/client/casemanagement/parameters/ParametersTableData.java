@@ -30,7 +30,7 @@ public class ParametersTableData extends ChangeableTableData {
     public String[] columns() {
         return new String[] { "Parameter", "Order", "Envt. Var.", "Sector", 
                 "Job", "Program", "Value", "Type",
-                "Reqd?", "Show?", "Notes", "Purpose" };
+                "Reqd?", "Show?", "Last Modified", "Notes", "Purpose" };
     }
 
     public Class getColumnClass(int col) {

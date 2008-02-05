@@ -17,6 +17,7 @@
 				<property name="required"	column="required"	type="boolean"	not-null="false"/>
 				<property name="show"	column="is_show"	type="boolean"	not-null="false"/>
 				<property name="order" column="exec_order" type="float" not-null="false"/>
+    			<property name="lastModifiedDate" column="last_modified_date" type="java.util.Date" not-null="false" length="4"/>
   
     			<many-to-one 
    					name="parameterName"
