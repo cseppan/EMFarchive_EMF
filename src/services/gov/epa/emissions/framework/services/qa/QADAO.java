@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -46,6 +47,7 @@ public class QADAO {
 
     public QAProgram[] getQAPrograms(Session session) {
         List list = hibernateFacade.getAll(QAProgram.class, session);
+        Collections.sort(list);
         return (QAProgram[]) list.toArray(new QAProgram[0]);
     }
 
