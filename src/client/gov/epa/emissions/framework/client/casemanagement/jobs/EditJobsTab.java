@@ -273,7 +273,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
                     clearMessage();
                     validateJobDatasets();
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                   // ex.printStackTrace();
                     messagePanel.setError(ex.getMessage());
                 }
             }

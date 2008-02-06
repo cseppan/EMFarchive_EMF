@@ -231,11 +231,9 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         
         for (CaseJob job : jobs)
             ids.add(new Integer(job.getId()));
-        
-        System.out.println("Validating input datasets of jobs");
+//      System.out.println("Validating input datasets of jobs");
         String msg = service().validateJobs(ids.toArray(new Integer[0]));
-        System.out.println("Finished validating case jobs.");
-        
+//        System.out.println("Finished validating case jobs.");
         return msg;
     }
     
