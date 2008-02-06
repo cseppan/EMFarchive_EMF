@@ -800,6 +800,7 @@ public class CaseDAO {
 
         try {
             hibernateFacade.add(persistedWaitTask, session);
+            if (DebugLevels.DEBUG_15) System.out.println("Adding job to persisted table, jobID: "+ persistedWaitTask.getJobId());
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -825,8 +826,16 @@ public class CaseDAO {
             Criterion crit3 = Restrictions.eq("jobId", new Integer(persistedWaitTask.getJobId()));
             Object object = hibernateFacade.load(PersistedWaitTask.class, new Criterion[] { crit1, crit2, crit3 },
                     session);
-
-            hibernateFacade.deleteTask(object, session);
+            if (object != null){
+                hibernateFacade.deleteTask(object, session);
+            } else {
+                if (DebugLevels.DEBUG_15) {
+                    System.out.println("Removing from persisted table a job currently not there, jobID: " + persistedWaitTask.getJobId() );
+                    int numberPersistedTasks = hibernateFacade.getAll(PersistedWaitTask.class, session).size();
+                    System.out.println("Current size of persisted table: " + numberPersistedTasks);
+                }
+                
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
