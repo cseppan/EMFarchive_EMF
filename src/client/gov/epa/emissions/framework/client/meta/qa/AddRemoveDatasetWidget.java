@@ -11,7 +11,6 @@ import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDial
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPresenter;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.ListWidget;
-import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -31,7 +30,7 @@ public class AddRemoveDatasetWidget extends JPanel {
     
     private EmfSession session;
     
-    private SingleLineMessagePanel messagePanel;
+//    private SingleLineMessagePanel messagePanel;
     
     private ListWidget datasetsList;
     
@@ -69,7 +68,9 @@ public class AddRemoveDatasetWidget extends JPanel {
    
    private DatasetType getDatasetType(int index) {
        Object[] types = getDatasets();
-       return (types == null || types.length == 0) ? null : ((EmfDataset)types[index]).getDatasetType();
+       if (types == null )
+           return null; 
+       return (types.length == 0) ? null : ((EmfDataset)types[index]).getDatasetType();
    }
    
     private void setupLayout(ManageChangeables changeables) {
@@ -142,7 +143,7 @@ public class AddRemoveDatasetWidget extends JPanel {
 
         } catch (Exception e) {
             e.printStackTrace();
-             messagePanel.setError(e.getMessage());
+ //            messagePanel.setError(e.getMessage());
         }
     }
     

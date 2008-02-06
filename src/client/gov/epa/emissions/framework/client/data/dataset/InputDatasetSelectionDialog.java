@@ -42,7 +42,7 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     private ComboBox datasetTypeCombo;
 
     private JList datasetList;
-
+    
     private EmfDataset[] datasets = new EmfDataset[] {};
 
     public InputDatasetSelectionDialog(EmfConsole parent, ManageChangeables changeables) {
@@ -57,7 +57,6 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     }
     
     public void display(DatasetType[] datasetTypes, DatasetType defaultType) {
-
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout(5, 5));
         JPanel panel = new JPanel(new BorderLayout(10, 10));
@@ -98,18 +97,11 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     private JPanel buildDatasetTypeCombo(DatasetType[] datasetTypes, DatasetType defaultType) {
         JPanel panel = new JPanel(new BorderLayout());
         datasetTypeCombo = new ComboBox("Choose a dataset type", datasetTypes);
-        datasetTypeCombo.setSelectedItem(defaultType);
+        if (defaultType != null )
+            datasetTypeCombo.setSelectedItem(defaultType); //setSelectedIndex(getIndex(defaultType, datasetTypes));
         datasetTypeCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    if (datasetTypeCombo.getSelectedItem() == null ){
-                        refreshDatasets(new EmfDataset[] {});
-                        return; 
-                    }  
-                    presenter.refreshDatasets((DatasetType) datasetTypeCombo.getSelectedItem(), name.getText());
-                } catch (EmfException e1) {
-                    // NOTE Auto-generated catch block
-                }
+                refresh();
             }
         });
 
@@ -117,18 +109,44 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
         panel.setBorder(BorderFactory.createEmptyBorder(1, 20, 5, 20));
         return panel;
     }
+    
+//    private int getIndex(DatasetType datasetType, DatasetType[] datasetTypes){
+//        for (int i =0; i<datasetTypes.length; i++){
+//            if (datasetType.getName().equalsIgnoreCase(datasetTypes[i].getName())){
+//                 return i+1;
+//            }
+//        }
+//        return 0; 
+//    }
 
     private JPanel buildNameContains(){
         JPanel panel = new JPanel(new SpringLayout()); 
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        name= new  TextField ("Name contains", "", 25);
+        name= new  TextField ("Dataset name contains", "", 25);
         name.setEditable(true);
+        name.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                refresh();
+            }
+        });
         
-        layoutGenerator.addLabelWidgetPair("Name contains:  ", name, panel);
+        layoutGenerator.addLabelWidgetPair("Dataset name contains:  ", name, panel);
         layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
                 25, 10, // initialX, initialY
                 5, 5);// xPad, yPad
         return panel; 
+    }
+    
+    private void refresh(){
+        try {
+            if (datasetTypeCombo.getSelectedItem() == null ){
+                refreshDatasets(new EmfDataset[] {});
+                return; 
+            }
+            presenter.refreshDatasets((DatasetType) datasetTypeCombo.getSelectedItem(), name.getText());
+        } catch (EmfException e1) {
+            e1.printStackTrace();
+        }
     }
     
     private JPanel buildDatasetsPanel() {
@@ -139,6 +157,7 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
         scrollPane.setPreferredSize(new Dimension(500, 300));
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.add(scrollPane);
+        refresh();
         return panel;
     }
 

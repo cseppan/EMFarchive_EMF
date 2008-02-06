@@ -40,7 +40,7 @@ public class InputDatasetSelectionPresenter {
     public void refreshDatasets(DatasetType datasetType, String nameContaining) throws EmfException {
         view.refreshDatasets(session.dataService().getDatasets(datasetType.getId(), nameContaining));
     }
-
+    
     public EmfDataset[] getDatasets() {
         return view.getDatasets();
     }
