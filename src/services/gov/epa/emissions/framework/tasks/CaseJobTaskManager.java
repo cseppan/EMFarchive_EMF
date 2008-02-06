@@ -471,6 +471,13 @@ public class CaseJobTaskManager implements TaskManager {
                         if (threadsAvail == 0) {
                             synchronized (waitTable) {
                                 waitTable.put(nextTask.getTaskId(), nextTask);
+
+                                // create a persisted wait task
+                                PersistedWaitTask pwTask = new PersistedWaitTask(nextTask.getJobId(), nextTask
+                                        .getCaseId(), nextTask.getUser().getId());
+                                // Register the newly added waitTask to the persisted wait Task Table
+                                caseDAO.addPersistedTask(pwTask);
+
                             }// synchronized
                         } else {
                             if (nextTask.isReady()) {
