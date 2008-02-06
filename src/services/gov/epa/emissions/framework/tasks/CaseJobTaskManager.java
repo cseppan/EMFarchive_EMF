@@ -218,12 +218,16 @@ public class CaseJobTaskManager implements TaskManager {
                     if (!(cjt == null)) {
                         System.out.println("Details of CJT: " + cjt.getJobName());
                         runTable.remove(taskId);
-                        if (DebugLevels.DEBUG_0)System.out.println("updateRunStatus Before remove from runTable on completed or failed job in thread");
+                        if (DebugLevels.DEBUG_0)
+                            System.out
+                                    .println("updateRunStatus Before remove from runTable on completed or failed job in thread");
 
                         // Now remove the task from the persisted wait table
-                           caseDAO.removePersistedTask(new PersistedWaitTask(cjt.getJobId(), cjt.getCaseId(), cjt
-                                   .getUser().getId()));
-                           if (DebugLevels.DEBUG_0)System.out.println("updateRunStatus After remove from runTable on completed or failed job in thread");
+                        caseDAO.removePersistedTask(new PersistedWaitTask(cjt.getJobId(), cjt.getCaseId(), cjt
+                                .getUser().getId()));
+                        if (DebugLevels.DEBUG_0)
+                            System.out
+                                    .println("updateRunStatus After remove from runTable on completed or failed job in thread");
 
                     }
                 }
@@ -239,12 +243,16 @@ public class CaseJobTaskManager implements TaskManager {
                         System.out.println("CaseJobTask Id for failed exports = " + cjt.getTaskId());
                         System.out.println("Size of the waitTable before remove: " + waitTable.size());
                         waitTable.remove(taskId);
-                        if (DebugLevels.DEBUG_0)System.out.println("updateRunStatus Before remove from runTable on completed or failed job in thread");
+                        if (DebugLevels.DEBUG_0)
+                            System.out
+                                    .println("updateRunStatus Before remove from runTable on completed or failed job in thread");
 
                         // Now remove the task from the persisted wait table
-                           caseDAO.removePersistedTask(new PersistedWaitTask(cjt.getJobId(), cjt.getCaseId(), cjt
-                                   .getUser().getId()));
-                           if (DebugLevels.DEBUG_0)System.out.println("updateRunStatus After remove from runTable on completed or failed job in thread");
+                        caseDAO.removePersistedTask(new PersistedWaitTask(cjt.getJobId(), cjt.getCaseId(), cjt
+                                .getUser().getId()));
+                        if (DebugLevels.DEBUG_0)
+                            System.out
+                                    .println("updateRunStatus After remove from runTable on completed or failed job in thread");
                         if (DebugLevels.DEBUG_9)
                             System.out.println("Size of the waitTable after remove: " + waitTable.size());
                     }
@@ -268,12 +276,16 @@ public class CaseJobTaskManager implements TaskManager {
                     if (DebugLevels.DEBUG_9)
                         System.out.println("Size of the waitTable before remove: " + waitTable.size());
                     waitTable.remove(taskId);
-                    if (DebugLevels.DEBUG_0)System.out.println("updateRunStatus Before remove from runTable on completed or failed job in thread");
+                    if (DebugLevels.DEBUG_0)
+                        System.out
+                                .println("updateRunStatus Before remove from runTable on completed or failed job in thread");
 
                     // Now remove the task from the persisted wait table
-                       caseDAO.removePersistedTask(new PersistedWaitTask(cjt.getJobId(), cjt.getCaseId(), cjt
-                               .getUser().getId()));
-                       if (DebugLevels.DEBUG_0)System.out.println("updateRunStatus After remove from runTable on completed or failed job in thread");
+                    caseDAO.removePersistedTask(new PersistedWaitTask(cjt.getJobId(), cjt.getCaseId(), cjt.getUser()
+                            .getId()));
+                    if (DebugLevels.DEBUG_0)
+                        System.out
+                                .println("updateRunStatus After remove from runTable on completed or failed job in thread");
                     if (DebugLevels.DEBUG_9)
                         System.out.println("CJTM::updateRunStatus return from removedPersistedTasks 3 (exportFailed)");
                     if (DebugLevels.DEBUG_9)
@@ -815,7 +827,8 @@ public class CaseJobTaskManager implements TaskManager {
      */
     public static synchronized void callBackFromJobRunServer() throws EmfException {
         if (DebugLevels.DEBUG_9)
-            System.out.println("EMF CMD CLIENT SENT A COMPLETED or FAILED STATUS BACK FROM THE RUNNING JOB: " + new Date());
+            System.out.println("EMF CMD CLIENT SENT A COMPLETED or FAILED STATUS BACK FROM THE RUNNING JOB: "
+                    + new Date());
         try {
             int timeWait = 10; // Set the time delay to 10 seconds
             timer = new Timer();
