@@ -33,7 +33,7 @@ import gov.epa.emissions.framework.services.exim.ManagedExportService;
 import gov.epa.emissions.framework.services.exim.ManagedImportService;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
-import gov.epa.emissions.framework.tasks.CaseJobSumitter;
+import gov.epa.emissions.framework.tasks.CaseJobSubmitter;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.TaskManagerFactory;
 import gov.epa.emissions.framework.tasks.TaskSubmitter;
@@ -1410,7 +1410,7 @@ public class ManagedCaseService {
             System.out.println("ManagedCaseService::submitJobs size: " + jobIds.length + " for caseId= " + caseId);
 
         // create a new caseJobSubmitter for each client call in a session
-        TaskSubmitter caseJobSubmitter = new CaseJobSumitter(sessionFactory);
+        TaskSubmitter caseJobSubmitter = new CaseJobSubmitter(sessionFactory);
 
         Hashtable<String, CaseJob> caseJobsTable = new Hashtable<String, CaseJob>();
         ManagedExportService expSvc = null;

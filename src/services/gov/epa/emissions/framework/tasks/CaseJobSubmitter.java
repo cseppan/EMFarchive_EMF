@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.Iterator;
 
 
-public class CaseJobSumitter implements TaskSubmitter {
+public class CaseJobSubmitter implements TaskSubmitter {
     private static int svcCount = 0;
 
     private String svcLabel = null;
@@ -27,7 +27,7 @@ public class CaseJobSumitter implements TaskSubmitter {
     
     private HibernateSessionFactory sessionFactory = null;
 
-    public CaseJobSumitter(HibernateSessionFactory sessionFactory) {
+    public CaseJobSubmitter(HibernateSessionFactory sessionFactory) {
         myTag();
         submitterId = svcLabel;
         if (DebugLevels.DEBUG_0) System.out.println("CaseJobSubmitter myTag called: " + submitterId);
