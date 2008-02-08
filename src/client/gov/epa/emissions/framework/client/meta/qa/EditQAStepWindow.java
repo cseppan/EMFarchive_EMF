@@ -12,6 +12,7 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.RunButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.commons.security.User;
@@ -47,6 +48,7 @@ import java.awt.event.KeyListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.swing.AbstractAction;
@@ -113,32 +115,28 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private JLabel creationDateLabel;
 
-    private EmfDataset[] datasets;
+    private EmfDataset[] inventories;
 
-    private EmfDataset[] invDatasets;
-
-    private ArrayList<EmfDataset> inputDatasets;
-
-    private ArrayList<EmfDataset> inputInvDatasets;
-
-    private EmfDataset[] inputDatasetsArray;
-
-    private EmfDataset[] inputInvDatasetsArray;
+    private EmfDataset[] invTables;
 
     private EmfDataset origDataset;
 
+    private static final String invTag = "-inventories";
+    
     private static final String invTableTag = "-invtable";
 
     private static final String avgDaySummaryProgram = "Average day to Annual State Summary";
 
     private static final String avgDayToAnnualProgram = "Average day to Annual Inventory";
+    
+    private static final String sqlProgram = "SQL";
 
     public EditQAStepWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
         super("Edit QA Step", new Dimension(680, 580), desktopManager);
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
-        inputDatasets = new ArrayList<EmfDataset>();
-        inputInvDatasets = new ArrayList<EmfDataset>();
+//        inventoryList = new ArrayList<EmfDataset>();
+//        invTableList = new ArrayList<EmfDataset>();
     }
 
     public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset,
@@ -505,9 +503,11 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         Button run = new RunButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    checkDatasets();
-                    clear();
-                    runQAStep();
+                    boolean result = checkDatasets();
+                    if (result){
+                        clear();
+                        runQAStep();
+                    }
                 } catch (Exception ex) {
                     messagePanel.setError(ex.getMessage());
                 }
@@ -517,81 +517,101 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         return run;
     }
 
-    private void checkDatasets() throws EmfException {
 
-        final String invTableTag = "-invtable";
+    private boolean checkDatasets() throws EmfException {
         String programSwitches = "";
-        String nextDataset = "";
-
+        boolean check=true;
         programSwitches = programArguments.getText();
-
-        if (avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                && !(programSwitches.equals(""))) {
-            int index1 = programSwitches.indexOf(invTableTag);
-            if (programSwitches.substring(0, 12).equals("-inventories") && index1 != -1) {
-                String inventoriesToken = programSwitches.substring(0, index1);
-                String invtableToken = programSwitches.substring(index1 + invTableTag.length());
-
-                StringTokenizer tokenizer2 = new StringTokenizer(inventoriesToken);
-
-                tokenizer2.nextToken();
-                int i = 0;
-
-                while (tokenizer2.hasMoreTokens()) {
-                    try {
-                        nextDataset = tokenizer2.nextToken().trim();
-                        inputDatasets.add(presenter.getDataset(nextDataset));
-                        i++;
-                    } catch (EmfException ex) {
-                        throw new EmfException("The dataset name " + nextDataset + " is not valid");
-                    }
-                }
-
-                inputDatasetsArray = new EmfDataset[inputDatasets.size()];
-                inputDatasets.toArray(inputDatasetsArray);
-                StringTokenizer tokenizer3 = new StringTokenizer(invtableToken);
-                int j = 0;
-
-                while (tokenizer3.hasMoreTokens()) {
-                    try {
-                        inputInvDatasets.add(presenter.getDataset(tokenizer3.nextToken().trim()));
-                        j++;
-                    } catch (EmfException ex) {
-                        throw new EmfException("The inventory table dataset is invalid");
-                    }
+        int indexInvTable = programSwitches.indexOf(invTableTag);
+        int indexInventories = programSwitches.indexOf("-inventories");
+        if (avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+            if ((programSwitches.trim().equals(""))) {
+                check = false; 
+            }else{
+                if (indexInventories!=-1 && indexInvTable != -1) {
+                    getInventories(programSwitches, indexInvTable);
+                    getInventoryTable(programSwitches, indexInvTable);
+                    if (!(inventories.length>0 && invTables.length>0) )
+                        check = false;  
+                }else {
+                    check = false;
                 }
             }
-        } else if (avgDayToAnnualProgram.equals(program.getSelectedItem()) && !(programSwitches.equals(""))) {
-            if (programSwitches.substring(0, 12).equals("-inventories")) {
-                StringTokenizer tokenizer2 = new StringTokenizer(programSwitches);
-                tokenizer2.nextToken();
-                int i = 0;
-
-                while (tokenizer2.hasMoreTokens()) {
-                    try {
-                        nextDataset = tokenizer2.nextToken().trim();
-                        inputDatasets.add(presenter.getDataset(nextDataset));
-                        i++;
-                    } catch (EmfException ex) {
-                        throw new EmfException("The dataset name " + nextDataset + " is not valid");
-                    }
-                }
-
-                inputDatasetsArray = new EmfDataset[inputDatasets.size()];
-                inputDatasets.toArray(inputDatasetsArray);
+            if (!check)
+                messagePanel.setMessage(" Both inventories and inventory table are needed ");   
+        } 
+        else if (avgDayToAnnualProgram.equals(program.getSelectedItem())){
+            // if argument is empty, return false
+            if (!(programSwitches.trim().equals(""))) {
+                check = false; 
+            // if no inventories are available, return false    
+            }else {
+                if (indexInventories != -1) {
+                    if (indexInvTable != -1)
+                        getInventories(programSwitches, indexInvTable);
+                    else 
+                        getInventories(programSwitches, programSwitches.length());
+                    if (!(inventories.length>0))
+                        check = false; 
+                }else
+                    check = false;
+            }
+            // print message if not ready to run
+            if (!check)
+                messagePanel.setMessage(" Inventories are needed "); 
+        }   
+        else if (sqlProgram.equals(program.getSelectedItem())){
+            if(!programSwitches.trim().toUpperCase().startsWith("SELECT ")){
+                check = false; 
+                messagePanel.setMessage(" SQL is not start with SELECT "); 
             }
         }
+        return check; 
+    }
+
+    private void getInventories(String programSwitches, int invTableIndex) throws EmfException{
+        List<EmfDataset> inventoryList = new ArrayList<EmfDataset>();
+        String nextDataset = "";  
+        
+        // get the part of the arguments starting with -inventories
+        String inventoriesString = programSwitches.substring(0, invTableIndex); 
+        StringTokenizer tokenizer2 = new StringTokenizer(inventoriesString);
+        tokenizer2.nextToken(); // skip the -inventories flag
+        
+        while (tokenizer2.hasMoreTokens()) {
+            try {
+                nextDataset = tokenizer2.nextToken().trim();
+                inventoryList.add(presenter.getDataset(nextDataset));
+            } catch (EmfException ex) {
+                throw new EmfException("The dataset name " + nextDataset + " is not valid");
+            }
+        }
+        inventories = inventoryList.toArray(new EmfDataset[inventoryList.size()]);
+
+    }
+    
+    private void getInventoryTable(String programSwitches, int invTableIndex) throws EmfException{
+        List<EmfDataset> invTableList = new ArrayList<EmfDataset>();
+        String invtableToken = programSwitches.substring(invTableIndex + invTableTag.length());
+        StringTokenizer tokenizer3 = new StringTokenizer(invtableToken);
+
+        while (tokenizer3.hasMoreTokens()) {
+            try {
+                invTableList.add(presenter.getDataset(tokenizer3.nextToken().trim()));
+            } catch (EmfException ex) {
+                throw new EmfException("The inventory table dataset is invalid");
+            }
+        }
+        invTables = invTableList.toArray(new EmfDataset[invTableList.size()]);
     }
 
     private Button exportButton() {
-        Button export = new Button("Export", new AbstractAction() {
+        Button export = new ExportButton("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clear();
                 doExport();
             }
         });
-        export.setMnemonic('x');
-
         return export;
     }
 
@@ -617,9 +637,17 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 clear();
 
                 if (avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
-                    showAvgDaySummaryWindow();
+                    try {
+                        showAvgDaySummaryWindow();
+                    } catch (EmfException e1) {
+                        messagePanel.setMessage(e1.getMessage());
+                    }
                 } else if (avgDayToAnnualProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
-                    showAvgDayToAnnualWindow();
+                    try {
+                        showAvgDayToAnnualWindow();
+                    } catch (EmfException e1) {
+                        messagePanel.setMessage(e1.getMessage());
+                    }
                 } else {
                     doSetWindow();
                 }
@@ -628,150 +656,68 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         return export;
     }
 
-    private void showAvgDaySummaryWindow() {
+    private void showAvgDaySummaryWindow() throws EmfException {
         // When there is no data in window, set button causes new window to pop up,
         // with the warning message to also show up. When data in window is invalid, a new window still
         // pops up, but with a different warning message.
         // Also change the window name to EditQASetArgumentsWindow
-        inputDatasets.clear();
-        inputInvDatasets.clear();
         String programSwitches = "";
-        String nextDataset = "";
         programSwitches = programArguments.getText();
-
-        if (!(programSwitches.equals(""))) {
-            int invTableIndex = programSwitches.indexOf(invTableTag);
-
-            if (programSwitches.substring(0, 12).equals("-inventories")) {
-                String inventoriesToken = null;
-                
-                if (invTableIndex > 0)
-                    inventoriesToken = programSwitches.substring(0, invTableIndex);
-                
-                if (invTableIndex == 0)
-                    inventoriesToken = "";
-                
-                if (invTableIndex < 0)
-                    inventoriesToken = programSwitches;
-                
-                StringTokenizer tokenizer2 = new StringTokenizer(inventoriesToken);
-                tokenizer2.nextToken();
-                int i = 0;
-
-                while (tokenizer2.hasMoreTokens()) {
-                    try {
-                        nextDataset = tokenizer2.nextToken().trim();
-                        inputDatasets.add(presenter.getDataset(nextDataset));
-                        i++;
-                    } catch (EmfException ex) {
-                        messagePanel.setError("The dataset name " + nextDataset + " is not valid");
-                    }
-                }
-
-                inputDatasetsArray = new EmfDataset[inputDatasets.size()];
-                inputDatasets.toArray(inputDatasetsArray);
-                
-                String invtableToken = invTableIndex < 0 ? "" : programSwitches.substring(invTableIndex + invTableTag.length());
-                StringTokenizer tokenizer3 = new StringTokenizer(invtableToken);
-                int j = 0;
-
-                while (tokenizer3.hasMoreTokens()) {
-                    try {
-                        inputInvDatasets.add(presenter.getDataset(tokenizer3.nextToken().trim()));
-                        j++;
-                    } catch (EmfException ex) {
-                        ex.printStackTrace();
-                        messagePanel.setError("The inventory table dataset is invalid");
-                    }
-                }
-
-                inputInvDatasetsArray = new EmfDataset[inputInvDatasets.size()];
-                inputInvDatasets.toArray(inputInvDatasetsArray);
-
-                EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, session, inputDatasetsArray,
-                        inputInvDatasetsArray);
-                EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
-                presenter.display(origDataset, step);
-
-                for (int m = 0; m < inputDatasetsArray.length; m++)
-                    inputDatasetsArray[m] = null;
-
-                for (int k = 0; k < inputInvDatasetsArray.length; k++)
-                    inputInvDatasetsArray[k] = null;
-            } else {
-                EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, session);
-                EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
-                presenter.display(origDataset, step);
-                // messagePanel.setError("The data in the Program Arguments window is invalid");
+        int invTableIndex = programSwitches.indexOf(invTableTag);
+        int invIndex = programSwitches.indexOf(invTag);
+        
+        if (!(programSwitches.trim().equals(""))) {
+            if (invTableIndex!=-1){
+                getInventories(programSwitches, invTableIndex);
+                getInventoryTable(programSwitches, invTableIndex);
             }
-        } else {
-            EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, session);
+            else if (invIndex !=-1){
+                getInventories(programSwitches, programSwitches.length());
+                invTables=null; 
+            }else{
+                inventories=null; 
+                invTables=null; 
+            }
+
+            EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, session, inventories,
+                    invTables);
             EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
             presenter.display(origDataset, step);
 
-            if (programSwitches == null || programSwitches.trim().equals(""))
-                messagePanel.setError(""); //The Program Arguments window is blank");
+        } else {
+            EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, session, null, null);
+            EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+            presenter.display(origDataset, step);
         }
     }
 
-    private void showAvgDayToAnnualWindow() {
+    private void showAvgDayToAnnualWindow() throws EmfException {
         // When there is no data in window, set button causes new window to pop up,
         // with the warning message to also show up. When data in window is invalid, a new window still
         // pops up, but with a different warning message.
-        inputDatasets.clear();
         String programSwitches = "";
-        StringTokenizer tokenizer2;
-        String nextDataset = "";
-        inputDatasets.clear();
+        
         programSwitches = programArguments.getText();
+        int invTableIndex = programSwitches.indexOf(invTableTag);
+        int invIndex = programSwitches.indexOf(invTag);
+        
+        if (!(programSwitches.trim().equals("")) && invIndex !=-1) {
+            
+            if (invTableIndex !=-1)
+                getInventories(programSwitches, invTableIndex);
+            else 
+                getInventories(programSwitches, programSwitches.length());
 
-        if (!(programSwitches.equals(""))) {
-            int index1 = programSwitches.indexOf(invTableTag);
-
-            if (programSwitches.substring(0, 12).equals("-inventories")) {
-                if (index1 != -1) {
-                    String inventoriesToken = programSwitches.substring(0, index1);
-                    tokenizer2 = new StringTokenizer(inventoriesToken);
-                } else {
-                    tokenizer2 = new StringTokenizer(programSwitches);
-                }
-
-                tokenizer2.nextToken();
-                int i = 0;
-
-                while (tokenizer2.hasMoreTokens()) {
-                    try {
-                        nextDataset = tokenizer2.nextToken().trim();
-                        inputDatasets.add(presenter.getDataset(nextDataset));
-                        i++;
-                    } catch (EmfException ex) {
-                        messagePanel.setError("The dataset name " + nextDataset + " is not valid");
-                    }
-                }
-
-                inputDatasetsArray = new EmfDataset[inputDatasets.size()];
-                inputDatasets.toArray(inputDatasetsArray);
-                EditQANonsummaryEmissionsWindow view = new EditQANonsummaryEmissionsWindow(desktopManager, session,
-                        inputDatasetsArray, messagePanel);
-                EditQANonsummaryEmissionsPresenter presenter = new EditQANonsummaryEmissionsPresenter(view, this);
-                presenter.display(origDataset, step);
-
-                for (int m = 0; m < inputDatasetsArray.length; m++)
-                    inputDatasetsArray[m] = null;
-
-            } else {
-                EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, session);
-                EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
-                presenter.display(origDataset, step);
-                // messagePanel.setError("The data in the Program Arguments window is invalid");
-            }
-        } else {
-            EditQANonsummaryEmissionsWindow view = new EditQANonsummaryEmissionsWindow(desktopManager, session);
+            EditQANonsummaryEmissionsWindow view = new EditQANonsummaryEmissionsWindow(desktopManager, session,
+                    inventories);
             EditQANonsummaryEmissionsPresenter presenter = new EditQANonsummaryEmissionsPresenter(view, this);
             presenter.display(origDataset, step);
 
-            if (programSwitches == null || programSwitches.trim().equals(""))
-                messagePanel.setError(""); //The Program Arguments window is blank");
+        } else {
+            EditQANonsummaryEmissionsWindow view = new EditQANonsummaryEmissionsWindow(desktopManager, session, null);
+            EditQANonsummaryEmissionsPresenter presenter = new EditQANonsummaryEmissionsPresenter(view, this);
+            presenter.display(origDataset, step);
+
         }
     }
 
@@ -787,34 +733,30 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         programArguments.setText(text);
     }
 
-    public void updateDatasets(Object[] retreivedDatasets, Object[] retrievedInvDatasets) {
+    public void updateInventories(Object[] retreivedInventories, Object[] retrievedInvTable) {
 
-        String datasetNames = "-inventories\n";
+        String datasetNames = invTag +"\n";
 
-        for (int i = 0; i < retreivedDatasets.length; i++) {
-            datasets = new EmfDataset[36];
-            datasets[i] = (EmfDataset) retreivedDatasets[i];
-            datasetNames += datasets[i] + "\n";
+        for (int i = 0; i < retreivedInventories.length; i++) {
+            datasetNames += ((EmfDataset)retreivedInventories[i]).getName() + "\n";
         }
-
-        for (int i = 0; i < retrievedInvDatasets.length; i++) {
-            invDatasets = new EmfDataset[1];
-            invDatasets[i] = (EmfDataset) retrievedInvDatasets[i];
-            datasetNames += "-invtable " + "\n" + invDatasets[i];
+        
+        if (retrievedInvTable.length >0 ){
+            datasetNames += invTableTag + "\n";
+            for (int i = 0; i < retrievedInvTable.length; i++) {
+                datasetNames += ((EmfDataset)retrievedInvTable[i]).getName() + "\n" ;
+            }
         }
-
         updateArgumentsTextArea(datasetNames);
 
     }
 
-    public void updateDatasets(Object[] retreivedDatasets) {
+    public void updateInventories(Object[] retreivedInventories) {
 
-        String datasetNames = "-inventories\n";
+        String datasetNames = invTag +"\n";
 
-        for (int i = 0; i < retreivedDatasets.length; i++) {
-            datasets = new EmfDataset[36];
-            datasets[i] = (EmfDataset) retreivedDatasets[i];
-            datasetNames += datasets[i] + "\n";
+        for (int i = 0; i < retreivedInventories.length; i++) {
+            datasetNames += ((EmfDataset)retreivedInventories[i]).getName() + "\n";
         }
 
         updateArgumentsTextArea(datasetNames);

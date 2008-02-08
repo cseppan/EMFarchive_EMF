@@ -48,10 +48,19 @@ public class AddRemoveDatasetWidget extends JPanel {
 
     }
     
-    public void setDatasets(EmfDataset [] datasets) {
+    // called when adding datasets
+    private void setDatasets(EmfDataset [] datasets) {
         for (int i = 0; i < datasets.length; i++) {
-            datasetsList.addElement(datasets[i]);
+            if (!isDuplicateDataset(datasetsList.getModel(),datasets[i]))
+               datasetsList.addElement(datasets[i]); 
         }
+    }
+
+    private boolean isDuplicateDataset(javax.swing.ListModel model, EmfDataset dataset) {
+        for (int i = 0; i < model.getSize(); i++)
+           if (model.getElementAt(i).equals(dataset))
+              return true;
+        return false;
     }
     
     public void setDatasetsFromStepWindow(EmfDataset [] datasets) {
@@ -121,21 +130,17 @@ public class AddRemoveDatasetWidget extends JPanel {
     private void doAddWindow() {
         List<DatasetType> datasetTypeList = new ArrayList<DatasetType>();
         try {
+            // FIXME: really, we don't want to contact the server to get the dataset types - could be slow
             DatasetType[] allDatasetTypes = session.dataCommonsService().getDatasetTypes();
             for (int i = 0; i < allDatasetTypes.length; i++) {
-                if (
-                        
-                        //get all dataset types that start with ORL
-                        allDatasetTypes[i].getName().startsWith("ORL")
-                    )
-                    {
+              //get all dataset types that start with ORL
+                if (allDatasetTypes[i].getName().startsWith("ORL"))
                     datasetTypeList.add(allDatasetTypes[i]);
-                }
             }
-            
+
             // Make an object of the view and presenter of the dialog, and run the presenter's display ().
             // Set the list of datasets in the JList of this widget (which is part of the EditQAEmissionsWindow
-            // to that of the datasets retrived from the presenter.
+            // to that of the datasets retrieved from the presenter.
             InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, changeables);
             InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypeList.toArray(new DatasetType[0]));
             presenter.display(getDatasetType(0));

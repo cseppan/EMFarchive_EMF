@@ -19,7 +19,7 @@ public class EditQANonsummaryEmissionsPresenter {
         view.display(dataset, qaStep);
     }
     
-    public void updateDatasets(Object [] datasets) {
-        view2.updateDatasets(datasets);
+    public void updateInventories(Object [] inventories) {
+        view2.updateInventories(inventories);
     }
 }

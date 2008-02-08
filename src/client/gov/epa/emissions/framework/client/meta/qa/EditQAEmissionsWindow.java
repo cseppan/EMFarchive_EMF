@@ -49,31 +49,20 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
     
     private Button addButton;
     
-    private EmfDataset [] datasets;
+    private EmfDataset[] inventories;
     
-    private EmfDataset [] invDatasets;
+    private EmfDataset[] invTables;
         
-public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session, EmfDataset [] datasets, EmfDataset [] invDatasets) {
+    public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session, EmfDataset[] inventories, EmfDataset [] invTables) {
         
         super("Emissions Inventories Editor", new Dimension(600, 300), desktopManager);
 
         this.session = session;
-        this.datasets = datasets;
-        this.invDatasets = invDatasets;
+        this.inventories = inventories;
+        this.invTables = invTables;
         this.getContentPane().add(createLayout());
         
     }
-
-public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) {
-    
-    super("Emissions Inventories Editor", new Dimension(600, 300), desktopManager);
-
-    this.session = session;
-    this.datasets = null;
-    this.invDatasets = null;
-    this.getContentPane().add(createLayout());
-    
-}
 
     public void display(EmfDataset dataset, QAStep qaStep) {
         super.setTitle("Setup "+qaStep.getName()+": " + dataset.getName() + "_" + qaStep.getId() );
@@ -88,7 +77,7 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) 
     // A Text Field for Adding the Inventory Table with a Select button
     // OK and Cancel buttons.
 
-    public JPanel createLayout() {
+    private JPanel createLayout() {
         
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
@@ -109,16 +98,16 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) 
     private JPanel emisinv() {
         datasetWidget = new AddRemoveDatasetWidget(this, parentConsole, session);
         datasetWidget.setPreferredSize(new Dimension(350,250));
-        if(datasets != null && datasets.length > 0)
-            datasetWidget.setDatasetsFromStepWindow(datasets);
+        if(inventories != null && inventories.length > 0)
+            datasetWidget.setDatasetsFromStepWindow(inventories);
         return datasetWidget;
     }
     
     private JPanel invTablePanel() {
         
         invTable = new ListWidget(new EmfDataset[0]);
-        if(!(invDatasets==null) && (invDatasets.length > 0))
-            setDatasetsFromStepWindow(invDatasets);
+        if(!(invTables==null) && (invTables.length > 0))
+            setDatasetsFromStepWindow(invTables);
         
         JScrollPane pane = new JScrollPane(invTable);
         pane.setPreferredSize(new Dimension(350, 25));
@@ -165,7 +154,7 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) 
             public void actionPerformed(ActionEvent e) {
                 
                 //System.out.println(invTable.getDataset());
-                presenter1.updateDatasets(datasetWidget.getDatasets(), getInvDatasets());
+                presenter1.updateInventories(datasetWidget.getDatasets(), getInvTableDatasets());
                 dispose();
                 disposeView();
             }
@@ -174,29 +163,27 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) 
     
     private void doAddWindow() {
         List<DatasetType> datasetTypeList = new ArrayList<DatasetType>();
-        //System.out.println("OK");
         try {
             DatasetType[] allDatasetTypes = session.dataCommonsService().getDatasetTypes();
             for (int i = 0; i < allDatasetTypes.length; i++) {
-                if (
-                        // Only get the dataset type INVTABLE
-                        allDatasetTypes[i].getName().equals("Inventory Table Data (INVTABLE)")
-                        
-                    )
-                    {
+             // Only get the dataset type INVTABLE
+                if (allDatasetTypes[i].getName().equals("Inventory Table Data (INVTABLE)"))
                     datasetTypeList.add(allDatasetTypes[i]);
-                }
             }
+            DatasetType[] datasetTypes = datasetTypeList.toArray(new DatasetType[0]);
             InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, this);
             InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypeList.toArray(new DatasetType[0]));
-            presenter.display(null);
+            if (datasetTypes.length == 1)
+                presenter.display(datasetTypes[0]);
+            else
+                presenter.display(null);
             setDatasets(presenter.getDatasets());
         } catch (Exception e) {
              messagePanel.setError(e.getMessage());
         }
     }
     
-    public void setDatasetsFromStepWindow(EmfDataset [] datasets){
+    private void setDatasetsFromStepWindow(EmfDataset [] datasets){
         invTable.removeAll();
         for (int i = 0; i < datasets.length; i++) {
             //System.out.println(" Inv dataset is: " + datasets[i]);
@@ -204,7 +191,7 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) 
         }
     }
     
-    public void setDatasets(EmfDataset [] datasets) {
+    private void setDatasets(EmfDataset [] datasets) {
         for (int i = 0; i < datasets.length; i++) {
            //System.out.println(" Inv dataset is: " + datasets[i]);
            invTable.addElement(datasets[i]);
@@ -212,7 +199,7 @@ public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session) 
         
     }
     
-   public Object[] getInvDatasets() {
+   private Object[] getInvTableDatasets() {
         return invTable.getAllElements();
    }
    

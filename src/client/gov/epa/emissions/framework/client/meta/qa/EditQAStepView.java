@@ -22,8 +22,8 @@ public interface EditQAStepView extends ManagedView {
     
     void updateArgumentsTextArea (String text);
     
-    void updateDatasets(Object [] datasets, Object [] invDatasets);
+    void updateInventories(Object [] inventories, Object [] invTables);
     
-    void updateDatasets(Object [] datasets);
+    void updateInventories(Object [] inventories);
 
 }

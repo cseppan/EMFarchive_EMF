@@ -19,8 +19,8 @@ public class EditQAEmissionsPresenter {
         view.display(dataset, qaStep);
     }
     
-    public void updateDatasets(Object [] datasets, Object [] invDatasets) {
-        editQAStepView.updateDatasets(datasets, invDatasets);
+    public void updateInventories(Object [] inventories, Object [] invTables) {
+        editQAStepView.updateInventories(inventories, invTables);
     }
    
 }

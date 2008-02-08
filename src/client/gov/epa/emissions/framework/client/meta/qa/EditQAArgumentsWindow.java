@@ -35,9 +35,6 @@ public class EditQAArgumentsWindow extends DisposableInteralFrame implements Edi
         super("Argument Editor", new Dimension(750, 350), desktopManager);
         this.textAreaArguments = textAreaArguments;
         this.getContentPane().add(createLayout());
-        //System.out.println("Args: " + textAreaArguments);
-        
-        //System.out.println("Args: " + this.textAreaArguments);
     }
 
   public void display(EmfDataset dataset, QAStep qaStep) {
