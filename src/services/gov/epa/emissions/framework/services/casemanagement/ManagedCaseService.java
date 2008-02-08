@@ -2602,8 +2602,8 @@ public class ManagedCaseService {
         if (finalVersionMsg == null || finalVersionMsg.isEmpty())
             returnMsg = laterVersionMsg;
         else
-            returnMsg = border(80, "*") + ls + finalVersionMsg + ls + border(80, "*") + ls + laterVersionMsg
-                    + border(80, "*");
+            returnMsg = border(100, "*") + ls + finalVersionMsg + ls + border(100, "*") + ls + laterVersionMsg
+                    + border(100, "*");
 
         return returnMsg;
     }
