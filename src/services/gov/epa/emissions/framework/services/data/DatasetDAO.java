@@ -31,7 +31,9 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -126,10 +128,10 @@ public class DatasetDAO {
     }
 
     public void remove(User user, EmfDataset dataset, Session session) throws EmfException {
-       if (DebugLevels.DEBUG_14)
-           System.out.println("DatasetDAO starts removing dataset " + dataset.getName() + " " + new Date());
+        if (DebugLevels.DEBUG_14)
+            System.out.println("DatasetDAO starts removing dataset " + dataset.getName() + " " + new Date());
 
-       // NOTE: method to be modified to really remove dataset. It is only rename it for now.
+        // NOTE: method to be modified to really remove dataset. It is only rename it for now.
         if (dataset.getStatus().equalsIgnoreCase("Deleted"))
             return;
 
@@ -148,10 +150,10 @@ public class DatasetDAO {
 
         if (isUsedByCases(session, dataset))
             throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is used by a case.");
-        
-// Disabled temporarily according to Alison's request 1/15/2008
-//        if (isUsedByControlStrategies(session, dataset))
-//            throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is use by a control strategy.");
+
+        // Disabled temporarily according to Alison's request 1/15/2008
+        // if (isUsedByControlStrategies(session, dataset))
+        // throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is use by a control strategy.");
 
         String prefix = "DELETED_" + new Date().getTime() + "_";
 
@@ -181,7 +183,7 @@ public class DatasetDAO {
             e.printStackTrace();
             throw new EmfException("Could not remove dataset " + datasetName + ". Reason: " + e.getMessage());
         }
-        
+
         if (DebugLevels.DEBUG_14)
             System.out.println("DatasetDAO has finished removing dataset " + dataset.getName() + " " + new Date());
     }
@@ -217,7 +219,8 @@ public class DatasetDAO {
                 System.out.println("DatasetDAO starts renaming emission table for dataset: " + oldDataset.getName());
             renameEmissionTable(locked, oldDataset, session);
             if (DebugLevels.DEBUG_14)
-                System.out.println("DatasetDAO has finished renaming emission table for dataset: " + oldDataset.getName());
+                System.out.println("DatasetDAO has finished renaming emission table for dataset: "
+                        + oldDataset.getName());
         } catch (Exception e) {
             LOG.error("Can not rename emission table: " + locked.getInternalSources()[0].getTable(), e);
         } finally { // to ignore if the rename fails
@@ -229,7 +232,7 @@ public class DatasetDAO {
     }
 
     private EmfDataset current(EmfDataset dataset, Session session) {
-        return (EmfDataset)current(dataset.getId(), EmfDataset.class, session);
+        return (EmfDataset) current(dataset.getId(), EmfDataset.class, session);
     }
 
     public List getDatasets(Session session, DatasetType datasetType) {
@@ -242,7 +245,14 @@ public class DatasetDAO {
     }
 
     public List getDatasets(Session session, int datasetTypeId, String nameContains) {
-        return session.createQuery("select new EmfDataset( DS.id, DS.name, DS.defaultVersion, DS.datasetType.id, DS.datasetType.name) from EmfDataset as DS where DS.datasetType.id = " + datasetTypeId + " and lower(DS.name) like " + "'%" + nameContains.toLowerCase().trim() + "%' and DS.status <> 'Deleted' order by DS.name").list();
+        return session
+                .createQuery(
+                        "select new EmfDataset( DS.id, DS.name, DS.defaultVersion, DS.datasetType.id, DS.datasetType.name) from EmfDataset as DS where DS.datasetType.id = "
+                                + datasetTypeId
+                                + " and lower(DS.name) like "
+                                + "'%"
+                                + nameContains.toLowerCase().trim() + "%' and DS.status <> 'Deleted' order by DS.name")
+                .list();
     }
 
     public EmfDataset getDataset(Session session, String name) {
@@ -334,7 +344,7 @@ public class DatasetDAO {
         } catch (SQLException e) {
             throw new SQLException("Cannot get total records number on dataset: " + dataset.getName() + " Reason: "
                     + e.getMessage());
-        } 
+        }
 
         return totalCount;
     }
@@ -438,10 +448,10 @@ public class DatasetDAO {
         DataTable table = new DataTable(oldDataset, datasource);
         String oldTableName = oldDataset.getInternalSources()[0].getTable();
         String newTableName = table.createName(dataset.getName());
-        
+
         if (DebugLevels.DEBUG_12)
             System.out.println("new table name: " + newTableName + " old table name:" + oldTableName);
-        
+
         sources[0].setTable(newTableName);
         table.rename(oldTableName, newTableName);
     }
@@ -481,13 +491,87 @@ public class DatasetDAO {
 
         return dbServer;
     }
-    
+
     public void updateVersionNReleaseLock(Version target, Session session) throws EmfException {
-        lockingScheme.releaseLockOnUpdate(target, (Version)current(target.getId(), Version.class, session), session);
+        lockingScheme.releaseLockOnUpdate(target, (Version) current(target.getId(), Version.class, session), session);
     }
-    
+
     public Version obtainLockOnVersion(User user, int id, Session session) {
-        return (Version)lockingScheme.getLocked(user, (Version)current(id, Version.class, session), session);
+        return (Version) lockingScheme.getLocked(user, (Version) current(id, Version.class, session), session);
+    }
+
+    public void deleteDatasets(User user, int[] datasetIDs, Session session) throws EmfException {
+        // Need to search all the items associated with datasets and remove them properly
+        // before remove the underline datasets
+        deleteFromEmfTables(datasetIDs, session);
+        deleteFromCases(datasetIDs, session);
+        deleteFromStrategies(datasetIDs, session);
+        deleteFromVersionTable(datasetIDs, session);
+        dropDataTables(datasetIDs, session);
+    }
+
+    private void deleteFromEmfTables(int[] datasetIDs, Session session) throws EmfException {
+        // NOTE Auto-generated method stub
+        deleteVersionTable(datasetIDs, session);
+    }
+
+    public int deleteVersionTable(int[] datasetIDs, Session session) throws EmfException {
+        int deletedEntities = 0;
+
+        try {
+            Transaction tx = session.beginTransaction();
+
+            String hqlDelete = "delete Version v where v.datasetId = " + getAndClause(datasetIDs, "v.datasetId");
+
+            if (DebugLevels.DEBUG_16)
+                System.out.println("hql delete string: " + hqlDelete);
+
+            deletedEntities = session.createQuery(hqlDelete).executeUpdate();
+            tx.commit();
+            
+            return deletedEntities;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            throw new EmfException(e.getMessage());
+        } finally {
+            if (DebugLevels.DEBUG_16)
+                LOG.warn(deletedEntities + " items deleted from Version table.");
+        }
+    }
+
+    public void deleteFromCases(int[] datasetIDs, Session session) throws EmfException {
+        // NOTE Auto-generated method stub
+        throw new EmfException("Under construction...");
+    }
+
+    public void deleteFromStrategies(int[] datasetIDs, Session session) throws EmfException {
+        // NOTE Auto-generated method stub
+        throw new EmfException("Under construction...");
+    }
+
+    public void deleteFromVersionTable(int[] datasetIDs, Session session) throws EmfException {
+        // NOTE Auto-generated method stub
+        throw new EmfException("Under construction...");
+    }
+
+    private void dropDataTables(int[] datasetIDs, Session session) throws EmfException {
+        // NOTE Auto-generated method stub
+        throw new EmfException("Under construction...");
+    }
+
+    private String getAndClause(int[] datasetIDs, String attrName) {
+        StringBuffer sb = new StringBuffer();
+        int numIDs = datasetIDs.length;
+
+        if (numIDs == 1)
+            return "" + datasetIDs[0];
+
+        for (int i = 0; i < numIDs - 1; i++)
+            sb.append(datasetIDs[i] + " OR " + attrName + " = ");
+
+        sb.append(datasetIDs[numIDs - 1]);
+
+        return sb.toString();
     }
 
 }

@@ -16,5 +16,6 @@ public class DebugLevels {
     public static final boolean DEBUG_11 = false; //to trace pattern matching of files
     public static final boolean DEBUG_12 = false; //to trace DAO classes
     public static final boolean DEBUG_14 = false; //to trace job run issues
-    public static final boolean DEBUG_15 = true; //to trace export job submitter issues
+    public static final boolean DEBUG_15 = false; //to trace export job submitter issues
+    public static boolean DEBUG_16 = true; // to trace dataset deletion
 }

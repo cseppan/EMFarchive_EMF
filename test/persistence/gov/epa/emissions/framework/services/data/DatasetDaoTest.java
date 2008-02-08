@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
@@ -12,6 +13,7 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 
+import java.util.Date;
 import java.util.List;
 
 public class DatasetDaoTest extends ServiceTestCase {
@@ -60,6 +62,26 @@ public class DatasetDaoTest extends ServiceTestCase {
             assertEquals(dataset.getName(), result.getName());
         } finally {
             remove(dataset);
+        }
+    }
+
+    public void testShouldDeleteDatasetRefsFromVersionTable() throws Exception {
+        try {
+            Version dsOne = newVersion(1, 0, true);
+            Version dsTwo = newVersion(2, 0, true);
+            Version dsThree = newVersion(3, 0, true);
+            Version dsFour = newVersion(4, 0, true);
+            add(dsOne);
+            add(dsTwo);
+            add(dsThree);
+            add(dsFour);
+            
+            int deletedItems = dao.deleteVersionTable(new int[]{1,2,3,4}, session);
+            
+            assertEquals(deletedItems, 4);
+            assertEquals(0, countRecords("versions"));
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
@@ -375,6 +397,24 @@ public class DatasetDaoTest extends ServiceTestCase {
         caseDao.add(element, session);
 
         return element;
+    }
+    
+    private Version newVersion(int datasetId, int versionNum, boolean isFinal) {
+        /**
+         * Associates dataset id w/ a new version adds version to db and returns new version
+         */
+        // Create version db
+        Version version = new Version();
+        version.setDatasetId(datasetId);
+        version.setVersion(versionNum);
+        version.setPath("");
+        version.setFinalVersion(isFinal);
+        Date lastModifiedDate = new Date(); // initialized to now
+        version.setLastModifiedDate(lastModifiedDate);
+
+        version.setName("test_version" + Math.random());
+        add(version);
+        return (version);
     }
 
 }
