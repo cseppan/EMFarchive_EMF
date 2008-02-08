@@ -281,6 +281,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 
     public synchronized void runStrategy(User user, int controlStrategyId,
             String exportDirectory, boolean useSQLApproach, boolean deleteResults) throws EmfException {
+        validatePath(exportDirectory);
         ControlStrategy strategy = getById(controlStrategyId);
         if (deleteResults){
             Integer[] dsList=getRusultsDSId(controlStrategyId);
@@ -290,7 +291,6 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
         
         StrategyFactory factory = new StrategyFactory(batchSize());
-        validatePath(exportDirectory);
         RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, 
                 dbServerFactory, threadPool,
                 exportDirectory, useSQLApproach);
