@@ -365,8 +365,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.nameUsed(note.getName(), Note.class, session))
-                throw new EmfException("Note name already in use");
+            //check has been done on the client side
+//            if (dao.nameUsed(note.getName(), Note.class, session))
+//                throw new EmfException("Note name already in use");
 
             dao.add(note, session);
             session.close();
