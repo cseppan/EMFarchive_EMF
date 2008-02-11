@@ -50,7 +50,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     protected ControlMeasureEquationTab controlMeasureEquationTabView; 
     
     public EditControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager, CostYearTable costYearTable) {
-        super("Control Measure Editor", new Dimension(770, 475), desktopManager);
+        super("Control Measure Editor", new Dimension(770, 500), desktopManager);
         this.desktopManager = desktopManager;
         this.session = session;
         this.parent = parent;

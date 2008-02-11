@@ -144,7 +144,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     private JPanel createOverviewSection() {
         JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
+        panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.LIGHT_GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addWidgetPair(createLeftOverview(), createRightOverview(), panel);
@@ -223,13 +223,13 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     
     private JPanel createAttributeSection() {
         JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
+        panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.LIGHT_GRAY));
 
   //    panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addWidgetPair(createLeftPanel(), createRightPanel(), panel);
-        widgetLayout(1, 2, 5, 5, 5, 5, layoutGenerator, panel);
+        widgetLayout(1, 2, 5, 5, 5, 8, layoutGenerator, panel);
 
         return panel;
     }
@@ -276,7 +276,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 //       layoutGenerator.addLabelWidgetPair("Sectors:", sectors(), panel);
 
 //        layoutGenerator.addLabelWidgetPair("", tempPanel(20, 20), panel);
-        widgetLayout(4, 2, 5, 5, 5, 5, layoutGenerator, panel);
+        widgetLayout(4, 2, 5, 5, 8, 5, layoutGenerator, panel);
         container.add(panel, BorderLayout.NORTH);
         return container;
     }
@@ -305,10 +305,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
         dataSources = new TextField("Data Sources:", 15);
         layoutGenerator.addLabelWidgetPair("Data Sources:", dataSources, panel);
-
- //       layoutGenerator.addLabelWidgetPair("Months:", months(), panel);
         
-        widgetLayout(4, 2, 5, 5, 5, 7, layoutGenerator, panel);
+        widgetLayout(4, 2, 5, 5, 5, 8, layoutGenerator, panel);
 
         container.add(panel, BorderLayout.NORTH);
         return container;
@@ -317,7 +315,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     
     private JPanel createSectorMonthSection() {
         JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
+        panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.LIGHT_GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addWidgetPair(createSector(), createMonth(), panel);
@@ -330,7 +328,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Sectors: ", sectors(), panel);
+        layoutGenerator.addLabelWidgetPair("Sectors: \n", sectors(), panel);
 
         widgetLayout(1, 2, 5, 5, 5, 5, layoutGenerator, panel);
         return panel;
@@ -340,7 +338,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Months: ", months(), panel);
+        layoutGenerator.addLabelWidgetPair("Months: \n", months(), panel);
 
         widgetLayout(1, 2, 5, 5, 10, 10, layoutGenerator, panel);
         return panel;
@@ -348,13 +346,13 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     private JPanel sectors() {
         sectorsWidget = new AddRemoveSectorWidget(getAllSectors(), changeablesList, parentConsole);
-        sectorsWidget.setPreferredSize(new Dimension(250, 80));
+        sectorsWidget.setPreferredSize(new Dimension(250, 100));
         return sectorsWidget;
     }
 
     private JPanel months() {
         monthsWidget = new AddRemoveMonthWidget(getAllMonths(), changeablesList, parentConsole);
-        monthsWidget.setPreferredSize(new Dimension(150, 80));
+        monthsWidget.setPreferredSize(new Dimension(150, 100));
         return monthsWidget;
     }
 

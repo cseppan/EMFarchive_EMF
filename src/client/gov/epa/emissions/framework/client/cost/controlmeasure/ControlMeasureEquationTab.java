@@ -123,7 +123,7 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
         return new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 if(tableData.rows().size()>0)  
-                    messagePanel.setError("Please remove old equation type to add new one" );
+                    messagePanel.setError("Please remove the old equation before adding a new one" );
                 else {
                     EquationTypeSelectionView view = new EquationTypeSelectionDialog(parent, dialogParent, changeables);
                     EquationTypeSelectionPresenter presenter = new EquationTypeSelectionPresenter(view, session);
@@ -185,7 +185,7 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
         if (tableData.rows().size()==0)
             return; 
         String title = "Warning";
-        String message = "Are you sure you want to remove equation type?";
+        String message = "Are you sure you want to remove the equation information?";
         int selection = JOptionPane.showConfirmDialog(parent, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
