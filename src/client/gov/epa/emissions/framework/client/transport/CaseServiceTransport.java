@@ -742,6 +742,7 @@ public class CaseServiceTransport implements CaseService {
         call.setOperation("validateJobs");
         call.addParam("jobIDs", caseMappings.casejobIds());
         call.setStringReturnType();
+        call.setTimeOut(40000);
         
         return (String) call.requestResponse(new Object[] {jobIDs});
     }
