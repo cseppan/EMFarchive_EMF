@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.tasks;
 
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.exim.ImportTask;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -431,7 +433,13 @@ public class ImportTaskManager implements TaskManager {
 
                 while (iter.hasNext()) {
                     Task et = iter.next();
-                    String etStatus = et.getUser().getId() + "," + et.getTaskId() + "\n";
+                    // Cast task to import task or import case output task and get dataset name
+                    String dsname = null;
+                    if (et instanceof ImportTask)
+                        dsname = ((ImportTask)et).getDataset().getName();
+                    else  
+                        dsname = ((ImportCaseOutputTask)et).getDataset().getName(); 
+                    String etStatus = et.getUser().getId() + "," + dsname + "\n";
                     sbuf.append(etStatus);
                 }
             }
@@ -443,7 +451,7 @@ public class ImportTaskManager implements TaskManager {
             labels = "UserId, Dataset Name\n";
             sbuf.append(labels);
 
-            if (waitingTasks.size() == 0) {
+            if (runningTasks.size() == 0) {
                 labels = "There are no tasks in the ImportTaskManager RunTable\n";
                 sbuf.append(labels);
 
@@ -452,7 +460,13 @@ public class ImportTaskManager implements TaskManager {
                 iter = runningTasks.iterator();
                 while (iter.hasNext()) {
                     Task et = iter.next();
-                    String etStatus = et.getUser().getId() + "," + et.getTaskId() + "\n";
+                    // Cast task to import task or import case output task and get dataset name
+                    String dsname = null;
+                    if (et instanceof ImportTask)
+                        dsname = ((ImportTask)et).getDataset().getName();
+                    else  
+                        dsname = ((ImportCaseOutputTask)et).getDataset().getName(); 
+                    String etStatus = et.getUser().getId() + "," + dsname + "\n";
                     sbuf.append(etStatus);
                 }
 
