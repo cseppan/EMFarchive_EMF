@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.Date;
 
@@ -45,24 +46,25 @@ public class SQLQAProgramRunner implements QAProgramRunner {
             dropTable(getExistedTableName(qaStep));
             dbServer.getEmissionsDatasource().query().execute(query);
             success(qaStep, tableName);
-            
-        // Changed this code by using e.message to pull out more detailed failure information.
+
+            // Changed this code by using e.message to pull out more detailed failure information.
         } catch (Exception e) {
             failure(qaStep);
-            //throw new EmfException("Check the query - " + query);
+            // throw new EmfException("Check the query - " + query);
             throw new EmfException("Check the query - " + e.getMessage());
-            
+
         }
     }
 
     public void printQuery(String query) {
-        System.out.println("QA Step '" + qaStep.getName() + "' query: " + query);
+        if (DebugLevels.DEBUG_0)
+            System.out.println("QA Step '" + qaStep.getName() + "' query: " + query);
     }
 
     public void dropTable(String tableName) throws EmfException {
         if (tableName == null || tableName.isEmpty())
             return;
-        
+
         try {
             if (tableCreator.exists(tableName)) {
                 tableCreator.drop(tableName);
@@ -99,7 +101,7 @@ public class SQLQAProgramRunner implements QAProgramRunner {
 
     // Modified SQLQueryParser constructor to reflect the changes to the actual class -- added arguments
     // for version and sessionFactory
-    
+
     protected String query(DbServer dbServer, QAStep qaStep, String tableName) throws EmfException {
         SQLQueryParser parser = new SQLQueryParser(qaStep, tableName, dbServer.getEmissionsDatasource().getName(),
                 dataset(qaStep), version(qaStep), sessionFactory);
@@ -126,12 +128,11 @@ public class SQLQAProgramRunner implements QAProgramRunner {
     }
 
     protected String tableName(QAStep qaStep) {
-        //System.out.println("The input is:" + qaStep);
+        // System.out.println("The input is:" + qaStep);
         String formattedDate = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
-        String table = "QA_DSID" + qaStep.getDatasetId() + "_V" + qaStep.getVersion() + "_"
-                + formattedDate;
-        
-        if (table.length() < 64) {     //postgresql table name max length is 64
+        String table = "QA_DSID" + qaStep.getDatasetId() + "_V" + qaStep.getVersion() + "_" + formattedDate;
+
+        if (table.length() < 64) { // postgresql table name max length is 64
             String name = qaStep.getName();
             int space = name.length() + table.length() - 64;
             table += name.substring((space < 0) ? 0 : space + 1);
@@ -142,13 +143,13 @@ public class SQLQAProgramRunner implements QAProgramRunner {
                 table = table.replace(table.charAt(i), '_');
             }
         }
-        //System.out.println("Table name is: " + table);
+        // System.out.println("Table name is: " + table);
         return table.trim().replaceAll(" ", "_");
     }
 
     protected String getExistedTableName(QAStep qaStep) {
         QAStepResult result = getResult(qaStep);
-        
+
         return (result != null) ? result.getTable() : null;
     }
 
