@@ -153,6 +153,7 @@ insert into emf.qa_programs values(DEFAULT,'Manual','');
 insert into emf.qa_programs values(DEFAULT,'Analysis Engine','');
 insert into emf.qa_programs values(DEFAULT,'Average Day to Annual State Summary','gov.epa.emissions.framework.services.qa.SQLAnnualQueryRunner');
 insert into emf.qa_programs values(DEFAULT,'Average day to Annual Inventory','gov.epa.emissions.framework.services.qa.SQLQAAnnualNonsummaryQueryRunner');
+insert into emf.qa_programs values(DEFAULT,'Fire Data Summary (Day-specific)','gov.epa.emissions.framework.services.qa.FireProgramRunner');
 
 --
 -- the dataset type id field depends on the order of dataset type table (ORL type being first)
@@ -239,5 +240,3 @@ insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, na
 select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by Control Technology and Pollutant', 1, 'select e.Control_Technology, e.poll, sum(e.Annual_Cost) / sum(e.Emis_Reduction) as avg_ann_cost_per_ton, sum(e.Annual_Cost) as Annual_Cost, sum(e.Emis_Reduction) as Emis_Reduction from $TABLE[1] e  group by e.Control_Technology, e.poll order by e.Control_Technology, e.poll', false, 1, ''
 from emf.dataset_types dt
 where name in ('Control Strategy Result Summary'); 
-
-

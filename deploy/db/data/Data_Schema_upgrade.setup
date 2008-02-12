@@ -260,3 +260,7 @@ where name = 'Summarize by State, SCC, and Control Technology'
 
 -- Update emf version 
 update emf.properties set value='v1.9 - 1/31/2008' where name='EMF-version';
+
+-- emf.qa_programs  02/12/08 by Dongmei Yang
+insert into emf.qa_programs values(DEFAULT,'Fire Data Summary (Day-specific)','gov.epa.emissions.framework.services.qa.FireProgramRunner');
+
