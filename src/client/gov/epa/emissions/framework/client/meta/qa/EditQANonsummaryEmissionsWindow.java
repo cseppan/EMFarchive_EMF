@@ -21,18 +21,18 @@ import javax.swing.SpringLayout;
 
 public class EditQANonsummaryEmissionsWindow extends DisposableInteralFrame implements EditQANonsummaryEmissionsView {
 
-private AddRemoveDatasetWidget datasetWidget;
-    
+    private AddRemoveDatasetWidget datasetWidget;
+
     private EmfConsole parentConsole;
-    
+
     private JPanel layout;
-    
+
     private EditQANonsummaryEmissionsPresenter presenter1;
-    
+
     private EmfSession session;
-    
+
     private EmfDataset [] datasets; 
-    
+
         
 public EditQANonsummaryEmissionsWindow(DesktopManager desktopManager, EmfSession session, EmfDataset [] datasets) {
         

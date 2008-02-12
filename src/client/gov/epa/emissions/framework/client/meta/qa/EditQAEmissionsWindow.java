@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
@@ -47,22 +48,28 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
     
     private SingleLineMessagePanel messagePanel;
     
-    private Button addButton;
+//    private Button addButton;
     
     private EmfDataset[] inventories;
     
     private EmfDataset[] invTables;
+    
+    private ComboBox summaryTypes;
+    
+    private String summaryType; 
         
-    public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session, EmfDataset[] inventories, EmfDataset [] invTables) {
+    public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session, EmfDataset[] inventories, EmfDataset [] invTables, String summaryType) {
         
         super("Emissions Inventories Editor", new Dimension(600, 300), desktopManager);
 
         this.session = session;
         this.inventories = inventories;
         this.invTables = invTables;
+        this.summaryType =summaryType;
         this.getContentPane().add(createLayout());
         
     }
+
 
     public void display(EmfDataset dataset, QAStep qaStep) {
         super.setTitle("Setup "+qaStep.getName()+": " + dataset.getName() + "_" + qaStep.getId() );
@@ -86,7 +93,9 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
        
         layoutGenerator.addLabelWidgetPair("Emission inventories:", emisinv(), content);
         layoutGenerator.addLabelWidgetPair("Inventory table:", invTablePanel(), content);
-        layoutGenerator.makeCompactGrid(content, 2, 2, // rows, cols
+        summaryTypeCombo();
+        layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
+        layoutGenerator.makeCompactGrid(content, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad*/
         layout.add(content);
@@ -113,7 +122,7 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         pane.setPreferredSize(new Dimension(350, 25));
         invTable.setToolTipText("The inventory table dataset.  Press select button to choose from a list.");
        
-        addButton = new AddButton("Select", addAction());
+        Button addButton = new AddButton("Select", addAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
         JPanel invPanel = new JPanel(new BorderLayout(5,0));
@@ -123,6 +132,20 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         return invPanel;
     }
     
+    private void summaryTypeCombo() {
+        String [] values= new String[]{"State", "State+SCC", "County"};
+        summaryTypes = new ComboBox("Not Selected", values);
+        summaryTypes.setPreferredSize(new Dimension(350, 25));
+        if(!(summaryType==null) && (summaryType.trim().length()>0))
+            summaryTypes.setSelectedItem(summaryType);
+        
+        summaryTypes.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                summaryTypes.getSelectedItem();
+            }
+        });
+    }
+
     private JPanel buttonPanel() {
         JPanel panel = new JPanel();
         panel.add(new OKButton(okAction()));
@@ -154,7 +177,7 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
             public void actionPerformed(ActionEvent e) {
                 
                 //System.out.println(invTable.getDataset());
-                presenter1.updateInventories(datasetWidget.getDatasets(), getInvTableDatasets());
+                presenter1.updateInventories(datasetWidget.getDatasets(), getInvTableDatasets(), getSummaryType() );
                 dispose();
                 disposeView();
             }
@@ -201,6 +224,12 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
     
    private Object[] getInvTableDatasets() {
         return invTable.getAllElements();
+   }
+   
+   private String getSummaryType(){
+       if (summaryTypes.getSelectedItem()==null)
+           return ""; 
+       return summaryTypes.getSelectedItem().toString();
    }
    
 }

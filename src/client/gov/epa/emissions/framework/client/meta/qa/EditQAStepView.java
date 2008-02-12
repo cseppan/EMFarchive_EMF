@@ -22,7 +22,7 @@ public interface EditQAStepView extends ManagedView {
     
     void updateArgumentsTextArea (String text);
     
-    void updateInventories(Object [] inventories, Object [] invTables);
+    void updateInventories(Object [] inventories, Object [] invTables, String summaryType);
     
     void updateInventories(Object [] inventories);
 
