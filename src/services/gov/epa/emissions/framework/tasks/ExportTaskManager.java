@@ -515,7 +515,7 @@ public class ExportTaskManager implements TaskManager {
             labels = "UserId,DatasetName,Version\n";
             sbuf.append(labels);
 
-            if (waitingTasks.size() == 0) {
+            if (runningTasks.size() == 0) {
                 labels = "There are no tasks in the ExportTaskManager RunTable\n";
                 sbuf.append(labels);
 

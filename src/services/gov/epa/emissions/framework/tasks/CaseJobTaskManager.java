@@ -904,7 +904,7 @@ public class CaseJobTaskManager implements TaskManager {
             labels = "JobId,JobName,CaseId,CaseName,UserId\n";
             sbuf.append(labels);
 
-            if (waitingTasks.size() == 0) {
+            if (runningTasks.size() == 0) {
                 labels = "There are no tasks in the CaseJobTaskManager RunTable\n";
                 sbuf.append(labels);
 
