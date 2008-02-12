@@ -1,17 +1,17 @@
 #!/bin/csh
 
-##::  Batch file to start the EMF Client
-setenv EMF_HOME ~/EMFClient
+## file to start the EMF Client
+setenv EMF_HOME ~/emf/EMFClient
 
 ## java 
-setenv JAVA_HOME /usr/java/jre1.6.0_01
+setenv JAVA_HOME /usr/lib/jvm/java-6-sun
 setenv JAVA_EXE $JAVA_HOME/bin/java
 
 ## tomcat apache server info (and port)
 setenv TOMCAT_SERVER http://localhost:8080
 
 ## Input/Output preferences file
-setenv PREF_FILE ~/EMFPrefs.txt
+setenv PREF_FILE ~/emf/EMFPrefs.txt
 
 ## add needed jar files to CLASSPATH
 
