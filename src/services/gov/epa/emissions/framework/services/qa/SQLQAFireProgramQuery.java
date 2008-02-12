@@ -21,6 +21,8 @@ public class SQLQAFireProgramQuery {
     
     private static final String invTableTag = "-invtable";
 
+    private static final String summaryTypeTag = "-summaryType";
+
     ArrayList<String> allDatasetNames = new ArrayList<String>();
     
     private boolean hasInvTableDataset;
@@ -39,11 +41,20 @@ public class SQLQAFireProgramQuery {
         //get applicable tables from the program arguments
         String inventoriesToken = "";
         String invtableToken = "";
+        String summaryTypeToken = "State+SCC";
         String invTableDatasetName = "";
         
         int index1 = programArguments.indexOf(invTableTag);
+        int index2 = programArguments.indexOf(summaryTypeTag);
         inventoriesToken = programArguments.substring(0, index1).trim();
-        invtableToken = programArguments.substring(index1 + invTableTag.length());
+        invtableToken = programArguments.substring(index1 + invTableTag.length(), index2 == -1 ? programArguments.length() : index2);
+        
+        if (index2 != -1) {
+            summaryTypeToken = programArguments.substring(index2 + summaryTypeTag.length()).trim();
+        } 
+        //default just in case...
+        if (summaryTypeToken.trim().length() == 0)
+            summaryTypeToken = "State+SCC";
 
          //parse inventories names...
         if (inventoriesToken.length() > 0) {
@@ -67,13 +78,13 @@ public class SQLQAFireProgramQuery {
          }
          
         //Create the outer query (the # symbol is a placeholder for the inner sql statement)
-         String outerQuery = "select te.fipsst, te.scc, " 
+         String outerQuery = "select @!@, " 
              + (hasInvTableDataset ? "coalesce(i.name, te.data)" : "te.data") + " as data, "
              + "sum(datavalue) as datavalue "
              + "\nfrom (#) as te " 
              + (hasInvTableDataset ? "\nleft outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i \non te.data = i.cas " : "") 
-             + " \ngroup by te.fipsst, te.scc, " + (hasInvTableDataset ? "coalesce(i.name, te.data)" : "te.data") 
-             + " \norder by te.fipsst, te.scc, " + (hasInvTableDataset ? "coalesce(i.name, te.data)" : "te.data") + "";
+             + " \ngroup by @@@, " + (hasInvTableDataset ? "coalesce(i.name, te.data)" : "te.data") 
+             + " \norder by @@@, " + (hasInvTableDataset ? "coalesce(i.name, te.data)" : "te.data") + "";
         
          outerQuery = query(outerQuery, true);
                 
@@ -82,16 +93,51 @@ public class SQLQAFireProgramQuery {
         for (int j = 0; j < allDatasetNames.size(); j++) {
             innerSQL += (j > 0 ? " \nunion all " : "") + createFireDatasetQuery(allDatasetNames.get(j).toString().trim());
         }
-        
-        return outerQuery.replaceAll(poundQueryTag, innerSQL);
+
+        //replace # symbol with the inner query
+        outerQuery = outerQuery.replaceAll(poundQueryTag, innerSQL);
+        //replace @!@ symbol with main columns in outer select statement
+        String sql = "";
+        if (summaryTypeToken.equals("State+SCC")) 
+            sql = "te.fipsst, te.scc";
+        else if (summaryTypeToken.equals("State")) 
+            sql = "te.fipsst";
+        else if (summaryTypeToken.equals("County")) 
+            sql = "te.fips";
+        outerQuery = outerQuery.replaceAll("@!@", sql);
+        //replace !@! symbol with main columns in inner select statement
+        if (summaryTypeToken.equals("State+SCC")) 
+            sql = "substr(fips, 1, 2) as fipsst, scc";
+        else if (summaryTypeToken.equals("State")) 
+            sql = "substr(fips, 1, 2) as fipsst";
+        else if (summaryTypeToken.equals("County")) 
+            sql = "fips";
+        outerQuery = outerQuery.replaceAll("!@!", sql);
+        //replace @@@ symbol with group by columns in outer select statement
+        if (summaryTypeToken.equals("State+SCC")) 
+            sql = "te.fipsst, te.scc";
+        else if (summaryTypeToken.equals("State")) 
+            sql = "te.fipsst";
+        else if (summaryTypeToken.equals("County")) 
+            sql = "te.fips";
+        outerQuery = outerQuery.replaceAll("@@@", sql);
+        //replace !!! symbol with group by columns in inner select statement
+        if (summaryTypeToken.equals("State+SCC")) 
+            sql = "substr(fips, 1, 2), scc";
+        else if (summaryTypeToken.equals("State")) 
+            sql = "substr(fips, 1, 2)";
+        else if (summaryTypeToken.equals("County")) 
+            sql = "fips";
+        outerQuery = outerQuery.replaceAll("!!!", sql);
+        return outerQuery;
     }
 
         private String createFireDatasetQuery(String datasetName) throws EmfException {
 
            String sql = "";
            
-           sql = "\nselect substr(fips, 1, 2) as fipsst, scc, data, sum(datavalue) as datavalue \nfrom $DATASET_TABLE[\"" + 
-               datasetName + "\", 1] m \ngroup by substr(fips, 1, 2), scc, data ";
+           sql = "\nselect !@!, data, sum(datavalue) as datavalue \nfrom $DATASET_TABLE[\"" + 
+               datasetName + "\", 1] m \ngroup by !!!, data ";
 
            sql = query(sql, false);
 
