@@ -12,6 +12,7 @@ import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.io.reference.CSVFileFormat;
+import gov.epa.emissions.commons.io.temporal.TemporalProfileImporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.AccessLog;
@@ -170,6 +171,59 @@ public class DatasetDaoTest extends ServiceTestCase {
   
             assertEquals("Test Case Output", loadedOutput.getName());
             assertEquals("Associated dataset deleted", loadedOutput.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            if (dbServer != null && dbServer.isConnected())
+                dbServer.disconnect();
+        }
+    }
+    
+    //NOTE: for this test case, one has to manually remove the remaining items from db tables, namely,
+    //  emf.internal_sources, emf.datasets, emissions.versions and drop table emissions.diurnal_weekend,
+    //  emissions.diurnal_weekday, emissions.weekly, and emissions.monthly.
+    public void testShouldDeleteDatasetDataRecordsFromCOSTYandPTPROTables() throws Exception {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        
+        try {
+            DatasetType type = dataDAO.getDatasetType("Temporal Profile (A/M/PTPRO)", session);
+            System.out.println("dataset type: " + type.getName().toUpperCase());
+            EmfDataset dataset = newDataset("dataset-dao-test-one");
+            dataset.setCreator("emf");
+            dataset.setDatasetType(type);
+            add(dataset);
+            EmfDataset toBeDelete = (EmfDataset) load(EmfDataset.class, dataset.getName());
+            
+            Version version = new Version();
+            version.setVersion(0);
+            
+            VersionedDataFormatFactory dataformatFactory = new VersionedDataFormatFactory(version, dataset);
+            File folder = new File("test/data/temporal-profiles");
+            Importer importer = new TemporalProfileImporter(folder, new String[] { "amptpro.m3.us+can.txt" }, dataset, dbServer,
+                    dbServer.getSqlDataTypes(), dataformatFactory);
+            VersionedImporter importerv = new VersionedImporter(importer, dataset, dbServer, new Date());
+            importerv.run();
+            
+            EmfDataset dataset2 = newDataset("dataset-dao-test-two");
+            dataset2.setCreator("emf");
+            dataset2.setDatasetType(type);
+            add(dataset2);
+            
+            Version version2 = new Version();
+            version2.setVersion(0);
+            
+            VersionedDataFormatFactory dataformatFactory2 = new VersionedDataFormatFactory(version2, dataset2);
+            File folder2 = new File("test/data/temporal-profiles");
+            Importer importer2 = new TemporalProfileImporter(folder2, new String[] { "diurnal-weekend.txt" }, dataset2, dbServer,
+                    dbServer.getSqlDataTypes(), dataformatFactory2);
+            VersionedImporter importerv2 = new VersionedImporter(importer2, dataset2, dbServer, new Date());
+            importerv2.run();
+            
+            
+            dao.deleteDatasets(new EmfDataset[]{toBeDelete}, dbServer, session);
+            
+            assertEquals(1, countRecords("versions"));
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Error: " + e.getMessage());
