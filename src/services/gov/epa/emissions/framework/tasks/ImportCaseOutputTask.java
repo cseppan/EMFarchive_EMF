@@ -139,13 +139,13 @@ public class ImportCaseOutputTask extends Task {
         } catch (Exception e) {
             log.error("Error deleting dataset - " + e.getMessage());
         } finally {
-            session.close();
 
             if (existedOutput != null)
                 caseDao.removeCaseOutputs(new CaseOutput[] { existedOutput }, session);
             caseDao.add(output);
             dataset.setStatus("Started import");
             addDataset();
+            session.close();
         }
     }
 
