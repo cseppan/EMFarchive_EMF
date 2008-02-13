@@ -87,13 +87,13 @@ public class ImportCaseOutputTask extends Task {
                 System.out.println("Task# " + taskId + " running");
 
         DbServer dbServer = null;
-        
+
         try {
             dbServer = dbServerFactory.getDbServer();
             ImporterFactory importerFactory = new ImporterFactory(dbServer);
             Importer importer = importerFactory.createVersioned(dataset, path, files);
             long startTime = System.currentTimeMillis();
-            
+
             prepare(dbServer);
             importer.run();
             numSeconds = (System.currentTimeMillis() - startTime) / 1000;
@@ -103,9 +103,9 @@ public class ImportCaseOutputTask extends Task {
             logError("Failed to import file(s) : " + filesList(), e);
             setStatus("failed", "Failed to import dataset " + dataset.getName() + ". Reason: " + e.getMessage());
             removeDataset(dataset);
-            
+
             Session session = sessionFactory.getSession();
-            
+
             try {
                 caseDao.removeCaseOutputs(user, new CaseOutput[] { output }, true, session);
             } catch (EmfException e1) {
@@ -125,22 +125,24 @@ public class ImportCaseOutputTask extends Task {
 
     private void prepare(DbServer dbServer) throws Exception {
         addStartStatus();
-        
+
         Session session = sessionFactory.getSession();
         CaseOutput existedOutput = null;
-        
+
         try {
             existedOutput = caseDao.getCaseOutput(output, session);
-            
+
             if (existedOutput != null) {
                 EmfDataset dataset = datasetDao.getDataset(session, existedOutput.getDatasetId());
-                datasetDao.deleteDatasets(new EmfDataset[]{dataset}, dbServer, session);
+                datasetDao.deleteDatasets(new EmfDataset[] { dataset }, dbServer, session);
             }
         } catch (Exception e) {
             log.error("Error deleting dataset - " + e.getMessage());
         } finally {
             session.close();
-            caseDao.removeCaseOutputs(new CaseOutput[]{existedOutput}, session);
+
+            if (existedOutput != null)
+                caseDao.removeCaseOutputs(new CaseOutput[] { existedOutput }, session);
             caseDao.add(output);
             dataset.setStatus("Started import");
             addDataset();
@@ -213,7 +215,7 @@ public class ImportCaseOutputTask extends Task {
 
     protected void removeDataset(EmfDataset dataset) {
         Session session = sessionFactory.getSession();
-        
+
         try {
             datasetDao.remove(dataset, session);
         } catch (Exception e) {
