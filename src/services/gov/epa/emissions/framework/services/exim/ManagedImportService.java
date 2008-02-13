@@ -303,9 +303,20 @@ public class ManagedImportService {
         registerSubmitter(FOR_OUTPUT, outputs[0].getPath(), files);
 
         Services services = services();
+        
+        Exception exception = null;
 
-        for (CaseOutput output : outputs)
-            submitterIds.add(importDatasetForCaseOutput(user, output, services));
+        for (CaseOutput output : outputs) {
+            try {
+                submitterIds.add(importDatasetForCaseOutput(user, output, services));
+            } catch (Exception e) {
+                log.error(e);
+                exception = e;
+            }
+        }
+        
+        if (exception != null)
+            throw new EmfException(exception.getMessage());
 
         return submitterIds.toArray(new String[0]);
     }
