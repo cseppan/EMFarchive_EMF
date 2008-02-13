@@ -2,19 +2,38 @@ package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.TableFormat;
+import gov.epa.emissions.commons.io.csv.CSVImporter;
+import gov.epa.emissions.commons.io.importer.Importer;
+import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
+import gov.epa.emissions.commons.io.importer.VersionedImporter;
+import gov.epa.emissions.commons.io.reference.CSVFileFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
+import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
+import gov.epa.emissions.framework.services.editor.Revision;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 
 public class DatasetDaoTest extends ServiceTestCase {
 
@@ -67,21 +86,96 @@ public class DatasetDaoTest extends ServiceTestCase {
 
     public void testShouldDeleteDatasetRefsFromVersionTable() throws Exception {
         try {
-            Version dsOne = newVersion(1, 0, true);
-            Version dsTwo = newVersion(2, 0, true);
-            Version dsThree = newVersion(3, 0, true);
-            Version dsFour = newVersion(4, 0, true);
-            add(dsOne);
-            add(dsTwo);
-            add(dsThree);
-            add(dsFour);
+            newVersion(1, 0, true);
+            newVersion(2, 0, true);
+            newVersion(3, 0, true);
+            newVersion(4, 0, true);
             
-            int deletedItems = dao.deleteVersionTable(new int[]{1,2,3,4}, session);
+            int deletedItems = dao.deleteFromObjectTable(new int[]{1,2,3,4}, Version.class, "datasetId", session);
             
             assertEquals(deletedItems, 4);
             assertEquals(0, countRecords("versions"));
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public void testShouldDeleteDatasetFromAllReferencedTables() throws Exception {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        
+        try {
+            User owner = userDAO.get("emf", session);
+            
+            EmfDataset dataset = newDataset("dataset-dao-test");
+            dataset.setCreator("emf");
+            add(dataset);
+            EmfDataset toBeDelete = (EmfDataset) load(EmfDataset.class, dataset.getName());
+            
+            Version version = new Version();
+            version.setVersion(0);
+            
+            VersionedDataFormatFactory dataformatFactory = new VersionedDataFormatFactory(version, dataset);
+            File folder = new File("test/data/ref");
+            Importer importer = new CSVImporter(folder, new String[] { "pollutants.txt" }, dataset, dbServer,
+                    dbServer.getSqlDataTypes(), dataformatFactory);
+            VersionedImporter importerv = new VersionedImporter(importer, dataset, dbServer, new Date());
+            importerv.run();
+            
+            AccessLog log = new AccessLog(owner.getUsername(), toBeDelete.getId(), new Date(), "initial version", "test", "not real");
+            add(log);
+            
+            Note note = new Note(owner, toBeDelete.getId(), new Date(), "testing", "test note", 
+                    (NoteType)dataDAO.getNoteTypes(session).get(0), "no reference", 0);
+            add(note);
+            
+            Revision revision = new Revision(owner, toBeDelete.getId(), new Date(), 
+                    0, "what what?", "test", "no reference");
+            add(revision);
+            
+            QAStep step = new QAStep();
+            step.setName("test dataset deletion - qa step");
+            step.setDatasetId(toBeDelete.getId());
+            add(step);
+            QAStep loadedStep = (QAStep) load(QAStep.class, step.getName());
+            
+            Datasource datasource = dbServer.getEmissionsDatasource();
+            TableCreator emissionTableTool = new TableCreator(datasource);
+
+            CSVFileFormat fileFormat = new CSVFileFormat(dbServer.getSqlDataTypes(), new String[]{"col1", "col2", "col3"});
+            TableFormat tableFormat = dataformatFactory.tableFormat(fileFormat, dbServer.getSqlDataTypes());
+            QAStepResult stepResult = new QAStepResult(loadedStep);
+            emissionTableTool.create("test_step_result_table", tableFormat, toBeDelete.getId());
+            stepResult.setTable("test_step_result_table");
+            add(stepResult);
+            
+            Case caseObj = load(newCase());
+            CaseJob job = load(newCaseJob(caseObj));
+            CaseOutput output = new CaseOutput("Test Case Output");
+            output.setCaseId(caseObj.getId());
+            output.setJobId(job.getId());
+            output.setDatasetId(toBeDelete.getId());
+            add(output);
+            
+            dao.deleteDatasets(new EmfDataset[]{dataset}, dbServer, session);
+            
+            assertEquals(0, countRecords("versions"));
+  
+            CaseOutput output2 = new CaseOutput("Test Case Output");
+            output2.setCaseId(caseObj.getId());
+            output2.setJobId(job.getId());
+            output2.setDatasetId(0);
+            session.flush();
+            session.clear();
+            CaseOutput loadedOutput = (CaseOutput)caseDao.loadCaseOutput(output2, session);
+  
+            assertEquals("Test Case Output", loadedOutput.getName());
+            assertEquals("Associated dataset deleted", loadedOutput.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            if (dbServer != null && dbServer.isConnected())
+                dbServer.disconnect();
         }
     }
 
@@ -415,6 +509,46 @@ public class DatasetDaoTest extends ServiceTestCase {
         version.setName("test_version" + Math.random());
         add(version);
         return (version);
+    }
+    
+    private CaseJob newCaseJob(Case caseObj) {
+        CaseJob job = new CaseJob("test" + Math.random());
+        job.setCaseId(caseObj.getId());
+        add(job);
+        
+        return job;
+    }
+
+    private Case load(Case caseObj) {
+        Transaction tx = null;
+
+        session.clear();
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(Case.class).add(Restrictions.eq("name", caseObj.getName()));
+            tx.commit();
+
+            return (Case) crit.uniqueResult();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    private CaseJob load(CaseJob job) {
+        Transaction tx = null;
+        
+        session.clear();
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(CaseJob.class).add(Restrictions.eq("name", job.getName()));
+            tx.commit();
+            
+            return (CaseJob) crit.uniqueResult();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
     }
 
 }
