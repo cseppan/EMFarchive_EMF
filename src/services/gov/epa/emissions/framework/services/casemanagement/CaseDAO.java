@@ -22,7 +22,6 @@ import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -65,48 +64,15 @@ public class CaseDAO {
         }
     }
 
-    public CaseOutput add(User user, CaseOutput output) throws Exception {
+    public CaseOutput add(CaseOutput output) throws Exception {
         Session session = sessionFactory.getSession();
 
         try {
-            removeCaseOutputIfExists(user, output);
-            
-            if (DebugLevels.DEBUG_14)
-                System.out.println("CaseDAO starts adding case output " + output.getName() + " " + new Date());
-            
             hibernateFacade.add(output, session);
-            
-            if (DebugLevels.DEBUG_14)
-                System.out.println("CaseDAO finished adding case output " + output.getName() + " " + new Date());
-            
+
             return getCaseOutput(output, session);
         } catch (Exception ex) {
-            ex.printStackTrace();
             throw new Exception("Problem adding case output: " + output.getName() + ". " + ex.getMessage());
-        } finally {
-            session.close();
-        }
-    }
-    
-    public void removeCaseOutputIfExists(User user, CaseOutput output) {
-        Session session = sessionFactory.getSession();
-        
-        try {
-            CaseOutput existed = getCaseOutput(output, session);
-
-            if (DebugLevels.DEBUG_12) {
-                System.out.println("Is output existed? " + (existed == null));
-                System.out.println("Output to check: " + output.getName() + " case id: " + output.getCaseId()
-                        + " jobid: " + output.getJobId());
-            }
-
-            if (existed != null)
-                removeCaseOutputs(user, new CaseOutput[] { existed }, true, session);
-
-            if (DebugLevels.DEBUG_14)
-                System.out.println("CaseDAO removed case output " + output.getName() + " " + new Date());
-        } catch (Exception ex) {
-            ex.printStackTrace();
         } finally {
             session.close();
         }
@@ -148,7 +114,7 @@ public class CaseDAO {
 
         return (outputs != null && outputs.size() > 0);
     }
-    
+
     public void add(Executable exe, Session session) {
         addObject(exe, session);
     }
@@ -227,8 +193,8 @@ public class CaseDAO {
 
     public Abbreviation getAbbreviation(Abbreviation abbr, Session session) {
         Criterion criterion = Restrictions.eq("name", abbr.getName());
-        
-        return (Abbreviation)hibernateFacade.load(Abbreviation.class, criterion, session);
+
+        return (Abbreviation) hibernateFacade.load(Abbreviation.class, criterion, session);
     }
 
     public List getAirQualityModels(Session session) {
@@ -267,7 +233,7 @@ public class CaseDAO {
         Criterion criterion = Restrictions.eq("id", new Integer(caseId));
         return (Case) hibernateFacade.get(Case.class, criterion, session).get(0);
     }
-    
+
     public Case getCaseFromAbbr(Abbreviation abbr, Session session) {
         Criterion crit = Restrictions.eq("abbreviation", abbr);
         return (Case) hibernateFacade.load(Case.class, crit, session);
@@ -301,6 +267,10 @@ public class CaseDAO {
         } finally {
             hibernateFacade.remove(outputs, session);
         }
+    }
+
+    public void removeCaseOutputs(CaseOutput[] outputs, Session session) {
+        hibernateFacade.removeObjects(outputs, session);
     }
 
     public Case obtainLocked(User owner, Case element, Session session) {
@@ -513,14 +483,14 @@ public class CaseDAO {
             session.close();
         }
     }
- 
+
     public void updateCaseJob(CaseJob job, Session session) throws Exception {
         try {
             hibernateFacade.updateOnly(job, session);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new Exception(ex.getMessage());
-        } 
+        }
     }
 
     public List<JobRunStatus> getJobRunStatuses(Session session) {
@@ -800,7 +770,8 @@ public class CaseDAO {
 
         try {
             hibernateFacade.add(persistedWaitTask, session);
-            if (DebugLevels.DEBUG_15) System.out.println("Adding job to persisted table, jobID: "+ persistedWaitTask.getJobId());
+            if (DebugLevels.DEBUG_15)
+                System.out.println("Adding job to persisted table, jobID: " + persistedWaitTask.getJobId());
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -826,15 +797,16 @@ public class CaseDAO {
             Criterion crit3 = Restrictions.eq("jobId", new Integer(persistedWaitTask.getJobId()));
             Object object = hibernateFacade.load(PersistedWaitTask.class, new Criterion[] { crit1, crit2, crit3 },
                     session);
-            if (object != null){
+            if (object != null) {
                 hibernateFacade.deleteTask(object, session);
             } else {
                 if (DebugLevels.DEBUG_15) {
-                    System.out.println("Removing from persisted table a job currently not there, jobID: " + persistedWaitTask.getJobId() );
+                    System.out.println("Removing from persisted table a job currently not there, jobID: "
+                            + persistedWaitTask.getJobId());
                     int numberPersistedTasks = hibernateFacade.getAll(PersistedWaitTask.class, session).size();
                     System.out.println("Current size of persisted table: " + numberPersistedTasks);
                 }
-                
+
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -921,7 +893,7 @@ public class CaseDAO {
                 } catch (EmfException e) {
                     if (DebugLevels.DEBUG_12)
                         System.out.println(e.getMessage());
-                    
+
                     throw new EmfException(e.getMessage());
                 }
             }
@@ -936,12 +908,12 @@ public class CaseDAO {
 
     private Criterion[] uniqueCaseOutputCriteria(CaseOutput output) {
         Integer caseID = new Integer(output.getCaseId());
-        String inputname = output.getName();
+        String outputname = output.getName();
         Integer datasetID = new Integer(output.getDatasetId());
         Integer jobID = new Integer(output.getJobId());
 
         Criterion c1 = Restrictions.eq("caseId", caseID);
-        Criterion c2 = Restrictions.eq("name", inputname);
+        Criterion c2 = Restrictions.eq("name", outputname);
         Criterion c3 = (datasetID == null) ? Restrictions.isNull("datasetId") : Restrictions.eq("datasetId", datasetID);
         Criterion c4 = Restrictions.eq("jobId", jobID);
 
@@ -960,6 +932,5 @@ public class CaseDAO {
 
     public void removeJobMessages(JobMessage[] msgs, Session session) {
         hibernateFacade.remove(msgs, session);
-
     }
 }

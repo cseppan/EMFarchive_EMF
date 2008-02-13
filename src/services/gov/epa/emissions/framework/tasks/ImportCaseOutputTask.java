@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.tasks;
 
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
@@ -85,13 +86,15 @@ public class ImportCaseOutputTask extends Task {
             if (DebugLevels.DEBUG_1)
                 System.out.println("Task# " + taskId + " running");
 
-        ImporterFactory importerFactory = new ImporterFactory(dbServerFactory);
+        DbServer dbServer = null;
         
         try {
+            dbServer = dbServerFactory.getDbServer();
+            ImporterFactory importerFactory = new ImporterFactory(dbServer);
             Importer importer = importerFactory.createVersioned(dataset, path, files);
             long startTime = System.currentTimeMillis();
             
-            prepare();
+            prepare(dbServer);
             importer.run();
             numSeconds = (System.currentTimeMillis() - startTime) / 1000;
             complete("Imported");
@@ -112,17 +115,34 @@ public class ImportCaseOutputTask extends Task {
             }
         } finally {
             try {
-                if (importerFactory != null)
-                    importerFactory.closeDbConnection();
+                if (dbServer != null && dbServer.isConnected())
+                    dbServer.disconnect();
             } catch (Exception e2) {
                 log.error("Error closing database connection.", e2);
             }
         }
     }
 
-    private void prepare() throws Exception {
+    private void prepare(DbServer dbServer) throws Exception {
         addStartStatus();
-        caseDao.add(user, output);
+        
+        Session session = sessionFactory.getSession();
+        
+        try {
+            CaseOutput existedOutput = caseDao.getCaseOutput(output, session);
+            
+            if (existedOutput != null) {
+                EmfDataset dataset = datasetDao.getDataset(session, existedOutput.getDatasetId());
+                datasetDao.deleteDatasets(new EmfDataset[]{dataset}, dbServer, session);
+                caseDao.removeCaseOutputs(new CaseOutput[]{existedOutput}, session);
+            }
+        } catch (Exception e) {
+            throw new Exception("Error deleting dataset and case output - " + e.getMessage());
+        } finally {
+            session.close();
+        }
+        
+        caseDao.add(output);
         dataset.setStatus("Started import");
         addDataset();
     }
