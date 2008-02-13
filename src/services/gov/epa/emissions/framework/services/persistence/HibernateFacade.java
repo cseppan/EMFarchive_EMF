@@ -152,6 +152,21 @@ public class HibernateFacade {
             saveOrUpdate(objects[i], session);
     }
 
+    public void removeObjects(Object[] objects, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+
+            for (Object obj : objects)
+                session.delete(obj);
+            
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
     public void remove(Object[] objects, Session session) {
         for (int i = 0; i < objects.length; i++)
             remove(objects[i], session);
@@ -236,7 +251,7 @@ public class HibernateFacade {
             throw e;
         }
     }
-    
+
     public Object get(Class clazz, Criterion criterion, StatelessSession session) {
         Transaction tx = null;
         try {
@@ -366,7 +381,7 @@ public class HibernateFacade {
             tx.rollback();
             throw e;
         }
- 
+
     }
 
 }
