@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.exim;
 
 import java.io.File;
 
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -80,8 +81,10 @@ public class ImportTask extends Task {
                 System.out.println("Task# " + taskId + " running");
         
         Session session = null;
-        ImporterFactory importerFactory = new ImporterFactory(dbServerFactory);
+        DbServer dbServer = null;
         try {
+            dbServer = dbServerFactory.getDbServer();
+            ImporterFactory importerFactory = new ImporterFactory(dbServer);
             Importer importer = importerFactory.createVersioned(dataset, path, files);
             long startTime = System.currentTimeMillis();
             session = sessionFactory.getSession();
@@ -103,8 +106,8 @@ public class ImportTask extends Task {
                     session.close();
                 }
                 
-                if (importerFactory != null)
-                    importerFactory.closeDbConnection();
+                if (dbServer != null && dbServer.isConnected())
+                    dbServer.disconnect();
             } catch (HibernateException e1) {
                 log.error("Error closing hibernate session.", e1);
             } catch (Exception e2) {
