@@ -56,7 +56,7 @@
     <many-to-many class="gov.epa.emissions.commons.data.Sector" column="sector_id"/>
   </array>
 
-  <array name="internalSources" table="internal_sources">
+  <array name="internalSources" table="internal_sources" cascade="save-update">
     <key column="dataset_id"/>
     <list-index column="list_index"/>
     <composite-element class="gov.epa.emissions.commons.data.InternalSource">
@@ -68,7 +68,7 @@
     </composite-element>
   </array>
 
-  <array name="externalSources" table="external_sources">
+  <array name="externalSources" table="external_sources" cascade="save-update">
     <key column="dataset_id"/>
     <list-index column="list_index"/>
     <composite-element class="gov.epa.emissions.commons.data.ExternalSource">
