@@ -25,6 +25,8 @@ public class SQLQAAnnualQuery {
     private String emissioDatasourceName;
     
     private static final String invTableTag = "-invtable";
+    
+    private static final String summaryTypeTag = "-summaryType";
 
     public SQLQAAnnualQuery(HibernateSessionFactory sessionFactory, String emissioDatasourceName, String tableName, QAStep qaStep) {
         
@@ -77,8 +79,9 @@ public class SQLQAAnnualQuery {
         String invTableDatasetName = "";
         
         int index1 = programArguments.indexOf(invTableTag);
+        int index2 = programArguments.indexOf(summaryTypeTag);
         inventoriesToken = programArguments.substring(0, index1);
-        invtableToken = programArguments.substring(index1 + invTableTag.length());
+        invtableToken = programArguments.substring(index1 + invTableTag.length(),index2 == -1 ? programArguments.length() : index2 );
         // System.out.println("The inventories are : \n" + inventoriesToken);
         // System.out.println("The invtable is : \n" + invtableToken);
          StringTokenizer tokenizer2 = new StringTokenizer(inventoriesToken);
