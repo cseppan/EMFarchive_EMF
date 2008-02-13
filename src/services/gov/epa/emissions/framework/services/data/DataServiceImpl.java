@@ -44,11 +44,10 @@ public class DataServiceImpl implements DataService {
         } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets", e);
             throw new EmfException("Could not get all Datasets");
+        } finally {
+            session.close();
         }
-        finally {
-            session.close();            
-        }
-        
+
     }
 
     public synchronized EmfDataset getDataset(Integer datasetId) throws EmfException {
@@ -80,9 +79,9 @@ public class DataServiceImpl implements DataService {
     }
 
     public synchronized EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
-       Session session = sessionFactory.getSession();
-       try {
-             EmfDataset locked = dao.obtainLocked(owner, dataset, session);
+        Session session = sessionFactory.getSession();
+        try {
+            EmfDataset locked = dao.obtainLocked(owner, dataset, session);
 
             return locked;
         } catch (RuntimeException e) {
@@ -124,7 +123,7 @@ public class DataServiceImpl implements DataService {
                 LOG.info("Renaming emission tables for dataset " + dataset.getName() + " is not allowed.");
 
             EmfDataset released = dao.update(dataset, session);
- 
+
             return released;
         } catch (Exception e) {
             LOG.error("Could not update Dataset: " + dataset.getName() + " " + e.getMessage(), e);
@@ -138,7 +137,7 @@ public class DataServiceImpl implements DataService {
         Session session = sessionFactory.getSession();
         try {
             List datasets = dao.getDatasets(session, datasetType);
- 
+
             return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets for dataset type " + datasetType, e);
@@ -175,18 +174,23 @@ public class DataServiceImpl implements DataService {
                     updateDataset(datasets[i]);
                 }
             }
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             LOG.error("Could not delete datasets: ", e);
             throw new EmfException("Could not delete datasets- " + e.getMessage());
         }
     }
 
     private synchronized boolean isRemovable(EmfDataset[] datasets, User owner) throws EmfException {
-        for (int i = 0; i < datasets.length; i++) {
+        int len = datasets.length;
+        int[] dsIDs = new int[len];
+
+        for (int i = 0; i < len; i++) {
             checkUser(datasets[i], owner);
-            checkCase(datasets[i]);
-            checkControlStrategy(datasets[i]);
+            dsIDs[i] = datasets[i].getId();
         }
+        
+        checkCase(dsIDs);
+        checkControlStrategy(dsIDs);
 
         return true;
     }
@@ -195,29 +199,29 @@ public class DataServiceImpl implements DataService {
         if (!owner.isAdmin() && !dataset.getCreator().equalsIgnoreCase(owner.getUsername())) {
             releaseLockedDataset(dataset);
             throw new EmfException("Cannot delete \"" + dataset.getName()
-                    + "\" - you are not the creator of this dataset.");
+                    + "\" - current user is not the creator of this dataset.");
 
         }
     }
 
-    private synchronized void checkCase(EmfDataset dataset) throws EmfException {
+    private synchronized void checkCase(int[] datasetIDs) throws EmfException {
         Session session = sessionFactory.getSession();
-        if (dao.isUsedByCases(session, dataset))
-        {
+
+        try {
+            dao.checkIfUsedByCases(datasetIDs, session);
+        } finally {
             session.close();
-            throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is used by a case.");
         }
-        session.close();
     }
 
-    private synchronized void checkControlStrategy(EmfDataset dataset) throws EmfException {
+    private synchronized void checkControlStrategy(int[] datasetIDs) throws EmfException {
         Session session = sessionFactory.getSession();
-        if (dao.isUsedByControlStrategies(session, dataset))
-        {
+
+        try {
+            dao.checkIfUsedByStrategies(datasetIDs, session);
+        } finally {
             session.close();
-            throw new EmfException("Cannot delete \"" + dataset.getName() + "\" - it is used by a control strategy.");
         }
-        session.close();
     }
 
     public synchronized String[] getDatasetValues(Integer datasetId) throws EmfException {
@@ -240,7 +244,7 @@ public class DataServiceImpl implements DataService {
 
     public Version obtainedLockOnVersion(User user, int id) throws EmfException {
         Session session = this.sessionFactory.getSession();
-        
+
         try {
             return dao.obtainLockOnVersion(user, id, session);
         } catch (Exception e) {
@@ -252,7 +256,7 @@ public class DataServiceImpl implements DataService {
 
     public void updateVersionNReleaseLock(Version locked) throws EmfException {
         Session session = this.sessionFactory.getSession();
-        
+
         try {
             dao.updateVersionNReleaseLock(locked, session);
         } catch (Exception e) {
@@ -260,7 +264,7 @@ public class DataServiceImpl implements DataService {
         } finally {
             session.close();
         }
-        
+
     }
 
 }
