@@ -127,24 +127,24 @@ public class ImportCaseOutputTask extends Task {
         addStartStatus();
         
         Session session = sessionFactory.getSession();
+        CaseOutput existedOutput = null;
         
         try {
-            CaseOutput existedOutput = caseDao.getCaseOutput(output, session);
+            existedOutput = caseDao.getCaseOutput(output, session);
             
             if (existedOutput != null) {
                 EmfDataset dataset = datasetDao.getDataset(session, existedOutput.getDatasetId());
                 datasetDao.deleteDatasets(new EmfDataset[]{dataset}, dbServer, session);
-                caseDao.removeCaseOutputs(new CaseOutput[]{existedOutput}, session);
             }
         } catch (Exception e) {
-            throw new Exception("Error deleting dataset and case output - " + e.getMessage());
+            log.error("Error deleting dataset - " + e.getMessage());
         } finally {
             session.close();
+            caseDao.removeCaseOutputs(new CaseOutput[]{existedOutput}, session);
+            caseDao.add(output);
+            dataset.setStatus("Started import");
+            addDataset();
         }
-        
-        caseDao.add(output);
-        dataset.setStatus("Started import");
-        addDataset();
     }
 
     private void complete(String status) {
