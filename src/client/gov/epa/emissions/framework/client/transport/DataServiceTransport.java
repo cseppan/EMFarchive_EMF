@@ -153,4 +153,24 @@ public class DataServiceTransport implements DataService {
         call.request(new Object[] { locked });
     }
 
+    public void purgeDeletedDatasets(User user) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("purgeDeletedDatasets");
+        call.addParam("user", mappings.user());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user });
+    }
+
+    public int getNumOfDeletedDatasets(User user) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getNumOfDeletedDatasets");
+        call.addParam("user", mappings.user());
+        call.setIntegerReturnType();
+
+        return (Integer) call.requestResponse(new Object[] { user });
+    }
+
 }

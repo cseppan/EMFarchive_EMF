@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -176,7 +177,7 @@ public class DataServiceImpl implements DataService {
             }
         } catch (Exception e) {
             LOG.error("Could not delete datasets: ", e);
-            throw new EmfException("Could not delete datasets- " + e.getMessage());
+            throw new EmfException(e.getMessage());
         }
     }
 
@@ -188,7 +189,7 @@ public class DataServiceImpl implements DataService {
             checkUser(datasets[i], owner);
             dsIDs[i] = datasets[i].getId();
         }
-        
+
         checkCase(dsIDs);
         checkControlStrategy(dsIDs);
 
@@ -198,9 +199,7 @@ public class DataServiceImpl implements DataService {
     private synchronized void checkUser(EmfDataset dataset, User owner) throws EmfException {
         if (!owner.isAdmin() && !dataset.getCreator().equalsIgnoreCase(owner.getUsername())) {
             releaseLockedDataset(dataset);
-            throw new EmfException("Cannot delete \"" + dataset.getName()
-                    + "\" - current user is not the creator of this dataset.");
-
+            throw new EmfException("You are not the creator of " + dataset.getName() + ".");
         }
     }
 
@@ -265,6 +264,42 @@ public class DataServiceImpl implements DataService {
             session.close();
         }
 
+    }
+
+    public void purgeDeletedDatasets(User user) throws EmfException {
+        Session session = this.sessionFactory.getSession();
+        DbServer dbServer = DbServerFactory.get().getDbServer();
+
+        try {
+            List<EmfDataset> list = dao.deletedDatasets(user, session);
+            dao.deleteDatasets(list.toArray(new EmfDataset[0]), dbServer, session);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+            closeDB(dbServer);
+        }
+    }
+
+    private void closeDB(DbServer dbServer) throws EmfException {
+        try {
+            if (dbServer != null && dbServer.isConnected())
+                dbServer.disconnect();
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+    }
+
+    public int getNumOfDeletedDatasets(User user) throws EmfException {
+        Session session = this.sessionFactory.getSession();
+
+        try {
+            return dao.deletedDatasets(user, session).size();
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
     }
 
 }

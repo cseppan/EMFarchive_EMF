@@ -31,4 +31,8 @@ public interface DataService {
     
     void updateVersionNReleaseLock(Version locked) throws EmfException;
 
+    void purgeDeletedDatasets(User user) throws EmfException;
+    
+    int getNumOfDeletedDatasets(User user) throws EmfException;
+
 }

@@ -162,5 +162,13 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         
         return dataService().getDatasets(type);
     }
+
+    public void purgeDeletedDatasets() throws EmfException {
+        dataService().purgeDeletedDatasets(getUser());
+    }
+    
+    public int getNumOfDeletedDatasets() throws EmfException {
+        return dataService().getNumOfDeletedDatasets(getUser());
+    }
     
 }

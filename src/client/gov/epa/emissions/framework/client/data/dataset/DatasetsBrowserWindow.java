@@ -243,7 +243,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
                 }
             }
         });
-        importButton.setToolTipText("Import a new Dataset");
+        importButton.setToolTipText("Import a new dataset");
         panel.add(importButton);
 
         Button exportButton = new ExportButton(new AbstractAction() {
@@ -251,8 +251,20 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
                 exportSelectedDatasets();
             }
         });
-        exportButton.setToolTipText("Export existing Dataset(s)");
+        exportButton.setToolTipText("Export existing dataset(s)");
         panel.add(exportButton);
+        
+        Button purgeButton = new Button("Purge", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    purgeDelectedDatasets();
+                } catch (EmfException e) {
+                    messagePanel.setMessage(e.getMessage().substring(0,100) + "...");
+                }
+            }
+        });
+        purgeButton.setToolTipText("Purge deleted dataset(s)");
+        panel.add(purgeButton);
 
         Button closeButton = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -276,6 +288,25 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
         ExportPresenter exportPresenter = new ExportPresenterImpl(session);
         presenter.doExport(exportView, exportPresenter, emfDatasets);
+    }
+    
+    protected void purgeDelectedDatasets() throws EmfException {
+        int numDelDatasets = presenter.getNumOfDeletedDatasets();
+        
+        String message = "You have " + numDelDatasets 
+            + " datasets marked as deleted." + (numDelDatasets > 0 ? " Are you sure you want to remove them pamernantly?" : "");
+        
+        if (numDelDatasets == 0) {
+            JOptionPane.showMessageDialog(parentConsole, message);
+            return;
+        }
+        
+        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (selection == JOptionPane.YES_OPTION) {
+            presenter.purgeDeletedDatasets();
+        }
     }
 
     private List<EmfDataset> getSelectedDatasets() {
