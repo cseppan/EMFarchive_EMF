@@ -246,10 +246,21 @@ where name in ('Control Strategy Result Summary');
 insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
 select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Cost Curve', 1, 'select poll, 
 	ann_cost_per_ton, 
+	cumulative_emis_reduction, 
+	incremental_emis_reduction, 
+	incremental_cost_Per_ton, 
+	case when coalesce(incremental_emis_reduction, 0) != 0 then incremental_cost_Per_ton / incremental_emis_reduction else 0.0 end as slope, 
+	
+cumulative_emis_reduction / (select sum(emis_reduction) from $TABLE[1] e where e.poll = tbl.poll) as pct_emis_red
+from (
+select poll, 
+	d.ann_cost_per_ton, 
+
 	(select sum(e.emis_reduction) 
 	from $TABLE[1] e
 	where coalesce(e.ann_cost_per_ton,0) <= coalesce(d.ann_cost_per_ton,0)
 	) as cumulative_emis_reduction,
+
 	coalesce((select sum(e.emis_reduction) 
 	from $TABLE[1] e
 	where coalesce(e.ann_cost_per_ton,0) <= coalesce(d.ann_cost_per_ton,0)
@@ -262,11 +273,18 @@ select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa
 		where coalesce(f.ann_cost_per_ton,0) < coalesce(d.ann_cost_per_ton,0)
 		order by coalesce(f.ann_cost_per_ton,0) desc
 		limit 1
-		),0)),0) as incremental_emis_reduction
+		),0)),0) as incremental_emis_reduction,
+
+	coalesce(ann_cost_per_ton,0) - 
+	coalesce((select distinct on (coalesce(f.ann_cost_per_ton,0)) f.ann_cost_per_ton 
+		from $TABLE[1] f
+		where coalesce(f.ann_cost_per_ton,0) < coalesce(d.ann_cost_per_ton,0)
+		order by coalesce(f.ann_cost_per_ton,0) desc
+		limit 1),0) as incremental_cost_Per_ton
 from $TABLE[1] d
-where 1 = 1
-group by poll, ann_cost_per_ton
-order by poll, coalesce(ann_cost_per_ton,0)', false, 1, ''
+WHERE 1 = 1
+group by poll, d.ann_cost_per_ton) tbl
+order by poll, ann_cost_per_ton', false, 1, ''
 from emf.dataset_types dt
 where name in ('Control Strategy Detailed Result'); 
 
