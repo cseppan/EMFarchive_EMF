@@ -2,14 +2,19 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
 
 public class StrategyTask implements Runnable {
 
@@ -23,27 +28,67 @@ public class StrategyTask implements Runnable {
 
     private ControlStrategyService csService;
 
-    public StrategyTask(Strategy strategy, User user, Services services, ControlStrategyService service) {
+    private HibernateSessionFactory sessionFactory;
+
+    public StrategyTask(Strategy strategy, User user, 
+            Services services, ControlStrategyService service,
+            HibernateSessionFactory sessionFactory) {
         this.user = user;
         this.services = services;
         this.strategy = strategy;
         this.csService = service;
+        this.sessionFactory = sessionFactory;
     }
 
     public void run() {
         String completeStatus = "";
-        try {
-            prepare();
-            strategy.run();
-            completeStatus = "Finished";
-            addCompletedStatus();
-        } catch (Exception e) {
-            completeStatus = "Failed";
-            logError("Failed to run strategy : ", e);
-            setStatus("Failed to run strategy: " + "Reason: " + e.getMessage());
-        } finally {
-            complete(completeStatus);
-//            closeConnection();
+//         //set strategy run status to waiting, this will make sure it is run in the make-shift queue
+//        try {
+//            setRunStatus("Waiting");
+//        } catch (EmfException e1) {
+//            // NOTE Auto-generated catch block
+//            e1.printStackTrace();
+//        }
+        Long poolSize = strategyPoolSize();
+        Long runningCount = getControlStrategyRunningCount();
+        
+        //make sure we can add an work item to the queue
+        //check the pool size and compare to the number of strategies currently running
+        if (runningCount < poolSize) {
+            try {
+                prepare();
+                strategy.run();
+                completeStatus = "Finished";
+                addCompletedStatus();
+            } catch (EmfException e) {
+                completeStatus = "Failed";
+                logError("Failed to run strategy : ", e);
+                setStatus("Failed to run strategy: " + "Reason: " + e.getMessage());
+            } finally {
+//                    closeConnection();
+                
+                //check to see if there is another strategy to run...
+                List<ControlStrategy> waitingStrategies;
+                try {
+                    setRunStatus(completeStatus);
+                    waitingStrategies = csService.getControlStrategiesByRunStatus("Waiting");
+                    if (waitingStrategies.size() > 0) {
+                        runningCount = getControlStrategyRunningCount();
+                        if (runningCount < poolSize) {
+                            for (ControlStrategy controlStrategy : waitingStrategies.toArray(new ControlStrategy[0])) {
+                                if (runningCount < poolSize) {
+                                    csService.runStrategy(user, controlStrategy.getId(),
+                                        true);
+                                    runningCount++;
+                                }
+                            }
+                        }
+                    }
+                } catch (EmfException e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -57,27 +102,50 @@ public class StrategyTask implements Runnable {
 //    }
 //
     private void prepare() throws EmfException {
-        strategy.getControlStrategy().setRunStatus("Running");
-        csService.updateControlStrategyWithLock(strategy.getControlStrategy());
+        ControlStrategy controlStrategy = strategy.getControlStrategy();
+        controlStrategy = csService.obtainLocked(controlStrategy.getCreator(), controlStrategy.getId());
+        controlStrategy.setRunStatus("Running");
+        csService.updateControlStrategyWithLock(controlStrategy);
         addStartStatus();
     }
 
-    private void complete(String completeStatus) {
+    private void setRunStatus(String completeStatus) throws EmfException {
         strategy.getControlStrategy().setRunStatus(completeStatus);
         strategy.getControlStrategy().setLastModifiedDate(new Date());
-        updateStrategy();
+//        updateStrategy();
+        csService.setControlStrategyRunStatus(strategy.getControlStrategy().getId(), completeStatus);
     }
 
-    private void updateStrategy() {
+//    private void updateStrategy() {
+//        try {
+//            csService.updateControlStrategy(strategy.getControlStrategy());
+//        } catch (EmfException e) {
+//            logError("Failed to update the strategy : ", e);
+//            setStatus("Failed to update strategy: " + "Reason: " + e.getMessage());
+//        }
+//
+//    }
+
+    private Long strategyPoolSize() {
+        Session session = sessionFactory.getSession();
         try {
-            csService.updateControlStrategy(strategy.getControlStrategy());
-        } catch (EmfException e) {
-            logError("Failed to update the strategy : ", e);
-            setStatus("Failed to update strategy: " + "Reason: " + e.getMessage());
+            EmfProperty property = new EmfPropertiesDAO().getProperty("strategy-pool-size", session);
+            return Long.parseLong(property.getValue());
+        } finally {
+            session.close();
         }
-
     }
-
+    private Long getControlStrategyRunningCount() {
+        Long count = 0L;
+        try {
+            count = csService.getControlStrategyRunningCount();
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+        return count;
+    }
+    
     private void addStartStatus() {
         setStatus("Started running control strategy: " + strategy.getControlStrategy().getName());
     }

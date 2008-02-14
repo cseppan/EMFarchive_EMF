@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -26,7 +28,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 public class ControlMeasureDAO {
-//    private static Log LOG = LogFactory.getLog(ControlMeasureDAO.class);
+    private static Log LOG = LogFactory.getLog(ControlMeasureDAO.class);
 
     private LockingScheme lockingScheme;
 
@@ -477,6 +479,7 @@ public class ControlMeasureDAO {
 
     public ControlMeasure[] getSummaryControlMeasures(DbServer dbServer, String whereFilter) throws EmfException {
         try {
+            LOG.error("dao.getSummaryControlMeasures");
             RetrieveControlMeasure retrieveControlMeasure = new RetrieveControlMeasure(dbServer);
             return retrieveControlMeasure.getControlMeasures(whereFilter);
         } catch (Exception e) {
@@ -514,7 +517,7 @@ public class ControlMeasureDAO {
     }
 
     public List getEquationTypes(Session session) {
-        Query query = session.createQuery("from EquationType as e");
+        Query query = session.createQuery("from EquationType as e order by e.name");
         query.setCacheable(true);
         return query.list();//hibernateFacade.getAll(EquationType.class, Order.asc("name"), session);
     }

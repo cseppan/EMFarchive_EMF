@@ -9,7 +9,6 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.TableFormat;
-import gov.epa.emissions.commons.io.VersionedDatasetQuery;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
@@ -100,16 +99,6 @@ public class ControlStrategyInventoryOutput {
         
         String outputInventoryTableName = dataset.getInternalSources()[0].getTable();
         
-if (1 == 0)
-        copyDataFromOriginalTable(inputTable, outputInventoryTableName, 
-                version(inputDataset, controlStrategyResult.getInputDatasetVersion()), inputDataset, 
-                datasource);
-        
-        //create indexes on controlled inventory table, this will help speed updating the 
-        //table with the detailed result info
-if (1 == 0)
-        makeSureInventoryDatasetHasIndexes(inputDataset, datasource);
-                
         ControlStrategyResult result = getControlStrategyResult();
         try {
             createControlledInventory(dataset.getId(), inputTable, detailDatasetTable(result),
@@ -120,32 +109,10 @@ if (1 == 0)
                     outputInventoryTableName, version(inputDataset, controlStrategyResult.getInputDatasetVersion()),
                     inputDataset, datasource, true);
         }        
-if (1 == 0)
-        updateDataWithDetailDatasetTable(outputInventoryTableName, detailDatasetTable(result), server
-                .getEmissionsDatasource());
-
-if (1 == 0)
-        updateDatasetIdAndVersion(outputInventoryTableName, server.getEmissionsDatasource(), dataset.getId());
 
         updateControlStrategyResults(result, dataset);
     }
-
-    private void makeSureInventoryDatasetHasIndexes(EmfDataset inputDataset, Datasource datasource) {
-        String query = "SET work_mem TO '128MB';SELECT public.create_orl_table_indexes('" + emissionTableName(inputDataset).toLowerCase() + "');analyze emissions." + emissionTableName(inputDataset).toLowerCase();
-        try {
-            datasource.query().execute(query);
-        } catch (SQLException e) {
-            //supress all errors, the indexes might already be on the table...
-        } finally {
-            //
-        }
-    }
     
-    private String emissionTableName(Dataset dataset) {
-        InternalSource[] internalSources = dataset.getInternalSources();
-        return internalSources[0].getTable();
-    }
-
 //    private void setandRunQASteps() throws EmfException {
 //        try {
 //            ControlStrategyResult result = getControlStrategyResult();
@@ -222,82 +189,13 @@ if (1 == 0)
         return inputTable;
     }
 
-    private void updateDatasetIdAndVersion(String tableName, Datasource datasource, int id) throws EmfException {
-        String query = "UPDATE " + qualifiedTable(tableName, datasource) + " SET dataset_id=" + id
-                + ", version=0, delete_versions=DEFAULT";
-
-        try {
-            datasource.query().execute(query);
-        } catch (SQLException e) {
-            throw new EmfException("Could not update dataset_id column in the new inventory table '" + tableName + "'");
-        }
-
-    }
-
-    private void updateDataWithDetailDatasetTable(String outputTable, String detailResultTable,
-            Datasource emissionsDatasource) throws EmfException {
-        String query = updateQuery(outputTable, detailResultTable, emissionsDatasource);
-        try {
-            emissionsDatasource.query().execute(query);
-        } catch (SQLException e) {
-            System.err.println(query);
-            e.printStackTrace();
-            throw new EmfException("Could not update inventory table '" + outputTable + "' using detail result table '"
-                    + detailResultTable + "'");
-        }
-
-    }
-
     private int getDaysInMonth(int month) {
         return month != - 1 ? DateUtil.daysInMonth(controlStrategy.getInventoryYear(), month) : 31;
     }
     
-    private String updateQuery(String outputTable, String detailResultTable, Datasource datasource) {
-        boolean pointDatasetType = inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL Point Inventory (PTINV)");
-        boolean costPointDatasetType = inputDataset.getDatasetType().getName().equalsIgnoreCase("ORL CoST Point Inventory (PTINV)");
-        int month = inputDataset.applicableMonth();
-        int noOfDaysInMonth = 31;
-        if (month != -1) {
-            noOfDaysInMonth = getDaysInMonth(month);
-        }
-        String sql = "update " + qualifiedTable(outputTable, datasource) + " as o "
-            + "set ceff = case when " + (month != -1 ? "coalesce(avd_emis, ann_emis)" : "ann_emis") + " <> 0 then (1 - " + (month != -1 ? "b.final_emissions / " + noOfDaysInMonth + " / coalesce(avd_emis, ann_emis)" : "b.final_emissions / ann_emis") + ") * 100 else 0 end, "
-            + "avd_emis = b.final_emissions / " + (month != -1 ? noOfDaysInMonth : "365") + ", "
-            + "ann_emis = b.final_emissions, "
-            + "reff = 100, "
-            + (!pointDatasetType && !costPointDatasetType? "rpen = 100, " : " ")
-            + "current_cost = annual_cost, " 
-            + "cumulative_cost = case when cumulative_cost is null and annual_cost is null then null else coalesce(cumulative_cost, 0) + coalesce(annual_cost, 0) end, "
-            + "control_measures = case when control_measures is null or length(control_measures) = 0 then cm_abbrev_list else control_measures || '& ' || cm_abbrev_list end, "
-            + "pct_reduction = case when pct_reduction is null or length(pct_reduction) = 0 then percent_reduction_list else pct_reduction || '& ' || percent_reduction_list end "
-            + "FROM ( "
-            + "SELECT source_id, "
-            + "max(final_emissions) as final_emissions, "
-            + "sum(annual_cost) as annual_cost, "
-            + "public.concatenate_with_ampersand(cm_abbrev) as cm_abbrev_list, "
-            + "public.concatenate_with_ampersand(cast(percent_reduction as varchar)) as percent_reduction_list "
-            + "FROM " + qualifiedTable(detailResultTable, datasource) + " "
-            + "group by source_id "
-            + ") as b "
-            + "WHERE o.record_id = b.source_id;";
-        return sql;
-    }
-
     private String detailDatasetTable(ControlStrategyResult result) {
         Dataset detailedResultDataset = result.getDetailedResultDataset();
         return detailedResultDataset.getInternalSources()[0].getTable();
-    }
-
-    private void copyDataFromOriginalTable(String inputTable, String outputInventoryTableName, Version version,
-            Dataset dataset, Datasource emissionsDatasource) throws EmfException {
-        String query = copyDataFromOriginalTableQuery(inputTable, outputInventoryTableName, version, dataset,
-                emissionsDatasource);
-        try {
-            emissionsDatasource.query().execute(query);
-        } catch (SQLException e) {
-            throw new EmfException("Error occured when copying data from " + inputTable + " to "
-                    + outputInventoryTableName + "\n" + e.getMessage());
-        }
     }
 
     private void createControlledInventory(int datasetId, String inputTable, String detailResultTable, String outputTable, Version version,
@@ -320,13 +218,6 @@ if (1 == 0)
             throw new EmfException("Error occured when copying data from " + inputTable + " to "
                     + outputTable + "\n" + e.getMessage());
         }
-    }
-
-    private String copyDataFromOriginalTableQuery(String inputTable, String outputTable, Version version,
-            Dataset dataset, Datasource datasource) {
-        String versionedQuery = new VersionedDatasetQuery(version, dataset).generate(qualifiedTable(inputTable,
-                datasource));
-        return "INSERT INTO " + qualifiedTable(outputTable, datasource) + " " + versionedQuery;
     }
 
     private String copyDataFromOriginalTableQuery2(int datasetId, String inputTable, String detailResultTable, String outputTable, Version version,
@@ -356,7 +247,7 @@ if (1 == 0)
                 sql += ", 0 as version";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("ceff")) {
-                sql += ", case when b.source_id is not null then case when " + (month != -1 ? "coalesce(avd_emis, ann_emis)" : "ann_emis") + " <> 0 then (1 - " + (month != -1 ? "b.final_emissions / " + noOfDaysInMonth + " / coalesce(avd_emis, ann_emis)" : "b.final_emissions / ann_emis") + ") * 100 else 0 end else ceff end as ceff";
+                sql += ", case when b.source_id is not null then case when " + (month != -1 ? "coalesce(avd_emis, ann_emis)" : "ann_emis") + " <> 0 then TO_CHAR((1 - " + (month != -1 ? "b.final_emissions / " + noOfDaysInMonth + " / coalesce(avd_emis, ann_emis)" : "b.final_emissions / ann_emis") + ") * 100, 'FM990.099')::double precision else 0.0 end else ceff end as ceff";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("avd_emis")) {
                 sql += ", case when b.source_id is not null then b.final_emissions / " + (month != -1 ? noOfDaysInMonth : "365") + " else avd_emis end as avd_emis";
@@ -367,11 +258,14 @@ if (1 == 0)
             } else if (columnName.equalsIgnoreCase("reff")) {
                 sql += ", case when b.source_id is not null then 100 else reff end as reff";
                 columnList += "," + columnName;
+            } else if (columnName.equalsIgnoreCase("rpen")) {
+                sql += ", case when b.source_id is not null then 100 else rpen end as rpen";
+                columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("CONTROL_MEASURES")) {
-                sql += ", case when " + (!missingColumns ? "control_measures" : "null") + " is null or length(" + (!missingColumns ? "control_measures" : "null") + ") = 0 then cm_abbrev_list else " + (!missingColumns ? "control_measures" : "null") + " || '& ' || cm_abbrev_list end as CONTROL_MEASURES";
+                sql += ", case when " + (!missingColumns ? "control_measures" : "null") + " is null or length(" + (!missingColumns ? "control_measures" : "null") + ") = 0 then cm_abbrev_list else " + (!missingColumns ? "control_measures" : "null") + " || '&' || cm_abbrev_list end as CONTROL_MEASURES";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("PCT_REDUCTION")) {
-                sql += ", case when " + (!missingColumns ? "pct_reduction" : "null") + " is null or length(" + (!missingColumns ? "pct_reduction" : "null") + ") = 0 then percent_reduction_list else " + (!missingColumns ? "pct_reduction" : "null") + " || '& ' || percent_reduction_list end as PCT_REDUCTION";
+                sql += ", case when " + (!missingColumns ? "pct_reduction" : "null") + " is null or length(" + (!missingColumns ? "pct_reduction" : "null") + ") = 0 then percent_reduction_list else " + (!missingColumns ? "pct_reduction" : "null") + " || '&' || percent_reduction_list end as PCT_REDUCTION";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("CURRENT_COST")) {
                 sql += ", annual_cost as CURRENT_COST";
@@ -390,7 +284,7 @@ if (1 == 0)
         + "max(final_emissions) as final_emissions, "
         + "sum(annual_cost) as annual_cost, "
         + "public.concatenate_with_ampersand(cm_abbrev) as cm_abbrev_list, "
-        + "public.concatenate_with_ampersand(cast(percent_reduction as varchar)) as percent_reduction_list "
+        + "public.concatenate_with_ampersand(TO_CHAR(percent_reduction, 'FM990.099')) as percent_reduction_list "
         + "FROM (select source_id, final_emissions, annual_cost, cm_abbrev, percent_reduction "
         + "        FROM " + qualifiedTable(detailResultTable, datasource)
         + "        order by source_id, apply_order "

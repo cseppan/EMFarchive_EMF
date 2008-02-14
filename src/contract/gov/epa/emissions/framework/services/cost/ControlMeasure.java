@@ -7,7 +7,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
-import gov.epa.emissions.framework.services.cost.data.AggregatedPollutantEfficiencyRecord;
+import gov.epa.emissions.framework.services.cost.data.SumEffRec;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -57,7 +57,7 @@ public class ControlMeasure implements Lockable, Serializable {
     private List sccs;
 
     private List efficiencyRecords;
-    private List aggregatedPollutantEfficiencyRecords;
+    private List sumEffRecs;
 
     private Sector[] sectors = new Sector[] {};
     
@@ -81,7 +81,7 @@ public class ControlMeasure implements Lockable, Serializable {
         this.lock = new Mutex();
         this.sccs = new ArrayList();
         this.efficiencyRecords = new ArrayList();
-        this.aggregatedPollutantEfficiencyRecords = new ArrayList();
+        this.sumEffRecs = new ArrayList();
 //        this.sectors = new ArrayList();
 //        this.equationTypeList = new ArrayList();
 //        this.equationTypes = new ArrayList();
@@ -98,8 +98,8 @@ public class ControlMeasure implements Lockable, Serializable {
         this.name = name;
         this.abbreviation = name;
         this.majorPollutant = majorPollutant;
-        this.getAggregatedPollutantEfficiencyRecords()[0].setAvgCostPerTon(avgCostPerTon);
-        this.getAggregatedPollutantEfficiencyRecords()[0].setAvgEfficiency(avgEfficiency);
+        this.getSumEffRecs()[0].setAvgCPT(avgCostPerTon);
+        this.getSumEffRecs()[0].setAvgCE(avgEfficiency);
     }
 //    Name    Abbreviation    Pollutant   Avg CPT Avg CE  Min CE  Max CE  Min CPT Max CPT Avg Rule Eff.   Avg Rule Pen.   Control Technology  Source Group    Equipment Life  NEI Device Code Sectors Class   Last Modified Time  Last Modified By    Date Reviewed   Creator Data Source
 //    Dry ESP-Wire Plate Type;(PM10) Ferrous Metals Processing - Ferroalloy Production    PDESPMPFP   PM10    NaN 95.0    95.0    95.0    NaN NaN 100.0   100.0   Dry ESP-Wire Plate Type Ferrous Metals Processing - Ferroalloy Production   20.0    0   PTNONIPM    Known   2008/01/28 00:11    EMF User    01/01/2006  EMF User    1
@@ -313,16 +313,16 @@ public class ControlMeasure implements Lockable, Serializable {
         return lastModifiedBy;
     }
 
-    public AggregatedPollutantEfficiencyRecord[] getAggregatedPollutantEfficiencyRecords() {
-        return (AggregatedPollutantEfficiencyRecord[]) aggregatedPollutantEfficiencyRecords.toArray(new AggregatedPollutantEfficiencyRecord[0]);
+    public SumEffRec[] getSumEffRecs() {
+        return (SumEffRec[]) sumEffRecs.toArray(new SumEffRec[0]);
     }
 
-    public void setAggregatedPollutantEfficiencyRecords(AggregatedPollutantEfficiencyRecord[] aggregatedPollutantEfficiencyRecords) {
-        this.aggregatedPollutantEfficiencyRecords = Arrays.asList(aggregatedPollutantEfficiencyRecords);
+    public void setSumEffRecs(SumEffRec[] aggregatedPollutantEfficiencyRecords) {
+        this.sumEffRecs = Arrays.asList(aggregatedPollutantEfficiencyRecords);
     }
 
-    public void addAggregatedPollutantEfficiencyRecord(AggregatedPollutantEfficiencyRecord aggregatedPollutantEfficiencyRecord) {
-        aggregatedPollutantEfficiencyRecords.add(aggregatedPollutantEfficiencyRecord);
+    public void addSumEffRec(SumEffRec aggregatedPollutantEfficiencyRecord) {
+        sumEffRecs.add(aggregatedPollutantEfficiencyRecord);
     }
 
     public void addSector(Sector sector) {

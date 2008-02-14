@@ -76,12 +76,12 @@ public class ControlStrategyResultsSummary {
         String runStatus = "";
         
         for (int i = 0; i < strategyResults.length; i++) {
-            String status = strategyResults[i].getRunStatus();
-            if (status.indexOf("Failed") >= 0 || status.indexOf("failed") >= 0)
-                runStatus += status + System.getProperty("line.separator");
+            runStatus = strategyResults[i].getRunStatus();
+//            if (status.indexOf("Failed") >= 0 || status.indexOf("failed") >= 0)
+//                runStatus += status + System.getProperty("line.separator");
         }
         
-        return runStatus.length() == 0 ? "Completed successfully." : "Failed at: " + runStatus;
+        return runStatus;//.length() == 0 ? "Completed successfully." : "Failed at: " + runStatus;
     }
     
 }

@@ -144,16 +144,12 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
 
     public void stopRun() throws EmfException {
-        service().stopRunStrategy();
-        summaryTabView.stopRun();
+        service().stopRunStrategy(controlStrategy.getId());
+        view.stopRun();
     }
 
-    public void runStrategy(String exportDirectory, boolean useSQLApproach, boolean deleteResults) throws EmfException {
-        service().runStrategy(session.user(), controlStrategy.getId(), exportDirectory, useSQLApproach, deleteResults);
-    }
-
-    public void runStrategy(String exportDirectory) throws EmfException {
-        service().runStrategy(session.user(), controlStrategy.getId(), exportDirectory);
+    public void runStrategy(boolean useSQLApproach) throws EmfException {
+        service().runStrategy(session.user(), controlStrategy.getId(), useSQLApproach);
     }
 
     public void doRefresh() throws EmfException {

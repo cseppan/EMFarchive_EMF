@@ -226,7 +226,7 @@ public class CMSummaryRecordReader {
             names[i] = st.nextToken().trim();
         
         for (int i = 0; i < names.length; i++) {
-            sarray[i] = sectors.getSector(names[i].trim());
+            sarray[i] = sectors.getSector(names[i].trim().toLowerCase());
         }
         
         return sarray;

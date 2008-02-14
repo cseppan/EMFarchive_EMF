@@ -216,7 +216,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
 
     public void testShouldStopRunControlStrategyWithoutError() throws Exception {
         try {
-            service.stopRunStrategy();
+            service.stopRunStrategy(0);
         } catch (Exception e) {
             throw e;
         }

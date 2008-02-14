@@ -56,8 +56,8 @@ public abstract class AbstractStrategyTask implements Strategy {
     protected int controlStrategyInputDatasetCount;
     
     private StatusDAO statusDAO;
-
-    private String exportDirectory;
+    
+    private ControlStrategyDAO controlStrategyDAO;
     
     private DatasetCreator creator;
     
@@ -68,8 +68,7 @@ public abstract class AbstractStrategyTask implements Strategy {
     private List<ControlStrategyResult> strategyResultList;
 
     public AbstractStrategyTask(ControlStrategy controlStrategy, User user, 
-            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory,
-            String exportDirectory) throws EmfException {
+            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) throws EmfException {
         this.controlStrategy = controlStrategy;
         this.controlStrategyInputDatasetCount = controlStrategy.getControlStrategyInputDatasets().length;
         this.dbServerFactory = dbServerFactory;
@@ -77,8 +76,8 @@ public abstract class AbstractStrategyTask implements Strategy {
         this.datasource = dbServer.getEmissionsDatasource();
         this.sessionFactory = sessionFactory;
         this.user = user;
-        this.exportDirectory = exportDirectory;
         this.statusDAO = new StatusDAO(sessionFactory);
+        this.controlStrategyDAO = new ControlStrategyDAO();
         this.tableFormat = new StrategySummaryResultTableFormat(dbServer.getSqlDataTypes());
         this.keywords = new Keywords(new DataCommonsServiceImpl(sessionFactory).getKeywords());
         this.creator = new DatasetCreator("Summary_", "CSSR_", 
@@ -97,6 +96,22 @@ public abstract class AbstractStrategyTask implements Strategy {
     }
     
     public void run(StrategyLoader loader) throws EmfException {
+        
+        //get rid of strategy results...
+        if (controlStrategy.getDeleteResults()){
+            Session session = sessionFactory.getSession();
+            try {
+                    Integer[] dsList = controlStrategyDAO.getResultDatasetIds(controlStrategy.getId(), session);
+                    if (dsList != null){
+                        controlStrategyDAO.removeResultDatasets(dsList, user, session);
+                    }
+            } catch (RuntimeException e) {
+                throw new EmfException("Could not remove Control Strategies results.");
+            } finally {
+                session.close();
+            }
+        }
+        
         String status = "";
         try {
             //process/load each input dataset
@@ -119,6 +134,12 @@ public abstract class AbstractStrategyTask implements Strategy {
                         saveControlStrategyResult(result);
                         strategyResultList.add(result);
                         addStatus(controlStrategyInputDatasets[i]);
+                    }
+                    //make sure somebody hasn't cancelled this run.
+                    if (isRunStatusCancelled()) {
+//                        status = "Cancelled. Strategy run was cancelled: " + controlStrategy.getName();
+//                        setStatus(status);
+                        throw new EmfException("Strategy run was cancelled.");
                     }
                 }
             }
@@ -181,6 +202,17 @@ public abstract class AbstractStrategyTask implements Strategy {
         }
     }
 
+    private boolean isRunStatusCancelled() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return controlStrategyDAO.getControlStrategyRunStatus(controlStrategy.getId(), session).equals("Cancelled");
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not check if strategy run was cancelled.");
+        } finally {
+            session.close();
+        }
+    }
+    
     private void setSummaryResultCount(ControlStrategyResult controlStrategyResult) throws EmfException {
         String query = "SELECT count(1) as record_count "
             + " FROM " + qualifiedEmissionTableName(controlStrategyResult.getInputDataset());
@@ -317,7 +349,7 @@ public abstract class AbstractStrategyTask implements Strategy {
         QAStepTemplate[] qaStepTemplates = dataset.getDatasetType().getQaStepTemplates();
         String[] qaStepTemplateNames = new String[qaStepTemplates.length];
         for (int i = 0; i < qaStepTemplates.length; i++) qaStepTemplateNames[i] = qaStepTemplates[i].getName();
-        qaTask.runSummaryQAStepsAndExport(qaStepTemplateNames, exportDirectory);
+        qaTask.runSummaryQAStepsAndExport(qaStepTemplateNames, controlStrategy.getExportDirectory());
     }
 
     protected void disconnectDbServer() throws EmfException {

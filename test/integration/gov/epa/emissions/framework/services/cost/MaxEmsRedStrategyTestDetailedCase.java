@@ -314,7 +314,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     
     protected void runStrategy(ControlStrategy strategy) throws EmfException {
         MaxEmsRedStrategy strategyTask = new MaxEmsRedStrategy(strategy, emfUser(), dbServerFactory,
-                new Integer(500), sessionFactory, getExportDirectory());
+                new Integer(500), sessionFactory);
         strategyTask.run();
     }
     
@@ -326,7 +326,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         output.create();
     }
     
-    private String getExportDirectory() {
+    protected String getExportDirectory() {
         // TBD: make this use the new temp dir
         String tempDir = System.getProperty("IMPORT_EXPORT_TEMP_DIR");
 

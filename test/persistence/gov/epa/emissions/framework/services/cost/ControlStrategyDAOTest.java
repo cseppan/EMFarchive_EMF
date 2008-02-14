@@ -24,7 +24,6 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
         int totalBeforeAdd = dao.all(session).size();
 
         ControlStrategy element = newControlStrategy();
-
         session.clear();
         try {
             List list = dao.all(session);
@@ -34,9 +33,16 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
         }
     }
 
+//    public void testTest() {
+//        List list = dao.test(session);
+//        System.err.println(list.size());
+//    }
+//
     private ControlStrategy newControlStrategy() {
         ControlStrategy element = new ControlStrategy("test" + Math.random());
-        dao.add(element, session);
+        element.setRunStatus("Running");
+        int id = dao.add(element, session);
+        element.setId(id);
         return element;
     }
 
@@ -94,4 +100,51 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
         }
     }
 
+
+    public void testShouldGetControlStrategyRunStatus() {
+        ControlStrategy element = newControlStrategy();
+        session.clear();
+        try {
+            String runStatus = dao.getControlStrategyRunStatus(element.getId(), session);
+            assertEquals("Running", runStatus);
+        } finally {
+            remove(element);
+        }
+    }
+
+    public void testShouldGetControlStrategiesByRunStatus() {
+        ControlStrategy element = newControlStrategy();
+        session.flush();
+        session.clear();
+        ControlStrategy element2 = newControlStrategy();
+        session.flush();
+        session.clear();
+        ControlStrategy element3 = newControlStrategy();
+        session.flush();
+        session.clear();
+        List all = dao.getControlStrategiesByRunStatus("Running", session);
+        dao.setControlStrategyRunStatus(element2.getId(), "Waiting", session);
+        session.flush();
+        session.clear();
+       try {
+            all = dao.getControlStrategiesByRunStatus("Running", session);
+            
+            assertEquals(all.size(), 2);
+        } finally {
+            remove(element);
+            remove(element2);
+            remove(element3);
+        }
+    }
+
+
+    public void testShouldGetControlStrategiesRunningCount() {
+        long count = dao.getControlStrategyRunningCount(session);
+       try {
+            
+            assertEquals(count, 0);
+        } finally {
+            //
+        }
+    }
 }

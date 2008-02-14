@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.transport;
 
+import java.util.List;
+
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
@@ -122,33 +124,17 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
     }
 
     public synchronized void runStrategy(User user, int controlStrategyId,
-            String exportDirectory) throws EmfException {
+            boolean useSQLApproach) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("runStrategy");
         call.addParam("user", mappings.user());
         call.addIntegerParam("controlStrategyId");
-        call.addStringParam("exportDirectory");
-        call.setVoidReturnType();
-
-        call.request(new Object[] { user, new Integer(controlStrategyId), 
-                exportDirectory });
-    }
-
-    public synchronized void runStrategy(User user, int controlStrategyId,
-            String exportDirectory, boolean useSQLApproach, boolean deleteResults) throws EmfException {
-        EmfCall call = call();
-
-        call.setOperation("runStrategy");
-        call.addParam("user", mappings.user());
-        call.addIntegerParam("controlStrategyId");
-        call.addStringParam("exportDirectory");
         call.addBooleanParameter("useSQLApproach");
-        call.addBooleanParameter("deleteResults");
         call.setVoidReturnType();
 
         call.request(new Object[] { user, new Integer(controlStrategyId), 
-                exportDirectory, useSQLApproach, deleteResults });
+                useSQLApproach });
     }
 
     public synchronized StrategyType[] getStrategyTypes() throws EmfException {
@@ -160,13 +146,14 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (StrategyType[]) call.requestResponse(new Object[] {});
     }
 
-    public synchronized void stopRunStrategy() throws EmfException {
+    public synchronized void stopRunStrategy(int controlStrategyId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("stopRunStrategy");
+        call.addIntegerParam("controlStrategyId");
         call.setVoidReturnType();
 
-        call.request(new Object[] {});
+        call.request(new Object[] { new Integer(controlStrategyId) });
     }
 
     public synchronized void createInventory(User user, ControlStrategy controlStrategy, 
@@ -259,4 +246,18 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (ControlStrategyResult[]) call.requestResponse(new Object[] { new Integer(controlStrategyId) });
     }
 
+    public List<ControlStrategy> getControlStrategiesByRunStatus(String runStatus) {
+        // NOTE Auto-generated method stub
+        return null;
+    }
+
+    public void setControlStrategyRunStatus(int id, String runStatus) {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    public Long getControlStrategyRunningCount() {
+        // NOTE Auto-generated method stub
+        return null;
+    }
 }

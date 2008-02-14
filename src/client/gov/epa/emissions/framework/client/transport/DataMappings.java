@@ -40,7 +40,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
-import gov.epa.emissions.framework.services.cost.data.AggregatedPollutantEfficiencyRecord;
+import gov.epa.emissions.framework.services.cost.data.SumEffRec;
 import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
@@ -122,7 +122,7 @@ public class DataMappings extends Mappings {
         bean(call, StrategyType.class, strategyType());
         bean(call, ControlStrategyResult.class, controlStrategyResult());
         bean(call, EfficiencyRecord.class, efficiencyRecord());
-        bean(call, AggregatedPollutantEfficiencyRecord.class, aggregatedPollutantEfficiencyRecord());
+        bean(call, SumEffRec.class, sumEffRec());
         bean(call, Scc.class, scc());
         bean(call, ControlStrategyResultsSummary.class, controlStrategyResultsSummary());
         bean(call, StrategyResultType.class, strategyResultType());
@@ -183,7 +183,7 @@ public class DataMappings extends Mappings {
         array(call, StrategyType[].class, strategyTypes());
         array(call, ControlStrategyResult[].class, controlStrategyResults());
         array(call, EfficiencyRecord[].class, efficiencyRecords());
-        array(call, AggregatedPollutantEfficiencyRecord[].class, aggregatedPollutantEfficiencyRecords());
+        array(call, SumEffRec[].class, sumEffRecs());
         array(call, Scc[].class, sccs());
         array(call, ControlMeasureClass[].class, controlMeasureClasses());
         array(call, EquationType[].class, equationTypes());
@@ -462,12 +462,12 @@ public class DataMappings extends Mappings {
         return qname("EfficiencyRecords");
     }
 
-    public QName aggregatedPollutantEfficiencyRecord() {
-        return qname("AggregatedPollutantEfficiencyRecord");
+    public QName sumEffRec() {
+        return qname("SumEffRec");
     }
 
-    public QName aggregatedPollutantEfficiencyRecords() {
-        return qname("AggregatedPollutantEfficiencyRecords");
+    public QName sumEffRecs() {
+        return qname("SumEffRecs");
     }
 
     public QName scc() {

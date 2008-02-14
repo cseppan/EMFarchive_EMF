@@ -9,7 +9,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
-import gov.epa.emissions.framework.services.cost.data.AggregatedPollutantEfficiencyRecord;
+import gov.epa.emissions.framework.services.cost.data.SumEffRec;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
@@ -78,15 +78,15 @@ public class ControlMeasureTableData extends AbstractTableData {
         boolean majorPollutant = pollutant.getName().equalsIgnoreCase("major");
         for (int i = 0; i < measures.length; i++) {
             ControlMeasure measure = measures[i];
-            AggregatedPollutantEfficiencyRecord[] apers = measure.getAggregatedPollutantEfficiencyRecords();
+            SumEffRec[] apers = measure.getSumEffRecs();
             found = false;
             for (int j = 0; j < apers.length; j++) {
-                AggregatedPollutantEfficiencyRecord aper = apers[j];
+                SumEffRec aper = apers[j];
                 if (majorPollutant && measure.getMajorPollutant().equals(measure.getMajorPollutant())) {
                     Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(measure),
-                            getCostPerTon(aper.getAvgCostPerTon()), new Double(aper.getAvgEfficiency()), new Double(aper.getMinEfficiency()), 
-                            new Double(aper.getMaxEfficiency()), getCostPerTon(aper.getMinCostPerTon()), getCostPerTon(aper.getMaxCostPerTon()), 
-                            new Double(aper.getAvgRuleEffectiveness()), new Double(aper.getAvgRulePenetration()), getControlTechnology(measure), 
+                            getCostPerTon(aper.getAvgCPT()), new Double(aper.getAvgCE()), new Double(aper.getMinCE()), 
+                            new Double(aper.getMaxCE()), getCostPerTon(aper.getMinCPT()), getCostPerTon(aper.getMaxCPT()), 
+                            new Double(aper.getAvgRE()), new Double(aper.getAvgRP()), getControlTechnology(measure), 
                             getSourceGroup(measure), new Double(measure.getEquipmentLife()), "" + measure.getDeviceCode(), 
                             getSectors(measure), measureClass(measure.getCmClass()), getLastModifiedTime(measure), 
                             measure.getLastModifiedBy(), getDateReviewed(measure), measure.getCreator().getName(), 
@@ -97,9 +97,9 @@ public class ControlMeasureTableData extends AbstractTableData {
                     break;
                 } else if (pollutant.equals(aper.getPollutant())) {
                     Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(aper.getPollutant()),
-                            getCostPerTon(aper.getAvgCostPerTon()), new Double(aper.getAvgEfficiency()), new Double(aper.getMinEfficiency()), 
-                            new Double(aper.getMaxEfficiency()), getCostPerTon(aper.getMinCostPerTon()), getCostPerTon(aper.getMaxCostPerTon()), 
-                            new Double(aper.getAvgRuleEffectiveness()), new Double(aper.getAvgRulePenetration()), getControlTechnology(measure), 
+                            getCostPerTon(aper.getAvgCPT()), new Double(aper.getAvgCE()), new Double(aper.getMinCE()), 
+                            new Double(aper.getMaxCE()), getCostPerTon(aper.getMinCPT()), getCostPerTon(aper.getMaxCPT()), 
+                            new Double(aper.getAvgRE()), new Double(aper.getAvgRP()), getControlTechnology(measure), 
                             getSourceGroup(measure), new Double(measure.getEquipmentLife()), "" + measure.getDeviceCode(), 
                             getSectors(measure), measureClass(measure.getCmClass()), getLastModifiedTime(measure), 
                             measure.getLastModifiedBy(), getDateReviewed(measure), measure.getCreator().getName(), 

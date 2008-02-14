@@ -18,7 +18,6 @@ public class EmfCall {
     public EmfCall(Call call, String service) {
         this.call = call;
         this.service = service;
-
         mappings = new EmfMappings();
         mappings.register(call);
     }

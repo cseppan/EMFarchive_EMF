@@ -97,7 +97,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
 
         ControlMeasure[] cms = dao.getSummaryControlMeasures(dbServer(), "");
         assertEquals(1, cms.length);
-        assertEquals(1, cms[0].getAggregatedPollutantEfficiencyRecords().length);
+        assertEquals(1, cms[0].getSumEffRecs().length);
     }
 
     public void testShouldUpdateControlMeasure() throws Exception {

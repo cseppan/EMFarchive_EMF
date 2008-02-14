@@ -15,7 +15,6 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -93,6 +92,19 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             session.close();
         }
         return csId;
+    }
+
+    public synchronized void setControlStrategyRunStatus(int id,
+            String runStatus) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.setControlStrategyRunStatus(id, runStatus, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not set Control Strategy run status: " + id, e);
+            throw new EmfException("Could not add Control Strategy run status: " + id);
+        } finally {
+            session.close();
+        }
     }
 
     public synchronized ControlStrategy obtainLocked(User owner, int id) throws EmfException {
@@ -266,55 +278,50 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     }
 
     public synchronized void runStrategy(User user, int controlStrategyId,
-            String exportDirectory) throws EmfException {
-        ControlStrategy strategy = getById(controlStrategyId);
-        StrategyFactory factory = new StrategyFactory(batchSize());
+            boolean useSQLApproach) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
+            //first see if the strategy has been canceled, is so don't run it...
+            String runStatus = dao.getControlStrategyRunStatus(controlStrategyId, session);
+            if (runStatus.equals("Cancelled")) return;
+            
+            //queue up the strategy to be run, by setting runStatus to Waiting
+            dao.setControlStrategyRunStatus(controlStrategyId, "Waiting", session);
+            
+            ControlStrategy strategy = getById(controlStrategyId);
+            
+            StrategyFactory factory = new StrategyFactory(batchSize());
+            validatePath(strategy.getExportDirectory());
             RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, 
                     dbServerFactory, threadPool,
-                    exportDirectory);
+                    useSQLApproach);
             runStrategy.run(user, strategy, this);
-        } catch (Exception e) {
-            //
+        } catch (EmfException e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
         }
     }
 
-    public synchronized void runStrategy(User user, int controlStrategyId,
-            String exportDirectory, boolean useSQLApproach, boolean deleteResults) throws EmfException {
-        validatePath(exportDirectory);
-        ControlStrategy strategy = getById(controlStrategyId);
-        if (deleteResults){
-            Integer[] dsList=getRusultsDSId(controlStrategyId);
-            if (dsList !=null){
-                removeResultDatasets(dsList, user);
-            }
+    public List<ControlStrategy> getControlStrategiesByRunStatus(String runStatus) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getControlStrategiesByRunStatus(runStatus, session);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not get Control Strategies by run status: " + runStatus);
+        } finally {
+            session.close();
         }
-        
-        StrategyFactory factory = new StrategyFactory(batchSize());
-        RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, 
-                dbServerFactory, threadPool,
-                exportDirectory, useSQLApproach);
-        runStrategy.run(user, strategy, this);
     }
-    
-    private Integer[] getRusultsDSId(int controlStrategyId) throws EmfException {
-        ControlStrategyResult[] results = getControlStrategyResults(controlStrategyId);
-        List<Integer> datasetLists = new ArrayList<Integer>();
-        if(results != null){
-            for (int i=0; i<results.length; i++){
-                if (results[i].getStrategyResultType().getName().equals("Detailed Strategy Result")) {
-                    if (results[i].getDetailedResultDataset() != null)
-                        datasetLists.add(results[i].getDetailedResultDataset().getId());
-                    if (results[i].getControlledInventoryDataset() != null)
-                        datasetLists.add( results[i].getControlledInventoryDataset().getId());
-                } else {
-                    datasetLists.add( results[i].getInputDataset().getId());
-                }
-            }
+    public Long getControlStrategyRunningCount() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getControlStrategyRunningCount(session);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not get Control Strategies running count");
+        } finally {
+            session.close();
         }
-        if (datasetLists.size()>0)
-            return datasetLists.toArray(new Integer[0]);
-        return null; 
     }
 
     private File validatePath(String folderPath) throws EmfException {
@@ -327,8 +334,16 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         return file;
     }
 
-    public synchronized void stopRunStrategy() {
-        // TODO:
+    public synchronized void stopRunStrategy(int controlStrategyId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.setControlStrategyRunStatus(controlStrategyId, "Cancelled", session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not set Control Strategy run status: " + controlStrategyId, e);
+            throw new EmfException("Could not add Control Strategy run status: " + controlStrategyId);
+        } finally {
+            session.close();
+        }
     }
 
     public synchronized StrategyType[] getStrategyTypes() throws EmfException {

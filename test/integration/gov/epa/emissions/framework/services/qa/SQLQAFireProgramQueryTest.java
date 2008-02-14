@@ -60,7 +60,7 @@ public class SQLQAFireProgramQueryTest extends ServiceTestCase {
             tableName = "newtable";
             QAStep qaStep = new QAStep();
             qaStep.setName("Step1");
-            qaStep.setProgramArguments("-inv\ntest\ntest2\ntest3\n-invtable\ninvtable");
+            qaStep.setProgramArguments("-inv\ntest\ntest2\ntest3\n-invtable\ninvtable\n-summaryType\n");
             dbServer = dbServerFactory.getDbServer();
             //String emissioDatasourceName = dbServer().getEmissionsDatasource().getName();
             //this will set the properties...

@@ -22,13 +22,11 @@ public class StrategyFactory {
     }
 
     public Strategy create(ControlStrategy controlStrategy, User user, 
-            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory,
-            String exportDirectory)
+            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory)
             throws EmfException {
         try {
             return doCreate(controlStrategy, user, 
-                    sessionFactory, dbServerFactory,
-                    exportDirectory);
+                    sessionFactory, dbServerFactory);
         } catch (Exception e) {
             log.error("Failed to create strategy. Cause: " + e.getMessage());
             throw new EmfException("Failed to create strategy." + e.getMessage());
@@ -37,12 +35,12 @@ public class StrategyFactory {
 
     public Strategy create(ControlStrategy controlStrategy, User user, 
             HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory,
-            String exportDirectory, boolean useSQLApproach)
+            boolean useSQLApproach)
             throws EmfException {
         try {
             return doCreate(controlStrategy, user, 
                     sessionFactory, dbServerFactory,
-                    exportDirectory, useSQLApproach);
+                    useSQLApproach);
         } catch (Exception e) {
             log.error("Failed to create strategy. Cause: " + e.getMessage());
             throw new EmfException("Failed to create strategy." + e.getMessage());
@@ -50,16 +48,15 @@ public class StrategyFactory {
     }
 
     private Strategy doCreate(ControlStrategy controlStrategy, User user, 
-            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory,
-            String exportDirectory)
+            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory)
             throws Exception {
         String strategyClassName = controlStrategy.getStrategyType().getStrategyClassName();
         Class strategyClass = Class.forName(strategyClassName);
         Class[] classParams = new Class[] { ControlStrategy.class, User.class, DbServerFactory.class, Integer.class,
-                HibernateSessionFactory.class, String.class };
+                HibernateSessionFactory.class };
         Object[] params = new Object[] { controlStrategy, user, 
                 dbServerFactory, new Integer(batchSize), 
-                sessionFactory, exportDirectory };
+                sessionFactory };
         Constructor strategyConstructor = strategyClass.getDeclaredConstructor(classParams);
 
         return (Strategy) strategyConstructor.newInstance(params);
@@ -67,15 +64,15 @@ public class StrategyFactory {
 
     private Strategy doCreate(ControlStrategy controlStrategy, User user, 
             HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory,
-            String exportDirectory, boolean useSQLApproach)
+            boolean useSQLApproach)
             throws Exception {
         String strategyClassName = controlStrategy.getStrategyType().getStrategyClassName();
         Class strategyClass = Class.forName(strategyClassName);
         Class[] classParams = new Class[] { ControlStrategy.class, User.class, DbServerFactory.class, Integer.class,
-                HibernateSessionFactory.class, String.class, Boolean.class };
+                HibernateSessionFactory.class, Boolean.class };
         Object[] params = new Object[] { controlStrategy, user, 
                 dbServerFactory, new Integer(batchSize), 
-                sessionFactory, exportDirectory, new Boolean( useSQLApproach) };
+                sessionFactory, new Boolean( useSQLApproach) };
         Constructor strategyConstructor = strategyClass.getDeclaredConstructor(classParams);
 
         return (Strategy) strategyConstructor.newInstance(params);

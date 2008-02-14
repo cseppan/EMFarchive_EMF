@@ -68,6 +68,10 @@ public class ControlStrategy implements Lockable, Serializable {
     
     private Double totalReduction;
     
+    private String exportDirectory;
+    
+    private Boolean deleteResults;
+    
     public ControlStrategy() {
         this.lock = new Mutex();
 //        this.controlStrategyInputDatasets = new ArrayList();
@@ -78,6 +82,11 @@ public class ControlStrategy implements Lockable, Serializable {
     public ControlStrategy(String name) {
         this();
         this.name = name;
+    }
+
+    public ControlStrategy(int id, String name) {
+        this(name);
+        this.id = id;
     }
 
     public ControlStrategy(int id, String name,
@@ -361,5 +370,21 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public Double getTotalReduction() {
         return totalReduction;
+    }
+
+    public void setExportDirectory(String exportDirectory) {
+        this.exportDirectory = exportDirectory;
+    }
+
+    public String getExportDirectory() {
+        return exportDirectory;
+    }
+
+    public void setDeleteResults(Boolean deleteResults) {
+        this.deleteResults = deleteResults;
+    }
+
+    public Boolean getDeleteResults() {
+        return deleteResults;
     }
 }

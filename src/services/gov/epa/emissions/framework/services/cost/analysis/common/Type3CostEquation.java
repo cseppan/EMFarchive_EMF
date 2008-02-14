@@ -43,7 +43,7 @@ public class Type3CostEquation implements CostEquation {
     public Double getCapitalCost() throws EmfException {
         if (minStackFlowRate == null || minStackFlowRate == 0.0) return null;
         if (minStackFlowRate <1028000 )
-            return Math.pow(1028000/minStackFlowRate, 0.6)*capitalCostFactor*gasFlowRateFactor*retrofitFactor*minStackFlowRate;
+            return costYearTable.factor(costYear) * Math.pow(1028000/minStackFlowRate, 0.6)*capitalCostFactor*gasFlowRateFactor*retrofitFactor*minStackFlowRate;
         return costYearTable.factor(costYear) * capitalCostFactor*gasFlowRateFactor*retrofitFactor*minStackFlowRate;
     }  
     
@@ -74,6 +74,9 @@ public class Type3CostEquation implements CostEquation {
     public Double getCapRecFactor(float equipmentLife, Double effRecCapRecFactor){
         // Calculate capital recovery factor 
         Double capRecFactor = effRecCapRecFactor;
+//        if (effRecCapRecFactor != null && effRecCapRecFactor!=0) 
+//            return capRecFactor;
+        
         if (equipmentLife!=0) 
              capRecFactor = DefaultCostEquation.calculateCapRecFactor(discountRate, equipmentLife);
         

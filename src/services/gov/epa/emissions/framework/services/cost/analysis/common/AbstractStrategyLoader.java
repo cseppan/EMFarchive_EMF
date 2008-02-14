@@ -331,11 +331,11 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     private boolean inventoryHasTargetPollutant(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
         String versionedQuery = new VersionedQuery(version(controlStrategyInputDataset)).query();
 
-        String query = "SELECT count(1) as Found "
+        String query = "SELECT DISTINCT ON (poll) 1 as Found "
             + " FROM " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()) 
             + " where " + versionedQuery
             + " and poll = '" + controlStrategy.getTargetPollutant().getName() + "' "
-            + getFilterForSourceQuery() + " limit 1";
+            + getFilterForSourceQuery() + " limit 1;";
         ResultSet rs = null;
         try {
             rs = datasource.query().executeQuery(query);
@@ -369,9 +369,10 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {
+            System.out.println("SQLException runStrategyUsingSQLApproach");
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {
-            //
+            //3
         }
     }
 

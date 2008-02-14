@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
-import gov.epa.emissions.commons.gui.EmptyStrings;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
@@ -310,11 +309,11 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         layoutGenerator.addLabelWidgetPair("Inventory Filter:", scrollPane, middlePanel);
 
         EmfDataset[] datasets = editControlStrategyPresenter.getDatasets( editControlStrategyPresenter.getDatasetType("List of Counties (CSV)") );
-        String width = EmptyStrings.create(80);
+//        String width = EmptyStrings.create(80);
 //        Dimension size=new Dimension(500, 13);
         
         dataset = new ComboBox("Not selected", datasets);
-        dataset.setPrototypeDisplayValue(width);
+//        dataset.setPrototypeDisplayValue(width);
         if (controlStrategy.getCountyDataset() != null) dataset.setSelectedItem(controlStrategy.getCountyDataset());
 //        dataset.setPrototypeDisplayValue(size);
 //        dataset.setToolTipText("Browse to find a CSV file with a column named FIPS that lists the counties to which the strategy should apply");
@@ -331,7 +330,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         });
 
         version =new ComboBox(new Version[0]);           
-        version.setPrototypeDisplayValue(width);
+//        version.setPrototypeDisplayValue(width);
         try {
             fillVersions((EmfDataset) dataset.getSelectedItem());
         } catch (EmfException e1) {

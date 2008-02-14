@@ -42,6 +42,7 @@ insert into emf.properties values(DEFAULT, 'SECONDS_TO_WAIT_AFTER_EXPORT', '2');
 insert into emf.properties values(DEFAULT, 'DO_NOT_EXPORT_JOBS', 'true');
 --update version each time EMF gets updated!
 insert into emf.properties values(DEFAULT, 'EMF-version', 'v1.9 - 1/31/2008');
+insert into emf.properties values(DEFAULT, 'strategy-pool-size', '2');
 
 --emf.properties
 -- DO NOT CHANGE THE ORDER OF THE DATASET TYPE
@@ -240,3 +241,33 @@ insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, na
 select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by Control Technology and Pollutant', 1, 'select e.Control_Technology, e.poll, sum(e.Annual_Cost) / sum(e.Emis_Reduction) as avg_ann_cost_per_ton, sum(e.Annual_Cost) as Annual_Cost, sum(e.Emis_Reduction) as Emis_Reduction from $TABLE[1] e  group by e.Control_Technology, e.poll order by e.Control_Technology, e.poll', false, 1, ''
 from emf.dataset_types dt
 where name in ('Control Strategy Result Summary'); 
+
+-- Cost Curve - Control Strategy Detailed Result
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Cost Curve', 1, 'select poll, 
+	ann_cost_per_ton, 
+	(select sum(e.emis_reduction) 
+	from $TABLE[1] e
+	where coalesce(e.ann_cost_per_ton,0) <= coalesce(d.ann_cost_per_ton,0)
+	) as cumulative_emis_reduction,
+	coalesce((select sum(e.emis_reduction) 
+	from $TABLE[1] e
+	where coalesce(e.ann_cost_per_ton,0) <= coalesce(d.ann_cost_per_ton,0)
+	), 0) - 
+	coalesce((select sum(e.emis_reduction) 
+	from $TABLE[1] e
+	where coalesce(e.ann_cost_per_ton,0) <= coalesce((
+		select distinct on (coalesce(f.ann_cost_per_ton,0)) f.ann_cost_per_ton 
+		from $TABLE[1] f
+		where coalesce(f.ann_cost_per_ton,0) < coalesce(d.ann_cost_per_ton,0)
+		order by coalesce(f.ann_cost_per_ton,0) desc
+		limit 1
+		),0)),0) as incremental_emis_reduction
+from $TABLE[1] d
+where 1 = 1
+group by poll, ann_cost_per_ton
+order by poll, coalesce(ann_cost_per_ton,0)', false, 1, ''
+from emf.dataset_types dt
+where name in ('Control Strategy Detailed Result'); 
+
+

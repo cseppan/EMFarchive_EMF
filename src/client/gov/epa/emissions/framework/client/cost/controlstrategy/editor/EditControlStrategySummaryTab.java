@@ -424,10 +424,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         updateSummaryPanelValuesExceptStartDate("Running", "", "", "");
     }
 
-    public void stopRun() {
-        // TODO:
-    }
-
     public void refresh(ControlStrategyResult[] controlStrategyResults) {
         messagePanel.clear();
         updateSummaryResultPanel(controlStrategy, controlStrategyResults);
@@ -442,7 +438,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         }
         ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
         String runStatus = summary.getRunStatus();
-        String completionTime = runStatus.indexOf("Failed") == -1 ? summary.getCompletionTime() : "Failed";
+        String completionTime = runStatus.indexOf("Cancelled") == -1 ? (runStatus.indexOf("Failed") == -1 ? summary.getCompletionTime() : "Failed") : "Cancelled";
         String userName =controlStrategy.getCreator().getName();
 //        String userName= summary.getUser().getName()== null ? summary.getUser().getName() : "";
         String startTime = summary.getStartTime()== null ||summary.getStartTime().trim()==""? "":summary.getStartTime();
@@ -466,6 +462,11 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         user.setText(userName);
         costValue.setText(cost.length() == 0 ? "" : decFormat.format(new Double(cost)));
         emissionReductionValue.setText(emisReduction.length() == 0 ? "" : decFormat.format(new Double(emisReduction)));
+    }
+
+    public void stopRun() {
+        // NOTE Auto-generated method stub
+        
     }
 
 }

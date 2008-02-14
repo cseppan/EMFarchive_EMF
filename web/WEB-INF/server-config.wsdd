@@ -323,8 +323,8 @@
 		qname="ns1:EfficiencyRecord" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping
-		languageSpecificType="java:gov.epa.emissions.framework.services.cost.data.AggregatedPollutantEfficiencyRecord"
-		qname="ns1:AggregatedPollutantEfficiencyRecord" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.data.SumEffRec"
+		qname="ns1:SumEffRec" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.data.ControlTechnology"
@@ -795,9 +795,9 @@
 		innerType="ns1:EfficiencyRecord"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
-	<arrayMapping qname="ns1:AggregatedPollutantEfficiencyRecords" xmlns:ns1="urn:gov.epa.services.EmfService"
-		languageSpecificType="java:gov.epa.emissions.framework.services.cost.data.AggregatedPollutantEfficiencyRecord[]"
-		innerType="ns1:AggregatedPollutantEfficiencyRecord"
+	<arrayMapping qname="ns1:SumEffRecs" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.data.SumEffRec[]"
+		innerType="ns1:SumEffRec"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<arrayMapping qname="ns1:ControlTechnologies" xmlns:ns1="urn:gov.epa.services.EmfService"

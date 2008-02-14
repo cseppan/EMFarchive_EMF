@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -52,6 +53,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private Button saveButton;
 
     private Button runButton;
+
+    private Button stopButton;
     
     private EditControlStrategyMeasuresTab measuresTabView;
 
@@ -93,7 +96,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         layout.setLayout(new BorderLayout());
         layout.add(messagePanel, BorderLayout.PAGE_START);
         layout.add(createTabbedPane(controlStrategy, controlStrategyResults));
-        layout.add(createButtonsPanel(), BorderLayout.PAGE_END);
+        layout.add(createButtonsPanel(controlStrategyResults), BorderLayout.PAGE_END);
 
         if (controlStrategy.getRunStatus().equalsIgnoreCase("Running"))
             enableButtons(false);
@@ -217,7 +220,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         messagePanel.setError(message);
     }
 
-    private JPanel createButtonsPanel() {
+    private JPanel createButtonsPanel(ControlStrategyResult[] controlStrategyResults) {
         JPanel panel = new JPanel(new BorderLayout());
 
         JPanel container = new JPanel();
@@ -240,12 +243,14 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         container.add(Box.createHorizontalStrut(20));
 
         runButton = new RunButton(runAction());
-        container.add(runButton);
+        ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
+        if (!summary.getRunStatus().equalsIgnoreCase("Running"))
+            container.add(runButton);
 
         Button refreshButton = new Button("Refresh", refreshAction());
         container.add(refreshButton);
 
-        Button stopButton = new StopButton(stopAction());
+        stopButton = new StopButton(stopAction());
         stopButton.setEnabled(false);
         container.add(stopButton);
 
@@ -272,7 +277,22 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
             public void actionPerformed(ActionEvent event) {
                 clearMessage();
                 try {
-                    presenter.stopRun();
+                    String title = "Warning";
+                    
+                    String message = "Would you like to stop the strategy run?  This could several minutes to cancel the run.";
+                    int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.QUESTION_MESSAGE);
+                    boolean cancel = false;
+                    if (selection == JOptionPane.CANCEL_OPTION) {
+                        return;
+                    } else if (selection == JOptionPane.YES_OPTION){
+                        cancel = true; 
+                    } else if (selection == JOptionPane.NO_OPTION){
+                        cancel = false; 
+                    }
+                    if (cancel) {
+                        presenter.stopRun();
+                    }
                 } catch (EmfException e) {
                     messagePanel.setError("Error stopping running strategy: " + e.getMessage());
                 }
@@ -304,13 +324,16 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                         }
                     }
                     
+                    controlStrategy.setDeleteResults(deleteResults);
+                    controlStrategy.setExportDirectory(outputTabView.getExportFolder());
                     save();
                     controlStrategy.setStartDate(new Date());
                     presenter.setResults(controlStrategy);
-                    presenter.runStrategy(outputTabView.getExportFolder(), summaryTabView.useSQLApproachCheck.isSelected(), deleteResults);
+                    presenter.runStrategy(summaryTabView.useSQLApproachCheck.isSelected());
                     messagePanel
                             .setMessage("Running strategy. Monitor the status window for progress, and refresh this window after completion to see results");
                     enableButtons(false);
+                    stopButton.setEnabled(true);
                 } catch (EmfException e) {
                     enableButtons(true);
                     messagePanel.setError("Error running strategy: " + e.getMessage());
@@ -438,5 +461,15 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     public void endControlMeasuresRefresh() {
         if (measuresTabView != null)
             measuresTabView.endControlMeasuresRefresh();
+    }
+
+    public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
+        ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
+        if (summary.getRunStatus().equalsIgnoreCase("Completed."))
+            stopButton.setEnabled(false);
+    }
+
+    public void stopRun()  {
+        stopButton.setEnabled(false);
     }
 }

@@ -253,7 +253,9 @@ CREATE TABLE emf.control_strategies
   lock_owner varchar(255),
   lock_date timestamp,
   county_file character varying,
-  use_cost_equations boolean
+  use_cost_equations boolean,
+  export_directory character varying,
+  delete_results boolean DEFAULT true
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.control_strategies OWNER TO emf;
@@ -1506,12 +1508,11 @@ DECLARE
 BEGIN
 	-- try cost equations first, then maybe use default approach, if needed
 	IF use_cost_equations THEN
-
 		IF equation_type is not null THEN
 			-- Type 1
 			IF equation_type = 'Type 1' THEN
 
-				converted_design_capacity := public.convert_design_capacity_to_mw(converted_design_capacity, design_capacity_unit_numerator, design_capacity_unit_denominator);
+				converted_design_capacity := public.convert_design_capacity_to_mw(design_capacity, design_capacity_unit_numerator, design_capacity_unit_denominator);
 
 				IF coalesce(design_capacity, 0) <> 0 THEN
 					select costs.annual_cost,
@@ -1538,7 +1539,7 @@ BEGIN
 			-- Type 2
 			IF equation_type = 'Type 2' THEN
 
-				converted_design_capacity := public.convert_design_capacity_to_mw(converted_design_capacity, design_capacity_unit_numerator, design_capacity_unit_denominator);
+				converted_design_capacity := public.convert_design_capacity_to_mw(design_capacity, design_capacity_unit_numerator, design_capacity_unit_denominator);
 
 -- validate the inputs...
 -- if they missing, use the default
@@ -1553,7 +1554,7 @@ BEGIN
 						from public.get_type2_equation_costs(control_measure_id, discount_rate, 
 							equipment_life, capital_recovery_factor, 
 							emis_reduction, ref_yr_chained_gdp_adjustment_factor, 
-							design_capacity, variable_coefficient1, 
+							converted_design_capacity, variable_coefficient1, 
 							variable_coefficient2, variable_coefficient3, 
 							variable_coefficient4) as costs
 						into annual_cost,
@@ -1608,17 +1609,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
-/*
-select costs.* 
-from emf.control_measures
-cross join  public.get_strategy_costs(true, 1, 
-	0.07, 20.0, 
-	1.47, null, 
-	2000, 45.5, 
-	null, null, 
-	null, null) costs) costs3;
-*/
-
 CREATE OR REPLACE FUNCTION public.get_default_costs(discount_rate double precision, equipment_life double precision,
 	capital_annualized_ratio double precision, capital_recovery_factor double precision, 
 	ref_yr_cost_per_ton double precision, emis_reduction double precision, 
@@ -1658,19 +1648,6 @@ BEGIN
 	END IF;
 
 	return (discount_rate * (1 + discount_rate) ^ equipment_life) / ((discount_rate + 1) ^ equipment_life - 1);
-END;
-$$ LANGUAGE plpgsql IMMUTABLE;
-
-CREATE OR REPLACE FUNCTION public.get_equation_type_variable(control_measure_id integer, variable_name character varying(255)) returns double precision AS $$
-DECLARE
-BEGIN
-	return (
-		select value
-		from emf.control_measure_equations e
-			inner join emf.equation_type_variables v
-			on v.id = e.equation_type_variable_id
-		where e.control_measure_id = control_measure_id
-			and v.name = variable_name);
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
@@ -1734,10 +1711,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
---select public.get_type1_equation_costs(13736, 'NSCR_UBCW',
---	0.07, 20.0,
---	null, 26.55, 
---	null);
 
 CREATE OR REPLACE FUNCTION public.get_type8_equation_costs(control_measure_id integer, discount_rate double precision, 
 	equipment_life double precision, capital_recovery_factor double precision, 
@@ -1851,8 +1824,8 @@ DECLARE
 BEGIN
 
         --default if not known
-        unit_numerator := coalesce(trim(upper(unit_numerator)), '');
-        unit_denominator := coalesce(trim(upper(unit_denominator)), '');
+        unit_numerator := coalesce(trim(upper(design_capacity_unit_numerator)), '');
+        unit_denominator := coalesce(trim(upper(design_capacity_unit_denominator)), '');
 
         --if you don't know the units then you can't convert the design capacity
         IF length(unit_numerator) = 0 THEN
@@ -1874,7 +1847,6 @@ BEGIN
         if you need help with the conversions. 
 */
 
-
         --capacity is already in the right units...
         --no conversion is necessary, these are the expected units.
         IF (unit_numerator = 'MW' and unit_denominator = '') THEN
@@ -1887,7 +1859,7 @@ BEGIN
                 or unit_numerator = 'HP'
                 or unit_numerator = 'BLRHP') THEN
 
-            --convert numerator unit
+           --convert numerator unit
 		IF (unit_numerator = 'MMBTU'
 		    or unit_numerator = 'E6BTU') THEN
 			converted_design_capacity := design_capacity / 3.412;
@@ -1981,7 +1953,7 @@ BEGIN
 
 	raise notice '%', 'start ' || strfipsst || ' ' || clock_timestamp();
 
-	execute  'insert into emissions.' || detailed_result_table_name || ' 
+	execute 'insert into emissions.' || detailed_result_table_name || ' 
 		(
 		dataset_id,
 		cm_abbrev,
@@ -2065,10 +2037,10 @@ BEGIN
 					inv.fips,
 					' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment,' end || '
 					er.control_measures_id,
-					er.efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' as percent_reduction,
+					' || percent_reduction_sql || ' as percent_reduction,
 					' || get_strategt_cost_inner_sql || '.computed_cost_per_ton as computed_cost_per_ton,
-					m.equipment_life,
-					cstp.precedence
+					m.equipment_life
+--,cstp.precedence
 
 				FROM emissions.' || inv_table_name || ' inv
 
@@ -2130,12 +2102,13 @@ BEGIN
 					' else '' end || '
 
 					-- target pollutant filter
-					inner join emf.control_strategy_target_pollutants cstp
-					on cstp.pollutant_id = p.id
-					and cstp.control_strategy_id = ' || control_strategy_id || '
+--					inner join emf.control_strategy_target_pollutants cstp
+--					on cstp.pollutant_id = p.id
+--					and cstp.control_strategy_id = ' || control_strategy_id || '
 
 				where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 					and inv.fips like ' ||  quote_literal(strfipsst || '%') || '
+					and p.id = ' ||  target_pollutant_id || '
 					-- measure region filter
 					' || case when measure_with_region_count > 0 then '
 					and 
@@ -2176,12 +2149,12 @@ BEGIN
 					inv.scc, ' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
 					er.control_measures_id, 
 					case when length(er.locale) = 5 then 0 when length(er.locale) = 2 then 1 else 2 end, 
-					er.efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' desc, 
+					' || percent_reduction_sql || ' desc, 
 					' || get_strategt_cost_inner_sql || '.computed_cost_per_ton
 			) sm
 			order by fips, 
 				scc,' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
-				precedence,
+--				precedence,
 				percent_reduction desc, 
 				computed_cost_per_ton
 		) m
@@ -2232,18 +2205,18 @@ BEGIN
 		and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)
 
 		-- target pollutant filter
-		left outer join emf.control_strategy_target_pollutants cstp
-		on cstp.pollutant_id = p.id
-		and cstp.control_strategy_id = ' || control_strategy_id || '
+--		left outer join emf.control_strategy_target_pollutants cstp
+--		on cstp.pollutant_id = p.id
+--		and cstp.control_strategy_id = ' || control_strategy_id || '
 
 	where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 		and inv.fips like ' ||  quote_literal(strfipsst || '%') || '		
 		-- constraint filter, BUT ONLY for target pollutants
 		' || case when has_constraints then '
-		and (	cstp.pollutant_id is null 
+		and (	p.id <> ' ||  target_pollutant_id || ' --cstp.pollutant_id is null 
 			or 
 			(
-				cstp.pollutant_id is not null  
+				p.id == ' ||  target_pollutant_id || '-- cstp.pollutant_id is not null  
 				and (
 					' || percent_reduction_sql || ' >= ' || coalesce(min_control_efficiency_constraint, -100.0) || '
 					' || coalesce(' and ' || percent_reduction_sql || ' / 100 * ' || annualized_emis_sql || ' >= ' || min_emis_reduction_constraint, '')  || '
@@ -2258,7 +2231,7 @@ BEGIN
 		' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
 		er.pollutant_id, 
 		case when length(er.locale) = 5 then 0 when length(er.locale) = 2 then 1 else 2 end, 
-		er.efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' desc, 
+		' || percent_reduction_sql || ' desc, 
 		' || get_strategt_cost_sql || '.computed_cost_per_ton';
 
 

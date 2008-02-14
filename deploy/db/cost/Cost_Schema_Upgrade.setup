@@ -489,3 +489,7 @@ CREATE INDEX control_measures_source_group
   ON emf.control_measures
   USING btree
   (source_group);
+  
+  ALTER TABLE emf.control_strategies ADD COLUMN export_directory character varying;
+ALTER TABLE emf.control_strategies ADD COLUMN delete_results boolean DEFAULT true;
+  

@@ -10,6 +10,8 @@ public interface EditControlStrategyView extends ManagedView {
 
     void display(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults);
     
+    void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults);
+    
     void notifyLockFailure(ControlStrategy controlStrategy);
 
     public void startControlMeasuresRefresh();
@@ -18,4 +20,6 @@ public interface EditControlStrategyView extends ManagedView {
     
     void signalChanges();
 
+    void stopRun();
+    
 }

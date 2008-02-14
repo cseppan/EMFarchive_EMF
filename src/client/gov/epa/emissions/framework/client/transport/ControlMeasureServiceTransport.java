@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.transport;
 
+import java.util.Date;
+
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
@@ -253,7 +255,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
     }
 
     public synchronized ControlMeasure[] getSummaryControlMeasures(String whereFilter) throws EmfException {
-//        System.out.println(new Date().toString() + " start transport.getSummaryControlMeasures");
+        System.out.println(new Date().toString() + " start transport.getSummaryControlMeasures");
         try {
             EmfCall call = call();
 
@@ -262,12 +264,12 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
             call.setReturnType(mappings.controlMeasures());
             return (ControlMeasure[]) call.requestResponse(new Object[] { whereFilter });
         } finally {
-//            System.out.println(new Date().toString() + " end transport.getSummaryControlMeasures");
+            System.out.println(new Date().toString() + " end transport.getSummaryControlMeasures");
         }
     }
 
     public synchronized ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, String whereFilter) throws EmfException {
-//        System.out.println(new Date().toString() + " start transport.getSummaryControlMeasures");
+        System.out.println(new Date().toString() + " start transport.getSummaryControlMeasures");
         try {
             EmfCall call = call();
 
@@ -277,7 +279,7 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
             call.setReturnType(mappings.controlMeasures());
             return (ControlMeasure[]) call.requestResponse(new Object[] { new Integer(majorPollutantId), whereFilter });
         } finally {
-//            System.out.println(new Date().toString() + " end transport.getSummaryControlMeasures");
+            System.out.println(new Date().toString() + " end transport.getSummaryControlMeasures");
         }
     }
 

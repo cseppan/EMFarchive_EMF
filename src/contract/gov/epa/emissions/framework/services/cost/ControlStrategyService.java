@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.cost;
 
+import java.util.List;
+
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EMFService;
 import gov.epa.emissions.framework.services.EmfException;
@@ -29,11 +31,11 @@ public interface ControlStrategyService extends EMFService {
     
     ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException;
     
-    void runStrategy (User user, int controlStrategyId, String exportDirectory) throws EmfException;
+    void runStrategy (User user, int controlStrategyId, boolean useSQLApproach) throws EmfException;
     
-    void runStrategy (User user, int controlStrategyId, String exportDirectory, boolean useSQLApproach, boolean deleteResults) throws EmfException;
+    List<ControlStrategy> getControlStrategiesByRunStatus(String runStatus) throws EmfException;
     
-    void stopRunStrategy() throws EmfException;
+    void stopRunStrategy(int controlStrategyId) throws EmfException;
 
 //    void createInventory(User user, ControlStrategy controlStrategy, ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException;
 
@@ -48,5 +50,8 @@ public interface ControlStrategyService extends EMFService {
 
     ControlStrategy getById(int id) throws EmfException;
 
+    void setControlStrategyRunStatus(int id, String runStatus) throws EmfException;
     //StrategyType[] getEquaitonTypes();
+    
+    Long getControlStrategyRunningCount() throws EmfException;
 }
