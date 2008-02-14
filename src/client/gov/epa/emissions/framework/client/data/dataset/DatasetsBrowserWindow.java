@@ -34,6 +34,7 @@ import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -305,9 +306,12 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     
     protected void purgeDelectedDatasets() throws EmfException {
         int numDelDatasets = presenter.getNumOfDeletedDatasets();
+        String ls = System.getProperty("line.separator");
         
         String message = "You have " + numDelDatasets 
-            + " datasets marked as deleted." + (numDelDatasets > 0 ? " Are you sure you want to remove them pamernantly?" : "");
+            + " dataset"+ (numDelDatasets > 0 ? "s " : " ") 
+            + "marked as deleted." + (numDelDatasets > 0 ? ls 
+            + "Are you sure you want to remove them pamernantly?" : "");
         
         if (numDelDatasets == 0) {
             JOptionPane.showMessageDialog(parentConsole, message);
@@ -318,7 +322,30 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
                 JOptionPane.QUESTION_MESSAGE);
 
         if (selection == JOptionPane.YES_OPTION) {
+            Thread populateThread = new Thread(new Runnable() {
+                public void run() {
+                    waitOnPurgingDatasets();
+                }
+            });
+            populateThread.start();
+        }
+    }
+    
+    private synchronized void waitOnPurgingDatasets() {
+        try {
+            messagePanel.setMessage("Please wait while purging all datasets...");
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             presenter.purgeDeletedDatasets();
+            messagePanel.clear();
+            setCursor(Cursor.getDefaultCursor());
+        } catch (Exception e) {
+            String msg = e.getMessage();
+            
+            if (msg != null && msg.length() > 100)
+                msg = msg.substring(0, 100);
+            
+            messagePanel.setError("Error purging datasets: " + msg);
+            setCursor(Cursor.getDefaultCursor());
         }
     }
 
@@ -341,26 +368,6 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             presenter.doDisplayPropertiesView(view, dataset);
         }
     }
-
-    // private List updateSelectedDatasets(List selectedDatasets) {
-    // // FIXME: update only datasets that user selected
-    // List updatedDatasets = new ArrayList();
-    // try {
-    // EmfDataset[] updatedAllDatasets1 = session.dataService().getDatasets();
-    // for (int i = 0; i < selectedDatasets.size(); i++) {
-    // EmfDataset selDataset = (EmfDataset) selectedDatasets.get(i);
-    // for (int j = 0; j < updatedAllDatasets1.length; j++) {
-    // if (selDataset.getId() == updatedAllDatasets1[j].getId()) {
-    // updatedDatasets.add(updatedAllDatasets1[j]);
-    // break;
-    // }
-    // }
-    // }
-    // } catch (EmfException e) {
-    // showError(e.getMessage());
-    // }
-    // return updatedDatasets;
-    // }
 
     protected void doDisplayPropertiesEditor() {
         clearMessage();
