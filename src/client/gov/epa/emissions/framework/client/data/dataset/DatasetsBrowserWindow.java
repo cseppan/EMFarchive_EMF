@@ -259,7 +259,10 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
                 try {
                     purgeDelectedDatasets();
                 } catch (EmfException e) {
-                    messagePanel.setMessage(e.getMessage().substring(0,100) + "...");
+                    if (e.getMessage().length()>100)
+                       messagePanel.setMessage(e.getMessage().substring(0,100) + "...");
+                    else
+                       messagePanel.setMessage(e.getMessage());
                 }
             }
         });
