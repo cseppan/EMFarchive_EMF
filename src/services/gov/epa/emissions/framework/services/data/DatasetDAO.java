@@ -528,7 +528,7 @@ public class DatasetDAO {
         TableCreator emissionTableTool = new TableCreator(datasource);
         
         // Need to search all the items associated with datasets and remove them properly
-        // before remove the underline datasets
+        // before remove the underlying datasets
         try {
             deleteFromOutputsTable(datasetIDs, session);
         } catch (Exception e) {
@@ -711,8 +711,21 @@ public class DatasetDAO {
     }
 
     private void dropDataTables(EmfDataset[] datasets, TableCreator tableTool) throws EmfException {
+        int problemCount = 0;
         for (int i = 0; i < datasets.length; i++)
-            dropDataTables(tableTool, datasets[i]);
+        {
+            try
+            {
+               dropDataTables(tableTool, datasets[i]);
+            }
+            catch (Exception exc)
+            {
+                LOG.error(exc);
+                problemCount++;
+            }
+        }
+        if (problemCount > 0)
+            throw new EmfException("There were problems dropping tables for "+problemCount+" datasets");
     }
 
     private void dropDataTables(TableCreator tableTool, EmfDataset dataset) throws EmfException {
@@ -722,9 +735,22 @@ public class DatasetDAO {
             return;
 
         InternalSource[] sources = dataset.getInternalSources();
+        int problemCount = 0;
 
         for (int i = 0; i < sources.length; i++)
-            dropIndividualTable(tableTool, sources[i], (type != null) ? type.getName() : "", dataset.getId());
+        {
+            try  
+            {
+               dropIndividualTable(tableTool, sources[i], (type != null) ? type.getName() : "", dataset.getId());
+            }
+            catch (Exception exc)  // if there is a problem with one table, keep going
+            {
+                problemCount++;
+                LOG.error(exc);
+            }
+        }
+        if (problemCount > 0)
+            throw new EmfException("There were problems deleting "+problemCount+" tables for dataset "+dataset.getName());
     }
 
     private void dropIndividualTable(TableCreator tableTool, InternalSource source, String type, int dsID)
@@ -745,8 +771,8 @@ public class DatasetDAO {
                     System.out.println("Data table  " + table + " dropped.");
             }
         } catch (Exception e) {
-            if (DebugLevels.DEBUG_16)
-                e.printStackTrace();
+//            if (DebugLevels.DEBUG_16)
+//                e.printStackTrace();  // this will cause a HUGE log file
 
             throw new EmfException("Problem dropping data table " + table + ". " + e.getMessage());
         }
