@@ -29,6 +29,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -518,29 +519,21 @@ public class DatasetDAO {
         return (Version) lockingScheme.getLocked(user, (Version) current(id, Version.class, session), session);
     }
 
-    public void deleteDatasets(EmfDataset[] datasets, DbServer dbServer, Session session)
-            throws EmfException {
-        
-        if (datasets == null || datasets.length == 0)
-            return;
-        
-        Exception exception = null;
+    public void deleteDatasets(EmfDataset[] datasets, DbServer dbServer, Session session) throws EmfException {
 
-        int[] datasetIDs = getIDs(datasets);
-
-        // NOTE: list at least one of the cases or control strategies linked
-        try {
-            checkIfUsedByCases(datasetIDs, session);
-        } catch (Exception e) {
-            LOG.error(e);
-            exception = e;
-        }
+        EmfDataset[] deletableDatasets = getCaseFreeDatasets(datasets, session);
         // NOTE: wait till decided by EPA OAQPS
         // checkIfUsedByStrategies(datasetIDs, session);
+        //EmfDataset[] deletableDatasets = getControlStrateyFreeDatasets(datasets, session);
+        
+        if (deletableDatasets == null || deletableDatasets.length == 0)
+            return;
 
+        Exception exception = null;
+        int[] datasetIDs = getIDs(deletableDatasets);
         Datasource datasource = dbServer.getEmissionsDatasource();
         TableCreator emissionTableTool = new TableCreator(datasource);
-        
+
         // Need to search all the items associated with datasets and remove them properly
         // before remove the underlying datasets
         try {
@@ -549,28 +542,28 @@ public class DatasetDAO {
             LOG.error(e);
             exception = e;
         }
-        
+
         try {
             deleteFromEmfTables(datasetIDs, emissionTableTool, session);
         } catch (Exception e) {
             LOG.error(e);
             exception = e;
         }
-        
+
         try {
-            hibernateFacade.remove(datasets, session);
+            hibernateFacade.remove(deletableDatasets, session);
         } catch (Exception e) {
             LOG.error(e);
             exception = e;
         }
-        
+
         try {
-            dropDataTables(datasets, emissionTableTool);
+            dropDataTables(deletableDatasets, emissionTableTool);
         } catch (Exception e) {
             LOG.error(e);
             exception = e;
         }
-        
+
         if (exception != null)
             throw new EmfException(exception.getMessage());
     }
@@ -649,22 +642,22 @@ public class DatasetDAO {
 
     private void deleteFromEmfTables(int[] datasetIDs, TableCreator tableTool, Session session) throws EmfException {
         Exception exception = null;
-        
+
         deleteFromObjectTable(datasetIDs, Version.class, "datasetId", session);
         deleteFromObjectTable(datasetIDs, AccessLog.class, "datasetId", session);
         deleteFromObjectTable(datasetIDs, Note.class, "datasetId", session);
         deleteFromObjectTable(datasetIDs, Revision.class, "datasetId", session);
-        
+
         try {
             dropQAStepResultTable(datasetIDs, tableTool, session);
         } catch (Exception e) {
             LOG.error(e);
             exception = e;
         }
-        
+
         deleteFromObjectTable(datasetIDs, QAStepResult.class, "datasetId", session);
         deleteFromObjectTable(datasetIDs, QAStep.class, "datasetId", session);
-        
+
         if (exception != null)
             throw new EmfException(exception.getMessage());
     }
@@ -699,24 +692,21 @@ public class DatasetDAO {
 
         try {
             Transaction tx = session.beginTransaction();
-            
+
             String firstPart = "UPDATE " + CaseOutput.class.getSimpleName() + " obj SET ";
             String secondPart = " WHERE obj.datasetId = " + getAndOrClause(datasetIDs, "obj.datasetId");
             String updateQuery = firstPart + "obj.message = :msg, obj.datasetId = :id" + secondPart;
-            
+
             if (DebugLevels.DEBUG_16)
                 System.out.println("hql update string: " + updateQuery);
 
-            updatedItems = session.createQuery(updateQuery)
-                .setString("msg", "Associated dataset deleted")
-                .setInteger("id", 0)
-                .executeUpdate();
+            updatedItems = session.createQuery(updateQuery).setString("msg", "Associated dataset deleted").setInteger(
+                    "id", 0).executeUpdate();
             tx.commit();
-            
+
             if (DebugLevels.DEBUG_16)
                 System.out.println(updatedItems + " items updated.");
         } catch (HibernateException e) {
-            e.printStackTrace();
             throw new EmfException(e.getMessage());
         } finally {
             if (DebugLevels.DEBUG_16)
@@ -726,18 +716,16 @@ public class DatasetDAO {
 
     private void dropDataTables(EmfDataset[] datasets, TableCreator tableTool) throws EmfException {
         int problemCount = 0;
-        for (int i = 0; i < datasets.length; i++)
-        {
-            try
-            {
+        
+        for (int i = 0; i < datasets.length; i++) {
+            try {
                dropDataTables(tableTool, datasets[i]);
-            }
-            catch (Exception exc)
-            {
+            } catch (Exception exc) {
                 LOG.error(exc);
                 problemCount++;
             }
         }
+        
         if (problemCount > 0)
             throw new EmfException("There were problems dropping tables for "+problemCount+" datasets");
     }
@@ -751,20 +739,18 @@ public class DatasetDAO {
         InternalSource[] sources = dataset.getInternalSources();
         int problemCount = 0;
 
-        for (int i = 0; i < sources.length; i++)
-        {
-            try  
-            {
+        for (int i = 0; i < sources.length; i++) {
+            try { 
                dropIndividualTable(tableTool, sources[i], (type != null) ? type.getName() : "", dataset.getId());
-            }
-            catch (Exception exc)  // if there is a problem with one table, keep going
-            {
+            } catch (Exception exc) { // if there is a problem with one table, keep going
                 problemCount++;
                 LOG.error(exc);
             }
         }
+        
         if (problemCount > 0)
-            throw new EmfException("There were problems deleting "+problemCount+" tables for dataset "+dataset.getName());
+            throw new EmfException("There were problems deleting/removing records from " + problemCount 
+                    + " tables for dataset " + dataset.getName());
     }
 
     private void dropIndividualTable(TableCreator tableTool, InternalSource source, String type, int dsID)
@@ -773,22 +759,20 @@ public class DatasetDAO {
         type = type.toUpperCase();
 
         try {
-            if (type.contains("A/M/PTPRO") || type.contains("TEMPORAL PROFILE") || type.contains("COSTCY") || type.contains("COUNTRY, STATE, AND COUNTY"))
+            if (type.contains("A/M/PTPRO") || type.contains("TEMPORAL PROFILE") || type.contains("COSTCY")
+                    || type.contains("COUNTRY, STATE, AND COUNTY"))
                 tableTool.deleteRecords(table, source.getCols()[1], "integer", "" + dsID); // 2nd column: dataset_id
             else {
                 if (DebugLevels.DEBUG_16)
                     System.out.println("Dropping data table  " + table);
 
                 tableTool.drop(table);
-                
+
                 if (DebugLevels.DEBUG_16)
                     System.out.println("Data table  " + table + " dropped.");
             }
         } catch (Exception e) {
-//            if (DebugLevels.DEBUG_16)
-//                e.printStackTrace();  // this will cause a HUGE log file
-
-            throw new EmfException("Problem dropping data table " + table + ". " + e.getMessage());
+            throw new EmfException(e.getMessage());
         }
     }
 
@@ -797,23 +781,27 @@ public class DatasetDAO {
                 "SELECT obj.table from " + QAStepResult.class.getSimpleName() + " as obj WHERE obj.datasetId = "
                         + getAndOrClause(datasetIDs, "obj.datasetId")).list();
 
+        Exception exception = null;
+
         for (Iterator<String> iter = tables.iterator(); iter.hasNext();) {
             String table = iter.next();
-            
+
             try {
                 tableTool.drop(table);
+
+                if (DebugLevels.DEBUG_16)
+                    System.out.println("QA step result table " + table + " dropped.");
             } catch (Exception e) {
                 LOG.error(e);
-                
+                exception = e;
+
                 if (DebugLevels.DEBUG_16)
                     e.printStackTrace();
-
-                throw new EmfException("Error dropping qa step result table " + iter + ". " + e.getMessage());
             }
-            
-            if (DebugLevels.DEBUG_16)
-                System.out.println("QA step result table " + table + " dropped.");
         }
+
+        if (exception != null)
+            throw new EmfException(exception.getMessage());
     }
 
     private String getAndOrClause(int[] datasetIDs, String attrName) {
@@ -841,11 +829,41 @@ public class DatasetDAO {
         return ids;
     }
 
+    public EmfDataset[] getCaseFreeDatasets(EmfDataset[] datasets, Session session) {
+        List<EmfDataset> list = new ArrayList<EmfDataset>();
+
+        for (EmfDataset dataset : datasets) {
+            try {
+                checkIfUsedByCases(new int[]{dataset.getId()}, session);
+                list.add(dataset);
+            } catch (Exception e) {
+                LOG.warn(e.getMessage());
+            }
+        }
+        
+        return list.toArray(new EmfDataset[0]);
+    }
+
+    public EmfDataset[] getControlStrateyFreeDatasets(EmfDataset[] datasets, Session session) {
+        List<EmfDataset> list = new ArrayList<EmfDataset>();
+        
+        for (EmfDataset dataset : datasets) {
+            try {
+                checkIfUsedByStrategies(new int[]{dataset.getId()}, session);
+                list.add(dataset);
+            } catch (Exception e) {
+                LOG.warn(e.getMessage());
+            }
+        }
+        
+        return list.toArray(new EmfDataset[0]);
+    }
+
     public List<EmfDataset> deletedDatasets(User user, Session session) {
-        Criterion statusCrit = Restrictions.eq("status", "Deleted"); 
+        Criterion statusCrit = Restrictions.eq("status", "Deleted");
         Criterion nameCrit = Restrictions.eq("creator", user.getUsername());
         Criterion criterion = Restrictions.and(statusCrit, nameCrit);
-        
+
         return hibernateFacade.get(EmfDataset.class, criterion, session);
     }
 
