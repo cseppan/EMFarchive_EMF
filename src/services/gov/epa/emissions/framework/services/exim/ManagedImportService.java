@@ -236,7 +236,7 @@ public class ManagedImportService {
         }
 
         File path = validatePath(folder);
-        DatasetType type = getDsType(output.getDatasetType());
+        DatasetType type = getDsType(output.getDatasetType(), output);
 
         if (files.length > 1 && !type.isExternal())
             for (int i = 0; i < files.length; i++)
@@ -285,12 +285,13 @@ public class ManagedImportService {
         return newOutput;
     }
 
-    private synchronized DatasetType getDsType(String datasetType) throws EmfException {
+    private synchronized DatasetType getDsType(String datasetType, CaseOutput output) throws EmfException {
         DatasetTypesDAO dao = new DatasetTypesDAO();
         DatasetType type = dao.get(datasetType, sessionFactory.getSession());
 
         if (type == null)
-            throw new EmfException("Error registering output: Dataset type '" + datasetType + "' does not exist.");
+            throw new EmfException("Error registering output: Dataset type '" 
+                    + datasetType + "' does not exist for dataset " + output.getDatasetName() + ".");
 
         return type;
     }
