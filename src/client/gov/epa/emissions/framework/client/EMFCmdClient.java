@@ -25,13 +25,15 @@ public class EMFCmdClient {
 
     private static ServiceLocator serviceLocator;
 
-    private static boolean DEBUG = false; 
+    private static int exitValue = 0;
+
+    private static boolean DEBUG = false;
 
     public synchronized static void main(String[] args) throws Exception {
         String debugString = System.getProperty("DEBUG_EMF_CLIENT");
         if (debugString != null && debugString.equalsIgnoreCase("TRUE"))
-           DEBUG=true;
-        
+            DEBUG = true;
+
         List<String> options = new ArrayList<String>();
         options.addAll(Arrays.asList(args));
 
@@ -40,7 +42,8 @@ public class EMFCmdClient {
         }
 
         if (DEBUG)
-            System.out.println("EMF command line client initialized on: " + new Date()+"; version ="+LoginWindow.EMF_VERSION);
+            System.out.println("EMF command line client initialized on: " + new Date() + "; version ="
+                    + LoginWindow.EMF_VERSION);
 
         if (args.length <= 1) {
             displayHelp();
@@ -92,7 +95,7 @@ public class EMFCmdClient {
         }
 
         run(options);
-        
+
         System.exit(0);
     }
 
@@ -211,6 +214,9 @@ public class EMFCmdClient {
 
     /* make a consistant exit value based on message contents */
     private static int getExitValue(String errorString) {
+        if (exitValue != 0)
+            return exitValue;
+
         if (errorString == null || (errorString.length() == 0))
             return 0;
 
@@ -244,13 +250,13 @@ public class EMFCmdClient {
         BufferedReader asistFileReader = new BufferedReader(new FileReader(logAsistFile));
         long sentLines = Long.parseLong(asistFileReader.readLine().trim());
         asistFileReader.close();
-        
+
         if (DEBUG)
             System.out.println("EMF client starts reading log assistance file: " + logAsistFile + " " + new Date());
 
         if (DEBUG)
             System.out.println("EMF client starts reading log file: " + logfile + " " + new Date());
-        
+
         BufferedReader br = new BufferedReader(new FileReader(logfile));
         String line = br.readLine();
         long lineCount = 1;
@@ -262,10 +268,18 @@ public class EMFCmdClient {
                 msgs.add(extractJobMsg(line));
                 keys.add(extractJobkey(line));
                 CaseOutput newOutput = extractOutput(line);
-                //if (!outputs.contains(newOutput))
-                outputs.add(newOutput);
-                //else
-                //  System.out.println("Ignoring redundant output "+newOutput.getName());
+                // if (!outputs.contains(newOutput))
+                
+                if (newOutput.getDatasetType() == null || newOutput.getDatasetType().trim().isEmpty()) {
+                    System.out.println("ERROR: Dataset type is empty for output " + newOutput.getName() + ". Dataset name: "
+                            + newOutput.getDatasetName() + ".");
+                    exitValue = 4;
+                } else {
+                    outputs.add(newOutput);
+                }
+                
+                // else
+                // System.out.println("Ignoring redundant output "+newOutput.getName());
 
                 if (start == 0)
                     start = getTime(line);
@@ -275,7 +289,7 @@ public class EMFCmdClient {
         }
 
         br.close();
-        
+
         if (DEBUG)
             System.out.println("EMF client has finished reading log file: " + logfile + " " + new Date());
 
@@ -301,7 +315,7 @@ public class EMFCmdClient {
         String logAsistFile = logfile + ".ast";
         File logAsistant = new File(logAsistFile);
         writeInitialAsistFile(logAsistant);
-        
+
         if (!logFile.exists()) {
             System.out.println("Specified log file: " + logfile + " doesn't exist.");
             return;
@@ -318,13 +332,14 @@ public class EMFCmdClient {
         BufferedReader asistFileReader = new BufferedReader(new FileReader(logAsistant));
         long sentLines = Long.parseLong(asistFileReader.readLine().trim());
         asistFileReader.close();
-        
+
         if (DEBUG)
-            System.out.println("EMF client has finished reading log assistance file: " + logAsistFile + " " + new Date());
+            System.out.println("EMF client has finished reading log assistance file: " + logAsistFile + " "
+                    + new Date());
 
         if (DEBUG)
             System.out.println("EMF client starts reading log file: " + logfile + " " + new Date());
-        
+
         BufferedReader br = new BufferedReader(new FileReader(logfile));
         String line = br.readLine();
         long lineCount = 1;
@@ -335,31 +350,24 @@ public class EMFCmdClient {
             if (lineCount >= sentLines) {
                 msgs.add(extractJobMsg(line));
                 keys.add(extractJobkey(line));
-                
-                // only add the output if it's not already there
-                CaseOutput nextOutput= extractOutput(line);
-                
-                outputs.add(nextOutput);
-//                if (!outputs.contains(nextOutput))
-//                {
-//                    //if (DEBUG)
-//                     //   System.out.println("Output is being added: " + nextOutput.getName() + " " + new Date());
-//                    outputs.add(nextOutput);
-//                }
-//                else
-//                    if (DEBUG)
-//                       System.out.println("Output is not unique and not added: " + nextOutput.getName() + " " + new Date());
-//                    System.out.println("Ignoring redundant output "+nextOutput.getName());
 
+                CaseOutput nextOutput = extractOutput(line);
 
+                if (nextOutput.getDatasetType() == null || nextOutput.getDatasetType().trim().isEmpty()) {
+                    System.out.println("ERROR: Dataset type is empty for output " + nextOutput.getName() + ". Dataset name: "
+                            + nextOutput.getDatasetName() + ".");
+                    exitValue = 4;
+                } else {
+                    outputs.add(nextOutput);
+                }
             }
         }
 
         br.close();
-        
+
         if (DEBUG)
             System.out.println("EMF client has finished reading log file: " + logfile + " " + new Date());
-        
+
         String errorString = null;
 
         if (msgs.size() > 0) {
@@ -373,13 +381,14 @@ public class EMFCmdClient {
     private synchronized static void rewriteSentLinesNumber(long lineCount, String logAsistFile) throws Exception {
         if (DEBUG)
             System.out.println("EMF client starts writing log assistance file: " + logAsistFile + " " + new Date());
-        
+
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(logAsistFile)));
         writer.println(lineCount);
         writer.close();
-        
+
         if (DEBUG)
-            System.out.println("EMF client has finished writing log assistance file: " + logAsistFile + " " + new Date());
+            System.out.println("EMF client has finished writing log assistance file: " + logAsistFile + " "
+                    + new Date());
     }
 
     private synchronized static String resend(List<String> args, int resendTimes, List<JobMessage> msgs,
@@ -414,8 +423,8 @@ public class EMFCmdClient {
             keyArrayList.toArray(nonEmptyKeys);
 
             service.recordJobMessages(nonEmptyMessages, nonEmptyKeys); // just need to send nonEmptykeys here
-            
-            if (DEBUG){
+
+            if (DEBUG) {
                 System.out.println("EMF command client sent " + nonEmptyMessages.length + " messages successfully.");
             }
             ArrayList outputKeyArrayList = new ArrayList();
@@ -425,7 +434,7 @@ public class EMFCmdClient {
 
             registerOutputs(nonEmptyOutputKeys, service, nonEmptyOutputs);
 
-            if (DEBUG){
+            if (DEBUG) {
                 System.out.println("EMF command client sent " + nonEmptyOutputs.length + " outputs successfully.");
                 System.out.println("EMF Command Client exited successfully on " + new Date());
             }
@@ -484,18 +493,16 @@ public class EMFCmdClient {
         for (int i = 0; i < outputs.length; i++) {
             if (!outputs[i].isEmpty()) {
                 // only add the output if it's not already there
-                CaseOutput nextOutput= outputs[i];
+                CaseOutput nextOutput = outputs[i];
 
-                if (!all.contains(nextOutput))
-                {
-                    //if (DEBUG)
-                    //    System.out.println("Output is unique and is added: " + nextOutput.getName() + " " + new Date());
+                if (!all.contains(nextOutput)) {
+                    // if (DEBUG)
+                    // System.out.println("Output is unique and is added: " + nextOutput.getName() + " " + new Date());
                     all.add(nextOutput);
                     keyArray.add(keys[i]);
-                }
-                else{
-                    //if (DEBUG)
-                    //    System.out.println("Ignoring redundant output "+nextOutput.getName());
+                } else {
+                    // if (DEBUG)
+                    // System.out.println("Ignoring redundant output "+nextOutput.getName());
                 }
             }
         }
