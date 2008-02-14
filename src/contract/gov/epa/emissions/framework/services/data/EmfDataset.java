@@ -87,6 +87,27 @@ public class EmfDataset implements Dataset, Lockable {
         this.datasetType = new DatasetType(datasetTypeId, datasetTypeName);
     }
 
+    //constructor is really only useful for reporting purposes, the datasettype should be a
+    //heavyweight object, not a light object like this...
+    public EmfDataset(int id, String name, 
+            Date modifiedDateTime, int datasetTypeId, 
+            String datasetTypeName, String status,
+            String creator, String intendedUse, 
+            String project, String region, 
+            Date startDateTime) {
+        this();
+        this.id = id;
+        this.name = name;
+        this.modifiedDateTime = modifiedDateTime;
+        this.datasetType = new DatasetType(datasetTypeId, datasetTypeName);
+        this.status = status;
+        this.creator = creator;
+        if (intendedUse != null) this.intendedUse = new IntendedUse(intendedUse);
+        if (project != null) this.project = new Project(project);
+        if (region != null) this.region = new Region(region);
+        this.startDateTime = startDateTime;
+    }
+
     public int getDefaultVersion() {
         return defaultVersion;
     }

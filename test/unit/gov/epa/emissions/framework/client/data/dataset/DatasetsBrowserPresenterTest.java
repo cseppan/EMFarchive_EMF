@@ -183,7 +183,12 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         PropertiesView viewProxy = (PropertiesView) propsView.proxy();
 
-        presenter.doDisplayPropertiesView(viewProxy, dataset);
+        try {
+            presenter.doDisplayPropertiesView(viewProxy, dataset);
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public void testShouldDisplayVersionsEditorOnSelectionOfEditDataOption() {
@@ -206,7 +211,12 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         
         VersionedDataView viewProxy = (VersionedDataView) editorView.proxy();
 
-        presenter.doDisplayVersionedData(viewProxy, dataset);
+        try {
+            presenter.doDisplayVersionedData(viewProxy, dataset);
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public void testShouldDeleteDatasets() {

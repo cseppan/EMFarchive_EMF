@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.util.List;
@@ -109,6 +110,15 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
             assertEquals("Running", runStatus);
         } finally {
             remove(element);
+        }
+    }
+
+    public void testShouldGetControlStrategyRunStatus3() {
+        try {
+            List awasd = new DatasetDAO().getDatasets(session, 1);
+            assertEquals(0, awasd.size());
+        } finally {
+            //
         }
     }
 

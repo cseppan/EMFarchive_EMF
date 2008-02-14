@@ -76,6 +76,8 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
 
     public void doDisplayPropertiesEditor(DatasetPropertiesEditorView propertiesEditorView, EmfDataset dataset)
             throws EmfException {
+        //pass in the full object, not the light version stored in the manager table
+        dataset = getDataset(dataset.getId());
         PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, propertiesEditorView, session);
         doDisplayPropertiesEditor(presenter);
     }
@@ -90,16 +92,20 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         importPresenter.display(importView);
     }
 
-    public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) {
+    public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException {
         view.clearMessage();
 
+        //pass in the full object, not the light version stored in the manager table
+        dataset = getDataset(dataset.getId());
         PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
         presenter.doDisplay(propertiesView);
     }
 
-    public void doDisplayVersionedData(VersionedDataView versionsView, EmfDataset dataset) {
+    public void doDisplayVersionedData(VersionedDataView versionsView, EmfDataset dataset) throws EmfException {
         view.clearMessage();
 
+        //pass in the full object, not the light version stored in the manager table
+        dataset = getDataset(dataset.getId());
         VersionedDataPresenter presenter = new VersionedDataPresenter(dataset, session);
         presenter.display(versionsView);
     }
@@ -160,11 +166,15 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         if (type.getName().equalsIgnoreCase("All"))
             return getDatasets();
         
-        return dataService().getDatasets(type);
+        return dataService().getDatasets(type.getId());
     }
 
     public void purgeDeletedDatasets() throws EmfException {
         dataService().purgeDeletedDatasets(getUser());
+    }
+    
+    public EmfDataset getDataset(int datasetId) throws EmfException {
+        return dataService().getDataset(datasetId);
     }
     
     public int getNumOfDeletedDatasets() throws EmfException {

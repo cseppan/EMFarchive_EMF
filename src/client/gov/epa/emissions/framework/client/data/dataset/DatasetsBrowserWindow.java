@@ -194,7 +194,12 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private Action viewAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
-                doDisplayPropertiesViewer();
+                try {
+                    doDisplayPropertiesViewer();
+                } catch (EmfException e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         };
     }
@@ -210,7 +215,12 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private Action editDataAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
-                doDisplayVersionedData();
+                try {
+                    doDisplayVersionedData();
+                } catch (EmfException e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         };
     }
@@ -316,7 +326,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         return (List<EmfDataset>) table.selected();
     }
 
-    protected void doDisplayPropertiesViewer() {
+    protected void doDisplayPropertiesViewer() throws EmfException {
         clearMessage();
         // for now, don't get updated copies of datasets - see updateSelectedDatasets
         // List datasets = updateSelectedDatasets(getSelectedDatasets());
@@ -371,7 +381,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         }
     }
 
-    protected void doDisplayVersionedData() {
+    protected void doDisplayVersionedData() throws EmfException {
         clearMessage();
         List datasets = getSelectedDatasets();
 

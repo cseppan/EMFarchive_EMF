@@ -78,6 +78,18 @@ public class DataServiceTransport implements DataService {
     
     }
 
+    public synchronized EmfDataset[] getDatasets(int datasetTypeId) throws EmfException {
+
+        EmfCall call = call();
+
+        call.setOperation("getDatasets");
+        call.addIntegerParam("datasetTypeId");
+        call.setReturnType(mappings.datasets());
+
+        return (EmfDataset[]) call.requestResponse(new Object[] { new Integer(datasetTypeId)});
+    
+    }
+
     public synchronized EmfDataset[] getDatasets(int datasetTypeId, String nameContaining) throws EmfException {
 
         EmfCall call = call();

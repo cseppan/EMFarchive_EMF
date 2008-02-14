@@ -105,8 +105,12 @@ public class DatasetDAO {
 
     // FIXME: to be deleted after dataset removed from db
     public List allNonDeleted(Session session) {
-        Criterion crit = Restrictions.ne("status", "Deleted");
-        return hibernateFacade.get(EmfDataset.class, crit, session);
+        return session
+        .createQuery(
+                "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime) "
+                        + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
+                        + " where DS.status <> 'Deleted' order by DS.name")
+        .list();
     }
 
     public void add(EmfDataset dataset, Session session) {
@@ -246,6 +250,16 @@ public class DatasetDAO {
         Criterion criterion = Restrictions.and(statusCrit, typeCrit);
         Order order = Order.asc("name");
         return hibernateFacade.get(EmfDataset.class, criterion, order, session);
+    }
+
+    public List getDatasets(Session session, int datasetTypeId) {
+        return session
+                .createQuery(
+                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime) "
+                                + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
+                                + " where DS.datasetType.id = " + datasetTypeId
+                                + " and DS.status <> 'Deleted' order by DS.name")
+                .list();
     }
 
     public List getDatasets(Session session, int datasetTypeId, String nameContains) {

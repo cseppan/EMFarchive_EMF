@@ -8,7 +8,9 @@ import gov.epa.emissions.framework.services.EmfException;
 public interface DataService {
     
     EmfDataset[] getDatasets(DatasetType datasetType) throws EmfException;
-
+    
+    EmfDataset[] getDatasets(int datasetTypeId) throws EmfException;
+    
     EmfDataset[] getDatasets(int datasetTypeId, String nameContaining) throws EmfException;
 
     EmfDataset[] getDatasets() throws EmfException;
