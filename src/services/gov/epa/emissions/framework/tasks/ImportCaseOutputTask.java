@@ -87,6 +87,8 @@ public class ImportCaseOutputTask extends Task {
                 System.out.println("Task# " + taskId + " running");
 
         DbServer dbServer = null;
+        boolean isDone = false;
+        String errorMsg = "";
 
         try {
             dbServer = dbServerFactory.getDbServer();
@@ -98,10 +100,13 @@ public class ImportCaseOutputTask extends Task {
             importer.run();
             numSeconds = (System.currentTimeMillis() - startTime) / 1000;
             complete("Imported");
+            isDone = true;
         } catch (Exception e) {
+            errorMsg += e.getMessage();
+            
             // this doesn't give the full path for some reason
             logError("Failed to import file(s) : " + filesList(), e);
-            setStatus("failed", "Failed to import dataset " + dataset.getName() + ". Reason: " + e.getMessage());
+
             removeDataset(dataset);
 
             Session session = sessionFactory.getSession();
@@ -110,10 +115,16 @@ public class ImportCaseOutputTask extends Task {
                 caseDao.removeCaseOutputs(user, new CaseOutput[] { output }, true, session);
             } catch (EmfException e1) {
                 e1.printStackTrace();
+                errorMsg += System.getProperty("line.separator") + e1.getMessage();
             } finally {
                 session.close();
             }
         } finally {
+            if (isDone)
+                addCompletedStatus();
+            else 
+                addFailedStatus(errorMsg);
+            
             try {
                 if (dbServer != null && dbServer.isConnected())
                     dbServer.disconnect();
@@ -155,7 +166,6 @@ public class ImportCaseOutputTask extends Task {
         dataset.setStatus(status);
         updateDataset(dataset);
         updateOutput(status, message);
-        addCompletedStatus();
     }
 
     private void updateOutput(String status, String message) {
@@ -235,6 +245,10 @@ public class ImportCaseOutputTask extends Task {
                 + " in " + numSeconds + " seconds from " + files[0]; // TODO: add batch size to message once
         // available
         setStatus("completed", message);
+    }
+    
+    private void addFailedStatus(String errorMsg) {
+        setStatus("failed", "Failed to import dataset " + dataset.getName() + ". Reason: " + errorMsg);
     }
 
     protected void setStatus(String status, String message) {

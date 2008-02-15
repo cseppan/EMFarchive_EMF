@@ -82,6 +82,9 @@ public class ImportTask extends Task {
         
         Session session = null;
         DbServer dbServer = null;
+        boolean isDone = false;
+        String errorMsg = "";
+        
         try {
             dbServer = dbServerFactory.getDbServer();
             ImporterFactory importerFactory = new ImporterFactory(dbServer);
@@ -94,12 +97,18 @@ public class ImportTask extends Task {
             importer.run();
             numSeconds = (System.currentTimeMillis() - startTime)/1000;
             complete(session, "Imported");
+            isDone = true;
         } catch (Exception e) {
+            errorMsg += e.getMessage();
             // this doesn't give the full path for some reason
             logError("Failed to import file(s) : " + filesList(), e);
-            setStatus("failed", "Failed to import dataset " + dataset.getName() + ". Reason: " + e.getMessage());
             removeDataset(dataset);
         } finally {
+            if (isDone)
+                addCompletedStatus();
+            else 
+                addFailedStatus(errorMsg);
+            
             try {
                 if (session != null) {
                     session.flush();
@@ -127,7 +136,7 @@ public class ImportTask extends Task {
         //dataset.setModifiedDateTime(new Date()); //last mod time has been set when creted
 
         updateDataset(dataset, session);
-        addCompletedStatus();
+        //addCompletedStatus();
     }
 
     protected String filesList() {
@@ -179,6 +188,10 @@ public class ImportTask extends Task {
         String message = "Completed import of " + dataset.getName() + " [" + dataset.getDatasetTypeName() + "] " 
                + " in " + numSeconds+" seconds from "+ files[0]; //TODO: add batch size to message once available
         setStatus("completed", message);
+    }
+    
+    private void addFailedStatus(String errorMsg) {
+        setStatus("failed", "Failed to import dataset " + dataset.getName() + ". Reason: " + errorMsg);
     }
 
     protected void setStatus(String status, String message) {
