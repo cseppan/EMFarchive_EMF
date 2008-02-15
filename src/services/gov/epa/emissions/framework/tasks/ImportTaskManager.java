@@ -27,9 +27,9 @@ public class ImportTaskManager implements TaskManager {
 
     private static int processQueueCount = 0;
 
-    private final int poolSize = 1; //reduced from 4 to 1 to remove the sessions out of synch issue
+    private final int poolSize = 1; // reduced from 4 to 1 to remove the sessions out of synch issue
 
-    private final int maxPoolSize = 1; //reduced from 4 to 1 to remove the sessions out of synch issue
+    private final int maxPoolSize = 1; // reduced from 4 to 1 to remove the sessions out of synch issue
 
     private final long keepAliveTime = 60;
 
@@ -308,25 +308,6 @@ public class ImportTaskManager implements TaskManager {
         return true;
     }
 
-    public synchronized void callBackFromThread(String taskId, String submitterId, String status, String mesg) {
-        if (DebugLevels.DEBUG_9) {
-            System.out.println("ImportTaskManager refCount= " + refCount);
-            System.out.println("%%%% ImportTaskManager reports that Task# " + taskId + " for submitter= " + submitterId
-                    + " completed with status= " + status + " and message= " + mesg);
-        }
-
-        Iterator<ImportSubmitter> iter = submitters.iterator();
-        while (iter.hasNext()) {
-            ImportSubmitter submitter = iter.next();
-            if (submitterId.equals(submitter.getSubmitterId())) {
-                if (DebugLevels.DEBUG_9)
-                    System.out.println(">>@@ Found a submitter in the taskmanager collection of submitters");
-                submitter.callbackFromTaskManager(taskId, status, mesg);
-            }
-        }
-        processTaskQueue();
-    }
-
     public static synchronized void callBackFromThread(String taskId, String submitterId, String status, long id,
             String mesg) {
         if (DebugLevels.DEBUG_9) {
@@ -337,49 +318,62 @@ public class ImportTaskManager implements TaskManager {
             System.out.println("Size of RUN TABLE: " + runTable.size());
         }
 
-        ImportSubmitter submitter = getCurrentSubmitter(submitterId);
+        boolean removeFromRun = true;
 
-        if (status.equals("started")) {
-            if (DebugLevels.DEBUG_9)
-                System.out.println("%%%% ImportTaskManager reports that Task# " + taskId
-                        + " that is running in thread#: " + id + " for submitter= " + submitterId + " has status= "
-                        + status + " and message= " + mesg);
-
-        } else {
-            // remove from waitTable
-            runTable.remove(taskId);
-
-            if (DebugLevels.DEBUG_9) {
-                System.out.println("%%%% ImportTaskManager reports that Task# " + taskId + " that ran in thread#: "
-                        + id + " for submitter= " + submitterId + " completed with status= " + status
-                        + " and message= " + mesg);
-                System.out.println("SIZE OF RUN TABLE BEFORE REMOVE= " + runTable.size());
-                System.out.println("SIZE OF RUN TABLE AFTER REMOVE= " + runTable.size());
-            }
-        }
-
-        if (DebugLevels.DEBUG_10)
-            System.out.println("Submitter: " + submitterId + " now is null? " + (submitter == null));
-        
         try {
-            submitter.callbackFromTaskManager(taskId, status, mesg);
-        } catch (RuntimeException e) {
+            ImportSubmitter submitter = getCurrentSubmitter(submitterId);
+
+            if (status.equals("started")) {
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("%%%% ImportTaskManager reports that Task# " + taskId
+                            + " that is running in thread#: " + id + " for submitter= " + submitterId + " has status= "
+                            + status + " and message= " + mesg);
+                removeFromRun = false;
+
+            } else {
+
+                if (DebugLevels.DEBUG_9) {
+                    System.out.println("%%%% ImportTaskManager reports that Task# " + taskId + " that ran in thread#: "
+                            + id + " for submitter= " + submitterId + " completed with status= " + status
+                            + " and message= " + mesg);
+                    System.out.println("SIZE OF RUN TABLE BEFORE REMOVE= " + runTable.size());
+                    System.out.println("SIZE OF RUN TABLE AFTER REMOVE= " + runTable.size());
+                }
+            }
+
+            if (DebugLevels.DEBUG_10)
+                System.out.println("Submitter: " + submitterId + " now is null? " + (submitter == null));
+
+            if (status == null)
+                status = "Failed";
+
+            try {
+                if (submitter != null)
+                    submitter.callbackFromTaskManager(taskId, status, mesg);
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+
+            if (submitter != null && submitter.getTaskCount() == 0) {
+                if (DebugLevels.DEBUG_10)
+                    System.out.println("Submitter " + submitter.getSubmitterId() + " is deregistering itself. ");
+
+                submitter.deregisterSubmitterFromRunManager(submitter);
+
+                if (DebugLevels.DEBUG_10)
+                    System.out.println("After deregistering itself, the number of submitters in import task manager: "
+                            + submitters.size());
+            }
+        } catch (Exception e) {
             e.printStackTrace();
-        }
+        } finally {
+            // remove from runTable
+            if (removeFromRun)
+                runTable.remove(taskId);
 
-        if (submitter.getTaskCount() == 0) {
-            if (DebugLevels.DEBUG_10)
-                System.out.println("Submitter " + submitter.getSubmitterId() + " is deregistering itself. ");
-            
-            submitter.deregisterSubmitterFromRunManager(submitter);
-            
-            if (DebugLevels.DEBUG_10)
-                System.out.println("After deregistering itself, the number of submitters in import task manager: "
-                        + submitters.size());
+            // done with the call back ... so process the two tables and task queue
+            processTaskQueue();
         }
-
-        // done with the call back ... so process the two tables and task queue
-        processTaskQueue();
 
         if (DebugLevels.DEBUG_9)
             System.out.println("*** END ImportTaskManager::callBackFromThread() *** " + new Date());
@@ -436,9 +430,9 @@ public class ImportTaskManager implements TaskManager {
                     // Cast task to import task or import case output task and get dataset name
                     String dsname = null;
                     if (et instanceof ImportTask)
-                        dsname = ((ImportTask)et).getDataset().getName();
-                    else  
-                        dsname = ((ImportCaseOutputTask)et).getDataset().getName(); 
+                        dsname = ((ImportTask) et).getDataset().getName();
+                    else
+                        dsname = ((ImportCaseOutputTask) et).getDataset().getName();
                     String etStatus = et.getUser().getId() + "," + dsname + "\n";
                     sbuf.append(etStatus);
                 }
@@ -463,9 +457,9 @@ public class ImportTaskManager implements TaskManager {
                     // Cast task to import task or import case output task and get dataset name
                     String dsname = null;
                     if (et instanceof ImportTask)
-                        dsname = ((ImportTask)et).getDataset().getName();
-                    else  
-                        dsname = ((ImportCaseOutputTask)et).getDataset().getName(); 
+                        dsname = ((ImportTask) et).getDataset().getName();
+                    else
+                        dsname = ((ImportCaseOutputTask) et).getDataset().getName();
                     String etStatus = et.getUser().getId() + "," + dsname + "\n";
                     sbuf.append(etStatus);
                 }
