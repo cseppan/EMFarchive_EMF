@@ -264,3 +264,5 @@ update emf.properties set value='v1.9 - 1/31/2008' where name='EMF-version';
 -- emf.qa_programs  02/12/08 by Dongmei Yang
 insert into emf.qa_programs values(DEFAULT,'Fire Data Summary (Day-specific)','gov.epa.emissions.framework.services.qa.FireProgramRunner');
 
+-- new dataset type in emf.dataset_types 2/15/2008
+insert into emf.dataset_types values(DEFAULT,'Chemical Speciation Combo Profiles (GSPRO_COMBO)','Chemical Speciation Combo Profiles (GSPRO_COMBO)', '1', '1', false,'', 'gov.epa.emissions.commons.io.speciation.SpeciationComboProfileImporter', 'gov.epa.emissions.commons.io.speciation.SpeciationComboProfileExporter');
