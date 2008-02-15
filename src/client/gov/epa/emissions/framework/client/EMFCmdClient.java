@@ -268,18 +268,7 @@ public class EMFCmdClient {
                 msgs.add(extractJobMsg(line));
                 keys.add(extractJobkey(line));
                 CaseOutput newOutput = extractOutput(line);
-                // if (!outputs.contains(newOutput))
-                
-                if (newOutput.getDatasetType() == null || newOutput.getDatasetType().trim().isEmpty()) {
-                    System.out.println("ERROR: Dataset type is empty for output " + newOutput.getName() + ". Dataset name: "
-                            + newOutput.getDatasetName() + ".");
-                    exitValue = 4;
-                } else {
-                    outputs.add(newOutput);
-                }
-                
-                // else
-                // System.out.println("Ignoring redundant output "+newOutput.getName());
+                outputs.add(newOutput);
 
                 if (start == 0)
                     start = getTime(line);
@@ -352,14 +341,7 @@ public class EMFCmdClient {
                 keys.add(extractJobkey(line));
 
                 CaseOutput nextOutput = extractOutput(line);
-
-                if (nextOutput.getDatasetType() == null || nextOutput.getDatasetType().trim().isEmpty()) {
-                    System.out.println("ERROR: Dataset type is empty for output " + nextOutput.getName() + ". Dataset name: "
-                            + nextOutput.getDatasetName() + ".");
-                    exitValue = 4;
-                } else {
-                    outputs.add(nextOutput);
-                }
+                outputs.add(nextOutput);
             }
         }
 
@@ -496,10 +478,14 @@ public class EMFCmdClient {
                 CaseOutput nextOutput = outputs[i];
 
                 if (!all.contains(nextOutput)) {
-                    // if (DEBUG)
-                    // System.out.println("Output is unique and is added: " + nextOutput.getName() + " " + new Date());
-                    all.add(nextOutput);
-                    keyArray.add(keys[i]);
+                    if (nextOutput.getDatasetType() == null || nextOutput.getDatasetType().trim().isEmpty()) {
+                        System.out.println("ERROR: Dataset type is empty for output " + nextOutput.getName()
+                                + ". Dataset name: " + nextOutput.getDatasetName() + ".");
+                        exitValue = 4;
+                    } else {
+                        all.add(nextOutput);
+                        keyArray.add(keys[i]);
+                    }
                 } else {
                     // if (DEBUG)
                     // System.out.println("Ignoring redundant output "+nextOutput.getName());
