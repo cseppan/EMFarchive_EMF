@@ -32,6 +32,8 @@ public class ImportCaseOutputSubmitter extends ImportSubmitter {
             if (DebugLevels.DEBUG_0)
                 System.out.println("!!!ImportCaseOutputSubmitter: callbackFromTaskManger() returned with taskId: " 
                         + taskId + " not searchable from submittedTable: " + submittedTable);
+           
+            removeTask(taskId, status);
             
             return;
         }
@@ -55,6 +57,15 @@ public class ImportCaseOutputSubmitter extends ImportSubmitter {
             System.out.println("!!!ImportCaseOutputSubmitter: passed setStatus()");
         }
 
+        removeTask(taskId, status);
+
+        if (DebugLevels.DEBUG_0)
+            System.out.println(">>>>>>>> Submitter: " + submitterId + " EXITING callback from TaskManager for Task: "
+                    + taskId + " status= " + status + " message= " + mesg);
+
+    }
+
+    private void removeTask(String taskId, String status) {
         // remove completed and failed import tasks from the submitted list
         if (!(status.equals("started"))) {
             if (DebugLevels.DEBUG_0) {
@@ -74,11 +85,6 @@ public class ImportCaseOutputSubmitter extends ImportSubmitter {
                 System.out.println("Size of submitted table after ETS removed= " + submittedTable.size());
             }
         }
-
-        if (DebugLevels.DEBUG_0)
-            System.out.println(">>>>>>>> Submitter: " + submitterId + " EXITING callback from TaskManager for Task: "
-                    + taskId + " status= " + status + " message= " + mesg);
-
     }
 
 }

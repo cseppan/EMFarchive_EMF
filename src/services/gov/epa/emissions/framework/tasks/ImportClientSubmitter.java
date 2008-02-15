@@ -25,8 +25,21 @@ public class ImportClientSubmitter extends ImportSubmitter {
         User user = null;
         StatusDAO statusServices = null;
         Task task = null;
+        
+        ImportTaskStatus ts = submittedTable.get(taskId);
+        
+        if (ts == null) {
+            if (DebugLevels.DEBUG_0)
+                System.out.println("!!!ImportClientSubmitter: task " + 
+                        taskId + " is out of status. Curretn status: " + 
+                        status + " messag: " + mesg + ".");
+            
+            removeTask(taskId, status);
+            
+            return;
+        }
 
-        task = submittedTable.get(taskId).getImportTask();
+        task = ts.getImportTask();
         user = task.getUser();
         statusServices = task.getStatusServices();
         
@@ -44,6 +57,15 @@ public class ImportClientSubmitter extends ImportSubmitter {
             System.out.println("!!!ImportClientSubmitter: passed setStatus()");
         }
 
+        removeTask(taskId, status);
+
+        if (DebugLevels.DEBUG_0)
+            System.out.println(">>>>>>>> Submitter: " + submitterId + " EXITING callback from TaskManager for Task: "
+                    + taskId + " status= " + status + " message= " + mesg);
+
+    }
+
+    private void removeTask(String taskId, String status) {
         // remove completed and failed import tasks from the submitted list
         if (!(status.equals("started"))) {
             if (DebugLevels.DEBUG_0) {
@@ -63,11 +85,6 @@ public class ImportClientSubmitter extends ImportSubmitter {
                 System.out.println("Size of submitted table after ETS removed= " + submittedTable.size());
             }
         }
-
-        if (DebugLevels.DEBUG_0)
-            System.out.println(">>>>>>>> Submitter: " + submitterId + " EXITING callback from TaskManager for Task: "
-                    + taskId + " status= " + status + " message= " + mesg);
-
     }
 
 }
