@@ -54,10 +54,10 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private Mutex lock;
 
-    private List sccs;
+    private Scc[] sccs = new Scc[] {};
 
-    private List efficiencyRecords;
-    private List sumEffRecs;
+    private EfficiencyRecord[] efficiencyRecords = new EfficiencyRecord[] {};
+    private SumEffRec[] sumEffRecs = new SumEffRec[] {};
 
     private Sector[] sectors = new Sector[] {};
     
@@ -79,9 +79,7 @@ public class ControlMeasure implements Lockable, Serializable {
     
     public ControlMeasure() {
         this.lock = new Mutex();
-        this.sccs = new ArrayList();
-        this.efficiencyRecords = new ArrayList();
-        this.sumEffRecs = new ArrayList();
+//        this.sccs = new ArrayList();
 //        this.sectors = new ArrayList();
 //        this.equationTypeList = new ArrayList();
 //        this.equationTypes = new ArrayList();
@@ -93,16 +91,15 @@ public class ControlMeasure implements Lockable, Serializable {
         this();
         this.name = name;
     }
-    public ControlMeasure(String name, String abbreviation, Pollutant majorPollutant, float avgCostPerTon, float avgEfficiency) {
+
+    public ControlMeasure(int id, String name, String abbreviation, String majorPollutant) {
         this();
+        this.id = id;
         this.name = name;
-        this.abbreviation = name;
-        this.majorPollutant = majorPollutant;
-        this.getSumEffRecs()[0].setAvgCPT(avgCostPerTon);
-        this.getSumEffRecs()[0].setAvgCE(avgEfficiency);
+        this.abbreviation = abbreviation;
+        if (majorPollutant != null) this.majorPollutant = new Pollutant(majorPollutant);
     }
-//    Name    Abbreviation    Pollutant   Avg CPT Avg CE  Min CE  Max CE  Min CPT Max CPT Avg Rule Eff.   Avg Rule Pen.   Control Technology  Source Group    Equipment Life  NEI Device Code Sectors Class   Last Modified Time  Last Modified By    Date Reviewed   Creator Data Source
-//    Dry ESP-Wire Plate Type;(PM10) Ferrous Metals Processing - Ferroalloy Production    PDESPMPFP   PM10    NaN 95.0    95.0    95.0    NaN NaN 100.0   100.0   Dry ESP-Wire Plate Type Ferrous Metals Processing - Ferroalloy Production   20.0    0   PTNONIPM    Known   2008/01/28 00:11    EMF User    01/01/2006  EMF User    1
+
     public float getAnnualizedCost() {
         return annualizedCost;
     }
@@ -242,11 +239,13 @@ public class ControlMeasure implements Lockable, Serializable {
     }
 
     public EfficiencyRecord[] getEfficiencyRecords() {
-        return (EfficiencyRecord[]) efficiencyRecords.toArray(new EfficiencyRecord[0]);
+        return efficiencyRecords;
+//        return (EfficiencyRecord[]) efficiencyRecords.toArray(new EfficiencyRecord[0]);
     }
 
     public void setEfficiencyRecords(EfficiencyRecord[] efficiencyRecords) {
-        this.efficiencyRecords = Arrays.asList(efficiencyRecords);
+        this.efficiencyRecords = efficiencyRecords;
+//        this.efficiencyRecords = Arrays.asList(efficiencyRecords);
     }
 
     public ControlTechnology getControlTechnology() {
@@ -282,11 +281,11 @@ public class ControlMeasure implements Lockable, Serializable {
     }
 
     public Scc[] getSccs() {
-        return (Scc[]) sccs.toArray(new Scc[0]);
+        return sccs;
     }
 
     public void setSccs(Scc[] sccs) {
-        this.sccs = Arrays.asList(sccs);
+        this.sccs = sccs;
     }
 
     public Sector[] getSectors() {
@@ -298,11 +297,17 @@ public class ControlMeasure implements Lockable, Serializable {
     }
 
     public void addEfficiencyRecord(EfficiencyRecord efficiencyRecord) {
-        this.efficiencyRecords.add(efficiencyRecord);
+        List<EfficiencyRecord> efficiencyRecordList = new ArrayList<EfficiencyRecord>();
+        efficiencyRecordList.addAll(Arrays.asList(efficiencyRecords));
+        efficiencyRecordList.add(efficiencyRecord);
+        this.efficiencyRecords = efficiencyRecordList.toArray(new EfficiencyRecord[0]);
     }
 
     public void addScc(Scc scc) {
-        this.sccs.add(scc);
+        List<Scc> sccList = new ArrayList<Scc>();
+        sccList.addAll(Arrays.asList(sccs));
+        sccList.add(scc);
+        this.sccs = sccList.toArray(new Scc[0]);
     }
 
     public void setLastModifiedBy(String lastModifiedBy) {
@@ -314,15 +319,18 @@ public class ControlMeasure implements Lockable, Serializable {
     }
 
     public SumEffRec[] getSumEffRecs() {
-        return (SumEffRec[]) sumEffRecs.toArray(new SumEffRec[0]);
+        return sumEffRecs;
     }
 
-    public void setSumEffRecs(SumEffRec[] aggregatedPollutantEfficiencyRecords) {
-        this.sumEffRecs = Arrays.asList(aggregatedPollutantEfficiencyRecords);
+    public void setSumEffRecs(SumEffRec[] sumEffRecs) {
+        this.sumEffRecs = sumEffRecs;
     }
 
     public void addSumEffRec(SumEffRec aggregatedPollutantEfficiencyRecord) {
-        sumEffRecs.add(aggregatedPollutantEfficiencyRecord);
+        List<SumEffRec> sumEffRecList = new ArrayList<SumEffRec>();
+        sumEffRecList.addAll(Arrays.asList(sumEffRecs));
+        sumEffRecList.add(aggregatedPollutantEfficiencyRecord);
+        this.sumEffRecs = sumEffRecList.toArray(new SumEffRec[0]);
     }
 
     public void addSector(Sector sector) {

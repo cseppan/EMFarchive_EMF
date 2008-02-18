@@ -36,6 +36,8 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -44,6 +46,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -95,7 +98,11 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     
     private Button refreshButton;
 
+    private JCheckBox showDetailsCheckBox = new JCheckBox("Show Details?", false);
+
     private SelectableSortFilterWrapper table;
+    
+    private boolean threadRunning;
     
     public ControlMeasuresManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Control Measure Manager", new Dimension(900, 350), desktopManager);
@@ -107,56 +114,65 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     public void run() {
-        if (this.threadAction == "refresh") {
-            try {
-                setButton(false);
-                messagePanel.setMessage("Please wait while retrieving control measures...");
-                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                refresh(new ControlMeasure[0]);
-                refresh(presenter.getControlMeasures(getSelectedMajorPollutant(), sccs));
-                messagePanel.clear();
-            } catch (Exception e) {
-                messagePanel.setError("Cannot retrieve control measures.  " + e.getMessage());
-            } finally  {
-                setButton(true);
-                setCursor(Cursor.getDefaultCursor());
-                this.populateThread = null;
+        if (!threadRunning) {
+            if (this.threadAction == "refresh") {
+                threadRunning = true;
+                try {
+                    setButton(false);
+                    messagePanel.setMessage("Please wait while retrieving control measures...");
+                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    refresh(new ControlMeasure[0]);
+                    refresh(presenter.getControlMeasures(getSelectedMajorPollutant(), sccs, showDetailsCheckBox.isSelected()));
+                    messagePanel.clear();
+                } catch (Exception e) {
+                    messagePanel.setError("Cannot retrieve control measures.  " + e.getMessage());
+                } finally  {
+                    setButton(true);
+                    setCursor(Cursor.getDefaultCursor());
+                    threadRunning = false;
+                    this.populateThread = null;
+                }
+            } else if (this.threadAction == "copy") {
+                threadRunning = true;
+                try {
+                    setButton(false);
+                    messagePanel.setMessage("Please wait while copying control measures...");
+                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    copySelectedControlMeasures();
+                    this.populateThread = null;
+                    doRefresh();
+                    messagePanel.clear();
+                } catch (Exception e) {
+                    messagePanel.setError("Cannot copy control measures.  " + e.getMessage());
+                } finally  {
+                    setButton(true);
+                    setCursor(Cursor.getDefaultCursor());
+                    threadRunning = false;
+                    this.populateThread = null;
+                }
+            } else if (this.threadAction == "find") {
+                threadRunning = true;
+                try {
+                    setButton(false);
+                    messagePanel.setMessage("Please wait while retrieving control measures...");
+                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    refresh(new ControlMeasure[0]);
+                    refresh(presenter.getControlMeasures(getSelectedMajorPollutant(), sccs, showDetailsCheckBox.isSelected()));
+                    String sccMsg = sccs.length>0 ? "Retrieved measures for SCC: " + getScc(): ""; 
+                    this.sccs = new Scc[] {};
+                    messagePanel.clear();
+                    messagePanel.setMessage(sccMsg);
+                } catch (Exception e) {
+                    messagePanel.setError("Cannot retrieve control measures.  " + e.getMessage());
+                } finally  {
+                    setButton(true);
+                    setCursor(Cursor.getDefaultCursor());
+                    threadRunning = false;
+                    this.populateThread = null;
+                }
             }
-        } else if (this.threadAction == "copy") {
-            try {
-                setButton(false);
-                messagePanel.setMessage("Please wait while copying control measures...");
-                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                copySelectedControlMeasures();
-                this.populateThread = null;
-                doRefresh();
-                messagePanel.clear();
-            } catch (Exception e) {
-                messagePanel.setError("Cannot copy control measures.  " + e.getMessage());
-            } finally  {
-                setButton(true);
-                setCursor(Cursor.getDefaultCursor());
-                this.populateThread = null;
-            }
-        }else if (this.threadAction == "find") {
-            try {
-                setButton(false);
-                messagePanel.setMessage("Please wait while retrieving control measures...");
-                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                refresh(new ControlMeasure[0]);
-                refresh(presenter.getControlMeasures(getSelectedMajorPollutant(), sccs));
-                String sccMsg = sccs.length>0 ? "Retrieved measures for SCC: " + getScc(): ""; 
-                this.sccs = new Scc[] {};
-                messagePanel.clear();
-                messagePanel.setMessage(sccMsg);
-            } catch (Exception e) {
-                messagePanel.setError("Cannot retrieve control measures.  " + e.getMessage());
-            } finally  {
-                setButton(true);
-                setCursor(Cursor.getDefaultCursor());
-                this.populateThread = null;
-            }
-        }
+        } else
+            this.populateThread = null;
     }
     
     private String getScc(){
@@ -215,7 +231,10 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     private void setupTableModel(ControlMeasure[] measures) throws EmfException {
-        tableData = new ControlMeasureTableData(measures, costYearTable, selectedPollutant(), selectedCostYear());
+        if (showDetailsCheckBox.isSelected())
+            tableData = new ControlMeasureTableData(measures, costYearTable, selectedPollutant(), selectedCostYear());
+        else
+            tableData = new LightControlMeasureTableData(measures, costYearTable, selectedPollutant(), selectedCostYear());
 //        model = new EmfTableModel(tableData);
 //        selectModel = new SortFilterSelectModel(model);
     }
@@ -254,11 +273,23 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private JPanel createTopPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        JPanel innerPanel = new JPanel(new BorderLayout());
 
-        panel.add(getItem("Major Pollutant:", majorPollutant), BorderLayout.WEST);
-        panel.setBorder(BorderFactory.createEmptyBorder(4,5,4,4));
+        innerPanel.add(getItem("Major Pollutant:", majorPollutant), BorderLayout.WEST);
+        innerPanel.setBorder(BorderFactory.createEmptyBorder(4,5,4,4));
         majorPollutant.setPreferredSize(new Dimension(100, 30));
-
+//        showDetailsCheckBox = new JCheckBox("Show Details?", false);
+        //showDetailsCheckBox.add
+        showDetailsCheckBox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED || e.getStateChange() == ItemEvent.DESELECTED) {
+                    doRefresh();
+                }
+            }
+        });
+        innerPanel.add(showDetailsCheckBox, BorderLayout.EAST);
+        panel.add(innerPanel, BorderLayout.WEST);
+        
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.CENTER);
 
@@ -287,7 +318,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     protected void disPlayControlMeasures(Pollutant pollutant) throws EmfException {
-        refresh(presenter.getControlMeasures(pollutant));
+        refresh(presenter.getControlMeasures(pollutant, showDetailsCheckBox.isSelected()));
     }
 
     private JPanel createControlPanel() {

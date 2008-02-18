@@ -89,8 +89,6 @@ public class ControlStrategiesManagerPresenterImpl implements RefreshObserver, C
     }
 
     public void loadControlMeasures() throws EmfException  {
-        System.err.println("start loadControlMeasures " + System.currentTimeMillis());
         controlMeasures = session.controlMeasureService().getLightControlMeasures();
-        System.err.println("end loadControlMeasures " + System.currentTimeMillis());
     }
 }

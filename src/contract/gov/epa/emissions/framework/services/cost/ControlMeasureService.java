@@ -65,7 +65,11 @@ public interface ControlMeasureService extends EMFService {
 
     ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, String whereFilter) throws EmfException;
     
+    ControlMeasure[] getControlMeasures(int majorPollutantId, String whereFilter) throws EmfException;
+    
     ControlMeasure[] getSummaryControlMeasures(String whereFilter) throws EmfException;
+    
+    ControlMeasure[] getControlMeasures(String whereFilter) throws EmfException;
     
     EquationType[] getEquationTypes() throws EmfException;
     

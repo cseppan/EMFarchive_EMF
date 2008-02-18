@@ -20,19 +20,19 @@ import java.util.List;
 
 public class ControlMeasureTableData extends AbstractTableData {
 
-    private List rows;
+    protected List rows;
 
-    private ControlMeasure[] allMeasures;
+    protected ControlMeasure[] allMeasures;
 
-    private CostYearTable costYearTable;
+    protected CostYearTable costYearTable;
 
-    private int targetYear;
+    protected int targetYear;
 
-    private final static int refYear = 2006;
+    protected final static int refYear = 2006;
 
-    private final static Double NAN_VALUE = new Double(Double.NaN);
+    protected final static Double NAN_VALUE = new Double(Double.NaN);
     
-    private Pollutant pollutant; 
+    protected Pollutant pollutant; 
 
     public ControlMeasureTableData(ControlMeasure[] measures, CostYearTable costYearTable, Pollutant pollutant, String year)
             throws EmfException {
@@ -42,6 +42,12 @@ public class ControlMeasureTableData extends AbstractTableData {
 //        filter(pollutant, year);
         this.targetYear = (year != null) ? new Integer(year) : 2000;
         this.rows = createRows(measures);
+    }
+
+    public ControlMeasureTableData(ControlMeasure[] measures, Pollutant pollutant) {
+        this.allMeasures = measures;
+        this.pollutant = pollutant;
+//        this.rows = createRows(measures);
     }
 
     public String[] columns() {

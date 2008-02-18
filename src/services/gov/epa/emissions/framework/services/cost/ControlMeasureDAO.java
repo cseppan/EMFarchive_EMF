@@ -15,8 +15,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -28,8 +26,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 public class ControlMeasureDAO {
-    private static Log LOG = LogFactory.getLog(ControlMeasureDAO.class);
-
     private LockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
@@ -479,12 +475,17 @@ public class ControlMeasureDAO {
 
     public ControlMeasure[] getSummaryControlMeasures(DbServer dbServer, String whereFilter) throws EmfException {
         try {
-            LOG.error("dao.getSummaryControlMeasures");
             RetrieveControlMeasure retrieveControlMeasure = new RetrieveControlMeasure(dbServer);
             return retrieveControlMeasure.getControlMeasures(whereFilter);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
+    }
+
+    public List getControlMeasures(Session session, String whereFilter) {
+        return session.createQuery("select new ControlMeasure(cM.id, cM.name, " +
+                "cM.abbreviation, cM.majorPollutant.name) " +
+                "from ControlMeasure cM " + (whereFilter.length() > 0 ? " where " + whereFilter: "") + " order by cM.name").list();
     }
 
     public ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, DbServer dbServer, String whereFilter) throws EmfException {
@@ -494,6 +495,12 @@ public class ControlMeasureDAO {
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
+    }
+
+    public List getControlMeasures(int majorPollutantId, Session session, String whereFilter) {
+        return session.createQuery("select new ControlMeasure(cM.id, cM.name, " +
+                "cM.abbreviation, cM.majorPollutant.name) " +
+                "from ControlMeasure cM where cM.majorPollutant.id=" + majorPollutantId + (whereFilter.length() > 0 ? " and " + whereFilter: "") + " order by cM.name").list();
     }
 
     private void updateAggregateEfficiencyRecords(int controlMeasureId, DbServer dbServer) throws EmfException {

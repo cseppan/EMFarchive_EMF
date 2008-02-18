@@ -379,6 +379,21 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
+    public synchronized ControlMeasure[] getControlMeasures(String whereFilter) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return (ControlMeasure[])dao.getControlMeasures(session, whereFilter).toArray(new ControlMeasure[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve control measure efficiency records.", e);
+            throw new EmfException("Could not retrieve control measures efficiency records.");
+        } catch (Exception e) {
+            LOG.error("Could not retrieve control measure efficiency records.", e);
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+
     public synchronized ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, String whereFilter) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
@@ -391,6 +406,21 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             throw new EmfException(e.getMessage());
         } finally {
             close(dbServer);
+        }
+    }
+
+    public synchronized ControlMeasure[] getControlMeasures(int majorPollutantId, String whereFilter) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return (ControlMeasure[])dao.getControlMeasures(majorPollutantId, session, whereFilter).toArray((new ControlMeasure[0]));
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve control measures.", e);
+            throw new EmfException("Could not retrieve control measures.");
+        } catch (Exception e) {
+            LOG.error("Could not retrieve control measures.", e);
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
         }
     }
 

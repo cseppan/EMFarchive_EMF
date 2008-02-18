@@ -140,19 +140,19 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         return service().getSccs(controlMeasureId);
     }
 
-    public ControlMeasure[] getControlMeasures(Pollutant pollutant) throws EmfException {
+    public ControlMeasure[] getControlMeasures(Pollutant pollutant, boolean getDetails) throws EmfException {
         if (pollutant.getName().equalsIgnoreCase("Select one"))
             return new ControlMeasure[0];
 
         if (pollutant.getName().equals("ALL"))
-            return service().getSummaryControlMeasures("");
+            return (getDetails ? service().getSummaryControlMeasures("") : service().getControlMeasures(""));
 
-        return service().getSummaryControlMeasures(pollutant.getId(), "");
+        return (getDetails ? service().getSummaryControlMeasures(pollutant.getId(), "") : service().getControlMeasures(pollutant.getId(), ""));
     }
     
-    public ControlMeasure[] getControlMeasures(Pollutant pollutant, Scc[] sccs) throws EmfException {
+    public ControlMeasure[] getControlMeasures(Pollutant pollutant, Scc[] sccs, boolean getDetails) throws EmfException {
         if (sccs.length==0 )
-            return getControlMeasures(pollutant);
+            return getControlMeasures(pollutant, getDetails);
         
         String scc="";
         for (int i=0; i<sccs.length-1; i++)
@@ -162,8 +162,8 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         
         String whereFilter = "cm.id in (select control_measures_id from emf.control_measure_sccs where name in (" + scc +")) " ;
         if (pollutant.getName().equals("ALL") || pollutant.getName().equalsIgnoreCase("Select one"))
-            return service().getSummaryControlMeasures(whereFilter);
-        return service().getSummaryControlMeasures(pollutant.getId(), whereFilter);
+            return (getDetails ? service().getSummaryControlMeasures(whereFilter) : service().getControlMeasures(whereFilter));
+        return (getDetails ? service().getSummaryControlMeasures(pollutant.getId(), whereFilter) : service().getControlMeasures(pollutant.getId(), whereFilter));
         
     }
 
