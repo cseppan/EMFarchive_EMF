@@ -147,8 +147,12 @@ public class ExportTask extends Task {
                 
                 session.close();
                 
-                Thread.sleep(this.sleepAfterExport * 1000);
-                log.warn("ExportTask sleeps " + sleepAfterExport + " seconds after export.");
+                if (this.sleepAfterExport > 0)
+                {
+                   Thread.sleep(this.sleepAfterExport * 1000);
+                   log.warn("ExportTask sleeps " + sleepAfterExport + " seconds after export.");
+                }   
+                
             } catch (Exception e) {
                 e.printStackTrace();
             }
