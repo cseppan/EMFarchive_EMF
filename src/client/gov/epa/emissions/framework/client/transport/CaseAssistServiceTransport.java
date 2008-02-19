@@ -11,21 +11,16 @@ public class CaseAssistServiceTransport implements CaseAssistService {
 
     private CaseMappings caseMappings;
 
-    private EmfCall emfCall;
-    
     public CaseAssistServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
         caseMappings = new CaseMappings();
     }
 
     private EmfCall call() throws EmfException {
-        if (emfCall == null)
-            emfCall = callFactory.createSessionEnabledCall("Case Assistance Service");
-        
-        return this.emfCall;
+        return callFactory.createCall("Case Assistance Service");
     }
 
-    public synchronized void recordJobMessages(JobMessage[] msgs, String[] keys) throws EmfException {
+    public void recordJobMessages(JobMessage[] msgs, String[] keys) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("recordJobMessages");
@@ -36,14 +31,14 @@ public class CaseAssistServiceTransport implements CaseAssistService {
         call.request(new Object[]{ msgs, keys });
     }
 
-    public synchronized String printStatusCaseJobTaskManager() throws EmfException {
+    public String printStatusCaseJobTaskManager() throws EmfException {
         EmfCall call = call();
         call.setOperation("printStatusCaseJobTaskManager");
         call.setStringReturnType();
         return (String) call.requestResponse(new Object[] { });
     }
 
-    public synchronized void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
+    public void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("registerOutputs");

@@ -28,8 +28,6 @@ public class RemoteServiceLocator implements ServiceLocator {
     
     private CaseService caseService;
     
-    private CaseAssistService caseAsistService;
-    
     private QAService qaService;
     
     private UserService userService;
@@ -112,10 +110,7 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
 
     public CaseAssistService caseAssistService() {
-        if (caseAsistService == null)
-            caseAsistService = new CaseAssistServiceTransport(baseUrl + "/gov.epa.emissions.framework.services.casemanagement.CaseAssistService");
-        
-        return caseAsistService;
+       return new CaseAssistServiceTransport(baseUrl + "/gov.epa.emissions.framework.services.casemanagement.CaseAssistService");
     }
     
     public ControlMeasureService controlMeasureService() {
