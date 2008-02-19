@@ -769,6 +769,7 @@ public class CaseDAO {
         Session session = sessionFactory.getSession();
 
         try {
+            //FIXME: should remove the old one if pesistedWaitTask already exists
             hibernateFacade.add(persistedWaitTask, session);
             if (DebugLevels.DEBUG_15)
                 System.out.println("Adding job to persisted table, jobID: " + persistedWaitTask.getJobId());

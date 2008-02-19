@@ -70,11 +70,11 @@ public class CaseAssistServiceImpl implements CaseAssistService {
         super.finalize();
     }
 
-    public synchronized String printStatusCaseJobTaskManager() throws EmfException {
+    public String printStatusCaseJobTaskManager() throws EmfException {
         return TaskManagerFactory.getCaseJobTaskManager(sessionFactory).getStatusOfWaitAndRunTable();
     }
 
-    public synchronized void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
+    public void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
         if (DebugLevels.DEBUG_14)
             System.out.println("Start registering case outputs. " + new Date());
         try {
@@ -98,7 +98,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
             System.out.println("Finished registering case outputs. " + new Date());
     }
 
-    private synchronized ManagedImportService getImportService() throws EmfException {
+    private ManagedImportService getImportService() throws EmfException {
         log.info("ManagedCaseService::getImportService");
 
         if (importService == null) {
@@ -113,7 +113,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
         return importService;
     }
 
-    public synchronized void recordJobMessages(JobMessage[] msgs, String[] keys) throws EmfException {
+    public void recordJobMessages(JobMessage[] msgs, String[] keys) throws EmfException {
         int msgLength = msgs.length;
 
         if (msgs.length != keys.length) {
@@ -125,7 +125,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
             recordJobMessage(msgs[i], keys[i]);
     }
 
-    public synchronized void recordJobMessage(JobMessage message, String jobKey) throws EmfException {
+    public void recordJobMessage(JobMessage message, String jobKey) throws EmfException {
         if (DebugLevels.DEBUG_14)
             System.out.println("Start recording job messages. " + message.getMessage() + " " + new Date());
         try {
