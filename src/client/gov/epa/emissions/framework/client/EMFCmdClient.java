@@ -29,7 +29,7 @@ public class EMFCmdClient {
 
     private static boolean DEBUG = false;
 
-    public synchronized static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         String debugString = System.getProperty("DEBUG_EMF_CLIENT");
         if (debugString != null && debugString.equalsIgnoreCase("TRUE"))
             DEBUG = true;
@@ -56,8 +56,31 @@ public class EMFCmdClient {
         }
 
         if (options.contains("-f")) {
-            runFromFile(options);
-            return;
+            final List<String> optionsVal = options;
+
+            Thread runningThread = new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        runFromFile(optionsVal);
+                    } catch (Exception e) {
+                        System.err.println(e.getMessage());
+                    } finally {
+                        if (DEBUG)
+                            System.out.println("runFromFile() exits before 60 second timeout.");
+                        System.exit(exitValue);
+                    }
+                }
+            });
+
+            runningThread.start();
+
+            Thread.sleep(60000);
+
+            if (DEBUG)
+                System.out.println("runFromFile() exits after 60 second timeout.");
+            
+            System.err.println("Error: EMF command client frozen.");
+            System.exit(5);
         }
 
         if (!options.contains("-k")) {
@@ -99,7 +122,7 @@ public class EMFCmdClient {
         System.exit(0);
     }
 
-    private synchronized static void displayHelp() {
+    private static void displayHelp() {
         System.out.println("Usage:\njava " + EMFClient.class.getName() + " [url] [options]\n"
                 + "\n\turl: location of EMF Services. Defaults to " + DEFAULT_URL + "\n" + "\n\toptions:\n"
                 + "\n\t-h --help\tShow this help message and exit" + "\n\t-k --jobkey\tJob key code"
@@ -112,10 +135,11 @@ public class EMFCmdClient {
                 + "\n\t-P pattern of the files to register as datasets" + "\n\t-T dataset type" + "\n\t-N dataset name"
                 + "\n\t-O output name (optional, default to dataset name)");
 
-        System.out.println("\nOr:\toptions:\n" + "\n\t-f --file\tSend job messages directly from this file\n");
+        System.out.println("\nOr:\toptions:\n" + "\n\t-f --file\tSend job messages directly from this file\n"
+                + "\n\t-n --line_number\tSending job messages should begin at this line number\n");
     }
 
-    private synchronized static void run(List<String> args) throws Exception {
+    private static void run(List<String> args) throws Exception {
         int keyIndex = args.indexOf("-k");
         int execIndex = args.indexOf("-x");
         int periodIndex = args.indexOf("-p");
@@ -181,18 +205,24 @@ public class EMFCmdClient {
             writeToLogger(args, logFile, logInterval, resendTimes, jobkey, jobMsg, output);
     }
 
-    private synchronized static void runFromFile(List<String> args) throws Exception {
-        int resendTimesIndex = args.indexOf("-r");
+    private static void runFromFile(List<String> args) throws Exception {
+        int startLineIndex = args.indexOf("-n");
         int msgFileIndex = args.indexOf("-f");
-        int resendTimes = (resendTimesIndex < 0) ? 1 : Integer.parseInt(args.get(++resendTimesIndex));
+        int resendTimes = 1; //Just want to send one time if reading job messages/outputs from a file
         String msgFile = (msgFileIndex < 0) ? "" : args.get(++msgFileIndex).trim();
+        
+        if (startLineIndex < 0)
+             throw new Exception("Starting line number not specified for the job message file.");
+        
+        long startLine = Long.parseLong(args.get(++startLineIndex));
+         
 
         if (!msgFile.isEmpty()) {
-            sendLogsFromFile(args, resendTimes, msgFile);
+            sendLogsFromFile(args, resendTimes, msgFile, startLine);
         }
     }
 
-    private synchronized static void sendMessage(List<String> args, String jobkey, JobMessage jobMsg, CaseOutput output)
+    private static void sendMessage(List<String> args, String jobkey, JobMessage jobMsg, CaseOutput output)
             throws Exception {
         int exitValue = 0;
 
@@ -218,18 +248,20 @@ public class EMFCmdClient {
             return exitValue;
 
         if (errorString == null || (errorString.length() == 0))
-            return 0;
+            exitValue = 0;
 
-        if (errorString.contains("Error recording job messages"))
-            return 1;
+        else if (errorString.contains("Error recording job messages"))
+            exitValue = 1;
 
-        if (errorString.contains("Error registering output"))
-            return 2;
+        else if (errorString.contains("Error registering output"))
+            exitValue = 2;
+        else
+            exitValue = 3; // unkown errors
 
-        return 3; // unknown error string
+        return exitValue;
     }
 
-    private synchronized static void sendLogs(List<String> args, int logInterval, int resendTimes, String logfile,
+    private static void sendLogs(List<String> args, int logInterval, int resendTimes, String logfile,
             String logAsistFile, String jobkey, JobMessage jobMsg, CaseOutput output, boolean now) throws Exception {
         List<JobMessage> msgs = new ArrayList<JobMessage>();
         List<String> keys = new ArrayList<String>();
@@ -295,36 +327,17 @@ public class EMFCmdClient {
         System.exit(getExitValue(errorString));
     }
 
-    private synchronized static void sendLogsFromFile(List<String> args, int resendTimes, String logfile)
+    private static void sendLogsFromFile(List<String> args, int resendTimes, String logfile, long sentLines)
             throws Exception {
         List<JobMessage> msgs = new ArrayList<JobMessage>();
         List<String> keys = new ArrayList<String>();
         List<CaseOutput> outputs = new ArrayList<CaseOutput>();
         File logFile = new File(logfile);
-        String logAsistFile = logfile + ".ast";
-        File logAsistant = new File(logAsistFile);
-        writeInitialAsistFile(logAsistant);
 
         if (!logFile.exists()) {
             System.out.println("Specified log file: " + logfile + " doesn't exist.");
             return;
         }
-
-        if (!logAsistant.exists()) {
-            System.out.println("Log asistant file: " + logAsistFile + " doesn't exist.");
-            return;
-        }
-
-        if (DEBUG)
-            System.out.println("EMF client starts reading log assistance file: " + logAsistFile + " " + new Date());
-
-        BufferedReader asistFileReader = new BufferedReader(new FileReader(logAsistant));
-        long sentLines = Long.parseLong(asistFileReader.readLine().trim());
-        asistFileReader.close();
-
-        if (DEBUG)
-            System.out.println("EMF client has finished reading log assistance file: " + logAsistFile + " "
-                    + new Date());
 
         if (DEBUG)
             System.out.println("EMF client starts reading log file: " + logfile + " " + new Date());
@@ -352,15 +365,13 @@ public class EMFCmdClient {
 
         String errorString = null;
 
-        if (msgs.size() > 0) {
+        if (msgs.size() > 0)
             errorString = resend(args, resendTimes, msgs, keys, outputs);
-            rewriteSentLinesNumber(++lineCount, logAsistFile);
-        }
 
         System.exit(getExitValue(errorString));
     }
 
-    private synchronized static void rewriteSentLinesNumber(long lineCount, String logAsistFile) throws Exception {
+    private static void rewriteSentLinesNumber(long lineCount, String logAsistFile) throws Exception {
         if (DEBUG)
             System.out.println("EMF client starts writing log assistance file: " + logAsistFile + " " + new Date());
 
@@ -373,7 +384,7 @@ public class EMFCmdClient {
                     + new Date());
     }
 
-    private synchronized static String resend(List<String> args, int resendTimes, List<JobMessage> msgs,
+    private static String resend(List<String> args, int resendTimes, List<JobMessage> msgs,
             List<String> keys, List<CaseOutput> outputs) {
         String errorString = null;
 
@@ -392,7 +403,7 @@ public class EMFCmdClient {
         return errorString;
     }
 
-    private synchronized static void send(List<String> args, JobMessage[] msgs, String[] keys, CaseOutput[] outputs)
+    private static void send(List<String> args, JobMessage[] msgs, String[] keys, CaseOutput[] outputs)
             throws Exception {
         try {
             if (DEBUG)
@@ -428,7 +439,7 @@ public class EMFCmdClient {
         }
     }
 
-    private synchronized static void registerOutputs(String[] keys, CaseAssistService service,
+    private static void registerOutputs(String[] keys, CaseAssistService service,
             CaseOutput[] nonEmptyOutputs) {
         if (nonEmptyOutputs.length >= 1) {
             try {
@@ -454,7 +465,7 @@ public class EMFCmdClient {
         }
     }
 
-    private synchronized static JobMessage[] getNonEmptyMsgs(JobMessage[] msgs, String[] keys, ArrayList keyArray) {
+    private static JobMessage[] getNonEmptyMsgs(JobMessage[] msgs, String[] keys, ArrayList keyArray) {
         ArrayList nonEmpty = new ArrayList();
 
         for (int i = 0; i < msgs.length; i++) {
@@ -469,7 +480,7 @@ public class EMFCmdClient {
         return nonEmptyMsgs;
     }
 
-    private synchronized static CaseOutput[] getNonEmptyOutputs(CaseOutput[] outputs, String[] keys, ArrayList keyArray) {
+    private static CaseOutput[] getNonEmptyOutputs(CaseOutput[] outputs, String[] keys, ArrayList keyArray) {
         List<CaseOutput> all = new ArrayList<CaseOutput>();
 
         for (int i = 0; i < outputs.length; i++) {
@@ -495,7 +506,7 @@ public class EMFCmdClient {
         return all.toArray(new CaseOutput[0]);
     }
 
-    private synchronized static void writeToLogger(List<String> args, String logFile, int logInterval, int resendTimes,
+    private static void writeToLogger(List<String> args, String logFile, int logInterval, int resendTimes,
             String jobkey, JobMessage jobMsg, CaseOutput output) throws Exception {
         boolean logFileExisted = new File(logFile).exists();
         String logAsistFile = logFile + ".ast";
@@ -514,7 +525,7 @@ public class EMFCmdClient {
             sendLogs(args, logInterval, resendTimes, logFile, logAsistFile, jobkey, jobMsg, output, true);
     }
 
-    private synchronized static void writeLogs(PrintWriter writer, String logAsistFile, JobMessage jobMsg,
+    private static void writeLogs(PrintWriter writer, String logAsistFile, JobMessage jobMsg,
             String jobkey, CaseOutput output, boolean logFileExisted) throws Exception {
         String record = jobkey;
         record += "," + jobMsg.getExecName();
@@ -552,7 +563,7 @@ public class EMFCmdClient {
         writer.println(record);
     }
 
-    private synchronized static void writeInitialAsistFile(File file) throws Exception {
+    private static void writeInitialAsistFile(File file) throws Exception {
         if (!file.exists()) {
             PrintWriter asistWriter = new PrintWriter(new BufferedWriter(new FileWriter(file)));
             asistWriter.println("2"); // line number to start extract job messages and send
@@ -562,7 +573,7 @@ public class EMFCmdClient {
         return;
     }
 
-    private synchronized static CaseAssistService getService(List<String> args) throws Exception {
+    private static CaseAssistService getService(List<String> args) throws Exception {
         String url = DEFAULT_URL;
 
         if (!args.get(0).startsWith("-"))
@@ -574,7 +585,7 @@ public class EMFCmdClient {
         return serviceLocator.caseAssistService();
     }
 
-    private synchronized static long getTime(String line) {
+    private static long getTime(String line) {
         int timeIndex = line.lastIndexOf(",");
         String time = line.substring(timeIndex + 1);
 
@@ -584,11 +595,11 @@ public class EMFCmdClient {
         return 0;
     }
 
-    private synchronized static String extractJobkey(String line) {
+    private static String extractJobkey(String line) {
         return line.substring(0, line.indexOf(","));
     }
 
-    private synchronized static JobMessage extractJobMsg(String line) throws Exception {
+    private static JobMessage extractJobMsg(String line) throws Exception {
         CommaDelimitedTokenizer tokenizer = new CommaDelimitedTokenizer();
         String[] fields = tokenizer.tokens(line);
 
@@ -613,7 +624,7 @@ public class EMFCmdClient {
         return msg;
     }
 
-    private synchronized static CaseOutput extractOutput(String line) throws Exception {
+    private static CaseOutput extractOutput(String line) throws Exception {
         CommaDelimitedTokenizer tokenizer = new CommaDelimitedTokenizer();
         String[] fields = tokenizer.tokens(line);
 
@@ -629,7 +640,7 @@ public class EMFCmdClient {
         return output;
     }
 
-    private synchronized static String createSafeName(String name) {
+    private static String createSafeName(String name) {
         if (name == null)
             return name;
 
