@@ -23,6 +23,7 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -71,7 +72,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private ComboBox categoriesBox;
 
     public CaseManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Case Manager", new Dimension(700, 400), desktopManager);
+        super("Case Manager", new Dimension(850, 400), desktopManager);
 
         this.session = session;
         this.parentConsole = parentConsole;
@@ -113,8 +114,13 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
         SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-
+        sortFilterSelectPanel.sort(sortCriteria());
         createLayout(layout, sortFilterSelectPanel);
+    }
+    
+    private SortCriteria sortCriteria() {
+        String[] columnNames = { "Last Modified Date"};
+        return new SortCriteria(columnNames, new boolean[] {false}, new boolean[] {false});
     }
 
     private void getAllCategories() throws EmfException {
