@@ -319,6 +319,9 @@ public class ImportTaskManager implements TaskManager {
         }
 
         boolean removeFromRun = true;
+        
+        if (status == null)
+            status = "failed";
 
         try {
             ImportSubmitter submitter = getCurrentSubmitter(submitterId);
@@ -344,9 +347,6 @@ public class ImportTaskManager implements TaskManager {
             if (DebugLevels.DEBUG_10)
                 System.out.println("Submitter: " + submitterId + " now is null? " + (submitter == null));
 
-            if (status == null)
-                status = "Failed";
-
             try {
                 if (submitter != null)
                     submitter.callbackFromTaskManager(taskId, status, mesg);
@@ -366,6 +366,9 @@ public class ImportTaskManager implements TaskManager {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            
+            if (!status.equals("started"))
+                removeFromRun = true;     // if something wrong with current task, we want to remove it from run
         } finally {
             // remove from runTable
             if (removeFromRun)

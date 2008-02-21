@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
+import gov.epa.emissions.framework.services.casemanagement.outputs.QueueCaseOutput;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
@@ -933,5 +934,17 @@ public class CaseDAO {
 
     public void removeJobMessages(JobMessage[] msgs, Session session) {
         hibernateFacade.remove(msgs, session);
+    }
+    
+    public List<QueueCaseOutput> getQueueCaseOutputs(Session session) {
+        return hibernateFacade.getAll(QueueCaseOutput.class, Order.asc("createDate"), session);
+    }
+    
+    public void addQueueCaseOutput(QueueCaseOutput output, Session session) {
+        hibernateFacade.add(output, session);
+    }
+
+    public void removeQedOutput(QueueCaseOutput output, Session session) {
+        hibernateFacade.remove(output, session);
     }
 }

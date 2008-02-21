@@ -15,7 +15,9 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
+import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
+import gov.epa.emissions.framework.services.casemanagement.outputs.QueueCaseOutput;
 import gov.epa.emissions.framework.services.data.CountriesDAO;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
@@ -38,6 +40,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -48,6 +51,10 @@ import org.hibernate.Session;
 public class ManagedImportService {
     private static Log log = LogFactory.getLog(ManagedImportService.class);
 
+    private static int numOfRunningThread = 0;
+
+    private static Thread runningThread = null;
+
     private HibernateSessionFactory sessionFactory;
 
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MMddyy_HHmmss");
@@ -57,6 +64,8 @@ public class ManagedImportService {
     private ImportSubmitter importCaseOutputSubmitter = null;
 
     private ArrayList<Runnable> importTasks = new ArrayList<Runnable>();
+
+    private ArrayList<Runnable> importOutputTasks = new ArrayList<Runnable>();
 
     private static int svcCount = 0;
 
@@ -85,6 +94,9 @@ public class ManagedImportService {
     public ManagedImportService(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
+
+        if (DebugLevels.DEBUG_17)
+            System.out.println("At the class initialization -- numOfRunningThread: " + numOfRunningThread);
     }
 
     private Services services() {
@@ -121,7 +133,7 @@ public class ManagedImportService {
             for (int i = 0; i < filenames.length; i++)
                 addTasks(folderPath, path, new String[] { filenames[i] }, filenames[i], user, datasetType, services);
 
-            addTasksToSubmitter(importClientSubmitter);
+            addTasksToSubmitter(importClientSubmitter, importTasks);
         } catch (Exception e) {
             setErrorMsgs(folderPath, e);
             throw new EmfException(e.getMessage());
@@ -138,7 +150,7 @@ public class ManagedImportService {
 
         try {
             addTasks(folderPath, path, filenames, datasetName, user, datasetType, services);
-            addTasksToSubmitter(importClientSubmitter);
+            addTasksToSubmitter(importClientSubmitter, importTasks);
         } catch (Exception e) {
             setErrorMsgs(folderPath, e);
             throw new EmfException(e.getMessage());
@@ -177,16 +189,16 @@ public class ManagedImportService {
         }
     }
 
-    private synchronized void addTasksToSubmitter(TaskSubmitter submitter) {
+    private synchronized void addTasksToSubmitter(TaskSubmitter submitter, ArrayList<Runnable> importTasksList) {
         if (DebugLevels.DEBUG_11)
             System.out.println("Before importTaskSubmitter.addTasksToSubmitter # of elements in importTasks array= "
-                    + importTasks.size());
+                    + importTasksList.size());
 
-        // All eximTasks have been created...so add to the submitter
-        submitter.addTasksToSubmitter(importTasks);
+        // All importTasks have been created...so add to the submitter
+        submitter.addTasksToSubmitter(importTasksList);
 
-        // now that all tasks have been submitted remove them from from eximTasks
-        importTasks.removeAll(importTasks);
+        // now that all tasks have been submitted remove them from from importTasks
+        importTasksList.removeAll(importTasksList);
 
         log.info("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + submitter.getTaskCount());
         log.info("ManagedImportService:import() submitted all importTasks dropping out of loop");
@@ -273,8 +285,7 @@ public class ManagedImportService {
         ImportCaseOutputTask task = new ImportCaseOutputTask(localOuput, dataset, files, path, user, services,
                 dbServerFactory, sessionFactory);
 
-        // System.out.println("\nADDING IMPORT TASK FOR DATASET: "+datasetName+";files[0]="+files[0]);
-        importTasks.add(task);
+        importOutputTasks.add(task);
     }
 
     private synchronized CaseOutput createNewCaseOutput(CaseOutput oldOutput) {
@@ -290,8 +301,8 @@ public class ManagedImportService {
         DatasetType type = dao.get(datasetType, sessionFactory.getSession());
 
         if (type == null)
-            throw new EmfException("Error registering output: Dataset type '" 
-                    + datasetType + "' does not exist for dataset " + output.getDatasetName() + ".");
+            throw new EmfException("Error registering output: Dataset type '" + datasetType
+                    + "' does not exist for dataset " + output.getDatasetName() + ".");
 
         return type;
     }
@@ -304,7 +315,7 @@ public class ManagedImportService {
         registerSubmitter(FOR_OUTPUT, outputs[0].getPath(), files);
 
         Services services = services();
-        
+
         Exception exception = null;
 
         for (CaseOutput output : outputs) {
@@ -315,7 +326,7 @@ public class ManagedImportService {
                 exception = e;
             }
         }
-        
+
         if (exception != null)
             throw new EmfException(exception.getMessage());
 
@@ -328,7 +339,7 @@ public class ManagedImportService {
 
         try {
             addOutputTasks(user, output, services);
-            addTasksToSubmitter(importCaseOutputSubmitter);
+            addTasksToSubmitter(importCaseOutputSubmitter, importOutputTasks);
         } catch (Exception e) {
             e.printStackTrace();
             setErrorMsgs(fileFolder, e);
@@ -467,6 +478,147 @@ public class ManagedImportService {
 
     public String printStatusImportTaskManager() throws EmfException {
         return TaskManagerFactory.getImportTaskManager().getStatusOfWaitAndRunTable();
+    }
+
+    public Long getCaseOutputCount(Session session) {
+        Long count = 0L;
+        count = (Long) session.createQuery("select count(*) as total from " + QueueCaseOutput.class.getSimpleName())
+                .uniqueResult();
+        return count;
+    }
+
+    public synchronized void registerCaseOutputs(User user, CaseOutput[] outputs) throws EmfException {
+        CaseDAO caseDao = new CaseDAO();
+        Session session = sessionFactory.getSession();
+        Exception exception = null;
+
+        for (CaseOutput output : outputs) {
+            try {
+                QueueCaseOutput queueOutput = new QueueCaseOutput();
+                queueOutput.poputlate(output);
+                caseDao.addQueueCaseOutput(queueOutput, session);
+            } catch (Exception e) {
+                log.error(e);
+                exception = e;
+            }
+        }
+
+        try {
+            if (ManagedImportService.numOfRunningThread == 0
+                    || (ManagedImportService.runningThread != null && !ManagedImportService.runningThread.isAlive())) {
+                executeCaseOutputRegistration(user);
+            }
+        } catch (HibernateException e) {
+            log.error(e);
+            exception = e;
+        }
+
+        session.close();
+
+        if (exception != null)
+            throw new EmfException(exception.getMessage());
+    }
+
+    private synchronized void executeCaseOutputRegistration(final User user) {
+
+        runningThread = new Thread(new Runnable() {
+            public void run() {
+                CaseDAO caseDao = null;
+                Session session = null;
+
+                try {
+                    if (DebugLevels.DEBUG_17)
+                        System.out.println("Current thread running the case output registration (id): "
+                                + Thread.currentThread().getId());
+
+                    caseDao = new CaseDAO();
+                    session = sessionFactory.getSession();
+
+                    List<QueueCaseOutput> caseOutputs = caseDao.getQueueCaseOutputs(session);
+                    int numOutputs = caseOutputs.size();
+
+                    while (numOutputs > 0) {
+
+                        for (int i = 0; i < numOutputs; i++) {
+                            if (DebugLevels.DEBUG_17)
+                                System.out.println("Currently running the queued case output (id): "
+                                        + caseOutputs.get(i).getId());
+
+                            createNRunOutputTasks(user, caseOutputs.get(i));
+                            removeQedOutput(caseOutputs.get(i), caseDao, session);
+                        }
+
+                        // Checking if new ones coming during the process
+                        caseOutputs = caseDao.getQueueCaseOutputs(session);
+                        numOutputs = caseOutputs.size();
+                    }
+                } catch (Exception e) {
+                    log.error(e);
+                } finally {
+                    ManagedImportService.numOfRunningThread = 0; // reset so that other thread can kick off
+
+                    if (session != null)
+                        session.close();
+                }
+            } // end of run()
+        }); // enf of new Thread
+
+        if (DebugLevels.DEBUG_17) {
+            System.out.println("Ready to kick off the case output registration thread -- numOfRunningThread: "
+                    + numOfRunningThread);
+        }
+
+        runningThread.start();
+        numOfRunningThread++;
+
+        if (DebugLevels.DEBUG_17)
+            System.out.println("After kicking off the case output registration thread -- numOfRunningThread: "
+                    + numOfRunningThread);
+    }
+
+    private void createNRunOutputTasks(final User user, QueueCaseOutput caseOutput) {
+        try {
+            createOutputTasksFromQ(user, caseOutput);
+        } catch (Exception e) {
+            log.error(e);
+        }
+
+        try {
+            runOutputTasks();
+        } catch (Exception e) {
+            log.error(e);
+        }
+    }
+
+    private void removeQedOutput(QueueCaseOutput qOutput, CaseDAO caseDao, Session session) {
+        caseDao.removeQedOutput(qOutput, session);
+
+        if (DebugLevels.DEBUG_17)
+            System.out.println("qedOutput (id = " + qOutput.getId() + ") removed from QueueCaseOutput table.");
+
+        session.flush();
+        session.clear();
+    }
+
+    private void createOutputTasksFromQ(User user, QueueCaseOutput qoutput) throws Exception {
+        importOutputTasks.removeAll(importOutputTasks);
+        CaseOutput output = qoutput.convert2CaseOutput();
+        Services services = services();
+
+        addOutputTasks(user, output, services);
+    }
+
+    private void runOutputTasks() throws Exception {
+        for (Iterator<Runnable> iter = importOutputTasks.iterator(); iter.hasNext();) {
+            try {
+                Runnable task = iter.next();
+                task.run();
+            } catch (Exception e) {
+                log.error(e);
+            }
+        }
+
+        importOutputTasks.removeAll(importOutputTasks); // make sure the list is cleared once all tasks done
     }
 
 }

@@ -3,11 +3,13 @@ package gov.epa.emissions.framework.services.casemanagement;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.exim.ManagedImportService;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.TaskManagerFactory;
@@ -16,6 +18,7 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
 
 public class CaseAssistServiceImpl implements CaseAssistService {
     private static Log log = LogFactory.getLog(CaseAssistServiceImpl.class);
@@ -41,6 +44,8 @@ public class CaseAssistServiceImpl implements CaseAssistService {
 
     private DbServerFactory dbFactory;
 
+    private boolean useTaskMangerForCaseOutputs;
+
     public CaseAssistServiceImpl() {
         this(HibernateSessionFactory.get(), DbServerFactory.get());
     }
@@ -57,6 +62,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
         if (DebugLevels.DEBUG_0)
             System.out.println(myTag());
 
+        this.useTaskMangerForCaseOutputs = useTaskManagerToRegisterOutputs(sessionFactory.getSession());
     }
 
     @Override
@@ -86,7 +92,10 @@ public class CaseAssistServiceImpl implements CaseAssistService {
                 outputs[i].setJobId(job.getId());
             }
 
-            getImportService().importDatasetsForCaseOutput(job.getUser(), outputs);
+            if (useTaskMangerForCaseOutputs)
+                getImportService().importDatasetsForCaseOutput(job.getUser(), outputs);
+            else
+                getImportService().registerCaseOutputs(job.getUser(), outputs);
         } catch (Exception e) {
             e.printStackTrace();
             if (e.getMessage().startsWith("Error registering output"))
@@ -176,7 +185,8 @@ public class CaseAssistServiceImpl implements CaseAssistService {
                 }
             }
         } catch (Exception e) {
-            if ((e.getMessage() != null) && e.getMessage().indexOf("Remote user") > 0) e.printStackTrace();
+            if ((e.getMessage() != null) && e.getMessage().indexOf("Remote user") > 0)
+                e.printStackTrace();
             log.error(e.getMessage());
             throw new EmfException("Error recording job messages: " + e.getMessage());
         }
@@ -192,6 +202,22 @@ public class CaseAssistServiceImpl implements CaseAssistService {
             throw new EmfException("Error recording job messages: No jobs found associated with job key: " + jobKey);
 
         return job;
+    }
+
+    private boolean useTaskManagerToRegisterOutputs(Session session) {
+        String value = "true";
+
+        try {
+            EmfProperty property = new EmfPropertiesDAO().getProperty("USE_IMPORT_TASK_MANAGER", session);
+            value = (property.getValue() == null) ? "true" : property.getValue();
+        } catch (Exception e) {
+            log.error(e);
+        }
+
+        if (DebugLevels.DEBUG_17)
+            System.out.println("Use import task manager for case output registration? " + value);
+        
+        return value.toUpperCase().equals("TRUE") || value.toUpperCase().equals("YES");
     }
 
 }
