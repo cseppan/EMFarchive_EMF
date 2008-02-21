@@ -10,12 +10,15 @@ import gov.epa.emissions.framework.ui.ListWidget;
 import java.awt.BorderLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Arrays;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 public class AddRemoveWidget extends JPanel {
 
@@ -29,9 +32,14 @@ public class AddRemoveWidget extends JPanel {
     private Button removeButton;
 
     public AddRemoveWidget(Object[] allObjects, ManageChangeables changeables, EmfConsole parentConsole) {
+        this(allObjects, changeables, parentConsole, true, true);
+    }
+    
+    public AddRemoveWidget(Object[] allObjects, ManageChangeables changeables, EmfConsole parentConsole, 
+            boolean horizontalBar, boolean verticalBar) {
         this.allObjects = allObjects;
         this.parentConsole = parentConsole;
-        setupLayout(changeables);
+        setupLayout(changeables, horizontalBar, verticalBar);
 
     }
 
@@ -45,11 +53,41 @@ public class AddRemoveWidget extends JPanel {
         return Arrays.asList(objectsList.getAllElements()).toArray(new Object[0]);
     }
 
-    private void setupLayout(ManageChangeables changeables) {
+    private void setupLayout(ManageChangeables changeables, boolean horizontalBar, boolean verticalBar) {
         this.objectsList = new ListWidget(new Object[0]);
+        final JPanel container = this;
+        this.objectsList.addMouseListener(new MouseListener() {
+            public void mouseClicked(MouseEvent event) {
+                container.setToolTipText(objectsList.getSelectedValue().toString());
+            }
+
+            public void mouseEntered(MouseEvent arg0) {
+                // NOTE Auto-generated method stub
+                
+            }
+
+            public void mouseExited(MouseEvent arg0) {
+                // NOTE Auto-generated method stub
+                
+            }
+
+            public void mousePressed(MouseEvent arg0) {
+                // NOTE Auto-generated method stub
+                
+            }
+
+            public void mouseReleased(MouseEvent arg0) {
+                // NOTE Auto-generated method stub
+                
+            }
+        });
         changeables.addChangeable(objectsList);
         
         JScrollPane pane = new JScrollPane(objectsList);
+        pane.setHorizontalScrollBarPolicy(horizontalBar ? ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED 
+                : ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        pane.setVerticalScrollBarPolicy(verticalBar ? ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED 
+                : ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         JPanel buttonPanel = addRemoveButtonPanel();
 
         this.setLayout(new BorderLayout(1, 1));

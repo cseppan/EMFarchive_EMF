@@ -568,7 +568,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             dependentJobNames = new String[0];
         }
         
-        dependentJobsList = new AddRemoveWidget(jobNames, changeablesList, parent);
+        dependentJobsList = new AddRemoveWidget(jobNames, changeablesList, parent, false, true);
         dependentJobsList.setObjects(dependentJobNames);
         dependentJobsList.setPreferredSize(new Dimension(140,120));
         return dependentJobsList;
