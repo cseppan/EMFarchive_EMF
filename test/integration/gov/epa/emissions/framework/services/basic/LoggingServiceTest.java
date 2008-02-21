@@ -29,7 +29,7 @@ public class LoggingServiceTest extends ServiceTestCase {
         dcService = new DataCommonsServiceImpl(sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
         logService = new LoggingServiceImpl(sessionFactory);
-        dataService = new DataServiceImpl(sessionFactory);
+        dataService = new DataServiceImpl(dbServerFactory, sessionFactory);
 
     }
 

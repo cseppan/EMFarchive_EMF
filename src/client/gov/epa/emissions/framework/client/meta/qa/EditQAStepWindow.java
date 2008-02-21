@@ -57,6 +57,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -492,11 +493,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         Button view = new Button("View Results", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clear();
-                try {
-                    viewResults();
-                } catch (EmfException exc) {
-                    messagePanel.setError(exc.getMessage());
-                }
+                viewResults();
             }
         });
 
@@ -806,17 +803,29 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         }
     }
 
-    private void viewResults() throws EmfException {
+    private void viewResults() {
         final String exportDir = exportFolder.getText();
 
-        if (exportDir == null || exportDir.trim().isEmpty())
-            throw new EmfException("Please specify the exported result directory.");
+//        if (exportDir == null || exportDir.trim().isEmpty())
+//            throw new EmfException("Please specify the exported result directory.");
 
         Thread viewResultsThread = new Thread(new Runnable() {
             public void run() {
                 try {
+                    QAStepResult stepResult = presenter.getStepResult(step);
                     clear();
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    if (presenter.getTableRecordCount(stepResult) > 100000) {
+                        String title = "Warning";
+                        String message = "Are you sure you want to view the result, the table has over 100,000 records?  It could take several minutes to load the data.";
+                        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE);
+                
+                        if (selection == JOptionPane.NO_OPTION) {
+                            return;
+                        }
+                    }
+
                     presenter.viewResults(step, exportDir.trim());
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());

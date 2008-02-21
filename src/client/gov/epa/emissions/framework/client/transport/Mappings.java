@@ -146,4 +146,7 @@ public class Mappings {
         call.setReturnType(Constants.XSD_INT);
     }
 
+    public void setLongReturnType(Call call) {
+        call.setReturnType(Constants.XSD_LONG);
+    }
 }

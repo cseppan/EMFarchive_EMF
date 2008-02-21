@@ -93,7 +93,7 @@ public class RunControlStrategy {
         Services services = new Services();
         services.setLoggingService(new LoggingServiceImpl(sessionFactory));
         services.setStatusService(new StatusDAO(sessionFactory));
-        services.setDataService(new DataServiceImpl(sessionFactory));
+        services.setDataService(new DataServiceImpl(dbServerFactory, sessionFactory));
 
         return services;
     }

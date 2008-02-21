@@ -36,5 +36,9 @@ public interface DataService {
     void purgeDeletedDatasets(User user) throws EmfException;
     
     int getNumOfDeletedDatasets(User user) throws EmfException;
+    
+    String getTableAsString(String qualifiedTableName) throws EmfException;
+    
+    long getTableRecordCount(String qualifiedTableName) throws EmfException;
 
 }

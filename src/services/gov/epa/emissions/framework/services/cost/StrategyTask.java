@@ -76,11 +76,9 @@ public class StrategyTask implements Runnable {
                         runningCount = getControlStrategyRunningCount();
                         if (runningCount < poolSize) {
                             for (ControlStrategy controlStrategy : waitingStrategies.toArray(new ControlStrategy[0])) {
-                                if (runningCount < poolSize) {
-                                    csService.runStrategy(user, controlStrategy.getId(),
-                                        true);
-                                    runningCount++;
-                                }
+                                csService.runStrategy(user, controlStrategy.getId(),
+                                    true);
+                                runningCount++;
                             }
                         }
                     }

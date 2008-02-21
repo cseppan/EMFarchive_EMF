@@ -34,6 +34,7 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -48,6 +49,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -423,6 +425,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         Button export = new Button("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clear();
+                
                 doExport();
             }
         });
@@ -455,14 +458,41 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     }
     
     private void viewResults() throws EmfException {
-        resetRunStatus(presenter.getStepResult(step));
+        QAStepResult stepResult = presenter.getStepResult(step);
+        resetRunStatus(stepResult);
         
-        String exportDir = exportFolder.getText();
+        final String exportDir = exportFolder.getText();
 
-        if (exportDir == null || exportDir.trim().isEmpty())
-            throw new EmfException("Please specify an export directory.");
+//        if (exportDir == null || exportDir.trim().isEmpty())
+//            throw new EmfException("Please specify an export directory.");
 
-        presenter.viewResults(step, exportDir.trim());
+        Thread viewResultsThread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    QAStepResult stepResult = presenter.getStepResult(step);
+                    clear();
+                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    if (presenter.getTableRecordCount(stepResult) > 100000) {
+                        String title = "Warning";
+                        String message = "Are you sure you want to view the result, the table has over 100,000 records?  It could take several minutes to load the data.";
+                        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE);
+                
+                        if (selection == JOptionPane.NO_OPTION) {
+                            return;
+                        }
+                    }
+
+                    presenter.viewResults(step, exportDir.trim());
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                } finally {
+                    setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        });
+
+        viewResultsThread.start();
     }
     
     private Button closeButton() {

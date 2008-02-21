@@ -185,4 +185,24 @@ public class DataServiceTransport implements DataService {
         return (Integer) call.requestResponse(new Object[] { user });
     }
 
+    public String getTableAsString(String qualifiedTableName) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getTableAsString");
+        call.addStringParam("qualifiedTableName");
+        call.setStringReturnType();
+
+        return (String) call.requestResponse(new Object[] { qualifiedTableName });
+    }
+
+    public long getTableRecordCount(String qualifiedTableName) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getTableRecordCount");
+        call.addStringParam("qualifiedTableName");
+        call.setLongReturnType();
+
+        return (Long) call.requestResponse(new Object[] { qualifiedTableName });
+    }
+
 }

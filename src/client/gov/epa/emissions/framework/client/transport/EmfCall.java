@@ -102,6 +102,10 @@ public class EmfCall {
         mappings.setIntegerReturnType(call);
     }
 
+    public void setLongReturnType() {
+        mappings.setLongReturnType(call);
+    }
+
     public void setIntArrayReturnType() {
         mappings.setIntArrayReturnType(call);
     }

@@ -32,7 +32,7 @@ public class DataServiceTest extends ServiceTestCase {
 
     protected void doSetUp() throws Exception {
         HibernateSessionFactory sessionFactory = sessionFactory(configFile());
-        service = new DataServiceImpl(sessionFactory);
+        service = new DataServiceImpl(dbServerFactory, sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
         dataCommonsService = new DataCommonsServiceImpl(sessionFactory);
         deleteAllDatasets();

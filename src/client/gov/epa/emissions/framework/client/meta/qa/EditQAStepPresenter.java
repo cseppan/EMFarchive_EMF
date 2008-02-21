@@ -2,15 +2,16 @@ package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
-import gov.epa.emissions.framework.client.remote.RemoteCopy;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.qa.QAService;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.Date;
 
 public class EditQAStepPresenter {
@@ -105,25 +106,46 @@ public class EditQAStepPresenter {
         if (qaResult == null)
             throw new EmfException("Please run the QA Step before viewing the result.");
 
-        File exported;
+        File localFile = new File(tempQAStepFilePath(exportDir, qaResult));
         try {
-            RemoteCopy remoteCopy = new RemoteCopy(new DefaultUserPreferences(), session.user());
-            String copied = remoteCopy.copyToLocal(exportedQAStepFilePath(exportDir, qaResult), "");
-            exported = new File(copied);
-
-            if (!exported.exists())
-                throw new EmfException("Copy remote files failed.");
+            if (!localFile.exists() || localFile.lastModified() != qaResult.getTableCreationDate().getTime()) {
+                Writer output = new BufferedWriter(new FileWriter(localFile));
+                try {
+                    output.write( getTableAsString(qaResult) );
+                }
+                finally {
+                    output.close();
+                    localFile.setLastModified(qaResult.getTableCreationDate().getTime());
+                }
+            }
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
-
-        view.displayResultsTable(qaStep.getName(), exported.getAbsolutePath());
+        
+        view.displayResultsTable(qaStep.getName(), localFile.getAbsolutePath());
     }
 
-    private String exportedQAStepFilePath(String exportDir, QAStepResult qaStepResult) {
+    private String tempQAStepFilePath(String exportDir, QAStepResult qaStepResult) throws EmfException {
         String separator = (exportDir.charAt(0) == '/') ? "/" : "\\";
-        return exportDir + separator + qaStepResult.getTable() + ".csv"; // this is how exported file name was
+        String tempDir = System.getProperty("IMPORT_EXPORT_TEMP_DIR");
+
+        if (tempDir == null || tempDir.isEmpty())
+            tempDir = System.getProperty("java.io.tmpdir");
+
+        File tempDirFile = new File(tempDir);
+
+        if (!(tempDirFile.exists() && tempDirFile.isDirectory() && tempDirFile.canWrite() && tempDirFile.canRead()))
+            throw new EmfException("Import-export temporary folder does not exist or lacks write permissions: "
+                    + tempDir);
+
+
+        return tempDir + separator + qaStepResult.getTable() + ".csv"; // this is how exported file name was
     }
+    
+//    private String exportedQAStepFilePath(String exportDir, QAStepResult qaStepResult) {
+//        String separator = (exportDir.charAt(0) == '/') ? "/" : "\\";
+//        return exportDir + separator + qaStepResult.getTable() + ".csv"; // this is how exported file name was
+//    }
 
     public QAStepResult getStepResult(QAStep step) throws EmfException {
         return session.qaService().getQAStepResult(step);
@@ -131,5 +153,13 @@ public class EditQAStepPresenter {
 
     public EmfDataset getDataset(String datasetName ) throws EmfException {
         return session.dataService().getDataset(datasetName);
+    }
+
+    public String getTableAsString(QAStepResult stepResult) throws EmfException {
+        return session.dataService().getTableAsString("emissions." + stepResult.getTable());
+    }
+
+    public long getTableRecordCount(QAStepResult stepResult) throws EmfException {
+        return session.dataService().getTableRecordCount("emissions." + stepResult.getTable());
     }
 }

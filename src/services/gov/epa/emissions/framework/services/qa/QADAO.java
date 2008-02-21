@@ -96,5 +96,4 @@ public class QADAO {
         Criterion criterion = Restrictions.eq("name", name);
         return hibernateFacade.load(clazz, criterion, session);
     }
-
 }

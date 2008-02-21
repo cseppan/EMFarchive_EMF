@@ -7,7 +7,10 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.services.qa.TableToString;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,10 +24,12 @@ public class DataServiceImpl implements DataService {
 
     private HibernateSessionFactory sessionFactory;
 
+    private DbServerFactory dbServerFactory;
+
     private DatasetDAO dao;
 
     public DataServiceImpl() {
-        this(HibernateSessionFactory.get());
+        this(DbServerFactory.get(), HibernateSessionFactory.get());
     }
 
     public DataServiceImpl(HibernateSessionFactory sessionFactory) {
@@ -33,6 +38,7 @@ public class DataServiceImpl implements DataService {
 
     public DataServiceImpl(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+        this.dbServerFactory = dbServerFactory;
         dao = new DatasetDAO(dbServerFactory);
     }
 
@@ -315,5 +321,37 @@ public class DataServiceImpl implements DataService {
             session.close();
         }
     }
+
+    public synchronized String getTableAsString(String qualifiedTableName) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        try {
+            return new TableToString(dbServer, qualifiedTableName, ",").toString();
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve table: " + qualifiedTableName, e);
+            throw new EmfException("Could not retrieve table: " + qualifiedTableName);
+        } finally {
+            closeDB(dbServer);
+        }
+    }
+
+    public synchronized long getTableRecordCount(String qualifiedTableName) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        long recordCount = 0;
+        try {
+            ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery("select count(1) as record_count from " + qualifiedTableName);
+            if (rs.next()) recordCount = rs.getLong(1);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve table record count: " + qualifiedTableName, e);
+            throw new EmfException("Could not retrieve table record count: " + qualifiedTableName);
+        } catch (SQLException e) {
+            LOG.error("Could not retrieve table record count: " + qualifiedTableName, e);
+            throw new EmfException("Could not retrieve table record count: " + qualifiedTableName);
+        } finally {
+            closeDB(dbServer);
+        }
+        return recordCount;
+    }
+    
+    
 
 }
