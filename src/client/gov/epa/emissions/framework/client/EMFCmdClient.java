@@ -79,7 +79,7 @@ public class EMFCmdClient {
             if (DEBUG)
                 System.out.println("runFromFile() exits after 60 second timeout.");
             
-            System.err.println("Error: EMF command client frozen.");
+            System.err.println("ERROR: EMF command client frozen.");
             System.exit(5);
         }
 
