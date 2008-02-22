@@ -160,7 +160,8 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         scc +="'"+sccs[sccs.length-1].getCode()+"'";
 //        System.out.println(scc);
         
-        String whereFilter = "cm.id in (select control_measures_id from emf.control_measure_sccs where name in (" + scc +")) " ;
+        String whereFilter = "cM.id in (select " + (!getDetails ? "controlMeasureId" : "control_measures_id") + " from " + (!getDetails ? "Scc" : "emf.control_measure_sccs") + " where " + (!getDetails ? "code" : "name") + " in (" + scc +")) " ;
+        System.out.println(whereFilter);
         if (pollutant.getName().equals("ALL") || pollutant.getName().equalsIgnoreCase("Select one"))
             return (getDetails ? service().getSummaryControlMeasures(whereFilter) : service().getControlMeasures(whereFilter));
         return (getDetails ? service().getSummaryControlMeasures(pollutant.getId(), whereFilter) : service().getControlMeasures(pollutant.getId(), whereFilter));

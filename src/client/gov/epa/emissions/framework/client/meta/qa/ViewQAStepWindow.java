@@ -459,6 +459,8 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     
     private void viewResults() throws EmfException {
         QAStepResult stepResult = presenter.getStepResult(step);
+        if (stepResult == null)
+            throw new EmfException("Please run the QA step before trying to view.");
         resetRunStatus(stepResult);
         
         final String exportDir = exportFolder.getText();

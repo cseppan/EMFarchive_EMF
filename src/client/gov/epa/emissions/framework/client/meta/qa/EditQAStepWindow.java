@@ -813,6 +813,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             public void run() {
                 try {
                     QAStepResult stepResult = presenter.getStepResult(step);
+                    if (stepResult == null)
+                        throw new EmfException("Please run the QA step before trying to view.");
+
                     clear();
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     if (presenter.getTableRecordCount(stepResult) > 100000) {

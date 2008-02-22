@@ -126,7 +126,7 @@ public class EditQAStepPresenter {
     }
 
     private String tempQAStepFilePath(String exportDir, QAStepResult qaStepResult) throws EmfException {
-        String separator = (exportDir.charAt(0) == '/') ? "/" : "\\";
+        String separator = exportDir.length() > 0 ? (exportDir.charAt(0) == '/') ? "/" : "\\" : "\\";
         String tempDir = System.getProperty("IMPORT_EXPORT_TEMP_DIR");
 
         if (tempDir == null || tempDir.isEmpty())

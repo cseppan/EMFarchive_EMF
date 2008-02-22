@@ -49,6 +49,9 @@ public class TableToString {
                 row = "";
                 for (int i = 1; i <= columnCount; i++) {
                     value = rs.getString(i);
+                    if (value != null) {
+                        if (value.indexOf(",") > 0) value = "\"" + value + "\"";
+                    }
                     row += (i > 1 ? delimiter : lineFeeder) + (!rs.wasNull() ? value : "");
                 }
                 output.append(row);
