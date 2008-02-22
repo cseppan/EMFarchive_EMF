@@ -414,7 +414,7 @@ public class DatasetDAO {
     }
 
     private void renameEmissionTable(EmfDataset dataset, EmfDataset oldDataset, Session session) throws Exception {
-        if (DebugLevels.DEBUG_12) {
+        if (DebugLevels.DEBUG_0) {
             System.out.println("Check to rename. Dataset name: " + dataset.getName() + " Status: "
                     + dataset.getStatus() + " id: " + dataset.getId());
             System.out.println("Old dataset is null? " + (oldDataset == null));

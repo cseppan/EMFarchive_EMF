@@ -96,7 +96,8 @@ public class ManagedImportService {
         this.dbServerFactory = dbServerFactory;
 
         if (DebugLevels.DEBUG_17)
-            System.out.println("At the class initialization -- numOfRunningThread: " + numOfRunningThread);
+            System.out.println("ManagedImportService: At the class initialization -- numOfRunningThread: " 
+                    + numOfRunningThread);
     }
 
     private Services services() {

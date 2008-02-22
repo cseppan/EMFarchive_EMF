@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.basic;
 
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -54,7 +55,7 @@ public class RemoteCommand {
     private static boolean extractQId(String message) {
         if (message == null || message.trim().isEmpty())
             return true;
-        
+
         Pattern p = Pattern.compile("^[0-9]*\\.(.)*");
         Matcher m = p.matcher(message.trim());
 
@@ -62,7 +63,7 @@ public class RemoteCommand {
             qID = message.trim();
             return false;
         }
-        
+
         return true;
     }
 
@@ -250,7 +251,9 @@ public class RemoteCommand {
             } catch (IllegalThreadStateException e2) {
                 // process is not finished wait -- don't wait
             }
-            LOG.warn("Started command on the local EMF machine: " + localCmd);
+
+            if (DebugLevels.DEBUG_0)
+                LOG.warn("Started command on the local EMF machine: " + localCmd);
 
             if (errorLevel > 0) {
                 // error in local command

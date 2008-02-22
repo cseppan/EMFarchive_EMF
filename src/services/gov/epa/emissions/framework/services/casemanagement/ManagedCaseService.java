@@ -223,7 +223,7 @@ public class ManagedCaseService {
             int id = dataset.getId();
             Version[] vers = versions.getLaterVersions(id, version, session);
 
-            if (DebugLevels.DEBUG_14)
+            if (DebugLevels.DEBUG_14 && vers.length > 0)
                 System.out.println("There are " + vers.length + " later versions for dataset: " + dataset.getName());
 
             return vers;
