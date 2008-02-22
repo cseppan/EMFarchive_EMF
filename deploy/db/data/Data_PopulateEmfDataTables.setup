@@ -40,6 +40,7 @@ insert into emf.properties values(DEFAULT, 'ImportExportTempDir', '');
 insert into emf.properties values(DEFAULT, 'NUMBER_OF_SIMULT_EXPORTS', '2');
 insert into emf.properties values(DEFAULT, 'SECONDS_TO_WAIT_AFTER_EXPORT', '2');
 insert into emf.properties values(DEFAULT, 'DO_NOT_EXPORT_JOBS', 'true');
+insert into emf.properties values(DEFAULT, 'USE_IMPORT_TASK_MANAGER', 'false');
 --update version each time EMF gets updated!
 insert into emf.properties values(DEFAULT, 'EMF-version', 'v1.9 - 1/31/2008');
 insert into emf.properties values(DEFAULT, 'strategy-pool-size', '2');
