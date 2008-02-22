@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -193,7 +194,10 @@ public class CaseJobTaskManager implements TaskManager {
         if (DebugLevels.DEBUG_0)
             System.out.println("***ABOVE*** In callback the sizes are shown ***ABOVE***");
 
-        updateRunStatus(taskId, status);
+        if (updateRunStatus(taskId, status))
+            synchronized (waitTable) {
+                waitTable.remove(taskId);
+            }
 
         if (DebugLevels.DEBUG_0)
             System.out.println("After Task removed Size of RUN TABLE: " + getSizeofRunTable());
@@ -201,12 +205,13 @@ public class CaseJobTaskManager implements TaskManager {
         processTaskQueue();
     }
 
-    private static void updateRunStatus(String taskId, String status) throws EmfException {
+    private static boolean updateRunStatus(String taskId, String status) throws EmfException {
         System.out.println("CaseJobTaskManager::updateRunStatus: " + taskId + " status= " + status);
 
         CaseJobTask cjt = null;
         String jobStatus = "";
         CaseJob caseJob = null;
+        boolean toRemove = false;
 
         try {
 
@@ -242,7 +247,8 @@ public class CaseJobTaskManager implements TaskManager {
                         System.out.println("CaseJobTask Id for failed exports = " + cjt.getJobId());
                         System.out.println("CaseJobTask Id for failed exports = " + cjt.getTaskId());
                         System.out.println("Size of the waitTable before remove: " + waitTable.size());
-                        waitTable.remove(taskId);
+                        //waitTable.remove(taskId);
+                        toRemove = true;
                         if (DebugLevels.DEBUG_0)
                             System.out
                                     .println("updateRunStatus Before remove from runTable on completed or failed job in thread");
@@ -275,7 +281,8 @@ public class CaseJobTaskManager implements TaskManager {
                         System.out.println("CaseJobTask Id for failed exports = " + cjt.getTaskId());
                     if (DebugLevels.DEBUG_9)
                         System.out.println("Size of the waitTable before remove: " + waitTable.size());
-                    waitTable.remove(taskId);
+                    //waitTable.remove(taskId);
+                    toRemove = true;
                     if (DebugLevels.DEBUG_0)
                         System.out
                                 .println("updateRunStatus Before remove from runTable on completed or failed job in thread");
@@ -397,6 +404,8 @@ public class CaseJobTaskManager implements TaskManager {
                 System.out.println("^^^^^^^^^^^^^^");
             throw new EmfException(e.getMessage());
         }
+        
+        return toRemove;
     }
 
     public static synchronized void processTaskQueue() throws EmfException {
@@ -650,12 +659,18 @@ public class CaseJobTaskManager implements TaskManager {
 
             if (status.equals("completed")) {
                 cjt.setExportsSuccess(true);
-                updateRunStatus(cjtId, "export succeeded");
+                if (updateRunStatus(cjtId, "export succeeded"))
+                    synchronized (waitTable) {
+                        waitTable.remove(cjtId);
+                    }
             }
 
             if (status.equals("failed")) {
                 cjt.setExportsSuccess(false);
-                updateRunStatus(cjtId, "export failed");
+                if (updateRunStatus(cjtId, "export failed"))
+                    synchronized (waitTable) {
+                        waitTable.remove(cjtId);
+                    }
             }
 
         }
@@ -673,6 +688,7 @@ public class CaseJobTaskManager implements TaskManager {
         // Get all the waiting CaseJobTasks in the waitTable
         Collection<Task> allWaitTasks = waitTable.values();
         Iterator<Task> iter = allWaitTasks.iterator();
+        List<String> tasks2Remove = new ArrayList<String>();
 
         // Loop over all the waiting CaseJobTasks tasks
         while (iter.hasNext()) {
@@ -795,7 +811,8 @@ public class CaseJobTaskManager implements TaskManager {
                             User user = caseJob.getUser();
 
                             // set the CaseJob jobstatus (casejob table) to Failed
-                            updateRunStatus(cjt.getTaskId(), "failed");
+                            if (updateRunStatus(cjt.getTaskId(), "failed"))
+                                tasks2Remove.add(cjt.getTaskId());
 
                             String message = "Job name= " + cjt.getJobName()
                                     + " failed due to at least one dependent jobs state = Failed or Not Started";
@@ -807,7 +824,8 @@ public class CaseJobTaskManager implements TaskManager {
                             synchronized (waitTable) {
                                 if (DebugLevels.DEBUG_9)
                                     System.out.println("Size of waitTable before remove: " + waitTable.size());
-                                waitTable.remove(cjt.getTaskId());
+                                //waitTable.remove(cjt.getTaskId());
+                                tasks2Remove.add(cjt.getTaskId());
                                 if (DebugLevels.DEBUG_9)
                                     System.out.println("Size of waitTable after remove: " + waitTable.size());
                             }
@@ -817,6 +835,12 @@ public class CaseJobTaskManager implements TaskManager {
                 }// CJT had dependents
             }// cjt dependencies was false
         }// loop over all waiting tasks
+        
+        //NOTE: can't remove these tasks while iterating through them
+        for(Iterator<String> iterator = tasks2Remove.iterator(); iterator.hasNext();) {
+            waitTable.remove(iterator.next());
+        }
+        
     }// testAndSetWaitingTasksDependencies
 
     protected static synchronized void setStatus(User user, StatusDAO statusServices, String message) {
