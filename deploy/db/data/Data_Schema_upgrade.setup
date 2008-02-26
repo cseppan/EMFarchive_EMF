@@ -267,5 +267,17 @@ insert into emf.qa_programs values(DEFAULT,'Fire Data Summary (Day-specific)','g
 -- new dataset type in emf.dataset_types 2/15/2008
 insert into emf.dataset_types values(DEFAULT,'Chemical Speciation Combo Profiles (GSPRO_COMBO)','Chemical Speciation Combo Profiles (GSPRO_COMBO)', '1', '1', false,'', 'gov.epa.emissions.commons.io.speciation.SpeciationComboProfileImporter', 'gov.epa.emissions.commons.io.speciation.SpeciationComboProfileExporter');
 
+
+-- Table: emf.datasets_notes
+CREATE TABLE emf.datasets_notes
+(
+  id serial NOT NULL,
+  dataset_id integer NOT NULL REFERENCES emf.datasets(id),
+  note_id integer NOT NULL REFERENCES emf.notes(id),
+  UNIQUE(dataset_id, note_id)
+) 
+WITHOUT OIDS;
+-- emf.datasets_notes
+
 -- 2/21/2008 to add a new property to emf.properties table
 insert into emf.properties values(DEFAULT, 'USE_IMPORT_TASK_MANAGER', 'false');

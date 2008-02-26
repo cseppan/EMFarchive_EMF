@@ -13,8 +13,8 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteDialog;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.ui.Dimensions;
@@ -93,7 +93,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         this.presenter = presenter;
     }
 
-    public void display(Version version, String table, User user, TableMetadata tableMetadata, Note[] notes) {
+    public void display(Version version, String table, User user, TableMetadata tableMetadata, DatasetNote[] notes) {
         this.version = version;
         this.user = user;
 
@@ -134,7 +134,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         }
     }
 
-    private JPanel bottomPanel(Note[] notes) {
+    private JPanel bottomPanel(DatasetNote[] notes) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -144,7 +144,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         return panel;
     }
 
-    private JPanel revisionPanel(Note[] notes) {
+    private JPanel revisionPanel(DatasetNote[] notes) {
         revisionPanel = new RevisionPanel(user, dataset, version, notes, parent);
         revisionPanel.disableWhatNWhy();
         return revisionPanel;

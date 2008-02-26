@@ -9,7 +9,7 @@ import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -50,22 +50,22 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         super.setLayout(new BorderLayout());
     }
 
-    public void display(Note[] notes, EditNotesTabPresenter presenter) {
+    public void display(DatasetNote[] datasetNotes, EditNotesTabPresenter presenter) {
         super.removeAll();
-        super.add(createLayout(notes, presenter, parentConsole), BorderLayout.CENTER);
+        super.add(createLayout(datasetNotes, presenter, parentConsole), BorderLayout.CENTER);
     }
 
-    private JPanel createLayout(Note[] notes, EditNotesTabPresenter presenter, EmfConsole parentConsole) {
+    private JPanel createLayout(DatasetNote[] datasetNotes, EditNotesTabPresenter presenter, EmfConsole parentConsole) {
         JPanel layout = new JPanel(new BorderLayout());
 
-        layout.add(tablePanel(notes, parentConsole), BorderLayout.CENTER);
+        layout.add(tablePanel(datasetNotes, parentConsole), BorderLayout.CENTER);
         layout.add(controlPanel(presenter), BorderLayout.PAGE_END);
 
         return layout;
     }
 
-    private JPanel tablePanel(Note[] notes, EmfConsole parentConsole) {
-        tableData = new NotesTableData(notes);
+    private JPanel tablePanel(DatasetNote[] datasetNotes, EmfConsole parentConsole) {
+        tableData = new NotesTableData(datasetNotes);
         changeables.addChangeable(tableData);
         selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
 
@@ -91,13 +91,15 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
                 doNewNote(presenter);
             }
         });
+        add.setToolTipText("add a new note");
         container.add(add);
         
         Button addExisting = new AddButton("Add Existing", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doNewNote(presenter);
+                addExistingNotes(presenter);
             }
         });
+        addExisting.setToolTipText("add an existing note");
         container.add(addExisting);
 
         Button view = new ViewButton(new AbstractAction() {
@@ -117,7 +119,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         List notes = selectModel.selected();
         for (Iterator iter = notes.iterator(); iter.hasNext();) {
             ViewNoteWindow window = new ViewNoteWindow(desktopManager);
-            presenter.doViewNote((Note) iter.next(), window);
+            presenter.doViewNote((DatasetNote) iter.next(), window);
         }
     }
 
@@ -129,16 +131,36 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
             messagePanel.setError(e.getMessage());
         }
     }
+    
+    protected void addExistingNotes(EditNotesTabPresenter presenter) {
+        AddExistingNotesDialog view = new AddExistingNotesDialog(parentConsole);
+        try {
+            presenter.addExistingNotes(view);
+            DatasetNote[] selectedNotes=presenter.getSelectedNotes(view);
+            
+//            System.out.println("length of selected notes " + selectedNotes.length );
+            if (selectedNotes.length>0){
+                tableData.add( selectedNotes);
+            }
+            refresh();
+        } catch (EmfException e) {
+            e.printStackTrace();
+            messagePanel.setError("Could not add existing notes" +e.getMessage());
+        }
+    }
 
-    public void addNote(Note note) {
+    public void addNote(DatasetNote note) {
         tableData.add(note);
+        refresh();
+    }
+    
+    private void refresh(){
         selectModel.refresh();
-
         tablePanel.removeAll();
         tablePanel.add(createSortFilterPanel(parentConsole));
     }
 
-    public Note[] additions() {
+    public DatasetNote[] additions() {
         return tableData.additions();
     }
 

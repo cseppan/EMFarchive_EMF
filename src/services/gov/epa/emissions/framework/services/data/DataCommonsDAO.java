@@ -54,6 +54,10 @@ public class DataCommonsDAO {
     public void add(Region region, Session session) {
         addObject(region, session);
     }
+    
+    public void add(DatasetNote note, Session session) {
+        addObject(note, session);
+    }
 
     public void add(Project project, Session session) {
         addObject(project, session);
@@ -218,7 +222,7 @@ public class DataCommonsDAO {
         addObject(revision, session);
     }
 
-    public void add(Note note, Session session) {
+    public void add1(DatasetNote note, Session session) {
         addObject(note, session);
     }
 
@@ -234,10 +238,25 @@ public class DataCommonsDAO {
         return session.createCriteria(Revision.class).add(Restrictions.eq("datasetId", new Integer(datasetId))).list();
     }
 
-    public List getNotes(int datasetId, Session session) {
-        return session.createCriteria(Note.class).add(Restrictions.eq("datasetId", new Integer(datasetId))).list();
+    public List getDatasetNotes(int datasetId, Session session) {
+        return session.createCriteria(DatasetNote.class).add(Restrictions.eq("datasetId", new Integer(datasetId))).list();
     }
+    
+    public List getNotes(Session session, String nameContains) {
+        if (nameContains.trim().equals(""))
+            return session
+            .createQuery(
+                    "select new Note( NT.id, NT.name) from Note as NT ").list();
+        return session
+        .createQuery(
+                "select new Note( NT.id, NT.name) from Note as NT " + "where "
+                        + " lower(NT.name) like "
+                        + "'%"
+                        + nameContains.toLowerCase().trim() + "%'") 
+        .list();
+ }
 
+    
     /*
      * Return true if the name is already used
      */

@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
@@ -51,10 +52,10 @@ public class DataCommonsTransportServiceTestCase extends ServiceTestCase {
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
         Note note = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME" + id,
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
-        dcs.addNote(note);
+        dcs.addDatasetNote(new DatasetNote(datasetFromDB.getId(),note));
 
         try {
-            Note[] notes = service.getNotes(datasetFromDB.getId());
+            DatasetNote[] notes = service.getDatasetNotes(datasetFromDB.getId());
             assertEquals(notes.length, 1);
         } finally {
             remove(note);
@@ -72,13 +73,13 @@ public class DataCommonsTransportServiceTestCase extends ServiceTestCase {
 
         Note note1 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME1" + id,
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
-        service.addNote(note1);
+        service.addDatasetNote(new DatasetNote(datasetFromDB.getId(),note1));
         Note note2 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME2" + id,
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
-        service.addNote(note2);
+        service.addDatasetNote(new DatasetNote(datasetFromDB.getId(),note2));
 
         try {
-            Note[] notes = service.getNotes(datasetFromDB.getId());
+            DatasetNote[] notes = service.getDatasetNotes(datasetFromDB.getId());
             assertEquals("Two notes should return", notes.length, 2);
         } finally {
             remove(note1);

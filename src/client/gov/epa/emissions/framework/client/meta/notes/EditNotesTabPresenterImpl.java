@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
@@ -28,8 +29,8 @@ public class EditNotesTabPresenterImpl implements EditNotesTabPresenter {
     }
 
     public void display() throws EmfException {
-        Note[] notes = service().getNotes(dataset.getId());
-        view.display(notes, this);
+        DatasetNote[] datasetNotes = service().getDatasetNotes(dataset.getId());
+        view.display(datasetNotes, this);
     }
 
     private DataCommonsService service() {
@@ -37,40 +38,78 @@ public class EditNotesTabPresenterImpl implements EditNotesTabPresenter {
     }
 
     public void doSave() throws EmfException {
-        Note[] additions = view.additions();
-        for (int i = 0; i < additions.length; i++) {
-            Note note = additions[i];
-            note.setDatasetId(dataset.getId());
-
-            service().addNote(note);
-        }
+        DatasetNote[] additions = view.additions();
+        service().addDatasetNotes(additions);
+//        for (int i = 0; i < additions.length; i++) {
+//            DatasetNote datasetNote = additions[i];
+//            datasetNote.setDatasetId(dataset.getId());
+//
+//            service().addDatasetNote(datasetNote);
+//        }
     }
 
     public void doAddNote(NewNoteView view) throws EmfException {
         NoteType[] types = service().getNoteTypes();
         Version[] versions = session.dataEditorService().getVersions(dataset.getId());
-        Note[] notes = service().getNotes(dataset.getId());
+        DatasetNote[] notes = service().getDatasetNotes(dataset.getId());
 
-        addNote(view, session.user(), dataset, notes, types, versions);
+        addDatasetNote(view, session.user(), dataset, notes, types, versions);
     }
 
-    void addNote(NewNoteView newNoteView, User user, EmfDataset dataset, Note[] notes, NoteType[] types,
+    public void addExistingNotes(AddExistingNotesDialog view) {
+     //   Note[] notes = service().getAllNotes("");
+        view.observe(this);
+        view.display(new Note[]{});
+    }
+    
+
+    void addDatasetNote(NewNoteView newNoteView, User user, EmfDataset dataset, DatasetNote[] datasetNotes, NoteType[] types,
             Version[] versions) {
-        Note[] combinedNotesList = combinedNotesList(notes, view.additions());
+        DatasetNote[] combinedNotesList = combinedNotesList(datasetNotes, view.additions());
         newNoteView.display(user, dataset, combinedNotesList, types, versions);
         if (newNoteView.shouldCreate())
             view.addNote(newNoteView.note());
     }
+    
 
-    private Note[] combinedNotesList(Note[] a, Note[] b) {
+    private DatasetNote[] combinedNotesList(DatasetNote[] a, DatasetNote[] datasetNotes) {
         List list = new ArrayList();
         list.addAll(Arrays.asList(a));
-        list.addAll(Arrays.asList(b));
+        list.addAll(Arrays.asList(datasetNotes));
 
-        return (Note[]) list.toArray(new Note[0]);
+        return (DatasetNote[]) list.toArray(new DatasetNote[0]);
     }
 
-    public void doViewNote(Note note, NoteView window) {
+    public void doViewNote(DatasetNote note, NoteView window) {
         window.display(note);
     }
+    
+    public DatasetNote[] getSelectedNotes(AddExistingNotesDialog dialog) throws EmfException{
+        List<Integer> noteIds =new ArrayList<Integer> (); 
+        Note[] notes=dialog.getNotes();
+        for (Note note: notes)
+            noteIds.add(new Integer(note.getId()));
+        
+        int[] selectedIndexes = new int[noteIds.size()];
+        for (int i = 0; i < selectedIndexes.length; i++) {
+            selectedIndexes[i] = noteIds.get(i).intValue();
+        }
+        return SetDSNote(service().getNotes(selectedIndexes));
+    }
+    
+    private DatasetNote[] SetDSNote(Note[] notes){
+        List<DatasetNote> dsNotes=new ArrayList<DatasetNote>();
+        for (Note note :notes){
+            DatasetNote dsNote = new DatasetNote();
+            dsNote.setDatasetId(dataset.getId());
+            dsNote.setNote(note);
+            dsNotes.add(dsNote);
+        }
+        return dsNotes.toArray(new DatasetNote[0]);
+    }
+
+    public Note[] getNotes(String nameContains) throws EmfException {
+        return service().getNameContainNotes(nameContains);
+    }
+
 }

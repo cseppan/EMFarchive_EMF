@@ -360,3 +360,13 @@ CREATE TABLE emf.qa_step_results
 WITHOUT OIDS;
 -- emf.qa_step_results
 
+-- Table: emf.datasets_notes
+CREATE TABLE emf.datasets_notes
+(
+  id serial NOT NULL,
+  dataset_id integer NOT NULL REFERENCES emf.datasets(id),
+  note_id integer NOT NULL REFERENCES emf.notes(id),
+  UNIQUE(dataset_id, note_id)
+) 
+WITHOUT OIDS;
+-- emf.datasets_notes

@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
@@ -66,7 +67,7 @@ public class EditNotesTabPresenterTest extends EmfMockObjectTestCase {
         NoteType[] types = new NoteType[0];
         Version[] versions = new Version[0];
         Note note = new Note();
-        Note[] notes = {};
+        DatasetNote[] notes = {};
 
         EmfDataset dataset = new EmfDataset();
         dataset.setId(2);
@@ -87,11 +88,11 @@ public class EditNotesTabPresenterTest extends EmfMockObjectTestCase {
         newNoteView.stubs().method("shouldCreate").will(returnValue(Boolean.TRUE));
         newNoteView.stubs().method("note").will(returnValue(note));
 
-        presenter.addNote((NewNoteView) newNoteView.proxy(), user, dataset, notes, types, versions);
+        presenter.addDatasetNote((NewNoteView) newNoteView.proxy(), user, dataset, notes, types, versions);
     }
     
     public void testShouldDisplayNoteOnViewNote() throws Exception {
-        Note note = new Note();
+        DatasetNote note = new DatasetNote();
         
         EmfDataset dataset = new EmfDataset();
         dataset.setId(2);

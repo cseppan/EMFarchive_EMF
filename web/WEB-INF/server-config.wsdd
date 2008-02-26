@@ -187,6 +187,10 @@
 		qname="ns1:Note" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.data.DatasetNote"
+		qname="ns1:DatasetNote" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.data.NoteType"
 		qname="ns1:NoteType" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
@@ -668,6 +672,11 @@
 	<arrayMapping qname="ns1:Notes" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.data.Note[]"
 		innerType="ns1:Note"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<arrayMapping qname="ns1:DatasetNotes" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.data.DatasetNote[]"
+		innerType="ns1:DatasetNote"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<arrayMapping qname="ns1:NoteTypes" xmlns:ns1="urn:gov.epa.services.EmfService"

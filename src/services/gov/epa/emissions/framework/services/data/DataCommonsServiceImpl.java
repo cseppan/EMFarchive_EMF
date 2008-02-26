@@ -348,10 +348,23 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public synchronized Note[] getNotes(int datasetId) throws EmfException {
+    public synchronized DatasetNote[] getDatasetNotes(int datasetId) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            List notes = dao.getNotes(datasetId, session);
+            List datasetNotes = dao.getDatasetNotes(datasetId, session);
+            session.close();
+
+            return (DatasetNote[]) datasetNotes.toArray(new DatasetNote[datasetNotes.size()]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Notes of dataset" + datasetId , e);
+            throw new EmfException("Could not get all Notes of dataset " + datasetId);
+        }
+    }
+    
+    public synchronized Note[] getNameContainNotes(String nameContains) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List notes = dao.getNotes(session, nameContains);
             session.close();
 
             return (Note[]) notes.toArray(new Note[notes.size()]);
@@ -360,8 +373,24 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             throw new EmfException("Could not get all Notes");
         }
     }
+    
+    public synchronized Note[] getNotes(int[] noteIds) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List<Note> notes = new ArrayList<Note>();
+            for (int id : noteIds){
+               notes.add((Note) dao.current(new Integer(id), Note.class, session)); 
+            }
+            session.close();
 
-    public synchronized void addNote(Note note) throws EmfException {
+            return notes.toArray(new Note[notes.size()]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Notes", e);
+            throw new EmfException("Could not get all Notes");
+        }
+    }
+
+    public synchronized void addDatasetNote(DatasetNote datasetNote) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
@@ -369,7 +398,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 //            if (dao.nameUsed(note.getName(), Note.class, session))
 //                throw new EmfException("Note name already in use");
 
-            dao.add(note, session);
+            dao.add(datasetNote, session);
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add new note", e);
@@ -377,22 +406,21 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public synchronized void addNotesB(Note[] notes) throws EmfException {
-        for (int i = 0; i < notes.length; i++) {
-            this.addNote(notes[i]);
-        }
-    }
+//    public synchronized void addNotesB(DatasetNote[] notes) throws EmfException {
+//        for (int i = 0; i < notes.length; i++) {
+//            this.addDatasetNote(notes[i]);
+//        }
+//    }
 
-    public synchronized void addNotes(Note[] notes) throws EmfException {
+    public synchronized void addDatasetNotes(DatasetNote[] dsNotes) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 
-            for (int i = 0; i < notes.length; i++) {
-                Note note = notes[i];
+            for (int i = 0; i < dsNotes.length; i++) {
+                DatasetNote note = dsNotes[i];
 
-                if (dao.nameUsed(note.getName(), Note.class, session))
-                    throw new EmfException("Note name already in use");
-
+//                if (dao.nameUsed(note.getNote().getName(), Note.class, session))
+//                    throw new EmfException("Note name already in use");
                 dao.add(note, session);
             }
             session.close();

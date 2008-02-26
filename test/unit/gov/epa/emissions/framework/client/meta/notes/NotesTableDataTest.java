@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.gui.DefaultChangeables;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.ui.Row;
@@ -19,25 +20,28 @@ public class NotesTableDataTest extends EmfMockObjectTestCase {
 
     private NotesTableData data;
 
-    private Note note0;
+    private DatasetNote note0;
 
-    private Note note1;
+    private DatasetNote note1;
 
     protected void setUp() {
-        note0 = new Note();
-        note0.setId(234);
-        note0.setName("note0");
-        note0.setCreator(new User());
-        note0.setDate(new Date());
-        note0.setNoteType(new NoteType("type0"));
+        note0 = new DatasetNote();
+        Note note=new Note(); 
+        note.setId(234);
+        note.setName("note0");
+        note.setCreator(new User());
+        note.setDate(new Date());
+        note.setNoteType(new NoteType("type0"));
+        note0.setNote(note);
 
-        note1 = new Note();
-        note1.setName("note1");
-        note1.setCreator(new User());
-        note1.setDate(new Date(note0.getDate().getTime() + 12000));
-        note1.setNoteType(new NoteType("type1"));
-
-        data = new NotesTableData(new Note[] { note0, note1 });
+        note1 = new DatasetNote();
+        Note noted = new Note();
+        noted.setName("note1");
+        noted.setCreator(new User());
+        noted.setDate(new Date(note0.getNote().getDate().getTime() + 12000));
+        noted.setNoteType(new NoteType("type1"));
+        note1.setNote(noted);
+        data = new NotesTableData(new DatasetNote[] { note0, note1 });
     }
 
     public void testShouldHaveSevenColumns() {
@@ -78,16 +82,17 @@ public class NotesTableDataTest extends EmfMockObjectTestCase {
         List rows = data.rows();
 
         Row row = (Row) rows.get(0);
+        Note note=note0.getNote();
         assertEquals(new Long(note0.getId()), row.getValueAt(0));
-        assertEquals(note0.getName(), row.getValueAt(1));
-        assertEquals(note0.getNoteType().getType(), row.getValueAt(2));
-        assertEquals(note0.getVersion(), ((Long) row.getValueAt(3)).longValue());
-        assertEquals(note0.getCreator().getName(), row.getValueAt(4));
+        assertEquals(note.getName(), row.getValueAt(1));
+        assertEquals(note.getNoteType().getType(), row.getValueAt(2));
+        assertEquals(note.getVersion(), ((Long) row.getValueAt(3)).longValue());
+        assertEquals(note.getCreator().getName(), row.getValueAt(4));
 
-        assertEquals(CustomDateFormat.format_YYYY_MM_DD_HH_MM(note0.getDate()), row.getValueAt(5));
+        assertEquals(CustomDateFormat.format_YYYY_MM_DD_HH_MM(note.getDate()), row.getValueAt(5));
 
-        assertEquals(note0.getDetails(), row.getValueAt(6));
-        assertEquals(note0.getReferences(), row.getValueAt(7));
+        assertEquals(note.getDetails(), row.getValueAt(6));
+        assertEquals(note.getReferences(), row.getValueAt(7));
     }
 
     public void testShouldReturnARowRepresentingANoteEntry() {
@@ -97,7 +102,7 @@ public class NotesTableDataTest extends EmfMockObjectTestCase {
 
     public void testShouldAddRowOnAddingNewNote() {
         int count = data.rows().size();
-
+        DatasetNote daNote = new DatasetNote();
         Note note = new Note();
         note.setName("note");
         note.setCreator(new User());
@@ -107,10 +112,11 @@ public class NotesTableDataTest extends EmfMockObjectTestCase {
         Mock observer = mock(ChangeObserver.class);
         expects(observer, 2, "signalSaved");
         Changeables changeablesList = new DefaultChangeables((ChangeObserver) observer.proxy());
-
+        daNote.setNote(note);
+        
         data.observe(changeablesList);
-        data.add(note);
-        data.add(note);
+        data.add(daNote);
+        data.add(daNote);
 
         assertEquals(count + 2, data.rows().size());
         assertEquals(2, data.additions().length);

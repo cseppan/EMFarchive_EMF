@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.Note;
 
 import java.awt.Dimension;
@@ -30,22 +31,22 @@ public class ViewNoteWindow extends DisposableInteralFrame implements NoteView {
         super.getContentPane().add(layout);
     }
 
-    public void display(Note note) {
-        super.setLabel(super.getTitle() + " : " + note.getName());
+    public void display(DatasetNote note) {
+        super.setLabel(super.getTitle() + " : " + note.getNote().getName());
 
         doLayout(note);
         super.display();
     }
 
-    private void doLayout(Note note) {
-        layout.add(inputPanel(note));
+    private void doLayout(DatasetNote dsNote) {
+        layout.add(inputPanel(dsNote));
         layout.add(buttonsPanel());
     }
 
-    private JPanel inputPanel(Note note) {
+    private JPanel inputPanel(DatasetNote dsNote) {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-
+        Note note = dsNote.getNote();
         layoutGenerator.addLabelWidgetPair("Name:", new Label(note.getName()), panel);
         layoutGenerator.addLabelWidgetPair("Type:", new Label(note.getNoteType().getType()), panel);
 

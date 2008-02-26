@@ -436,12 +436,12 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
         Note note = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME" + id,
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
-        service.addNote(note);
+        service.addDatasetNote(new DatasetNote(datasetFromDB.getId(), note));
         boolean newNoteAdded = false;
         try {
-            Note[] notes = service.getNotes(datasetFromDB.getId());
+            DatasetNote[] notes = service.getDatasetNotes(datasetFromDB.getId());
             for (int i = 0; i < notes.length; i++)
-                if (notes[i].getName().equalsIgnoreCase("NOTE NAME" + id))
+                if (notes[i].getNote().getName().equalsIgnoreCase("NOTE NAME" + id))
                     newNoteAdded = true;
 
             assertTrue(newNoteAdded);
@@ -459,18 +459,20 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         super.add(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 
-        int notesBeforeAdd = service.getNotes(datasetFromDB.getId()).length;
+        int notesBeforeAdd = service.getDatasetNotes(datasetFromDB.getId()).length;
 
         Note note1 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME1" + id,
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
         Note note2 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME2" + id,
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
 
-        Note[] notesToAdd = new Note[] { note1, note2 };
-        service.addNotes(notesToAdd);
+        DatasetNote[] notesToAdd = new DatasetNote[] { 
+                new DatasetNote(datasetFromDB.getId(),note1), 
+                new DatasetNote(datasetFromDB.getId(),note2) };
+        service.addDatasetNotes(notesToAdd);
 
         try {
-            Note[] notes = service.getNotes(datasetFromDB.getId());
+            DatasetNote[] notes = service.getDatasetNotes(datasetFromDB.getId());
             assertEquals("Two notes should return", notesBeforeAdd + 2, notes.length);
         } finally {
             remove(note1);
@@ -487,17 +489,17 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         super.add(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 
-        int notesBeforeAdd = service.getNotes(datasetFromDB.getId()).length;
+        int notesBeforeAdd = service.getDatasetNotes(datasetFromDB.getId()).length;
 
         Note note1 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME1" + id,
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
-        service.addNote(note1);
+        service.addDatasetNote(new DatasetNote(datasetFromDB.getId(),note1));
         Note note2 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME2" + id,
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
-        service.addNote(note2);
+        service.addDatasetNote(new DatasetNote(datasetFromDB.getId(),note2));
 
         try {
-            Note[] notes = service.getNotes(datasetFromDB.getId());
+            DatasetNote[] notes = service.getDatasetNotes(datasetFromDB.getId());
             assertEquals("Two notes should return", notesBeforeAdd + 2, notes.length);
         } finally {
             remove(note1);

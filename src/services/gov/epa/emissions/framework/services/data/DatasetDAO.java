@@ -645,7 +645,7 @@ public class DatasetDAO {
 
         deleteFromObjectTable(datasetIDs, Version.class, "datasetId", session);
         deleteFromObjectTable(datasetIDs, AccessLog.class, "datasetId", session);
-        deleteFromObjectTable(datasetIDs, Note.class, "datasetId", session);
+        deleteFromObjectTable(datasetIDs, DatasetNote.class, "datasetId", session);
         deleteFromObjectTable(datasetIDs, Revision.class, "datasetId", session);
 
         try {

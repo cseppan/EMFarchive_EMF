@@ -2,8 +2,8 @@ package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.Note;
 
 public class NotesTabPresenter {
 
@@ -17,11 +17,11 @@ public class NotesTabPresenter {
     }
 
     public void display(NotesTabView view) throws EmfException {
-        Note[] notes = service.getNotes(dataset.getId());
+        DatasetNote[] notes = service.getDatasetNotes(dataset.getId());
         view.display(notes, this);
     }
 
-    public void doViewNote(Note note, NoteView view) {
+    public void doViewNote(DatasetNote note, NoteView view) {
         view.display(note);
     }
 }

@@ -64,4 +64,5 @@ DROP TABLE emf.revisions CASCADE;
 --
 -- emf qa_programs
 DROP TABLE emf.qa_programs CASCADE;
---
+-- emf emf datasets_notes
+DROP TABLE emf.datasets_notes CASCADE;

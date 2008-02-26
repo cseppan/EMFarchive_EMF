@@ -68,9 +68,11 @@ public interface DataCommonsService {
     void addRevision(Revision revision) throws EmfException;
 
     // Notes
-    Note[] getNotes(int datasetId) throws EmfException;
-    void addNote(Note note) throws EmfException;
-    void addNotes(Note[] notes) throws EmfException;
+    Note[] getNameContainNotes(String nameContains) throws EmfException;
+    Note[] getNotes(int[] noteIds) throws EmfException;  //get Notes from light notes
+    DatasetNote[] getDatasetNotes(int datasetId) throws EmfException;
+    void addDatasetNote(DatasetNote datasetNote) throws EmfException;
+    void addDatasetNotes(DatasetNote[] dsNotes) throws EmfException;
 
     // Note types
     NoteType[] getNoteTypes() throws EmfException;

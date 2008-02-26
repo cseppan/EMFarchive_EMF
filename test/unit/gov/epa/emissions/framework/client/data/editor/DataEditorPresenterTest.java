@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
@@ -194,7 +195,7 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
         NoteType[] types = new NoteType[0];
         Version[] versions = new Version[0];
         User user = new User();
-        Note[] notes = {};
+        DatasetNote[] notes = {};
 
         Mock service = mock(DataCommonsService.class);
         service.expects(once()).method("addNote").with(same(note));

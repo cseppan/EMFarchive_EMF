@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
-import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 
 public interface NoteView {
-    void display(Note note);
+    void display(DatasetNote note);
 }

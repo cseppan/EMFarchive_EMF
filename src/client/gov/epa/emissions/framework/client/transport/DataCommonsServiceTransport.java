@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
@@ -233,34 +234,54 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { type });
     }
 
-    public synchronized Note[] getNotes(int datasetId) throws EmfException {
+    public synchronized DatasetNote[] getDatasetNotes(int datasetId) throws EmfException {
         EmfCall call = call();
 
         call.addIntegerParam("datasetId");
+        call.setOperation("getDatasetNotes");
+        call.setReturnType(mappings.datasetNotes());
+
+        return (DatasetNote[]) call.requestResponse(new Object[] { new Integer(datasetId) });
+    }
+    
+    public synchronized Note[] getNotes(int[] noteIds) throws EmfException {
+        EmfCall call = call();
+
+        call.addIntArrayParam();
         call.setOperation("getNotes");
         call.setReturnType(mappings.notes());
 
-        return (Note[]) call.requestResponse(new Object[] { new Integer(datasetId) });
+        return (Note[]) call.requestResponse(new Object[] {noteIds });
     }
-
-    public synchronized void addNote(Note note) throws EmfException {
+    
+    public synchronized Note[] getNameContainNotes(String nameContains) throws EmfException {
         EmfCall call = call();
 
-        call.addParam("note", mappings.note());
-        call.setOperation("addNote");
+        call.setOperation("getNameContainNotes");
+        call.addStringParam("getNameContainNotes");
+        call.setReturnType(mappings.notes());
+
+        return (Note[]) call.requestResponse(new Object[] {nameContains});
+    }
+
+    public synchronized void addDatasetNote(DatasetNote note) throws EmfException {
+        EmfCall call = call();
+
+        call.addParam("note", mappings.datasetNotes());
+        call.setOperation("addDatasetNote");
         call.setVoidReturnType();
 
         call.request(new Object[] { note });
     }
 
-    public synchronized void addNotes(Note[] notes) throws EmfException {
+    public synchronized void addDatasetNotes(DatasetNote[] dsNotes) throws EmfException {
         EmfCall call = call();
 
-        call.addParam("notes", mappings.notes());
-        call.setOperation("addNotes");
+        call.addParam("dsNotes", mappings.datasetNotes());
+        call.setOperation("addDatasetNotes");
         call.setVoidReturnType();
 
-        call.request(new Object[] { notes });
+        call.request(new Object[] { dsNotes });
     }
 
     public synchronized NoteType[] getNoteTypes() throws EmfException {

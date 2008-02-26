@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
-import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.ui.ChangeableTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -12,11 +12,11 @@ public class NotesTableData extends ChangeableTableData {
 
     private List rows;
 
-    private Note[] values;
+    private DatasetNote[] values;
 
     private List additions;
 
-    public NotesTableData(Note[] values) {
+    public NotesTableData(DatasetNote[] values) {
         this.values = values;
         this.rows = createRows(values);
         this.additions = new ArrayList();
@@ -36,13 +36,24 @@ public class NotesTableData extends ChangeableTableData {
         return rows;
     }
 
-    public void add(Note note) {
+    public void add(DatasetNote note) {
         additions.add(note);
         rows.add(row(note));
         notifyChanges();
     }
+    
+    public void add(DatasetNote[] notes) {
+        for (int i=0; i< notes.length; i++){
+            Row row = row (notes[i]);
+            if(!rows.contains(row)){ 
+                additions.add(notes[i]);
+                rows.add(row(notes[i]));
+                notifyChanges();
+            }
+        }
+    }
 
-    private List createRows(Note[] values) {
+    private List createRows(DatasetNote[] values) {
         List rows = new ArrayList();
         for (int i = 0; i < values.length; i++)
             rows.add(row(values[i]));
@@ -50,7 +61,7 @@ public class NotesTableData extends ChangeableTableData {
         return rows;
     }
 
-    private Row row(Note note) {
+    private Row row(DatasetNote note) {
         return new ViewableRow(new NotesRowSource(note));
     }
 
@@ -58,12 +69,12 @@ public class NotesTableData extends ChangeableTableData {
         return false;
     }
 
-    public Note[] getValues() {
+    public DatasetNote[] getValues() {
         return values;
     }
 
-    public Note[] additions() {
-        return (Note[]) additions.toArray(new Note[0]);
+    public DatasetNote[] additions() {
+        return (DatasetNote[]) additions.toArray(new DatasetNote[0]);
     }
 
 }

@@ -246,11 +246,12 @@ public class DataCommonsDAOTest extends ServiceTestCase {
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
         Note note = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME",
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
-
-        dao.add(note, session);
+        DatasetNote daNote=new DatasetNote(datasetFromDB.getId(), note);
+        
+        dao.add(daNote, session);
 
         try {
-            List allNotes = dao.getNotes(datasetFromDB.getId(), session);
+            List allNotes = dao.getDatasetNotes(datasetFromDB.getId(), session);
             assertEquals(1, allNotes.size());
         } finally {
             remove(note);
@@ -269,11 +270,11 @@ public class DataCommonsDAOTest extends ServiceTestCase {
         Note note2 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS2", "NOTE NAME 2",
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
 
-        dao.add(note1, session);
+        dao.add(new DatasetNote(datasetFromDB.getId(),note1), session);
 
-        dao.add(note2, session);
+        dao.add(new DatasetNote(datasetFromDB.getId(),note2), session);
         try {
-            List allNotes = dao.getNotes(datasetFromDB.getId(), session);
+            List allNotes = dao.getDatasetNotes(datasetFromDB.getId(), session);
             assertEquals(2, allNotes.size());
         } finally {
             remove(note1);

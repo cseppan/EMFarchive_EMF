@@ -7,8 +7,8 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
@@ -65,7 +65,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
 
     private void displayView(DataEditorView view) throws EmfException {
         TableMetadata tableMetadata = dataEditorService().getTableMetadata(table);
-        Note[] notes = commonsService().getNotes(dataset.getId());
+        DatasetNote[] notes = commonsService().getDatasetNotes(dataset.getId());
 
         view.display(version, table, session.user(), tableMetadata, notes);
     }
@@ -139,7 +139,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
     public void doAddNote(NewNoteView view) throws EmfException {
         NoteType[] types = commonsService().getNoteTypes();
         Version[] versions = dataEditorService().getVersions(dataset.getId());
-        Note[] notes = commonsService().getNotes(dataset.getId());
+        DatasetNote[] notes = commonsService().getDatasetNotes(dataset.getId());
 
         addNote(view, session.user(), dataset, notes, types, versions);
     }
@@ -148,11 +148,11 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
         return session.dataCommonsService();
     }
 
-    void addNote(NewNoteView view, User user, EmfDataset dataset, Note[] notes, NoteType[] types, Version[] versions)
+    void addNote(NewNoteView view, User user, EmfDataset dataset, DatasetNote[] notes, NoteType[] types, Version[] versions)
             throws EmfException {
         view.display(user, dataset, version, notes, types, versions);
         if (view.shouldCreate())
-            commonsService().addNote(view.note());
+            commonsService().addDatasetNote(view.note());
     }
 
 }

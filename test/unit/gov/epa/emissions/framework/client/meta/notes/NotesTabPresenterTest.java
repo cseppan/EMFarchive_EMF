@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.Note;
 
@@ -27,11 +28,11 @@ public class NotesTabPresenterTest extends EmfMockObjectTestCase {
     public void testShouldDisplayNoteViewOnDisplayNote() throws Exception {
         NotesTabPresenter presenter = new NotesTabPresenter(null, null);
 
-        Note note = new Note();
+        DatasetNote dsNote = new DatasetNote();
         Mock view = mock(NoteView.class);
-        view.expects(once()).method("display").with(same(note));
+        view.expects(once()).method("display").with(same(dsNote));
         
-        presenter.doViewNote(note, (NoteView)view.proxy());
+        presenter.doViewNote(dsNote, (NoteView)view.proxy());
     }
 
 }

@@ -31,6 +31,11 @@ public class Note {
         return name + " (" + id + ")";
     }
 
+    public Note(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Note(User creator, int datasetId, Date date, String details, String name, NoteType type, String references,
             int version) {
         this.creator = creator;
@@ -114,5 +119,12 @@ public class Note {
     public void setVersion(int version) {
         this.version = version;
     }
-
+    
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof Note)) {
+            return false;
+        }
+        Note other = (Note) obj;
+        return (id == other.getId()) ;
+    }
 }

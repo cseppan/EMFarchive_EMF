@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
@@ -37,13 +37,13 @@ public class NotesTab extends JPanel implements NotesTabView {
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     }
 
-    public void display(Note[] notes, NotesTabPresenter presenter) {
+    public void display(DatasetNote[] notes, NotesTabPresenter presenter) {
         this.presenter = presenter;
         super.removeAll();
         super.add(createLayout(notes, parentConsole));
     }
 
-    private JPanel createLayout(Note[] notes, EmfConsole parentConsole) {
+    private JPanel createLayout(DatasetNote[] notes, EmfConsole parentConsole) {
         JPanel layout = new JPanel(new BorderLayout());
 
         layout.add(createSortFilterPane(notes, parentConsole), BorderLayout.CENTER);
@@ -52,7 +52,7 @@ public class NotesTab extends JPanel implements NotesTabView {
         return layout;
     }
 
-    private JScrollPane createSortFilterPane(Note[] notes, EmfConsole parentConsole) {
+    private JScrollPane createSortFilterPane(DatasetNote[] notes, EmfConsole parentConsole) {
         EmfTableModel model = new EmfTableModel(new NotesTableData(notes));
         selectModel = new SortFilterSelectModel(model);
 
@@ -84,7 +84,7 @@ public class NotesTab extends JPanel implements NotesTabView {
         List selected = selectModel.selected();
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
             ViewNoteWindow view = new ViewNoteWindow(desktopManager);
-            presenter.doViewNote((Note) iter.next(), view);    
+            presenter.doViewNote((DatasetNote) iter.next(), view);    
         }
     }
 }

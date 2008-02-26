@@ -7,8 +7,8 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.DataViewService;
@@ -78,10 +78,10 @@ public class DataViewPresenter {
 
     void addNote(NewNoteView view, User user, EmfDataset dataset, NoteType[] types, Version[] versions)
             throws EmfException {
-        Note[] notes = commonsService().getNotes(dataset.getId());
+        DatasetNote[] notes = commonsService().getDatasetNotes(dataset.getId());
         view.display(user, dataset, version, notes, types, versions);
         if (view.shouldCreate())
-            commonsService().addNote(view.note());
+            commonsService().addDatasetNote(view.note());
     }
 
 }

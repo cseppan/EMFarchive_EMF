@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.SetReferencesDialog;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
@@ -57,7 +58,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
 
     private EmfConsole parent;
 
-    private Note[] selectedReferences;
+    private DatasetNote[] selectedReferences;
 
     private TextArea referencesListing;
 
@@ -67,10 +68,10 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         super.center();
         
         this.parent = parent;
-        selectedReferences = new Note[0];
+        selectedReferences = new DatasetNote[0];
     }
 
-    public void display(User user, EmfDataset dataset, Version version, Note[] notes, NoteType[] types,
+    public void display(User user, EmfDataset dataset, Version version, DatasetNote[] notes, NoteType[] types,
             Version[] versions) {
         versionsSet = new VersionsSet(versions);
         this.version = version.getName();
@@ -78,14 +79,14 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         doDisplay(user, dataset, notes, types);
     }
 
-    public void display(User user, EmfDataset dataset, Note[] notes, NoteType[] types, Version[] versions) {
+    public void display(User user, EmfDataset dataset, DatasetNote[] notes, NoteType[] types, Version[] versions) {
         versionsSet = new VersionsSet(versions);
         version = versionsSet.getDefaultVersionName(dataset);
 
         doDisplay(user, dataset, notes, types);
     }
 
-    private void doDisplay(User user, EmfDataset dataset, Note[] notes, NoteType[] types) {
+    private void doDisplay(User user, EmfDataset dataset, DatasetNote[] notes, NoteType[] types) {
         this.user = user;
         this.dataset = dataset;
         this.types = types;
@@ -95,7 +96,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         super.display();
     }
 
-    private JPanel createLayout(Note[] notes, NoteType[] types, VersionsSet versionsSet) {
+    private JPanel createLayout(DatasetNote[] notes, NoteType[] types, VersionsSet versionsSet) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -105,7 +106,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         return panel;
     }
 
-    private JPanel inputPanel(final Note[] notes, NoteType[] types, VersionsSet versionsSet) {
+    private JPanel inputPanel(final DatasetNote[] notes, NoteType[] types, VersionsSet versionsSet) {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -135,7 +136,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         return panel;
     }
 
-    private void layoutReferences(final Note[] notes, JPanel panel, SpringLayoutGenerator layoutGenerator) {
+    private void layoutReferences(final DatasetNote[] notes, JPanel panel, SpringLayoutGenerator layoutGenerator) {
         JPanel rightPanel = new JPanel(new BorderLayout());
 
         JPanel container = new JPanel();
@@ -161,7 +162,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         return ScrollableComponent.createWithVerticalScrollBar(referencesListing);
     }
 
-    protected void doAddReferences(Note[] notes) {
+    protected void doAddReferences(DatasetNote[] notes) {
         SetReferencesDialog dialog = new SetReferencesDialog(parent);
         dialog.display(notes, selectedReferences);
         selectedReferences = dialog.selected();
@@ -184,7 +185,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         return combo;
     }
 
-    private JPanel buttonsPanel(final Note[] notes) {
+    private JPanel buttonsPanel(final DatasetNote[] notes) {
         JPanel panel = new JPanel();
         Button ok = new OKButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -205,14 +206,14 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         return panel;
     }
 
-    private void doNew(Note[] notes) {
+    private void doNew(DatasetNote[] notes) {
         if (verifyInput(notes)) {
             shouldCreate = true;
             close();
         }
     }
 
-    protected boolean verifyInput(Note[] notes) {
+    protected boolean verifyInput(DatasetNote[] notes) {
         String noteName = name.getText().trim();
         if (noteName.length() == 0) {
             JOptionPane.showMessageDialog(super.getParent(), "Please enter Name", "Error", JOptionPane.ERROR_MESSAGE);
@@ -228,9 +229,9 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         return true;
     }
 
-    private boolean duplicate(String noteName, Note[] notes) {
+    private boolean duplicate(String noteName, DatasetNote[] notes) {
         for (int i = 0; i < notes.length; i++) {
-            if (notes[i].getName().equals(noteName))
+            if (notes[i].getNote().getName().equals(noteName))
                 return true;
         }
 
@@ -241,7 +242,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         return shouldCreate;
     }
 
-    public Note note() {
+    public DatasetNote note() {
         Note note = new Note();
         note.setName(name.getText());
         note.setDetails(details.getText());
@@ -251,8 +252,11 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         note.setDate(new Date());
         note.setCreator(user);
         note.setDatasetId(dataset.getId());
-
-        return note;
+        
+        DatasetNote datasetNote = new DatasetNote();
+        datasetNote.setDatasetId(dataset.getId());
+        datasetNote.setNote(note);
+        return datasetNote;
     }
 
     private NoteType type() {

@@ -1,23 +1,23 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.commons.util.CustomDateFormat;
-import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.ui.RowSource;
 
 import java.util.Date;
 
 public class NotesRowSource implements RowSource {
 
-    private Note note;
+    private DatasetNote datasetNote;
 
-    public NotesRowSource(Note source) {
-        this.note = source;
+    public NotesRowSource(DatasetNote source) {
+        this.datasetNote = source;
     }
 
     public Object[] values() {
-        return new Object[] { new Long(note.getId()), note.getName(), note.getNoteType().getType(),
-                new Long(note.getVersion()), note.getCreator().getName(), format(note.getDate()), note.getReferences(),
-                note.getDetails() };
+        return new Object[] { new Long(datasetNote.getNote().getId()), datasetNote.getNote().getName(), datasetNote.getNote().getNoteType().getType(),
+                new Long(datasetNote.getNote().getVersion()), datasetNote.getNote().getCreator().getName(), format(datasetNote.getNote().getDate()), datasetNote.getNote().getReferences(),
+                datasetNote.getNote().getDetails() };
     }
 
     private Object format(Date date) {
@@ -25,7 +25,7 @@ public class NotesRowSource implements RowSource {
     }
 
     public Object source() {
-        return note;
+        return datasetNote;
     }
 
     public void validate(int rowNumber) {// No Op

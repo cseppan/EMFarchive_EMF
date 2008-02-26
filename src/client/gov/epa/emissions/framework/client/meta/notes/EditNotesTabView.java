@@ -1,13 +1,13 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
-import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 
 public interface EditNotesTabView {
 
-    void display(Note[] notes, EditNotesTabPresenter presenter);
+    void display(DatasetNote[] notes, EditNotesTabPresenter presenter);
 
-    Note[] additions();
+    DatasetNote[] additions();
 
-    void addNote(Note note);
+    void addNote(DatasetNote note);
 
 }

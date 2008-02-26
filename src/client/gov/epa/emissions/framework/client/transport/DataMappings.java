@@ -40,10 +40,11 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
-import gov.epa.emissions.framework.services.cost.data.SumEffRec;
 import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
+import gov.epa.emissions.framework.services.cost.data.SumEffRec;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
@@ -94,6 +95,7 @@ public class DataMappings extends Mappings {
         bean(call, AccessLog.class, log());
 
         bean(call, Note.class, note());
+        bean(call, DatasetNote.class, datasetNote());
         bean(call, NoteType.class, notetype());
         bean(call, Revision.class, revision());
         bean(call, Pollutant.class, pollutant());
@@ -163,6 +165,7 @@ public class DataMappings extends Mappings {
         array(call, AccessLog[].class, logs());
 
         array(call, Note[].class, notes());
+        array(call, DatasetNote[].class, datasetNotes());
         array(call, NoteType[].class, notetypes());
         array(call, Revision[].class, revisions());
         array(call, Pollutant[].class, pollutants());
@@ -326,8 +329,16 @@ public class DataMappings extends Mappings {
         return qname("Note");
     }
 
+    public QName datasetNote() {
+        return qname("DatasetNote");
+    }
+
     public QName notes() {
         return qname("Notes");
+    }
+
+    public QName datasetNotes() {
+        return qname("DatasetNotes");
     }
 
     public QName revision() {

@@ -7,18 +7,16 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.SetReferencesDialog;
+import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.ui.Border;
 
 import java.awt.BorderLayout;
-//import javax.swing.border.TitledBorder;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.Date;
 
-//import javax.swing.BorderFactory;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -36,17 +34,17 @@ public class RevisionPanel extends JPanel {
 
     private Version version;
 
-    private Note[] selectedReferences;
+    private DatasetNote[] selectedReferences;
 
-    private Note[] notes;
+    private DatasetNote[] notes;
 
     private SetReferencesDialog setReferencesDialog;
 
-    public RevisionPanel(User user, EmfDataset dataset, Version version, Note[] notes, EmfConsole parent) {
+    public RevisionPanel(User user, EmfDataset dataset, Version version, DatasetNote[] notes, EmfConsole parent) {
         this.user = user;
         this.dataset = dataset;
         this.version = version;
-        selectedReferences = new Note[0];
+        selectedReferences = new DatasetNote[0];
         this.notes = notes;
         setReferencesDialog = new SetReferencesDialog(parent);
 
