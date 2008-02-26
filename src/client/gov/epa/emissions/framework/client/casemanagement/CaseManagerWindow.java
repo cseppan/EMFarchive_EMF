@@ -72,7 +72,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private ComboBox categoriesBox;
 
     public CaseManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Case Manager", new Dimension(850, 400), desktopManager);
+        super("Case Manager", new Dimension(900, 400), desktopManager);
 
         this.session = session;
         this.parentConsole = parentConsole;
