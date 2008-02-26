@@ -247,7 +247,7 @@ public class CaseJobTaskManager implements TaskManager {
                         System.out.println("CaseJobTask Id for failed exports = " + cjt.getJobId());
                         System.out.println("CaseJobTask Id for failed exports = " + cjt.getTaskId());
                         System.out.println("Size of the waitTable before remove: " + waitTable.size());
-                        //waitTable.remove(taskId);
+                        // waitTable.remove(taskId);
                         toRemove = true;
                         if (DebugLevels.DEBUG_0)
                             System.out
@@ -281,7 +281,7 @@ public class CaseJobTaskManager implements TaskManager {
                         System.out.println("CaseJobTask Id for failed exports = " + cjt.getTaskId());
                     if (DebugLevels.DEBUG_9)
                         System.out.println("Size of the waitTable before remove: " + waitTable.size());
-                    //waitTable.remove(taskId);
+                    // waitTable.remove(taskId);
                     toRemove = true;
                     if (DebugLevels.DEBUG_0)
                         System.out
@@ -328,10 +328,11 @@ public class CaseJobTaskManager implements TaskManager {
 
             // update the run status in the Case_CaseJobs
             int jid = cjt.getJobId();
-            if (DebugLevels.DEBUG_9)
+            
+            if (DebugLevels.DEBUG_9) {
                 System.out.println("Before getJobId jid= " + jid);
-
-            System.out.println("after getJobId is the CJT null? " + (cjt == null));
+                System.out.println("after getJobId is the CJT null? " + (cjt == null));
+            }
 
             caseJob = caseDAO.getCaseJob(jid);
             JobRunStatus jrs = caseJob.getRunstatus();
@@ -404,7 +405,7 @@ public class CaseJobTaskManager implements TaskManager {
                 System.out.println("^^^^^^^^^^^^^^");
             throw new EmfException(e.getMessage());
         }
-        
+
         return toRemove;
     }
 
@@ -768,9 +769,9 @@ public class CaseJobTaskManager implements TaskManager {
                         if (DebugLevels.DEBUG_9)
                             System.out.println("dependent job status: " + status);
 
-                        if ((status.equals("Not Started")) || (status.equals("Failed"))) {
+                        if ((status.equalsIgnoreCase("Not Started")) || (status.equalsIgnoreCase("Failed"))) {
                             foNSD++;
-                        } else if (status.equals("Completed")) {
+                        } else if (status.equalsIgnoreCase("Completed") || status.equalsIgnoreCase("Quality Assured")) {
                             compD++;
                         } else {
                             nonFinalD++;
@@ -824,7 +825,7 @@ public class CaseJobTaskManager implements TaskManager {
                             synchronized (waitTable) {
                                 if (DebugLevels.DEBUG_9)
                                     System.out.println("Size of waitTable before remove: " + waitTable.size());
-                                //waitTable.remove(cjt.getTaskId());
+                                // waitTable.remove(cjt.getTaskId());
                                 tasks2Remove.add(cjt.getTaskId());
                                 if (DebugLevels.DEBUG_9)
                                     System.out.println("Size of waitTable after remove: " + waitTable.size());
@@ -835,12 +836,12 @@ public class CaseJobTaskManager implements TaskManager {
                 }// CJT had dependents
             }// cjt dependencies was false
         }// loop over all waiting tasks
-        
-        //NOTE: can't remove these tasks while iterating through them
-        for(Iterator<String> iterator = tasks2Remove.iterator(); iterator.hasNext();) {
+
+        // NOTE: can't remove these tasks while iterating through them
+        for (Iterator<String> iterator = tasks2Remove.iterator(); iterator.hasNext();) {
             waitTable.remove(iterator.next());
         }
-        
+
     }// testAndSetWaitingTasksDependencies
 
     protected static synchronized void setStatus(User user, StatusDAO statusServices, String message) {
