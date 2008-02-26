@@ -355,7 +355,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         try {
             if (dirOnly) {
                 messagePanel.setMessage("Please wait while retrieving all subfolders ...");
-                subdirsList.setListData(getAllDirs(currentDir));
+                refreshFiles(getAllDirs(currentDir), new EmfFileInfo[0]);
                 messagePanel.setMessage("Finished retrieving subfolders.");
             } else {
                 messagePanel.setMessage("Please wait while retrieving all subfolders and files ...");
