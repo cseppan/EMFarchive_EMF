@@ -271,7 +271,7 @@ insert into emf.dataset_types values(DEFAULT,'Chemical Speciation Combo Profiles
 -- Table: emf.datasets_notes
 CREATE TABLE emf.datasets_notes
 (
-  id serial NOT NULL,
+  id SERIAL PRIMARY KEY,
   dataset_id integer NOT NULL REFERENCES emf.datasets(id),
   note_id integer NOT NULL REFERENCES emf.notes(id),
   UNIQUE(dataset_id, note_id)
