@@ -56,8 +56,11 @@ public class ImportCaseOutputTask extends Task {
 
     private DbServerFactory dbServerFactory;
 
+    private boolean useTaskManager;
+
     public ImportCaseOutputTask(CaseOutput output, EmfDataset dataset, String[] files, File path, User user,
-            Services services, DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
+            Services services, DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory,
+            boolean useTaskManager) {
         super();
         createId();
 
@@ -69,6 +72,7 @@ public class ImportCaseOutputTask extends Task {
         this.path = path;
         this.dataset = dataset;
         this.output = output;
+        this.useTaskManager = useTaskManager;
         this.statusServices = services.getStatus();
         this.dbServerFactory = dbServerFactory;
         this.sessionFactory = sessionFactory;
@@ -103,7 +107,7 @@ public class ImportCaseOutputTask extends Task {
             isDone = true;
         } catch (Exception e) {
             errorMsg += e.getMessage();
-            
+
             // this doesn't give the full path for some reason
             logError("Failed to import file(s) : " + filesList(), e);
 
@@ -122,9 +126,9 @@ public class ImportCaseOutputTask extends Task {
         } finally {
             if (isDone)
                 addCompletedStatus();
-            else 
+            else
                 addFailedStatus(errorMsg);
-            
+
             try {
                 if (dbServer != null && dbServer.isConnected())
                     dbServer.disconnect();
@@ -246,7 +250,7 @@ public class ImportCaseOutputTask extends Task {
         // available
         setStatus("completed", message);
     }
-    
+
     private void addFailedStatus(String errorMsg) {
         setStatus("failed", "Failed to import dataset " + dataset.getName() + ". Reason: " + errorMsg);
     }
@@ -264,7 +268,9 @@ public class ImportCaseOutputTask extends Task {
             System.out.println("message = " + message);
         }
 
-        ImportTaskManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(), message);
+        if (this.useTaskManager)
+            ImportTaskManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(),
+                    message);
     }
 
     protected void logError(String messge, Exception e) {

@@ -227,7 +227,7 @@ public class ManagedImportService {
         importTasks.add(task);
     }
 
-    private synchronized void addOutputTasks(User user, CaseOutput output, Services services) throws Exception {
+    private synchronized void addOutputTasks(User user, CaseOutput output, Services services, boolean useTaskManager) throws Exception {
         String folder = output.getPath();
         String pattern = output.getPattern();
         String fullPath = output.getDatasetFile();
@@ -254,14 +254,14 @@ public class ManagedImportService {
         if (files.length > 1 && !type.isExternal())
             for (int i = 0; i < files.length; i++)
                 // here we're making multiple datasets
-                createOutputTask(type, datasetName, user, output, services, new String[] { files[i] }, path);
+                createOutputTask(type, datasetName, user, output, services, new String[] { files[i] }, path, useTaskManager);
         else
             // this is to make one dataset
-            createOutputTask(type, datasetName, user, output, services, files, path);
+            createOutputTask(type, datasetName, user, output, services, files, path, useTaskManager);
     }
 
     private synchronized void createOutputTask(DatasetType type, String datasetName, User user, CaseOutput output,
-            Services services, String[] files, File path) throws Exception {
+            Services services, String[] files, File path, boolean useTaskManager) throws Exception {
         if (datasetName == null || datasetName.trim().isEmpty())
             datasetName = files[0];
 
@@ -284,7 +284,7 @@ public class ManagedImportService {
         }
 
         ImportCaseOutputTask task = new ImportCaseOutputTask(localOuput, dataset, files, path, user, services,
-                dbServerFactory, sessionFactory);
+                dbServerFactory, sessionFactory, useTaskManager);
 
         importOutputTasks.add(task);
     }
@@ -339,7 +339,7 @@ public class ManagedImportService {
         String fileFolder = output.getPath();
 
         try {
-            addOutputTasks(user, output, services);
+            addOutputTasks(user, output, services, true);
             addTasksToSubmitter(importCaseOutputSubmitter, importOutputTasks);
         } catch (Exception e) {
             e.printStackTrace();
@@ -606,7 +606,7 @@ public class ManagedImportService {
         CaseOutput output = qoutput.convert2CaseOutput();
         Services services = services();
 
-        addOutputTasks(user, output, services);
+        addOutputTasks(user, output, services, false);
     }
 
     private void runOutputTasks() throws Exception {
