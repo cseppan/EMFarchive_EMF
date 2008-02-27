@@ -137,3 +137,23 @@ ALTER TABLE cases.cases_caseinputs
 ALTER TABLE cases.cases_parameters
    ADD COLUMN last_modified_date timestamp without time zone;
    
+-- 02/27/2008 add new table to accomodate the new method of registering case outputs
+CREATE TABLE cases.output_queue
+(
+  id serial NOT NULL,
+  case_id int4 NOT NULL REFERENCES cases.cases(id),
+  job_id int4 NOT NULL REFERENCES cases.cases_casejobs(id),
+  name varchar(255),
+  exec_name varchar(255),
+  message text,
+  dataset_file varchar(255),
+  path varchar(255),
+  pattern varchar(255),
+  dataset_name varchar(255),
+  cr_date timestamp,
+  remote_user varchar(255),
+  dataset_type varchar(255),
+  status varchar(50)
+) 
+WITHOUT OIDS;
+-- cases.output_queue

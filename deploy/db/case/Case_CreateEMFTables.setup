@@ -360,3 +360,24 @@ CREATE TABLE cases.outputs
 )
 WITHOUT OIDS;
 -- cases.outputs
+
+-- cases.output_queue
+CREATE TABLE cases.output_queue
+(
+  id serial NOT NULL,
+  case_id int4 NOT NULL REFERENCES cases.cases(id),
+  job_id int4 NOT NULL REFERENCES cases.cases_casejobs(id),
+  name varchar(255),
+  exec_name varchar(255),
+  message text,
+  dataset_file varchar(255),
+  path varchar(255),
+  pattern varchar(255),
+  dataset_name varchar(255),
+  cr_date timestamp,
+  remote_user varchar(255),
+  dataset_type varchar(255),
+  status varchar(50)
+) 
+WITHOUT OIDS;
+-- cases.output_queue
