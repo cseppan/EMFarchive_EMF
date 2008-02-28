@@ -96,7 +96,7 @@ public class ManagedImportService {
         this.dbServerFactory = dbServerFactory;
 
         if (DebugLevels.DEBUG_17)
-            System.out.println("ManagedImportService: At the class initialization -- numOfRunningThread: " 
+            System.out.println("ManagedImportService: At the class initialization -- numOfRunningThread: "
                     + numOfRunningThread);
     }
 
@@ -227,7 +227,8 @@ public class ManagedImportService {
         importTasks.add(task);
     }
 
-    private synchronized void addOutputTasks(User user, CaseOutput output, Services services, boolean useTaskManager) throws Exception {
+    private synchronized void addOutputTasks(User user, CaseOutput output, Services services, boolean useTaskManager)
+            throws Exception {
         String folder = output.getPath();
         String pattern = output.getPattern();
         String fullPath = output.getDatasetFile();
@@ -254,7 +255,8 @@ public class ManagedImportService {
         if (files.length > 1 && !type.isExternal())
             for (int i = 0; i < files.length; i++)
                 // here we're making multiple datasets
-                createOutputTask(type, datasetName, user, output, services, new String[] { files[i] }, path, useTaskManager);
+                createOutputTask(type, datasetName, user, output, services, new String[] { files[i] }, path,
+                        useTaskManager);
         else
             // this is to make one dataset
             createOutputTask(type, datasetName, user, output, services, files, path, useTaskManager);
@@ -514,7 +516,8 @@ public class ManagedImportService {
             exception = e;
         }
 
-        session.close();
+        if (session != null && session.isConnected())
+            session.close();
 
         if (exception != null)
             throw new EmfException(exception.getMessage());
@@ -558,7 +561,7 @@ public class ManagedImportService {
                 } finally {
                     ManagedImportService.numOfRunningThread = 0; // reset so that other thread can kick off
 
-                    if (session != null)
+                    if (session != null && session.isConnected())
                         session.close();
                 }
             } // end of run()
