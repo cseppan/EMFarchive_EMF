@@ -467,10 +467,16 @@ public class ManagedCaseService {
         }
     }
 
-    public Case releaseLocked(Case locked) throws EmfException {
+    public Case releaseLocked(User owner, Case locked) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            Case released = dao.releaseLocked(locked, session);
+            Case loaded = dao.getCase(locked.getId(), session);
+            String lockOwner = loaded.getLockOwner();
+            
+            if (lockOwner != null && !lockOwner.equals(owner.getUsername())) //so to not release other's lock by accident
+                return locked;
+            
+            Case released = dao.releaseLocked(owner, locked, session);
             return released;
         } catch (RuntimeException e) {
             e.printStackTrace();
@@ -1296,7 +1302,7 @@ public class ManagedCaseService {
             // FIXME: Verfiy why locked?
             // NOTE: it could be being edited by other user, but you still want to copy it
             if (loaded.isLocked())
-                dao.releaseLocked(loaded, session);
+                dao.releaseLocked(user, loaded, session);
         } finally {
             session.close();
         }
@@ -2610,7 +2616,7 @@ public class ManagedCaseService {
 
     private String listNonFinalInputs(List<CaseInput> inputs) {
         String inputsList = "";
-        String lineSeparator = System.getProperty("line.separator");
+        String ls = System.getProperty("line.separator");
 
         if (DebugLevels.DEBUG_14)
             System.out.println("Start listing non-final inputs. " + new Date());
@@ -2621,13 +2627,16 @@ public class ManagedCaseService {
             Version version = input.getVersion();
 
             if (!version.isFinalVersion())
-                inputsList += "Input: " + input.getName() + ";  Dataset: " + dataset + lineSeparator;
+                inputsList += "Input: " + input.getName() + ";  Dataset: " + dataset + ls;
         }
-
+        
         if (DebugLevels.DEBUG_14)
             System.out.println("Finished listing non-final inputs. " + new Date());
-
-        return inputsList;
+        
+        if (inputsList.isEmpty())
+            return inputsList;
+        
+        return "The selected jobs have non-final dataset versions:" + ls + inputsList;
     }
 
     private String listInputsMsg(List<CaseInput> inputs) throws EmfException {

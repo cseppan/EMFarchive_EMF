@@ -180,14 +180,15 @@ public class CaseServiceTransport implements CaseService {
         return (Case) call.requestResponse(new Object[] { owner, element });
     }
 
-    public synchronized Case releaseLocked(Case locked) throws EmfException {
+    public synchronized Case releaseLocked(User owner, Case locked) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("releaseLocked");
-        call.addParam("element", caseMappings.caseObject());
+        call.addParam("owner", dataMappings.user());
+        call.addParam("locked", caseMappings.caseObject());
         call.setReturnType(caseMappings.caseObject());
 
-        return (Case) call.requestResponse(new Object[] { locked });
+        return (Case) call.requestResponse(new Object[] { owner, locked });
     }
 
     public synchronized Case updateCase(Case element) throws EmfException {

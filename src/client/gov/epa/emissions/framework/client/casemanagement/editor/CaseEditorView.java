@@ -9,10 +9,12 @@ public interface CaseEditorView extends ManagedView {
 
     void observe(CaseEditorPresenter presenter);
 
-    void display(Case caseObj);
+    void display(Case caseObj, String msg);
 
     void notifyLockFailure(Case caseObj);
 
     void setCursor(Cursor cursor);
+
+    void showRemindingMessage(String msg);
 
 }

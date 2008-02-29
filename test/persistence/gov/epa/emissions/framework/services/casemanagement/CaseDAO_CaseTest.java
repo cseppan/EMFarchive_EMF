@@ -366,7 +366,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
 
         try {
             Case locked = dao.obtainLocked(owner, element, session);
-            Case released = dao.releaseLocked(locked, session);
+            Case released = dao.releaseLocked(owner, locked, session);
             assertFalse("Should have released lock", released.isLocked());
 
             Case loadedFromDb = load(element);

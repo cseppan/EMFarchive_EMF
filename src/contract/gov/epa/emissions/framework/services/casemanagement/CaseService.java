@@ -53,7 +53,7 @@ public interface CaseService {
 
     Case obtainLocked(User owner, Case element) throws EmfException;
 
-    Case releaseLocked(Case locked) throws EmfException;
+    Case releaseLocked(User owner, Case locked) throws EmfException;
 
     Case updateCase(Case element) throws EmfException;
     

@@ -70,17 +70,25 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     public void doDisplay() throws EmfException {
         view.observe(this);
 
+        Case b4locked = caseObj;
         caseObj = service().obtainLocked(session.user(), caseObj);
+
         if (!caseObj.isLocked(session.user())) {// view mode, locked by another user
             view.notifyLockFailure(caseObj);
             return;
         }
 
-        view.display(caseObj);
+        String msg = "";
+        
+        if (b4locked.isLocked() && !b4locked.isLocked(session.user()))
+            msg = "Lock acquired from an expired one (by user "
+                    + b4locked.getLockOwner() + ").";
+        
+        view.display(caseObj, msg);
     }
 
     public void doClose() throws EmfException {
-        service().releaseLocked(caseObj);
+        service().releaseLocked(session.user(), caseObj);
         closeView();
     }
 

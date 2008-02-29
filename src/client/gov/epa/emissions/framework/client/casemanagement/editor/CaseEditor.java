@@ -43,11 +43,11 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private EmfSession session;
 
     private EmfConsole parentConsole;
-    
+
     private String tabTitle;
-    
+
     private JTabbedPane tabbedPane;
-    
+
     public CaseEditor(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
         super("Case Editor", new Dimension(780, 580), desktopManager);
         this.session = session;
@@ -67,20 +67,20 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         final MessagePanel localMsgPanel = this.messagePanel;
 
-        tabbedPane.addChangeListener(new ChangeListener(){
+        tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 try {
                     localMsgPanel.clear();
                     loadComponents();
                 } catch (EmfException exc) {
-                    showError("Could not load component: "  + tabbedPane.getSelectedComponent().getName());
+                    showError("Could not load component: " + tabbedPane.getSelectedComponent().getName());
                 }
             }
         });
-        
+
         return tabbedPane;
     }
-    
+
     protected void loadComponents() throws EmfException {
         int tabIndex = tabbedPane.getSelectedIndex();
         tabTitle = tabbedPane.getTitleAt(tabIndex);
@@ -127,7 +127,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
             return createErrorTab("Could not load CaseJob Tab." + e.getMessage());
         }
     }
-    
+
     private JPanel createOutputTab() {
         try {
             EditOutputsTab view = new EditOutputsTab(parentConsole, this, messagePanel, desktopManager, session);
@@ -138,7 +138,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
             return createErrorTab("Could not load Output Tab. " + e.getMessage());
         }
     }
-    
+
     private JPanel createHistoryTab() {
         ShowHistoryTab view = new ShowHistoryTab(parentConsole, messagePanel, session);
         presenter.set(view);
@@ -149,7 +149,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         return new ErrorPanel(message);
     }
 
-    public void display(Case caseObj) {
+    public void display(Case caseObj, String msg) {
         super.setLabel("Case Editor: " + caseObj);
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
@@ -160,6 +160,9 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         panel.add(createTabbedPane(caseObj, messagePanel), BorderLayout.CENTER);
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
+        if (msg != null && !msg.isEmpty())
+            messagePanel.setMessage(msg);
+        
         contentPane.add(panel);
         super.display();
         resetChanges();
@@ -193,8 +196,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
             }
         });
         buttonsPanel.add(save);
-        save.setToolTipText(
-        "Saves only the information on the Summary tab and the input and output folders.");
+        save.setToolTipText("Saves only the information on the Summary tab and the input and output folders.");
 
         Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -208,7 +210,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     }
 
     private void refreshCurrentTab() throws EmfException {
-        RefreshObserver tab = (RefreshObserver)tabbedPane.getSelectedComponent();
+        RefreshObserver tab = (RefreshObserver) tabbedPane.getSelectedComponent();
         try {
             messagePanel.clear();
             tab.doRefresh();
@@ -228,8 +230,12 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     public void notifyLockFailure(Case caseObj) {
         String message = "Cannot edit Properties of Case: " + caseObj + System.getProperty("line.separator")
                 + " as it was locked by User: " + caseObj.getLockOwner() + "(at " + format(caseObj.getLockDate()) + ")";
-        InfoDialog dialog = new InfoDialog(this, "Message", message);
+        InfoDialog dialog = new InfoDialog(parentConsole, "Message", message);
         dialog.confirm();
+    }
+
+    public void showRemindingMessage(String msg) {
+        messagePanel.setMessage(msg);
     }
 
     private String format(Date lockDate) {
@@ -252,8 +258,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private void doSave() {
         try {
             presenter.doSave();
-            messagePanel
-            .setMessage("Case was saved successfully.");
+            messagePanel.setMessage("Case was saved successfully.");
             resetChanges();
         } catch (EmfException e) {
             showError(e.getMessage());

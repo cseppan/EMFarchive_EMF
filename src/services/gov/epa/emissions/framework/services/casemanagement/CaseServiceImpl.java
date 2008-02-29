@@ -145,8 +145,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().obtainLocked(owner, element);
     }
 
-    public Case releaseLocked(Case locked) throws EmfException {
-        return getCaseService().releaseLocked(locked);
+    public Case releaseLocked(User owner, Case locked) throws EmfException {
+        return getCaseService().releaseLocked(owner, locked);
     }
 
     public Case updateCase(Case element) throws EmfException {

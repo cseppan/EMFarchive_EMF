@@ -112,7 +112,7 @@ public class CaseServiceTest2 extends ServiceTestCase {
 
         try {
             Case locked = service.obtainLocked(owner, element);
-            Case released = service.releaseLocked(locked);
+            Case released = service.releaseLocked(owner, locked);
             assertFalse("Should have released lock", released.isLocked());
 
             Case loadedFromDb = (Case) load(Case.class, element.getName());

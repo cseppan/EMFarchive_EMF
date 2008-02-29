@@ -278,7 +278,7 @@ public class CaseDAO {
         return (Case) lockingScheme.getLocked(owner, current(element, session), session);
     }
 
-    public Case releaseLocked(Case locked, Session session) {
+    public Case releaseLocked(User owner, Case locked, Session session) {
         return (Case) lockingScheme.releaseLock(current(locked, session), session);
     }
 
