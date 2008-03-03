@@ -310,6 +310,8 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         envValue.setEnabled(false);
         purpose.setEnabled(false);
         order.setEnabled(false);
+        required.setEnabled(false);
+        show.setEnabled(false);
     }
 
 }

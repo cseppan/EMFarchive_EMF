@@ -411,6 +411,8 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         qaStatus.setEnabled(false);
         subDir.setEnabled(false);
         jobs.setEnabled(false);
+        required.setEnabled(false);
+        show.setEnabled(false);
     }
 
 }

@@ -525,9 +525,8 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         meteorlogicalYearCombo.setEnabled(false);
         speciationCombo.setEnabled(false);
         gridResolutionCombo.setEnabled(false);
-        //isFinal;
-        //isTemplate;
-        //sectorsWidget.viewOnly();
+        isFinal.setEnabled(false);
+        isTemplate.setEnabled(false);
         //airQualityModels;
         //emissionsYears;
         //grids;
@@ -537,6 +536,7 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         runStatusCombo.setEditable(false);
         startDate.setEditable(false);
         endDate.setEditable(false);
+        runStatusCombo.setEnabled(false);
     }
 
 

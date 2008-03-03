@@ -588,6 +588,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         browseButton.setVisible(false);
         name.setEditable(false);
         purpose.setEditable(false);
+        purpose.setEnabled(false);
         path.setEditable(false);
         version.setEditable(false);
         args.setEditable(false);
@@ -600,6 +601,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         qoption.setEditable(false);
         
         lastMsg.setEnabled(false);
+        lastMsg.setEditable(false);
+        runNote.setEditable(false);
         runNote.setEnabled(false);
     }
 
