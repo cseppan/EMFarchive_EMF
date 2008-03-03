@@ -146,7 +146,7 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
     }
 
     public void display(Case caseObj) {
-        super.setLabel("Case Editor: " + caseObj);
+        super.setLabel("Case Viewer: " + caseObj);
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 

@@ -95,11 +95,11 @@ public class ViewableOutputsTab extends JPanel implements RefreshObserver {
     private void doRefresh(CaseOutput[] outputs){
         messagePanel.clear();
         selectedJob=(CaseJob) jobCombo.getSelectedItem();
-//        try {
-//            getAllJobs();
-//        } catch (EmfException e) {
-//            messagePanel.setError(e.getMessage());
-//        }
+        try {
+            getAllJobs();
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
         super.removeAll();
         super.add(createLayout(outputs), BorderLayout.CENTER);
         super.revalidate();
@@ -189,7 +189,6 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
             }
         });
         view.setMargin(insets);
-//        edit.setEnabled(false);
         container.add(view);
         
         Button viewDS = new ViewButton("View Dataset", new AbstractAction() {
