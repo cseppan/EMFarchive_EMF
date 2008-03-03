@@ -28,6 +28,14 @@ public class EditCaseJobPresenterImpl implements EditJobPresenter {
         this.parentPresenter = parentPresenter;
     }
     
+    public EditCaseJobPresenterImpl(EditCaseJobView view, 
+           EditJobsTabPresenter parentPresenter, EmfSession session) {
+        this.view = view;
+        this.session = session;
+        this.parentPresenter = parentPresenter;
+    }
+
+    
     public void display(CaseJob job) throws EmfException {
         this.job = job;
         view.observe(this);

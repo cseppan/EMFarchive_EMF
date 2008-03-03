@@ -28,6 +28,13 @@ public class EditCaseParameterPresenterImpl implements EditCaseParameterPresente
         this.caseid = caseid;
     }
     
+    public EditCaseParameterPresenterImpl(int caseid, 
+            EditCaseParameterView view, EmfSession session) {
+        this.view = view;
+        this.session = session;
+        this.caseid = caseid;
+    }
+    
     public void display(CaseParameter param) throws EmfException {
         this.parameter = param;
         view.observe(this);

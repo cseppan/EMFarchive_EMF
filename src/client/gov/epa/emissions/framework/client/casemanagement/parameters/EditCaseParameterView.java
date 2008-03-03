@@ -11,4 +11,6 @@ public interface EditCaseParameterView {
     void loadInput() throws EmfException;
     
     void populateFields();
+    
+    void viewOnly();
 }

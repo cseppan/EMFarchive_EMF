@@ -58,6 +58,8 @@ public class AddRemoveWidget extends JPanel {
         final JPanel container = this;
         this.objectsList.addMouseListener(new MouseListener() {
             public void mouseClicked(MouseEvent event) {
+                if (objectsList.getSelectedValue()==null)
+                    return; 
                 container.setToolTipText(objectsList.getSelectedValue().toString());
             }
 

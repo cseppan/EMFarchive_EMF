@@ -102,6 +102,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
     private TextField oldJobOrder;
     
+    private Button browseButton;
+    
     private AddRemoveWidget dependentJobsList;
 
     private static String lastPath = "";
@@ -299,7 +301,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     }
 
     private JPanel getFolderChooserPanel(final JTextField dir, final String title) {
-        Button browseButton = new BrowseButton(new AbstractAction() {
+        browseButton = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 clearMessage();
                 selectFolder(dir, title);
@@ -580,6 +582,25 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
     private void setError(String error) {
         messagePanel.setError(error);
+    }
+
+    public void viewOnly() {
+        browseButton.setVisible(false);
+        name.setEditable(false);
+        purpose.setEditable(false);
+        path.setEditable(false);
+        version.setEditable(false);
+        args.setEditable(false);
+        dependentJobsList.viewOnly();
+        
+        sector.setEnabled(false);
+        status.setEnabled(false);
+        jobOrder.setEditable(false);
+        host.setEnabled(false);
+        qoption.setEditable(false);
+        
+        lastMsg.setEnabled(false);
+        runNote.setEnabled(false);
     }
 
 }

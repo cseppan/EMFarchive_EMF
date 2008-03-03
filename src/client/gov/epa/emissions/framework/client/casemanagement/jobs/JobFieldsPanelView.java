@@ -17,4 +17,6 @@ public interface JobFieldsPanelView {
     CaseJob getJob() throws EmfException;
     
     void validateFields() throws EmfException;
+    
+    void viewOnly();
 }

@@ -7,5 +7,7 @@ public interface EditCaseParameterPresenter {
     
     void display(CaseParameter param) throws EmfException;
     
+//    void viewDisplay(CaseParameter param);
+    
     void doSave() throws EmfException;
 }

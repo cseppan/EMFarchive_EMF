@@ -28,6 +28,13 @@ public class EditCaseOutputPresenterImpl implements EditOutputPresenter {
         this.caseid = caseid;
     }
     
+    public EditCaseOutputPresenterImpl(int caseid, EditCaseOutputView view, 
+            EmfSession session) {
+        this.view = view;
+        this.session = session;
+        this.caseid = caseid;
+    }
+    
     public void display(CaseOutput output) throws EmfException {
         this.output = output;
         view.observe(this);

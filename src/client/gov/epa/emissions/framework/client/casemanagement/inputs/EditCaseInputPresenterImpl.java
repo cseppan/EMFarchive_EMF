@@ -28,6 +28,13 @@ public class EditCaseInputPresenterImpl implements EditInputPresenter {
         this.caseid = caseid;
     }
     
+    public EditCaseInputPresenterImpl(int caseid, EditCaseInputView view, 
+           EmfSession session) {
+        this.view = view;
+        this.session = session;
+        this.caseid = caseid;
+    }
+    
     public void display(CaseInput input) throws EmfException {
         this.input = input;
         view.observe(this);

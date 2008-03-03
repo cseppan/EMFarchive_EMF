@@ -398,5 +398,19 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
         setFields();
     }
+    
+    public void viewOnly(){
+        program.setEditable(false);
+        program.setEnabled(false);
+        inputName.setEnabled(false);
+        sector.setEnabled(false);
+        envtVar.setEnabled(false);
+        dataset.setEnabled(false);
+        version.setEnabled(false);
+        dsType.setEnabled(false);
+        qaStatus.setEnabled(false);
+        subDir.setEnabled(false);
+        jobs.setEnabled(false);
+    }
 
 }

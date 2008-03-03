@@ -298,5 +298,18 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
     public CaseParameter getParameter() {
         return this.parameter;
     }
+    
+    public void viewOnly(){
+        parameterName.setEnabled(false);
+        program.setEnabled(false);
+        sector.setEnabled(false);
+        envtVar.setEnabled(false);
+        jobs.setEnabled(false);
+        varTypes.setEnabled(false);
+        notes.setEnabled(false);
+        envValue.setEnabled(false);
+        purpose.setEnabled(false);
+        order.setEnabled(false);
+    }
 
 }

@@ -515,6 +515,16 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     }
 
     public void viewOnly() {
+        name.setEditable(false);
+        description.setEditable(false);
+        abbreviation.setEditable(false);
+        majorPollutant.setEditable(false);
+        controlTechnology.setEditable(false);
+        equipmentLife.setEditable(false);
+        dataSources.setEditable(false);
+        dateReviewed.setEditable(false);
+        sourceGroup.setEditable(false);
+        cmClass.setEditable(false);
         sectorsWidget.viewOnly();
         monthsWidget.viewOnly();
     }

@@ -134,4 +134,9 @@ public class EditCaseOutputWindow extends DisposableInteralFrame implements Edit
     private void doValidateFields() throws EmfException {
         outputFieldsPanel.validateFields();
     }
+    
+    public void viewOnly(){
+        save.setVisible(false);
+        outputFieldsPanel.viewOnly();
+    }
 }

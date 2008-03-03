@@ -148,6 +148,9 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
         super.signalChanges();
     }
 
- 
+    public void viewOnly(){
+        ok.setVisible(false);
+        jobFieldsPanel.viewOnly();
+    }
 
 }

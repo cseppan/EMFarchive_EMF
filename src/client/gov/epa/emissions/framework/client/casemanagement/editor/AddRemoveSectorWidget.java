@@ -36,6 +36,10 @@ public class AddRemoveSectorWidget extends JPanel {
 
     }
 
+    public AddRemoveSectorWidget(Sector[] allSectors) {
+        setupLayout();
+
+    }
     public void setSectors(Sector[] sectors) {
         for (int i = 0; i < sectors.length; i++) {
             sectorsList.addElement(sectors[i]);
@@ -57,6 +61,16 @@ public class AddRemoveSectorWidget extends JPanel {
         this.add(pane);
         this.add(buttonPanel, BorderLayout.SOUTH);
     }
+    
+    private void setupLayout() {
+        this.sectorsList = new ListWidget(new Sector[0]);
+        
+        JScrollPane pane = new JScrollPane(sectorsList);
+
+        this.setLayout(new BorderLayout(1, 1));
+        this.add(pane);
+    }
+
 
     private JPanel addRemoveButtonPanel() {
         JPanel panel = new JPanel();

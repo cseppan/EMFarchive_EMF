@@ -133,5 +133,10 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
         clearMessage();
         super.signalChanges();
     }
+    
+    public void viewOnly(){
+        ok.setVisible(false);
+        inputFieldsPanel.viewOnly();
+    }
 
 }

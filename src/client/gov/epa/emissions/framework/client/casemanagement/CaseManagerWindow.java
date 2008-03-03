@@ -13,6 +13,7 @@ import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditor;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewer;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -272,11 +273,25 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         };
 
         SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, selectModel, confirmDialog);
-        viewButton.setEnabled(false);
         return viewButton;
     }
 
-    private void viewCases() {// TODO
+    private void viewCases() {
+        cases = selected();
+        if (cases.isEmpty()) {
+            messagePanel.setMessage("Please select one or more Cases");
+            return;
+        }
+
+        for (Iterator iter = cases.iterator(); iter.hasNext();) {
+            Case caseObj = (Case) iter.next();
+            CaseViewer view = new CaseViewer(parentConsole, session, desktopManager);
+            try {
+                presenter.doView(view, caseObj);
+            } catch (EmfException e) {
+                showError(e.getMessage());
+            }
+        }
     }
 
     private void editCases() {

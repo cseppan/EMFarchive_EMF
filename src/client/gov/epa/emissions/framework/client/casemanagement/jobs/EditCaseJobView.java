@@ -11,4 +11,6 @@ public interface EditCaseJobView {
     void loadCaseJob() throws EmfException;
     
     void populateFields();
+    
+    void viewOnly();
 }

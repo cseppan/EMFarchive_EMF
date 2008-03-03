@@ -27,7 +27,7 @@ public class ViewControlMeasureWindow extends EditControlMeasureWindow {
         super.setName("viewControlMeasure" + measure.getId());
     }
 
-    public void viewOnly() {
+    private void viewOnly() {
         // NOTE Auto-generated method stub
         saveButton.setVisible(false);
         controlMeasureSccTabView.viewOnly();

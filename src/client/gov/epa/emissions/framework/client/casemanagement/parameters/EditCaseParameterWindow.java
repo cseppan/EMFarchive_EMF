@@ -133,5 +133,10 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
         clearMessage();
         super.signalChanges();
     }
-
+    
+    public void viewOnly(){
+        ok.setVisible(false);
+        inputFieldsPanel.viewOnly();
+    }
+    
 }

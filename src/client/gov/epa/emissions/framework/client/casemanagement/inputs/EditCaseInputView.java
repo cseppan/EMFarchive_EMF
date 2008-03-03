@@ -11,4 +11,6 @@ public interface EditCaseInputView {
     void loadInput() throws EmfException;
     
     void populateFields();
+    
+    void viewOnly();
 }

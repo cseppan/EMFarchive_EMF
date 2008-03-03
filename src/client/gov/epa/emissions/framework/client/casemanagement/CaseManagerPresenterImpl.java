@@ -4,6 +4,9 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenterImpl;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorView;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewerView;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewerPresenter;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewerPresenterImpl;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
@@ -82,6 +85,11 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
     public void doEdit(CaseEditorView caseView, Case caseObj) throws EmfException {
         CaseEditorPresenter presenter = new CaseEditorPresenterImpl(caseObj, session, caseView, this);
         displayEditor(presenter);
+    }
+    
+    public void doView(CaseViewerView caseView, Case caseObj) throws EmfException {
+        CaseViewerPresenter presenter = new CaseViewerPresenterImpl(caseObj, session, caseView, this);
+        presenter.doDisplay();
     }
 
     void displayEditor(CaseEditorPresenter presenter) throws EmfException {
