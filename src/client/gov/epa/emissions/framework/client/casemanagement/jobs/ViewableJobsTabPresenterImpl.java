@@ -1,11 +1,13 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.CaseObjectManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 
 import java.util.ArrayList;
@@ -167,5 +169,10 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
         // NOTE Auto-generated method stub
         
     }
+    
+    public synchronized JobRunStatus[] getRunStatuses() throws EmfException {
+        return CaseObjectManager.getCaseObjectManager(session).getJobRunStatuses();
+    }
+
     
 }
