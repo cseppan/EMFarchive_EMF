@@ -117,6 +117,12 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             messagePanel.setError("Cannot retrieve all case jobs.");
         } finally {
             setCursor(Cursor.getDefaultCursor());
+            
+            try {
+                presenter.checkIfLockedByCurrentUser();
+            } catch (Exception e) {
+                messagePanel.setMessage(e.getMessage());
+            }
         }
     }
 

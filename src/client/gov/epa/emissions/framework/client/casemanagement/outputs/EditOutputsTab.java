@@ -47,7 +47,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
 
     private EmfConsole parentConsole;
 
-    private EditOutputsTabPresenter presenter;
+    private EditOutputsTabPresenterImpl presenter;
     
     private MessagePanel messagePanel;
 
@@ -366,18 +366,21 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         try {
             messagePanel.setMessage("Please wait while retrieving all outputs...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            if ( selectedJob == null){
-                clearMessage();
-                setCursor(Cursor.getDefaultCursor());
-            }
-            else {
+            
+            if ( selectedJob != null)
                 doRefresh(presenter.getCaseOutputs(caseObj.getId(), selectedJob.getId()));
-                messagePanel.clear();
-                setCursor(Cursor.getDefaultCursor());
-            }
+            
+            clearMessage();
         } catch (Exception e) {
             messagePanel.setError("Cannot retrieve all outputs.");
+        } finally {
             setCursor(Cursor.getDefaultCursor());
+            
+            try {
+                presenter.checkIfLockedByCurrentUser();
+            } catch (Exception e) {
+                messagePanel.setMessage(e.getMessage());
+            }
         }
     }
 

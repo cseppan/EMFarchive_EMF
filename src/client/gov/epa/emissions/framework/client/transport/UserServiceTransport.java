@@ -96,14 +96,15 @@ public class UserServiceTransport implements UserService {
         return (User) call.requestResponse(params);
     }
 
-    public synchronized User releaseLocked(User object) throws EmfException {
+    public synchronized User releaseLocked(User user, User object) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("releaseLocked");
+        call.addParam("user", mappings.user());
         call.addParam("object", mappings.user());
         call.setReturnType(mappings.user());
 
-        return (User) call.requestResponse(new Object[] { object });
+        return (User) call.requestResponse(new Object[] { user, object });
     }
 
     public synchronized String getEmfVersion() throws EmfException {

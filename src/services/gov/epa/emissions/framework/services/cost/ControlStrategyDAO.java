@@ -134,11 +134,11 @@ public class ControlStrategyDAO {
 //            lockingScheme.releaseLock(current, session);
 //    }
 
-    public void releaseLocked(int id, Session session) {
+    public void releaseLocked(User user, int id, Session session) {
         ControlStrategy current = getById(id, session);
         String runStatus = current.getRunStatus();
         if (runStatus == null || !runStatus.equalsIgnoreCase("Running"))
-            lockingScheme.releaseLock(current, session);
+            lockingScheme.releaseLock(user, current, session);
     }
 
     public ControlStrategy update(ControlStrategy locked, Session session) throws EmfException {

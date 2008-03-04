@@ -156,7 +156,7 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
             return;
         
         for(int i = 0; i < lockedDatasets.length; i++)
-            dataService().releaseLockedDataset(lockedDatasets[i]);
+            dataService().releaseLockedDataset(session.user(), lockedDatasets[i]);
     }
 
     public EmfDataset[] getEmfDatasets(DatasetType type) throws EmfException {

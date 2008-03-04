@@ -70,7 +70,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     public void doDisplay() throws EmfException {
         view.observe(this);
 
-        Case b4locked = caseObj;
+        Case b4locked = service().reloadCase(caseObj.getId());
         caseObj = service().obtainLocked(session.user(), caseObj);
 
         if (!caseObj.isLocked(session.user())) {// view mode, locked by another user
@@ -79,11 +79,10 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         }
 
         String msg = "";
-        
+
         if (b4locked.isLocked() && !b4locked.isLocked(session.user()))
-            msg = "Lock acquired from an expired one (by user "
-                    + b4locked.getLockOwner() + ").";
-        
+            msg = "Lock acquired from an expired one (by user " + b4locked.getLockOwner() + ").";
+
         view.display(caseObj, msg);
     }
 
@@ -101,6 +100,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     }
 
     void updateCase() throws EmfException {
+        checkIfLockedByCurrentUser();
         saveTabs();
 
         if (isDuplicate(caseObj))
@@ -126,6 +126,13 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         }
 
         return false;
+    }
+
+    public void checkIfLockedByCurrentUser() throws EmfException {
+        Case reloaded = service().reloadCase(caseObj.getId());
+
+        if (!reloaded.isLocked(session.user()))
+            throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner() + " has it now.");
     }
 
     private CaseService service() {

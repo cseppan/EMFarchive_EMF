@@ -38,7 +38,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
     private EmfConsole parentConsole;
 
-    private EditParametersTabPresenter presenter;
+    private EditParametersTabPresenterImpl presenter;
 
     private Case caseObj;
 
@@ -69,7 +69,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
         this.caseObj = caseObj;
         this.caseId = caseObj.getId();
-        this.presenter = presenter;
+        this.presenter = (EditParametersTabPresenterImpl)presenter;
         this.session = session;
 
         try {
@@ -97,10 +97,16 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             doRefresh(presenter.getCaseParameters(caseId));
             messagePanel.clear();
-            setCursor(Cursor.getDefaultCursor());
         } catch (Exception e) {
-            e.printStackTrace();
             messagePanel.setError("Cannot retrieve all case parameters.");
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
+            
+            try {
+                presenter.checkIfLockedByCurrentUser();
+            } catch (Exception e) {
+                messagePanel.setMessage(e.getMessage());
+            }
         }
     }
 

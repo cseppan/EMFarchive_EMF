@@ -63,6 +63,16 @@ public class CaseServiceTransport implements CaseService {
 
         return (Case[]) call.requestResponse(new Object[] {});
     }
+    
+    public synchronized Case reloadCase(int caseId) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("reloadCase");
+        call.addIntegerParam("caseId");
+        call.setReturnType(caseMappings.caseObject());
+        
+        return (Case)call.requestResponse(new Object[] {new Integer(caseId)});
+    }
 
     public synchronized Abbreviation[] getAbbreviations() throws EmfException {
         EmfCall call = call();
@@ -473,6 +483,17 @@ public class CaseServiceTransport implements CaseService {
 
         call.request(new Object[] { user, job });
     }
+    
+    public synchronized void saveCaseJobFromClient(User user, CaseJob job) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("saveCaseJobFromClient");
+        call.addParam("user", dataMappings.user());
+        call.addParam("job", caseMappings.casejob());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, job });
+    }
 
     public synchronized Host[] getHosts() throws EmfException {
         EmfCall call = call();
@@ -824,4 +845,5 @@ public class CaseServiceTransport implements CaseService {
         return (CaseOutput) call.requestResponse(new Object[] { output });
 
     }
+
 }

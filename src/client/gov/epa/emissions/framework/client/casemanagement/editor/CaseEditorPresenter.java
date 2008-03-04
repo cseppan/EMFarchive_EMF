@@ -30,5 +30,7 @@ public interface CaseEditorPresenter {
     void set(ShowHistoryTabView caseHistoryView);
 
     void doLoad(String tabTitle) throws EmfException;
+    
+    void checkIfLockedByCurrentUser() throws EmfException;
 
 }

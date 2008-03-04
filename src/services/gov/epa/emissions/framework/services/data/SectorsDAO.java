@@ -45,8 +45,8 @@ public class SectorsDAO {
         return (Sector) lockingScheme.releaseLockOnUpdate(sector, current(sector, session), session);
     }
 
-    public Sector releaseLocked(Sector locked, Session session) {
-        return (Sector) lockingScheme.releaseLock(current(locked, session), session);
+    public Sector releaseLocked(User user, Sector locked, Session session) {
+        return (Sector) lockingScheme.releaseLock(user, current(locked, session), session);
     }
 
     private Sector current(Sector sector, Session session) {

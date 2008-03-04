@@ -76,7 +76,7 @@ public class DataServiceTest extends ServiceTestCase {
 
         try {
             EmfDataset locked = service.obtainLockedDataset(owner, dataset);
-            EmfDataset released = service.releaseLockedDataset(locked);
+            EmfDataset released = service.releaseLockedDataset(owner, locked);
             assertFalse("Should have released lock", released.isLocked());
 
             EmfDataset loadedFromDb = load(dataset);

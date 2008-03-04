@@ -57,6 +57,8 @@ public interface CaseService {
 
     Case updateCase(Case element) throws EmfException;
     
+    Case reloadCase(int caseId) throws EmfException;
+    
     InputName addCaseInputName(InputName name) throws EmfException;
 
     CaseProgram addProgram(CaseProgram program) throws EmfException;
@@ -98,6 +100,8 @@ public interface CaseService {
     void removeCaseJobs(CaseJob[] jobs) throws EmfException;
 
     void updateCaseJob(User user, CaseJob job) throws EmfException;
+    
+    void saveCaseJobFromClient(User user, CaseJob job) throws EmfException;
 
     Host[] getHosts() throws EmfException;
 

@@ -162,7 +162,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
         if (msg != null && !msg.isEmpty())
             messagePanel.setMessage(msg);
-        
+
         contentPane.add(panel);
         super.display();
         resetChanges();
@@ -211,12 +211,13 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
     private void refreshCurrentTab() throws EmfException {
         RefreshObserver tab = (RefreshObserver) tabbedPane.getSelectedComponent();
+
         try {
             messagePanel.clear();
             tab.doRefresh();
         } catch (Exception e) {
-            throw new EmfException(tabbedPane.getSelectedComponent().getName() + e.getMessage());
-        }
+            throw new EmfException(e.getMessage());
+        } 
     }
 
     public void observe(CaseEditorPresenter presenter) {

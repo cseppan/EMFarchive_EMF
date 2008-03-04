@@ -86,14 +86,15 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (Sector) call.requestResponse(new Object[] { sector });
     }
 
-    public synchronized Sector releaseLockedSector(Sector sector) throws EmfException {
+    public synchronized Sector releaseLockedSector(User user, Sector sector) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("releaseLockedSector");
+        call.addParam("user", mappings.user());
         call.addParam("sector", mappings.sector());
         call.setReturnType(mappings.sector());
 
-        return (Sector) call.requestResponse(new Object[] { sector });
+        return (Sector) call.requestResponse(new Object[] { user, sector });
     }
 
     public synchronized DatasetType[] getDatasetTypes() throws EmfException {

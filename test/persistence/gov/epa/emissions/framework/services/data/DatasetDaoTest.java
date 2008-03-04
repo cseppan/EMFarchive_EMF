@@ -364,7 +364,7 @@ public class DatasetDaoTest extends ServiceTestCase {
 
         try {
             EmfDataset locked = dao.obtainLocked(owner, dataset, session);
-            EmfDataset released = dao.releaseLocked(locked, session);
+            EmfDataset released = dao.releaseLocked(owner, locked, session);
             assertFalse("Should have released lock", released.isLocked());
 
             EmfDataset loadedFromDb = (EmfDataset) load(EmfDataset.class, dataset.getName());

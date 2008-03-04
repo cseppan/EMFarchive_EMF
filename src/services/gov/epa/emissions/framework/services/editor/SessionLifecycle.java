@@ -113,10 +113,10 @@ public class SessionLifecycle {
         return open(token, pageSize);
     }
 
-    void releaseLock(DataAccessToken token) throws EmfException {
+    void releaseLock(User user, DataAccessToken token) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            Version unlocked = lockableVersions.releaseLocked(token.getVersion(), session);
+            Version unlocked = lockableVersions.releaseLocked(user, token.getVersion(), session);
             token.setVersion(unlocked);
             token.setLockTimeInterval(lockTimeInterval(session));
 
@@ -127,11 +127,11 @@ public class SessionLifecycle {
         }
     }
 
-    public DataAccessToken closeEdit(DataAccessToken token) throws EmfException {
+    public DataAccessToken closeEdit(User owner, DataAccessToken token) throws EmfException {
         if (!isLockOwned(token))
             return token;//abort
 
-        releaseLock(token);
+        releaseLock(owner, token);
         close(token);
 
         return token;

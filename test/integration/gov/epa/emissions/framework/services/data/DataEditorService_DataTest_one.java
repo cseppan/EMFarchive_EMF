@@ -86,7 +86,7 @@ public class DataEditorService_DataTest_one extends ServiceTestCase {
     }
 
     protected void doTearDown() throws Exception {
-        service.closeSession(token);
+        service.closeSession(user, token);
         dropTable(dataset.getName(), datasource);
         dropData("versions", datasource);
     }

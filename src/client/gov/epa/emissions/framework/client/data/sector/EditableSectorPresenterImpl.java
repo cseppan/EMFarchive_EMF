@@ -40,7 +40,7 @@ public class EditableSectorPresenterImpl implements EditableSectorPresenter {
     }
 
     public void doClose() throws EmfException {
-        service().releaseLockedSector(sector);
+        service().releaseLockedSector(session.user(), sector);
         closeView();
     }
 

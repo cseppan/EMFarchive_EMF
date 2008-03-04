@@ -154,10 +154,10 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public synchronized User releaseLocked(User object) throws EmfException {
+    public synchronized User releaseLocked(User user, User object) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            User released = dao.releaseLocked(object, session);
+            User released = dao.releaseLocked(user, object, session);
             session.close();
 
             return released;

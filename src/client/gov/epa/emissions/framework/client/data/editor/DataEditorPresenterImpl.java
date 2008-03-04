@@ -89,7 +89,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
     }
 
     void close(ClosingRule closingRule, boolean changesSaved) throws EmfException {
-        closingRule.close(changesSaved);
+        closingRule.close(session.user(), changesSaved);
     }
 
     private ClosingRule closingRule() {
@@ -132,7 +132,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
         } catch (EmfException e) {
             view.notifySaveFailure(e.getMessage());
             discard(service, token, tablePresenter);
-            closingRule.proceedWithClose(areChangesSaved());
+            closingRule.proceedWithClose(session.user(), areChangesSaved());
         }
     }
 

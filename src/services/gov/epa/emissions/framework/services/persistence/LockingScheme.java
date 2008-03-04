@@ -57,10 +57,8 @@ public class LockingScheme {
     }
 
     public Lockable releaseLock(Lockable current, Session session) {
-        if (!current.isLocked())
-            return current;// abort
-
         Transaction tx = session.beginTransaction();
+        
         try {
             current.setLockOwner(null);
             current.setLockDate(null);
@@ -73,6 +71,13 @@ public class LockingScheme {
         }
 
         return current;
+    }
+
+    public Lockable releaseLock(User owner, Lockable current, Session session) {
+        if (!current.isLocked() || !current.isLocked(owner))
+            return current;
+        
+        return releaseLock(current, session);
     }
 
     public Lockable releaseLockOnUpdate(Lockable target, Lockable current, Session session) throws EmfException {
@@ -97,11 +102,12 @@ public class LockingScheme {
         Transaction tx = session.beginTransaction();
         try {
             target.setLockDate(new Date());
-            session.update(target);
             tx.commit();
         } catch (HibernateException e) {
             tx.rollback();
             throw e;
+        } finally {
+            session.update(target);
         }
     }
 

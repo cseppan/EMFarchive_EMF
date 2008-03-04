@@ -109,7 +109,7 @@ public class DataAccessorTest extends ServiceTestCase {
     public void testClosingEditSessionShouldReleaseLock() throws Exception {
         DataAccessToken locked = accessor.openEditSession(owner, token);
 
-        DataAccessToken result = accessor.closeEditSession(locked);
+        DataAccessToken result = accessor.closeEditSession(owner, locked);
         assertFalse("Should be unlocked on close", result.isLocked(owner));
     }
 }

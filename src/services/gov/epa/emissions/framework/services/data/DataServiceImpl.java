@@ -101,10 +101,10 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    public synchronized EmfDataset releaseLockedDataset(EmfDataset locked) throws EmfException {
+    public synchronized EmfDataset releaseLockedDataset(User user, EmfDataset locked) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            EmfDataset released = dao.releaseLocked(locked, session);
+            EmfDataset released = dao.releaseLocked(user, locked, session);
 
             return released;
         } catch (RuntimeException e) {
@@ -218,7 +218,7 @@ public class DataServiceImpl implements DataService {
 
     private synchronized void checkUser(EmfDataset dataset, User owner) throws EmfException {
         if (!owner.isAdmin() && !dataset.getCreator().equalsIgnoreCase(owner.getUsername())) {
-            releaseLockedDataset(dataset);
+            releaseLockedDataset(owner, dataset);
             throw new EmfException("You are not the creator of " + dataset.getName() + ".");
         }
     }

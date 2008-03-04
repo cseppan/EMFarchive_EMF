@@ -53,7 +53,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
     private EmfConsole parentConsole;
 
-    private EditInputsTabPresenter presenter;
+    private EditInputsTabPresenterImpl presenter;
 
     private Case caseObj;
 
@@ -90,7 +90,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
         this.caseObj = caseObj;
         this.caseId = caseObj.getId();
-        this.presenter = presenter;
+        this.presenter = (EditInputsTabPresenterImpl)presenter;
         this.session = session;
         this.inputDir = new TextField("inputdir", 50);
         inputDir.setText(caseObj.getInputFileDir());
@@ -120,10 +120,16 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             doRefresh(presenter.getCaseInput(caseId));
             messagePanel.clear();
-            setCursor(Cursor.getDefaultCursor());
         } catch (Exception e) {
             messagePanel.setError("Cannot retrieve all case inputs.");
+        } finally {
             setCursor(Cursor.getDefaultCursor());
+            
+            try {
+                presenter.checkIfLockedByCurrentUser();
+            } catch (Exception e) {
+                messagePanel.setMessage(e.getMessage());
+            }
         }
     }
 

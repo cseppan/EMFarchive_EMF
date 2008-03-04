@@ -201,8 +201,8 @@ public class DatasetDAO {
         return (EmfDataset) lockingScheme.getLocked(user, current(dataset, session), session);
     }
 
-    public EmfDataset releaseLocked(EmfDataset locked, Session session) {
-        return (EmfDataset) lockingScheme.releaseLock(current(locked, session), session);
+    public EmfDataset releaseLocked(User user, EmfDataset locked, Session session) {
+        return (EmfDataset) lockingScheme.releaseLock(user, current(locked, session), session);
     }
 
     public EmfDataset update(EmfDataset locked, Session session) throws Exception {

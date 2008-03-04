@@ -121,10 +121,10 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public synchronized Sector releaseLockedSector(Sector sector) throws EmfException {
+    public synchronized Sector releaseLockedSector(User user, Sector sector) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            Sector released = dao.releaseLockedSector(sector, session);
+            Sector released = dao.releaseLockedSector(user, sector, session);
             session.close();
 
             return released;
@@ -194,7 +194,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public synchronized DatasetType releaseLockedDatasetType(User user, DatasetType type) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            DatasetType locked = dao.releaseLockedDatasetType(type, session);
+            DatasetType locked = dao.releaseLockedDatasetType(user, type, session);
             session.close();
 
             return locked;

@@ -19,7 +19,7 @@ public interface ControlMeasureService extends EMFService {
 
 //    ControlMeasure releaseLockedControlMeasure(ControlMeasure locked) throws EmfException;
 
-    void releaseLockedControlMeasure(int controlMeasureId) throws EmfException;
+    void releaseLockedControlMeasure(User user, int controlMeasureId) throws EmfException;
 
 //    void removeMeasure(ControlMeasure measure) throws EmfException;
 

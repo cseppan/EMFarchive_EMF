@@ -169,6 +169,12 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
         // NOTE Auto-generated method stub
         
     }
+
+    @Override
+    public void checkIfLockedByCurrentUser() {
+        // NOTE Auto-generated method stub
+        
+    }
     
     public synchronized JobRunStatus[] getRunStatuses() throws EmfException {
         return CaseObjectManager.getCaseObjectManager(session).getJobRunStatuses();

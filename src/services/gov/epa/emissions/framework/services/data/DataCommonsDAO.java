@@ -103,12 +103,12 @@ public class DataCommonsDAO {
         return datasetTypesDAO.update(type, session);
     }
 
-    public Sector releaseLockedSector(Sector locked, Session session) {
-        return sectorsDao.releaseLocked(locked, session);
+    public Sector releaseLockedSector(User user, Sector locked, Session session) {
+        return sectorsDao.releaseLocked(user, locked, session);
     }
 
-    public DatasetType releaseLockedDatasetType(DatasetType locked, Session session) {
-        return datasetTypesDAO.releaseLocked(locked, session);
+    public DatasetType releaseLockedDatasetType(User user, DatasetType locked, Session session) {
+        return datasetTypesDAO.releaseLocked(user, locked, session);
     }
 
     public List getPollutants(Session session) {

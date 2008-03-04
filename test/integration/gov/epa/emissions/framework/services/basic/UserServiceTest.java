@@ -147,7 +147,7 @@ public class UserServiceTest extends ServiceTestCase {
             User owner = service.getUser("emf");
 
             User locked = service.obtainLocked(owner, target);
-            User released = service.releaseLocked(locked);
+            User released = service.releaseLocked(owner, locked);
             assertFalse("Should have released lock", released.isLocked());
 
             User loadedFromDb = user(locked.getUsername());

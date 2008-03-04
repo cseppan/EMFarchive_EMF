@@ -172,7 +172,7 @@ public class ManagedCaseService {
 
     // ***************************************************************************
 
-    public Case[] getCases() throws EmfException {
+    public synchronized Case[] getCases() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List cases = dao.getCases(session);
@@ -187,7 +187,7 @@ public class ManagedCaseService {
         }
     }
 
-    public Case getCase(int caseId) throws EmfException {
+    public synchronized Case getCase(int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             Case caseObj = dao.getCase(caseId, session);
@@ -211,11 +211,11 @@ public class ManagedCaseService {
         }
     }
 
-    public Case[] getCases(CaseCategory category) {
+    public synchronized Case[] getCases(CaseCategory category) {
         return dao.getCases(category);
     }
 
-    public Version[] getLaterVersions(EmfDataset dataset, Version version) throws EmfException {
+    public synchronized Version[] getLaterVersions(EmfDataset dataset, Version version) throws EmfException {
         Versions versions = new Versions();
         Session session = sessionFactory.getSession();
 
@@ -236,7 +236,7 @@ public class ManagedCaseService {
         }
     }
 
-    public CaseJob getCaseJob(int jobId) throws EmfException {
+    public synchronized CaseJob getCaseJob(int jobId) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -260,7 +260,7 @@ public class ManagedCaseService {
         }
     }
 
-    public Abbreviation[] getAbbreviations() throws EmfException {
+    public synchronized Abbreviation[] getAbbreviations() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List abbreviations = dao.getAbbreviations(session);
@@ -275,7 +275,7 @@ public class ManagedCaseService {
         }
     }
 
-    public Abbreviation addAbbreviation(Abbreviation abbr) throws EmfException {
+    public synchronized Abbreviation addAbbreviation(Abbreviation abbr) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -290,7 +290,7 @@ public class ManagedCaseService {
         }
     }
 
-    public AirQualityModel[] getAirQualityModels() throws EmfException {
+    public synchronized AirQualityModel[] getAirQualityModels() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List airQualityModels = dao.getAirQualityModels(session);
@@ -304,7 +304,7 @@ public class ManagedCaseService {
         }
     }
 
-    public CaseCategory[] getCaseCategories() throws EmfException {
+    public synchronized CaseCategory[] getCaseCategories() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List results = dao.getCaseCategories(session);
@@ -332,7 +332,7 @@ public class ManagedCaseService {
         }
     }
 
-    public EmissionsYear[] getEmissionsYears() throws EmfException {
+    public synchronized EmissionsYear[] getEmissionsYears() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List results = dao.getEmissionsYears(session);
@@ -346,7 +346,7 @@ public class ManagedCaseService {
         }
     }
 
-    public Grid[] getGrids() throws EmfException {
+    public synchronized Grid[] getGrids() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List results = dao.getGrids(session);
@@ -360,7 +360,7 @@ public class ManagedCaseService {
         }
     }
 
-    public GridResolution[] getGridResolutions() throws EmfException {
+    public synchronized GridResolution[] getGridResolutions() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List results = dao.getGridResolutions(session);
@@ -374,7 +374,7 @@ public class ManagedCaseService {
         }
     }
 
-    public MeteorlogicalYear[] getMeteorlogicalYears() throws EmfException {
+    public synchronized MeteorlogicalYear[] getMeteorlogicalYears() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List results = dao.getMeteorlogicalYears(session);
@@ -388,7 +388,7 @@ public class ManagedCaseService {
         }
     }
 
-    public Speciation[] getSpeciations() throws EmfException {
+    public synchronized Speciation[] getSpeciations() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List results = dao.getSpeciations(session);
@@ -453,7 +453,7 @@ public class ManagedCaseService {
         statusDao.add(status);
     }
 
-    public Case obtainLocked(User owner, Case element) throws EmfException {
+    public synchronized Case obtainLocked(User owner, Case element) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             Case locked = dao.obtainLocked(owner, element, session);
@@ -467,15 +467,9 @@ public class ManagedCaseService {
         }
     }
 
-    public Case releaseLocked(User owner, Case locked) throws EmfException {
+    public synchronized Case releaseLocked(User owner, Case locked) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            Case loaded = dao.getCase(locked.getId(), session);
-            String lockOwner = loaded.getLockOwner();
-            
-            if (lockOwner != null && !lockOwner.equals(owner.getUsername())) //so to not release other's lock by accident
-                return locked;
-            
             Case released = dao.releaseLocked(owner, locked, session);
             return released;
         } catch (RuntimeException e) {
@@ -502,7 +496,7 @@ public class ManagedCaseService {
         }
     }
 
-    public CaseInput getCaseInput(int inputId) throws EmfException {
+    public synchronized CaseInput getCaseInput(int inputId) throws EmfException {
 
         Session session = sessionFactory.getSession();
         try {
@@ -519,7 +513,7 @@ public class ManagedCaseService {
 
     }
 
-    public InputName[] getInputNames() throws EmfException {
+    public synchronized InputName[] getInputNames() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List results = dao.getInputNames(session);
@@ -533,7 +527,7 @@ public class ManagedCaseService {
         }
     }
 
-    public InputEnvtVar[] getInputEnvtVars() throws EmfException {
+    public synchronized InputEnvtVar[] getInputEnvtVars() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List results = dao.getInputEnvtVars(session);
@@ -547,7 +541,7 @@ public class ManagedCaseService {
         }
     }
 
-    public CaseProgram[] getPrograms() throws EmfException {
+    public synchronized CaseProgram[] getPrograms() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List results = dao.getPrograms(session);
@@ -561,7 +555,7 @@ public class ManagedCaseService {
         }
     }
 
-    public ModelToRun[] getModelToRuns() throws EmfException {
+    public synchronized ModelToRun[] getModelToRuns() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List results = dao.getModelToRuns(session);
@@ -684,7 +678,7 @@ public class ManagedCaseService {
         }
     }
 
-    public SubDir[] getSubDirs() throws EmfException {
+    public synchronized SubDir[] getSubDirs() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             List results = dao.getSubDirs(session);
@@ -754,7 +748,7 @@ public class ManagedCaseService {
         }
     }
 
-    public void removeCaseInputs(CaseInput[] inputs) throws EmfException {
+    public synchronized void removeCaseInputs(CaseInput[] inputs) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -768,7 +762,7 @@ public class ManagedCaseService {
         }
     }
 
-    public CaseInput[] getCaseInputs(int caseId) throws EmfException {
+    public synchronized CaseInput[] getCaseInputs(int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -988,7 +982,7 @@ public class ManagedCaseService {
         return addCaseJob(copied);
     }
 
-    public ParameterName[] getParameterNames() throws EmfException {
+    public synchronized ParameterName[] getParameterNames() throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -1023,7 +1017,7 @@ public class ManagedCaseService {
         }
     }
 
-    public void removeCaseParameters(CaseParameter[] params) throws EmfException {
+    public synchronized void removeCaseParameters(CaseParameter[] params) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -1037,7 +1031,7 @@ public class ManagedCaseService {
         }
     }
 
-    public CaseParameter[] getCaseParameters(int caseId) throws EmfException {
+    public synchronized CaseParameter[] getCaseParameters(int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -1083,7 +1077,7 @@ public class ManagedCaseService {
         }
     }
 
-    public ValueType[] getValueTypes() throws EmfException {
+    public synchronized ValueType[] getValueTypes() throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -1113,7 +1107,7 @@ public class ManagedCaseService {
         }
     }
 
-    public ParameterEnvVar[] getParameterEnvVars() throws EmfException {
+    public synchronized ParameterEnvVar[] getParameterEnvVars() throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -1186,7 +1180,7 @@ public class ManagedCaseService {
         }
     }
 
-    public CaseJob[] getCaseJobs(int caseId) throws EmfException {
+    public synchronized CaseJob[] getCaseJobs(int caseId) throws EmfException {
 
         Session session = sessionFactory.getSession();
 
@@ -1203,7 +1197,7 @@ public class ManagedCaseService {
         }
     }
 
-    public JobRunStatus[] getJobRunStatuses() throws EmfException {
+    public synchronized JobRunStatus[] getJobRunStatuses() throws EmfException {
 
         Session session = sessionFactory.getSession();
 
@@ -1220,7 +1214,7 @@ public class ManagedCaseService {
         }
     }
 
-    public Executable[] getExecutables(int casejobId) throws EmfException {
+    public synchronized Executable[] getExecutables(int casejobId) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -1268,7 +1262,7 @@ public class ManagedCaseService {
 
     }
 
-    public void removeCaseJobs(CaseJob[] jobs) throws EmfException {
+    public synchronized void removeCaseJobs(CaseJob[] jobs) throws EmfException {
 
         Session session = sessionFactory.getSession();
 
@@ -1655,7 +1649,27 @@ public class ManagedCaseService {
         }
     }
 
-    public Host[] getHosts() throws EmfException {
+    public synchronized void saveCaseJobFromClient(User user, CaseJob job) throws EmfException {
+        try {
+            Case currentCase = getCase(job.getCaseId());
+            obtainLocked(user, currentCase); // to automatically extend lock on case
+            
+            CaseJob loaded = (CaseJob) dao.loadCaseJob(job);
+            
+            if (user == null)
+                throw new EmfException("Running Case Job requires a valid user");
+            
+            if (loaded != null && loaded.getId() != job.getId())
+                throw new EmfException("Case job uniqueness check failed (" + loaded.getId() + "," + job.getId() + ")");
+            
+            dao.updateCaseJob(job);
+        } catch (RuntimeException e) {
+            log.error("Could not update case job: " + job.getName() + ".\n" + e);
+            throw new EmfException("Could not update case job: " + job.getName() + ".");
+        } 
+    }
+
+    public synchronized Host[] getHosts() throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -2296,7 +2310,7 @@ public class ManagedCaseService {
     }
 
     // for command line client
-    public int recordJobMessage(JobMessage message, String jobKey) throws EmfException {
+    public synchronized int recordJobMessage(JobMessage message, String jobKey) throws EmfException {
         try {
             CaseJob job = getJobFromKey(jobKey);
 
@@ -2356,7 +2370,7 @@ public class ManagedCaseService {
         return job;
     }
 
-    public JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException {
+    public synchronized JobMessage[] getJobMessages(int caseId, int jobId) throws EmfException {
         Session session = sessionFactory.getSession();
         List<JobMessage> msgs = null;
 
@@ -2376,7 +2390,7 @@ public class ManagedCaseService {
         }
     }
 
-    public String[] getAllValidJobs(int jobId) throws EmfException {
+    public synchronized String[] getAllValidJobs(int jobId) throws EmfException {
         try {
             return dao.getAllValidJobs(jobId);
         } catch (Exception e) {
@@ -2386,7 +2400,7 @@ public class ManagedCaseService {
         }
     }
 
-    public String[] getDependentJobs(int jobId) throws EmfException {
+    public synchronized String[] getDependentJobs(int jobId) throws EmfException {
         try {
             return dao.getDependentJobs(jobId);
         } catch (Exception e) {
@@ -2396,7 +2410,7 @@ public class ManagedCaseService {
         }
     }
 
-    public int[] getJobIds(int caseId, String[] jobNames) throws EmfException {
+    public synchronized int[] getJobIds(int caseId, String[] jobNames) throws EmfException {
         try {
             return dao.getJobIds(caseId, jobNames);
         } catch (Exception e) {
@@ -2406,12 +2420,12 @@ public class ManagedCaseService {
         }
     }
 
-    public void finalize() throws Throwable {
+    public synchronized void finalize() throws Throwable {
         this.session = null;
         super.finalize();
     }
 
-    public String restoreTaskManagers() throws EmfException {
+    public synchronized String restoreTaskManagers() throws EmfException {
         if (DebugLevels.DEBUG_9)
             System.out.println("ManagedCaseService::restoreTaskManagers");
 
@@ -2444,7 +2458,7 @@ public class ManagedCaseService {
 
     }
 
-    private void resubmitPersistedTasksForUser(int uid) throws EmfException {
+    private synchronized void resubmitPersistedTasksForUser(int uid) throws EmfException {
         if (DebugLevels.DEBUG_9)
             System.out.println("Start ManagedCaseService::resubmitPersistedTasksForUser uid= " + uid);
         Integer[] jobIds = null;
@@ -2570,7 +2584,7 @@ public class ManagedCaseService {
         return distUid;
     }
 
-    public String printStatusCaseJobTaskManager() throws EmfException {
+    public synchronized String printStatusCaseJobTaskManager() throws EmfException {
         return TaskManagerFactory.getCaseJobTaskManager(sessionFactory).getStatusOfWaitAndRunTable();
     }
 
@@ -2636,7 +2650,7 @@ public class ManagedCaseService {
         if (inputsList.isEmpty())
             return inputsList;
         
-        return "The selected jobs have non-final dataset versions:" + ls + inputsList;
+        return "The selected jobs have non-final dataset versions:" + ls + ls + inputsList;
     }
 
     private String listInputsMsg(List<CaseInput> inputs) throws EmfException {
@@ -2690,7 +2704,7 @@ public class ManagedCaseService {
         return sb.toString();
     }
 
-    public CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException {
+    public synchronized CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException {
         Session session = sessionFactory.getSession();
         List<CaseOutput> outputs = null;
 
@@ -2745,7 +2759,7 @@ public class ManagedCaseService {
         }
     }
 
-    public void updateCaseOutput(User user, CaseOutput output) throws EmfException {
+    public synchronized void updateCaseOutput(User user, CaseOutput output) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -2770,7 +2784,7 @@ public class ManagedCaseService {
 
     }
 
-    public void removeMessages(User user, JobMessage[] msgs) throws EmfException {
+    public synchronized void removeMessages(User user, JobMessage[] msgs) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -2785,7 +2799,7 @@ public class ManagedCaseService {
 
     }
 
-    public CaseOutput addCaseOutput(CaseOutput output) throws EmfException {
+    public synchronized CaseOutput addCaseOutput(CaseOutput output) throws EmfException {
         Session session = sessionFactory.getSession();
 
         if (dao.caseOutputExists(output, session))

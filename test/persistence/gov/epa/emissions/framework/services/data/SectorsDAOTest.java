@@ -72,7 +72,7 @@ public class SectorsDAOTest extends ServiceTestCase {
         Sector sector = (Sector) sectors.get(0);
 
         Sector lockedSector = dao.obtainLocked(owner, sector, session);
-        Sector releasedSector = dao.releaseLocked(lockedSector, session);
+        Sector releasedSector = dao.releaseLocked(owner, lockedSector, session);
         assertFalse("Should have released lock", releasedSector.isLocked());
 
         Sector sectorLoadedFromDb = currentSector(sector);
@@ -80,8 +80,8 @@ public class SectorsDAOTest extends ServiceTestCase {
     }
 
     public void testShouldUpdateSector() throws EmfException {
-        List sectors = dao.getAll(session);
-        Sector sector = (Sector) sectors.get(0);
+        List<Sector> sectors = dao.getAll(session);
+        Sector sector = sectors.get(0);
         String name = sector.getName();
 
         User owner = userDao.get("emf", session);

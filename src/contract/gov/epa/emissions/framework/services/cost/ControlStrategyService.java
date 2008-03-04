@@ -25,7 +25,7 @@ public interface ControlStrategyService extends EMFService {
 
 //    void releaseLocked(ControlStrategy locked) throws EmfException;
 
-    void releaseLocked(int id) throws EmfException;
+    void releaseLocked(User user, int id) throws EmfException;
 
     ControlStrategy updateControlStrategy(ControlStrategy element) throws EmfException;
     

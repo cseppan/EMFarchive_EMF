@@ -307,6 +307,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             try {
                 presenter.doEdit(view, caseObj);
             } catch (EmfException e) {
+                e.printStackTrace();
                 showError(e.getMessage());
             }
         }

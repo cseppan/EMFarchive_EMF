@@ -79,7 +79,7 @@ public class LockableVersionsTest extends HibernateTestCase {
         Version version = versions.get(1, 0, session);
         Version locked = lockableVersions.obtainLocked(owner, version, session);
 
-        Version released = lockableVersions.releaseLocked(locked, session);
+        Version released = lockableVersions.releaseLocked(owner, locked, session);
         assertFalse("Should have released lock", released.isLocked());
 
         Version loadedFromDb = versions.get(1, 0, session);

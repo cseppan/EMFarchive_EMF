@@ -23,6 +23,6 @@ public interface DataEditorService extends DataAccessService {
     // session
     DataAccessToken openSession(User user, DataAccessToken token) throws EmfException;
 
-    void closeSession(DataAccessToken token) throws EmfException;
+    void closeSession(User user, DataAccessToken token) throws EmfException;
     
 }

@@ -135,8 +135,8 @@ public class DataAccessorImpl implements DataAccessor {
         return sessionLifecycle.openEdit(user, token, pageSize);
     }
 
-    public DataAccessToken closeEditSession(DataAccessToken token) throws EmfException {
-        return sessionLifecycle.closeEdit(token);
+    public DataAccessToken closeEditSession(User user, DataAccessToken token) throws EmfException {
+        return sessionLifecycle.closeEdit(user, token);
     }
 
     public boolean isLockOwned(DataAccessToken token) throws EmfException {

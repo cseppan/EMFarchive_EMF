@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data.editor;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
@@ -39,22 +40,22 @@ public class ClosingRule {
         return session.dataCommonsService();
     }
 
-    public void close(boolean askForRevision) throws EmfException {
+    public void close(User user, boolean askForRevision) throws EmfException {
         if (shouldCancelClose())
             return;
 
-        proceedWithClose(askForRevision);
+        proceedWithClose(user, askForRevision);
     }
 
     public boolean shouldCancelClose() throws EmfException {
         return hasChanges() && !view.confirmDiscardChanges();
     }
 
-    public void proceedWithClose(boolean askForRevision) throws EmfException {
+    public void proceedWithClose(User user, boolean askForRevision) throws EmfException {
         if (askForRevision)
             saveRevision();
 
-        dataEditorService().closeSession(token);
+        dataEditorService().closeSession(user, token);
         view.disposeView();
     }
 

@@ -23,7 +23,7 @@ public interface DataService {
 
     EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException;
 
-    EmfDataset releaseLockedDataset(EmfDataset locked) throws EmfException;
+    EmfDataset releaseLockedDataset(User user, EmfDataset locked) throws EmfException;
 
     EmfDataset updateDataset(EmfDataset dataset) throws EmfException;
     

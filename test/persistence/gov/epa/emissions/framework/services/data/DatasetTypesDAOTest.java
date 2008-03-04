@@ -88,7 +88,7 @@ public class DatasetTypesDAOTest extends ServiceTestCase {
         DatasetType type = (DatasetType) list.get(0);
 
         DatasetType locked = dao.obtainLocked(owner, type, session);
-        DatasetType released = dao.releaseLocked(locked, session);
+        DatasetType released = dao.releaseLocked(owner, locked, session);
         assertFalse("Should have released lock", released.isLocked());
 
         DatasetType loadedFromDb = currentDatasetType(type);

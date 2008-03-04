@@ -140,10 +140,10 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 //        }
 //    }
 
-    public synchronized void releaseLocked(int id) throws EmfException {
+    public synchronized void releaseLocked(User user, int id) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            dao.releaseLocked(id, session);
+            dao.releaseLocked(user, id, session);
         } catch (RuntimeException e) {
             LOG.error(
                     "Could not release lock for Control Strategy id: " + id,

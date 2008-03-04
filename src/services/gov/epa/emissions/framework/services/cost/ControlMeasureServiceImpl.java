@@ -165,10 +165,10 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
 //        }
 //    }
 
-    public synchronized void releaseLockedControlMeasure(int id) throws EmfException {
+    public synchronized void releaseLockedControlMeasure(User user, int id) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            dao.releaseLocked(id, session);
+            dao.releaseLocked(user, id, session);
         } catch (RuntimeException e) {
             LOG.error("Could not release lock for control measure id: " + id, e);
             throw new EmfException("Could not release lock for control measure id: " + id);

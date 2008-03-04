@@ -112,12 +112,13 @@ public class DataEditorServiceTransport implements DataEditorService {
         return (DataAccessToken) call.requestResponse(new Object[] { user, token });
     }
 
-    public void closeSession(DataAccessToken token) throws EmfException {
+    public void closeSession(User user, DataAccessToken token) throws EmfException {
+        call.addParam("user", mappings.user());
         call.addParam("token", mappings.dataAccessToken());
         call.setOperation("closeSession");
         call.setVoidReturnType();
 
-        call.request(new Object[] { token });
+        call.request(new Object[] { user, token });
     }
 
     public DataAccessToken save(DataAccessToken token, EmfDataset dataset, Version version) throws EmfException {

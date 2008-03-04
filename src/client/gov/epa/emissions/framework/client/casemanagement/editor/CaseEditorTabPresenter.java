@@ -8,4 +8,6 @@ public interface CaseEditorTabPresenter {
     void doSave() throws EmfException;
     
     Case getCaseObj();
+    
+    void checkIfLockedByCurrentUser() throws EmfException;
 }

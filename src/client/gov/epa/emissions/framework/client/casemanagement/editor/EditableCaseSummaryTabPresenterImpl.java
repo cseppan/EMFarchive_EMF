@@ -24,5 +24,10 @@ public class EditableCaseSummaryTabPresenterImpl implements EditableCaseSummaryT
     public Case getCaseObj() {
         return this.caseObj;
     }
+    
+    @Override
+    public void checkIfLockedByCurrentUser() {
+        //
+    }
 
 }

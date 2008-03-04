@@ -82,7 +82,7 @@ public class DataEditorService_DataTest_two extends ServiceTestCase {
     }
 
     protected void doTearDown() throws Exception {
-        service.closeSession(token);
+        service.closeSession(user, token);
         dropTable(dataset.getName(), datasource);
         dropData("versions", datasource);
     }

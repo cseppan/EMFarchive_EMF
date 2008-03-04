@@ -59,7 +59,7 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
     }
 
     public void doClose() throws EmfException {
-        dataService().releaseLockedDataset(dataset);
+        dataService().releaseLockedDataset(session.user(), dataset);
         view.disposeView();
     }
 

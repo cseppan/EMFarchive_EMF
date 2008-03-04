@@ -64,8 +64,8 @@ public class UserDAO {
         return (User) lockingScheme.releaseLockOnUpdate(user, current(user, session), session);
     }
 
-    public User releaseLocked(User locked, Session session) {
-        return (User) lockingScheme.releaseLock(current(locked, session), session);
+    public User releaseLocked(User user, User locked, Session session) {
+        return (User) lockingScheme.releaseLock(user, current(locked, session), session);
     }
 
     private User current(User user, Session session) {

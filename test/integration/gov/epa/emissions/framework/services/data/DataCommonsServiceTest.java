@@ -93,7 +93,7 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         Sector sector = sectors[0];
 
         Sector locked = service.obtainLockedSector(owner, sector);
-        Sector released = service.releaseLockedSector(locked);
+        Sector released = service.releaseLockedSector(owner, locked);
         assertFalse("Should have released lock", released.isLocked());
 
         Sector loadedFromDb = currentSector(sector);

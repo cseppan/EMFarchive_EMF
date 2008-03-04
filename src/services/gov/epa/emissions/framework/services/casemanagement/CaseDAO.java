@@ -279,7 +279,7 @@ public class CaseDAO {
     }
 
     public Case releaseLocked(User owner, Case locked, Session session) {
-        return (Case) lockingScheme.releaseLock(current(locked, session), session);
+        return (Case) lockingScheme.releaseLock(owner, current(locked, session), session);
     }
 
     public Case update(Case locked, Session session) throws EmfException {
@@ -477,7 +477,6 @@ public class CaseDAO {
         Session session = sessionFactory.getSession();
         try {
             hibernateFacade.updateOnly(job, session);
-
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {

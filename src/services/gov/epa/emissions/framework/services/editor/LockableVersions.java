@@ -23,8 +23,8 @@ public class LockableVersions {
         return (Version) lockingScheme.getLocked(owner, versions.current(version, session), session);
     }
 
-    public Version releaseLocked(Version locked, Session session) {
-        return (Version) lockingScheme.releaseLock(versions.current(locked, session), session);
+    public Version releaseLocked(User user, Version locked, Session session) {
+        return (Version) lockingScheme.releaseLock(user, versions.current(locked, session), session);
     }
 
     public Version releaseLockOnUpdate(Version locked, Session session) throws EmfException {

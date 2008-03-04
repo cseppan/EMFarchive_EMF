@@ -187,7 +187,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         try {
             ControlMeasure locked = service.obtainLockedMeasure(owner, cm.getId());
 //            ControlMeasure released = service.releaseLockedControlMeasure(locked.getId());
-            service.releaseLockedControlMeasure(locked.getId());
+            service.releaseLockedControlMeasure(owner, locked.getId());
 //            assertFalse("Should have released lock", released.isLocked());
 
             ControlMeasure loadedFromDb = load(cm);

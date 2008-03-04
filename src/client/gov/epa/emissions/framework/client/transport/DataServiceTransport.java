@@ -56,14 +56,15 @@ public class DataServiceTransport implements DataService {
         return (EmfDataset) call.requestResponse(new Object[] { dataset });
     }
 
-    public synchronized EmfDataset releaseLockedDataset(EmfDataset locked) throws EmfException {
+    public synchronized EmfDataset releaseLockedDataset(User user, EmfDataset locked) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("releaseLockedDataset");
+        call.addParam("user", mappings.user());
         call.addParam("locked", mappings.dataset());
         call.setReturnType(mappings.dataset());
 
-        return (EmfDataset) call.requestResponse(new Object[] { locked });
+        return (EmfDataset) call.requestResponse(new Object[] { user, locked });
     }
 
     public synchronized EmfDataset[] getDatasets(DatasetType datasetType) throws EmfException {

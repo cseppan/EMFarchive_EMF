@@ -79,7 +79,7 @@ public class DataEditorService_MetaDataTest extends ServiceTestCase {
     }
 
     protected void doTearDown() throws Exception {
-        service.closeSession(token);
+        service.closeSession(user, token);
         dropTable(dataset.getName(), datasource);
         dropData("versions", datasource);
     }

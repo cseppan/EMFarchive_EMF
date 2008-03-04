@@ -45,7 +45,7 @@ public interface DataCommonsService {
 
     void addSector(Sector sector) throws EmfException;
 
-    Sector releaseLockedSector(Sector sector) throws EmfException;
+    Sector releaseLockedSector(User user, Sector sector) throws EmfException;
 
     // DatasetType
     DatasetType[] getDatasetTypes() throws EmfException;

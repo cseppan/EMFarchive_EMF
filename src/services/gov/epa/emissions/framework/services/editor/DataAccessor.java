@@ -33,7 +33,7 @@ public interface DataAccessor {
 
     DataAccessToken openEditSession(User user, DataAccessToken token, int pageSize) throws Exception;
 
-    DataAccessToken closeEditSession(DataAccessToken token) throws EmfException;
+    DataAccessToken closeEditSession(User user, DataAccessToken token) throws EmfException;
 
     boolean isLockOwned(DataAccessToken token) throws EmfException;
 

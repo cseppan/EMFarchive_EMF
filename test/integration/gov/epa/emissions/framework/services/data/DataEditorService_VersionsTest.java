@@ -80,7 +80,7 @@ public class DataEditorService_VersionsTest extends ServiceTestCase {
     }
 
     protected void doTearDown() throws Exception {
-        service.closeSession(token);
+        service.closeSession(new UserDAO().get("emf", session), token);
 
         DbUpdate dbUpdate = new PostgresDbUpdate(datasource.getConnection());
         dbUpdate.dropTable(datasource.getName(), dataset.getName());

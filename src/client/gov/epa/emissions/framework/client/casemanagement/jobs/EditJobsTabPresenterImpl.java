@@ -235,4 +235,11 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         return service().validateJobs(ids.toArray(new Integer[0]));
     }
     
+    public void checkIfLockedByCurrentUser() throws EmfException {
+        Case reloaded = service().reloadCase(caseObj.getId());
+
+        if (!reloaded.isLocked(session.user()))
+            throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner() + " has it now.");
+    }
+    
 }

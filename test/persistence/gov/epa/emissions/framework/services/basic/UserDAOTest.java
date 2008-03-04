@@ -120,7 +120,7 @@ public class UserDAOTest extends HibernateTestCase {
         User emf = dao.get("emf", session);
 
         User locked = dao.obtainLocked(emf, user, session);
-        User released = dao.releaseLocked(locked, session);
+        User released = dao.releaseLocked(emf, locked, session);
         assertFalse("Should have released lock", released.isLocked());
 
         User loadedFromDb = user(user.getUsername());

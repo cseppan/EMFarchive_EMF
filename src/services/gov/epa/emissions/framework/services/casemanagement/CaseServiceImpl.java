@@ -100,6 +100,10 @@ public class CaseServiceImpl implements CaseService {
     public Case[] getCases() throws EmfException {
         return getCaseService().getCases();
     }
+    
+    public Case reloadCase(int caseId) throws EmfException {
+        return getCaseService().getCase(caseId);
+    }
 
     public Abbreviation[] getAbbreviations() throws EmfException {
         return getCaseService().getAbbreviations();
@@ -248,6 +252,10 @@ public class CaseServiceImpl implements CaseService {
 
     public void updateCaseJob(User user, CaseJob job) throws EmfException {
         getCaseService().updateCaseJob(user, job);
+    }
+    
+    public void saveCaseJobFromClient(User user, CaseJob job) throws EmfException {
+        getCaseService().saveCaseJobFromClient(user, job);
     }
 
     public Host[] getHosts() throws EmfException {

@@ -47,7 +47,7 @@ public class UpdateUserPresenterImpl implements UpdateUserPresenter {
             return;
         }
 
-        service.releaseLocked(user);
+        service.releaseLocked(session.user(), user);
         updateView.disposeView();
     }
 
