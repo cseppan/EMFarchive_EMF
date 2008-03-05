@@ -73,6 +73,32 @@ public class ScrollableTable extends JScrollPane {
         table.repaint();
     }
 
+    public void setMaxColWidth(String[] columns) {
+        TableColumnModel model = table.getColumnModel();
+        
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            TableColumn col = model.getColumn(i);
+            String headerValue = (String) col.getHeaderValue();
+            if (contains(columns, headerValue))
+                col.setMaxWidth(headerValue.length() * 10);
+            else 
+                col.setMinWidth(headerValue.length() * 10);
+            col.setResizable(true);
+        }
+        table.repaint();
+    }
+    
+    private boolean contains(String[] columns, String column){
+        for (String col : columns){
+            if (col.equalsIgnoreCase(column.trim()))
+                return true;
+        }
+        return false;
+    }
+    public void autoScrolling() {
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+    }
+    
     public void disableScrolling() {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
     }
