@@ -58,7 +58,7 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
 
     public ViewableJobsTab(EmfConsole parentConsole, MessagePanel messagePanel,
             DesktopManager desktopManager, EmfSession session) {
-        super.setName("editJobsTab");
+        super.setName("viewJobsTab");
         this.parentConsole = parentConsole;
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;
@@ -208,6 +208,15 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
         });
         validate.setMargin(insets);
         container.add(validate);
+        
+        Button set = new Button("Set Status", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                clearMessage();
+                setStatus();
+            }
+        });
+        set.setMargin(insets);
+        container.add(set);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
@@ -249,6 +258,18 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
         showMessageDialog(createMsgScrollPane(validationMsg, width, height), title);
     }
 
+    private void setStatus() {
+        CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
+
+        if (jobs.length == 0) {
+            messagePanel.setMessage("Please select one or more jobs to run.");
+            return;
+        }
+
+        SetjobsStatusDialog setDialog = new  SetjobsStatusDialog(parentConsole, this, jobs,presenter);
+        setDialog.run();    
+    }
+            
     private void runJobs() throws Exception {
         CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
 
@@ -377,5 +398,13 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
             throw new EmfException(e.getMessage());
         }
     }
-
+    
+    public void setStatusField(){
+//        List jobs = getSelectedJobs();
+//        for (Iterator iter = jobs.iterator(); iter.hasNext();) {
+//            CaseJob job = (CaseJob) iter.next();
+//            job.setRunstatus(runstatus);
+//        }
+    }
+    
 }

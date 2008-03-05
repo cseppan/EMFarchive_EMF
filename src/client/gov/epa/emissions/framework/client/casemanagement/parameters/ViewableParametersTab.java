@@ -51,7 +51,7 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
     private EmfSession session;
 
     public ViewableParametersTab(EmfConsole parentConsole, MessagePanel messagePanel, DesktopManager desktopManager) {
-        super.setName("editParametersTab");
+        super.setName("viewParametersTab");
         this.parentConsole = parentConsole;
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;

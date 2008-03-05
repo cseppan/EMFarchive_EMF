@@ -68,7 +68,7 @@ public class ViewableOutputsTab extends JPanel implements RefreshObserver {
 
     public ViewableOutputsTab(EmfConsole parentConsole, MessagePanel messagePanel,
             DesktopManager desktopManager, EmfSession session) {
-        super.setName("editOutputsTab");
+        super.setName("viewOutputsTab");
         this.parentConsole = parentConsole;
         this.session=session; 
         this.desktopManager=desktopManager;

@@ -104,7 +104,7 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
 
     public ViewableCaseSummaryTab(Case caseObj, EmfSession session,
             EmfConsole parentConsole) {
-        super.setName("summary");
+        super.setName("viewSummary");
         this.caseObj = caseObj;
         this.session = session;
 //        this.parentConsole = parentConsole;

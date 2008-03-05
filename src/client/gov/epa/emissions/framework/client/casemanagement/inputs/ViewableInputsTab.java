@@ -64,7 +64,7 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
 
     public ViewableInputsTab(EmfConsole parentConsole, MessagePanel messagePanel,
             DesktopManager desktopManager) {
-        super.setName("editInputsTab");
+        super.setName("viewInputsTab");
         this.parentConsole = parentConsole;
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;

@@ -51,7 +51,7 @@ public class ViewableHistoryTab extends JPanel implements RefreshObserver {
     private CaseJob selectedJob=null;
 
     public ViewableHistoryTab(EmfConsole parentConsole, MessagePanel messagePanel, EmfSession session) {
-        super.setName("showCaseHistoryTab");
+        super.setName("viewCaseHistoryTab");
         this.parentConsole = parentConsole;
         this.messagePanel = messagePanel;
         this.session = session;

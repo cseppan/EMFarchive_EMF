@@ -1,19 +1,21 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
 import gov.epa.emissions.commons.gui.ComboBox;
+import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-
 import javax.swing.AbstractAction;
+
 import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -26,16 +28,19 @@ public class SetjobsStatusDialog extends JDialog{
 
     private ComboBox status; 
     
-//    private CaseJob[] jobs; 
-
-    public SetjobsStatusDialog(EmfConsole parent, CaseJob[] jobs, ViewableJobsTabPresenterImpl presenter) {
-        super(parent);
+    private CaseJob[] jobs; 
+    
+    private ViewableJobsTab view; 
+    
+    
+    public SetjobsStatusDialog(EmfConsole parentConsole, ViewableJobsTab view, CaseJob[] jobs, ViewableJobsTabPresenterImpl presenter) {
+        super(parentConsole);
         this.presenter = presenter; 
-//        this.jobs=jobs; 
-        
+        this.jobs =jobs; 
+        this.view=view; 
     }
-    
-    
+
+
     public void run(){
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout(5, 10));
@@ -66,6 +71,7 @@ public class SetjobsStatusDialog extends JDialog{
     private JPanel buttonPanel() {
         JPanel panel = new JPanel();
         panel.add(new OKButton(okAction()));
+        panel.add(new CancelButton(cancelAction()));
         return panel;
     }
     
@@ -76,7 +82,6 @@ public class SetjobsStatusDialog extends JDialog{
         status =new ComboBox(presenter.getRunStatuses());           
  //       versionCombo.setSize(new Dimension(200,10));
         status.setPreferredSize(new Dimension(300,15));
-//        status.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
 
         layoutGenerator.addLabelWidgetPair("Status:", status, panel);
         layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
@@ -87,10 +92,31 @@ public class SetjobsStatusDialog extends JDialog{
 
     private Action okAction() {
         return new AbstractAction() {
-            public void actionPerformed(ActionEvent e){            
-                //;
+            public void actionPerformed(ActionEvent e){  
+                setField();
+                try {
+                    presenter.doSave(jobs);
+                    view.refresh();
+                } catch (EmfException e1) {
+                    // NOTE Auto-generated catch block
+                    e1.printStackTrace();
+                }
                 dispose();
             }
         };
+    }
+
+    private Action cancelAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e){            
+                dispose();
+            }
+        };
+    }
+    
+    private void setField(){
+        for (CaseJob job : jobs) {
+            job.setRunstatus((JobRunStatus) (status.getSelectedItem()));
+        }
     }
 }

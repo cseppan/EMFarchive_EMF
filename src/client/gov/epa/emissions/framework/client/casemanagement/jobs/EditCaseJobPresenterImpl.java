@@ -34,7 +34,7 @@ public class EditCaseJobPresenterImpl implements EditJobPresenter {
         this.session = session;
         this.parentPresenter = parentPresenter;
     }
-
+    
     
     public void display(CaseJob job) throws EmfException {
         this.job = job;
