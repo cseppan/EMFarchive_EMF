@@ -102,13 +102,12 @@ public class LockingScheme {
         Transaction tx = session.beginTransaction();
         try {
             target.setLockDate(new Date());
+            session.update(target);
             tx.commit();
         } catch (HibernateException e) {
             tx.rollback();
             throw e;
-        } finally {
-            session.update(target);
-        }
+        } 
     }
 
 }
