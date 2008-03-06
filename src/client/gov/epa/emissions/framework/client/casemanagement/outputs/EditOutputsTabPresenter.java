@@ -17,7 +17,7 @@ public interface EditOutputsTabPresenter extends CaseEditorTabPresenter {
 
     void doRemove(CaseOutput[] outputs, boolean deleteDataset) throws EmfException;
 
-    void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset);
+    void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException;
     
     EmfDataset getDataset(int id) throws EmfException;
     

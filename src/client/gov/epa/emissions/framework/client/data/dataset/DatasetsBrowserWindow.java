@@ -198,7 +198,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
                 try {
                     doDisplayPropertiesViewer();
                 } catch (EmfException e) {
-                    // NOTE Auto-generated catch block
+                    messagePanel.setError(e.getMessage());
                     e.printStackTrace();
                 }
             }

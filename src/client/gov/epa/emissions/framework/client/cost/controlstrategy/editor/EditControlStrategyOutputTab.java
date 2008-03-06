@@ -500,25 +500,28 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             messagePanel.setError("Please select at least one item.");
             return;
         }
-         
-        for (int i = 0; i < controlStrategyResults.length; i++) {
-            DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
- 
-            if (controlStrategyResults[i].getStrategyResultType().getName().equals("Detailed Strategy Result")) {
-                if (buttonGroup.getSelection().equals(invButton.getModel())) {
-                    presenter.doDisplayPropertiesView(view, controlStrategyResults[i].getInputDataset());
+        try{ 
+            for (int i = 0; i < controlStrategyResults.length; i++) {
+                DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
 
-                } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
-                    presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
+                if (controlStrategyResults[i].getStrategyResultType().getName().equals("Detailed Strategy Result")) {
+                    if (buttonGroup.getSelection().equals(invButton.getModel())) {
+                        presenter.doDisplayPropertiesView(view, controlStrategyResults[i].getInputDataset());
 
-                } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
-                    if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
-                        presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
+                    } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
+                        presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
+
+                    } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
+                        if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
+                            presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
+                        }
                     }
+                } else if (controlStrategyResults[i].getStrategyResultType().getName().equals("Strategy Summary")) {
+                    presenter.doDisplayPropertiesView(view, controlStrategyResults[i].getInputDataset());
                 }
-            } else if (controlStrategyResults[i].getStrategyResultType().getName().equals("Strategy Summary")) {
-                presenter.doDisplayPropertiesView(view, controlStrategyResults[i].getInputDataset());
             }
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
         }
     }
     

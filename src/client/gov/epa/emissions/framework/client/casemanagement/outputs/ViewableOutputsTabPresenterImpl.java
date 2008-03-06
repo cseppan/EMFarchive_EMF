@@ -48,7 +48,7 @@ public class ViewableOutputsTabPresenterImpl{
     }
 
 
-    public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) {
+    public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException {
         view.clearMessage();
 
         PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);

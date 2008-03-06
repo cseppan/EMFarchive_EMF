@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.util.CustomDateFormat;
@@ -25,10 +26,12 @@ import javax.swing.SpringLayout;
 public class SummaryTab extends JPanel implements SummaryTabView {
 
     private EmfDataset dataset;
+    private Version version; 
 
-    public SummaryTab(EmfDataset dataset) {
+    public SummaryTab(EmfDataset dataset, Version version) {
         super.setName("summary");
         this.dataset = dataset;
+        this.version = version; 
 
         super.setLayout(new BorderLayout());
         super.add(createOverviewSection(), BorderLayout.PAGE_START);
@@ -73,7 +76,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         layoutGenerator.addLabelWidgetPair("Intended Use:", new Label("intendedUse", intendedUseName), panel);
 
         layoutGenerator.addLabelWidgetPair("Default Version:", new Label("defaultVersion", ""
-                + dataset.getDefaultVersion()), panel);
+                + version.toString()), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols

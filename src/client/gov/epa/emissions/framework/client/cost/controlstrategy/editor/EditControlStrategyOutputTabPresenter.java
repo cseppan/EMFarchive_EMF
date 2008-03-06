@@ -105,7 +105,7 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
 //        view.recentExportFolder(folder());
     }
     
-    public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) {
+    public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException {
         view.clearMsgPanel();
         PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
         presenter.doDisplay(propertiesView);

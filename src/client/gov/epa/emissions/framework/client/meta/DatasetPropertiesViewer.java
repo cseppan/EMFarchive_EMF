@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
@@ -47,6 +48,8 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     private EmfSession session;
     
     private EmfDataset dataset;
+    
+    private Version version; 
 
     public DatasetPropertiesViewer(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties View", new Dimension(700, 500), desktopManager);
@@ -55,9 +58,10 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         this.desktopManager = desktopManager;
     }
 
-    public void display(EmfDataset dataset) {
+    public void display(EmfDataset dataset, Version version) {
         super.setTitle("Dataset Properties View: " + dataset.getName());
         super.setName("datasetPropertiesView:" + dataset.getId());
+        this.version=version; 
         this.dataset=dataset; 
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
@@ -74,7 +78,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
 
-        tabbedPane.addTab("Summary", createSummaryTab(dataset));
+        tabbedPane.addTab("Summary", createSummaryTab());
         tabbedPane.addTab("Data", createDataTab(parentConsole));
         tabbedPane.addTab("Keywords", createKeywordsTab());
         tabbedPane.addTab("Notes", createNotesTab(parentConsole));
@@ -87,8 +91,8 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         return tabbedPane;
     }
 
-    private JPanel createSummaryTab(EmfDataset dataset) {
-        SummaryTab view = new SummaryTab(dataset);
+    private JPanel createSummaryTab() {
+        SummaryTab view = new SummaryTab(dataset, version);
         presenter.set(view);
         return view;
     }

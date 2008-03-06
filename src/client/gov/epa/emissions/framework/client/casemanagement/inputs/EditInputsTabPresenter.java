@@ -20,7 +20,7 @@ public interface EditInputsTabPresenter extends CaseEditorTabPresenter {
 
    // void doCheckDuplicate(CaseInput input, CaseInput[] existingInputs) throws EmfException;
 
-    void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset);
+    void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException;
     
 //    void doExportWithOverwrite(EmfDataset[] datasets, Version[] versions, String[] folders, String purpose) throws EmfException;
 //

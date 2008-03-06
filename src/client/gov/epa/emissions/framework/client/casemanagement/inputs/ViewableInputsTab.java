@@ -244,7 +244,11 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
         for (Iterator<EmfDataset> iter = datasets.iterator(); iter.hasNext();) {
             DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
             EmfDataset dataset = iter.next();
-            presenter.doDisplayPropertiesView(view, dataset);
+            try {
+                presenter.doDisplayPropertiesView(view, dataset);
+            } catch (EmfException e) {
+                messagePanel.setError(e.getMessage());
+            }
         }
     }
 

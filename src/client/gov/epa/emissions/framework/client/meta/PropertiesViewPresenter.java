@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -38,16 +39,26 @@ public class PropertiesViewPresenter {
         this.session = session;
     }
 
-    public void doDisplay(PropertiesView view) {
+    public void doDisplay(PropertiesView view) throws EmfException {
         this.view = view;
         view.observe(this);
-        view.display(dataset);
+        Version version = session.eximService().getVersion(dataset, dataset.getDefaultVersion());
+        view.display(dataset, version);
     }
 
     public void doClose() {
         view.disposeView();
     }
-
+    
+//    private Version version(int datasetId, int version) {
+//        Session session = sessionFactory.getSession();
+//        try {
+//            Versions versions = new Versions();
+//            return versions.get(datasetId, version, session);
+//        } finally {
+//            session.close();
+//        }
+//    }
     public void set(SummaryTabView summary) {
         SummaryTabPresenter summaryPresenter = new SummaryTabPresenter();
         summaryPresenter.display();
