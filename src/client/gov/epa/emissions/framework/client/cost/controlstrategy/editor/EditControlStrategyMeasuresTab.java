@@ -359,11 +359,11 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
 
     public void startControlMeasuresRefresh() {
-        addButton.setEnabled(false);
+        if (addButton != null) addButton.setEnabled(false);
     }
 
     public void endControlMeasuresRefresh() {
-        addButton.setEnabled(true);
+        if (addButton != null) addButton.setEnabled(true);
     }
 
     public void edit(Double applyOrder, Double rulePenetration, 
