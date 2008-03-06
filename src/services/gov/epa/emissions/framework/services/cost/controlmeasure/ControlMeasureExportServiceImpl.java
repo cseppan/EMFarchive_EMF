@@ -68,6 +68,10 @@ public class ControlMeasureExportServiceImpl implements ControlMeasureExportServ
     private synchronized void doExport(String folderPath, String prefix, int[] controlMeasureIds, User user,
             boolean overwrite) throws EmfException {
         try {
+            File dir = new File(folderPath);
+            if (!dir.isDirectory())
+                throw new EmfException("Export folder does not exist: " + folderPath);
+            
             validateExportFile(new File(folderPath), prefix, overwrite);
             CMExportTask exportTask = new CMExportTask(new File(folderPath), prefix, controlMeasureIds, user,
                     sessionFactory, dbServerFactory);

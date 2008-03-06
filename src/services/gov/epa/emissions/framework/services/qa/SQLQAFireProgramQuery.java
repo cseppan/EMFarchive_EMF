@@ -77,25 +77,26 @@ public class SQLQAFireProgramQuery {
              if (invTableDatasetName.length() > 0) hasInvTableDataset = true;
          }
          
-        //Create the outer query (the # symbol is a placeholder for the inner sql statement)
+        //Create the query template and add placeholders (#, @!@, @@@, ...) for sql to be inserted in a later steps
          String outerQuery = "select @!@, " 
              + (hasInvTableDataset ? "coalesce(i.name, te.data)" : "te.data") + " as data, "
-             + "sum(datavalue) as datavalue "
+             + "sum(" + (hasInvTableDataset ? "coalesce(cast(i.factor as double precision) * datavalue, datavalue)" : "datavalue") + ") as datavalue "
              + "\nfrom (#) as te " 
              + (hasInvTableDataset ? "\nleft outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i \non te.data = i.cas " : "") 
              + " \ngroup by @@@, " + (hasInvTableDataset ? "coalesce(i.name, te.data)" : "te.data") 
              + " \norder by @@@, " + (hasInvTableDataset ? "coalesce(i.name, te.data)" : "te.data") + "";
-        
+         //, i.name, sum(cast(i.factor as double precision) * mo_emis)
          outerQuery = query(outerQuery, true);
-                
-        //build inner sql statement with the datasets specified
+
+        //build inner sql statement with the datasets specified, make sure and unionize (append) the tables together
         String innerSQL = "";
         for (int j = 0; j < allDatasetNames.size(); j++) {
             innerSQL += (j > 0 ? " \nunion all " : "") + createFireDatasetQuery(allDatasetNames.get(j).toString().trim());
         }
 
-        //replace # symbol with the inner query
+        //replace # symbol with the unionized fire datasets query
         outerQuery = outerQuery.replaceAll(poundQueryTag, innerSQL);
+
         //replace @!@ symbol with main columns in outer select statement
         String sql = "";
         if (summaryTypeToken.equals("State+SCC")) 
@@ -105,6 +106,7 @@ public class SQLQAFireProgramQuery {
         else if (summaryTypeToken.equals("County")) 
             sql = "te.fips";
         outerQuery = outerQuery.replaceAll("@!@", sql);
+
         //replace !@! symbol with main columns in inner select statement
         if (summaryTypeToken.equals("State+SCC")) 
             sql = "substr(fips, 1, 2) as fipsst, scc";
@@ -113,6 +115,7 @@ public class SQLQAFireProgramQuery {
         else if (summaryTypeToken.equals("County")) 
             sql = "fips";
         outerQuery = outerQuery.replaceAll("!@!", sql);
+        
         //replace @@@ symbol with group by columns in outer select statement
         if (summaryTypeToken.equals("State+SCC")) 
             sql = "te.fipsst, te.scc";
@@ -121,6 +124,7 @@ public class SQLQAFireProgramQuery {
         else if (summaryTypeToken.equals("County")) 
             sql = "te.fips";
         outerQuery = outerQuery.replaceAll("@@@", sql);
+        
         //replace !!! symbol with group by columns in inner select statement
         if (summaryTypeToken.equals("State+SCC")) 
             sql = "substr(fips, 1, 2), scc";
@@ -129,6 +133,8 @@ public class SQLQAFireProgramQuery {
         else if (summaryTypeToken.equals("County")) 
             sql = "fips";
         outerQuery = outerQuery.replaceAll("!!!", sql);
+
+        //return the built query
         return outerQuery;
     }
 

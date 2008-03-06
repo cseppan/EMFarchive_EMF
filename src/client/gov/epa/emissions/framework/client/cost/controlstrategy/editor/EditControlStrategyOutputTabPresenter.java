@@ -28,9 +28,8 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         this.view = view;
     }
 
-    public void doSave(ControlStrategy controlStrategy) {
-        // NOTE Auto-generated method stub
-
+    public void doSave(ControlStrategy controlStrategy) throws EmfException {
+        view.save(controlStrategy);
     }
 
     public void doExport(EmfDataset[] datasets, String folder) throws EmfException {
@@ -73,17 +72,17 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
             throw new EmfException("Please specify a directory to export");
     }
 
-    public void doDisplay() {
+    public void doDisplay(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) throws EmfException {
         view.observe(this);
-        view.recentExportFolder(folder());
+        view.display(controlStrategy, controlStrategyResults);
+//        view.recentExportFolder(folder());
     }
-    
+
     public void setLastFolder(String folder){
         lastFolder = folder; 
     }
-    
 
-    private String folder() {
+    public String folder() {
         return (lastFolder != null) ? lastFolder : defaultFolder();
     }
 
@@ -103,7 +102,7 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
 
     public void doRefresh(ControlStrategyResult[] controlStrategyResults) {
         view.refresh(controlStrategyResults);
-        view.recentExportFolder(folder());
+//        view.recentExportFolder(folder());
     }
     
     public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) {

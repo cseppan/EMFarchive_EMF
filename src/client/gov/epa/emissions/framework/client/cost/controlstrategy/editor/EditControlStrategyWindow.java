@@ -201,9 +201,14 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 //    }
     
     private JPanel outputPanel(ControlStrategyResult[] controlStrategyResults) {
-        outputTabView = new EditControlStrategyOutputTab(controlStrategy,
-                controlStrategyResults, messagePanel, desktopManager, parentConsole, session);
-        this.presenter.set(outputTabView);
+        try {
+            outputTabView = new EditControlStrategyOutputTab(controlStrategy,
+                    controlStrategyResults, messagePanel, desktopManager, parentConsole, session);
+            this.presenter.set(outputTabView);
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
         return (JPanel) outputTabView;
     }
 

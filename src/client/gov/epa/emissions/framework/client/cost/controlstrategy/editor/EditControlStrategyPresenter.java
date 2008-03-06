@@ -19,7 +19,7 @@ public interface EditControlStrategyPresenter {
 
     void set(EditControlStrategySummaryTabView view);
     
-    void set(EditControlStrategyOutputTabView view);
+    void set(EditControlStrategyOutputTabView view) throws EmfException;
 
     void set(ControlStrategyMeasuresTabView view) throws EmfException;
 

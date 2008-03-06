@@ -128,9 +128,9 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         presenters.add(summaryTabPresenter);
     }
 
-    public void set(EditControlStrategyOutputTabView view) {
+    public void set(EditControlStrategyOutputTabView view) throws EmfException {
         EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter(session, view);
-        presenter.doDisplay();
+        presenter.doDisplay(controlStrategy, getResult());
         presenters.add(presenter);
     }
 

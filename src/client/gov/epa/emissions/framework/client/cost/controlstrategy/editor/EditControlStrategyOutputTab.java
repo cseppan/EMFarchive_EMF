@@ -79,7 +79,11 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;
         this.parentConsole = parentConsole;
-        setLayout(controlStrategy, controlStrategyResults);
+//        setLayout(controlStrategy, controlStrategyResults);
+    }
+
+    public void display(ControlStrategy strategy, ControlStrategyResult[] controlStrategyResults) {
+      setLayout(controlStrategy, controlStrategyResults);
     }
 
     private void setLayout(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
@@ -96,7 +100,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     public void save(ControlStrategy controlStrategy) {
-        // TODO: output settings
+        controlStrategy.setExportDirectory(folder.getText());
     }
 
     public void observe(EditControlStrategyOutputTabPresenter presenter) {
@@ -255,7 +259,10 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private JPanel folderPanel() {
         JLabel folderLabel = new JLabel("Export Folder: ");
         folder = new TextField("folderName", 30);
-
+        String exportDirectory = controlStrategy.getExportDirectory();
+        exportDirectory = (exportDirectory != null ? exportDirectory : presenter.folder());
+        folder.setText(exportDirectory);
+        
         Button browseButton = new BrowseButton(browseAction());
 
         JPanel panel = new JPanel();
@@ -470,10 +477,10 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         }
     }
 
-    public void recentExportFolder(String recentfolder) {
-        if (recentfolder != null)
-            folder.setText(recentfolder);
-    }
+//    public void recentExportFolder(String recentfolder) {
+//        if (recentfolder != null)
+//            folder.setText(recentfolder);
+//    }
 
     public String getExportFolder() {
         return folder.getText();

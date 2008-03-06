@@ -44,18 +44,13 @@ public class CMExportPresenter {
     private void doExport(int[] controlMeasureIds, String folder, boolean overwrite, String prefix) throws EmfException {
         ControlMeasureExportService service = session.controlMeasureExportService();
         
-        File dir = new File(folder);
-        if (dir.isDirectory())
-            lastFolder = folder;
-        else 
-            throw new EmfException("Export folder does not exist: " + folder);
-        
-        session.setMostRecentExportFolder(folder);
-        
         if (overwrite)
             service.exportControlMeasuresWithOverwrite(folder, prefix, controlMeasureIds, session.user());
         else
             service.exportControlMeasures(folder, prefix, controlMeasureIds, session.user());
+
+        session.setMostRecentExportFolder(folder);
+        
     }
 
 //    private String mapToRemote(String dir) {
