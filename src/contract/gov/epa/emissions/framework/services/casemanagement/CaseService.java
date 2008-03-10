@@ -142,6 +142,7 @@ public interface CaseService {
     void runJobs(CaseJob[] jobs, User user) throws EmfException;
     String runJobs(Integer[] jobIds, int caseId, User user) throws EmfException;
     String getJobStatusMessage(int caseId) throws EmfException;
+    void updateCaseJobStatus(CaseJob job) throws EmfException;
 
     // Used for CaseService ExportInputs
     void exportCaseInputs(User user, Integer[] caseInputIds, String purpose) throws EmfException;

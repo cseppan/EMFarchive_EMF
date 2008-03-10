@@ -31,7 +31,7 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
 
     public void doSave(CaseJob[] jobs) throws EmfException {
         for (CaseJob job : jobs)
-            service().updateCaseJob(session.user(), job);
+            service().updateCaseJobStatus(job);
     }
 
 

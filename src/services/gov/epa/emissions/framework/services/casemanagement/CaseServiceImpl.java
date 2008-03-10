@@ -254,6 +254,10 @@ public class CaseServiceImpl implements CaseService {
         getCaseService().updateCaseJob(user, job);
     }
     
+    public void updateCaseJobStatus(CaseJob job) throws EmfException {
+        getCaseService().updateCaseJobStatus(job);
+    }
+    
     public void saveCaseJobFromClient(User user, CaseJob job) throws EmfException {
         getCaseService().saveCaseJobFromClient(user, job);
     }

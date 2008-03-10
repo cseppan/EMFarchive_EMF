@@ -483,6 +483,16 @@ public class CaseServiceTransport implements CaseService {
         call.request(new Object[] { user, job });
     }
     
+    public synchronized void updateCaseJobStatus(CaseJob job) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("updateCaseJobStatus");
+        call.addParam("job", caseMappings.casejob());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { job });
+    }
+    
     public synchronized void saveCaseJobFromClient(User user, CaseJob job) throws EmfException {
         EmfCall call = call();
 
