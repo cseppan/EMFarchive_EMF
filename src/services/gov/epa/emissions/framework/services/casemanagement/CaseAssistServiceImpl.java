@@ -93,9 +93,9 @@ public class CaseAssistServiceImpl implements CaseAssistService {
             }
 
             if (useTaskMangerForCaseOutputs)
-                getImportService().importDatasetsForCaseOutput(job.getUser(), outputs);
+                getImportService().importDatasetsForCaseOutput(job.getRunJobUser(), outputs);
             else
-                getImportService().registerCaseOutputs(job.getUser(), outputs);
+                getImportService().registerCaseOutputs(job.getRunJobUser(), outputs);
         } catch (Exception e) {
             e.printStackTrace();
             if (e.getMessage().startsWith("Error registering output"))
