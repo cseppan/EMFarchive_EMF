@@ -708,7 +708,7 @@ public class ManagedCaseService {
 
     public synchronized CaseInput addCaseInput(User user, CaseInput input, boolean copyingCase) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             if (!copyingCase)
                 checkNExtendCaseLock(user, getCase(input.getCaseID(), session));
@@ -734,7 +734,7 @@ public class ManagedCaseService {
 
     public synchronized void updateCaseInput(User user, CaseInput input) throws EmfException {
         Session localSession = sessionFactory.getSession();
-        
+
         try {
             checkNExtendCaseLock(user, getCase(input.getCaseID(), localSession));
         } catch (EmfException e) {
@@ -1166,7 +1166,8 @@ public class ManagedCaseService {
             copySingleParameter(user, tocopy[i], copiedCaseId);
     }
 
-    private synchronized CaseParameter copySingleParameter(User user, CaseParameter parameter, int copiedCaseId) throws Exception {
+    private synchronized CaseParameter copySingleParameter(User user, CaseParameter parameter, int copiedCaseId)
+            throws Exception {
         CaseParameter copied = (CaseParameter) DeepCopy.copy(parameter);
         copied.setCaseID(copiedCaseId);
 
@@ -1187,14 +1188,14 @@ public class ManagedCaseService {
 
     public synchronized CaseJob addCaseJob(User user, CaseJob job, boolean copyingCase) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             if (!copyingCase) // if not copying case, automatically extend the lock on case object
                 checkNExtendCaseLock(user, getCase(job.getCaseId(), session));
         } catch (EmfException e) {
             throw e;
         }
-        
+
         try {
             if (job.getRunstatus() == null)
                 job.setRunstatus(dao.getJobRunStatuse("Not Started"));
@@ -1495,11 +1496,8 @@ public class ManagedCaseService {
                 // set the job key in the case job
                 caseJob.setJobkey(jobKey);
 
-                // set the user for the case job
-                User runJobUser = caseJob.getRunJobUser();
-                if (runJobUser == null || !runJobUser.equals(user)) {
-                    caseJob.setUser(user);
-                }
+                // set the run user for the case job
+                caseJob.setRunJobUser(user);
 
                 // FIXME: Is this still needed?????
                 // caseJob.setRunStartDate(new Date());
@@ -1689,9 +1687,19 @@ public class ManagedCaseService {
         }
     }
 
+    public synchronized void updateCaseJobStatus(CaseJob job) throws EmfException {
+        try {
+            dao.updateCaseJob(job);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            log.error("Could not update case job: " + job.getName() + ".\n" + e);
+            throw new EmfException("Could not update case job: " + job.getName() + ".");
+        }
+    }
+    
     public synchronized void saveCaseJobFromClient(User user, CaseJob job) throws EmfException {
         Session localSession = sessionFactory.getSession();
-        
+
         try {
             checkNExtendCaseLock(user, getCase(job.getCaseId(), localSession));
         } catch (EmfException e) {
@@ -1699,7 +1707,7 @@ public class ManagedCaseService {
         } finally {
             localSession.close();
         }
-        
+
         try {
             CaseJob loaded = (CaseJob) dao.loadCaseJob(job);
 
