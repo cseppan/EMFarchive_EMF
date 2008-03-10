@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.casemanagement;
 
 import java.io.Serializable;
 
-public class MeteorlogicalYear implements Comparable, Serializable {
+public class MeteorlogicalYear implements Comparable<MeteorlogicalYear>, Serializable {
 
     private int id;
 
@@ -50,7 +50,7 @@ public class MeteorlogicalYear implements Comparable, Serializable {
         return getName();
     }
 
-    public int compareTo(Object other) {
-        return name.compareToIgnoreCase(((MeteorlogicalYear) other).getName());
+    public int compareTo(MeteorlogicalYear other) {
+        return name.compareToIgnoreCase(other.getName());
     }
 }

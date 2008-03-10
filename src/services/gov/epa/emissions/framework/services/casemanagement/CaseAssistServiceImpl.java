@@ -146,7 +146,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
                 this.log.error("Job run status for job " + job.getName() + " is null. JobMessage: "
                         + "message status -> " + message.getStatus() + ".");
 
-            User user = job.getUser();
+            User user = job.getRunJobUser();
             message.setCaseId(job.getCaseId());
             message.setJobId(job.getId());
             String status = message.getStatus();

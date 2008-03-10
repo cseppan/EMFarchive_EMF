@@ -7,12 +7,18 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
+import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
+import gov.epa.emissions.framework.services.casemanagement.Grid;
+import gov.epa.emissions.framework.services.casemanagement.GridResolution;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
+import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
+import gov.epa.emissions.framework.services.casemanagement.Speciation;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
@@ -76,6 +82,18 @@ public class CaseObjectManager {
     private List<Region> regions;
 
     private List<ModelToRun> modelToRuns;
+
+    private List<AirQualityModel> airQualityModels;
+
+    private List<EmissionsYear> emissionsYears;
+
+    private List<MeteorlogicalYear> meteorlogicalYears;
+
+    private List<Speciation> speciations;
+
+    private List<GridResolution> gridResolutions;
+
+    private List<Grid> grids;
 
     // up to here
 
@@ -165,7 +183,7 @@ public class CaseObjectManager {
         jobs.addAll(Arrays.asList(caseService.getCaseJobs(caseId)));
         jobs.add(0, allJobsForSector);
         jobsForLastCaseId = jobs.toArray(new CaseJob[jobs.size()]);
-        //Arrays.sort(jobsForLastCaseId, new CaseJobNameComparator());
+        // Arrays.sort(jobsForLastCaseId, new CaseJobNameComparator());
         lastCaseId = caseId;
         return jobsForLastCaseId;
     }
@@ -637,4 +655,203 @@ public class CaseObjectManager {
         // the model was not found in the list
         return addModelToRun(model);
     }
+
+    public synchronized AirQualityModel[] getAirQualityModels() throws EmfException {
+        airQualityModels = Arrays.asList(caseService.getAirQualityModels());
+        Collections.sort(airQualityModels);
+
+        return airQualityModels.toArray(new AirQualityModel[0]);
+    }
+
+    public synchronized AirQualityModel addAirQualityModel(AirQualityModel airQModel) throws EmfException {
+        AirQualityModel newAirQModel = caseService.addAirQualityModel(airQModel);
+
+        return newAirQModel;
+    }
+
+    public synchronized AirQualityModel getOrAddAirQualityModel(Object selected) throws EmfException {
+        if (selected == null)
+            return null;
+
+        AirQualityModel airQModel = null;
+        if (selected instanceof String) {
+            airQModel = new AirQualityModel(selected.toString());
+        } else if (selected instanceof AirQualityModel) {
+            airQModel = (AirQualityModel) selected;
+        }
+
+        this.getAirQualityModels(); // make sure AirQualityModel have been retrieved
+
+        if (airQualityModels.contains(airQModel))
+            return airQualityModels.get(airQualityModels.indexOf(airQModel));
+
+        // the AirQualityModel was not found in the list
+        return addAirQualityModel(airQModel);
+    }
+    
+    public synchronized EmissionsYear[] getEmissionsYears() throws EmfException {
+        emissionsYears = Arrays.asList(caseService.getEmissionsYears());
+        Collections.sort(emissionsYears);
+
+        return emissionsYears.toArray(new EmissionsYear[0]);
+    }
+
+    public synchronized EmissionsYear addEmissionsYear(EmissionsYear emissYear) throws EmfException {
+        EmissionsYear newEmissYear = caseService.addEmissionsYear(emissYear);
+
+        return newEmissYear;
+    }
+
+    public synchronized EmissionsYear getOrAddEmissionsYear(Object selected) throws EmfException {
+        if (selected == null)
+            return null;
+
+        EmissionsYear emissYear = null;
+        if (selected instanceof String) {
+            emissYear = new EmissionsYear(selected.toString());
+        } else if (selected instanceof EmissionsYear) {
+            emissYear = (EmissionsYear) selected;
+        }
+
+        this.getEmissionsYears(); // make sure EmissionsYear have been retrieved
+
+        if (emissionsYears.contains(emissYear))
+            return emissionsYears.get(emissionsYears.indexOf(emissYear));
+
+        // the EmissionsYear was not found in the list
+        return addEmissionsYear(emissYear);
+    }
+
+    public synchronized MeteorlogicalYear[] getMeteorlogicalYears() throws EmfException {
+        meteorlogicalYears = Arrays.asList(caseService.getMeteorlogicalYears());
+        Collections.sort(meteorlogicalYears);
+        
+        return meteorlogicalYears.toArray(new MeteorlogicalYear[0]);
+    }
+    
+    public synchronized MeteorlogicalYear addMeteorlogicalYear(MeteorlogicalYear metYear) throws EmfException {
+        MeteorlogicalYear newMetYear = caseService.addMeteorologicalYear(metYear);
+        
+        return newMetYear;
+    }
+    
+    public synchronized MeteorlogicalYear getOrAddMeteorlogicalYear(Object selected) throws EmfException {
+        if (selected == null)
+            return null;
+        
+        MeteorlogicalYear metYear = null;
+        if (selected instanceof String) {
+            metYear = new MeteorlogicalYear(selected.toString());
+        } else if (selected instanceof MeteorlogicalYear) {
+            metYear = (MeteorlogicalYear) selected;
+        }
+        
+        this.getMeteorlogicalYears(); // make sure MeteorlogicalYear have been retrieved
+        
+        if (meteorlogicalYears.contains(metYear))
+            return meteorlogicalYears.get(meteorlogicalYears.indexOf(metYear));
+        
+        // the MeteorlogicalYear was not found in the list
+        return addMeteorlogicalYear(metYear);
+    }
+
+    public synchronized Speciation[] getSpeciations() throws EmfException {
+        speciations = Arrays.asList(caseService.getSpeciations());
+        Collections.sort(speciations);
+        
+        return speciations.toArray(new Speciation[0]);
+    }
+    
+    public synchronized Speciation addSpeciation(Speciation speciation) throws EmfException {
+        Speciation newSpeciation = caseService.addSpeciation(speciation);
+        
+        return newSpeciation;
+    }
+    
+    public synchronized Speciation getOrAddSpeciation(Object selected) throws EmfException {
+        if (selected == null)
+            return null;
+        
+        Speciation speication = null;
+        if (selected instanceof String) {
+            speication = new Speciation(selected.toString());
+        } else if (selected instanceof Speciation) {
+            speication = (Speciation) selected;
+        }
+        
+        this.getSpeciations(); // make sure Speciation have been retrieved
+        
+        if (speciations.contains(speication))
+            return speciations.get(speciations.indexOf(speication));
+        
+        // the Speciation was not found in the list
+        return addSpeciation(speication);
+    }
+
+    public synchronized GridResolution[] getGridResolutions() throws EmfException {
+        gridResolutions = Arrays.asList(caseService.getGridResolutions());
+        Collections.sort(gridResolutions);
+        
+        return gridResolutions.toArray(new GridResolution[0]);
+    }
+    
+    public synchronized GridResolution addGridResolution(GridResolution gridResolution) throws EmfException {
+        GridResolution newResolution = caseService.addGridResolution(gridResolution);
+        
+        return newResolution;
+    }
+    
+    public synchronized GridResolution getOrAddGridResolution(Object selected) throws EmfException {
+        if (selected == null)
+            return null;
+        
+        GridResolution gridResolution = null;
+        if (selected instanceof String) {
+            gridResolution = new GridResolution(selected.toString());
+        } else if (selected instanceof GridResolution) {
+            gridResolution = (GridResolution) selected;
+        }
+        
+        this.getGridResolutions(); // make sure GridResolution have been retrieved
+        
+        if (gridResolutions.contains(gridResolution))
+            return gridResolutions.get(gridResolutions.indexOf(gridResolution));
+        
+        // the GridResolution was not found in the list
+        return addGridResolution(gridResolution);
+    }
+
+    public synchronized Grid[] getGrids() throws EmfException {
+        grids = Arrays.asList(caseService.getGrids());
+        Collections.sort(grids);
+        
+        return grids.toArray(new Grid[0]);
+    }
+    
+    public synchronized Grid addGrid(Grid grid) throws EmfException {
+        Grid newGrid = caseService.addGrid(grid);
+        
+        return newGrid;
+    }
+    
+    public synchronized Grid getOrAddGrid(Object selected) throws EmfException {
+        if (selected == null)
+            return null;
+        
+        Grid grid = null;
+        if (selected instanceof String) {
+            grid = new Grid(selected.toString());
+        } else if (selected instanceof Grid) {
+            grid = (Grid) selected;
+        }
+        
+        this.getGrids(); // make sure Grid have been retrieved
+        
+        if (grids.contains(grid))
+            return grids.get(grids.indexOf(grid));
+        
+        // the Grid was not found in the list
+        return addGrid(grid);
+    }
+
 }

@@ -157,3 +157,6 @@ CREATE TABLE cases.output_queue
 ) 
 WITHOUT OIDS;
 -- cases.output_queue
+
+-- 3/8/2008 add a new column running_user_id to case_jobs table
+ALTER TABLE cases.cases_casejobs ADD COLUMN running_user_id int4 REFERENCES emf.users(id);

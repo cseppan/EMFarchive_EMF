@@ -46,7 +46,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
     public void addNewInput(CaseInput input) throws EmfException {
         input.setCaseID(caseObj.getId());
-        view.addInput(service().addCaseInput(input));
+        view.addInput(service().addCaseInput(session.user(), input));
         refreshView();
     }
 

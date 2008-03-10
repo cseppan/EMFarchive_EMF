@@ -17,7 +17,7 @@ public class CaseJobsRowSource implements RowSource {
                 getSectorName(job), getRunStatus(job), getRunLog(job), 
                 getStartDate(job), getCompleteDate(job), getExecutableName(job),  
                 getArgs(job), getVersion(job), getOrder(job),
-                getPath(job), getQOpt(job),  getIDInQ(job),
+                getPath(job), getQOpt(job),  getIDInQ(job), getRunningUser(job),
                 getUser(job), getHost(job), getPurpose(job) };
     }
     
@@ -87,6 +87,10 @@ public class CaseJobsRowSource implements RowSource {
 
     private String getUser(CaseJob job) {
         return (job.getUser() == null) ? "" : job.getUser().getName();
+    }
+    
+    private String getRunningUser(CaseJob job) {
+        return (job.getRunJobUser() == null) ? "" : job.getRunJobUser().getName();
     }
     
     public Object source() {

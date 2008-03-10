@@ -38,7 +38,7 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
 
     public void addNewParameter(CaseParameter param) throws EmfException {
         param.setCaseID(caseObj.getId());
-        view.addParameter(service().addCaseParameter(param));
+        view.addParameter(service().addCaseParameter(session.user(), param));
         refreshView();
     }
 

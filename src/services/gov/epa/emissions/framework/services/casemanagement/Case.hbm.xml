@@ -32,42 +32,42 @@
             class="gov.epa.emissions.framework.services.casemanagement.Abbreviation"
             column="abbreviation_id"/> 
 
-	 <many-to-one cascade="save-update"
+	 <many-to-one 
             name="model" 
             class="gov.epa.emissions.framework.services.casemanagement.ModelToRun"
             column="model_to_run_id"/> 
 
-	 <many-to-one cascade="save-update"
+	 <many-to-one 
             name="airQualityModel" 
             class="gov.epa.emissions.framework.services.casemanagement.AirQualityModel"
             column="air_quality_model_id"/> 
 
-	 <many-to-one cascade="save-update"
+	 <many-to-one 
             name="caseCategory" 
             class="gov.epa.emissions.framework.services.casemanagement.CaseCategory"
             column="category_id"/> 
 
-	 <many-to-one cascade="save-update"
+	 <many-to-one 
             name="emissionsYear" 
             class="gov.epa.emissions.framework.services.casemanagement.EmissionsYear"
             column="emissions_year_id"/> 
 
-	 <many-to-one cascade="save-update"
+	 <many-to-one 
             name="grid" 
             class="gov.epa.emissions.framework.services.casemanagement.Grid"
             column="grid_id"/> 
 
-	 <many-to-one cascade="save-update"
+	 <many-to-one 
             name="gridResolution" 
             class="gov.epa.emissions.framework.services.casemanagement.GridResolution"
             column="grid_resolution_id"/> 
 
-	 <many-to-one cascade="save-update"
+	 <many-to-one 
             name="meteorlogicalYear" 
             class="gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear"
             column="meteorlogical_year_id"/> 
 
-	 <many-to-one cascade="save-update"
+	 <many-to-one 
             name="speciation" 
             class="gov.epa.emissions.framework.services.casemanagement.Speciation"
             column="speciation_id"/> 
@@ -82,7 +82,7 @@
             class="gov.epa.emissions.commons.security.User"
             column="user_id"/> 
             
-	<many-to-one cascade="save-update"
+	<many-to-one 
             name="project" 
             class="gov.epa.emissions.commons.data.Project"
             column="project_id"/> 

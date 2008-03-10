@@ -77,13 +77,12 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
             view.notifyLockFailure(caseObj);
             return;
         }
-
-        String msg = "";
+        
+        String jobSummaryMsg = service().getJobStatusMessage(caseObj.getId());
+        view.display(caseObj, jobSummaryMsg);
 
         if (b4locked.isLocked() && !b4locked.isLocked(session.user()))
-            msg = "Lock acquired from an expired one (by user " + b4locked.getLockOwner() + ").";
-
-        view.display(caseObj, msg);
+            view.showLockingMsg("Lock acquired from an expired one (by user " + b4locked.getLockOwner() + ").");
     }
 
     public void doClose() throws EmfException {

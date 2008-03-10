@@ -282,6 +282,10 @@ public class CaseDAO {
         return (Case) lockingScheme.releaseLock(owner, current(locked, session), session);
     }
 
+    public Case forceReleaseLocked(Case locked, Session session) {
+        return (Case) lockingScheme.releaseLock(current(locked, session), session);
+    }
+
     public Case update(Case locked, Session session) throws EmfException {
         return (Case) lockingScheme.releaseLockOnUpdate(locked, current(locked, session), session);
     }
@@ -322,6 +326,11 @@ public class CaseDAO {
 
     public Object load(Class clazz, String name, Session session) {
         Criterion criterion = Restrictions.eq("name", name);
+        return hibernateFacade.load(clazz, criterion, session);
+    }
+
+    public Object load(Class clazz, int id, Session session) {
+        Criterion criterion = Restrictions.eq("id", new Integer(id));
         return hibernateFacade.load(clazz, criterion, session);
     }
 

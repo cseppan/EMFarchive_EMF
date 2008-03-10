@@ -706,13 +706,21 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized CaseInput addCaseInput(CaseInput input) throws EmfException {
+    public synchronized CaseInput addCaseInput(User user, CaseInput input, boolean copyingCase) throws EmfException {
         Session session = sessionFactory.getSession();
-
-        if (dao.caseInputExists(input, session))
-            throw new EmfException("The combination of 'Input Name', 'Sector', 'Program', and 'Job' should be unique.");
+        
+        try {
+            if (!copyingCase)
+                checkNExtendCaseLock(user, getCase(input.getCaseID(), session));
+        } catch (EmfException e) {
+            throw e;
+        }
 
         try {
+            if (dao.caseInputExists(input, session))
+                throw new EmfException(
+                        "The combination of 'Input Name', 'Sector', 'Program', and 'Job' should be unique.");
+
             dao.add(input, session);
             return (CaseInput) dao.loadCaseInput(input, session);
         } catch (Exception e) {
@@ -725,10 +733,16 @@ public class ManagedCaseService {
     }
 
     public synchronized void updateCaseInput(User user, CaseInput input) throws EmfException {
-        Session session = sessionFactory.getSession();
+        Session localSession = sessionFactory.getSession();
+        
+        try {
+            checkNExtendCaseLock(user, getCase(input.getCaseID(), localSession));
+        } catch (EmfException e) {
+            throw e;
+        }
 
         try {
-            CaseInput loaded = (CaseInput) dao.loadCaseInput(input, session);
+            CaseInput loaded = (CaseInput) dao.loadCaseInput(input, localSession);
 
             if (loaded != null && loaded.getId() != input.getId())
                 throw new EmfException("Case input uniqueness check failed (" + loaded.getId() + "," + input.getId()
@@ -736,15 +750,15 @@ public class ManagedCaseService {
 
             // Clear the cached information. To update a case
             // FIXME: Verify the session.clear()
-            session.clear();
-            dao.updateCaseInput(input, session);
+            localSession.clear();
+            dao.updateCaseInput(input, localSession);
             // setStatus(user, "Saved input " + input.getName() + " to database.", "Save Input");
         } catch (RuntimeException e) {
             e.printStackTrace();
             log.error("Could not update case input: " + input.getName() + ".\n" + e);
             throw new EmfException("Could not update case input: " + input.getName() + ".");
         } finally {
-            session.close();
+            localSession.close();
         }
     }
 
@@ -913,14 +927,14 @@ public class ManagedCaseService {
         return copiedList.toArray(new Case[0]);
     }
 
-    private synchronized void copyCaseInputs(int origCaseId, int copiedCaseId) throws Exception {
+    private synchronized void copyCaseInputs(User user, int origCaseId, int copiedCaseId) throws Exception {
         CaseInput[] tocopy = getCaseInputs(origCaseId);
 
         for (int i = 0; i < tocopy.length; i++)
-            copySingleInput(tocopy[i], copiedCaseId);
+            copySingleInput(user, tocopy[i], copiedCaseId);
     }
 
-    private synchronized CaseInput copySingleInput(CaseInput input, int copiedCaseId) throws Exception {
+    private synchronized CaseInput copySingleInput(User user, CaseInput input, int copiedCaseId) throws Exception {
         CaseInput copied = (CaseInput) DeepCopy.copy(input);
         copied.setCaseID(copiedCaseId);
 
@@ -940,7 +954,7 @@ public class ManagedCaseService {
             session.close();
         }
 
-        return addCaseInput(copied);
+        return addCaseInput(user, copied, true);
     }
 
     private synchronized Case addCopiedCase(Case element, User user) throws EmfException {
@@ -961,14 +975,14 @@ public class ManagedCaseService {
         }
     }
 
-    private synchronized void copyCaseJobs(int toCopyCaseId, int copiedCaseId) throws Exception {
+    private synchronized void copyCaseJobs(int toCopyCaseId, int copiedCaseId, User user) throws Exception {
         CaseJob[] tocopy = getCaseJobs(toCopyCaseId);
 
         for (int i = 0; i < tocopy.length; i++)
-            copySingleJob(tocopy[i], copiedCaseId);
+            copySingleJob(tocopy[i], copiedCaseId, user);
     }
 
-    private synchronized CaseJob copySingleJob(CaseJob job, int copiedCaseId) throws Exception {
+    private synchronized CaseJob copySingleJob(CaseJob job, int copiedCaseId, User user) throws Exception {
         job.setRunCompletionDate(new Date());
         job.setRunStartDate(new Date());
         CaseJob copied = (CaseJob) DeepCopy.copy(job);
@@ -979,7 +993,7 @@ public class ManagedCaseService {
         copied.setRunStartDate(null);
         copied.setRunCompletionDate(null);
 
-        return addCaseJob(copied);
+        return addCaseJob(user, copied, true);
     }
 
     public synchronized ParameterName[] getParameterNames() throws EmfException {
@@ -998,14 +1012,22 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized CaseParameter addCaseParameter(CaseParameter param) throws EmfException {
+    public synchronized CaseParameter addCaseParameter(User user, CaseParameter param, boolean copyingCase)
+            throws EmfException {
         Session session = sessionFactory.getSession();
 
-        if (dao.caseParameterExists(param, session))
-            throw new EmfException(
-                    "The combination of 'Parameter Name', 'Sector', 'Program', and 'Job' should be unique.");
+        try {
+            if (!copyingCase)
+                checkNExtendCaseLock(user, getCase(param.getCaseID(), session));
+        } catch (EmfException e) {
+            throw e;
+        }
 
         try {
+            if (dao.caseParameterExists(param, session))
+                throw new EmfException(
+                        "The combination of 'Parameter Name', 'Sector', 'Program', and 'Job' should be unique.");
+
             dao.addParameter(param, session);
             return (CaseParameter) dao.loadCaseParameter(param, session);
         } catch (Exception e) {
@@ -1137,14 +1159,14 @@ public class ManagedCaseService {
         }
     }
 
-    private synchronized void copyCaseParameters(int toCopyCaseId, int copiedCaseId) throws Exception {
+    private synchronized void copyCaseParameters(User user, int toCopyCaseId, int copiedCaseId) throws Exception {
         CaseParameter[] tocopy = getCaseParameters(toCopyCaseId);
 
         for (int i = 0; i < tocopy.length; i++)
-            copySingleParameter(tocopy[i], copiedCaseId);
+            copySingleParameter(user, tocopy[i], copiedCaseId);
     }
 
-    private synchronized CaseParameter copySingleParameter(CaseParameter parameter, int copiedCaseId) throws Exception {
+    private synchronized CaseParameter copySingleParameter(User user, CaseParameter parameter, int copiedCaseId) throws Exception {
         CaseParameter copied = (CaseParameter) DeepCopy.copy(parameter);
         copied.setCaseID(copiedCaseId);
 
@@ -1160,11 +1182,19 @@ public class ManagedCaseService {
             session.close();
         }
 
-        return addCaseParameter(copied);
+        return addCaseParameter(user, copied, true);
     }
 
-    public synchronized CaseJob addCaseJob(CaseJob job) throws EmfException {
+    public synchronized CaseJob addCaseJob(User user, CaseJob job, boolean copyingCase) throws EmfException {
         Session session = sessionFactory.getSession();
+        
+        try {
+            if (!copyingCase) // if not copying case, automatically extend the lock on case object
+                checkNExtendCaseLock(user, getCase(job.getCaseId(), session));
+        } catch (EmfException e) {
+            throw e;
+        }
+        
         try {
             if (job.getRunstatus() == null)
                 job.setRunstatus(dao.getJobRunStatuse("Not Started"));
@@ -1186,6 +1216,10 @@ public class ManagedCaseService {
 
         try {
             List<CaseJob> jobs = dao.getCaseJobs(caseId, session);
+
+            if (jobs == null || jobs.size() == 0)
+                return new CaseJob[0];
+
             Collections.sort(jobs);
             return jobs.toArray(new CaseJob[0]);
         } catch (Exception e) {
@@ -1285,18 +1319,18 @@ public class ManagedCaseService {
         copied.setTemplateUsed(toCopy.getName());
         copied.setAbbreviation(null);
         Case loaded = addCopiedCase(copied, user);
-        copyCaseJobs(toCopy.getId(), loaded.getId()); // copy job first for references in input and parameter
-        copyCaseInputs(toCopy.getId(), loaded.getId());
-        copyCaseParameters(toCopy.getId(), loaded.getId());
+        copyCaseJobs(toCopy.getId(), loaded.getId(), user); // copy job first for references in input and parameter
+        copyCaseInputs(user, toCopy.getId(), loaded.getId());
+        copyCaseParameters(user, toCopy.getId(), loaded.getId());
 
         Session session = sessionFactory.getSession();
 
         try {
 
-            // FIXME: Verfiy why locked?
+            // NOTE: Verify why locked?
             // NOTE: it could be being edited by other user, but you still want to copy it
             if (loaded.isLocked())
-                dao.releaseLocked(user, loaded, session);
+                dao.forceReleaseLocked(loaded, session);
         } finally {
             session.close();
         }
@@ -1378,25 +1412,31 @@ public class ManagedCaseService {
     }
 
     public synchronized void updateCaseParameter(User user, CaseParameter parameter) throws EmfException {
-        Session session = sessionFactory.getSession();
+        Session localSession = sessionFactory.getSession();
 
         try {
-            CaseParameter loaded = (CaseParameter) dao.loadCaseParameter(parameter, session);
+            checkNExtendCaseLock(user, getCase(parameter.getCaseID(), localSession));
+        } catch (EmfException e) {
+            throw e;
+        }
+
+        try {
+            CaseParameter loaded = (CaseParameter) dao.loadCaseParameter(parameter, localSession);
 
             if (loaded != null && loaded.getId() != parameter.getId())
                 throw new EmfException("Case parameter uniqueness check failed (" + loaded.getId() + ","
                         + parameter.getId() + ")");
 
             // FIXME: why session.clear()?
-            session.clear();
-            dao.updateCaseParameter(parameter, session);
+            localSession.clear();
+            dao.updateCaseParameter(parameter, localSession);
             // setStatus(user, "Saved parameter " + parameter.getName() + " to database.", "Save Parameter");
         } catch (RuntimeException e) {
             e.printStackTrace();
             log.error("Could not update case parameter: " + parameter.getName() + ".\n" + e);
             throw new EmfException("Could not update case parameter: " + parameter.getName() + ".");
         } finally {
-            session.close();
+            localSession.close();
         }
     }
 
@@ -1437,11 +1477,11 @@ public class ManagedCaseService {
             // the casejjobtask unique id as the key to find the casejob
             for (Integer jobId : jobIds) {
                 int jid = jobId.intValue();
-                
+
                 if (DebugLevels.DEBUG_15) {
                     logNumDBConn("beginning of job submitter loop (jobID: " + jid + ")");
                 }
-                
+
                 String jobKey = null;
 
                 if (DebugLevels.DEBUG_0)
@@ -1456,8 +1496,8 @@ public class ManagedCaseService {
                 caseJob.setJobkey(jobKey);
 
                 // set the user for the case job
-                User jobUser = caseJob.getUser();
-                if (jobUser == null || !jobUser.equals(user)) {
+                User runJobUser = caseJob.getRunJobUser();
+                if (runJobUser == null || !runJobUser.equals(user)) {
                     caseJob.setUser(user);
                 }
 
@@ -1466,7 +1506,7 @@ public class ManagedCaseService {
                 if (DebugLevels.DEBUG_15) {
                     logNumDBConn("beginning of job task creation (jobID: " + jid + ")");
                 }
-                
+
                 CaseJobTask cjt = new CaseJobTask(jid, caseId, user);
                 cjt.setJobkey(jobKey);
                 cjt.setNumDepends(caseJob.getDependentJobs().length);
@@ -1495,7 +1535,7 @@ public class ManagedCaseService {
                 if (DebugLevels.DEBUG_15) {
                     logNumDBConn("after creation of job file (jobID: " + jid + ")");
                 }
-                
+
                 cjt.setJobFile(jobFileName);
                 cjt.setLogFile(this.getLog(jobFileName));
                 cjt.setJobName(caseJob.getName());
@@ -1522,7 +1562,7 @@ public class ManagedCaseService {
             Arrays.sort(caseJobsTasksInSubmission);
 
             for (CaseJobTask cjt : caseJobsTasksInSubmission) {
-                
+
                 if (DebugLevels.DEBUG_15) {
                     logNumDBConn("beginning of job task loop (jobID: " + cjt.getJobId() + ")");
                 }
@@ -1553,7 +1593,7 @@ public class ManagedCaseService {
                 if (DebugLevels.DEBUG_15) {
                     logNumDBConn("beginning of adding job task (jobID: " + cjt.getJobId() + ")");
                 }
-                
+
                 // send the casejobtask to the CJTM priority queue and then to wait queue
                 TaskManagerFactory.getCaseJobTaskManager(sessionFactory).addTask(cjt);
 
@@ -1570,7 +1610,7 @@ public class ManagedCaseService {
                 if (DebugLevels.DEBUG_15) {
                     logNumDBConn("after submitted to export (jobID: " + cjt.getJobId() + ")");
                 }
-                
+
                 String runStatusExporting = "Exporting";
 
                 caseJob.setRunstatus(getJobRunStatus(runStatusExporting, session));
@@ -1598,7 +1638,7 @@ public class ManagedCaseService {
             if (DebugLevels.DEBUG_15) {
                 logNumDBConn("finished job submission");
             }
-            
+
             if (session != null && session.isConnected())
                 session.close();
         }
@@ -1650,23 +1690,30 @@ public class ManagedCaseService {
     }
 
     public synchronized void saveCaseJobFromClient(User user, CaseJob job) throws EmfException {
+        Session localSession = sessionFactory.getSession();
+        
         try {
-            Case currentCase = getCase(job.getCaseId());
-            obtainLocked(user, currentCase); // to automatically extend lock on case
-            
+            checkNExtendCaseLock(user, getCase(job.getCaseId(), localSession));
+        } catch (EmfException e) {
+            throw e;
+        } finally {
+            localSession.close();
+        }
+        
+        try {
             CaseJob loaded = (CaseJob) dao.loadCaseJob(job);
-            
+
             if (user == null)
                 throw new EmfException("Running Case Job requires a valid user");
-            
+
             if (loaded != null && loaded.getId() != job.getId())
                 throw new EmfException("Case job uniqueness check failed (" + loaded.getId() + "," + job.getId() + ")");
-            
+
             dao.updateCaseJob(job);
         } catch (RuntimeException e) {
             log.error("Could not update case job: " + job.getName() + ".\n" + e);
             throw new EmfException("Could not update case job: " + job.getName() + ".");
-        } 
+        }
     }
 
     public synchronized Host[] getHosts() throws EmfException {
@@ -2643,13 +2690,13 @@ public class ManagedCaseService {
             if (!version.isFinalVersion())
                 inputsList += "Input: " + input.getName() + ";  Dataset: " + dataset + ls;
         }
-        
+
         if (DebugLevels.DEBUG_14)
             System.out.println("Finished listing non-final inputs. " + new Date());
-        
+
         if (inputsList.isEmpty())
             return inputsList;
-        
+
         return "The selected jobs have non-final dataset versions:" + ls + ls + inputsList;
     }
 
@@ -2760,10 +2807,16 @@ public class ManagedCaseService {
     }
 
     public synchronized void updateCaseOutput(User user, CaseOutput output) throws EmfException {
-        Session session = sessionFactory.getSession();
+        Session localSession = sessionFactory.getSession();
 
         try {
-            CaseOutput loaded = (CaseOutput) dao.loadCaseOutput(output, session);
+            checkNExtendCaseLock(user, getCase(output.getCaseId(), localSession));
+        } catch (EmfException e) {
+            throw e;
+        }
+
+        try {
+            CaseOutput loaded = (CaseOutput) dao.loadCaseOutput(output, localSession);
 
             if (loaded != null && loaded.getId() != output.getId())
                 throw new EmfException("Case output uniqueness check failed (" + loaded.getId() + "," + output.getId()
@@ -2771,15 +2824,15 @@ public class ManagedCaseService {
 
             // Clear the cached information. To update a case
             // FIXME: Verify the session.clear()
-            session.clear();
-            dao.updateCaseOutput(output, session);
+            localSession.clear();
+            dao.updateCaseOutput(output, localSession);
             // setStatus(user, "Saved input " + input.getName() + " to database.", "Save Input");
         } catch (RuntimeException e) {
             e.printStackTrace();
             log.error("Could not update case output: " + output.getName() + ".\n" + e);
             throw new EmfException("Could not update case output: " + output.getName() + ".");
         } finally {
-            session.close();
+            localSession.close();
         }
 
     }
@@ -2799,13 +2852,19 @@ public class ManagedCaseService {
 
     }
 
-    public synchronized CaseOutput addCaseOutput(CaseOutput output) throws EmfException {
+    public synchronized CaseOutput addCaseOutput(User user, CaseOutput output) throws EmfException {
         Session session = sessionFactory.getSession();
 
-        if (dao.caseOutputExists(output, session))
-            throw new EmfException("The combination of 'Output Name'and 'Job' should be unique.");
+        try {
+            checkNExtendCaseLock(user, getCase(output.getCaseId(), session));
+        } catch (EmfException e) {
+            throw e;
+        }
 
         try {
+            if (dao.caseOutputExists(output, session))
+                throw new EmfException("The combination of 'Output Name'and 'Job' should be unique.");
+
             dao.add(output, session);
             return (CaseOutput) dao.loadCaseOutput(output, session);
         } catch (Exception e) {
@@ -2815,6 +2874,14 @@ public class ManagedCaseService {
         } finally {
             session.close();
         }
+    }
+
+    private synchronized void checkNExtendCaseLock(User user, Case currentCase) throws EmfException {
+        Case locked = obtainLocked(user, currentCase);
+
+        if (!locked.isLocked(user))
+            throw new EmfException("Lock on the current case object expired. User " + locked.getLockOwner()
+                    + " has it now.");
     }
 
     private boolean doNotExportJobs(Session session) {
@@ -2832,6 +2899,117 @@ public class ManagedCaseService {
         InputStream inStream = RemoteCommand.executeLocal(logNumDBConnCmd);
 
         RemoteCommand.logStdout("Logged DB connections: " + prefix, inStream);
+    }
+
+    public synchronized AirQualityModel addAirQualityModel(AirQualityModel airQModel) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(airQModel, session);
+            return (AirQualityModel) dao.load(AirQualityModel.class, airQModel.getName(), session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not add new AirQualityModel '" + airQModel.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new AirQualityModel '" + airQModel.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
+    public synchronized EmissionsYear addEmissionYear(EmissionsYear emissYear) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(emissYear, session);
+            return (EmissionsYear) dao.load(EmissionsYear.class, emissYear.getName(), session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not add new EmissionsYear '" + emissYear.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new EmissionsYear '" + emissYear.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
+    public synchronized Grid addGrid(Grid grid) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(grid, session);
+            return (Grid) dao.load(Grid.class, grid.getName(), session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not add new Grid '" + grid.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new Grid '" + grid.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
+    public synchronized MeteorlogicalYear addMeteorologicalYear(MeteorlogicalYear metYear) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(metYear, session);
+            return (MeteorlogicalYear) dao.load(MeteorlogicalYear.class, metYear.getName(), session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not add new MeteorlogicalYear '" + metYear.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new MeteorlogicalYear '" + metYear.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
+    public synchronized Speciation addSpeciation(Speciation speciation) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            dao.add(speciation, session);
+            return (Speciation) dao.load(Speciation.class, speciation.getName(), session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not add new speciation '" + speciation.getName() + "'\n" + e.getMessage());
+            throw new EmfException("Could not add new speciation '" + speciation.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
+
+    public synchronized String getJobStatusMessage(int caseId) {
+        Session session = sessionFactory.getSession();
+
+        int failedCount = 0;
+        int waitingCount = 0;
+        int runningCount = 0;
+
+        try {
+            CaseJob[] jobs = getCaseJobs(caseId);
+
+            if (jobs.length == 0)
+                return "";
+
+            for (CaseJob job : jobs) {
+                JobRunStatus status = job.getRunstatus();
+
+                if (status == null)
+                    continue;
+
+                if (status.getName().equalsIgnoreCase("Failed"))
+                    failedCount++;
+
+                if (status.getName().equalsIgnoreCase("Waiting"))
+                    waitingCount++;
+
+                if (status.getName().equalsIgnoreCase("Running"))
+                    runningCount++;
+            }
+
+            if (failedCount == 0 && waitingCount == 0 && runningCount == 0)
+                return "";
+
+            return "Current case has " + runningCount + " running, " + waitingCount + " waiting, and " + failedCount
+                    + " failed jobs.";
+        } catch (Exception e) {
+            return "";
+        } finally {
+            session.close();
+        }
     }
 
 }

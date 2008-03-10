@@ -51,6 +51,11 @@
          	name="user" 
         	class="gov.epa.emissions.commons.security.User"
         	column="user_id"/> 
+
+		<many-to-one
+         	name="runJobUser" 
+        	class="gov.epa.emissions.commons.security.User"
+        	column="running_user_id"/> 
         	
   		<array name="dependentJobs" table="cases.job_dependencies" cascade="save-update">
     		<key column="job_id"/>

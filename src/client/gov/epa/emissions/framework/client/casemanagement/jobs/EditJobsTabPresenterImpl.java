@@ -49,7 +49,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
     public CaseJob addNewJob(CaseJob job) throws EmfException {
         job.setCaseId(caseObj.getId());
-        CaseJob newJob = service().addCaseJob(job);
+        CaseJob newJob = service().addCaseJob(session.user(), job);
         view.addJob(newJob);
         refreshView();
 

@@ -47,7 +47,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private String tabTitle;
 
     private JTabbedPane tabbedPane;
-
+    
     public CaseEditor(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
         super("Case Editor", new Dimension(780, 580), desktopManager);
         this.session = session;
@@ -264,6 +264,12 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         } catch (EmfException e) {
             showError(e.getMessage());
         }
+    }
+
+    @Override
+    public void showLockingMsg(String msg) {
+        InfoDialog dialog = new InfoDialog(parentConsole, "Message", msg);
+        dialog.confirm();
     }
 
 }

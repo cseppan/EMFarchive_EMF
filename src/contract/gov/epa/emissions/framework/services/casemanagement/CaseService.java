@@ -19,17 +19,27 @@ public interface CaseService {
 
     AirQualityModel[] getAirQualityModels() throws EmfException;
 
+    AirQualityModel addAirQualityModel(AirQualityModel airQModel) throws EmfException;
+
     CaseCategory[] getCaseCategories() throws EmfException;
 
     EmissionsYear[] getEmissionsYears() throws EmfException;
+
+    EmissionsYear addEmissionsYear(EmissionsYear emissYear) throws EmfException;
     
     GridResolution[] getGridResolutions() throws EmfException;
 
     Grid[] getGrids() throws EmfException;
 
+    Grid addGrid(Grid grid) throws EmfException;
+
+    MeteorlogicalYear addMeteorologicalYear(MeteorlogicalYear metYear) throws EmfException;
+
     MeteorlogicalYear[] getMeteorlogicalYears() throws EmfException;
 
     Speciation[] getSpeciations() throws EmfException;
+
+    Speciation addSpeciation(Speciation speciation) throws EmfException;
     
     InputName[] getInputNames() throws EmfException;
 
@@ -71,7 +81,7 @@ public interface CaseService {
 
     SubDir addSubDir(SubDir subdir) throws EmfException;
 
-    CaseInput addCaseInput(CaseInput input) throws EmfException;
+    CaseInput addCaseInput(User user, CaseInput input) throws EmfException;
     
     void updateCaseInput(User user, CaseInput input) throws EmfException;
     
@@ -83,7 +93,7 @@ public interface CaseService {
     
     Case[] copyCaseObject(int[] toCopy, User user) throws EmfException;
     
-    CaseJob addCaseJob(CaseJob job) throws EmfException;
+    CaseJob addCaseJob(User user, CaseJob job) throws EmfException;
     
     CaseJob getCaseJob(int jobId) throws EmfException;
     
@@ -121,7 +131,7 @@ public interface CaseService {
     
     ParameterName[] getParameterNames() throws EmfException;
     
-    CaseParameter addCaseParameter(CaseParameter param) throws EmfException;
+    CaseParameter addCaseParameter(User user, CaseParameter param) throws EmfException;
     
     void removeCaseParameters(CaseParameter[] params) throws EmfException;
     
@@ -131,6 +141,7 @@ public interface CaseService {
 
     void runJobs(CaseJob[] jobs, User user) throws EmfException;
     String runJobs(Integer[] jobIds, int caseId, User user) throws EmfException;
+    String getJobStatusMessage(int caseId) throws EmfException;
 
     // Used for CaseService ExportInputs
     void exportCaseInputs(User user, Integer[] caseInputIds, String purpose) throws EmfException;
@@ -144,7 +155,8 @@ public interface CaseService {
 //    void registerOutput(CaseOutput output, String jobKey) throws EmfException;
     void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException;
     CaseOutput[] getCaseOutputs(int caseId, int jobId) throws EmfException;
-    CaseOutput addCaseOutput(CaseOutput output) throws EmfException;
+    CaseOutput addCaseOutput(User user, CaseOutput output) throws EmfException;
+    void updateCaseOutput(User user, CaseOutput output) throws EmfException;
     
     String restoreTaskManagers() throws EmfException;
 
@@ -156,8 +168,6 @@ public interface CaseService {
     
     Case updateCaseWithLock(Case caseObj) throws EmfException;
 
-    void updateCaseOutput(User user, CaseOutput output) throws EmfException;
-
-    void removeMessages(User user, JobMessage[] msgs)throws EmfException;
+    void removeMessages(User user, JobMessage[] msgs) throws EmfException;
 
  }

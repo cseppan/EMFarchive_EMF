@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.casemanagement;
 
 import java.io.Serializable;
 
-public class Grid implements Serializable, Comparable {
+public class Grid implements Serializable, Comparable<Grid> {
 
     private int id;
 
@@ -50,7 +50,7 @@ public class Grid implements Serializable, Comparable {
         return getName();
     }
 
-    public int compareTo(Object other) {
-        return name.compareToIgnoreCase(((Grid) other).getName());
+    public int compareTo(Grid other) {
+        return name.compareToIgnoreCase(other.getName());
     }
 }

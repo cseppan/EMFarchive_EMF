@@ -11,12 +11,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
-import gov.epa.emissions.framework.client.casemanagement.AirQualityModels;
-import gov.epa.emissions.framework.client.casemanagement.EmissionsYears;
-import gov.epa.emissions.framework.client.casemanagement.Grids;
-import gov.epa.emissions.framework.client.casemanagement.MeteorlogicalYears;
 import gov.epa.emissions.framework.client.casemanagement.RunStatuses;
-import gov.epa.emissions.framework.client.casemanagement.Speciations;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
@@ -87,18 +82,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private CheckBox isTemplate;
 
     private AddRemoveSectorWidget sectorsWidget;
-
-    private AirQualityModels airQualityModels;
-
-    private EmissionsYears emissionsYears;
-
-    private Grids grids;
-
-    private MeteorlogicalYears meteorlogicalYears;
-
-    private Speciations speciations;
-
-    private GridResolutions gridResolutions;
 
     private ComboBox runStatusCombo;
 
@@ -328,8 +311,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private EditableComboBox gridResolution() throws EmfException {
-        gridResolutions = new GridResolutions(session, session.caseService().getGridResolutions());
-        gridResolutionCombo = new EditableComboBox(gridResolutions.getAll());
+        gridResolutionCombo = new EditableComboBox(presenter.getGridResolutions());
         gridResolutionCombo.setSelectedItem(caseObj.getGridResolution());
         gridResolutionCombo.setPreferredSize(defaultDimension);
         changeablesList.addChangeable(gridResolutionCombo);
@@ -357,11 +339,8 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private EditableComboBox airQualityModels() throws EmfException {
-        airQualityModels = new AirQualityModels(session.caseService().getAirQualityModels());
-        airQualityModelsCombo = new EditableComboBox(airQualityModels.names());
-
-        String name = caseObj.getAirQualityModel() != null ? caseObj.getAirQualityModel().getName() : "";
-        airQualityModelsCombo.setSelectedItem(name);
+        airQualityModelsCombo = new EditableComboBox(presenter.getAirQualityModels());
+        airQualityModelsCombo.setSelectedItem(caseObj.getAirQualityModel());
         airQualityModelsCombo.setPreferredSize(defaultDimension);
 
         changeablesList.addChangeable(airQualityModelsCombo);
@@ -387,50 +366,35 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private EditableComboBox emissionsYears() throws EmfException {
-        emissionsYears = new EmissionsYears(session.caseService().getEmissionsYears());
-        emissionsYearCombo = new EditableComboBox(emissionsYears.names());
-
-        String name = caseObj.getEmissionsYear() != null ? caseObj.getEmissionsYear().getName() : "";
-        emissionsYearCombo.setSelectedItem(name);
+        emissionsYearCombo = new EditableComboBox(presenter.getEmissionsYears());
+        emissionsYearCombo.setSelectedItem(caseObj.getEmissionsYear());
         emissionsYearCombo.setPreferredSize(defaultDimension);
-
         changeablesList.addChangeable(emissionsYearCombo);
 
         return emissionsYearCombo;
     }
 
     private EditableComboBox grids() throws EmfException {
-        grids = new Grids(session.caseService().getGrids());
-        gridCombo = new EditableComboBox(grids.names());
-
-        String name = caseObj.getGrid() != null ? caseObj.getGrid().getName() : "";
-        gridCombo.setSelectedItem(name);
+        gridCombo = new EditableComboBox(presenter.getGrids());
+        gridCombo.setSelectedItem(caseObj.getGrid());
         gridCombo.setPreferredSize(defaultDimension);
-
         changeablesList.addChangeable(gridCombo);
 
         return gridCombo;
     }
 
     private EditableComboBox meteorlogicalYears() throws EmfException {
-        meteorlogicalYears = new MeteorlogicalYears(session.caseService().getMeteorlogicalYears());
-        meteorlogicalYearCombo = new EditableComboBox(meteorlogicalYears.names());
-
-        String name = caseObj.getMeteorlogicalYear() != null ? caseObj.getMeteorlogicalYear().getName() : "";
-        meteorlogicalYearCombo.setSelectedItem(name);
+        meteorlogicalYearCombo = new EditableComboBox(presenter.getMeteorlogicalYears());
+        meteorlogicalYearCombo.setSelectedItem(caseObj.getMeteorlogicalYear());
         meteorlogicalYearCombo.setPreferredSize(defaultDimension);
-
         changeablesList.addChangeable(meteorlogicalYearCombo);
 
         return meteorlogicalYearCombo;
     }
 
     private EditableComboBox speciations() throws EmfException {
-        speciations = new Speciations(session.caseService().getSpeciations());
-        speciationCombo = new EditableComboBox(speciations.all());
-
-        String name = caseObj.getSpeciation() != null ? caseObj.getSpeciation().getName() : "";
-        speciationCombo.setSelectedItem(name);
+        speciationCombo = new EditableComboBox(presenter.getSpeciations());
+        speciationCombo.setSelectedItem(caseObj.getSpeciation());
         speciationCombo.setPreferredSize(defaultDimension);
 
         changeablesList.addChangeable(speciationCombo);
@@ -541,18 +505,18 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         caseObj.setModelingRegion((Region) modRegionsCombo.getSelectedItem());
         caseObj.setControlRegion((Region) controlRegionsCombo.getSelectedItem());
         caseObj.setAbbreviation(presenter.getAbbreviation(abbreviationsCombo.getSelectedItem()));
-        caseObj.setAirQualityModel(airQualityModels.get((String) airQualityModelsCombo.getSelectedItem()));
+        caseObj.setAirQualityModel(presenter.getAirQualityModel(airQualityModelsCombo.getSelectedItem()));
         caseObj.setCaseCategory(presenter.getCaseCategory(categoriesCombo.getSelectedItem()));
-        caseObj.setEmissionsYear(emissionsYears.get((String) emissionsYearCombo.getSelectedItem()));
-        caseObj.setGrid(grids.get((String) gridCombo.getSelectedItem()));
-        caseObj.setMeteorlogicalYear(meteorlogicalYears.get((String) meteorlogicalYearCombo.getSelectedItem()));
-        caseObj.setSpeciation(speciations.get((String) speciationCombo.getSelectedItem()));
+        caseObj.setEmissionsYear(presenter.getEmissionsYear(emissionsYearCombo.getSelectedItem()));
+        caseObj.setGrid(presenter.getGrid(gridCombo.getSelectedItem()));
+        caseObj.setMeteorlogicalYear(presenter.getMeteorlogicalYear(meteorlogicalYearCombo.getSelectedItem()));
+        caseObj.setSpeciation(presenter.getSpeciation(speciationCombo.getSelectedItem()));
         caseObj.setRunStatus(runStatusCombo.getSelectedItem() + "");
         saveStartDate();
         saveEndDate();
         caseObj.setSectors(sectorsWidget.getSectors());
         caseObj.setModel(presenter.getModelToRun(modelToRunCombo.getSelectedItem()));
-        caseObj.setGridResolution(gridResolutions.get(gridResolutionCombo.getSelectedItem()));
+        caseObj.setGridResolution(presenter.getGridResolutionl(gridResolutionCombo.getSelectedItem()));
     }
 
     private void saveFutureYear() throws EmfException {
@@ -596,6 +560,8 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     public void doRefresh() throws EmfException {
+        super.removeAll();
+        setLayout();
         checkIfLockedByCurrentUser();
     }
 

@@ -216,6 +216,7 @@ CREATE TABLE cases.cases_casejobs
   start_date timestamp,
   complete_date timestamp,
   user_id int4 REFERENCES emf.users(id), 
+  running_user_id int4 REFERENCES emf.users(id),
   run_notes text,
   run_log text,
   host_id int4 REFERENCES cases.hosts(id),

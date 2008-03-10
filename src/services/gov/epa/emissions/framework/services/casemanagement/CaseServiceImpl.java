@@ -202,8 +202,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().addSubDir(subdir);
     }
 
-    public CaseInput addCaseInput(CaseInput input) throws EmfException {
-        return getCaseService().addCaseInput(input);
+    public CaseInput addCaseInput(User user, CaseInput input) throws EmfException {
+        return getCaseService().addCaseInput(user, input, false);
     }
 
     public void updateCaseInput(User user, CaseInput input) throws EmfException {
@@ -226,8 +226,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().copyCaseObject(toCopy, user);
     }
 
-    public CaseJob addCaseJob(CaseJob job) throws EmfException {
-        return getCaseService().addCaseJob(job);
+    public CaseJob addCaseJob(User user, CaseJob job) throws EmfException {
+        return getCaseService().addCaseJob(user, job, false);
     }
 
     public CaseJob[] getCaseJobs(int caseId) throws EmfException {
@@ -332,8 +332,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getParameterNames();
     }
 
-    public CaseParameter addCaseParameter(CaseParameter param) throws EmfException {
-        return getCaseService().addCaseParameter(param);
+    public CaseParameter addCaseParameter(User user, CaseParameter param) throws EmfException {
+        return getCaseService().addCaseParameter(user, param, false);
     }
 
     public CaseParameter[] getCaseParameters(int caseId) throws EmfException {
@@ -567,8 +567,37 @@ public class CaseServiceImpl implements CaseService {
 
     }
 
-    public CaseOutput addCaseOutput(CaseOutput output) throws EmfException {
-        return getCaseService().addCaseOutput(output);
+    public CaseOutput addCaseOutput(User user, CaseOutput output) throws EmfException {
+        return getCaseService().addCaseOutput(user, output);
+    }
+
+    @Override
+    public AirQualityModel addAirQualityModel(AirQualityModel airQModel) throws EmfException {
+        return getCaseService().addAirQualityModel(airQModel);
+    }
+
+    @Override
+    public EmissionsYear addEmissionsYear(EmissionsYear emissYear) throws EmfException {
+        return getCaseService().addEmissionYear(emissYear);
+    }
+
+    @Override
+    public Grid addGrid(Grid grid) throws EmfException {
+        return getCaseService().addGrid(grid);
+    }
+
+    @Override
+    public MeteorlogicalYear addMeteorologicalYear(MeteorlogicalYear metYear) throws EmfException {
+        return getCaseService().addMeteorologicalYear(metYear);
+    }
+
+    @Override
+    public Speciation addSpeciation(Speciation speciation) throws EmfException {
+        return getCaseService().addSpeciation(speciation);
+    }
+    
+    public String getJobStatusMessage(int caseId) {
+        return getCaseService().getJobStatusMessage(caseId);
     }
 
 }

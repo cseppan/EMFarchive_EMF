@@ -41,6 +41,8 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     
     private User user;
     
+    private User runJobUser;
+    
     private String runNotes;
     
     private String runLog;
@@ -255,6 +257,14 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
 
     public void setDependentJobs(DependentJob[] dependentJobs) {
         this.dependentJobs = Arrays.asList(dependentJobs);
+    }
+
+    public User getRunJobUser() {
+        return runJobUser;
+    }
+
+    public void setRunJobUser(User runJobUser) {
+        this.runJobUser = runJobUser;
     }
 
 }

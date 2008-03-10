@@ -16,5 +16,7 @@ public interface CaseEditorView extends ManagedView {
     void setCursor(Cursor cursor);
 
     void showRemindingMessage(String msg);
+    
+    void showLockingMsg(String msg);
 
 }

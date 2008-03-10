@@ -30,6 +30,8 @@ public class CaseServiceCaseInputTest extends ServiceTestCase {
     public void testShouldPersistACaseInputWhenAddCaseInputWithSomeFieldsAreNull() throws Exception {
         HibernateSessionFactory sessionFactory = sessionFactory(configFile());
         CaseService service = new CaseServiceImpl(sessionFactory, dbServerFactory);
+        UserService usersvc = new UserServiceImpl(sessionFactory);
+        User user = usersvc.getUser("emf");
         
         Case element = newCase();
         InputName inputname = new InputName("test input name");
@@ -62,9 +64,9 @@ public class CaseServiceCaseInputTest extends ServiceTestCase {
             inputOne.setCaseID(caseId);
             inputTwo.setCaseID(caseId);
             inputThree.setCaseID(caseId);
-            CaseInput returnedInput1 = service.addCaseInput(inputOne);
-            CaseInput returnedInput2 = service.addCaseInput(inputTwo);
-            CaseInput returnedInput3 = service.addCaseInput(inputThree);
+            CaseInput returnedInput1 = service.addCaseInput(user, inputOne);
+            CaseInput returnedInput2 = service.addCaseInput(user, inputTwo);
+            CaseInput returnedInput3 = service.addCaseInput(user, inputThree);
             
             CaseInput[] loadedInputs = service.getCaseInputs(caseId);
             assertEquals(3, loadedInputs.length);
@@ -102,6 +104,7 @@ public class CaseServiceCaseInputTest extends ServiceTestCase {
         HibernateSessionFactory sessionFactory = sessionFactory(configFile());
         CaseService service = new CaseServiceImpl(sessionFactory, dbServerFactory);
         UserService usersvc = new UserServiceImpl(sessionFactory);
+        User user = usersvc.getUser("emf");
         
         Case element = newCase();
         InputName inputname = new InputName("test input name");
@@ -136,14 +139,13 @@ public class CaseServiceCaseInputTest extends ServiceTestCase {
             inputOne.setCaseID(caseId);
             inputTwo.setCaseID(caseId);
             inputThree.setCaseID(caseId);
-            CaseInput returnedInput1 = service.addCaseInput(inputOne);
-            CaseInput returnedInput2 = service.addCaseInput(inputTwo);
-            CaseInput returnedInput3 = service.addCaseInput(inputThree);
+            CaseInput returnedInput1 = service.addCaseInput(user, inputOne);
+            CaseInput returnedInput2 = service.addCaseInput(user, inputTwo);
+            CaseInput returnedInput3 = service.addCaseInput(user, inputThree);
             returnedInput1.setEnvtVars(envtVars);
             returnedInput2.setEnvtVars(envtVars);
             returnedInput3.setEnvtVars(envtVars);
             
-            User user = usersvc.getUser("emf");
             service.updateCaseInput(user, returnedInput1);
             service.updateCaseInput(user, returnedInput2);
             service.updateCaseInput(user, returnedInput3);
@@ -182,6 +184,7 @@ public class CaseServiceCaseInputTest extends ServiceTestCase {
         HibernateSessionFactory sessionFactory = sessionFactory(configFile());
         CaseService service = new CaseServiceImpl(sessionFactory, dbServerFactory);
         UserService usersvc = new UserServiceImpl(sessionFactory);
+        User user = usersvc.getUser("emf");
         
         Case element = newCase();
         InputName inputname = new InputName("test input name");
@@ -216,14 +219,13 @@ public class CaseServiceCaseInputTest extends ServiceTestCase {
             inputOne.setCaseID(caseId);
             inputTwo.setCaseID(caseId);
             inputThree.setCaseID(caseId);
-            CaseInput returnedInput1 = service.addCaseInput(inputOne);
-            CaseInput returnedInput2 = service.addCaseInput(inputTwo);
-            CaseInput returnedInput3 = service.addCaseInput(inputThree);
+            CaseInput returnedInput1 = service.addCaseInput(user, inputOne);
+            CaseInput returnedInput2 = service.addCaseInput(user, inputTwo);
+            CaseInput returnedInput3 = service.addCaseInput(user, inputThree);
             returnedInput1.setEnvtVars(envtVars);
             returnedInput2.setEnvtVars(envtVars);
             returnedInput3.setEnvtVars(envtVars);
             
-            User user = usersvc.getUser("emf");
             service.updateCaseInput(user, returnedInput1);
             service.updateCaseInput(user, returnedInput2);
             service.updateCaseInput(user, returnedInput3);

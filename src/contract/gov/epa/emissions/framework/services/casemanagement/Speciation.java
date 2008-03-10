@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.casemanagement;
 
 import java.io.Serializable;
 
-public class Speciation implements Comparable, Serializable {
+public class Speciation implements Comparable<Speciation>, Serializable {
 
     private int id;
 
@@ -50,7 +50,7 @@ public class Speciation implements Comparable, Serializable {
         return getName();
     }
 
-    public int compareTo(Object other) {
-        return name.compareToIgnoreCase(((Speciation) other).getName());
+    public int compareTo(Speciation other) {
+        return name.compareToIgnoreCase(other.getName());
     }
 }
