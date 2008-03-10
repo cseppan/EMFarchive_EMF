@@ -32,12 +32,13 @@ public class EditQANonsummaryEmissionsWindow extends DisposableInteralFrame impl
     private EmfSession session;
 
     private EmfDataset [] datasets; 
-
+    
+    private String program;
         
-public EditQANonsummaryEmissionsWindow(DesktopManager desktopManager, EmfSession session, EmfDataset [] datasets) {
+public EditQANonsummaryEmissionsWindow(DesktopManager desktopManager, String program, EmfSession session, EmfDataset [] datasets) {
         
         super("Emissions Inventories Editor", new Dimension(600, 300), desktopManager);
-
+        this.program = program; 
         this.session = session;
         this.datasets = datasets;
         this.getContentPane().add(createLayout());
@@ -85,7 +86,7 @@ public EditQANonsummaryEmissionsWindow(DesktopManager desktopManager, EmfSession
     }
     
     private JPanel emisinv() {
-        datasetWidget = new AddRemoveDatasetWidget(this, parentConsole, session);
+        datasetWidget = new AddRemoveDatasetWidget(this, program, parentConsole, session);
         datasetWidget.setPreferredSize(new Dimension(350,250));
         if(!(datasets==null) && (datasets.length > 0))
             datasetWidget.setDatasetsFromStepWindow(datasets);

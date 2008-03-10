@@ -40,11 +40,11 @@ public class AddRemoveDatasetWidget extends JPanel {
     
     private ManageChangeables changeables;
 
-    public AddRemoveDatasetWidget(ManageChangeables changeables, EmfConsole parentConsole, EmfSession session) {
+    public AddRemoveDatasetWidget(ManageChangeables changeables, String program, EmfConsole parentConsole, EmfSession session) {
         this.parentConsole = parentConsole;
         this.changeables = changeables;
         this.session = session;
-        setupLayout(changeables);
+        setupLayout(changeables, program);
 
     }
     
@@ -82,14 +82,14 @@ public class AddRemoveDatasetWidget extends JPanel {
        return (types.length == 0) ? null : ((EmfDataset)types[index]).getDatasetType();
    }
    
-    private void setupLayout(ManageChangeables changeables) {
+    private void setupLayout(ManageChangeables changeables, String program) {
         
         this.datasetsList = new ListWidget(new EmfDataset[0]);
         changeables.addChangeable(datasetsList);
         
         JScrollPane pane = new JScrollPane(datasetsList);
         pane.setPreferredSize(new Dimension(500, 300));
-        JPanel buttonPanel = addRemoveButtonPanel();
+        JPanel buttonPanel = addRemoveButtonPanel(program);
         //JLabel emisLabel = new JLabel("Emission Inventories");
         this.setLayout(new BorderLayout(1, 1));
         //this.add(emisLabel, BorderLayout.WEST);
@@ -97,9 +97,9 @@ public class AddRemoveDatasetWidget extends JPanel {
         this.add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    private JPanel addRemoveButtonPanel() {
+    private JPanel addRemoveButtonPanel(String program) {
         JPanel panel = new JPanel();
-        addButton = new AddButton("Add", addAction());
+        addButton = new AddButton("Add", addAction(program));
         removeButton = new RemoveButton("Remove", removeAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));      
         removeButton.setMargin(new Insets(1, 2, 1, 2));
@@ -119,25 +119,36 @@ public class AddRemoveDatasetWidget extends JPanel {
         };
     }
 
-    private Action addAction() {
+    private Action addAction(final String program) {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doAddWindow();
+                doAddWindow(program);
             }
         };
     }
 
-    private void doAddWindow() {
+    private void doAddWindow(String program) {
         List<DatasetType> datasetTypeList = new ArrayList<DatasetType>();
         try {
             // FIXME: really, we don't want to contact the server to get the dataset types - could be slow
             DatasetType[] allDatasetTypes = session.dataCommonsService().getDatasetTypes();
-            for (int i = 0; i < allDatasetTypes.length; i++) {
-              //get all dataset types that start with ORL
-                if (allDatasetTypes[i].getName().startsWith("ORL"))
-                    datasetTypeList.add(allDatasetTypes[i]);
+            
+            if (program.equalsIgnoreCase("Fire Data Summary (Day-specific)")){
+                for (int i = 0; i < allDatasetTypes.length; i++) {
+                    //only get dataset "Fire Data Summary (Day-specific)"
+                    if (allDatasetTypes[i].getName().startsWith("ORL Day-Specific Fires"))
+                        datasetTypeList.add(allDatasetTypes[i]);
+                }
+            }else{   
+                for (int i = 0; i < allDatasetTypes.length; i++) {
+                    //get all dataset types that start with ORL
+                    if (allDatasetTypes[i].getName().startsWith("ORL") 
+                            && !allDatasetTypes[i].getName().startsWith("ORL Day-Specific Fires")
+                            && !allDatasetTypes[i].getName().startsWith("ORL Fires"))
+                        datasetTypeList.add(allDatasetTypes[i]);
+                }
+                
             }
-
             // Make an object of the view and presenter of the dialog, and run the presenter's display ().
             // Set the list of datasets in the JList of this widget (which is part of the EditQAEmissionsWindow
             // to that of the datasets retrieved from the presenter.

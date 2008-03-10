@@ -57,11 +57,13 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
     private ComboBox summaryTypes;
     
     private String summaryType; 
+    
+    private String program;
         
-    public EditQAEmissionsWindow(DesktopManager desktopManager, EmfSession session, EmfDataset[] inventories, EmfDataset [] invTables, String summaryType) {
+    public EditQAEmissionsWindow(DesktopManager desktopManager, String program, EmfSession session, EmfDataset[] inventories, EmfDataset [] invTables, String summaryType) {
         
         super("Emissions Inventories Editor", new Dimension(600, 300), desktopManager);
-
+        this.program=program; 
         this.session = session;
         this.inventories = inventories;
         this.invTables = invTables;
@@ -105,7 +107,7 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
     }
     
     private JPanel emisinv() {
-        datasetWidget = new AddRemoveDatasetWidget(this, parentConsole, session);
+        datasetWidget = new AddRemoveDatasetWidget(this, program, parentConsole, session);
         datasetWidget.setPreferredSize(new Dimension(350,250));
         if(inventories != null && inventories.length > 0)
             datasetWidget.setDatasetsFromStepWindow(inventories);
