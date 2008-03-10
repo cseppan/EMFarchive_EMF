@@ -104,11 +104,6 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
     private void doRefresh(CaseOutput[] outputs){
         messagePanel.clear();
         selectedJob=(CaseJob) jobCombo.getSelectedItem();
-//        try {
-//            getAllJobs();
-//        } catch (EmfException e) {
-//            messagePanel.setError(e.getMessage());
-//        }
         super.removeAll();
         super.add(createLayout(outputs), BorderLayout.CENTER);
         super.revalidate();
