@@ -16,6 +16,10 @@ public class ControlStrategyConstraint implements Serializable {
 
     private Double minAnnCost;
     
+    private Double domainWideEmisReduction;
+
+    private Double domainWidePctReduction;
+    
     public ControlStrategyConstraint() {
         //
     }
@@ -73,5 +77,21 @@ public class ControlStrategyConstraint implements Serializable {
             || maxControlEfficiency != null 
             || minCostPerTon != null 
             || minAnnCost != null;
+    }
+
+    public void setDomainWideEmisReduction(Double domainWideEmisReduction) {
+        this.domainWideEmisReduction = domainWideEmisReduction;
+    }
+
+    public Double getDomainWideEmisReduction() {
+        return domainWideEmisReduction;
+    }
+
+    public void setDomainWidePctReduction(Double domainWidePctReduction) {
+        this.domainWidePctReduction = domainWidePctReduction;
+    }
+
+    public Double getDomainWidePctReduction() {
+        return domainWidePctReduction;
     }
 }

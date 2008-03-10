@@ -67,8 +67,8 @@ public class RunControlStrategy {
     }
 
     private void currentLimitations(ControlStrategy controlStrategy) throws EmfException {
-        if (controlStrategy.getStrategyType().getName().equalsIgnoreCase("Least Cost"))
-            throw new EmfException("Least Cost Analysis is not supported.");
+//        if (controlStrategy.getStrategyType().getName().equalsIgnoreCase("Least Cost"))
+//            throw new EmfException("Least Cost Analysis is not supported.");
 
         ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy.getControlStrategyInputDatasets();
         if (controlStrategyInputDatasets.length == 0)

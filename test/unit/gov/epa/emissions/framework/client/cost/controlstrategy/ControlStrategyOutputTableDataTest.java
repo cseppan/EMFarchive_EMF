@@ -45,7 +45,7 @@ public class ControlStrategyOutputTableDataTest extends TestCase {
 
     private StrategyResultType type() {
         StrategyResultType type = new StrategyResultType();
-        type.setName("Detailed Strategy Result");
+        type.setName(StrategyResultType.detailedStrategyResult);
 
         return type;
     }
@@ -81,7 +81,7 @@ public class ControlStrategyOutputTableDataTest extends TestCase {
         Row row1 = (Row) rows.get(0);
         assertEquals("input dataset1", row1.getValueAt(0));
         assertEquals("detailed dataset1", row1.getValueAt(1));
-        assertEquals("Detailed Strategy Result", row1.getValueAt(2));
+        assertEquals(StrategyResultType.detailedStrategyResult, row1.getValueAt(2));
 
     }
 

@@ -492,4 +492,8 @@ CREATE INDEX control_measures_source_group
   
   ALTER TABLE emf.control_strategies ADD COLUMN export_directory character varying;
 ALTER TABLE emf.control_strategies ADD COLUMN delete_results boolean DEFAULT true;
+
+
+ALTER TABLE emf.control_strategy_constraints ADD COLUMN domain_wide_emis_reduction double precision;
+ALTER TABLE emf.control_strategy_constraints ADD COLUMN domain_wide_pct_reduction double precision;
   

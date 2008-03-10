@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
@@ -50,5 +51,7 @@ public interface EditControlStrategyPresenter {
     EmfDataset getDataset(int id) throws EmfException;
 
     boolean hasResults();
+    
+    void doChangeStrategyType(StrategyType strategyType);
     
 }

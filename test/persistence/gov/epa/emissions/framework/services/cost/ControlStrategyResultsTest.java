@@ -65,7 +65,7 @@ public class ControlStrategyResultsTest extends ServiceTestCase {
 
     public void testShouldGetDetailedStrategyResultType() {
         StrategyResultType detailedStrategyResultType = controlStrategydao.getDetailedStrategyResultType(session);
-        assertEquals("Detailed Strategy Result", detailedStrategyResultType.getName());
+        assertEquals(StrategyResultType.detailedStrategyResult, detailedStrategyResultType.getName());
     }
 
     private EmfDataset dataset() {

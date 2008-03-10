@@ -29,7 +29,7 @@ import org.hibernate.Session;
 
 public class DatasetCreator {
 
-    private String tablePrefix;
+//    private String tablePrefix;
 
     private User user;
 
@@ -39,20 +39,19 @@ public class DatasetCreator {
 
     private DbServerFactory dbServerFactory;
 
-    private String datasetNamePrefix;
+//    private String datasetNamePrefix;
     
     private ControlStrategy controlStrategy;
 
     private Keywords keywordMasterList;
     
     private Datasource datasource;
-    
-    public DatasetCreator(String datasetNamePrefix, String tablePrefix, 
-            ControlStrategy controlStrategy, User user, 
+
+    public DatasetCreator(ControlStrategy controlStrategy, User user, 
             HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory,
             Datasource datasource, Keywords keywordMasterList) {
-        this.datasetNamePrefix = datasetNamePrefix;
-        this.tablePrefix = tablePrefix;
+//        this.datasetNamePrefix = datasetNamePrefix;
+//        this.tablePrefix = tablePrefix;
         this.user = user;
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
@@ -62,10 +61,11 @@ public class DatasetCreator {
         this.keywordMasterList = keywordMasterList;//new Keywords(new DataCommonsServiceImpl(sessionFactory).getKeywords());
     }
 
-    public EmfDataset addDataset(EmfDataset inputDataset, DatasetType type, 
+    public EmfDataset addDataset(String datasetNamePrefix, String tablePrefix, 
+            EmfDataset inputDataset, DatasetType type, 
             TableFormat tableFormat, String description) throws EmfException {
-        String outputDatasetName = createResultDatasetName(inputDataset);
-        String outputTableName = createTableName(inputDataset);
+        String outputDatasetName = createResultDatasetName(datasetNamePrefix, inputDataset);
+        String outputTableName = createTableName(tablePrefix, inputDataset);
         
         EmfDataset dataset = new EmfDataset();
         Date start = new Date();
@@ -125,9 +125,75 @@ public class DatasetCreator {
         return dataset;
     }
 
-    public EmfDataset addDataset(EmfDataset inputDataset, DatasetType type, 
+    public EmfDataset addDataset(String datasetNamePrefix, String tablePrefix, 
+            String datasetName, DatasetType type, 
+            TableFormat tableFormat, String description) throws EmfException {
+        String outputTableName = createTableName(tablePrefix, datasetName);
+        
+        EmfDataset dataset = new EmfDataset();
+        Date start = new Date();
+
+        dataset.setName(datasetName);
+        dataset.setCreator(user.getUsername());
+        dataset.setDatasetType(type);
+        dataset.setDescription(description);
+        dataset.setCreatedDateTime(start);
+        dataset.setModifiedDateTime(start);
+        dataset.setAccessedDateTime(start);
+        dataset.setStatus("Created by control strategy");
+
+        //Add properties from input dataset...
+//        dataset.setStartDateTime(controlStrategy.getStartDateTime());
+//        dataset.setStopDateTime(inputDataset.getStopDateTime());
+//        dataset.setTemporalResolution(inputDataset.getTemporalResolution());
+//        dataset.setSectors(inputDataset.getSectors());
+        dataset.setRegion(controlStrategy.getRegion());
+//        dataset.setCountry(inputDataset.getCountry());
+        
+        //Add keyword to the dataset
+        addKeyVal(dataset, "COST_YEAR", controlStrategy.getCostYear() + "");
+        addKeyVal(dataset, "STRATEGY_TYPE", controlStrategy.getStrategyType().getName());
+        addKeyVal(dataset, "TARGET_POLLUTANT", controlStrategy.getTargetPollutant().getName());
+        addKeyVal(dataset, "REGION", controlStrategy.getRegion() != null ? controlStrategy.getRegion().getName() : "Not Specified");
+        addKeyVal(dataset, "STRATEGY_NAME", controlStrategy.getName());
+        addKeyVal(dataset, "STRATEGY_ID", controlStrategy.getId()+"");
+//        addKeyVal(dataset, "STRATEGY_INVENTORY_NAME", inputDataset.getName());
+//        addKeyVal(dataset, "STRATEGY_INVENTORY_VERSION", inputDataset.getDefaultVersion()+"");
+        int measureCount = (controlStrategy.getControlMeasures() != null ? controlStrategy.getControlMeasures().length : 0);
+        addKeyVal(dataset, "MEASURES_INCLUDED", measureCount + "");
+        addKeyVal(dataset, "DISCOUNT_RATE", controlStrategy.getDiscountRate()+"%");
+        addKeyVal(dataset, "USE_COST_EQUATION",(controlStrategy.getUseCostEquations()==true? "true" : "false"));
+        ControlMeasureClass[] controlMeasureClasses = controlStrategy.getControlMeasureClasses();
+        String classList = "All";
+        if (controlMeasureClasses != null) {
+            if (controlMeasureClasses.length > 0) classList = "";
+            for (int i = 0; i < controlMeasureClasses.length; i++) {
+                if (classList.length() > 0) classList += ", ";  
+                classList += controlMeasureClasses[i].getName();
+            }
+        }
+        addKeyVal(dataset, "MEASURE_CLASSES", classList);
+        
+        setDatasetInternalSource(dataset, outputTableName, 
+                tableFormat, datasetName);
+        add(dataset);
+        try {
+            addVersionZeroEntryToVersionsTable(dataset);
+        } catch (Exception e) {
+            throw new EmfException("Cannot add version zero entry to versions table for dataset: " + dataset.getName());
+        }
+
+        createTable(outputTableName, tableFormat);
+
+        return dataset;
+    }
+
+    public EmfDataset addDataset(String datasetNamePrefix, String tablePrefix, 
+            EmfDataset inputDataset, DatasetType type, 
             TableFormat tableFormat) throws EmfException {
-        return addDataset(inputDataset, type, tableFormat, description(inputDataset));
+        return addDataset(datasetNamePrefix, tablePrefix, 
+                inputDataset, type, 
+                tableFormat, description(inputDataset));
     }
     
     private void addKeyVal(EmfDataset dataset, String keywordName, String value) {
@@ -159,16 +225,19 @@ public class DatasetCreator {
         return (String[]) names.toArray(new String[0]);
     }
 
-    private String createResultDatasetName(EmfDataset inputDataset) {
+    private String createResultDatasetName(String datasetNamePrefix, EmfDataset inputDataset) {
         String timestamp = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
         String name = datasetNamePrefix + inputDataset.getId() 
             + "_V" + inputDataset.getDefaultVersion() 
             + "_" + timestamp;
 
+        return createDatasetName(datasetNamePrefix, name);
+    }
+        
+    public static String createDatasetName(String prefix, String name) {
         if (name.length() < 64) {     //postgresql table name max length is 64
-            String inputDatasetName = inputDataset.getName();
-            int space = inputDatasetName.length() + name.length() - 64;
-            name += inputDatasetName.substring((space < 0) ? 0 : space + 1);
+            int space = name.length() + prefix.length() - 64;
+            name = prefix + name.substring((space < 0) ? 0 : space + 1);
         }
 
         for (int i = 0; i < name.length(); i++) {
@@ -179,15 +248,22 @@ public class DatasetCreator {
 
         return name.trim().replaceAll(" ", "_");
     }
-    
-    private String createTableName(EmfDataset inputDataset) {
+        
+    private String createTableName(String tablePrefix, EmfDataset inputDataset) {
         String formattedDate = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
-        String table = tablePrefix + inputDataset.getId() 
+        String prefix = tablePrefix + inputDataset.getId() 
             + "_V" + inputDataset.getDefaultVersion() 
             + "_" + formattedDate;
+        String name = inputDataset.getName();
+        return createTableName(prefix, name);
+    }
+    
+    private String createTableName(String tablePrefix, String name) {
+        String formattedDate = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
+        String prefix = tablePrefix + "_" + formattedDate;
+        String table = prefix;
         
         if (table.length() < 64) {     //postgresql table name max length is 64
-            String name = inputDataset.getName();
             int space = name.length() + table.length() - 64;
             table += name.substring((space < 0) ? 0 : space + 1);
         }

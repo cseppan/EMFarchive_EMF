@@ -32,6 +32,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
@@ -88,10 +90,12 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private CostYearTable costYearTable;
 
     private NumberFieldVerifier verifier;
+    
+    private EditControlStrategyPresenter presenter;
 
     public EditControlStrategySummaryTab(ControlStrategy controlStrategy,
             ControlStrategyResult[] controlStrategyResults, EmfSession session, ManageChangeables changeablesList,
-            MessagePanel messagePanel, EmfConsole parentConsole, CostYearTable costYearTable) throws EmfException {
+            MessagePanel messagePanel, EmfConsole parentConsole, CostYearTable costYearTable, EditControlStrategyPresenter presenter) throws EmfException {
         super.setName("summary");
         this.controlStrategy = controlStrategy;
         this.controlStrategyResults = controlStrategyResults;
@@ -102,7 +106,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         this.decFormat = new DecimalFormat("0.###E0");
         this.costYearTable = costYearTable;
         this.verifier = new NumberFieldVerifier("Summary tab: ");
-
+        this.presenter = presenter;
         setLayout();
     }
 
@@ -152,9 +156,15 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private ComboBox typeOfAnalysis() throws EmfException {
         StrategyType[] types = session.controlStrategyService().getStrategyTypes();
         strategyTypeCombo = new ComboBox("Choose a strategy type", types);
+        strategyTypeCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                StrategyType strategyType = (StrategyType)strategyTypeCombo.getSelectedItem();
+                presenter.doChangeStrategyType(strategyType);
+            }
+        });
         strategyTypeCombo.setSelectedItem(controlStrategy.getStrategyType());
         changeablesList.addChangeable(strategyTypeCombo);
-
+        
         return strategyTypeCombo;
     }
 
@@ -468,5 +478,4 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         // NOTE Auto-generated method stub
         
     }
-
 }

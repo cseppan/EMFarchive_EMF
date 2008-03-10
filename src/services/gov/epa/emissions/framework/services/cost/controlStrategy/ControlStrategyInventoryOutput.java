@@ -61,8 +61,7 @@ public class ControlStrategyInventoryOutput {
 //        this.dbServerFactory = dbServerFactory;
         this.dbServer = dbServerFactory.getDbServer();
         this.tableFormat = new FileFormatFactory(dbServer).tableFormat(inputDataset.getDatasetType());
-        this.creator = new DatasetCreator("ControlledInventory_", "CSINVEN_", 
-                controlStrategy, user, 
+        this.creator = new DatasetCreator(controlStrategy, user, 
                 sessionFactory, dbServerFactory,
                 dbServer.getEmissionsDatasource(), new Keywords(new DataCommonsServiceImpl(sessionFactory).getKeywords()));
         this.statusServices = new StatusDAO(sessionFactory);
@@ -94,7 +93,8 @@ public class ControlStrategyInventoryOutput {
 //    private void copyAndUpdateData(EmfDbServer server, Datasource datasource, EmfDataset inputDataset,
     private void copyAndUpdateData(DbServer server, Datasource datasource, EmfDataset inputDataset,
             String inputTable) throws EmfException {
-        EmfDataset dataset = creator.addDataset(inputDataset, inputDataset.getDatasetType(), 
+        EmfDataset dataset = creator.addDataset("ControlledInventory_", "CSINVEN_", 
+                inputDataset, inputDataset.getDatasetType(), 
                 tableFormat, description(inputDataset));
         
         String outputInventoryTableName = dataset.getInternalSources()[0].getTable();

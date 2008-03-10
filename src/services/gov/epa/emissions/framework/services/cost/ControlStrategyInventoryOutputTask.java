@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import org.apache.commons.logging.Log;
@@ -44,7 +45,7 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
         try {
             int count = 0;
             for (int i = 0; i < controlStrategyResults.length; i++) {
-                if (controlStrategyResults[i].getStrategyResultType().getName().equals("Detailed Strategy Result")) {
+                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
                     ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,
                             controlStrategyResults[i], sessionFactory, 
                             dbServerFactory);
@@ -90,7 +91,7 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
             for (int i = 0; i < controlStrategyResults.length; i++) {
-                if (controlStrategyResults[i].getStrategyResultType().getName().equals("Detailed Strategy Result")) {
+                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
                     Dataset detailedResultDataset = controlStrategyResults[i].getDetailedResultDataset();
                     if (detailedResultDataset == null)
                         throw new EmfException("You should run the control strategy first before creating the inventory, input inventory - " + controlStrategyResults[i].getInputDataset().getName());

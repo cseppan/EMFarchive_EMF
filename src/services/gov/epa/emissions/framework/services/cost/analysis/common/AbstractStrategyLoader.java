@@ -60,7 +60,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     
     protected int recordCount = 0;
     
-    private Datasource datasource;
+    protected Datasource datasource;
     
     private int batchSize;
 
@@ -68,7 +68,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
 
     protected boolean pointDatasetType;
     
-    private DatasetCreator creator;
+    protected DatasetCreator creator;
     
     protected HibernateSessionFactory sessionFactory;
     
@@ -140,8 +140,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         this.dbServer = dbServerFactory.getDbServer();
         this.tableFormat = new StrategyDetailedResultTableFormat(dbServer.getSqlDataTypes());
         this.datasource = dbServer.getEmissionsDatasource();
-        this.creator = new DatasetCreator("Strategy_", "CSDR_", 
-                controlStrategy, user, 
+        this.creator = new DatasetCreator(controlStrategy, user, 
                 sessionFactory, dbServerFactory,
                 datasource, keywords);
         this.costYearTable = new CostYearTableReader(dbServer, controlStrategy.getCostYear()).costYearTable();
@@ -244,7 +243,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
 
     }
 
-    private ControlStrategyResult createStrategyResult(EmfDataset inputDataset, int inputDatasetVersion) throws EmfException {
+    protected ControlStrategyResult createStrategyResult(EmfDataset inputDataset, int inputDatasetVersion) throws EmfException {
         ControlStrategyResult result = new ControlStrategyResult();
         result.setControlStrategyId(controlStrategy.getId());
         result.setInputDataset(inputDataset);
@@ -287,7 +286,8 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     private EmfDataset createResultDataset(EmfDataset inputDataset) throws EmfException {
-        return creator.addDataset(inputDataset, getControlStrategyDetailedResultDatasetType(), 
+        return creator.addDataset("Strategy_", "CSDR_", 
+                inputDataset, getControlStrategyDetailedResultDatasetType(), 
                 tableFormat);
     }
 
@@ -328,7 +328,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return recordCount;
     }
     
-    private boolean inventoryHasTargetPollutant(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
+    protected boolean inventoryHasTargetPollutant(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
         String versionedQuery = new VersionedQuery(version(controlStrategyInputDataset)).query();
 
         String query = "SELECT DISTINCT ON (poll) 1 as Found "
@@ -469,7 +469,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return sqlFilter.length() > 0 ? " and fips in (" + query + ")" : "" ;
     }
 
-    private void setResultTotalCostTotalReductionAndCount(ControlStrategyResult controlStrategyResult) throws EmfException {
+    protected void setResultTotalCostTotalReductionAndCount(ControlStrategyResult controlStrategyResult) throws EmfException {
         String query = "SELECT count(1) as record_count, sum(Annual_Cost) as total_cost, sum(case when poll = '" + controlStrategy.getTargetPollutant().getName() 
             + "' then Emis_Reduction else null end) as total_reduction "
             + " FROM " + qualifiedEmissionTableName(controlStrategyResult.getDetailedResultDataset());

@@ -190,7 +190,7 @@ public class ControlStrategyDAO {
     }
 
     public StrategyResultType getDetailedStrategyResultType(Session session) {
-        return getStrategyResultType("Detailed Strategy Result", session);
+        return getStrategyResultType(StrategyResultType.detailedStrategyResult, session);
     }
 
     public StrategyResultType getStrategyResultType(String name, Session session) {
@@ -199,7 +199,7 @@ public class ControlStrategyDAO {
     }
 
     public StrategyResultType getSummaryStrategyResultType(Session session) {
-        return getStrategyResultType("Strategy Summary", session);
+        return getStrategyResultType(StrategyResultType.strategySummaryResult, session);
     }
 
     public ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId, 
@@ -290,7 +290,7 @@ public class ControlStrategyDAO {
         List<Integer> datasetLists = new ArrayList<Integer>();
         if(results != null){
             for (int i=0; i<results.size(); i++){
-                if (results.get(i).getStrategyResultType().getName().equals("Detailed Strategy Result")) {
+                if (results.get(i).getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
                     if (results.get(i).getDetailedResultDataset() != null)
                         datasetLists.add(results.get(i).getDetailedResultDataset().getId());
                     if (results.get(i).getControlledInventoryDataset() != null)

@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.io.NullFormatter;
 import gov.epa.emissions.commons.io.RealFormatter;
 import gov.epa.emissions.commons.io.StringFormatter;
 import gov.epa.emissions.commons.io.TableFormat;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +24,7 @@ public class StrategySummaryResultTableFormat implements TableFormat {
     }
 
     public String identify() {
-        return "Strategy Summary";
+        return StrategyResultType.strategySummaryResult;
     }
     
     public String key() {

@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.client.cost.controlstrategy.ControlStrategies
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -124,7 +125,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     public void set(EditControlStrategySummaryTabView view) {
         this.summaryTabView = view;
-        this.summaryTabPresenter = new EditControlStrategySummaryTabPresenterImpl(controlStrategy, view);
+        this.summaryTabPresenter = new EditControlStrategySummaryTabPresenterImpl(this, controlStrategy, view);
         presenters.add(summaryTabPresenter);
     }
 
@@ -226,6 +227,11 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     
     public EmfDataset getDataset(int id) throws EmfException {
         return session.dataService().getDataset(id);
+    }
+
+    public void doChangeStrategyType(StrategyType strategyType) {
+        if (constraintsTabPresenter != null)
+            constraintsTabPresenter.doChangeStrategyType(strategyType);
     }
 
 }

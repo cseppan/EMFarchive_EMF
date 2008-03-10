@@ -14,6 +14,7 @@ public class StrategyType implements Serializable, Comparable {
 
     private String strategyClassName;
 
+    public static final String leastCost = "Least Cost";
 //    private Mutex lock;
 
     public StrategyType() {

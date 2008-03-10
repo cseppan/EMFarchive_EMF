@@ -8,6 +8,12 @@ public class StrategyResultType implements Serializable {
     
     private String name;
     
+    public static final String strategySummaryResult = "Strategy Summary";
+    
+    public static final String detailedStrategyResult = "Detailed Strategy Result";
+    
+    public static final String leastCostControlMeasureWorksheetResult = "Least Cost Control Measure Worksheet";
+    
     public StrategyResultType(){
         //
     }

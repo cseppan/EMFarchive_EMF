@@ -146,7 +146,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private JPanel createSummaryTab(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         try {
             summaryTabView = new EditControlStrategySummaryTab(controlStrategy,
-                    controlStrategyResults, session, this, messagePanel, parentConsole, this.presenter.getCostYearTable());
+                    controlStrategyResults, session, this, messagePanel, parentConsole, this.presenter.getCostYearTable(),
+                    presenter);
             this.presenter.set(summaryTabView);
             return summaryTabView;
         } catch (EmfException e) {

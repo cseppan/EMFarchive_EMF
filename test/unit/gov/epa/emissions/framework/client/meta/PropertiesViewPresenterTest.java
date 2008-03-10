@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.client.meta.logs.LogsTabView;
 import gov.epa.emissions.framework.client.meta.notes.NotesTabView;
 import gov.epa.emissions.framework.client.meta.qa.ViewQATabPresenter;
 import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabView;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.LoggingService;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -29,7 +30,12 @@ public class PropertiesViewPresenterTest extends MockObjectTestCase {
         PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, null);
         view.expects(once()).method("observe").with(eq(presenter));
 
-        presenter.doDisplay((PropertiesView) view.proxy());
+        try {
+            presenter.doDisplay((PropertiesView) view.proxy());
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public void testShouldCloseViewOnClose() {
@@ -42,7 +48,12 @@ public class PropertiesViewPresenterTest extends MockObjectTestCase {
 
         PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, null);
         view.expects(once()).method("observe").with(eq(presenter));
-        presenter.doDisplay((PropertiesView) view.proxy());
+        try {
+            presenter.doDisplay((PropertiesView) view.proxy());
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
 
         view.expects(once()).method("disposeView");
 

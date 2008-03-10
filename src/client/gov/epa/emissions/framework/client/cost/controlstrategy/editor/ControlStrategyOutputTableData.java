@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
@@ -35,11 +36,13 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
         EmfDataset outputDataset = (EmfDataset) result.getDetailedResultDataset();
         EmfDataset controlledInvDataset = (EmfDataset) result.getControlledInventoryDataset();
         EmfDataset inputDataset = result.getInputDataset();
-        boolean stratSummary = result.getStrategyResultType().getName().equals("Strategy Summary");
-        Object[] values = { !stratSummary ? result.getInputDataset().getName() : "Strategy Summary", result.getRecordCount() == null ? 0 : result.getRecordCount(), inputDataset != null ? result.getInputDatasetVersion() : new Integer(0), 
+        boolean isStrategySummaryResult = result.getStrategyResultType().getName().equals(StrategyResultType.strategySummaryResult);
+        boolean isDetailedStrategyResult = result.getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult);
+        boolean isLeastCostControlMeasureWorksheetResult = result.getStrategyResultType().getName().equals(StrategyResultType.leastCostControlMeasureWorksheetResult);
+        Object[] values = { isDetailedStrategyResult ? result.getInputDataset().getName() : isLeastCostControlMeasureWorksheetResult ? StrategyResultType.leastCostControlMeasureWorksheetResult : isStrategySummaryResult ? StrategyResultType.strategySummaryResult : "", result.getRecordCount() == null ? 0 : result.getRecordCount(), inputDataset != null ? result.getInputDatasetVersion() : new Integer(0), 
                 outputDataset != null ? outputDataset.getName() : "", controlledInvDataset == null ? "" : controlledInvDataset.getName(), 
-                result.getRunStatus(), !stratSummary ? result.getTotalCost() : Double.NaN, 
-                !stratSummary ? result.getTotalReduction() : Double.NaN, format(result.getStartTime()),
+                result.getRunStatus(), isDetailedStrategyResult ? result.getTotalCost() : Double.NaN, 
+                isDetailedStrategyResult ? result.getTotalReduction() : Double.NaN, format(result.getStartTime()),
                 format(result.getCompletionTime()) };
         return values;
     }

@@ -34,4 +34,14 @@ public class StrategyTask extends AbstractStrategyTask {
     public void run() throws EmfException {
         super.run(loader);
     }
+
+    public void postRun() {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    public void preRun() {
+        // NOTE Auto-generated method stub
+        
+    }
 }

@@ -427,6 +427,8 @@ CREATE TABLE emf.control_strategy_constraints
   max_control_efficiency real,
   min_cost_per_ton real,
   min_ann_cost real,
+  domain_wide_emis_reduction double precision,
+  domain_wide_pct_reduction double precision,
   CONSTRAINT control_strategy_constraints_pkey PRIMARY KEY (control_strategy_id),
   CONSTRAINT control_strategy_constraints_control_strategy_id_fkey FOREIGN KEY (control_strategy_id)
       REFERENCES emf.control_strategies (id) MATCH SIMPLE
