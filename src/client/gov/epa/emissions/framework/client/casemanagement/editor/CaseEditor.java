@@ -266,7 +266,6 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         }
     }
 
-    @Override
     public void showLockingMsg(String msg) {
         InfoDialog dialog = new InfoDialog(parentConsole, "Message", msg);
         dialog.confirm();

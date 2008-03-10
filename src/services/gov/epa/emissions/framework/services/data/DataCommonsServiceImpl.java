@@ -417,11 +417,12 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             Session session = sessionFactory.getSession();
 
             for (int i = 0; i < dsNotes.length; i++) {
-                DatasetNote note = dsNotes[i];
+                DatasetNote DSnote = dsNotes[i];
 
 //                if (dao.nameUsed(note.getNote().getName(), Note.class, session))
 //                    throw new EmfException("Note name already in use");
-                dao.add(note, session);
+                System.out.println("adding dataset note: " + dsNotes[i].getId() + " name: " + dsNotes[i].getNote().getName() + " dataset id: " + dsNotes[i].getDatasetId());
+                dao.add(DSnote, session);
             }
             session.close();
         } catch (RuntimeException e) {

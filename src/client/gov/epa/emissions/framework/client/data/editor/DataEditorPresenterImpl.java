@@ -152,7 +152,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
             throws EmfException {
         view.display(user, dataset, version, notes, types, versions);
         if (view.shouldCreate())
-            commonsService().addDatasetNote(view.note());
+            commonsService().addDatasetNote(view.DSnote());
     }
 
 }

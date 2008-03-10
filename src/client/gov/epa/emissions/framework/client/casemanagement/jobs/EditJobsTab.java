@@ -146,7 +146,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         return layout;
     }
 
-    public JPanel createFolderPanel() {
+    private JPanel createFolderPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 

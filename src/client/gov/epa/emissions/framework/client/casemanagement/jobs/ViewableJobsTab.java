@@ -126,7 +126,7 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
         return layout;
     }
 
-    public JPanel createFolderPanel() {
+    private JPanel createFolderPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 

@@ -81,7 +81,7 @@ public class DataViewPresenter {
         DatasetNote[] notes = commonsService().getDatasetNotes(dataset.getId());
         view.display(user, dataset, version, notes, types, versions);
         if (view.shouldCreate())
-            commonsService().addDatasetNote(view.note());
+            commonsService().addDatasetNote(view.DSnote());
     }
 
 }

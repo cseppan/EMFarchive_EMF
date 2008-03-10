@@ -67,8 +67,10 @@ public class EditNotesTabPresenterImpl implements EditNotesTabPresenter {
             Version[] versions) {
         DatasetNote[] combinedNotesList = combinedNotesList(datasetNotes, view.additions());
         newNoteView.display(user, dataset, combinedNotesList, types, versions);
-        if (newNoteView.shouldCreate())
-            view.addNote(newNoteView.note());
+        if (newNoteView.shouldCreate()){
+            //service().addDatasetNote(datasetNote);
+            view.addNote(newNoteView.DSnote());
+        }
     }
     
 
