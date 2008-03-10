@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJobKey;
 import gov.epa.emissions.framework.services.casemanagement.jobs.DependentJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
@@ -496,6 +497,48 @@ public class CaseDAO {
     public void updateCaseJob(CaseJob job, Session session) throws Exception {
         try {
             hibernateFacade.updateOnly(job, session);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new Exception(ex.getMessage());
+        }
+    }
+    
+    public CaseJobKey getCaseJobKey(int jobId, Session session) {
+        Criterion criterion = Restrictions.eq("jobId", new Integer(jobId));
+        return (CaseJobKey) hibernateFacade.get(CaseJobKey.class, criterion, session).get(0);
+    }
+    
+    public CaseJob getCaseJobFromKey(String key) {
+        Session session = sessionFactory.getSession();
+        CaseJob job = null;
+        
+        try {
+            Criterion criterion = Restrictions.eq("key", key);
+            CaseJobKey keyObj = (CaseJobKey) hibernateFacade.get(CaseJobKey.class, criterion, session).get(0);
+            job = getCaseJob(keyObj.getJobId(), session);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            session.close();
+        }
+        
+        return job;
+    }
+
+    public void updateCaseJobKey(int jobId, String jobKey, Session session) throws Exception {
+        try {
+            CaseJobKey keyObj = getCaseJobKey(jobId, session);
+            
+            if (keyObj == null) {
+                addObject(new CaseJobKey(jobKey, jobId), session);
+                return;
+            }
+            
+            if (keyObj.getKey().equals(jobKey))
+                return;
+            
+            keyObj.setKey(jobKey);
+            hibernateFacade.updateOnly(keyObj, session);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new Exception(ex.getMessage());

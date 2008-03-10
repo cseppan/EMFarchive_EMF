@@ -196,7 +196,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
     }
 
     private synchronized CaseJob getJobFromKey(String jobKey) throws EmfException {
-        CaseJob job = dao.getCaseJob(jobKey);
+        CaseJob job = dao.getCaseJobFromKey(jobKey);
 
         if (job == null)
             throw new EmfException("Error recording job messages: No jobs found associated with job key: " + jobKey);

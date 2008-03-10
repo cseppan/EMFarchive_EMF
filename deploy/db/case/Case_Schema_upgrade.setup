@@ -160,3 +160,15 @@ WITHOUT OIDS;
 
 -- 3/8/2008 add a new column running_user_id to case_jobs table
 ALTER TABLE cases.cases_casejobs ADD COLUMN running_user_id int4 REFERENCES emf.users(id);
+
+-- 3/10/2008 add a new table casesjobkeys
+-- cases.casesjobkeys
+CREATE TABLE cases.casesjobkeys
+(
+  id serial NOT NULL,
+  job_id int4 NOT NULL REFERENCES cases.cases_casejobs(id),
+  key_value text,
+  UNIQUE(job_id, key_value)
+) 
+WITHOUT OIDS;
+-- cases.casesjobkeys

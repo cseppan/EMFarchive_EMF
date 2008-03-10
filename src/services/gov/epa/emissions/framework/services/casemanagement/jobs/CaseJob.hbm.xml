@@ -22,7 +22,6 @@
 		<property name="runLog" column="run_log" type="java.lang.String" not-null="false"/>
 		<property name="queOptions" column="que_option" type="java.lang.String" not-null="false"/>
 		<property name="path" column="path" type="java.lang.String" not-null="false"/>
-		<property name="jobkey" column="job_key" type="java.lang.String" not-null="false"/>
 		<property name="idInQueue" column="q_id" type="java.lang.String" not-null="false"/>
 		
 		<many-to-one

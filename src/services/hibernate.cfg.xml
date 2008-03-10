@@ -76,6 +76,7 @@
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/jobs/JobRunStatus.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/jobs/Host.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/jobs/Executable.hbm.xml"/>
+    	<mapping resource="gov/epa/emissions/framework/services/casemanagement/jobs/CaseJobKey.hbm.xml/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/outputs/CaseOutput.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/outputs/OutputQueue.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/parameters/ParameterEnvVar.hbm.xml"/>
