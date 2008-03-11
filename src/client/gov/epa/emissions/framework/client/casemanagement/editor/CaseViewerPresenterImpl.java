@@ -12,7 +12,9 @@ import gov.epa.emissions.framework.client.casemanagement.outputs.ViewableOutputs
 import gov.epa.emissions.framework.client.casemanagement.outputs.ViewableOutputsTabPresenterImpl;
 import gov.epa.emissions.framework.client.casemanagement.parameters.ViewableParametersTab;
 import gov.epa.emissions.framework.client.casemanagement.parameters.ViewableParametersTabPresenterImpl;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseService;
 
 public class CaseViewerPresenterImpl implements CaseViewerPresenter {
     private CaseViewerView view;
@@ -50,9 +52,20 @@ public class CaseViewerPresenterImpl implements CaseViewerPresenter {
         this.view = view;
     }
 
-    public void doDisplay() {
+    public void doDisplay() throws EmfException {
         view.observe(this);
-        view.display(caseObj);
+        CaseService service = session.caseService();
+        
+        String jobSummaryMsg = service.getJobStatusMessage(caseObj.getId());
+        view.display(caseObj, jobSummaryMsg);
+        
+        caseObj = service.obtainLocked(session.user(), caseObj);
+
+        if (!caseObj.isLocked(session.user())) {// view mode, locked by another user
+            view.showLockingMsg("Current case object is locked by user " + caseObj.getLockOwner() + ".");
+        } else {
+            service.releaseLocked(session.user(), caseObj);
+        }
     }
 
     public void doClose(){

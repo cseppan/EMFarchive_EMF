@@ -9,10 +9,10 @@ public interface CaseViewerView extends ManagedView {
 
     void observe(CaseViewerPresenter presenter);
 
-    void display(Case caseObj);
-
-//    void notifyLockFailure(Case caseObj);
+    void display(Case caseObj, String caseJobSummaryMsg);
 
     void setCursor(Cursor cursor);
+    
+    void showLockingMsg(String msg);
 
 }

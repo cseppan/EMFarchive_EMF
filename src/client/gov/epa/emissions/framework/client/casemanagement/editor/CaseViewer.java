@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.ui.ErrorPanel;
+import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -145,7 +146,7 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
         return new ErrorPanel(message);
     }
 
-    public void display(Case caseObj) {
+    public void display(Case caseObj, String caseJobSummaryMsg) {
         super.setLabel("Case Viewer: " + caseObj);
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
@@ -155,6 +156,10 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
         panel.add(messagePanel, BorderLayout.PAGE_START);
         panel.add(createTabbedPane(caseObj, messagePanel), BorderLayout.CENTER);
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
+        
+        if (caseJobSummaryMsg != null && !caseJobSummaryMsg.isEmpty())
+            messagePanel.setMessage(caseJobSummaryMsg);
+
 
         contentPane.add(panel);
         super.display();
@@ -234,6 +239,11 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
         } catch (EmfException e) {
             showError("Could not close: " + e.getMessage());
         }
+    }
+    
+    public void showLockingMsg(String msg) {
+        InfoDialog dialog = new InfoDialog(parentConsole, "Message", msg);
+        dialog.confirm();
     }
 
 }
