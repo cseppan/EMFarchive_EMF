@@ -1659,6 +1659,7 @@ public class ManagedCaseService {
     private synchronized void updateJob(CaseJob caseJob, Session session) throws EmfException {
         try {
             dao.updateCaseJob(caseJob, session);
+            dao.updateCaseJobKey(caseJob.getId(), caseJob.getJobkey(), session);
             session.flush();
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
