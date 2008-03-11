@@ -503,9 +503,9 @@ public class CaseDAO {
         }
     }
     
-    public CaseJobKey getCaseJobKey(int jobId, Session session) {
+    public List getCaseJobKey(int jobId, Session session) {
         Criterion criterion = Restrictions.eq("jobId", new Integer(jobId));
-        return (CaseJobKey) hibernateFacade.get(CaseJobKey.class, criterion, session).get(0);
+        return hibernateFacade.get(CaseJobKey.class, criterion, session);
     }
     
     public CaseJob getCaseJobFromKey(String key) {
@@ -527,7 +527,8 @@ public class CaseDAO {
 
     public void updateCaseJobKey(int jobId, String jobKey, Session session) throws Exception {
         try {
-            CaseJobKey keyObj = getCaseJobKey(jobId, session);
+            List keys = getCaseJobKey(jobId, session);
+            CaseJobKey keyObj = (keys == null || keys.size() == 0) ? null : (CaseJobKey)keys.get(0);
             
             if (keyObj == null) {
                 addObject(new CaseJobKey(jobKey, jobId), session);
