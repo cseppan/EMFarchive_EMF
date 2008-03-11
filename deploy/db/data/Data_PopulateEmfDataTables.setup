@@ -159,7 +159,7 @@ insert into emf.qa_programs values(DEFAULT,'Average day to Annual Inventory','go
 insert into emf.qa_programs values(DEFAULT,'Fire Data Summary (Day-specific)','gov.epa.emissions.framework.services.qa.FireProgramRunner');
 insert into emf.qa_programs values(DEFAULT,'Multi-inventory sum','gov.epa.emissions.framework.services.qa.MultiInvSumProgramRunner');
 insert into emf.qa_programs values(DEFAULT,'Multi-inventory column report','gov.epa.emissions.framework.services.qa.MultiInvRepProgramRunner');
-insert into emf.qa_programs values(DEFAULT,'Multi-inventory difference report','gov.epa.emissions.framework.services.qa.MultiInvDifProgramRunner');
+insert into emf.qa_programs values(DEFAULT,'Multi-inventory difference report','gov.epa.emissions.framework.services.qa.MultiInvDiffProgramRunner');
 
 --
 -- the dataset type id field depends on the order of dataset type table (ORL type being first)

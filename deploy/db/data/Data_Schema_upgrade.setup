@@ -285,4 +285,4 @@ insert into emf.properties values(DEFAULT, 'USE_IMPORT_TASK_MANAGER', 'false');
 -- emf.qa_programs  03/07/08 by Dongmei Yang
 insert into emf.qa_programs values(DEFAULT,'Multi-inventory sum','gov.epa.emissions.framework.services.qa.MultiInvSumProgramRunner');
 insert into emf.qa_programs values(DEFAULT,'Multi-inventory column report','gov.epa.emissions.framework.services.qa.MultiInvRepProgramRunner');
-insert into emf.qa_programs values(DEFAULT,'Multi-inventory difference report','gov.epa.emissions.framework.services.qa.MultiInvDifProgramRunner');
+insert into emf.qa_programs values(DEFAULT,'Multi-inventory difference report','gov.epa.emissions.framework.services.qa.MultiInvDiffProgramRunner');
