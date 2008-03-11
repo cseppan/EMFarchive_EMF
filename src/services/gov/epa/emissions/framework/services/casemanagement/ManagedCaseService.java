@@ -1712,12 +1712,13 @@ public class ManagedCaseService {
         try {
             CaseJob loaded = (CaseJob) dao.loadCaseJob(job);
 
-            if (user == null)
-                throw new EmfException("Running Case Job requires a valid user");
-
             if (loaded != null && loaded.getId() != job.getId())
                 throw new EmfException("Case job uniqueness check failed (" + loaded.getId() + "," + job.getId() + ")");
 
+            // maintain current running user from server 
+            // do NOT update the running user from the client
+            job.setRunJobUser(loaded.getRunJobUser());
+            
             dao.updateCaseJob(job);
         } catch (RuntimeException e) {
             log.error("Could not update case job: " + job.getName() + ".\n" + e);
