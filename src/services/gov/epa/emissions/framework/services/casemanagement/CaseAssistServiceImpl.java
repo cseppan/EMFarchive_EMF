@@ -185,8 +185,6 @@ public class CaseAssistServiceImpl implements CaseAssistService {
                 }
             }
         } catch (Exception e) {
-            if ((e.getMessage() != null) && e.getMessage().indexOf("Remote user") > 0)
-                e.printStackTrace();
             log.error(e.getMessage());
             throw new EmfException("Error recording job messages: " + e.getMessage());
         }
