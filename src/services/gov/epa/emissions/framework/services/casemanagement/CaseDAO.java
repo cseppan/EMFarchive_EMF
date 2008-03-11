@@ -514,8 +514,12 @@ public class CaseDAO {
         
         try {
             Criterion criterion = Restrictions.eq("key", key);
-            CaseJobKey keyObj = (CaseJobKey) hibernateFacade.get(CaseJobKey.class, criterion, session).get(0);
-            job = getCaseJob(keyObj.getJobId(), session);
+            List<CaseJobKey> keyObjs = hibernateFacade.get(CaseJobKey.class, criterion, session);
+            
+            if (keyObjs == null || keyObjs.size() == 0)
+                return null;
+            
+            job = getCaseJob(keyObjs.get(0).getJobId(), session);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
