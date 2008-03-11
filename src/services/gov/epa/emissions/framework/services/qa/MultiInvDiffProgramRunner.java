@@ -5,11 +5,11 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-public class MultiInvSumProgramRunner extends SQLQAProgramRunner {
+public class MultiInvDiffProgramRunner extends SQLQAProgramRunner {
     
     private String emissioDatasourceName;
 
-    public MultiInvSumProgramRunner(DbServer dbServer, HibernateSessionFactory sessionFactory, QAStep qaStep) {
+    public MultiInvDiffProgramRunner(DbServer dbServer, HibernateSessionFactory sessionFactory, QAStep qaStep) {
         super(dbServer, sessionFactory, qaStep);
         this.emissioDatasourceName = dbServer.getEmissionsDatasource().getName();
     }
