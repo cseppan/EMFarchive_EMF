@@ -22,5 +22,9 @@ public class EditQAEmissionsPresenter {
     public void updateInventories(Object [] inventories, Object [] invTables, String summaryType) {
         editQAStepView.updateInventories(inventories, invTables, summaryType);
     }
+    
+    public void updateInventories(Object [] invBase, Object [] invControl, Object [] invTables, String summaryType) {
+        editQAStepView.updateInventories(invBase, invControl, invTables, summaryType);
+    }
    
 }

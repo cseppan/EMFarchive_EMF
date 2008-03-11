@@ -117,6 +117,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private JLabel creationDateLabel;
 
     private EmfDataset[] inventories = null;
+    private EmfDataset[] invBase = null;
+    private EmfDataset[] invControl=null;
 
     private EmfDataset[] invTables = null;
 
@@ -125,6 +127,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private String summaryType = "";
 
     private static final String invTag = "-inventories";
+    
+    private static final String invBaseTag = "-inventories_base";
+    private static final String invControlTag = "-inventories_control";
 
     private static final String invTableTag = "-invtable";
 
@@ -141,7 +146,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private static final String MultiInvRepProgram = "Multi-inventory column report";
 
     private static final String MultiInvDifRepProgram = "Multi-inventory difference report";
-
+    
     private static final String sqlProgram = "SQL";
 
     public EditQAStepWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
@@ -526,7 +531,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         return run;
     }
 
-    private boolean checkDatasets() {
+    private boolean checkDatasets() throws EmfException {
         String programSwitches = "";
         boolean check = true;
         programSwitches = programArguments.getText();
@@ -537,92 +542,106 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         if (avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
                 || fireDataSummaryProgram.equals(program.getSelectedItem())
                 || MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                || MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                || MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
-            if (!(programSwitches.trim().equals("")) && invIndex != -1) {
-
-                getInventories(programSwitches, invTableIndex, sumTypeIndex);
-                //getInventoryTable(programSwitches, invTableIndex, sumTypeIndex);
+                || MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+            if (!(programSwitches.trim().equals("")) && invIndex != -1 && invTableIndex !=-1) {
+                getInventories(programSwitches, 0, invTableIndex);
                 getSummaryType(programSwitches, sumTypeIndex);
-                // if and of them doesn't exist
+                // if any of them doesn't exist
                 if (!(inventories.length > 0) || summaryType.trim().equalsIgnoreCase(""))
                     check = false;
             } else
                 check = false;
 
             if (!check)
-                messagePanel.setMessage(" Inventories, summary type are needed ");
+                throw new EmfException(" Inventories, summary type are needed ");
         } else if (avgDayToAnnualProgram.equals(program.getSelectedItem())) {
             // if argument is empty, return false
             if (!(programSwitches.trim().equals("")) && invIndex != -1) {
-                getInventories(programSwitches, invTableIndex, sumTypeIndex);
+                getInventories(programSwitches, 0, programSwitches.length());
                 if (!(inventories.length > 0))
                     check = false;
             } else
                 check = false;
-            // print message if not ready to run
             if (!check)
-                messagePanel.setMessage(" Inventories are needed ");
+                throw new EmfException (" Inventories are needed ");
         } else if (sqlProgram.equals(program.getSelectedItem())) {
             if (!programSwitches.trim().toUpperCase().startsWith("SELECT ")) {
                 check = false;
-                messagePanel.setMessage(" SQL is not start with SELECT ");
+                throw new EmfException(" SQL is not start with SELECT ");
             }
+        }else if (MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+            check = checkMultiInvDiff(programSwitches) ;
+            if (!check)
+                throw new EmfException (" Both base and control inventories are needed ");
         }
         return check;
     }
+    
+    private boolean checkMultiInvDiff(String programSwitches) throws EmfException{
+        int baseIndex = programSwitches.indexOf(invBaseTag);
+        int controlIndex = programSwitches.indexOf(invControlTag);
+        int invTableIndex = programSwitches.indexOf(invTableTag);
+        int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
+        if (!(programSwitches.trim().equals("")) 
+                && baseIndex != -1 && controlIndex != -1
+                && sumTypeIndex != -1) {
+                getBaseInventories(programSwitches, 0, controlIndex);
+                getControlInventories(programSwitches, controlIndex, invTableIndex);
+                getInventoryTable(programSwitches, invTableIndex, sumTypeIndex);
+                getSummaryType(programSwitches, sumTypeIndex);
+                return true; 
+        }
+        return false; 
+    }
 
-    private void getInventories(String programSwitches, int invTableIndex, int sumTypeIndex) {
+    private void getInventories(String programSwitches, int beginIndex, int endIndex) throws EmfException {
+        List<EmfDataset> inventoryList= new ArrayList<EmfDataset>();
+        inventoryList = getDatasets(programSwitches, beginIndex, endIndex);
+        inventories = inventoryList.toArray(new EmfDataset[inventoryList.size()]);
+
+    }
+    
+    private List<EmfDataset> getDatasets(String programSwitches, int beginIndex, int endIndex) throws EmfException{
         List<EmfDataset> inventoryList = new ArrayList<EmfDataset>();
         String nextDataset = "";
         String inventoriesString = "";
-        // get the part of the arguments starting with -inventories
-        if (invTableIndex != -1)
-            inventoriesString = programSwitches.substring(0, invTableIndex);
-        else if (sumTypeIndex != -1)
-            inventoriesString = programSwitches.substring(0, sumTypeIndex);
-        else
-            inventoriesString = programSwitches.substring(0, programSwitches.length());
-
+        // get the part of the arguments starting with -inventories or -inventories_base(control)
+        
+        inventoriesString = programSwitches.substring(beginIndex, endIndex);
         StringTokenizer tokenizer2 = new StringTokenizer(inventoriesString);
-        tokenizer2.nextToken(); // skip the -inventories flag
+        tokenizer2.nextToken(); // skip the flag
 
         while (tokenizer2.hasMoreTokens()) {
             try {
                 nextDataset = tokenizer2.nextToken().trim();
                 inventoryList.add(presenter.getDataset(nextDataset));
             } catch (EmfException ex) {
-                messagePanel.setError("The dataset name " + nextDataset + " is not valid");
-                // throw new EmfException("The dataset name " + nextDataset + " is not valid");
+                //messagePanel.setError("The dataset name " + nextDataset + " is not valid");
+                 throw new EmfException("The dataset name " + nextDataset + " is not valid");
             }
         }
-        inventories = inventoryList.toArray(new EmfDataset[inventoryList.size()]);
-
+        return inventoryList;
     }
 
-    private void getInventoryTable(String programSwitches, int invTableIndex, int sumTypeIndex) {
-        List<EmfDataset> invTableList = new ArrayList<EmfDataset>();
-        String invtableToken = "";
-        if (invTableIndex == -1)
-            return;
-        if (sumTypeIndex != -1)
-            invtableToken = programSwitches.substring(invTableIndex + invTableTag.length(), sumTypeIndex);
-        else
-            invtableToken = programSwitches.substring(invTableIndex + invTableTag.length());
-
-        StringTokenizer tokenizer3 = new StringTokenizer(invtableToken);
-
-        while (tokenizer3.hasMoreTokens()) {
-            try {
-                invTableList.add(presenter.getDataset(tokenizer3.nextToken().trim()));
-            } catch (EmfException ex) {
-                messagePanel.setError("The inventory table dataset is invalid");
-                // throw new EmfException("The inventory table dataset is invalid");
-            }
-        }
+    private void getInventoryTable(String programSwitches, int beginIndex, int endIndex) throws EmfException {
+        List<EmfDataset> invTableList= new ArrayList<EmfDataset>();
+        invTableList = getDatasets(programSwitches, beginIndex, endIndex);
         invTables = invTableList.toArray(new EmfDataset[invTableList.size()]);
     }
-
+    
+    private void getBaseInventories(String programSwitches, int beginIndex, int endIndex) throws EmfException {
+        List<EmfDataset> baseInvList= new ArrayList<EmfDataset>();
+        baseInvList = getDatasets(programSwitches, beginIndex, endIndex);
+        invBase = baseInvList.toArray(new EmfDataset[baseInvList.size()]);
+    }
+    
+    private void getControlInventories(String programSwitches, int beginIndex, int endIndex) throws EmfException {
+        List<EmfDataset> controlInvList= new ArrayList<EmfDataset>();
+        controlInvList = getDatasets(programSwitches, beginIndex, endIndex);
+        invControl = controlInvList.toArray(new EmfDataset[controlInvList.size()]);
+    }
+    
+    
     private void getSummaryType(String programSwitches, int sumTypeIndex) {
         String summaryTypeToken = "";
         // return if no summary type 
@@ -672,12 +691,13 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 if (avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
                         || fireDataSummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
                         || MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                        || MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                        || MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+                        || MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
                     showAvgDaySummaryWindow();
                 } else if (avgDayToAnnualProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
                     showAvgDayToAnnualWindow();
-                } else {
+                } else if (MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+                    showMultiInvDiffWindow();
+                }else{
                     doSetWindow();
                 }
             }
@@ -685,6 +705,48 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         return export;
     }
 
+    private void showMultiInvDiffWindow() {
+        // When there is no data in window, set button causes new window to pop up,
+        // with the warning message to also show up. When data in window is invalid, a new window still
+        // pops up, but with a different warning message.
+        // Also change the window name to EditQASetArgumentsWindow
+        invBase = null;
+        invControl = null;
+        invTables = null;
+        summaryType = "";
+
+        String programSwitches = "";
+        programSwitches = programArguments.getText();
+        String programVal = program.getSelectedItem().toString();
+        
+        int baseIndex = programSwitches.indexOf(invBaseTag);
+        int controlIndex = programSwitches.indexOf(invControlTag);
+        int invTableIndex = programSwitches.indexOf(invTableTag);
+        int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
+        if (!(programSwitches.trim().equals("")) 
+                && baseIndex != -1 && controlIndex != -1
+                && sumTypeIndex != -1) {
+            try {
+                getBaseInventories(programSwitches, 0, controlIndex);
+                getControlInventories(programSwitches, controlIndex, invTableIndex);
+                getInventoryTable(programSwitches, invTableIndex, sumTypeIndex);
+                getSummaryType(programSwitches, sumTypeIndex);
+            } catch (EmfException e) {
+                messagePanel.setError(e.getMessage());
+            }finally {
+                EditMultiInvDiffWindow view = new EditMultiInvDiffWindow(desktopManager, programVal, session, invBase, invControl, invTables,
+                        summaryType);
+                EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+                presenter.display(origDataset, step);
+            }
+        }
+        EditMultiInvDiffWindow view = new EditMultiInvDiffWindow(desktopManager, programVal, session, invBase, invControl, invTables,
+                summaryType);
+        EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+        presenter.display(origDataset, step);
+
+    }
+    
     private void showAvgDaySummaryWindow() {
         // When there is no data in window, set button causes new window to pop up,
         // with the warning message to also show up. When data in window is invalid, a new window still
@@ -695,16 +757,27 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         summaryType = "";
 
         String programSwitches = "";
+        String programVal = program.getSelectedItem().toString();
+        
         programSwitches = programArguments.getText();
         int invTableIndex = programSwitches.indexOf(invTableTag);
         int invIndex = programSwitches.indexOf(invTag);
         int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
-        if (!(programSwitches.trim().equals("")) && invIndex != -1) {
-            getInventories(programSwitches, invTableIndex, sumTypeIndex);
-            getInventoryTable(programSwitches, invTableIndex, sumTypeIndex);
-            getSummaryType(programSwitches, sumTypeIndex);
+        if (!(programSwitches.trim().equals("")) 
+                && invIndex != -1 && sumTypeIndex !=-1) {
+            try {
+                getInventories(programSwitches, 0, invTableIndex);
+                getInventoryTable(programSwitches, invTableIndex, sumTypeIndex);
+                getSummaryType(programSwitches, sumTypeIndex);
+            } catch (EmfException e) {
+                messagePanel.setError(e.getMessage());
+            }finally{
+                EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, programVal, session, inventories, invTables,
+                        summaryType);
+                EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+                presenter.display(origDataset, step); 
+            }
         }
-        String programVal = program.getSelectedItem().toString();
         EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, programVal, session, inventories, invTables,
                 summaryType);
         EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
@@ -717,15 +790,21 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         // with the warning message to also show up. When data in window is invalid, a new window still
         // pops up, but with a different warning message.
         String programSwitches = "";
-
+        String programVal = program.getSelectedItem().toString();
         programSwitches = programArguments.getText();
         int invTableIndex = programSwitches.indexOf(invTableTag);
         int invIndex = programSwitches.indexOf(invTag);
-        int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
         if (!(programSwitches.trim().equals("")) && invIndex != -1) {
-            getInventories(programSwitches, invTableIndex, sumTypeIndex);
+            try {
+                getInventories(programSwitches, 0, invTableIndex);
+            } catch (EmfException e) {
+                messagePanel.setError(e.getMessage());
+            }finally{
+                EditQANonsummaryEmissionsWindow view = new EditQANonsummaryEmissionsWindow(desktopManager, programVal, session, inventories);
+                EditQANonsummaryEmissionsPresenter presenter = new EditQANonsummaryEmissionsPresenter(view, this);
+                presenter.display(origDataset, step); 
+            }
         }
-        String programVal = program.getSelectedItem().toString();
         EditQANonsummaryEmissionsWindow view = new EditQANonsummaryEmissionsWindow(desktopManager, programVal, session, inventories);
         EditQANonsummaryEmissionsPresenter presenter = new EditQANonsummaryEmissionsPresenter(view, this);
         presenter.display(origDataset, step);
@@ -745,35 +824,45 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     public void updateInventories(Object[] retreivedInventories, Object[] retrievedInvTable,
-            String TretrievedSummaryType) {
+            String retrievedSummaryType) {
         clear();
-        String datasetNames = invTag + "\n";
-
-        for (int i = 0; i < retreivedInventories.length; i++) {
-            datasetNames += ((EmfDataset) retreivedInventories[i]).getName() + "\n";
-        }
+        String datasetNames = "";
+        datasetNames += getInvString(invTag, retreivedInventories);
+        datasetNames += getInvString(invTableTag, retrievedInvTable);
         
-        datasetNames += invTableTag + "\n";
-        if (retrievedInvTable.length > 0) {
-            for (int i = 0; i < retrievedInvTable.length; i++) {
-                datasetNames += ((EmfDataset) retrievedInvTable[i]).getName() + "\n";
-            }
-        }
-        if (TretrievedSummaryType.length() > 0)
-            datasetNames += summaryTypeTag + "\n" + TretrievedSummaryType;
+        if (retrievedSummaryType.length() > 0)
+            datasetNames += summaryTypeTag + "\n" + retrievedSummaryType;
 
         updateArgumentsTextArea(datasetNames);
 
     }
+    
+    public void updateInventories(Object[] invBase, Object[] invControl, Object[] invTables, String summaryType) {
+        clear();
+        String datasetNames = "";
+        datasetNames += getInvString(invBaseTag, invBase);
+        datasetNames += getInvString(invControlTag, invControl);
+        datasetNames += getInvString(invTableTag, invTables);
+        
+        if (summaryType.length() > 0)
+            datasetNames += summaryTypeTag + "\n" + summaryType;
+
+        updateArgumentsTextArea(datasetNames);
+    }
+    
+    private String getInvString(String tag, Object[] inventories){
+        String invString =tag + "\n";
+        for (int i = 0; i < inventories.length; i++) {
+            invString += ((EmfDataset) inventories[i]).getName() + "\n";
+        }   
+        return invString;
+    }
 
     public void updateInventories(Object[] retreivedInventories) {
 
-        String datasetNames = invTag + "\n";
-
-        for (int i = 0; i < retreivedInventories.length; i++) {
-            datasetNames += ((EmfDataset) retreivedInventories[i]).getName() + "\n";
-        }
-
+        clear();
+        String datasetNames = "";
+        datasetNames += getInvString(invTag, retreivedInventories);
         updateArgumentsTextArea(datasetNames);
     }
 
@@ -920,4 +1009,5 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 new Dimension(800, 500), desktopManager, parentConsole);
         app.display(new String[] { exportedFileName });
     }
+
 }
