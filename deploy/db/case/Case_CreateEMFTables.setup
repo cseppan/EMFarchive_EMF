@@ -223,7 +223,6 @@ CREATE TABLE cases.cases_casejobs
   exe_id int4 REFERENCES cases.executables(id),
   que_option varchar(255),
   path varchar(255),
-  job_key text,
   q_id varchar(255) ,
   UNIQUE (case_id, name)
 )
