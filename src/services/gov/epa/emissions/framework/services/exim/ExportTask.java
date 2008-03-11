@@ -30,7 +30,7 @@ import org.hibernate.Session;
  * 
  */
 public class ExportTask extends Task {
-    @Override
+    
     public boolean isEquivalent(Task task) {
         ExportTask etsk = (ExportTask) task;
         boolean eq = false;
