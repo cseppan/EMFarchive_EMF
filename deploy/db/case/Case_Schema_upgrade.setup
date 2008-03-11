@@ -172,3 +172,6 @@ CREATE TABLE cases.casesjobkeys
 ) 
 WITHOUT OIDS;
 -- cases.casesjobkeys
+
+-- 3/10/2008 drop job_key column from cases.case_jobs table
+ALTER TABLE cases.cases_casejobs DROP COLUMN job_key;
