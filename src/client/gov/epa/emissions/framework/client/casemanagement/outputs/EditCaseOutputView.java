@@ -13,5 +13,5 @@ public interface EditCaseOutputView {
 
     void loadOutput() throws EmfException;
     
-    void viewOnly();
+    void viewOnly(String title);
 }

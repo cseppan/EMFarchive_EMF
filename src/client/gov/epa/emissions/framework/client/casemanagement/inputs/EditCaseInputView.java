@@ -12,5 +12,5 @@ public interface EditCaseInputView {
     
     void populateFields();
     
-    void viewOnly();
+    void viewOnly(String title);
 }

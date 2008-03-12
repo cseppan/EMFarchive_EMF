@@ -224,7 +224,7 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
             String title = output.getName() + " (" + caseObj.getName() + ")";
             EditCaseOutputView outputEditor = new EditCaseOutputWindow(title, desktopManager);
             presenter.viewOutput(output, outputEditor);
-            outputEditor.viewOnly();
+            outputEditor.viewOnly(title);
         }
     }
 

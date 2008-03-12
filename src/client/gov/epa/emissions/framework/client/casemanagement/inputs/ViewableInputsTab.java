@@ -231,7 +231,7 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
             String title = input.getName() + "(" + input.getId() + ")(" + caseObj.getName() + ")";
             EditCaseInputView inputEditor = new EditCaseInputWindow(title, desktopManager);
             presenter.doEditInput(input, inputEditor);
-            inputEditor.viewOnly();
+            inputEditor.viewOnly(title);
         }
     }
 

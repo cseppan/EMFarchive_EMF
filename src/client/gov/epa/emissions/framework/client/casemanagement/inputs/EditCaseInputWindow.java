@@ -33,7 +33,7 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
     
     public EditCaseInputWindow(String title, DesktopManager desktopManager) {
         super("Edit Case Input", new Dimension(610, 520), desktopManager);
-        super.setLabel(super.getTitle() + ": " + title);
+        super.setTitle(super.getTitle() + ": " + title);
     }
 
     public void display(CaseInput input) throws EmfException {
@@ -134,7 +134,8 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
         super.signalChanges();
     }
     
-    public void viewOnly(){
+    public void viewOnly(String title){
+        super.setTitle("View Case Input: " + title);
         ok.setVisible(false);
         inputFieldsPanel.viewOnly();
     }

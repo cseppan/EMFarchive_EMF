@@ -12,5 +12,5 @@ public interface EditCaseJobView {
     
     void populateFields();
     
-    void viewOnly();
+    void viewOnly(String title);
 }

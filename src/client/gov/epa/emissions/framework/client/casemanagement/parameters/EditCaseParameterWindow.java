@@ -33,7 +33,7 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
     
     public EditCaseParameterWindow(String title, DesktopManager desktopManager) {
         super("Edit Parameter", new Dimension(450, 550), desktopManager);
-        super.setLabel(super.getTitle() + ": " + title);
+        super.setTitle(super.getTitle() + ": " + title);
     }
 
     public void display(CaseParameter parameter) throws EmfException {
@@ -134,7 +134,8 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
         super.signalChanges();
     }
     
-    public void viewOnly(){
+    public void viewOnly(String title){
+        super.setTitle("View Parameter: " + title);
         ok.setVisible(false);
         inputFieldsPanel.viewOnly();
     }

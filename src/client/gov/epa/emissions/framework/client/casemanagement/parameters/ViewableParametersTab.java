@@ -186,7 +186,7 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
             String title = param.getName() + "(" + param.getId() + ")(" + caseObj.getName() + ")";
             EditCaseParameterView parameterEditor = new EditCaseParameterWindow(title, desktopManager);
             presenter.editParameter(param, parameterEditor);
-            parameterEditor.viewOnly();
+            parameterEditor.viewOnly(title);
         }
     }
 

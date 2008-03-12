@@ -40,7 +40,7 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
     
     public EditCaseJobWindow(String title, DesktopManager desktopManager, EmfConsole parent, EmfSession session) {
         super("Edit Case Job", new Dimension(600, 560), desktopManager);
-        super.setLabel(super.getTitle() + ": " + title);
+        super.setTitle(super.getTitle() + ": " + title);
         this.parent = parent;
         this.session = session;
     }
@@ -148,7 +148,8 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
         super.signalChanges();
     }
 
-    public void viewOnly(){
+    public void viewOnly(String title){
+        super.setTitle("View Case Job: " + title);
         ok.setVisible(false);
         jobFieldsPanel.viewOnly();
     }
