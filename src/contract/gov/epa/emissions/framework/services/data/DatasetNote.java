@@ -6,6 +6,8 @@ public class DatasetNote {
     private int id;
 
     private int datasetId;
+    
+    private int version;
 
     private Note note;
 
@@ -52,6 +54,14 @@ public class DatasetNote {
 
     public int getDatasetId() {
         return datasetId;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
     
 }

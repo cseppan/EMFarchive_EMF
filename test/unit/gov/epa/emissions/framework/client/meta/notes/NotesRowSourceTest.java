@@ -15,7 +15,7 @@ public class NotesRowSourceTest extends TestCase {
         DatasetNote note = new DatasetNote();
         note.setId(45);
         note.getNote().setName("note0");
-        note.getNote().setVersion(2);
+        note.setVersion(2);
         note.getNote().setCreator(new User());
         note.getNote().setDate(new Date());
         note.getNote().setNoteType(new NoteType("type0"));
@@ -27,7 +27,7 @@ public class NotesRowSourceTest extends TestCase {
         assertEquals(new Long(note.getId()), values[0]);
         assertEquals(note.getNote().getName(), values[1]);
         assertEquals(note.getNote().getNoteType().getType(), values[2]);
-        assertEquals(note.getNote().getVersion(), ((Long)values[3]).longValue());
+        assertEquals(note.getVersion(), ((Long)values[3]).longValue());
         assertEquals(note.getNote().getCreator().getName(), values[4]);
 
         assertEquals(CustomDateFormat.format_YYYY_MM_DD_HH_MM(note.getNote().getDate()), values[5]);

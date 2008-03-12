@@ -8,10 +8,6 @@ public class Note {
 
     private int id;
 
-    private int datasetId;
-
-    private int version;
-
     private String name;
 
     private User creator;
@@ -39,13 +35,11 @@ public class Note {
     public Note(User creator, int datasetId, Date date, String details, String name, NoteType type, String references,
             int version) {
         this.creator = creator;
-        this.datasetId = datasetId;
         this.date = date;
         this.details = details;
         this.name = name;
         noteType = type;
         this.references = references;
-        this.version = version;
     }
 
     public User getCreator() {
@@ -54,14 +48,6 @@ public class Note {
 
     public void setCreator(User creator) {
         this.creator = creator;
-    }
-
-    public int getDatasetId() {
-        return datasetId;
-    }
-
-    public void setDatasetId(int datasetId) {
-        this.datasetId = datasetId;
     }
 
     public Date getDate() {
@@ -112,14 +98,6 @@ public class Note {
         this.references = references;
     }
 
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
-    }
-    
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof Note)) {
             return false;

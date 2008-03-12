@@ -286,3 +286,9 @@ insert into emf.properties values(DEFAULT, 'USE_IMPORT_TASK_MANAGER', 'false');
 insert into emf.qa_programs values(DEFAULT,'Multi-inventory sum','gov.epa.emissions.framework.services.qa.MultiInvSumProgramRunner');
 insert into emf.qa_programs values(DEFAULT,'Multi-inventory column report','gov.epa.emissions.framework.services.qa.MultiInvRepProgramRunner');
 insert into emf.qa_programs values(DEFAULT,'Multi-inventory difference report','gov.epa.emissions.framework.services.qa.MultiInvDiffProgramRunner');
+
+-- drop clumns from emf.notes table 03/12/2008
+ALTER TABLE emf.notes DROP COLUMN dataset_id, DROP COLUMN version;
+
+-- add column into emf.datasets_notes table 3/12/2008
+ALTER TABLE emf.datasets_notes ADD COLUMN version integer DEFAULT 0;

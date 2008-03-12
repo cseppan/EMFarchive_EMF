@@ -242,33 +242,18 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         return shouldCreate;
     }
 
-    public Note note() {
-        Note note = new Note();
-        note.setName(name.getText());
-        note.setDetails(details.getText());
-        note.setReferences(referencesListing.getText());
-        note.setVersion(version().getVersion());
-        note.setNoteType(type());
-        note.setDate(new Date());
-        note.setCreator(user);
-        note.setDatasetId(dataset.getId());
-        
-        return note;
-    }
-
     public DatasetNote DSnote() {
         Note note = new Note();
         note.setName(name.getText());
         note.setDetails(details.getText());
         note.setReferences(referencesListing.getText());
-        note.setVersion(version().getVersion());
         note.setNoteType(type());
         note.setDate(new Date());
         note.setCreator(user);
-        note.setDatasetId(dataset.getId());
         
         DatasetNote datasetNote = new DatasetNote();
         datasetNote.setDatasetId(dataset.getId());
+        datasetNote.setVersion(version().getVersion());
         datasetNote.setNote(note);
         return datasetNote;
     }

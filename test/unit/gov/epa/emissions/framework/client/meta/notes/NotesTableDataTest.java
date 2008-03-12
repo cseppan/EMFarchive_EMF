@@ -86,7 +86,7 @@ public class NotesTableDataTest extends EmfMockObjectTestCase {
         assertEquals(new Long(note0.getId()), row.getValueAt(0));
         assertEquals(note.getName(), row.getValueAt(1));
         assertEquals(note.getNoteType().getType(), row.getValueAt(2));
-        assertEquals(note.getVersion(), ((Long) row.getValueAt(3)).longValue());
+        assertEquals(note0.getVersion(), ((Long) row.getValueAt(3)).longValue());
         assertEquals(note.getCreator().getName(), row.getValueAt(4));
 
         assertEquals(CustomDateFormat.format_YYYY_MM_DD_HH_MM(note.getDate()), row.getValueAt(5));

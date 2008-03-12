@@ -56,7 +56,7 @@ public class ViewNoteWindow extends DisposableInteralFrame implements NoteView {
         layoutGenerator.addLabelWidgetPair("Details:", scrollableDetails, panel);
 
         layoutGenerator.addLabelWidgetPair("References:", new Label(note.getReferences()), panel);
-        layoutGenerator.addLabelWidgetPair("Version:", new Label(note.getVersion() + ""), panel);
+        layoutGenerator.addLabelWidgetPair("Version:", new Label(dsNote.getVersion() + ""), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols

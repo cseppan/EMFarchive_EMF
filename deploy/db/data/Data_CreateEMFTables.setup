@@ -198,8 +198,6 @@ WITHOUT OIDS;
 CREATE TABLE emf.notes
 (
   id SERIAL PRIMARY KEY,
-  dataset_id int4 NOT NULL REFERENCES emf.datasets (id), 
-  version int4 NOT NULL,
   name varchar(255) NOT NULL,
   creator int4 NOT NULL REFERENCES emf.users(id),
   date_time timestamp,
@@ -365,6 +363,7 @@ CREATE TABLE emf.datasets_notes
 (
   id SERIAL PRIMARY KEY,
   dataset_id integer NOT NULL REFERENCES emf.datasets(id),
+  version int4 NOT NULL DEFAULT 0,
   note_id integer NOT NULL REFERENCES emf.notes(id),
   UNIQUE(dataset_id, note_id)
 ) 

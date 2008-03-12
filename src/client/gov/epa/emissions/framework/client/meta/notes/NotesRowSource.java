@@ -16,7 +16,7 @@ public class NotesRowSource implements RowSource {
 
     public Object[] values() {
         return new Object[] { new Long(datasetNote.getNote().getId()), datasetNote.getNote().getName(), datasetNote.getNote().getNoteType().getType(),
-                new Long(datasetNote.getNote().getVersion()), datasetNote.getNote().getCreator().getName(), format(datasetNote.getNote().getDate()), datasetNote.getNote().getReferences(),
+                new Long(datasetNote.getVersion()), datasetNote.getNote().getCreator().getName(), format(datasetNote.getNote().getDate()), datasetNote.getNote().getReferences(),
                 datasetNote.getNote().getDetails() };
     }
 
