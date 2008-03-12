@@ -84,7 +84,7 @@ if __name__ =="__main__":
     parser.add_option("-O", metavar=" outName", dest="outName", default="",
                       help="Output name.  Default is '', i.e. autogenerate name "
                       "to be the same as the dataset name.")
-    parser.add_option("--debug", dest="debug", default=True, action="store_true",
+    parser.add_option("--debug", dest="debug", default=False, action="store_true",
                       help="Turn debugging on.")
 
 
@@ -117,7 +117,7 @@ if __name__ =="__main__":
 
     ## Construct log file based on environmental variables
     try:
-        logDir = os.environ["EMF_LOGGERPYTHONDIR"]
+        logDir = os.path.expanduser(os.environ["EMF_LOGGERPYTHONDIR"])
     except:
         logDir = "/tmp"
     try:
@@ -153,6 +153,13 @@ if __name__ =="__main__":
         javaCmd = None
 
 
+    ## Check if log dir (where csv file is written) exists,
+    ## if not create it and make it rwx for owner and group
+    if not os.path.isdir(logDir):
+        os.mkdir(logDir)
+        os.chmod(logDir,0775)
+        
+        
     ## test if first time through, ie. the log file exists
     firstTime = True
     if os.path.isfile(logFile):
@@ -166,6 +173,7 @@ if __name__ =="__main__":
         buff = g.readline()
         buffLst = buff.split(",")
         lastmsgDate = float(buffLst[0])
+        nextLine = int(buffLst[1])
         g.close()
 
     else:
@@ -174,12 +182,13 @@ if __name__ =="__main__":
         ## write header
         f.write("job key,exec name,exec path,message,message type,status,period,user,last mod date,log time(ms),output file,output dir,pattern,dataset type,dataset name,output name\n")
 
-        ## initialize message date to present
+        ## initialize message date to present and line to send to 2 (first message/output)
         lastmsgDate = time.time()
+        nextLine = 2
 
         ## write to date file
         g = open(dateFile, "w")
-        g.write("%.1f\n" %lastmsgDate)
+        g.write("%.1f, %d\n" %(lastmsgDate, nextLine))
         g.close()
 
 
@@ -243,17 +252,23 @@ if __name__ =="__main__":
         time.sleep(1)
 
         ## call java client w/ input from log file, in-line process
-        javaCmd = javaCmd + " -k %s -f %s" %(jobKey, logFileJava)
+        javaCmd = javaCmd + " -k %s -n %d -f %s" %(jobKey, nextLine, logFileJava)
         if debug: print "EMF cmd client: Python calling java Cmd client -- sent status info to EMF server: %s" %time.asctime() 
         javaStatus = os.system(javaCmd)
         if debug: print "EMF cmd client: Python finished calling java Cmd client -- sent status info to EMF server: %s" %time.asctime() 
         if (javaStatus != 0):
             raise OSError, "Error sending message(s) through EMF Java command client"
-        
+
+        ## Calculate the number of lines in the csv file,
+        ## the next time you send, it should be the next line in csv file
+        f = open(logFile)
+        buffLst = f.readlines()
+        nextLine = len(buffLst) + 1
+        f.close()
 
         ## write the date as seconds from epoch to the date file
         g = open(dateFile, "w")
-        g.write("%.1f\n" %time.time())
+        g.write("%.1f, %d\n" %(time.time(), nextLine))
         g.close()
 
     else:
