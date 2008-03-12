@@ -84,7 +84,7 @@ if __name__ =="__main__":
     parser.add_option("-O", metavar=" outName", dest="outName", default="",
                       help="Output name.  Default is '', i.e. autogenerate name "
                       "to be the same as the dataset name.")
-    parser.add_option("--debug", dest="debug", default=False, action="store_true",
+    parser.add_option("--debug", dest="debug", default=True, action="store_true",
                       help="Turn debugging on.")
 
 
