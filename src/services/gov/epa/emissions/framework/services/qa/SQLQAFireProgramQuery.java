@@ -106,6 +106,8 @@ public class SQLQAFireProgramQuery {
             sql = "te.fipsst";
         else if (summaryTypeToken.equals("County")) 
             sql = "te.fips";
+        else if (summaryTypeToken.equals("County+SCC")) 
+            sql = "te.fips, te.scc";
         outerQuery = outerQuery.replaceAll("@!@", sql);
 
         //replace !@! symbol with main columns in inner select statement
@@ -115,6 +117,8 @@ public class SQLQAFireProgramQuery {
             sql = "substr(fips, 1, 2) as fipsst";
         else if (summaryTypeToken.equals("County")) 
             sql = "fips";
+        else if (summaryTypeToken.equals("County+SCC")) 
+            sql = "fips, scc";
         outerQuery = outerQuery.replaceAll("!@!", sql);
         
         //replace @@@ symbol with group by columns in outer select statement
@@ -124,6 +128,8 @@ public class SQLQAFireProgramQuery {
             sql = "te.fipsst";
         else if (summaryTypeToken.equals("County")) 
             sql = "te.fips";
+        else if (summaryTypeToken.equals("County+SCC")) 
+            sql = "te.fips, te.scc";
         outerQuery = outerQuery.replaceAll("@@@", sql);
         
         //replace !!! symbol with group by columns in inner select statement
@@ -133,6 +139,8 @@ public class SQLQAFireProgramQuery {
             sql = "substr(fips, 1, 2)";
         else if (summaryTypeToken.equals("County")) 
             sql = "fips";
+        else if (summaryTypeToken.equals("County+SCC")) 
+            sql = "fips, scc";
         outerQuery = outerQuery.replaceAll("!!!", sql);
 
         //return the built query

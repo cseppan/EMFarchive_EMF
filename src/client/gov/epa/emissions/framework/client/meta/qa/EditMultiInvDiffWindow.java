@@ -35,7 +35,7 @@ import javax.swing.SpringLayout;
 public class EditMultiInvDiffWindow extends DisposableInteralFrame implements EditQAEmissionsView {
     
     private AddRemoveDatasetWidget datasetWidgetBase;
-    private AddRemoveDatasetWidget datasetWidgetControl;
+    private AddRemoveDatasetWidget datasetWidgetCompare;
     
     private EmfConsole parentConsole;
     
@@ -51,7 +51,7 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
     
     private EmfDataset[] invBase;
     
-    private EmfDataset[] invControl;
+    private EmfDataset[] invCompare;
     
     private EmfDataset[] invTables;
     
@@ -62,14 +62,14 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
     private String program;
         
     public EditMultiInvDiffWindow(DesktopManager desktopManager, String program, 
-            EmfSession session, EmfDataset[] invBase, EmfDataset[] invControl, 
+            EmfSession session, EmfDataset[] invBase, EmfDataset[] invCompare, 
             EmfDataset [] invTables, String summaryType) {
         
-        super("Emissions Inventories Editor", new Dimension(600, 600), desktopManager);
+        super("Emissions Inventories Editor", new Dimension(600, 400), desktopManager);
         this.program=program; 
         this.session = session;
         this.invBase = invBase;
-        this.invControl = invControl;
+        this.invCompare = invCompare;
         this.invTables = invTables;
         this.summaryType =summaryType;
         this.getContentPane().add(createLayout());
@@ -98,7 +98,7 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
        
         layoutGenerator.addLabelWidgetPair("Base inventories:", emisinvBase(), content);
-        layoutGenerator.addLabelWidgetPair("Control inventories:", emisinvControl(), content);
+        layoutGenerator.addLabelWidgetPair("Compare inventories:", emisinvCompare(), content);
         layoutGenerator.addLabelWidgetPair("Inventory table:", invTablePanel(), content);
         summaryTypeCombo();
         layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
@@ -119,12 +119,12 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
         return datasetWidgetBase;
     }
     
-    private JPanel emisinvControl() {
-        datasetWidgetControl = new AddRemoveDatasetWidget(this, program, parentConsole, session);
-        datasetWidgetControl.setPreferredSize(new Dimension(350,250));
-        if(invControl != null && invControl.length > 0)
-            datasetWidgetControl.setDatasetsFromStepWindow(invControl);
-        return datasetWidgetControl;
+    private JPanel emisinvCompare() {
+        datasetWidgetCompare = new AddRemoveDatasetWidget(this, program, parentConsole, session);
+        datasetWidgetCompare.setPreferredSize(new Dimension(350,250));
+        if(invCompare != null && invCompare.length > 0)
+            datasetWidgetCompare.setDatasetsFromStepWindow(invCompare);
+        return datasetWidgetCompare;
     }
     
     private JPanel invTablePanel() {
@@ -148,7 +148,7 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
     }
     
     private void summaryTypeCombo() {
-        String [] values= new String[]{"State", "State+SCC", "County"};
+        String [] values= new String[]{"State", "State+SCC", "County", "County+SCC"};
         summaryTypes = new ComboBox("Not Selected", values);
         summaryTypes.setPreferredSize(new Dimension(350, 25));
         if(!(summaryType==null) && (summaryType.trim().length()>0))
@@ -192,7 +192,7 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
             public void actionPerformed(ActionEvent e) {
                 
                 //System.out.println(invTable.getDataset());
-                presenter.updateInventories(datasetWidgetBase.getDatasets(),datasetWidgetControl.getDatasets(), getInvTableDatasets(), getSummaryType() );
+                presenter.updateInventories(datasetWidgetBase.getDatasets(),datasetWidgetCompare.getDatasets(), getInvTableDatasets(), getSummaryType() );
                 dispose();
                 disposeView();
             }

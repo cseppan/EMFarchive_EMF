@@ -135,7 +135,7 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
     }
     
     private void summaryTypeCombo() {
-        String [] values= new String[]{"State", "State+SCC", "County"};
+        String [] values= new String[]{"State", "State+SCC", "County", "County+SCC"};
         summaryTypes = new ComboBox("Not Selected", values);
         summaryTypes.setPreferredSize(new Dimension(350, 25));
         if(!(summaryType==null) && (summaryType.trim().length()>0))

@@ -118,7 +118,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private EmfDataset[] inventories = null;
     private EmfDataset[] invBase = null;
-    private EmfDataset[] invControl=null;
+    private EmfDataset[] invCompare=null;
 
     private EmfDataset[] invTables = null;
 
@@ -129,7 +129,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private static final String invTag = "-inventories";
     
     private static final String invBaseTag = "-inventories_base";
-    private static final String invControlTag = "-inventories_control";
+    private static final String invCompareTag = "-inventories_compare";
 
     private static final String invTableTag = "-invtable";
 
@@ -572,21 +572,21 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         }else if (MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
             check = checkMultiInvDiff(programSwitches) ;
             if (!check)
-                throw new EmfException (" Both base and control inventories are needed ");
+                throw new EmfException (" Both base and compare inventories are needed ");
         }
         return check;
     }
     
     private boolean checkMultiInvDiff(String programSwitches) throws EmfException{
         int baseIndex = programSwitches.indexOf(invBaseTag);
-        int controlIndex = programSwitches.indexOf(invControlTag);
+        int compareIndex = programSwitches.indexOf(invCompareTag);
         int invTableIndex = programSwitches.indexOf(invTableTag);
         int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
         if (!(programSwitches.trim().equals("")) 
-                && baseIndex != -1 && controlIndex != -1
+                && baseIndex != -1 && compareIndex != -1
                 && sumTypeIndex != -1) {
-                getBaseInventories(programSwitches, 0, controlIndex);
-                getControlInventories(programSwitches, controlIndex, invTableIndex);
+                getBaseInventories(programSwitches, 0, compareIndex);
+                getCompareInventories(programSwitches, compareIndex, invTableIndex);
                 getInventoryTable(programSwitches, invTableIndex, sumTypeIndex);
                 getSummaryType(programSwitches, sumTypeIndex);
                 return true; 
@@ -605,7 +605,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         List<EmfDataset> inventoryList = new ArrayList<EmfDataset>();
         String nextDataset = "";
         String inventoriesString = "";
-        // get the part of the arguments starting with -inventories or -inventories_base(control)
+        // get the part of the arguments starting with -inventories or -inventories_base(compare)
         
         inventoriesString = programSwitches.substring(beginIndex, endIndex);
         StringTokenizer tokenizer2 = new StringTokenizer(inventoriesString);
@@ -635,10 +635,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         invBase = baseInvList.toArray(new EmfDataset[baseInvList.size()]);
     }
     
-    private void getControlInventories(String programSwitches, int beginIndex, int endIndex) throws EmfException {
-        List<EmfDataset> controlInvList= new ArrayList<EmfDataset>();
-        controlInvList = getDatasets(programSwitches, beginIndex, endIndex);
-        invControl = controlInvList.toArray(new EmfDataset[controlInvList.size()]);
+    private void getCompareInventories(String programSwitches, int beginIndex, int endIndex) throws EmfException {
+        List<EmfDataset> compareInvList= new ArrayList<EmfDataset>();
+        compareInvList = getDatasets(programSwitches, beginIndex, endIndex);
+        invCompare = compareInvList.toArray(new EmfDataset[compareInvList.size()]);
     }
     
     
@@ -711,7 +711,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         // pops up, but with a different warning message.
         // Also change the window name to EditQASetArgumentsWindow
         invBase = null;
-        invControl = null;
+        invCompare = null;
         invTables = null;
         summaryType = "";
 
@@ -720,27 +720,27 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         String programVal = program.getSelectedItem().toString();
         
         int baseIndex = programSwitches.indexOf(invBaseTag);
-        int controlIndex = programSwitches.indexOf(invControlTag);
+        int compareIndex = programSwitches.indexOf(invCompareTag);
         int invTableIndex = programSwitches.indexOf(invTableTag);
         int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
         if (!(programSwitches.trim().equals("")) 
-                && baseIndex != -1 && controlIndex != -1
+                && baseIndex != -1 && compareIndex != -1
                 && sumTypeIndex != -1) {
             try {
-                getBaseInventories(programSwitches, 0, controlIndex);
-                getControlInventories(programSwitches, controlIndex, invTableIndex);
+                getBaseInventories(programSwitches, 0, compareIndex);
+                getCompareInventories(programSwitches, compareIndex, invTableIndex);
                 getInventoryTable(programSwitches, invTableIndex, sumTypeIndex);
                 getSummaryType(programSwitches, sumTypeIndex);
             } catch (EmfException e) {
                 messagePanel.setError(e.getMessage());
             }finally {
-                EditMultiInvDiffWindow view = new EditMultiInvDiffWindow(desktopManager, programVal, session, invBase, invControl, invTables,
+                EditMultiInvDiffWindow view = new EditMultiInvDiffWindow(desktopManager, programVal, session, invBase, invCompare, invTables,
                         summaryType);
                 EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
                 presenter.display(origDataset, step);
             }
         }
-        EditMultiInvDiffWindow view = new EditMultiInvDiffWindow(desktopManager, programVal, session, invBase, invControl, invTables,
+        EditMultiInvDiffWindow view = new EditMultiInvDiffWindow(desktopManager, programVal, session, invBase, invCompare, invTables,
                 summaryType);
         EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
         presenter.display(origDataset, step);
@@ -837,11 +837,11 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     }
     
-    public void updateInventories(Object[] invBase, Object[] invControl, Object[] invTables, String summaryType) {
+    public void updateInventories(Object[] invBase, Object[] invCompare, Object[] invTables, String summaryType) {
         clear();
         String datasetNames = "";
         datasetNames += getInvString(invBaseTag, invBase);
-        datasetNames += getInvString(invControlTag, invControl);
+        datasetNames += getInvString(invCompareTag, invCompare);
         datasetNames += getInvString(invTableTag, invTables);
         
         if (summaryType.length() > 0)

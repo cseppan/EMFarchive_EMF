@@ -15,8 +15,8 @@ public class MultiInvDiffProgramRunner extends SQLQAProgramRunner {
     }
     
     protected String query(DbServer dbServer, QAStep qaStep, String tableName) throws EmfException {
-        SQLMultiInvSumProgramQuery parser = new SQLMultiInvSumProgramQuery(sessionFactory, emissioDatasourceName, tableName, qaStep);
-        return parser.createInvSumProgramQuery();
+        SQLMultiInvDiffProgramQuery parser = new SQLMultiInvDiffProgramQuery(sessionFactory, emissioDatasourceName, tableName, qaStep);
+        return parser.createInvDiffProgramQuery();
     }
     
     public void run() throws EmfException{
@@ -28,9 +28,9 @@ public class MultiInvDiffProgramRunner extends SQLQAProgramRunner {
         if (programArguments == null || programArguments.trim().length() == 0) {
             throw new EmfException("Please specify the multi-inventory sum program query");
         }
-        System.out.println("The input to tableName is: " + qaStep);
+        //System.out.println("The input to tableName is: " + qaStep);
         String tableName = tableName(qaStep);
-        System.out.println("The tableName is: " + tableName);
+        //System.out.println("The tableName is: " + tableName);
         String query = query(dbServer, qaStep, tableName);
         printQuery(query);
         try {

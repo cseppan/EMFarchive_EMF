@@ -15,13 +15,13 @@ public class SQLMultiInvDiffProgramQuery {
 
     private HibernateSessionFactory sessionFactory;
     
-    private static final String poundQueryTag = "#";
+    //private static final String poundQueryTag = "#";
     
     private String emissioDatasourceName;
     
     private static final String invBaseTag = "-inventories_base";
     
-    private static final String invControlTag = "-inventories_control";
+    private static final String invCompareTag = "-inventories_compare";
     
     private static final String invTableTag = "-invtable";
 
@@ -29,7 +29,7 @@ public class SQLMultiInvDiffProgramQuery {
 
     ArrayList<String> baseDatasetNames = new ArrayList<String>();
     
-    ArrayList<String> controlDatasetNames = new ArrayList<String>();
+    ArrayList<String> compareDatasetNames = new ArrayList<String>();
     
     private boolean hasInvTableDataset;
     
@@ -40,25 +40,25 @@ public class SQLMultiInvDiffProgramQuery {
         this.emissioDatasourceName = emissioDatasourceName;
     }
         
-    public String createInvSumProgramQuery() throws EmfException {
+    public String createInvDiffProgramQuery() throws EmfException {
         
         String programArguments = qaStep.getProgramArguments();
         
         //get applicable tables from the program arguments
         String invBaseToken = "";
-        String invControlToken ="";
+        String invCompareToken ="";
         String invtableToken = "";
         String summaryTypeToken = "State+SCC";
         String invTableDatasetName = "";
         
         int indexBase = programArguments.indexOf(invBaseTag);
-        int indexControl = programArguments.indexOf(invControlTag);
+        int indexCompare = programArguments.indexOf(invCompareTag);
         int indexInvTable = programArguments.indexOf(invTableTag);
         int indexSumType = programArguments.indexOf(summaryTypeTag);
         
-        if (indexBase !=-1  && indexControl !=-1 && indexInvTable != -1){
-            invBaseToken = programArguments.substring(0, indexControl).trim();
-            invControlToken = programArguments.substring(indexControl, indexInvTable).trim();
+        if (indexBase !=-1  && indexCompare !=-1 && indexInvTable != -1){
+            invBaseToken = programArguments.substring(0, indexCompare).trim();
+            invCompareToken = programArguments.substring(indexCompare, indexInvTable).trim();
             invtableToken = programArguments.substring(indexInvTable + invTableTag.length(), indexSumType == -1 ? programArguments.length() : indexSumType);
         }
         if (indexSumType != -1) {
@@ -68,7 +68,7 @@ public class SQLMultiInvDiffProgramQuery {
         if (summaryTypeToken.trim().length() == 0)
             summaryTypeToken = "State+SCC";
 
-         //parse inventories names for base and control...
+         //parse inventories names for base and compare...
         if (invBaseToken.length() > 0 ) {
             StringTokenizer tokenizer2 = new StringTokenizer(invBaseToken);
             tokenizer2.nextToken();
@@ -82,17 +82,19 @@ public class SQLMultiInvDiffProgramQuery {
             //see if there are tables to build the query with, if not throw an exception
             throw new EmfException("There are no ORL Inventory datasets specified (base).");
         }
-       if ( invControlToken.length() > 0 ) {
-            StringTokenizer tokenizer2 = new StringTokenizer(invControlToken);
+        
+        // get compare datasets
+       if ( invCompareToken.length() > 0 ) {
+            StringTokenizer tokenizer2 = new StringTokenizer(invCompareToken);
             tokenizer2.nextToken();
             while (tokenizer2.hasMoreTokens()) {
                 String datasetName = tokenizer2.nextToken().trim();
                 if (datasetName.length() > 0)
-                    controlDatasetNames.add(datasetName);
+                    compareDatasetNames.add(datasetName);
             }
         } else {
             //see if there are tables to build the query with, if not throw an exception
-            throw new EmfException("There are no ORL Inventory datasets specified (control).");
+            throw new EmfException("There are no ORL Inventory datasets specified (compare).");
         }
 
          //parse inventory table name...
@@ -102,95 +104,123 @@ public class SQLMultiInvDiffProgramQuery {
              if (invTableDatasetName.length() > 0) hasInvTableDataset = true;
          }
          
-        //Create the query template and add placeholders (#, @!@, @@@, ...) for sql to be inserted in a later steps
-         String outerQuery = "select @!@, " 
-             + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", te.poll) as poll, "
+         String diffQuery = "\nselect @!@, " 
+             
+             + " coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", b.poll, c.poll) as poll,"
              + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION') as poll_desc, "
-             + "sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * ann_emis" : "null") + ", ann_emis)) as ann_emis, "
-             + "sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * avd_emis" : "null") + ", avd_emis)) as avd_emis "
-             + "\nfrom (#) as te " 
-             + (hasInvTableDataset ? "\nleft outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i \non te.poll = i.cas " : "\nleft outer join reference.pollutant_codes p \non te.poll = p.pollutant_code ") 
-             + " \ngroup by @@@, " + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", te.poll)" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
-             + " \norder by @@@, " + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", te.poll)" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')";
-         //, i.name, sum(cast(i.factor as double precision) * mo_emis)
-         outerQuery = query(outerQuery, true);
+             + " sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * b.ann_emis" : "null") + ", b.ann_emis)) as base_ann_emis," 
+             + " sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * c.ann_emis" : "null") + ", c.ann_emis)) as compare_ann_emis,"
+             //+ " coalesce(sum(coalesce(cast(i.factor as double precision) * c.ann_emis,  c.ann_emis)),0) - coalesce(sum(coalesce(cast(i.factor as double precision) * b.ann_emis,  b.ann_emis)),0) as diff_ann_emis, " 
+
+             + " sum(coalesce("+ (hasInvTableDataset ? "cast(i.factor as double precision) * b.avd_emis" : "null") + ", b.avd_emis)) as base_avd_emis," 
+             + " sum(coalesce("+ (hasInvTableDataset ? "cast(i.factor as double precision) * c.avd_emis" : "null") + ", c.avd_emis)) as compare_avd_emis"
+             //+ " coalesce(sum("+ (hasInvTableDataset ? "cast(i.factor as double precision) * c.avd_emis" : "null") + ", c.avd_emis)),0)"
+             //+ "- coalesce(sum(" + (hasInvTableDataset ? "cast(i.factor as double precision) * b.avd_emis" : "null") + ", b.ann_emis)),0) as diff_ann_emis " 
+
+             + "\nfrom (#base) as b "
+             + " \nfull outer join (#compare) as c "
+             + " \non !!! and b.poll = c.poll"
+             + (hasInvTableDataset ? "\nleft outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i \non coalesce(b.poll, c.poll) = i.cas " : "\nleft outer join reference.pollutant_codes p \non coalesce(b.poll, c.poll) = p.pollutant_code ") 
+             + " \ngroup by @@@, " + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", b.poll, c.poll)" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
+             + " \norder by @@@, " + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", b.poll, c.poll)" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')";
+
+         diffQuery = query(diffQuery, true);
 
         //build inner sql statement with the datasets specified, make sure and unionize (append) the tables together
-        String innerSQL = "";
-        for (int j = 0; j < baseDatasetNames.size(); j++) {
-            innerSQL += (j > 0 ? " \nunion all " : "") + createFireDatasetQuery(baseDatasetNames.get(j).toString().trim());
-        }
+         String innerSQLBase = "";
+         for (int j = 0; j < baseDatasetNames.size(); j++) {
+             innerSQLBase += (j > 0 ? " \nunion all " : "") + createDatasetQuery(baseDatasetNames.get(j).toString().trim());
+         }
 
-        //replace # symbol with the unionized fire datasets query
-        outerQuery = outerQuery.replaceAll(poundQueryTag, innerSQL);
+         //replace #base symbol with the unionized fire datasets query
+         diffQuery = diffQuery.replaceAll("#base", innerSQLBase);
 
-        //replace @!@ symbol with main columns in outer select statement
-        String sql = "";
-        if (summaryTypeToken.equals("State+SCC")) 
-            sql = "te.fipsst, te.scc";
-        else if (summaryTypeToken.equals("State")) 
-            sql = "te.fipsst";
-        else if (summaryTypeToken.equals("County")) 
-            sql = "te.fips";
-        outerQuery = outerQuery.replaceAll("@!@", sql);
+         String innerSQLCompare = "";
+       for (int j = 0; j < compareDatasetNames.size(); j++) {
+           //System.out.println("compare dataset : " +j +"  " + compareDatasetNames.get(j));
+           innerSQLCompare += (j > 0 ? " \nunion all " : "") + createDatasetQuery(compareDatasetNames.get(j).toString().trim());
+       }
 
-        //replace !@! symbol with main columns in inner select statement
-        if (summaryTypeToken.equals("State+SCC")) 
-            sql = "substr(fips, 1, 2) as fipsst, scc";
-        else if (summaryTypeToken.equals("State")) 
-            sql = "substr(fips, 1, 2) as fipsst";
-        else if (summaryTypeToken.equals("County")) 
-            sql = "fips";
-        outerQuery = outerQuery.replaceAll("!@!", sql);
-        
-        //replace @@@ symbol with group by columns in outer select statement
-        if (summaryTypeToken.equals("State+SCC")) 
-            sql = "te.fipsst, te.scc";
-        else if (summaryTypeToken.equals("State")) 
-            sql = "te.fipsst";
-        else if (summaryTypeToken.equals("County")) 
-            sql = "te.fips";
-        outerQuery = outerQuery.replaceAll("@@@", sql);
-        
-        //replace !!! symbol with group by columns in inner select statement
-        if (summaryTypeToken.equals("State+SCC")) 
-            sql = "substr(fips, 1, 2), scc";
-        else if (summaryTypeToken.equals("State")) 
-            sql = "substr(fips, 1, 2)";
-        else if (summaryTypeToken.equals("County")) 
-            sql = "fips";
-        outerQuery = outerQuery.replaceAll("!!!", sql);
+       //replace #compare symbol with the unionized fire datasets query
+       diffQuery = diffQuery.replaceAll("#compare", innerSQLCompare);
+       
+     //replace !!! symbol with conditions when join table base with compare
+       String sql = "";
+       if (summaryTypeToken.equals("State+SCC")) 
+           sql = "b.fipsst=c.fipsst and b.scc=c.scc";
+       else if (summaryTypeToken.equals("State")) 
+           sql = "b.fipsst=c.fipsst";
+       else if (summaryTypeToken.equals("County")) 
+           sql = "b.fips=c.fips";
+       else if (summaryTypeToken.equals("County+SCC")) 
+           sql = "b.fips=c.fips and b.scc=c.scc";
+       diffQuery = diffQuery.replaceAll("!!!", sql);
+       
+       
+         //replace @!@ symbol with main columns in outer select statement
+         if (summaryTypeToken.equals("State+SCC")) 
+             sql = "coalesce(b.fipsst, c.fipsst) as fipsst, coalesce(b.scc, c.scc) as scc";
+         else if (summaryTypeToken.equals("State")) 
+             sql = "coalesce(b.fipsst, c.fipsst) as fipsst";
+         else if (summaryTypeToken.equals("County")) 
+             sql = "coalesce(b.fips, c.fips) as fips";
+         else if (summaryTypeToken.equals("County+SCC")) 
+             sql = "coalesce(b.fips, c.fips) as fips, coalesce(b.scc, c.scc) as scc";
+         diffQuery = diffQuery.replaceAll("@!@", sql);
+
+         //replace !@! symbol with main columns in inner select statement
+         if (summaryTypeToken.equals("State+SCC")) 
+             sql = "substr(fips, 1, 2) as fipsst, scc";
+         else if (summaryTypeToken.equals("State")) 
+             sql = "substr(fips, 1, 2) as fipsst";
+         else if (summaryTypeToken.equals("County")) 
+             sql = "fips";
+         else if (summaryTypeToken.equals("County+SCC")) 
+             sql = "fips, scc";
+         diffQuery = diffQuery.replaceAll("!@!", sql);
+         
+         //replace @@@ symbol with group by columns in outer select statement
+         if (summaryTypeToken.equals("State+SCC")) 
+             sql = "coalesce(b.fipsst, c.fipsst), coalesce(b.scc, c.scc)";
+         else if (summaryTypeToken.equals("State")) 
+             sql = "coalesce(b.fipsst, c.fipsst)";
+         else if (summaryTypeToken.equals("County")) 
+             sql = "coalesce(b.fips, c.fips)";
+         else if (summaryTypeToken.equals("County+SCC")) 
+             sql = "coalesce(b.fips, c.fips), coalesce(b.scc, c.scc)";
+         diffQuery = diffQuery.replaceAll("@@@", sql);
+         
+         //replace !!@ symbol with group by columns in inner select statement
+         if (summaryTypeToken.equals("State+SCC")) 
+             sql = "substr(fips, 1, 2), scc";
+         else if (summaryTypeToken.equals("State")) 
+             sql = "substr(fips, 1, 2)";
+         else if (summaryTypeToken.equals("County")) 
+             sql = "fips";
+         else if (summaryTypeToken.equals("County+SCC")) 
+             sql = "fips, scc";
+         diffQuery = diffQuery.replaceAll("!!@", sql);
 
         //return the built query
-        return outerQuery;
+        return diffQuery;
     }
 
-        private String createFireDatasetQuery(String datasetName) throws EmfException {
+    
+    private String createDatasetQuery(String datasetName) throws EmfException {
 
-           String sql = "";
-           
-           sql = "\nselect !@!, poll, sum(ann_emis) as ann_emis, sum(avd_emis) as avd_emis  \nfrom $DATASET_TABLE[\"" + 
-               datasetName + "\", 1] m \ngroup by !!!, poll ";
+        String sql = "";
+        sql = "\nselect !@!, poll, sum(ann_emis) as ann_emis, sum(avd_emis) as avd_emis  \nfrom $DATASET_TABLE[\"" + 
+        datasetName + "\", 1] m  \ngroup by !!@, poll ";
 
-           sql = query(sql, false);
+        sql = query(sql, false);
 
-           return sql;
-        }
+        return sql;
+    }
 
-        private String query(String partialQuery, boolean createClause) throws EmfException {
-            
-            SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissioDatasourceName, tableName );
-            return parser.parse(partialQuery, createClause);
-        }
-        
-//        private EmfDataset getDataset(String dsName) throws EmfException {
-//            //System.out.println("Database name = \n" + dsName + "\n");
-//            DatasetDAO dao = new DatasetDAO();
-//            try {
-//                return dao.getDataset(sessionFactory.getSession(), dsName);
-//            } catch (Exception ex) {
-//                ex.printStackTrace();
-//                throw new EmfException("The dataset name " + dsName + " is not valid");
-//            }
-//        }
+    private String query(String partialQuery, boolean createClause) throws EmfException {
+
+        SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissioDatasourceName, tableName );
+        return parser.parse(partialQuery, createClause);
+    }
+
 }
