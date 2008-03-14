@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.meta.versions;
 
-import gov.epa.emissions.commons.gui.ConfirmDialog;
-import gov.epa.emissions.commons.gui.SelectAwareButton;
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -10,11 +9,8 @@ import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenterImpl;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.ui.EmfDatasetTableData;
 import gov.epa.emissions.framework.ui.MessagePanel;
-import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
-import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -28,11 +24,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-
 public class VersionedDataWindow extends ReusableInteralFrame implements VersionedDataView {
 
     private EmfConsole parentConsole;
-    
+
     private EmfDataset dataset;
 
     private SingleLineMessagePanel messagePanel;
@@ -40,9 +35,9 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
     private VersionedDataPresenter presenter;
 
     private JPanel layout;
-    
-    private JLabel defaultVersion;
 
+    private JLabel defaultVersion;
+    
     public VersionedDataWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Data Versions Editor", new Dimension(750, 350), desktopManager);
 
@@ -86,14 +81,14 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
 
         return versionsPanel;
     }
-    
+
     private JPanel createControlPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(leftControlPanel(), BorderLayout.LINE_START);
         panel.add(rightControlPanel(), BorderLayout.LINE_END);
-        
+
         return panel;
-        
+
     }
 
     private JPanel leftControlPanel() {
@@ -107,21 +102,16 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
         }
         return labelPanel;
     }
-    
+
     private JPanel rightControlPanel() {
         JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        JPanel editPanel = new JPanel();
-        
-        //New code to move Edit Properties button from elsewhere on the Window
-        
-        ConfirmDialog confirmDialog = new ConfirmDialog("", "Warning", parentConsole);
-        SelectAwareButton propButton = new SelectAwareButton("Edit Properties", editPropAction(), getTable(),
-                        confirmDialog);
-        editPanel.add(propButton);
-        panel.add(editPanel);
 
-        JPanel closePanel = new JPanel();
+        Button appendData = new Button("Append Data", appendDataAction());
+        panel.add(appendData);
+
+        Button propButton = new Button("Edit Properties", editPropAction());
+        panel.add(propButton);
+
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -129,20 +119,23 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
             }
         });
 
-        closePanel.add(closeButton);
         getRootPane().setDefaultButton(closeButton);
-        panel.add(closePanel, BorderLayout.EAST);
+        panel.add(closeButton);
 
         return panel;
     }
-    private SelectableSortFilterWrapper getTable() {
-        EmfDatasetTableData tableData = new EmfDatasetTableData(new EmfDataset[] { dataset });
-        return new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
-    }
 
-    private SortCriteria sortCriteria() {
-        String[] columnNames = { "Last Modified Date" };
-        return new SortCriteria(columnNames, new boolean[] { false }, new boolean[] { true });
+    private Action appendDataAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                clear();
+
+                AppendDataWindow dialog = new AppendDataWindow(parentConsole, desktopManager);
+                AppendDataViewPresenter appendDataPresenter = new AppendDataViewPresenter(dataset, dialog,
+                        presenter.getSession());
+                appendDataPresenter.displayView();
+            }
+        };
     }
 
     private Action editPropAction() {
@@ -165,9 +158,11 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
             }
         };
     }
+
     public void observe(VersionedDataPresenter presenter) {
         this.presenter = presenter;
     }
+
     private void clear() {
         messagePanel.clear();
     }
