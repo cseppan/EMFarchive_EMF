@@ -103,7 +103,7 @@ public class SQLMultiInvDiffProgramQuery {
              invTableDatasetName  = tokenizer3.nextToken().trim();
              if (invTableDatasetName.length() > 0) hasInvTableDataset = true;
          }
-         String diffQuery = "select t.fipsst, t.poll, t.poll_desc, t.base_ann_emis, t.compare_ann_emis, (t.compare_ann_emis-t.base_ann_emis) as diff_ann_emis, " 
+         String diffQuery = "select @@!, t.base_ann_emis, t.compare_ann_emis, (t.compare_ann_emis-t.base_ann_emis) as diff_ann_emis, " 
              + " \nabs(t.compare_ann_emis-t.base_ann_emis) as abs_diff_ann, "
              + " \ncase when t.base_ann_emis >0  then (abs(t.compare_ann_emis-t.base_ann_emis)/t.base_ann_emis) "
              + " \nelse null "
@@ -162,6 +162,17 @@ public class SQLMultiInvDiffProgramQuery {
            sql = "b.fips=c.fips and b.scc=c.scc";
        diffQuery = diffQuery.replaceAll("!!!", sql);
        
+     //replace @@! symbol with main columns in outer select statement
+       if (summaryTypeToken.equals("State+SCC")) 
+           sql = "t.fipsst, t.scc";
+       else if (summaryTypeToken.equals("State")) 
+           sql = "t.fipsst";
+       else if (summaryTypeToken.equals("County")) 
+           sql = "t.fips";
+       else if (summaryTypeToken.equals("County+SCC")) 
+           sql = "t.fips, t.scc";
+       diffQuery = diffQuery.replaceAll("@@!", sql);
+
        
          //replace @!@ symbol with main columns in outer select statement
          if (summaryTypeToken.equals("State+SCC")) 
