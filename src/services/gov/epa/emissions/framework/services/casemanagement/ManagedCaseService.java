@@ -1697,7 +1697,7 @@ public class ManagedCaseService {
             throw new EmfException("Could not update case job: " + job.getName() + ".");
         }
     }
-    
+
     public synchronized void saveCaseJobFromClient(User user, CaseJob job) throws EmfException {
         Session localSession = sessionFactory.getSession();
 
@@ -1715,10 +1715,10 @@ public class ManagedCaseService {
             if (loaded != null && loaded.getId() != job.getId())
                 throw new EmfException("Case job uniqueness check failed (" + loaded.getId() + "," + job.getId() + ")");
 
-            // maintain current running user from server 
+            // maintain current running user from server
             // do NOT update the running user from the client
             job.setRunJobUser(loaded.getRunJobUser());
-            
+
             dao.updateCaseJob(job);
         } catch (RuntimeException e) {
             log.error("Could not update case job: " + job.getName() + ".\n" + e);
@@ -1810,7 +1810,8 @@ public class ManagedCaseService {
 
     public synchronized void export(User user, String dirName, String purpose, boolean overWrite, int caseId)
             throws EmfException {
-        System.out.println("ManagedCaseService::export for caseId: " + caseId);
+        if (DebugLevels.DEBUG_0)
+            System.out.println("ManagedCaseService::export for caseId: " + caseId);
 
         EmfDataset[] datasets = getInputDatasets(caseId);
         Version[] versions = getInputDatasetVersions(caseId);
@@ -2281,7 +2282,6 @@ public class ManagedCaseService {
         // get some info from the header input
         EmfDataset dataset = headerInput.getDataset();
         Version version = headerInput.getVersion();
-        System.out.println("Version of EMF JOBHEADER : " + version.getVersion());
 
         // create an exporter to get the string
         DbServer dbServer = this.dbFactory.getDbServer();
