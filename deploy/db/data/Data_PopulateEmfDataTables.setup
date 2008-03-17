@@ -158,7 +158,7 @@ insert into emf.qa_programs values(DEFAULT,'Average Day to Annual State Summary'
 insert into emf.qa_programs values(DEFAULT,'Average day to Annual Inventory','gov.epa.emissions.framework.services.qa.SQLQAAnnualNonsummaryQueryRunner');
 insert into emf.qa_programs values(DEFAULT,'Fire Data Summary (Day-specific)','gov.epa.emissions.framework.services.qa.FireProgramRunner');
 insert into emf.qa_programs values(DEFAULT,'Multi-inventory sum','gov.epa.emissions.framework.services.qa.MultiInvSumProgramRunner');
-insert into emf.qa_programs values(DEFAULT,'Multi-inventory column report','gov.epa.emissions.framework.services.qa.MultiInvRepProgramRunner');
+insert into emf.qa_programs values(DEFAULT,'Multi-inventory column report','gov.epa.emissions.framework.services.qa.NInvDiffProgramRunner');
 insert into emf.qa_programs values(DEFAULT,'Multi-inventory difference report','gov.epa.emissions.framework.services.qa.MultiInvDiffProgramRunner');
 
 --
