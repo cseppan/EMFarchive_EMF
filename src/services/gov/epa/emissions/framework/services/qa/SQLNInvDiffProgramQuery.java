@@ -94,8 +94,15 @@ public class SQLNInvDiffProgramQuery {
              aliasedFipsList += (j > 0 ? "," : "") + "t" + j + ".fips";
              aliasedFipsStList += (j > 0 ? "," : "") + "t" + j + ".fipsst";
              aliasedSCCList += (j > 0 ? "," : "") + "t" + j + ".scc";
-             aliasedSCCList += (j > 0 ? "," : "") + "t" + j + ".scc";
-             sqlAnnEmisList += (j > 0 ? "," : "") + "sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * t" + j + ".ann_emis" : "null") + ", t" + j + ".ann_emis)) as \"" + datasetNames.get(j).toString().trim() + "\"";
+             String datasetName = datasetNames.get(j).toString().trim();
+             //make sure dataset name only includes SQL friendly characters...
+             for (int i = 0; i < datasetName.length(); i++) {
+                 if (!Character.isLetterOrDigit(datasetName.charAt(i))) {
+                     datasetName = datasetName.replace(datasetName.charAt(i), '_');
+                 }
+             }
+             datasetName = datasetName.replaceAll(" ", "_");
+             sqlAnnEmisList += (j > 0 ? "," : "") + "sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * t" + j + ".ann_emis" : "null") + ", t" + j + ".ann_emis)) as \"" + datasetName + "\"";
          }
 
          String diffQuery = "select @!@, " 
@@ -177,7 +184,7 @@ public class SQLNInvDiffProgramQuery {
          else if (summaryTypeToken.equals("County+SCC")) 
              sql = "fips, scc";
          diffQuery = diffQuery.replaceAll("!!@", sql);
-
+System.out.println(diffQuery);
         //return the built query
         return diffQuery;
     }
