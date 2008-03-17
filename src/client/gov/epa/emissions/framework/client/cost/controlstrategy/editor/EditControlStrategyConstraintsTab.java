@@ -107,9 +107,12 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         presenter.setConstraint(constraint);
     }
 
-    public void refresh(ControlStrategyResult[] controlStrategyResults) {
-        // NOTE Auto-generated method stub
-
+    public void refresh(ControlStrategy strategy, ControlStrategyResult[] controlStrategyResults) {
+        ControlStrategyConstraint constraint = strategy.getConstraint();
+        if (constraint != null) {
+            domainWideEmisReduction.setText(constraint.getDomainWideEmisReduction() != null ? constraint.getDomainWideEmisReduction() + "" : "");
+            domainWidePctReduction.setText(constraint.getDomainWidePctReduction() != null ? constraint.getDomainWidePctReduction() + "" : "");
+        }
     }
 
     public void display(ControlStrategy strategy) {
@@ -130,5 +133,4 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
             domainWidePctReduction.setEnabled(false);
         }
     }
-
 }

@@ -31,9 +31,8 @@ public class EditControlStrategyConstraintsTabPresenter  implements EditControlS
         strategy.setConstraint(constraint);
     }
 
-    public void doRefresh(ControlStrategyResult[] controlStrategyResults) {
-        // NOTE Auto-generated method stub
-        
+    public void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
+        view.refresh(controlStrategy, controlStrategyResults);
     }
 
     public void doSave(ControlStrategy controlStrategy) throws EmfException {

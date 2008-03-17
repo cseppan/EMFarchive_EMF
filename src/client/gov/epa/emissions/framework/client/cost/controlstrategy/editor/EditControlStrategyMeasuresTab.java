@@ -320,7 +320,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         return controlMeasureClasses;
     }
 
-    public void refresh(ControlStrategyResult[] controlStrategyResults) {
+    public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         // NOTE Auto-generated method stub
 
     }

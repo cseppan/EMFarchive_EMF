@@ -25,8 +25,8 @@ public class EditControlStrategySummaryTabPresenterImpl implements EditControlSt
         view.setRunMessage(controlStrategy);
     }
 
-    public void doRefresh(ControlStrategyResult[] controlStrategyResults) {
-        view.refresh(controlStrategyResults);
+    public void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
+        view.refresh(controlStrategy, controlStrategyResults);
     }
 
     public void doChangeStrategyType(StrategyType strategyType) {

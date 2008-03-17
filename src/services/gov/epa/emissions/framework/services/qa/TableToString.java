@@ -52,9 +52,9 @@ public class TableToString {
                     if (value != null) {
                         if (value.indexOf(",") > 0) value = "\"" + value + "\"";
                     }
-                    row += (i > 1 ? delimiter : lineFeeder) + (!rs.wasNull() ? value : "");
+                    row += (i > 1 ? delimiter : "") + (!rs.wasNull() ? value : "");
                 }
-                output.append(row);
+                output.append(row + lineFeeder);
             }
         } catch (SQLException e) {
             throw new ExporterException("could not export lines ", e);
@@ -66,6 +66,6 @@ public class TableToString {
         for (int i = 1; i <= md.getColumnCount(); i++) {
             header += (i > 1 ? delimiter : "") + md.getColumnName(i).toLowerCase();
         }
-        output.append(header);
+        output.append(header + lineFeeder);
     }
 }

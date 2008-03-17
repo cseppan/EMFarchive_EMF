@@ -491,7 +491,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         app.display(fileNames);
     }
 
-    public void refresh(ControlStrategyResult[] controlStrategyResults) {
+    public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         setLayout(controlStrategy, controlStrategyResults);
     }
 

@@ -183,7 +183,7 @@ public class EditControlStrategyPollutantsTab extends JPanel implements ControlS
 //        controlStrategy.setControlMeasures(pollutants);
     }
 
-    public void refresh(ControlStrategyResult[] controlStrategyResults) {
+    public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         // NOTE Auto-generated method stub
 
     }

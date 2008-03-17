@@ -376,8 +376,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         }
     }
 
-    public void refresh(ControlStrategyResult[] controlStrategyResults) {
+    public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         // do nothing
     }
-
 }

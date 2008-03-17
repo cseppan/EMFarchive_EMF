@@ -100,8 +100,8 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
                 controlStrategyResults);
     }
 
-    public void doRefresh(ControlStrategyResult[] controlStrategyResults) {
-        view.refresh(controlStrategyResults);
+    public void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
+        view.refresh(controlStrategy, controlStrategyResults);
 //        view.recentExportFolder(folder());
     }
     

@@ -16,7 +16,7 @@ public class EditControlStrategyTabPresenterImpl implements EditControlStrategyT
         view.save(controlStrategy);
     }
 
-    public void doRefresh(ControlStrategyResult[] controlStrategyResults) {
-        view.refresh(controlStrategyResults);
+    public void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
+        view.refresh(controlStrategy, controlStrategyResults);
     }
 }

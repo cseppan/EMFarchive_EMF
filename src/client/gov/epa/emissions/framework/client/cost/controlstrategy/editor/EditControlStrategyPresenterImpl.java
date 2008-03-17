@@ -70,6 +70,10 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         return service().getControlStrategyResults(controlStrategy.getId());
     }
 
+    public ControlStrategy getControlStrategy(int id) throws EmfException {
+        return service().getById(id);
+    }
+
     public void doClose() throws EmfException {
         service().releaseLocked(session.user(), controlStrategy.getId());
         closeView();
@@ -156,11 +160,12 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     public void doRefresh() throws EmfException {
         //ControlStrategyResult result = session.controlStrategyService().controlStrategyResults(controlStrategy);
         ControlStrategyResult[] controlStrategyResults = getResult();
+        ControlStrategy strategy = getControlStrategy(controlStrategy.getId());
 //        String runStatus = service().controlStrategyRunStatus(controlStrategy.getId());
 //        if (runStatus == null || !runStatus.equalsIgnoreCase("Running")) {
             for (Iterator iter = presenters.iterator(); iter.hasNext();) {
                 EditControlStrategyTabPresenter element = (EditControlStrategyTabPresenter) iter.next();
-                element.doRefresh(controlStrategyResults);
+                element.doRefresh(strategy, controlStrategyResults);
             }
 //        }
     }

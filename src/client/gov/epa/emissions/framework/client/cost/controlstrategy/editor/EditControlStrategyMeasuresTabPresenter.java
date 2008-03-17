@@ -48,7 +48,7 @@ public class EditControlStrategyMeasuresTabPresenter  implements EditControlStra
         return controlStrategiesManagerPresenter.getControlMeasures();
     }
 
-    public void doRefresh(ControlStrategyResult[] controlStrategyResults) {
+    public void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         // NOTE Auto-generated method stub
         
     }
