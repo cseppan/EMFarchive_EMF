@@ -19,9 +19,9 @@ public class SQLMultiInvDiffProgramQuery {
     
     private String emissioDatasourceName;
     
-    private static final String invBaseTag = "-inventories_base";
+    private static final String invBaseTag = "-inv_base";
     
-    private static final String invCompareTag = "-inventories_compare";
+    private static final String invCompareTag = "-inv_compare";
     
     private static final String invTableTag = "-invtable";
 

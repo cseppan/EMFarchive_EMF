@@ -128,8 +128,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private static final String invTag = "-inventories";
     
-    private static final String invBaseTag = "-inventories_base";
-    private static final String invCompareTag = "-inventories_compare";
+    private static final String invBaseTag = "-inv_base";
+    private static final String invCompareTag = "-inv_compare";
 
     private static final String invTableTag = "-invtable";
 
