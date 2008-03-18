@@ -40,5 +40,8 @@ public interface DataService {
     String getTableAsString(String qualifiedTableName) throws EmfException;
     
     long getTableRecordCount(String qualifiedTableName) throws EmfException;
+    
+    void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion, int targetStartLineNumber) throws EmfException;
+    
 
 }

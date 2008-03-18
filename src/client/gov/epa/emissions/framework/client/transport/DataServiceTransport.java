@@ -206,4 +206,22 @@ public class DataServiceTransport implements DataService {
         return (Long) call.requestResponse(new Object[] { qualifiedTableName });
     }
 
+    public void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion,
+            int targetStartLineNumber) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("appendData");
+        call.addIntegerParam("srcDSid");
+        call.addIntegerParam("srcDSVersion");
+        call.addStringParam("filter");
+        call.addIntegerParam("targetDSid");
+        call.addIntegerParam("targetDSVersion");
+        call.addIntegerParam("targetStartLineNumber");
+        call.setVoidReturnType();
+        
+        call.request(new Object[]{new Integer(srcDSid), new Integer(srcDSVersion), filter, new Integer(targetDSid),
+                new Integer(targetDSVersion), new Integer(targetStartLineNumber)});
+        
+    }
+
 }

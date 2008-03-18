@@ -1,8 +1,11 @@
 package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.DataModifier;
+import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.VersionedDatasetQuery;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -350,6 +353,41 @@ public class DataServiceImpl implements DataService {
             closeDB(dbServer);
         }
         return recordCount;
+    }
+
+    public synchronized void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion,
+            int targetStartLineNumber) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        Session session = sessionFactory.getSession();
+        
+        try {
+            Datasource datasource = dbServer.getEmissionsDatasource();
+            Version srcVersion = dao.getVersion(session, srcDSid, srcDSVersion);
+            EmfDataset srcDS = dao.getDataset(session, srcDSid);
+            String srcTable = datasource.getName() + "." + srcDS.getInternalSources()[0].getTable();
+            EmfDataset targetDS = dao.getDataset(session, targetDSid);
+            String targetTable = datasource.getName() + "." + targetDS.getInternalSources()[0].getTable();
+           
+            
+            VersionedDatasetQuery dsQuery = new VersionedDatasetQuery(srcVersion, srcDS);
+            String query = "INSERT INTO " + targetTable + " (" + dsQuery.generateFilteringQuery(srcTable, filter) + ")";
+            
+            System.out.println("source query: " + query); //NOTE: to be deleted
+            
+            try {
+                DataModifier dataModifier = datasource.dataModifier();
+                dataModifier.execute(query);
+            } catch (SQLException e) {
+                throw new SQLException("Error in executing append data query: \n"
+                        + query + ".\n" + e.getMessage());
+            }
+        } catch (Exception e) {
+            LOG.error("Could not query table : ", e);
+            throw new EmfException("Could not query table :");
+        } finally {
+            closeDB(dbServer);
+            session.close();
+        }
     }
     
     
