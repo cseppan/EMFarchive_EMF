@@ -188,9 +188,10 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
                 clearMsgPanel();
 
                 try {
-                    presenter.appendData(sourceDataset.getId(), ((Version)sourceVersionBox.getSelectedItem()).getVersion(),
-                            sourceFilterField.getText(),
-                            presenter.getDataset().getId(), ((Version)targetDatasetVerison.getSelectedItem()).getVersion());
+//                    presenter.appendData(sourceDataset.getId(), ((Version)sourceVersionBox.getSelectedItem()).getVersion(),
+//                            sourceFilterField.getText(),
+//                            presenter.getDataset().getId(), ((Version)targetDatasetVerison.getSelectedItem()).getVersion());
+                    presenter.appendData(0, 0, "", 0, 0); //NOTE: a place holder, to be deleted
                 } catch (Exception e) {
                     setErrorMsg(e.getMessage());
                 }

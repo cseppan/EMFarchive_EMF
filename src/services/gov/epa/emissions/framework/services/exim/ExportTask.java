@@ -30,7 +30,7 @@ import org.hibernate.Session;
  * 
  */
 public class ExportTask extends Task {
-    
+
     public boolean isEquivalent(Task task) {
         ExportTask etsk = (ExportTask) task;
         boolean eq = false;
@@ -60,7 +60,7 @@ public class ExportTask extends Task {
     private Version version;
 
     private DbServerFactory dbFactory;
-    
+
     private int sleepAfterExport = 0;
 
     protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog,
@@ -85,7 +85,7 @@ public class ExportTask extends Task {
         DbServer dbServer = null;
         Session session = sessionFactory.getSession();
         this.sleepAfterExport = sleepAfterExport(session);
-        
+
         if (DebugLevels.DEBUG_1)
             System.out.println(">>## ExportTask:run() " + createId() + " for datasetId: " + this.dataset.getId());
         if (DebugLevels.DEBUG_1)
@@ -104,13 +104,15 @@ public class ExportTask extends Task {
 
             } else {
                 dbServer = this.dbFactory.getDbServer();
-                VersionedExporterFactory exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes(),
-                        batchSize(session));
+                VersionedExporterFactory exporterFactory = new VersionedExporterFactory(dbServer, dbServer
+                        .getSqlDataTypes(), batchSize(session));
                 Exporter exporter = exporterFactory.create(dataset, version);
                 exporter.export(file);
                 accesslog.setEnddate(new Date());
                 accesslog.setLinesExported(exporter.getExportedLinesCount());
-                printLogInfo(accesslog);
+                
+                if (DebugLevels.DEBUG_1)
+                    printLogInfo(accesslog);
 
                 if (!compareDatasetRecordsNumbers(accesslog, session, dbServer))
                     return;
@@ -144,15 +146,14 @@ public class ExportTask extends Task {
                 // check for isConnected before disconnecting
                 if ((dbServer != null) && (dbServer.isConnected()))
                     dbServer.disconnect();
-                
+
                 session.close();
-                
-                if (this.sleepAfterExport > 0)
-                {
-                   Thread.sleep(this.sleepAfterExport * 1000);
-                   log.warn("ExportTask sleeps " + sleepAfterExport + " seconds after export.");
-                }   
-                
+
+                if (this.sleepAfterExport > 0) {
+                    Thread.sleep(this.sleepAfterExport * 1000);
+                    log.warn("ExportTask sleeps " + sleepAfterExport + " seconds after export.");
+                }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -182,7 +183,7 @@ public class ExportTask extends Task {
             records = datasetDao.getDatasetRecordsNumber(dbServer, session, dataset, version);
         } catch (RuntimeException e) {
             e.printStackTrace();
-        } 
+        }
 
         if (records != log.getLinesExported()) {
             setErrorStatus(null, "No. of records in database: " + records + ", but" + " exported "
@@ -242,7 +243,7 @@ public class ExportTask extends Task {
             log.error("Error getting batch size for export. ", e);
             throw new Exception(e.getMessage());
         }
-        
+
     }
 
     private int sleepAfterExport(Session session) {
@@ -253,8 +254,8 @@ public class ExportTask extends Task {
             value = Integer.parseInt(property.getValue());
         } catch (Exception e) {
             return value; // Default value for maxpool and poolsize
-        } 
-            
+        }
+
         return value;
     }
 
