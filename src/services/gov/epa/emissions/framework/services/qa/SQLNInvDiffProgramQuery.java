@@ -184,7 +184,7 @@ public class SQLNInvDiffProgramQuery {
          else if (summaryTypeToken.equals("County+SCC")) 
              sql = "fips, scc";
          diffQuery = diffQuery.replaceAll("!!@", sql);
-System.out.println(diffQuery);
+
         //return the built query
         return diffQuery;
     }
