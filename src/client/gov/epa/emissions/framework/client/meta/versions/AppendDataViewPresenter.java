@@ -27,8 +27,8 @@ public class AppendDataViewPresenter {
         view.display();
     }
     
-    public void appendData(EmfDataset sourceDataset) throws EmfException {
-        throw new EmfException("Under construction...");
+    public void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion) throws EmfException {
+        session.dataService().appendData(srcDSid, srcDSVersion, filter, targetDSid, targetDSVersion, 0);
     }
     
     public Version[] getVersions(int dsId) throws EmfException {
@@ -37,7 +37,6 @@ public class AppendDataViewPresenter {
     
     public Version[] getTargetDatasetNonFinalVersions() throws EmfException {
         List<Version> nonFinalVersions = new ArrayList<Version>();
-        nonFinalVersions.add(new Version());
         
         Version[] allVersions = getVersions(dataset.getId());
         

@@ -27,9 +27,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
-import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -46,7 +44,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
 
     private EmfDataset sourceDataset;
 
-    private JComboBox sourceVersionBox;
+    private ComboBox sourceVersionBox;
 
     private JTextField sourceDatasetField;
 
@@ -54,7 +52,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
 
     private JTextField startLineField;
 
-    private JComboBox targetDatasetVerison;
+    private ComboBox targetDatasetVerison;
 
     public AppendDataWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Append Data Window", new Dimension(750, 350), desktopManager);
@@ -99,7 +97,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
             }
         });
 
-        Icon icon = new ImageResources().open("Export a Dataset");
+        Icon icon = new ImageResources().open("Select a Dataset");
         button.setIcon(icon);
 
         JPanel sourceDatasetPanel = new JPanel(new BorderLayout(2, 0));
@@ -128,6 +126,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
 
         startLineField = new JTextField(40);
         startLineField.setName("startLineField");
+        startLineField.setEnabled(false);
         layoutGenerator.addLabelWidgetPair("Starting Line Number", startLineField, panel);
 
         Version[] versions = null;
@@ -179,7 +178,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
 
         if (sourceDataset != null) {
             sourceDatasetField.setText(sourceDataset == null ? "" : sourceDataset.getName());
-            sourceVersionBox.setModel(new DefaultComboBoxModel(presenter.getVersions(sourceDataset.getId())));
+            sourceVersionBox.resetModel(presenter.getVersions(sourceDataset.getId()));
         }
     }
 
@@ -189,7 +188,9 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
                 clearMsgPanel();
 
                 try {
-                    presenter.appendData(sourceDataset);
+                    presenter.appendData(sourceDataset.getId(), ((Version)sourceVersionBox.getSelectedItem()).getVersion(),
+                            sourceFilterField.getText(),
+                            presenter.getDataset().getId(), ((Version)targetDatasetVerison.getSelectedItem()).getVersion());
                 } catch (Exception e) {
                     setErrorMsg(e.getMessage());
                 }
