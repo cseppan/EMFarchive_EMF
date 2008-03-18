@@ -1201,7 +1201,7 @@ public class ManagedCaseService {
                 job.setRunstatus(dao.getJobRunStatuse("Not Started"));
 
             dao.add(job, session);
-            return (CaseJob) dao.loadCaseJob(job);
+            return (CaseJob) dao.loadCaseJobByName(job);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not add new case job '" + job.getName() + "'\n" + e.getMessage());
@@ -1668,7 +1668,7 @@ public class ManagedCaseService {
 
     public synchronized void updateCaseJob(User user, CaseJob job) throws EmfException {
         try {
-            CaseJob loaded = (CaseJob) dao.loadCaseJob(job);
+            CaseJob loaded = (CaseJob) dao.loadCaseJobByName(job);
             if (user == null)
                 throw new EmfException("Running Case Job requires a valid user");
 
@@ -1710,18 +1710,19 @@ public class ManagedCaseService {
         }
 
         try {
-            CaseJob loaded = (CaseJob) dao.loadCaseJob(job);
+            CaseJob loaded = (CaseJob) dao.loadCaseJobByName(job);
 
             if (loaded != null && loaded.getId() != job.getId())
                 throw new EmfException("Case job uniqueness check failed (" + loaded.getId() + "," + job.getId() + ")");
 
             // maintain current running user from server
             // do NOT update the running user from the client
-            job.setRunJobUser(loaded.getRunJobUser());
+            job.setRunJobUser(dao.getCaseJob(job.getId()).getRunJobUser());
 
             dao.updateCaseJob(job);
         } catch (RuntimeException e) {
-            log.error("Could not update case job: " + job.getName() + ".\n" + e);
+            e.printStackTrace();
+            log.error("Could not update case job: " + job.getName() + ".\n", e);
             throw new EmfException("Could not update case job: " + job.getName() + ".");
         }
     }

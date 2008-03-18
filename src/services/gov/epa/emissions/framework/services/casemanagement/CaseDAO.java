@@ -664,7 +664,7 @@ public class CaseDAO {
         hibernateFacade.updateOnly(parameter, session);
     }
 
-    public Object loadCaseJob(CaseJob job) {
+    public Object loadCaseJobByName(CaseJob job) {
         Session session = sessionFactory.getSession();
         Object obj = null;
         try {
