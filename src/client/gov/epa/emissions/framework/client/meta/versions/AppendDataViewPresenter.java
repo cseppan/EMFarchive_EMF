@@ -28,7 +28,8 @@ public class AppendDataViewPresenter {
     }
     
     public void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion) throws EmfException {
-        session.dataService().appendData(srcDSid, srcDSVersion, filter, targetDSid, targetDSVersion, 0);
+        //session.dataService().appendData(srcDSid, srcDSVersion, filter, targetDSid, targetDSVersion, 0);
+        throw new EmfException("Under construction...");
     }
     
     public Version[] getVersions(int dsId) throws EmfException {
