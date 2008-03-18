@@ -291,6 +291,14 @@ public class DatasetDAO {
         Criterion criterion = Restrictions.and(statusCrit, idCrit);
         return (EmfDataset) hibernateFacade.load(EmfDataset.class, criterion, session);
     }
+    
+    public Version getVersion(Session session, int datasetId, int version) {
+        Criterion crit1 = Restrictions.eq("datasetId", new Integer(datasetId)); 
+        Criterion crit2 = Restrictions.eq("version", new Integer(version));
+        Criterion criterion = Restrictions.and(crit1, crit2);
+        
+        return (Version) hibernateFacade.load(Version.class, criterion, session);
+    }
 
     public boolean isUsedByControlStrategies(Session session, EmfDataset dataset) {
         List strategies = hibernateFacade.getAll(ControlStrategy.class, session);
