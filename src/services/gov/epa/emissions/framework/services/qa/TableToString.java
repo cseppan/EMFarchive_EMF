@@ -41,8 +41,8 @@ public class TableToString {
         try {
             ResultSet rs = datasource.query().executeQuery("select * from " + qualifiedTableName);
             ResultSetMetaData md = rs.getMetaData();
-            writeHeaderRow(md);
             int columnCount = md.getColumnCount();
+            writeHeaderRow(md, columnCount);
             String row = "";
             String value = "";
             while (rs.next()) {
@@ -61,11 +61,15 @@ public class TableToString {
         }
     }
 
-    private void writeHeaderRow(ResultSetMetaData md) throws SQLException {
-        String header = "";
-        for (int i = 1; i <= md.getColumnCount(); i++) {
-            header += (i > 1 ? delimiter : "") + md.getColumnName(i).toLowerCase();
+    private void writeHeaderRow(ResultSetMetaData md, int columnCount) throws SQLException {
+        String colTypes = "#TYPES=";
+        String colNames = ""; 
+        
+        for (int i = 1; i <= columnCount; i++) {
+            colTypes += md.getColumnTypeName(i) + (i < columnCount ? " " : "");
+            colNames += (i > 1 ? delimiter : "") + md.getColumnName(i).toLowerCase();
         }
-        output.append(header + lineFeeder);
+        
+        output.append(colTypes + lineFeeder + colNames + lineFeeder);
     }
 }

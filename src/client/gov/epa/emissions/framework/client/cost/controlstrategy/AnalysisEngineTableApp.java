@@ -1,9 +1,12 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
+import gov.epa.emissions.commons.Record;
+import gov.epa.emissions.commons.io.csv.CSVFileReader;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.EmfImageTool;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.mims.analysisengine.gui.DefaultUserInteractor;
 import gov.epa.mims.analysisengine.gui.UserInteractor;
 import gov.epa.mims.analysisengine.table.SpecialTableModel;
@@ -19,6 +22,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JTabbedPane;
 
@@ -27,13 +33,14 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
     private JTabbedPane mainTabbedPane;
 
     private EmfConsole parentConsole;
-    
-    private Dimension dimension;
-    
-    private static int counter=0;
 
-    public AnalysisEngineTableApp(String controlStrategyName, Dimension dimension, DesktopManager desktopManager, EmfConsole parentConsole) {
-        super(controlStrategyName+counter++, dimension, desktopManager);
+    private Dimension dimension;
+
+    private static int counter = 0;
+
+    public AnalysisEngineTableApp(String controlStrategyName, Dimension dimension, DesktopManager desktopManager,
+            EmfConsole parentConsole) {
+        super(controlStrategyName + counter++, dimension, desktopManager);
         this.dimension = dimension;
         this.parentConsole = parentConsole;
     }
@@ -46,7 +53,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
     private void setLayout(String[] fileNames) {
         mainTabbedPane = new JTabbedPane();
         String[] tabNames = createTabNames(1, 40, fileNames);
-        importFiles(fileNames, tabNames, FileImportGUI.GENERIC_FILE, ",", 1);
+        importFiles(fileNames, tabNames, FileImportGUI.GENERIC_FILE, ",");
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
         contentPane.add(mainTabbedPane);
@@ -91,19 +98,15 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
         return tabNames;
     }// createTabNames()
 
-    private void importFiles(String[] fileNames, String[] tabNames, String fileType, String delimiter,
-            int noOfColumnNameRows) {
+    private void importFiles(String[] fileNames, String[] tabNames, String fileType, String delimiter) {
         boolean allSuccessful = true; // a flag to check whether all the file imported sucessfuly
-        ArrayList importFileStatus = new ArrayList();
-        ArrayList warningWindow = new ArrayList();
+        ArrayList<String> importFileStatus = new ArrayList<String>();
+        ArrayList<String> warningWindow = new ArrayList<String>();
 
         for (int i = 0; i < fileNames.length; i++) {
             SpecialTableModel model = null;
             try {
-                model = FileImportGUI.createAModel(fileNames[i], fileType, delimiter, noOfColumnNameRows);
-                if (FileImportGUI.getLogMessages() != null) {
-                    warningWindow.add(FileImportGUI.getLogMessages());
-                }
+                model = createSpecialTableModel(fileNames[i], delimiter, warningWindow);
                 insertIntoTabbedPane(model, fileNames[i], tabNames[i], fileType);
                 importFileStatus.add("Success: " + fileNames[i]);
             } // try
@@ -120,6 +123,82 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
             }// catch
         }
         importStatus(allSuccessful, importFileStatus, warningWindow);
+    }
+
+    private SpecialTableModel createSpecialTableModel(String file, String delimiter, ArrayList<String> warningWindow)
+            throws Exception {
+        CSVFileReader reader = null;
+
+        if (delimiter.equals(","))
+            reader = new CSVFileReader(new File(file));
+        else
+            throw new EmfException("File " + file + " is not csv format. Sorry, I cannot read it.");
+
+        ArrayList<ArrayList<String[]>> tableData = new ArrayList<ArrayList<String[]>>();
+
+        Record record = reader.read();
+
+        while (!record.isEnd()) {
+            ArrayList<String[]> rowData = new ArrayList<String[]>();
+            rowData.add(record.getTokens());
+            tableData.add(rowData);
+            record = reader.read();
+        }
+
+        String[] rowHeader = new String[0];
+        String fileHeader = (reader.getHeader() == null) ? "" : reader.getHeader().get(0).toString();
+        String[][] colHeader = new String[1][];
+        colHeader[0] = reader.getCols();
+
+        Class[] colClasses = getColumnClass(reader.comments(), reader.getCols().length);
+
+        return new SpecialTableModel(fileHeader, rowHeader, colHeader, tableData, "", colClasses);
+    }
+
+    private Class[] getColumnClass(List comments, int numOfCols) throws EmfException {
+        List<Class> colClasses = new ArrayList<Class>();
+
+        String[] colTypes = null;
+
+        for (Iterator<String> iter = comments.iterator(); iter.hasNext();) {
+            String line = iter.next().toUpperCase();
+
+            if (line.contains("TYPES")) {
+                int index = line.indexOf("=");
+
+                if (index < 0)
+                    throw new EmfException(
+                            "Column types line format is not correct. The correct format is: #TYPES=[type_1] [type_2] ... [type_n]");
+
+                colTypes = line.substring(++index).split("[\\S]+");
+                break;
+            }
+        }
+        
+        if (colTypes == null) {
+            for (int i = 0; i < numOfCols; i++)
+                colClasses.add(String.class);
+        } else if (colTypes.length != numOfCols)
+            throw new EmfException("Number of column types don't match number of columns.");
+
+        for (String type : colTypes) {
+            if (type.toUpperCase().startsWith("CHAR"))
+                colClasses.add(String.class);
+            else if (type.toUpperCase().startsWith("TEXT"))
+                colClasses.add(String.class);
+            else if (type.toUpperCase().startsWith("INT"))
+                colClasses.add(Integer.class);
+            else if (type.toUpperCase().startsWith("REAL"))
+                colClasses.add(Double.class);
+            else if (type.toUpperCase().startsWith("BOOL"))
+                colClasses.add(Boolean.class);
+            else if (type.toUpperCase().startsWith("TIME"))
+                colClasses.add(Date.class);
+            else
+                colClasses.add(String.class);
+        }
+        
+        return colClasses.toArray(new Class[0]);
     }
 
     private void importStatus(boolean allSuccessful, ArrayList importFileStatus, ArrayList warningWindow) {

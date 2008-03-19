@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.qa.TableToString;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -341,8 +342,10 @@ public class DataServiceImpl implements DataService {
         DbServer dbServer = dbServerFactory.getDbServer();
         long recordCount = 0;
         try {
-            ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery("select count(1) as record_count from " + qualifiedTableName);
-            if (rs.next()) recordCount = rs.getLong(1);
+            ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery(
+                    "select count(1) as record_count from " + qualifiedTableName);
+            if (rs.next())
+                recordCount = rs.getLong(1);
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve table record count: " + qualifiedTableName, e);
             throw new EmfException("Could not retrieve table record count: " + qualifiedTableName);
@@ -355,11 +358,11 @@ public class DataServiceImpl implements DataService {
         return recordCount;
     }
 
-    public synchronized void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion,
-            int targetStartLineNumber) throws EmfException {
+    public synchronized void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid,
+            int targetDSVersion, int targetStartLineNumber) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         Session session = sessionFactory.getSession();
-        
+
         try {
             Datasource datasource = dbServer.getEmissionsDatasource();
             Version srcVersion = dao.getVersion(session, srcDSid, srcDSVersion);
@@ -367,19 +370,36 @@ public class DataServiceImpl implements DataService {
             String srcTable = datasource.getName() + "." + srcDS.getInternalSources()[0].getTable();
             EmfDataset targetDS = dao.getDataset(session, targetDSid);
             String targetTable = datasource.getName() + "." + targetDS.getInternalSources()[0].getTable();
-           
-            
+
             VersionedDatasetQuery dsQuery = new VersionedDatasetQuery(srcVersion, srcDS);
             String query = "INSERT INTO " + targetTable + " (" + dsQuery.generateFilteringQuery(srcTable, filter) + ")";
-            
-            System.out.println("source query: " + query); //NOTE: to be deleted
-            
+
+            System.out.println("source query: " + query); // NOTE: to be deleted
+
             try {
                 DataModifier dataModifier = datasource.dataModifier();
+
+                String[] srcColumns = null;
+                try {
+                    srcColumns = getTableColumns(dataModifier, srcTable, filter);
+                } catch (SQLException e) {
+                    System.out.println("Filter clause \"" + filter + "\" is not quite right." + e.getMessage());
+                    throw e;
+                }
+
+                String[] targetColumns = null;
+                try {
+                    targetColumns = getTableColumns(dataModifier, targetTable, "");
+                } catch (SQLException e) {
+                    System.out.println("Error getting target dataset table columns." + e.getMessage());
+                }
+                
+                if (srcColumns != targetColumns)
+                    throw new EmfException("Cannot append data - source and target datasets have different table definitions.");
+                    
                 dataModifier.execute(query);
             } catch (SQLException e) {
-                throw new SQLException("Error in executing append data query: \n"
-                        + query + ".\n" + e.getMessage());
+                throw new SQLException("Error in executing append data query: \n" + query + ".\n" + e.getMessage());
             }
         } catch (Exception e) {
             LOG.error("Could not query table : ", e);
@@ -389,7 +409,28 @@ public class DataServiceImpl implements DataService {
             session.close();
         }
     }
-    
-    
+
+    private String[] getTableColumns(DataModifier mod, String table, String filter) throws SQLException {
+        ResultSet rs = null;
+        String query = null;
+        
+        if (filter != null || !filter.isEmpty())
+            query = "SELECT * FROM " + table + " WHERE (" + filter + ") LIMIT 0";
+        else
+            query = "SELECT * FROM " + table + " LIMIT 0";
+
+        try {
+            rs = mod.executeQuery(query);
+        } catch (SQLException e) {
+            throw e;
+        }
+
+        List<String> cols = new ArrayList<String>();
+        ResultSetMetaData md = rs.getMetaData();
+        for (int i = 1; i <= md.getColumnCount(); i++)
+            cols.add(md.getColumnName(i));
+
+        return cols.toArray(new String[0]);
+    }
 
 }
