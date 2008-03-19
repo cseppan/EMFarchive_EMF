@@ -12,6 +12,7 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
@@ -27,6 +28,7 @@ import gov.epa.emissions.framework.services.data.IntendedUsesDAO;
 import gov.epa.emissions.framework.services.data.ProjectsDAO;
 import gov.epa.emissions.framework.services.data.RegionsDAO;
 import gov.epa.emissions.framework.services.data.SectorsDAO;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.ImportCaseOutputSubmitter;
@@ -94,6 +96,9 @@ public class ManagedImportService {
     public ManagedImportService(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
+        
+        if (System.getProperty("IMPORT_EXPORT_TEMP_DIR") == null)
+            setProperties();
 
         if (DebugLevels.DEBUG_17)
             System.out.println("ManagedImportService: At the class initialization -- numOfRunningThread: "
@@ -623,6 +628,18 @@ public class ManagedImportService {
         }
 
         importOutputTasks.removeAll(importOutputTasks); // make sure the list is cleared once all tasks done
+    }
+    
+    private void setProperties() {
+        Session session = sessionFactory.getSession();
+        try {
+            EmfProperty eximTempDir = new EmfPropertiesDAO().getProperty("ImportExportTempDir", session);
+
+            if (eximTempDir != null)
+                System.setProperty("IMPORT_EXPORT_TEMP_DIR", eximTempDir.getValue());
+        } finally {
+            session.close();
+        }
     }
 
 }

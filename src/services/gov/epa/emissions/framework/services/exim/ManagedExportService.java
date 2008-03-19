@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
@@ -20,6 +21,7 @@ import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.ExportClientSubmitter;
@@ -68,6 +70,9 @@ public class ManagedExportService {
             System.out.println(">>>> " + myTag());
         this.sessionFactory = sessionFactory;
         this.dbFactory = dbFactory;
+
+        if (System.getProperty("IMPORT_EXPORT_TEMP_DIR") == null)
+            setProperties();
     }
 
     private File validateExportFile(File path, String fileName, boolean overwrite) throws EmfException {
@@ -115,7 +120,8 @@ public class ManagedExportService {
         String message = null;
 
         if (version.isLocked() && !version.isFinalVersion())
-            message = "The dataset " + dataset.getName() + " is being edited and the version is not final -- not exported.";
+            message = "The dataset " + dataset.getName()
+                    + " is being edited and the version is not final -- not exported.";
 
         if ((datasetType.getExporterClassName().equals("")) || (datasetType.getExporterClassName() == null)) {
             message = "The exporter for dataset type '" + datasetType + " is not supported";
@@ -133,7 +139,7 @@ public class ManagedExportService {
     public String getCleanDatasetName(EmfDataset dataset, Version version) {
         String name = dataset.getName();
         String prefix = "", suffix = "";
-//        KeyVal[] keyvals = dataset.getKeyVals(); // only gets KeyVals from dataset itself
+        // KeyVal[] keyvals = dataset.getKeyVals(); // only gets KeyVals from dataset itself
         KeyVal[] keyvals = dataset.mergeKeyVals(); // this function is not equal to getKeyVals() anymore
         String date = CustomDateFormat.format_ddMMMyyyy(version.getLastModifiedDate());
 
@@ -284,14 +290,14 @@ public class ManagedExportService {
         }
 
         // FIXME: Verify at team meeting Test if subpath exists. If not create subpath
-//        File toSubDir = null;
+        // File toSubDir = null;
         if (DebugLevels.DEBUG_9)
             System.out.println("FULL PATH= " + dirName);
 
-//        toSubDir = new File(dirName);
-//        if (!toSubDir.exists()) {
-//            toSubDir.mkdirs();
-//        }
+        // toSubDir = new File(dirName);
+        // if (!toSubDir.exists()) {
+        // toSubDir.mkdirs();
+        // }
 
         File path = validatePath(dirName);
 
@@ -374,7 +380,7 @@ public class ManagedExportService {
         accesslog.setDatasetname(dataset.getName());
 
         if (DebugLevels.DEBUG_9)
-            System.out.println("ManagedExportService: right before creating export task: dbFactory null? " 
+            System.out.println("ManagedExportService: right before creating export task: dbFactory null? "
                     + (dbFactory == null) + " dataset: " + dataset.getName());
         ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, dbFactory, sessionFactory,
                 version);
@@ -399,6 +405,22 @@ public class ManagedExportService {
 
     public String printStatusExportTaskManager() throws EmfException {
         return TaskManagerFactory.getExportTaskManager().getStatusOfWaitAndRunTable();
+    }
+
+    private void setProperties() {
+        Session session = sessionFactory.getSession();
+        try {
+            EmfProperty batchSize = new EmfPropertiesDAO().getProperty("export-batch-size", session);
+            EmfProperty eximTempDir = new EmfPropertiesDAO().getProperty("ImportExportTempDir", session);
+
+            if (eximTempDir != null)
+                System.setProperty("IMPORT_EXPORT_TEMP_DIR", eximTempDir.getValue());
+
+            if (batchSize != null)
+                System.setProperty("EXPORT_BATCH_SIZE", batchSize.getValue());
+        } finally {
+            session.close();
+        }
     }
 
     @Override
