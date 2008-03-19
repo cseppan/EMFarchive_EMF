@@ -79,13 +79,13 @@ public class SQLQAFireProgramQuery {
          
         //Create the query template and add placeholders (#, @!@, @@@, ...) for sql to be inserted in a later steps
          String outerQuery = "select @!@, " 
-             + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", te.data) as data, "
+             + "te.data, "
              + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION') as data_desc, "
              + "sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * datavalue" : "null") + ", datavalue)) as datavalue "
              + "\nfrom (#) as te " 
              + (hasInvTableDataset ? "\nleft outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i \non te.data = i.cas " : "\nleft outer join reference.pollutant_codes p \non te.data = p.pollutant_code ") 
-             + " \ngroup by @@@, " + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", te.data)" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
-             + " \norder by @@@, " + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", te.data)" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')";
+             + " \ngroup by @@@, te.data, coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
+             + " \norder by @@@, te.data, coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')";
          //, i.name, sum(cast(i.factor as double precision) * mo_emis)
          outerQuery = query(outerQuery, true);
 

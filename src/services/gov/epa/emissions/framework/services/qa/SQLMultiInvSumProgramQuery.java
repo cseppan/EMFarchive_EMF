@@ -67,7 +67,7 @@ public class SQLMultiInvSumProgramQuery {
             }
         } else {
             //see if there are tables to build the query with, if not throw an exception
-            throw new EmfException("There are no ORL Day-Specific Fire Data Inventory datasets specified.");
+            throw new EmfException("There are no datasets specified.");
         }
 
          //parse inventory table name...
@@ -79,14 +79,14 @@ public class SQLMultiInvSumProgramQuery {
          
         //Create the query template and add placeholders (#, @!@, @@@, ...) for sql to be inserted in a later steps
          String outerQuery = "select @!@, " 
-             + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", te.poll) as poll, "
+             + "te.poll, "
              + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION') as poll_desc, "
              + "sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * ann_emis" : "null") + ", ann_emis)) as ann_emis, "
              + "sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * avd_emis" : "null") + ", avd_emis)) as avd_emis "
              + "\nfrom (#) as te " 
              + (hasInvTableDataset ? "\nleft outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i \non te.poll = i.cas " : "\nleft outer join reference.pollutant_codes p \non te.poll = p.pollutant_code ") 
-             + " \ngroup by @@@, " + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", te.poll)" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
-             + " \norder by @@@, " + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", te.poll)" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')";
+             + " \ngroup by @@@, te.poll, coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
+             + " \norder by @@@, te.poll, coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')";
          //, i.name, sum(cast(i.factor as double precision) * mo_emis)
          outerQuery = query(outerQuery, true);
 

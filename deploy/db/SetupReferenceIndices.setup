@@ -1,5 +1,6 @@
 DROP TABLE reference.pollutants;
 
+ALTER TABLE reference.gdplev ADD CONSTRAINT gdplev_pkey PRIMARY KEY (annual);
 ALTER TABLE reference.fips ADD CONSTRAINT fips_pkey PRIMARY KEY (costcy_fips);
 ALTER TABLE reference.mact_codes ADD CONSTRAINT mact_pkey PRIMARY KEY (mact_code);
 ALTER TABLE reference.naics_codes ADD CONSTRAINT naics_pkey PRIMARY KEY (naics_code);
@@ -15,6 +16,12 @@ CREATE INDEX countries_abbr
   ON reference.countries
   USING btree
   (country_code, country_abbr);
+
+CREATE INDEX gdplev_annual
+  ON reference.gdplev
+  USING btree
+  (annual);
+ALTER TABLE reference.gdplev CLUSTER ON gdplev_annual;
 
 CREATE INDEX fips_co_st
   ON reference.fips

@@ -15,6 +15,10 @@ CREATE INDEX pollutant_id
   USING btree
   (id);
 ALTER TABLE emf.pollutants CLUSTER ON pollutant_id;
+CREATE INDEX pollutant_name
+  ON emf.pollutants
+  USING btree
+  (name);
 -- emf.pollutants
 --
 -- emf.source_groups

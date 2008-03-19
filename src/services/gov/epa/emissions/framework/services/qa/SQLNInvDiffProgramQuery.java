@@ -106,13 +106,15 @@ public class SQLNInvDiffProgramQuery {
          }
 
          String diffQuery = "select @!@, " 
-             + " \ncoalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", " + aliasedPollList + ") as poll,"
-             + " \ncoalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION') as poll_desc, "
+             + " \ncoalesce(" + aliasedPollList + ") as poll,"
+//             + " \ncoalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", " + aliasedPollList + ") as poll,"
+             + " \ncoalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION') as " + (hasInvTableDataset ? "smoke_name" : "poll_desc") + ", "
              + sqlAnnEmisList
              + " \nfrom # "
              + (hasInvTableDataset ? "\nleft outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i \non coalesce(" + aliasedPollList + ") = i.cas " : "\nleft outer join reference.pollutant_codes p \non coalesce(" + aliasedPollList + ") = p.pollutant_code ") 
-             + " \ngroup by @@@, " + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", " + aliasedPollList + ")" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
-             + " \norder by @@@, " + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", " + aliasedPollList + ")" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')";
+             + " \ngroup by @@@, " + "coalesce(" + aliasedPollList + ")" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
+//             + " \ngroup by @@@, " + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", " + aliasedPollList + ")" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
+             + " \norder by @@@, " + "coalesce(" + aliasedPollList + ")" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')";
 
          diffQuery = query(diffQuery, true);
 

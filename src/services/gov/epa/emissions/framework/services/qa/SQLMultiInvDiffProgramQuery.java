@@ -103,7 +103,7 @@ public class SQLMultiInvDiffProgramQuery {
              invTableDatasetName  = tokenizer3.nextToken().trim();
              if (invTableDatasetName.length() > 0) hasInvTableDataset = true;
          }
-         String diffQuery = "select @@!, t.base_ann_emis, t.compare_ann_emis, (t.compare_ann_emis-t.base_ann_emis) as diff_ann_emis, " 
+         String diffQuery = "select @@!, t.poll, t.base_ann_emis, t.compare_ann_emis, (t.compare_ann_emis-t.base_ann_emis) as diff_ann_emis, " 
              + " \nabs(t.compare_ann_emis-t.base_ann_emis) as abs_diff_ann, "
              + " \ncase when t.base_ann_emis >0  then (abs(t.compare_ann_emis-t.base_ann_emis)/t.base_ann_emis) "
              + " \nelse null "
@@ -115,7 +115,7 @@ public class SQLMultiInvDiffProgramQuery {
              + " \nend as percent_diff_avd "
              
              + "\n from (select @!@, " 
-             + " \ncoalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", b.poll, c.poll) as poll,"
+             + " \ncoalesce(b.poll, c.poll) as poll,"
              + " \ncoalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION') as poll_desc, "
              + " \nsum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * b.ann_emis" : "null") + ", b.ann_emis)) as base_ann_emis," 
              + " \nsum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * c.ann_emis" : "null") + ", c.ann_emis)) as compare_ann_emis,"
@@ -127,8 +127,8 @@ public class SQLMultiInvDiffProgramQuery {
              + " \nfull outer join (#compare) as c "
              + " \non !!! and b.poll = c.poll"
              + (hasInvTableDataset ? "\nleft outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i \non coalesce(b.poll, c.poll) = i.cas " : "\nleft outer join reference.pollutant_codes p \non coalesce(b.poll, c.poll) = p.pollutant_code ") 
-             + " \ngroup by @@@, " + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", b.poll, c.poll)" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
-             + " \norder by @@@, " + "coalesce(" + (hasInvTableDataset ? "i.name" : "null") + ", b.poll, c.poll)" + "," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')) as t";
+             + " \ngroup by @@@, " + "coalesce(b.poll, c.poll)," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
+             + " \norder by @@@, " + "coalesce(b.poll, c.poll)," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')) as t";
 
          diffQuery = query(diffQuery, true);
 

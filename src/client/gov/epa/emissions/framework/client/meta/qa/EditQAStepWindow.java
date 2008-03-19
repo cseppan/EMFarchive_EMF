@@ -825,7 +825,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     public void updateInventories(Object[] retreivedInventories, Object[] retrievedInvTable,
-            String retrievedSummaryType) {
+            String summaryType) {
         clear();
         String datasetNames = "";
         datasetNames += getInvString(invTag, retreivedInventories);
