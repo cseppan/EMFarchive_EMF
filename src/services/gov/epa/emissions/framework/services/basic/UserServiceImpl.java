@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
         try {
             User user = getUser(username);
             
-            LOG.warn("User " + user.getUsername() + " (" + user.getName() + ") tried to login to the EMF service. " + new Date());
+            LOG.warn("User " + user.getUsername() + " (" + user.getName() + ") tried to login to the EMF service.");
             
             if (user == null)
                 throw new AuthenticationException("User " + username + " does not exist");
@@ -189,7 +189,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public void logExitMessage(User user) {
-        LOG.warn("User " + user.getUsername() + " (" + user.getName() + ") logged out of the EMF service. " + new Date());
+        LOG.warn("User " + user.getUsername() + " (" + user.getName() + ") logged out of the EMF service.");
         
         try {
             User existed = getUser(user.getUsername());
