@@ -93,6 +93,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private User user;
 
     private TextField config;
+    
+    private TextField name; 
 
     private QAPrograms qaPrograms;
 
@@ -363,8 +365,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-
-        layoutGenerator.addLabelWidgetPair("Name:", new Label(step.getName()), panel);
+        
+        name = new TextField("name", step.getName(), 40);
+        addChangeable(name);
+        layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         program = new EditableComboBox(qaPrograms.names());
         program.setPreferredSize(new Dimension(250, 20));
@@ -979,7 +983,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         if (order.getText().equals("")) {
             throw new EmfException("Order should be a floating point number");
         }
-
+        step.setName(name.getText().trim());
         step.setProgram(qaPrograms.get(program.getSelectedItem()));
         step.setProgramArguments(programArguments.getText());
         step.setOrder(Float.parseFloat(order.getText()));
