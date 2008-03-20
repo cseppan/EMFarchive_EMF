@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy;
 
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.io.csv.CSVFileReader;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.swing.JTabbedPane;
 
@@ -46,11 +48,15 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
     }
 
     public void display(String[] fileNames) {
-        setLayout(fileNames);
-        super.display();
+        try {
+            setLayout(fileNames);
+            super.display();
+        } catch (Exception e) {
+            System.out.println("Error displaying analysis engine.");
+        }
     }
 
-    private void setLayout(String[] fileNames) {
+    private void setLayout(String[] fileNames) throws Exception {
         mainTabbedPane = new JTabbedPane();
         String[] tabNames = createTabNames(1, 40, fileNames);
         importFiles(fileNames, tabNames, FileImportGUI.GENERIC_FILE, ",");
@@ -58,7 +64,6 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
         contentPane.setLayout(new BorderLayout());
         contentPane.add(mainTabbedPane);
         pack();
-
     }
 
     private String[] createTabNames(int startIndex, int endIndex, String[] fileNames) {
@@ -98,7 +103,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
         return tabNames;
     }// createTabNames()
 
-    private void importFiles(String[] fileNames, String[] tabNames, String fileType, String delimiter) {
+    private void importFiles(String[] fileNames, String[] tabNames, String fileType, String delimiter) throws Exception {
         boolean allSuccessful = true; // a flag to check whether all the file imported sucessfuly
         ArrayList<String> importFileStatus = new ArrayList<String>();
         ArrayList<String> warningWindow = new ArrayList<String>();
@@ -120,6 +125,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
                     importFileStatus.add("FAILURE: " + fileNames[i] + ":\n" + e.getMessage());
                     importFileStatus.add(get50Lines(fileNames[i]));
                 }
+                throw e;
             }// catch
         }
         importStatus(allSuccessful, importFileStatus, warningWindow);
@@ -128,37 +134,66 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
     private SpecialTableModel createSpecialTableModel(String file, String delimiter, ArrayList<String> warningWindow)
             throws Exception {
         CSVFileReader reader = null;
+        File csvFile = new File(file);
+
+        if (csvFile.length() > 200000000)
+            throw new EmfException("File is too big to open (> 200MB).");
 
         if (delimiter.equals(","))
-            reader = new CSVFileReader(new File(file));
+            reader = new CSVFileReader(csvFile);
         else
-            throw new EmfException("File " + file + " is not csv format. Sorry, I cannot read it.");
-
-        ArrayList<ArrayList<String[]>> tableData = new ArrayList<ArrayList<String[]>>();
-
-        Record record = reader.read();
-
-        while (!record.isEnd()) {
-            ArrayList<String[]> rowData = new ArrayList<String[]>();
-            rowData.add(record.getTokens());
-            tableData.add(rowData);
-            record = reader.read();
-        }
+            throw new EmfException("File " + csvFile + " is not csv format. Sorry, I cannot read it.");
 
         String[] rowHeader = new String[0];
         String fileHeader = (reader.getHeader() == null) ? "" : reader.getHeader().get(0).toString();
         String[][] colHeader = new String[1][];
         colHeader[0] = reader.getCols();
 
-        Class[] colClasses = getColumnClass(reader.comments(), reader.getCols().length);
+        Class<?>[] colClasses = getColumnClass(reader.comments(), reader.getCols().length);
+
+        ArrayList<ArrayList<?>> tableData = getTableData(reader, colClasses);
 
         return new SpecialTableModel(fileHeader, rowHeader, colHeader, tableData, "", colClasses);
     }
 
-    private Class[] getColumnClass(List comments, int numOfCols) throws EmfException {
-        List<Class> colClasses = new ArrayList<Class>();
+    private ArrayList<ArrayList<?>> getTableData(CSVFileReader reader, Class<?>[] colClasses) throws Exception {
+        ArrayList<ArrayList<?>> tableData = new ArrayList<ArrayList<?>>();
+        int numOfCols = colClasses.length;
 
-        String[] colTypes = null;
+        Record record = reader.read();
+
+        while (!record.isEnd()) {
+            String[] tokens = record.getTokens();
+            int numOfTokens = tokens.length;
+            ArrayList rowData = new ArrayList();
+
+            for (int j = 0; j < numOfCols; j++) {
+                if (j > numOfTokens - 1)
+                    rowData.add(null);
+                else if (colClasses[j].equals(String.class))
+                    rowData.add(tokens[j]);
+                else if (colClasses[j].equals(Double.class))
+                    rowData.add(new Double(tokens[j]));
+                else if (colClasses[j].equals(Boolean.class))
+                    rowData.add(new Boolean(tokens[j]));
+                else if (colClasses[j].equals(Date.class))
+                    rowData.add(CustomDateFormat.parse_YYYY_MM_DD_HH_MM(tokens[j]));
+                else if (colClasses[j].equals(Integer.class))
+                    rowData.add(new Integer(tokens[j]));
+                else
+                    rowData.add(tokens[j]);
+            }
+
+            tableData.add(rowData);
+            record = reader.read();
+        }
+
+        return tableData;
+    }
+
+    private Class<?>[] getColumnClass(List<String> comments, int numOfCols) throws EmfException {
+        List<Class<?>> colClasses = new ArrayList<Class<?>>();
+        List<String> colTypes = new ArrayList<String>();
 
         for (Iterator<String> iter = comments.iterator(); iter.hasNext();) {
             String line = iter.next().toUpperCase();
@@ -170,25 +205,33 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
                     throw new EmfException(
                             "Column types line format is not correct. The correct format is: #TYPES=[type_1] [type_2] ... [type_n]");
 
-                colTypes = line.substring(++index).split("[\\S]+");
+                StringTokenizer st = new StringTokenizer(line.substring(++index), "|");
+
+                while (st.hasMoreTokens())
+                    colTypes.add(st.nextToken());
+
                 break;
             }
         }
-        
-        if (colTypes == null) {
+
+        if (colTypes.size() == 0) {
             for (int i = 0; i < numOfCols; i++)
                 colClasses.add(String.class);
-        } else if (colTypes.length != numOfCols)
+        } else if (colTypes.size() != numOfCols)
             throw new EmfException("Number of column types don't match number of columns.");
 
-        for (String type : colTypes) {
-            if (type.toUpperCase().startsWith("CHAR"))
+        for (Iterator<String> iter = colTypes.iterator(); iter.hasNext();) {
+            String type = iter.next().trim();
+
+            if (type.toUpperCase().startsWith("VARCHAR"))
                 colClasses.add(String.class);
             else if (type.toUpperCase().startsWith("TEXT"))
                 colClasses.add(String.class);
             else if (type.toUpperCase().startsWith("INT"))
                 colClasses.add(Integer.class);
             else if (type.toUpperCase().startsWith("REAL"))
+                colClasses.add(Double.class);
+            else if (type.toUpperCase().startsWith("FLOAT"))
                 colClasses.add(Double.class);
             else if (type.toUpperCase().startsWith("BOOL"))
                 colClasses.add(Boolean.class);
@@ -197,7 +240,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
             else
                 colClasses.add(String.class);
         }
-        
+
         return colClasses.toArray(new Class[0]);
     }
 

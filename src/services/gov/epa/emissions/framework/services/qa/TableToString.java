@@ -66,7 +66,7 @@ public class TableToString {
         String colNames = ""; 
         
         for (int i = 1; i <= columnCount; i++) {
-            colTypes += md.getColumnTypeName(i) + (i < columnCount ? " " : "");
+            colTypes += md.getColumnTypeName(i) + "(" + md.getPrecision(i) + ")" + (i < columnCount ? "|" : "");
             colNames += (i > 1 ? delimiter : "") + md.getColumnName(i).toLowerCase();
         }
         
