@@ -328,7 +328,7 @@ public class CaseJobTaskManager implements TaskManager {
 
             // update the run status in the Case_CaseJobs
             int jid = cjt.getJobId();
-            
+
             if (DebugLevels.DEBUG_9) {
                 System.out.println("Before getJobId jid= " + jid);
                 System.out.println("after getJobId is the CJT null? " + (cjt == null));
@@ -838,8 +838,9 @@ public class CaseJobTaskManager implements TaskManager {
         }// loop over all waiting tasks
 
         // NOTE: can't remove these tasks while iterating through them
-        for (Iterator<String> iterator = tasks2Remove.iterator(); iterator.hasNext();) {
-            waitTable.remove(iterator.next());
+        synchronized (waitTable) {
+            for (Iterator<String> iterator = tasks2Remove.iterator(); iterator.hasNext();)
+                waitTable.remove(iterator.next());
         }
 
     }// testAndSetWaitingTasksDependencies
