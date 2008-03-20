@@ -1576,7 +1576,7 @@ public class ManagedCaseService {
                 Case jobCase = this.getCase(caseId, session);
                 cjt.setCaseName(jobCase.getName());
 
-                String purpose = "Used by " + caseJob.getName() + " of Case " + jobCase.getName();
+                String purpose = "Used by job: " + caseJob.getName() + " of Case: " + jobCase.getName();
                 if (DebugLevels.DEBUG_6)
                     System.out.println("Purpose= " + purpose);
 

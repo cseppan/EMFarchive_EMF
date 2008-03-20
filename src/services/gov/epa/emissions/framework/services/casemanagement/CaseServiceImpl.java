@@ -389,7 +389,7 @@ public class CaseServiceImpl implements CaseService {
         // if (DebugLevels.DEBUG_0) System.out.println("Number of inputs for this job: " + inputs.size());
         // FIXME: Need to flesh this string out
         // purpose = "Used by CaseName and JobName"
-        String purpose = "Used by " + job.getName() + " of Case " + jobCase.getName();
+        String purpose = "Used by job: " + job.getName() + " of Case: " + jobCase.getName();
 
         if (DebugLevels.DEBUG_6)
             System.out.println("User: " + user.getName());
