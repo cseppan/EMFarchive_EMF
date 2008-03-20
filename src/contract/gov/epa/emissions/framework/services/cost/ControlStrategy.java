@@ -70,7 +70,7 @@ public class ControlStrategy implements Lockable, Serializable {
     
     private String exportDirectory;
     
-    private Boolean deleteResults;
+    private Boolean deleteResults = false;
     
     public ControlStrategy() {
         this.lock = new Mutex();
