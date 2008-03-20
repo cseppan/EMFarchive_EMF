@@ -41,8 +41,8 @@ public class LogsTableData extends AbstractTableData {
         for (int i = 0; i < logs.length; i++) {
             AccessLog log = logs[i];
             Object[] values = { log.getUsername(), log.getVersion(), 
-                    CustomDateFormat.format_MM_DD_YYYY_HH_mm(log.getTimestamp()),
-                    CustomDateFormat.format_MM_DD_YYYY_HH_mm(log.getEnddate()), 
+                    CustomDateFormat.format_YYYY_MM_DD_HH_MM(log.getTimestamp()),
+                    CustomDateFormat.format_YYYY_MM_DD_HH_MM(log.getEnddate()), 
                     log.getLinesExported() + "", log.getTimereqrd() + "", 
                     log.getDescription(), log.getFolderPath() };
 
