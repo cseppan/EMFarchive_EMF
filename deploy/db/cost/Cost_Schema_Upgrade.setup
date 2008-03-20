@@ -496,4 +496,7 @@ ALTER TABLE emf.control_strategies ADD COLUMN delete_results boolean DEFAULT tru
 
 ALTER TABLE emf.control_strategy_constraints ADD COLUMN domain_wide_emis_reduction double precision;
 ALTER TABLE emf.control_strategy_constraints ADD COLUMN domain_wide_pct_reduction double precision;
-  
+
+-- implementing least cost strategy
+insert into emf.strategy_types values(DEFAULT,'Least Cost','Least Cost', '', 'gov.epa.emissions.framework.services.cost.analysis.leastcost.StrategyTask');
+insert into emf.strategy_result_types (name) select 'Least Cost Control Measure Worksheet';
