@@ -98,6 +98,9 @@ public class ExportTask extends Task {
         try {
             setStartStatus();
             accesslog.setTimestamp(new Date());
+            long exportedLineCount = 0;
+            accesslog.setFolderPath(file.getAbsolutePath());
+            
             if (file.exists()) {
                 setStatus("completed", "FILE EXISTS: Completed export of " + dataset.getName() + " to "
                         + file.getAbsolutePath() + " in " + accesslog.getTimereqrd() + " seconds.");
@@ -108,9 +111,8 @@ public class ExportTask extends Task {
                         .getSqlDataTypes(), batchSize(session));
                 Exporter exporter = exporterFactory.create(dataset, version);
                 exporter.export(file);
-                accesslog.setEnddate(new Date());
-                accesslog.setLinesExported(exporter.getExportedLinesCount());
                 
+                exportedLineCount = exporter.getExportedLinesCount();
                 if (DebugLevels.DEBUG_1)
                     printLogInfo(accesslog);
 
@@ -127,9 +129,12 @@ public class ExportTask extends Task {
                 } else
                     setStatus("completed", msghead + " to " + file.getAbsolutePath() + msgend);
 
-                loggingService.setAccessLog(accesslog);
             }
 
+            accesslog.setEnddate(new Date());
+            accesslog.setLinesExported(exportedLineCount);
+            loggingService.setAccessLog(accesslog);
+            
             if (DebugLevels.DEBUG_4)
                 System.out.println("#### Task #" + taskId
                         + " has completed processing making the callback to ExportTaskManager THREAD ID: "
