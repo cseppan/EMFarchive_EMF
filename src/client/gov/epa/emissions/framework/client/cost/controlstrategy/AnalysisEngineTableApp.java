@@ -173,7 +173,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
                 else if (colClasses[j].equals(String.class))
                     rowData.add(tokens[j]);
                 else if (colClasses[j].equals(Double.class))
-                    rowData.add(new Double(tokens[j]));
+                    rowData.add(tokens[j].trim().length() != 0 ? new Double(tokens[j]) : Double.NaN);
                 else if (colClasses[j].equals(Boolean.class))
                     rowData.add(new Boolean(tokens[j]));
                 else if (colClasses[j].equals(Date.class))
