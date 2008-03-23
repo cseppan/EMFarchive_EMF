@@ -108,6 +108,8 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         tableModel = new EmfTableModel(tableData);
 
         ScrollableTable table = new ScrollableTable(tableModel, null);
+        
+        // set maximum column width
         String[] columns = {"Select", "Version", "Base", "Is Final?"}; //table.setColWidthsBasedOnColNames();
         table.setMaxColWidth(columns);
         table.disableScrolling();

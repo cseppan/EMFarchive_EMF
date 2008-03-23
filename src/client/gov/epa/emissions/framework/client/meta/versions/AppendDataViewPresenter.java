@@ -5,6 +5,8 @@ import java.util.List;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.data.viewer.DataView;
+import gov.epa.emissions.framework.client.data.viewer.DataViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
@@ -17,7 +19,8 @@ public class AppendDataViewPresenter {
     private AppendDataWindowView view;
 
     public AppendDataViewPresenter(EmfDataset dataset, AppendDataWindowView view, EmfSession session) {
-        this.dataset = dataset;
+        //super(dataset, session);
+        this.dataset=dataset;
         this.session = session;
         this.view = view;
     }
@@ -36,6 +39,10 @@ public class AppendDataViewPresenter {
         return session.dataEditorService().getVersions(dsId);
     }
     
+    public EmfDataset getDataset(int datasetId) throws EmfException{
+        return session.dataService().getDataset(datasetId);
+    }
+    
     public Version[] getTargetDatasetNonFinalVersions() throws EmfException {
         List<Version> nonFinalVersions = new ArrayList<Version>();
         
@@ -46,6 +53,15 @@ public class AppendDataViewPresenter {
                 nonFinalVersions.add(version);
         
         return nonFinalVersions.toArray(new Version[0]);
+    }
+    
+    public void doView(Version version, String table, DataView view) throws EmfException {
+        if (!version.isFinalVersion())
+            throw new EmfException("Cannot view a Version that is not Final. Please choose edit for Version "+
+                    version.getName());
+
+        DataViewPresenter presenter = new DataViewPresenter(dataset, version, table, view, session);
+        presenter.display();
     }
     
     public EmfDataset getDataset() {

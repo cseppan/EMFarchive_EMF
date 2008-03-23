@@ -130,7 +130,7 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
             public void actionPerformed(ActionEvent arg0) {
                 clear();
 
-                AppendDataWindow dialog = new AppendDataWindow(parentConsole, desktopManager);
+                AppendDataWindowView dialog = new AppendDataWindow(parentConsole, desktopManager);
                 AppendDataViewPresenter appendDataPresenter = new AppendDataViewPresenter(dataset, dialog,
                         presenter.getSession());
                 appendDataPresenter.displayView();
