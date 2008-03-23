@@ -134,18 +134,26 @@ public class SQLMultiInvDiffProgramQuery {
 
         //build inner sql statement with the datasets specified, make sure and unionize (append) the tables together
          String innerSQLBase = "";
+         if (baseDatasetNames.size() > 1) 
+             innerSQLBase = "select @@!, poll, sum(ann_emis) as ann_emis, sum(avd_emis) as avd_emis from (";
          for (int j = 0; j < baseDatasetNames.size(); j++) {
              innerSQLBase += (j > 0 ? " \nunion all " : "") + createDatasetQuery(baseDatasetNames.get(j).toString().trim());
          }
+         if (baseDatasetNames.size() > 1) 
+             innerSQLBase += ") t group by @@!, poll";
 
          //replace #base symbol with the unionized fire datasets query
          diffQuery = diffQuery.replaceAll("#base", innerSQLBase);
 
-         String innerSQLCompare = "";
+        String innerSQLCompare = "";
+        if (compareDatasetNames.size() > 1) 
+            innerSQLCompare = "select @@!, poll, sum(ann_emis) as ann_emis, sum(avd_emis) as avd_emis from (";
        for (int j = 0; j < compareDatasetNames.size(); j++) {
            //System.out.println("compare dataset : " +j +"  " + compareDatasetNames.get(j));
            innerSQLCompare += (j > 0 ? " \nunion all " : "") + createDatasetQuery(compareDatasetNames.get(j).toString().trim());
        }
+       if (compareDatasetNames.size() > 1) 
+           innerSQLCompare += ") t group by @@!, poll";
 
        //replace #compare symbol with the unionized fire datasets query
        diffQuery = diffQuery.replaceAll("#compare", innerSQLCompare);
@@ -217,7 +225,7 @@ public class SQLMultiInvDiffProgramQuery {
          else if (summaryTypeToken.equals("County+SCC")) 
              sql = "fips, scc";
          diffQuery = diffQuery.replaceAll("!!@", sql);
-
+System.out.println(diffQuery);
         //return the built query
         return diffQuery;
     }
