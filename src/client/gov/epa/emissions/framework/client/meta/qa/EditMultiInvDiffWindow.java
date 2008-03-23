@@ -210,7 +210,7 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
             }
             DatasetType[] datasetTypes = datasetTypeList.toArray(new DatasetType[0]);
             InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, this);
-            InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypeList.toArray(new DatasetType[0]));
+            InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypes);
             if (datasetTypes.length == 1)
                 presenter.display(datasetTypes[0]);
             else
