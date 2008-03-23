@@ -181,11 +181,15 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     private Action okAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                // get selected datasets
-                List<EmfDataset> list = new ArrayList<EmfDataset>(datasetList.getSelectedValues().length);
-                for (int i = 0; i < datasetList.getSelectedValues().length; i++)
-                    list.add((EmfDataset) datasetList.getSelectedValues()[i]);
-                datasets = list.toArray(new EmfDataset[0]);
+                if (datasetList.getSelectedValues() == null || datasetList.getSelectedValues().length == 0) 
+                    datasets = new EmfDataset[]{}; 
+                else {
+                    // get selected datasets
+                    List<EmfDataset> list = new ArrayList<EmfDataset>(datasetList.getSelectedValues().length);
+                    for (int i = 0; i < datasetList.getSelectedValues().length; i++)
+                        list.add((EmfDataset) datasetList.getSelectedValues()[i]);
+                    datasets = list.toArray(new EmfDataset[0]);
+                }
                 setVisible(false);
                 dispose();
             }
