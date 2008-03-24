@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
@@ -11,6 +12,7 @@ import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.qa.TableToString;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -359,7 +361,7 @@ public class DataServiceImpl implements DataService {
     }
 
     public synchronized void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid,
-            int targetDSVersion, int targetStartLineNumber) throws EmfException {
+            int targetDSVersion, int targetStartLineNumber, int targetEndLineNumber) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         Session session = sessionFactory.getSession();
 
@@ -367,70 +369,128 @@ public class DataServiceImpl implements DataService {
             Datasource datasource = dbServer.getEmissionsDatasource();
             Version srcVersion = dao.getVersion(session, srcDSid, srcDSVersion);
             EmfDataset srcDS = dao.getDataset(session, srcDSid);
-            String srcTable = datasource.getName() + "." + srcDS.getInternalSources()[0].getTable();
+            InternalSource[] srcSources = srcDS.getInternalSources();
             EmfDataset targetDS = dao.getDataset(session, targetDSid);
-            String targetTable = datasource.getName() + "." + targetDS.getInternalSources()[0].getTable();
+            InternalSource[] targetSources = targetDS.getInternalSources();
 
-            VersionedDatasetQuery dsQuery = new VersionedDatasetQuery(srcVersion, srcDS);
-            String query = "INSERT INTO " + targetTable + " (" + dsQuery.generateFilteringQuery(srcTable, filter) + ")";
+            DataModifier dataModifier = datasource.dataModifier();
+            
+            if (srcDS.getDatasetTypeName().contains("Line-based"))
+                throw new EmfException("Line based data appending is not supported yet.");
 
-            System.out.println("source query: " + query); // NOTE: to be deleted
+            if (srcSources.length != targetSources.length)
+                throw new EmfException("Source dataset set has different number of tables from target dataset.");
 
-            try {
-                DataModifier dataModifier = datasource.dataModifier();
+            for (int i = 0; i < targetSources.length; i++) {
+                String srcTable = datasource.getName() + "." + srcSources[i].getTable();
+                String targetTable = datasource.getName() + "." + targetSources[i].getTable();
 
-                String[] srcColumns = null;
-                try {
-                    srcColumns = getTableColumns(dataModifier, srcTable, filter);
-                } catch (SQLException e) {
-                    System.out.println("Filter clause \"" + filter + "\" is not quite right." + e.getMessage());
-                    throw e;
-                }
-
-                String[] targetColumns = null;
-                try {
-                    targetColumns = getTableColumns(dataModifier, targetTable, "");
-                } catch (SQLException e) {
-                    System.out.println("Error getting target dataset table columns." + e.getMessage());
-                }
-                
-                if (srcColumns != targetColumns)
-                    throw new EmfException("Cannot append data - source and target datasets have different table definitions.");
-                    
-                dataModifier.execute(query);
-            } catch (SQLException e) {
-                throw new SQLException("Error in executing append data query: \n" + query + ".\n" + e.getMessage());
+                appendData2SingleTable(filter, srcVersion, srcDS, srcTable, targetTable, targetDSid, targetDSVersion,
+                        dataModifier);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             LOG.error("Could not query table : ", e);
-            throw new EmfException("Could not query table :");
+            throw new EmfException("Could not query table: " + e.getMessage());
         } finally {
             closeDB(dbServer);
             session.close();
         }
     }
 
-    private String[] getTableColumns(DataModifier mod, String table, String filter) throws SQLException {
-        ResultSet rs = null;
+    private void appendData2SingleTable(String filter, Version srcVersion, EmfDataset srcDS, String srcTable,
+            String targetTable, int targetDSid, int targetDSVersion, DataModifier dataModifier) throws Exception {
+        String[] srcColumns = null;
+        srcColumns = getTableColumns(dataModifier, srcTable, filter);
+
+        String[] targetColumns = null;
+        targetColumns = getTableColumns(dataModifier, targetTable, "");
+
+        if (!areColumnsMatched(srcColumns, targetColumns))
+            throw new EmfException("Cannot append data - source and target datasets have different table definitions.");
+
+        VersionedDatasetQuery dsQuery = new VersionedDatasetQuery(srcVersion, srcDS);
+        String query = "INSERT INTO "
+                + targetTable
+                + " ("
+                + getTargetColString(targetColumns)
+                + ") ("
+                + dsQuery.generateFilteringQuery(getSrcColString(targetDSid, targetDSVersion, srcColumns), srcTable,
+                        filter) + ")";
+
+        if (DebugLevels.DEBUG_17) {
+            LOG.warn("Append data query: " + query);
+            LOG.warn("Query starts at: " + new Date());
+        }
+
+        dataModifier.execute(query);
+
+        if (DebugLevels.DEBUG_17)
+            LOG.warn("Query ends at: " + new Date());
+    }
+
+    private String[] getTableColumns(DataModifier mod, String table, String filter) throws Exception {
+        ResultSetMetaData md = null;
         String query = null;
-        
-        if (filter != null || !filter.isEmpty())
-            query = "SELECT * FROM " + table + " WHERE (" + filter + ") LIMIT 0";
-        else
+
+        if (filter == null || filter.isEmpty())
             query = "SELECT * FROM " + table + " LIMIT 0";
+        else
+            query = "SELECT * FROM " + table + " WHERE (" + filter + ") LIMIT 0";
 
         try {
-            rs = mod.executeQuery(query);
+            md = mod.getMetaData(query);
         } catch (SQLException e) {
-            throw e;
+            if (filter.isEmpty())
+                throw e;
+
+            throw new Exception("Filter format is incorrect: " + filter);
         }
 
         List<String> cols = new ArrayList<String>();
-        ResultSetMetaData md = rs.getMetaData();
-        for (int i = 1; i <= md.getColumnCount(); i++)
+        int colCount = md.getColumnCount();
+
+        for (int i = 1; i <= colCount; i++)
             cols.add(md.getColumnName(i));
 
         return cols.toArray(new String[0]);
+    }
+
+    private boolean areColumnsMatched(String[] srcColumns, String[] targetColumns) {
+        if (srcColumns.length != targetColumns.length)
+            return false;
+
+        for (int i = 0; i < srcColumns.length; i++)
+            if (!srcColumns[i].equalsIgnoreCase(targetColumns[i]))
+                return false;
+
+        // NOTE: better if column types are also compared.
+
+        return true;
+    }
+
+    private String getSrcColString(int targetDSid, int targetDSVersion, String[] cols) {
+        // NOTE: assume first 4 columns are record_id, dataset_id, version, delete_versions
+        // which is common for dataset tables. Omit the first column.
+        String colString = targetDSid + ", " + targetDSVersion;
+        int numOfCols = cols.length;
+
+        for (int i = 3; i < numOfCols; i++)
+            colString += ", " + cols[i];
+
+        return colString;
+    }
+
+    private String getTargetColString(String[] cols) {
+        // NOTE: assume first 4 columns are record_id, dataset_id, version, delete_versions
+        // which is common for dataset tables. Omit the first column.
+        String colString = cols[1];
+        int numOfCols = cols.length;
+
+        for (int i = 2; i < numOfCols; i++)
+            colString += ", " + cols[i];
+
+        return colString;
     }
 
 }

@@ -30,9 +30,8 @@ public class AppendDataViewPresenter {
         view.display();
     }
     
-    public void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion) throws EmfException {
-        //session.dataService().appendData(srcDSid, srcDSVersion, filter, targetDSid, targetDSVersion, 0);
-        throw new EmfException("Under construction...");
+    public void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion, int startLineNum, int endLineNum) throws EmfException {
+        session.dataService().appendData(srcDSid, srcDSVersion, filter, targetDSid, targetDSVersion, startLineNum, endLineNum);
     }
     
     public Version[] getVersions(int dsId) throws EmfException {
