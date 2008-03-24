@@ -127,7 +127,8 @@ public class EditQAStepPresenter {
     }
 
     private String tempQAStepFilePath(String exportDir, QAStepResult qaStepResult) throws EmfException {
-        String separator = exportDir.length() > 0 ? (exportDir.charAt(0) == '/') ? "/" : "\\" : "\\";
+        String separator = File.separator;
+        // FIXME: this is supposed to come from the local.temp.dir set in the EMFPrefs.txt file instead!
         String tempDir = System.getProperty("IMPORT_EXPORT_TEMP_DIR");
 
         if (tempDir == null || tempDir.isEmpty())
