@@ -729,13 +729,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
         if (!(programSwitches.trim().equals("")) 
                 && baseIndex != -1 && compareIndex != -1
-                && invTableIndex != -1 ) {
+                && invTableIndex != -1 && sumTypeIndex != -1  ) {
             try {
                 getBaseInventories(programSwitches, 0, compareIndex);
                 getCompareInventories(programSwitches, compareIndex, invTableIndex);
                 getInventoryTable(programSwitches, invTableIndex, sumTypeIndex);
-                if (sumTypeIndex != -1)
-                    getSummaryType(programSwitches, sumTypeIndex);
+                getSummaryType(programSwitches, sumTypeIndex);
             } catch (EmfException e) {
                 messagePanel.setError(e.getMessage());
             }finally {
@@ -769,12 +768,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         int invIndex = programSwitches.indexOf(invTag);
         int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
         if (!(programSwitches.trim().equals("")) 
-                && invIndex != -1 && invTableIndex != -1 ) {
+                && invIndex != -1 && invTableIndex != -1 
+                && sumTypeIndex != -1) {
             try {
                 getInventories(programSwitches, 0, invTableIndex);
                 getInventoryTable(programSwitches, invTableIndex, sumTypeIndex);
-                if (sumTypeIndex != -1)
-                    getSummaryType(programSwitches, sumTypeIndex);
+                getSummaryType(programSwitches, sumTypeIndex);
             } catch (EmfException e) {
                 messagePanel.setError(e.getMessage());
             }finally{
