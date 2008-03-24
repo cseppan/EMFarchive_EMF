@@ -56,7 +56,7 @@ public class EditQAStepPresenter {
         QAStep step = view.save();
         session.qaService().updateWitoutCheckingConstraints(new QAStep[] { step });
         tabView.refresh();
-        close();
+        //close();
     }
 
     public void run() throws EmfException {
@@ -66,6 +66,7 @@ public class EditQAStepPresenter {
         step.setWho(session.user().getUsername());
         tabView.refresh();
         session.qaService().runQAStep(step, session.user());
+        //view.resetChanges();
     }
 
     public void export(QAStep qaStep, QAStepResult stepResult, String dirName) throws EmfException {

@@ -882,7 +882,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         runButton.setEnabled(false); // only allow user to run one time at a open window session
 
         presenter.run();
-        resetChanges();
+        //resetChanges();
     }
 
     private void resetRunStatus(QAStepResult result) {
@@ -890,6 +890,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             return;
 
         saveButton.setEnabled(true);
+        runButton.setEnabled(true);
         who.setText(step.getWho());
         date.setText(DATE_FORMATTER.format(step.getDate()));
         status.setSelectedItem(step.getStatus());
@@ -898,6 +899,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         creationDateLabel.setText(CustomDateFormat.format_MM_DD_YYYY_HH_mm(result.getTableCreationDate()));
         currentTable.setSelected(result.isCurrentTable());
         qaStepResult = result;
+        resetChanges();
         super.revalidate();
     }
 
@@ -954,7 +956,11 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             public void actionPerformed(ActionEvent e) {
                 try {
                     clear();
-                    presenter.save();
+                    if (hasChanges()){
+                        presenter.save();
+                        messagePanel.setMessage("QA step is saved successfully. ");
+                        resetChanges();
+                    }
                 } catch (EmfException e1) {
                     messagePanel.setError(e1.getMessage());
                 }
