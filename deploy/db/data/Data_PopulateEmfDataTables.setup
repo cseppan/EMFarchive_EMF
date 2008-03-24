@@ -120,9 +120,10 @@ insert into emf.dataset_types values(DEFAULT,'Control Strategy Least Cost Contro
 --
 -- emf.intended_uses
 insert into emf.intended_uses values (DEFAULT, 'public');
+insert into emf.intended_uses values (DEFAULT, 'public read-only');
+insert into emf.intended_uses values (DEFAULT, 'group read+write');
+insert into emf.intended_uses values (DEFAULT, 'group read-only');
 insert into emf.intended_uses values (DEFAULT, 'private');
-insert into emf.intended_uses values (DEFAULT, 'EIAG');
-insert into emf.intended_uses values (DEFAULT, 'ORD ');
 -- emf.intended_uses
 --
 -- emf.note_types
