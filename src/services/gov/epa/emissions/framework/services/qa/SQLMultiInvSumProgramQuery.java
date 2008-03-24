@@ -93,7 +93,7 @@ public class SQLMultiInvSumProgramQuery {
         //build inner sql statement with the datasets specified, make sure and unionize (append) the tables together
         String innerSQL = "";
         for (int j = 0; j < allDatasetNames.size(); j++) {
-            innerSQL += (j > 0 ? " \nunion all " : "") + createFireDatasetQuery(allDatasetNames.get(j).toString().trim());
+            innerSQL += (j > 0 ? " \nunion all " : "") + createDatasetQuery(allDatasetNames.get(j).toString().trim());
         }
 
         //replace # symbol with the unionized fire datasets query
@@ -148,12 +148,12 @@ public class SQLMultiInvSumProgramQuery {
         return outerQuery;
     }
 
-        private String createFireDatasetQuery(String datasetName) throws EmfException {
+        private String createDatasetQuery(String datasetName) throws EmfException {
 
            String sql = "";
            
-           sql = "\nselect !@!, poll, sum(ann_emis) as ann_emis, sum(avd_emis) as avd_emis  \nfrom $DATASET_TABLE[\"" + 
-               datasetName + "\", 1] m \ngroup by !!!, poll ";
+           sql = "\nselect !@!, trim(poll) as poll, sum(ann_emis) as ann_emis, sum(avd_emis) as avd_emis  \nfrom $DATASET_TABLE[\"" + 
+               datasetName + "\", 1] m \ngroup by !!!, trim(poll) ";
 
            sql = query(sql, false);
 

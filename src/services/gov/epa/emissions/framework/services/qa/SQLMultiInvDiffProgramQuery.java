@@ -117,17 +117,17 @@ public class SQLMultiInvDiffProgramQuery {
              + "\n from (select @!@, " 
              + " \ncoalesce(b.poll, c.poll) as poll,"
              + " \ncoalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION') as poll_desc, "
-             + " \nsum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * b.ann_emis" : "null") + ", b.ann_emis)) as base_ann_emis," 
-             + " \nsum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * c.ann_emis" : "null") + ", c.ann_emis)) as compare_ann_emis,"
+             + " \ncoalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * b.ann_emis" : "null") + ", b.ann_emis) as base_ann_emis," 
+             + " \ncoalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * c.ann_emis" : "null") + ", c.ann_emis) as compare_ann_emis,"
 
-             + " \nsum(coalesce("+ (hasInvTableDataset ? "cast(i.factor as double precision) * b.avd_emis" : "null") + ", b.avd_emis)) as base_avd_emis, " 
-             + " \nsum(coalesce("+ (hasInvTableDataset ? "cast(i.factor as double precision) * c.avd_emis" : "null") + ", c.avd_emis)) as compare_avd_emis "
+             + " \ncoalesce("+ (hasInvTableDataset ? "cast(i.factor as double precision) * b.avd_emis" : "null") + ", b.avd_emis) as base_avd_emis, " 
+             + " \ncoalesce("+ (hasInvTableDataset ? "cast(i.factor as double precision) * c.avd_emis" : "null") + ", c.avd_emis) as compare_avd_emis "
 
              + " \nfrom (#base) as b "
              + " \nfull outer join (#compare) as c "
-             + " \non !!! and b.poll = c.poll"
+             + " \non !!! and b.poll = c.poll "
              + (hasInvTableDataset ? "\nleft outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i \non coalesce(b.poll, c.poll) = i.cas " : "\nleft outer join reference.pollutant_codes p \non coalesce(b.poll, c.poll) = p.pollutant_code ") 
-             + " \ngroup by @@@, " + "coalesce(b.poll, c.poll)," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
+//             + " \ngroup by @@@, " + "coalesce(b.poll, c.poll)," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
              + " \norder by @@@, " + "coalesce(b.poll, c.poll)," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')) as t";
 
          diffQuery = query(diffQuery, true);
@@ -135,25 +135,25 @@ public class SQLMultiInvDiffProgramQuery {
         //build inner sql statement with the datasets specified, make sure and unionize (append) the tables together
          String innerSQLBase = "";
          if (baseDatasetNames.size() > 1) 
-             innerSQLBase = "select @@!, poll, sum(ann_emis) as ann_emis, sum(avd_emis) as avd_emis from (";
+             innerSQLBase = "select @@!, trim(poll) as poll, sum(ann_emis) as ann_emis, sum(avd_emis) as avd_emis from (";
          for (int j = 0; j < baseDatasetNames.size(); j++) {
              innerSQLBase += (j > 0 ? " \nunion all " : "") + createDatasetQuery(baseDatasetNames.get(j).toString().trim());
          }
          if (baseDatasetNames.size() > 1) 
-             innerSQLBase += ") t group by @@!, poll";
+             innerSQLBase += ") t group by @@!, trim(poll)";
 
          //replace #base symbol with the unionized fire datasets query
          diffQuery = diffQuery.replaceAll("#base", innerSQLBase);
 
         String innerSQLCompare = "";
         if (compareDatasetNames.size() > 1) 
-            innerSQLCompare = "select @@!, poll, sum(ann_emis) as ann_emis, sum(avd_emis) as avd_emis from (";
+            innerSQLCompare = "select @@!, trim(poll) as poll, sum(ann_emis) as ann_emis, sum(avd_emis) as avd_emis from (";
        for (int j = 0; j < compareDatasetNames.size(); j++) {
            //System.out.println("compare dataset : " +j +"  " + compareDatasetNames.get(j));
            innerSQLCompare += (j > 0 ? " \nunion all " : "") + createDatasetQuery(compareDatasetNames.get(j).toString().trim());
        }
        if (compareDatasetNames.size() > 1) 
-           innerSQLCompare += ") t group by @@!, poll";
+           innerSQLCompare += ") t group by @@!, trim(poll)";
 
        //replace #compare symbol with the unionized fire datasets query
        diffQuery = diffQuery.replaceAll("#compare", innerSQLCompare);
@@ -225,7 +225,7 @@ public class SQLMultiInvDiffProgramQuery {
          else if (summaryTypeToken.equals("County+SCC")) 
              sql = "fips, scc";
          diffQuery = diffQuery.replaceAll("!!@", sql);
-System.out.println(diffQuery);
+
         //return the built query
         return diffQuery;
     }

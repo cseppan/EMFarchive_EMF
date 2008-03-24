@@ -195,8 +195,8 @@ public class SQLNInvDiffProgramQuery {
     private String createDatasetQuery(String datasetName) throws EmfException {
 
         String sql = "";
-        sql = "\nselect !@!, poll, sum(ann_emis) as ann_emis, sum(avd_emis) as avd_emis  \nfrom $DATASET_TABLE[\"" + 
-        datasetName + "\", 1] m  \ngroup by !!@, poll ";
+        sql = "\nselect !@!, trim(poll) as poll, sum(ann_emis) as ann_emis, sum(avd_emis) as avd_emis  \nfrom $DATASET_TABLE[\"" + 
+        datasetName + "\", 1] m  \ngroup by !!@, trim(poll) ";
 
         sql = query(sql, false);
 
