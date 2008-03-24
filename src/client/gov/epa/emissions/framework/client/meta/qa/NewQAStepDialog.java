@@ -46,7 +46,7 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
 
     public NewQAStepDialog(EmfConsole parent, Version[] versions) {
         super("Add QA Steps", parent);
-        super.setSize(new Dimension(550, 350));
+        super.setSize(new Dimension(550, 500));
         super.center();
 
         this.versionsSet = new VersionsSet(versions);
@@ -101,7 +101,7 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
 
     // Modified Dimension to make width fit the Dialog window
     private JScrollPane createScrollPane(Component component) {
-        return new ScrollableComponent(component, new Dimension(450, 100));
+        return new ScrollableComponent(component, new Dimension(450, 200));
     }
 
     private JList optional(QAStepTemplates templates) {
