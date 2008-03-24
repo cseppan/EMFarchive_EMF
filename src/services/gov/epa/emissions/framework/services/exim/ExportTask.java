@@ -116,7 +116,7 @@ public class ExportTask extends Task {
                 if (DebugLevels.DEBUG_1)
                     printLogInfo(accesslog);
 
-                if (!compareDatasetRecordsNumbers(accesslog, session, dbServer))
+                if (!compareDatasetRecordsNumbers(exportedLineCount, session, dbServer))
                     return;
                 // updateDataset(dataset); //Disabled because of nothing updated during exporting
 
@@ -174,7 +174,7 @@ public class ExportTask extends Task {
         // setStatus(info);
     }
 
-    private boolean compareDatasetRecordsNumbers(AccessLog log, Session session, DbServer dbServer) throws Exception {
+    private boolean compareDatasetRecordsNumbers(long linesExported, Session session, DbServer dbServer) throws Exception {
         String type = dataset.getDatasetType().getName();
         // COSTCY & A/M/PTPRO types temporarily disabled
         if (type.equalsIgnoreCase("Country, state, and county names and data (COSTCY)")
@@ -190,9 +190,9 @@ public class ExportTask extends Task {
             e.printStackTrace();
         }
 
-        if (records != log.getLinesExported()) {
+        if (records != linesExported) {
             setErrorStatus(null, "No. of records in database: " + records + ", but" + " exported "
-                    + log.getLinesExported() + " lines");
+                    + linesExported + " lines");
             return false;
         }
 
