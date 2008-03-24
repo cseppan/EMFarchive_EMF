@@ -691,7 +691,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         Button export = new Button("Set", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clear();
-
+                saveButton.setEnabled(true);
+                runButton.setEnabled(true);
                 if (avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
                         || fireDataSummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
                         || MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString())
