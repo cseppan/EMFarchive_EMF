@@ -133,7 +133,7 @@ public class AddRemoveDatasetWidget extends JPanel {
             // FIXME: really, we don't want to contact the server to get the dataset types - could be slow
             DatasetType[] allDatasetTypes = session.dataCommonsService().getDatasetTypes();
             
-            if (program.equalsIgnoreCase("Fire Data Summary (Day-specific)")){
+            if (program.toLowerCase().startsWith("fire data summary")){
                 for (int i = 0; i < allDatasetTypes.length; i++) {
                     //only get dataset "Fire Data Summary (Day-specific)"
                     if (allDatasetTypes[i].getName().startsWith("ORL Day-Specific Fires"))
