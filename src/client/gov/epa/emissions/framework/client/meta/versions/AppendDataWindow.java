@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPresenter;
+import gov.epa.emissions.framework.client.data.viewer.DataViewer;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -46,7 +47,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
 
     private JPanel layout;
 
-    private EmfDataset sourceDataset;
+    private EmfDataset sourceDataset=null;
 
     private ComboBox sourceVersionBox;
 
@@ -145,7 +146,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
                     try {
                         viewSourceDataset();
                     } catch (Exception e) {
-                        setErrorMsg(e.getMessage());
+                        setErrorMsg("Can not view source dataset: " + e.getMessage());
                     }
                 }
             });
@@ -157,8 +158,8 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
     private Component targePanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 0));
         panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Target Dataset", 0, 0, Font.decode(""), Color.BLUE));
-
-        panel.add(linePanel(), BorderLayout.NORTH);
+        if (presenter.isLineBased())
+            panel.add(linePanel(), BorderLayout.NORTH);
         
         JPanel pairPanel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -262,7 +263,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
         InputDatasetSelectionPresenter srcDSPresenter = new InputDatasetSelectionPresenter(view,
                 presenter.getSession(), datasetTypes);
         srcDSPresenter.display(datasetTypes[0]);
-
+        // get sourceDataset from light dataset
         EmfDataset[] datasets = view.getDatasets();
         sourceDataset = (datasets == null || datasets.length == 0) ? null : presenter.getDataset(datasets[0].getId());
 
@@ -272,20 +273,26 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
         }
     }
     
-    private void viewSourceDataset(){
-        try { 
+    private void viewSourceDataset() throws EmfException{
+        if (sourceDataset ==null )
+            throw new EmfException ("Please set a source dataset");
+        if (sourceVersionBox.getSelectedItem()==null)
+            throw new EmfException ("Please select a source dataset version");
+        
+        try{
             clearMsgPanel();
-            DatasetPropertiesViewer view = new DatasetPropertiesViewer(presenter.getSession(), parentConsole, desktopManager);
-            presenter.doDisplayPropertiesView(view, sourceDataset);
-//        EmfDataset ds = presenter.getDataset(sourceDataset.getId());
-//        DataViewer view = new DataViewer(ds, parentConsole, desktopManager);
-//            if (sourceDataset.getInternalSources().length > 0)
-//                presenter.doView((Version)sourceVersionBox.getSelectedItem(), sourceDataset.getName(), view);
-//            else
-//                messagePanel.setError("Could not open viewer.This is an external file.");
+            if (sourceDataset.getInternalSources().length >1){
+                DatasetPropertiesViewer view = new DatasetPropertiesViewer(presenter.getSession(), parentConsole, desktopManager);
+                presenter.doDisplayPropertiesView(view, sourceDataset);
+            }else if (sourceDataset.getInternalSources().length ==1){
+                String table = sourceDataset.getInternalSources()[0].getTable();
+                DataViewer view = new DataViewer(sourceDataset, parentConsole, desktopManager);
+                presenter.doView((Version)sourceVersionBox.getSelectedItem(), table, view);
+            }else    
+                messagePanel.setError("Could not open viewer.This is an external file.");
         } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-            e.printStackTrace();
+            //e.printStackTrace();
+            throw new EmfException(e.getMessage());
         }
     }
 

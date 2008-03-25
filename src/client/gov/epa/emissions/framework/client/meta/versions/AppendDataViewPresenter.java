@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.data.viewer.DataView;
+import gov.epa.emissions.framework.client.data.viewer.DataViewPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
@@ -59,14 +61,18 @@ public class AppendDataViewPresenter {
         presenter.doDisplay(propertiesView);
     }
     
-//    public void doView(Version version, String table, DataView view) throws EmfException {
-//        if (!version.isFinalVersion())
-//            throw new EmfException("Cannot view a Version that is not Final. Please choose edit for Version "+
-//                    version.getName());
-//
-//        DataViewPresenter presenter = new DataViewPresenter(dataset, version, table, view, session);
-//        presenter.display();
-//    }
+    public void doView(Version version, String table, DataView view) throws EmfException {
+        if (!version.isFinalVersion())
+            throw new EmfException("Cannot view a Version that is not Final. Please choose edit for Version "+
+                    version.getName());
+
+        DataViewPresenter presenter = new DataViewPresenter(dataset, version, table, view, session);
+        presenter.display();
+    }
+
+    public boolean isLineBased(){
+      return dataset.getDatasetTypeName().toLowerCase().contains("line-based");
+    }
     
     public EmfDataset getDataset() {
         return this.dataset;
