@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
+import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -128,9 +130,9 @@ public class EditQAStepPresenter {
 
     private String tempQAStepFilePath(String exportDir, QAStepResult qaStepResult) throws EmfException {
         String separator = File.separator;
-        // FIXME: this is supposed to come from the local.temp.dir set in the EMFPrefs.txt file instead!
-        String tempDir = System.getProperty("IMPORT_EXPORT_TEMP_DIR");
-
+        UserPreference preferences = new DefaultUserPreferences();
+        String tempDir = preferences.localTempDir();
+        
         if (tempDir == null || tempDir.isEmpty())
             tempDir = System.getProperty("java.io.tmpdir");
 
