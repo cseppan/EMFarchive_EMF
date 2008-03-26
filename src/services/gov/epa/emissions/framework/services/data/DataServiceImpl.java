@@ -291,6 +291,19 @@ public class DataServiceImpl implements DataService {
         }
 
     }
+    
+    public void checkIfDeletable(User user, int datasetID) throws EmfException {
+        Session session = this.sessionFactory.getSession();
+        
+        try {
+            dao.checkIfUsedByCases(new int[]{datasetID}, session);
+            dao.checkIfUsedByStrategies(new int[]{datasetID}, session);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
 
     public void purgeDeletedDatasets(User user) throws EmfException {
         Session session = this.sessionFactory.getSession();
@@ -375,7 +388,7 @@ public class DataServiceImpl implements DataService {
 
             DataModifier dataModifier = datasource.dataModifier();
             
-            if (srcDS.getDatasetTypeName().contains("Line-based"))
+            if (srcDS.getDatasetType().getImporterClassName().equals("gov.epa.emissions.commons.io.generic.LineImporter"))
                 throw new EmfException("Line based data appending is not supported yet.");
 
             if (srcSources.length != targetSources.length)
@@ -492,5 +505,6 @@ public class DataServiceImpl implements DataService {
 
         return colString;
     }
+
 
 }

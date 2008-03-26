@@ -165,6 +165,17 @@ public class DataServiceTransport implements DataService {
 
         call.request(new Object[] { locked });
     }
+    
+    public void checkIfDeletable(User user, int datasetID) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("checkIfDeletable");
+        call.addParam("user", mappings.user());
+        call.addIntegerParam("datasetID");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, new Integer(datasetID) });
+    }
 
     public void purgeDeletedDatasets(User user) throws EmfException {
         EmfCall call = call();
@@ -223,5 +234,6 @@ public class DataServiceTransport implements DataService {
         call.request(new Object[]{new Integer(srcDSid), new Integer(srcDSVersion), filter, new Integer(targetDSid),
                 new Integer(targetDSVersion), new Integer(targetStartLineNumber), new Integer(targetEndLineNumber)});
     }
+
 
 }

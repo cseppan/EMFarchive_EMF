@@ -44,4 +44,6 @@ public interface DataService {
     void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion,
             int targetStartLineNumber, int targetEndLineNumber) throws EmfException;
 
+    void checkIfDeletable(User user, int datasetID) throws EmfException;
+
 }
