@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.client.data.viewer.DataViewer;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -25,6 +26,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -40,14 +42,14 @@ import javax.swing.SpringLayout;
 public class AppendDataWindow extends ReusableInteralFrame implements AppendDataWindowView {
 
     private AppendDataViewPresenter presenter;
-    
+
     private SingleLineMessagePanel messagePanel;
 
     private EmfConsole parentConsole;
 
     private JPanel layout;
 
-    private EmfDataset sourceDataset=null;
+    private EmfDataset sourceDataset = null;
 
     private ComboBox sourceVersionBox;
 
@@ -56,12 +58,16 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
     private JTextField sourceFilterField;
 
     private JTextField startLineField;
-    
-    private JTextField endLineField;
 
     private ComboBox targetDatasetVerison;
-    
+
     private JCheckBox deleteDSCheckBox;
+
+    private TextArea what;
+
+    private TextArea why;
+
+    private Button okButton;
 
     public AppendDataWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Append Data Window", new Dimension(700, 450), desktopManager);
@@ -90,7 +96,8 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
     private Component createUpperPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        //panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Source Dataset", 0, 0, Font.decode(""), Color.BLUE));
+        // panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Source
+        // Dataset", 0, 0, Font.decode(""), Color.BLUE));
 
         sourceDatasetField = new JTextField(40);
         sourceDatasetField.setName("sourceDataset");
@@ -107,7 +114,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
         JPanel sourceDatasetPanel = new JPanel(new BorderLayout(2, 0));
         sourceDatasetPanel.add(sourceDatasetField, BorderLayout.LINE_START);
         sourceDatasetPanel.add(setButton, BorderLayout.CENTER);
-        //sourceDatasetPanel.add(view, BorderLayout.LINE_END);
+        // sourceDatasetPanel.add(view, BorderLayout.LINE_END);
         layoutGenerator.addLabelWidgetPair("Dataset Name", sourceDatasetPanel, panel);
 
         sourceVersionBox = new ComboBox("Select a version", new Version[0]);
@@ -115,7 +122,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
 
         sourceFilterField = new JTextField(40);
         layoutGenerator.addLabelWidgetPair("Data Filter", sourceFilterField, panel);
-        
+
         deleteDSCheckBox = new JCheckBox();
         deleteDSCheckBox.setSelected(false);
         layoutGenerator.addLabelWidgetPair("Delete after append?", deleteDSCheckBox, panel);
@@ -127,43 +134,46 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
 
         return panel;
     }
-    
+
     private JPanel sourcePanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 0));
-        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Source Dataset", 0, 0, Font.decode(""), Color.BLUE));
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Source Dataset",
+                0, 0, Font.decode(""), Color.BLUE));
 
         panel.add(createUpperPanel(), BorderLayout.CENTER);
         panel.add(viewButtonPanel(), BorderLayout.SOUTH);
 
         return panel;
     }
-    
-    private Component viewButtonPanel(){
+
+    private Component viewButtonPanel() {
         JPanel panel = new JPanel();
         Button view = new Button("View Dataset", new AbstractAction() {
-            //Button button = new BrowseButton(new AbstractAction() {
-                public void actionPerformed(ActionEvent arg0) {
-                    try {
-                        viewSourceDataset();
-                    } catch (Exception e) {
-                        setErrorMsg("Can not view source dataset: " + e.getMessage());
-                    }
+            // Button button = new BrowseButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    viewSourceDataset();
+                } catch (Exception e) {
+                    setErrorMsg("Can not view source dataset: " + e.getMessage());
                 }
-            });
-        //view.setEnabled(false);
+            }
+        });
+        // view.setEnabled(false);
         panel.add(view);
-        return  panel; 
+        return panel;
     }
-    
+
     private Component targePanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 0));
-        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Target Dataset", 0, 0, Font.decode(""), Color.BLUE));
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Target Dataset",
+                0, 0, Font.decode(""), Color.BLUE));
         if (presenter.isLineBased())
             panel.add(linePanel(), BorderLayout.NORTH);
-        
+
         JPanel pairPanel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        //pairPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Target Dataset", 0, 0, Font.decode(""), Color.BLUE));
+        // pairPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Target
+        // Dataset", 0, 0, Font.decode(""), Color.BLUE));
 
         Version[] versions = null;
         try {
@@ -171,7 +181,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
         } catch (EmfException e) {
             setErrorMsg(e.getMessage());
         }
-        
+
         targetDatasetVerison = new ComboBox("Select a version", versions);
         layoutGenerator.addLabelWidgetPair("Nonfinal Version  ", targetDatasetVerison, pairPanel);
 
@@ -179,56 +189,45 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
         layoutGenerator.makeCompactGrid(pairPanel, 1, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
-        
+
         panel.add(pairPanel, BorderLayout.CENTER);
         return panel;
     }
+
     // top part of target dataset
-    private JPanel linePanel(){
+    private JPanel linePanel() {
         JPanel panel = new JPanel(new BorderLayout(30, 0));
         panel.add(createStartLinePanel(), BorderLayout.LINE_START);
-        panel.add(createEndLinePanel(), BorderLayout.CENTER);
-        return panel; 
+        return panel;
     }
-    
-    private JPanel createStartLinePanel(){
+
+    private JPanel createStartLinePanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         startLineField = new JTextField(15);
         startLineField.setName("startLineField");
-        //startLineField.setEnabled(false);
-        layoutGenerator.addLabelWidgetPair("Starting Line Number", startLineField, panel);
+        // startLineField.setEnabled(false);
+        layoutGenerator.addLabelWidgetPair("Insert after Line Number", startLineField, panel);
         layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
-        return panel; 
-    }     
-    private JPanel createEndLinePanel(){ 
-        JPanel panel = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        endLineField = new JTextField(15);
-        endLineField.setName("endLineField");
-        //endLineField.setEnabled(false);
-        layoutGenerator.addLabelWidgetPair("Ending Line Number", endLineField, panel);
-        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-                5, 5, // initialX, initialY
-                5, 5);// xPad, yPad
-        return panel; 
+        return panel;
     }
-    
-    private JPanel revisionPanel(){
-        JPanel panel = new JPanel(new GridLayout(1, 2, 10, 10));
-        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Revision Information", 0, 0, Font.decode(""), Color.BLUE));
 
-        TextArea what = new TextArea("", "", 30, 2);
+    private JPanel revisionPanel() {
+        JPanel panel = new JPanel(new GridLayout(1, 2, 10, 10));
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY),
+                "Revision Information", 0, 0, Font.decode(""), Color.BLUE));
+
+        what = new TextArea("", "", 30, 2);
         panel.add(labelValuePanel("What was added", ScrollableComponent.createWithVerticalScrollBar(what)));
 
-        TextArea why = new TextArea("", "", 30, 2);
+        why = new TextArea("", "", 30, 2);
         panel.add(labelValuePanel("Why it was added", ScrollableComponent.createWithVerticalScrollBar(why)));
 
         return panel;
     }
-    
+
     private JPanel labelValuePanel(String labelText, JComponent widget) {
         BorderLayout bl = new BorderLayout(3, 4);
         JPanel panel = new JPanel(bl);
@@ -242,7 +241,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
     private Component createButtonPanel() {
         JPanel panel = new JPanel();
 
-        Button okButton = new Button("OK", okAction());
+        okButton = new Button("OK", okAction());
         panel.add(okButton);
 
         Button closeButton = new Button("Close", closeWindowAction());
@@ -257,7 +256,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
 
     private void selectSourceDataset() throws Exception {
         clearMsgPanel();
-        
+
         DatasetType[] datasetTypes = new DatasetType[] { presenter.getDataset().getDatasetType() };
         InputDatasetSelectionDialog view = new InputDatasetSelectionDialog(parentConsole, this);
         InputDatasetSelectionPresenter srcDSPresenter = new InputDatasetSelectionPresenter(view,
@@ -272,26 +271,27 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
             sourceVersionBox.resetModel(presenter.getVersions(sourceDataset.getId()));
         }
     }
-    
-    private void viewSourceDataset() throws EmfException{
-        if (sourceDataset ==null )
-            throw new EmfException ("Please set a source dataset");
-        if (sourceVersionBox.getSelectedItem()==null)
-            throw new EmfException ("Please select a source dataset version");
-        
-        try{
+
+    private void viewSourceDataset() throws EmfException {
+        if (sourceDataset == null)
+            throw new EmfException("Please set a source dataset");
+        if (sourceVersionBox.getSelectedItem() == null)
+            throw new EmfException("Please select a source dataset version");
+
+        try {
             clearMsgPanel();
-            if (sourceDataset.getInternalSources().length >1){
-                DatasetPropertiesViewer view = new DatasetPropertiesViewer(presenter.getSession(), parentConsole, desktopManager);
+            if (sourceDataset.getInternalSources().length > 1) {
+                DatasetPropertiesViewer view = new DatasetPropertiesViewer(presenter.getSession(), parentConsole,
+                        desktopManager);
                 presenter.doDisplayPropertiesView(view, sourceDataset);
-            }else if (sourceDataset.getInternalSources().length ==1){
+            } else if (sourceDataset.getInternalSources().length == 1) {
                 String table = sourceDataset.getInternalSources()[0].getTable();
                 DataViewer view = new DataViewer(sourceDataset, parentConsole, desktopManager);
-                presenter.doView((Version)sourceVersionBox.getSelectedItem(), table, view);
-            }else    
+                presenter.doView((Version) sourceVersionBox.getSelectedItem(), table, view);
+            } else
                 messagePanel.setError("Could not open viewer.This is an external file.");
         } catch (EmfException e) {
-            //e.printStackTrace();
+            // e.printStackTrace();
             throw new EmfException(e.getMessage());
         }
     }
@@ -302,16 +302,61 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
                 clearMsgPanel();
 
                 try {
-                    presenter.appendData(sourceDataset.getId(), ((Version)sourceVersionBox.getSelectedItem()).getVersion(),
-                            sourceFilterField.getText(),
-                            presenter.getDataset().getId(), ((Version)targetDatasetVerison.getSelectedItem()).getVersion(),
-                            0, 0);
+                    validateSelections();
+                    presenter.appendData(sourceDataset.getId(), ((Version) sourceVersionBox.getSelectedItem())
+                            .getVersion(), sourceFilterField.getText(), presenter.getDataset().getId(),
+                            ((Version) targetDatasetVerison.getSelectedItem()).getVersion(), 0, 0);
+                    saveRevision();
                     setMsg("Appending data finished.");
+                    okButton.setEnabled(false);
                 } catch (Exception e) {
                     setErrorMsg(e.getMessage());
                 }
             }
         };
+    }
+
+    private void validateSelections() throws EmfException {
+        String sourceDSName = sourceDatasetField.getText();
+
+        if (sourceDSName == null || sourceDSName.trim().isEmpty())
+            throw new EmfException("Please specify a valid source dataset.");
+
+        if (sourceDataset == null)
+            sourceDataset = presenter.getDataset(sourceDSName);
+
+        if (sourceDataset == null)
+            throw new EmfException("Specified source dataset doesn't exist.");
+        
+        if (sourceVersionBox.getSelectedItem() == null)
+            throw new EmfException("Please specify a valid source dataset version.");
+
+        if (deleteDSCheckBox.isSelected()) {
+            try {
+                presenter.checkIfDeletable(sourceDataset);
+            } catch (Exception e) {
+                throw new EmfException("Cannot delete after append: " + e.getMessage());
+            }
+        }
+        
+        if (targetDatasetVerison.getItemCount() < 2)
+            throw new EmfException("Target dataset doesn't have a valid non-final version. Please create one if needed.");
+        
+        if (targetDatasetVerison.getSelectedItem() == null)
+            throw new EmfException("Please specify a valid non-final version for target dataset.");
+    }
+
+    private void saveRevision() throws EmfException {
+        Revision revision = new Revision();
+        revision.setCreator(presenter.getSession().user());
+        revision.setDatasetId(presenter.getDataset().getId());
+        revision.setDate(new Date());
+        revision.setVersion(((Version) targetDatasetVerison.getSelectedItem()).getVersion());
+        revision.setWhat(what.getText());
+        revision.setWhy(why.getText());
+        revision.setReferences("");
+
+        presenter.addRevision(revision);
     }
 
     private Action closeWindowAction() {

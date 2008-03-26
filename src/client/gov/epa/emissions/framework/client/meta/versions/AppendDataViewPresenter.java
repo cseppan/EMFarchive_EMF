@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.editor.Revision;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +72,9 @@ public class AppendDataViewPresenter {
     }
 
     public boolean isLineBased(){
-      return dataset.getDatasetTypeName().toLowerCase().contains("line-based");
+        String importerClass = dataset.getDatasetType().getImporterClassName();
+        
+      return importerClass.equals("gov.epa.emissions.commons.io.generic.LineImporter");
     }
     
     public EmfDataset getDataset() {
@@ -80,5 +83,22 @@ public class AppendDataViewPresenter {
     
     public EmfSession getSession() {
         return this.session;
+    }
+    
+    public void addRevision(Revision revision) throws EmfException {
+        session.dataCommonsService().addRevision(revision);
+    }
+    
+    public void checkIfDeletable(EmfDataset dataset) throws EmfException {
+        String currentUser = session.user().getUsername();
+        
+        if (currentUser.equals(dataset.getCreator()))
+            throw new EmfException("Current user is not the creator.");
+               
+        session.dataService().checkIfDeletable(session.user(), dataset.getId());
+    }
+
+    public EmfDataset getDataset(String sourceDSName) throws EmfException {
+        return session.dataService().getDataset(sourceDSName);
     }
 }
