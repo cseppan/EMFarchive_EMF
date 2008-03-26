@@ -107,6 +107,10 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
         JPanel panel = new JPanel();
 
         Button appendData = new Button("Append Data", appendDataAction());
+        
+        if (dataset.isExternal())
+            appendData.setEnabled(false);
+        
         panel.add(appendData);
 
         Button propButton = new Button("Edit Properties", editPropAction());
