@@ -587,7 +587,7 @@ public class DatasetDAO {
         if (list != null && list.size() > 0) {
             Criterion criterion = Restrictions.eq("id", list.get(0));
             Case usedCase = (Case) hibernateFacade.get(Case.class, criterion, session).get(0);
-            throw new EmfException("Error: dataset used by case " + usedCase.getName() + ".");
+            throw new EmfException("Dataset used by case " + usedCase.getName() + ".");
         }
     }
 
@@ -645,7 +645,7 @@ public class DatasetDAO {
                         + getAndOrClause(datasetIDs, "cS.countyDataset.id") + ")").list();
 
         if (list != null && list.size() > 0)
-            throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
+            throw new EmfException("Dataset used by control strategy " + list.get(0) + ".");
     }
 
     private void deleteFromEmfTables(int[] datasetIDs, TableCreator tableTool, Session session) throws EmfException {
