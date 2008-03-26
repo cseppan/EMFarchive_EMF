@@ -42,7 +42,7 @@ public interface DataService {
     long getTableRecordCount(String qualifiedTableName) throws EmfException;
 
     void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion,
-            int targetStartLineNumber, int targetEndLineNumber) throws EmfException;
+            int targetStartLineNumber) throws EmfException;
 
     void checkIfDeletable(User user, int datasetID) throws EmfException;
 

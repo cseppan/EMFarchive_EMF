@@ -218,7 +218,7 @@ public class DataServiceTransport implements DataService {
     }
 
     public void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion,
-            int targetStartLineNumber, int targetEndLineNumber) throws EmfException {
+            int targetStartLineNumber) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("appendData");
@@ -228,11 +228,10 @@ public class DataServiceTransport implements DataService {
         call.addIntegerParam("targetDSid");
         call.addIntegerParam("targetDSVersion");
         call.addIntegerParam("targetStartLineNumber");
-        call.addIntegerParam("targetEndLineNumber");
         call.setVoidReturnType();
         
         call.request(new Object[]{new Integer(srcDSid), new Integer(srcDSVersion), filter, new Integer(targetDSid),
-                new Integer(targetDSVersion), new Integer(targetStartLineNumber), new Integer(targetEndLineNumber)});
+                new Integer(targetDSVersion), new Integer(targetStartLineNumber)});
     }
 
 

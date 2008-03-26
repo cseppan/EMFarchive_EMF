@@ -374,7 +374,7 @@ public class DataServiceImpl implements DataService {
     }
 
     public synchronized void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid,
-            int targetDSVersion, int targetStartLineNumber, int targetEndLineNumber) throws EmfException {
+            int targetDSVersion, int targetStartLineNumber) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         Session session = sessionFactory.getSession();
 

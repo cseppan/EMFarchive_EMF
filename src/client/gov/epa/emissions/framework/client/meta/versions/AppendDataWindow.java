@@ -68,6 +68,8 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
     private TextArea why;
 
     private Button okButton;
+    
+    private int startLineNum;
 
     public AppendDataWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Append Data Window", new Dimension(700, 450), desktopManager);
@@ -305,7 +307,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
                     validateSelections();
                     presenter.appendData(sourceDataset.getId(), ((Version) sourceVersionBox.getSelectedItem())
                             .getVersion(), sourceFilterField.getText(), presenter.getDataset().getId(),
-                            ((Version) targetDatasetVerison.getSelectedItem()).getVersion(), 0, 0);
+                            ((Version) targetDatasetVerison.getSelectedItem()).getVersion(), startLineNum);
                     saveRevision();
                     setMsg("Appending data finished.");
                     okButton.setEnabled(false);
@@ -327,7 +329,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
 
         if (sourceDataset == null)
             throw new EmfException("Specified source dataset doesn't exist.");
-        
+
         if (sourceVersionBox.getSelectedItem() == null)
             throw new EmfException("Please specify a valid source dataset version.");
 
@@ -338,12 +340,26 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
                 throw new EmfException("Cannot delete after append: " + e.getMessage());
             }
         }
-        
+
         if (targetDatasetVerison.getItemCount() < 2)
-            throw new EmfException("Target dataset doesn't have a valid non-final version. Please create one if needed.");
-        
+            throw new EmfException(
+                    "Target dataset doesn't have a valid non-final version. Please create one if needed.");
+
         if (targetDatasetVerison.getSelectedItem() == null)
             throw new EmfException("Please specify a valid non-final version for target dataset.");
+
+        if (presenter.isLineBased()) {
+            String startLine = startLineField.getText();
+            
+            if (startLine == null || startLine.trim().isEmpty())
+                startLine = "-1";
+            
+            try {
+                startLineNum = Integer.parseInt(startLine.trim());
+            } catch (Exception e) {
+                throw new EmfException("Error parsing Append after Line Number field: " + e.getMessage() + ".");
+            }
+        }
     }
 
     private void saveRevision() throws EmfException {
