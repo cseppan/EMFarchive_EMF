@@ -92,7 +92,7 @@ public class AppendDataViewPresenter {
     public void checkIfDeletable(EmfDataset dataset) throws EmfException {
         String currentUser = session.user().getUsername();
         
-        if (currentUser.equals(dataset.getCreator()))
+        if (!currentUser.equals(dataset.getCreator()))
             throw new EmfException("Current user is not the creator.");
                
         session.dataService().checkIfDeletable(session.user(), dataset.getId());
