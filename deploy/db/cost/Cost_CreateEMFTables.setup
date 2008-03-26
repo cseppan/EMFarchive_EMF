@@ -620,36 +620,6 @@ CREATE INDEX control_strategy_target_pollutants_strategy_id
   (control_strategy_id);
 
 
-CREATE TABLE emf.control_strategy_target_pollutants
-(
-   id serial, 
-   control_strategy_id integer, 
-   pollutant_id integer, 
-   precedence double precision, 
-   list_index integer, 
-   CONSTRAINT control_strategy_target_pollutants_id_pk PRIMARY KEY (id), 
-   CONSTRAINT control_strategy_target_pollutants_strategy_fk FOREIGN KEY (control_strategy_id) REFERENCES emf.control_strategies (id)    ON UPDATE NO ACTION ON DELETE NO ACTION, 
-   CONSTRAINT control_strategy_target_pollutants_pollutant_fk FOREIGN KEY (pollutant_id) REFERENCES emf.pollutants (id)    ON UPDATE NO ACTION ON DELETE NO ACTION, 
-   CONSTRAINT control_strategy_target_pollutants_uq UNIQUE (control_strategy_id, pollutant_id)
-) WITHOUT OIDS;
-ALTER TABLE emf.control_strategy_target_pollutants OWNER TO emf;
-CREATE INDEX control_strategy_target_pollutants_pollutant_id
-  ON emf.control_strategy_target_pollutants
-  USING btree
-  (pollutant_id);
-
-CREATE INDEX control_strategy_target_pollutants_strategy_id
-  ON emf.control_strategy_target_pollutants
-  USING btree
-  (control_strategy_id);
-
-CREATE INDEX control_strategy_target_pollutants_precedence
-  ON emf.control_strategy_target_pollutants
-  USING btree
-  (precedence);
-
-
-
 -- FUNCTIONS
 
 
