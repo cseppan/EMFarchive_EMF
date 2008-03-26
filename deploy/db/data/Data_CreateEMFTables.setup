@@ -204,7 +204,7 @@ CREATE TABLE emf.notes
   type int4 NOT NULL REFERENCES emf.note_types(id),
   details text NOT NULL,
   refers_notes text,
-  UNIQUE (dataset_id, name)
+  UNIQUE (name)
 ) 
 WITHOUT OIDS;
 --emf.notes
