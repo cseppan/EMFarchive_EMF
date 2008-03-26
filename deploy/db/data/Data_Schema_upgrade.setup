@@ -292,3 +292,13 @@ ALTER TABLE emf.notes DROP COLUMN dataset_id, DROP COLUMN version;
 
 -- add column into emf.datasets_notes table 3/12/2008
 ALTER TABLE emf.datasets_notes ADD COLUMN version integer DEFAULT 0;
+
+-- 3/20/08 DCD - Changed dataset type name and renamed some supoorting classes...
+update emf.dataset_types
+set name = 'ORL Merged Inventory',
+description = 'ORL Merged Inventory',
+importer_classname = 'gov.epa.emissions.commons.io.orl.ORLMergedImporter',
+exporter_classname = 'gov.epa.emissions.commons.io.orl.ORLMergedExporter'
+where name = 'ORL CoST Point Inventory (PTINV)';
+
+

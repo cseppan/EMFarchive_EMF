@@ -257,6 +257,8 @@ CREATE TABLE emf.control_strategies
   lock_owner varchar(255),
   lock_date timestamp,
   county_file character varying,
+  county_dataset_id int4 REFERENCES emf.datasets (id),
+  county_dataset_version int4,
   use_cost_equations boolean,
   export_directory character varying,
   delete_results boolean DEFAULT true

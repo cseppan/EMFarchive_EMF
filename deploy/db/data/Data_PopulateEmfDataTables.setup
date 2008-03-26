@@ -110,7 +110,7 @@ insert into emf.dataset_types (name,
   importer_classname,
   exporter_classname,
   table_per_dataset)
-select 'ORL CoST Point Inventory (PTINV)','ORL CoST Point Inventory (PTINV)',1,1,'FALSE','gov.epa.emissions.commons.io.orl.ORLCoSTPointImporter','gov.epa.emissions.commons.io.orl.ORLCoSTPointExporter',1;
+select 'ORL Merged Inventory','ORL Merged Inventory',1,1,'FALSE','gov.epa.emissions.commons.io.orl.ORLMergedImporter','gov.epa.emissions.commons.io.orl.ORLMergedExporter',1;
 insert into emf.dataset_types values(DEFAULT,'Control Strategy Result Summary','Control Strategy Result Summary', '1', '1', false,'', '', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 insert into emf.dataset_types values(DEFAULT,'List of Counties (CSV)','List of Counties (CSV)', '1', '1', false,'', 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 insert into emf.dataset_types values(DEFAULT,'Control Strategy Least Cost Control Measure Worksheet','Control Strategy Least Cost Control Measure Worksheet', '1', '1', false,'', '', 'gov.epa.emissions.commons.io.csv.CSVExporter');
@@ -175,7 +175,7 @@ insert into emf.qa_programs values(DEFAULT,'Multi-inventory difference report','
 insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
 select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by Pollutant', 1, 'select POLL, sum(ann_emis) as ann_emis from $TABLE[1] e group by POLL order by POLL', false, 1, ''
 from emf.dataset_types dt
-where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL CoST Point Inventory (PTINV)');
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory');
 
 -- Summarize by Pollutant - Control Strategy Detailed Result
 insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
@@ -187,7 +187,7 @@ where name in ('Control Strategy Detailed Result');
 insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
 select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by SCC and Pollutant', 1, 'select SCC, POLL, sum(ann_emis) as ann_emis from $TABLE[1] e group by SCC, POLL order by SCC, POLL', false, 1, ''
 from emf.dataset_types dt
-where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL CoST Point Inventory (PTINV)');
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory');
 
 -- Summarize by SCC and Pollutant - Control Strategy Detailed Result
 insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
@@ -199,7 +199,7 @@ where name in ('Control Strategy Detailed Result');
 insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
 select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by County and Pollutant', 1, 'select FIPS, POLL, sum(ann_emis) as ann_emis from $TABLE[1] e group by FIPS, POLL order by FIPS, POLL', false, 1, ''
 from emf.dataset_types dt
-where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL CoST Point Inventory (PTINV)');
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory');
 
 -- Summarize by County and Pollutant - Control Strategy Detailed Result
 insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
@@ -211,7 +211,7 @@ where name in ('Control Strategy Detailed Result');
 insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
 select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by US State and Pollutant', 1, 'select fips.state_name, fips.state_abbr, fips.fipsst, e.POLL, sum(ann_emis) as ann_emis from $TABLE[1] e inner join reference.fips on fips.state_county_fips = e.FIPS where fips.country_num = ''0'' group by fips.state_name, fips.state_abbr, fips.fipsst, POLL order by fips.state_name, POLL', false, 1, ''
 from emf.dataset_types dt
-where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL CoST Point Inventory (PTINV)');
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory');
 
 -- Summarize by US State and Pollutant - Control Strategy Detailed Result
 insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
