@@ -1,12 +1,14 @@
 package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.data.viewer.DataView;
 import gov.epa.emissions.framework.client.data.viewer.DataViewPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.editor.Revision;
 
@@ -20,12 +22,18 @@ public class AppendDataViewPresenter {
     private EmfSession session;
     
     private AppendDataWindowView view;
+    
+    private DataService dataService;
+    
+    private User user;
 
     public AppendDataViewPresenter(EmfDataset dataset, AppendDataWindowView view, EmfSession session) {
         //super(dataset, session);
         this.dataset=dataset;
         this.session = session;
         this.view = view;
+        this.dataService = session.dataService();
+        this.user = session.user();
     }
     
     public void displayView() {
@@ -34,7 +42,7 @@ public class AppendDataViewPresenter {
     }
     
     public void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion, int startLineNum) throws EmfException {
-        session.dataService().appendData(srcDSid, srcDSVersion, filter, targetDSid, targetDSVersion, startLineNum);
+        dataService.appendData(srcDSid, srcDSVersion, filter, targetDSid, targetDSVersion, startLineNum);
     }
     
     public Version[] getVersions(int dsId) throws EmfException {
@@ -42,7 +50,7 @@ public class AppendDataViewPresenter {
     }
     
     public EmfDataset getDataset(int datasetId) throws EmfException{
-        return session.dataService().getDataset(datasetId);
+        return dataService.getDataset(datasetId);
     }
     
     public Version[] getTargetDatasetNonFinalVersions() throws EmfException {
@@ -90,15 +98,30 @@ public class AppendDataViewPresenter {
     }
     
     public void checkIfDeletable(EmfDataset dataset) throws EmfException {
-        String currentUser = session.user().getUsername();
+        String currentUser = user.getUsername();
         
         if (!currentUser.equals(dataset.getCreator()))
             throw new EmfException("Current user is not the creator.");
                
-        session.dataService().checkIfDeletable(session.user(), dataset.getId());
+        dataService.checkIfDeletable(user, dataset.getId());
     }
 
     public EmfDataset getDataset(String sourceDSName) throws EmfException {
-        return session.dataService().getDataset(sourceDSName);
+        return dataService.getDataset(sourceDSName);
+    }
+    
+    public void deleteDataset(EmfDataset dataset) throws EmfException {
+        EmfDataset locked = dataService.obtainLockedDataset(user, dataset);
+        
+        if (!locked.isLocked(user)) // view mode, locked by another user
+            throw new EmfException("Couldn't get a lock to remove dataset.");
+        
+        try {
+            dataService.deleteDatasets(user, new EmfDataset[]{locked});
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            dataService.releaseLockedDataset(user, locked);
+        }
     }
 }

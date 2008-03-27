@@ -68,7 +68,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
     private TextArea why;
 
     private Button okButton;
-    
+
     private int startLineNum;
 
     public AppendDataWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
@@ -302,18 +302,40 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
         return new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 clearMsgPanel();
+                String msg = "Appending data finished. ";
 
                 try {
                     validateSelections();
+                } catch (Exception e) {
+                    setErrorMsg(e.getMessage());
+                    return;
+                }
+
+                try {
                     presenter.appendData(sourceDataset.getId(), ((Version) sourceVersionBox.getSelectedItem())
                             .getVersion(), sourceFilterField.getText(), presenter.getDataset().getId(),
                             ((Version) targetDatasetVerison.getSelectedItem()).getVersion(), startLineNum);
-                    saveRevision();
-                    setMsg("Appending data finished.");
                     okButton.setEnabled(false);
                 } catch (Exception e) {
                     setErrorMsg(e.getMessage());
+                    return;
                 }
+
+                try {
+                    saveRevision();
+                } catch (Exception e) {
+                    msg += " Error set revision: " + e.getMessage();
+                }
+
+                if (deleteDSCheckBox.isSelected()) {
+                    try {
+                        presenter.deleteDataset(sourceDataset);
+                    } catch (EmfException e) {
+                        msg += " Error deleting dataset: " + e.getMessage();
+                    }
+                }
+
+                setMsg(msg);
             }
         };
     }
@@ -350,10 +372,10 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
 
         if (presenter.isLineBased()) {
             String startLine = startLineField.getText();
-            
+
             if (startLine == null || startLine.trim().isEmpty())
                 startLine = "-1";
-            
+
             try {
                 startLineNum = Integer.parseInt(startLine.trim());
             } catch (Exception e) {
