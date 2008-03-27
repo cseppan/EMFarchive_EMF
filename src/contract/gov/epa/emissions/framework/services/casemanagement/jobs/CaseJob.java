@@ -55,7 +55,7 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     
     private String jobkey;
     
-    private List<DependentJob> dependentJobs;
+    private DependentJob[] dependentJobs = new DependentJob[] {};
 
     public CaseJob() {
         this("");
@@ -63,7 +63,6 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     
     public CaseJob(String name) {
         this.name = name;
-        this.dependentJobs = new ArrayList<DependentJob>();
     }
     
     public String getPath() {
@@ -251,12 +250,20 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
         this.jobkey = jobKey;
     }
     
+    public void addDependentJob(DependentJob job) {
+        List<DependentJob> jobsList = new ArrayList<DependentJob>();
+        jobsList.addAll(Arrays.asList(this.dependentJobs));
+        jobsList.add(job);
+        
+        this.dependentJobs = jobsList.toArray(new DependentJob[0]);
+    }
+    
     public DependentJob[] getDependentJobs() {
-        return dependentJobs.toArray(new DependentJob[0]);
+        return this.dependentJobs;
     }
 
     public void setDependentJobs(DependentJob[] dependentJobs) {
-        this.dependentJobs = Arrays.asList(dependentJobs);
+        this.dependentJobs = dependentJobs;
     }
 
     public User getRunJobUser() {
