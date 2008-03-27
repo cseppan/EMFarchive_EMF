@@ -318,3 +318,68 @@ from emf.dataset_types dt
 where name in ('Control Strategy Detailed Result'); 
 
 
+-- Summarize by SCC and Pollutant with Descriptions - ORL Types
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by SCC and Pollutant with Descriptions', 1, 'select e.SCC, coalesce(s.scc_description,''AN UNSPECIFIED DESCRIPTION'') as scc_description, e.POLL, coalesce(p.pollutant_code_desc,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, coalesce(p.smoke_name,''AN UNSPECIFIED SMOKE NAME'') as smoke_name,p.factor, p.voctog, p.species, coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis from $TABLE[1] e left outer join reference.pollutant_codes p on e.POLL=p.pollutant_code left outer join reference.scc s on e.SCC=s.scc group by e.SCC,e.POLL,p.pollutant_code_desc,s.scc_description, p.smoke_name, p.factor,p.voctog, p.species order by e.SCC, p.smoke_name', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory');
+
+
+-- Summarize by U.S. County and Pollutant with Descriptions - ORL Types
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by U.S. County and Pollutant with Descriptions', 1, 'select e.fips, coalesce(fips.county,''AN UNSPECIFIED COUNTY NAME'') as county, coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, e.POLL, coalesce(p.pollutant_code_desc,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, coalesce(p.smoke_name,''AN UNSPECIFIED DESCRIPTION'') as smoke_name, p.factor,p.voctog, p.species, coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis from $TABLE[1] e left outer join reference.pollutant_codes p on e.POLL=p.pollutant_code left outer join reference.fips on fips.state_county_fips = e.FIPS where fips.country_num = ''0'' group by fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), e.POLL, p.pollutant_code_desc, p.smoke_name, p.factor, p.voctog, p.species, e.fips, fips.county order by e.fips, e.POLL', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory');
+
+
+-- Summarize by Pollutant with Descriptions - ORL Types
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by Pollutant with Descriptions', 1, 'select e.POLL, coalesce(p.pollutant_code_desc,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, coalesce(p.smoke_name,''AN UNSPECIFIED SMOKE NAME'') as smoke_name, p.factor ,p.voctog, p.species, coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis from $TABLE[1] e left outer join reference.pollutant_codes p on e.POLL = p.pollutant_code group by e.POLL, p.pollutant_code_desc, p.smoke_name, p.factor, p.voctog, p.species order by p.smoke_name', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory');
+
+
+-- Summarize by Mact Code, U.S. State and Pollutant with Descriptions - ORL Types
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by Mact Code, U.S. State and Pollutant with Descriptions', 1, 'select substr(e.fips, 1, 2) as fipsst, coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, coalesce(e.mact, ''AN UNSPECIFIED MACT CODE'') as mact_code, coalesce(m.mact_source_category, ''AN UNSPECIFIED CATEGORY NAME'') as mact_source_category, e.POLL, coalesce(p.pollutant_code_desc,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, coalesce(p.smoke_name,''AN UNSPECIFIED SMOKE NAME'') as smoke_name, p.factor,p.voctog, p.species, coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis from $TABLE[1] e left outer join reference.pollutant_codes p on e.POLL=p.pollutant_code left outer join reference.fips on fips.state_county_fips = e.FIPS left outer join reference.mact_codes m on m.mact_code = e.mact where fips.country_num = ''0'' group by fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), e.POLL, p.pollutant_code_desc, p.smoke_name, p.factor, p.voctog, p.species, e.mact, m.mact_source_category order by e.mact, substr(e.fips, 1, 2), e.POLL', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Point Inventory (PTINV)');
+
+
+-- List Data Source Codes and U.S. State with Descriptions - ORL Types
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'List Data Source Codes and U.S. State with Descriptions', 1, 'select substr(e.fips, 1, 2) as fipsst, coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, e.data_source, coalesce(d.description,''AN UNSPECIFIED DESCRIPTION'') as datasource_desc, count(1) as count from $TABLE[1] e left outer join reference.datasource_codes d on e.data_source=d.code left outer join reference.fips on fips.state_county_fips = e.FIPS where fips.country_num = ''0'' group by fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), e.data_source, d.description order by substr(e.fips, 1, 2), e.data_source', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory');
+
+
+-- Summarize by Data Source Code, U.S. State and Pollutant with Descriptions - ORL Types
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by Data Source Code, U.S. State and Pollutant with Descriptions', 1, 'select substr(e.fips, 1, 2) as fipsst, coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, e.data_source, coalesce(d.description,''AN UNSPECIFIED DESCRIPTION'') as datasource_desc, e.POLL, coalesce(p.pollutant_code_desc,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, coalesce(p.smoke_name,''AN UNSPECIFIED SMOKE NAME'') as smoke_name, coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis from $TABLE[1] e left outer join reference.datasource_codes d on e.data_source=d.code left outer join reference.pollutant_codes p on e.POLL=p.pollutant_code left outer join reference.fips on fips.state_county_fips = e.FIPS where fips.country_num = ''0'' group by fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), e.poll, e.data_source, d.description, d.description, p.pollutant_code_desc, p.smoke_name order by substr(e.fips, 1, 2), e.data_source', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory');
+
+
+-- Summarize by U.S. State and Pollutant with Descriptions - ORL Types
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by U.S. State and Pollutant with Descriptions', 1, 'select substr(e.fips, 1, 2) as fipsst, coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, e.POLL, coalesce(p.pollutant_code_desc,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, coalesce(p.smoke_name,''AN UNSPECIFIED SMOKE NAME'') as smoke_name, p.factor,p.voctog, p.species, coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis from $TABLE[1] e left outer join reference.pollutant_codes p on e.POLL=p.pollutant_code left outer join reference.fips on fips.state_county_fips = e.FIPS where fips.country_num = ''0'' group by fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), e.POLL, p.pollutant_code_desc, p.smoke_name, p.factor, p.voctog, p.species order by substr(e.fips, 1, 2)', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory');
+
+
+-- Summarize by U.S. State, SCC and Pollutant with Descriptions - ORL Types
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by U.S. State, SCC and Pollutant with Descriptions', 1, 'select substr(e.fips, 1, 2) as fipsst, coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, e.SCC, coalesce(s.scc_description,''AN UNSPECIFIED DESCRIPTION'') as scc_description, e.POLL, coalesce(p.pollutant_code_desc,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, coalesce(p.smoke_name,''AN UNSPECIFIED SMOKE NAME'') as smoke_name, p.factor,p.voctog, p.species, coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis from $TABLE[1] e left outer join reference.pollutant_codes p on e.POLL=p.pollutant_code left outer join reference.scc s on e.SCC=s.scc left outer join reference.fips on fips.state_county_fips = e.FIPS where fips.country_num = ''0'' group by substr(e.fips, 1, 2), fips.state_abbr, fips.state_name, e.SCC,e.POLL,p.pollutant_code_desc,s.scc_description, p.smoke_name, p.factor,p.voctog, p.species order by substr(e.fips, 1, 2), e.SCC, e.POLL', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory');
+
+
+-- Summarize by U.S. State and SMOKE Pollutant Name - ORL Types
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by U.S. State and SMOKE Pollutant Name', 1, 'select substr(e.fips, 1, 2) as fipsst, coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, r.name, r.species, r.voctog, coalesce(sum(cast(r.factor as double precision) * ann_emis), 0) as ann_emis, coalesce(sum(cast(r.factor as double precision) * avd_emis), 0) as avd_emis from $TABLE[1] e left outer join reference.fips on fips.state_county_fips = e.FIPS inner join reference.invtable r on e.poll = r.cas where fips.country_num = ''0'' group by fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), r.name, r.voctog, r.species   order by substr(e.fips, 1, 2),  r.species, r.voctog, r.name', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory');
+
+
+
+
