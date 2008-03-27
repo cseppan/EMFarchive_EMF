@@ -136,15 +136,15 @@ public class AddRemoveDatasetWidget extends JPanel {
             if (program.toLowerCase().startsWith("fire data summary")){
                 for (int i = 0; i < allDatasetTypes.length; i++) {
                     //only get dataset "Fire Data Summary (Day-specific)"
-                    if (allDatasetTypes[i].getName().startsWith("ORL Day-Specific Fires"))
+                    if (allDatasetTypes[i].getName().startsWith("ORL Day-Specific Fire"))
                         datasetTypeList.add(allDatasetTypes[i]);
                 }
             }else{   
                 for (int i = 0; i < allDatasetTypes.length; i++) {
                     //get all dataset types that start with ORL
                     if (allDatasetTypes[i].getName().startsWith("ORL") 
-                            && !allDatasetTypes[i].getName().startsWith("ORL Day-Specific Fires")
-                            && !allDatasetTypes[i].getName().startsWith("ORL Fires"))
+                            && !allDatasetTypes[i].getName().startsWith("ORL Day-Specific Fire")
+                            && !allDatasetTypes[i].getName().startsWith("ORL Fire"))
                         datasetTypeList.add(allDatasetTypes[i]);
                 }
                 

@@ -23,4 +23,5 @@ DROP TABLE cases.parameter_env_vars CASCADE;
 DROP TABLE cases.value_types CASCADE;
 DROP TABLE cases.parameter_names CASCADE;
 DROP TABLE cases.cases_parameters CASCADE;
+DROP TABLE cases.job_messages CASCADE;
 
