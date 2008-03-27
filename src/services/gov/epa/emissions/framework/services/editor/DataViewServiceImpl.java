@@ -77,9 +77,9 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
     }
 
     public DataAccessToken openSession(DataAccessToken token) throws EmfException {
-        Version current = accessor.currentVersion(token.getVersion());
-        if (!current.isFinalVersion())
-            throw new EmfException("Can only view a final Version.");
+//        Version current = accessor.currentVersion(token.getVersion());
+//        if (!current.isFinalVersion())
+//            throw new EmfException("Can only view a final Version.");
 
         try {
             return accessor.openSession(token);

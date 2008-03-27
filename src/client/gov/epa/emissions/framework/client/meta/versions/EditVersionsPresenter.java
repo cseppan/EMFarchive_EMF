@@ -49,9 +49,9 @@ public class EditVersionsPresenter {
     }
     
     public void doView(Version version, String table, DataView view) throws EmfException {
-        if (!version.isFinalVersion())
-            throw new EmfException("Cannot view a Version that is not Final. Please choose edit for Version "+
-                    version.getName());
+//        if (!version.isFinalVersion())
+//            throw new EmfException("Cannot view a Version that is not Final. Please choose edit for Version "+
+//                    version.getName());
 
         DataViewPresenter presenter = new DataViewPresenter(dataset, version, table, view, session);
         presenter.display();
