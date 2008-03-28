@@ -38,11 +38,15 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
     private EmfDataset dataset;
 
     private TableMetadata tableMetadata;
+    
+    private String rowFilter; 
 
-    public ViewerPanel(MessagePanel messagePanel, EmfDataset dataset, TableMetadata tableMetadata) {
+    public ViewerPanel(MessagePanel messagePanel, EmfDataset dataset, 
+            TableMetadata tableMetadata, String filter) {
         super(new BorderLayout());
         this.tableMetadata = tableMetadata;
         this.dataset = dataset;
+        this.rowFilter =filter;
         doLayout(messagePanel);
     }
 
@@ -79,7 +83,7 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
     }
 
     private DataSortFilterPanel sortFilterPanel(MessagePanel messagePanel) {
-        sortFilterPanel = new DataSortFilterPanel(messagePanel, dataset);
+        sortFilterPanel = new DataSortFilterPanel(messagePanel, dataset, rowFilter);
         return sortFilterPanel;
     }
 
@@ -128,6 +132,10 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
 
     public TableMetadata tableMetadata() {
         return tableMetadata;
+    }
+
+    public String getRowFilter(){
+        return rowFilter;
     }
 
 }

@@ -31,7 +31,7 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
     private DataViewPresenter presenter;
 
     private EmfDataset dataset;
-
+    private String filter=""; 
     private EmfConsole parent;
 
     public DataViewer(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
@@ -40,6 +40,18 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
         this.dataset = dataset;
         this.parent = parent;
 
+        layout = new JPanel(new BorderLayout());
+        layout.add(topPanel(), BorderLayout.PAGE_START);
+
+        this.getContentPane().add(layout);
+    }
+    
+    public DataViewer(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager, String filter) {
+        super("Data Viewer [Dataset:" + dataset.getName(), desktopManager);
+        setDimension();
+        this.dataset = dataset;
+        this.parent = parent;
+        this.filter = filter; 
         layout = new JPanel(new BorderLayout());
         layout.add(topPanel(), BorderLayout.PAGE_START);
 
@@ -84,7 +96,7 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
     }
 
     private JPanel tablePanel(TableMetadata tableMetadata) {
-        ViewerPanel viewerPanel = new ViewerPanel(messagePanel, dataset, tableMetadata);
+        ViewerPanel viewerPanel = new ViewerPanel(messagePanel, dataset, tableMetadata, filter);
         try {
             presenter.displayTable(viewerPanel);
         } catch (EmfException e) {

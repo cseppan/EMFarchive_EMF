@@ -15,12 +15,14 @@ public class ViewableTablePresenter implements TablePresenter {
     private ViewerPanelView view;
 
     private TablePresenterDelegate delegate;
+    
+    //private String rowFilter=""; 
 
     public ViewableTablePresenter(DatasetType datasetType, DataAccessToken token, TableMetadata tableMetadata,
             ViewerPanelView view, DataAccessService service) {
         this(datasetType, new TablePaginatorImpl(token, view, service), tableMetadata, view, service);
     }
-
+    
     public ViewableTablePresenter(DatasetType datasetType, TablePaginator paginator, TableMetadata tableMetadata,
             ViewerPanelView view, DataAccessService service) {
         this(new TablePresenterDelegateImpl(datasetType, paginator, tableMetadata, view, service), view);
@@ -68,4 +70,7 @@ public class ViewableTablePresenter implements TablePresenter {
         delegate.doApplyConstraints(rowFilter, sortOrder);
     }
 
+//    public String getRowFilter(){
+//        return rowFilter; 
+//    }
 }

@@ -31,12 +31,12 @@ public class TablePresenterDelegateImpl implements TablePresenterDelegate {
         this.service = service;
         this.tableMetadata = tableMetadata;
         this.view = view;
-
+        this.rowFilter = view.getRowFilter(); 
         this.paginator = paginator;
     }
 
     public void display() throws EmfException {
-        applyConstraints("", datasetType.getDefaultSortOrder());
+        applyConstraints(rowFilter, datasetType.getDefaultSortOrder());
         paginator.doDisplayFirst();
     }
 
@@ -116,5 +116,6 @@ public class TablePresenterDelegateImpl implements TablePresenterDelegate {
     public int pageNumber() {
         return paginator.pageNumber();
     }
+
 
 }

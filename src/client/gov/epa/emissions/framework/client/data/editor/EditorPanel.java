@@ -72,7 +72,7 @@ public class EditorPanel extends JPanel implements EditorPanelView {
     }
 
     private DataSortFilterPanel sortFilterPanel(MessagePanel messagePanel) {
-        sortFilterPanel = new DataSortFilterPanel(messagePanel, dataset);
+        sortFilterPanel = new DataSortFilterPanel(messagePanel, dataset, "");
         return sortFilterPanel;
     }
 
@@ -110,6 +110,11 @@ public class EditorPanel extends JPanel implements EditorPanelView {
     
     public TableMetadata tableMetadata() {
         return tableMetadata;
+    }
+
+    public String getRowFilter() {
+        // NOTE Auto-generated method stub
+        return null;
     }
 
 }

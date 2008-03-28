@@ -31,22 +31,22 @@ public class DataSortFilterPanel extends JPanel {
 
     private JPanel actionPanel;
 
-    public DataSortFilterPanel(MessagePanel messagePanel, EmfDataset dataset) {
+    public DataSortFilterPanel(MessagePanel messagePanel, EmfDataset dataset, String rowFilters) {
         this.messagePanel = messagePanel;
         this.dataset = dataset;
 
         super.setLayout(new BorderLayout(5, 5));
-        super.add(sortFilterPanel(), BorderLayout.CENTER);
+        super.add(sortFilterPanel(rowFilters), BorderLayout.CENTER);
         super.add(controlPanel(), BorderLayout.EAST);
         super.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    private JPanel sortFilterPanel() {
+    private JPanel sortFilterPanel(String rowFilters) {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(2, 1, 5, 5));
 
         panel.add(sortOrderPanel());
-        panel.add(rowFilterPanel());
+        panel.add(rowFilterPanel(rowFilters));
 
         return panel;
     }
@@ -72,11 +72,11 @@ public class DataSortFilterPanel extends JPanel {
         return panel;
     }
 
-    private JPanel rowFilterPanel() {
+    private JPanel rowFilterPanel(String rowFilters) {
         JPanel panel = new JPanel(new BorderLayout());
-
+        //System.out.println("row filter is " + rowFilters);
         panel.add(new Label("Row Filter  "), BorderLayout.WEST);
-        rowFilter = new TextArea("rowFilter", "", 25, 2);
+        rowFilter = new TextArea("rowFilter", rowFilters, 25, 2);
         rowFilter.setToolTipText(rowFilter.getText());
         panel.add(ScrollableComponent.createWithVerticalScrollBar(rowFilter), BorderLayout.CENTER);
 
@@ -111,6 +111,10 @@ public class DataSortFilterPanel extends JPanel {
         } catch (EmfException ex) {
             messagePanel.setError(ex.getMessage());
         }
+    }
+    
+    public void setSortFilter(String filter){
+        rowFilter.setText(filter);
     }
 
 }

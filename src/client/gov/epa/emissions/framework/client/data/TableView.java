@@ -15,4 +15,6 @@ public interface TableView {
     void observe(TablePresenter presenter);
 
     void updateFilteredRecordsCount(int filtered);
+    
+    String getRowFilter();
 }

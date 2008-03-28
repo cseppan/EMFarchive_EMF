@@ -289,7 +289,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
                 presenter.doDisplayPropertiesView(view, sourceDataset);
             } else if (sourceDataset.getInternalSources().length == 1) {
                 String table = sourceDataset.getInternalSources()[0].getTable();
-                DataViewer view = new DataViewer(sourceDataset, parentConsole, desktopManager);
+                DataViewer view = new DataViewer(sourceDataset, parentConsole, desktopManager, sourceFilterField.getText());
                 presenter.doView((Version) sourceVersionBox.getSelectedItem(), table, view);
             } else
                 messagePanel.setError("Could not open viewer.This is an external file.");
