@@ -437,7 +437,7 @@ public class DataServiceImpl implements DataService {
             startLineNum = dataModifier.getLastRowLineNumber(targetTable);
             increatment = 1.0;
         } else {
-            long records2Append = dataModifier.getRowCount(dsQuery.generateFilteringQuery(" COUNT(*) ", srcTable, filter));
+            long records2Append = dataModifier.getRowCount(dsQuery.generateFilteringQueryWithoutOrderBy(" COUNT(*) ", srcTable, filter));
             nextBiggerLineNum = dataModifier.getNextBiggerLineNumber(targetTable, startLineNum);
             increatment = (nextBiggerLineNum - startLineNum) / (records2Append + 1);
         }
