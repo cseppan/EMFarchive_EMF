@@ -20,7 +20,7 @@ public class SQLMultiInvSumProgramQuery {
     private String emissioDatasourceName;
     
     private static final String invTableTag = "-invtable";
-    private static final String emissionTypeTag = "-emissionType";
+
     private static final String summaryTypeTag = "-summaryType";
 
     ArrayList<String> allDatasetNames = new ArrayList<String>();
@@ -41,30 +41,22 @@ public class SQLMultiInvSumProgramQuery {
         //get applicable tables from the program arguments
         String inventoriesToken = "";
         String invtableToken = "";
-        String invEmisToken = "ann";
         String summaryTypeToken = "State+SCC";
         String invTableDatasetName = "";
         
-        int indexInvTable = programArguments.indexOf(invTableTag);
-        int emisIndex = programArguments.indexOf(emissionTypeTag);
-        int indexSumType = programArguments.indexOf(summaryTypeTag);
-        if (indexInvTable != -1 && emisIndex !=-1){
-            inventoriesToken = programArguments.substring(0, indexInvTable).trim();
-            invtableToken = programArguments.substring(indexInvTable + invTableTag.length(), emisIndex);
-            invEmisToken = programArguments.substring(emisIndex + emissionTypeTag.length(), indexSumType == -1 ? programArguments.length() : indexSumType);
-        }
-        if (indexSumType != -1 ){
-            summaryTypeToken = programArguments.substring(indexSumType + summaryTypeTag.length()).trim();
+        int index1 = programArguments.indexOf(invTableTag);
+        int index2 = programArguments.indexOf(summaryTypeTag);
+        inventoriesToken = programArguments.substring(0, index1).trim();
+        invtableToken = programArguments.substring(index1 + invTableTag.length(), index2 == -1 ? programArguments.length() : index2);
+        
+        if (index2 != -1) {
+            summaryTypeToken = programArguments.substring(index2 + summaryTypeTag.length()).trim();
         } 
         //default just in case...
         if (summaryTypeToken.trim().length() == 0)
             summaryTypeToken = "State+SCC";
-        
-        if (invEmisToken.trim().startsWith("Average"))
-            invEmisToken = "avd";
-        
+
          //parse inventories names...
-       
         if (inventoriesToken.length() > 0) {
             StringTokenizer tokenizer2 = new StringTokenizer(inventoriesToken);
             tokenizer2.nextToken();
@@ -89,8 +81,8 @@ public class SQLMultiInvSumProgramQuery {
          String outerQuery = "select @!@, " 
              + "te.poll, "
              + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION') as poll_desc, "
-             + "sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * " + invEmisToken + "_emis" : "null") + ", " + invEmisToken +"_emis)) as " + invEmisToken + "_emis "
-             //+ "sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * avd_emis" : "null") + ", avd_emis)) as avd_emis "
+             + "sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * ann_emis" : "null") + ", ann_emis)) as ann_emis, "
+             + "sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * avd_emis" : "null") + ", avd_emis)) as avd_emis "
              + "\nfrom (#) as te " 
              + (hasInvTableDataset ? "\nleft outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i \non te.poll = i.cas " : "\nleft outer join reference.pollutant_codes p \non te.poll = p.pollutant_code ") 
              + " \ngroup by @@@, te.poll, coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"

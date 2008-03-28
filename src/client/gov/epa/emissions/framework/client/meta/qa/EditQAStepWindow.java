@@ -714,10 +714,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 saveButton.setEnabled(true);
                 runButton.setEnabled(true);
                 if (avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                        || fireDataSummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+                        || fireDataSummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
+                        || MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showAvgDaySummaryWindow();
-                }else if (MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                        || MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+                }else if (MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
                     showColumnSummaryWindow();
                 } else if (avgDayToAnnualProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
                     showAvgDayToAnnualWindow();
