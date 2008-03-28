@@ -293,6 +293,31 @@ ALTER TABLE emf.notes DROP COLUMN dataset_id, DROP COLUMN version;
 -- add column into emf.datasets_notes table 3/12/2008
 ALTER TABLE emf.datasets_notes ADD COLUMN version integer DEFAULT 0;
 
+--added for line0-based data appending 3/26/2008
+
+CREATE OR REPLACE FUNCTION public.run_sum(numeric, numeric, text, text)
+  RETURNS numeric AS
+$BODY$
+   if {![info exists GD(sum.$3.$4)]} {
+       set GD(sum.$3.$4) $1
+   }
+   if {[argisnull 1]} {
+       return $GD(sum.$3.$4)
+   } else {
+       return [set GD(sum.$3.$4) [expr $GD(sum.$3.$4) + $2]]
+   }
+$BODY$
+  LANGUAGE 'pltcl' VOLATILE;
+ALTER FUNCTION public.run_sum(numeric, numeric, text, text) OWNER TO emf;
+
+
+CREATE OR REPLACE FUNCTION public.run_sum(numeric, numeric, text)
+  RETURNS numeric AS
+'select run_sum($1,$2,$3,statement_timestamp()::text)'
+  LANGUAGE 'sql' IMMUTABLE STRICT;
+ALTER FUNCTION public.run_sum(numeric, numeric, text) OWNER TO emf;
+ALTER TABLE emf.datasets_notes ADD COLUMN version integer DEFAULT 0;
+
 -- 3/20/08 DCD - Changed dataset type name and renamed some supoorting classes...
 update emf.dataset_types
 set name = 'ORL Merged Inventory',

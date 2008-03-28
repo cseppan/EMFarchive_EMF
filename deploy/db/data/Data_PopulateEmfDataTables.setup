@@ -110,7 +110,7 @@ insert into emf.dataset_types (name,
   importer_classname,
   exporter_classname,
   table_per_dataset)
-select 'ORL Merged Inventory','ORL Merged Inventory',1,1,'FALSE','gov.epa.emissions.commons.io.orl.ORLMergedImporter','gov.epa.emissions.commons.io.orl.ORLMergedExporter',1;
+select 'ORL CoST Point Inventory (PTINV)','ORL CoST Point Inventory (PTINV)',1,1,'FALSE','gov.epa.emissions.commons.io.orl.ORLCoSTPointImporter','gov.epa.emissions.commons.io.orl.ORLCoSTPointExporter',1;
 insert into emf.dataset_types values(DEFAULT,'Control Strategy Result Summary','Control Strategy Result Summary', '1', '1', false,'', '', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 insert into emf.dataset_types values(DEFAULT,'List of Counties (CSV)','List of Counties (CSV)', '1', '1', false,'', 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 insert into emf.dataset_types values(DEFAULT,'Control Strategy Least Cost Control Measure Worksheet','Control Strategy Least Cost Control Measure Worksheet', '1', '1', false,'', '', 'gov.epa.emissions.commons.io.csv.CSVExporter');
@@ -316,6 +316,30 @@ group by poll, d.ann_cost_per_ton) tbl
 order by poll, coalesce(ann_cost_per_ton,0)', false, 1, ''
 from emf.dataset_types dt
 where name in ('Control Strategy Detailed Result'); 
+
+--added for line0-based data appending 3/26/2008
+
+CREATE OR REPLACE FUNCTION public.run_sum(numeric, numeric, text, text)
+  RETURNS numeric AS
+$BODY$
+   if {![info exists GD(sum.$3.$4)]} {
+       set GD(sum.$3.$4) $1
+   }
+   if {[argisnull 1]} {
+       return $GD(sum.$3.$4)
+   } else {
+       return [set GD(sum.$3.$4) [expr $GD(sum.$3.$4) + $2]]
+   }
+$BODY$
+  LANGUAGE 'pltcl' VOLATILE;
+ALTER FUNCTION public.run_sum(numeric, numeric, text, text) OWNER TO emf;
+
+
+CREATE OR REPLACE FUNCTION public.run_sum(numeric, numeric, text)
+  RETURNS numeric AS
+'select run_sum($1,$2,$3,statement_timestamp()::text)'
+  LANGUAGE 'sql' IMMUTABLE STRICT;
+ALTER FUNCTION public.run_sum(numeric, numeric, text) OWNER TO emf;
 
 
 -- Summarize by SCC and Pollutant with Descriptions - ORL Types
