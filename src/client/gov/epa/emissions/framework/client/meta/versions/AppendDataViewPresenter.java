@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.data.viewer.DataViewPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.controlStrategy.DoubleValue;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.editor.Revision;
@@ -41,7 +42,7 @@ public class AppendDataViewPresenter {
         view.display();
     }
     
-    public void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion, int startLineNum) throws EmfException {
+    public void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion, DoubleValue startLineNum) throws EmfException {
         dataService.appendData(srcDSid, srcDSVersion, filter, targetDSid, targetDSVersion, startLineNum);
     }
     

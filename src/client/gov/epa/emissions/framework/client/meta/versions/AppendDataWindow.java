@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPres
 import gov.epa.emissions.framework.client.data.viewer.DataViewer;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.controlStrategy.DoubleValue;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -69,7 +70,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
 
     private Button okButton;
 
-    private int startLineNum;
+    private DoubleValue startLineNum;
 
     public AppendDataWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Append Data Window", new Dimension(700, 450), desktopManager);
@@ -374,10 +375,10 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
             String startLine = startLineField.getText();
 
             if (startLine == null || startLine.trim().isEmpty())
-                startLine = "-1";
+                startLine = "-1.0";
 
             try {
-                startLineNum = Integer.parseInt(startLine.trim());
+                startLineNum = new DoubleValue(Double.parseDouble(startLine.trim()));
             } catch (Exception e) {
                 throw new EmfException("Error parsing Append after Line Number field: " + e.getMessage() + ".");
             }

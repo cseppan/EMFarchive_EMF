@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.controlStrategy.DoubleValue;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
@@ -12,11 +13,14 @@ public class DataServiceTransport implements DataService {
 
     private DataMappings mappings;
     
+    private EmfMappings emfMappings;
+    
     private EmfCall call;
 
     public DataServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
         mappings = new DataMappings();
+        emfMappings = new EmfMappings();
     }
 
     private EmfCall call() throws EmfException {
@@ -218,7 +222,7 @@ public class DataServiceTransport implements DataService {
     }
 
     public void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion,
-            int targetStartLineNumber) throws EmfException {
+            DoubleValue targetStartLineNumber) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("appendData");
@@ -227,11 +231,11 @@ public class DataServiceTransport implements DataService {
         call.addStringParam("filter");
         call.addIntegerParam("targetDSid");
         call.addIntegerParam("targetDSVersion");
-        call.addIntegerParam("targetStartLineNumber");
+        call.addParam("targetStartLineNumber", emfMappings.doubleValue());
         call.setVoidReturnType();
         
         call.request(new Object[]{new Integer(srcDSid), new Integer(srcDSVersion), filter, new Integer(targetDSid),
-                new Integer(targetDSVersion), new Integer(targetStartLineNumber)});
+                new Integer(targetDSVersion), targetStartLineNumber});
     }
 
 

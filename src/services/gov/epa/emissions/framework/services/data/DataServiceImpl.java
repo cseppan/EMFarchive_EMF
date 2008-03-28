@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.io.VersionedDatasetQuery;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.controlStrategy.DoubleValue;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.qa.TableToString;
 import gov.epa.emissions.framework.tasks.DebugLevels;
@@ -291,13 +292,13 @@ public class DataServiceImpl implements DataService {
         }
 
     }
-    
+
     public void checkIfDeletable(User user, int datasetID) throws EmfException {
         Session session = this.sessionFactory.getSession();
-        
+
         try {
-            dao.checkIfUsedByCases(new int[]{datasetID}, session);
-            dao.checkIfUsedByStrategies(new int[]{datasetID}, session);
+            dao.checkIfUsedByCases(new int[] { datasetID }, session);
+            dao.checkIfUsedByStrategies(new int[] { datasetID }, session);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         } finally {
@@ -374,7 +375,7 @@ public class DataServiceImpl implements DataService {
     }
 
     public synchronized void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid,
-            int targetDSVersion, int targetStartLineNumber) throws EmfException {
+            int targetDSVersion, DoubleValue targetStartLineNumber) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         Session session = sessionFactory.getSession();
 
@@ -387,9 +388,15 @@ public class DataServiceImpl implements DataService {
             InternalSource[] targetSources = targetDS.getInternalSources();
 
             DataModifier dataModifier = datasource.dataModifier();
-            
-            if (srcDS.getDatasetType().getImporterClassName().equals("gov.epa.emissions.commons.io.generic.LineImporter"))
-                throw new EmfException("Line based data appending is not supported yet.");
+
+            if (srcDS.getDatasetType().getImporterClassName().equals(
+                    "gov.epa.emissions.commons.io.generic.LineImporter")) {
+                String srcTable = datasource.getName() + "." + srcSources[0].getTable();
+                String targetTable = datasource.getName() + "." + targetSources[0].getTable();
+
+                appendLineBasedData(filter, srcVersion, srcDS, srcTable, targetTable, targetDSid, targetDSVersion,
+                        dataModifier, targetStartLineNumber.getValue());
+            }
 
             if (srcSources.length != targetSources.length)
                 throw new EmfException("Source dataset set has different number of tables from target dataset.");
@@ -409,6 +416,49 @@ public class DataServiceImpl implements DataService {
             closeDB(dbServer);
             session.close();
         }
+    }
+
+    private void appendLineBasedData(String filter, Version srcVersion, EmfDataset srcDS, String srcTable,
+            String targetTable, int targetDSid, int targetDSVersion, DataModifier dataModifier, double startLineNum)
+            throws Exception {
+        String[] srcColumns = null;
+        srcColumns = getTableColumns(dataModifier, srcTable, filter);
+
+        String[] targetColumns = null;
+        targetColumns = getTableColumns(dataModifier, targetTable, "");
+
+        if (!areColumnsMatched(srcColumns, targetColumns))
+            throw new EmfException("Cannot append data - source and target datasets have different table definitions.");
+
+        VersionedDatasetQuery dsQuery = new VersionedDatasetQuery(srcVersion, srcDS);
+        double nextBiggerLineNum, increatment;
+        
+        if (startLineNum < 0) {
+            startLineNum = dataModifier.getLastRowLineNumber(targetTable);
+            increatment = 1.0;
+        } else {
+            long records2Append = dataModifier.getRowCount(dsQuery.generateFilteringQuery(" COUNT(*) ", srcTable, filter));
+            nextBiggerLineNum = dataModifier.getNextBiggerLineNumber(targetTable, startLineNum);
+            increatment = (nextBiggerLineNum - startLineNum) / (records2Append + 1);
+        }
+
+        String query = "INSERT INTO "
+                + targetTable
+                + " ("
+                + getTargetColString(targetColumns)
+                + ") ("
+                + getLineBasedSrcColString(targetDSid, targetDSVersion,
+                        srcColumns, startLineNum, increatment, srcTable, filter, dsQuery) + ")";
+
+        if (DebugLevels.DEBUG_17) {
+            LOG.warn("Append data query: " + query);
+            LOG.warn("Query starts at: " + new Date());
+        }
+
+        dataModifier.execute(query);
+
+        if (DebugLevels.DEBUG_17)
+            LOG.warn("Query ends at: " + new Date());
     }
 
     private void appendData2SingleTable(String filter, Version srcVersion, EmfDataset srcDS, String srcTable,
@@ -482,13 +532,39 @@ public class DataServiceImpl implements DataService {
         return true;
     }
 
+    private String getLineBasedSrcColString(int targetDSid, int targetDSVersion, String[] cols, double startLineNum,
+            double increatment, String srcTable, String filter, VersionedDatasetQuery dsQuery) {
+        // NOTE: assume first 4 columns are record_id, dataset_id, version, delete_versions
+        // which is common for dataset tables. Omit the first column.
+        // delete_versions is overwritten with blank string ''
+        String colString = "SELECT " + targetDSid + " AS dataset_id, " + targetDSVersion + " AS version, '' AS delete_versions";
+
+        int numOfCols = cols.length;
+        String colsOtherThanLineNumber = "";
+
+        for (int i = 4; i < numOfCols; i++) {
+            if (cols[i].equals("line_number"))
+                colString += ", public.run_sum(" + startLineNum + ", incrementor, 'line_no'::text) AS line_number";
+            else {
+                colString += ", " + cols[i];
+                colsOtherThanLineNumber += cols[i] + ", ";
+            }
+        }
+        
+        colString += " FROM (SELECT " + colsOtherThanLineNumber + " " + increatment + " AS incrementor " +
+        		"FROM " + srcTable + " WHERE " + dsQuery.getVersionQuery() + filter + " ORDER BY line_number) AS srctbl";
+
+        return colString;
+    }
+
     private String getSrcColString(int targetDSid, int targetDSVersion, String[] cols) {
         // NOTE: assume first 4 columns are record_id, dataset_id, version, delete_versions
         // which is common for dataset tables. Omit the first column.
-        String colString = targetDSid + ", " + targetDSVersion;
+        // delete_versions is overwritten with blank string ''
+        String colString = targetDSid + " AS dataset_id, " + targetDSVersion + " AS version,  '' AS delete_versions";
         int numOfCols = cols.length;
 
-        for (int i = 3; i < numOfCols; i++)
+        for (int i = 4; i < numOfCols; i++)
             colString += ", " + cols[i];
 
         return colString;
@@ -505,6 +581,5 @@ public class DataServiceImpl implements DataService {
 
         return colString;
     }
-
 
 }

@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.controlStrategy.DoubleValue;
 
 public interface DataService {
 
@@ -42,7 +43,7 @@ public interface DataService {
     long getTableRecordCount(String qualifiedTableName) throws EmfException;
 
     void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion,
-            int targetStartLineNumber) throws EmfException;
+            DoubleValue targetStartLineNumber) throws EmfException;
 
     void checkIfDeletable(User user, int datasetID) throws EmfException;
 
