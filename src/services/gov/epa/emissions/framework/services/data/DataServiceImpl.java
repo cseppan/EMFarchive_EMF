@@ -389,6 +389,9 @@ public class DataServiceImpl implements DataService {
 
             DataModifier dataModifier = datasource.dataModifier();
 
+            if (srcSources.length != targetSources.length)
+                throw new EmfException("Source dataset set has different number of tables from target dataset.");
+
             if (srcDS.getDatasetType().getImporterClassName().equals(
                     "gov.epa.emissions.commons.io.generic.LineImporter")) {
                 String srcTable = datasource.getName() + "." + srcSources[0].getTable();
@@ -396,10 +399,8 @@ public class DataServiceImpl implements DataService {
 
                 appendLineBasedData(filter, srcVersion, srcDS, srcTable, targetTable, targetDSid, targetDSVersion,
                         dataModifier, targetStartLineNumber.getValue());
+                return;
             }
-
-            if (srcSources.length != targetSources.length)
-                throw new EmfException("Source dataset set has different number of tables from target dataset.");
 
             for (int i = 0; i < targetSources.length; i++) {
                 String srcTable = datasource.getName() + "." + srcSources[i].getTable();
@@ -436,10 +437,15 @@ public class DataServiceImpl implements DataService {
         if (startLineNum < 0) {
             startLineNum = dataModifier.getLastRowLineNumber(targetTable);
             increatment = 1.0;
+            
         } else {
             long records2Append = dataModifier.getRowCount(dsQuery.generateFilteringQueryWithoutOrderBy(" COUNT(*) ", srcTable, filter));
             nextBiggerLineNum = dataModifier.getNextBiggerLineNumber(targetTable, startLineNum);
-            increatment = (nextBiggerLineNum - startLineNum) / (records2Append + 1);
+            
+            if (nextBiggerLineNum < 0)
+                increatment = 1.0;
+            else 
+                increatment = (nextBiggerLineNum - startLineNum) / (records2Append + 1);
         }
 
         String query = "INSERT INTO "
