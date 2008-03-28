@@ -98,13 +98,16 @@ public class AppendDataViewPresenter {
         session.dataCommonsService().addRevision(revision);
     }
     
-    public void checkIfDeletable(EmfDataset dataset) throws EmfException {
+    public void checkIfDeletable(EmfDataset localDataset) throws EmfException {
+        if (localDataset.getId() == this.dataset.getId())
+            throw new EmfException("Cannot delete current target dataset.");
+        
         String currentUser = user.getUsername();
         
-        if (!currentUser.equals(dataset.getCreator()))
+        if (!currentUser.equals(localDataset.getCreator()))
             throw new EmfException("Current user is not the creator.");
                
-        dataService.checkIfDeletable(user, dataset.getId());
+        dataService.checkIfDeletable(user, localDataset.getId());
     }
 
     public EmfDataset getDataset(String sourceDSName) throws EmfException {

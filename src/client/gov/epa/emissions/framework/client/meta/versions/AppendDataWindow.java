@@ -290,7 +290,8 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
                 presenter.doDisplayPropertiesView(view, sourceDataset);
             } else if (sourceDataset.getInternalSources().length == 1) {
                 String table = sourceDataset.getInternalSources()[0].getTable();
-                DataViewer view = new DataViewer(sourceDataset, parentConsole, desktopManager, sourceFilterField.getText());
+                DataViewer view = new DataViewer(sourceDataset, parentConsole, desktopManager, sourceFilterField
+                        .getText());
                 presenter.doView((Version) sourceVersionBox.getSelectedItem(), table, view);
             } else
                 messagePanel.setError("Could not open viewer.This is an external file.");
@@ -317,10 +318,10 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
                     boolean sameDef = presenter.checkTableDefinitions(sourceDataset, presenter.getDataset());
 
                     if (!sameDef) {
-                        String defMsg = "Source dataset and target dataset have different table definitions. Would you like to proceed to append data anyway?";
+                        String defMsg = "Source dataset and target dataset have different table definitions.\nWould you like to proceed to append data anyway?";
                         int answer = JOptionPane.showConfirmDialog(parentConsole, defMsg, title,
                                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                        
+
                         if (answer != JOptionPane.YES_OPTION)
                             return;
                     }
