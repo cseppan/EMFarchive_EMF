@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.client.transport;
 
 import java.io.File;
 
+import javax.xml.namespace.QName;
+
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.cost.controlStrategy.DoubleValue;
 
@@ -22,8 +24,8 @@ public class EmfMappings extends Mappings {
         caseMappings.register(call);
         dataMappings.register(call);
 
-        bean(call, DoubleValue.class, "DoubleValue");
-        array(call, DoubleValue[].class, "DoubleValueArray");
+        bean(call, DoubleValue.class, doubleValue());
+        array(call, DoubleValue[].class, doubleValueArray());
 
         bean(call, EmfFileSystemView.class, "EmfFileSystemView");
         
@@ -31,5 +33,12 @@ public class EmfMappings extends Mappings {
         array(call, File[].class, files());
     }
 
+    public QName doubleValue() {
+        return qname("DoubleValue");
+    }
+    
+    public QName doubleValueArray() {
+        return qname("DoubleValueArray");
+    }
 
 }
