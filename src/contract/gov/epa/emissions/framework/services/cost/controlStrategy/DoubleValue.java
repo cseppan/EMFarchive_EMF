@@ -7,6 +7,10 @@ public class DoubleValue {
     public DoubleValue() {
         //
     }
+    
+    public DoubleValue(double value) {
+        this.value = value;
+    }
 
     public double getValue() {
         return value;
