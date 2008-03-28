@@ -225,7 +225,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
 
         for (Iterator<String> iter = colTypes.iterator(); iter.hasNext();) {
             String type = iter.next().trim();
-
+            //using postgresql data types.
             if (type.toUpperCase().startsWith("VARCHAR"))
                 colClasses.add(String.class);
             else if (type.toUpperCase().startsWith("TEXT"))
