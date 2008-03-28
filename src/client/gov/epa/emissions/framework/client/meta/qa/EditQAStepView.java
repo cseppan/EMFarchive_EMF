@@ -24,6 +24,8 @@ public interface EditQAStepView extends ManagedView {
     
     void updateInventories(Object [] inventories, Object [] invTables, String summaryType);
     
+    void updateInventories(Object [] inventories, Object [] invTables, String summaryType, String emissionType);
+    
     void updateInventories(Object [] invBase, Object [] invControl, Object [] invTables, String summaryType);
     
     void updateInventories(Object [] inventories);

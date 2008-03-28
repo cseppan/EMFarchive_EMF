@@ -34,31 +34,31 @@ import javax.swing.SpringLayout;
 
 public class EditQAEmissionsWindow extends DisposableInteralFrame implements EditQAEmissionsView {
     
-    private AddRemoveDatasetWidget datasetWidget;
+    protected AddRemoveDatasetWidget datasetWidget;
     
-    private EmfConsole parentConsole;
+    protected EmfConsole parentConsole;
     
-    private JPanel layout;
+    protected JPanel layout;
     
-    private EditQAEmissionsPresenter presenter1;
+    protected EditQAEmissionsPresenter presenter1;
     
-    private ListWidget invTable;
+    protected ListWidget invTable;
     
-    private EmfSession session;
+    protected EmfSession session;
     
-    private SingleLineMessagePanel messagePanel;
+    protected SingleLineMessagePanel messagePanel;
     
 //    private Button addButton;
     
-    private EmfDataset[] inventories;
+    protected EmfDataset[] inventories;
     
-    private EmfDataset[] invTables;
+    protected EmfDataset[] invTables;
     
-    private ComboBox summaryTypes;
+    protected ComboBox summaryTypes;
     
-    private String summaryType; 
+    protected String summaryType; 
     
-    private String program;
+    protected String program;
         
     public EditQAEmissionsWindow(DesktopManager desktopManager, String program, EmfSession session, EmfDataset[] inventories, EmfDataset [] invTables, String summaryType) {
         
@@ -106,7 +106,7 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         return layout;
     }
     
-    private JPanel emisinv() {
+    protected JPanel emisinv() {
         datasetWidget = new AddRemoveDatasetWidget(this, program, parentConsole, session);
         datasetWidget.setPreferredSize(new Dimension(350,250));
         if(inventories != null && inventories.length > 0)
@@ -114,7 +114,7 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         return datasetWidget;
     }
     
-    private JPanel invTablePanel() {
+    protected JPanel invTablePanel() {
         
         invTable = new ListWidget(new EmfDataset[0]);
         if(!(invTables==null) && (invTables.length > 0))
@@ -134,7 +134,7 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         return invPanel;
     }
     
-    private void summaryTypeCombo() {
+    protected void summaryTypeCombo() {
         String [] values= new String[]{"State", "State+SCC", "County", "County+SCC"};
         summaryTypes = new ComboBox("Not Selected", values);
         summaryTypes.setPreferredSize(new Dimension(350, 25));
@@ -155,7 +155,7 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         return panel;
     }
     
-    private Action addAction() {
+    protected Action addAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doAddWindow();
@@ -164,7 +164,7 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
     }
   
 
-    private Action cancelAction() {
+    protected Action cancelAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -186,7 +186,7 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         };
     }
     
-    private void doAddWindow() {
+    protected void doAddWindow() {
         List<DatasetType> datasetTypeList = new ArrayList<DatasetType>();
         try {
             DatasetType[] allDatasetTypes = session.dataCommonsService().getDatasetTypes();
@@ -208,7 +208,7 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         }
     }
     
-    private void setDatasetsFromStepWindow(EmfDataset [] datasets){
+    protected void setDatasetsFromStepWindow(EmfDataset [] datasets){
         invTable.removeAll();
         for (int i = 0; i < datasets.length; i++) {
             //System.out.println(" Inv dataset is: " + datasets[i]);
@@ -216,7 +216,8 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         }
     }
     
-    private void setDatasets(EmfDataset [] datasets) {
+    protected void setDatasets(EmfDataset [] datasets) {
+        invTable.removeAllElements();
         for (int i = 0; i < datasets.length; i++) {
            //System.out.println(" Inv dataset is: " + datasets[i]);
            invTable.addElement(datasets[i]);
@@ -224,11 +225,11 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         
     }
     
-   private Object[] getInvTableDatasets() {
+    protected Object[] getInvTableDatasets() {
         return invTable.getAllElements();
    }
    
-   private String getSummaryType(){
+    protected String getSummaryType(){
        if (summaryTypes.getSelectedItem()==null)
            return ""; 
        return summaryTypes.getSelectedItem().toString();

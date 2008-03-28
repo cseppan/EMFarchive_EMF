@@ -106,11 +106,13 @@ public class SQLMultiInvDiffProgramQuery {
          String diffQuery = "select @@!, t.poll, t.base_ann_emis, t.compare_ann_emis, (t.compare_ann_emis-t.base_ann_emis) as diff_ann_emis, " 
              + " \nabs(t.compare_ann_emis-t.base_ann_emis) as abs_diff_ann, "
              + " \ncase when t.base_ann_emis >0  then (abs(t.compare_ann_emis-t.base_ann_emis)/t.base_ann_emis) "
+             + " \ncase when t.base_ann_emis >0  then (t.compare_ann_emis-t.base_ann_emis/t.base_ann_emis) "
              + " \nelse null "
              + " \nend as percent_diff_ann, "
              + " \nt.base_avd_emis, t.compare_avd_emis, (t.compare_avd_emis-t.base_avd_emis) as diff_avd_emis, " 
              + " \nabs(t.compare_avd_emis-t.base_avd_emis) as abs_diff_avd, "
              + " \ncase when t.base_avd_emis >0  then (abs(t.compare_avd_emis-t.base_avd_emis)/t.base_avd_emis) "
+             + " \ncase when t.base_avd_emis >0  then (t.compare_avd_emis-t.base_avd_emis/t.base_avd_emis) "
              + " \nelse null "
              + " \nend as percent_diff_avd "
              

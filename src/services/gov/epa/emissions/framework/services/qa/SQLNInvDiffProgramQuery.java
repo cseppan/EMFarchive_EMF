@@ -22,7 +22,7 @@ public class SQLNInvDiffProgramQuery {
 //    private static final String invTag = "-inventories";
     
     private static final String invTableTag = "-invtable";
-
+    private static final String emissionTypeTag = "-emissionType";
     private static final String summaryTypeTag = "-summaryType";
 
     private boolean hasInvTableDataset;
@@ -40,6 +40,7 @@ public class SQLNInvDiffProgramQuery {
         
         //get applicable tables from the program arguments
         String invBaseToken = "";
+        String invEmisToken = "ann";
         String invtableToken = "";
         String summaryTypeToken = "State+SCC";
         String invTableDatasetName = "";
@@ -51,25 +52,31 @@ public class SQLNInvDiffProgramQuery {
         
 //        int indexBase = programArguments.indexOf(invTag);
         int indexInvTable = programArguments.indexOf(invTableTag);
+        int emisIndex = programArguments.indexOf(emissionTypeTag);
         int indexSumType = programArguments.indexOf(summaryTypeTag);
         
         ArrayList<String> datasetNames = new ArrayList<String>();
         
-        if (indexInvTable != -1){
+        if (indexInvTable != -1 && emisIndex !=-1){
             invBaseToken = programArguments.substring(0, indexInvTable).trim();
-            invtableToken = programArguments.substring(indexInvTable + invTableTag.length(), indexSumType == -1 ? programArguments.length() : indexSumType);
+            invtableToken = programArguments.substring(indexInvTable+ invTableTag.length(), emisIndex);
+            invEmisToken = programArguments.substring(emisIndex + emissionTypeTag.length(), indexSumType == -1 ? programArguments.length() : indexSumType);
         }
         if (indexSumType != -1) {
             summaryTypeToken = programArguments.substring(indexSumType + summaryTypeTag.length()).trim();
         } 
         //default just in case...
+         
+        if (invEmisToken.trim().startsWith("Average"))
+            invEmisToken = "avd";
+        
         if (summaryTypeToken.trim().length() == 0)
             summaryTypeToken = "State+SCC";
 
          //parse inventories names for base and compare...
         if (invBaseToken.length() > 0 ) {
             StringTokenizer tokenizer2 = new StringTokenizer(invBaseToken);
-            tokenizer2.nextToken();
+            tokenizer2.nextToken();  // skip -inventoy tag
             while (tokenizer2.hasMoreTokens()) {
                 String datasetName = tokenizer2.nextToken().trim();
                 if (datasetName.length() > 0)
@@ -102,7 +109,7 @@ public class SQLNInvDiffProgramQuery {
                  }
              }
              datasetName = datasetName.replaceAll(" ", "_");
-             sqlAnnEmisList += (j > 0 ? "," : "") + "sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * t" + j + ".ann_emis" : "null") + ", t" + j + ".ann_emis)) as \"" + datasetName + "\"";
+             sqlAnnEmisList += (j > 0 ? "," : "") + "sum(coalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * t" + j + "." + invEmisToken + "_emis" : "null") + ", t" + j + "." + invEmisToken + "_emis)) as \"" + datasetName + "\"";
          }
 
          String diffQuery = "select @!@, " 
@@ -122,7 +129,7 @@ public class SQLNInvDiffProgramQuery {
          String innerSQLBase = "";
          for (int j = 0; j < datasetNames.size(); j++) {
              innerSQLBase += (j > 0 ? " \nfull outer join " : "") 
-                 + "(" + createDatasetQuery(datasetNames.get(j).toString().trim())
+                 + "(" + createDatasetQuery(datasetNames.get(j).toString().trim(), invEmisToken.trim())
                  + ") as t" + j + (j > 0 ? " \non " : "");
              if (j > 0) {
                  if (summaryTypeToken.equals("State+SCC")) 
@@ -192,14 +199,12 @@ public class SQLNInvDiffProgramQuery {
     }
 
     
-    private String createDatasetQuery(String datasetName) throws EmfException {
+    private String createDatasetQuery(String datasetName, String emisType) throws EmfException {
 
         String sql = "";
         sql = "\nselect !@!, trim(poll) as poll, sum(ann_emis) as ann_emis, sum(avd_emis) as avd_emis  \nfrom $DATASET_TABLE[\"" + 
         datasetName + "\", 1] m  \ngroup by !!@, trim(poll) ";
-
         sql = query(sql, false);
-
         return sql;
     }
 

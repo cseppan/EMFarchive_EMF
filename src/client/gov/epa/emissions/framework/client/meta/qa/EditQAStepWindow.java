@@ -127,6 +127,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private EmfDataset origDataset;
 
     private String summaryType = "";
+    private String emissionType = "";
 
     private static final String invTag = "-inventories";
     
@@ -136,6 +137,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private static final String invTableTag = "-invtable";
 
     private static final String summaryTypeTag = "-summaryType";
+    
+    private static final String emissionTypeTag = "-emissionType";
 
     private static final String avgDaySummaryProgram = "Average day to Annual State Summary";
 
@@ -541,11 +544,18 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         programSwitches = programArguments.getText();
         int invTableIndex = programSwitches.indexOf(invTableTag);
         int invIndex = programSwitches.indexOf(invTag);
+        int emiIndex = programSwitches.indexOf(emissionTypeTag);
         int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
 
         if (avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                || fireDataSummaryProgram.equals(program.getSelectedItem())
-                || MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString())
+                || fireDataSummaryProgram.equals(program.getSelectedItem())){
+            if (!(programSwitches.trim().equals("")) && invIndex != -1 
+                   && invTableIndex !=-1 && emiIndex !=-1 && sumTypeIndex !=-1)
+                check =true; 
+            else 
+                check = false; 
+            
+        }else if (MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString())
                 || MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
             if (!(programSwitches.trim().equals("")) && invIndex != -1 && invTableIndex !=-1) {
                 getInventories(programSwitches, 0, invTableIndex);
@@ -645,6 +655,16 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         invCompare = compareInvList.toArray(new EmfDataset[compareInvList.size()]);
     }
     
+    private void getEmissionType(String programSwitches, int emiIndex, int sumTypeIndex) {
+        String emissionTypeToken = "";
+        // return if no summary type 
+        emissionTypeToken = programSwitches.substring(emiIndex, sumTypeIndex);
+        StringTokenizer tokenizer3 = new StringTokenizer(emissionTypeToken);
+        tokenizer3.nextToken(); // skip the -emisionType flag
+
+        if (tokenizer3.hasMoreTokens())
+            emissionType = tokenizer3.nextToken().trim();
+    }
     
     private void getSummaryType(String programSwitches, int sumTypeIndex) {
         String summaryTypeToken = "";
@@ -655,7 +675,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         }
         summaryTypeToken = programSwitches.substring(sumTypeIndex);
         StringTokenizer tokenizer3 = new StringTokenizer(summaryTypeToken);
-        tokenizer3.nextToken(); // skip the -inventories flag
+        tokenizer3.nextToken(); // skip the -summaryType flag
 
         if (tokenizer3.hasMoreTokens())
             summaryType = tokenizer3.nextToken().trim();
@@ -694,10 +714,11 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 saveButton.setEnabled(true);
                 runButton.setEnabled(true);
                 if (avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                        || fireDataSummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                        || MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                        || MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+                        || fireDataSummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showAvgDaySummaryWindow();
+                }else if (MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString())
+                        || MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+                    showColumnSummaryWindow();
                 } else if (avgDayToAnnualProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
                     showAvgDayToAnnualWindow();
                 } else if (MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
@@ -790,6 +811,50 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         presenter.display(origDataset, step);
 
     }
+    
+    private void showColumnSummaryWindow() {
+        // When there is no data in window, set button causes new window to pop up,
+        // with the warning message to also show up. When data in window is invalid, a new window still
+        // pops up, but with a different warning message.
+        // Also change the window name to EditQASetArgumentsWindow
+        inventories = null;
+        invTables = null;
+        summaryType = "";
+        emissionType =""; 
+
+        String programSwitches = "";
+        String programVal = program.getSelectedItem().toString();
+        
+        programSwitches = programArguments.getText();
+        int invTableIndex = programSwitches.indexOf(invTableTag);
+        int invIndex = programSwitches.indexOf(invTag);
+        int emiIndex = programSwitches.indexOf(emissionTypeTag);
+        int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
+        if (!(programSwitches.trim().equals("")) 
+                && invIndex != -1 && invTableIndex != -1 
+                && emiIndex !=-1 && sumTypeIndex != -1) {
+            try {
+                getInventories(programSwitches, 0, invTableIndex);
+                getInventoryTable(programSwitches, invTableIndex, emiIndex);
+                getEmissionType(programSwitches, emiIndex, sumTypeIndex);
+                System.out.println("annual vs average " + emissionType);
+                getSummaryType(programSwitches, sumTypeIndex);
+            } catch (EmfException e) {
+                messagePanel.setError(e.getMessage());
+            }finally{
+                EditQAEmissionsColumnBasedWindow view = new EditQAEmissionsColumnBasedWindow(desktopManager, programVal, session, inventories, invTables,
+                        summaryType, emissionType);
+                EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+                presenter.display(origDataset, step); 
+            }
+        }
+        EditQAEmissionsColumnBasedWindow view = new EditQAEmissionsColumnBasedWindow(desktopManager, programVal, session, inventories, invTables,
+                summaryType, emissionType);
+        EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+        presenter.display(origDataset, step);
+
+    }
+
 
     private void showAvgDayToAnnualWindow() {
         // When there is no data in window, set button causes new window to pop up,
@@ -834,6 +899,24 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         String datasetNames = "";
         datasetNames += getInvString(invTag, retreivedInventories);
         datasetNames += getInvString(invTableTag, retrievedInvTable);
+        
+        datasetNames += summaryTypeTag + "\n";
+        if (summaryType.length() > 0)
+            datasetNames += summaryType + "\n" ;
+        updateArgumentsTextArea(datasetNames);
+
+    }
+    
+    public void updateInventories(Object[] retreivedInventories, Object[] retrievedInvTable,
+            String summaryType, String emissionType) {
+        clear();
+        String datasetNames = "";
+        datasetNames += getInvString(invTag, retreivedInventories);
+        datasetNames += getInvString(invTableTag, retrievedInvTable);
+        
+        datasetNames += emissionTypeTag + "\n";
+        if (emissionType.length() > 0)
+            datasetNames += emissionType + "\n" ;
         
         datasetNames += summaryTypeTag + "\n";
         if (summaryType.length() > 0)
