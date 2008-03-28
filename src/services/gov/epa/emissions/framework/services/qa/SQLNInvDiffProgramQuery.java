@@ -69,6 +69,8 @@ public class SQLNInvDiffProgramQuery {
          
         if (invEmisToken.trim().startsWith("Average"))
             invEmisToken = "avd";
+        if (invEmisToken.trim().startsWith("Annual"))
+            invEmisToken = "ann";
         
         if (summaryTypeToken.trim().length() == 0)
             summaryTypeToken = "State+SCC";

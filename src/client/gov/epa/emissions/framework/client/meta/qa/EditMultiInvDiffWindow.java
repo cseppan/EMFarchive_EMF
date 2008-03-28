@@ -230,6 +230,7 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
     }
     
     private void setDatasets(EmfDataset [] datasets) {
+        invTable.removeAllElements();
         for (int i = 0; i < datasets.length; i++) {
            //System.out.println(" Inv dataset is: " + datasets[i]);
            invTable.addElement(datasets[i]);

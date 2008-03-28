@@ -837,7 +837,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 getInventories(programSwitches, 0, invTableIndex);
                 getInventoryTable(programSwitches, invTableIndex, emiIndex);
                 getEmissionType(programSwitches, emiIndex, sumTypeIndex);
-                System.out.println("annual vs average " + emissionType);
+                //System.out.println("annual vs average " + emissionType);
                 getSummaryType(programSwitches, sumTypeIndex);
             } catch (EmfException e) {
                 messagePanel.setError(e.getMessage());
