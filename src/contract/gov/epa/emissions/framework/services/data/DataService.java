@@ -46,5 +46,7 @@ public interface DataService {
             DoubleValue targetStartLineNumber) throws EmfException;
 
     void checkIfDeletable(User user, int datasetID) throws EmfException;
+    
+    boolean checkTableDefinitions(int srcDSid, int targetDSid) throws EmfException;
 
 }

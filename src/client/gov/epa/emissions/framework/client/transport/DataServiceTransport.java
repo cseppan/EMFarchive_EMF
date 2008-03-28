@@ -237,6 +237,17 @@ public class DataServiceTransport implements DataService {
         call.request(new Object[]{new Integer(srcDSid), new Integer(srcDSVersion), filter, new Integer(targetDSid),
                 new Integer(targetDSVersion), targetStartLineNumber});
     }
+    
+    public boolean checkTableDefinitions(int srcDSid, int targetDSid) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("checkTableDefinitions");
+        call.addIntegerParam("srcDSid");
+        call.addIntegerParam("targetDSid");
+        call.setBooleanReturnType();
+        
+        return (Boolean)call.requestResponse(new Object[]{new Integer(srcDSid), new Integer(targetDSid)});
+    }
 
 
 }

@@ -125,4 +125,15 @@ public class AppendDataViewPresenter {
             dataService.releaseLockedDataset(user, locked);
         }
     }
+    
+    public boolean checkTableDefinitions(EmfDataset srcDS, EmfDataset targetDS) throws EmfException {
+        boolean sameDefinition = false;
+        
+        try {
+            sameDefinition = dataService.checkTableDefinitions(srcDS.getId(), targetDS.getId());
+            return sameDefinition;
+        } catch (Exception e) {
+            throw new EmfException("Please check your source dataset table columns carefully before append: " + e.getMessage());
+        } 
+    }
 }

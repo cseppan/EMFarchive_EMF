@@ -36,6 +36,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -307,6 +308,22 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
 
                 try {
                     validateSelections();
+                } catch (Exception e) {
+                    setErrorMsg(e.getMessage());
+                    return;
+                }
+
+                try {
+                    boolean sameDef = presenter.checkTableDefinitions(sourceDataset, presenter.getDataset());
+
+                    if (!sameDef) {
+                        String defMsg = "Source dataset and target dataset have different table definitions. Would you like to proceed to append data anyway?";
+                        int answer = JOptionPane.showConfirmDialog(parentConsole, defMsg, title,
+                                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                        
+                        if (answer != JOptionPane.YES_OPTION)
+                            return;
+                    }
                 } catch (Exception e) {
                     setErrorMsg(e.getMessage());
                     return;

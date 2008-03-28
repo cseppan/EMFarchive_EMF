@@ -428,23 +428,21 @@ public class DataServiceImpl implements DataService {
         String[] targetColumns = null;
         targetColumns = getTableColumns(dataModifier, targetTable, "");
 
-        if (!areColumnsMatched(srcColumns, targetColumns))
-            throw new EmfException("Cannot append data - source and target datasets have different table definitions.");
-
         VersionedDatasetQuery dsQuery = new VersionedDatasetQuery(srcVersion, srcDS);
         double nextBiggerLineNum, increatment;
-        
+
         if (startLineNum < 0) {
             startLineNum = dataModifier.getLastRowLineNumber(targetTable);
             increatment = 1.0;
-            
+
         } else {
-            long records2Append = dataModifier.getRowCount(dsQuery.generateFilteringQueryWithoutOrderBy(" COUNT(*) ", srcTable, filter));
+            long records2Append = dataModifier.getRowCount(dsQuery.generateFilteringQueryWithoutOrderBy(" COUNT(*) ",
+                    srcTable, filter));
             nextBiggerLineNum = dataModifier.getNextBiggerLineNumber(targetTable, startLineNum);
-            
+
             if (nextBiggerLineNum < 0)
                 increatment = 1.0;
-            else 
+            else
                 increatment = (nextBiggerLineNum - startLineNum) / (records2Append + 1);
         }
 
@@ -453,8 +451,8 @@ public class DataServiceImpl implements DataService {
                 + " ("
                 + getTargetColString(targetColumns)
                 + ") ("
-                + getLineBasedSrcColString(targetDSid, targetDSVersion,
-                        srcColumns, startLineNum, increatment, srcTable, filter, dsQuery) + ")";
+                + getLineBasedSrcColString(targetDSid, targetDSVersion, srcColumns, startLineNum, increatment,
+                        srcTable, filter, dsQuery) + ")";
 
         if (DebugLevels.DEBUG_17) {
             LOG.warn("Append data query: " + query);
@@ -475,16 +473,13 @@ public class DataServiceImpl implements DataService {
         String[] targetColumns = null;
         targetColumns = getTableColumns(dataModifier, targetTable, "");
 
-        if (!areColumnsMatched(srcColumns, targetColumns))
-            throw new EmfException("Cannot append data - source and target datasets have different table definitions.");
-
         VersionedDatasetQuery dsQuery = new VersionedDatasetQuery(srcVersion, srcDS);
         String query = "INSERT INTO "
                 + targetTable
                 + " ("
                 + getTargetColString(targetColumns)
                 + ") ("
-                + dsQuery.generateFilteringQuery(getSrcColString(targetDSid, targetDSVersion, srcColumns), srcTable,
+                + dsQuery.generateFilteringQuery(getSrcColString(targetDSid, targetDSVersion, srcColumns, targetColumns), srcTable,
                         filter) + ")";
 
         if (DebugLevels.DEBUG_17) {
@@ -525,6 +520,45 @@ public class DataServiceImpl implements DataService {
         return cols.toArray(new String[0]);
     }
 
+    public boolean checkTableDefinitions(int srcDSid, int targetDSid) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        Session session = sessionFactory.getSession();
+
+        try {
+            Datasource datasource = dbServer.getEmissionsDatasource();
+            EmfDataset srcDS = dao.getDataset(session, srcDSid);
+            InternalSource[] srcSources = srcDS.getInternalSources();
+            EmfDataset targetDS = dao.getDataset(session, targetDSid);
+            InternalSource[] targetSources = targetDS.getInternalSources();
+
+            DataModifier dataModifier = datasource.dataModifier();
+
+            if (srcSources.length != targetSources.length)
+                throw new EmfException("Source dataset set has different number of tables from target dataset.");
+
+            for (int i = 0; i < targetSources.length; i++) {
+                String srcTable = datasource.getName() + "." + srcSources[i].getTable();
+                String targetTable = datasource.getName() + "." + targetSources[i].getTable();
+
+                String[] srcCols = getTableColumns(dataModifier, srcTable, "");
+                String[] targetCols = getTableColumns(dataModifier, targetTable, "");
+
+                if (!areColumnsMatched(srcCols, targetCols))
+                    return false;
+            }
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("Could not query table : ", e);
+            throw new EmfException("Could not query table: " + e.getMessage());
+        } finally {
+            closeDB(dbServer);
+            session.close();
+        }
+
+    }
+
     private boolean areColumnsMatched(String[] srcColumns, String[] targetColumns) {
         if (srcColumns.length != targetColumns.length)
             return false;
@@ -543,7 +577,8 @@ public class DataServiceImpl implements DataService {
         // NOTE: assume first 4 columns are record_id, dataset_id, version, delete_versions
         // which is common for dataset tables. Omit the first column.
         // delete_versions is overwritten with blank string ''
-        String colString = "SELECT " + targetDSid + " AS dataset_id, " + targetDSVersion + " AS version, '' AS delete_versions";
+        String colString = "SELECT " + targetDSid + " AS dataset_id, " + targetDSVersion
+                + " AS version, '' AS delete_versions";
 
         int numOfCols = cols.length;
         String colsOtherThanLineNumber = "";
@@ -556,22 +591,22 @@ public class DataServiceImpl implements DataService {
                 colsOtherThanLineNumber += cols[i] + ", ";
             }
         }
-        
-        colString += " FROM (SELECT " + colsOtherThanLineNumber + " " + increatment + " AS incrementor " +
-        		"FROM " + srcTable + " WHERE " + dsQuery.getVersionQuery() + filter + " ORDER BY line_number) AS srctbl";
+
+        colString += " FROM (SELECT " + colsOtherThanLineNumber + " " + increatment + " AS incrementor " + "FROM "
+                + srcTable + " WHERE " + dsQuery.getVersionQuery() + filter + " ORDER BY line_number) AS srctbl";
 
         return colString;
     }
 
-    private String getSrcColString(int targetDSid, int targetDSVersion, String[] cols) {
+    private String getSrcColString(int targetDSid, int targetDSVersion, String[] srcCols, String[] targetCols) {
         // NOTE: assume first 4 columns are record_id, dataset_id, version, delete_versions
         // which is common for dataset tables. Omit the first column.
         // delete_versions is overwritten with blank string ''
         String colString = targetDSid + " AS dataset_id, " + targetDSVersion + " AS version,  '' AS delete_versions";
-        int numOfCols = cols.length;
+        int numOfTargetCols = targetCols.length;
 
-        for (int i = 4; i < numOfCols; i++)
-            colString += ", " + cols[i];
+        for (int i = 4; i < numOfTargetCols; i++)
+            colString += ", " + srcCols[i];
 
         return colString;
     }
