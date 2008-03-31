@@ -153,6 +153,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private static final String MultiInvDifRepProgram = "Multi-inventory difference report";
     
     private static final String sqlProgram = "SQL";
+    
+    private String lineFeeder = System.getProperty("line.separator");
 
     public EditQAStepWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
         super("Edit QA Step", new Dimension(680, 580), desktopManager);
@@ -900,9 +902,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         datasetNames += getInvString(invTag, retreivedInventories);
         datasetNames += getInvString(invTableTag, retrievedInvTable);
         
-        datasetNames += summaryTypeTag + "\n";
+        datasetNames += summaryTypeTag + lineFeeder;
         if (summaryType.length() > 0)
-            datasetNames += summaryType + "\n" ;
+            datasetNames += summaryType + lineFeeder ;
         updateArgumentsTextArea(datasetNames);
 
     }
@@ -914,13 +916,13 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         datasetNames += getInvString(invTag, retreivedInventories);
         datasetNames += getInvString(invTableTag, retrievedInvTable);
         
-        datasetNames += emissionTypeTag + "\n";
+        datasetNames += emissionTypeTag + lineFeeder;
         if (emissionType.length() > 0)
-            datasetNames += emissionType + "\n" ;
+            datasetNames += emissionType + lineFeeder ;
         
-        datasetNames += summaryTypeTag + "\n";
+        datasetNames += summaryTypeTag + lineFeeder;
         if (summaryType.length() > 0)
-            datasetNames += summaryType + "\n" ;
+            datasetNames += summaryType + lineFeeder ;
         updateArgumentsTextArea(datasetNames);
 
     }
@@ -932,17 +934,17 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         datasetNames += getInvString(invCompareTag, invCompare);
         datasetNames += getInvString(invTableTag, invTables);
         
-        datasetNames += summaryTypeTag + "\n";
+        datasetNames += summaryTypeTag + lineFeeder;
         if (summaryType.length() > 0)
-            datasetNames += summaryType + "\n";
+            datasetNames += summaryType + lineFeeder;
 
         updateArgumentsTextArea(datasetNames);
     }
     
     private String getInvString(String tag, Object[] inventories){
-        String invString =tag + "\n";
+        String invString =tag + lineFeeder;
         for (int i = 0; i < inventories.length; i++) {
-            invString += ((EmfDataset) inventories[i]).getName() + "\n";
+            invString += ((EmfDataset) inventories[i]).getName() + lineFeeder;
         }   
         return invString;
     }

@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.QAProgram;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -12,6 +13,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.util.StringTokenizer;
 
 public class ViewQAStepPresenter {
 
@@ -63,7 +65,7 @@ public class ViewQAStepPresenter {
             if (!localFile.exists() || localFile.lastModified() != qaResult.getTableCreationDate().getTime()) {
                 Writer output = new BufferedWriter(new FileWriter(localFile));
                 try {
-                    output.write( getTableAsString(qaResult) );
+                    output.write(  writerHeader(qaStep, qaResult, dataset.getName())+ getTableAsString(qaResult) );
                 }
                 finally {
                     output.close();
@@ -100,6 +102,29 @@ public class ViewQAStepPresenter {
 //        return exportDir + separator + qaStepResult.getTable() + ".csv"; // this is how exported file name was created
 //    }
 
+    private String writerHeader(QAStep qaStep, QAStepResult stepResult, String dsName){
+        String lineFeeder = System.getProperty("line.separator");
+        String header="#DATASET_NAME=" + dsName + lineFeeder;
+        header +="#DATASET_VERSION_NUM= " + qaStep.getVersion() + lineFeeder;
+        header +="#CREATION_DATE=" + CustomDateFormat.format_YYYY_MM_DD_HH_MM(stepResult.getTableCreationDate())+ lineFeeder;
+        header +="#QA_STEP_NAME=" + qaStep.getName() + lineFeeder; 
+        header +="#QA_PROGRAM=" + qaStep.getProgram()+ lineFeeder;
+        String arguments= qaStep.getProgramArguments();
+        StringTokenizer argumentTokenizer = new StringTokenizer(arguments);
+        header += "#ARGUMENTS=" +argumentTokenizer.nextToken(); // get first token
+
+        while (argumentTokenizer.hasMoreTokens()){
+            String next = argumentTokenizer.nextToken().trim(); 
+            if (next.contains("-"))
+                header += lineFeeder+ "#" +next;
+            else 
+                header += "  " +next;
+        }
+        header +=lineFeeder;
+        //arguments.replaceAll(lineFeeder, "#");
+        System.out.println("after replace  \n" + header);
+        return header;
+    }
     public QAStepResult getStepResult(QAStep step) throws EmfException {
         return session.qaService().getQAStepResult(step);
     }
