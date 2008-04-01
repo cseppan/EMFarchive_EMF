@@ -116,7 +116,8 @@ public class EditQAStepPresenter {
             if (!localFile.exists() || localFile.lastModified() != qaResult.getTableCreationDate().getTime()) {
                 Writer output = new BufferedWriter(new FileWriter(localFile));
                 try {
-                    output.write( writerHeader(qaStep, qaResult, dataset.getName())+ getTableAsString(qaResult) );
+                    output.write( writeHeader(qaStep, qaResult, dataset.getName()));
+                    output.write( getTableAsString(qaResult) );
                 }
                 finally {
                     output.close();
@@ -148,7 +149,7 @@ public class EditQAStepPresenter {
         return tempDir + separator + qaStepResult.getTable() + ".csv"; // this is how exported file name was
     }
     
-    private String writerHeader(QAStep qaStep, QAStepResult stepResult, String dsName){
+    private String writeHeader(QAStep qaStep, QAStepResult stepResult, String dsName){
         String lineFeeder = System.getProperty("line.separator");
         String header="#DATASET_NAME=" + dsName + lineFeeder;
         header +="#DATASET_VERSION_NUM= " + qaStep.getVersion() + lineFeeder;

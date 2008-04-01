@@ -145,7 +145,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
             throw new EmfException("File " + csvFile + " is not csv format. Sorry, I cannot read it.");
 
         String[] rowHeader = new String[0];
-        String fileHeader = (reader.getHeader() == null) ? "" : reader.getHeader().toString();
+        String fileHeader = ((reader.getHeader() == null) ? "" : reader.headerToString());
         String[][] colHeader = new String[1][];
         colHeader[0] = reader.getCols();
 
@@ -156,6 +156,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
         return new SpecialTableModel(fileHeader, rowHeader, colHeader, tableData, "", colClasses);
     }
 
+    
     private ArrayList<ArrayList<?>> getTableData(CSVFileReader reader, Class<?>[] colClasses) throws Exception {
         ArrayList<ArrayList<?>> tableData = new ArrayList<ArrayList<?>>();
         int numOfCols = colClasses.length;
