@@ -342,10 +342,10 @@ NGR; Utility Boiler - Coal/Wall,NNGR_UBCW,NOx,NGR,Utility Boiler - Coal/Wall,PTI
 NGR; Utility Boiler - Cyclone,NNGR_UBCY,NOx,NGR,Utility Boiler - Cyclone,PTIPM,Known,20,,2006,1,N00702
 NGR; Utility Boiler - Oil-Gas/Tangential,NNGR_UBOT,NOx,NGR,Utility Boiler - Oil-Gas/Tangential,PTIPM,Known,20,,2006,1,N00602
 NGR; Utility Boiler - Oil-Gas/Wall,NNGR_UBOW,NOx,NGR,Utility Boiler - Oil-Gas/Wall,PTIPM,Known,20,,2006,1,N00502
-NSCR; Nitric Acid Manufacturing,NNSCRNAMF,NOx,NSCR,Nitric Acid Manufacturing,PTNONIPM,Known,10,,2006,1,Abbreviation was N0293
-"NSCR; Rich Burn IC Engines - Gas, Diesel, LPG",NNSCRRBGD,NOx,NSCR,Rich Burn IC Engines - Gas/ Diesel/ LPG,PTNONIPM,Known,15,,2006,1,Abbreviation was N0465
-NSCR; Rich Burn Internal Combustion Engines -,NNSCRRBIC,NOx,NSCR,Rich Burn Internal Combustion Engines -,PTNONIPM,Known,15,,2006,1,Abbreviation was N0215
-NSCR; Rich Burn Internal Combustion Engines (2),NNSCRRBIC2,NOx,NSCR,Rich Burn Internal Combustion Engines -,PTNONIPM,Known,15,,2006,1|37,Abbreviation was N02213NSCR
+NSCR; Nitric Acid Manufacturing,NSNCRNAMF,NOx,NSCR,Nitric Acid Manufacturing,PTNONIPM,Known,10,,2006,1,Abbreviation was N0293
+"NSCR; Rich Burn IC Engines - Gas, Diesel, LPG",NSNCRRBGD,NOx,NSCR,Rich Burn IC Engines - Gas/ Diesel/ LPG,PTNONIPM,Known,15,,2006,1,Abbreviation was N0465
+NSCR; Rich Burn Internal Combustion Engines -,NSNCRRBIC,NOx,NSCR,Rich Burn Internal Combustion Engines -,PTNONIPM,Known,15,,2006,1,Abbreviation was N0215
+NSCR; Rich Burn Internal Combustion Engines (2),NSNCRRBIC2,NOx,NSCR,Rich Burn Internal Combustion Engines -,PTNONIPM,Known,15,,2006,1|37,Abbreviation was N02213NSCR
 OT + WI; Ammonia - NG-Fired Reformers,NOTWIFRNG,NOx,OT + WI,Ammonia - NG-Fired Reformers,PTNONIPM,Known,10,,2006,1,Abbreviation was N0563
 OT + WI; ICI Boilers - Natural Gas,NOTWIIBNG,NOx,OT + WI,ICI Boilers - Natural Gas,PTNONIPM,Known,10,,2006,1,Abbreviation was N0173
 OT + WI; ICI Boilers - Process Gas,NOTWIIBPG,NOx,OT + WI,ICI Boilers - Process Gas,PTNONIPM,Known,10,,2006,1,Abbreviation was N0413

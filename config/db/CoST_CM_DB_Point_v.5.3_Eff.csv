@@ -455,8 +455,8 @@ NSNCRMWCB,NOx,,,,,365,,45.00%,1990,1130,100,100,cpton,0.0944,,4.1,1130,Applied t
 NSNCRMWCB,NOx,,,,,0,365,45.00%,1990,1130,100,100,cpton,0.0944,,4.1,1130,Applied to small source types
 NSNCRMWIN,NOx,,,,,365,,45.00%,1990,4510,100,100,cpton,0.0944,,4.1,4510,Applied to large source types
 NSNCRMWIN,NOx,,,,,0,365,45.00%,1990,4510,100,100,cpton,0.0944,,4.1,4510,Applied to small source types
-NNSCRNAMF,NOx,,,,,0,365,98.00%,1990,550,100,100,cpton,0.1424,,2.4,550,Applied to small source types
-NNSCRNAMF,NOx,,,,,365,,98.00%,1990,550,100,100,cpton,0.1424,,2.4,550,Applied to large source types
+NSNCRNAMF,NOx,,,,,0,365,98.00%,1990,550,100,100,cpton,0.1424,,2.4,550,Applied to small source types
+NSNCRNAMF,NOx,,,,,365,,98.00%,1990,550,100,100,cpton,0.1424,,2.4,550,Applied to large source types
 NSNCRPHDO,NOx,,,,,0,365,60.00%,1990,3180,100,100,cpton,0.1098,,6.2,3180,Applied to small source types
 NSNCRPHDO,NOx,,,,,365,,60.00%,1990,1720,100,100,cpton,0.1098,,5.2,1720,Applied to large source types
 NSNCRPHLP,NOx,,,,,0,365,60.00%,1990,3180,100,100,cpton,0.1098,,6.2,3180,Applied to small source types
@@ -469,11 +469,11 @@ NSNCRPHPG,NOx,,,,,365,,60.00%,1990,1950,100,100,cpton,0.1098,,5.7,1950,Applied t
 NSNCRPHPG,NOx,,,,,0,365,60.00%,1990,2850,100,100,cpton,0.1098,,6.4,2850,Applied to small source types
 NSNCRPHRO,NOx,,,,,365,,60.00%,1990,1100,100,100,cpton,0.1098,,4.8,1100,Applied to large source types
 NSNCRPHRO,NOx,,,,,0,365,60.00%,1990,1930,100,100,cpton,0.1098,,6,1930,Applied to small source types
-NNSCRRBGD,NOx,,,,,365,,90.00%,1993,342,100,100,cpton,0.1098,,,,Applied to large source types
-NNSCRRBGD,NOx,,,,,0,365,90.00%,1993,342,100,100,cpton,0.1098,,2,342,Applied to small source types
-NNSCRRBIC,NOx,,,,,0,365,90.00%,1990,342,100,100,cpton,0.1098,,2,342,Applied to small source types
-NNSCRRBIC,NOx,,,,,365,,90.00%,1990,342,100,100,cpton,0.1098,,,,Applied to large source types
-NNSCRRBIC2,NOx,,,,,,,90.00%,1990,342,100,100,cpton,0.1098,,3.4,, 
+NSNCRRBGD,NOx,,,,,365,,90.00%,1993,342,100,100,cpton,0.1098,,,,Applied to large source types
+NSNCRRBGD,NOx,,,,,0,365,90.00%,1993,342,100,100,cpton,0.1098,,2,342,Applied to small source types
+NSNCRRBIC,NOx,,,,,0,365,90.00%,1990,342,100,100,cpton,0.1098,,2,342,Applied to small source types
+NSNCRRBIC,NOx,,,,,365,,90.00%,1990,342,100,100,cpton,0.1098,,,,Applied to large source types
+NSNCRRBIC2,NOx,,,,,,,90.00%,1990,342,100,100,cpton,0.1098,,3.4,, 
 NSNCRSHDO,NOx,,,,,365,,50.00%,1990,1890,100,100,cpton,0.0944,,8.2,1010,Applied to large source types
 NSNCRSHDO,NOx,,,,,0,365,50.00%,1990,4640,100,100,cpton,0.0944,,9.4,3470,Applied to small source types
 NSNCRSHNG,NOx,,,,,365,,50.00%,1990,1570,100,100,cpton,0.0944,,8.2,840,Applied to large source types
