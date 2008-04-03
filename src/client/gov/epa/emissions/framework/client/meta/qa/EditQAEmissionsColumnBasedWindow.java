@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -59,6 +60,8 @@ public class EditQAEmissionsColumnBasedWindow extends EditQAEmissionsWindow impl
         layoutGenerator.makeCompactGrid(content, 4, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad*/
+        messagePanel = new SingleLineMessagePanel();
+        layout.add(messagePanel);
         layout.add(content);
         layout.add(buttonPanel());
         
@@ -94,8 +97,10 @@ public class EditQAEmissionsColumnBasedWindow extends EditQAEmissionsWindow impl
     private Action okAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                
-                //System.out.println(invTable.getDataset());
+                if (!validateValues()){
+                    messagePanel.setError("Please select inventories, emission type or summary type");
+                    return; 
+                }
                 presenter1.updateInventories(datasetWidget.getDatasets(), getInvTableDatasets(), getSummaryType(), getEmissionType() );
                 dispose();
                 disposeView();
@@ -103,7 +108,13 @@ public class EditQAEmissionsColumnBasedWindow extends EditQAEmissionsWindow impl
         };
     }
     
-    
+    private boolean validateValues(){
+        if (datasetWidget.getDatasets().length ==0 
+                || getEmissionType().trim().equals("")
+                || getSummaryType().trim().equals(""))
+            return false; 
+        return true; 
+    }
     
    private String getEmissionType(){
        if (emissionTypes.getSelectedItem()==null)

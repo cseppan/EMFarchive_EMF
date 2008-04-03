@@ -105,6 +105,8 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
         layoutGenerator.makeCompactGrid(content, 4, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad*/
+        messagePanel = new SingleLineMessagePanel();
+        layout.add(messagePanel);
         layout.add(content);
         layout.add(buttonPanel());
         
@@ -190,13 +192,23 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
     private Action okAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                
-                //System.out.println(invTable.getDataset());
+                if (!validateValues()){
+                    messagePanel.setError("Please select base or compare inventories, or summary type");
+                    return; 
+                }
                 presenter.updateInventories(datasetWidgetBase.getDatasets(),datasetWidgetCompare.getDatasets(), getInvTableDatasets(), getSummaryType() );
                 dispose();
                 disposeView();
             }
         };
+    }
+    
+    private boolean validateValues(){
+        if (datasetWidgetBase.getDatasets().length ==0 
+                || datasetWidgetCompare.getDatasets().length ==0 
+                || getSummaryType().trim().equals(""))
+            return false; 
+        return true; 
     }
     
     private void doAddWindow() {

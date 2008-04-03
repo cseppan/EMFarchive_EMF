@@ -48,8 +48,6 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
     
     protected SingleLineMessagePanel messagePanel;
     
-//    private Button addButton;
-    
     protected EmfDataset[] inventories;
     
     protected EmfDataset[] invTables;
@@ -59,6 +57,8 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
     protected String summaryType; 
     
     protected String program;
+    
+    
         
     public EditQAEmissionsWindow(DesktopManager desktopManager, String program, EmfSession session, EmfDataset[] inventories, EmfDataset [] invTables, String summaryType) {
         
@@ -100,6 +100,8 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         layoutGenerator.makeCompactGrid(content, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad*/
+        messagePanel = new SingleLineMessagePanel();
+        layout.add(messagePanel);
         layout.add(content);
         layout.add(buttonPanel());
         
@@ -177,13 +179,22 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
     private Action okAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                
-                //System.out.println(invTable.getDataset());
+                if (!validateValues()){
+                    messagePanel.setError("Please select inventories or summary type");
+                    return; 
+                }
                 presenter1.updateInventories(datasetWidget.getDatasets(), getInvTableDatasets(), getSummaryType() );
                 dispose();
                 disposeView();
             }
         };
+    }
+    
+    private boolean validateValues(){
+        if (datasetWidget.getDatasets().length ==0 
+                || getSummaryType().trim().equals(""))
+            return false; 
+        return true; 
     }
     
     protected void doAddWindow() {
