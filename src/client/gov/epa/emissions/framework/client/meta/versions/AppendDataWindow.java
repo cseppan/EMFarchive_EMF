@@ -187,6 +187,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
         }
 
         targetDatasetVerison = new ComboBox("Select a version", versions);
+        targetDatasetVerison.setToolTipText("Select a nonfinal version of target dataset to append rows into");
         layoutGenerator.addLabelWidgetPair("Nonfinal Version  ", targetDatasetVerison, pairPanel);
 
         // Lay out the panel.
