@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.services.cost.analysis.leastcost;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
@@ -75,8 +74,9 @@ public class StrategyLoader extends AbstractStrategyLoader {
     }
 
     private EmfDataset createDataset() throws EmfException {
-        return creator.addDataset("LeatCostCM_", "CSLCM_", 
-                DatasetCreator.createDatasetName("Strat_LCCMWS_", CustomDateFormat.format_YYYYMMDDHHMMSS(new Date())), getControlStrategyLeastCostCMWorksheetDatasetType(), 
+        //"LeatCostCM_", 
+        return creator.addDataset("CSLCM_", 
+                DatasetCreator.createDatasetName(controlStrategy.getName() + "_MeasureWorksheet"), getControlStrategyLeastCostCMWorksheetDatasetType(), 
                 new StrategyLeastCostCMWorksheetTableFormat(dbServer.getSqlDataTypes()), leastCostCMWorksheetDescription());
     }
 
@@ -97,7 +97,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
     private ControlStrategyResult createLeastCostCMWorksheetResult() throws EmfException {
         ControlStrategyResult result = new ControlStrategyResult();
         result.setControlStrategyId(controlStrategy.getId());
-        result.setInputDataset(createDataset());
+        result.setDetailedResultDataset(createDataset());
 
         result.setStrategyResultType(getLeastCostCMWorksheetResultType());
         result.setStartTime(new Date());
@@ -107,7 +107,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
         saveControlStrategyResult(result);
         
         //create indexes on the datasets table...
-        createLeastCostCMWorksheetIndexes(result.getInputDataset());
+        createLeastCostCMWorksheetIndexes((EmfDataset)result.getDetailedResultDataset());
 
         return result;
     }

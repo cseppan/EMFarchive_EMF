@@ -10,7 +10,10 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class ControlStrategy implements Lockable, Serializable {
 
@@ -162,6 +165,13 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public void setControlStrategyInputDatasets(ControlStrategyInputDataset[] inputDatasets) {
         this.controlStrategyInputDatasets = inputDatasets;//Arrays.asList(inputDatasets);
+    }
+
+    public void addControlStrategyInputDatasets(ControlStrategyInputDataset inputDataset) {
+        List<ControlStrategyInputDataset> inputDatasetList = new ArrayList<ControlStrategyInputDataset>();
+        inputDatasetList.addAll(Arrays.asList(controlStrategyInputDatasets));
+        inputDatasetList.add(inputDataset);
+        this.controlStrategyInputDatasets = inputDatasetList.toArray(new ControlStrategyInputDataset[0]);
     }
 
     public String getDescription() {

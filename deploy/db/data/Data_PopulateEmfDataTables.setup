@@ -114,6 +114,7 @@ select 'ORL CoST Point Inventory (PTINV)','ORL CoST Point Inventory (PTINV)',1,1
 insert into emf.dataset_types values(DEFAULT,'Control Strategy Result Summary','Control Strategy Result Summary', '1', '1', false,'', '', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 insert into emf.dataset_types values(DEFAULT,'List of Counties (CSV)','List of Counties (CSV)', '1', '1', false,'', 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 insert into emf.dataset_types values(DEFAULT,'Control Strategy Least Cost Control Measure Worksheet','Control Strategy Least Cost Control Measure Worksheet', '1', '1', false,'', '', 'gov.epa.emissions.commons.io.csv.CSVExporter');
+insert into emf.dataset_types values(DEFAULT,'Control Strategy Least Cost Curve Summary','Control Strategy Least Cost Curve Summary', '1', '1', false,'', '', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 
  
 -- emf.dataset_types

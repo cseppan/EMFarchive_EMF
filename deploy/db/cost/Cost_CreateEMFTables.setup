@@ -371,7 +371,7 @@ CREATE TABLE emf.strategy_results
 (
   id SERIAL PRIMARY KEY,
   control_strategy_id int4 NOT NULL REFERENCES emf.control_strategies(id),
-  dataset_id int4 NOT NULL REFERENCES emf.datasets(id),
+  dataset_id int4 REFERENCES emf.datasets(id),
   strategy_result_type_id int4 NOT NULL REFERENCES emf.strategy_result_types(id),
   detailed_result_dataset_id int4 REFERENCES emf.datasets(id),
   controlled_inven_dataset_id int4 REFERENCES emf.datasets(id),
@@ -382,7 +382,7 @@ CREATE TABLE emf.strategy_results
   completion_time timestamp,
   run_status VARCHAR(255),
   record_count integer,
-  dataset_version integer NOT NULL DEFAULT 0,
+  dataset_version integer,
   UNIQUE (control_strategy_id,dataset_id,detailed_result_dataset_id)
 ) 
 WITHOUT OIDS;
@@ -435,6 +435,9 @@ CREATE TABLE emf.control_strategy_constraints
   min_ann_cost real,
   domain_wide_emis_reduction double precision,
   domain_wide_pct_reduction double precision,
+  domain_wide_pct_reduction_increment double precision,
+  domain_wide_pct_reduction_start double precision,
+  domain_wide_pct_reduction_end double precision,
   CONSTRAINT control_strategy_constraints_pkey PRIMARY KEY (control_strategy_id),
   CONSTRAINT control_strategy_constraints_control_strategy_id_fkey FOREIGN KEY (control_strategy_id)
       REFERENCES emf.control_strategies (id) MATCH SIMPLE

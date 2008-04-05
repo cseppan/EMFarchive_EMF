@@ -326,4 +326,5 @@ importer_classname = 'gov.epa.emissions.commons.io.orl.ORLMergedImporter',
 exporter_classname = 'gov.epa.emissions.commons.io.orl.ORLMergedExporter'
 where name = 'ORL CoST Point Inventory (PTINV)';
 
+insert into emf.dataset_types values(DEFAULT,'Control Strategy Least Cost Curve Summary','Control Strategy Least Cost Curve Summary', '1', '1', false,'', '', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 

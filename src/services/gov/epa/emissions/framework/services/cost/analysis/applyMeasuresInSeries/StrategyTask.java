@@ -35,12 +35,12 @@ public class StrategyTask extends AbstractStrategyTask {
         super.run(loader);
     }
 
-    public void postRun() {
+    public void afterRun() {
         // NOTE Auto-generated method stub
         
     }
 
-    public void preRun() {
+    public void beforeRun() {
         // NOTE Auto-generated method stub
         
     }

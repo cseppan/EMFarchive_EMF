@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.services.cost;
 
-import java.util.Date;
-
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
@@ -10,9 +8,12 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutputFactory;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,11 +45,11 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
     public void run() {
         try {
             int count = 0;
+            ControlStrategyInventoryOutputFactory factory = new ControlStrategyInventoryOutputFactory(user, controlStrategy,
+                    sessionFactory, dbServerFactory);
             for (int i = 0; i < controlStrategyResults.length; i++) {
                 if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
-                    ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,
-                            controlStrategyResults[i], sessionFactory, 
-                            dbServerFactory);
+                    ControlStrategyInventoryOutput output = factory.get(controlStrategyResults[i]);
                     output.create();
                     ++count;
                 }

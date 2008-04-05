@@ -7,9 +7,9 @@ public interface Strategy {
 
     void run() throws EmfException;
 
-    void postRun() throws EmfException;
+    void afterRun() throws EmfException;
 
-    void preRun() throws EmfException;
+    void beforeRun() throws EmfException;
 
     abstract ControlStrategy getControlStrategy();
     

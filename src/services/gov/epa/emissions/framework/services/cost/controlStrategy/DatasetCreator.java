@@ -67,52 +67,65 @@ public class DatasetCreator {
         String outputDatasetName = createResultDatasetName(datasetNamePrefix, inputDataset);
         String outputTableName = createTableName(tablePrefix, inputDataset);
         
-        EmfDataset dataset = new EmfDataset();
-        Date start = new Date();
+        //create dataset
+        EmfDataset dataset = createDataset(outputDatasetName, description, type, inputDataset);
 
-        dataset.setName(outputDatasetName);
-        dataset.setCreator(user.getUsername());
-        dataset.setDatasetType(type);
-        dataset.setDescription(description);
-        dataset.setCreatedDateTime(start);
-        dataset.setModifiedDateTime(start);
-        dataset.setAccessedDateTime(start);
-        dataset.setStatus("Created by control strategy");
-
-        //Add properties from input dataset...
-        dataset.setStartDateTime(inputDataset.getStartDateTime());
-        dataset.setStopDateTime(inputDataset.getStopDateTime());
-        dataset.setTemporalResolution(inputDataset.getTemporalResolution());
-        dataset.setSectors(inputDataset.getSectors());
-        dataset.setRegion(inputDataset.getRegion());
-        dataset.setCountry(inputDataset.getCountry());
-        
-        //Add keyword to the dataset
-        addKeyVal(dataset, "COST_YEAR", controlStrategy.getCostYear() + "");
-        addKeyVal(dataset, "STRATEGY_TYPE", controlStrategy.getStrategyType().getName());
-        addKeyVal(dataset, "TARGET_POLLUTANT", controlStrategy.getTargetPollutant().getName());
-        addKeyVal(dataset, "REGION", controlStrategy.getRegion() != null ? controlStrategy.getRegion().getName() : "Not Specified");
-        addKeyVal(dataset, "STRATEGY_NAME", controlStrategy.getName());
-        addKeyVal(dataset, "STRATEGY_ID", controlStrategy.getId()+"");
-        addKeyVal(dataset, "STRATEGY_INVENTORY_NAME", inputDataset.getName());
-        addKeyVal(dataset, "STRATEGY_INVENTORY_VERSION", inputDataset.getDefaultVersion()+"");
-        int measureCount = (controlStrategy.getControlMeasures() != null ? controlStrategy.getControlMeasures().length : 0);
-        addKeyVal(dataset, "MEASURES_INCLUDED", measureCount + "");
-        addKeyVal(dataset, "DISCOUNT_RATE", controlStrategy.getDiscountRate()+"%");
-        addKeyVal(dataset, "USE_COST_EQUATION",(controlStrategy.getUseCostEquations()==true? "true" : "false"));
-        ControlMeasureClass[] controlMeasureClasses = controlStrategy.getControlMeasureClasses();
-        String classList = "All";
-        if (controlMeasureClasses != null) {
-            if (controlMeasureClasses.length > 0) classList = "";
-            for (int i = 0; i < controlMeasureClasses.length; i++) {
-                if (classList.length() > 0) classList += ", ";  
-                classList += controlMeasureClasses[i].getName();
-            }
-        }
-        addKeyVal(dataset, "MEASURE_CLASSES", classList);
-        
         setDatasetInternalSource(dataset, outputTableName, 
                 tableFormat, inputDataset.getName());
+
+        //persist dataset to db
+        add(dataset);
+        try {
+            addVersionZeroEntryToVersionsTable(dataset);
+        } catch (Exception e) {
+            throw new EmfException("Cannot add version zero entry to versions table for dataset: " + dataset.getName());
+        }
+
+        createTable(outputTableName, tableFormat);
+
+        return dataset;
+    }
+
+    public EmfDataset addDataset(String tablePrefix, 
+            String datasetName, DatasetType type, 
+            TableFormat tableFormat, String description) throws EmfException {
+        String outputTableName = createTableName(tablePrefix, datasetName);
+        
+        //create dataset
+        EmfDataset dataset = createDataset(datasetName, description, type);
+
+        setDatasetInternalSource(dataset, outputTableName, 
+                tableFormat, datasetName);
+
+        //persist dataset to db
+        add(dataset);
+        try {
+            addVersionZeroEntryToVersionsTable(dataset);
+        } catch (Exception e) {
+            throw new EmfException("Cannot add version zero entry to versions table for dataset: " + dataset.getName());
+        }
+
+        createTable(outputTableName, tableFormat);
+
+        return dataset;
+    }
+
+    public EmfDataset addDataset(String datasetName, 
+            EmfDataset inputDataset, DatasetType type, 
+            TableFormat tableFormat, String description) throws EmfException {
+//        return addDataset(datasetName, "DS", 
+//                inputDataset, type, 
+//                tableFormat, description);
+        String outputDatasetName = createDatasetName(datasetName);
+        String outputTableName = createTableName(datasetName);
+        
+        //create dataset
+        EmfDataset dataset = createDataset(outputDatasetName, description, type, inputDataset);
+
+        setDatasetInternalSource(dataset, outputTableName, 
+                tableFormat, inputDataset.getName());
+
+        //persist dataset to db
         add(dataset);
         try {
             addVersionZeroEntryToVersionsTable(dataset);
@@ -126,14 +139,39 @@ public class DatasetCreator {
     }
 
     public EmfDataset addDataset(String datasetNamePrefix, String tablePrefix, 
-            String datasetName, DatasetType type, 
-            TableFormat tableFormat, String description) throws EmfException {
-        String outputTableName = createTableName(tablePrefix, datasetName);
+            EmfDataset inputDataset, DatasetType type, 
+            TableFormat tableFormat) throws EmfException {
+        return addDataset(datasetNamePrefix, tablePrefix, 
+                inputDataset, type, 
+                tableFormat, detailedResultDescription(inputDataset));
+    }
+
+    private EmfDataset createDataset(String name, 
+            String description,
+            DatasetType type,
+            EmfDataset inputDataset) {
+        EmfDataset dataset = createDataset(name, 
+                description,
+                type);
+
+        //Add properties from input dataset...
+        dataset.setStartDateTime(inputDataset.getStartDateTime());
+        dataset.setStopDateTime(inputDataset.getStopDateTime());
+        dataset.setTemporalResolution(inputDataset.getTemporalResolution());
+        dataset.setSectors(inputDataset.getSectors());
+        dataset.setRegion(inputDataset.getRegion());
+        dataset.setCountry(inputDataset.getCountry());
         
+        return dataset;
+    }
+    
+    private EmfDataset createDataset(String name, 
+            String description,
+            DatasetType type) {
         EmfDataset dataset = new EmfDataset();
         Date start = new Date();
 
-        dataset.setName(datasetName);
+        dataset.setName(name);
         dataset.setCreator(user.getUsername());
         dataset.setDatasetType(type);
         dataset.setDescription(description);
@@ -141,16 +179,17 @@ public class DatasetCreator {
         dataset.setModifiedDateTime(start);
         dataset.setAccessedDateTime(start);
         dataset.setStatus("Created by control strategy");
-
-        //Add properties from input dataset...
-//        dataset.setStartDateTime(controlStrategy.getStartDateTime());
-//        dataset.setStopDateTime(inputDataset.getStopDateTime());
-//        dataset.setTemporalResolution(inputDataset.getTemporalResolution());
-//        dataset.setSectors(inputDataset.getSectors());
-        dataset.setRegion(controlStrategy.getRegion());
-//        dataset.setCountry(inputDataset.getCountry());
         
-        //Add keyword to the dataset
+        dataset.setRegion(controlStrategy.getRegion());
+
+        //Add keywords to the dataset
+        addKeyVals(dataset);
+        
+        return dataset;
+    }
+    
+    private void addKeyVals(EmfDataset dataset) {
+        //Add keywords to the dataset
         addKeyVal(dataset, "COST_YEAR", controlStrategy.getCostYear() + "");
         addKeyVal(dataset, "STRATEGY_TYPE", controlStrategy.getStrategyType().getName());
         addKeyVal(dataset, "TARGET_POLLUTANT", controlStrategy.getTargetPollutant().getName());
@@ -173,27 +212,6 @@ public class DatasetCreator {
             }
         }
         addKeyVal(dataset, "MEASURE_CLASSES", classList);
-        
-        setDatasetInternalSource(dataset, outputTableName, 
-                tableFormat, datasetName);
-        add(dataset);
-        try {
-            addVersionZeroEntryToVersionsTable(dataset);
-        } catch (Exception e) {
-            throw new EmfException("Cannot add version zero entry to versions table for dataset: " + dataset.getName());
-        }
-
-        createTable(outputTableName, tableFormat);
-
-        return dataset;
-    }
-
-    public EmfDataset addDataset(String datasetNamePrefix, String tablePrefix, 
-            EmfDataset inputDataset, DatasetType type, 
-            TableFormat tableFormat) throws EmfException {
-        return addDataset(datasetNamePrefix, tablePrefix, 
-                inputDataset, type, 
-                tableFormat, description(inputDataset));
     }
     
     private void addKeyVal(EmfDataset dataset, String keywordName, String value) {
@@ -226,18 +244,14 @@ public class DatasetCreator {
     }
 
     private String createResultDatasetName(String datasetNamePrefix, EmfDataset inputDataset) {
-        String timestamp = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
-        String name = datasetNamePrefix + inputDataset.getId() 
-            + "_V" + inputDataset.getDefaultVersion() 
-            + "_" + timestamp;
-
-        return createDatasetName(datasetNamePrefix, name);
+        return createDatasetName(datasetNamePrefix + inputDataset.getId() 
+                + "_V" + inputDataset.getDefaultVersion());
     }
         
-    public static String createDatasetName(String prefix, String name) {
-        if (name.length() < 64) {     //postgresql table name max length is 64
-            int space = name.length() + prefix.length() - 64;
-            name = prefix + name.substring((space < 0) ? 0 : space + 1);
+    public static String createDatasetName(String name) {
+        //name += "_" + CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date());
+        if (name.length() > 47) {     //postgresql table name max length is 64
+            name = name.substring(0, 46);
         }
 
         for (int i = 0; i < name.length(); i++) {
@@ -246,26 +260,24 @@ public class DatasetCreator {
             }
         }
 
-        return name.trim().replaceAll(" ", "_");
+        return name.trim().replaceAll(" ", "_") + "_" + CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date());
     }
         
     private String createTableName(String tablePrefix, EmfDataset inputDataset) {
-        String formattedDate = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
         String prefix = tablePrefix + inputDataset.getId() 
-            + "_V" + inputDataset.getDefaultVersion() 
-            + "_" + formattedDate;
+            + "_V" + inputDataset.getDefaultVersion();
         String name = inputDataset.getName();
         return createTableName(prefix, name);
     }
     
     private String createTableName(String tablePrefix, String name) {
-        String formattedDate = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
-        String prefix = tablePrefix + "_" + formattedDate;
-        String table = prefix;
-        
-        if (table.length() < 64) {     //postgresql table name max length is 64
-            int space = name.length() + table.length() - 64;
-            table += name.substring((space < 0) ? 0 : space + 1);
+        return createTableName(tablePrefix + "_" + name);
+    }
+
+    private String createTableName(String name) {
+        String table = name;
+        if (table.length() > 47) {     //postgresql table name max length is 64
+            table = table.substring(0, 46);
         }
 
         for (int i = 0; i < table.length(); i++) {
@@ -274,7 +286,7 @@ public class DatasetCreator {
             }
         }
 
-        return table.trim().replaceAll(" ", "_");
+        return table.trim().replaceAll(" ", "_") + "_" + CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date());
     }
 
     private void add(EmfDataset dataset) throws EmfException {
@@ -304,7 +316,7 @@ public class DatasetCreator {
         }
     }
     
-    private String description(EmfDataset inputDataset) {
+    public String detailedResultDescription(EmfDataset inputDataset) {
         return "#Control strategy detailed result\n" + 
            "#Implements control strategy: " + controlStrategy.getName() + "\n"
                 + "#Input dataset used: " + inputDataset.getName()+"\n#";

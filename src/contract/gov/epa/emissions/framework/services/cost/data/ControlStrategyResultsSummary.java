@@ -18,7 +18,7 @@ public class ControlStrategyResultsSummary {
         float totalCost = 0;
         
         for (int i = 0; i < strategyResults.length; i++)
-            totalCost += strategyResults[i].getTotalCost();
+            totalCost += strategyResults[i].getTotalCost() != null ? strategyResults[i].getTotalCost() : 0.0;
         
         return totalCost;
     }
@@ -27,7 +27,7 @@ public class ControlStrategyResultsSummary {
         float totalReduction = 0;
         
         for (int i = 0; i < strategyResults.length; i++)
-            totalReduction += strategyResults[i].getTotalReduction();
+            totalReduction += strategyResults[i].getTotalReduction() != null ? strategyResults[i].getTotalReduction() : 0.0;
         
         return totalReduction;
     }

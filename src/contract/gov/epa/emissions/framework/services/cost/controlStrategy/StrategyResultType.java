@@ -14,6 +14,10 @@ public class StrategyResultType implements Serializable {
     
     public static final String leastCostControlMeasureWorksheetResult = "Least Cost Control Measure Worksheet";
     
+    public static final String leastCostCurveSummaryResult = "Least Cost Curve Summary";
+    
+    public static final String controlledInventoryResult = "Controlled Inventory";
+    
     public StrategyResultType(){
         //
     }

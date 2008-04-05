@@ -47,8 +47,8 @@ public class ControlStrategyResultsSummaryTest extends TestCase {
         ControlStrategyResult result = new ControlStrategyResult();
         result.setStartTime(date);
         result.setCompletionTime(date);
-        result.setTotalCost(100);
-        result.setTotalReduction(1000);
+        result.setTotalCost(100.0);
+        result.setTotalReduction(1000.0);
         result.setRunStatus(status);
         
         return result;

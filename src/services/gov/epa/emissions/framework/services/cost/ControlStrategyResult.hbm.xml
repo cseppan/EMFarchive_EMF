@@ -9,7 +9,7 @@
 	  <generator class="identity"/>
  	</id>
 	<property name="controlStrategyId" column="control_strategy_id" type="integer" not-null="true" />
-	<property name="inputDatasetVersion" column="dataset_version" type="integer" not-null="true"  />
+	<property name="inputDatasetVersion" column="dataset_version" type="integer" not-null="false"  />
 	<property name="totalCost" column="total_cost" not-null="false"/>
 	<property name="totalReduction" column="total_reduction" type="double"  not-null="false" />
 	<property name="runStatus" column="run_status"	type="java.lang.String"	/>
@@ -28,7 +28,7 @@
 	<many-to-one
             name="inputDataset" 
             class="gov.epa.emissions.framework.services.data.EmfDataset"
-            column="dataset_id" not-null="true"/> 
+            column="dataset_id" not-null="false"/> 
 	
   </class> 
 </hibernate-mapping>  

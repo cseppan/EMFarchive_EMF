@@ -499,4 +499,33 @@ ALTER TABLE emf.control_strategy_constraints ADD COLUMN domain_wide_pct_reductio
 
 -- implementing least cost strategy
 insert into emf.strategy_types values(DEFAULT,'Least Cost','Least Cost', '', 'gov.epa.emissions.framework.services.cost.analysis.leastcost.StrategyTask');
+insert into emf.strategy_types values(DEFAULT,'Least Cost Curve','Least Cost Curve', '', 'gov.epa.emissions.framework.services.cost.analysis.leastcostcurve.StrategyTask');
 insert into emf.strategy_result_types (name) select 'Least Cost Control Measure Worksheet';
+insert into emf.strategy_result_types (name) select 'Controlled Inventory';
+
+ALTER TABLE emf.strategy_results
+   ALTER COLUMN dataset_id DROP NOT NULL;
+ALTER TABLE emf.strategy_results
+   ALTER COLUMN dataset_version DROP NOT NULL;
+ALTER TABLE emf.strategy_results
+   ALTER COLUMN dataset_version DROP DEFAULT;
+   
+
+update emf.strategy_results
+set detailed_result_dataset_id = dataset_id,
+dataset_id = null,
+dataset_version = null
+where strategy_result_type_id in
+(
+select id
+from emf.strategy_result_types
+where name in ('Strategy Summary','Least Cost Control Measure Worksheet')
+);
+
+
+-- 4/2/08 dcd added some new columns for least cost incremental strategy type
+ALTER TABLE emf.control_strategy_constraints ADD COLUMN domain_wide_pct_reduction_increment double precision;
+ALTER TABLE emf.control_strategy_constraints ADD COLUMN domain_wide_pct_reduction_start double precision;
+ALTER TABLE emf.control_strategy_constraints ADD COLUMN domain_wide_pct_reduction_end double precision;
+
+   

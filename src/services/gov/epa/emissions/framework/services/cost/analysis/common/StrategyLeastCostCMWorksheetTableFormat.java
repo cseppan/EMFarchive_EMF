@@ -104,20 +104,24 @@ public class StrategyLeastCostCMWorksheetTableFormat implements TableFormat {
         Column controlStrategyId = new Column("CS_Id", types.intType(), new IntegerFormatter());
         Column controlMeasureId = new Column("CM_Id", types.intType(), new IntegerFormatter());
         Column equationType = new Column("equation_type", types.stringType(255), new StringFormatter(255));
-        Column comment = new Column("Comment", types.stringType(128), new StringFormatter(128));
 
         Column marginal = new Column("marginal", types.realType(), new RealFormatter());
         Column cumAnnualCost = new Column("cum_annual_cost", types.realType(), new RealFormatter());
         Column cumEmisReduction = new Column("cum_emis_reduction", types.realType(), new RealFormatter());
         Column remove = new Column("remove", types.booleanType());
+        Column status = new Column("status", types.smallInt());
+        Column originalDatasetId = new Column("ORIGINAL_DATASET_ID", types.intType(), new IntegerFormatter());
+        Column sector = new Column("SECTOR", types.stringType(64), 64, new StringFormatter(255));
+
+        Column comment = new Column("Comment", types.stringType(128), new StringFormatter(128));
 
         return new Column[] { disable, controlMeasureAbbr, pollutant, scc, fips, plantId, pointId, stackId, segment, 
                 annualOperMaintCost,AnnualizedCapical, TotalCapitalCost,annualCost, annualCostPerTon, 
                 controlEfficiency, rulePenetration, ruleEffectiveness, percentReduction, 
                 inventoryControlEfficiency, inventoryRulePenetration, inventoryRuleEffectiveness, finalEmissions, 
                 emissionsReduction, inventoryEmissions, applyOrder, inputEmissions, outputEmissions, fipsState, fipsCounty, 
-                sic, naics, sourceId, inputDatasetId, controlStrategyId, controlMeasureId, equationType, comment,
-                marginal, cumAnnualCost, cumEmisReduction, remove };
+                sic, naics, sourceId, inputDatasetId, controlStrategyId, controlMeasureId, equationType,
+                marginal, cumAnnualCost, cumEmisReduction, remove, status, originalDatasetId, sector, comment };
     }
 
 }

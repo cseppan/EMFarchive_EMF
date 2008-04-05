@@ -61,57 +61,56 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
     }
 
     private Column[] baseCols() {
-        Column disable = new Column("Disable", types.booleanType(), new StringFormatter(5));
-        Column controlMeasureAbbr = new Column("CM_Abbrev", types.stringType(10), new StringFormatter(10), "DEFAULT ''");
-        Column pollutant = new Column("Poll", types.stringType(20), new StringFormatter(20));
-        Column scc = new Column("SCC", types.stringType(10), new StringFormatter(10));
-        Column fips = new Column("FIPS", types.stringType(6), new StringFormatter(6)); //after fips will add 4 more cols plantid, etc.
+        List<Column> cols = new ArrayList<Column>();
+
+        cols.add(new Column("Disable", types.booleanType(), new StringFormatter(5)));
+        cols.add(new Column("CM_Abbrev", types.stringType(10), new StringFormatter(10), "DEFAULT ''"));
+        cols.add(new Column("Poll", types.stringType(20), new StringFormatter(20)));
+        cols.add(new Column("SCC", types.stringType(10), new StringFormatter(10)));
+        cols.add(new Column("FIPS", types.stringType(6), new StringFormatter(6))); //after fips will add 4 more cols plantid, etc.
  
         //new columns for point sources...
-        Column plantId = new Column("PLANTID", types.stringType(15), 15, new StringFormatter(15));
-        Column pointId = new Column("POINTID", types.stringType(15), 15, new StringFormatter(15));
-        Column stackId = new Column("STACKID", types.stringType(15), 15, new StringFormatter(15));
-        Column segment = new Column("SEGMENT", types.stringType(15), 15, new StringFormatter(15));
+        cols.add(new Column("PLANTID", types.stringType(15), 15, new StringFormatter(15)));
+        cols.add(new Column("POINTID", types.stringType(15), 15, new StringFormatter(15)));
+        cols.add(new Column("STACKID", types.stringType(15), 15, new StringFormatter(15)));
+        cols.add(new Column("SEGMENT", types.stringType(15), 15, new StringFormatter(15)));
 
-        Column annualCost = new Column("Annual_Cost", types.realType(), new RealFormatter());
-        Column annualCostPerTon = new Column("Ann_Cost_per_Ton", types.realType(), new RealFormatter());
-        Column annualOperMaintCost = new Column("Annual_Oper_Maint_Cost", types.realType(), new RealFormatter());
-        Column AnnualizedCapical = new Column("Annualized_Capital_Cost", types.realType(), new RealFormatter());
-        Column TotalCapitalCost = new Column("Total_Capital_Cost", types.realType(), new RealFormatter());
+        cols.add(new Column("Annual_Cost", types.realType(), new RealFormatter()));
+        cols.add(new Column("Ann_Cost_per_Ton", types.realType(), new RealFormatter()));
+        cols.add(new Column("Annual_Oper_Maint_Cost", types.realType(), new RealFormatter()));
+        cols.add(new Column("Annualized_Capital_Cost", types.realType(), new RealFormatter()));
+        cols.add(new Column("Total_Capital_Cost", types.realType(), new RealFormatter()));
 
-        Column controlEfficiency = new Column("Control_Eff", types.realType(), new RealFormatter());
-        Column rulePenetration = new Column("Rule_Pen", types.realType(), new RealFormatter());
-        Column ruleEffectiveness = new Column("Rule_Eff", types.realType(), new RealFormatter());
-        Column percentReduction = new Column("Percent_Reduction", types.realType(), new RealFormatter());
-        Column inventoryControlEfficiency = new Column("Inv_Ctrl_Eff", types.realType(), new RealFormatter());
-        Column inventoryRulePenetration = new Column("Inv_Rule_Pen", types.realType(), new RealFormatter());
-        Column inventoryRuleEffectiveness = new Column("Inv_Rule_Eff", types.realType(), new RealFormatter());
-        Column finalEmissions = new Column("Final_emissions", types.realType(), new RealFormatter());
-        Column emissionsReduction = new Column("Emis_Reduction", types.realType(), new RealFormatter());
-        Column inventoryEmissions = new Column("Inv_emissions", types.realType(), new RealFormatter());
-        Column applyOrder = new Column("Apply_Order", types.intType(), new IntegerFormatter(), "DEFAULT 1");
-        Column inputEmissions = new Column("input_emis", types.realType(), new RealFormatter());
-        Column outputEmissions = new Column("output_emis", types.realType(), new RealFormatter());
+        cols.add(new Column("Control_Eff", types.realType(), new RealFormatter()));
+        cols.add(new Column("Rule_Pen", types.realType(), new RealFormatter()));
+        cols.add(new Column("Rule_Eff", types.realType(), new RealFormatter()));
+        cols.add(new Column("Percent_Reduction", types.realType(), new RealFormatter()));
+        cols.add(new Column("Inv_Ctrl_Eff", types.realType(), new RealFormatter()));
+        cols.add(new Column("Inv_Rule_Pen", types.realType(), new RealFormatter()));
+        cols.add(new Column("Inv_Rule_Eff", types.realType(), new RealFormatter()));
+        cols.add(new Column("Final_emissions", types.realType(), new RealFormatter()));
+        cols.add(new Column("Emis_Reduction", types.realType(), new RealFormatter()));
+        cols.add(new Column("Inv_emissions", types.realType(), new RealFormatter()));
+        cols.add(new Column("Apply_Order", types.intType(), new IntegerFormatter(), "DEFAULT 1"));
+        cols.add(new Column("input_emis", types.realType(), new RealFormatter()));
+        cols.add(new Column("output_emis", types.realType(), new RealFormatter()));
 
-        Column fipsState = new Column("FIPSST", types.stringType(2), 2, new StringFormatter(2));
-        Column fipsCounty = new Column("FIPSCTY", types.stringType(3), 3, new StringFormatter(3));
-        Column sic = new Column("SIC", types.stringType(4), 4, new StringFormatter(4));
-        Column naics = new Column("NAICS", types.stringType(6), 6, new StringFormatter(6));
+        cols.add(new Column("FIPSST", types.stringType(2), 2, new StringFormatter(2)));
+        cols.add(new Column("FIPSCTY", types.stringType(3), 3, new StringFormatter(3)));
+        cols.add(new Column("SIC", types.stringType(4), 4, new StringFormatter(4)));
+        cols.add(new Column("NAICS", types.stringType(6), 6, new StringFormatter(6)));
 
         
-        Column sourceId = new Column("Source_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
-        Column inputDatasetId = new Column("Input_DS_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
-        Column controlStrategyId = new Column("CS_Id", types.intType(), new IntegerFormatter());
-        Column controlMeasureId = new Column("CM_Id", types.intType(), new IntegerFormatter());
-        Column equationType = new Column("equation_type", types.stringType(255), new StringFormatter(255));
-        Column comment = new Column("Comment", types.stringType(128), new StringFormatter(128));
+        cols.add(new Column("Source_Id", types.intType(), new IntegerFormatter(), "NOT NULL"));
+        cols.add(new Column("Input_DS_Id", types.intType(), new IntegerFormatter(), "NOT NULL"));
+        cols.add(new Column("CS_Id", types.intType(), new IntegerFormatter()));
+        cols.add(new Column("CM_Id", types.intType(), new IntegerFormatter()));
+        cols.add(new Column("equation_type", types.stringType(255), new StringFormatter(255)));
+        cols.add(new Column("ORIGINAL_DATASET_ID", types.intType(), new IntegerFormatter()));
+        cols.add(new Column("SECTOR", types.stringType(64), 64, new StringFormatter(255)));
+        cols.add(new Column("Comment", types.stringType(128), new StringFormatter(128)));
         
-        return new Column[] { disable, controlMeasureAbbr, pollutant, scc, fips, plantId, pointId, stackId, segment, 
-                annualOperMaintCost,AnnualizedCapical, TotalCapitalCost,annualCost, annualCostPerTon, 
-                controlEfficiency, rulePenetration, ruleEffectiveness, percentReduction, 
-                inventoryControlEfficiency, inventoryRulePenetration, inventoryRuleEffectiveness, finalEmissions, 
-                emissionsReduction, inventoryEmissions, applyOrder, inputEmissions, outputEmissions, fipsState, fipsCounty, 
-                sic, naics, sourceId, inputDatasetId, controlStrategyId, controlMeasureId, equationType, comment };
+        return cols.toArray(new Column[0]);
     }
 
 }

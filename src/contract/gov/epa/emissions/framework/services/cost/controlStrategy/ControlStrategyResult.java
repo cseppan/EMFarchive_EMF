@@ -12,9 +12,9 @@ public class ControlStrategyResult implements Serializable {
 
     private int controlStrategyId;
 
-    private double totalCost;
+    private Double totalCost;
 
-    private double totalReduction;
+    private Double totalReduction;
 
     private String runStatus;
 
@@ -24,7 +24,7 @@ public class ControlStrategyResult implements Serializable {
 
     private EmfDataset inputDataset;
 
-    private int inputDatasetVersion;
+    private Integer inputDatasetVersion;
 
     private Dataset detailedResultDataset;
     
@@ -63,19 +63,19 @@ public class ControlStrategyResult implements Serializable {
         this.strategyResultType = resultType;
     }
 
-    public double getTotalCost() {
+    public Double getTotalCost() {
         return totalCost;
     }
 
-    public void setTotalCost(double totalCost) {
+    public void setTotalCost(Double totalCost) {
         this.totalCost = totalCost;
     }
 
-    public double getTotalReduction() {
+    public Double getTotalReduction() {
         return totalReduction;
     }
 
-    public void setTotalReduction(double totalReduction) {
+    public void setTotalReduction(Double totalReduction) {
         this.totalReduction = totalReduction;
     }
 
@@ -135,11 +135,11 @@ public class ControlStrategyResult implements Serializable {
         this.recordCount = recordCount;
     }
 
-    public void setInputDatasetVersion(int inputDatasetVersion) {
+    public void setInputDatasetVersion(Integer inputDatasetVersion) {
         this.inputDatasetVersion = inputDatasetVersion;
     }
 
-    public int getInputDatasetVersion() {
+    public Integer getInputDatasetVersion() {
         return inputDatasetVersion;
     }
 }

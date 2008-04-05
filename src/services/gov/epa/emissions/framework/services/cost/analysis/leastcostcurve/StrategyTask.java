@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services.cost.analysis.leastcost;
+package gov.epa.emissions.framework.services.cost.analysis.leastcostcurve;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Sector;
@@ -32,6 +32,8 @@ public class StrategyTask extends AbstractStrategyTask {
     private StrategyLoader loader;
     
     private ControlStrategyResult leastCostCMWorksheetResult;
+
+    private ControlStrategyResult leastCostCurveSummaryResult;
 
     public StrategyTask(ControlStrategy controlStrategy, User user, 
             DbServerFactory dbServerFactory, Integer batchSize,
@@ -73,28 +75,15 @@ public class StrategyTask extends AbstractStrategyTask {
         try {
             //process/load each input dataset
             ControlStrategyInputDataset controlStrategyInputDataset = getInventory();
-            ControlStrategyResult result = null;
             try {
-                result = loader.loadStrategyResult(controlStrategyInputDataset);
-                recordCount = loader.getRecordCount();
-                result.setRecordCount(recordCount);
-                status = "Completed.";
+                loader.loadStrategyResult(controlStrategyInputDataset);
             } catch (Exception e) {
                 e.printStackTrace();
                 status = "Failed. Error processing input dataset: " + controlStrategyInputDataset.getInputDataset().getName() + ". " + e.getMessage();
                 setStatus(status);
             } finally {
-                if (result != null) {
-                    result.setCompletionTime(new Date());
-                    result.setRunStatus(status);
-                    saveControlStrategyResult(result);
-                    strategyResultList.add(result);
-                    addStatus(controlStrategyInputDataset);
-                }
+                addStatus(controlStrategyInputDataset);
             }
-            
-            //now create the summary detailed result based on the results from the strategy run...
-            createStrategySummaryResult();
             
         } catch (Exception e) {
             status = "Failed. Error processing input dataset";
@@ -122,11 +111,18 @@ public class StrategyTask extends AbstractStrategyTask {
         setSummaryResultCount(leastCostCMWorksheetResult);
         saveControlStrategySummaryResult(leastCostCMWorksheetResult);
         runSummaryQASteps((EmfDataset)leastCostCMWorksheetResult.getDetailedResultDataset(), 0);
-    }
+
+        leastCostCurveSummaryResult.setCompletionTime(new Date());
+        leastCostCurveSummaryResult.setRunStatus("Completed.");
+        setSummaryResultCount(leastCostCurveSummaryResult);
+        saveControlStrategySummaryResult(leastCostCurveSummaryResult);
+        runSummaryQASteps((EmfDataset)leastCostCurveSummaryResult.getDetailedResultDataset(), 0);
+}
 
     public void beforeRun() throws EmfException {
         //create the worksheet (strat result)
         leastCostCMWorksheetResult = loader.loadLeastCostCMWorksheetResult();
+        leastCostCurveSummaryResult = loader.loadLeastCostCurveSummaryResult();
         
         //if there is more than one input inventory, then merge these into one dataset, 
         //then we use that as the input to the strategy run

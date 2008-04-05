@@ -1,13 +1,17 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
+import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
@@ -27,9 +31,22 @@ public class ControlStrategyDAO {
 
     private HibernateFacade hibernateFacade;
 
+    private HibernateSessionFactory sessionFactory;
+
+    private DbServerFactory dbServerFactory;
+    
+    private DatasetDAO datasetDao;
+
     public ControlStrategyDAO() {
         lockingScheme = new LockingScheme();
         hibernateFacade = new HibernateFacade();
+        this.datasetDao = new DatasetDAO();
+    }
+
+    public ControlStrategyDAO(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
+        this();
+        this.dbServerFactory = dbServerFactory;
+        this.sessionFactory = sessionFactory;
     }
 
     public int add(ControlStrategy element, Session session) {
@@ -263,32 +280,104 @@ public class ControlStrategyDAO {
     }
 
     public List getControlStrategyResults(int controlStrategyId, Session session) {
-        Criterion c = Restrictions.eq("controlStrategyId", controlStrategyId);
-        return hibernateFacade.get(ControlStrategyResult.class, c, session);
+        return session.createCriteria(ControlStrategyResult.class).add(Restrictions.eq("controlStrategyId", controlStrategyId)).list();
     }
     
-    public void removeResultDatasets(Integer[] ids, User user, Session session) throws EmfException {
-        DatasetDAO dsDao = new DatasetDAO();
-        for (Integer id : ids ) {
-            EmfDataset dataset = dsDao.getDataset(session, id);
-
-            if (dataset != null) {
-                try {
-                    dsDao.remove(user, dataset, session);
-                } catch (EmfException e) {
-                    if (DebugLevels.DEBUG_12)
-                        System.out.println(e.getMessage());
-                    
-                    throw new EmfException(e.getMessage());
-                }
+    public void removeResultDatasets(EmfDataset[] datasets, User user, Session session, DbServer dbServer) throws EmfException {
+        if (datasets != null) {
+            try {
+                deleteDatasets(datasets, user, session);
+                datasetDao.deleteDatasets(datasets, dbServer, session);
+//                    session.flush();
+//                    session.clear();
+            } catch (EmfException e) {
+                if (DebugLevels.DEBUG_12)
+                    System.out.println(e.getMessage());
+                
+                throw new EmfException(e.getMessage());
             }
         }
     }
     
+    public void deleteDatasets(EmfDataset[] datasets, User user, Session session) throws EmfException {
+        EmfDataset[] lockedDatasets = getLockedDatasets(datasets, user, session);
+        
+        if (lockedDatasets == null)
+            return;
+        
+        try {
+            new DataServiceImpl(dbServerFactory, sessionFactory).deleteDatasets(user, datasets);
+        } catch (EmfException e) {
+            releaseLocked(lockedDatasets, user, session);
+            throw new EmfException(e.getMessage());
+        }
+    }
+    
+    private EmfDataset[] getLockedDatasets(EmfDataset[] datasets, User user, Session session) {
+        List lockedList = new ArrayList();
+        
+        for (int i = 0; i < datasets.length; i++) {
+            EmfDataset locked = obtainLockedDataset(datasets[i], user, session);
+            if (locked == null) {
+                releaseLocked((EmfDataset[])lockedList.toArray(new EmfDataset[0]), user, session);
+                return null;
+            }
+            
+            lockedList.add(locked);
+        }
+        
+        return (EmfDataset[])lockedList.toArray(new EmfDataset[0]);
+    }
+
+    private EmfDataset obtainLockedDataset(EmfDataset dataset, User user, Session session) {
+        EmfDataset locked = datasetDao.obtainLocked(user, dataset, session);
+        return locked;
+    }
+    
+    private void releaseLocked(EmfDataset[] lockedDatasets, User user, Session session) {
+        if (lockedDatasets.length == 0)
+            return;
+        
+        for(int i = 0; i < lockedDatasets.length; i++)
+            datasetDao.releaseLocked(user, lockedDatasets[i], session);
+    }
+//    public void removeResultDatasets(Integer[] ids, User user, Session session, DbServer dbServer) throws EmfException {
+//        DatasetDAO dsDao = new DatasetDAO();
+//        for (Integer id : ids ) {
+//            EmfDataset dataset = dsDao.getDataset(session, id);
+//
+//            if (dataset != null) {
+//                try {
+//                    dsDao.remove(user, dataset, session);
+//                    purgeDeletedDatasets(dataset, session, dbServer);
+//                    session.flush();
+//                    session.clear();
+//                } catch (EmfException e) {
+//                    if (DebugLevels.DEBUG_12)
+//                        System.out.println(e.getMessage());
+//                    
+//                    throw new EmfException(e.getMessage());
+//                }
+//            }
+//        }
+//    }
+    
+//    private void purgeDeletedDatasets(EmfDataset dataset, Session session, DbServer dbServer) throws EmfException {
+//        try {
+//            DatasetDAO dao = new DatasetDAO();
+//            dao.deleteDatasets(new EmfDataset[] {dataset}, dbServer, session);
+//        } catch (Exception e) {
+//            throw new EmfException(e.getMessage());
+//        } finally {
+//            //
+//        }
+//    }
+
     public Integer[] getResultDatasetIds(int controlStrategyId, Session session) {
         List<ControlStrategyResult> results = getControlStrategyResults(controlStrategyId, session);
         List<Integer> datasetLists = new ArrayList<Integer>();
         if(results != null){
+            System.out.println(results.size());
             for (int i=0; i<results.size(); i++){
                 if (results.get(i).getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
                     if (results.get(i).getDetailedResultDataset() != null)
@@ -296,7 +385,7 @@ public class ControlStrategyDAO {
                     if (results.get(i).getControlledInventoryDataset() != null)
                         datasetLists.add( results.get(i).getControlledInventoryDataset().getId());
                 } else {
-                    datasetLists.add( results.get(i).getInputDataset().getId());
+                    datasetLists.add( results.get(i).getDetailedResultDataset().getId());
                 }
             }
         }
@@ -305,5 +394,21 @@ public class ControlStrategyDAO {
         return null; 
     }
 
+    
+    public EmfDataset[] getResultDatasets(int controlStrategyId, Session session) {
+        List<ControlStrategyResult> results = getControlStrategyResults(controlStrategyId, session);
+        List<EmfDataset> datasets = new ArrayList<EmfDataset>();
+        if(results != null){
+            for (int i=0; i<results.size(); i++){
+                if (results.get(i).getDetailedResultDataset() != null)
+                    datasets.add((EmfDataset)results.get(i).getDetailedResultDataset());
+                if (results.get(i).getControlledInventoryDataset() != null)
+                    datasets.add((EmfDataset)results.get(i).getControlledInventoryDataset());
+            }
+        }
+        if (datasets.size()>0)
+            return datasets.toArray(new EmfDataset[0]);
+        return null; 
+    }
 
 }

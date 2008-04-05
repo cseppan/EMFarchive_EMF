@@ -20,6 +20,12 @@ public class ControlStrategyConstraint implements Serializable {
 
     private Double domainWidePctReduction;
     
+    private Double domainWidePctReductionIncrement;
+    
+    private Double domainWidePctReductionStart;
+    
+    private Double domainWidePctReductionEnd;
+    
     public ControlStrategyConstraint() {
         //
     }
@@ -93,5 +99,29 @@ public class ControlStrategyConstraint implements Serializable {
 
     public Double getDomainWidePctReduction() {
         return domainWidePctReduction;
+    }
+
+    public void setDomainWidePctReductionIncrement(Double domainWidePctReductionIncrement) {
+        this.domainWidePctReductionIncrement = domainWidePctReductionIncrement;
+    }
+
+    public Double getDomainWidePctReductionIncrement() {
+        return domainWidePctReductionIncrement;
+    }
+
+    public void setDomainWidePctReductionStart(Double domainWidePctReductionStart) {
+        this.domainWidePctReductionStart = domainWidePctReductionStart;
+    }
+
+    public Double getDomainWidePctReductionStart() {
+        return domainWidePctReductionStart;
+    }
+
+    public void setDomainWidePctReductionEnd(Double domainWidePctReductionEnd) {
+        this.domainWidePctReductionEnd = domainWidePctReductionEnd;
+    }
+
+    public Double getDomainWidePctReductionEnd() {
+        return domainWidePctReductionEnd;
     }
 }
