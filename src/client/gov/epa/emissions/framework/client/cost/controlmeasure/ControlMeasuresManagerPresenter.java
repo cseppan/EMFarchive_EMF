@@ -30,7 +30,7 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         try {
             this.costYearTable = populateCostYearTable();
         } catch (EmfException e) {
-            //
+            e.printStackTrace();
         }
     }
 

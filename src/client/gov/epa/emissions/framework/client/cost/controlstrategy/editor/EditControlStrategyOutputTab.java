@@ -113,20 +113,22 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
             List<EmfDataset> datasetList = new ArrayList<EmfDataset>();
             for (int i = 0; i < controlStrategyResults.length; i++) {
-                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+//                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
                     if (buttonGroup.getSelection().equals(invButton.getModel())) {
-                        datasetList.add(controlStrategyResults[i].getInputDataset());
+                        if (controlStrategyResults[i].getInputDataset() != null)
+                            datasetList.add(controlStrategyResults[i].getInputDataset());
                     } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
-                        datasetList.add((EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
+                        if (controlStrategyResults[i].getDetailedResultDataset() != null)
+                            datasetList.add((EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
                     } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
                         if (controlStrategyResults[i].getControlledInventoryDataset() != null)
                             datasetList.add((EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
                         else
                             messagePanel.setError("Please create controled inventory first.");
                     }
-                } else {//if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.strategySummary)) {
-                    datasetList.add(controlStrategyResults[i].getInputDataset());
-                }
+//                } else {//if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.strategySummary)) {
+//                    datasetList.add(controlStrategyResults[i].getInputDataset());
+//                }
             }
             presenter.doExport(datasetList.toArray(new EmfDataset[0]), folder.getText());
             messagePanel.setMessage("Started Export. Please monitor the Status window to track your export request");
@@ -140,11 +142,13 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
             List<EmfDataset> datasetList = new ArrayList<EmfDataset>();
             for (int i = 0; i < controlStrategyResults.length; i++) {
-                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+//                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
                     if (buttonGroup.getSelection().equals(invButton.getModel())) {
-                        datasetList.add(controlStrategyResults[i].getInputDataset());
+                        if (controlStrategyResults[i].getInputDataset() != null)
+                            datasetList.add(controlStrategyResults[i].getInputDataset());
                     } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
-                        datasetList.add((EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
+                        if (controlStrategyResults[i].getDetailedResultDataset() != null)
+                            datasetList.add((EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
                     } 
                     else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
                         if (controlStrategyResults[i].getControlledInventoryDataset() != null)
@@ -152,9 +156,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                         else
                             messagePanel.setError("Please create controled inventory first.");
                     }
-                } else {//if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.strategySummary)) {
-                    datasetList.add(controlStrategyResults[i].getInputDataset());
-                }
+//                } else {//if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.strategySummary)) {
+//                    datasetList.add(controlStrategyResults[i].getInputDataset());
+//                }
             }
             presenter.doAnalyze(controlStrategy.getName(), datasetList.toArray(new EmfDataset[0]));
         } catch (EmfException e) {
@@ -318,7 +322,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         createButton.setEnabled(false);
 //        editButton.setEnabled(false);
         
-        detailButton = new JRadioButton("Detailed Result");
+        detailButton = new JRadioButton("Result");
         detailButton.addActionListener(radioButtonAction());
         detailButton.setSelected(true);
         invButton = new JRadioButton("Input Inventory");
@@ -372,22 +376,26 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         for (int i = 0; i < controlStrategyResults.length; i++) {
             DatasetPropertiesEditor view = new DatasetPropertiesEditor(session, parentConsole, desktopManager);
 
-            if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+//            if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
                 if (buttonGroup.getSelection().equals(invButton.getModel())) {
-                    presenter.doDisplayPropertiesEditor(view, controlStrategyResults[i].getInputDataset());
-                    counter++;
+                    if (controlStrategyResults[i].getInputDataset() != null) {
+                        presenter.doDisplayPropertiesEditor(view, controlStrategyResults[i].getInputDataset());
+                        counter++;
+                    }
                 } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
-                    presenter.doDisplayPropertiesEditor(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
-                    counter++;
+                    if (controlStrategyResults[i].getDetailedResultDataset() != null) {
+                        presenter.doDisplayPropertiesEditor(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
+                        counter++;
+                    }
                 } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
                     if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
                         presenter.doDisplayPropertiesEditor(view, (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
                         counter++;
                     }
                }
-            } else {//if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.strategySummary)) {
-                presenter.doDisplayPropertiesEditor(view, controlStrategyResults[i].getInputDataset());
-            }
+//            } else {//if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.strategySummary)) {
+//                presenter.doDisplayPropertiesEditor(view, controlStrategyResults[i].getInputDataset());
+//            }
         }
     }
 
@@ -506,20 +514,22 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             for (int i = 0; i < controlStrategyResults.length; i++) {
                 DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
      
-                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+//                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
                     if (buttonGroup.getSelection().equals(invButton.getModel())) {
-                        presenter.doDisplayPropertiesView(view, controlStrategyResults[i].getInputDataset());
+                        if (controlStrategyResults[i].getInputDataset() != null) 
+                            presenter.doDisplayPropertiesView(view, controlStrategyResults[i].getInputDataset());
                     } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
-                        presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
+                        if (controlStrategyResults[i].getDetailedResultDataset() != null) 
+                            presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
     
                     } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
                         if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
                             presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
                         }
                     }
-                } else {//if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.strategySummary)) {
-                    presenter.doDisplayPropertiesView(view, controlStrategyResults[i].getInputDataset());
-                }
+//                } else {//if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.strategySummary)) {
+//                    presenter.doDisplayPropertiesView(view, controlStrategyResults[i].getInputDataset());
+//                }
             }
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());

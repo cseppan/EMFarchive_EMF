@@ -164,11 +164,10 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         InputDatasetSelectionView view = new InputDatasetSelectionDialog(parentConsole, changeablesList);
         InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session,
                 new DatasetType[] { 
-                    editControlStrategyPresenter.getDatasetType("ORL Nonpoint Inventory (ARINV)"),
-                    editControlStrategyPresenter.getDatasetType("ORL Nonroad Inventory (ARINV)"),
-                    editControlStrategyPresenter.getDatasetType("ORL Onroad Inventory (MBINV)"),
-                    editControlStrategyPresenter.getDatasetType("ORL Point Inventory (PTINV)"),
-                    editControlStrategyPresenter.getDatasetType("ORL CoST Point Inventory (PTINV)")
+                    editControlStrategyPresenter.getDatasetType(DatasetType.orlPointInventory),
+                    editControlStrategyPresenter.getDatasetType(DatasetType.orlNonpointInventory),
+                    editControlStrategyPresenter.getDatasetType(DatasetType.orlNonroadInventory),
+                    editControlStrategyPresenter.getDatasetType(DatasetType.orlOnroadInventory)
                 });
         try {
             presenter.display(null);
@@ -377,6 +376,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     }
 
     public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
-        // do nothing
+        tableData.add(controlStrategy.getControlStrategyInputDatasets());
+        buildSortFilterPanel();
     }
 }

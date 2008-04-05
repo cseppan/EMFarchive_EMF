@@ -28,25 +28,32 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
     private TextField annCost;
     private TextField domainWideEmisReduction;
     private TextField domainWidePctReduction;
+    private TextField domainWidePctReductionIncrement;
+    private TextField domainWidePctReductionStart;
+    private TextField domainWidePctReductionEnd;
 
     private ManageChangeables changeablesList;
 
     private EditControlStrategyConstraintsTabPresenter presenter;
     
+    private ControlStrategy controlStrategy;
+    
     public EditControlStrategyConstraintsTab(ControlStrategy controlStrategy, ManageChangeables changeablesList,
             SingleLineMessagePanel messagePanel, EmfConsole parentConsole, EmfSession session) {
         this.changeablesList = changeablesList;
+        this.controlStrategy = controlStrategy;
     }
     
     private void setupLayout(ManageChangeables changeables) {
         this.setLayout(new BorderLayout());
         this.add(createConstraintPanel(changeables), BorderLayout.CENTER);
+        notifyStrategyTypeChange(controlStrategy.getStrategyType());
     }
 
     private JPanel createConstraintPanel(ManageChangeables changeables) {
         ControlStrategyConstraint constraint = presenter.getConstraint();
         JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(80,80,100,80));
+        panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10)); //100,80));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Constraints for Target Pollutant:", new JLabel(), panel);
@@ -81,7 +88,22 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         changeables.addChangeable(domainWidePctReduction);
         layoutGenerator.addLabelWidgetPair("Domain Wide Percent Reduction (%)", domainWidePctReduction, panel);
 
-        layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
+        domainWidePctReductionIncrement = new TextField("domain wide percent reduction increment", 10);
+        domainWidePctReductionIncrement.setText(constraint != null ? (constraint.getDomainWidePctReductionIncrement() != null ? constraint.getDomainWidePctReductionIncrement() + "" : "") : "");
+        changeables.addChangeable(domainWidePctReductionIncrement);
+        layoutGenerator.addLabelWidgetPair("Domain Wide Percent Reduction Increment (%)", domainWidePctReductionIncrement, panel);
+
+        domainWidePctReductionStart = new TextField("domain wide percent reduction start", 10);
+        domainWidePctReductionStart.setText(constraint != null ? (constraint.getDomainWidePctReductionStart() != null ? constraint.getDomainWidePctReductionStart() + "" : "") : "");
+        changeables.addChangeable(domainWidePctReductionStart);
+        layoutGenerator.addLabelWidgetPair("Domain Wide Percent Reduction Start (%)", domainWidePctReductionStart, panel);
+
+        domainWidePctReductionEnd = new TextField("domain wide percent reduction end", 10);
+        domainWidePctReductionEnd.setText(constraint != null ? (constraint.getDomainWidePctReductionEnd() != null ? constraint.getDomainWidePctReductionEnd() + "" : "") : "");
+        changeables.addChangeable(domainWidePctReductionEnd);
+        layoutGenerator.addLabelWidgetPair("Domain Wide Percent Reduction End (%)", domainWidePctReductionEnd, panel);
+
+        layoutGenerator.makeCompactGrid(panel, 10, 2, // rows, cols
                 10, 10, // initialX, initialY
                 10, 20); // xPad, yPad
 
@@ -99,6 +121,9 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         if (annCost.getText().trim().length() > 0) constraint.setMinAnnCost(erValidation.parseDouble("minimum annualized cost", annCost.getText()));
         if (domainWideEmisReduction.getText().trim().length() > 0) constraint.setDomainWideEmisReduction(erValidation.parseDouble("domain wide emission reduction", domainWideEmisReduction.getText()));
         if (domainWidePctReduction.getText().trim().length() > 0) constraint.setDomainWidePctReduction(erValidation.parseDouble("domain wide percent reduction", domainWidePctReduction.getText()));
+        if (domainWidePctReductionIncrement.getText().trim().length() > 0) constraint.setDomainWidePctReductionIncrement(erValidation.parseDouble("domain wide percent reduction increment", domainWidePctReductionIncrement.getText()));
+        if (domainWidePctReductionStart.getText().trim().length() > 0) constraint.setDomainWidePctReductionStart(erValidation.parseDouble("domain wide percent reduction start", domainWidePctReductionStart.getText()));
+        if (domainWidePctReductionEnd.getText().trim().length() > 0) constraint.setDomainWidePctReductionEnd(erValidation.parseDouble("domain wide percent reduction end", domainWidePctReductionEnd.getText()));
         if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.leastCost)) {
             //make sure that either Emis OR Pct Reduction was specified for the Least Cost.  This is needed for the run.
             if (constraint.getDomainWideEmisReduction() == null && constraint.getDomainWidePctReduction() == null) 
@@ -127,10 +152,21 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         if (strategyType != null && strategyType.getName().equals(StrategyType.leastCost)) {
             domainWideEmisReduction.setEnabled(true);
             domainWidePctReduction.setEnabled(true);
-        }
-        else {
+            domainWidePctReductionIncrement.setEnabled(false);
+            domainWidePctReductionStart.setEnabled(false);
+            domainWidePctReductionEnd.setEnabled(false);
+        } else if (strategyType != null && strategyType.getName().equals(StrategyType.leastCostCurve)) {
             domainWideEmisReduction.setEnabled(false);
             domainWidePctReduction.setEnabled(false);
+            domainWidePctReductionIncrement.setEnabled(true);
+            domainWidePctReductionStart.setEnabled(true);
+            domainWidePctReductionEnd.setEnabled(true);
+        } else {
+            domainWideEmisReduction.setEnabled(false);
+            domainWidePctReduction.setEnabled(false);
+            domainWidePctReductionIncrement.setEnabled(false);
+            domainWidePctReductionStart.setEnabled(false);
+            domainWidePctReductionEnd.setEnabled(false);
         }
     }
 }
