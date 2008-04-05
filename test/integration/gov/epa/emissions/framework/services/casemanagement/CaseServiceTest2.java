@@ -467,7 +467,7 @@ public class CaseServiceTest2 extends ServiceTestCase {
         Sector sectorOR = (Sector) load(Sector.class, "On Road");
 
         // Create metadata for new dataset of specific type
-        datasets[0] = newDataset("mbinv_onroad", "ORL Onroad Inventory (MBINV)");
+        datasets[0] = newDataset("mbinv_onroad", DatasetType.orlOnroadInventory);
         datasets[0].setSectors(new Sector[] { sectorOR });
 
         // Create metadata for new dataset of specific type
@@ -476,7 +476,7 @@ public class CaseServiceTest2 extends ServiceTestCase {
 
         if (numOfDatasets > 2) {
             for (int i = 2; i < numOfDatasets; i++) {
-                datasets[i] = newDataset("test" + i, "ORL Onroad Inventory (MBINV)");
+                datasets[i] = newDataset("test" + i, DatasetType.orlOnroadInventory);
                 datasets[i].setSectors(new Sector[] { sectorOR });
             }
         }

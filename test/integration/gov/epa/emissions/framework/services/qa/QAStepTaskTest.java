@@ -71,7 +71,7 @@ public class QAStepTaskTest extends ServiceTestCase {
         EmfDataset inputDataset = new EmfDataset();
         inputDataset.setName(tableName);
         inputDataset.setCreator(userDAO.get("emf", session).getUsername());
-        inputDataset.setDatasetType(getDatasetType("ORL Nonpoint Inventory (ARINV)"));
+        inputDataset.setDatasetType(getDatasetType(DatasetType.orlNonpointInventory));
         inputDataset = addORLNonpointDataset(inputDataset);
 
         addVersionZeroEntryToVersionsTable(inputDataset, dbserver.getEmissionsDatasource());
@@ -95,7 +95,7 @@ public class QAStepTaskTest extends ServiceTestCase {
         User owner = userDAO.get("emf", session);
 
         if (type.equals(""))
-            type = "ORL Nonpoint Inventory (ARINV)";
+            type = DatasetType.orlNonpointInventory;
 
         EmfDataset dataset = new EmfDataset();
         dataset.setName(name);

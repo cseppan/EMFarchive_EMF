@@ -191,7 +191,7 @@ public class CaseDAO_CaseTest2 extends ServiceTestCase {
         qatemplate.setProgramArguments("args");
         qatemplate.setRequired(true);
 
-        DatasetType dstype = loadDatasetType("ORL Nonpoint Inventory (ARINV)");
+        DatasetType dstype = loadDatasetType(DatasetType.orlNonpointInventory);
 
         InternalSource internalSrc = new InternalSource();
         internalSrc.setCols(new String[] { "col one" });

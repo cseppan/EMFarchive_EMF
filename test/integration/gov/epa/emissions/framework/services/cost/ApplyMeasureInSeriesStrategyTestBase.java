@@ -19,6 +19,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries.StrategyTask;
+import gov.epa.emissions.framework.services.cost.controlStrategy.AbstractControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlmeasure.io.CMImportTask;
@@ -75,18 +76,18 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
     private DatasetType getDatasetType(String type) {
         DatasetType ds = null;
         if (type.equalsIgnoreCase("ORL nonpoint")) 
-            ds = (DatasetType) load(DatasetType.class, "ORL Nonpoint Inventory (ARINV)");
+            ds = (DatasetType) load(DatasetType.class, DatasetType.orlNonpointInventory);
         else if (type.equalsIgnoreCase("ORL point"))
-            ds = (DatasetType) load(DatasetType.class, "ORL Point Inventory (PTINV)");
+            ds = (DatasetType) load(DatasetType.class, DatasetType.orlPointInventory);
         else if (type.equalsIgnoreCase("ORL onroad"))
-            ds = (DatasetType) load(DatasetType.class, "ORL Onroad Inventory (MBINV)");
+            ds = (DatasetType) load(DatasetType.class, DatasetType.orlOnroadInventory);
         else if (type.equalsIgnoreCase("ORL Nonroad"))
-            ds = (DatasetType) load(DatasetType.class, "ORL Nonroad Inventory (ARINV)");
+            ds = (DatasetType) load(DatasetType.class, DatasetType.orlNonroadInventory);
         return ds;
     }
 
 //    private DatasetType orlNonpointDatasetType() {
-//        return (DatasetType) load(DatasetType.class, "ORL Nonpoint Inventory (ARINV)");
+//        return (DatasetType) load(DatasetType.class, DatasetType.orlNonpointInventory);
 //    }
 
     private void addVersionZeroEntryToVersionsTable(Dataset dataset, Datasource datasource) throws Exception {
@@ -281,7 +282,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
     
     protected void createControlledInventory(ControlStrategy strategy, ControlStrategyResult controlStrategyResult) throws Exception {
         //create the controlled inventory for this strategy run....
-        ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(emfUser(), strategy,
+        ControlStrategyInventoryOutput output = new AbstractControlStrategyInventoryOutput(emfUser(), strategy,
                 controlStrategyResult, sessionFactory, 
                 dbServerFactory);
         output.create();

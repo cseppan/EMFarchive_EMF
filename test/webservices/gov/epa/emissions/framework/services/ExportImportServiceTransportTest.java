@@ -49,7 +49,7 @@ public class ExportImportServiceTransportTest extends ServiceTestCase {
         DatasetType[] datasetTypes = dataCommonsService.getDatasetTypes();
         for (int i = 0; i < datasetTypes.length; i++) {
             String name = datasetTypes[i].getName();
-            if (name.startsWith("ORL Nonpoint Inventory (ARINV)"))
+            if (name.startsWith(DatasetType.orlNonpointInventory))
                 return datasetTypes[i];
         }
         return null;

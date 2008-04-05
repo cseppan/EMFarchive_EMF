@@ -53,7 +53,7 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
     }
 
     private DatasetType orlNonpointDatasetType() {
-        return (DatasetType) load(DatasetType.class, "ORL Nonpoint Inventory (ARINV)");
+        return (DatasetType) load(DatasetType.class, DatasetType.orlNonpointInventory);
     }
 
     private void addVersionZeroEntryToVersionsTable(Dataset dataset, Datasource datasource) throws Exception {
