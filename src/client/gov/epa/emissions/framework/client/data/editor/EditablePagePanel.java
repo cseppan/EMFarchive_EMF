@@ -88,6 +88,13 @@ public class EditablePagePanel extends JPanel {
         String nameClearAll = "Clear All";
         JButton buttonClearAll = toolbar.add(selectAction(false, tableData, nameClearAll, iconClearAll));
         buttonClearAll.setToolTipText(nameClearAll);
+        
+        String replace = "/toolbarButtonGraphics/general/Replace24.gif";
+        ImageIcon iconReplace = createImageIcon(replace);
+        String replaceTip = "Find and Replace Column Values";
+        JButton buttonReplace = toolbar.add(selectAction(false, tableData, replaceTip, iconReplace));
+        buttonReplace.setToolTipText(replaceTip);
+        
         return toolbar;
     }
 
