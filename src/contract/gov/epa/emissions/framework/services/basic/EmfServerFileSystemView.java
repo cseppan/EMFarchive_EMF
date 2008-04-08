@@ -17,7 +17,13 @@ public class EmfServerFileSystemView extends FileSystemView {
         
         try {
             File newFolder = new File(folder.getAbsolutePath() + File.separatorChar + "newfolder");
-            return newFolder.mkdir() ? newFolder.getCanonicalFile() : null;
+            
+            if (newFolder.mkdir()) {
+                newFolder.setWritable(true, false);
+                return newFolder.getCanonicalFile();
+            }
+            
+            return null;
         } catch (Exception e) {
             throw new IOException("User is not allowed to create a new folder. " + e.getMessage());
         }
