@@ -137,6 +137,7 @@ public class DatasetDAO {
         hibernateFacade.remove(dataset, session);
     }
 
+    //FIXME: change this method name to indicate mark deleted
     public void remove(User user, EmfDataset dataset, Session session) throws EmfException {
         if (DebugLevels.DEBUG_14)
             System.out.println("DatasetDAO starts removing dataset " + dataset.getName() + " " + new Date());
