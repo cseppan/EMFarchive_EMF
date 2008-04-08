@@ -104,16 +104,15 @@ public class ImportTask extends Task {
             logError("Failed to import file(s) : " + filesList(), e);
             removeDataset(dataset);
         } finally {
-            if (isDone)
+            if (isDone) {
                 addCompletedStatus();
-            else 
+                session.flush();
+            } else 
                 addFailedStatus(errorMsg);
             
             try {
-                if (session != null) {
-                    session.flush();
+                if (session != null) 
                     session.close();
-                }
                 
                 if (dbServer != null && dbServer.isConnected())
                     dbServer.disconnect();
@@ -133,10 +132,7 @@ public class ImportTask extends Task {
 
     protected void complete(Session session, String status) {
         dataset.setStatus(status);
-        //dataset.setModifiedDateTime(new Date()); //last mod time has been set when creted
-
         updateDataset(dataset, session);
-        //addCompletedStatus();
     }
 
     protected String filesList() {
