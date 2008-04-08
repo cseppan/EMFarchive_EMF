@@ -211,8 +211,10 @@ public class ManagedExportService {
                 System.out.println("FULL PATH= " + fullPath);
 
             toSubDir = new File(fullPath);
+            
             if (!toSubDir.exists()) {
                 toSubDir.mkdirs();
+                toSubDir.setWritable(true, false);
             }
 
             if (isExportable(dataset, version, services, user)) {
