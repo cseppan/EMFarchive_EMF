@@ -20,6 +20,7 @@ import gov.epa.emissions.framework.tasks.Task;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -100,7 +101,7 @@ public class ExportTask extends Task {
             accesslog.setTimestamp(new Date());
             long exportedLineCount = 0;
             accesslog.setFolderPath(file.getAbsolutePath());
-            
+
             if (file.exists()) {
                 setStatus("completed", "FILE EXISTS: Completed export of " + dataset.getName() + " to "
                         + file.getAbsolutePath() + " in " + accesslog.getTimereqrd() + " seconds.");
@@ -111,7 +112,7 @@ public class ExportTask extends Task {
                         .getSqlDataTypes(), batchSize(session));
                 Exporter exporter = exporterFactory.create(dataset, version);
                 exporter.export(file);
-                
+
                 exportedLineCount = exporter.getExportedLinesCount();
                 if (DebugLevels.DEBUG_1)
                     printLogInfo(accesslog);
@@ -130,20 +131,25 @@ public class ExportTask extends Task {
                     setStatus("completed", msghead + " to " + file.getAbsolutePath() + msgend);
 
             }
+            // NOTE: want to check if accesslog exists for the same dataset, version, and description.
+            // If it is there, don't set accesslog.
 
-            accesslog.setEnddate(new Date());
-            accesslog.setLinesExported(exportedLineCount);
-            loggingService.setAccessLog(accesslog);
-            
+            String query = "SELECT obj.id from " + AccessLog.class.getSimpleName() + " obj WHERE obj.datasetId = "
+                    + accesslog.getDatasetId() + " AND obj.version = '" + accesslog.getVersion() + "' "
+                    + "AND obj.description LIKE '%" + accesslog.getDescription() + "%'";
+            System.out.println("query to access log table: " + query);
+            List<?> list = session.createQuery(query).list();
+
+            if (list == null || list.size() == 0) {
+                accesslog.setEnddate(new Date());
+                accesslog.setLinesExported(exportedLineCount);
+                loggingService.setAccessLog(accesslog);
+            }
+
             if (DebugLevels.DEBUG_4)
                 System.out.println("#### Task #" + taskId
                         + " has completed processing making the callback to ExportTaskManager THREAD ID: "
                         + Thread.currentThread().getId());
-
-            // FIXME: Why was the callBack method commented out?
-            // ExportTaskManager.callBackFromThread(taskId, this.submitterId, "completed", "succefully in THREAD ID: "
-            // + Thread.currentThread().getId());
-
         } catch (Exception e) {
             setErrorStatus(e, "");
         } finally {
@@ -174,7 +180,8 @@ public class ExportTask extends Task {
         // setStatus(info);
     }
 
-    private boolean compareDatasetRecordsNumbers(long linesExported, Session session, DbServer dbServer) throws Exception {
+    private boolean compareDatasetRecordsNumbers(long linesExported, Session session, DbServer dbServer)
+            throws Exception {
         String type = dataset.getDatasetType().getName();
         // COSTCY & A/M/PTPRO types temporarily disabled
         if (type.equalsIgnoreCase("Country, state, and county names and data (COSTCY)")
@@ -191,8 +198,8 @@ public class ExportTask extends Task {
         }
 
         if (records != linesExported) {
-            setErrorStatus(null, "No. of records in database: " + records + ", but" + " exported "
-                    + linesExported + " lines");
+            setErrorStatus(null, "No. of records in database: " + records + ", but" + " exported " + linesExported
+                    + " lines");
             return false;
         }
 
