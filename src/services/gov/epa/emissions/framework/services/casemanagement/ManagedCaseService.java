@@ -19,6 +19,7 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJobKey;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
@@ -52,7 +53,9 @@ import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public class ManagedCaseService {
     private static Log log = LogFactory.getLog(ManagedCaseService.class);
@@ -811,8 +814,6 @@ public class ManagedCaseService {
 
                 CaseInput cip = iter.next();
                 badCipName = cip.getName();
-                // if (DebugLevels.DEBUG_9)
-                // System.out.println(cip.getCaseID());
                 cipDataset = cip.getDataset();
 
                 if (cipDataset == null) {
@@ -1298,20 +1299,80 @@ public class ManagedCaseService {
     }
 
     public synchronized void removeCaseJobs(CaseJob[] jobs) throws EmfException {
-
         Session session = sessionFactory.getSession();
 
+        checkJobOutputItems(jobs, session);
+        checkJobHistoryItems(jobs, session);
         resetRelatedJobsField(jobs);
+        deleteCaseJobKeyObjects(jobs, session);
 
         try {
             dao.removeCaseJobs(jobs, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not remove case job " + jobs[0].getName() + " etc.\n" + e.getMessage());
-            throw new EmfException("Could not remove case job " + jobs[0].getName() + " etc.");
+            throw new EmfException("Could not remove case job " + jobs[0].getName() + " etc. -- " + e.getMessage());
         } finally {
             session.close();
         }
+    }
+
+    private void checkJobOutputItems(CaseJob[] jobs, Session session) throws EmfException {
+        String query = "SELECT obj.name from " + CaseOutput.class.getSimpleName() + " obj WHERE obj.jobId = "
+                + getAndOrClause(jobs, "obj.jobId");
+        List<?> list = session.createQuery(query).list();
+
+        if (list != null && list.size() > 0)
+            throw new EmfException("Please remove case outputs for the selected jobs.");
+    }
+
+    private void checkJobHistoryItems(CaseJob[] jobs, Session session) throws EmfException {
+        String query = "SELECT obj.message from " + JobMessage.class.getSimpleName() + " obj WHERE obj.jobId = "
+                + getAndOrClause(jobs, "obj.jobId");
+        List<?> list = session.createQuery(query).list();
+
+        if (list != null && list.size() > 0)
+            throw new EmfException("Please remove job messages for the selected jobs.");
+    }
+
+    private void deleteCaseJobKeyObjects(CaseJob[] jobs, Session session) throws EmfException {
+        int updatedItems = 0;
+
+        try {
+            Transaction tx = session.beginTransaction();
+
+            String query = "DELETE " + CaseJobKey.class.getSimpleName() + " obj WHERE obj.jobId = "
+                    + getAndOrClause(jobs, "obj.jobId");
+
+            if (DebugLevels.DEBUG_16)
+                System.out.println("hql delete string: " + query);
+
+            updatedItems = session.createQuery(query).executeUpdate();
+            tx.commit();
+
+            if (DebugLevels.DEBUG_16)
+                System.out.println(updatedItems + " items updated.");
+        } catch (HibernateException e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            if (DebugLevels.DEBUG_16)
+                log.warn(updatedItems + " items updated from " + CaseJobKey.class.getName() + " table.");
+        }
+    }
+
+    private String getAndOrClause(CaseJob[] jobs, String attrName) {
+        StringBuffer sb = new StringBuffer();
+        int numIDs = jobs.length;
+
+        if (numIDs == 1)
+            return "" + jobs[0].getId();
+
+        for (int i = 0; i < numIDs - 1; i++)
+            sb.append(jobs[i].getId() + " OR " + attrName + " = ");
+
+        sb.append(jobs[numIDs - 1].getId());
+
+        return sb.toString();
     }
 
     private synchronized Case copySingleCaseObj(Case toCopy, User user) throws Exception {
@@ -1404,8 +1465,11 @@ public class ManagedCaseService {
             String subdir = (subdirs[i] == null) ? "" : subdirs[i].getName();
             String exportDir = dirName + System.getProperty("file.separator") + subdir;
             File dir = new File(exportDir);
-            if (!dir.exists())
+
+            if (!dir.exists()) {
                 dir.mkdirs();
+                dir.setWritable(true, false);
+            }
 
             getExportService().exportForClient(user, new EmfDataset[] { datasets[i] }, new Version[] { versions[i] },
                     exportDir, purpose, overWrite);
@@ -1460,7 +1524,7 @@ public class ManagedCaseService {
         ArrayList<CaseJobTask> caseJobsTasksList = new ArrayList<CaseJobTask>();
 
         if (DebugLevels.DEBUG_15) {
-            logNumDBConn("beginning of job submitter");
+            //logNumDBConn("beginning of job submitter");
         }
 
         Session session = sessionFactory.getSession();
@@ -1480,7 +1544,7 @@ public class ManagedCaseService {
                 int jid = jobId.intValue();
 
                 if (DebugLevels.DEBUG_15) {
-                    logNumDBConn("beginning of job submitter loop (jobID: " + jid + ")");
+                    //logNumDBConn("beginning of job submitter loop (jobID: " + jid + ")");
                 }
 
                 String jobKey = null;
@@ -2329,7 +2393,7 @@ public class ManagedCaseService {
             throw new EmfException("Output job script directory must be set to run job: " + job.getName());
         }
 
-        String fileName = jobName + "_" + caseAbbrev + "_" + dateStamp + this.runSuffix;
+        String fileName = replaceNonDigitNonLetterChars(jobName + "_" + caseAbbrev + "_" + dateStamp + this.runSuffix);
         fileName = outputFileDir + System.getProperty("file.separator") + fileName;
         return fileName;
     }
@@ -3021,6 +3085,22 @@ public class ManagedCaseService {
         } finally {
             session.close();
         }
+    }
+    
+    private String replaceNonDigitNonLetterChars(String name) {
+        String filename = name.trim();
+        StringBuffer sb = new StringBuffer();
+        
+        for (int i = 0; i < filename.length(); i++) {
+            if (filename.charAt(i) == '.')
+                sb.append(".");
+            else if (!Character.isLetterOrDigit(filename.charAt(i)))
+                sb.append("_");
+            else
+                sb.append(filename.charAt(i));
+        }
+
+        return sb.toString();
     }
 
 }
