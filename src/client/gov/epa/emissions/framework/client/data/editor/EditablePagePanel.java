@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.util.ClipBoardCopy;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.data.ObserverPanel;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -12,6 +13,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -36,10 +39,13 @@ public class EditablePagePanel extends JPanel {
     private ManageChangeables listOfChangeables;
 
     private DataEditorTable editableTable;
-    
+
     private ObserverPanel observer;
 
-    public EditablePagePanel(EditablePage page, ObserverPanel observer, MessagePanel messagePanel, ManageChangeables listOfChangeables) {
+    private DesktopManager desktopManager;
+
+    public EditablePagePanel(EditablePage page, ObserverPanel observer, MessagePanel messagePanel,
+            ManageChangeables listOfChangeables) {
         this.listOfChangeables = listOfChangeables;
         this.messagePanel = messagePanel;
         this.observer = observer;
@@ -88,13 +94,13 @@ public class EditablePagePanel extends JPanel {
         String nameClearAll = "Clear All";
         JButton buttonClearAll = toolbar.add(selectAction(false, tableData, nameClearAll, iconClearAll));
         buttonClearAll.setToolTipText(nameClearAll);
-        
+
         String replace = "/toolbarButtonGraphics/general/Replace24.gif";
         ImageIcon iconReplace = createImageIcon(replace);
         String replaceTip = "Find and Replace Column Values";
-        JButton buttonReplace = toolbar.add(selectAction(false, tableData, replaceTip, iconReplace));
+        JButton buttonReplace = toolbar.add(replaceAction(tableData, replaceTip, iconReplace));
         buttonReplace.setToolTipText(replaceTip);
-        
+
         return toolbar;
     }
 
@@ -116,7 +122,7 @@ public class EditablePagePanel extends JPanel {
         addCopyPasteClipBoard(editableTable);
         return table;
     }
-    
+
     private void addCopyPasteClipBoard(JTable viewTable) {
         ClipBoardCopy clipBoardCopy = new ClipBoardCopy(viewTable);
         clipBoardCopy.registerCopyKeyStroke();
@@ -142,13 +148,26 @@ public class EditablePagePanel extends JPanel {
         return new AbstractAction(name, icon) {
             public void actionPerformed(ActionEvent e) {
                 messagePanel.clear();
-                
+
                 if (select)
                     tableData.selectAll();
                 else
                     tableData.clearAll();
-                
+
                 refresh();
+            }
+        };
+    }
+
+    private Action replaceAction(final EditablePage tableData, String replaceTip, ImageIcon icon) {
+        return new AbstractAction(replaceTip, icon) {
+            public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
+
+                FindReplaceWindowView dialog = new DataFindReplaceWindow(getDesktopManager(), removeFirstCol(tableData
+                        .columns()));
+                FindReplaceViewPresenter findReplacePresenter = new FindReplaceViewPresenter(dialog, null);
+                findReplacePresenter.displayView();
             }
         };
     }
@@ -174,7 +193,7 @@ public class EditablePagePanel extends JPanel {
         } else {
             messagePanel.setError("Please highlight a row before clicking the insert button");
         }
-        
+
         this.observer.update(1);
     }
 
@@ -209,5 +228,22 @@ public class EditablePagePanel extends JPanel {
         }
         messagePanel.setError("Could not find file: " + path);
         return null;
+    }
+
+    private String[] removeFirstCol(String[] cols) {
+        List<String> newCols = new ArrayList<String>();
+
+        for (int i = 1; i < cols.length; i++)
+            newCols.add(cols[i]);
+
+        return newCols.toArray(new String[0]);
+    }
+
+    public DesktopManager getDesktopManager() {
+        return this.desktopManager;
+    }
+
+    public void setDesktopManager(DesktopManager desktopManager) {
+        this.desktopManager = desktopManager;
     }
 }

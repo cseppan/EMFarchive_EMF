@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.io.TableMetadata;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.data.DataSortFilterPanel;
 import gov.epa.emissions.framework.client.data.PaginationPanel;
 import gov.epa.emissions.framework.client.data.viewer.TablePresenter;
@@ -38,6 +39,8 @@ public class EditorPanel extends JPanel implements EditorPanelView {
     private ManageChangeables changeablesList;
 
     private TableMetadata tableMetadata;
+
+    private DesktopManager desktopManager;
 
     public EditorPanel(EmfDataset dataset, Version version, TableMetadata tableMetadata, 
             MessagePanel messagePanel, ManageChangeables changeablesList) {
@@ -90,6 +93,7 @@ public class EditorPanel extends JPanel implements EditorPanelView {
     private EditablePagePanel createEditablePage(Page page) {
         editablePage = new EditablePage(dataset.getId(), version, page, tableMetadata);
         editablePagePanel = new EditablePagePanel(editablePage, paginationPanel, messagePanel, changeablesList);
+        editablePagePanel.setDesktopManager(desktopManager);
 
         return editablePagePanel;
     }
@@ -115,6 +119,14 @@ public class EditorPanel extends JPanel implements EditorPanelView {
     public String getRowFilter() {
         // NOTE Auto-generated method stub
         return null;
+    }
+    
+    public DesktopManager getDesktopManager() {
+        return this.desktopManager;
+    }
+    
+    public void setDesktopManager(DesktopManager desktopManager) {
+        this.desktopManager = desktopManager;
     }
 
 }
