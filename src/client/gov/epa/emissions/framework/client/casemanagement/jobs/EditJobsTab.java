@@ -117,7 +117,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             messagePanel.setError("Cannot retrieve all case jobs.");
         } finally {
             setCursor(Cursor.getDefaultCursor());
-            
+
             try {
                 presenter.checkIfLockedByCurrentUser();
             } catch (Exception e) {
@@ -279,7 +279,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
                     clearMessage();
                     validateJobDatasets();
                 } catch (Exception ex) {
-                   // ex.printStackTrace();
+                    // ex.printStackTrace();
                     messagePanel.setError(ex.getMessage());
                 }
             }
@@ -451,14 +451,18 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
         if (validationMsg.isEmpty())
             // there are no nonfinal dataset versions used, so return yes
-            return JOptionPane.YES_OPTION; 
-        
-        String finalMsg = validationMsg + ls + "ARE YOU SURE YOU WANT TO RUN THE SELECTED JOB" + 
-                    (jobs.length > 1 ? "S" : "") + "?";
+            return JOptionPane.YES_OPTION;
+
+        String finalMsg = validationMsg + ls + "ARE YOU SURE YOU WANT TO RUN THE SELECTED JOB"
+                + (jobs.length > 1 ? "S" : "") + "?";
         int width = 50;
         int height = validationMsg.length() / 50;
-        ScrollableComponent msgArea = createMsgScrollPane(finalMsg, width, height);
+
+        if (height > 30)
+            height = 30;
         
+        ScrollableComponent msgArea = createMsgScrollPane(finalMsg, width, height);
+
         return showDialog(msgArea, "Confirm Running Jobs");
     }
 
@@ -487,7 +491,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         TextArea message = new TextArea("msgArea", msg, width, height);
         message.setEditable(false);
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(message);
-        //descScrollableTextArea.setMinimumSize(new Dimension(width * 3, height * 2));
+        // descScrollableTextArea.setMinimumSize(new Dimension(width * 3, height * 2));
         return descScrollableTextArea;
     }
 
