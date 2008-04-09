@@ -214,7 +214,7 @@ public class ManagedExportService {
             
             if (!toSubDir.exists()) {
                 toSubDir.mkdirs();
-                setDirsWritable(toSubDir);
+                setDirsWritable(new File(caseObj.getInputFileDir()), toSubDir);
             }
 
             if (isExportable(dataset, version, services, user)) {
@@ -271,7 +271,7 @@ public class ManagedExportService {
         return exportJobTaskSubmitter.getSubmitterId();
     }
     
-    private void setDirsWritable(File dir) {
+    private void setDirsWritable(File base, File dir) {
         while (dir != null) {
             try {
                 dir.setWritable(true, false);
@@ -280,6 +280,9 @@ public class ManagedExportService {
             }
             
             dir = dir.getParentFile();
+            
+            if (dir.compareTo(base) == 0)
+                return;
         }
     }
 
