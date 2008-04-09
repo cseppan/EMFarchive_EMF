@@ -551,7 +551,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
                 throw new EmfException("Subfolder " + subfolder + " already exists.");
             
             if (subdir.mkdirs()) {
-                subdir.setWritable(true, false);
+                setDirsWritable(subdir);
                 return EmfFileSerializer.convert(subdir);
             }
 
@@ -559,6 +559,18 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         } catch (Exception e) {
             LOG.error("Could not create new folder " + folder + File.separator + subfolder + ". ", e);
             throw new EmfException(e.getMessage());
+        }
+    }
+    
+    private void setDirsWritable(File dir) {
+        while (dir != null) {
+            try {
+                dir.setWritable(true, false);
+            } catch (Exception e) {
+                return;
+            }
+            
+            dir = dir.getParentFile();
         }
     }
 

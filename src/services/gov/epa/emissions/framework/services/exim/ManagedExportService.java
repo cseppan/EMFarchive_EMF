@@ -214,7 +214,7 @@ public class ManagedExportService {
             
             if (!toSubDir.exists()) {
                 toSubDir.mkdirs();
-                toSubDir.setWritable(true, false);
+                setDirsWritable(toSubDir);
             }
 
             if (isExportable(dataset, version, services, user)) {
@@ -269,6 +269,18 @@ public class ManagedExportService {
             System.out.println("ManagedExportService:export() exiting at: " + new Date());
 
         return exportJobTaskSubmitter.getSubmitterId();
+    }
+    
+    private void setDirsWritable(File dir) {
+        while (dir != null) {
+            try {
+                dir.setWritable(true, false);
+            } catch (Exception e) {
+                return;
+            }
+            
+            dir = dir.getParentFile();
+        }
     }
 
     public synchronized String exportForClient(User user, EmfDataset[] datasets, Version[] versions, String dirName,

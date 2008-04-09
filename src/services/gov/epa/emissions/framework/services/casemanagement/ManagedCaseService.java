@@ -1468,11 +1468,23 @@ public class ManagedCaseService {
 
             if (!dir.exists()) {
                 dir.mkdirs();
-                dir.setWritable(true, false);
+                setDirsWritable(dir);
             }
 
             getExportService().exportForClient(user, new EmfDataset[] { datasets[i] }, new Version[] { versions[i] },
                     exportDir, purpose, overWrite);
+        }
+    }
+
+    private void setDirsWritable(File dir) {
+        while (dir != null) {
+            try {
+                dir.setWritable(true, false);
+            } catch (Exception e) {
+                return;
+            }
+            
+            dir = dir.getParentFile();
         }
     }
 
@@ -1524,7 +1536,7 @@ public class ManagedCaseService {
         ArrayList<CaseJobTask> caseJobsTasksList = new ArrayList<CaseJobTask>();
 
         if (DebugLevels.DEBUG_15) {
-            //logNumDBConn("beginning of job submitter");
+            // logNumDBConn("beginning of job submitter");
         }
 
         Session session = sessionFactory.getSession();
@@ -1544,7 +1556,7 @@ public class ManagedCaseService {
                 int jid = jobId.intValue();
 
                 if (DebugLevels.DEBUG_15) {
-                    //logNumDBConn("beginning of job submitter loop (jobID: " + jid + ")");
+                    // logNumDBConn("beginning of job submitter loop (jobID: " + jid + ")");
                 }
 
                 String jobKey = null;
@@ -1890,8 +1902,11 @@ public class ManagedCaseService {
 
             String exportDir = dirName + System.getProperty("file.separator") + subdir;
             File dir = new File(exportDir);
-            if (!dir.exists())
+            
+            if (!dir.exists()) {
                 dir.mkdirs();
+                setDirsWritable(dir);
+            }
 
             getExportService().exportForClient(user, new EmfDataset[] { datasets[i] }, new Version[] { versions[i] },
                     exportDir, purpose, overWrite);
@@ -2412,16 +2427,17 @@ public class ManagedCaseService {
 
         // Check if logs dir (jobpath/logs) exists, if not create
         File logDir = new File(file.getParent() + System.getProperty("file.separator") + "logs");
+        
         if (!(logDir.isDirectory())) {
             // Need to create the directory
             if (!(logDir.mkdir())) {
                 throw new EmfException("Error creating job log directory: " + logDir);
             }
-        }
-
-        // Make directory writable by everyone
-        if (!logDir.setWritable(true, false)) {
-            throw new EmfException("Error changing job log directory's write permissions: " + logDir);
+            
+            // Make directory writable by everyone
+            if (!logDir.setWritable(true, false)) {
+                throw new EmfException("Error changing job log directory's write permissions: " + logDir);
+            }
         }
 
         // Create the logFile full name
@@ -3086,11 +3102,11 @@ public class ManagedCaseService {
             session.close();
         }
     }
-    
+
     private String replaceNonDigitNonLetterChars(String name) {
         String filename = name.trim();
         StringBuffer sb = new StringBuffer();
-        
+
         for (int i = 0; i < filename.length(); i++) {
             if (filename.charAt(i) == '.')
                 sb.append(".");
