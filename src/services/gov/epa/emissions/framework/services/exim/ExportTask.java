@@ -137,7 +137,6 @@ public class ExportTask extends Task {
             String query = "SELECT obj.id from " + AccessLog.class.getSimpleName() + " obj WHERE obj.datasetId = "
                     + accesslog.getDatasetId() + " AND obj.version = '" + accesslog.getVersion() + "' "
                     + "AND obj.description LIKE '%" + accesslog.getDescription() + "%'";
-            System.out.println("query to access log table: " + query);
             List<?> list = session.createQuery(query).list();
 
             if (list == null || list.size() == 0) {
