@@ -175,7 +175,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         super.setLabel(super.getTitle() + ": " + step.getName() + " - " + dataset.getName() + " (v" + step.getVersion()
                 + ")");
 
-        JPanel layout = createLayout(step, qaStepResult, versionName);
+        JPanel layout = createLayout(qaStepResult, versionName);
         super.getContentPane().add(layout);
         super.display();
     }
@@ -188,40 +188,40 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         this.presenter = presenter;
     }
 
-    private JPanel createLayout(QAStep step, QAStepResult qaStepResult, String versionName) {
+    private JPanel createLayout(QAStepResult qaStepResult, String versionName) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
 
-        panel.add(inputPanel(step, qaStepResult, versionName));
+        panel.add(inputPanel(qaStepResult, versionName));
         panel.add(buttonsPanel());
 
         return panel;
     }
 
-    private JPanel inputPanel(QAStep step, QAStepResult qaStepResult, String versionName) {
+    private JPanel inputPanel(QAStepResult qaStepResult, String versionName) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        panel.add(upperPanel(step, versionName));
-        panel.add(lowerPanel(step, qaStepResult));
+        panel.add(upperPanel(versionName));
+        panel.add(lowerPanel(qaStepResult));
 
         return panel;
     }
 
-    private JPanel lowerPanel(QAStep step, QAStepResult qaStepResult) {
+    private JPanel lowerPanel(QAStepResult qaStepResult) {
 
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
-        topPanel.add(lowerTopLeftPanel(step));
+        topPanel.add(lowerTopLeftPanel());
         topPanel.add(lowerTopRightPanel(qaStepResult));
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(topPanel);
-        panel.add(lowerBottomPanel(step));
+        panel.add(lowerBottomPanel());
         return panel;
     }
 
@@ -265,7 +265,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         return panel;
     }
 
-    private JPanel lowerBottomPanel(QAStep step) {
+    private JPanel lowerBottomPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -324,7 +324,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         }
     }
 
-    private JPanel lowerTopLeftPanel(QAStep step) {
+    private JPanel lowerTopLeftPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -366,7 +366,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         return step.getStatus() != null ? step.getStatus() : QAProperties.initialStatus();
     }
 
-    private JPanel upperPanel(QAStep step, String versionName) {
+    private JPanel upperPanel(String versionName) {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -975,24 +975,26 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         runButton.setEnabled(false); // only allow user to run one time at a open window session
 
         presenter.run();
-        //resetChanges();
+        resetChanges();
     }
 
-    private void resetRunStatus(QAStepResult result) {
-        if (result == null)
-            return;
-
+    private void resetRunStatus(QAStepResult result) throws EmfException {
         saveButton.setEnabled(true);
         runButton.setEnabled(true);
-        who.setText(step.getWho());
-        date.setText(DATE_FORMATTER.format(step.getDate()));
-        status.setSelectedItem(step.getStatus());
-        tableName.setText(result.getTable());
-        creationStatusLabel.setText(result.getTableCreationStatus());
-        creationDateLabel.setText(CustomDateFormat.format_MM_DD_YYYY_HH_mm(result.getTableCreationDate()));
-        currentTable.setSelected(result.isCurrentTable());
-        qaStepResult = result;
+        saveQA();
+        
+        if (result != null){
+            who.setText(step.getWho());
+            date.setText(DATE_FORMATTER.format(step.getDate()));
+            status.setSelectedItem(step.getStatus());
+            tableName.setText(result.getTable());
+            creationStatusLabel.setText(result.getTableCreationStatus());
+            creationDateLabel.setText(CustomDateFormat.format_MM_DD_YYYY_HH_mm(result.getTableCreationDate()));
+            currentTable.setSelected(result.isCurrentTable());
+            qaStepResult = result;
+        }
         resetChanges();
+        clear();
         super.revalidate();
     }
 
@@ -1049,17 +1051,21 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             public void actionPerformed(ActionEvent e) {
                 try {
                     clear();
-                    if (hasChanges()){
-                        presenter.save();
-                        messagePanel.setMessage("QA step is saved successfully. ");
-                        resetChanges();
-                    }
+                    saveQA();
                 } catch (EmfException e1) {
                     messagePanel.setError(e1.getMessage());
                 }
             }
         });
         return save;
+    }
+    
+    private void saveQA() throws EmfException{
+        if (hasChanges()){
+            presenter.save();
+            messagePanel.setMessage("QA step is saved successfully. ");
+            resetChanges();
+        }
     }
 
     private Button closeButton() {
