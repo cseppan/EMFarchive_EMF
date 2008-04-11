@@ -5,8 +5,6 @@ import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
@@ -24,14 +22,13 @@ import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
@@ -41,7 +38,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
@@ -55,9 +51,9 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
     private CaseJobsTableData tableData;
 
-    private SortFilterSelectModel selectModel;
+    private SelectableSortFilterWrapper table;
 
-    private JPanel tablePanel;
+    private JPanel mainPanel;
 
     private MessagePanel messagePanel;
 
@@ -127,14 +123,15 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     }
 
     private void doRefresh(CaseJob[] jobs) throws Exception {
-        super.removeAll();
+        //super.removeAll();
         String outputFileDir = caseObj.getOutputFileDir();
 
         if (!outputDir.getText().equalsIgnoreCase(outputFileDir))
             outputDir.setText(outputFileDir);
 
-        super.add(createLayout(jobs, parentConsole), BorderLayout.CENTER);
-    }
+        setupTableModel(jobs);
+        table.refresh(tableData);
+        panelRefresh();    }
 
     private JPanel createLayout(CaseJob[] jobs, EmfConsole parentConsole) throws Exception {
         final JPanel layout = new JPanel(new BorderLayout());
@@ -190,22 +187,16 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     }
 
     private JPanel tablePanel(CaseJob[] jobs, EmfConsole parentConsole) {
-        tableData = new CaseJobsTableData(jobs);
-        selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
+        setupTableModel(jobs);
 
-        tablePanel = new JPanel(new BorderLayout());
-        tablePanel.add(createSortFilterPanel(parentConsole), BorderLayout.CENTER);
-
-        return tablePanel;
+        mainPanel = new JPanel(new BorderLayout());
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());      
+        mainPanel.add(table);
+        return mainPanel;
     }
-
-    private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
-        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        sortFilterPanel.sort(sortCriteria());
-
-        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
-        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
-        return scrollPane;
+    
+    private void setupTableModel(CaseJob[] jobs){
+        tableData = new CaseJobsTableData(jobs);
     }
 
     private SortCriteria sortCriteria() {
@@ -256,7 +247,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
         String message = "You have asked to copy too many jobs. Do you wish to proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
-        SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(), selectModel, confirmDialog);
+        SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(), table, confirmDialog);
         copy.setMargin(insets);
         container.add(copy);
 
@@ -475,7 +466,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     }
 
     private List<CaseJob> getSelectedJobs() {
-        return (List<CaseJob>) selectModel.selected();
+        return (List<CaseJob>) table.selected();
     }
 
     private int showDialog(Object msg, String title) {
@@ -519,10 +510,14 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
     public void addJob(CaseJob job) {
         tableData.add(job);
-        selectModel.refresh();
-
-        tablePanel.removeAll();
-        tablePanel.add(createSortFilterPanel(parentConsole));
+        table.refresh(tableData);
+        panelRefresh(); 
+    }
+    
+    private void panelRefresh() {
+        mainPanel.removeAll();
+        mainPanel.add(table);
+        super.validate();
     }
 
     public CaseJob[] caseJobs() {

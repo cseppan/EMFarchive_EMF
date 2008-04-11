@@ -3,8 +3,6 @@ package gov.epa.emissions.framework.client.casemanagement.outputs;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
@@ -21,9 +19,9 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.YesNoDialog;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
@@ -40,7 +38,6 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
 public class EditOutputsTab extends JPanel implements EditOutputsTabView, RefreshObserver {
@@ -55,7 +52,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
 
     private ManageChangeables changeables;
 
-    private SortFilterSelectModel selectModel;
+    private SelectableSortFilterWrapper table;
 
     private JPanel tablePanel;
     
@@ -104,9 +101,10 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
     private void doRefresh(CaseOutput[] outputs){
         messagePanel.clear();
         selectedJob=(CaseJob) jobCombo.getSelectedItem();
-        super.removeAll();
-        super.add(createLayout(outputs), BorderLayout.CENTER);
-        super.revalidate();
+        //super.removeAll();
+        setupTableModel(outputs);
+        table.refresh(tableData);
+        panelRefresh();
     }
 
     private JPanel createLayout(CaseOutput[] outputs){
@@ -155,24 +153,19 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
     }
 
     private JPanel tablePanel(CaseOutput[] outputs, EmfConsole parentConsole){
-        tableData = new OutputsTableData(outputs, session);
+        setupTableModel(outputs);
         changeables.addChangeable(tableData);
-        selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
+        
         tablePanel = new JPanel(new BorderLayout());
-        tablePanel.add(createSortFilterPanel(parentConsole), BorderLayout.CENTER);
-
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+        tablePanel.add(table, BorderLayout.CENTER);
         return tablePanel;
     }
-
-    private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
-        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        sortFilterPanel.sort(sortCriteria());
-        
-        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
-        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
-        return scrollPane;
-    }
     
+    private void setupTableModel(CaseOutput[] outputs){
+        tableData = new OutputsTableData(outputs, session);
+    }
+
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Sector", "Output name", "Job" };
         return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false,
@@ -255,7 +248,7 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         }
     }
     protected void editOutput() throws EmfException {
-        List outputs = selectModel.selected();
+        List outputs = table.selected();
         if (outputs.size() == 0) {
             messagePanel.setMessage("Please select output(s) to edit.");
             return;
@@ -270,7 +263,7 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
 
     protected void displayOutputDatasetsPropertiesViewer() throws EmfException {
         messagePanel.clear();
-        List selected = selectModel.selected();
+        List selected = table.selected();
         
         if (selected.size() == 0) {
             messagePanel.setMessage("Please select one or more outputs to view.");
@@ -292,7 +285,7 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
 
     private void removeSelectedOutput(){
         messagePanel.clear();
-        CaseOutput[] selected =selectModel.selected().toArray(new CaseOutput[0]);
+        CaseOutput[] selected =table.selected().toArray(new CaseOutput[0]);
 
         if (selected.length==0) {
             messagePanel.setMessage("Please select one or more outputs to remove.");
@@ -385,10 +378,14 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
 
     public void addOutput(CaseOutput addCaseOutput) {
         tableData.add(addCaseOutput);
-        selectModel.refresh();
-
-        tablePanel.removeAll();
-        tablePanel.add(createSortFilterPanel(parentConsole));
-        
+        table.refresh(tableData);
+        panelRefresh();
     }
+    
+    private void panelRefresh() {
+        tablePanel.removeAll();
+        tablePanel.add(table);
+        super.validate();
+    }
+    
 }

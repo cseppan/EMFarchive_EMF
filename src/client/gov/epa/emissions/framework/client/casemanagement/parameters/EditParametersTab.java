@@ -3,8 +3,6 @@ package gov.epa.emissions.framework.client.casemanagement.parameters;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
@@ -14,14 +12,13 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
@@ -32,7 +29,6 @@ import javax.swing.Action;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class EditParametersTab extends JPanel implements EditCaseParametersTabView, RefreshObserver {
 
@@ -46,7 +42,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
     private ParametersTableData tableData;
 
-    private SortFilterSelectModel selectModel;
+    private SelectableSortFilterWrapper table;
 
     private JPanel tablePanel;
 
@@ -111,8 +107,10 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     }
 
     private void doRefresh(CaseParameter[] params) throws Exception {
-        super.removeAll();
-        super.add(createLayout(params, presenter, parentConsole), BorderLayout.CENTER);
+        //super.removeAll();
+        setupTableModel(params);
+        table.refresh(tableData);
+        panelRefresh();
     }
 
     private JPanel createLayout(CaseParameter[] params, EditParametersTabPresenter presenter, EmfConsole parentConsole)
@@ -126,22 +124,17 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     }
 
     private JPanel tablePanel(CaseParameter[] params, EmfConsole parentConsole) {
-        tableData = new ParametersTableData(params, session);
-        selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
-
+        setupTableModel(params);
         tablePanel = new JPanel(new BorderLayout());
-        tablePanel.add(createSortFilterPanel(parentConsole), BorderLayout.CENTER);
-
+        
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+        tablePanel.add(table, BorderLayout.CENTER);
+        
         return tablePanel;
     }
-
-    private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
-        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        sortFilterPanel.sort(sortCriteria());
-
-        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
-        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
-        return scrollPane;
+    
+    private void setupTableModel(CaseParameter[] params){
+        tableData = new ParametersTableData(params, session);
     }
 
     private SortCriteria sortCriteria() {
@@ -192,7 +185,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
         String message = "You have asked to copy too many parameters. Do you wish to proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
-        SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(presenter), selectModel, confirmDialog);
+        SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(presenter), table, confirmDialog);
         copy.setMargin(insets);
         container.add(copy);
 
@@ -292,14 +285,18 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
     public void addParameter(CaseParameter param) {
         tableData.add(param);
-        selectModel.refresh();
-
+        table.refresh(tableData);
+        panelRefresh();
+    }
+    
+    private void panelRefresh() {
         tablePanel.removeAll();
-        tablePanel.add(createSortFilterPanel(parentConsole));
+        tablePanel.add(table);
+        super.validate();
     }
 
     private List getSelectedParameters() {
-        return selectModel.selected();
+        return table.selected();
     }
 
     public CaseParameter[] caseParameters() {

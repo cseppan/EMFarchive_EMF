@@ -2,8 +2,6 @@ package gov.epa.emissions.framework.client.casemanagement.inputs;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
@@ -16,14 +14,13 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -34,7 +31,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
 public class ViewableInputsTab extends JPanel implements RefreshObserver {
@@ -49,9 +45,9 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
 
     private InputsTableData tableData;
 
-    private SortFilterSelectModel selectModel;
-
-    private JPanel tablePanel;
+    private JPanel mainPanel;
+    
+    private SelectableSortFilterWrapper table;
 
     private MessagePanel messagePanel;
 
@@ -117,8 +113,15 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
         String inputFileDir = caseObj.getInputFileDir();
         if (!inputDir.getText().equalsIgnoreCase(inputFileDir))
             inputDir.setText(inputFileDir);
-        super.removeAll();
-        super.add(createLayout(inputs, parentConsole), BorderLayout.CENTER);
+        setupTableModel(inputs);
+        table.refresh(tableData);
+        panelRefresh();
+    }
+    
+    private void panelRefresh() {
+        mainPanel.removeAll();
+        mainPanel.add(table);
+        super.validate();
     }
 
     private JPanel createLayout(CaseInput[] inputs, EmfConsole parentConsole)
@@ -133,23 +136,27 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
     }
 
     private JPanel tablePanel(CaseInput[] inputs, EmfConsole parentConsole) {
+        setupTableModel(inputs);
+
+        mainPanel = new JPanel(new BorderLayout());
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+        mainPanel.add(table);
+
+        return mainPanel;
+    }
+    
+    private void setupTableModel(CaseInput[] inputs){
         tableData = new InputsTableData(inputs, session);
-        selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
-
-        tablePanel = new JPanel(new BorderLayout());
-        tablePanel.add(createSortFilterPanel(parentConsole), BorderLayout.CENTER);
-
-        return tablePanel;
     }
 
-    private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
-        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        sortFilterPanel.sort(sortCriteria());
-
-        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
-        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
-        return scrollPane;
-    }
+//    private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
+//        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, table);
+//        sortFilterPanel.sort(sortCriteria());
+//
+//        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
+//        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
+//        return scrollPane;
+//    }
 
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Envt. Var.", "Sector", "Input" };
@@ -342,14 +349,12 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
 
     public void addInput(CaseInput note) {
         tableData.add(note);
-        selectModel.refresh();
-
-        tablePanel.removeAll();
-        tablePanel.add(createSortFilterPanel(parentConsole));
+        table.refresh(tableData);
+        panelRefresh();
     }
 
     private List getSelectedInputs() {
-        return selectModel.selected();
+        return table.selected();
     }
 
     public CaseInput[] caseInputs() {

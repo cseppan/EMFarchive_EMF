@@ -1,8 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.parameters;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -10,14 +8,13 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
@@ -26,7 +23,6 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class ViewableParametersTab extends JPanel implements RefreshObserver {
 
@@ -40,7 +36,7 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
 
     private ParametersTableData tableData;
 
-    private SortFilterSelectModel selectModel;
+    private SelectableSortFilterWrapper table;
 
     private JPanel tablePanel;
 
@@ -99,8 +95,16 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
     }
 
     private void doRefresh(CaseParameter[] params) throws Exception {
-        super.removeAll();
-        super.add(createLayout(params,  parentConsole), BorderLayout.CENTER);
+        //super.removeAll();
+        setupTableModel(params);
+        table.refresh(tableData);
+        panelRefresh();
+    }
+    
+    private void panelRefresh() {
+        tablePanel.removeAll();
+        tablePanel.add(table);
+        super.validate();
     }
 
     private JPanel createLayout(CaseParameter[] params, EmfConsole parentConsole)
@@ -114,23 +118,18 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
     }
 
     private JPanel tablePanel(CaseParameter[] params, EmfConsole parentConsole) {
-        tableData = new ParametersTableData(params, session);
-        selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
-
+        setupTableModel(params);
         tablePanel = new JPanel(new BorderLayout());
-        tablePanel.add(createSortFilterPanel(parentConsole), BorderLayout.CENTER);
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+        tablePanel.add(table, BorderLayout.CENTER);
 
         return tablePanel;
     }
-
-    private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
-        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        sortFilterPanel.sort(sortCriteria());
-
-        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
-        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
-        return scrollPane;
+    
+    private void setupTableModel(CaseParameter[] params){
+        tableData = new ParametersTableData(params, session);
     }
+
 
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Order", "Envt. Var.", "Sector", "Parameter" };
@@ -192,22 +191,13 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
 
 
     private List getSelectedParameters() {
-        return selectModel.selected();
+        return table.selected();
     }
 
     public CaseParameter[] caseParameters() {
         return tableData.sources();
     }
 
-    public void refresh() {
-        // note that this will get called when the case is save
-        try {
-            if (tableData != null) // it's still null if you've never displayed this tab
-                doRefresh(tableData.sources());
-        } catch (Exception e) {
-            messagePanel.setError("Cannot refresh current tab. " + e.getMessage());
-        }
-    }
 
     public int numberOfRecord() {
         return tableData.sources().length;

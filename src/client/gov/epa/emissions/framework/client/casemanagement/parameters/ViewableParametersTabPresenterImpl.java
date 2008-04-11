@@ -26,10 +26,6 @@ public class ViewableParametersTabPresenterImpl {
         view.display(session, caseObj, this);
     }
 
-    public void doSave() {
-        view.refresh();
-    }
-
 
     private CaseService service() {
         return session.caseService();

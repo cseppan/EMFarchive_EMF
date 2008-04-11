@@ -2,8 +2,6 @@ package gov.epa.emissions.framework.client.casemanagement.jobs;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.RunButton;
@@ -15,14 +13,13 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
@@ -31,7 +28,6 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
 public class ViewableJobsTab extends JPanel implements RefreshObserver {
@@ -44,7 +40,7 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
 
     private CaseJobsTableData tableData;
 
-    private SortFilterSelectModel selectModel;
+    private SelectableSortFilterWrapper table;
 
     private JPanel tablePanel;
 
@@ -107,13 +103,21 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
     }
 
     private void doRefresh(CaseJob[] jobs) throws Exception {
-        super.removeAll();
+        //super.removeAll();
         String outputFileDir = caseObj.getOutputFileDir();
 
         if (!outputDir.getText().equalsIgnoreCase(outputFileDir))
             outputDir.setText(outputFileDir);
 
-        super.add(createLayout(jobs, parentConsole), BorderLayout.CENTER);
+        setupTableModel(jobs);
+        table.refresh(tableData);
+        panelRefresh();    
+    }
+    
+    private void panelRefresh() {
+        tablePanel.removeAll();
+        tablePanel.add(table);
+        super.validate();
     }
 
     private JPanel createLayout(CaseJob[] jobs, EmfConsole parentConsole) throws Exception {
@@ -140,23 +144,20 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
 
 
     private JPanel tablePanel(CaseJob[] jobs, EmfConsole parentConsole) {
-        tableData = new CaseJobsTableData(jobs);
-        selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
+        setupTableModel(jobs);
 
         tablePanel = new JPanel(new BorderLayout());
-        tablePanel.add(createSortFilterPanel(parentConsole), BorderLayout.CENTER);
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+
+        tablePanel.add(table, BorderLayout.CENTER);
 
         return tablePanel;
     }
-
-    private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
-        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        sortFilterPanel.sort(sortCriteria());
-
-        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
-        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
-        return scrollPane;
+    
+    private void setupTableModel(CaseJob[] jobs){
+        tableData = new CaseJobsTableData(jobs);
     }
+    
 
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Order", "Sector", "Name", "Executable" };
@@ -339,7 +340,7 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
     }
 
     private List<CaseJob> getSelectedJobs() {
-        return (List<CaseJob>) selectModel.selected();
+        return (List<CaseJob>) table.selected();
     }
 
     private int showDialog(Object msg, String title) {

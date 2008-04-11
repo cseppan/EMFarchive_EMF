@@ -637,7 +637,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         clearMessage();
         try {
             tableData.refresh(selectedPollutant(), selectedCostYear());
-           table.refresh(tableData); // AME: added to fix refresh issue
+            table.refresh(tableData); // AME: added to fix refresh issue
             panelRefresh();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());

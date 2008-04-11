@@ -4,8 +4,6 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
@@ -19,10 +17,10 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
@@ -44,17 +42,16 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class CaseManagerWindow extends ReusableInteralFrame implements CaseManagerView, RefreshObserver {
 
     private CaseManagerPresenterImpl presenter;
 
-    private SortFilterSelectModel selectModel;
-
-    private EmfTableModel model;
+    private JPanel mainPanel;
 
     private CasesTableData tableData;
+    
+    private SelectableSortFilterWrapper table;
 
     private JPanel layout;
 
@@ -92,7 +89,14 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     }
 
     public void refresh(Case[] cases) {
-        doLayout(cases);
+        setupTableModel(cases);
+        table.refresh(tableData);
+        panelRefresh();
+    }
+    
+    private void panelRefresh() {
+        mainPanel.removeAll();
+        mainPanel.add(table);
         super.refreshLayout();
     }
 
@@ -111,12 +115,27 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         }
 
         createCategoriesComboBox();
+        setupTableModel(cases);
+//        model = new EmfTableModel(tableData);
+//        selectModel = new SortFilterSelectModel(model);
+//        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
+//        sortFilterSelectPanel.sort(sortCriteria());
+        createLayout(layout, mainPanel(parentConsole));
+    }
+    
+    private void setupTableModel(Case[] cases){
         tableData = new CasesTableData(cases);
-        model = new EmfTableModel(tableData);
-        selectModel = new SortFilterSelectModel(model);
-        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        sortFilterSelectPanel.sort(sortCriteria());
-        createLayout(layout, sortFilterSelectPanel);
+    }
+    
+    private JPanel mainPanel(EmfConsole parentConsole) {
+        this.mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+
+//        JScrollPane sortFilterPane = sortFilterPane(parentConsole);
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+        mainPanel.add(table);
+
+        return mainPanel;
     }
     
     private SortCriteria sortCriteria() {
@@ -158,15 +177,15 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         return selectedCategory;
     }
 
-    private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
+    private void createLayout(JPanel layout, JPanel table) {
         layout.removeAll();
         layout.setLayout(new BorderLayout());
 
-        JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
-        sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
+//        JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
+//        sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
 
         layout.add(createTopPanel(), BorderLayout.NORTH);
-        layout.add(scrollPane, BorderLayout.CENTER);
+        layout.add(table, BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.SOUTH);
     }
 
@@ -260,7 +279,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             }
 
         };
-        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction, selectModel, confirmDialog);
+        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction, table, confirmDialog);
         return editButton;
     }
 
@@ -272,7 +291,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             }
         };
 
-        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, selectModel, confirmDialog);
+        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, table, confirmDialog);
         return viewButton;
     }
 
@@ -386,7 +405,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     }
 
     private List selected() {
-        return selectModel.selected();
+        return table.selected();
     }
 
     public EmfConsole getParentConsole() {

@@ -13,6 +13,6 @@ public interface CaseViewerView extends ManagedView {
 
     void setCursor(Cursor cursor);
     
-    void showLockingMsg(String msg);
+    //void showMsg(String msg);
 
 }

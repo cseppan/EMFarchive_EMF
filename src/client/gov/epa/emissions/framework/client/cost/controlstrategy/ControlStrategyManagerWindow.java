@@ -3,8 +3,6 @@ package gov.epa.emissions.framework.client.cost.controlstrategy;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
@@ -16,10 +14,10 @@ import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditContro
 import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
@@ -37,7 +35,6 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class ControlStrategyManagerWindow extends ReusableInteralFrame implements ControlStrategyManagerView,
         RefreshObserver, Runnable {
@@ -46,9 +43,11 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
 
     private ControlStrategiesTableData tableData;
 
-    private SortFilterSelectModel selectModel;
+    private JPanel tablePanel;
+    
+    private SelectableSortFilterWrapper table;
 
-    private EmfTableModel model;
+    //private EmfTableModel model;
 
     private JPanel layout;
 
@@ -100,7 +99,10 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
 
     public void refresh(ControlStrategy[] controlStrategies) {
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        doLayout(controlStrategies, this.session);
+        //doLayout(controlStrategies, this.session);
+        setupTableModel(controlStrategies);
+        table.refresh(tableData);
+        panelRefresh();
         super.refreshLayout();
         setCursor(Cursor.getDefaultCursor());
         //refresh Edit Control Strategy windows...
@@ -114,18 +116,40 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         this.populateThread = new Thread(this);
         populateThread.start();
     }
+    
+    private void panelRefresh() {
+        tablePanel.removeAll();
+        tablePanel.add(table);
+        super.refreshLayout();
+    }
 
     public void doRefresh() throws EmfException {
         presenter.doRefresh();
     }
 
     private void doLayout(ControlStrategy[] controlStrategies, EmfSession session) {
-        tableData = new ControlStrategiesTableData(controlStrategies, session);
-        model = new EmfTableModel(tableData);
-        selectModel = new SortFilterSelectModel(model);
-        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        sortFilterSelectPanel.sort(sortCriteria());
-        createLayout(layout, sortFilterSelectPanel);
+        layout.removeAll();
+        layout.setLayout(new BorderLayout());
+
+//        JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
+//        sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
+
+        layout.add(createTopPanel(), BorderLayout.NORTH);
+        layout.add(tablePanel(controlStrategies, parentConsole, session), BorderLayout.CENTER);
+        layout.add(createControlPanel(), BorderLayout.SOUTH);
+    }
+    
+    private JPanel tablePanel(ControlStrategy[] controlStrategies, EmfConsole parentConsole, EmfSession session) {
+        setupTableModel(controlStrategies);
+        tablePanel = new JPanel(new BorderLayout());
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+        tablePanel.add(table, BorderLayout.CENTER);
+
+        return tablePanel;
+    }
+    
+    private void setupTableModel(ControlStrategy[] controlStrategies){
+        tableData = new ControlStrategiesTableData(controlStrategies);
     }
     
     private SortCriteria sortCriteria() {
@@ -133,18 +157,6 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         return new SortCriteria(columnNames, new boolean[] { false }, new boolean[] { true });
     }
     
-    private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
-        layout.removeAll();
-        layout.setLayout(new BorderLayout());
-
-        JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
-        sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
-
-        layout.add(createTopPanel(), BorderLayout.NORTH);
-        layout.add(scrollPane, BorderLayout.CENTER);
-        layout.add(createControlPanel(), BorderLayout.SOUTH);
-    }
-
     private JPanel createTopPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
@@ -229,7 +241,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
             }
 
         };
-        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction, selectModel, confirmDialog);
+        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction, table, confirmDialog);
         return editButton;
     }
 
@@ -240,7 +252,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
             }
         };
 
-        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, selectModel, confirmDialog);
+        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, table, confirmDialog);
         viewButton.setEnabled(false);
         return viewButton;
     }
@@ -328,7 +340,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     }
 
     private List selected() {
-        return selectModel.selected();
+        return table.selected();
     }
 
     private void createNewStrategy() {

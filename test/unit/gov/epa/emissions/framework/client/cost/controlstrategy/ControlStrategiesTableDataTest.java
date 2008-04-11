@@ -44,7 +44,7 @@ public class ControlStrategiesTableDataTest extends TestCase {
         controlStrategy2.setLastModifiedDate(new Date());
         controlStrategy2.setCreator(new User("test user 2", "sss", "123-4567", "email@xxx.com", "xxx", "xxxxx123", false, false));
         
-        data = new ControlStrategiesTableData(new ControlStrategy[] { controlStrategy1, controlStrategy2 }, null);
+        data = new ControlStrategiesTableData(new ControlStrategy[] { controlStrategy1, controlStrategy2 });
     }
 
     public void testShouldHaveTwoColumns() {

@@ -14,7 +14,6 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.ui.ErrorPanel;
-import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -241,9 +240,9 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
         }
     }
     
-    public void showLockingMsg(String msg) {
-        InfoDialog dialog = new InfoDialog(parentConsole, "Message", msg);
-        dialog.confirm();
-    }
+//    public void showLockingMsg(String msg) {
+//        InfoDialog dialog = new InfoDialog(parentConsole, "Message", msg);
+//        dialog.confirm();
+//    }
 
 }

@@ -59,13 +59,13 @@ public class CaseViewerPresenterImpl implements CaseViewerPresenter {
         String jobSummaryMsg = service.getJobStatusMessage(caseObj.getId());
         view.display(caseObj, jobSummaryMsg);
         
-        caseObj = service.obtainLocked(session.user(), caseObj);
+        //caseObj = service.obtainLocked(session.user(), caseObj);
 
-        if (!caseObj.isLocked(session.user())) {// view mode, locked by another user
-            view.showLockingMsg("Current case object is locked by user " + caseObj.getLockOwner() + ".");
-        } else {
-            service.releaseLocked(session.user(), caseObj);
-        }
+        //if (!caseObj.isLocked(session.user())) {// view mode, locked by another user
+        //    view.showMsg("Current case object is locked by user " + caseObj.getLockOwner() + ".");
+        //} else {
+//            service.releaseLocked(session.user(), caseObj);
+//        }
     }
 
     public void doClose(){

@@ -18,6 +18,9 @@ import gov.epa.mims.analysisengine.table.io.FileImportGUI;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -28,12 +31,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
 
 public class AnalysisEngineTableApp extends DisposableInteralFrame {
 
     private JTabbedPane mainTabbedPane;
+    
+    private JMenuItem exportMenuItem;
 
+    private JMenuItem closeMenuItem;
+    
     private EmfConsole parentConsole;
 
     private Dimension dimension;
@@ -57,12 +71,30 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
     }
 
     private void setLayout(String[] fileNames) throws Exception {
+        JPanel menuPanel = createMenuPanel();
         mainTabbedPane = new JTabbedPane();
         String[] tabNames = createTabNames(1, 40, fileNames);
         importFiles(fileNames, tabNames, FileImportGUI.GENERIC_FILE, ",");
-        Container contentPane = getContentPane();
-        contentPane.setLayout(new BorderLayout());
-        contentPane.add(mainTabbedPane);
+//        Container contentPane = getContentPane();
+//        contentPane.setLayout(new BorderLayout());
+//        contentPane.add(mainTabbedPane);
+        JPanel componentsPanel = new JPanel();
+
+        componentsPanel.setBorder(BorderFactory.createEtchedBorder());
+        componentsPanel.setLayout(new BorderLayout());
+        componentsPanel.add(mainTabbedPane);
+        
+        
+        JPanel mainPanel = new JPanel();
+
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setPreferredSize(new Dimension(700, 600));
+        menuPanel.setMaximumSize(new Dimension(4000, 25));
+        mainPanel.add(menuPanel);
+        mainPanel.add(componentsPanel);
+        Container container = getContentPane();
+        container.add(mainPanel);
         pack();
     }
 
@@ -314,5 +346,89 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
         }
         return lines.toString();
     }
+    
+    private JPanel createMenuPanel() {
+        JPanel menuPanel = new JPanel(new BorderLayout());
+        menuPanel.setBorder(BorderFactory.createEtchedBorder());
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.X_AXIS));
 
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.setMnemonic('F');
+        menuBar.add(fileMenu);
+
+
+//        loadConfigMenu(fileMenu);
+//        saveConfiguredPlotsMenuItem = new JMenuItem("Save Configuration");
+//        fileMenu.add(saveConfiguredPlotsMenuItem);
+//        saveConfiguredPlotsMenuItem.setEnabled(false);
+//        saveConfiguredPlotsMenuItem.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                if (mainTabbedPane.getTabCount() == 0) {
+//                    new GUIUserInteractor().notify(TableApp.this, "Save Configuration", "No "
+//                            + " table is currently being analyzed", UserInteractor.WARNING);
+//                    return;
+//                }
+//                TablePanel panel = ((TablePanel) mainTabbedPane.getSelectedComponent());
+//
+//                (panel.tablePanel).showSaveConfigGUI();
+//                return;
+//            }
+//        });
+        exportMenuItem = createExportMenuItem();
+        exportMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.ALT_MASK));
+        fileMenu.add(exportMenuItem);
+        exportMenuItem.setEnabled(false);
+
+        closeMenuItem = createCloseMenuItem();
+        closeMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.ALT_MASK));
+        fileMenu.add(closeMenuItem);
+        closeMenuItem.setEnabled(false);
+
+        JMenuItem quitMenuItem = new JMenuItem("Quit");
+        quitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.ALT_MASK));
+        fileMenu.add(quitMenuItem);
+//        quitMenuItem.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                try {
+//                    history.saveHistory();
+//                } catch (java.io.IOException ie) {
+//                    new GUIUserInteractor().notify(TableApp.this, "Error", "Error saving the file history. "
+//                            + ie.getMessage(), UserInteractor.ERROR);
+//                }
+//                Runtime.getRuntime().gc();
+//                Runtime.getRuntime().runFinalization();
+//                if (standAlone) {
+//                    dispose();
+//                    System.exit(0);
+//                } else {
+//                    setVisible(false);
+//                    dispose();
+//                }
+//            }
+//        });
+        menuPanel.add(menuBar, BorderLayout.WEST);
+        return menuPanel;
+    }
+    private JMenuItem createExportMenuItem() {
+        JMenuItem exportMenu = new JMenuItem("Export");
+        exportMenu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int size = mainTabbedPane.getTabCount();
+                // if nothing in the tabbed pane then nothing to import!
+                if (size == 0) {
+                    return;
+                }// if(size == 0)
+//                new FileExportGUI(TableApp.this, filesInTabbedPane.getAllTabUniqueNames(), mainTabbedPane
+//                        .getSelectedIndex(), currentDirectory);
+            }// actionPerformed()
+        });
+        // create a file chooser
+        return exportMenu;
+    }// createExportMenuItem()
+    
+    private JMenuItem createCloseMenuItem() {
+        JMenuItem closeMenu = new JMenuItem("Close");
+        return closeMenu;
+    }
 }

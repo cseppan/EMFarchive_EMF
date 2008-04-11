@@ -1,17 +1,15 @@
 package gov.epa.emissions.framework.client.casemanagement.history;
 
 import gov.epa.emissions.commons.gui.ComboBox;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
@@ -24,7 +22,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
 public class ViewableHistoryTab extends JPanel implements RefreshObserver {
@@ -36,7 +33,7 @@ public class ViewableHistoryTab extends JPanel implements RefreshObserver {
 
     private JobMessagesTableData tableData;
 
-    private SortFilterSelectModel selectModel;
+    private SelectableSortFilterWrapper table;
 
     private JPanel tablePanel;
 
@@ -162,22 +159,17 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
     }
 
     private JPanel tablePanel(JobMessage[] msgs, EmfConsole parentConsole) {
-        tableData = new JobMessagesTableData(msgs, session);
-        selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
+        setupTableModel(msgs);
 
         tablePanel = new JPanel(new BorderLayout());
-        tablePanel.add(createSortFilterPanel(parentConsole), BorderLayout.CENTER);
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+        tablePanel.add(table, BorderLayout.CENTER);
 
         return tablePanel;
     }
-
-    private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
-        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        sortFilterPanel.sort(sortCriteria());
-
-        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
-        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
-        return scrollPane;
+    
+    private void setupTableModel(JobMessage[] msgs){
+        tableData = new JobMessagesTableData(msgs, session);
     }
 
     private SortCriteria sortCriteria() {
@@ -194,10 +186,19 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
     }
 
     public void doRefresh(JobMessage[] msgs) throws Exception {
-        super.removeAll();
-        super.add(createLayout(msgs, parentConsole), BorderLayout.CENTER);
-        super.revalidate();
+        //super.removeAll();
+//        super.add(createLayout(msgs, parentConsole), BorderLayout.CENTER);
+//        super.revalidate();
         clearMessage();
+        setupTableModel(msgs);
+        table.refresh(tableData);
+        panelRefresh();
+    }
+    
+    private void panelRefresh() {
+        tablePanel.removeAll();
+        tablePanel.add(table);
+        super.validate();
     }
 
     public void doRefresh() throws EmfException {

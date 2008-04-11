@@ -81,6 +81,10 @@ public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
         return topModelSelectedIndexes().length;
     }
     
+    public SortFilterSelectModel getModel(){
+        return selectModel;
+    }
+    
     //update()
     
     //add()

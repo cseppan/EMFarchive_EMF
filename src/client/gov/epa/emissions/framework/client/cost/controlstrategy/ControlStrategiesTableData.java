@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
 import gov.epa.emissions.commons.data.Project;
-import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.ui.AbstractTableData;
@@ -20,7 +19,7 @@ public class ControlStrategiesTableData extends AbstractTableData {
     
 //    private EmfSession session;
     
-    public ControlStrategiesTableData(ControlStrategy[] controlStrategies, EmfSession session) {
+    public ControlStrategiesTableData(ControlStrategy[] controlStrategies) {
 //        this.session = session;
         this.rows = createRows(controlStrategies);
     }

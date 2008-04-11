@@ -5,8 +5,6 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
@@ -26,14 +24,13 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -45,7 +42,6 @@ import javax.swing.Action;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
@@ -61,9 +57,9 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
     private InputsTableData tableData;
 
-    private SortFilterSelectModel selectModel;
-
-    private JPanel tablePanel;
+    private JPanel mainPanel;
+    
+    private SelectableSortFilterWrapper table;
 
     private MessagePanel messagePanel;
 
@@ -137,8 +133,19 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         String inputFileDir = caseObj.getInputFileDir();
         if (!inputDir.getText().equalsIgnoreCase(inputFileDir))
             inputDir.setText(inputFileDir);
-        super.removeAll();
-        super.add(createLayout(inputs, presenter, parentConsole), BorderLayout.CENTER);
+        setupTableModel(inputs);
+        table.refresh(tableData);
+        panelRefresh();
+    }
+    
+    private void panelRefresh() {
+        mainPanel.removeAll();
+        mainPanel.add(table);
+        super.validate();
+    }
+    
+    private void setupTableModel(CaseInput[] inputs){
+        tableData = new InputsTableData(inputs, session);
     }
 
     private JPanel createLayout(CaseInput[] inputs, EditInputsTabPresenter presenter, EmfConsole parentConsole)
@@ -153,23 +160,15 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
     }
 
     private JPanel tablePanel(CaseInput[] inputs, EmfConsole parentConsole) {
-        tableData = new InputsTableData(inputs, session);
-        selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
+        setupTableModel(inputs);
 
-        tablePanel = new JPanel(new BorderLayout());
-        tablePanel.add(createSortFilterPanel(parentConsole), BorderLayout.CENTER);
+        mainPanel = new JPanel(new BorderLayout());
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+        mainPanel.add(table);
 
-        return tablePanel;
+        return mainPanel;
     }
 
-    private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
-        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        sortFilterPanel.sort(sortCriteria());
-
-        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
-        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
-        return scrollPane;
-    }
 
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Envt. Var.", "Sector", "Input" };
@@ -261,7 +260,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
         String message = "You have asked to copy too many inputs. Do you wish to proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
-        SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(presenter), selectModel, confirmDialog);
+        SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(presenter), table, confirmDialog);
         copy.setMargin(insets);
         container.add(copy);
 
@@ -483,14 +482,12 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
     public void addInput(CaseInput note) {
         tableData.add(note);
-        selectModel.refresh();
-
-        tablePanel.removeAll();
-        tablePanel.add(createSortFilterPanel(parentConsole));
+        table.refresh(tableData);
+        panelRefresh();
     }
 
     private List getSelectedInputs() {
-        return selectModel.selected();
+        return table.selected();
     }
 
     public CaseInput[] caseInputs() {
