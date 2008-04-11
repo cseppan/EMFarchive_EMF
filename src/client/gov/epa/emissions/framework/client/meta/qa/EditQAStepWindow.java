@@ -550,26 +550,34 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
 
         if (avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                || fireDataSummaryProgram.equals(program.getSelectedItem())){
+                || fireDataSummaryProgram.equals(program.getSelectedItem().toString())
+                || MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString()))
+        {
             if (!(programSwitches.trim().equals("")) && invIndex != -1 
-                   && invTableIndex !=-1 && emiIndex !=-1 && sumTypeIndex !=-1)
-                check =true; 
-            else 
-                check = false; 
-            
-        }else if (MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                || MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
-            if (!(programSwitches.trim().equals("")) && invIndex != -1 && invTableIndex !=-1) {
-                getInventories(programSwitches, 0, invTableIndex);
-                getSummaryType(programSwitches, sumTypeIndex);
-                // if any of them doesn't exist
-                if (!(inventories.length > 0) || summaryType.trim().equalsIgnoreCase(""))
-                    check = false;
-            } else
+                    && invTableIndex !=-1 && sumTypeIndex !=-1 ) {
+                check = true;
+                //getInventories(programSwitches, 0, invTableIndex);
+                //getSummaryType(programSwitches, sumTypeIndex);
+            }
+            // if any of them doesn't exist
+            //if (!(inventories.length > 0) || summaryType.trim().equalsIgnoreCase(""))
+                //check = false;
+            else
                 check = false;
 
             if (!check)
                 throw new EmfException(" Inventories, summary type are needed ");
+
+        }else if (MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+            if (!(programSwitches.trim().equals("")) && invIndex != -1 
+                    && emiIndex !=-1 && invTableIndex !=-1 && sumTypeIndex !=-1) 
+                 check =true; 
+             else 
+                 check = false; 
+               
+             if (!check)
+                 throw new EmfException(" Inventories, summary type are needed "); 
+        
         } else if (avgDayToAnnualProgram.equals(program.getSelectedItem())) {
             // if argument is empty, return false
             if (!(programSwitches.trim().equals("")) && invIndex != -1) {
