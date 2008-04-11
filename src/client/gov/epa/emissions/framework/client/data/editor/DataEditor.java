@@ -122,6 +122,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private JPanel tablePanel(Version version, String table, TableMetadata tableMetadata) {
         pageContainer = new EditorPanel(dataset, version, tableMetadata, messagePanel, this);
         pageContainer.setDesktopManager(desktopManager);
+        pageContainer.setEmfSession(presenter.getEmfSession());
         displayTable(table);
 
         return pageContainer;

@@ -155,4 +155,8 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
             commonsService().addDatasetNote(view.DSnote());
     }
 
+    public EmfSession getEmfSession() {
+        return session;
+    }
+
 }

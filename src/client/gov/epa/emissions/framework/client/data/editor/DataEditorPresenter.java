@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data.editor;
 
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteView;
 import gov.epa.emissions.framework.services.EmfException;
 
@@ -16,5 +17,7 @@ public interface DataEditorPresenter {
     void doSave() throws EmfException;
 
     void doAddNote(NewNoteView view) throws EmfException;
+    
+    EmfSession getEmfSession();
 
 }

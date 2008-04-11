@@ -18,6 +18,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 public class DataSortFilterPanel extends JPanel {
 
@@ -115,6 +116,14 @@ public class DataSortFilterPanel extends JPanel {
     
     public void setSortFilter(String filter){
         rowFilter.setText(filter);
+    }
+    
+    public JTextArea getRowFilter() {
+        return rowFilter;
+    }
+    
+    public JTextArea getSortOrder() {
+        return sortOrder;
     }
 
 }

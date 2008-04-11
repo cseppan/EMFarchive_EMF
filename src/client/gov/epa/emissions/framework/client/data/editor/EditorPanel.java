@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.io.TableMetadata;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.data.DataSortFilterPanel;
 import gov.epa.emissions.framework.client.data.PaginationPanel;
@@ -39,8 +40,12 @@ public class EditorPanel extends JPanel implements EditorPanelView {
     private ManageChangeables changeablesList;
 
     private TableMetadata tableMetadata;
+    
+    private TablePresenter tablePresenter;
 
     private DesktopManager desktopManager;
+
+    private EmfSession emfSession;
 
     public EditorPanel(EmfDataset dataset, Version version, TableMetadata tableMetadata, 
             MessagePanel messagePanel, ManageChangeables changeablesList) {
@@ -82,6 +87,7 @@ public class EditorPanel extends JPanel implements EditorPanelView {
     public void observe(TablePresenter presenter) {
         paginationPanel.init(presenter);
         sortFilterPanel.init(presenter);
+        tablePresenter = presenter;
     }
 
     public void display(Page page) {
@@ -92,8 +98,14 @@ public class EditorPanel extends JPanel implements EditorPanelView {
 
     private EditablePagePanel createEditablePage(Page page) {
         editablePage = new EditablePage(dataset.getId(), version, page, tableMetadata);
+        editablePage.setDatasetName(dataset.getName());
+        
         editablePagePanel = new EditablePagePanel(editablePage, paginationPanel, messagePanel, changeablesList);
         editablePagePanel.setDesktopManager(desktopManager);
+        editablePagePanel.setEmfSession(emfSession);
+        editablePagePanel.setRowFilter(sortFilterPanel.getRowFilter());
+        editablePagePanel.setSortOrder(sortFilterPanel.getSortOrder());
+        editablePagePanel.setTablePresenter(tablePresenter);
 
         return editablePagePanel;
     }
@@ -127,6 +139,14 @@ public class EditorPanel extends JPanel implements EditorPanelView {
     
     public void setDesktopManager(DesktopManager desktopManager) {
         this.desktopManager = desktopManager;
+    }
+
+    public void setEmfSession(EmfSession emfSession) {
+        this.emfSession = emfSession;
+    }
+    
+    public EmfSession getEmfSession() {
+        return emfSession;
     }
 
 }

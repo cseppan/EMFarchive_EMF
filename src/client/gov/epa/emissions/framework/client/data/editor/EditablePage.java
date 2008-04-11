@@ -19,6 +19,8 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
     private List rows;
 
     private int datasetId;
+    
+    private String dsName;
 
     private Version version;
 
@@ -193,6 +195,10 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
         changeset.addDeleted(records);
     }
 
+    public Version getVersion() {
+        return this.version;
+    }
+    
     public Class getColumnClass(int col) {
         return columnClasses[col];
     }
@@ -211,6 +217,14 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
 
     public void clearAll() {
         setValueForSelectColumn(Boolean.FALSE);
+    }
+    
+    public void setDatasetName(String dsName) {
+        this.dsName = dsName;
+    }
+    
+    public String getDatasetName() {
+        return dsName;
     }
 
     private void setValueForSelectColumn(Boolean value) {

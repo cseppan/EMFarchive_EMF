@@ -214,8 +214,9 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         combo.setName("temporalResolutions");
         combo.setPreferredSize(new Dimension(170, 20));
 
-        String temporalResolution = dataset.getTemporalResolution();
-        combo.setSelectedItem(temporalResolution);
+        String resolution = dataset.getTemporalResolution();
+        System.out.println("sumarry tab: resolution: " + resolution);
+        combo.setSelectedItem(TemporalResolution.get(TemporalResolution.class, resolution));
 
         changeablesList.addChangeable(combo);
 

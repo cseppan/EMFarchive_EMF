@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.VersionedDatasetQuery;
+import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -479,8 +480,9 @@ public class DataServiceImpl implements DataService {
                 + " ("
                 + getTargetColString(targetColumns)
                 + ") ("
-                + dsQuery.generateFilteringQuery(getSrcColString(targetDSid, targetDSVersion, srcColumns, targetColumns), srcTable,
-                        filter) + ")";
+                + dsQuery.generateFilteringQuery(
+                        getSrcColString(targetDSid, targetDSVersion, srcColumns, targetColumns), srcTable, filter)
+                + ")";
 
         if (DebugLevels.DEBUG_17) {
             LOG.warn("Append data query: " + query);
@@ -621,6 +623,30 @@ public class DataServiceImpl implements DataService {
             colString += ", " + cols[i];
 
         return colString;
+    }
+
+    public void replaceColValues(String table, String col, String find, String replaceWith, Version version, String filter)
+            throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+
+        try {
+            Datasource datasource = dbServer.getEmissionsDatasource();
+            DataModifier dataModifier = datasource.dataModifier();
+            VersionedQuery versionedQuery = new VersionedQuery(version);
+            String query = "UPDATE " + table + " SET " + col + "='" + replaceWith
+                    + "' WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")" 
+                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") ;
+            
+            if (DebugLevels.DEBUG_16)
+                System.out.println("Query to replace column values: " + query);
+            
+            dataModifier.execute(query);
+        } catch (Exception e) {
+            LOG.error("Could not query table : ", e);
+            throw new EmfException("Could not query table: " + e.getMessage());
+        } finally {
+            closeDB(dbServer);
+        }
     }
 
 }

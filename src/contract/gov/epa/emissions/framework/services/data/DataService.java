@@ -48,5 +48,7 @@ public interface DataService {
     void checkIfDeletable(User user, int datasetID) throws EmfException;
     
     boolean checkTableDefinitions(int srcDSid, int targetDSid) throws EmfException;
+    
+    void replaceColValues(String table, String colName, String find, String replaceWith, Version version, String rowFilter) throws EmfException;
 
 }

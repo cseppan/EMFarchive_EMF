@@ -104,4 +104,5 @@ public interface DataCommonsService {
     EmfFileInfo getChild(EmfFileInfo file, String child) throws EmfException;
 
     EmfFileInfo getParentDirectory(EmfFileInfo file) throws EmfException;
+
 }

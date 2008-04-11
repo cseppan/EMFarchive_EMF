@@ -249,5 +249,20 @@ public class DataServiceTransport implements DataService {
         return (Boolean)call.requestResponse(new Object[]{new Integer(srcDSid), new Integer(targetDSid)});
     }
 
+    public void replaceColValues(String table, String colName, String find, String replaceWith, Version version, String rowFilter) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("replaceColValues");
+        call.addStringParam("table");
+        call.addStringParam("colName");
+        call.addStringParam("find");
+        call.addStringParam("replaceWith");
+        call.addParam("version", mappings.version());
+        call.addStringParam("rowFilter");
+        call.setVoidReturnType();
+        
+        call.request(new Object[]{table, colName, find, replaceWith, version, rowFilter});
+    }
+
 
 }

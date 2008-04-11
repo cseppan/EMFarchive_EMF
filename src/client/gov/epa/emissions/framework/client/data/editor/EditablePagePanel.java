@@ -2,8 +2,10 @@ package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.util.ClipBoardCopy;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.data.ObserverPanel;
+import gov.epa.emissions.framework.client.data.viewer.TablePresenter;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
@@ -24,6 +26,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -40,9 +43,18 @@ public class EditablePagePanel extends JPanel {
 
     private DataEditorTable editableTable;
 
+    private JTextArea rowFilter;
+    
+    private JTextArea sortOrder;
+
     private ObserverPanel observer;
 
     private DesktopManager desktopManager;
+
+    private EmfSession emfSession;
+
+    private TablePresenter tablePresenter;
+
 
     public EditablePagePanel(EditablePage page, ObserverPanel observer, MessagePanel messagePanel,
             ManageChangeables listOfChangeables) {
@@ -164,9 +176,11 @@ public class EditablePagePanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 messagePanel.clear();
 
-                FindReplaceWindowView dialog = new DataFindReplaceWindow(getDesktopManager(), removeFirstCol(tableData
-                        .columns()));
-                FindReplaceViewPresenter findReplacePresenter = new FindReplaceViewPresenter(dialog, null);
+                FindReplaceWindowView dialog = new DataFindReplaceWindow(tableData.getDatasetName(), tableData
+                        .getTableMetadata().getTable(), tableData.getVersion(), rowFilter, sortOrder,
+                        getDesktopManager(), removeFirstCol(tableData.columns()));
+                FindReplaceViewPresenter findReplacePresenter = new FindReplaceViewPresenter(tablePresenter, dialog,
+                        emfSession);
                 findReplacePresenter.displayView();
             }
         };
@@ -245,5 +259,21 @@ public class EditablePagePanel extends JPanel {
 
     public void setDesktopManager(DesktopManager desktopManager) {
         this.desktopManager = desktopManager;
+    }
+
+    public void setEmfSession(EmfSession session) {
+        this.emfSession = session;
+    }
+
+    public void setRowFilter(JTextArea filter) {
+        this.rowFilter = filter;
+    }
+
+    public void setTablePresenter(TablePresenter tablePresenter) {
+        this.tablePresenter = tablePresenter;
+    }
+
+    public void setSortOrder(JTextArea sortOrderText) {
+        this.sortOrder = sortOrderText;
     }
 }
