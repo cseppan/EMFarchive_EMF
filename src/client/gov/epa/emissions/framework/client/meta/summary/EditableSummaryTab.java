@@ -39,9 +39,8 @@ import javax.swing.SpringLayout;
 
 public class EditableSummaryTab extends JPanel implements EditableSummaryTabView {
 
-    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(
-            CustomDateFormat.PATTERN_MMddYYYY_HHmm);
-    
+    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(CustomDateFormat.PATTERN_MMddYYYY_HHmm);
+
     private EmfDataset dataset;
 
     private TextField name;
@@ -129,10 +128,10 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         allIntendedUses = service.getIntendedUses();
         intendedUseCombo = new ComboBox(allIntendedUses);
         IntendedUse intendedUse = dataset.getIntendedUse();
-        
+
         if (intendedUse == null)
             intendedUse = getPublic(allIntendedUses);
-        
+
         intendedUseCombo.setSelectedItem(intendedUse);
         changeablesList.addChangeable(intendedUseCombo);
     }
@@ -141,7 +140,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         for (IntendedUse use : allIntendedUses)
             if (use.getName().equalsIgnoreCase("public"))
                 return use;
-        
+
         return null;
     }
 
@@ -215,12 +214,23 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         combo.setPreferredSize(new Dimension(170, 20));
 
         String resolution = dataset.getTemporalResolution();
-        System.out.println("sumarry tab: resolution: " + resolution);
-        combo.setSelectedItem(TemporalResolution.get(TemporalResolution.class, resolution));
+
+        if (resolution != null) 
+            combo.setSelectedIndex(getIndexOfTempResolution(resolution) + 1);
 
         changeablesList.addChangeable(combo);
 
         return combo;
+    }
+
+    private int getIndexOfTempResolution(String res) {
+        Object[] names = TemporalResolution.NAMES.toArray();
+        
+        for (int i = 0; i < names.length; i++)
+            if (names[i].toString().equals(res))
+                return i;
+        
+        return -1;
     }
 
     private JPanel createOverviewSection() throws EmfException {
@@ -241,11 +251,11 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
         changeablesList.addChangeable(description);
         ScrollableComponent viewableTextArea = new ScrollableComponent(description);
-        viewableTextArea.setPreferredSize(new Dimension(575,100));
+        viewableTextArea.setPreferredSize(new Dimension(575, 100));
         layoutGenerator.addLabelWidgetPair("Description:", viewableTextArea, panel);
-        
-        //old version vefore changes
-        //layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description), panel);
+
+        // old version vefore changes
+        // layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description), panel);
 
         allProjects = service.getProjects();
         projectsCombo = new EditableComboBox(allProjects);
@@ -279,7 +289,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     public void save(EmfDataset dataset) {
         messagePanel.clear();
-        
+
         dataset.setName(name.getText().trim());
         dataset.setDescription(description.getText());
         updateProject();
