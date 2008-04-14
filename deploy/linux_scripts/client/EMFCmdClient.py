@@ -134,7 +134,11 @@ if __name__ =="__main__":
         msgTime = 120
 
     ## Create a log file and a date file, also create one for the Java client
-    logFile = jobName + "_" + case + "_" + jobKey
+##    logFile = jobName + "_" + case + "_" + jobKey
+    ## We are not using the case abbreviation b.c. in some scripts this changes
+    ## if we did want this identifier, we could set EMF_CASE to CASE in the top, EMF script
+    ## and use the EMF_CASE environment variable
+    logFile = jobName + "_" + jobKey
     logFileJava = logFile + "_java.csv"
     logFile = logFile + ".csv"
     logFile = os.path.join(logDir, logFile)
