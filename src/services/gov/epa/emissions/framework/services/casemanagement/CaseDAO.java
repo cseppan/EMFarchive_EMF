@@ -341,10 +341,41 @@ public class CaseDAO {
         return hibernateFacade.load(CaseInput.class, criterions, session);
     }
 
+    public List getCaseInputs(int caseId, Sector sector, boolean showAll, Session session) {
+        if (sector == null && showAll)
+            return getCaseInputs(caseId, session);
+        
+        if (sector == null && !showAll)
+            return getCaseInputsWithShow(caseId, session);
+        
+        if (sector != null && showAll)
+            return getCaseInputsWithSector(caseId, sector, session);
+        
+        Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
+        Criterion crit2 = Restrictions.eq("sector", sector);
+        Criterion crit3 = Restrictions.eq("show", true);
+        
+        return hibernateFacade.get(CaseInput.class, new Criterion[]{ crit1, crit2, crit3}, session);
+    }
+    
     public List getCaseInputs(int caseId, Session session) {
         Criterion crit = Restrictions.eq("caseID", new Integer(caseId));
 
         return hibernateFacade.get(CaseInput.class, crit, session);
+    }
+    
+    private List getCaseInputsWithShow(int caseId, Session session) {
+        Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
+        Criterion crit2 = Restrictions.eq("show", true);
+        
+        return hibernateFacade.get(CaseInput.class, new Criterion[]{ crit1, crit2}, session);
+    }
+
+    private List getCaseInputsWithSector(int caseId, Sector sector, Session session) {
+        Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
+        Criterion crit2 = Restrictions.eq("sector", sector);
+        
+        return hibernateFacade.get(CaseInput.class, new Criterion[]{ crit1, crit2}, session);
     }
 
     public List<CaseInput> getJobInputs(int caseId, int jobId, Sector sector, Session session) {

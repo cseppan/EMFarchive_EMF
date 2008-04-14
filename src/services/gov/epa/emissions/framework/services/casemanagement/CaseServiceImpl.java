@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -220,6 +221,10 @@ public class CaseServiceImpl implements CaseService {
 
     public CaseInput[] getCaseInputs(int caseId) throws EmfException {
         return getCaseService().getCaseInputs(caseId);
+    }
+    
+    public CaseInput[] getCaseInputs(int caseId, Sector sector, boolean showAll) throws EmfException {
+        return getCaseService().getCaseInputs(caseId, sector, showAll);
     }
 
     public Case[] copyCaseObject(int[] toCopy, User user) throws EmfException {

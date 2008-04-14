@@ -794,6 +794,22 @@ public class ManagedCaseService {
             session.close();
         }
     }
+    
+    public synchronized CaseInput[] getCaseInputs(int caseId, Sector sector, boolean showAll) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            List<CaseInput> inputs = dao.getCaseInputs(caseId, sector, showAll, session);
+
+            return inputs.toArray(new CaseInput[0]);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get all inputs for case (id=" + caseId + ").\n" + e.getMessage());
+            throw new EmfException("Could not get all inputs for case (id=" + caseId + ").\n");
+        } finally {
+            session.close();
+        }
+    }
 
     /**
      * Gets all the inputs for this job, selects based on: case ID, job ID, and sector

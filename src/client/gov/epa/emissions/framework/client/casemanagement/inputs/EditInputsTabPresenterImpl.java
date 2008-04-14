@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
@@ -89,8 +90,8 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         presenter.doDisplay(propertiesView);
     }
 
-    public CaseInput[] getCaseInput(int caseId) throws EmfException {
-        return service().getCaseInputs(caseId);
+    public CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException {
+        return service().getCaseInputs(caseId, sector, showAll);
     }
 
     private void doExport(List<CaseInput> caseInputs, boolean overwrite, String purpose) throws EmfException {
@@ -126,6 +127,10 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         if (!reloaded.isLocked(session.user()))
             throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner()
                     + " has it now.");
+    }
+    
+    public Sector[] getAllSetcors() throws EmfException {
+        return session.dataCommonsService().getSectors();
     }
     
 }

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
@@ -400,6 +401,18 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.caseinputs());
 
         return (CaseInput[]) call.requestResponse(new Object[] { new Integer(caseId) });
+    }
+    
+    public synchronized CaseInput[] getCaseInputs(int caseId, Sector sector, boolean showAll) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getCaseInputs");
+        call.addParam("caseId", dataMappings.integer());
+        call.addParam("sector", dataMappings.sector());
+        call.addBooleanParameter("showAll");
+        call.setReturnType(caseMappings.caseinputs());
+
+        return (CaseInput[]) call.requestResponse(new Object[] { new Integer(caseId), sector, showAll });
     }
 
     public synchronized Case[] copyCaseObject(int[] toCopy, User user) throws EmfException {

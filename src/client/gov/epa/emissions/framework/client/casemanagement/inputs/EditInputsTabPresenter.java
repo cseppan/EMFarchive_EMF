@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorTabPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.services.EmfException;
@@ -31,7 +32,7 @@ public interface EditInputsTabPresenter extends CaseEditorTabPresenter {
     
     void removeInputs(CaseInput[] inputs) throws EmfException;
     
-    CaseInput[] getCaseInput(int caseId) throws EmfException;
+    CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException;
 
     void copyInput(CaseInput input, NewInputView dialog) throws Exception;
 }

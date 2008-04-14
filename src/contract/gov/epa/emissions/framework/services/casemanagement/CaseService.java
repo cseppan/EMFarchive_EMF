@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
@@ -90,6 +91,8 @@ public interface CaseService {
     void removeCaseOutputs(User user, CaseOutput[] outputs, boolean deleteDataset) throws EmfException;
     
     CaseInput[] getCaseInputs(int caseId) throws EmfException;
+    
+    CaseInput[] getCaseInputs(int caseId, Sector sector, boolean showAll) throws EmfException;
     
     Case[] copyCaseObject(int[] toCopy, User user) throws EmfException;
     
