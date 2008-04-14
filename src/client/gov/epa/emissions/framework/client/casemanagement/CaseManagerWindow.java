@@ -267,6 +267,14 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             }
         });
         crudPanel.add(copyButton);
+        
+        Button sensitivityButton = new Button("Sensitivity", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                clearMsgPanel();
+                sensitivityCase();
+            }
+        });
+        crudPanel.add(sensitivityButton);
 
         return crudPanel;
     }
@@ -335,6 +343,16 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private void createNewCase() {
         NewCaseWindow view = new NewCaseWindow(desktopManager);
         presenter.doNew(view);
+    }
+    
+    private void sensitivityCase() {
+        cases = selected();
+        if (cases.isEmpty() || cases.size() !=1) {
+            messagePanel.setMessage("Please select a single case");
+            return;
+        }
+        SensitivityWindow view = new SensitivityWindow(desktopManager);
+        presenter.doSensitivity(view, (Case) cases.get(0));
     }
 
     private void removeSelectedCases() {
