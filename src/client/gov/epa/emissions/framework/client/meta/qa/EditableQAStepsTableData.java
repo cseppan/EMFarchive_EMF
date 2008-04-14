@@ -31,7 +31,7 @@ public class EditableQAStepsTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Version", "Name", "Required", "Order", "Status", "When", "Who", "Comment", "Program",
+        return new String[] { "Name", "Version", "Required", "Order", "Status", "When", "Who", "Comment", "Program",
                 "Arguments", "Configuration" };
     }
 

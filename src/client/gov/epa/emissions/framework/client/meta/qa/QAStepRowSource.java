@@ -20,7 +20,7 @@ public class QAStepRowSource implements RowSource {
         if (comments != null && comments.length() > 50)
             comments = comments.substring(0, 45) + "  ...";
 
-        return new Object[] { new Integer(source.getVersion()), source.getName(), Boolean.valueOf(source.isRequired()),
+        return new Object[] { source.getName(), new Integer(source.getVersion()), Boolean.valueOf(source.isRequired()),
                 new Float(source.getOrder()), source.getStatus(), format(source.getDate()), source.getWho(), comments,
                 program(source.getProgram()), getShortenedProgramArguments(source.getProgramArguments()), 
                 source.getConfiguration() };
