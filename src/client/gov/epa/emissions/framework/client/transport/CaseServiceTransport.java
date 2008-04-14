@@ -624,6 +624,18 @@ public class CaseServiceTransport implements CaseService {
         return (CaseParameter[]) call.requestResponse(new Object[] { new Integer(caseId) });
     }
 
+    public synchronized CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getCaseParameters");
+        call.addIntegerParam("caseId");
+        call.addParam("sector", dataMappings.sector());
+        call.addBooleanParameter("showAll");
+        call.setReturnType(caseMappings.caseParameters());
+        
+        return (CaseParameter[]) call.requestResponse(new Object[] { new Integer(caseId), sector, showAll });
+    }
+
     public synchronized void removeCaseParameters(CaseParameter[] params) throws EmfException {
         EmfCall call = call();
 

@@ -1,12 +1,15 @@
 package gov.epa.emissions.framework.client.casemanagement.parameters;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -29,6 +32,7 @@ import javax.swing.Action;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 
 public class EditParametersTab extends JPanel implements EditCaseParametersTabView, RefreshObserver {
 
@@ -45,6 +49,10 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     private SelectableSortFilterWrapper table;
 
     private JPanel tablePanel;
+    
+    private ComboBox sectorsComboBox;
+
+    private JCheckBox showAll;
 
     private MessagePanel messagePanel;
 
@@ -91,7 +99,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         try {
             messagePanel.setMessage("Please wait while retrieving all case parameters...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            doRefresh(presenter.getCaseParameters(caseId));
+            doRefresh(presenter.getCaseParameters(caseId, getSelectedSector(), showAll.isSelected()));
             messagePanel.clear();
         } catch (Exception e) {
             messagePanel.setError("Cannot retrieve all case parameters.");
@@ -117,6 +125,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             throws Exception {
         final JPanel layout = new JPanel(new BorderLayout());
 
+        layout.add(createSectorPanel(), BorderLayout.NORTH);
         layout.add(tablePanel(params, parentConsole), BorderLayout.CENTER);
         layout.add(controlPanel(presenter), BorderLayout.PAGE_END);
 
@@ -143,6 +152,18 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
                 false, false });
     }
 
+    private JPanel createSectorPanel() throws EmfException {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        sectorsComboBox = new ComboBox("Select a Sector", presenter.getAllSetcors());
+        layoutGenerator.addLabelWidgetPair("Sector:", sectorsComboBox, panel);
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+                5, 5, // initialX, initialY
+                5, 5);// xPad, yPad
+
+        return panel;
+    }
+    
     private JPanel controlPanel(final EditParametersTabPresenter presenter) {
         Insets insets = new Insets(1, 2, 1, 2);
 
@@ -163,7 +184,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
                 try {
                     removeParameter(presenter);
                 } catch (EmfException exc) {
-                    setMessage(exc.getMessage());
+                    setErrorMessage(exc.getMessage());
                 }
             }
         });
@@ -176,7 +197,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
                     clearMessage();
                     editParameter(presenter);
                 } catch (EmfException ex) {
-                    setMessage(ex.getMessage());
+                    setErrorMessage(ex.getMessage());
                 }
             }
         });
@@ -189,14 +210,17 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         copy.setMargin(insets);
         container.add(copy);
 
-        final JCheckBox showAll = new JCheckBox("Show All", false);
+        showAll = new JCheckBox("Show All", false);
         showAll.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                // doRefresh(showAll);
                 clearMessage();
+                try {
+                    doRefresh(presenter.getCaseParameters(caseId, getSelectedSector(), showAll.isSelected()));
+                } catch (Exception e1) {
+                    setErrorMessage(e1.getMessage());
+                }
             }
         });
-        showAll.setEnabled(false);
         container.add(showAll);
 
         JPanel panel = new JPanel(new BorderLayout());
@@ -321,8 +345,12 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         messagePanel.clear();
     }
 
-    private void setMessage(String msg) {
+    private void setErrorMessage(String msg) {
         messagePanel.setError(msg);
+    }
+
+    private Sector getSelectedSector() {
+        return (Sector)sectorsComboBox.getSelectedItem();
     }
 
     public void doRefresh() throws EmfException {

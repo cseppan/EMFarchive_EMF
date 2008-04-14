@@ -226,7 +226,7 @@ public class CaseServiceImpl implements CaseService {
     public CaseInput[] getCaseInputs(int caseId, Sector sector, boolean showAll) throws EmfException {
         return getCaseService().getCaseInputs(caseId, sector, showAll);
     }
-
+    
     public Case[] copyCaseObject(int[] toCopy, User user) throws EmfException {
         return getCaseService().copyCaseObject(toCopy, user);
     }
@@ -347,6 +347,10 @@ public class CaseServiceImpl implements CaseService {
 
     public CaseParameter[] getCaseParameters(int caseId) throws EmfException {
         return getCaseService().getCaseParameters(caseId);
+    }
+    
+    public CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
+        return getCaseService().getCaseParameters(caseId, sector, showAll);
     }
 
     public void removeCaseParameters(CaseParameter[] params) throws EmfException {

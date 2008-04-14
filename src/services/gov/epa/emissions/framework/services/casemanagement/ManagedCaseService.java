@@ -1086,6 +1086,22 @@ public class ManagedCaseService {
         }
     }
 
+    public synchronized CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            List<CaseParameter> params = dao.getCaseParameters(caseId, sector, showAll, session);
+            
+            return params.toArray(new CaseParameter[0]);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get all parameters for case (id=" + caseId + ").\n" + e.getMessage());
+            throw new EmfException("Could not get all parameters for case (id=" + caseId + ").\n");
+        } finally {
+            session.close();
+        }
+    }
+
     public synchronized Executable addExecutable(Executable exe) throws EmfException {
         Session session = sessionFactory.getSession();
         try {

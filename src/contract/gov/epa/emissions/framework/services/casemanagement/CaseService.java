@@ -140,6 +140,8 @@ public interface CaseService {
     
     CaseParameter[] getCaseParameters(int caseId) throws EmfException;
 
+    CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException;
+    
     void updateCaseParameter(User user, CaseParameter parameter) throws EmfException;
 
     void runJobs(CaseJob[] jobs, User user) throws EmfException;
@@ -173,5 +175,6 @@ public interface CaseService {
     Case updateCaseWithLock(Case caseObj) throws EmfException;
 
     void removeMessages(User user, JobMessage[] msgs) throws EmfException;
+
 
  }

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.parameters;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
@@ -66,12 +67,16 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
         parameterFieldsPresenter.display(newParameter, container);
     }
 
-    public CaseParameter[] getCaseParameters(int caseId) throws EmfException {
-        return service().getCaseParameters(caseId);
+    public CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
+        return service().getCaseParameters(caseId, sector, showAll);
     }
 
     public void removeParameters(CaseParameter[] params) throws EmfException {
         service().removeCaseParameters(params);
+    }
+    
+    public Sector[] getAllSetcors() throws EmfException {
+        return session.dataCommonsService().getSectors();
     }
     
     public Case getCaseObj() {

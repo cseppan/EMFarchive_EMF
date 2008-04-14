@@ -295,7 +295,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
                 try {
                     doRefresh(presenter.getCaseInput(caseId, getSelectedSector(), showAll.isSelected()));
                 } catch (Exception ex) {
-                    messagePanel.setError(ex.getMessage());
+                    setErrorMessage(ex.getMessage());
                 }
             }
         });

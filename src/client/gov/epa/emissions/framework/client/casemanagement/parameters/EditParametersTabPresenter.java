@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.parameters;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorTabPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
@@ -16,7 +17,7 @@ public interface EditParametersTabPresenter extends CaseEditorTabPresenter {
 
    // void doCheckDuplicate(CaseInput input, CaseInput[] existingInputs) throws EmfException;
 
-    CaseParameter[] getCaseParameters(int caseId) throws EmfException;
+    CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException;
 
     void removeParameters(CaseParameter[] params) throws EmfException;
 
