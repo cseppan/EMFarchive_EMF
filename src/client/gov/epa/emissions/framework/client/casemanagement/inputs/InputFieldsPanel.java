@@ -174,7 +174,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         show = new CheckBox("");
         show.setSelected(input.isShow());
         changeablesList.addChangeable(show);
-        layoutGenerator.addLabelWidgetPair("Show?", show, panel);
+        layoutGenerator.addLabelWidgetPair("Local?", show, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 12, 2, // rows, cols

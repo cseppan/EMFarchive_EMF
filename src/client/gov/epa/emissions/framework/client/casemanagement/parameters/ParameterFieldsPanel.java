@@ -140,7 +140,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         SpringLayoutGenerator layout = new SpringLayoutGenerator();
         JPanel showPanel = new JPanel();
         showPanel.add(new JLabel(EmptyStrings.create(20)));
-        showPanel.add(new JLabel("Show?"));
+        showPanel.add(new JLabel("Local?"));
         showPanel.add(new JLabel(EmptyStrings.create(20)));
         showPanel.add(show);
         layout.addWidgetPair(required, showPanel, checkBoxPanel);
