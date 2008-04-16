@@ -21,6 +21,7 @@ import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
@@ -35,6 +36,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -70,6 +72,8 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     
     private ComboBox version, dataset;
     
+    private JCheckBox mergeInventories;
+    
     public EditControlStrategyInventoryFilterTab(ControlStrategy controlStrategy, ManageChangeables changeablesList, 
             MessagePanel messagePanel, EmfConsole parentConsole, 
             EmfSession session, DesktopManager desktopManager,
@@ -97,6 +101,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         buildSortFilterPanel();
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         this.add(mainPanel, BorderLayout.CENTER);
+        notifyStrategyTypeChange(controlStrategy.getStrategyType());
     }
 
     private void buildSortFilterPanel() {
@@ -154,8 +159,12 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         });
         panel.add(viewButton);
 
+        JPanel rightPanel = new JPanel();
+        mergeInventories = new JCheckBox("Merge Inventories", null, controlStrategy.getMergeInventories() != null ? controlStrategy.getMergeInventories() : true);
+        rightPanel.add(mergeInventories);
         JPanel container = new JPanel(new BorderLayout());
         container.add(panel, BorderLayout.LINE_START);
+        container.add(rightPanel, BorderLayout.LINE_END);
 
         return container;
     }
@@ -373,10 +382,26 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             }
             controlStrategy.setControlStrategyInputDatasets(inputDatasets);
         }
+        controlStrategy.setMergeInventories(mergeInventories.isSelected());
+        //make sure if there are multiple inventories for the least cost strategies,
+        //then enforce merging datasets, this type of strategy only takes one input inventory.
+        if (inputDatasets.length > 1
+                && (controlStrategy.getStrategyType().getName().equals(StrategyType.leastCost) 
+                        || controlStrategy.getStrategyType().getName().equals(StrategyType.leastCostCurve))
+                && !controlStrategy.getMergeInventories()) 
+            throw new EmfException("Inventories Tab: Multiple inventories must be merged.  Check the Merge Inventories checkbock.");
     }
 
     public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         tableData.add(controlStrategy.getControlStrategyInputDatasets());
         buildSortFilterPanel();
+    }
+
+    public void notifyStrategyTypeChange(StrategyType strategyType) {
+        
+        if (strategyType != null && (strategyType.getName().equals(StrategyType.leastCost) || strategyType.getName().equals(StrategyType.leastCostCurve)))
+            mergeInventories.setVisible(true);
+        else
+            mergeInventories.setVisible(false);
     }
 }

@@ -17,6 +17,8 @@ import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.DateUtil;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
@@ -27,6 +29,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.DatasetCreator;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.cost.controlmeasure.io.Pollutants;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -77,7 +80,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     
     protected DbServer dbServer;
     
-    private Keywords keywords;
+    protected Keywords keywords;
 
     private DatasetType controlStrategyDetailedResultDatasetType;
     
@@ -116,6 +119,12 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     protected boolean useSQLApproach;
     protected String strategyType;
 
+    private StatusDAO statusDAO;
+    
+    protected ControlStrategyResult[] results;
+
+    private ControlStrategyDAO controlStrategyDAO;
+    
     public AbstractStrategyLoader(User user, DbServerFactory dbServerFactory, 
             HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
             int batchSize, boolean useSQLApproach) throws EmfException {
@@ -144,6 +153,9 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
                 datasource, keywords);
         this.costYearTable = new CostYearTableReader(dbServer, controlStrategy.getCostYear()).costYearTable();
         this.strategyType = controlStrategy.getStrategyType().getName();
+        this.statusDAO = new StatusDAO(sessionFactory);
+        this.controlStrategyDAO = new ControlStrategyDAO(dbServerFactory, sessionFactory);
+        this.results = getControlStrategyResults();
     }
 
     //call this to process the input and create the output in a batch fashion
@@ -528,7 +540,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return filterForSourceQuery;
     }
 
-    private Version version(ControlStrategyInputDataset controlStrategyInputDataset) {
+    protected Version version(ControlStrategyInputDataset controlStrategyInputDataset) {
         return version(controlStrategyInputDataset.getInputDataset().getId(), controlStrategyInputDataset.getVersion());
     }
 
@@ -555,11 +567,46 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return datasource.getName() + "." + table;
     }
 
-    private int getDaysInMonth(int month) {
+    protected int getDaysInMonth(int month) {
         return month != - 1 ? DateUtil.daysInMonth(controlStrategy.getInventoryYear(), month) : 31;
     }
     
     protected double getEmission(double annEmis, double avdEmis) {
         return month != - 1 ? (avdEmis == 0.0 ? annEmis : avdEmis * daysInMonth) : annEmis;
+    }
+    
+    protected void updateDataset(EmfDataset dataset) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            DatasetDAO dao = new DatasetDAO(dbServerFactory);
+            dao.updateWithoutLocking(dataset, session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException("Could not update dataset: " + dataset.getName());
+        } finally {
+            session.close();
+        }
+    }
+
+    protected void setStatus(String message) {
+        Status endStatus = new Status();
+        endStatus.setUsername(user.getUsername());
+        endStatus.setType("Strategy");
+        endStatus.setMessage(message);
+        endStatus.setTimestamp(new Date());
+
+        statusDAO.add(endStatus);
+    }
+    
+    public ControlStrategyResult[] getControlStrategyResults() {
+        if (results == null) {
+            Session session = sessionFactory.getSession();
+            try {
+                results = controlStrategyDAO.getControlStrategyResults(controlStrategy.getId(), session).toArray(new ControlStrategyResult[0]);
+            } finally {
+                session.close();
+            }
+        }
+        return results;
     }
 }

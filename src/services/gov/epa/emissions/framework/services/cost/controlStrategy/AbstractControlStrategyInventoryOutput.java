@@ -76,7 +76,7 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
     protected void doCreateInventory(EmfDataset inputDataset, String inputTable) throws EmfException, Exception, SQLException {
         startStatus(statusServices);
         try {
-            EmfDataset dataset = creator.addDataset("ControlledInventory_", "CSINVEN_", 
+            EmfDataset dataset = creator.addDataset(creator.createDatasetName(inputDataset + "_CntlInv"), 
                     inputDataset, inputDataset.getDatasetType(), 
                     tableFormat, description(inputDataset));
             
@@ -118,7 +118,7 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
 //    }
 
     protected String description(EmfDataset inputDataset) {
-        String startingDesc = inputDataset.getDescription();
+        String startingDesc = inputDataset.getDescription() + "";
         if ((startingDesc.indexOf("FIPS,SCC") > 0) || (startingDesc.indexOf("\"FIPS\",") > 0))
         {
            return startingDesc;
@@ -215,7 +215,7 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
 
     private void createControlledInventory(int datasetId, String inputTable, String detailResultTable, String outputTable, Version version,
             Dataset dataset, Datasource datasource, boolean missingColumns) throws EmfException {
-        String query = copyDataFromOriginalTableQuery2(datasetId, inputTable, 
+        String query = populateInventory(datasetId, inputTable, 
                 detailResultTable, outputTable,
                 version(inputDataset, controlStrategyResult.getInputDatasetVersion()), inputDataset, 
                 datasource, missingColumns);
@@ -227,7 +227,7 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
         }
     }
 
-    private String copyDataFromOriginalTableQuery2(int datasetId, String inputTable, String detailResultTable, String outputTable, Version version,
+    private String populateInventory(int datasetId, String inputTable, String detailResultTable, String outputTable, Version version,
             Dataset dataset, Datasource datasource, boolean missingColumns) {
         VersionedQuery versionedQuery = new VersionedQuery(version);
         int month = inputDataset.applicableMonth();

@@ -1,7 +1,8 @@
-package gov.epa.emissions.framework.services.cost.analysis.leastcost;
+package gov.epa.emissions.framework.services.cost.controlStrategy;
 
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.Column;
@@ -27,9 +28,9 @@ import java.util.Date;
 
 import org.hibernate.Session;
 
-public class LeastCostControlStrategyInventoryOutput extends AbstractControlStrategyInventoryOutput {
+public class MergedControlStrategyInventoryOutput extends AbstractControlStrategyInventoryOutput {
    
-    public LeastCostControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
+    public MergedControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
             ControlStrategyResult controlStrategyResult, HibernateSessionFactory sessionFactory, 
             DbServerFactory dbServerFactory) throws Exception {
         super(user, controlStrategy,
@@ -46,7 +47,6 @@ public class LeastCostControlStrategyInventoryOutput extends AbstractControlStra
         try {
 
             ControlStrategyInputDataset[] inventories = controlStrategy.getControlStrategyInputDatasets();
-            ControlStrategyResult detailedResult = getControlStrategyResult(controlStrategyResult.getId());
             //we need to create a controlled inventory for each invnentory, except the merged inventory
             for (int i = 0; i < inventories.length; i++) {
 //                EmfDataset inventory = inventories[i].getInputDataset();
@@ -54,7 +54,7 @@ public class LeastCostControlStrategyInventoryOutput extends AbstractControlStra
                 if (!inputDataset.getDatasetType().getName().equals(DatasetType.orlMergedInventory)) {
                     tableFormat = new FileFormatFactory(dbServer).tableFormat(inputDataset.getDatasetType());
                     //create controlled inventory dataset
-                    EmfDataset dataset = creator.addDataset("ControlledInventory_", "CSINVEN_", 
+                    EmfDataset dataset = creator.addDataset(creator.createDatasetName(inputDataset + "_CntlInv"), 
                             inputDataset, inputDataset.getDatasetType(), 
                             tableFormat, description(inputDataset));
                     //get table name
@@ -65,10 +65,13 @@ public class LeastCostControlStrategyInventoryOutput extends AbstractControlStra
                             getControlledInventoryStrategyResultType());
 
                     createControlledInventory(dataset.getId(), getDatasetTableName(inputDataset), 
-                            detailDatasetTable(detailedResult), outputInventoryTableName, 
+                            detailDatasetTable(controlStrategyResult), outputInventoryTableName, 
                             version(inputDataset, inventories[i].getVersion()), datasource, 
                             tableFormat);
 
+                    //set the cont inv record count
+                    setResultRecordCount(result);
+                    
                     result.setCompletionTime(new Date());
                     result.setRunStatus("Completed.");
                     saveControlStrategyResult(result);
@@ -88,7 +91,7 @@ public class LeastCostControlStrategyInventoryOutput extends AbstractControlStra
             String detailResultTable, String outputTable, 
             Version version, Datasource datasource,
             TableFormat tableFormat) throws EmfException {
-        String query = copyDataFromOriginalTableQuery2(datasetId, inputTable, 
+        String query = populateInventory(datasetId, inputTable, 
                 detailResultTable, outputTable,
                 version(inputDataset, controlStrategyResult.getInputDatasetVersion()), inputDataset, 
                 datasource, tableFormat);
@@ -100,7 +103,7 @@ public class LeastCostControlStrategyInventoryOutput extends AbstractControlStra
         }
     }
 
-    private String copyDataFromOriginalTableQuery2(int contInvDatasetId, String invTableName, 
+    private String populateInventory(int contInvDatasetId, String invTableName, 
             String detailResultTableName, String contInvTableName, 
             Version invVersion, Dataset invDataset, 
             Datasource datasource, TableFormat invTableFormat) throws EmfException {
@@ -203,7 +206,7 @@ public class LeastCostControlStrategyInventoryOutput extends AbstractControlStra
         
         result.setInputDataset(inventory.getInputDataset());
         result.setInputDatasetVersion(inventory.getVersion());
-        result.setControlledInventoryDataset(controlledInventory);
+        result.setDetailedResultDataset(controlledInventory);
         result.setStrategyResultType(strategyResultType);
         result.setStartTime(new Date());
         result.setRunStatus("Start processing controlled inventory");
@@ -236,5 +239,40 @@ public class LeastCostControlStrategyInventoryOutput extends AbstractControlStra
             throw new EmfException(e.getMessage());
         }
         return md;
+    }
+
+    private void setResultRecordCount(ControlStrategyResult controlStrategyResult) throws EmfException {
+        String query = "SELECT count(1) as record_count "
+            + " FROM " + qualifiedEmissionTableName(controlStrategyResult.getDetailedResultDataset());
+        ResultSet rs = null;
+        System.out.println(System.currentTimeMillis() + " " + query);
+        try {
+            rs = datasource.query().executeQuery(query);
+            while (rs.next()) {
+                controlStrategyResult.setRecordCount(rs.getInt(1));
+            }
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    //
+                }
+        }
+    }
+    
+    private String qualifiedEmissionTableName(Dataset dataset) {
+        return qualifiedName(emissionTableName(dataset));
+    }
+
+    private String emissionTableName(Dataset dataset) {
+        InternalSource[] internalSources = dataset.getInternalSources();
+        return internalSources[0].getTable();
+    }
+
+    private String qualifiedName(String table) {
+        return datasource.getName() + "." + table;
     }
 }

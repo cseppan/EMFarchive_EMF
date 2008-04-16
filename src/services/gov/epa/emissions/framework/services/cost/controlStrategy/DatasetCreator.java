@@ -112,7 +112,9 @@ public class DatasetCreator {
 
     public EmfDataset addDataset(String datasetName, 
             EmfDataset inputDataset, DatasetType type, 
-            TableFormat tableFormat, String description) throws EmfException {
+            TableFormat tableFormat, String description
+//            ,Map<String,String> keywordValues
+            ) throws EmfException {
 //        return addDataset(datasetName, "DS", 
 //                inputDataset, type, 
 //                tableFormat, description);
@@ -121,6 +123,19 @@ public class DatasetCreator {
         
         //create dataset
         EmfDataset dataset = createDataset(outputDatasetName, description, type, inputDataset);
+        
+//        Iterator iterator = keywordValues.entrySet().iterator();
+//
+//        Map.Entry entry =  (Map.Entry)iterator.next();
+//        String keyword = (String) entry.getKey();
+//        String value = (String) entry.getValue();
+//
+//        while (iterator.hasNext()) {
+//            entry =  (Map.Entry)iterator.next();
+//            keyword = (String) entry.getKey();
+//            value = (String) entry.getValue();
+//            addKeyVal(dataset, keyword, value);
+//        }
 
         setDatasetInternalSource(dataset, outputTableName, 
                 tableFormat, inputDataset.getName());
@@ -199,9 +214,6 @@ public class DatasetCreator {
 //        addKeyVal(dataset, "STRATEGY_INVENTORY_NAME", inputDataset.getName());
 //        addKeyVal(dataset, "STRATEGY_INVENTORY_VERSION", inputDataset.getDefaultVersion()+"");
         int measureCount = (controlStrategy.getControlMeasures() != null ? controlStrategy.getControlMeasures().length : 0);
-        addKeyVal(dataset, "MEASURES_INCLUDED", measureCount + "");
-        addKeyVal(dataset, "DISCOUNT_RATE", controlStrategy.getDiscountRate()+"%");
-        addKeyVal(dataset, "USE_COST_EQUATION",(controlStrategy.getUseCostEquations()==true? "true" : "false"));
         ControlMeasureClass[] controlMeasureClasses = controlStrategy.getControlMeasureClasses();
         String classList = "All";
         if (controlMeasureClasses != null) {
@@ -211,7 +223,12 @@ public class DatasetCreator {
                 classList += controlMeasureClasses[i].getName();
             }
         }
-        addKeyVal(dataset, "MEASURE_CLASSES", classList);
+        if (measureCount > 0) 
+            addKeyVal(dataset, "MEASURES_INCLUDED", measureCount + "");
+        else
+            addKeyVal(dataset, "MEASURE_CLASSES", classList);
+        addKeyVal(dataset, "DISCOUNT_RATE", controlStrategy.getDiscountRate()+"%");
+        addKeyVal(dataset, "USE_COST_EQUATION", (controlStrategy.getUseCostEquations()==true? "true" : "false"));
     }
     
     private void addKeyVal(EmfDataset dataset, String keywordName, String value) {
@@ -250,8 +267,8 @@ public class DatasetCreator {
         
     public static String createDatasetName(String name) {
         //name += "_" + CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date());
-        if (name.length() > 47) {     //postgresql table name max length is 64
-            name = name.substring(0, 46);
+        if (name.length() > 46) {     //postgresql table name max length is 64
+            name = name.substring(0, 45);
         }
 
         for (int i = 0; i < name.length(); i++) {
@@ -276,8 +293,8 @@ public class DatasetCreator {
 
     private String createTableName(String name) {
         String table = name;
-        if (table.length() > 47) {     //postgresql table name max length is 64
-            table = table.substring(0, 46);
+        if (table.length() > 46) {     //postgresql table name max length is 64
+            table = table.substring(0, 45);
         }
 
         for (int i = 0; i < table.length(); i++) {

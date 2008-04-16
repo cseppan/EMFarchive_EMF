@@ -296,7 +296,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         Session session = sessionFactory.getSession();
         try {
 //            return new ControlStrategyDAO().getControlStrategyResults(controlStrategy.getId(), session)[index];
-            return ((ControlStrategyResult[]) (new ControlStrategyDAO()).getControlStrategyResults(controlStrategy.getId(), session).toArray(new ControlStrategyResult[0]))[index];
+            return (new ControlStrategyDAO()).getControlStrategyResults(controlStrategy.getId(), session).toArray(new ControlStrategyResult[0])[index];
         } finally {
             session.close();
         }

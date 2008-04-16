@@ -1,10 +1,9 @@
 package gov.epa.emissions.framework.services.cost.controlStrategy;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
-import gov.epa.emissions.framework.services.cost.StrategyType;
-import gov.epa.emissions.framework.services.cost.analysis.leastcost.LeastCostControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 public class ControlStrategyInventoryOutputFactory {
@@ -26,8 +25,8 @@ public class ControlStrategyInventoryOutputFactory {
     }
 
     public ControlStrategyInventoryOutput get(ControlStrategyResult controlStrategyResult) throws Exception {
-        if (controlStrategy.getStrategyType().getName().equals(StrategyType.leastCost))
-            return new LeastCostControlStrategyInventoryOutput(user, controlStrategy, 
+        if (controlStrategyResult.getInputDataset().getDatasetType().getName().equals(DatasetType.orlMergedInventory))
+            return new MergedControlStrategyInventoryOutput(user, controlStrategy, 
                     controlStrategyResult, sessionFactory, 
                     dbServerFactory);
         return new AbstractControlStrategyInventoryOutput(user, controlStrategy, 

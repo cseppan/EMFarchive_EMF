@@ -36,12 +36,12 @@ public class StrategySummaryResultTableFormat implements TableFormat {
     }
     
     private Column[] createCols() {
-        List cols = new ArrayList();
+        List<Column> cols = new ArrayList<Column>();
 
         cols.addAll(Arrays.asList(versionCols()));
         cols.addAll(Arrays.asList(baseCols()));
 
-        return (Column[]) cols.toArray(new Column[0]);
+        return cols.toArray(new Column[0]);
     }
     
     private Column[] versionCols() {
@@ -50,7 +50,12 @@ public class StrategySummaryResultTableFormat implements TableFormat {
         Column version = new Column("Version", types.intType(), new NullFormatter(), "NULL DEFAULT 0");
         Column deleteVersions = new Column("Delete_Versions", types.text(), new NullFormatter(), "DEFAULT ''::text");
 
-        return new Column[] { recordId, datasetId,  version, deleteVersions};
+        return new Column[] { 
+                recordId, 
+                datasetId,  
+                version, 
+                deleteVersions
+                };
     }
 
     private Column recordID(SqlDataTypes types) {
@@ -61,6 +66,7 @@ public class StrategySummaryResultTableFormat implements TableFormat {
     }
 
     private Column[] baseCols() {
+        Column sector = new Column("SECTOR", types.stringType(64), 64, new StringFormatter(255));
         Column fips = new Column("FIPS", types.stringType(6), new StringFormatter(6));
         Column scc = new Column("SCC", types.stringType(10), new StringFormatter(10));
         Column pollutant = new Column("Poll", types.stringType(20), new StringFormatter(20));
@@ -70,9 +76,16 @@ public class StrategySummaryResultTableFormat implements TableFormat {
         Column emissionsReduction = new Column("Emis_Reduction", types.realType(), new RealFormatter());
         Column comment = new Column("Comment", types.stringType(128), new StringFormatter(128));
 
-        return new Column[] { fips, scc, 
-                pollutant, controlTechnology, 
-                annualCost, avgAnnualCostPerTon,
-                emissionsReduction, comment };
+        return new Column[] { 
+                sector, 
+                fips, 
+                scc, 
+                pollutant, 
+                controlTechnology, 
+                annualCost, 
+                avgAnnualCostPerTon,
+                emissionsReduction, 
+                comment 
+                };
     }
 }

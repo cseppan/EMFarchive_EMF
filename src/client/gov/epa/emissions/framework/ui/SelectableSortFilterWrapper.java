@@ -4,9 +4,7 @@ import gov.epa.emissions.commons.gui.SelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.mims.analysisengine.table.filter.FilterCriteria;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
-//import gov.epa.mims.analysisengine.table.filter.FilterCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -55,13 +53,13 @@ public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
         // TBD: refine this to get the sort criteria and filter criteria from the SFSP
         //      this may require adding some new methods to get this info from that class
         SortCriteria currentSort = sortFilterSelectionpanel.getSortCriteria();
-        FilterCriteria currentFilter = sortFilterSelectionpanel.getFilterCriteria();
+//        FilterCriteria currentFilter = sortFilterSelectionpanel.getFilterCriteria();
         this.removeAll();
         this.add(setLayout(parentConsole, tableData));
         // TBD: restore the sort and filter criteria (maybe after repaint??)
         // TBD: if possible, retain the column widths and order in addition to sort and filter info
         sortFilterSelectionpanel.sort(currentSort);
-        sortFilterSelectionpanel.filter(currentFilter);
+//        sortFilterSelectionpanel.filter(currentFilter);
         repaint();
     }
 

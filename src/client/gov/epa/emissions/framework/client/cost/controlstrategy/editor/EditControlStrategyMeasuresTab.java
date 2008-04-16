@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyMeasure;
 import gov.epa.emissions.framework.services.cost.LightControlMeasure;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
@@ -405,6 +406,11 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
       tableData = new ControlStrategyMeasureTableData(measures);
       //rebuild the sort filter panel
       buildSortFilterPanel();
+    }
+
+    public void notifyStrategyTypeChange(StrategyType strategyType) {
+        // NOTE Auto-generated method stub
+        
     }
         
 }

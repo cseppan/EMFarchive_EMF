@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 
 public class EditControlStrategyTabPresenterImpl implements EditControlStrategyTabPresenter {
@@ -18,5 +19,9 @@ public class EditControlStrategyTabPresenterImpl implements EditControlStrategyT
 
     public void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         view.refresh(controlStrategy, controlStrategyResults);
+    }
+
+    public void doChangeStrategyType(StrategyType strategyType) {
+        view.notifyStrategyTypeChange(strategyType);
     }
 }

@@ -261,7 +261,8 @@ CREATE TABLE emf.control_strategies
   county_dataset_version int4,
   use_cost_equations boolean,
   export_directory character varying,
-  delete_results boolean DEFAULT true
+  delete_results boolean DEFAULT true,
+  merge_inventories boolean DEFAULT false
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.control_strategies OWNER TO emf;

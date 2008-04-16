@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.services.cost.analysis.leastcost;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -25,6 +27,12 @@ import org.hibernate.Session;
 public class StrategyLoader extends AbstractStrategyLoader {
     
     private ControlStrategyResult leastCostCMWorksheetResult;
+
+//    private double maxEmisReduction;
+
+    private double uncontrolledEmis;
+
+    private double emisReduction;
 
     public StrategyLoader(User user, DbServerFactory dbServerFactory, 
             HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
@@ -66,6 +74,8 @@ public class StrategyLoader extends AbstractStrategyLoader {
         System.out.println(System.currentTimeMillis() + " done with");
         //still need to calculate the total cost and reduction...
         setResultTotalCostTotalReductionAndCount(result);
+        
+        addDetailedResultSummaryDatasetKeywords((EmfDataset)result.getDetailedResultDataset());
         return result;
     }
 
@@ -127,15 +137,24 @@ public class StrategyLoader extends AbstractStrategyLoader {
 
     private void runStrategyUsingSQLApproach(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
         String query = "";
-        query = "SELECT public.run_least_cost_strategy("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
+        query = "SELECT * from public.run_least_cost_strategy("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
+        ResultSet rs = null;
         System.out.println(System.currentTimeMillis() + " " + query);
         try {
-            datasource.query().execute(query);
+            rs = datasource.query().executeQuery(query);
+            while (rs.next()) {
+                uncontrolledEmis = rs.getDouble("domain_wide_uncontrolled_emis");
+//                maxEmisReduction = rs.getDouble("max_emis_reduction");
+            }
         } catch (SQLException e) {
-            System.out.println("SQLException runStrategyUsingSQLApproach");
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {
-            //3
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    //
+                }
         }
     }
 
@@ -151,4 +170,54 @@ public class StrategyLoader extends AbstractStrategyLoader {
         }
     }
 
+    private void addKeyVal(EmfDataset dataset, String keywordName, String value) {
+        Keyword keyword = keywords.get(keywordName);
+        KeyVal keyval = new KeyVal(keyword, value); 
+        dataset.addKeyVal(keyval);
+    }
+    
+    private void addDetailedResultSummaryDatasetKeywords(EmfDataset dataset) throws EmfException {
+        String query = "select TO_CHAR(sum(annual_cost), 'FM999999999999999990.09')::double precision as total_annual_cost, "
+            + "TO_CHAR(sum(annual_cost) / sum(emis_reduction), 'FM999999999999999990.09')::double precision as average_ann_cost_per_ton, "
+            + "TO_CHAR(sum(annual_oper_maint_cost), 'FM999999999999999990.09')::double precision as Total_Annual_Oper_Maint_Cost, "
+            + "TO_CHAR(sum(annualized_capital_cost), 'FM999999999999999990.09')::double precision as Total_Annualized_Capital_Cost, "
+            + "TO_CHAR(sum(total_capital_cost), 'FM999999999999999990.09')::double precision as Total_Capital_Cost, "
+            + "TO_CHAR(" + emisReduction + " / " + uncontrolledEmis + " * 100, 'FM990.099')::double precision as Target_Percent_Reduction, " 
+            + "TO_CHAR(sum(emis_reduction) / " + uncontrolledEmis + " * 100, 'FM990.099')::double precision as Actual_Percent_Reduction, "
+            + "sum(emis_reduction) as Total_Emis_Reduction " 
+            + "FROM " + qualifiedEmissionTableName(dataset)
+            + " where poll='" + controlStrategy.getTargetPollutant().getName() + "'"
+            + " group by poll";
+//        System.out.println(System.currentTimeMillis() + " " + query);
+        ResultSet rs = null;
+        try {
+            rs = datasource.query().executeQuery(query);
+            while (rs.next()) {
+                addKeyVal(dataset, "TOTAL_ANNUAL_COST", rs.getDouble("total_annual_cost") + "");
+                addKeyVal(dataset, "AVERAGE_ANNUAL_COST_PER_TON", rs.getDouble("average_ann_cost_per_ton") + "");
+                addKeyVal(dataset, "TOTAL_ANNUAL_OPERATION_MAINTENANCE_COST", rs.getDouble("Total_Annual_Oper_Maint_Cost") + "");
+                addKeyVal(dataset, "TOTAL_ANNUALIZED_CAPITAL_COST", rs.getDouble("Total_Annualized_Capital_Cost") + "");
+                addKeyVal(dataset, "TOTAL_CAPITAL_COST", rs.getDouble("Total_Capital_Cost") + "");
+                addKeyVal(dataset, "TARGET_PERCENT_REDUCTION", rs.getDouble("Target_Percent_Reduction") + "");
+                addKeyVal(dataset, "ACTUAL_PERCENT_REDUCTION", rs.getDouble("Actual_Percent_Reduction") + "");
+                addKeyVal(dataset, "TOTAL_EMISSION_REDUCTION", rs.getDouble("Total_Emis_Reduction") + "");
+                addKeyVal(dataset, "UNCONTROLLED_EMISSION", uncontrolledEmis + "");
+                
+                try {
+                    updateDataset(dataset);
+                } catch (Exception e) {
+                    //suppress exceptions for now
+                }
+            }
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    //
+                }
+        }
+    }
 }

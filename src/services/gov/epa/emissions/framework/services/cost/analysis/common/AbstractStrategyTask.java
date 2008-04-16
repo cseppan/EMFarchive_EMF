@@ -29,6 +29,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -182,6 +183,30 @@ public abstract class AbstractStrategyTask implements Strategy {
         }
     }
     
+    protected void deleteStrategyResults(ControlStrategyResult[] results) throws EmfException {
+        //get rid of strategy results...
+        if (controlStrategy.getDeleteResults()){
+            Session session = sessionFactory.getSession();
+            try {
+                List<EmfDataset> dsList = new ArrayList<EmfDataset>();
+                for (ControlStrategyResult result : results) {
+                    dsList.add((EmfDataset) Arrays.asList(controlStrategyDAO.getResultDatasets(controlStrategy.getId(), result.getId(), session)));
+                    //get rid of old strategy results...
+                    removeControlStrategyResult(result.getId());
+                }
+                //delete and purge datasets
+                if (dsList != null && dsList.size() > 0) {
+                    controlStrategyDAO.removeResultDatasets(dsList.toArray(new EmfDataset[0]), user, session, dbServer);
+                }
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+                throw new EmfException("Could not remove Control Strategies results.");
+            } finally {
+                session.close();
+            }
+        }
+    }
+    
     protected void createStrategySummaryResult() throws EmfException {
         //now create the summary detailed result based on the results from the strategy run...
         if (strategyResultList.size() > 0) {
@@ -202,8 +227,8 @@ public abstract class AbstractStrategyTask implements Strategy {
     private void populateStrategySummaryResultDataset(ControlStrategyResult[] results, ControlStrategyResult summaryResult) throws EmfException {
         if (results.length > 0) {
             //SET work_mem TO '512MB';
-            String sql = "SET work_mem TO '512MB';INSERT INTO " + qualifiedEmissionTableName(summaryResult.getDetailedResultDataset()) + " (dataset_id, version, fips, scc, poll, Control_Technology, avg_ann_cost_per_ton, Annual_Cost, Emis_Reduction) " 
-            + "select " + summaryResult.getDetailedResultDataset().getId() + ", 0, summary.fips, summary.scc, summary.poll, ct.name as Control_Technology, "
+            String sql = "INSERT INTO " + qualifiedEmissionTableName(summaryResult.getDetailedResultDataset()) + " (dataset_id, version, sector, fips, scc, poll, Control_Technology, avg_ann_cost_per_ton, Annual_Cost, Emis_Reduction) " 
+            + "select " + summaryResult.getDetailedResultDataset().getId() + ", 0, summary.sector, summary.fips, summary.scc, summary.poll, ct.name as Control_Technology, "
             + "case when sum(summary.Emis_Reduction) <> 0 then sum(summary.Annual_Cost) / sum(summary.Emis_Reduction) else null end as avg_cost_per_ton, " 
             + "sum(summary.Annual_Cost) as Annual_Cost, "
             + "sum(summary.Emis_Reduction) as Emis_Reduction " 
@@ -213,9 +238,9 @@ public abstract class AbstractStrategyTask implements Strategy {
                 if (results[i].getDetailedResultDataset() != null) {
                     String tableName = qualifiedEmissionTableName(results[i].getDetailedResultDataset());
                     sql += (count > 0 ? " union all " : "") 
-                        + "select e.fips, e.scc, e.poll, e.cm_id, sum(e.Annual_Cost) as Annual_Cost, sum(e.Emis_Reduction) as Emis_Reduction "
+                        + "select e.sector, e.fips, e.scc, e.poll, e.cm_id, sum(e.Annual_Cost) as Annual_Cost, sum(e.Emis_Reduction) as Emis_Reduction "
                         + "from " + tableName + " e "
-                        + "group by e.fips, e.scc, e.poll, e.cm_id ";
+                        + "group by e.sector, e.fips, e.scc, e.poll, e.cm_id ";
                     ++count;
                 }
             }
@@ -224,8 +249,8 @@ public abstract class AbstractStrategyTask implements Strategy {
                 + "on cm.id = summary.cm_id "
                 + "inner join emf.control_technologies ct "
                 + "on ct.id = cm.control_technology "
-                + "group by summary.fips, summary.scc, summary.poll, ct.name "
-                + "order by summary.fips, summary.scc, summary.poll, ct.name";
+                + "group by summary.sector, summary.fips, summary.scc, summary.poll, ct.name "
+                + "order by summary.sector, summary.fips, summary.scc, summary.poll, ct.name";
             try {
                 datasource.query().execute(sql);
             } catch (SQLException e) {
@@ -320,6 +345,17 @@ public abstract class AbstractStrategyTask implements Strategy {
         return datasetType;
     }
 
+    protected ControlStrategyResult[] getControlStrategyResults() {
+        ControlStrategyResult[] results = new ControlStrategyResult[] {};
+        Session session = sessionFactory.getSession();
+        try {
+            results = controlStrategyDAO.getControlStrategyResults(controlStrategy.getId(), session).toArray(new ControlStrategyResult[0]);
+        } finally {
+            session.close();
+        }
+        return results;
+    }
+
     private EmfDataset createSummaryResultDataset() throws EmfException {
         //"Summary_", 
         return creator.addDataset("CSSR_", 
@@ -376,6 +412,18 @@ public abstract class AbstractStrategyTask implements Strategy {
         Session session = sessionFactory.getSession();
         try {
             dao.removeControlStrategyResults(controlStrategy.getId(), session);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not remove previous control strategy result(s)");
+        } finally {
+            session.close();
+        }
+    }
+
+    private void removeControlStrategyResult(int resultId) throws EmfException {
+        ControlStrategyDAO dao = new ControlStrategyDAO();
+        Session session = sessionFactory.getSession();
+        try {
+            dao.removeControlStrategyResult(controlStrategy.getId(), resultId, session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not remove previous control strategy result(s)");
         } finally {

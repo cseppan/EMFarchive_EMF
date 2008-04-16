@@ -36,12 +36,12 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
     }
     
     private Column[] createCols() {
-        List cols = new ArrayList();
+        List<Column> cols = new ArrayList<Column>();
 
         cols.addAll(Arrays.asList(versionCols()));
         cols.addAll(Arrays.asList(baseCols()));
 
-        return (Column[]) cols.toArray(new Column[0]);
+        return cols.toArray(new Column[0]);
     }
     
     private Column[] versionCols() {

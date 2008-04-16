@@ -74,6 +74,8 @@ public class ControlStrategy implements Lockable, Serializable {
     private String exportDirectory;
     
     private Boolean deleteResults = false;
+
+    private Boolean mergeInventories;
     
     public ControlStrategy() {
         this.lock = new Mutex();
@@ -396,5 +398,13 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public Boolean getDeleteResults() {
         return deleteResults;
+    }
+
+    public void setMergeInventories(Boolean mergeInventories) {
+        this.mergeInventories = mergeInventories;
+    }
+
+    public Boolean getMergeInventories() {
+        return mergeInventories;
     }
 }

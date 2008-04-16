@@ -478,4 +478,9 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         // NOTE Auto-generated method stub
         
     }
+
+    public void notifyStrategyTypeChange(StrategyType strategyType) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

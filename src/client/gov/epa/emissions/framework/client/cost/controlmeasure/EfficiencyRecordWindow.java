@@ -100,8 +100,6 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     
     protected JLabel refYrCostPerTon;
 
-    protected final int refYear = 2006;
-    
     static int counter = 0;
     
     protected SaveButton saveRecord;
@@ -113,7 +111,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         this.session = session;
         this.verifier = new NumberFieldVerifier("");
         this.costYearTable = costYearTable;
-        this.costYearTable.setTargetYear(refYear);
+        this.costYearTable.setTargetYear(CostYearTable.REFERENCE_COST_YEAR);
     }
 
     public abstract void save();

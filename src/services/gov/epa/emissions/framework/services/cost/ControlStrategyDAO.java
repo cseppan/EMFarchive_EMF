@@ -110,7 +110,13 @@ public class ControlStrategyDAO {
                 "cS.project, cS.strategyType, " +
                 "cS.costYear, cS.inventoryYear, " +
                 "cS.creator, (select sum(sR.totalCost) from ControlStrategyResult sR where sR.controlStrategyId = cS.id), (select sum(sR.totalReduction) from ControlStrategyResult sR where sR.controlStrategyId = cS.id)) " +
-                "from ControlStrategy cS left join cS.strategyType left join cS.region left join cS.project left join cS.region order by cS.name").list();
+                "from ControlStrategy cS " +
+                "left join cS.targetPollutant " +
+                "left join cS.strategyType " +
+                "left join cS.region " +
+                "left join cS.project " +
+                "left join cS.region " +
+                "order by cS.name").list();
         //return hibernateFacade.getAll(ControlStrategy.class, Order.asc("name"), session);
     }
 //    // return ControlStrategies orderby name
@@ -269,6 +275,15 @@ public class ControlStrategyDAO {
         session.flush();
     }
 
+    public void removeControlStrategyResult(int controlStrategyId, int resultId, Session session) {
+        String hqlDelete = "delete ControlStrategyResult sr where sr.id = :resultId and sr.controlStrategyId = :controlStrategyId";
+        session.createQuery( hqlDelete )
+             .setInteger("resultId", resultId)
+             .setInteger("controlStrategyId", controlStrategyId)
+             .executeUpdate();
+        session.flush();
+    }
+
     public ControlStrategy getByName(String name, Session session) {
         ControlStrategy cs = (ControlStrategy) hibernateFacade.load(ControlStrategy.class, Restrictions.eq("name", new String(name)), session);
         return cs;
@@ -279,7 +294,7 @@ public class ControlStrategyDAO {
         return cs;
     }
 
-    public List getControlStrategyResults(int controlStrategyId, Session session) {
+    public List<ControlStrategyResult> getControlStrategyResults(int controlStrategyId, Session session) {
         return session.createCriteria(ControlStrategyResult.class).add(Restrictions.eq("controlStrategyId", controlStrategyId)).list();
     }
     
@@ -405,6 +420,20 @@ public class ControlStrategyDAO {
                 if (results.get(i).getControlledInventoryDataset() != null)
                     datasets.add((EmfDataset)results.get(i).getControlledInventoryDataset());
             }
+        }
+        if (datasets.size()>0)
+            return datasets.toArray(new EmfDataset[0]);
+        return null; 
+    }
+
+    public EmfDataset[] getResultDatasets(int controlStrategyId, int resultId, Session session) {
+        ControlStrategyResult result = getControlStrategyResult(resultId, session);
+        List<EmfDataset> datasets = new ArrayList<EmfDataset>();
+        if(result != null){
+            if (result.getDetailedResultDataset() != null)
+                datasets.add((EmfDataset)result.getDetailedResultDataset());
+            if (result.getControlledInventoryDataset() != null)
+                datasets.add((EmfDataset)result.getControlledInventoryDataset());
         }
         if (datasets.size()>0)
             return datasets.toArray(new EmfDataset[0]);

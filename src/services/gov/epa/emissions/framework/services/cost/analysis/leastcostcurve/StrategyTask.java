@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.analysis.common.AbstractStrategyTask;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.DatasetCreator;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -34,7 +35,7 @@ public class StrategyTask extends AbstractStrategyTask {
     private ControlStrategyResult leastCostCMWorksheetResult;
 
     private ControlStrategyResult leastCostCurveSummaryResult;
-
+    
     public StrategyTask(ControlStrategy controlStrategy, User user, 
             DbServerFactory dbServerFactory, Integer batchSize,
             HibernateSessionFactory sessionFactory) throws EmfException {
@@ -117,20 +118,43 @@ public class StrategyTask extends AbstractStrategyTask {
         setSummaryResultCount(leastCostCurveSummaryResult);
         saveControlStrategySummaryResult(leastCostCurveSummaryResult);
         runSummaryQASteps((EmfDataset)leastCostCurveSummaryResult.getDetailedResultDataset(), 0);
-}
+    }
 
     public void beforeRun() throws EmfException {
-        //create the worksheet (strat result)
-        leastCostCMWorksheetResult = loader.loadLeastCostCMWorksheetResult();
-        leastCostCurveSummaryResult = loader.loadLeastCostCurveSummaryResult();
-        
+        //create the worksheet (strat result), if needed, maybe they don't want to recreate these...
+        ControlStrategyResult[] results = loader.getControlStrategyResults();
+        if (controlStrategy.getDeleteResults() || results.length == 0) {
+            leastCostCMWorksheetResult = loader.loadLeastCostCMWorksheetResult();
+            leastCostCurveSummaryResult = loader.loadLeastCostCurveSummaryResult();
+        } else {
+            for (ControlStrategyResult result : results) {
+                if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostControlMeasureWorksheetResult)) {
+                    leastCostCMWorksheetResult = result;
+                } else if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostCurveSummaryResult)) {
+                    leastCostCurveSummaryResult = result;
+                }
+            }
+        }
         //if there is more than one input inventory, then merge these into one dataset, 
         //then we use that as the input to the strategy run
-        if (controlStrategyInputDatasetCount >= 1) {
-            //check to see if exists already, if so, then truncate its data and start over...
+        if (controlStrategy.getControlStrategyInputDatasets().length > 1) {
+//        if (controlStrategyInputDatasetCount >= 1) {
             ControlStrategyInputDataset[] inputDatasets = controlStrategy.getControlStrategyInputDatasets();
+
+            //TODO: look for any errors or warnings in the input inventories
+            //i.e., missing sector or differing temporal period
+//            String sector = getDatasetSector(inputDatasets[0].getInputDataset());
+//            for (ControlStrategyInputDataset inputDataset : inputDatasets) 
+//                if (!inputDataset.getInputDataset().getDatasetType().getName().equals(DatasetType.orlMergedInventory)) {
+//                    inputDataset.getInputDataset().getTemporalResolution()
+//                    hasMergedDataset = true;
+//                    mergedDataset = inputDataset.getInputDataset();
+//                }
+            
+            //check to see if exists already, if so, then truncate its data and start over...
             boolean hasMergedDataset = false;
             EmfDataset mergedDataset = null;
+            //see if it already has a merged dataset
             for (ControlStrategyInputDataset inputDataset : inputDatasets) 
                 if (inputDataset.getInputDataset().getDatasetType().getName().equals(DatasetType.orlMergedInventory)) {
                     hasMergedDataset = true;
@@ -146,9 +170,9 @@ public class StrategyTask extends AbstractStrategyTask {
                 controlStrategy.addControlStrategyInputDatasets(controlStrategyInputDataset);
                 saveControlStrategy(controlStrategy);
             } else {
-                truncateORLMergedDataset(mergedDataset);
+                if (controlStrategy.getDeleteResults() || results.length == 0) truncateORLMergedDataset(mergedDataset);
             }
-            populateORLMergedDataset(mergedDataset);
+            if (controlStrategy.getDeleteResults() || results.length == 0) populateORLMergedDataset(mergedDataset);
             
         }
     }

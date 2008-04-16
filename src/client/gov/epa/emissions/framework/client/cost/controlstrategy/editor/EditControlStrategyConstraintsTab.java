@@ -10,7 +10,9 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.EfficiencyRecordValidation;
+import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -38,6 +40,12 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
     
     private ControlStrategy controlStrategy;
     
+    private JPanel leastCostPanel;
+
+    private JPanel leastCostCurvePanel;
+    
+    private JPanel leastCostPanelContainer;
+
     public EditControlStrategyConstraintsTab(ControlStrategy controlStrategy, ManageChangeables changeablesList,
             SingleLineMessagePanel messagePanel, EmfConsole parentConsole, EmfSession session) {
         this.changeablesList = changeablesList;
@@ -46,66 +54,124 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
     
     private void setupLayout(ManageChangeables changeables) {
         this.setLayout(new BorderLayout());
-        this.add(createConstraintPanel(changeables), BorderLayout.CENTER);
-        notifyStrategyTypeChange(controlStrategy.getStrategyType());
+        this.add(getBorderedPanel(createAllStrategiesPanel(changeables), "All Strategies"), BorderLayout.NORTH);
+        leastCostPanelContainer = new JPanel(new BorderLayout());
+        leastCostPanel = getBorderedPanel(createLeastCostPanel(changeables), "Least Cost");
+        leastCostCurvePanel = getBorderedPanel(createLeastCostCurvePanel(changeables), "Least Cost Curve");
+        if (controlStrategy.getStrategyType().getName().equals(StrategyType.leastCost)) {
+            leastCostPanelContainer.add(leastCostPanel, BorderLayout.NORTH);
+        }else if (controlStrategy.getStrategyType().getName().equals(StrategyType.leastCostCurve)) {
+            leastCostPanelContainer.add(leastCostCurvePanel, BorderLayout.NORTH);
+        }
+        this.add(leastCostPanelContainer, BorderLayout.CENTER);
     }
 
-    private JPanel createConstraintPanel(ManageChangeables changeables) {
+    private JPanel getBorderedPanel(JPanel component, String border) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(new Border(border));
+        panel.add(component);
+
+        return panel;
+    }
+
+    private JPanel createAllStrategiesPanel(ManageChangeables changeables) {
         ControlStrategyConstraint constraint = presenter.getConstraint();
         JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10)); //100,80));
+   //     panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10)); //100,80));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Constraints for Target Pollutant:", new JLabel(), panel);
 
         emisReduction = new TextField("emission reduction", 10);
         emisReduction.setText(constraint != null ? (constraint.getMaxEmisReduction() != null ? constraint.getMaxEmisReduction() + "" : "") : "");
+        emisReduction.setToolTipText("Enter the sources target pollutant minimum emission reduction (in tons).  The control measure must be able to control greater than or equal to this tonnage.");
         changeables.addChangeable(emisReduction);
         layoutGenerator.addLabelWidgetPair("Minimum Emissions Reduction (tons)", emisReduction, panel);
 
         contrlEff = new TextField("control efficiency", 10);
         contrlEff.setText(constraint != null ? (constraint.getMaxControlEfficiency() != null ? constraint.getMaxControlEfficiency() + "" : "") : "");
+        contrlEff.setToolTipText("Enter the sources target pollutant minimum control efficiency (%).  The control measure must be have a control efficiency greater than or equal to this perecentage.");
         changeables.addChangeable(contrlEff);
         layoutGenerator.addLabelWidgetPair("Minimum Control Efficiency (%)", contrlEff, panel);
 
         costPerTon = new TextField("cost per ton", 10);
         costPerTon.setText(constraint != null ? (constraint.getMinCostPerTon() != null ? constraint.getMinCostPerTon() + "" : "") : "");
+        costPerTon.setToolTipText("Enter the sources target pollutant maximum cost per ton.  The control measure must be have a cost per ton less than or equal to this cost per ton.");
         changeables.addChangeable(costPerTon);
-        layoutGenerator.addLabelWidgetPair("Maximum 2006 Cost per Ton ($/ton)", costPerTon, panel);
+        layoutGenerator.addLabelWidgetPair("Maximum " + CostYearTable.REFERENCE_COST_YEAR + " Cost per Ton ($/ton)", costPerTon, panel);
 
         annCost = new TextField("annual cost", 10);
         annCost.setText(constraint != null ? (constraint.getMinAnnCost() != null ? constraint.getMinAnnCost() + "" : "") : "");
+        annCost.setToolTipText("Enter the sources target pollutant maximum annualized cost.  The controlled source must have a annualized cost less than or equal to this cost.");
         changeables.addChangeable(annCost);
-        layoutGenerator.addLabelWidgetPair("Maximum 2006 Annualized Cost ($/yr)", annCost, panel);
+        
+        layoutGenerator.addLabelWidgetPair("Maximum " + CostYearTable.REFERENCE_COST_YEAR + " Annualized Cost ($/yr)", annCost, panel);
+
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+                10, 10, // initialX, initialY
+                10, 10); // xPad, yPad
+
+        return panel;
+    }
+
+    private JPanel createLeastCostPanel(ManageChangeables changeables) {
+        ControlStrategyConstraint constraint = presenter.getConstraint();
+        JPanel panel = new JPanel(new SpringLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10)); //100,80));
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        layoutGenerator.addLabelWidgetPair("Constraints for Target Pollutant:", new JLabel(), panel);
+        layoutGenerator.addLabelWidgetPair("Specify either an emission reduction (tons) or percent reduction (%).", new JLabel(), panel);
 
         domainWideEmisReduction = new TextField("domain wide emission reduction", 10);
         domainWideEmisReduction.setText(constraint != null ? (constraint.getDomainWideEmisReduction() != null ? constraint.getDomainWideEmisReduction() + "" : "") : "");
+        domainWideEmisReduction.setToolTipText("Enter the target domain wide emission reduction (in tons for the target pollutant).");
         changeables.addChangeable(domainWideEmisReduction);
-        layoutGenerator.addLabelWidgetPair("Domain Wide Emission Reduction (ton)", domainWideEmisReduction, panel);
+        layoutGenerator.addLabelWidgetPair("Domain Wide Emission Reduction (tons)", domainWideEmisReduction, panel);
 
         domainWidePctReduction = new TextField("domain wide percent reduction", 10);
         domainWidePctReduction.setText(constraint != null ? (constraint.getDomainWidePctReduction() != null ? constraint.getDomainWidePctReduction() + "" : "") : "");
+        domainWidePctReduction.setToolTipText("Enter the target domain wide precent reduction (% for the target pollutant).");
         changeables.addChangeable(domainWidePctReduction);
         layoutGenerator.addLabelWidgetPair("Domain Wide Percent Reduction (%)", domainWidePctReduction, panel);
 
+        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+                10, 10, // initialX, initialY
+                10, 10); // xPad, yPad
+
+        return panel;
+    }
+
+    private JPanel createLeastCostCurvePanel(ManageChangeables changeables) {
+        ControlStrategyConstraint constraint = presenter.getConstraint();
+        JPanel panel = new JPanel(new SpringLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10)); //100,80));
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        layoutGenerator.addLabelWidgetPair("Constraints for Target Pollutant:", new JLabel(), panel);
+        layoutGenerator.addLabelWidgetPair("Specify an increment, start and end percent reduction (%).", new JLabel(), panel);
+
         domainWidePctReductionIncrement = new TextField("domain wide percent reduction increment", 10);
-        domainWidePctReductionIncrement.setText(constraint != null ? (constraint.getDomainWidePctReductionIncrement() != null ? constraint.getDomainWidePctReductionIncrement() + "" : "") : "");
+        domainWidePctReductionIncrement.setText(constraint != null ? (constraint.getDomainWidePctReductionIncrement() != null ? constraint.getDomainWidePctReductionIncrement() + "" : "25") : "25");
+        domainWidePctReductionIncrement.setToolTipText("Enter the domain wide percent reduction increment.");
         changeables.addChangeable(domainWidePctReductionIncrement);
         layoutGenerator.addLabelWidgetPair("Domain Wide Percent Reduction Increment (%)", domainWidePctReductionIncrement, panel);
 
         domainWidePctReductionStart = new TextField("domain wide percent reduction start", 10);
-        domainWidePctReductionStart.setText(constraint != null ? (constraint.getDomainWidePctReductionStart() != null ? constraint.getDomainWidePctReductionStart() + "" : "") : "");
+        domainWidePctReductionStart.setText(constraint != null ? (constraint.getDomainWidePctReductionStart() != null ? constraint.getDomainWidePctReductionStart() + "" : "0") : "0");
+        domainWidePctReductionStart.setToolTipText("Enter the domain wide percent reduction start precentage.");
         changeables.addChangeable(domainWidePctReductionStart);
         layoutGenerator.addLabelWidgetPair("Domain Wide Percent Reduction Start (%)", domainWidePctReductionStart, panel);
 
         domainWidePctReductionEnd = new TextField("domain wide percent reduction end", 10);
-        domainWidePctReductionEnd.setText(constraint != null ? (constraint.getDomainWidePctReductionEnd() != null ? constraint.getDomainWidePctReductionEnd() + "" : "") : "");
+        domainWidePctReductionEnd.setText(constraint != null ? (constraint.getDomainWidePctReductionEnd() != null ? constraint.getDomainWidePctReductionEnd() + "" : "100") : "100");
+        domainWidePctReductionEnd.setToolTipText("Enter the domain wide percent reduction end precentage.");
         changeables.addChangeable(domainWidePctReductionEnd);
         layoutGenerator.addLabelWidgetPair("Domain Wide Percent Reduction End (%)", domainWidePctReductionEnd, panel);
 
-        layoutGenerator.makeCompactGrid(panel, 10, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 10, 10, // initialX, initialY
-                10, 20); // xPad, yPad
+                10, 10); // xPad, yPad
 
         return panel;
     }
@@ -127,7 +193,18 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.leastCost)) {
             //make sure that either Emis OR Pct Reduction was specified for the Least Cost.  This is needed for the run.
             if (constraint.getDomainWideEmisReduction() == null && constraint.getDomainWidePctReduction() == null) 
-                throw new EmfException("Please specify either an emission reduction or percent reduction for the Least Cost strategy type.");
+                throw new EmfException("Constraints Tab: Please specify either an emission reduction or percent reduction for the Least Cost strategy type.");
+            if (constraint.getDomainWideEmisReduction() != null && constraint.getDomainWidePctReduction() != null) 
+                throw new EmfException("Constraints Tab: Specify only an emission reduction or a percent reduction for the Least Cost strategy type.");
+        }
+        if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.leastCostCurve)) {
+            //make sure that the Pct Reduction Increment was specified for the Least Cost Curve.  This is needed for the run.
+            if (constraint.getDomainWidePctReductionIncrement() == null || constraint.getDomainWidePctReductionIncrement() <= 0.0D) 
+                throw new EmfException("Constraints Tab: Please specify a percent reduction increment for the Least Cost Curve strategy type.");
+            if (constraint.getDomainWidePctReductionStart() == null) 
+                throw new EmfException("Constraints Tab: Please specify a percent reduction starting percentage for the Least Cost Curve strategy type.");
+            if (constraint.getDomainWidePctReductionEnd() == null) 
+                throw new EmfException("Constraints Tab: Please specify a percent reduction ending percentage for the Least Cost Curve strategy type.");
         }
         presenter.setConstraint(constraint);
     }
@@ -149,24 +226,11 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
     }
 
     public void notifyStrategyTypeChange(StrategyType strategyType) {
+        leastCostPanelContainer.removeAll();
         if (strategyType != null && strategyType.getName().equals(StrategyType.leastCost)) {
-            domainWideEmisReduction.setEnabled(true);
-            domainWidePctReduction.setEnabled(true);
-            domainWidePctReductionIncrement.setEnabled(false);
-            domainWidePctReductionStart.setEnabled(false);
-            domainWidePctReductionEnd.setEnabled(false);
+            leastCostPanelContainer.add(leastCostPanel, BorderLayout.NORTH);
         } else if (strategyType != null && strategyType.getName().equals(StrategyType.leastCostCurve)) {
-            domainWideEmisReduction.setEnabled(false);
-            domainWidePctReduction.setEnabled(false);
-            domainWidePctReductionIncrement.setEnabled(true);
-            domainWidePctReductionStart.setEnabled(true);
-            domainWidePctReductionEnd.setEnabled(true);
-        } else {
-            domainWideEmisReduction.setEnabled(false);
-            domainWidePctReduction.setEnabled(false);
-            domainWidePctReductionIncrement.setEnabled(false);
-            domainWidePctReductionStart.setEnabled(false);
-            domainWidePctReductionEnd.setEnabled(false);
+            leastCostPanelContainer.add(leastCostCurvePanel, BorderLayout.NORTH);
         }
     }
 }

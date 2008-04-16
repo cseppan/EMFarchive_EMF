@@ -315,7 +315,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                     if (presenter.hasResults()) {
                         String title = "Warning";
                         
-                        String message = "There are results available for this strategy. \n" + " Would you like to delete results and contorled inventories?";
+                        String message = "There are results available for this strategy. \n" + " Would you like to delete results and controlled inventories?";
                         int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_CANCEL_OPTION,
                                 JOptionPane.QUESTION_MESSAGE);
                         if (selection == JOptionPane.CANCEL_OPTION) {

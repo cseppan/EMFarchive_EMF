@@ -32,7 +32,7 @@ public class ControlStrategyResult implements Serializable {
     
     private StrategyResultType strategyResultType;
 
-    private Integer recordCount;
+    private Integer recordCount = 0;
 
     public ControlStrategyResult() {
         //

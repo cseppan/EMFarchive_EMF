@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.io.NullFormatter;
 import gov.epa.emissions.commons.io.RealFormatter;
 import gov.epa.emissions.commons.io.StringFormatter;
 import gov.epa.emissions.commons.io.TableFormat;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +25,7 @@ public class StrategyLeastCostCMWorksheetTableFormat implements TableFormat {
     }
 
     public String identify() {
-        return "Strategy Least Cost Control Measure Worksheet";
+        return "Strategy " + StrategyResultType.leastCostControlMeasureWorksheetResult;
     }
     
     public String key() {
@@ -36,12 +37,12 @@ public class StrategyLeastCostCMWorksheetTableFormat implements TableFormat {
     }
     
     private Column[] createCols() {
-        List cols = new ArrayList();
+        List<Column> cols = new ArrayList<Column>();
 
         cols.addAll(Arrays.asList(versionCols()));
         cols.addAll(Arrays.asList(baseCols()));
 
-        return (Column[]) cols.toArray(new Column[0]);
+        return cols.toArray(new Column[0]);
     }
     
     private Column[] versionCols() {
@@ -112,6 +113,7 @@ public class StrategyLeastCostCMWorksheetTableFormat implements TableFormat {
         Column status = new Column("status", types.smallInt());
         Column originalDatasetId = new Column("ORIGINAL_DATASET_ID", types.intType(), new IntegerFormatter());
         Column sector = new Column("SECTOR", types.stringType(64), 64, new StringFormatter(255));
+        Column source = new Column("SOURCE", types.intType(), new IntegerFormatter());
 
         Column comment = new Column("Comment", types.stringType(128), new StringFormatter(128));
 
@@ -121,7 +123,7 @@ public class StrategyLeastCostCMWorksheetTableFormat implements TableFormat {
                 inventoryControlEfficiency, inventoryRulePenetration, inventoryRuleEffectiveness, finalEmissions, 
                 emissionsReduction, inventoryEmissions, applyOrder, inputEmissions, outputEmissions, fipsState, fipsCounty, 
                 sic, naics, sourceId, inputDatasetId, controlStrategyId, controlMeasureId, equationType,
-                marginal, cumAnnualCost, cumEmisReduction, remove, status, originalDatasetId, sector, comment };
+                marginal, cumAnnualCost, cumEmisReduction, remove, status, originalDatasetId, sector, source, comment };
     }
 
 }

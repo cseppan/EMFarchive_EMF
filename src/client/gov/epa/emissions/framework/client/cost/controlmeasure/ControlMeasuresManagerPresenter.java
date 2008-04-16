@@ -172,6 +172,6 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
     }
 
     private CostYearTable populateCostYearTable() throws EmfException {
-        return session.controlMeasureService().getCostYearTable(2006);
+        return session.controlMeasureService().getCostYearTable(CostYearTable.REFERENCE_COST_YEAR);
     }
 }

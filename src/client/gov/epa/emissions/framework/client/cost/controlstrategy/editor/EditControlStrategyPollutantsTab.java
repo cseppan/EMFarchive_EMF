@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -186,7 +187,7 @@ public class EditControlStrategyPollutantsTab extends JPanel implements ControlS
     public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         // NOTE Auto-generated method stub
 
-    }
+    } 
 
     public void observe(EditControlStrategyPollutantsTabPresenter presenter) {
         this.presenter = presenter;
@@ -197,5 +198,10 @@ public class EditControlStrategyPollutantsTab extends JPanel implements ControlS
             tableData.add(pollutants);
         }
         setupLayout(changeablesList);
+    }
+
+    public void notifyStrategyTypeChange(StrategyType strategyType) {
+        // NOTE Auto-generated method stub
+        
     }
 }

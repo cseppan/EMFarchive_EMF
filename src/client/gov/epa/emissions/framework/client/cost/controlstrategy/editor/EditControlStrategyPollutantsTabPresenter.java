@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 
 public class EditControlStrategyPollutantsTabPresenter  implements EditControlStrategyTabPresenter {
@@ -40,5 +41,10 @@ public class EditControlStrategyPollutantsTabPresenter  implements EditControlSt
 
     public void doSave(ControlStrategy controlStrategy) throws EmfException {
         view.save(controlStrategy);
+    }
+
+    public void doChangeStrategyType(StrategyType strategyType) {
+        // NOTE Auto-generated method stub
+        
     }
 }

@@ -40,16 +40,16 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
 //        boolean isLeastCostControlMeasureWorksheetResult = result.getStrategyResultType().getName().equals(StrategyResultType.leastCostControlMeasureWorksheetResult);
         Object[] values = { 
                 result.getStrategyResultType().getName(),
-                inputDataset != null ? inputDataset.getName() : "", //isDetailedStrategyResult ? result.getInputDataset().getName() : isLeastCostControlMeasureWorksheetResult ? StrategyResultType.leastCostControlMeasureWorksheetResult : isStrategySummaryResult ? StrategyResultType.strategySummaryResult : "", 
                 result.getRecordCount() == null ? 0 : result.getRecordCount(), 
-                inputDataset != null && result.getInputDatasetVersion() != null ? result.getInputDatasetVersion() : new Integer(0), 
                 outputDataset != null ? outputDataset.getName() : "", 
-                controlledInvDataset == null ? "" : controlledInvDataset.getName(), 
                 result.getRunStatus(), 
                 result.getTotalCost() != null ? result.getTotalCost() : Double.NaN, 
                 result.getTotalReduction() != null ? result.getTotalReduction() : Double.NaN, 
                 format(result.getStartTime()),
-                format(result.getCompletionTime())
+                format(result.getCompletionTime()),
+                inputDataset != null ? inputDataset.getName() : "", //isDetailedStrategyResult ? result.getInputDataset().getName() : isLeastCostControlMeasureWorksheetResult ? StrategyResultType.leastCostControlMeasureWorksheetResult : isStrategySummaryResult ? StrategyResultType.strategySummaryResult : "", 
+                inputDataset != null && result.getInputDatasetVersion() != null ? result.getInputDatasetVersion() : new Integer(0), 
+                controlledInvDataset == null ? "" : controlledInvDataset.getName() 
                 };
         return values;
     }
@@ -57,21 +57,24 @@ public class ControlStrategyOutputTableData extends AbstractTableData {
     public String[] columns() {
         return new String[] { 
                 "Result Type", 
-                "Input Inventory", 
                 "Record Count", 
-                "Input Version", 
                 "Result", 
-                "Controlled Inventory", 
-                "Status", "Total Cost", 
-                "Total Reduction", "Start Time", 
-                "Completion Time" };
+                "Status", 
+                "Total Cost", 
+                "Total Reduction", 
+                "Start Time", 
+                "Completion Time",
+                "Input Inventory", 
+                "Input Version", 
+                "Controlled Inventory" 
+                };
     }
 
     public Class getColumnClass(int col) {
-        if (col == 3 || col == 2)
+        if (col == 9 || col == 1)
             return Integer.class;
 
-        if (col == 7 || col == 8)
+        if (col == 4 || col == 5)
             return Double.class;
 
         return String.class;

@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 
 public interface EditControlStrategySummaryTabView  extends EditControlStrategyTabView{
     
@@ -8,4 +9,5 @@ public interface EditControlStrategySummaryTabView  extends EditControlStrategyT
 
     void stopRun();
 
+    void notifyStrategyTypeChange(StrategyType strategyType);
 }

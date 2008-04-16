@@ -30,7 +30,9 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     private List presenters;
 
     private EditControlStrategySummaryTabView summaryTabView;
-
+    
+    private EditControlStrategyTabPresenter inventoryTabPresenter;
+    
     private EditControlStrategySummaryTabPresenter summaryTabPresenter;
 
     private EditControlStrategyMeasuresTabPresenter measuresTabPresenter;
@@ -140,8 +142,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
 
     public void set(EditControlStrategyTabView view) {
-        EditControlStrategyTabPresenter presenter = new EditControlStrategyTabPresenterImpl(controlStrategy, view);
-        presenters.add(presenter);
+        this.inventoryTabPresenter = new EditControlStrategyTabPresenterImpl(controlStrategy, view);
+        presenters.add(this.inventoryTabPresenter);
     }
 
     public void setResults(ControlStrategy controlStrategy) {
@@ -199,7 +201,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
     
     public CostYearTable getCostYearTable() throws EmfException {
-        return session.controlMeasureService().getCostYearTable(2006);
+        return session.controlMeasureService().getCostYearTable(CostYearTable.REFERENCE_COST_YEAR);
     }
 
     public void fireTracking() {
@@ -237,6 +239,9 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     public void doChangeStrategyType(StrategyType strategyType) {
         if (constraintsTabPresenter != null)
             constraintsTabPresenter.doChangeStrategyType(strategyType);
+        if (inventoryTabPresenter != null)
+            inventoryTabPresenter.doChangeStrategyType(strategyType);
+        
     }
 
 }

@@ -28,8 +28,6 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     protected int targetYear;
 
-    protected final static int refYear = 2006;
-
     protected final static Double NAN_VALUE = new Double(Double.NaN);
     
     protected Pollutant pollutant; 
@@ -250,7 +248,7 @@ public class ControlMeasureTableData extends AbstractTableData {
             return NAN_VALUE;
         costYearTable.setTargetYear(targetYear);
         
-        double newCost = costPerTon * costYearTable.factor(refYear);
+        double newCost = costPerTon * costYearTable.factor(CostYearTable.REFERENCE_COST_YEAR);
         return new Double(newCost);
     }
 

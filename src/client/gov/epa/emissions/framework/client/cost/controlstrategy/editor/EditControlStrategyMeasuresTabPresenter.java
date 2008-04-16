@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.cost.ControlStrategyMeasure;
 import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 
 public class EditControlStrategyMeasuresTabPresenter  implements EditControlStrategyTabPresenter {
@@ -55,5 +56,10 @@ public class EditControlStrategyMeasuresTabPresenter  implements EditControlStra
 
     public void doSave(ControlStrategy controlStrategy) throws EmfException {
         view.save(controlStrategy);
+    }
+
+    public void doChangeStrategyType(StrategyType strategyType) {
+        // NOTE Auto-generated method stub
+        
     }
 }

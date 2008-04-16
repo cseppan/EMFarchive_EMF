@@ -502,6 +502,7 @@ insert into emf.strategy_types values(DEFAULT,'Least Cost','Least Cost', '', 'go
 insert into emf.strategy_types values(DEFAULT,'Least Cost Curve','Least Cost Curve', '', 'gov.epa.emissions.framework.services.cost.analysis.leastcostcurve.StrategyTask');
 insert into emf.strategy_result_types (name) select 'Least Cost Control Measure Worksheet';
 insert into emf.strategy_result_types (name) select 'Controlled Inventory';
+insert into emf.strategy_result_types (name) select 'Least Cost Curve Summary';
 
 ALTER TABLE emf.strategy_results
    ALTER COLUMN dataset_id DROP NOT NULL;
@@ -528,4 +529,5 @@ ALTER TABLE emf.control_strategy_constraints ADD COLUMN domain_wide_pct_reductio
 ALTER TABLE emf.control_strategy_constraints ADD COLUMN domain_wide_pct_reduction_start double precision;
 ALTER TABLE emf.control_strategy_constraints ADD COLUMN domain_wide_pct_reduction_end double precision;
 
+ALTER TABLE emf.control_strategies ADD COLUMN merge_inventories boolean DEFAULT false;
    
