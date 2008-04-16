@@ -40,7 +40,7 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
     
     public EditCaseJobWindow(String title, DesktopManager desktopManager, EmfConsole parent, EmfSession session) {
         super("Edit Case Job", new Dimension(600, 640), desktopManager);
-        super.setTitle(super.getTitle() + ": " + title);
+        super.setLabel(super.getTitle() + ": " + title);
         this.parent = parent;
         this.session = session;
     }

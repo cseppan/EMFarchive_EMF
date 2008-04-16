@@ -8,6 +8,10 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javax.swing.JComponent;
 
 public class EditParametersTabPresenterImpl implements EditParametersTabPresenter {
@@ -68,6 +72,12 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
     }
 
     public CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
+        if (sector == null)
+            return new CaseParameter[0];
+        
+        if (sector.compareTo(new Sector("All", "All")) == 0)
+            sector = null; // to trigger select all on the server side
+        
         return service().getCaseParameters(caseId, sector, showAll);
     }
 
@@ -76,7 +86,11 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
     }
     
     public Sector[] getAllSetcors() throws EmfException {
-        return session.dataCommonsService().getSectors();
+        List<Sector> all = new ArrayList<Sector>();
+        all.add(new Sector("All", "All"));
+        all.addAll(Arrays.asList(session.dataCommonsService().getSectors()));
+        
+        return all.toArray(new Sector[0]);
     }
     
     public Case getCaseObj() {

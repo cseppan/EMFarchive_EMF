@@ -188,6 +188,16 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
                 "Select the base Input Folder for the Case"), panel);
 
         sectorsComboBox = new ComboBox("Select a Sector", presenter.getAllSetcors());
+        sectorsComboBox.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    doRefresh(presenter.getCaseInput(caseId, getSelectedSector(), showAll.isSelected()));
+                } catch (Exception exc) {
+                    setErrorMessage(exc.getMessage());
+                }
+            }
+        });
+        
         layoutGenerator.addLabelWidgetPair("Sector:", sectorsComboBox, panel);
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY

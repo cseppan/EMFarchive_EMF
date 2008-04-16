@@ -11,6 +11,8 @@ import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -91,6 +93,12 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     }
 
     public CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException {
+        if (sector == null)
+            return new CaseInput[0];
+        
+        if (sector.compareTo(new Sector("All", "All")) == 0)
+            sector = null; // to trigger select all on the server side
+        
         return service().getCaseInputs(caseId, sector, showAll);
     }
 
@@ -130,7 +138,11 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     }
     
     public Sector[] getAllSetcors() throws EmfException {
-        return session.dataCommonsService().getSectors();
+        List<Sector> all = new ArrayList<Sector>();
+        all.add(new Sector("All", "All"));
+        all.addAll(Arrays.asList(session.dataCommonsService().getSectors()));
+        
+        return all.toArray(new Sector[0]);
     }
     
 }

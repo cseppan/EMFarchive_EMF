@@ -33,7 +33,7 @@ public class EditCaseOutputWindow extends DisposableInteralFrame implements Edit
 
     public EditCaseOutputWindow(String title, DesktopManager desktopManager) {
         super("Edit Case Output", new Dimension(610, 420), desktopManager);
-        super.setTitle(super.getTitle() + ": " + title);
+        super.setLabel(super.getTitle() + ": " + title);
     }
     
 
