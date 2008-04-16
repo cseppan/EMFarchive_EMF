@@ -8,7 +8,11 @@ import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditor;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -25,33 +29,42 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SpringLayout;
 
-public class SensitivityWindow extends DisposableInteralFrame implements SensitivityView{
+public class SensitivityWindow extends DisposableInteralFrame implements SensitivityView {
     private SensitivityPresenter presenter;
 
     private JPanel layout;
 
     private SingleLineMessagePanel messagePanel;
-    
-    private JRadioButton newSenCase; 
-    
-    private JRadioButton existSenCase; 
+
+    private JRadioButton newSenCase;
+
+    private JRadioButton existSenCase;
 
     private TextField senName;
 
     private TextField senAbrev;
-    
 
-    public SensitivityWindow(DesktopManager desktopManager) {
+    private EmfConsole parentConsole;
+    
+    private SensitivityWindow sensitivityWindow;
+
+    private Case parentCase;
+
+    public SensitivityWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
         super("Sensitivity", new Dimension(480, 280), desktopManager);
+
+        this.parentConsole = parentConsole;
+        this.sensitivityWindow = this;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
     }
 
-    private void doLayout(JPanel layout, Case case1) {
+    private void doLayout(JPanel layout, Case parentCase) {
+        this.parentCase = parentCase;
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
-        layout.add(createInputPanel(case1));
+        layout.add(createInputPanel(parentCase));
         layout.add(createButtonsPanel());
     }
 
@@ -73,21 +86,20 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
         Label caseName = new Label("Case Name", case1.getName());
         layoutGenerator.addLabelWidgetPair("Sensitivity for Case:", caseName, panel);
-        
+
         layoutGenerator.addLabelWidgetPair("Sensitivity for Case:", newOrExistRadios(), panel);
-        
-        String[] types = {"Adjust AQM-ready Emissions"};
+
+        String[] types = { "Adjust AQM-ready Emissions" };
         ComboBox senType = new ComboBox("Select One", types);
         layoutGenerator.addLabelWidgetPair("Sensitivity Type:", senType, panel);
 
-        
         senName = new TextField("Sensitivity Name", 25);
         addChangeable(senName);
         layoutGenerator.addLabelWidgetPair("Sensitivity Name:", senName, panel);
 
         senAbrev = new TextField("Abbreviation", 25);
         addChangeable(senAbrev);
-        layoutGenerator.addLabelWidgetPair("Sensitivity Abbreviation:",senAbrev, panel);
+        layoutGenerator.addLabelWidgetPair("Sensitivity Abbreviation:", senAbrev, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
@@ -97,36 +109,43 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         return panel;
     }
 
-    private JPanel newOrExistRadios(){
+    private JPanel newOrExistRadios() {
         newSenCase = new JRadioButton("New");
-        //newSenCase.addActionListener(radioButtonAction());
+        // newSenCase.addActionListener(radioButtonAction());
         newSenCase.setSelected(true);
         existSenCase = new JRadioButton("Add to existing");
-        //existSenCase.addActionListener(radioButtonAction());
+        // existSenCase.addActionListener(radioButtonAction());
         existSenCase.setEnabled(false);
-        //Create logical relationship between JradioButtons 
+        // Create logical relationship between JradioButtons
         ButtonGroup buttonGroup = new ButtonGroup();
-        buttonGroup.add(newSenCase);     
+        buttonGroup.add(newSenCase);
         buttonGroup.add(existSenCase);
-        
+
         JPanel radioPanel = new JPanel();
         radioPanel.add(newSenCase);
         radioPanel.add(existSenCase);
         return radioPanel;
     }
-    
+
     private Action saveAction() {
         Action action = new AbstractAction() {
+
             public void actionPerformed(ActionEvent event) {
                 resetChanges();
-//
-//                Case newCase = new Case(senName.getText());
-//                newCase.setDescription(description.getText());
-//                try {
-//                    presenter.doSave(newCase);
-//                } catch (EmfException e) {
-//                    messagePanel.setError(e.getMessage());
-//                }
+
+                try {
+                    Case sensitivityCase = presenter.copyCase(parentCase.getId());
+                    sensitivityCase.setName(senName.getText());
+                    sensitivityCase.setAbbreviation(new Abbreviation(senAbrev.getText()));
+                    Case updated = presenter.updateCase(sensitivityCase);
+
+                    CaseEditor view = new CaseEditor(parentConsole, presenter.getSession(), desktopManager);
+                    presenter.editCase(view, updated);
+                    sensitivityWindow.disposeView();
+                } catch (EmfException e) {
+                    e.printStackTrace();
+                    messagePanel.setError(e.getMessage());
+                }
             }
         };
 

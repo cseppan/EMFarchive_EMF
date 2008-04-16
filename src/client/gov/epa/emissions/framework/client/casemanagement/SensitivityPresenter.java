@@ -1,6 +1,9 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenterImpl;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
@@ -60,4 +63,21 @@ public class SensitivityPresenter {
         return session.caseService();
     }
 
+    public Case copyCase(int caseId) throws EmfException {
+        return service().copyCaseObject(new int[] {caseId}, session.user())[0];
+    }
+    
+    public Case updateCase(Case caseObj) throws EmfException {
+        Case locked = service().obtainLocked(session.user(), caseObj);
+        return service().updateCase(locked);
+    }
+    
+    public void editCase(CaseEditorView caseView, Case caseObj) throws EmfException {
+        CaseEditorPresenter presenter = new CaseEditorPresenterImpl(caseObj, session, caseView, managerPresenter);
+        presenter.doDisplay();
+    }
+
+    public EmfSession getSession() {
+        return this.session;
+    }
 }
