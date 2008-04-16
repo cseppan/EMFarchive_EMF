@@ -158,5 +158,9 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
     public EmfSession getEmfSession() {
         return session;
     }
+    
+    public void setSaveChanged(boolean changeSaved) {
+        this.changesSaved = changeSaved;
+    }
 
 }

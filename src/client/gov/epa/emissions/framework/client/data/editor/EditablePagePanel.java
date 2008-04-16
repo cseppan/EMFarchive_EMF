@@ -178,7 +178,7 @@ public class EditablePagePanel extends JPanel {
 
                 FindReplaceWindowView dialog = new DataFindReplaceWindow(tableData.getDatasetName(), tableData
                         .getTableMetadata().getTable(), tableData.getVersion(), rowFilter, sortOrder,
-                        getDesktopManager(), removeFirstCol(tableData.columns()));
+                        getDesktopManager(), removeFirstCol(tableData.columns()), listOfChangeables);
                 FindReplaceViewPresenter findReplacePresenter = new FindReplaceViewPresenter(tablePresenter, dialog,
                         emfSession);
                 findReplacePresenter.displayView();

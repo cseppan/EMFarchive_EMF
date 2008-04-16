@@ -19,5 +19,7 @@ public interface DataEditorPresenter {
     void doAddNote(NewNoteView view) throws EmfException;
     
     EmfSession getEmfSession();
+    
+    void setSaveChanged(boolean changeSaved);
 
 }

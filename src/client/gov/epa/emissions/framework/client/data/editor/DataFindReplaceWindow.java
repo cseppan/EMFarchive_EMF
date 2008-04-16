@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.data.editor;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -49,29 +50,28 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
 
     private String table;
 
-    private String dsName;
-
     private JTextArea sortOrder;
+    
+    private ManageChangeables listOfChangeables;
 
     public DataFindReplaceWindow(String dsName, String table, Version version, JTextArea filter, JTextArea sortOrder,
-            DesktopManager desktopManager, String[] cols) {
+            DesktopManager desktopManager, String[] cols, ManageChangeables listOfChangeables) {
         super("Find and Replace Column Values", new Dimension(500, 260), desktopManager);
-
+        super.setLabel("Find and Replace Column Values: " + dsName + " (version: " + version.getVersion() + ")");
+        
         this.cols = cols;
         this.table = table;
         this.version = version;
+        this.listOfChangeables = listOfChangeables;
         this.filterLabel = new JLabel(filter.getText() == null || filter.getText().trim().isEmpty() ? "NO FILTER"
                 : filter.getText().trim());
         this.sortOrder = sortOrder;
-        this.dsName = dsName;
 
         layout = new JPanel();
         this.getContentPane().add(layout);
     }
 
     public void display() {
-        setTitle("Find and Replace Column Values: " + dsName);
-        setName("Find and Replace Column Values " + dsName + Math.random());
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
@@ -113,7 +113,7 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
     private Component createButtonPanel() {
         JPanel panel = new JPanel();
 
-        okButton = new Button("OK", okAction());
+        okButton = new Button("Apply", okAction());
         panel.add(okButton);
 
         Button closeButton = new Button("Close", closeWindowAction());
@@ -141,7 +141,7 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
 
                     presenter.replaceColValues(table, col, findString, replaceString, version, rowFilter);
                     presenter.applyConstraint(rowFilter, sortOrder.getText());
-                    okButton.setEnabled(false);
+                    resetDataeditorRevisionField();
                     setMsg("Successfully replaced column values.");
                 } catch (EmfException e) {
                     setErrorMsg(e.getMessage());
@@ -156,6 +156,13 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
 
         if (columnNames.getSelectedItem() == null)
             throw new EmfException("Please select a valid column");
+    }
+    
+    private void resetDataeditorRevisionField() {
+        boolean nofilter = filterLabel.getText().equals("NO FILTER");
+        ((DataEditor)listOfChangeables).setHasReplacedValues(true);
+        ((DataEditor)listOfChangeables).append2WhatField("Replaced '" + find.getText() + "' with '" + replaceWith.getText() + "' for column " +
+                columnNames.getSelectedItem().toString() + (nofilter ? "" : " using filter '" + filterLabel.getText() + "'"));
     }
 
     private Action closeWindowAction() {

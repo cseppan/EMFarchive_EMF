@@ -30,4 +30,6 @@ public interface DataEditorView extends ManagedView {
     
     void disableSaveDiscard();
 
+    boolean hasReplacedValues();
+
 }

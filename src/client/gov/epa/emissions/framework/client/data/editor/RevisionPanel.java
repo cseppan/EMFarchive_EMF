@@ -132,4 +132,11 @@ public class RevisionPanel extends JPanel {
         what.setEnabled(false);
         why.setEnabled(false);
     }
+    
+    public void appendWhatField(String text) {
+        String ls = System.getProperty("line.separator");
+        String existing = what.getText();
+        enableWhatNWhy();
+        what.setText((existing == null ? text : existing + text) + ls);
+    }
 }

@@ -29,7 +29,7 @@ public class ClosingRule {
     }
 
     public boolean hasChanges() throws EmfException {
-        return tablePresenter.hasChanges() || dataEditorService().hasChanges(token);
+        return tablePresenter.hasChanges() || dataEditorService().hasChanges(token) || view.hasReplacedValues();
     }
 
     private DataEditorService dataEditorService() {

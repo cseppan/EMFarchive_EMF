@@ -56,6 +56,8 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private ChangeAwareButton save, discard;
 
+    private boolean hasReplacedValues;
+
     public DataEditor(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
         super("Data Editor: " + dataset.getName(), desktopManager);
         setDimension();
@@ -323,6 +325,19 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     public void disableSaveDiscard() {
         save.signalSaved();
         discard.signalSaved();
+    }
+
+    public void append2WhatField(String text) {
+        revisionPanel.appendWhatField(text);
+    }
+
+    public boolean hasReplacedValues() {
+        return hasReplacedValues;
+    }
+    
+    public void setHasReplacedValues(boolean hasReplacedValues) {
+        this.hasReplacedValues = hasReplacedValues;
+        presenter.setSaveChanged(true);
     }
 
 }
