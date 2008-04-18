@@ -392,7 +392,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
         Object[] selected = presenter.getAllCaseNameIDs();
         String selectedCase = (String) JOptionPane.showInputDialog(parentConsole, "Copy " + inputs.size()
-                + " case inputs to case: ", "Copy Case Inputs", JOptionPane.PLAIN_MESSAGE, getCopyIcon(), selected,
+                + " case input(s) to case: ", "Copy Case Inputs", JOptionPane.PLAIN_MESSAGE, getCopyIcon(), selected,
                 selected[getDefultIndex(selected)]);
 
         if ((selectedCase != null) && (selectedCase.length() > 0)) {

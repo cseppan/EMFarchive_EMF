@@ -374,7 +374,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
 
         Object[] selected = presenter.getAllCaseNameIDs();
-        String selectedCase = (String)JOptionPane.showInputDialog(parentConsole, "Copy " + jobs.size() + " jobs to case: ",
+        String selectedCase = (String)JOptionPane.showInputDialog(parentConsole, "Copy " + jobs.size() + " job(s) to case: ",
                 "Copy Case Jobs", JOptionPane.PLAIN_MESSAGE, getCopyIcon(), selected, selected[getDefultIndex(selected)]);
 
         if ((selectedCase != null) && (selectedCase.length() > 0)) {
