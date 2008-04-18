@@ -38,13 +38,16 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
 
     public void addNewParameterDialog(NewCaseParameterView dialog, CaseParameter newParam) {
         dialog.register(this);
-        dialog.display(caseObj.getId(), newParam);
+        dialog.display(newParam.getCaseID(), newParam);
     }
 
     public void addNewParameter(CaseParameter param) throws EmfException {
-        param.setCaseID(caseObj.getId());
-        view.addParameter(service().addCaseParameter(session.user(), param));
-        refreshView();
+        CaseParameter loaded = service().addCaseParameter(session.user(), param);
+
+        if (param.getCaseID() == caseObj.getId()) {
+            view.addParameter(loaded);
+            refreshView();
+        }
     }
 
     private CaseService service() {
@@ -57,52 +60,60 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
     }
 
     public void editParameter(CaseParameter param, EditCaseParameterView parameterEditor) throws EmfException {
-        EditCaseParameterPresenter editInputPresenter = new EditCaseParameterPresenterImpl(caseObj.getId(), parameterEditor, view, session);
+        EditCaseParameterPresenter editInputPresenter = new EditCaseParameterPresenterImpl(caseObj.getId(),
+                parameterEditor, view, session);
         editInputPresenter.display(param);
     }
-    
-    public void copyParameter(NewCaseParameterDialog dialog, CaseParameter param) throws Exception {
+
+    public void copyParameter(int caseID, NewCaseParameterDialog dialog, CaseParameter param) throws Exception {
         CaseParameter newParam = (CaseParameter) DeepCopy.copy(param);
+        newParam.setCaseID(caseID);
         addNewParameterDialog(dialog, newParam);
     }
 
-    public void addParameterFields(CaseParameter newParameter, JComponent container, ParameterFieldsPanelView parameterFields) throws EmfException {
-        ParameterFieldsPanelPresenter parameterFieldsPresenter = new ParameterFieldsPanelPresenter(caseObj.getId(), parameterFields, session);
+    public void addParameterFields(CaseParameter newParameter, JComponent container,
+            ParameterFieldsPanelView parameterFields) throws EmfException {
+        ParameterFieldsPanelPresenter parameterFieldsPresenter = new ParameterFieldsPanelPresenter(caseObj.getId(),
+                parameterFields, session);
         parameterFieldsPresenter.display(newParameter, container);
     }
 
     public CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
         if (sector == null)
             return new CaseParameter[0];
-        
+
         if (sector.compareTo(new Sector("All", "All")) == 0)
             sector = null; // to trigger select all on the server side
-        
+
         return service().getCaseParameters(caseId, sector, showAll);
     }
 
     public void removeParameters(CaseParameter[] params) throws EmfException {
         service().removeCaseParameters(params);
     }
-    
+
     public Sector[] getAllSetcors() throws EmfException {
         List<Sector> all = new ArrayList<Sector>();
         all.add(new Sector("All", "All"));
         all.addAll(Arrays.asList(session.dataCommonsService().getSectors()));
-        
+
         return all.toArray(new Sector[0]);
     }
-    
+
     public Case getCaseObj() {
         return this.caseObj;
     }
-    
+
     public void checkIfLockedByCurrentUser() throws EmfException {
         Case reloaded = service().reloadCase(caseObj.getId());
 
         if (!reloaded.isLocked(session.user()))
             throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner()
                     + " has it now.");
+    }
+    
+    public Object[] getAllCaseNameIDs() throws EmfException {
+        return service().getAllCaseNameIDs();
     }
 
 }

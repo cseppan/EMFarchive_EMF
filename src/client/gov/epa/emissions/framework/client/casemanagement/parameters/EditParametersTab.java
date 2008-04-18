@@ -24,11 +24,14 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -49,7 +52,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     private SelectableSortFilterWrapper table;
 
     private JPanel tablePanel;
-    
+
     private ComboBox sectorsComboBox;
 
     private JCheckBox showAll;
@@ -73,7 +76,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
         this.caseObj = caseObj;
         this.caseId = caseObj.getId();
-        this.presenter = (EditParametersTabPresenterImpl)presenter;
+        this.presenter = (EditParametersTabPresenterImpl) presenter;
         this.session = session;
 
         try {
@@ -105,7 +108,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             messagePanel.setError("Cannot retrieve all case parameters.");
         } finally {
             setCursor(Cursor.getDefaultCursor());
-            
+
             try {
                 presenter.checkIfLockedByCurrentUser();
             } catch (Exception e) {
@@ -115,7 +118,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     }
 
     private void doRefresh(CaseParameter[] params) throws Exception {
-        //super.removeAll();
+        // super.removeAll();
         setupTableModel(params);
         table.refresh(tableData);
         panelRefresh();
@@ -135,14 +138,14 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     private JPanel tablePanel(CaseParameter[] params, EmfConsole parentConsole) {
         setupTableModel(params);
         tablePanel = new JPanel(new BorderLayout());
-        
+
         table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
         tablePanel.add(table, BorderLayout.CENTER);
-        
+
         return tablePanel;
     }
-    
-    private void setupTableModel(CaseParameter[] params){
+
+    private void setupTableModel(CaseParameter[] params) {
         tableData = new ParametersTableData(params, session);
     }
 
@@ -165,7 +168,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
                 }
             }
         });
-        
+
         layoutGenerator.addLabelWidgetPair("Sector:", sectorsComboBox, panel);
         layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
                 5, 5, // initialX, initialY
@@ -173,7 +176,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
         return panel;
     }
-    
+
     private JPanel controlPanel(final EditParametersTabPresenter presenter) {
         Insets insets = new Insets(1, 2, 1, 2);
 
@@ -256,6 +259,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         NewCaseParameterDialog view = new NewCaseParameterDialog(parentConsole);
         try {
             CaseParameter newParameter = new CaseParameter();
+            newParameter.setCaseID(caseId);
             newParameter.setShow(true);
             newParameter.setRequired(true);
             presenter.addNewParameterDialog(view, newParameter);
@@ -265,7 +269,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     }
 
     protected void removeParameter(EditParametersTabPresenter presenter) throws EmfException {
-        CaseParameter[] params = (CaseParameter[]) getSelectedParameters().toArray(new CaseParameter[0]);
+        CaseParameter[] params = getSelectedParameters().toArray(new CaseParameter[0]);
 
         if (params.length == 0) {
             messagePanel.setMessage("Please select parameter(s) to remove.");
@@ -301,19 +305,26 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     }
 
     private void copyParameters(EditParametersTabPresenter presenter) throws Exception {
-        List params = getSelectedParameters();
+        List<CaseParameter> params = getSelectedParameters();
 
         if (params.size() == 0) {
             messagePanel.setMessage("Please select parameter(s) to copy.");
             return;
         }
 
-        for (Iterator iter = params.iterator(); iter.hasNext();) {
-            CaseParameter param = (CaseParameter) iter.next();
-            NewCaseParameterDialog view = new NewCaseParameterDialog(parentConsole);
-            view.setModal(false);
-            view.setLocationByPlatform(true);
-            presenter.copyParameter(view, param);
+        Object[] selected = presenter.getAllCaseNameIDs();
+        String selectedCase = (String) JOptionPane.showInputDialog(parentConsole, "Copy " + params.size()
+                + " case parameter(s) to case: ", "Copy Case Parameters", JOptionPane.PLAIN_MESSAGE, getCopyIcon(),
+                selected, selected[getDefultIndex(selected)]);
+
+        if ((selectedCase != null) && (selectedCase.length() > 0)) {
+            for (Iterator<CaseParameter> iter = params.iterator(); iter.hasNext();) {
+                CaseParameter param = iter.next();
+                NewCaseParameterDialog view = new NewCaseParameterDialog(parentConsole);
+                view.setModal(false);
+                view.setLocationByPlatform(true);
+                presenter.copyParameter(getCaseId(selectedCase), view, param);
+            }
         }
     }
 
@@ -322,19 +333,47 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         table.refresh(tableData);
         panelRefresh();
     }
-    
+
     private void panelRefresh() {
         tablePanel.removeAll();
         tablePanel.add(table);
         super.validate();
     }
 
-    private List getSelectedParameters() {
-        return table.selected();
+    private List<CaseParameter> getSelectedParameters() {
+        return (List<CaseParameter>) table.selected();
     }
 
     public CaseParameter[] caseParameters() {
         return tableData.sources();
+    }
+
+    private int getDefultIndex(Object[] selected) {
+        int currentCaseId = this.caseObj.getId();
+        int length = selected.length;
+
+        for (int i = 0; i < length; i++)
+            if (selected[i].toString().contains("(" + currentCaseId + ")"))
+                return i;
+
+        return 0;
+    }
+
+    private int getCaseId(String selectedCase) {
+        int index1 = selectedCase.indexOf("(") + 1;
+        int index2 = selectedCase.indexOf(")");
+
+        return Integer.parseInt(selectedCase.substring(index1, index2));
+    }
+
+    private Icon getCopyIcon() {
+        URL imgURL = getClass().getResource("/toolbarButtonGraphics/general/Copy24.gif");
+
+        if (imgURL != null) {
+            return new ImageIcon(imgURL);
+        }
+
+        return null;
     }
 
     public void refresh() {
@@ -360,7 +399,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     }
 
     private Sector getSelectedSector() {
-        return (Sector)sectorsComboBox.getSelectedItem();
+        return (Sector) sectorsComboBox.getSelectedItem();
     }
 
     public void doRefresh() throws EmfException {

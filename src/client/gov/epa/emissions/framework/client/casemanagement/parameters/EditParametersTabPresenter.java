@@ -21,6 +21,7 @@ public interface EditParametersTabPresenter extends CaseEditorTabPresenter {
 
     void removeParameters(CaseParameter[] params) throws EmfException;
 
-    void copyParameter(NewCaseParameterDialog view, CaseParameter param) throws Exception;
+    void copyParameter(int caseId, NewCaseParameterDialog view, CaseParameter param) throws Exception;
 
+    public Object[] getAllCaseNameIDs() throws EmfException;
 }
