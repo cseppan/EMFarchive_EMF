@@ -6,6 +6,7 @@
 #DESC Original file format in EMSHAP format. Reformatted using UNIX cut and
 #DESC    paste commands.
 #DESC    North Carolina only
+#EMF_TEMPORAL_RESOLUTION=Monthly
 37001,2260001010,100414,0.56,,,,
 37001,2260001010,100425,0.03,,,,
 37001,2260001010,106990,0.02,,,,
