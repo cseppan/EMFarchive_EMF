@@ -8,6 +8,7 @@
  	<id name="id" type="integer" column="id">
 	  <generator class="identity"/>
  	</id>
+ 	<property name="parentId" column="parent_id" type="integer" not-null="false"/>
 	<property name="name"	column="name"	type="java.lang.String"	not-null="true"/>
 	<property name="description"	column="description"	type="java.lang.String"/>
 	<property name="runStatus" column="run_status" type="java.lang.String" not-null="false"/>

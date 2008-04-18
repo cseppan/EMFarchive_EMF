@@ -1308,7 +1308,7 @@ public class ManagedCaseService {
 
         try {
             int caseId = jobs[0].getCaseId();
-            CaseInput[] inputs = (CaseInput[]) dao.getCaseInputs(caseId, session).toArray(new CaseInput[0]);
+            CaseInput[] inputs = dao.getCaseInputs(caseId, session).toArray(new CaseInput[0]);
             CaseParameter[] params = dao.getCaseParameters(caseId, session).toArray(new CaseParameter[0]);
 
             for (int i = 0; i < jobslen; i++) {

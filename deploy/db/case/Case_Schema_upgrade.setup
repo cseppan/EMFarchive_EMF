@@ -175,3 +175,6 @@ WITHOUT OIDS;
 
 -- 3/10/2008 drop job_key column from cases.case_jobs table
 ALTER TABLE cases.cases_casejobs DROP COLUMN job_key;
+
+-- 4/18/2008 add parent id column to cases.cases table
+ALTER TABLE cases.cases ADD COLUMN parent_id int4 DEFAULT 0;
