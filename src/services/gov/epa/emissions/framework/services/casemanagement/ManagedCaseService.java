@@ -3154,4 +3154,17 @@ public class ManagedCaseService {
         return sb.toString();
     }
 
+    public synchronized String[] getAllCaseNameIDs() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getAllCaseNameIDs(session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not retrieve all case names and ids.", e);
+            throw new EmfException("Could not retrieve all case names and ids. " + e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+
 }

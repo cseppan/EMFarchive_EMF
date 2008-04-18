@@ -613,4 +613,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getJobStatusMessage(caseId);
     }
 
+    public String[] getAllCaseNameIDs() throws EmfException {
+        return getCaseService().getAllCaseNameIDs();
+    }
+
 }

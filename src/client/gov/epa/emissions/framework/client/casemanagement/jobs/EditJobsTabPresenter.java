@@ -14,7 +14,7 @@ public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
 
     void editJob(CaseJob job, EditCaseJobView jobEditor) throws EmfException;
     
-    void copyJob(CaseJob job, EditCaseJobView jobEditor) throws Exception;
+    void copyJob(int caseId, CaseJob job, EditCaseJobView jobEditor) throws Exception;
 
     void removeJobs(CaseJob[] jobs) throws EmfException;
     
@@ -29,4 +29,6 @@ public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
     String validateJobs(CaseJob[] jobs) throws EmfException;
     
     void checkIfLockedByCurrentUser() throws EmfException;
+    
+    Object[] getAllCaseNameIDs() throws EmfException;
 }

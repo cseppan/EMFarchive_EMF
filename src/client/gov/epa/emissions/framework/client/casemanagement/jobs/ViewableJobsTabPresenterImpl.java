@@ -56,7 +56,7 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
         presenter.display(job);
     }
 
-    public void copyJob(CaseJob job, EditCaseJobView jobEditor) throws Exception {
+    public void copyJob(int caseId, CaseJob job, EditCaseJobView jobEditor) throws Exception {
  //
     }
 
@@ -159,6 +159,11 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
     public void checkIfLockedByCurrentUser() {
         // NOTE Auto-generated method stub
         
+    }
+
+    public Object[] getAllCaseNameIDs() {
+        // NOTE Auto-generated method stub
+        return null;
     }
 
     

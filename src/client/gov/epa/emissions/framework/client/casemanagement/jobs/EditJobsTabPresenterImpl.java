@@ -48,10 +48,12 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     }
 
     public CaseJob addNewJob(CaseJob job) throws EmfException {
-        job.setCaseId(caseObj.getId());
         CaseJob newJob = service().addCaseJob(session.user(), job);
-        view.addJob(newJob);
-        refreshView();
+
+        if (newJob.getCaseId() == caseObj.getId()) {
+            view.addJob(newJob);
+            refreshView();
+        }
 
         return newJob;
     }
@@ -62,7 +64,6 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
     private void refreshView() {
         view.refresh();
-        // view.notifychanges();
     }
 
     public boolean jobsUsed(CaseJob[] jobs) throws EmfException {
@@ -95,8 +96,9 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         presenter.display(job);
     }
 
-    public void copyJob(CaseJob job, EditCaseJobView jobEditor) throws Exception {
+    public void copyJob(int caseId, CaseJob job, EditCaseJobView jobEditor) throws Exception {
         CaseJob newJob = (CaseJob) DeepCopy.copy(job);
+        newJob.setCaseId(caseId);
         newJob.setName(getUniqueNewName("Copy of " + job.getName()));
         newJob.setJobkey(null); // jobkey supposedly generated when it is run
         newJob.setRunstatus(null);
@@ -110,6 +112,10 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
     public CaseJob[] getCaseJobs() throws EmfException {
         return service().getCaseJobs(caseObj.getId());
+    }
+
+    public Object[] getAllCaseNameIDs() throws EmfException {
+        return service().getAllCaseNameIDs();
     }
 
     public void addJobFields(CaseJob job, JComponent container, JobFieldsPanel jobFieldsPanel) throws EmfException {
@@ -139,9 +145,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         List<String> ok = new ArrayList<String>();
         List<String> cancel = new ArrayList<String>();
         List<String> warning = new ArrayList<String>();
-        
-        System.out.println("Getting status of jobs from server");
-        
+
         for (int i = 0; i < jobs.length; i++) {
             String status = service().getCaseJob(jobs[i].getId()).getRunstatus().getName();
 
@@ -172,8 +176,6 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
             if (status != null && status.equalsIgnoreCase("Waiting"))
                 cancel.add(status);
         }
-        
-        System.out.println("Finished getting jobs status from server");
 
         if (ok.size() == jobs.length)
             return "OK";
@@ -228,18 +230,19 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
     public String validateJobs(CaseJob[] jobs) throws EmfException {
         List<Integer> ids = new ArrayList<Integer>();
-        
+
         for (CaseJob job : jobs)
             ids.add(new Integer(job.getId()));
 
         return service().validateJobs(ids.toArray(new Integer[0]));
     }
-    
+
     public void checkIfLockedByCurrentUser() throws EmfException {
         Case reloaded = service().reloadCase(caseObj.getId());
 
         if (!reloaded.isLocked(session.user()))
-            throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner() + " has it now.");
+            throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner()
+                    + " has it now.");
     }
-    
+
 }

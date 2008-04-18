@@ -31,11 +31,14 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -123,7 +126,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     }
 
     private void doRefresh(CaseJob[] jobs) throws Exception {
-        //super.removeAll();
+        // super.removeAll();
         String outputFileDir = caseObj.getOutputFileDir();
 
         if (!outputDir.getText().equalsIgnoreCase(outputFileDir))
@@ -131,7 +134,8 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
         setupTableModel(jobs);
         table.refresh(tableData);
-        panelRefresh();    }
+        panelRefresh();
+    }
 
     private JPanel createLayout(CaseJob[] jobs, EmfConsole parentConsole) throws Exception {
         final JPanel layout = new JPanel(new BorderLayout());
@@ -190,12 +194,12 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         setupTableModel(jobs);
 
         mainPanel = new JPanel(new BorderLayout());
-        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());      
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
         mainPanel.add(table);
         return mainPanel;
     }
-    
-    private void setupTableModel(CaseJob[] jobs){
+
+    private void setupTableModel(CaseJob[] jobs) {
         tableData = new CaseJobsTableData(jobs);
     }
 
@@ -346,15 +350,15 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     }
 
     private void editJobs() throws EmfException {
-        List jobs = getSelectedJobs();
+        List<CaseJob> jobs = getSelectedJobs();
 
         if (jobs.size() == 0) {
             messagePanel.setMessage("Please select job(s) to edit.");
             return;
         }
 
-        for (Iterator iter = jobs.iterator(); iter.hasNext();) {
-            CaseJob job = (CaseJob) iter.next();
+        for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
+            CaseJob job = iter.next();
             String title = job.getName() + "(" + job.getId() + ")(" + caseObj.getName() + ")";
             EditCaseJobView jobEditor = new EditCaseJobWindow(title, desktopManager, parentConsole, session);
             presenter.editJob(job, jobEditor);
@@ -362,21 +366,55 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     }
 
     private void copyJobs() throws Exception {
-        List jobs = getSelectedJobs();
+        List<CaseJob> jobs = getSelectedJobs();
 
         if (jobs.size() == 0) {
             messagePanel.setMessage("Please select job(s) to copy.");
             return;
         }
 
-        for (Iterator iter = jobs.iterator(); iter.hasNext();) {
-            CaseJob job = (CaseJob) iter.next();
-            String title = "Copy of " + job.getName() + "(" + job.getId() + ")(" + caseObj.getName() + ")";
-            EditCaseJobView jobEditor = new EditCaseJobWindow(title, desktopManager, parentConsole, session);
-            presenter.copyJob(job, jobEditor);
+        Object[] selected = presenter.getAllCaseNameIDs();
+        String selectedCase = (String)JOptionPane.showInputDialog(parentConsole, "Copy " + jobs.size() + " jobs to case: ",
+                "Copy Case Jobs", JOptionPane.PLAIN_MESSAGE, getCopyIcon(), selected, selected[getDefultIndex(selected)]);
+
+        if ((selectedCase != null) && (selectedCase.length() > 0)) {
+            for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
+                CaseJob job = iter.next();
+                String title = "Copy of " + job.getName() + "(" + job.getId() + ")(" + caseObj.getName() + ")";
+                EditCaseJobView jobEditor = new EditCaseJobWindow(title, desktopManager, parentConsole, session);
+                presenter.copyJob(getCaseId(selectedCase), job, jobEditor);
+            }
         }
     }
 
+    private int getDefultIndex(Object[] selected) {
+        int currentCaseId = this.caseObj.getId();
+        int length = selected.length;
+        
+        for (int i = 0; i < length; i++)
+            if (selected[i].toString().contains("(" + currentCaseId + ")"))
+                return i;
+        
+        return 0;
+    }
+
+    private int getCaseId(String selectedCase) {
+        int index1 = selectedCase.indexOf("(") + 1;
+        int index2 = selectedCase.indexOf(")");
+         
+        return Integer.parseInt(selectedCase.substring(index1, index2));
+    }
+
+    private Icon getCopyIcon() {
+        URL imgURL = getClass().getResource("/toolbarButtonGraphics/general/Copy24.gif");
+        
+        if (imgURL != null) {
+            return new ImageIcon(imgURL);
+        }
+        
+        return null;
+    }
+    
     private void validateJobDatasets() throws EmfException {
         CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
 
@@ -451,7 +489,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
         if (height > 30)
             height = 30;
-        
+
         ScrollableComponent msgArea = createMsgScrollPane(finalMsg, width, height);
 
         return showDialog(msgArea, "Confirm Running Jobs");
@@ -511,9 +549,9 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     public void addJob(CaseJob job) {
         tableData.add(job);
         table.refresh(tableData);
-        panelRefresh(); 
+        panelRefresh();
     }
-    
+
     private void panelRefresh() {
         mainPanel.removeAll();
         mainPanel.add(table);

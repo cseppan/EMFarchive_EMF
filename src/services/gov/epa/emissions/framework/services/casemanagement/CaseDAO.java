@@ -1065,4 +1065,20 @@ public class CaseDAO {
     public void removeQedOutput(QueueCaseOutput output, Session session) {
         hibernateFacade.remove(output, session);
     }
+
+    public String[] getAllCaseNameIDs(Session session) {
+        List<?> names = session.createQuery("SELECT obj.name from " + Case.class.getSimpleName() + " as obj ORDER BY obj.name").list();
+        List<?> ids = session.createQuery("SELECT obj.id from " + Case.class.getSimpleName() + " as obj ORDER BY obj.name").list();
+        int size = names.size();
+        
+        if (size != ids.size())
+            return new String[0];
+        
+        String[] nameIDStrings = new String[size];
+        
+        for (int i = 0; i < size; i++)
+            nameIDStrings[i] = names.get(i).toString()  + "(" + ids.get(i).toString() + ")";
+        
+        return nameIDStrings;
+    }
 }

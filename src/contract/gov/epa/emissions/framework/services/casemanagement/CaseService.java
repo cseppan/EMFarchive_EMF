@@ -176,5 +176,7 @@ public interface CaseService {
 
     void removeMessages(User user, JobMessage[] msgs) throws EmfException;
 
+    String[] getAllCaseNameIDs() throws EmfException;
+
 
  }

@@ -947,4 +947,13 @@ public class CaseServiceTransport implements CaseService {
         return (String) call.requestResponse(new Object[]{new Integer(caseId)});
     }
 
+    public String[] getAllCaseNameIDs() throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getAllCaseNameIDs");
+        call.setStringArrayReturnType();
+        
+        return (String[]) call.requestResponse(new Object[]{});
+    }
+
 }
