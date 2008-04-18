@@ -44,13 +44,16 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
     public void addNewInputDialog(NewInputView dialog, CaseInput newInput) {
         dialog.register(this);
-        dialog.display(caseObj.getId(), newInput);
+        dialog.display(newInput.getCaseID(), newInput);
     }
 
     public void addNewInput(CaseInput input) throws EmfException {
-        input.setCaseID(caseObj.getId());
-        view.addInput(service().addCaseInput(session.user(), input));
-        refreshView();
+        CaseInput loaded = service().addCaseInput(session.user(), input);
+
+        if (input.getCaseID() == caseObj.getId()) {
+            view.addInput(loaded);
+            refreshView();
+        }
     }
 
     private CaseService service() {
@@ -59,7 +62,6 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
     private void refreshView() {
         view.refresh();
-        // view.notifychanges();
     }
 
     public void removeInputs(CaseInput[] inputs) throws EmfException {
@@ -71,15 +73,17 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
                 session);
         editInputPresenter.display(input);
     }
-    
-    public void copyInput(CaseInput input, NewInputView dialog) throws Exception {
+
+    public void copyInput(int caseId, CaseInput input, NewInputView dialog) throws Exception {
         CaseInput newInput = (CaseInput) DeepCopy.copy(input);
+        newInput.setCaseID(caseId);
         addNewInputDialog(dialog, newInput);
     }
 
-    public void doAddInputFields(JComponent container, InputFieldsPanelView inputFields, CaseInput newInput) throws EmfException {
+    public void doAddInputFields(JComponent container, InputFieldsPanelView inputFields, CaseInput newInput)
+            throws EmfException {
         newInput.setId(view.numberOfRecord());
-        
+
         InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj.getId(), inputFields,
                 session);
         inputFieldsPresenter.display(newInput, container);
@@ -95,10 +99,10 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     public CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException {
         if (sector == null)
             return new CaseInput[0];
-        
+
         if (sector.compareTo(new Sector("All", "All")) == 0)
             sector = null; // to trigger select all on the server side
-        
+
         return service().getCaseInputs(caseId, sector, showAll);
     }
 
@@ -124,11 +128,11 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     public void exportCaseInputsWithOverwrite(List<CaseInput> inputList, String purpose) throws EmfException {
         doExport(inputList, true, purpose);
     }
-    
+
     public Case getCaseObj() {
         return this.caseObj;
     }
-    
+
     public void checkIfLockedByCurrentUser() throws EmfException {
         Case reloaded = session.caseService().reloadCase(caseObj.getId());
 
@@ -136,13 +140,17 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
             throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner()
                     + " has it now.");
     }
-    
+
     public Sector[] getAllSetcors() throws EmfException {
         List<Sector> all = new ArrayList<Sector>();
         all.add(new Sector("All", "All"));
         all.addAll(Arrays.asList(session.dataCommonsService().getSectors()));
-        
+
         return all.toArray(new Sector[0]);
     }
     
+    public Object[] getAllCaseNameIDs() throws EmfException {
+        return service().getAllCaseNameIDs();
+    }
+
 }
