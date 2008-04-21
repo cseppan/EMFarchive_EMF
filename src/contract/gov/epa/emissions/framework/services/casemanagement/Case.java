@@ -17,8 +17,6 @@ public class Case implements Comparable, Lockable, Serializable {
 
     private int id;
     
-    private int parentId;
-
     private String name;
 
     private Abbreviation abbreviation;
@@ -416,14 +414,6 @@ public class Case implements Comparable, Lockable, Serializable {
 
     public void setModel(ModelToRun model) {
         this.model = model;
-    }
-
-    public int getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(int parentId) {
-        this.parentId = parentId;
     }
 
 }
