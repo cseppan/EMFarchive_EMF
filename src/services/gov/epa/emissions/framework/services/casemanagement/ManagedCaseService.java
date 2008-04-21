@@ -2146,8 +2146,9 @@ public class ManagedCaseService {
         List<CaseInput> inputsAJ = null; // inputs for all sectors specific jobs
         List<CaseInput> inputsSJ = null; // inputs for specific sectors specific jobs
 
+        // Make sure no spaces or strange characters in the job name
         String jobName = job.getName().replace(" ", "_");
-
+        jobName = replaceNonDigitNonLetterChars(jobName);
         /*
          * Get the inputs in the following order: all sectors, all jobs sector specific, all jobs all sectors, job
          * specific sector specific, job specific
