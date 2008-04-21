@@ -234,6 +234,10 @@ public class CaseServiceImpl implements CaseService {
     public CaseJob addCaseJob(User user, CaseJob job) throws EmfException {
         return getCaseService().addCaseJob(user, job, false);
     }
+    
+    public void addCaseJobs(User user, int caseId, CaseJob[] jobs) throws EmfException {
+        getCaseService().addCaseJobs(user, caseId, jobs);
+    }
 
     public CaseJob[] getCaseJobs(int caseId) throws EmfException {
         return getCaseService().getCaseJobs(caseId);

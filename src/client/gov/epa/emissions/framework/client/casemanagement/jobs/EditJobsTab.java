@@ -295,7 +295,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
                     clearMessage();
                     copyJobs();
                 } catch (Exception ex) {
-                    ex.printStackTrace();
                     messagePanel.setError(ex.getMessage());
                 }
             }
@@ -378,12 +377,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
                 "Copy Case Jobs", JOptionPane.PLAIN_MESSAGE, getCopyIcon(), selected, selected[getDefultIndex(selected)]);
 
         if ((selectedCase != null) && (selectedCase.length() > 0)) {
-            for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
-                CaseJob job = iter.next();
-                String title = "Copy of " + job.getName() + "(" + job.getId() + ")(" + caseObj.getName() + ")";
-                EditCaseJobView jobEditor = new EditCaseJobWindow(title, desktopManager, parentConsole, session);
-                presenter.copyJob(getCaseId(selectedCase), job, jobEditor);
-            }
+            presenter.copyJobs(getCaseId(selectedCase), jobs);
         }
     }
 

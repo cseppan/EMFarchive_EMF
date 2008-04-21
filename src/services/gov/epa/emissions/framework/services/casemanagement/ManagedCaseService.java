@@ -794,7 +794,7 @@ public class ManagedCaseService {
             session.close();
         }
     }
-    
+
     public synchronized CaseInput[] getCaseInputs(int caseId, Sector sector, boolean showAll) throws EmfException {
         Session session = sessionFactory.getSession();
 
@@ -1086,12 +1086,13 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
+    public synchronized CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll)
+            throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             List<CaseParameter> params = dao.getCaseParameters(caseId, sector, showAll, session);
-            
+
             return params.toArray(new CaseParameter[0]);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1217,6 +1218,23 @@ public class ManagedCaseService {
         }
 
         return addCaseParameter(user, copied, true);
+    }
+
+    public synchronized void addCaseJobs(User user, int caseId, CaseJob[] jobs) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            for (CaseJob job : jobs)
+                if (dao.getCaseJob(caseId, job, session) != null)
+                    throw new EmfException("Case job: " + job.getName() + " already exists in the target case.");
+            
+            for (CaseJob job : jobs) {
+                job.setCaseId(caseId);
+                job.setRunstatus(dao.getJobRunStatuse("Not Started"));
+                dao.add(job, session);
+            }
+        } catch (EmfException e) {
+            throw e;
+        }
     }
 
     public synchronized CaseJob addCaseJob(User user, CaseJob job, boolean copyingCase) throws EmfException {
@@ -1515,9 +1533,9 @@ public class ManagedCaseService {
             } catch (Exception e) {
                 return;
             }
-            
+
             dir = dir.getParentFile();
-            
+
             if (dir.compareTo(base) == 0)
                 return;
         }
@@ -1937,7 +1955,7 @@ public class ManagedCaseService {
 
             String exportDir = dirName + System.getProperty("file.separator") + subdir;
             File dir = new File(exportDir);
-            
+
             if (!dir.exists()) {
                 dir.mkdirs();
                 setDirsWritable(new File(dirName), dir);
@@ -2462,13 +2480,13 @@ public class ManagedCaseService {
 
         // Check if logs dir (jobpath/logs) exists, if not create
         File logDir = new File(file.getParent() + System.getProperty("file.separator") + "logs");
-        
+
         if (!(logDir.isDirectory())) {
             // Need to create the directory
             if (!(logDir.mkdir())) {
                 throw new EmfException("Error creating job log directory: " + logDir);
             }
-            
+
             // Make directory writable by everyone
             if (!logDir.setWritable(true, false)) {
                 throw new EmfException("Error changing job log directory's write permissions: " + logDir);

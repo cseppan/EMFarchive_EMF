@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
+import java.util.List;
+
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorTabPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
@@ -14,8 +16,10 @@ public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
 
     void editJob(CaseJob job, EditCaseJobView jobEditor) throws EmfException;
     
-    void copyJob(int caseId, CaseJob job, EditCaseJobView jobEditor) throws Exception;
+    void copyJob2CurrentCase(int caseId, CaseJob job, EditCaseJobView jobEditor) throws Exception;
 
+    void copyJobs(int caseId, List<CaseJob> jobs) throws Exception;
+    
     void removeJobs(CaseJob[] jobs) throws EmfException;
     
     CaseJob[] getCaseJobs() throws EmfException;
@@ -31,4 +35,5 @@ public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
     void checkIfLockedByCurrentUser() throws EmfException;
     
     Object[] getAllCaseNameIDs() throws EmfException;
+
 }

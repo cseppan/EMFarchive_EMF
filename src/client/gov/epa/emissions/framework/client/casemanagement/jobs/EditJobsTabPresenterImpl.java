@@ -96,7 +96,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         presenter.display(job);
     }
 
-    public void copyJob(int caseId, CaseJob job, EditCaseJobView jobEditor) throws Exception {
+    public void copyJob2CurrentCase(int caseId, CaseJob job, EditCaseJobView jobEditor) throws Exception {
         CaseJob newJob = (CaseJob) DeepCopy.copy(job);
         newJob.setCaseId(caseId);
         newJob.setName(getUniqueNewName("Copy of " + job.getName()));
@@ -106,8 +106,17 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         newJob.setRunStartDate(null);
         newJob.setRunCompletionDate(null);
 
-        EditJobPresenter presenter = new EditCaseJobPresenterImpl(jobEditor, view, this, session);
-        presenter.display(addNewJob(newJob));
+//        EditJobPresenter presenter = new EditCaseJobPresenterImpl(jobEditor, view, this, session);
+//        presenter.display(addNewJob(newJob));
+        addNewJob(newJob);
+    }
+
+    public void copyJobs(int caseId, List<CaseJob> jobs) throws Exception {
+        if (caseId == this.caseObj.getId())
+            for (CaseJob job : jobs)
+                copyJob2CurrentCase(caseId, job, null);
+        else
+            service().addCaseJobs(session.user(), caseId, jobs.toArray(new CaseJob[0]));
     }
 
     public CaseJob[] getCaseJobs() throws EmfException {

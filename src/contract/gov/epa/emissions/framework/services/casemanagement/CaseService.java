@@ -178,5 +178,7 @@ public interface CaseService {
 
     String[] getAllCaseNameIDs() throws EmfException;
 
+    void addCaseJobs(User user, int caseId, CaseJob[] jobs) throws EmfException;
+
 
  }
