@@ -206,6 +206,10 @@ public class CaseServiceImpl implements CaseService {
     public CaseInput addCaseInput(User user, CaseInput input) throws EmfException {
         return getCaseService().addCaseInput(user, input, false);
     }
+    
+    public void addCaseInputs(User user, int caseId, CaseInput[] inputs) throws EmfException {
+        getCaseService().addCaseInputs(user, caseId, inputs);
+    }
 
     public void updateCaseInput(User user, CaseInput input) throws EmfException {
         getCaseService().updateCaseInput(user, input);
@@ -347,6 +351,10 @@ public class CaseServiceImpl implements CaseService {
 
     public CaseParameter addCaseParameter(User user, CaseParameter param) throws EmfException {
         return getCaseService().addCaseParameter(user, param, false);
+    }
+    
+    public void addCaseParameters(User user, int caseID, CaseParameter[] params) throws EmfException {
+        getCaseService().addCaseParameters(user, caseID, params);
     }
 
     public CaseParameter[] getCaseParameters(int caseId) throws EmfException {
@@ -620,5 +628,6 @@ public class CaseServiceImpl implements CaseService {
     public String[] getAllCaseNameIDs() throws EmfException {
         return getCaseService().getAllCaseNameIDs();
     }
+
 
 }

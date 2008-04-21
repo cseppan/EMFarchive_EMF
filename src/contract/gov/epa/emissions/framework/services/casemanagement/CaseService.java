@@ -84,6 +84,8 @@ public interface CaseService {
 
     CaseInput addCaseInput(User user, CaseInput input) throws EmfException;
     
+    void addCaseInputs(User user, int caseId, CaseInput[] inputs) throws EmfException;
+    
     void updateCaseInput(User user, CaseInput input) throws EmfException;
     
     void removeCaseInputs(CaseInput[] inputs) throws EmfException;
@@ -180,5 +182,6 @@ public interface CaseService {
 
     void addCaseJobs(User user, int caseId, CaseJob[] jobs) throws EmfException;
 
+    void addCaseParameters(User user, int caseID, CaseParameter[] params) throws EmfException;
 
  }

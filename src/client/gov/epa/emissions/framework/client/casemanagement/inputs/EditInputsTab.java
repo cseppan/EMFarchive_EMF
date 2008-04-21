@@ -396,15 +396,27 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
                 selected[getDefultIndex(selected)]);
 
         if ((selectedCase != null) && (selectedCase.length() > 0)) {
-            for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
-                CaseInput input = iter.next();
-                NewInputDialog view = new NewInputDialog(parentConsole);
-                view.setModal(false);
-                view.setLocationByPlatform(true);
-                presenter.copyInput(getCaseId(selectedCase), input, view);
+            int selectedCaseId = getCaseId(selectedCase);
+
+            if (selectedCaseId != this.caseId) {
+                presenter.copyInput(selectedCaseId, inputs);
+                return;
             }
+
+            showEditor(presenter, inputs, selectedCase);
         }
     }
+    
+    private void showEditor(EditInputsTabPresenter presenter, List<CaseInput> inputs, String selectedCase)
+    throws Exception {
+        for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
+            CaseInput input = iter.next();
+            NewInputDialog view = new NewInputDialog(parentConsole);
+            view.setModal(false);
+            view.setLocationByPlatform(true);
+            presenter.copyInput(input, view);
+        }
+}
 
     private void doDisplayInputDatasetsPropertiesViewer() {
         List<EmfDataset> datasets = getSelectedDatasets(getSelectedInputs());

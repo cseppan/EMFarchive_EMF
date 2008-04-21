@@ -318,13 +318,25 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
                 selected, selected[getDefultIndex(selected)]);
 
         if ((selectedCase != null) && (selectedCase.length() > 0)) {
-            for (Iterator<CaseParameter> iter = params.iterator(); iter.hasNext();) {
-                CaseParameter param = iter.next();
-                NewCaseParameterDialog view = new NewCaseParameterDialog(parentConsole);
-                view.setModal(false);
-                view.setLocationByPlatform(true);
-                presenter.copyParameter(getCaseId(selectedCase), view, param);
+            int selectedCaseId = getCaseId(selectedCase);
+
+            if (selectedCaseId != this.caseId) {
+                presenter.copyParameter(selectedCaseId, params);
+                return;
             }
+
+            showEditor(presenter, params, selectedCase);
+        }
+    }
+
+    private void showEditor(EditParametersTabPresenter presenter, List<CaseParameter> params, String selectedCase)
+            throws Exception {
+        for (Iterator<CaseParameter> iter = params.iterator(); iter.hasNext();) {
+            CaseParameter param = iter.next();
+            NewCaseParameterDialog view = new NewCaseParameterDialog(parentConsole);
+            view.setModal(false);
+            view.setLocationByPlatform(true);
+            presenter.copyParameter(view, param);
         }
     }
 

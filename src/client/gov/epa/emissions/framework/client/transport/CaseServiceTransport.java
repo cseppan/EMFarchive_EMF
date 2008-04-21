@@ -348,6 +348,18 @@ public class CaseServiceTransport implements CaseService {
         return (SubDir) call.requestResponse(new Object[] { subdir });
     }
 
+    public synchronized void addCaseInputs(User user, int caseId, CaseInput[] inputs) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("addCaseInputs");
+        call.addParam("user", dataMappings.user());
+        call.addIntegerParam("caseId");
+        call.addParam("inputs", caseMappings.caseinputs());
+        call.setVoidReturnType();
+
+       call.request(new Object[] { user, new Integer(caseId), inputs });
+    }
+
     public synchronized CaseInput addCaseInput(User user, CaseInput input) throws EmfException {
         EmfCall call = call();
 
@@ -624,6 +636,18 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.caseParameter());
 
         return (CaseParameter) call.requestResponse(new Object[] { user, param });
+    }
+    
+    public synchronized void addCaseParameters(User user, int caseID, CaseParameter[] params) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("addCaseParameters");
+        call.addParam("user", dataMappings.user());
+        call.addIntegerParam("caseId");
+        call.addParam("params", caseMappings.caseParameters());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, new Integer(caseID), params });
     }
 
     public synchronized CaseParameter[] getCaseParameters(int caseId) throws EmfException {

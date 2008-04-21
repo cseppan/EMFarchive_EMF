@@ -65,10 +65,13 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
         editInputPresenter.display(param);
     }
 
-    public void copyParameter(int caseID, NewCaseParameterDialog dialog, CaseParameter param) throws Exception {
+    public void copyParameter(NewCaseParameterDialog dialog, CaseParameter param) throws Exception {
         CaseParameter newParam = (CaseParameter) DeepCopy.copy(param);
-        newParam.setCaseID(caseID);
         addNewParameterDialog(dialog, newParam);
+    }
+
+    public void copyParameter(int caseID, List<CaseParameter> params) throws Exception {
+        service().addCaseParameters(session.user(), caseID, params.toArray(new CaseParameter[0]));
     }
 
     public void addParameterFields(CaseParameter newParameter, JComponent container,
@@ -111,7 +114,7 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
             throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner()
                     + " has it now.");
     }
-    
+
     public Object[] getAllCaseNameIDs() throws EmfException {
         return service().getAllCaseNameIDs();
     }

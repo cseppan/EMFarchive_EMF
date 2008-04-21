@@ -415,6 +415,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     }
 
     public CaseJob setFields() throws EmfException {
+        job.setCaseId(this.caseObj.getId());
         job.setName(name.getText().trim());
         job.setPurpose(purpose.getText().trim());
         job.setJobNo(Float.parseFloat(jobOrder.getText().trim()));

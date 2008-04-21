@@ -74,10 +74,19 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         editInputPresenter.display(input);
     }
 
-    public void copyInput(int caseId, CaseInput input, NewInputView dialog) throws Exception {
+    public void copyInput(CaseInput input, NewInputView dialog) throws Exception {
+        CaseInput newInput = (CaseInput) DeepCopy.copy(input);
+        addNewInputDialog(dialog, newInput);
+    }
+
+    public void copyInput(int caseId, List<CaseInput> inputs) throws Exception {
+        service().addCaseInputs(session.user(), caseId, inputs.toArray(new CaseInput[0]));
+    }
+
+    public void copyInput(int caseId, CaseInput input) throws Exception {
         CaseInput newInput = (CaseInput) DeepCopy.copy(input);
         newInput.setCaseID(caseId);
-        addNewInputDialog(dialog, newInput);
+        addNewInput(newInput);
     }
 
     public void doAddInputFields(JComponent container, InputFieldsPanelView inputFields, CaseInput newInput)
@@ -148,7 +157,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
         return all.toArray(new Sector[0]);
     }
-    
+
     public Object[] getAllCaseNameIDs() throws EmfException {
         return service().getAllCaseNameIDs();
     }

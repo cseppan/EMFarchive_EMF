@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement.parameters;
 
+import java.util.List;
+
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorTabPresenter;
 import gov.epa.emissions.framework.services.EmfException;
@@ -21,7 +23,9 @@ public interface EditParametersTabPresenter extends CaseEditorTabPresenter {
 
     void removeParameters(CaseParameter[] params) throws EmfException;
 
-    void copyParameter(int caseId, NewCaseParameterDialog view, CaseParameter param) throws Exception;
+    void copyParameter(int caseId, List<CaseParameter> params) throws Exception;
+    
+    void copyParameter(NewCaseParameterDialog view, CaseParameter param) throws Exception;
 
     public Object[] getAllCaseNameIDs() throws EmfException;
 }

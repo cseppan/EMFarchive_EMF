@@ -709,6 +709,39 @@ public class ManagedCaseService {
         }
     }
 
+    public synchronized void addCaseInputs(User user, int caseId, CaseInput[] inputs) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            for (int i = 0; i < inputs.length; i++) {
+                inputs[i].setCaseID(caseId);
+                CaseJob job = dao.getCaseJob(inputs[i].getCaseJobID());
+
+                if (job != null) {
+                    CaseJob targetJob = dao.getCaseJob(caseId, job, session);
+
+                    if (targetJob == null)
+                        throw new EmfException("Required case job: " + job.getName() + " doesn't exist in target case.");
+
+                    inputs[i].setCaseJobID(targetJob.getId());
+                }
+
+                if (dao.caseInputExists(inputs[i], session))
+                    throw new EmfException("Case input: " + inputs[i].getName() + " already exists in target case.");
+            }
+
+            for (CaseInput input : inputs) {
+                dao.add(input, session);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not add new case input '" + inputs[0].getName() + "' etc.\n" + e.getMessage());
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+
     public synchronized CaseInput addCaseInput(User user, CaseInput input, boolean copyingCase) throws EmfException {
         Session session = sessionFactory.getSession();
 
@@ -1029,6 +1062,39 @@ public class ManagedCaseService {
         }
     }
 
+    public synchronized void addCaseParameters(User user, int caseId, CaseParameter[] params) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            for (int i = 0; i < params.length; i++) {
+                params[i].setCaseID(caseId);
+
+                CaseJob job = dao.getCaseJob(params[i].getJobId());
+
+                if (job != null) {
+                    CaseJob targetJob = dao.getCaseJob(caseId, job, session);
+
+                    if (targetJob == null)
+                        throw new EmfException("Required case job: " + job.getName() + " doesn't exist in target case.");
+
+                    params[i].setJobId(targetJob.getId());
+                }
+
+                if (dao.caseParameterExists(params[i], session))
+                    throw new EmfException("Case parameter: " + params[i].getName() + " already exists in target case.");
+            }
+
+            for (CaseParameter param : params)
+                dao.addParameter(param, session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not add new case parameter '" + params[0].getName() + "' etc.\n" + e.getMessage());
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+
     public synchronized CaseParameter addCaseParameter(User user, CaseParameter param, boolean copyingCase)
             throws EmfException {
         Session session = sessionFactory.getSession();
@@ -1226,14 +1292,21 @@ public class ManagedCaseService {
             for (CaseJob job : jobs)
                 if (dao.getCaseJob(caseId, job, session) != null)
                     throw new EmfException("Case job: " + job.getName() + " already exists in the target case.");
-            
+
             for (CaseJob job : jobs) {
                 job.setCaseId(caseId);
+                job.setJobkey(null); // jobkey supposedly generated when it is run
+                job.setRunLog(null);
+                job.setRunStartDate(null);
+                job.setRunCompletionDate(null);
                 job.setRunstatus(dao.getJobRunStatuse("Not Started"));
                 dao.add(job, session);
             }
         } catch (EmfException e) {
-            throw e;
+            log.error("Could not add new case jobs '" + jobs[0].getName() + "' etc.\n" + e.getMessage());
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
         }
     }
 
