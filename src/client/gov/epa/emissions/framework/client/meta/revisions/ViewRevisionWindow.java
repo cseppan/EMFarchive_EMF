@@ -67,7 +67,11 @@ public class ViewRevisionWindow extends DisposableInteralFrame implements Revisi
         layoutGenerator.addLabelWidgetPair("Version:", new Label("" + revision.getVersion()), panel);
         layoutGenerator.addLabelWidgetPair("Creator:", new Label(revision.getCreator().getName()), panel);
         layoutGenerator.addLabelWidgetPair("Date:", new Label(format(revision.getDate())), panel);
-        layoutGenerator.addLabelWidgetPair("References:", new Label(references(revision)), panel);
+        
+        TextArea refText = new TextArea("References", references(revision), 48, 5);
+        refText.setEditable(false);
+        ScrollableComponent scrollableRef = ScrollableComponent.createWithVerticalScrollBar(whatText);
+        layoutGenerator.addLabelWidgetPair("References:", scrollableRef, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
