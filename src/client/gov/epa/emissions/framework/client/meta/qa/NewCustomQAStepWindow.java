@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
@@ -29,13 +30,12 @@ import java.awt.event.KeyListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 public class NewCustomQAStepWindow extends DisposableInteralFrame implements NewCustomQAStepView {
 
-    private JComboBox versionsSelection;
+    private ComboBox versionsSelection;
 
     private VersionsSet versionsSet;
 
@@ -118,7 +118,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
         layoutGenerator.addLabelWidgetPair("Description:", scrollableDesc, panel);
 
-        versionsSelection = new JComboBox(versionsSet.nameAndNumbers());
+        versionsSelection = new ComboBox("Select one", versionsSet.nameAndNumbers());
         layoutGenerator.addLabelWidgetPair("Version:", versionsSelection, panel);
 
         // Lay out the panel.
@@ -204,6 +204,9 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
     }
 
     public QAStep save() throws EmfException {
+        if ( versionsSelection.getSelectedItem() == null ){
+            throw new EmfException("Please select a version" );
+        }
         
         String stepName = name.getText().trim();
         if(stepName.length()==0)

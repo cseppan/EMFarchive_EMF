@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
@@ -13,6 +14,8 @@ import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.Dialog;
+import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -23,7 +26,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -34,13 +36,15 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
 
     private boolean shouldCreate;
 
-    private JComboBox versionsSelection;
+    private ComboBox versionsSelection;
 
     private VersionsSet versionsSet;
 
     private EmfDataset dataset;
 
     private QAStepTemplates templates;
+    
+    private MessagePanel messagePanel;
 
     private JList optional;
 
@@ -66,7 +70,9 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
     private JPanel createLayout(QAStepTemplates templates) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
+        
+        messagePanel = new SingleLineMessagePanel();
+        panel.add(messagePanel);
         panel.add(inputPanel(templates));
         panel.add(buttonsPanel());
 
@@ -77,7 +83,7 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        versionsSelection = new JComboBox(versionsSet.nameAndNumbers());
+        versionsSelection = new ComboBox("Select one", versionsSet.nameAndNumbers());
         //First try at resizing the version selection combo box, did not work as expected
         //Added next line later -- may be useful
         //versionsModel = new DefaultComboBoxModel(versionNames(versions));
@@ -133,6 +139,10 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
     }
 
     private void doNew() {
+        if (versionsSelection.getSelectedItem() == null){
+            messagePanel.setError("Please select a version" );
+            return; 
+        }
         shouldCreate = true;
         close();
     }
