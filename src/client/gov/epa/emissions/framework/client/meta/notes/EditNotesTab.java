@@ -127,13 +127,15 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         AddExistingNotesDialog view = new AddExistingNotesDialog(parentConsole);
         try {
             presenter.addExistingNotes(view);
-            DatasetNote[] selectedNotes=presenter.getSelectedNotes(view);
-            
-//            System.out.println("length of selected notes " + selectedNotes.length );
-            if (selectedNotes.length>0){
-                tableData.add( selectedNotes);
+            if (view.check()){
+                DatasetNote[] selectedNotes=presenter.getSelectedNotes(view);
+
+//              System.out.println("length of selected notes " + selectedNotes.length );
+                if (selectedNotes.length>0){
+                    tableData.add( selectedNotes);
+                    refresh();
+                }
             }
-            refresh();
         } catch (EmfException e) {
             e.printStackTrace();
             messagePanel.setError("Could not add existing notes" +e.getMessage());

@@ -1,15 +1,19 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
-import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.EmfImageTool;
+import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
@@ -21,6 +25,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -33,11 +38,18 @@ public class AddExistingNotesDialog extends JDialog{
       private TextField name; 
       
       private EditNotesTabPresenter presenter; 
+      
+      private ComboBox versionsSelection;
+      
+      private VersionsSet versionsSet;
 
       private JList notesList;
       
-//      private Note[] allNotes = new Note[] {};
+      private MessagePanel messagePanel; 
+      
       private Note[] notes = new Note[] {};
+      
+      private boolean addExistingNote =false; 
 
       public AddExistingNotesDialog(EmfConsole parent) {
           super(parent);
@@ -45,16 +57,16 @@ public class AddExistingNotesDialog extends JDialog{
           setModal(true);
       }
 
-      public void display(Note[] notes) {
-//          allNotes=notes; 
+      public void display(Note[] notes, Version[] versions) {
+          this.versionsSet = new VersionsSet(versions);
           Container contentPane = getContentPane();
           contentPane.setLayout(new BorderLayout(5, 5));
-          JPanel panel = new JPanel(new BorderLayout(10, 10));
+          JPanel panel = new JPanel(new BorderLayout(5, 5));
           panel.add(buildTopPanel(), BorderLayout.NORTH);
           panel.add(buildNotesPanel(notes), BorderLayout.CENTER);
           panel.add(buttonPanel(), BorderLayout.SOUTH);
           contentPane.add(panel);
-          setTitle("Select Notes");
+          setTitle("Add existing notes to dataset");
           this.pack();
           this.setSize(500, 400);
           this.setLocation(ScreenUtils.getPointToCenter(this));
@@ -65,14 +77,33 @@ public class AddExistingNotesDialog extends JDialog{
           return notes;
       }
       
+      public boolean check(){
+          return addExistingNote;
+      }
+      
+      public Version getVersion(){
+          return versionsSet.getVersionFromNameAndNumber((String)versionsSelection.getSelectedItem());
+      }
+      
       private JPanel buildTopPanel(){
+          messagePanel = new SingleLineMessagePanel();
+          JPanel panel = new JPanel();
+          panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+          panel.add(messagePanel);
+          panel.add(buildfilterPanel());
+          return panel; 
+      }
+      private JPanel buildfilterPanel(){
           JPanel panel = new JPanel(new SpringLayout());
           SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
           
+          versionsSelection = new ComboBox("Select one", versionsSet.nameAndNumbers());
+          layoutGenerator.addLabelWidgetPair("Version:  ", versionsSelection, panel);
+          // set up name filter
           JPanel rightPanel = new JPanel(new BorderLayout());
-          JPanel container = new JPanel();
+          //JPanel container = new JPanel();
           nameField();
-          container.add(name);
+          rightPanel.add(name, BorderLayout.LINE_START);
 
           Button button = new Button("Get", new AbstractAction() {
               public void actionPerformed(ActionEvent e) {
@@ -80,20 +111,20 @@ public class AddExistingNotesDialog extends JDialog{
               }
           });
           button.setToolTipText("Get notes");
-          container.add(button);
+          rightPanel.add(button, BorderLayout.CENTER);
 
-          rightPanel.add(container, BorderLayout.LINE_START);
-          layoutGenerator.addWidgetPair(new Label("Note name contains:  "), rightPanel, panel);
+          //rightPanel.add(container, BorderLayout.LINE_START);
+          layoutGenerator.addLabelWidgetPair("Note name contains:", rightPanel, panel);
           
-          layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-                  20, 5, // initialX, initialY
-                  10, 10);// xPad, yPad
+          layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+                  10, 5, // initialX, initialY
+                  10, 5);// xPad, yPad
           return panel; 
       }
 
 
       private void nameField(){
-          name= new  TextField ("Note name contains", "", 18);
+          name= new TextField ("Note name contains", "", 18);
           name.setEditable(true);
       }
       
@@ -134,9 +165,9 @@ public class AddExistingNotesDialog extends JDialog{
           return new AbstractAction() {
               public void actionPerformed(ActionEvent e) {
                   setVisible(false);
+                  addExistingNote =false; 
                   dispose();
               }
-
           };
       }
 
@@ -144,14 +175,24 @@ public class AddExistingNotesDialog extends JDialog{
           return new AbstractAction() {
               public void actionPerformed(ActionEvent e) {
                   // get selected notes
-                  List<Note> list = new ArrayList<Note>(notesList.getSelectedValues().length);
-                  for (int i = 0; i < notesList.getSelectedValues().length; i++)
-                      list.add((Note) notesList.getSelectedValues()[i]);
-                  notes = list.toArray(new Note[0]);
-                  setVisible(false);
-                  dispose();
+                  addExistingNotes();
               }
           };
+      }
+      
+      private void addExistingNotes(){
+          if (versionsSelection.getSelectedItem() == null){
+              messagePanel.setError("Please select a version" );
+              return; 
+          }
+          // get selected notes
+          List<Note> list = new ArrayList<Note>(notesList.getSelectedValues().length);
+          for (int i = 0; i < notesList.getSelectedValues().length; i++)
+              list.add((Note) notesList.getSelectedValues()[i]);
+          notes = list.toArray(new Note[0]);
+          addExistingNote =true; 
+          setVisible(false);
+          dispose();
       }
 
       public void observe(EditNotesTabPresenter presenter) {

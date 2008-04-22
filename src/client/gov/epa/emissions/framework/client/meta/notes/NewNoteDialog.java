@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
@@ -42,7 +43,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
 
     private TextArea details;
 
-    private DefaultComboBoxModel versionsModel;
+    private ComboBox versionsCombo; 
 
     private VersionsSet versionsSet;
 
@@ -123,8 +124,8 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
 
         layoutReferences(notes, panel, layoutGenerator);
 
-        versionsModel = new DefaultComboBoxModel(versionsSet.nameAndNumbers());
-        JComboBox versionsCombo = createCombo(versionsModel);
+        //versionsModel = new DefaultComboBoxModel(versionsSet.nameAndNumbers());
+        versionsCombo = new ComboBox("Select one", versionsSet.nameAndNumbers());
         versionsCombo.setSelectedItem(version);
         layoutGenerator.addLabelWidgetPair("Version", versionsCombo, panel);
 
@@ -225,6 +226,11 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
                     "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
+        if (versionsCombo.getSelectedItem() == null){
+            JOptionPane.showMessageDialog(super.getParent(), "Please select a version", "Error", JOptionPane.ERROR_MESSAGE);
+            return false; 
+        }
+        
 
         return true;
     }
@@ -269,7 +275,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
     }
 
     private Version version() {
-        return versionsSet.getVersionFromNameAndNumber((String) versionsModel.getSelectedItem());
+        return versionsSet.getVersionFromNameAndNumber((String) versionsCombo.getSelectedItem());
     }
 
 }

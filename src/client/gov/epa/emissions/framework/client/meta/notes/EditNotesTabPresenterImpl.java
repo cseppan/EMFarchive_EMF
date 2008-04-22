@@ -56,10 +56,11 @@ public class EditNotesTabPresenterImpl implements EditNotesTabPresenter {
         addDatasetNote(view, session.user(), dataset, notes, types, versions);
     }
 
-    public void addExistingNotes(AddExistingNotesDialog view) {
+    public void addExistingNotes(AddExistingNotesDialog view) throws EmfException {
      //   Note[] notes = service().getAllNotes("");
         view.observe(this);
-        view.display(new Note[]{});
+        Version[] versions = session.dataEditorService().getVersions(dataset.getId());
+        view.display(new Note[]{}, versions);
     }
     
 
@@ -96,14 +97,15 @@ public class EditNotesTabPresenterImpl implements EditNotesTabPresenter {
         for (int i = 0; i < selectedIndexes.length; i++) {
             selectedIndexes[i] = noteIds.get(i).intValue();
         }
-        return SetDSNote(service().getNotes(selectedIndexes));
+        return SetDSNote(service().getNotes(selectedIndexes), dialog.getVersion());
     }
     
-    private DatasetNote[] SetDSNote(Note[] notes){
+    private DatasetNote[] SetDSNote(Note[] notes, Version version){
         List<DatasetNote> dsNotes=new ArrayList<DatasetNote>();
         for (Note note :notes){
             DatasetNote dsNote = new DatasetNote();
             dsNote.setDatasetId(dataset.getId());
+            dsNote.setVersion(version.getVersion());
             dsNote.setNote(note);
             dsNotes.add(dsNote);
         }
