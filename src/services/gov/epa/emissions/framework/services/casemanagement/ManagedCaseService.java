@@ -2557,7 +2557,7 @@ public class ManagedCaseService {
 
         if (!(logDir.isDirectory())) {
             // Need to create the directory
-            if (!(logDir.mkdir())) {
+            if (!(logDir.mkdirs())) {
                 throw new EmfException("Error creating job log directory: " + logDir);
             }
 
@@ -2566,6 +2566,7 @@ public class ManagedCaseService {
                 throw new EmfException("Error changing job log directory's write permissions: " + logDir);
             }
         }
+        logDir.getParentFile().setWritable(true,false);
 
         // Create the logFile full name
         logFileName = logDir + System.getProperty("file.separator") + logFileName;
