@@ -415,16 +415,17 @@ public class CaseServiceTransport implements CaseService {
         return (CaseInput[]) call.requestResponse(new Object[] { new Integer(caseId) });
     }
     
-    public synchronized CaseInput[] getCaseInputs(int caseId, Sector sector, boolean showAll) throws EmfException {
+    public synchronized CaseInput[] getCaseInputs(int pageSize, int caseId, Sector sector, boolean showAll) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getCaseInputs");
+        call.addParam("pageSize", dataMappings.integer());
         call.addParam("caseId", dataMappings.integer());
         call.addParam("sector", dataMappings.sector());
         call.addBooleanParameter("showAll");
         call.setReturnType(caseMappings.caseinputs());
 
-        return (CaseInput[]) call.requestResponse(new Object[] { new Integer(caseId), sector, showAll });
+        return (CaseInput[]) call.requestResponse(new Object[] { new Integer(pageSize), new Integer(caseId), sector, showAll });
     }
 
     public synchronized Case[] copyCaseObject(int[] toCopy, User user) throws EmfException {
@@ -660,16 +661,17 @@ public class CaseServiceTransport implements CaseService {
         return (CaseParameter[]) call.requestResponse(new Object[] { new Integer(caseId) });
     }
 
-    public synchronized CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
+    public synchronized CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("getCaseParameters");
+        call.addIntegerParam("pageSize");
         call.addIntegerParam("caseId");
         call.addParam("sector", dataMappings.sector());
         call.addBooleanParameter("showAll");
         call.setReturnType(caseMappings.caseParameters());
         
-        return (CaseParameter[]) call.requestResponse(new Object[] { new Integer(caseId), sector, showAll });
+        return (CaseParameter[]) call.requestResponse(new Object[] {new Integer(pageSize), new Integer(caseId), sector, showAll });
     }
 
     public synchronized void removeCaseParameters(CaseParameter[] params) throws EmfException {

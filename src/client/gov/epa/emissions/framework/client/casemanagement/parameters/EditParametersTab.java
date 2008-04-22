@@ -102,8 +102,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         try {
             messagePanel.setMessage("Please wait while retrieving all case parameters...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            doRefresh(presenter.getCaseParameters(caseId, getSelectedSector(), showAll.isSelected()));
-            messagePanel.clear();
+            doRefresh(listFreshParameters());
         } catch (Exception e) {
             messagePanel.setError("Cannot retrieve all case parameters.");
         } finally {
@@ -162,7 +161,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         sectorsComboBox.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    doRefresh(presenter.getCaseParameters(caseId, getSelectedSector(), showAll.isSelected()));
+                    doRefresh(listFreshParameters());
                 } catch (Exception exc) {
                     setErrorMessage(exc.getMessage());
                 }
@@ -228,7 +227,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             public void actionPerformed(ActionEvent e) {
                 clearMessage();
                 try {
-                    doRefresh(presenter.getCaseParameters(caseId, getSelectedSector(), showAll.isSelected()));
+                    doRefresh(listFreshParameters());
                 } catch (Exception e1) {
                     setErrorMessage(e1.getMessage());
                 }
@@ -408,6 +407,21 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
     private void setErrorMessage(String msg) {
         messagePanel.setError(msg);
+    }
+    
+    private void setMessage(String msg) {
+        messagePanel.setMessage(msg);
+    }
+    
+    private CaseParameter[] listFreshParameters() throws EmfException {
+        CaseParameter[] freshList = presenter.getCaseParameters(caseId, getSelectedSector(), showAll.isSelected());
+        
+        if (getSelectedSector() == null && freshList.length == presenter.getPageSize())
+            setMessage("Please select a sector to see full list of parameters.");
+        else
+            messagePanel.clear();
+        
+        return freshList;
     }
 
     private Sector getSelectedSector() {

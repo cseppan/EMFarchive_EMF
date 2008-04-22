@@ -23,4 +23,6 @@ public interface UserPreference {
     String localTempDir();
     
     String remoteHost();
+    
+    String sortFilterPageSize();
 }

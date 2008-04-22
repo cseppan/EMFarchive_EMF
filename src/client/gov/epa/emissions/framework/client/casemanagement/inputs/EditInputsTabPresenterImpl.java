@@ -5,6 +5,8 @@ import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
+import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
+import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
@@ -24,11 +26,20 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     private EditInputsTabView view;
 
     private EmfSession session;
+    
+    private int defaultPageSize = 20;
 
     public EditInputsTabPresenterImpl(EmfSession session, EditInputsTabView view, Case caseObj) {
         this.caseObj = caseObj;
         this.view = view;
         this.session = session;
+        
+        try {
+            UserPreference pref = new DefaultUserPreferences();
+            defaultPageSize = Integer.parseInt(pref.sortFilterPageSize());
+        } catch (Exception e) {
+            //NOTE: pass silently
+        }
     }
 
     public void display() {
@@ -106,13 +117,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     }
 
     public CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException {
-        if (sector == null)
-            return new CaseInput[0];
-
-        if (sector.compareTo(new Sector("All", "All")) == 0)
-            sector = null; // to trigger select all on the server side
-
-        return service().getCaseInputs(caseId, sector, showAll);
+        return service().getCaseInputs(defaultPageSize, caseId, sector, showAll);
     }
 
     private void doExport(List<CaseInput> caseInputs, boolean overwrite, String purpose) throws EmfException {
@@ -160,6 +165,10 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
     public Object[] getAllCaseNameIDs() throws EmfException {
         return service().getAllCaseNameIDs();
+    }
+    
+    public int getPageSize() {
+        return this.defaultPageSize;
     }
 
 }

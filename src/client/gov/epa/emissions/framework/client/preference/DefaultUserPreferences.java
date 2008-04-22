@@ -32,6 +32,8 @@ public class DefaultUserPreferences implements UserPreference {
     private static final String LOCAL_TEMP_DIR = "local.temp.dir";
 
     private static final String REMOTE_HOST = "remote.host";
+    
+    private static final String SORT_FILTER_PAGE_SIZE = "table.page.size";
 
     private static Log log = LogFactory.getLog(DefaultUserPreferences.class);
 
@@ -134,5 +136,9 @@ public class DefaultUserPreferences implements UserPreference {
 
     public String remoteHost() {
         return property(REMOTE_HOST);
+    }
+    
+    public String sortFilterPageSize() {
+        return property(SORT_FILTER_PAGE_SIZE);
     }
 }

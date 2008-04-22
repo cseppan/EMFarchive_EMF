@@ -828,11 +828,11 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized CaseInput[] getCaseInputs(int caseId, Sector sector, boolean showAll) throws EmfException {
+    public synchronized CaseInput[] getCaseInputs(int pageSize, int caseId, Sector sector, boolean showAll) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
-            List<CaseInput> inputs = dao.getCaseInputs(caseId, sector, showAll, session);
+            List<CaseInput> inputs = dao.getCaseInputs(pageSize, caseId, sector, showAll, session);
 
             return inputs.toArray(new CaseInput[0]);
         } catch (Exception e) {
@@ -1152,12 +1152,12 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll)
+    public synchronized CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll)
             throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
-            List<CaseParameter> params = dao.getCaseParameters(caseId, sector, showAll, session);
+            List<CaseParameter> params = dao.getCaseParameters(pageSize, caseId, sector, showAll, session);
 
             return params.toArray(new CaseParameter[0]);
         } catch (Exception e) {

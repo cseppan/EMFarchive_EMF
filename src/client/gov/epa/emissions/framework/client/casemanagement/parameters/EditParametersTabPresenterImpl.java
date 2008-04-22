@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.casemanagement.parameters;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
+import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
@@ -21,11 +23,20 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
     private EditCaseParametersTabView view;
 
     private EmfSession session;
+    
+    private int defaultPageSize = 20;
 
     public EditParametersTabPresenterImpl(EmfSession session, EditCaseParametersTabView view, Case caseObj) {
         this.caseObj = caseObj;
         this.view = view;
         this.session = session;
+        
+        try {
+            UserPreference pref = new DefaultUserPreferences();
+            defaultPageSize = Integer.parseInt(pref.sortFilterPageSize());
+        } catch (Exception e) {
+            //NOTE: pass silently
+        }
     }
 
     public void display() {
@@ -82,13 +93,7 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
     }
 
     public CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
-        if (sector == null)
-            return new CaseParameter[0];
-
-        if (sector.compareTo(new Sector("All", "All")) == 0)
-            sector = null; // to trigger select all on the server side
-
-        return service().getCaseParameters(caseId, sector, showAll);
+        return service().getCaseParameters(defaultPageSize, caseId, sector, showAll);
     }
 
     public void removeParameters(CaseParameter[] params) throws EmfException {
@@ -117,6 +122,10 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
 
     public Object[] getAllCaseNameIDs() throws EmfException {
         return service().getAllCaseNameIDs();
+    }
+
+    public int getPageSize() {
+        return this.defaultPageSize;
     }
 
 }

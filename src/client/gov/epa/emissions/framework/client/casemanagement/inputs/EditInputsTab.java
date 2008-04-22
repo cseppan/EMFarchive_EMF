@@ -123,8 +123,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         try {
             messagePanel.setMessage("Please wait while retrieving all case inputs...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            doRefresh(presenter.getCaseInput(caseId, getSelectedSector(), showAll.isSelected()));
-            messagePanel.clear();
+            doRefresh(listFreshInputs());
         } catch (Exception e) {
             messagePanel.setError("Cannot retrieve all case inputs.");
         } finally {
@@ -194,7 +193,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         sectorsComboBox.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    doRefresh(presenter.getCaseInput(caseId, getSelectedSector(), showAll.isSelected()));
+                    doRefresh(listFreshInputs());
                 } catch (Exception exc) {
                     setErrorMessage(exc.getMessage());
                 }
@@ -306,7 +305,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             public void actionPerformed(ActionEvent e) {
                 clearMessage();
                 try {
-                    doRefresh(presenter.getCaseInput(caseId, getSelectedSector(), showAll.isSelected()));
+                    doRefresh(listFreshInputs());
                 } catch (Exception ex) {
                     setErrorMessage(ex.getMessage());
                 }
@@ -576,6 +575,17 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         return null;
     }
 
+    private CaseInput[] listFreshInputs() throws EmfException {
+        CaseInput[] freshList = presenter.getCaseInput(caseId, getSelectedSector(), showAll.isSelected());
+        
+        if (getSelectedSector() == null && freshList.length == presenter.getPageSize())
+            setMessage("Please select a sector to see full list of inputs.");
+        else
+            messagePanel.clear();
+        
+        return freshList;
+    }
+    
     public void refresh() {
         // note that this will get called when the case is save
         try {
@@ -596,6 +606,10 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
     public void setErrorMessage(String message) {
         messagePanel.setError(message);
+    }
+
+    public void setMessage(String message) {
+        messagePanel.setMessage(message);
     }
 
     public void doRefresh() throws EmfException {
