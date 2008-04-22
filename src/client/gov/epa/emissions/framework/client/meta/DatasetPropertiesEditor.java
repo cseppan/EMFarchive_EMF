@@ -64,10 +64,10 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         this.tabbedPane = new JTabbedPane();
     }
 
-    private JTabbedPane createTabbedPane(EmfDataset dataset, Version[] versions, MessagePanel messagePanel) {
+    private JTabbedPane createTabbedPane(EmfDataset dataset, Version[] versions) {
         tabbedPane.setName("tabbedPane");
 
-        tabbedPane.addTab("Summary", createSummaryTab(dataset, versions, messagePanel));
+        tabbedPane.addTab("Summary", createSummaryTab(dataset, versions));
         tabbedPane.addTab("Data", createDataTab(parentConsole));
         tabbedPane.addTab("Keywords", createKeywordsTab());
         tabbedPane.addTab("Notes", createNotesTab(parentConsole));
@@ -81,7 +81,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         return tabbedPane;
     }
 
-    private JPanel createSummaryTab(EmfDataset dataset, Version[] versions, MessagePanel messagePanel) {
+    private JPanel createSummaryTab(EmfDataset dataset, Version[] versions) {
         try {
             EditableSummaryTab view = new EditableSummaryTab(dataset, versions, session.dataCommonsService(),
                     messagePanel, this);
@@ -141,8 +141,9 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private JPanel createRevisionsTab(EmfConsole parentConsole) {
+        messagePanel.clear();
         try {
-            RevisionsTab view = new RevisionsTab(parentConsole, desktopManager);
+            RevisionsTab view = new RevisionsTab(parentConsole, desktopManager, messagePanel);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
@@ -183,7 +184,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.PAGE_START);
-        panel.add(createTabbedPane(dataset, versions, messagePanel), BorderLayout.CENTER);
+        panel.add(createTabbedPane(dataset, versions), BorderLayout.CENTER);
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         contentPane.add(panel);
