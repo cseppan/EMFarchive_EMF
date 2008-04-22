@@ -623,6 +623,28 @@ CREATE INDEX control_strategy_target_pollutants_strategy_id
   USING btree
   (control_strategy_id);
 
+CREATE TABLE emf.sources
+(
+  id serial NOT NULL,
+  scc character varying(10) NOT NULL,
+  fips character varying(6) NOT NULL,
+  plantid character varying(15),
+  pointid character varying(15),
+  stackid character varying(15),
+  segment character varying(15)
+);
+
+CREATE INDEX sources_id
+  ON emf.sources
+  USING btree
+  (id);
+ALTER TABLE emf.sources CLUSTER ON sources_id;
+
+CREATE INDEX sources_source
+  ON emf.sources
+  USING btree
+  (scc, fips, plantid, pointid, stackid, segment);
+
 
 -- FUNCTIONS
 
