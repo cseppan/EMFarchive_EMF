@@ -28,7 +28,7 @@ public class ViewRevisionWindow extends DisposableInteralFrame implements Revisi
     private static int count = 0;
 
     public ViewRevisionWindow(DesktopManager desktopManager) {
-        super("View Revision", new Dimension(650, 350), desktopManager);
+        super("View Revision", new Dimension(650, 450), desktopManager);
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
@@ -53,7 +53,7 @@ public class ViewRevisionWindow extends DisposableInteralFrame implements Revisi
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        TextArea whatText = new TextArea("What", revision.getWhy(), 48, 5);
+        TextArea whatText = new TextArea("What", revision.getWhat(), 48, 5);
         whatText.setEditable(false);
         ScrollableComponent scrollableWhat = ScrollableComponent.createWithVerticalScrollBar(whatText);
         layoutGenerator.addLabelWidgetPair("What:", scrollableWhat, panel);
@@ -70,7 +70,7 @@ public class ViewRevisionWindow extends DisposableInteralFrame implements Revisi
         
         TextArea refText = new TextArea("References", references(revision), 48, 5);
         refText.setEditable(false);
-        ScrollableComponent scrollableRef = ScrollableComponent.createWithVerticalScrollBar(whatText);
+        ScrollableComponent scrollableRef = ScrollableComponent.createWithVerticalScrollBar(refText);
         layoutGenerator.addLabelWidgetPair("References:", scrollableRef, panel);
 
         // Lay out the panel.
