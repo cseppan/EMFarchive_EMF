@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost.analysis.leastcost;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -69,14 +70,18 @@ public class StrategyLoader extends AbstractStrategyLoader {
         totalReduction = 0.0;
         
         //setup result
-        ControlStrategyResult result = createStrategyResult(inputDataset, controlStrategyInputDataset.getVersion());
-        runStrategyUsingSQLApproach(controlStrategyInputDataset, result);
+        ControlStrategyResult detailedResult = createStrategyResult(inputDataset, controlStrategyInputDataset.getVersion());
+        populateWorksheet(controlStrategyInputDataset);
+        
+        populateDetailedResult(controlStrategyInputDataset, detailedResult, getTargetEmissionReduction());
         System.out.println(System.currentTimeMillis() + " done with");
         //still need to calculate the total cost and reduction...
-        setResultTotalCostTotalReductionAndCount(result);
+        setResultTotalCostTotalReductionAndCount(detailedResult);
         
-        addDetailedResultSummaryDatasetKeywords((EmfDataset)result.getDetailedResultDataset());
-        return result;
+        //also get the uncontrolled emission...
+        uncontrolledEmis = getUncontrolledEmission(controlStrategyInputDataset);
+        addDetailedResultSummaryDatasetKeywords((EmfDataset)detailedResult.getDetailedResultDataset());
+        return detailedResult;
     }
 
     protected void doBatchInsert(ResultSet resultSet) throws Exception {
@@ -135,26 +140,45 @@ public class StrategyLoader extends AbstractStrategyLoader {
         return resultType;
     }
 
-    private void runStrategyUsingSQLApproach(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
+    private void populateWorksheet(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
         String query = "";
-        query = "SELECT * from public.run_least_cost_strategy("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
-        ResultSet rs = null;
+        String query2 = "";
+        String query3 = "";
+        query = "SELECT * from public.populate_least_cost_strategy_worksheet("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ");";
+        query2 = "analyze "  + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) + ";";
+        query3 = "SELECT * from public.eliminate_least_cost_strategy_source_measures("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ");vacuum analyze "  + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) + ";";
         System.out.println(System.currentTimeMillis() + " " + query);
+        System.out.println(System.currentTimeMillis() + " " + query2);
+        System.out.println(System.currentTimeMillis() + " " + query3);
         try {
-            rs = datasource.query().executeQuery(query);
-            while (rs.next()) {
-                uncontrolledEmis = rs.getDouble("domain_wide_uncontrolled_emis");
-//                maxEmisReduction = rs.getDouble("max_emis_reduction");
-            }
+            datasource.query().execute(query);
+            datasource.query().execute(query2);
+            datasource.query().execute(query3);
         } catch (SQLException e) {
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {
-            if (rs != null)
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    //
-                }
+            //
+        }
+    }
+
+    private void populateDetailedResult(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult,
+            double emisReduction) throws EmfException {
+        String query = "";
+        //, " + rnd.nextInt() + "::integer
+        query = "SELECT public.populate_least_cost_strategy_detailed_result("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ", " + emisReduction + "::double precision);";
+        System.out.println(System.currentTimeMillis() + " " + query);
+        DbServer dbSvr = dbServerFactory.getDbServer();
+        try {
+            dbSvr.getEmissionsDatasource().query().executeQuery(query);
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            try {
+                dbSvr.disconnect();
+            } catch (Exception e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 
@@ -218,6 +242,21 @@ public class StrategyLoader extends AbstractStrategyLoader {
                 } catch (SQLException e) {
                     //
                 }
+        }
+    }
+
+
+    // return ControlStrategies orderby name
+    public Double getTargetEmissionReduction() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return (Double)session.createQuery("select cS.domainWideEmisReduction " +
+                    "from ControlStrategyConstraint cS " +
+                    "where cS.controlStrategyId = " + controlStrategy.getId()).uniqueResult();
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not get strategy target emission reduction");
+        } finally {
+            session.close();
         }
     }
 }

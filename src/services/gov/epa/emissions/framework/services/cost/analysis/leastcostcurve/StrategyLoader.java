@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.db.DbServer;
-import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -87,13 +86,12 @@ public class StrategyLoader extends AbstractStrategyLoader {
                     leastCostCurveSummaryResult = result;
                 }
             }
-            resetWorksheetMeasureStatus(leastCostCMWorksheetResult);
-            
-            //also get the uncontrolled emission...
-            uncontrolledEmis = getUncontrolledEmission(controlStrategyInputDataset);
-            maxEmisReduction = getMaximumEmissionReduction(leastCostCMWorksheetResult);
         }
         
+        //also get the uncontrolled emission...
+        uncontrolledEmis = getUncontrolledEmission(controlStrategyInputDataset);
+        maxEmisReduction = getMaximumEmissionReduction(leastCostCMWorksheetResult);
+
         Double pctRedIncrement = controlStrategy.getConstraint().getDomainWidePctReductionIncrement();
         Double pctRed = 0.0;
         Double pctRedStart = controlStrategy.getConstraint().getDomainWidePctReductionStart();
@@ -252,71 +250,36 @@ public class StrategyLoader extends AbstractStrategyLoader {
 
     private void populateWorksheet(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
         String query = "";
+        String query2 = "";
+        String query3 = "";
         query = "SELECT * from public.populate_least_cost_strategy_worksheet("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ");";
-        ResultSet rs = null;
+        query2 = "analyze "  + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) + ";";
+        query3 = "SELECT * from public.eliminate_least_cost_strategy_source_measures("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ");vacuum analyze "  + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) + ";";
         System.out.println(System.currentTimeMillis() + " " + query);
+        System.out.println(System.currentTimeMillis() + " " + query2);
+        System.out.println(System.currentTimeMillis() + " " + query3);
         try {
-            rs = datasource.query().executeQuery(query);
-            while (rs.next()) {
-                uncontrolledEmis = rs.getDouble(1);
-                maxEmisReduction = rs.getDouble(2);
-            }
+            datasource.query().execute(query);
+            datasource.query().execute(query2);
+            datasource.query().execute(query3);
         } catch (SQLException e) {
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {
-            if (rs != null)
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    //
-                }
+            //
         }
-    }
-
-    private double getUncontrolledEmission(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
-        String versionedQuery = new VersionedQuery(version(controlStrategyInputDataset)).query();
-        int month = controlStrategyInputDataset.getInputDataset().applicableMonth();
-        int daysInMonth = getDaysInMonth(month);
-        double uncontrolledEmission = 0.0D;
-        
-        String query = "SELECT sum("  + (month != -1 ? "coalesce(avd_emis * " + daysInMonth + ", ann_emis)" : "ann_emis") + ") "
-            + " FROM " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()) 
-            + " where " + versionedQuery
-            + " and poll = '" + controlStrategy.getTargetPollutant().getName() + "' "
-            + getFilterForSourceQuery() + ";";
-        ResultSet rs = null;
-        System.out.println(System.currentTimeMillis() + " " + query);
-        try {
-            rs = datasource.query().executeQuery(query);
-            while (rs.next()) {
-                uncontrolledEmission = rs.getDouble(1);
-            }
-        } catch (SQLException e) {
-            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
-        } finally {
-            if (rs != null)
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    //
-                }
-        }
-        return uncontrolledEmission;
     }
 
     private double getMaximumEmissionReduction(ControlStrategyResult leastCostCMWorksheetResult) throws EmfException {
         double maximumEmissionReduction = 0.0D;
-        String query = "SELECT cum_emis_reduction from ("
-            + "SELECT public.run_sum(emis_reduction::numeric, 'max_emis_reduction'::text) as cum_emis_reduction"
-            + " from ("
-            + " SELECT distinct on (scc, fips, plantid, pointid, stackid, segment)"
-            + " emis_reduction"
+        String query = "SELECT sum(emis_reduction) "
+            + " from ( "
+            + " SELECT distinct on (source) " 
+            + "    emis_reduction "
             + " FROM " + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) 
-            + " where status is null "
-            + " and poll = '" + controlStrategy.getTargetPollutant().getName() + "'"
-            + " ORDER BY scc, fips, plantid, pointid, stackid, segment, marginal desc, emis_reduction, record_id desc"
-            + " ) tbl"
-            + " ) tbl order by cum_emis_reduction desc limit 1";
+            + " where status is null " 
+            + "    and poll = '" + controlStrategy.getTargetPollutant().getName() + "' "
+            + " ORDER BY source, marginal desc, emis_reduction, record_id desc "
+            + " ) tbl";
 
         ResultSet rs = null;
         System.out.println(System.currentTimeMillis() + " " + query);
@@ -336,19 +299,6 @@ public class StrategyLoader extends AbstractStrategyLoader {
                 }
         }
         return maximumEmissionReduction;
-    }
-
-    private void resetWorksheetMeasureStatus(ControlStrategyResult leastCostCMWorksheetResult) throws EmfException {
-        String query = "";
-        query = "update " + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) + " set status = null where status = 1;";
-        System.out.println(System.currentTimeMillis() + " " + query);
-        try {
-            datasource.query().execute(query);
-        } catch (SQLException e) {
-            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
-        } finally {
-            //
-        }
     }
 
     private void populateDetailedResult(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult,

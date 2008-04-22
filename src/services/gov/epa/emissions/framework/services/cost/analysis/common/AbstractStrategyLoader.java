@@ -609,4 +609,36 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         }
         return results;
     }
+    
+    protected double getUncontrolledEmission(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
+        String versionedQuery = new VersionedQuery(version(controlStrategyInputDataset)).query();
+        int month = controlStrategyInputDataset.getInputDataset().applicableMonth();
+        int daysInMonth = getDaysInMonth(month);
+        double uncontrolledEmission = 0.0D;
+        
+        String query = "SELECT sum("  + (month != -1 ? "coalesce(avd_emis * " + daysInMonth + ", ann_emis)" : "ann_emis") + ") "
+            + " FROM " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()) 
+            + " where " + versionedQuery
+            + " and poll = '" + controlStrategy.getTargetPollutant().getName() + "' "
+            + getFilterForSourceQuery() + ";";
+        ResultSet rs = null;
+        System.out.println(System.currentTimeMillis() + " " + query);
+        try {
+            rs = datasource.query().executeQuery(query);
+            while (rs.next()) {
+                uncontrolledEmission = rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    //
+                }
+        }
+        return uncontrolledEmission;
+    }
+
 }
