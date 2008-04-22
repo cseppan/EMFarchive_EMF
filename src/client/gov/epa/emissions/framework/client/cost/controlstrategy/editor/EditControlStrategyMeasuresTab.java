@@ -2,8 +2,6 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
@@ -17,8 +15,8 @@ import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.ListWidget;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
@@ -52,17 +50,17 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
     private ControlMeasureClass defaultClass = new ControlMeasureClass("All");
 
-    private JPanel mainPanel;
+    private JPanel tablePanel; 
 
     private JPanel classesPanel;
 
     private SingleLineMessagePanel messagePanel;
 
-    private EmfTableModel tableModel;
+    private SelectableSortFilterWrapper table;
 
     private ControlStrategyMeasureTableData tableData;
 
-    private SortFilterSelectModel sortFilterSelectModel;
+    //private SortFilterSelectModel sortFilterSelectModel;
 
     private EmfConsole parent;
 
@@ -91,8 +89,8 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
     public void display(ControlStrategy strategy) throws EmfException {
         this.allClasses = presenter.getAllClasses();
         this.classes = presenter.getControlMeasureClasses();
-        mainPanel = new JPanel(new BorderLayout(5, 5));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        //mainPanel = new JPanel(new BorderLayout(5, 5));
+        //mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setupLayout(changeablesList);
     }
 
@@ -108,26 +106,16 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         // this.setBorder(BorderFactory.createEmptyBorder(50,50,0,300));
         classesPanel = createClassesPanel(changeables);
         this.add(classesPanel, BorderLayout.NORTH);
-        // mainPanel.add(new JLabel("Measures to Include:"), BorderLayout.NORTH);
-        buildSortFilterPanel();
-        // mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
-        this.add(mainPanel, BorderLayout.CENTER);
+        //buildSortFilterPanel();
+        this.add(mainPanel(), BorderLayout.CENTER);
+        
         // disable class filter since there are measures selected
-        if (sortFilterSelectModel.getRowCount() > 0) 
+        if (table.getModel().getRowCount() > 0) 
             classesPanel.setVisible(false);//classesList.setVisible(false);
         else
             classesPanel.setVisible(true);//classesList.setVisible(false);
     }
 
-    private SortFilterSelectionPanel sortFilterPanel() {
-        tableModel = new EmfTableModel(tableData);
-        sortFilterSelectModel = new SortFilterSelectModel(tableModel);
-//        changeablesList.addChangeable(sortFilterSelectModel);
-        SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parent, sortFilterSelectModel);
-        sortFilterSelectionPanel.setPreferredSize(new Dimension(550, 300));
-        sortFilterSelectionPanel.sort(sortCriteria());
-        return sortFilterSelectionPanel;
-    }
 
     private SortCriteria sortCriteria() {
         String[] columnNames = {"Order", "Name" };
@@ -158,7 +146,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
             public void actionPerformed(ActionEvent e) {
                 messagePanel.clear();
               //get selected items
-              ControlStrategyMeasure[] selectedMeasures = (sortFilterSelectModel.selected()).toArray(new ControlStrategyMeasure[0]);
+              ControlStrategyMeasure[] selectedMeasures = (table.selected()).toArray(new ControlStrategyMeasure[0]);
               int measureSize =selectedMeasures.length;
               if (measureSize == 0) {
                   messagePanel.setMessage("Please select an items that you want to edit.");
@@ -202,7 +190,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
             public void actionPerformed(ActionEvent e) {
                 remove();
 
-                if (sortFilterSelectModel.getRowCount() > 0) 
+                if (table.getModel().getRowCount() > 0) 
                     classesPanel.setVisible(false);
                 else
                     classesPanel.setVisible(true);
@@ -212,7 +200,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
     protected void remove() {
         messagePanel.clear();
-        List selected = sortFilterSelectModel.selected();
+        List selected = table.selected();
 
         if (selected.size() == 0) {
             messagePanel.setError("Please select an item to remove.");
@@ -231,12 +219,12 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
         if (selection == JOptionPane.YES_OPTION) {
             tableData.remove(records);
-            buildSortFilterPanel();
+            refresh();
         }
 
         // disable class filter, if there are measures selected, or enable if no
         // measures are selected
-        if (sortFilterSelectModel.getRowCount() == 0) {
+        if (table.getModel().getRowCount() == 0) {
             classesList.setEnabled(true);
         } else {
             classesList.setEnabled(false);
@@ -244,17 +232,34 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
     }
 
-    private void buildSortFilterPanel() {
+    private JPanel mainPanel() {
+        JPanel mainPanel = new JPanel(new BorderLayout(5, 5));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+      
         mainPanel.removeAll();
         mainPanel.add(new JLabel("Measures to Include:"), BorderLayout.NORTH);
-        SortFilterSelectionPanel panel = sortFilterPanel();
-        mainPanel.add(panel);
+        mainPanel.add(tablePanel());
         mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
+        return mainPanel; 
+    }
+    
+    private JPanel tablePanel() {
+        tablePanel = new JPanel(new BorderLayout());
+        table = new SelectableSortFilterWrapper(parent, tableData, sortCriteria());
+        tablePanel.add(table);
 
-        // SortFilterSelectionPanel panel = sortFilterPanel();
-        // sortFilterPanelContainer.removeAll();
-        // sortFilterPanelContainer.add(panel);
-        // mainPanel.add(sortFilterPanelContainer);
+        return tablePanel;
+    }
+    
+    private void refresh(){
+        table.refresh(tableData);
+        panelRefresh();
+    }
+    
+    private void panelRefresh() {
+        tablePanel.removeAll();
+        tablePanel.add(table);
+        super.validate();
     }
 
     private JPanel createClassesPanel(ManageChangeables changeables) {
@@ -346,11 +351,11 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
             }
             tableData.add(strategyMeasures);
 
-            buildSortFilterPanel();
+            refresh();
 
             // disable class filter since there are measures selected
 //            if (sortFilterSelectModel.getRowCount() > 0) classesList.setEnabled(false);
-            if (sortFilterSelectModel.getRowCount() > 0) 
+            if (table.getModel().getRowCount() > 0) 
                 classesPanel.setVisible(false);
             else
                 classesPanel.setVisible(true);
@@ -373,7 +378,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
             Integer ver) {
         messagePanel.clear();
       //get selected items
-      ControlStrategyMeasure[] selectedMeasures = (sortFilterSelectModel.selected()).toArray(new ControlStrategyMeasure[0]);
+      ControlStrategyMeasure[] selectedMeasures = (table.selected()).toArray(new ControlStrategyMeasure[0]);
       //get all measures
       ControlStrategyMeasure[] measures = tableData.sources();
 
@@ -405,7 +410,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
       //repopulate the tabe data
       tableData = new ControlStrategyMeasureTableData(measures);
       //rebuild the sort filter panel
-      buildSortFilterPanel();
+      refresh();
     }
 
     public void notifyStrategyTypeChange(StrategyType strategyType) {

@@ -1,14 +1,11 @@
 package gov.epa.emissions.framework.client.meta.revisions;
 
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.editor.Revision;
-import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
@@ -17,13 +14,12 @@ import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class RevisionsTab extends JPanel implements RevisionsTabView {
 
     private EmfConsole parentConsole;
 
-    private SortFilterSelectModel selectModel;
+    private SelectableSortFilterWrapper table;
 
     private DesktopManager desktopManager;
 
@@ -44,25 +40,22 @@ public class RevisionsTab extends JPanel implements RevisionsTabView {
     }
 
     private JPanel createLayout(Revision[] revisions, EmfConsole parentConsole) {
-        JPanel layout = new JPanel(new BorderLayout());
+        JPanel layout = new JPanel(new BorderLayout(5, 10));
 
-        layout.add(createSortFilterPane(revisions, parentConsole), BorderLayout.CENTER);
+        layout.add(tablePanel(revisions, parentConsole), BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.SOUTH);
 
         return layout;
     }
 
-    private JScrollPane createSortFilterPane(Revision[] revisions, EmfConsole parentConsole) {
-        EmfTableModel model = new EmfTableModel(new RevisionsTableData(revisions));
-        selectModel = new SortFilterSelectModel(model);
+    private JPanel tablePanel(Revision[] revisions, EmfConsole parentConsole) {
+        //EmfTableModel model = new EmfTableModel(new RevisionsTableData(revisions));
+        JPanel tablePanel = new JPanel(new BorderLayout());
 
-        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        panel.getTable().setName("revisionsTable");
+        SelectableSortFilterWrapper table = new SelectableSortFilterWrapper(parentConsole, new RevisionsTableData(revisions), null);
 
-        JScrollPane scrollPane = new JScrollPane(panel);
-        panel.setPreferredSize(new Dimension(450, 60));
-
-        return scrollPane;
+        tablePanel.add(table);
+        return tablePanel;
     }
 
     private JPanel createControlPanel() {
@@ -83,7 +76,7 @@ public class RevisionsTab extends JPanel implements RevisionsTabView {
     }
 
     private void viewRevisions() {
-        List selected = selectModel.selected();
+        List selected = table.selected();
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
             ViewRevisionWindow view = new ViewRevisionWindow(desktopManager);
             presenter.doViewRevision((Revision) iter.next(), view);

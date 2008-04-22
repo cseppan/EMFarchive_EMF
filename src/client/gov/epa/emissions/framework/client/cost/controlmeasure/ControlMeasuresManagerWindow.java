@@ -78,7 +78,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private Pollutant[] pollutants;
 
-    private JPanel mainPanel;
+    private JPanel tablePanel;
 
     private Pollutant[] pollsFromDB;
     
@@ -213,21 +213,21 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         panel.setLayout(new BorderLayout());
 
         panel.add(createTopPanel(), BorderLayout.NORTH);
-        panel.add(mainPanel(parentConsole), BorderLayout.CENTER);
+        panel.add(tablePanel(parentConsole), BorderLayout.CENTER);
         panel.add(createControlPanel(), BorderLayout.SOUTH);
 
         this.getContentPane().add(panel);
     }
 
-    private JPanel mainPanel(EmfConsole parentConsole) {
-        this.mainPanel = new JPanel();
-        mainPanel.setLayout(new BorderLayout());
+    private JPanel tablePanel(EmfConsole parentConsole) {
+        this.tablePanel = new JPanel();
+        tablePanel.setLayout(new BorderLayout());
 
 //        JScrollPane sortFilterPane = sortFilterPane(parentConsole);
         table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
-        mainPanel.add(table);
+        tablePanel.add(table);
 
-        return mainPanel;
+        return tablePanel;
     }
 
     private void setupTableModel(ControlMeasure[] measures) throws EmfException {
@@ -645,8 +645,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     private void panelRefresh() {
-        mainPanel.removeAll();
-        mainPanel.add(table);
+        tablePanel.removeAll();
+        tablePanel.add(table);
         super.refreshLayout();
     }
     

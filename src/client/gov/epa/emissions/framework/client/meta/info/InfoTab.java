@@ -2,16 +2,12 @@ package gov.epa.emissions.framework.client.meta.info;
 
 import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
-import gov.epa.emissions.commons.gui.SimpleTableModel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.ui.Border;
-import gov.epa.emissions.framework.ui.EmfTableModel;
-import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.TableData;
-import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -23,7 +19,7 @@ public class InfoTab extends JPanel implements InfoTabView {
 
     private JPanel sourcesPanel;
 
-    private SingleLineMessagePanel messagePanel;
+    //private SingleLineMessagePanel messagePanel;
 
     public InfoTab(EmfConsole parentConsole) {
         setName("infoTab");
@@ -31,8 +27,8 @@ public class InfoTab extends JPanel implements InfoTabView {
 
         super.setLayout(new BorderLayout());
 
-        messagePanel = new SingleLineMessagePanel();
-        add(messagePanel, BorderLayout.PAGE_START);
+        //messagePanel = new SingleLineMessagePanel();
+        //add(messagePanel, BorderLayout.PAGE_START);
         add(createLayout(), BorderLayout.CENTER);
     }
 
@@ -61,15 +57,13 @@ public class InfoTab extends JPanel implements InfoTabView {
     }
 
     private JPanel createSortFilterPane(TableData tableData, EmfConsole parentConsole) {
-        EmfTableModel model = new EmfTableModel(tableData);
-        SimpleTableModel wrapperModel = new SimpleTableModel(model);
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        //SimpleTableModel wrapperModel = new SimpleTableModel(model);
 
-        SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, wrapperModel);
-        panel.getTable().setName("sourcesTable");
+        SelectableSortFilterWrapper table = new SelectableSortFilterWrapper(parentConsole, tableData, null);
+        tablePanel.add(table);
 
-        panel.setPreferredSize(new Dimension(450, 200));// essential for SortFilterTablePanel
-
-        return panel;
+        return tablePanel;
     }
 
 }

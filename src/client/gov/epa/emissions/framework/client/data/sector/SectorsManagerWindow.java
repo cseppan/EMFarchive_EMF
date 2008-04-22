@@ -4,16 +4,14 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -28,18 +26,17 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 //FIXME: look at the common design b/w this and UserManagerWindow. Refactor ?
 public class SectorsManagerWindow extends ReusableInteralFrame implements SectorsManagerView, RefreshObserver {
 
     private SectorsManagerPresenter presenter;
 
-    private SortFilterSelectModel selectModel;
-
-    private EmfTableModel model;
+    private SelectableSortFilterWrapper table;
 
     private JPanel layout;
+    
+    private JPanel tablePanel;
 
     private MessagePanel messagePanel;
 
@@ -65,7 +62,13 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     }
 
     public void refresh(Sector[] sectors) {
-        doLayout(sectors);
+        table.refresh(new SectorsTableData(sectors));
+        panelRefresh();
+    }
+    
+    private void panelRefresh() {
+        tablePanel.removeAll();
+        tablePanel.add(table);
         super.refreshLayout();
     }
 
@@ -74,22 +77,19 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     }
 
     private void doLayout(Sector[] sectors) {
-        model = new EmfTableModel(new SectorsTableData(sectors));
-        selectModel = new SortFilterSelectModel(model);
-        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-
-        createLayout(layout, sortFilterSelectPanel);
+        //model = new EmfTableModel(new SectorsTableData(sectors));
+        tablePanel = new JPanel(new BorderLayout());
+        table = new SelectableSortFilterWrapper(parentConsole, new SectorsTableData(sectors), null);
+        tablePanel.add(table);
+        createLayout();
     }
 
-    private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
+    private void createLayout() {
         layout.removeAll();
         layout.setLayout(new BorderLayout());
 
-        JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
-        sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
-
         layout.add(createTopPanel(), BorderLayout.NORTH);
-        layout.add(scrollPane, BorderLayout.CENTER);
+        layout.add(tablePanel, BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.SOUTH);
     }
 
@@ -139,7 +139,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
 
         String message = "You have asked to open a lot of windows. Do you wish to proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
-        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, selectModel, confirmDialog);
+        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, table, confirmDialog);
         crudPanel.add(viewButton);
 
         Action editAction = new AbstractAction() {
@@ -148,7 +148,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
             }
 
         };
-        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction, selectModel, confirmDialog);
+        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction, table, confirmDialog);
         crudPanel.add(editButton);
 
         JButton newButton = new JButton("New");
@@ -195,7 +195,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     }
 
     private List selected() {
-        return selectModel.selected();
+        return table.selected();
     }
 
     // FIXME: this table refresh sequence applies to every CRUD panel. Refactor

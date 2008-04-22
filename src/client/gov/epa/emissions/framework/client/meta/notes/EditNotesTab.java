@@ -2,26 +2,22 @@ package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DatasetNote;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class EditNotesTab extends JPanel implements EditNotesTabView {
 
@@ -29,7 +25,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
 
     private NotesTableData tableData;
 
-    private SortFilterSelectModel selectModel;
+    private SelectableSortFilterWrapper table;
 
     private JPanel tablePanel;
 
@@ -65,22 +61,17 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
     }
 
     private JPanel tablePanel(DatasetNote[] datasetNotes, EmfConsole parentConsole) {
-        tableData = new NotesTableData(datasetNotes);
+        setupTableModel(datasetNotes);
         changeables.addChangeable(tableData);
-        selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
-
+        
         tablePanel = new JPanel(new BorderLayout());
-        tablePanel.add(createSortFilterPanel(parentConsole), BorderLayout.CENTER);
-
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, null);
+        tablePanel.add(table);
         return tablePanel;
     }
-
-    private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
-        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-
-        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
-        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
-        return scrollPane;
+    
+    private void setupTableModel(DatasetNote[] datasetNotes) {
+        tableData = new NotesTableData(datasetNotes);
     }
 
     private JPanel controlPanel(final EditNotesTabPresenter presenter) {
@@ -116,7 +107,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
     }
 
     protected void doViewNote(EditNotesTabPresenter presenter) {
-        List notes = selectModel.selected();
+        List notes = table.selected();
         for (Iterator iter = notes.iterator(); iter.hasNext();) {
             ViewNoteWindow window = new ViewNoteWindow(desktopManager);
             presenter.doViewNote((DatasetNote) iter.next(), window);
@@ -155,9 +146,14 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
     }
     
     private void refresh(){
-        selectModel.refresh();
+        table.refresh(tableData);
+        panelRefresh();
+    }
+    
+    private void panelRefresh() {
         tablePanel.removeAll();
-        tablePanel.add(createSortFilterPanel(parentConsole));
+        tablePanel.add(table);
+        super.validate();
     }
 
     public DatasetNote[] additions() {

@@ -6,8 +6,6 @@ import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -25,11 +23,10 @@ import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
@@ -60,11 +57,11 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
     private ControlStrategyInputDatasetTableData tableData;
 
-    private SortFilterSelectModel sortFilterSelectModel;
+    private SelectableSortFilterWrapper table;
 
-    private EmfTableModel tableModel;
+    private JPanel tablePanel;
 
-    private JPanel mainPanel;
+    //private JPanel mainPanel;
 
     private DesktopManager desktopManager;
     
@@ -97,30 +94,28 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         setLayout(new BorderLayout(5, 5));
         add(panel,BorderLayout.SOUTH);
         // mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
-        mainPanel = new JPanel(new BorderLayout(10, 10));
-        buildSortFilterPanel();
+        //mainPanel = new JPanel(new BorderLayout(10, 10));
+        //buildSortFilterPanel();
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        this.add(mainPanel, BorderLayout.CENTER);
+        this.add(buildSortFilterPanel(), BorderLayout.CENTER);
         notifyStrategyTypeChange(controlStrategy.getStrategyType());
     }
 
-    private void buildSortFilterPanel() {
-        mainPanel.removeAll();
-        JPanel panel = new JPanel(new BorderLayout());
+    private JPanel buildSortFilterPanel() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(new Border("Inventories to Process"));
-        SortFilterSelectionPanel sfpanel = sortFilterPanel();
-        panel.add(sfpanel, BorderLayout.CENTER);
+        //SortFilterSelectionPanel sfpanel = sortFilterPanel();
+        panel.add(tablePanel(), BorderLayout.CENTER);
         panel.add(buttonPanel(), BorderLayout.SOUTH);
-        mainPanel.add(panel);
+        return panel; 
     }
+    
+    private JPanel tablePanel() {
+        tablePanel = new JPanel(new BorderLayout());
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, null);
+        tablePanel.add(table);
 
-    private SortFilterSelectionPanel sortFilterPanel() {
-        tableModel = new EmfTableModel(tableData);
-        sortFilterSelectModel = new SortFilterSelectModel(tableModel);
-        //changeablesList.addChangeable(sortFilterSelectModel);
-        SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parentConsole, sortFilterSelectModel);
-        sortFilterSelectionPanel.setPreferredSize(new Dimension(625, 200));
-        return sortFilterSelectionPanel;
+        return tablePanel;
     }
 
     private JPanel buttonPanel() {
@@ -188,7 +183,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             }
             tableData.add(controlStrategyInputDatasets);
             if (inputDatasets.length > 0) editControlStrategyPresenter.fireTracking();
-            buildSortFilterPanel();
+            refresh();
         } catch (Exception exp) {
             messagePanel.setError(exp.getMessage());
         }
@@ -197,7 +192,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     private void setVersionAction(){
         messagePanel.clear();
         //get a single selected item
-        List selected = sortFilterSelectModel.selected();
+        List selected = table.selected();
         if (selected.size() != 1) {
             messagePanel.setMessage("Please select a single item to set version.");
             return;
@@ -228,9 +223,19 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             //repopulate the tabe data
             tableData = new ControlStrategyInputDatasetTableData(datasets);
             //rebuild the sort filter panelControlStrategyInputDatasetTableData
-            buildSortFilterPanel();
+            refresh();
         }
-        
+    }
+    
+    private void refresh(){
+        table.refresh(tableData);
+        panelRefresh();
+    }
+    
+    private void panelRefresh() {
+        tablePanel.removeAll();
+        tablePanel.add(table);
+        super.validate();
     }
 
     private void fillVersions(EmfDataset dataset) throws EmfException{
@@ -258,7 +263,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
  
     protected void removeAction() {
         messagePanel.clear();
-        List selected = sortFilterSelectModel.selected();
+        List selected = table.selected();
 
         if (selected.size() == 0) {
             messagePanel.setError("Please select an item to remove.");
@@ -278,13 +283,13 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         if (selection == JOptionPane.YES_OPTION) {
             tableData.remove(controlStrategyInputDatasets);
             if (controlStrategyInputDatasets.length > 0) editControlStrategyPresenter.fireTracking();
-            buildSortFilterPanel();
+            refresh();
         }
     }
 
     protected void viewAction() throws EmfException {
         messagePanel.clear();
-        List selected = sortFilterSelectModel.selected();
+        List selected = table.selected();
 
         if (selected.size() == 0) {
             messagePanel.setError("Please select an item to view.");
@@ -394,7 +399,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
     public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         tableData.add(controlStrategy.getControlStrategyInputDatasets());
-        buildSortFilterPanel();
+        refresh();
     }
 
     public void notifyStrategyTypeChange(StrategyType strategyType) {

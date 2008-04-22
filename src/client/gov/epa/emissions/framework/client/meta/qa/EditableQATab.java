@@ -5,16 +5,14 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
@@ -25,7 +23,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class EditableQATab extends JPanel implements EditableQATabView {
 
@@ -33,7 +30,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     private EditableQAStepsTableData tableData;
 
-    private SortFilterSelectModel selectModel;
+    private SelectableSortFilterWrapper table;
 
     private JPanel tablePanel;
 
@@ -64,21 +61,17 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     }
 
     protected JPanel tablePanel(QAStep[] steps) {
-        tableData = new EditableQAStepsTableData(steps);
-        selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
+        setupTableModel(steps);
 
         tablePanel = new JPanel(new BorderLayout());
-        tablePanel.add(createSortFilterPanel(parentConsole), BorderLayout.CENTER);
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+        tablePanel.add(table, BorderLayout.CENTER);
 
         return tablePanel;
     }
-
-    private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
-        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        sortFilterPanel.sort(sortCriteria());
-        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
-        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
-        return scrollPane;
+    
+    private void setupTableModel(QAStep[] steps) {
+        tableData = new EditableQAStepsTableData(steps);
     }
 
     private SortCriteria sortCriteria() {
@@ -149,7 +142,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     private void doEdit() {
         clearMessage();
 
-        List selected = selectModel.selected();
+        List selected = table.selected();
         if (selected.size() == 0) {
             messagePanel.setMessage("Please select a QA step.");
             return;
@@ -204,16 +197,20 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     
     public void refresh() {
         tableData.refresh();
-        selectModel.refresh();
-
+        table.refresh(tableData);
+        panelRefresh();
+    }
+    
+    private void panelRefresh() {
         tablePanel.removeAll();
-        tablePanel.add(createSortFilterPanel(parentConsole));
+        tablePanel.add(table);
+        super.validate();
     }
 
     public void doSetStatus() {
         clearMessage();
 
-        List selected = selectModel.selected();
+        List selected = table.selected();
         QAStep[] steps = (QAStep[]) selected.toArray(new QAStep[0]);
         if (steps.length > 0)
             presenter.doSetStatus(new SetQAStatusWindow(desktop, datasetID), steps);

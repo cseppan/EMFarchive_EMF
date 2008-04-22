@@ -28,7 +28,7 @@ public class ViewRevisionWindow extends DisposableInteralFrame implements Revisi
     private static int count = 0;
 
     public ViewRevisionWindow(DesktopManager desktopManager) {
-        super("View Revision", new Dimension(550, 275), desktopManager);
+        super("View Revision", new Dimension(650, 350), desktopManager);
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
@@ -53,18 +53,21 @@ public class ViewRevisionWindow extends DisposableInteralFrame implements Revisi
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Summary", new Label(revision.getWhat()), panel);
+        TextArea whatText = new TextArea("What", revision.getWhy(), 48, 5);
+        whatText.setEditable(false);
+        ScrollableComponent scrollableWhat = ScrollableComponent.createWithVerticalScrollBar(whatText);
+        layoutGenerator.addLabelWidgetPair("What:", scrollableWhat, panel);
 
-        TextArea details = new TextArea("Why", revision.getWhy(), 40, 3);
+        TextArea details = new TextArea("Why", revision.getWhy(), 48, 5);
         details.setEditable(false);
-        ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(details);
-        layoutGenerator.addLabelWidgetPair("Why", scrollableDetails, panel);
+        ScrollableComponent scrollableWhy = ScrollableComponent.createWithVerticalScrollBar(details);
+        layoutGenerator.addLabelWidgetPair("Why: ", scrollableWhy, panel);
 
-        layoutGenerator.addLabelWidgetPair("Dataset", new Label(dataset.getName()), panel);
-        layoutGenerator.addLabelWidgetPair("Version", new Label("" + revision.getVersion()), panel);
-        layoutGenerator.addLabelWidgetPair("Creator", new Label(revision.getCreator().getName()), panel);
-        layoutGenerator.addLabelWidgetPair("Date", new Label(format(revision.getDate())), panel);
-        layoutGenerator.addLabelWidgetPair("References", new Label(references(revision)), panel);
+        layoutGenerator.addLabelWidgetPair("Dataset:", new Label(dataset.getName()), panel);
+        layoutGenerator.addLabelWidgetPair("Version:", new Label("" + revision.getVersion()), panel);
+        layoutGenerator.addLabelWidgetPair("Creator:", new Label(revision.getCreator().getName()), panel);
+        layoutGenerator.addLabelWidgetPair("Date:", new Label(format(revision.getDate())), panel);
+        layoutGenerator.addLabelWidgetPair("References:", new Label(references(revision)), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols

@@ -1,8 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
@@ -22,8 +20,8 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
@@ -57,9 +55,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private EmfConsole parentConsole;
 
-    private SortFilterSelectModel selectModel;
+    private SelectableSortFilterWrapper table;
 
-//    private CheckBox inventoryCheckBox;
+    private JPanel tablePanel; 
 
     private Button analysisButton, view, exportButton, createButton, editButton;
     
@@ -87,20 +85,15 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     public void display(ControlStrategy strategy, ControlStrategyResult[] controlStrategyResults) {
-      setLayout(controlStrategy, controlStrategyResults);
+      setLayout(controlStrategyResults);
     }
 
-    private void setLayout(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
-//        //this is called for both the load and refresh window process, so i'll set the boolean flag here...
-//        for (int i = 0; i < controlStrategyResults.length; i++) {
-//            if (controlStrategyResults[i].getControlledInventoryDataset() != null) 
-//            hasControlledInventories = true;
-//        }
+    private void setLayout(ControlStrategyResult[] controlStrategyResults) {
+//        //this is called for both the load window process, so i'll set the boolean flag here...
         
         setLayout(new BorderLayout());
         removeAll();
-        add(outputPanel(controlStrategy, controlStrategyResults));
-   //     add(bottomPanel(controlStrategyResults), BorderLayout.SOUTH);
+        add(outputPanel(controlStrategyResults));
     }
 
     public void save(ControlStrategy controlStrategy) {
@@ -172,32 +165,6 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             messagePanel.setMessage(e.getMessage());
         }
     }
-
-//    private JPanel bottomPanel(ControlStrategyResult[] controlStrategyResults) {
-//        JPanel topPanel = new JPanel(new BorderLayout());
-////        topPanel.add(productPanel());
-////        topPanel.add(createButtonPanel(), BorderLayout.SOUTH);
-//        disableTopPanel(controlStrategyResults);
-//        topPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
-//                BorderFactory.createTitledBorder("Outputs")));
-//
-//        return topPanel;
-//    }
-
-//    private void disableTopPanel(ControlStrategyResult[] controlStrategyResults) {
-//        boolean enable = (controlStrategyResults == null) ? false : true;
-//        if (enable)
-//            return;
-//        inventoryCheckBox.setEnabled(enable);
-//        createButton.setEnabled(enable);
-//    }
-
-//    private JPanel createButtonPanel() {
-//        createButton = new Button("Create", createOutputAction());
-//        JPanel createPanel = new JPanel();
-//        createPanel.add(createButton);
-//        return createPanel;
-//    }
 
     private Action createOutputAction() {
         Action action = new AbstractAction() {
@@ -280,17 +247,6 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         }
     }
 
-//    private JPanel productPanel() {
-//        JPanel productPanel = new JPanel();
-//        inventoryCheckBox = new CheckBox("Controlled Inventory");
-//        inventoryCheckBox.setSelected(true);
-//        CheckBox summaryFIPS = new CheckBox("Custom Summaries");
-//        summaryFIPS.setEnabled(false);
-//        productPanel.add(inventoryCheckBox);
-//        productPanel.add(summaryFIPS);
-//        return productPanel;
-//    }
-
     private JPanel folderPanel() {
         JLabel folderLabel = new JLabel("Export Folder: ");
         folder = new TextField("folderName", 30);
@@ -308,8 +264,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         return panel;
     }
 
-    private JPanel outputPanel(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
-        JPanel tablePanel = tablePanel(controlStrategy, controlStrategyResults);
+    private JPanel outputPanel(ControlStrategyResult[] controlStrategyResults) {
+        JPanel tablePanel = tablePanel(controlStrategyResults);
         JPanel buttonPanel = buttonPanel();
 
         JPanel outputPanel = new JPanel(new BorderLayout(5, 10));
@@ -325,23 +281,18 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         return outputPanel;
     }
 
-    private JPanel tablePanel(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
+    private JPanel tablePanel(ControlStrategyResult[] controlStrategyResults) {
         ControlStrategyOutputTableData tableData = new ControlStrategyOutputTableData(controlStrategyResults);
-        EmfTableModel model = new EmfTableModel(tableData);
-        selectModel = new SortFilterSelectModel(model);
-//        if (selectModel.getRowCount() == 1) selectModel.setValueAt(true, 0, 0);
-        SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        sortFilterSelectionPanel.setPreferredSize(new Dimension(625, 200));
-        sortFilterSelectionPanel.sort(sortCriteria());
-        selectModel.addTableModelListener(new TableModelListener() {
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+        table.getModel().addTableModelListener(new TableModelListener() {
 
             public void tableChanged(TableModelEvent e) {
                 toggleRadioButtons();
             }
         }
         );
-        JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.add(sortFilterSelectionPanel);
+        tablePanel = new JPanel(new BorderLayout());
+        tablePanel.add(table);
         return tablePanel;
     }
 
@@ -561,7 +512,12 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
-        setLayout(controlStrategy, controlStrategyResults);
+        //setLayout(controlStrategy, controlStrategyResults);
+        ControlStrategyOutputTableData tableData = new ControlStrategyOutputTableData(controlStrategyResults);
+        table.refresh(tableData);
+        tablePanel.removeAll();
+        tablePanel.add(table);
+        super.validate();
     }
 
     private void viewDataSets() {
@@ -601,7 +557,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     
 
     private ControlStrategyResult[] getSelectedDatasets() {
-        return selectModel.selected().toArray(new ControlStrategyResult[0]);
+        return table.selected().toArray(new ControlStrategyResult[0]);
     }
 
     public void clearMsgPanel() {
@@ -612,5 +568,6 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         // NOTE Auto-generated method stub
         
     }
+
 
 }

@@ -4,8 +4,6 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -13,10 +11,10 @@ import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -29,17 +27,18 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class DatasetTypesManagerWindow extends ReusableInteralFrame implements DatasetTypesManagerView, RefreshObserver {
 
     private DatasetTypesManagerPresenter presenter;
 
-    private SortFilterSelectModel selectModel;
+    //private SortFilterSelectModel selectModel;
 
-    private EmfTableModel model;
+    private SelectableSortFilterWrapper table;
 
     private JPanel layout;
+    
+    private JPanel tablePanel;
 
     private MessagePanel messagePanel;
 
@@ -63,7 +62,14 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     public void refresh(DatasetType[] types) {
-        doLayout(types);
+        //doLayout(types);
+        table.refresh(new DatasetTypesTableData(types));
+        panelRefresh();
+    }
+    
+    private void panelRefresh() {
+        tablePanel.removeAll();
+        tablePanel.add(table);
         super.refreshLayout();
     }
 
@@ -77,18 +83,15 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         layout.setLayout(new BorderLayout());
 
         layout.add(createTopPanel(), BorderLayout.NORTH);
-        layout.add(createSortFilterScrollPane(types), BorderLayout.CENTER);
+        layout.add(tablePanel(types), BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.SOUTH);
     }
 
-    private JScrollPane createSortFilterScrollPane(DatasetType[] types) {
-        model = new EmfTableModel(new DatasetTypesTableData(types));
-        selectModel = new SortFilterSelectModel(model);
-
-        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
-
-        return new JScrollPane(sortFilterSelectPanel);
+    private JPanel tablePanel(DatasetType[] types) {
+        tablePanel = new JPanel(new BorderLayout());
+        table = new SelectableSortFilterWrapper(parentConsole, new DatasetTypesTableData(types), null);
+        tablePanel.add(table);
+        return tablePanel;
     }
 
     private JPanel createTopPanel() {
@@ -133,14 +136,14 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
                 viewDatasetTypes();
             }
         };
-        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, selectModel, confirmDialog);
+        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, table, confirmDialog);
 
         Action editAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 editDatasetTypes();
             }
         };
-        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction, selectModel, confirmDialog);
+        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction, table, confirmDialog);
 
         Action createAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -189,7 +192,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private List selected() {
-        return selectModel.selected();
+        return table.selected();
     }
 
     private ViewableDatasetTypeWindow viewableView() {
