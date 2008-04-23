@@ -373,25 +373,28 @@ public class CaseDAO {
 
     private List<CaseInput> getCaseInputsWithShow(boolean showAll, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
-        Criterion crit2 = Restrictions.eq("show", showAll);
+        Criterion crit2 = Restrictions.eq("show", true);
+        Criterion[] crits = (showAll) ? new Criterion[]{crit1} : new Criterion[]{crit1, crit2};
 
-        return hibernateFacade.get(CaseInput.class, new Criterion[] { crit1, crit2 }, session);
+        return hibernateFacade.get(CaseInput.class, crits, session);
     }
 
     private List<CaseInput> getCaseInputsWithNullSector(boolean showAll, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.isNull("sector");
-        Criterion crit3 = Restrictions.eq("show", showAll);
+        Criterion crit3 = Restrictions.eq("show", true);
+        Criterion[] crits = (showAll) ? new Criterion[]{crit1, crit2} : new Criterion[]{crit1, crit2, crit3};
 
-        return hibernateFacade.get(CaseInput.class, new Criterion[] { crit1, crit2, crit3 }, session);
+        return hibernateFacade.get(CaseInput.class, crits, session);
     }
 
     private List<CaseInput> getCaseInputsWithSector(boolean showAll, Sector sector, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("sector", sector);
-        Criterion crit3 = Restrictions.eq("show", showAll);
+        Criterion crit3 = Restrictions.eq("show", true);
+        Criterion[] crits = (showAll) ? new Criterion[]{crit1, crit2} : new Criterion[]{crit1, crit2, crit3};
 
-        return hibernateFacade.get(CaseInput.class, new Criterion[] { crit1, crit2, crit3 }, session);
+        return hibernateFacade.get(CaseInput.class, crits, session);
     }
 
     public List<CaseInput> getJobInputs(int caseId, int jobId, Sector sector, Session session) {
@@ -695,7 +698,6 @@ public class CaseDAO {
     }
     
     public List<CaseParameter> getCaseParameters(int caseId, Session session) {
-
         Criterion crit = Restrictions.eq("caseID", new Integer(caseId));
 
         return hibernateFacade.get(CaseParameter.class, crit, session);
@@ -727,25 +729,28 @@ public class CaseDAO {
 
     private List<CaseParameter> getCaseParametersWithShow(boolean showAll, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
-        Criterion crit2 = Restrictions.eq("show", showAll);
+        Criterion crit2 = Restrictions.eq("show", true);
+        Criterion[] crits = (showAll) ? new Criterion[]{crit1} : new Criterion[]{crit1, crit2};
 
-        return hibernateFacade.get(CaseParameter.class, new Criterion[] { crit1, crit2 }, session);
+        return hibernateFacade.get(CaseParameter.class, crits, session);
     }
 
     private List<CaseParameter> getCaseParametersWithNullSector(boolean showAll, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.isNull("sector");
-        Criterion crit3 = Restrictions.eq("show", showAll);
+        Criterion crit3 = Restrictions.eq("show", true);
+        Criterion[] crits = (showAll) ? new Criterion[]{crit1, crit2} : new Criterion[]{crit1, crit2, crit3};
 
-        return hibernateFacade.get(CaseParameter.class, new Criterion[] { crit1, crit2, crit3 }, session);
+        return hibernateFacade.get(CaseParameter.class, crits, session);
     }
 
     private List<CaseParameter> getCaseParametersWithSector(boolean showAll, Sector sector, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("sector", sector);
-        Criterion crit3 = Restrictions.eq("show", showAll);
+        Criterion crit3 = Restrictions.eq("show", true);
+        Criterion[] crits = (showAll) ? new Criterion[]{crit1, crit2} : new Criterion[]{crit1, crit2, crit3};
 
-        return hibernateFacade.get(CaseInput.class, new Criterion[] { crit1, crit2, crit3 }, session);
+        return hibernateFacade.get(CaseInput.class, crits, session);
     }
 
     public boolean caseParameterExists(CaseParameter param, Session session) {
