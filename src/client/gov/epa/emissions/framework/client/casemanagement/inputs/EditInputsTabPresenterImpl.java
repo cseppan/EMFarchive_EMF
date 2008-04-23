@@ -90,8 +90,14 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         addNewInputDialog(dialog, newInput);
     }
 
+    //NOTE: used for copying into different case
     public void copyInput(int caseId, List<CaseInput> inputs) throws Exception {
-        service().addCaseInputs(session.user(), caseId, inputs.toArray(new CaseInput[0]));
+        CaseInput[] inputsArray = inputs.toArray(new CaseInput[0]);
+        
+        for (int i = 0; i < inputs.size(); i++)
+            inputsArray[i].setParentCaseId(this.caseObj.getId());
+        
+        service().addCaseInputs(session.user(), caseId, inputsArray);
     }
 
     public void copyInput(int caseId, CaseInput input) throws Exception {

@@ -10,6 +10,7 @@
  	            </id>
 
     			<property name="caseID" column="case_id" type="integer" not-null="true"/>
+    			<property name="parentCaseId" column="parent_case_id" type="integer" not-null="false"/>
     			<property name="jobId" column="case_job_id" type="integer" not-null="false"/>
     			<property name="value"	column="env_value"	type="java.lang.String"	not-null="false"/>
       			<property name="notes"	column="notes"	type="java.lang.String"	not-null="false"/>

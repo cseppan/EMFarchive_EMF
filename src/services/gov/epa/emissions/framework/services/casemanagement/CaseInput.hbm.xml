@@ -10,6 +10,7 @@
  	            </id>
 
     			<property name="caseID" column="case_id" type="integer" not-null="true"/>
+    			<property name="parentCaseId" column="parent_case_id" type="integer" not-null="false"/>
     			<property name="caseJobID" column="case_job_id" type="integer" not-null="false"/>
     			<property name="subdir"	column="sub_dir"	type="java.lang.String"	not-null="false"/>
 				<property name="required"	column="required"	type="boolean"	not-null="false"/>

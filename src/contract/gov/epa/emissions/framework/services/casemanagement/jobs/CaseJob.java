@@ -35,6 +35,8 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     
     private int caseId;
     
+    private int parentCaseId;
+    
     private Date runStartDate;
 
     private Date runCompletionDate;
@@ -272,6 +274,14 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
 
     public void setRunJobUser(User runJobUser) {
         this.runJobUser = runJobUser;
+    }
+
+    public int getParentCaseId() {
+        return parentCaseId;
+    }
+
+    public void setParentCaseId(int parentCaseId) {
+        this.parentCaseId = parentCaseId;
     }
 
 }

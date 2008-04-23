@@ -13,6 +13,8 @@ public class CaseInput implements Serializable, Comparable {
     private int id;
 
     private int caseID;
+    
+    private int parentCaseId;
 
     private int caseJobID;
     
@@ -208,6 +210,14 @@ public class CaseInput implements Serializable, Comparable {
 
     public Date getLastModifiedDate() {
         return lastModifiedDate;
+    }
+
+    public int getParentCaseId() {
+        return parentCaseId;
+    }
+
+    public void setParentCaseId(int parentCaseId) {
+        this.parentCaseId = parentCaseId;
     }
 
 }

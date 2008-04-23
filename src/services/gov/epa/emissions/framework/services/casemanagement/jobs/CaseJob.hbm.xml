@@ -11,6 +11,7 @@
  	    
  	    <property name="name" column="name" type="java.lang.String" not-null="true"/>
     	<property name="caseId" column="case_id" type="integer" not-null="true"/>
+    	<property name="parentCaseId" column="parent_case_id" type="integer" not-null="false"/>
     	<property name="purpose" column="purpose" type="java.lang.String" not-null="false"/>
     	<property name="jobNo" column ="job_num" type="float" not-null="false"/>
 		<property name="args" column="arguments" type="java.lang.String" not-null="false"/>

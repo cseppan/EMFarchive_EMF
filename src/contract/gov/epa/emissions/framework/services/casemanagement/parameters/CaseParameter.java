@@ -36,6 +36,8 @@ public class CaseParameter implements Serializable, Comparable<CaseParameter> {
     
     private int caseID;
     
+    private int parentCaseId;
+    
     private Date lastModifiedDate;
     
     public CaseParameter() {
@@ -207,6 +209,14 @@ public class CaseParameter implements Serializable, Comparable<CaseParameter> {
 
     public Date getLastModifiedDate() {
         return lastModifiedDate;
+    }
+
+    public int getParentCaseId() {
+        return parentCaseId;
+    }
+
+    public void setParentCaseId(int parentCaseId) {
+        this.parentCaseId = parentCaseId;
     }
 
 }

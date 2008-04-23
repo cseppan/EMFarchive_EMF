@@ -178,3 +178,8 @@ ALTER TABLE cases.cases_casejobs DROP COLUMN job_key;
 
 -- 4/21/2008 add parent id column to cases.cases table
 ALTER TABLE cases.cases DROP COLUMN parent_id;
+
+-- 4/23/2008 add parent_case_id column
+ALTER TABLE cases.cases_casejobs ADD COLUMN parent_case_id int4 DEFAULT 0;
+ALTER TABLE cases.cases_caseinputs ADD COLUMN parent_case_id int4 DEFAULT 0;
+ALTER TABLE cases.cases_parameters ADD COLUMN parent_case_id int4 DEFAULT 0;

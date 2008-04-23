@@ -23,19 +23,19 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
     private EditCaseParametersTabView view;
 
     private EmfSession session;
-    
+
     private int defaultPageSize = 20;
 
     public EditParametersTabPresenterImpl(EmfSession session, EditCaseParametersTabView view, Case caseObj) {
         this.caseObj = caseObj;
         this.view = view;
         this.session = session;
-        
+
         try {
             UserPreference pref = new DefaultUserPreferences();
             defaultPageSize = Integer.parseInt(pref.sortFilterPageSize());
         } catch (Exception e) {
-            //NOTE: pass silently
+            // NOTE: pass silently
         }
     }
 
@@ -81,8 +81,14 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
         addNewParameterDialog(dialog, newParam);
     }
 
+    // NOTE: used for copying into different case
     public void copyParameter(int caseID, List<CaseParameter> params) throws Exception {
-        service().addCaseParameters(session.user(), caseID, params.toArray(new CaseParameter[0]));
+        CaseParameter[] paramsArray = params.toArray(new CaseParameter[0]);
+        
+        for (int i = 0; i < params.size(); i++)
+            paramsArray[i].setParentCaseId(this.caseObj.getId());
+        
+        service().addCaseParameters(session.user(), caseID, paramsArray);
     }
 
     public void addParameterFields(CaseParameter newParameter, JComponent container,

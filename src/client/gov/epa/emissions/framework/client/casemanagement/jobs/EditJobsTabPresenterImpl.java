@@ -106,17 +106,21 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         newJob.setRunStartDate(null);
         newJob.setRunCompletionDate(null);
 
-//        EditJobPresenter presenter = new EditCaseJobPresenterImpl(jobEditor, view, this, session);
-//        presenter.display(addNewJob(newJob));
         addNewJob(newJob);
     }
 
     public void copyJobs(int caseId, List<CaseJob> jobs) throws Exception {
-        if (caseId == this.caseObj.getId())
+        if (caseId == this.caseObj.getId()) {
             for (CaseJob job : jobs)
                 copyJob2CurrentCase(caseId, job, null);
-        else
-            service().addCaseJobs(session.user(), caseId, jobs.toArray(new CaseJob[0]));
+        } else {
+            CaseJob[] jobsArray = jobs.toArray(new CaseJob[0]);
+            
+            for (int i = 0; i < jobs.size(); i++)
+                jobsArray[i].setParentCaseId(this.caseObj.getId());
+            
+            service().addCaseJobs(session.user(), caseId, jobsArray);
+        }
     }
 
     public CaseJob[] getCaseJobs() throws EmfException {
