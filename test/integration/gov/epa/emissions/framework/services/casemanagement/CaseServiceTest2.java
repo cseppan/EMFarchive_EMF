@@ -58,7 +58,7 @@ public class CaseServiceTest2 extends ServiceTestCase {
 
         // create a new case and set the name and export top dir
         Case element = new Case(name);
-        element.setInputFileDir("/home/azubrow/smoke_emf_training/2002/smoke");
+        element.setInputFileDir("D:\\temp");
         element.setCaseCategory(category);
 
         // adds the element to the db and then reloads it from the db
@@ -300,6 +300,158 @@ public class CaseServiceTest2 extends ServiceTestCase {
             remove(execVal);
             remove(caseObj);
 
+        }
+    }
+
+    public void testMergeCases() throws Exception {
+        Case template = newCase("Template Test Case", new CaseCategory("Template"), true);
+        Case parent = newCase("Parent Test Case", new CaseCategory("Parent"), true);
+        Case sensitivity = new Case("Sensitivity Test Case");
+        
+        CaseJob job = new CaseJob();
+        EmfDataset[] datasets = null;
+        CaseInput[] inputs = null;
+        InputName[] inNames = null;
+        CaseProgram program = null;
+        Executable execVal = null;
+        SubDir subDirObj = null;
+        CaseCategory category = null;
+        
+        try {
+            User user = userService.getUser("emf");
+            
+            execVal = new Executable();
+            execVal.setName("smk_onroad_test.csh");
+            add(execVal);
+            execVal = (Executable) load(Executable.class, execVal.getName());
+            
+            job.setName("job_test1");
+            job.setPath("D:\\temp");
+            job.setExecutable(execVal);
+            datasets = loadMetaDatasets(2);
+            inputs = new CaseInput[datasets.length];
+            inNames = new InputName[datasets.length];
+            
+            session.clear();
+            
+            subDirObj = new SubDir();
+            subDirObj.setName("ge_dat/v3");
+            add(subDirObj);
+            subDirObj = (SubDir) load(SubDir.class, subDirObj.getName());
+            
+            program = new CaseProgram("test case program2");
+            add(program);
+            program = (CaseProgram) load(CaseProgram.class, program.getName());
+            
+            for (int i = 0; i < datasets.length; i++) {
+                inputs[i] = new CaseInput();
+                inNames[i] = new InputName();
+                inNames[i].setName(datasets[i].getDatasetTypeName() + "test");
+                add(inNames[i]);
+                inNames[i] = (InputName) load(InputName.class, inNames[i].getName());
+                
+                inputs[i].setInputName(inNames[i]);
+                inputs[i].setDataset(datasets[i]);
+                inputs[i].setVersion(newVersion(datasets[i], 0, true));
+                inputs[i].setDatasetType(datasets[i].getDatasetType());
+                inputs[i].setProgram(program);
+                inputs[i].setSector(datasets[i].getSectors()[0]);
+                inputs[i].setSubdirObj(subDirObj);
+                
+                inputs[i].setCaseID(template.getId());
+                
+                add(inputs[i]);
+                inputs[i] = loadCaseInput(inputs[i]);
+                
+            }
+            
+            job = loadNewCaseJob(job, template);
+            sensitivity.setAbbreviation(new Abbreviation("xyz"));
+            
+            add(new CaseCategory("Sensitivity"));
+            category = (CaseCategory) load(CaseCategory.class, "Sensitivity");
+            sensitivity.setCaseCategory(category);
+            
+            parent.setDescription("Test parent case in merge cases test.");
+            
+            service.mergeCases(user, parent.getId(), template.getId(), new int[] {job.getId()}, sensitivity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                dropAll(CaseInput.class);
+            } catch (RuntimeException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+            try {
+                for (InputName name : inNames)
+                    remove(name);
+            } catch (RuntimeException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+            try {
+                remove(program);
+            } catch (RuntimeException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+            try {
+                dropAll(Version.class);
+            } catch (RuntimeException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+            try {
+                dropAll(SubDir.class);
+            } catch (RuntimeException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+            try {
+                dropAll(EmfDataset.class);
+            } catch (RuntimeException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            try {
+                dropAll(CaseJob.class);
+            } catch (RuntimeException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+            try {
+                dropAll(Executable.class);
+            } catch (RuntimeException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+            try {
+                dropAll(Case.class);
+            } catch (RuntimeException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+            try {
+                dropAll(CaseCategory.class);
+            } catch (RuntimeException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+            try {
+                dropAll(Abbreviation.class);
+            } catch (RuntimeException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 

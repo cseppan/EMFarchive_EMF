@@ -629,5 +629,9 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getAllCaseNameIDs();
     }
 
+    public int mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, Case sensitivityCase) throws EmfException {
+        return getCaseService().mergeCases(user, parentCaseId, templateCaseId, jobIds, sensitivityCase);
+    }
+
 
 }

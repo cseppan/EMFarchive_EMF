@@ -828,7 +828,8 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized CaseInput[] getCaseInputs(int pageSize, int caseId, Sector sector, boolean showAll) throws EmfException {
+    public synchronized CaseInput[] getCaseInputs(int pageSize, int caseId, Sector sector, boolean showAll)
+            throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -2566,7 +2567,7 @@ public class ManagedCaseService {
                 throw new EmfException("Error changing job log directory's write permissions: " + logDir);
             }
         }
-        logDir.getParentFile().setWritable(true,false);
+        logDir.getParentFile().setWritable(true, false);
 
         // Create the logFile full name
         logFileName = logDir + System.getProperty("file.separator") + logFileName;
@@ -3258,6 +3259,151 @@ public class ManagedCaseService {
         } finally {
             session.close();
         }
+    }
+
+    public synchronized int mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds,
+            Case sensitivityCase) throws EmfException {
+        Session session = sessionFactory.getSession();
+        Case lockedSC = null;
+        Case lockedPC = null;
+        Case lockedTC = null;
+
+        try {
+            Abbreviation abbr = sensitivityCase.getAbbreviation();
+
+            if (abbr != null)
+                dao.add(abbr, session);
+
+            dao.add(sensitivityCase, session);
+            Case loaded = (Case) dao.load(Case.class, sensitivityCase.getName(), session);
+            lockedSC = dao.obtainLocked(user, loaded, session);
+            int targetId = loaded.getId();
+
+            Case parent = dao.getCase(parentCaseId, session);
+            lockedPC = dao.obtainLocked(user, parent, session);
+            Case template = dao.getCase(templateCaseId, session);
+            lockedTC = dao.obtainLocked(user, template, session);
+
+            if (lockedSC == null)
+                throw new EmfException("Cannot obtain lock for merging case to happen: User " + loaded.getLockOwner()
+                        + " has the lock for case '" + loaded.getName() + "'");
+
+            if (lockedPC == null)
+                throw new EmfException("Cannot obtain lock for merging case to happen: User " + parent.getLockOwner()
+                        + " has the lock for case '" + parent.getName() + "'");
+
+            if (lockedTC == null)
+                throw new EmfException("Cannot obtain lock for merging case to happen: User " + template.getLockOwner()
+                        + " has the lock for case '" + template.getName() + "'");
+
+            CaseJob[] jobs = cloneCaseJobs(getJobs2Copy(jobIds));
+            CaseInput[] inputs = cloneCaseInputs(dao.getCaseInputs(template.getId(), session).toArray(new CaseInput[0]));
+            CaseParameter[] params = cloneCaseParameters(dao.getCaseParameters(template.getId(), session).toArray(
+                    new CaseParameter[0]));
+
+            setParentId(templateCaseId, jobs, inputs, params);
+            addCaseJobs(user, targetId, jobs);
+            addCaseInputs(user, targetId, inputs);
+            addCaseParameters(user, targetId, params);
+            copySummaryInfo(lockedPC, lockedSC);
+
+            if (abbr == null)
+                lockedSC.setAbbreviation(new Abbreviation(lockedSC.getId() + ""));
+            
+            updateCase(lockedSC);
+
+            return targetId;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not merge case.", e);
+            throw new EmfException("Could not merge case. " + e.getMessage());
+        } finally {
+            if (lockedSC != null)
+                dao.releaseLocked(user, lockedSC, session);
+
+            if (lockedPC != null)
+                dao.releaseLocked(user, lockedPC, session);
+
+            if (lockedTC != null)
+                dao.releaseLocked(user, lockedTC, session);
+
+            session.close();
+        }
+    }
+
+    private void setParentId(int parentCaseId, CaseJob[] jobs, CaseInput[] inputs, CaseParameter[] params) {
+        for (CaseJob job : jobs)
+            job.setParentCaseId(parentCaseId);
+
+        for (CaseInput input : inputs)
+            input.setParentCaseId(parentCaseId);
+
+        for (CaseParameter parameter : params)
+            parameter.setParentCaseId(parentCaseId);
+    }
+
+    private void copySummaryInfo(Case parent, Case sensitivityCase) {
+        sensitivityCase.setAirQualityModel(parent.getAirQualityModel());
+        sensitivityCase.setBaseYear(parent.getBaseYear());
+        sensitivityCase.setControlRegion(parent.getControlRegion());
+        sensitivityCase.setDescription(parent.getDescription());
+        sensitivityCase.setEmissionsYear(parent.getEmissionsYear());
+        sensitivityCase.setFutureYear(parent.getFutureYear());
+        sensitivityCase.setGrid(parent.getGrid());
+        sensitivityCase.setGridDescription(parent.getGridDescription());
+        sensitivityCase.setGridResolution(parent.getGridResolution());
+        sensitivityCase.setMeteorlogicalYear(parent.getMeteorlogicalYear());
+        sensitivityCase.setModel(parent.getModel());
+        sensitivityCase.setModelingRegion(parent.getModelingRegion());
+        sensitivityCase.setProject(parent.getProject());
+        sensitivityCase.setSectors(parent.getSectors());
+        sensitivityCase.setSpeciation(parent.getSpeciation());
+    }
+
+    private CaseJob[] getJobs2Copy(int[] jobIds) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            CaseJob[] jobs = new CaseJob[jobIds.length];
+
+            for (int i = 0; i < jobs.length; i++)
+                jobs[i] = dao.getCaseJob(jobIds[i], session);
+
+            return jobs;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get all jobs.", e);
+            throw new EmfException("Could not get all jobs. " + e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+
+    private CaseJob[] cloneCaseJobs(CaseJob[] objects) throws Exception {
+        List<CaseJob> copied = new ArrayList<CaseJob>();
+
+        for (int i = 0; i < objects.length; i++)
+            copied.add((CaseJob) DeepCopy.copy(objects[i]));
+
+        return copied.toArray(new CaseJob[0]);
+    }
+
+    private CaseInput[] cloneCaseInputs(CaseInput[] objects) throws Exception {
+        List<CaseInput> copied = new ArrayList<CaseInput>();
+
+        for (int i = 0; i < objects.length; i++)
+            copied.add((CaseInput) DeepCopy.copy(objects[i]));
+
+        return copied.toArray(new CaseInput[0]);
+    }
+
+    private CaseParameter[] cloneCaseParameters(CaseParameter[] objects) throws Exception {
+        List<CaseParameter> copied = new ArrayList<CaseParameter>();
+
+        for (int i = 0; i < objects.length; i++)
+            copied.add((CaseParameter) DeepCopy.copy(objects[i]));
+
+        return copied.toArray(new CaseParameter[0]);
     }
 
 }
