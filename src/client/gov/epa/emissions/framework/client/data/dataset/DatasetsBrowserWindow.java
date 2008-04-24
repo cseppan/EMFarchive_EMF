@@ -208,6 +208,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private Action editPropAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
+                clearMessage();
                 doDisplayPropertiesEditor();
             }
         };
