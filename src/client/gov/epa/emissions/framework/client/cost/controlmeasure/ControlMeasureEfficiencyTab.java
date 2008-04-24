@@ -3,8 +3,6 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
@@ -21,8 +19,8 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -41,15 +39,12 @@ import javax.swing.SpringLayout;
 
 public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasureEfficiencyTabView {
 
-    private SortFilterSelectModel selectModel;
-
     private EmfConsole parentConsole;
 
-    private EmfTableModel model;
-
+    private SelectableSortFilterWrapper table;
     private ControlMeasureEfficiencyTableData tableData;
 
-    private JPanel mainPanel;
+    private JPanel tablePanel;
 
     private ControlMeasure measure;
 
@@ -84,7 +79,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     public ControlMeasureEfficiencyTab(ControlMeasure measure, ManageChangeables changeablesList, EmfConsole parent,
             EmfSession session, DesktopManager desktopManager, MessagePanel messagePanel, ControlMeasureView editControlMeasureWindowView,
             ControlMeasurePresenter controlMeasurePresenter, CostYearTable costYearTable) {
-        this.mainPanel = new JPanel(new BorderLayout());
+        this.tablePanel = new JPanel(new BorderLayout());
         this.parentConsole = parent;
         this.changeablesList = changeablesList;
         this.desktopManager = desktopManager;
@@ -126,31 +121,32 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
 
         setLayout(new BorderLayout());
         add(sortFilterPanel(), BorderLayout.NORTH);
-        add(mainPanel, BorderLayout.CENTER);
+        add(tablePanel, BorderLayout.CENTER);
         add(controlPanel(), BorderLayout.SOUTH);
     }
 
     private void updateMainPanel(EfficiencyRecord[] records) {
-        mainPanel.removeAll();
+        tablePanel.removeAll();
         initModel(records);
-        mainPanel.add(sortFilterPane(parentConsole));
-        mainPanel.validate();
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, null);
+        tablePanel.add(table);
+        tablePanel.validate();
     }
-
+    
     private void initModel(EfficiencyRecord[] records) {
         tableData = new ControlMeasureEfficiencyTableData(records);
-        model = new EmfTableModel(tableData);
-        selectModel = new SortFilterSelectModel(model);
+//        model = new EmfTableModel(tableData);
+//        selectModel = new SortFilterSelectModel(model);
     }
 
-    private SortFilterSelectionPanel sortFilterPane(EmfConsole parentConsole) {
-        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        panel.getTable().setName("controlMeasureEfficiencyTable");
-//        panel.sort(sortCriteria());
-        panel.setPreferredSize(new Dimension(450, 120));
-
-        return panel;
-    }
+//    private SortFilterSelectionPanel sortFilterPane(EmfConsole parentConsole) {
+//        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
+//        panel.getTable().setName("controlMeasureEfficiencyTable");
+////        panel.sort(sortCriteria());
+//        panel.setPreferredSize(new Dimension(450, 120));
+//
+//        return panel;
+//    }
 
 //    private JScrollPane sortFilterPane(EmfConsole parentConsole) {
 //        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
@@ -191,7 +187,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     private Action editAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                List list = selectModel.selected();
+                List list = table.selected();
                 
                 if (list.size() == 0) {
                     messagePanel.setError("Please select an item to edit.");
@@ -211,7 +207,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     private Action viewAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                List list = selectModel.selected();
+                List list = table.selected();
                 
                 if (list.size() == 0) {
                     messagePanel.setError("Please select an item to view.");
@@ -250,7 +246,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     private Action copyAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                List list = selectModel.selected();
+                List list = table.selected();
                 EfficiencyRecord[] records = (EfficiencyRecord[]) list.toArray(new EfficiencyRecord[0]);
                 for (int i = 0; i < records.length; i++) {
                     doCopy(records[i]);
@@ -325,7 +321,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
     }
 
     private EfficiencyRecord[] getSelectedRecords() {
-        return selectModel.selected().toArray(new EfficiencyRecord[0]);
+        return table.selected().toArray(new EfficiencyRecord[0]);
     }
 
     public void refreshData() {
@@ -334,7 +330,10 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
 
     public void refreshPanel() {
         refreshData();
-        updateMainPanel(tableData.sources());
+        table.refresh(tableData);
+        tablePanel.removeAll();
+        tablePanel.add(table);
+        super.validate();
     }
 
     public void save(ControlMeasure measure) {

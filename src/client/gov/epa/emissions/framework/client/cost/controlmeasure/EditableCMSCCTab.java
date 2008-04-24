@@ -2,8 +2,6 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -12,13 +10,12 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
@@ -33,9 +30,9 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
 
     private EmfConsole parent;
 
-    private EmfTableModel tableModel;
+    private SelectableSortFilterWrapper table;
 
-    private SortFilterSelectModel sortFilterSelectModel;
+    //private SortFilterSelectModel sortFilterSelectModel;
 
     private MessagePanel messagePanel;
 
@@ -135,22 +132,23 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
     private void updateMainPanel(Scc[] sccs) {
         mainPanel.removeAll();
         initModel(sccs);
-        mainPanel.add(sortFilterPanel());
+        tablePanel();
+        mainPanel.add(table);
         mainPanel.validate();
     }
 
     private void initModel(Scc[] sccs) {
         tableData = new SCCTableData(sccs);
-        tableModel = new EmfTableModel(tableData);
-        sortFilterSelectModel = new SortFilterSelectModel(tableModel);
+//        tableModel = new EmfTableModel(tableData);
+//        sortFilterSelectModel = new SortFilterSelectModel(tableModel);
     }
 
-    private SortFilterSelectionPanel sortFilterPanel() {
+    private void tablePanel() {
 //        tableModel = new EmfTableModel(tableData);
 //        changeables.addChangeable(sortFilterSelectModel);
-        SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parent, sortFilterSelectModel);
-        sortFilterSelectionPanel.setPreferredSize(new Dimension(450, 120));
-        return sortFilterSelectionPanel;
+        table = new SelectableSortFilterWrapper(parent, tableData, null);
+//        sortFilterSelectionPanel.setPreferredSize(new Dimension(450, 120));
+//        return sortFilterSelectionPanel;
     }
     
     private JPanel buttonPanel() {
@@ -194,7 +192,7 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
 
     protected void remove() {
         messagePanel.clear();
-        List selected = sortFilterSelectModel.selected();
+        List selected = table.selected();
         
         if (selected.size() == 0) {
             messagePanel.setError("Please select an item to remove.");
@@ -224,7 +222,11 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
 
     public void refreshPanel() {
         refreshData();
-        updateMainPanel(tableData.sources());
+        //updateMainPanel(tableData.sources());
+        table.refresh(tableData);
+        mainPanel.removeAll();
+        mainPanel.add(table);
+        super.validate();
     }
 
     private Scc[] getSCCs(int controlMeasureId) throws EmfException {
