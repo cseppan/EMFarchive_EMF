@@ -236,7 +236,7 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
 
         for (Iterator iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = (CaseJob) iter.next();
-            String title = job.getName() + "(" + job.getId() + ")(" + caseObj.getName() + ")";
+            String title = "View Case Job : " + job.getName() + "(" + job.getId() + ")(" + caseObj.getName() + ")";
             EditCaseJobView jobEditor = new EditCaseJobWindow(title, desktopManager, parentConsole, session);
             presenter.editJob(job, jobEditor);
             jobEditor.viewOnly(title);
