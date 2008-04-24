@@ -34,6 +34,8 @@ import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class DatasetPropertiesViewer extends DisposableInteralFrame implements PropertiesView {
 
@@ -87,6 +89,13 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         tabbedPane.addTab("Tables", createInfoTab(parentConsole));
         tabbedPane.addTab("QA", createQAStepsTab(desktopManager));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        
+        final MessagePanel localMsgPanel = this.messagePanel;
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                localMsgPanel.clear();
+            }
+        });
 
         return tabbedPane;
     }
