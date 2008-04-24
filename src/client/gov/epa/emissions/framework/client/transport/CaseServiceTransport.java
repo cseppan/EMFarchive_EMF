@@ -989,7 +989,7 @@ public class CaseServiceTransport implements CaseService {
         return (String[]) call.requestResponse(new Object[] {});
     }
 
-    public synchronized int mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, Case sensitivityCase)
+    public synchronized Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, Case sensitivityCase)
             throws EmfException {
         EmfCall call = call();
 
@@ -999,9 +999,9 @@ public class CaseServiceTransport implements CaseService {
         call.addIntegerParam("templateCaseId");
         call.addIntArrayParam();
         call.addParam("sensitivityCase", caseMappings.caseObject());
-        call.setIntegerReturnType();
+        call.setReturnType(caseMappings.caseObject());
 
-        return (Integer) call.requestResponse(new Object[] { user, new Integer(parentCaseId), new Integer(templateCaseId),
+        return (Case) call.requestResponse(new Object[] { user, new Integer(parentCaseId), new Integer(templateCaseId),
                 jobIds, sensitivityCase });
     }
 

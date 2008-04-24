@@ -184,6 +184,6 @@ public interface CaseService {
 
     void addCaseParameters(User user, int caseID, CaseParameter[] params) throws EmfException;
     
-    int mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, Case sensitivityCase) throws EmfException;
+    Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, Case sensitivityCase) throws EmfException;
 
  }

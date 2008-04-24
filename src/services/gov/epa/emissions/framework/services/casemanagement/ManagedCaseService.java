@@ -3261,7 +3261,7 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized int mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds,
+    public synchronized Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds,
             Case sensitivityCase) throws EmfException {
         Session session = sessionFactory.getSession();
         Case lockedSC = null;
@@ -3312,7 +3312,7 @@ public class ManagedCaseService {
             
             updateCase(lockedSC);
 
-            return targetId;
+            return lockedSC;
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not merge case.", e);
