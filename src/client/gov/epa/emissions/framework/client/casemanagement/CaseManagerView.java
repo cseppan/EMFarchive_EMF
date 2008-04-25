@@ -8,7 +8,7 @@ public interface CaseManagerView extends ManagedView {
 
     void display();
 
-    void observe(CaseManagerPresenterImpl presenter);
+    void observe(CaseManagerPresenter presenter);
 
     void refresh(Case[] cases);
     

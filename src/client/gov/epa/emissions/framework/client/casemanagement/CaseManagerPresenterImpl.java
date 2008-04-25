@@ -58,7 +58,7 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
     
     public void doSensitivity(SensitivityView view, Case case1) {
         SensitivityPresenter presenter = new SensitivityPresenter(session, view, this);
-        presenter.doDisplay(case1);
+        presenter.doDisplay(case1, this);
     }
     
     public void addNewCaseToTableData(Case newCase) {

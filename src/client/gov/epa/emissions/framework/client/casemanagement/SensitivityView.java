@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 
 public interface SensitivityView extends ManagedView {
 
-    void observe(SensitivityPresenter presenter);
+    void observe(SensitivityPresenter presenter, CaseManagerPresenter parentPresenter);
 
     void display(Case case1);
 

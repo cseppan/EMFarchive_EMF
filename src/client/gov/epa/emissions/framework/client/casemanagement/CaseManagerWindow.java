@@ -45,7 +45,7 @@ import javax.swing.JPanel;
 
 public class CaseManagerWindow extends ReusableInteralFrame implements CaseManagerView, RefreshObserver {
 
-    private CaseManagerPresenterImpl presenter;
+    private CaseManagerPresenter presenter;
 
     private JPanel mainPanel;
 
@@ -79,7 +79,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         this.getContentPane().add(layout);
     }
 
-    public void observe(CaseManagerPresenterImpl presenter) {
+    public void observe(CaseManagerPresenter presenter) {
         this.presenter = presenter;
     }
 
@@ -351,8 +351,8 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             messagePanel.setMessage("Please select a single case");
             return;
         }
-        String title = "Add Senditivity to Case: " + ((Case)cases.get(0)).getName();
-        SensitivityWindow view = new SensitivityWindow(title, desktopManager, parentConsole, categories);
+        //String title = "Add Senditivity to Case: " + ((Case)cases.get(0)).getName();
+        SensitivityWindow view = new SensitivityWindow(desktopManager, parentConsole, categories);
         presenter.doSensitivity(view, (Case) cases.get(0));
     }
     

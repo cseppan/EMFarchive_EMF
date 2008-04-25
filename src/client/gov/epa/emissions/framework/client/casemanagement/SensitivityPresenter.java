@@ -25,8 +25,8 @@ public class SensitivityPresenter {
         this.managerPresenter = managerPresenter;
     }
 
-    public void doDisplay(Case case1) {
-        view.observe(this);
+    public void doDisplay(Case case1, CaseManagerPresenter parentPresenter) {
+        view.observe(this, parentPresenter);
         view.display(case1);
     }
 

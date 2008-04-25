@@ -64,11 +64,13 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     
     private JList templateJobsList;
     
+    private CaseManagerPresenter parentPresenter;
+    
     private ComboBox senTypeCombox;
     private ComboBox categoryCombox;
 
-    public SensitivityWindow(String title, DesktopManager desktopManager, EmfConsole parentConsole, List<CaseCategory> categories) {
-        super(title, new Dimension(480, 450), desktopManager);
+    public SensitivityWindow(DesktopManager desktopManager, EmfConsole parentConsole, List<CaseCategory> categories) {
+        super("Sensitivity", new Dimension(480, 450), desktopManager);
         super.setName(title);
         this.parentConsole = parentConsole;
         //this.sensitivityWindow = this;
@@ -78,12 +80,13 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         super.getContentPane().add(layout);
     }
 
-    public void observe(SensitivityPresenter presenter) {
+    public void observe(SensitivityPresenter presenter, CaseManagerPresenter parentPresenter) {
         this.presenter = presenter;
+        this.parentPresenter = parentPresenter; 
     }
 
     public void display(Case case1) {
-        //super.setLabel("Sensitivity");
+        super.setLabel("Add Senditivity to Case: " + case1.getName() );
         layout.removeAll();
         doLayout(layout, case1);
         super.display();
@@ -217,8 +220,8 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
                 try {
                     Case sensitivityCase = new Case();
                     //Case sensitivityCase = presenter.copyCase(parentCase.getId());
-                    sensitivityCase.setName(senName.getText());
-                    sensitivityCase.setAbbreviation(new Abbreviation(senAbrev.getText()));
+                    sensitivityCase.setName(checkEmpty(senName.getText()));
+                    sensitivityCase.setAbbreviation(new Abbreviation(checkEmpty(senAbrev.getText())));
                     
                     //sensitivityCase.setCaseTemplate(true);
                     sensitivityCase.setCaseCategory((CaseCategory) categoryCombox.getSelectedItem());
@@ -226,16 +229,22 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
                     //Case updated = presenter.updateCase(sensitivityCase);
                     
                     CaseEditor view = new CaseEditor(parentConsole, presenter.getSession(), desktopManager);
-                    presenter.editCase(view, updated);
-                    disposeView();
+                    parentPresenter.doEdit(view, updated);
+                    //disposeView();
                 } catch (EmfException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                     messagePanel.setError(e.getMessage());
                 }
             }
         };
 
         return action;
+    }
+    
+    private String checkEmpty(String string) throws EmfException{
+        if (string.trim().isEmpty())
+            throw new EmfException("Please specify a name and Abbreviation. ");
+        return string; 
     }
     
     private int[] jobIds(){
