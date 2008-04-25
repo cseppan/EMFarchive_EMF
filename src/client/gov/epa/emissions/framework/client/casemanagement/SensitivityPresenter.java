@@ -6,7 +6,9 @@ import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresen
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 
 import java.util.Date;
 
@@ -36,7 +38,7 @@ public class SensitivityPresenter {
         view.disposeView();
     }
 
-    public void doSave(Case newCase) throws EmfException {
+    public Case doSave(int parentCaseId, int templateCaseId, int[] jobIds, Case newCase) throws EmfException {
         if (isDuplicate(newCase))
             throw new EmfException("A Case named '" + newCase.getName() + "' already exists.");
 
@@ -44,9 +46,10 @@ public class SensitivityPresenter {
         newCase.setLastModifiedBy(session.user());
         newCase.setLastModifiedDate(new Date());
         
-        Case loaded = service().addCase(session.user(), newCase);
+        Case loaded = service().mergeCases(session.user(), parentCaseId, templateCaseId, jobIds, newCase);
         closeView();
         managerPresenter.addNewCaseToTableData(loaded);
+        return loaded;
     }
 
     private boolean isDuplicate(Case newCase) throws EmfException {
@@ -75,6 +78,20 @@ public class SensitivityPresenter {
     public void editCase(CaseEditorView caseView, Case caseObj) throws EmfException {
         CaseEditorPresenter presenter = new CaseEditorPresenterImpl(caseObj, session, caseView, managerPresenter);
         presenter.doDisplay();
+    }
+    
+    public Case[] getCases(CaseCategory category) throws EmfException {
+        if (category == null)
+            return new Case[0];
+        
+        if (category.getName().equals("All"))
+            return service().getCases();
+        
+        return service().getCases(category);
+    }
+    
+    public CaseJob[] getCaseJobs(Case caseObj) throws EmfException {
+        return service().getCaseJobs(caseObj.getId());
     }
 
     public EmfSession getSession() {
