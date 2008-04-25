@@ -3296,12 +3296,12 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot obtain lock for merging case to happen: User " + template.getLockOwner()
                         + " has the lock for case '" + template.getName() + "'");
 
-            CaseJob[] jobs = cloneCaseJobs(getJobs2Copy(jobIds));
-            CaseInput[] inputs = cloneCaseInputs(dao.getCaseInputs(template.getId(), session).toArray(new CaseInput[0]));
-            CaseParameter[] params = cloneCaseParameters(dao.getCaseParameters(template.getId(), session).toArray(
-                    new CaseParameter[0]));
+            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), getJobs2Copy(jobIds));
+            CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), dao.getCaseInputsByJobIds(template.getId(), jobIds,
+                    session).toArray(new CaseInput[0]), session);
+            CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao.getCaseParametersByJobIds(template.getId(),
+                    jobIds, session).toArray(new CaseParameter[0]), session);
 
-            setParentId(templateCaseId, jobs, inputs, params);
             addCaseJobs(user, targetId, jobs);
             addCaseInputs(user, targetId, inputs);
             addCaseParameters(user, targetId, params);
@@ -3309,7 +3309,7 @@ public class ManagedCaseService {
 
             if (abbr == null)
                 lockedSC.setAbbreviation(new Abbreviation(lockedSC.getId() + ""));
-            
+
             updateCase(lockedSC);
 
             return lockedSC;
@@ -3329,17 +3329,6 @@ public class ManagedCaseService {
 
             session.close();
         }
-    }
-
-    private void setParentId(int parentCaseId, CaseJob[] jobs, CaseInput[] inputs, CaseParameter[] params) {
-        for (CaseJob job : jobs)
-            job.setParentCaseId(parentCaseId);
-
-        for (CaseInput input : inputs)
-            input.setParentCaseId(parentCaseId);
-
-        for (CaseParameter parameter : params)
-            parameter.setParentCaseId(parentCaseId);
     }
 
     private void copySummaryInfo(Case parent, Case sensitivityCase) {
@@ -3379,29 +3368,59 @@ public class ManagedCaseService {
         }
     }
 
-    private CaseJob[] cloneCaseJobs(CaseJob[] objects) throws Exception {
+    private CaseJob[] cloneCaseJobs(int targetCaseId, int parentCaseId, CaseJob[] objects) throws Exception {
         List<CaseJob> copied = new ArrayList<CaseJob>();
 
-        for (int i = 0; i < objects.length; i++)
-            copied.add((CaseJob) DeepCopy.copy(objects[i]));
+        for (int i = 0; i < objects.length; i++) {
+            CaseJob job = (CaseJob) DeepCopy.copy(objects[i]);
+            job.setCaseId(targetCaseId);
+            job.setParentCaseId(parentCaseId);
+            copied.add(job);
+        }
 
         return copied.toArray(new CaseJob[0]);
     }
 
-    private CaseInput[] cloneCaseInputs(CaseInput[] objects) throws Exception {
+    private CaseInput[] cloneCaseInputs(int parentCaseId, int targetCaseId, CaseInput[] inputs, Session session)
+            throws Exception {
         List<CaseInput> copied = new ArrayList<CaseInput>();
 
-        for (int i = 0; i < objects.length; i++)
-            copied.add((CaseInput) DeepCopy.copy(objects[i]));
+        for (int i = 0; i < inputs.length; i++) {
+            CaseInput input = dao.loadCaseInput(parentCaseId, inputs[i], session);
+
+            if (input == null) {
+                input = (CaseInput) DeepCopy.copy(inputs[i]);
+                input.setParentCaseId(inputs[i].getCaseID());
+            } else {
+                input.setParentCaseId(parentCaseId);
+            }
+
+            input.setCaseID(targetCaseId);
+            input.setShow(inputs[i].isShow());
+            copied.add(input);
+        }
 
         return copied.toArray(new CaseInput[0]);
     }
 
-    private CaseParameter[] cloneCaseParameters(CaseParameter[] objects) throws Exception {
+    private CaseParameter[] cloneCaseParameters(int parentCaseId, int targetCaseId, CaseParameter[] params,
+            Session session) throws Exception {
         List<CaseParameter> copied = new ArrayList<CaseParameter>();
 
-        for (int i = 0; i < objects.length; i++)
-            copied.add((CaseParameter) DeepCopy.copy(objects[i]));
+        for (int i = 0; i < params.length; i++) {
+            CaseParameter param = dao.loadCaseParameter(parentCaseId, params[i], session);
+            
+            if (param == null) {
+                param = (CaseParameter) DeepCopy.copy(params[i]);
+                param.setParentCaseId(params[i].getCaseID());
+            } else {
+                param.setParentCaseId(parentCaseId);
+            }
+            
+            param.setCaseID(targetCaseId);
+            param.setShow(params[i].isShow());
+            copied.add(param);
+        }
 
         return copied.toArray(new CaseParameter[0]);
     }

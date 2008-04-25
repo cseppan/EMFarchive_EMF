@@ -300,7 +300,7 @@ public class CaseDAO {
     }
 
     public boolean caseInputExists(CaseInput input, Session session) {
-        Criterion[] criterions = uniqueCaseInputCriteria(input);
+        Criterion[] criterions = uniqueCaseInputCriteria(input.getCaseID(), input);
 
         return hibernateFacade.exists(CaseInput.class, criterions, session);
     }
@@ -309,14 +309,13 @@ public class CaseDAO {
         return hibernateFacade.exists(id, clazz, session);
     }
 
-    private Criterion[] uniqueCaseInputCriteria(CaseInput input) {
-        Integer caseId = new Integer(input.getCaseID());
+    private Criterion[] uniqueCaseInputCriteria(int caseId, CaseInput input) {
         InputName inputname = input.getInputName();
         Sector sector = input.getSector();
         CaseProgram program = input.getProgram();
         Integer jobID = new Integer(input.getCaseJobID());
 
-        Criterion c1 = Restrictions.eq("caseID", caseId);
+        Criterion c1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion c2 = (inputname == null) ? Restrictions.isNull("inputName") : Restrictions.eq("inputName", inputname);
         Criterion c3 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
         Criterion c4 = (program == null) ? Restrictions.isNull("program") : Restrictions.eq("program", program);
@@ -336,15 +335,33 @@ public class CaseDAO {
     }
 
     public Object loadCaseInput(CaseInput input, Session session) {
-        Criterion[] criterions = uniqueCaseInputCriteria(input);
+        Criterion[] criterions = uniqueCaseInputCriteria(input.getCaseID(), input);
 
         return hibernateFacade.load(CaseInput.class, criterions, session);
+    }
+
+    public CaseInput loadCaseInput(int caseId, CaseInput input, Session session) {
+        Criterion[] criterions = uniqueCaseInputCriteria(caseId, input);
+        
+        return (CaseInput)hibernateFacade.load(CaseInput.class, criterions, session);
     }
 
     public List<CaseInput> getCaseInputs(int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
 
         return hibernateFacade.get(CaseInput.class, crit1, session);
+    }
+
+    public List<CaseInput> getCaseInputsByJobIds(int caseId, int[] jobIds, Session session) {
+        List<?> ids = session.createQuery("SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = "
+                        + caseId + " AND (obj.caseJobID = 0 OR obj.caseJobID = " + getAndOrClause(jobIds, "obj.caseJobID") + ")").list();
+        
+        List<CaseInput> inputs = new ArrayList<CaseInput>();
+        
+        for (Iterator<?> iter = ids.iterator(); iter.hasNext();)
+            inputs.add(this.getCaseInput((Integer)iter.next(), session));
+
+        return inputs;
     }
     
     public List<CaseInput> getCaseInputs(int pageSize, int caseId, Sector sector, boolean showAll, Session session) {
@@ -675,19 +692,50 @@ public class CaseDAO {
     }
 
     public Object loadCaseParameter(CaseParameter param, Session session) {
-        Criterion[] criterions = uniqueCaseParameterCriteria(param);
+        Criterion[] criterions = uniqueCaseParameterCriteria(param.getCaseID(), param);
 
         return hibernateFacade.load(CaseParameter.class, criterions, session);
     }
 
-    private Criterion[] uniqueCaseParameterCriteria(CaseParameter param) {
-        Integer caseId = new Integer(param.getCaseID());
+    public CaseParameter loadCaseParameter(int caseId, CaseParameter param, Session session) {
+        Criterion[] criterions = sensitivityCaseParameterCriteria(caseId, param, session);
+        
+        return (CaseParameter)hibernateFacade.load(CaseParameter.class, criterions, session);
+    }
+    
+    //NOTE: this method is soly for creating sensitivity case. The questions without clear answers include the following:
+    // What if the job does exist in the parent case, but the parameter to copy has a different job?
+    private Criterion[] sensitivityCaseParameterCriteria(int caseId, CaseParameter param, Session session) {
+        ParameterName paramname = param.getParameterName();
+        Sector sector = param.getSector();
+        CaseProgram program = param.getProgram();
+        Integer jobID = new Integer(param.getJobId());
+        
+        CaseJob job = this.getCaseJob(jobID);
+        CaseJob parentJob = this.getCaseJob(caseId, job, session);
+
+        Criterion c1 = Restrictions.eq("caseID", new Integer(caseId));
+        Criterion c2 = (paramname == null) ? Restrictions.isNull("parameterName") : Restrictions.eq("parameterName",
+                paramname);
+        Criterion c3 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
+        Criterion c4 = (program == null) ? Restrictions.isNull("program") : Restrictions.eq("program", program);
+        Criterion c5 = null;
+        
+        if (parentJob != null)
+            c5 = Restrictions.eq("jobId", parentJob.getId());
+        else
+            c5 = Restrictions.eq("jobId", new Integer(0));
+
+        return new Criterion[] { c1, c2, c3, c4, c5 };
+    }
+
+    private Criterion[] uniqueCaseParameterCriteria(int caseId, CaseParameter param) {
         ParameterName paramname = param.getParameterName();
         Sector sector = param.getSector();
         CaseProgram program = param.getProgram();
         Integer jobID = new Integer(param.getJobId());
 
-        Criterion c1 = Restrictions.eq("caseID", caseId);
+        Criterion c1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion c2 = (paramname == null) ? Restrictions.isNull("parameterName") : Restrictions.eq("parameterName",
                 paramname);
         Criterion c3 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
@@ -701,6 +749,18 @@ public class CaseDAO {
         Criterion crit = Restrictions.eq("caseID", new Integer(caseId));
 
         return hibernateFacade.get(CaseParameter.class, crit, session);
+    }
+    
+    public List<CaseParameter> getCaseParametersByJobIds(int caseId, int[] jobIds, Session session) {
+        List<?> ids = session.createQuery("SELECT obj.id from " + CaseParameter.class.getSimpleName() + " as obj WHERE obj.caseID = "
+                        + caseId + " AND (obj.jobId = 0 OR obj.jobId = " + getAndOrClause(jobIds, "obj.jobId") + ")").list();
+        
+        List<CaseParameter> params = new ArrayList<CaseParameter>();
+        
+        for (Iterator<?> iter = ids.iterator(); iter.hasNext();)
+            params.add(this.getCaseParameter((Integer)iter.next(), session));
+
+        return params;
     }
 
     public List<CaseParameter> getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll, Session session) {
@@ -754,7 +814,7 @@ public class CaseDAO {
     }
 
     public boolean caseParameterExists(CaseParameter param, Session session) {
-        Criterion[] criterions = uniqueCaseParameterCriteria(param);
+        Criterion[] criterions = uniqueCaseParameterCriteria(param.getCaseID(), param);
 
         return hibernateFacade.exists(CaseParameter.class, criterions, session);
     }
@@ -793,11 +853,10 @@ public class CaseDAO {
         return (CaseInput) hibernateFacade.load(CaseInput.class, crit, session);
     }
 
-    // private boolean loopDepends(int jid, DependentJob job) {
-    // boolean loopDetected = false;
-    //
-    // return loopDetected;
-    // }
+    public CaseParameter getCaseParameter(int paramId, Session session) {
+        Criterion crit = Restrictions.eq("id", new Integer(paramId));
+        return (CaseParameter) hibernateFacade.load(CaseParameter.class, crit, session);
+    }
 
     public String[] getAllValidJobs(int jobId) {
         List<String> validJobNames = new ArrayList<String>();
@@ -1119,5 +1178,20 @@ public class CaseDAO {
             nameIDStrings[i] = names.get(i).toString() + "(" + ids.get(i).toString() + ")";
 
         return nameIDStrings;
+    }
+    
+    private String getAndOrClause(int[] ids, String attrName) {
+        StringBuffer sb = new StringBuffer();
+        int numIDs = ids.length;
+
+        if (numIDs == 1)
+            return "" + ids[0];
+
+        for (int i = 0; i < numIDs - 1; i++)
+            sb.append(ids[i] + " OR " + attrName + " = ");
+
+        sb.append(ids[numIDs - 1]);
+
+        return sb.toString();
     }
 }
