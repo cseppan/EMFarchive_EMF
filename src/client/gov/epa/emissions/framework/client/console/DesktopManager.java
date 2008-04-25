@@ -8,6 +8,8 @@ public interface DesktopManager {
 
     public void closeWindow(ManagedView manageView);
     
+    public ManagedView getWindow(String windowName);
+    
     public int numberOfOpenWindows();
 
     public boolean closeAll();

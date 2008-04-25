@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.ManagedView;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteDialog;
@@ -255,6 +256,9 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         clearMessages();
         revisionPanel.enableWhatNWhy();
         try {
+            ManagedView findReplaceWindow = desktopManager.getWindow("Find and Replace Column Values: " + dataset.getName() + " (version: "
+                    + version.getVersion() + ")"); 
+            findReplaceWindow.windowClosing(); //NOTE: to close the find and replace window
             presenter.doClose();
         } catch (EmfException e) {
             displayError("Could not close: " + e.getMessage());
@@ -334,7 +338,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     public boolean hasReplacedValues() {
         return hasReplacedValues;
     }
-    
+
     public void setHasReplacedValues(boolean hasReplacedValues) {
         this.hasReplacedValues = hasReplacedValues;
         presenter.setSaveChanged(true);

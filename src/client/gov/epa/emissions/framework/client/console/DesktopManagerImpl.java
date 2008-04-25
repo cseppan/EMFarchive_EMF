@@ -56,6 +56,10 @@ public class DesktopManagerImpl implements DesktopManager {
         layout.remove(manageView);
     }
 
+    public ManagedView getWindow(String windowName) {
+        return (ManagedView) windowNames.get(windowName);
+    }
+
     public boolean closeAll() {
         List list = new ArrayList(windowNames.keySet());
         for (int i = 0; i < list.size(); i++) {
