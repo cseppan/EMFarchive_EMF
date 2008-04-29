@@ -3297,10 +3297,12 @@ public class ManagedCaseService {
                         + " has the lock for case '" + template.getName() + "'");
 
             CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), getJobs2Copy(jobIds));
-            CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), dao.getCaseInputsByJobIds(template.getId(), jobIds,
-                    session).toArray(new CaseInput[0]), session);
-            CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao.getCaseParametersByJobIds(template.getId(),
-                    jobIds, session).toArray(new CaseParameter[0]), session);
+            CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), dao.getCaseInputsByJobIds(
+                    template.getId(), jobIds, session).toArray(new CaseInput[0]), session);
+            System.out.println("Inputs to add : " + inputs.length);
+            CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao.getCaseParametersByJobIds(
+                    template.getId(), jobIds, session).toArray(new CaseParameter[0]), session);
+            System.out.println("Parameters to add : " + params.length);
 
             addCaseJobs(user, targetId, jobs);
             addCaseInputs(user, targetId, inputs);
@@ -3318,16 +3320,22 @@ public class ManagedCaseService {
             log.error("Could not merge case.", e);
             throw new EmfException("Could not merge case. " + e.getMessage());
         } finally {
-            if (lockedSC != null)
-                dao.releaseLocked(user, lockedSC, session);
+            try {
+                if (lockedSC != null)
+                    dao.releaseLocked(user, lockedSC, session);
 
-            if (lockedPC != null)
-                dao.releaseLocked(user, lockedPC, session);
+                session.clear();
+                if (lockedPC != null)
+                    dao.releaseLocked(user, lockedPC, session);
 
-            if (lockedTC != null)
-                dao.releaseLocked(user, lockedTC, session);
+                session.clear();
+                if (lockedTC != null)
+                    dao.releaseLocked(user, lockedTC, session);
 
-            session.close();
+                session.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -3347,6 +3355,8 @@ public class ManagedCaseService {
         sensitivityCase.setProject(parent.getProject());
         sensitivityCase.setSectors(parent.getSectors());
         sensitivityCase.setSpeciation(parent.getSpeciation());
+        sensitivityCase.setStartDate(parent.getStartDate());
+        sensitivityCase.setEndDate(parent.getEndDate());
     }
 
     private CaseJob[] getJobs2Copy(int[] jobIds) throws EmfException {
@@ -3383,46 +3393,108 @@ public class ManagedCaseService {
 
     private CaseInput[] cloneCaseInputs(int parentCaseId, int targetCaseId, CaseInput[] inputs, Session session)
             throws Exception {
-        List<CaseInput> copied = new ArrayList<CaseInput>();
+        List<CaseInput> inputList2Target = new ArrayList<CaseInput>();
 
         for (int i = 0; i < inputs.length; i++) {
-            CaseInput input = dao.loadCaseInput(parentCaseId, inputs[i], session);
+            CaseInput tempInput = (CaseInput) DeepCopy.copy(inputs[i]);
+            CaseInput inputFromParent = dao.loadCaseInput(parentCaseId, inputs[i], session);
+            boolean modifiedFromParent = false;
 
-            if (input == null) {
-                input = (CaseInput) DeepCopy.copy(inputs[i]);
-                input.setParentCaseId(inputs[i].getCaseID());
+            if (inputFromParent != null) {
+                tempInput.setParentCaseId(parentCaseId);
+
+                if (tempInput.getDataset() == null) {
+                    tempInput.setDataset(inputFromParent.getDataset());
+                    tempInput.setVersion(inputFromParent.getVersion());
+                    tempInput.setDatasetType(inputFromParent.getDatasetType());
+                    modifiedFromParent = true;
+                }
+
+                if (tempInput.getEnvtVars() == null) {
+                    tempInput.setEnvtVars(inputFromParent.getEnvtVars());
+                    modifiedFromParent = true;
+                }
+
+                if (tempInput.getSubdirObj() == null) {
+                    tempInput.setSubdirObj(inputFromParent.getSubdirObj());
+                    modifiedFromParent = true;
+                }
+
+                if (modifiedFromParent)
+                    tempInput.setLastModifiedDate(inputFromParent.getLastModifiedDate());
             } else {
-                input.setParentCaseId(parentCaseId);
+                tempInput.setParentCaseId(inputs[i].getCaseID());
             }
 
-            input.setCaseID(targetCaseId);
-            input.setShow(inputs[i].isShow());
-            copied.add(input);
+            tempInput.setCaseID(targetCaseId);
+            inputList2Target.add(tempInput);
         }
 
-        return copied.toArray(new CaseInput[0]);
+        /* 
+         * NOTE:  If two inputs are very similar in the  template, they potentially could be
+         * identical after they are updated from the parent.  This makes sure that we
+         * do not try to add 2 identical inputs.  
+         * GOTCHA: If we need both inputs, maybe we need to check for this and copy
+         * the original inputs without updating from parent.
+         */
+        TreeSet<CaseInput> set = new TreeSet<CaseInput>(inputList2Target);
+        List<CaseInput> uniqueInputs = new ArrayList<CaseInput>(set);
+
+        return uniqueInputs.toArray(new CaseInput[0]);
     }
 
     private CaseParameter[] cloneCaseParameters(int parentCaseId, int targetCaseId, CaseParameter[] params,
             Session session) throws Exception {
-        List<CaseParameter> copied = new ArrayList<CaseParameter>();
+        List<CaseParameter> params2Target = new ArrayList<CaseParameter>();
 
         for (int i = 0; i < params.length; i++) {
-            CaseParameter param = dao.loadCaseParameter(parentCaseId, params[i], session);
+            CaseParameter tempParam = (CaseParameter) DeepCopy.copy(params[i]);
+            CaseParameter parentParameter = dao.loadCaseParameter(parentCaseId, params[i], session);
+            boolean modifiedFromParent = false;
             
-            if (param == null) {
-                param = (CaseParameter) DeepCopy.copy(params[i]);
-                param.setParentCaseId(params[i].getCaseID());
+            if (parentParameter != null) {
+                tempParam.setParentCaseId(parentCaseId);
+                
+                if (tempParam.getEnvVar() == null) {
+                    tempParam.setEnvVar(parentParameter.getEnvVar());
+                    modifiedFromParent = true;
+                }
+                
+                if (tempParam.getType() == null) {
+                    tempParam.setType(parentParameter.getType());
+                    modifiedFromParent = true;
+                }
+                
+                if (tempParam.getValue() == null || tempParam.getValue().trim().isEmpty()) {
+                    tempParam.setValue(parentParameter.getValue());
+                    modifiedFromParent  = true;
+                }
+                
+                if (tempParam.getPurpose() == null || tempParam.getPurpose().trim().isEmpty()) {
+                    tempParam.setPurpose(parentParameter.getPurpose());
+                    modifiedFromParent  = true;
+                }
+                
+                if (modifiedFromParent)
+                    tempParam.setLastModifiedDate(parentParameter.getLastModifiedDate());
             } else {
-                param.setParentCaseId(parentCaseId);
+                tempParam.setParentCaseId(params[i].getCaseID());
             }
             
-            param.setCaseID(targetCaseId);
-            param.setShow(params[i].isShow());
-            copied.add(param);
+            tempParam.setCaseID(targetCaseId);
+            params2Target.add(tempParam);
         }
+        
+        /* 
+         * NOTE:  If two parameters are very similar in the  template, they potentially could be
+         * identical after they are updated from the parent.  This makes sure that we
+         * do not try to add 2 identical parameters.  
+         * GOTCHA: If we need both parameters, maybe we need to check for this and copy
+         * the original parameters without updating from parent.
+         */
+        TreeSet<CaseParameter> set = new TreeSet<CaseParameter>(params2Target);
+        List<CaseParameter> uniqueParameters = new ArrayList<CaseParameter>(set);
 
-        return copied.toArray(new CaseParameter[0]);
+        return uniqueParameters.toArray(new CaseParameter[0]);
     }
-
 }

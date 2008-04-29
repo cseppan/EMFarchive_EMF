@@ -57,6 +57,8 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     
     private String jobkey;
     
+    private boolean local;
+    
     private DependentJob[] dependentJobs = new DependentJob[] {};
 
     public CaseJob() {
@@ -282,6 +284,14 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
 
     public void setParentCaseId(int parentCaseId) {
         this.parentCaseId = parentCaseId;
+    }
+
+    public boolean isLocal() {
+        return local;
+    }
+
+    public void setLocal(boolean local) {
+        this.local = local;
     }
 
 }

@@ -371,7 +371,7 @@ public class CaseDAO {
         String sectorName = sector.getName().toUpperCase();
 
         if (sectorName.equals("ALL"))
-            return getCaseInputsWithShow(showAll, caseId, session);
+            return getCaseInputsWithLocal(showAll, caseId, session);
 
         if (sectorName.equals("ALL SECTORS"))
             return getCaseInputsWithNullSector(showAll, caseId, session);
@@ -380,7 +380,7 @@ public class CaseDAO {
     }
 
     private List<CaseInput> getAllInputs(int pageSize, int caseId, boolean showAll, Session session) {
-        List<CaseInput> inputs = getCaseInputsWithShow(showAll, caseId, session);
+        List<CaseInput> inputs = getCaseInputsWithLocal(showAll, caseId, session);
 
         if (inputs.size() < pageSize)
             return inputs;
@@ -388,9 +388,9 @@ public class CaseDAO {
         return inputs.subList(0, pageSize);
     }
 
-    private List<CaseInput> getCaseInputsWithShow(boolean showAll, int caseId, Session session) {
+    private List<CaseInput> getCaseInputsWithLocal(boolean showAll, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
-        Criterion crit2 = Restrictions.eq("show", true);
+        Criterion crit2 = Restrictions.eq("local", true);
         Criterion[] crits = (showAll) ? new Criterion[]{crit1} : new Criterion[]{crit1, crit2};
 
         return hibernateFacade.get(CaseInput.class, crits, session);
@@ -399,7 +399,7 @@ public class CaseDAO {
     private List<CaseInput> getCaseInputsWithNullSector(boolean showAll, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.isNull("sector");
-        Criterion crit3 = Restrictions.eq("show", true);
+        Criterion crit3 = Restrictions.eq("local", true);
         Criterion[] crits = (showAll) ? new Criterion[]{crit1, crit2} : new Criterion[]{crit1, crit2, crit3};
 
         return hibernateFacade.get(CaseInput.class, crits, session);
@@ -408,7 +408,7 @@ public class CaseDAO {
     private List<CaseInput> getCaseInputsWithSector(boolean showAll, Sector sector, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("sector", sector);
-        Criterion crit3 = Restrictions.eq("show", true);
+        Criterion crit3 = Restrictions.eq("local", true);
         Criterion[] crits = (showAll) ? new Criterion[]{crit1, crit2} : new Criterion[]{crit1, crit2, crit3};
 
         return hibernateFacade.get(CaseInput.class, crits, session);
@@ -712,7 +712,7 @@ public class CaseDAO {
         Integer jobID = new Integer(param.getJobId());
         
         CaseJob job = this.getCaseJob(jobID);
-        CaseJob parentJob = this.getCaseJob(caseId, job, session);
+        CaseJob parentJob = (job == null) ? null : this.getCaseJob(caseId, job, session);
 
         Criterion c1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion c2 = (paramname == null) ? Restrictions.isNull("parameterName") : Restrictions.eq("parameterName",
@@ -770,7 +770,7 @@ public class CaseDAO {
         String sectorName = sector.getName().toUpperCase();
 
         if (sectorName.equals("ALL"))
-            return getCaseParametersWithShow(showAll, caseId, session);
+            return getCaseParametersWithLocal(showAll, caseId, session);
 
         if (sectorName.equals("ALL SECTORS"))
             return getCaseParametersWithNullSector(showAll, caseId, session);
@@ -779,7 +779,7 @@ public class CaseDAO {
     }
 
     private List<CaseParameter> getAllParameters(int pageSize, int caseId, boolean showAll, Session session) {
-        List<CaseParameter> inputs = getCaseParametersWithShow(showAll, caseId, session);
+        List<CaseParameter> inputs = getCaseParametersWithLocal(showAll, caseId, session);
 
         if (inputs.size() < pageSize)
             return inputs;
@@ -787,9 +787,9 @@ public class CaseDAO {
         return inputs.subList(0, pageSize);
     }
 
-    private List<CaseParameter> getCaseParametersWithShow(boolean showAll, int caseId, Session session) {
+    private List<CaseParameter> getCaseParametersWithLocal(boolean showAll, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
-        Criterion crit2 = Restrictions.eq("show", true);
+        Criterion crit2 = Restrictions.eq("local", true);
         Criterion[] crits = (showAll) ? new Criterion[]{crit1} : new Criterion[]{crit1, crit2};
 
         return hibernateFacade.get(CaseParameter.class, crits, session);
@@ -798,7 +798,7 @@ public class CaseDAO {
     private List<CaseParameter> getCaseParametersWithNullSector(boolean showAll, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.isNull("sector");
-        Criterion crit3 = Restrictions.eq("show", true);
+        Criterion crit3 = Restrictions.eq("local", true);
         Criterion[] crits = (showAll) ? new Criterion[]{crit1, crit2} : new Criterion[]{crit1, crit2, crit3};
 
         return hibernateFacade.get(CaseParameter.class, crits, session);
@@ -807,10 +807,10 @@ public class CaseDAO {
     private List<CaseParameter> getCaseParametersWithSector(boolean showAll, Sector sector, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("sector", sector);
-        Criterion crit3 = Restrictions.eq("show", true);
+        Criterion crit3 = Restrictions.eq("local", true);
         Criterion[] crits = (showAll) ? new Criterion[]{crit1, crit2} : new Criterion[]{crit1, crit2, crit3};
 
-        return hibernateFacade.get(CaseInput.class, crits, session);
+        return hibernateFacade.get(CaseParameter.class, crits, session);
     }
 
     public boolean caseParameterExists(CaseParameter param, Session session) {
@@ -1175,7 +1175,7 @@ public class CaseDAO {
         String[] nameIDStrings = new String[size];
 
         for (int i = 0; i < size; i++)
-            nameIDStrings[i] = names.get(i).toString() + "(" + ids.get(i).toString() + ")";
+            nameIDStrings[i] = names.get(i).toString() + "  (" + ids.get(i).toString() + ")";
 
         return nameIDStrings;
     }

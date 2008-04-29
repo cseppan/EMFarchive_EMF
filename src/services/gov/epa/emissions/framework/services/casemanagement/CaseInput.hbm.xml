@@ -14,7 +14,7 @@
     			<property name="caseJobID" column="case_job_id" type="integer" not-null="false"/>
     			<property name="subdir"	column="sub_dir"	type="java.lang.String"	not-null="false"/>
 				<property name="required"	column="required"	type="boolean"	not-null="false"/>
-				<property name="show"	column="show"	type="boolean"	not-null="false"/>
+				<property name="local"	column="local"	type="boolean"	not-null="false"/>
     			<property name="lastModifiedDate" column="last_modified_date" type="java.util.Date" not-null="false" length="4"/>
   
     			<many-to-one 

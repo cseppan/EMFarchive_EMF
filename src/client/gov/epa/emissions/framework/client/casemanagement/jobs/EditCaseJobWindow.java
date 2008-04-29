@@ -37,7 +37,7 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
     private EmfSession session;
 
     private JobFieldsPanel jobFieldsPanel;
-    
+
     public EditCaseJobWindow(String title, DesktopManager desktopManager, EmfConsole parent, EmfSession session) {
         super(title, new Dimension(600, 640), desktopManager);
         //super.setLabel(super.getTitle());

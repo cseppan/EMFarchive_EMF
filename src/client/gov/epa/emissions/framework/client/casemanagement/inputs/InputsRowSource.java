@@ -21,7 +21,7 @@ public class InputsRowSource implements RowSource {
     public Object[] values() {
         return new Object[] { getInputName(input), getEnvtVarName(input), getSectorName(input), 
                 getJob(input), getProgramName(input), getDatasetName(input), getVersion(input),
-                getQAStatus(input), getDSType(input), isRequired(input), isShow(input), 
+                getQAStatus(input), getDSType(input), isRequired(input), isLocal(input), 
                 getSubDir(input), getLastModifiedDate(input)};
     }
     
@@ -61,8 +61,8 @@ public class InputsRowSource implements RowSource {
         return (input == null) ? "" : input.isRequired() + "";
     }
     
-    private String isShow(CaseInput input) {
-        return (input == null) ? "" : input.isShow() + "";
+    private String isLocal(CaseInput input) {
+        return (input == null) ? "" : input.isLocal() + "";
     }
 
     private String getSubDir(CaseInput input) {

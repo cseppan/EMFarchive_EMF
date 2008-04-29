@@ -53,7 +53,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
     private CheckBox required;
 
-    private CheckBox show;
+    private CheckBox localBox;
 
     private MessagePanel messagePanel;
 
@@ -171,10 +171,10 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         changeablesList.addChangeable(required);
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
-        show = new CheckBox("");
-        show.setSelected(input.isShow());
-        changeablesList.addChangeable(show);
-        layoutGenerator.addLabelWidgetPair("Local?", show, panel);
+        localBox = new CheckBox("");
+        localBox.setSelected(input.isLocal());
+        changeablesList.addChangeable(localBox);
+        layoutGenerator.addLabelWidgetPair("Local?", localBox, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 12, 2, // rows, cols
@@ -288,7 +288,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         updateVersion();
         updateSubdir();
         input.setRequired(required.isSelected());
-        input.setShow(show.isSelected());
+        input.setLocal(localBox.isSelected());
         input.setLastModifiedDate(new Date());
         updateJob();
         return input;
@@ -412,7 +412,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         subDir.setEnabled(false);
         jobs.setEnabled(false);
         required.setEnabled(false);
-        show.setEnabled(false);
+        localBox.setEnabled(false);
     }
 
 }

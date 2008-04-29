@@ -183,3 +183,8 @@ ALTER TABLE cases.cases DROP COLUMN parent_id;
 ALTER TABLE cases.cases_casejobs ADD COLUMN parent_case_id int4 DEFAULT 0;
 ALTER TABLE cases.cases_caseinputs ADD COLUMN parent_case_id int4 DEFAULT 0;
 ALTER TABLE cases.cases_parameters ADD COLUMN parent_case_id int4 DEFAULT 0;
+
+-- 4/28/2008 add/change column names
+ALTER TABLE cases.cases_caseinputs RENAME COLUMN show TO local;
+ALTER TABLE cases.cases_parameters RENAME COLUMN is_show TO local;
+ALTER TABLE cases.cases_casejobs ADD COLUMN local bool DEFAULT true;

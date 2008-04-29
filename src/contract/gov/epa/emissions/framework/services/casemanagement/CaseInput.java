@@ -34,7 +34,7 @@ public class CaseInput implements Serializable, Comparable {
     
     private boolean required;
     
-    private boolean show;
+    private boolean local;
     
     private String subdir;
     
@@ -136,12 +136,12 @@ public class CaseInput implements Serializable, Comparable {
         this.sector = sector;
     }
 
-    public boolean isShow() {
-        return show;
+    public boolean isLocal() {
+        return local;
     }
 
-    public void setShow(boolean show) {
-        this.show = show;
+    public void setLocal(boolean local) {
+        this.local = local;
     }
 
     public String getSubdir() {

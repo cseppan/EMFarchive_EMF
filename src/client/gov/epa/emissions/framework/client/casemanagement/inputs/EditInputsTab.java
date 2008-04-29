@@ -338,7 +338,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             CaseInput newInput = new CaseInput();
             newInput.setCaseID(caseId);
             newInput.setRequired(true);
-            newInput.setShow(true);
+            newInput.setLocal(true);
             presenter.addNewInputDialog(view, newInput);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());

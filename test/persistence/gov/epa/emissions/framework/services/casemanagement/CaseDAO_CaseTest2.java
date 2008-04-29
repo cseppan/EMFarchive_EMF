@@ -301,7 +301,7 @@ public class CaseDAO_CaseTest2 extends ServiceTestCase {
         input.setProgram(caseProg);
         input.setRequired(true);
         input.setSector(casesector);
-        input.setShow(true);
+        input.setLocal(true);
         input.setVersion(version);
         input.setCaseID(toCopy.getId());
         add(input);

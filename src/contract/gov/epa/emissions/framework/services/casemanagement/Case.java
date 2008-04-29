@@ -75,7 +75,7 @@ public class Case implements Comparable, Lockable, Serializable {
     
     private Date endDate;
     
-    private List sectors;
+    private Sector[] sectors = new Sector[]{};
 
     //private List caseInputs;
     
@@ -88,8 +88,6 @@ public class Case implements Comparable, Lockable, Serializable {
      */
     public Case() {
         lock = new Mutex();
-        this.sectors = new ArrayList();
-        //this.caseInputs = new ArrayList();
     }
 
     public Case(String name) {
@@ -344,14 +342,22 @@ public class Case implements Comparable, Lockable, Serializable {
         this.numMetLayers = numMetLayers;
     }
 
+    public void addSector(Sector sector) {
+        List<Sector> sectorsList = new ArrayList<Sector>();
+        sectorsList.addAll(Arrays.asList(this.sectors));
+        sectorsList.add(sector);
+        
+        this.sectors = sectorsList.toArray(new Sector[0]);
+    }
+
     public Sector[] getSectors() {
-        return (Sector[])sectors.toArray(new Sector[0]);
+        return this.sectors;
     }
 
     public void setSectors(Sector[] sectors) {
-        this.sectors = Arrays.asList(sectors);
+        this.sectors = sectors;
     }
-
+    
     public Date getStartDate() {
         return startDate;
     }

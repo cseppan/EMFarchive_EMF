@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.casemanagement.jobs;
 
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.EmptyStrings;
@@ -104,6 +105,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     
     private Button browseButton;
     
+    private CheckBox localBox;
+    
     private AddRemoveWidget dependentJobsList;
 
     private static String lastPath = "";
@@ -120,6 +123,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     public void display(Case caseObj, CaseJob job, JComponent container) {
         this.job = job;
         this.caseObj = caseObj;
+        localBox = new CheckBox("Local?");
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         container.add(nameNPurposPanel());
@@ -134,6 +138,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             container.add(resultPanel());
             populateFields();
         }
+        
+        container.add(parentCaseInfoPanel(edit));
     }
 
     private JPanel nameNPurposPanel() {
@@ -262,6 +268,28 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
+        return panel;
+    }
+    
+    private JPanel parentCaseInfoPanel(boolean editor) {
+        JPanel panel = new JPanel(new BorderLayout());
+        
+        JPanel panel1 = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator1 = new SpringLayoutGenerator();
+        JLabel label = new JLabel("" + this.job.getParentCaseId());
+        layoutGenerator1.addLabelWidgetPair("Parent case ID:", label, panel1);
+        
+        // Lay out the panel.
+        layoutGenerator1.makeCompactGrid(panel1, 1, 2, // rows, cols
+                10, 10, // initialX, initialY
+                10, 10);// xPad, yPad
+        
+        if (!editor)
+            localBox.setEnabled(false);
+
+        panel.add(panel1, BorderLayout.LINE_START);
+        panel.add(localBox, BorderLayout.CENTER);
+        
         return panel;
     }
 
@@ -401,6 +429,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         oldJobOrder.setText(job.getOrder() + "");
         this.qoption.setText(job.getQueOptions());
         this.version.setText(job.getVersion() + "");
+        this.localBox.setSelected(job.isLocal());
 
         User user = job.getUser();
         Date startDate = job.getRunStartDate();
@@ -427,6 +456,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         job.setRunstatus((JobRunStatus) status.getSelectedItem());
         job.setVersion(Integer.parseInt(version.getText().trim()));
         job.setQueOptions(qoption.getText().trim());
+        job.setLocal(localBox.isSelected());
         Object[] objects = dependentJobsList.getObjects();
         String[] jobNames = new String[objects.length];
         

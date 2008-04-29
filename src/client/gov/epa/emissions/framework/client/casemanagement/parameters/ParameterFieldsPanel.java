@@ -40,7 +40,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
 
     private CheckBox required;
 
-    private CheckBox show;
+    private CheckBox local;
 
     private ManageChangeables changeablesList;
 
@@ -130,8 +130,8 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         changeablesList.addChangeable(order);
         layoutGenerator.addLabelWidgetPair("Order:", order, panel);
 
-        show = new CheckBox("");
-        changeablesList.addChangeable(show);
+        local = new CheckBox("");
+        changeablesList.addChangeable(local);
 
         required = new CheckBox("");
         changeablesList.addChangeable(required);
@@ -142,7 +142,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         showPanel.add(new JLabel(EmptyStrings.create(20)));
         showPanel.add(new JLabel("Local?"));
         showPanel.add(new JLabel(EmptyStrings.create(20)));
-        showPanel.add(show);
+        showPanel.add(local);
         layout.addWidgetPair(required, showPanel, checkBoxPanel);
         layout.makeCompactGrid(checkBoxPanel, 1, 2, 0, 0, 0, 0);
         layoutGenerator.addLabelWidgetPair("Required?", checkBoxPanel, panel);
@@ -210,7 +210,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
 
     private void populateFields(CaseParameter param) {
         required.setSelected(param.isRequired());
-        show.setSelected(param.isShow());
+        local.setSelected(param.isLocal());
     }
 
     public CaseParameter setFields() throws EmfException {
@@ -219,7 +219,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         updateEnvtVar();
         updateSector();
         parameter.setRequired(required.isSelected());
-        parameter.setShow(show.isSelected());
+        parameter.setLocal(local.isSelected());
         parameter.setLastModifiedDate(new Date());
         updateJob();
         parameter.setType((ValueType) varTypes.getSelectedItem());
@@ -311,7 +311,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         purpose.setEnabled(false);
         order.setEnabled(false);
         required.setEnabled(false);
-        show.setEnabled(false);
+        local.setEnabled(false);
     }
 
 }

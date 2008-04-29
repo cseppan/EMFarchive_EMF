@@ -30,7 +30,7 @@ public class CaseParameter implements Serializable, Comparable<CaseParameter> {
     
     private boolean required;
     
-    private boolean show;
+    private boolean local;
     
     private int jobId;
     
@@ -191,14 +191,14 @@ public class CaseParameter implements Serializable, Comparable<CaseParameter> {
         this.required = required;
     }
 
-    public boolean isShow() {
-        return show;
+    public boolean isLocal() {
+        return local;
     }
 
-    public void setShow(boolean show) {
-        this.show = show;
+    public void setLocal(boolean local) {
+        this.local = local;
     }
-    
+
     public String toString() {
         return getName();
     }

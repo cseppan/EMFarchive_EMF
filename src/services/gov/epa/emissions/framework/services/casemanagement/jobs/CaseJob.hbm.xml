@@ -24,6 +24,7 @@
 		<property name="queOptions" column="que_option" type="java.lang.String" not-null="false"/>
 		<property name="path" column="path" type="java.lang.String" not-null="false"/>
 		<property name="idInQueue" column="q_id" type="java.lang.String" not-null="false"/>
+		<property name="local" column="local" type="boolean" not-null="false"/>
 		
 		<many-to-one
          	name="sector" 

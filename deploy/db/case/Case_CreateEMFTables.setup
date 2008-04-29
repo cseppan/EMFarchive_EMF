@@ -225,6 +225,7 @@ CREATE TABLE cases.cases_casejobs
   que_option varchar(255),
   path varchar(255),
   q_id varchar(255) ,
+  local bool DEFAULT true,
   UNIQUE (case_id, name)
 )
 WITHOUT OIDS;
@@ -239,7 +240,7 @@ CREATE TABLE cases.cases_caseinputs
   case_job_id int4 DEFAULT 0,
   sub_dir varchar(255),
   required bool DEFAULT false,
-  show bool DEFAULT false,
+  local bool DEFAULT false,
   last_modified_date timestamp,
   sector_id int4  REFERENCES emf.sectors(id),
   program_id int4  REFERENCES cases.programs(id),
@@ -290,7 +291,7 @@ CREATE TABLE cases.cases_parameters
   case_job_id int4 DEFAULT 0,
   param_name_id int4  REFERENCES cases.parameter_names(id),
   required bool DEFAULT false,
-  is_show bool DEFAULT false,
+  local bool DEFAULT false,
   last_modified_date timestamp,
   sector_id int4  REFERENCES emf.sectors(id),
   program_id int4  REFERENCES cases.programs(id),

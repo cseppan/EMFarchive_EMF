@@ -22,7 +22,7 @@ public class ParametersRowSource implements RowSource {
     public Object[] values() {
         return new Object[] { getParameterName(parameter), getOrder(parameter),  getEnvtVarName(parameter),
                 getSectorName(parameter), getJob(parameter), getProgramName(parameter), parameter.getValue(),
-                getValueType(parameter), isRequired(parameter), isShow(parameter), getLastModified(parameter), 
+                getValueType(parameter), isRequired(parameter), isLocal(parameter), getLastModified(parameter), 
                 parameter.getNotes(), parameter.getPurpose() };
     }
 
@@ -54,8 +54,8 @@ public class ParametersRowSource implements RowSource {
         return (param == null) ? "" : param.isRequired() + "";
     }
 
-    private String isShow(CaseParameter input) {
-        return (input == null) ? "" : input.isShow() + "";
+    private String isLocal(CaseParameter param) {
+        return (param == null) ? "" : param.isLocal() + "";
     }
     
     private String getLastModified(CaseParameter input) {

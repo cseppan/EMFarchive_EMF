@@ -259,7 +259,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         try {
             CaseParameter newParameter = new CaseParameter();
             newParameter.setCaseID(caseId);
-            newParameter.setShow(true);
+            newParameter.setLocal(true);
             newParameter.setRequired(true);
             presenter.addNewParameterDialog(view, newParameter);
         } catch (EmfException e) {
