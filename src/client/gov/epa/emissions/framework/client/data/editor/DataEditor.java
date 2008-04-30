@@ -256,9 +256,10 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         clearMessages();
         revisionPanel.enableWhatNWhy();
         try {
-            ManagedView findReplaceWindow = desktopManager.getWindow("Find and Replace Column Values: " + dataset.getName() + " (version: "
-                    + version.getVersion() + ")"); 
-            findReplaceWindow.windowClosing(); //NOTE: to close the find and replace window
+            ManagedView findReplaceWindow = desktopManager.getWindow("Find and Replace Column Values: "
+                    + dataset.getName() + " (version: " + version.getVersion() + ")");
+            if (findReplaceWindow != null)
+                findReplaceWindow.windowClosing(); // NOTE: to close the find and replace window
             presenter.doClose();
         } catch (EmfException e) {
             displayError("Could not close: " + e.getMessage());
