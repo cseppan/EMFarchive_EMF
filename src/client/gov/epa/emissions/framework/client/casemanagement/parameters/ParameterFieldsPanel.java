@@ -72,11 +72,12 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         String width = EmptyStrings.create(65);
-        Dimension preferredSize = new Dimension(20, 30);
+        Dimension preferredSize = new Dimension(300, 25);
 
         parameterName = new EditableComboBox(presenter.getParameterNames());
         addPopupMenuListener(parameterName, "parameternames");
         parameterName.setSelectedItem(param.getParameterName());
+        parameterName.setPreferredSize(preferredSize);
         changeablesList.addChangeable(parameterName);
         parameterName.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Parameter Name:", parameterName, panel);
@@ -84,6 +85,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         program = new EditableComboBox(presenter.getPrograms());
         addPopupMenuListener(program, "programs");
         program.setSelectedItem(param.getProgram());
+        program.setPreferredSize(preferredSize);
         changeablesList.addChangeable(program);
         program.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
@@ -91,24 +93,27 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         envtVar = new EditableComboBox(presenter.getEnvtVars());
         addPopupMenuListener(envtVar, "envtvars");
         envtVar.setSelectedItem(param.getEnvVar());
+        envtVar.setPreferredSize(preferredSize);
         changeablesList.addChangeable(envtVar);
         envtVar.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Envt. Variable:", envtVar, panel);
 
         varTypes = new ComboBox(presenter.getValueTypes());
         varTypes.setSelectedItem(param.getType());
+        varTypes.setPreferredSize(preferredSize);
         addPopupMenuListener(varTypes, "vartypes");
         changeablesList.addChangeable(varTypes);
         varTypes.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Type:", varTypes, panel);
 
-        envValue = new TextField("value", param.getValue(), 20);
+        envValue = new TextField("value", param.getValue(),27);
         envValue.setPreferredSize(preferredSize);
         changeablesList.addChangeable(envValue);
         layoutGenerator.addLabelWidgetPair("Value:", envValue, panel);
 
         sector = new ComboBox(presenter.getSectors());
         sector.setSelectedItem(param.getSector() == null ? sector.getItemAt(0) : param.getSector());
+        sector.setPreferredSize(preferredSize);
         addPopupMenuListener(sector, "sectors");
         changeablesList.addChangeable(sector);
         sector.setPrototypeDisplayValue(width);
@@ -117,15 +122,16 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         setJob(param);
         changeablesList.addChangeable(jobs);
         jobs.setPrototypeDisplayValue(width);
+        jobs.setPreferredSize(preferredSize);
         layoutGenerator.addLabelWidgetPair("Job:", jobs, panel);
 
         purpose = new TextArea("purpose", param.getPurpose());
         changeablesList.addChangeable(purpose);
         ScrollableComponent scrolpane = new ScrollableComponent(purpose);
-        scrolpane.setPreferredSize(new Dimension(224, 80));
+        scrolpane.setPreferredSize(new Dimension(300, 80));
         layoutGenerator.addLabelWidgetPair("Purpose:", scrolpane, panel);
 
-        order = new TextField("order", param.getOrder() + "", 20);
+        order = new TextField("order", param.getOrder() + "",27);
         order.setPreferredSize(preferredSize);
         changeablesList.addChangeable(order);
         layoutGenerator.addLabelWidgetPair("Order:", order, panel);
@@ -139,7 +145,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         JPanel checkBoxPanel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layout = new SpringLayoutGenerator();
         JPanel showPanel = new JPanel();
-        showPanel.add(new JLabel(EmptyStrings.create(20)));
+        showPanel.add(new JLabel(EmptyStrings.create(25)));
         showPanel.add(new JLabel("Local?"));
         showPanel.add(new JLabel(EmptyStrings.create(20)));
         showPanel.add(local);
@@ -150,7 +156,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         notes = new TextArea("notes", param.getNotes());
         changeablesList.addChangeable(notes);
         ScrollableComponent notes_scrollpane = new ScrollableComponent(notes);
-        notes_scrollpane.setPreferredSize(new Dimension(224, 80));
+        notes_scrollpane.setPreferredSize(new Dimension(300, 80));
         layoutGenerator.addLabelWidgetPair("Notes:", notes_scrollpane, panel);
         
         layoutGenerator.addLabelWidgetPair("Parent case ID:", new JLabel("" + this.parameter.getParentCaseId()), panel);
