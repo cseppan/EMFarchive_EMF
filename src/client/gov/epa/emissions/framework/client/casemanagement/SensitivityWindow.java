@@ -163,7 +163,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         Button editButton = new OKButton("Edit Case", editAction());
         container.add(editButton);
         container.add(new CancelButton(closeAction()));
-        getRootPane().setDefaultButton(editButton);
+        getRootPane().setDefaultButton(wizardButton);
 
         panel.add(container, BorderLayout.CENTER);
 
