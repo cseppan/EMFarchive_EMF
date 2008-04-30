@@ -180,8 +180,8 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
     }
 
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Envt. Var.", "Sector", "Input" };
-        return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
+        String[] columnNames = { "Envt. Var.", "Sector", "Input", "Job" };
+        return new SortCriteria(columnNames, new boolean[] { true, true, true, true }, new boolean[] { false, false, false, false });
     }
 
     private JPanel controlPanel() {

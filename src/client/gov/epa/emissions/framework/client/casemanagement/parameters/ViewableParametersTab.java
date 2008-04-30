@@ -162,9 +162,9 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
 
 
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Order", "Envt. Var.", "Sector", "Parameter" };
-        return new SortCriteria(columnNames, new boolean[] { true, true, true, true }, new boolean[] { false, false,
-                false, false });
+        String[] columnNames = { "Order", "Envt. Var.", "Sector", "Parameter", "Job" };
+        return new SortCriteria(columnNames, new boolean[] { true, true, true, true, true }, new boolean[] { false, false,
+                false, false, false });
     }
 
     private JPanel controlPanel() {

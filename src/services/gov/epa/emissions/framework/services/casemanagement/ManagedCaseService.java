@@ -44,6 +44,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -819,6 +820,30 @@ public class ManagedCaseService {
         try {
             List<CaseInput> inputs = dao.getCaseInputs(caseId, session);
 
+            Collections.sort(inputs, new Comparator<CaseInput>() {
+                public int compare(CaseInput o1, CaseInput o2) {
+                    int sectorId1 = (o1.getSector() == null) ? 0 : o1.getSector().getId();
+                    int sectorId2 = (o2.getSector() == null) ? 0 : o2.getSector().getId();
+                    
+                    int envId1 = (o1.getEnvtVars() == null) ? 0 : o1.getEnvtVars().getId();
+                    int envId2 = (o2.getEnvtVars() == null) ? 0 : o2.getEnvtVars().getId();
+                    
+                    int jobId1 = o1.getCaseJobID();
+                    int jobId2 = o2.getCaseJobID();
+                    
+                    if (sectorId1 > sectorId2)
+                        return 1;
+                    else if (sectorId1 == sectorId2 && envId1 > envId2)
+                        return 1;
+                    else if (sectorId1 == sectorId2 && envId1 == envId2 && jobId1 > jobId2)
+                        return 1;
+                    else if (sectorId1 == sectorId2 && envId1 == envId2 && jobId1 == jobId2)
+                        return 0;
+                    
+                    return -1;
+                }
+            });
+            
             return inputs.toArray(new CaseInput[0]);
         } catch (Exception e) {
             e.printStackTrace();
@@ -836,6 +861,29 @@ public class ManagedCaseService {
         try {
             List<CaseInput> inputs = dao.getCaseInputs(pageSize, caseId, sector, showAll, session);
 
+            Collections.sort(inputs, new Comparator<CaseInput>() {
+                public int compare(CaseInput o1, CaseInput o2) {
+                    int sectorId1 = (o1.getSector() == null) ? 0 : o1.getSector().getId();
+                    int sectorId2 = (o2.getSector() == null) ? 0 : o2.getSector().getId();
+                    
+                    int envId1 = (o1.getEnvtVars() == null) ? 0 : o1.getEnvtVars().getId();
+                    int envId2 = (o2.getEnvtVars() == null) ? 0 : o2.getEnvtVars().getId();
+                    
+                    int jobId1 = o1.getCaseJobID();
+                    int jobId2 = o2.getCaseJobID();
+                    
+                    if (sectorId1 > sectorId2)
+                        return 1;
+                    else if (sectorId1 == sectorId2 && envId1 > envId2)
+                        return 1;
+                    else if (sectorId1 == sectorId2 && envId1 == envId2 && jobId1 > jobId2)
+                        return 1;
+                    else if (sectorId1 == sectorId2 && envId1 == envId2 && jobId1 == jobId2)
+                        return 0;
+                    
+                    return -1;
+                }
+            });
             return inputs.toArray(new CaseInput[0]);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1144,6 +1192,30 @@ public class ManagedCaseService {
         try {
             List<CaseParameter> params = dao.getCaseParameters(caseId, session);
 
+            Collections.sort(params, new Comparator<CaseParameter>() {
+                public int compare(CaseParameter o1, CaseParameter o2) {
+                    int sectorId1 = (o1.getSector() == null) ? 0 : o1.getSector().getId();
+                    int sectorId2 = (o2.getSector() == null) ? 0 : o2.getSector().getId();
+                    
+                    int envId1 = (o1.getEnvVar() == null) ? 0 : o1.getEnvVar().getId();
+                    int envId2 = (o2.getEnvVar() == null) ? 0 : o2.getEnvVar().getId();
+                    
+                    int jobId1 = o1.getJobId();
+                    int jobId2 = o2.getJobId();
+                    
+                    if (sectorId1 > sectorId2)
+                        return 1;
+                    else if (sectorId1 == sectorId2 && envId1 > envId2)
+                        return 1;
+                    else if (sectorId1 == sectorId2 && envId1 == envId2 && jobId1 > jobId2)
+                        return 1;
+                    else if (sectorId1 == sectorId2 && envId1 == envId2 && jobId1 == jobId2)
+                        return 0;
+                    
+                    return -1;
+                }
+            });
+            
             return params.toArray(new CaseParameter[0]);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1161,6 +1233,30 @@ public class ManagedCaseService {
         try {
             List<CaseParameter> params = dao.getCaseParameters(pageSize, caseId, sector, showAll, session);
 
+            Collections.sort(params, new Comparator<CaseParameter>() {
+                public int compare(CaseParameter o1, CaseParameter o2) {
+                    int sectorId1 = (o1.getSector() == null) ? 0 : o1.getSector().getId();
+                    int sectorId2 = (o2.getSector() == null) ? 0 : o2.getSector().getId();
+                    
+                    int envId1 = (o1.getEnvVar() == null) ? 0 : o1.getEnvVar().getId();
+                    int envId2 = (o2.getEnvVar() == null) ? 0 : o2.getEnvVar().getId();
+                    
+                    int jobId1 = o1.getJobId();
+                    int jobId2 = o2.getJobId();
+                    
+                    if (sectorId1 > sectorId2)
+                        return 1;
+                    else if (sectorId1 == sectorId2 && envId1 > envId2)
+                        return 1;
+                    else if (sectorId1 == sectorId2 && envId1 == envId2 && jobId1 > jobId2)
+                        return 1;
+                    else if (sectorId1 == sectorId2 && envId1 == envId2 && jobId1 == jobId2)
+                        return 0;
+                    
+                    return -1;
+                }
+            });
+            
             return params.toArray(new CaseParameter[0]);
         } catch (Exception e) {
             e.printStackTrace();
