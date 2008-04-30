@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
@@ -54,6 +56,10 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
     private DesktopManager desktopManager;
 
     private TextField inputDir;
+    
+    private JCheckBox showAll;
+    
+    private ComboBox sectorsComboBox;
 
     private EmfSession session;
 
@@ -100,11 +106,10 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
         try {
             messagePanel.setMessage("Please wait while retrieving all case inputs...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            doRefresh(presenter.getCaseInput(caseId));
-            messagePanel.clear();
-            setCursor(Cursor.getDefaultCursor());
+            doRefresh(listFreshInputs());
         } catch (Exception e) {
             messagePanel.setError("Cannot retrieve all case inputs.");
+        } finally {
             setCursor(Cursor.getDefaultCursor());
         }
     }
@@ -128,7 +133,7 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
             throws Exception {
         final JPanel layout = new JPanel(new BorderLayout());
 
-        layout.add(createFolderPanel(), BorderLayout.NORTH);
+        layout.add(createFolderNSectorPanel(), BorderLayout.NORTH);
         layout.add(tablePanel(inputs, parentConsole), BorderLayout.CENTER);
         layout.add(controlPanel(), BorderLayout.PAGE_END);
 
@@ -149,30 +154,34 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
         tableData = new InputsTableData(inputs, session);
     }
 
-//    private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
-//        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, table);
-//        sortFilterPanel.sort(sortCriteria());
-//
-//        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
-//        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
-//        return scrollPane;
-//    }
-
-    private SortCriteria sortCriteria() {
-        String[] columnNames = { "Envt. Var.", "Sector", "Input" };
-        return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
-    }
-
-    private JPanel createFolderPanel() {
+    private JPanel createFolderNSectorPanel() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Input Folder:", inputDir, panel);
-        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+
+        sectorsComboBox = new ComboBox("Select a Sector", presenter.getAllSetcors());
+        sectorsComboBox.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    doRefresh(listFreshInputs());
+                } catch (Exception exc) {
+                    setErrorMessage(exc.getMessage());
+                }
+            }
+        });
+
+        layoutGenerator.addLabelWidgetPair("Sector:", sectorsComboBox, panel);
+        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
 
         return panel;
+    }
+
+    private SortCriteria sortCriteria() {
+        String[] columnNames = { "Envt. Var.", "Sector", "Input" };
+        return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { false, false, false });
     }
 
     private JPanel controlPanel() {
@@ -209,14 +218,17 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
         export.setMargin(insets);
         container.add(export);
 
-        final JCheckBox showAll = new JCheckBox("Show All", false);
+        showAll = new JCheckBox("Show All", false);
         showAll.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                // doRefresh(showAll);
                 clearMessage();
+                try {
+                    doRefresh(listFreshInputs());
+                } catch (Exception ex) {
+                    setErrorMessage(ex.getMessage());
+                }
             }
         });
-        showAll.setEnabled(false);
         container.add(showAll);
 
         JPanel panel = new JPanel(new BorderLayout());
@@ -327,10 +339,6 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
     }
 
     private int checkOverWrite() {
-//        String title = "Message";
-//        String message = "Would you like to remove previously exported files prior to export?";
-//        return JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
-//                JOptionPane.QUESTION_MESSAGE);
         //FIXME: Temporal setting till gets back from Marc on this policy 11/09/2007 Qun
         return JOptionPane.YES_OPTION;
     }
@@ -347,6 +355,29 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
         return datasetList;
     }
 
+    private CaseInput[] listFreshInputs() throws EmfException {
+        CaseInput[] freshList = presenter.getCaseInput(caseId, getSelectedSector(), showAll.isSelected());
+        
+        if (getSelectedSector() == null && freshList.length == presenter.getPageSize())
+            setMessage("Please select a sector to see full list of inputs.");
+        else
+            messagePanel.clear();
+        
+        return freshList;
+    }
+    
+    private Sector getSelectedSector() {
+        return (Sector) sectorsComboBox.getSelectedItem();
+    }
+    
+    public void setMessage(String message) {
+        messagePanel.setMessage(message);
+    }
+    
+    public void setErrorMessage(String message) {
+        messagePanel.setError(message);
+    }
+    
     public void addInput(CaseInput note) {
         tableData.add(note);
         table.refresh(tableData);

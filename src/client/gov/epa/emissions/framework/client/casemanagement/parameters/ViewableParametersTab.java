@@ -1,8 +1,11 @@
 package gov.epa.emissions.framework.client.casemanagement.parameters;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -23,6 +26,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 
 public class ViewableParametersTab extends JPanel implements RefreshObserver {
 
@@ -39,6 +43,10 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
     private SelectableSortFilterWrapper table;
 
     private JPanel tablePanel;
+    
+    private ComboBox sectorsComboBox;
+
+    private JCheckBox showAll;
 
     private MessagePanel messagePanel;
 
@@ -85,12 +93,11 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
         try {
             messagePanel.setMessage("Please wait while retrieving all case parameters...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            doRefresh(presenter.getCaseParameters(caseId));
-            messagePanel.clear();
-            setCursor(Cursor.getDefaultCursor());
+            doRefresh(listFreshParameters());
         } catch (Exception e) {
-            e.printStackTrace();
-            messagePanel.setError("Cannot retrieve all case parameters.");
+            messagePanel.setError("Cannot retrieve all case parameters: " + e.getMessage());
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
         }
     }
 
@@ -111,12 +118,35 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
             throws Exception {
         final JPanel layout = new JPanel(new BorderLayout());
 
+        layout.add(createSectorPanel(), BorderLayout.NORTH);
         layout.add(tablePanel(params, parentConsole), BorderLayout.CENTER);
         layout.add(controlPanel(), BorderLayout.PAGE_END);
 
         return layout;
     }
 
+    private JPanel createSectorPanel() throws EmfException {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        sectorsComboBox = new ComboBox("Select a Sector", presenter.getAllSetcors());
+        sectorsComboBox.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    doRefresh(listFreshParameters());
+                } catch (Exception exc) {
+                    setErrorMessage(exc.getMessage());
+                }
+            }
+        });
+
+        layoutGenerator.addLabelWidgetPair("Sector:", sectorsComboBox, panel);
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+                5, 5, // initialX, initialY
+                5, 5);// xPad, yPad
+
+        return panel;
+    }
+    
     private JPanel tablePanel(CaseParameter[] params, EmfConsole parentConsole) {
         setupTableModel(params);
         tablePanel = new JPanel(new BorderLayout());
@@ -155,14 +185,17 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
         view.setMargin(insets);
         container.add(view);
 
-        final JCheckBox showAll = new JCheckBox("Show All", false);
+        showAll = new JCheckBox("Show All", false);
         showAll.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                // doRefresh(showAll);
                 clearMessage();
+                try {
+                    doRefresh(listFreshParameters());
+                } catch (Exception e1) {
+                    setErrorMessage(e1.getMessage());
+                }
             }
         });
-        showAll.setEnabled(false);
         container.add(showAll);
 
         JPanel panel = new JPanel(new BorderLayout());
@@ -207,8 +240,27 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
         messagePanel.clear();
     }
 
-    private void setMessage(String msg) {
+    private void setErrorMessage(String msg) {
         messagePanel.setError(msg);
+    }
+    
+    private void setMessage(String msg) {
+        messagePanel.setMessage(msg);
+    }
+    
+    private CaseParameter[] listFreshParameters() throws EmfException {
+        CaseParameter[] freshList = presenter.getCaseParameters(caseId, getSelectedSector(), showAll.isSelected());
+        
+        if (getSelectedSector() == null && freshList.length == presenter.getPageSize())
+            setMessage("Please select a sector to see full list of parameters.");
+        else
+            messagePanel.clear();
+        
+        return freshList;
+    }
+
+    private Sector getSelectedSector() {
+        return (Sector) sectorsComboBox.getSelectedItem();
     }
 
     public void doRefresh() throws EmfException {

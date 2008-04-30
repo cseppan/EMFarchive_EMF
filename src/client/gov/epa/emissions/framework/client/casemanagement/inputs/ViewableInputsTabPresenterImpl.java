@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
@@ -9,6 +10,8 @@ import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -18,6 +21,8 @@ public class ViewableInputsTabPresenterImpl {
     private Case caseObj;
 
     private ViewableInputsTab view;
+    
+    private int defaultPageSize = 20;
 
     private EmfSession session;
 
@@ -90,6 +95,22 @@ public class ViewableInputsTabPresenterImpl {
     
     public Case getCaseObj() {
         return this.caseObj;
+    }
+    
+    public int getPageSize() {
+        return this.defaultPageSize;
+    }
+
+    public CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException {
+        return service().getCaseInputs(defaultPageSize, caseId, sector, showAll);
+    }
+    
+    public Sector[] getAllSetcors() throws EmfException {
+        List<Sector> all = new ArrayList<Sector>();
+        all.add(new Sector("All", "All"));
+        all.addAll(Arrays.asList(session.dataCommonsService().getSectors()));
+
+        return all.toArray(new Sector[0]);
     }
     
 }
