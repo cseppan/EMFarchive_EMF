@@ -58,7 +58,7 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
    
     private Case caseObj;
 
-    private Button prevButton, nexButton;
+    private Button prevButton, nexButton, editButton;
 
     private SetCaseObject  currentObject; 
     
@@ -158,11 +158,12 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         
         prevButton = new Button("Prev", prevsAction());
         container.add(prevButton);
-        Button editButton = new OKButton("Edit Case", editAction());
-        getRootPane().setDefaultButton(editButton);
+        editButton = new OKButton("Edit Case", editAction());
+        //getRootPane().setDefaultButton(editButton);
         container.add(editButton);
         nexButton = new Button("Next", nextAction());
         container.add(nexButton);
+        getRootPane().setDefaultButton(nexButton);
         
         resetButtons();
         panel.add(container, BorderLayout.CENTER);
@@ -244,10 +245,13 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     private void resetButtons(){
         prevButton.setEnabled(true);
         nexButton.setEnabled(true);
+        getRootPane().setDefaultButton(nexButton);
         if (currentIndex == 0 )
             prevButton.setEnabled(false);
-        if (setCaseObjects.size() == currentIndex+1)
+        if (setCaseObjects.size() == currentIndex+1){
             nexButton.setEnabled(false);
+            getRootPane().setDefaultButton(editButton);
+        }
     }
     
     private JPanel displayParam(CaseParameter param) throws EmfException {
@@ -281,7 +285,7 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         scrolpane.setPreferredSize(new Dimension(300, 120));
         layoutGenerator.addLabelWidgetPair("Information:", scrolpane, panel);
 
-        JLabel required = new JLabel(param.isRequired()? "true" : "false" );
+        JLabel required = new JLabel(param.isRequired()? "True" : "False" );
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
         // Lay out the panel.

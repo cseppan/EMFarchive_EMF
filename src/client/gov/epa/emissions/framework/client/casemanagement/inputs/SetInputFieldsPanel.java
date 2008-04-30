@@ -95,7 +95,7 @@ public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView 
         layoutGenerator.addLabelWidgetPair("Version:", version, panel);
         
 
-        JLabel required = new JLabel(input.isRequired()? "true" : "false" );
+        JLabel required = new JLabel(input.isRequired()? "True" : "False" );
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
         // Lay out the panel.
@@ -106,13 +106,6 @@ public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView 
         container.add(panel);
     }
 
-
-
-//    private void setJob() throws EmfException {
-//        CaseJob[] jobArray = presenter.getCaseJobs();
-//        jobs = new ComboBox(jobArray);
-//        jobs.setSelectedIndex(presenter.getJobIndex(input.getCaseJobID(), jobArray));
-//    }
 
     private void fillDatasets(DatasetType type) {
         try {
