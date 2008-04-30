@@ -176,5 +176,15 @@ public class InputFieldsPanelPresenter {
         
         return 0;
     }
-
+    
+    public String getJobName(int jobId) throws EmfException {
+        if (jobId == 0)
+            return "All jobs for sector";
+        
+        CaseJob job = session.caseService().getCaseJob(jobId);
+        if (job == null)
+            throw new EmfException("Cannot retrieve job (id = " + jobId + ").");
+        return job.getName();
+    }
+    
 }
