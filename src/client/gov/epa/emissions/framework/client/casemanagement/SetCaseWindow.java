@@ -257,7 +257,7 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     private JPanel displayParam(CaseParameter param) throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        Dimension preferredSize = new Dimension(20, 25);
+        //Dimension preferredSize = new Dimension(20, 25);
         
         JLabel parameterName = new JLabel(param.getParameterName().toString());
         layoutGenerator.addLabelWidgetPair("Parameter Name:", parameterName, panel);
@@ -274,15 +274,15 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         JLabel varTypes = new JLabel(param.getType()==null? "":param.getType().toString());
         layoutGenerator.addLabelWidgetPair("Type:", varTypes, panel);
         
-        envValue = new TextField("value", param.getValue(), 20);
-        envValue.setPreferredSize(preferredSize);
+        envValue = new TextField("value", param.getValue(), 32);
+        //envValue.setPreferredSize(new Dimension(340, 25));
         addChangeable(envValue);
         layoutGenerator.addLabelWidgetPair("Value:", envValue, panel);
         
         purpose = new TextArea("Information", param.getPurpose());
         purpose.setEditable(false);
         ScrollableComponent scrolpane = new ScrollableComponent(purpose);
-        scrolpane.setPreferredSize(new Dimension(300, 120));
+        scrolpane.setPreferredSize(new Dimension(360, 160));
         layoutGenerator.addLabelWidgetPair("Information:", scrolpane, panel);
 
         JLabel required = new JLabel(param.isRequired()? "True" : "False" );
