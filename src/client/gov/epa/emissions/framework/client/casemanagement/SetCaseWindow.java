@@ -274,7 +274,7 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         JLabel varTypes = new JLabel(param.getType()==null? "":param.getType().toString());
         layoutGenerator.addLabelWidgetPair("Type:", varTypes, panel);
         
-        envValue = new TextField("value", param.getValue(), 32);
+        envValue = new TextField("value", param.getValue(), 34);
         //envValue.setPreferredSize(new Dimension(340, 25));
         addChangeable(envValue);
         layoutGenerator.addLabelWidgetPair("Value:", envValue, panel);
@@ -282,7 +282,7 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         purpose = new TextArea("Information", param.getPurpose());
         purpose.setEditable(false);
         ScrollableComponent scrolpane = new ScrollableComponent(purpose);
-        scrolpane.setPreferredSize(new Dimension(360, 160));
+        scrolpane.setPreferredSize(new Dimension(380, 160));
         layoutGenerator.addLabelWidgetPair("Information:", scrolpane, panel);
 
         JLabel required = new JLabel(param.isRequired()? "True" : "False" );
@@ -290,7 +290,7 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 8, 2, // rows, cols
-                15, 10, // initialX, initialY
+                10, 10, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
