@@ -3271,8 +3271,13 @@ public class ManagedCaseService {
         try {
             Abbreviation abbr = sensitivityCase.getAbbreviation();
 
-            if (abbr != null)
-                dao.add(abbr, session);
+            if (abbr != null) {
+                try {
+                    dao.add(abbr, session);
+                } catch (RuntimeException e) {
+                    throw new EmfException("Please check if the specified abbreviation already exists.");
+                }
+            }
 
             dao.add(sensitivityCase, session);
             Case loaded = (Case) dao.load(Case.class, sensitivityCase.getName(), session);
@@ -3299,10 +3304,8 @@ public class ManagedCaseService {
             CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), getJobs2Copy(jobIds));
             CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), dao.getCaseInputsByJobIds(
                     template.getId(), jobIds, session).toArray(new CaseInput[0]), session);
-            System.out.println("Inputs to add : " + inputs.length);
             CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao.getCaseParametersByJobIds(
                     template.getId(), jobIds, session).toArray(new CaseParameter[0]), session);
-            System.out.println("Parameters to add : " + params.length);
 
             addCaseJobs(user, targetId, jobs);
             addCaseInputs(user, targetId, inputs);
@@ -3357,6 +3360,7 @@ public class ManagedCaseService {
         sensitivityCase.setSpeciation(parent.getSpeciation());
         sensitivityCase.setStartDate(parent.getStartDate());
         sensitivityCase.setEndDate(parent.getEndDate());
+        sensitivityCase.setTemplateUsed(parent.getName());
     }
 
     private CaseJob[] getJobs2Copy(int[] jobIds) throws EmfException {
@@ -3437,10 +3441,11 @@ public class ManagedCaseService {
          * GOTCHA: If we need both inputs, maybe we need to check for this and copy
          * the original inputs without updating from parent.
          */
-        TreeSet<CaseInput> set = new TreeSet<CaseInput>(inputList2Target);
-        List<CaseInput> uniqueInputs = new ArrayList<CaseInput>(set);
-
-        return uniqueInputs.toArray(new CaseInput[0]);
+//        TreeSet<CaseInput> set = new TreeSet<CaseInput>(inputList2Target);
+//        List<CaseInput> uniqueInputs = new ArrayList<CaseInput>(set);
+//
+//        return uniqueInputs.toArray(new CaseInput[0]);
+        return inputList2Target.toArray(new CaseInput[0]);
     }
 
     private CaseParameter[] cloneCaseParameters(int parentCaseId, int targetCaseId, CaseParameter[] params,
@@ -3492,9 +3497,10 @@ public class ManagedCaseService {
          * GOTCHA: If we need both parameters, maybe we need to check for this and copy
          * the original parameters without updating from parent.
          */
-        TreeSet<CaseParameter> set = new TreeSet<CaseParameter>(params2Target);
-        List<CaseParameter> uniqueParameters = new ArrayList<CaseParameter>(set);
-
-        return uniqueParameters.toArray(new CaseParameter[0]);
+//        TreeSet<CaseParameter> set = new TreeSet<CaseParameter>(params2Target);
+//        List<CaseParameter> uniqueParameters = new ArrayList<CaseParameter>(set);
+//
+//        return uniqueParameters.toArray(new CaseParameter[0]);
+        return params2Target.toArray(new CaseParameter[0]);
     }
 }

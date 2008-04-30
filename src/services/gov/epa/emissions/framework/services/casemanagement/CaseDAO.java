@@ -355,11 +355,12 @@ public class CaseDAO {
     public List<CaseInput> getCaseInputsByJobIds(int caseId, int[] jobIds, Session session) {
         List<?> ids = session.createQuery("SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = "
                         + caseId + " AND (obj.caseJobID = 0 OR obj.caseJobID = " + getAndOrClause(jobIds, "obj.caseJobID") + ")").list();
-        
         List<CaseInput> inputs = new ArrayList<CaseInput>();
         
-        for (Iterator<?> iter = ids.iterator(); iter.hasNext();)
-            inputs.add(this.getCaseInput((Integer)iter.next(), session));
+        for (Iterator<?> iter = ids.iterator(); iter.hasNext();) {
+            Integer id = (Integer)iter.next();
+            inputs.add(this.getCaseInput(id, session));
+        }
 
         return inputs;
     }

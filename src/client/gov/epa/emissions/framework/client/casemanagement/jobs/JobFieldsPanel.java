@@ -123,7 +123,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     public void display(Case caseObj, CaseJob job, JComponent container) {
         this.job = job;
         this.caseObj = caseObj;
-        localBox = new CheckBox("Local?");
+        localBox = new CheckBox("");
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         container.add(nameNPurposPanel());
@@ -272,24 +272,22 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     }
     
     private JPanel parentCaseInfoPanel(boolean editor) {
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel panel1 = new JPanel();
+        panel1.add(new JLabel("Local?"));
+        panel1.add(localBox);
         
-        JPanel panel1 = new JPanel(new SpringLayout());
+        JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator1 = new SpringLayoutGenerator();
-        JLabel label = new JLabel("" + this.job.getParentCaseId());
-        layoutGenerator1.addLabelWidgetPair("Parent case ID:", label, panel1);
+        layoutGenerator1.addLabelWidgetPair("Parent case ID: " + job.getParentCaseId(), panel1, panel);
         
         // Lay out the panel.
-        layoutGenerator1.makeCompactGrid(panel1, 1, 2, // rows, cols
+        layoutGenerator1.makeCompactGrid(panel, 1, 2, // rows, cols
                 10, 10, // initialX, initialY
                 10, 10);// xPad, yPad
         
         if (!editor)
             localBox.setEnabled(false);
 
-        panel.add(panel1, BorderLayout.LINE_START);
-        panel.add(localBox, BorderLayout.CENTER);
-        
         return panel;
     }
 

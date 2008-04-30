@@ -175,9 +175,11 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         localBox.setSelected(input.isLocal());
         changeablesList.addChangeable(localBox);
         layoutGenerator.addLabelWidgetPair("Local?", localBox, panel);
+        
+        layoutGenerator.addLabelWidgetPair("Parent case ID:", new JLabel("" + this.input.getParentCaseId()), panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 12, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 13, 2, // rows, cols
                 10, 10, // initialX, initialY
                 10, 10);// xPad, yPad
 

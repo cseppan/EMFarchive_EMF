@@ -347,11 +347,12 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     
     private void sensitivityCase() {
         cases = selected();
+        
         if (cases.isEmpty() || cases.size() !=1) {
             messagePanel.setMessage("Please select a single case");
             return;
         }
-        //String title = "Add Senditivity to Case: " + ((Case)cases.get(0)).getName();
+        
         SensitivityWindow view = new SensitivityWindow(desktopManager, parentConsole, categories);
         presenter.doSensitivity(view, (Case) cases.get(0));
     }

@@ -10,13 +10,11 @@ import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class EditCaseInputWindow extends DisposableInteralFrame implements EditCaseInputView {
@@ -31,17 +29,14 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
 
     private Button ok;
     
-    private CaseInput input;
-
     private InputFieldsPanel inputFieldsPanel;
     
     public EditCaseInputWindow(String title, DesktopManager desktopManager) {
-        super(title, new Dimension(610, 520), desktopManager);
+        super(title, new Dimension(610, 540), desktopManager);
         //super.setLabel(super.getTitle() + ": " + title);
     }
 
     public void display(CaseInput input) throws EmfException {
-        this.input = input;
         layout = createLayout();
         
         super.getContentPane().add(layout);
@@ -57,16 +52,8 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
         panel.add(messagePanel);
         this.inputFieldsPanel = new InputFieldsPanel(messagePanel, this);
         presenter.doAddInputFields(panel, inputFieldsPanel);
-        panel.add(parentCaseInfoPanel());
         panel.add(buttonsPanel());
 
-        return panel;
-    }
-    
-    private JPanel parentCaseInfoPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(new JLabel("   Parent case ID: " + this.input.getParentCaseId()), BorderLayout.LINE_START);
-        
         return panel;
     }
     

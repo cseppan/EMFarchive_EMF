@@ -54,11 +54,9 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
     private EmfConsole parentConsole;
     
-    //private SensitivityWindow sensitivityWindow;
-
     private Case parentCase;
     
-    private List<CaseCategory> categories;
+    private List<CaseCategory> categories = new ArrayList<CaseCategory>();
     
     private List<Case> templateCases;
     
@@ -73,8 +71,8 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         super("Sensitivity", new Dimension(480, 450), desktopManager);
         super.setName(title);
         this.parentConsole = parentConsole;
-        //this.sensitivityWindow = this;
-        this.categories = categories;
+        this.categories.addAll(categories);
+        this.categories.remove(new CaseCategory("All"));
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -86,7 +84,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     }
 
     public void display(Case case1) {
-        super.setLabel("Add Senditivity to Case: " + case1.getName() );
+        super.setLabel("Add Sensitivity for Case: " + case1.getName() );
         layout.removeAll();
         doLayout(layout, case1);
         super.display();
@@ -107,21 +105,20 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        Label caseName = new Label("Case Name", case1.getName());
-        layoutGenerator.addLabelWidgetPair("Sensitivity for Case:", caseName, panel);
+        Label caseNameNAbbr = new Label("Case Name", case1.getName() + " (" + case1.getAbbreviation() + ")");
+        layoutGenerator.addLabelWidgetPair("Parent Case:", caseNameNAbbr, panel);
 
-        layoutGenerator.addLabelWidgetPair("Sensitivity for Case:", newOrExistRadios(), panel);
+        layoutGenerator.addLabelWidgetPair("Select:", newOrExistRadios(), panel);
 
         CaseCategory category = getSenTemCategory("Sensitivity Template");
         try {
             getAllSenTemplateCases(category);
         } catch (EmfException e) {
-            // NOTE Auto-generated catch block
-            e.printStackTrace();
-            messagePanel.setError("Couldn't get Senstivity Template Cases");
-        } //{ "Adjust AQM-ready Emissions" };
+            messagePanel.setError("Couldn't get Senstivity Template Cases: " + e.getMessage());
+        }
         
         senTypeCombox = new ComboBox("Select One", templateCases.toArray(new Case[0]));
+        senTypeCombox.setPreferredSize(new Dimension(276, 20));
         senTypeCombox.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 refresh();
@@ -137,6 +134,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         layoutGenerator.addLabelWidgetPair("Sensitivity Abbreviation:", senAbrev, panel);
 
         categoryCombox = new ComboBox("Select One", categories.toArray(new CaseCategory[0]));
+        categoryCombox.setPreferredSize(new Dimension(276, 20));
         categoryCombox.setSelectedItem(getSenTemCategory("Sensitivity"));
         layoutGenerator.addLabelWidgetPair("Case Category: ", categoryCombox, panel);
 
@@ -164,7 +162,6 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     
     private void getAllSenTemplateCases(CaseCategory category) throws EmfException{
         this.templateCases = new ArrayList<Case>();
-        //templateCases.add(new CaseCategory("All"));
         templateCases.addAll(Arrays.asList(presenter.getCases(category)));
     }
     
@@ -195,12 +192,9 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     
     private JPanel newOrExistRadios() {
         newRadioButton = new JRadioButton("New");
-        // newSenCase.addActionListener(radioButtonAction());
         newRadioButton.setSelected(true);
         existRadioButton = new JRadioButton("Add to existing");
-        // existSenCase.addActionListener(radioButtonAction());
         existRadioButton.setEnabled(false);
-        // Create logical relationship between JradioButtons
         ButtonGroup buttonGroup = new ButtonGroup();
         buttonGroup.add(newRadioButton);
         buttonGroup.add(existRadioButton);
@@ -219,20 +213,15 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
                 try {
                     Case sensitivityCase = new Case();
-                    //Case sensitivityCase = presenter.copyCase(parentCase.getId());
-                    sensitivityCase.setName(checkEmpty(senName.getText()));
-                    sensitivityCase.setAbbreviation(new Abbreviation(checkEmpty(senAbrev.getText())));
+                    sensitivityCase.setName(checkEmpty(senName.getText(), "name"));
+                    sensitivityCase.setAbbreviation(new Abbreviation(checkEmpty(senAbrev.getText(), "abbreviation")));
                     
-                    //sensitivityCase.setCaseTemplate(true);
                     sensitivityCase.setCaseCategory((CaseCategory) categoryCombox.getSelectedItem());
-                    Case updated = presenter.doSave(parentCase.getId(), ((Case)senTypeCombox.getSelectedItem()).getId(), jobIds(), sensitivityCase);
-                    //Case updated = presenter.updateCase(sensitivityCase);
+                    Case updated = presenter.doSave(parentCase.getId(), getSensitivityTempId(), jobIds(), sensitivityCase);
                     
                     CaseEditor view = new CaseEditor(parentConsole, presenter.getSession(), desktopManager);
                     parentPresenter.doEdit(view, updated);
-                    //disposeView();
                 } catch (EmfException e) {
-                    //e.printStackTrace();
                     messagePanel.setError(e.getMessage());
                 }
             }
@@ -241,21 +230,41 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         return action;
     }
     
-    private String checkEmpty(String string) throws EmfException{
+    protected int getSensitivityTempId() throws EmfException {
+        if (senTypeCombox.getSelectedItem() == null)
+            throw new EmfException("Please select a case template.");
+        
+        return ((Case)senTypeCombox.getSelectedItem()).getId();
+    }
+
+    private String checkEmpty(String string, String field) throws EmfException{
+        if (string == null && field.equals("name"))
+            throw new EmfException("Please specify a name for the sensitivity case.");
+            
+        if (string == null && field.equals("abbreviation"))
+            throw new EmfException("Please specify an abbreviation for the sensitivity case.");
+        
+        if (string.trim().isEmpty() && field.equals("name"))
+            throw new EmfException("Please specify a name for the sensitivity case.");
+        
         if (string.trim().isEmpty())
-            throw new EmfException("Please specify a name and Abbreviation. ");
+            throw new EmfException("Please specify an abbreviation for the sensitivity case.");
+        
         return string; 
     }
     
-    private int[] jobIds(){
+    private int[] jobIds() throws EmfException {
         int jobsNumber = templateJobsList.getSelectedValues().length;
         //System.out.println("selectedJobs length="+ templateJobsList.getSelectedValues().length);    
         
+        if (jobsNumber == 0)
+            throw new EmfException("Please select one or more jobs.");
+        
         int[] selectedIndexes = new int[jobsNumber];
-        for (int i = 0; i < jobsNumber; i++) {
+        
+        for (int i = 0; i < jobsNumber; i++)
             selectedIndexes[i] =((CaseJob)templateJobsList.getSelectedValues()[i]).getId();
-            System.out.println("selectedIndexes[i]="+selectedIndexes[i]);
-        }
+        
         return selectedIndexes;
     }
 

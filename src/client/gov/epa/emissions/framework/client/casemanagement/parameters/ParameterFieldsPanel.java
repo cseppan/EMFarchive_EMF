@@ -152,9 +152,11 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         ScrollableComponent notes_scrollpane = new ScrollableComponent(notes);
         notes_scrollpane.setPreferredSize(new Dimension(224, 80));
         layoutGenerator.addLabelWidgetPair("Notes:", notes_scrollpane, panel);
+        
+        layoutGenerator.addLabelWidgetPair("Parent case ID:", new JLabel("" + this.parameter.getParentCaseId()), panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 11, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 12, 2, // rows, cols
                 10, 10, // initialX, initialY
                 10, 10);// xPad, yPad
 
