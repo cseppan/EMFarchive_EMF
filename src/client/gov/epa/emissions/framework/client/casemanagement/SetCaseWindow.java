@@ -68,7 +68,7 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     
     public SetCaseWindow(String title, EmfConsole parentConsole, 
             DesktopManager desktopManager) {
-        super(title, new Dimension(520, 350), desktopManager);
+        super(title, new Dimension(520, 370), desktopManager);
         this.parentConsole = parentConsole;
     }
 
@@ -282,7 +282,7 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         purpose = new TextArea("Information", param.getPurpose());
         purpose.setEditable(false);
         ScrollableComponent scrolpane = new ScrollableComponent(purpose);
-        scrolpane.setPreferredSize(new Dimension(380, 160));
+        scrolpane.setPreferredSize(new Dimension(380, 100));
         layoutGenerator.addLabelWidgetPair("Information:", scrolpane, panel);
 
         JLabel required = new JLabel(param.isRequired()? "True" : "False" );
