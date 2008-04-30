@@ -436,6 +436,7 @@ public class ManagedCaseService {
             dao.removeCaseParameters(parameters.toArray(new CaseParameter[0]), session);
 
             dao.remove(caseObj, session);
+            dao.removeObject(caseObj.getAbbreviation(), session);
             setStatus(caseObj.getLastModifiedBy(), "Finished removing case " + caseObj.getName() + ".", "Remove Case");
         } catch (RuntimeException e) {
             e.printStackTrace();

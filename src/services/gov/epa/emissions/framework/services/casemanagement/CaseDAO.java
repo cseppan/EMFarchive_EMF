@@ -253,6 +253,10 @@ public class CaseDAO {
         return hibernateFacade.getAll(InputEnvtVar.class, Order.asc("name"), session);
     }
 
+    public void removeObject(Object object, Session session) {
+        hibernateFacade.remove(object, session);
+    }
+
     public void remove(Case element, Session session) {
         hibernateFacade.remove(element, session);
     }
