@@ -24,6 +24,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -109,7 +110,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         layoutGenerator.addLabelWidgetPair("Parent Case:", caseNameNAbbr, panel);
 
         layoutGenerator.addLabelWidgetPair("Select:", newOrExistRadios(), panel);
-
+       
         CaseCategory category = getSenTemCategory("Sensitivity Template");
         try {
             getAllSenTemplateCases(category);
@@ -186,6 +187,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     private void getAllSenTemplateCases(CaseCategory category) throws EmfException{
         this.templateCases = new ArrayList<Case>();
         templateCases.addAll(Arrays.asList(presenter.getCases(category)));
+        Collections.sort(templateCases);
     }
     
     private JScrollPane buildjobsPanel() {

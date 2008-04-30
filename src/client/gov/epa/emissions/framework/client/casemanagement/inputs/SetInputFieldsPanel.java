@@ -47,7 +47,7 @@ public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView 
         this.input = input;
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        String width = EmptyStrings.create(120);
+        String width = EmptyStrings.create(125);
         JLabel inputName = new JLabel(input.getInputName().toString());
         layoutGenerator.addLabelWidgetPair("Input Name:", inputName, panel);
 
