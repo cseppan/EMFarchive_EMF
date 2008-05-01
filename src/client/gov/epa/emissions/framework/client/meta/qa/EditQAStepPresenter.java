@@ -158,14 +158,15 @@ public class EditQAStepPresenter {
         header +="#QA_PROGRAM=" + qaStep.getProgram()+ lineFeeder;
         String arguments= qaStep.getProgramArguments();
         StringTokenizer argumentTokenizer = new StringTokenizer(arguments);
-        header += "#ARGUMENTS=" +argumentTokenizer.nextToken(); // get first token
+        header += "#ARGUMENTS=" + lineFeeder ;
+        header += "#" + argumentTokenizer.nextToken(); // get first token
 
         while (argumentTokenizer.hasMoreTokens()){
             String next = argumentTokenizer.nextToken().trim(); 
             if (next.contains("-"))
                 header += lineFeeder+ "#" +next;
             else 
-                header += " " +next;
+                header += "  " +next;
         }
         header +=lineFeeder;
         //arguments.replaceAll(lineFeeder, "#");
