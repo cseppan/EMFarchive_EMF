@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.client.casemanagement.outputs;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.ComboBox;
-import gov.epa.emissions.commons.gui.EmptyStrings;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
@@ -57,6 +56,8 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     private ManageChangeables changeablesList;
 
     private OutputFieldsPanelPresenter presenter;
+    
+    private Dimension preferredSize = new Dimension(480, 20);
 
     private CaseOutput output;
 
@@ -70,18 +71,18 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         this.datasetValues = presenter.getDatasetValues();
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        String width = EmptyStrings.create(150);
+        //String width = EmptyStrings.create(150);
 
-        outputName = new TextField("name", output.getName(), 40);
+        outputName = new TextField("name", output.getName(), 43);
         outputName.setEditable(true);
-//        outputName.setMaximumSize(new Dimension(200, 20));
+        outputName.setPreferredSize(preferredSize);
         changeablesList.addChangeable(outputName);
         layoutGenerator.addLabelWidgetPair("Output Name:", outputName, panel);
         CaseJob[] jobArray = presenter.getCaseJobs();
         jobCombo= new ComboBox(jobArray);
         jobCombo.setSelectedIndex(presenter.getJobIndex(output.getJobId(), jobArray));
         changeablesList.addChangeable(jobCombo);
-        jobCombo.setPrototypeDisplayValue(width);
+        jobCombo.setPreferredSize(preferredSize);
         jobCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 updateSectorName((CaseJob)jobCombo.getSelectedItem());
@@ -101,7 +102,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
             }
         });
         changeablesList.addChangeable(dsTypeCombo);
-        dsTypeCombo.setPrototypeDisplayValue(width);
+        dsTypeCombo.setPreferredSize(preferredSize);
         layoutGenerator.addLabelWidgetPair("Dataset Type:", dsTypeCombo, panel);
 
         // fill in dataset
@@ -117,7 +118,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
             }
         });
         changeablesList.addChangeable(datasetCombo);
-        datasetCombo.setPrototypeDisplayValue(width);
+        datasetCombo.setPreferredSize(preferredSize);
         layoutGenerator.addLabelWidgetPair("Dataset:", datasetCombo, panel);
         
         sector=new JLabel("");
@@ -182,10 +183,10 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     private ScrollableComponent message() {
         message = new TextArea("message", output.getMessage(), 40, 3 );
         changeablesList.addChangeable(message);
-        //description.setPreferredSize(new Dimension(200, 60));
+        //message.setPreferredSize(new Dimension(450, 80));
 
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(message);
-        descScrollableTextArea.setMinimumSize(new Dimension(200, 20));
+        descScrollableTextArea.setPreferredSize(new Dimension(480, 80));
         return descScrollableTextArea;
     }
     

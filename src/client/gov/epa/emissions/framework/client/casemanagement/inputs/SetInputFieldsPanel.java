@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +49,7 @@ public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView 
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         String width = EmptyStrings.create(125);
+        Dimension preferredSize = new Dimension(380, 25);
         JLabel inputName = new JLabel(input.getInputName().toString());
         layoutGenerator.addLabelWidgetPair("Input Name:", inputName, panel);
 
@@ -81,6 +83,7 @@ public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView 
             }
         });
         changeablesList.addChangeable(dataset);
+        dataset.setPreferredSize(preferredSize);
         dataset.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Dataset:", dataset, panel);
 
@@ -91,6 +94,7 @@ public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView 
             version.setSelectedItem(input.getVersion());
         
         changeablesList.addChangeable(version);
+        version.setPreferredSize(preferredSize);
         version.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Version:", version, panel);
         
