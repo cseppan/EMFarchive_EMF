@@ -142,7 +142,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         layoutGenerator.addLabelWidgetPair("Sensitivity Jobs: ", buildjobsPanel(), panel);
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
-                5, 0, // initialX, initialY
+                10, 10, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
@@ -153,12 +153,11 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
         JPanel container = new JPanel();
         FlowLayout layout = new FlowLayout();
-        layout.setHgap(20);
+        layout.setHgap(15);
         layout.setVgap(10);
         container.setLayout(layout);
         
         Button wizardButton = new Button("Wizard", setAction());
-        //wizardButton.setEnabled(false);
         container.add(wizardButton);
         Button editButton = new OKButton("Edit Case", editAction());
         container.add(editButton);

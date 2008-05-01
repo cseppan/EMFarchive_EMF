@@ -73,7 +73,16 @@ public class SetCasePresenterImpl implements SetCasePresenter {
     }
 
     public CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
+        //return service().getCaseParameters(defaultPageSize, caseId, sector, showAll);
+        if (sector == null)
+            return new CaseParameter[0];
+
+        if (sector.compareTo(new Sector("All", "All")) == 0)
+            sector = null; // to trigger select all on the server side
+
+        //return service().getcasgetCaseParameters(caseId, sector, showAll);
         return service().getCaseParameters(defaultPageSize, caseId, sector, showAll);
+
     }
     
     public void doClose() throws EmfException {

@@ -141,7 +141,7 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     private void panelRefresh() throws EmfException {
         mainPanel.removeAll();
         if (!currentObject.isInput())
-        mainPanel.add(displayParam((CaseParameter)currentObject.getObject()));
+            mainPanel.add(displayParam((CaseParameter)currentObject.getObject()));
         else
             mainPanel.add(displayInput((CaseInput)currentObject.getObject()));
         super.validate();
@@ -257,7 +257,7 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     private JPanel displayParam(CaseParameter param) throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        //Dimension preferredSize = new Dimension(20, 25);
+        Dimension preferredSize = new Dimension(380, 25);
         
         JLabel parameterName = new JLabel(param.getParameterName().toString());
         layoutGenerator.addLabelWidgetPair("Parameter Name:", parameterName, panel);
@@ -275,11 +275,11 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         layoutGenerator.addLabelWidgetPair("Type:", varTypes, panel);
         
         envValue = new TextField("value", param.getValue(), 34);
-        //envValue.setPreferredSize(new Dimension(340, 25));
+        envValue.setPreferredSize(preferredSize);
         addChangeable(envValue);
         layoutGenerator.addLabelWidgetPair("Value:", envValue, panel);
         
-        purpose = new TextArea("Information", param.getPurpose());
+        purpose = new TextArea("Information", param.getPurpose(), 34, 3);
         purpose.setEditable(false);
         ScrollableComponent scrolpane = new ScrollableComponent(purpose);
         scrolpane.setPreferredSize(new Dimension(380, 100));
@@ -319,8 +319,12 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     }
 
     private void doClose() {
-        if (shouldDiscardChanges())
-            super.disposeView();
+        try {
+            if (shouldDiscardChanges())
+                presenter.doClose();
+        } catch (EmfException e) {
+            messagePanel.setMessage("Could not close: " + e.getMessage());
+        }
     }
     
     private void validateFields() throws EmfException {

@@ -14,6 +14,8 @@ public interface SetCasePresenter extends CaseEditorTabPresenter {
 
     void display() throws EmfException;
     
+    void doClose() throws EmfException;
+    
     void doSaveInput(CaseInput input) throws EmfException;
     
     void doSaveParam(CaseParameter param) throws EmfException;
