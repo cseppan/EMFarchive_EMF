@@ -137,6 +137,13 @@ public class CaseObjectManager {
         lastCaseId = -1;
         jobsForLastCaseId = null;
     }
+    
+    public synchronized void refreshJobList() throws EmfException {
+        List<CaseJob> jobs = new ArrayList<CaseJob>();
+        jobs.addAll(Arrays.asList(caseService.getCaseJobs(lastCaseId)));
+        jobs.add(0, allJobsForSector);
+        jobsForLastCaseId = jobs.toArray(new CaseJob[jobs.size()]);
+    }
 
     public synchronized DatasetType[] getDatasetTypes() throws EmfException {
         if (datasetTypes == null)

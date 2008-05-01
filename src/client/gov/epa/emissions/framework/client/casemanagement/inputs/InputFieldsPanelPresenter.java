@@ -167,6 +167,7 @@ public class InputFieldsPanelPresenter {
     {
         //CaseJob[] jobs = session.caseService().getCaseJobs(caseId);
         // AME: don't go get the jobs from the server again!
+        // QH: This will use the cached list of jobs and won't get the newest list of jobs for the session.
         
         if (caseJobId == 0) return 0;
         

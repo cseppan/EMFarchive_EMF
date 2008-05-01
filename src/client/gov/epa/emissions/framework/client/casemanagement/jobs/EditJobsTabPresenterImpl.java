@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.casemanagement.jobs;
 
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.CaseObjectManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
@@ -22,6 +23,8 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     private Case caseObj;
 
     private EditJobsTabView view;
+    
+    private CaseObjectManager caseObjectManager = null;
 
     private EmfSession session;
 
@@ -29,6 +32,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         this.caseObj = caseObj;
         this.view = view;
         this.session = session;
+        this.caseObjectManager = CaseObjectManager.getCaseObjectManager(session);
     }
 
     public void display() {
@@ -49,6 +53,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
     public CaseJob addNewJob(CaseJob job) throws EmfException {
         CaseJob newJob = service().addCaseJob(session.user(), job);
+        this.caseObjectManager.refreshJobList();
 
         if (newJob.getCaseId() == caseObj.getId()) {
             view.addJob(newJob);
