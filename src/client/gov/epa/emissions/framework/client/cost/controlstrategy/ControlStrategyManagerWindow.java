@@ -99,7 +99,6 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
 
     public void refresh(ControlStrategy[] controlStrategies) {
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        //doLayout(controlStrategies, this.session);
         setupTableModel(controlStrategies);
         table.refresh(tableData);
         panelRefresh();
@@ -130,9 +129,6 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     private void doLayout(ControlStrategy[] controlStrategies, EmfSession session) {
         layout.removeAll();
         layout.setLayout(new BorderLayout());
-
-//        JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
-//        sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
 
         layout.add(createTopPanel(), BorderLayout.NORTH);
         layout.add(tablePanel(controlStrategies, parentConsole, session), BorderLayout.CENTER);
