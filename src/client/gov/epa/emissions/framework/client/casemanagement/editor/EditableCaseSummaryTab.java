@@ -65,7 +65,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox airQualityModelsCombo;
 
-    private EditableComboBox categoriesCombo;
+    private ComboBox categoriesCombo;
 
     private EditableComboBox emissionsYearCombo;
 
@@ -89,12 +89,12 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private TextField endDate;
 
-    private Dimension defaultDimension = new Dimension(200, 20);
+    private Dimension defaultDimension = new Dimension(280, 20);
 
     private EditCaseSummaryTabPresenter presenter;
 
     private EmfConsole parentConsole;
-
+    
     public EditableCaseSummaryTab(Case caseObj, EmfSession session, ManageChangeables changeablesList,
             EmfConsole parentConsole) {
         super.setName("summary");
@@ -126,7 +126,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         JPanel container = new JPanel();
         container.setLayout(new GridLayout(1, 2));
-        // container.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         container.add(createLeftOverviewSection());
         container.add(createRightOverviewSection());
 
@@ -163,12 +162,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         finalTemplatePanel.add(isFinal());
         finalTemplatePanel.add(isTemplate());
         layoutGenerator.addLabelWidgetPair("Is Final:", finalTemplatePanel, panel);
-        // layoutGenerator.addLabelWidgetPair("Is Template:", isTemplate(), panel);
         layoutGenerator.addLabelWidgetPair("<html>Sectors:<br><br><br></html>", sectors(), panel);
-        // layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
         layoutGenerator.addLabelWidgetPair("Copied From:", template(), panel);
-        // layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
-        layoutGenerator.addLabelWidgetPair("Last Modified By:", creator(), panel);
+        layoutGenerator.addLabelWidgetPair("Last Modified By:  ", creator(), panel);
 
         layoutGenerator.makeCompactGrid(panel, 5, 2, 10, 10, 10, 10);
 
@@ -230,26 +226,27 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private ScrollableComponent description() {
-        description = new TextArea("description", caseObj.getDescription(), 19, 3);
+        description = new TextArea("description", caseObj.getDescription(), 25, 3);
         changeablesList.addChangeable(description);
-        // description.setPreferredSize(new Dimension(200, 60));
+        description.setPreferredSize(defaultDimension);
 
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(description);
-        descScrollableTextArea.setMinimumSize(defaultDimension);
+        descScrollableTextArea.setPreferredSize(defaultDimension);
         return descScrollableTextArea;
     }
 
     private TextField name() {
-        name = new TextField("name", 20);
+        name = new TextField("name", 25);
         name.setText(caseObj.getName());
-        name.setMaximumSize(new Dimension(300, 15));
+        name.setPreferredSize(defaultDimension);
         changeablesList.addChangeable(name);
 
         return name;
     }
+    
 
     private TextField futureYear() {
-        futureYear = new TextField("Future Year", 10);
+        futureYear = new TextField("Future Year", 25);
         futureYear.setText(caseObj.getFutureYear() + "");
         changeablesList.addChangeable(futureYear);
         futureYear.setPreferredSize(defaultDimension);
@@ -258,7 +255,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private TextField template() {
-        template = new TextField("Template", 20);
+        template = new TextField("Template", 25);
         template.setText(caseObj.getTemplateUsed());
         template.setToolTipText(caseObj.getTemplateUsed());
         template.setEditable(false);
@@ -348,8 +345,8 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return airQualityModelsCombo;
     }
 
-    private EditableComboBox categories() throws EmfException {
-        categoriesCombo = new EditableComboBox(presenter.getCaseCategories());
+    private ComboBox categories() throws EmfException {
+        categoriesCombo = new ComboBox(presenter.getCaseCategories());
         categoriesCombo.setSelectedItem(caseObj.getCaseCategory());
         categoriesCombo.setPreferredSize(defaultDimension);
         addPopupMenuListener(categoriesCombo, "categories");
@@ -361,7 +358,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private JPanel sectors() throws EmfException {
         sectorsWidget = new AddRemoveSectorWidget(presenter.getAllSectors(), changeablesList, parentConsole);
         sectorsWidget.setSectors(caseObj.getSectors());
-        sectorsWidget.setPreferredSize(new Dimension(220, 80));
+        sectorsWidget.setPreferredSize(new Dimension(280, 80));
         return sectorsWidget;
     }
 
@@ -416,7 +413,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private TextField startDate() {
-        startDate = new TextField("Start Date", 10);
+        startDate = new TextField("Start Date", 25);
         startDate.setText(format(caseObj.getStartDate()) + "");
         changeablesList.addChangeable(startDate);
         startDate.setPreferredSize(defaultDimension);
@@ -426,7 +423,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private TextField endDate() {
-        endDate = new TextField("End Date", 10);
+        endDate = new TextField("End Date", 25);
         endDate.setText(format(caseObj.getEndDate()) + "");
         changeablesList.addChangeable(endDate);
         endDate.setPreferredSize(defaultDimension);
