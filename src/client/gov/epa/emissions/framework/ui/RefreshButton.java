@@ -14,6 +14,7 @@ public class RefreshButton extends Button {
             String message, final MessagePanel messagePanel) {
         super(label, new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
                 try {
                     observer.doRefresh();
                 } catch (EmfException ex) {
