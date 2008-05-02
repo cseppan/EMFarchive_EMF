@@ -1,71 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry including="**/*.java" path="test/integration" kind="src"/>
-	<classpathentry path="test/webservices" kind="src"/>
-	<classpathentry including="**/*.java" path="test/persistence" kind="src"/>
-	<classpathentry including="**/*.java" path="test/commons" kind="src"/>
-	<classpathentry path="src/client" kind="src"/>
-	<classpathentry path="src/contract" kind="src"/>
-	<classpathentry path="src/services" kind="src"/>
-	<classpathentry including="**/*.java" path="test/uat" kind="src"/>
-	<classpathentry including="**/*.java" path="test/unit" kind="src"/>
-	<classpathentry path="res" kind="src"/>
-	<classpathentry path="lib/axis.jar" kind="lib"/>
-	<classpathentry path="lib/axis-ant.jar" kind="lib"/>
-	<classpathentry path="lib/commons-discovery-0.2.jar" kind="lib"/>
-	<classpathentry path="lib/commons-logging-1.0.4.jar" kind="lib"/>
-	<classpathentry path="lib/jaxrpc.jar" kind="lib"/>
-	<classpathentry path="lib/saaj.jar" kind="lib"/>
-	<classpathentry path="lib/wsdl4j-1.5.1.jar" kind="lib"/>
-	<classpathentry path="lib/soap.jar" kind="lib"/>
-	<classpathentry path="lib/dev/junit.jar" kind="lib"/>
-	<classpathentry path="lib/colt.jar" kind="lib"/>
-	<classpathentry path="lib/cosu.jar" kind="lib"/>
-	<classpathentry path="lib/java_cup.jar" kind="lib"/>
-	<classpathentry path="lib/jh.jar" kind="lib"/>
-	<classpathentry path="lib/jlfgr-1_0.jar" kind="lib"/>
-	<classpathentry path="lib/weka.jar" kind="lib"/>
-	<classpathentry path="lib/commons-primitives-1.0.jar" kind="lib"/>
-	<classpathentry path="lib/dev/j2ee.jar" kind="lib"/>
-	<classpathentry path="lib/tomcat/mysql-connector-java-3.1.10-bin.jar" kind="lib"/>
-	<classpathentry path="lib/antlr-2.7.5H3.jar" kind="lib"/>
-	<classpathentry path="lib/cglib-2.1.jar" kind="lib"/>
-	<classpathentry path="lib/dom4j-1.6.jar" kind="lib"/>
-	<classpathentry path="lib/ehcache-1.1.jar" kind="lib"/>
-	<classpathentry path="lib/hibernate3.jar" kind="lib"/>
-	<classpathentry path="lib/log4j-1.2.9.jar" kind="lib"/>
-	<classpathentry path="lib/xercesImpl.jar" kind="lib"/>
-	<classpathentry path="lib/xercesSamples.jar" kind="lib"/>
-	<classpathentry path="lib/xml-apis.jar" kind="lib"/>
-	<classpathentry path="lib/xmlParserAPIs.jar" kind="lib"/>
-	<classpathentry sourcepath="lib/dev/abbot-src.jar" path="lib/dev/abbot.jar" kind="lib"/>
-	<classpathentry path="lib/dev/jdom.jar" kind="lib"/>
-	<classpathentry path="lib/dev/gnu-regexp.jar" kind="lib"/>
-	<classpathentry path="lib/asm.jar" kind="lib"/>
-	<classpathentry path="lib/asm-attrs.jar" kind="lib"/>
-	<classpathentry path="lib/cleanimports.jar" kind="lib"/>
-	<classpathentry path="lib/connector.jar" kind="lib"/>
-	<classpathentry path="lib/jta.jar" kind="lib"/>
-	<classpathentry path="lib/oscache-2.1.jar" kind="lib"/>
-	<classpathentry path="lib/proxool-0.8.3.jar" kind="lib"/>
-	<classpathentry path="lib/swarmcache-1.0rc2.jar" kind="lib"/>
-	<classpathentry path="lib/versioncheck.jar" kind="lib"/>
-	<classpathentry path="lib/dev/commons-configuration-1.1.jar" kind="lib"/>
-	<classpathentry path="lib/dev/commons-lang-2.1.jar" kind="lib"/>
-	<classpathentry path="lib/commons-collections-3.1.jar" kind="lib"/>
-	<classpathentry sourcepath="lib/dev/dbunit-src.zip" path="lib/dev/dbunit-2.1.jar" kind="lib"/>
-	<classpathentry path="lib/dev/jmock/jmock-cglib-1.0.1.jar" kind="lib"/>
-	<classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/Java 6" kind="con"/>
-	<classpathentry path="lib/concurrent.jar" kind="lib"/>
-	<classpathentry path="lib/dev/jmock/jmock-SNAPSHOT-09262005.jar" kind="lib"/>
-	<classpathentry path="lib/jnlp.jar" kind="lib"/>
-	<classpathentry path="lib/c3p0-0.9.0.2.jar" kind="lib"/>
-	<classpathentry path="lib/tomcat/postgresql-8.1-404.jdbc3.jar" kind="lib"/>
-	<classpathentry path="lib/activation.jar" kind="lib"/>
-	<classpathentry path="lib/mail.jar" kind="lib"/>
-	<classpathentry path="lib/saaj-api.jar" kind="lib"/>
-	<classpathentry path="lib/saaj-impl.jar" kind="lib"/>
-	<classpathentry path="lib/analysis-engine-0.1.1.jar" kind="lib"/>
-	<classpathentry path="/Commons" combineaccessrules="false" kind="src"/>
-	<classpathentry path="build/eclipse" kind="output"/>
+	<classpathentry including="**/*.java" kind="src" path="test/integration"/>
+	<classpathentry kind="src" path="test/webservices"/>
+	<classpathentry including="**/*.java" kind="src" path="test/persistence"/>
+	<classpathentry including="**/*.java" kind="src" path="test/commons"/>
+	<classpathentry kind="src" path="src/client"/>
+	<classpathentry kind="src" path="src/contract"/>
+	<classpathentry kind="src" path="src/services"/>
+	<classpathentry including="**/*.java" kind="src" path="test/uat"/>
+	<classpathentry including="**/*.java" kind="src" path="test/unit"/>
+	<classpathentry kind="src" path="res"/>
+	<classpathentry kind="lib" path="lib/axis.jar"/>
+	<classpathentry kind="lib" path="lib/axis-ant.jar"/>
+	<classpathentry kind="lib" path="lib/commons-discovery-0.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jaxrpc.jar"/>
+	<classpathentry kind="lib" path="lib/saaj.jar"/>
+	<classpathentry kind="lib" path="lib/wsdl4j-1.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/soap.jar"/>
+	<classpathentry kind="lib" path="lib/dev/junit.jar"/>
+	<classpathentry kind="lib" path="lib/colt.jar"/>
+	<classpathentry kind="lib" path="lib/cosu.jar"/>
+	<classpathentry kind="lib" path="lib/java_cup.jar"/>
+	<classpathentry kind="lib" path="lib/jh.jar"/>
+	<classpathentry kind="lib" path="lib/jlfgr-1_0.jar"/>
+	<classpathentry kind="lib" path="lib/weka.jar"/>
+	<classpathentry kind="lib" path="lib/commons-primitives-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/dev/j2ee.jar"/>
+	<classpathentry kind="lib" path="lib/tomcat/mysql-connector-java-3.1.10-bin.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-2.7.5H3.jar"/>
+	<classpathentry kind="lib" path="lib/cglib-2.1.jar"/>
+	<classpathentry kind="lib" path="lib/dom4j-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/ehcache-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate3.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.9.jar"/>
+	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="lib/xercesSamples.jar"/>
+	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
+	<classpathentry kind="lib" path="lib/xmlParserAPIs.jar"/>
+	<classpathentry kind="lib" path="lib/dev/abbot.jar" sourcepath="lib/dev/abbot-src.jar"/>
+	<classpathentry kind="lib" path="lib/dev/jdom.jar"/>
+	<classpathentry kind="lib" path="lib/dev/gnu-regexp.jar"/>
+	<classpathentry kind="lib" path="lib/asm.jar"/>
+	<classpathentry kind="lib" path="lib/asm-attrs.jar"/>
+	<classpathentry kind="lib" path="lib/cleanimports.jar"/>
+	<classpathentry kind="lib" path="lib/connector.jar"/>
+	<classpathentry kind="lib" path="lib/jta.jar"/>
+	<classpathentry kind="lib" path="lib/oscache-2.1.jar"/>
+	<classpathentry kind="lib" path="lib/proxool-0.8.3.jar"/>
+	<classpathentry kind="lib" path="lib/swarmcache-1.0rc2.jar"/>
+	<classpathentry kind="lib" path="lib/versioncheck.jar"/>
+	<classpathentry kind="lib" path="lib/dev/commons-configuration-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/dev/commons-lang-2.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/dev/dbunit-2.1.jar" sourcepath="lib/dev/dbunit-src.zip"/>
+	<classpathentry kind="lib" path="lib/dev/jmock/jmock-cglib-1.0.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/Java 6"/>
+	<classpathentry kind="lib" path="lib/concurrent.jar"/>
+	<classpathentry kind="lib" path="lib/dev/jmock/jmock-SNAPSHOT-09262005.jar"/>
+	<classpathentry kind="lib" path="lib/jnlp.jar"/>
+	<classpathentry kind="lib" path="lib/activation.jar"/>
+	<classpathentry kind="lib" path="lib/mail.jar"/>
+	<classpathentry kind="lib" path="lib/saaj-api.jar"/>
+	<classpathentry kind="lib" path="lib/saaj-impl.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Commons"/>
+	<classpathentry kind="lib" path="lib/tomcat/postgresql-8.2-508.jdbc4.jar"/>
+	<classpathentry kind="lib" path="lib/analysis-engine.jar"/>
+	<classpathentry kind="lib" path="lib/c3p0-0.9.1.2.jar"/>
+	<classpathentry kind="lib" path="lib/xstream-1.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/epa-commons.jar"/>
+	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>
