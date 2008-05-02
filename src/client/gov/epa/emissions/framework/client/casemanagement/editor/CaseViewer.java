@@ -45,7 +45,7 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
     private JTabbedPane tabbedPane;
     
     public CaseViewer(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
-        super("Case Viewer", new Dimension(780, 580), desktopManager);
+        super("Case Viewer", new Dimension(820, 580), desktopManager);
         this.session = session;
         this.desktopManager = desktopManager;
         this.parentConsole = parentConsole;

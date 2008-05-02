@@ -146,7 +146,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         layoutGenerator.addLabelWidgetPair("Description:             ", description(), panel);
         layoutGenerator.addLabelWidgetPair("Project:", projects(), panel);
         layoutGenerator.addLabelWidgetPair("Run Status:", runStatus(), panel);
-//        layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
@@ -219,10 +218,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         return panel;
     }
-
-//    private JLabel lastModifiedDate() {
-//        return createLeftAlignedLabel(format(caseObj.getLastModifiedDate()));
-//    }
 
     private JLabel creator() {
         return createLeftAlignedLabel(caseObj.getLastModifiedBy().getName()+ " on "
@@ -472,15 +467,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         else if (toget.equals("modeltoruns"))
             return presenter.getModelToRuns();
-
-        // else if (toget.equals("sectors"))
-        // return presenter.getSectors();
-        //
-        // else if (toget.equals("subdirs"))
-        // return presenter.getSubdirs();
-        //
-        // else
-        // throw new EmfException("Unknown object type: " + toget);
 
         return new Object[0];
 
