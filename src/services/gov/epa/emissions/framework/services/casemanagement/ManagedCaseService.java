@@ -423,14 +423,51 @@ public class ManagedCaseService {
         }
     }
 
+    public synchronized String checkParentCase(Case caseObj) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            List<?> list1 = session.createQuery("SELECT obj.caseId FROM CaseJob as obj WHERE obj.parentCaseId = " + caseObj.getId()).list();
+            List<?> list2 = session.createQuery("SELECT obj.caseID FROM CaseInput as obj WHERE obj.parentCaseId = " + caseObj.getId()).list();
+            List<?> list3 = session.createQuery("SELECT obj.caseID FROM CaseParameter as obj WHERE obj.parentCaseId = " + caseObj.getId()).list();
+
+            if (list1 != null && list1.size() > 0) {
+                Case childCase = dao.getCase(Integer.parseInt(list1.get(0).toString()), session);
+                return "\"" + caseObj.getName() + "\" is a parent case for at least one job from case \"" + childCase.getName() + "\".";
+            }
+            
+            if (list2 != null && list2.size() > 0){
+                Case childCase = dao.getCase(Integer.parseInt(list2.get(0).toString()), session);
+                return "\"" + caseObj.getName() + "\" is a parent case for at least one input from case \"" + childCase.getName() + "\".";
+            }
+            
+            if (list3 != null && list3.size() > 0){
+                Case childCase = dao.getCase(Integer.parseInt(list3.get(0).toString()), session);
+                return "\"" + caseObj.getName() + "\" is a parent case for at least one parameter from case \"" + childCase.getName() + "\".";
+            }
+            
+            return "";
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not check whether case: " + caseObj.getName() + " is a parent case of anything.", e);
+            throw new EmfException("Could not check whether case: " + caseObj.getName() + " is a parent case of anything. Reason: " + e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+    
     public synchronized void removeCase(Case caseObj) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             setStatus(caseObj.getLastModifiedBy(), "Started removing case " + caseObj.getName() + ".", "Remove Case");
+            
             List<CaseInput> inputs = dao.getCaseInputs(caseObj.getId(), session);
             dao.removeCaseInputs(inputs.toArray(new CaseInput[0]), session);
 
             List<CaseJob> jobs = dao.getCaseJobs(caseObj.getId(), session);
+            JobMessage[] msgs = getJobsMessages(jobs, session);
+            CaseOutput[] outputs = getJobsOutputs(jobs, session);
+            dao.removeObjects(msgs, session);
+            dao.removeObjects(outputs, session);
             dao.removeCaseJobs(jobs.toArray(new CaseJob[0]), session);
 
             List<CaseParameter> parameters = dao.getCaseParameters(caseObj.getId(), session);
@@ -439,13 +476,35 @@ public class ManagedCaseService {
             dao.remove(caseObj, session);
             dao.removeObject(caseObj.getAbbreviation(), session);
             setStatus(caseObj.getLastModifiedBy(), "Finished removing case " + caseObj.getName() + ".", "Remove Case");
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not remove Case: " + caseObj, e);
-            throw new EmfException("Could not remove Case: " + caseObj);
+            throw new EmfException("Could not remove Case: " + caseObj.getName() + ". Reason: " + e.getMessage());
         } finally {
             session.close();
         }
+    }
+
+    private CaseOutput[] getJobsOutputs(List<CaseJob> jobs, Session session) {
+        List<CaseOutput> allOutputs = new ArrayList<CaseOutput>();
+        
+        for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
+            CaseJob job = iter.next();
+            allOutputs.addAll(dao.getCaseOutputs(job.getCaseId(), job.getId(), session));
+        }
+            
+        return allOutputs.toArray(new CaseOutput[0]);
+    }
+
+    private JobMessage[] getJobsMessages(List<CaseJob> jobs, Session session) {
+        List<JobMessage> allMsgs = new ArrayList<JobMessage>();
+        
+        for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
+            CaseJob job = iter.next();
+            allMsgs.addAll(dao.getJobMessages(job.getCaseId(), job.getId(), session));
+        }
+        
+        return allMsgs.toArray(new JobMessage[0]);
     }
 
     private synchronized void setStatus(User user, String message, String type) {

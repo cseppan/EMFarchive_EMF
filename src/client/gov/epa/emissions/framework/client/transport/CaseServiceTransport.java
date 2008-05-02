@@ -1005,4 +1005,14 @@ public class CaseServiceTransport implements CaseService {
                 jobIds, sensitivityCase });
     }
 
+    public synchronized String checkParentCase(Case caseObj) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("checkParentCase");
+        call.addParam("caseObj", caseMappings.caseObject());
+        call.setStringReturnType();
+        
+        return (String) call.requestResponse(new Object[]{caseObj});
+    }
+
 }

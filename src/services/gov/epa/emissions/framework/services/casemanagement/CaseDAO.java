@@ -256,6 +256,10 @@ public class CaseDAO {
     public void removeObject(Object object, Session session) {
         hibernateFacade.remove(object, session);
     }
+    
+    public void removeObjects(Object[] objects, Session session) {
+        hibernateFacade.remove(objects, session);
+    }
 
     public void remove(Case element, Session session) {
         hibernateFacade.remove(element, session);

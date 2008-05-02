@@ -9,6 +9,8 @@ import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 public interface CaseManagerPresenter {
 
     void display() throws EmfException;
+    
+    String checkParentCase(Case caseObj) throws EmfException;
 
     void doRemove(Case caseObj) throws EmfException;
     

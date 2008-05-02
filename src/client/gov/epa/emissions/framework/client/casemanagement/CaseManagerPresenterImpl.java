@@ -122,4 +122,8 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
     public void refreshWithLastCategory() throws EmfException {
         view.refreshWithLastCategory();
     }
+
+    public String checkParentCase(Case caseObj) throws EmfException {
+        return service().checkParentCase(caseObj);
+    }
 }

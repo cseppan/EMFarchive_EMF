@@ -50,7 +50,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private JPanel mainPanel;
 
     private CasesTableData tableData;
-    
+
     private SelectableSortFilterWrapper table;
 
     private JPanel layout;
@@ -93,7 +93,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         table.refresh(tableData);
         panelRefresh();
     }
-    
+
     private void panelRefresh() {
         mainPanel.removeAll();
         mainPanel.add(table);
@@ -116,31 +116,31 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
         createCategoriesComboBox();
         setupTableModel(cases);
-//        model = new EmfTableModel(tableData);
-//        selectModel = new SortFilterSelectModel(model);
-//        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-//        sortFilterSelectPanel.sort(sortCriteria());
+        // model = new EmfTableModel(tableData);
+        // selectModel = new SortFilterSelectModel(model);
+        // SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
+        // sortFilterSelectPanel.sort(sortCriteria());
         createLayout(layout, mainPanel(parentConsole));
     }
-    
-    private void setupTableModel(Case[] cases){
+
+    private void setupTableModel(Case[] cases) {
         tableData = new CasesTableData(cases);
     }
-    
+
     private JPanel mainPanel(EmfConsole parentConsole) {
         this.mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
 
-//        JScrollPane sortFilterPane = sortFilterPane(parentConsole);
+        // JScrollPane sortFilterPane = sortFilterPane(parentConsole);
         table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
         mainPanel.add(table);
 
         return mainPanel;
     }
-    
+
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Last Modified Date"};
-        return new SortCriteria(columnNames, new boolean[] {false}, new boolean[] {false});
+        String[] columnNames = { "Last Modified Date" };
+        return new SortCriteria(columnNames, new boolean[] { false }, new boolean[] { false });
     }
 
     private void getAllCategories() throws EmfException {
@@ -181,8 +181,8 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         layout.removeAll();
         layout.setLayout(new BorderLayout());
 
-//        JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
-//        sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
+        // JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
+        // sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
 
         layout.add(createTopPanel(), BorderLayout.NORTH);
         layout.add(table, BorderLayout.CENTER);
@@ -267,7 +267,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             }
         });
         crudPanel.add(copyButton);
-        
+
         Button sensitivityButton = new Button("Sensitivity", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMsgPanel();
@@ -344,19 +344,19 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         NewCaseWindow view = new NewCaseWindow(desktopManager);
         presenter.doNew(view);
     }
-    
+
     private void sensitivityCase() {
         cases = selected();
-        
-        if (cases.isEmpty() || cases.size() !=1) {
+
+        if (cases.isEmpty() || cases.size() != 1) {
             messagePanel.setMessage("Please select a single case");
             return;
         }
-        
+
         SensitivityWindow view = new SensitivityWindow(desktopManager, parentConsole, categories);
         presenter.doSensitivity(view, (Case) cases.get(0));
     }
-    
+
     private void removeSelectedCases() {
         clearMsgPanel();
         List selected = selected();
@@ -366,31 +366,53 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             return;
         }
 
-        String title = "Warning";
-        String message = "Are you sure you want to remove the selected case(s)?";
-        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
-
+        int selection = showWarningMsg("Warning", "Are you sure you want to remove the selected case(s)?");
+        
         if (selection == JOptionPane.NO_OPTION) {
             return;
         }
 
-        messagePanel.setMessage("Please wait while removing cases...");
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         try {
             for (Iterator iter = selected.iterator(); iter.hasNext();) {
                 Case element = (Case) iter.next();
+
+                if (isParentCase(element)) {
+                    clearMsgPanel();
+                    break;
+                }
+
+                messagePanel.setMessage("Please wait while removing cases...");
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 presenter.doRemove(element);
                 doRefresh();
+                clearMsgPanel();
+                messagePanel.setMessage("Finished removing cases.");
             }
         } catch (EmfException e) {
             showError(e.getMessage());
         } finally {
             setCursor(Cursor.getDefaultCursor());
         }
+    }
 
-        clearMsgPanel();
-        messagePanel.setMessage("Finished removing cases.");
+    private boolean isParentCase(Case element) throws EmfException {
+        String msg = presenter.checkParentCase(element);
+
+        if (msg.isEmpty())
+            return false;
+        
+        int selection = showWarningMsg("Warning", msg + "\nAre you sure you want to remove the selected case " + element.getName() + "?");
+
+        if (selection == JOptionPane.NO_OPTION) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private int showWarningMsg(String title, String msg) {
+        return JOptionPane.showConfirmDialog(parentConsole, msg, title, JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
     }
 
     private void copySelectedCases() {

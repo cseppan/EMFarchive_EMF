@@ -632,6 +632,10 @@ public class CaseServiceImpl implements CaseService {
     public Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, Case sensitivityCase) throws EmfException {
         return getCaseService().mergeCases(user, parentCaseId, templateCaseId, jobIds, sensitivityCase);
     }
+    
+    public String checkParentCase(Case caseObj) throws EmfException {
+        return getCaseService().checkParentCase(caseObj);
+    }
 
 
 }
