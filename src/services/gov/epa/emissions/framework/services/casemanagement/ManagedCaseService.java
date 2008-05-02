@@ -426,40 +426,59 @@ public class ManagedCaseService {
     public synchronized String checkParentCase(Case caseObj) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            List<?> list1 = session.createQuery("SELECT obj.caseId FROM CaseJob as obj WHERE obj.parentCaseId = " + caseObj.getId()).list();
-            List<?> list2 = session.createQuery("SELECT obj.caseID FROM CaseInput as obj WHERE obj.parentCaseId = " + caseObj.getId()).list();
-            List<?> list3 = session.createQuery("SELECT obj.caseID FROM CaseParameter as obj WHERE obj.parentCaseId = " + caseObj.getId()).list();
+            List<?> list1 = session.createQuery(
+                    "SELECT obj.caseId FROM CaseJob as obj WHERE obj.parentCaseId = " + caseObj.getId()).list();
+            List<?> list2 = session.createQuery(
+                    "SELECT obj.caseID FROM CaseInput as obj WHERE obj.parentCaseId = " + caseObj.getId()).list();
+            List<?> list3 = session.createQuery(
+                    "SELECT obj.caseID FROM CaseParameter as obj WHERE obj.parentCaseId = " + caseObj.getId()).list();
 
             if (list1 != null && list1.size() > 0) {
-                Case childCase = dao.getCase(Integer.parseInt(list1.get(0).toString()), session);
-                return "\"" + caseObj.getName() + "\" is a parent case for at least one job from case \"" + childCase.getName() + "\".";
+                int childId = Integer.parseInt(list1.get(0).toString());
+
+                if (childId != caseObj.getId()) {
+                    Case childCase = dao.getCase(childId, session);
+                    return "\"" + caseObj.getName() + "\" is a parent case for at least one job from case \""
+                            + childCase.getName() + "\".";
+                }
             }
-            
-            if (list2 != null && list2.size() > 0){
-                Case childCase = dao.getCase(Integer.parseInt(list2.get(0).toString()), session);
-                return "\"" + caseObj.getName() + "\" is a parent case for at least one input from case \"" + childCase.getName() + "\".";
+
+            if (list2 != null && list2.size() > 0) {
+                int childId = Integer.parseInt(list2.get(0).toString());
+
+                if (childId != caseObj.getId()) {
+                    Case childCase = dao.getCase(childId, session);
+                    return "\"" + caseObj.getName() + "\" is a parent case for at least one input from case \""
+                            + childCase.getName() + "\".";
+                }
             }
-            
-            if (list3 != null && list3.size() > 0){
-                Case childCase = dao.getCase(Integer.parseInt(list3.get(0).toString()), session);
-                return "\"" + caseObj.getName() + "\" is a parent case for at least one parameter from case \"" + childCase.getName() + "\".";
+
+            if (list3 != null && list3.size() > 0) {
+                int childId = Integer.parseInt(list3.get(0).toString());
+
+                if (childId != caseObj.getId()) {
+                    Case childCase = dao.getCase(childId, session);
+                    return "\"" + caseObj.getName() + "\" is a parent case for at least one parameter from case \""
+                            + childCase.getName() + "\".";
+                }
             }
-            
+
             return "";
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not check whether case: " + caseObj.getName() + " is a parent case of anything.", e);
-            throw new EmfException("Could not check whether case: " + caseObj.getName() + " is a parent case of anything. Reason: " + e.getMessage());
+            throw new EmfException("Could not check whether case: " + caseObj.getName()
+                    + " is a parent case of anything. Reason: " + e.getMessage());
         } finally {
             session.close();
         }
     }
-    
+
     public synchronized void removeCase(Case caseObj) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             setStatus(caseObj.getLastModifiedBy(), "Started removing case " + caseObj.getName() + ".", "Remove Case");
-            
+
             List<CaseInput> inputs = dao.getCaseInputs(caseObj.getId(), session);
             dao.removeCaseInputs(inputs.toArray(new CaseInput[0]), session);
 
@@ -487,23 +506,23 @@ public class ManagedCaseService {
 
     private CaseOutput[] getJobsOutputs(List<CaseJob> jobs, Session session) {
         List<CaseOutput> allOutputs = new ArrayList<CaseOutput>();
-        
+
         for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = iter.next();
             allOutputs.addAll(dao.getCaseOutputs(job.getCaseId(), job.getId(), session));
         }
-            
+
         return allOutputs.toArray(new CaseOutput[0]);
     }
 
     private JobMessage[] getJobsMessages(List<CaseJob> jobs, Session session) {
         List<JobMessage> allMsgs = new ArrayList<JobMessage>();
-        
+
         for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = iter.next();
             allMsgs.addAll(dao.getJobMessages(job.getCaseId(), job.getId(), session));
         }
-        
+
         return allMsgs.toArray(new JobMessage[0]);
     }
 
@@ -883,13 +902,13 @@ public class ManagedCaseService {
                 public int compare(CaseInput o1, CaseInput o2) {
                     int sectorId1 = (o1.getSector() == null) ? 0 : o1.getSector().getId();
                     int sectorId2 = (o2.getSector() == null) ? 0 : o2.getSector().getId();
-                    
+
                     int envId1 = (o1.getEnvtVars() == null) ? 0 : o1.getEnvtVars().getId();
                     int envId2 = (o2.getEnvtVars() == null) ? 0 : o2.getEnvtVars().getId();
-                    
+
                     int jobId1 = o1.getCaseJobID();
                     int jobId2 = o2.getCaseJobID();
-                    
+
                     if (sectorId1 > sectorId2)
                         return 1;
                     else if (sectorId1 == sectorId2 && envId1 > envId2)
@@ -898,11 +917,11 @@ public class ManagedCaseService {
                         return 1;
                     else if (sectorId1 == sectorId2 && envId1 == envId2 && jobId1 == jobId2)
                         return 0;
-                    
+
                     return -1;
                 }
             });
-            
+
             return inputs.toArray(new CaseInput[0]);
         } catch (Exception e) {
             e.printStackTrace();
@@ -924,13 +943,13 @@ public class ManagedCaseService {
                 public int compare(CaseInput o1, CaseInput o2) {
                     int sectorId1 = (o1.getSector() == null) ? 0 : o1.getSector().getId();
                     int sectorId2 = (o2.getSector() == null) ? 0 : o2.getSector().getId();
-                    
+
                     int envId1 = (o1.getEnvtVars() == null) ? 0 : o1.getEnvtVars().getId();
                     int envId2 = (o2.getEnvtVars() == null) ? 0 : o2.getEnvtVars().getId();
-                    
+
                     int jobId1 = o1.getCaseJobID();
                     int jobId2 = o2.getCaseJobID();
-                    
+
                     if (sectorId1 > sectorId2)
                         return 1;
                     else if (sectorId1 == sectorId2 && envId1 > envId2)
@@ -939,7 +958,7 @@ public class ManagedCaseService {
                         return 1;
                     else if (sectorId1 == sectorId2 && envId1 == envId2 && jobId1 == jobId2)
                         return 0;
-                    
+
                     return -1;
                 }
             });
@@ -1255,13 +1274,13 @@ public class ManagedCaseService {
                 public int compare(CaseParameter o1, CaseParameter o2) {
                     int sectorId1 = (o1.getSector() == null) ? 0 : o1.getSector().getId();
                     int sectorId2 = (o2.getSector() == null) ? 0 : o2.getSector().getId();
-                    
+
                     int envId1 = (o1.getEnvVar() == null) ? 0 : o1.getEnvVar().getId();
                     int envId2 = (o2.getEnvVar() == null) ? 0 : o2.getEnvVar().getId();
-                    
+
                     int jobId1 = o1.getJobId();
                     int jobId2 = o2.getJobId();
-                    
+
                     if (sectorId1 > sectorId2)
                         return 1;
                     else if (sectorId1 == sectorId2 && envId1 > envId2)
@@ -1270,11 +1289,11 @@ public class ManagedCaseService {
                         return 1;
                     else if (sectorId1 == sectorId2 && envId1 == envId2 && jobId1 == jobId2)
                         return 0;
-                    
+
                     return -1;
                 }
             });
-            
+
             return params.toArray(new CaseParameter[0]);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1296,13 +1315,13 @@ public class ManagedCaseService {
                 public int compare(CaseParameter o1, CaseParameter o2) {
                     int sectorId1 = (o1.getSector() == null) ? 0 : o1.getSector().getId();
                     int sectorId2 = (o2.getSector() == null) ? 0 : o2.getSector().getId();
-                    
+
                     int envId1 = (o1.getEnvVar() == null) ? 0 : o1.getEnvVar().getId();
                     int envId2 = (o2.getEnvVar() == null) ? 0 : o2.getEnvVar().getId();
-                    
+
                     int jobId1 = o1.getJobId();
                     int jobId2 = o2.getJobId();
-                    
+
                     if (sectorId1 > sectorId2)
                         return 1;
                     else if (sectorId1 == sectorId2 && envId1 > envId2)
@@ -1311,11 +1330,11 @@ public class ManagedCaseService {
                         return 1;
                     else if (sectorId1 == sectorId2 && envId1 == envId2 && jobId1 == jobId2)
                         return 0;
-                    
+
                     return -1;
                 }
             });
-            
+
             return params.toArray(new CaseParameter[0]);
         } catch (Exception e) {
             e.printStackTrace();
@@ -3590,17 +3609,15 @@ public class ManagedCaseService {
             inputList2Target.add(tempInput);
         }
 
-        /* 
-         * NOTE:  If two inputs are very similar in the  template, they potentially could be
-         * identical after they are updated from the parent.  This makes sure that we
-         * do not try to add 2 identical inputs.  
-         * GOTCHA: If we need both inputs, maybe we need to check for this and copy
-         * the original inputs without updating from parent.
+        /*
+         * NOTE: If two inputs are very similar in the template, they potentially could be identical after they are
+         * updated from the parent. This makes sure that we do not try to add 2 identical inputs. GOTCHA: If we need
+         * both inputs, maybe we need to check for this and copy the original inputs without updating from parent.
          */
-//        TreeSet<CaseInput> set = new TreeSet<CaseInput>(inputList2Target);
-//        List<CaseInput> uniqueInputs = new ArrayList<CaseInput>(set);
-//
-//        return uniqueInputs.toArray(new CaseInput[0]);
+        // TreeSet<CaseInput> set = new TreeSet<CaseInput>(inputList2Target);
+        // List<CaseInput> uniqueInputs = new ArrayList<CaseInput>(set);
+        //
+        // return uniqueInputs.toArray(new CaseInput[0]);
         return inputList2Target.toArray(new CaseInput[0]);
     }
 
@@ -3612,51 +3629,50 @@ public class ManagedCaseService {
             CaseParameter tempParam = (CaseParameter) DeepCopy.copy(params[i]);
             CaseParameter parentParameter = dao.loadCaseParameter(parentCaseId, params[i], session);
             boolean modifiedFromParent = false;
-            
+
             if (parentParameter != null) {
                 tempParam.setParentCaseId(parentCaseId);
-                
+
                 if (tempParam.getEnvVar() == null) {
                     tempParam.setEnvVar(parentParameter.getEnvVar());
                     modifiedFromParent = true;
                 }
-                
+
                 if (tempParam.getType() == null) {
                     tempParam.setType(parentParameter.getType());
                     modifiedFromParent = true;
                 }
-                
+
                 if (tempParam.getValue() == null || tempParam.getValue().trim().isEmpty()) {
                     tempParam.setValue(parentParameter.getValue());
-                    modifiedFromParent  = true;
+                    modifiedFromParent = true;
                 }
-                
+
                 if (tempParam.getPurpose() == null || tempParam.getPurpose().trim().isEmpty()) {
                     tempParam.setPurpose(parentParameter.getPurpose());
-                    modifiedFromParent  = true;
+                    modifiedFromParent = true;
                 }
-                
+
                 if (modifiedFromParent)
                     tempParam.setLastModifiedDate(parentParameter.getLastModifiedDate());
             } else {
                 tempParam.setParentCaseId(params[i].getCaseID());
             }
-            
+
             tempParam.setCaseID(targetCaseId);
             params2Target.add(tempParam);
         }
-        
-        /* 
-         * NOTE:  If two parameters are very similar in the  template, they potentially could be
-         * identical after they are updated from the parent.  This makes sure that we
-         * do not try to add 2 identical parameters.  
-         * GOTCHA: If we need both parameters, maybe we need to check for this and copy
-         * the original parameters without updating from parent.
+
+        /*
+         * NOTE: If two parameters are very similar in the template, they potentially could be identical after they are
+         * updated from the parent. This makes sure that we do not try to add 2 identical parameters. GOTCHA: If we need
+         * both parameters, maybe we need to check for this and copy the original parameters without updating from
+         * parent.
          */
-//        TreeSet<CaseParameter> set = new TreeSet<CaseParameter>(params2Target);
-//        List<CaseParameter> uniqueParameters = new ArrayList<CaseParameter>(set);
-//
-//        return uniqueParameters.toArray(new CaseParameter[0]);
+        // TreeSet<CaseParameter> set = new TreeSet<CaseParameter>(params2Target);
+        // List<CaseParameter> uniqueParameters = new ArrayList<CaseParameter>(set);
+        //
+        // return uniqueParameters.toArray(new CaseParameter[0]);
         return params2Target.toArray(new CaseParameter[0]);
     }
 }
