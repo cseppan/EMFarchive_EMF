@@ -44,6 +44,8 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     private JList datasetList;
     
     private EmfDataset[] datasets = new EmfDataset[] {};
+    
+    private boolean shouldCreate = false;  
 
     public InputDatasetSelectionDialog(EmfConsole parent, ManageChangeables changeables) {
         super(parent);
@@ -110,15 +112,6 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
         return panel;
     }
     
-//    private int getIndex(DatasetType datasetType, DatasetType[] datasetTypes){
-//        for (int i =0; i<datasetTypes.length; i++){
-//            if (datasetType.getName().equalsIgnoreCase(datasetTypes[i].getName())){
-//                 return i+1;
-//            }
-//        }
-//        return 0; 
-//    }
-
     private JPanel buildNameContains(){
         JPanel panel = new JPanel(new SpringLayout()); 
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -174,7 +167,6 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
                 setVisible(false);
                 dispose();
             }
-
         };
     }
 
@@ -190,6 +182,8 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
                         list.add((EmfDataset) datasetList.getSelectedValues()[i]);
                     datasets = list.toArray(new EmfDataset[0]);
                 }
+                if (datasets.length>0)
+                    shouldCreate = true; 
                 setVisible(false);
                 dispose();
             }
@@ -199,5 +193,10 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     public void observe(InputDatasetSelectionPresenter presenter) {
         this.presenter = presenter;
     }
+    
+    public boolean shouldCreate() {
+        return shouldCreate;
+    }
+
 
 }

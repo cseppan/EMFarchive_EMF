@@ -114,7 +114,7 @@ public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView,
 
         dataset = new ListWidget(new EmfDataset[0]);
         if(input.getDataset() != null )
-            dataset.add(dataset);
+            dataset.addElement(input.getDataset());
 
         changeablesList.addChangeable(dataset);
         JScrollPane pane = new JScrollPane(dataset);
@@ -134,29 +134,31 @@ public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView,
     private Action selectAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doAddWindow();
+                try {
+                    doAddWindow();
+                } catch (Exception e1) {
+                    messagePanel.setError(e1.getMessage());
+                }
             }
         };
     }
 
-    protected void doAddWindow() {
-
-        try {
-            DatasetType type = input.getDatasetType();
-            DatasetType[] datasetTypes = new DatasetType[]{type};
-            InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, this);
-            InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypes);
-            if (datasetTypes.length == 1)
-                presenter.display(datasetTypes[0]);
-            else
-                presenter.display(null);
+    protected void doAddWindow() throws Exception {
+        DatasetType type = input.getDatasetType();
+        if (type == null)
+            throw new EmfException("Dataset Type doesn't exist. ");
+        DatasetType[] datasetTypes = new DatasetType[]{type};
+        InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, this);
+        InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypes);
+        if (datasetTypes.length == 1)
+            presenter.display(datasetTypes[0]);
+        else
+            presenter.display(null);
+        if (view.shouldCreate())
             setDatasets(presenter.getDatasets());
-        } catch (Exception e) {
-            messagePanel.setError(e.getMessage());
-        }
     }
 
-    protected void setDatasets(EmfDataset [] datasets) {
+    private void setDatasets(EmfDataset [] datasets) {
         dataset.removeAllElements();
         for (int i = 0; i < datasets.length; i++) {
            //System.out.println(" Inv dataset is: " + datasets[i]);
