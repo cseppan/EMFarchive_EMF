@@ -10,7 +10,6 @@ import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
-import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
@@ -240,9 +239,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
     private JPanel controlPanel(final EditInputsTabPresenter presenter) {
         Insets insets = new Insets(1, 2, 1, 2);
-
         JPanel container = new JPanel();
-
+        
         Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMessage();
@@ -264,23 +262,16 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         });
         remove.setMargin(insets);
         container.add(remove);
-
-        Button edit = new EditButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    clearMessage();
-                    doEditInput(presenter);
-                } catch (EmfException ex) {
-                    messagePanel.setError(ex.getMessage());
-                }
-            }
-        });
+        
+        String message1 = "You have asked to open a lot of windows. Do you wish to proceed?";
+        ConfirmDialog confirmDialog1 = new ConfirmDialog(message1, "Warning", this);
+        SelectAwareButton edit = new SelectAwareButton("Edit", editAction(), table, confirmDialog1);
         edit.setMargin(insets);
         container.add(edit);
 
-        String message = "You have asked to copy too many inputs. Do you wish to proceed?";
-        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
-        SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(presenter), table, confirmDialog);
+        String message2 = "You have asked to copy too many inputs. Do you wish to proceed?";
+        ConfirmDialog confirmDialog2 = new ConfirmDialog(message2, "Warning", this);
+        SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(presenter), table, confirmDialog2);
         copy.setMargin(insets);
         container.add(copy);
 
@@ -330,6 +321,20 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
                 }
             }
         };
+    }
+    
+    private Action editAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    clearMessage();
+                    doEditInput(presenter);
+                } catch (EmfException ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        };
+        return action; 
     }
 
     protected void doNewInput(EditInputsTabPresenter presenter) {

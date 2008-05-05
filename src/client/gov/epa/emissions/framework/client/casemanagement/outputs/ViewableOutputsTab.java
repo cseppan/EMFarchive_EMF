@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.client.casemanagement.outputs;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
+import gov.epa.emissions.commons.gui.ConfirmDialog;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -31,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
@@ -133,12 +136,12 @@ public class ViewableOutputsTab extends JPanel implements RefreshObserver {
             }
         });  
         layoutGenerator.addLabelWidgetPair("Job: ", jobCombo, panel);
-layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-        150, 15, // initialX, initialY
-        5, 15);// xPad, yPad
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+                150, 15, // initialX, initialY
+                5, 15);// xPad, yPad
         return panel;
     }
-    
+
     public synchronized void retrieveJobMsg() {
         try {
             messagePanel.setMessage("Please wait while retrieving all case outputs...");
@@ -180,16 +183,9 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         JPanel container = new JPanel();
         Insets insets = new Insets(1, 2, 1, 2);
         
-        Button view = new ViewButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    clearMessage();
-                    viewOutput();
-                } catch (EmfException e1) {
-                    messagePanel.setError(e1.getMessage());
-                }
-            }
-        });
+        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+        SelectAwareButton view = new SelectAwareButton("View", viewAction(), table, confirmDialog);
         view.setMargin(insets);
         container.add(view);
         
@@ -219,16 +215,31 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         panel.add(container, BorderLayout.WEST);
         return panel;
     }
+    
+    private Action viewAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    clearMessage();
+                    viewOutput();
+                } catch (EmfException ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        };
+        return action; 
+    }
 
     protected void viewOutput() throws EmfException {
         List outputs = table.selected();
         if (outputs.size() == 0) {
             messagePanel.setMessage("Please select output(s) to edit.");
+            System.out.println("selected : " + outputs.size());
             return;
         }
         for (Iterator iter = outputs.iterator(); iter.hasNext();) {
             CaseOutput output = (CaseOutput) iter.next();
-            String title = "View Case Output: " + output.getName() + " (" + caseObj.getName() + ")";
+            String title = "View Case Output: " + output.getName() + "("+output.getId()+ ")(" + caseObj.getName() + ")";
             EditCaseOutputView outputEditor = new EditCaseOutputWindow(title, desktopManager);
             presenter.viewOutput(output, outputEditor);
             outputEditor.viewOnly(title);

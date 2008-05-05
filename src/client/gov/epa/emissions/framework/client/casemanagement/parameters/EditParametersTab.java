@@ -6,7 +6,6 @@ import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
-import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -178,8 +177,10 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
     private JPanel controlPanel(final EditParametersTabPresenter presenter) {
         Insets insets = new Insets(1, 2, 1, 2);
-
         JPanel container = new JPanel();
+        
+        String message = "You have asked to copy too many parameters. Do you wish to proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
 
         Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -203,21 +204,10 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         remove.setMargin(insets);
         container.add(remove);
 
-        Button edit = new EditButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    clearMessage();
-                    editParameter(presenter);
-                } catch (EmfException ex) {
-                    setErrorMessage(ex.getMessage());
-                }
-            }
-        });
+        SelectAwareButton edit = new SelectAwareButton("Edit", editAction(), table, confirmDialog);
         edit.setMargin(insets);
         container.add(edit);
 
-        String message = "You have asked to copy too many parameters. Do you wish to proceed?";
-        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
         SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(presenter), table, confirmDialog);
         copy.setMargin(insets);
         container.add(copy);
@@ -240,6 +230,22 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
         return panel;
     }
+
+    private Action editAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    clearMessage();
+                    editParameter(presenter);
+                } catch (EmfException ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        };
+        return action; 
+    }
+
+
 
     private Action copyAction(final EditParametersTabPresenter localPresenter) {
         return new AbstractAction() {

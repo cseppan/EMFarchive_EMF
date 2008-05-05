@@ -4,6 +4,8 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
+import gov.epa.emissions.commons.gui.ConfirmDialog;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
@@ -30,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -186,19 +189,11 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
 
     private JPanel controlPanel() {
         Insets insets = new Insets(1, 2, 1, 2);
-
         JPanel container = new JPanel();
-
-        Button view = new ViewButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    clearMessage();
-                    doView();
-                } catch (EmfException ex) {
-                    messagePanel.setError(ex.getMessage());
-                }
-            }
-        });
+        
+        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+        SelectAwareButton view = new SelectAwareButton("View", viewAction(), table, confirmDialog);
         view.setMargin(insets);
         container.add(view);
 
@@ -236,7 +231,21 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
 
         return panel;
     }
-
+    
+    private Action viewAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    clearMessage();
+                    doView();
+                } catch (EmfException ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        };
+        return action; 
+    }
+    
     private void doView() throws EmfException {
         List inputs = getSelectedInputs();
 

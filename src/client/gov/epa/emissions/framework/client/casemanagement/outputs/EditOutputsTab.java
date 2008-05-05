@@ -2,9 +2,10 @@ package gov.epa.emissions.framework.client.casemanagement.outputs;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
+import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
-import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
@@ -36,6 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -83,10 +85,6 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
         super.setLayout(new BorderLayout());
     }
 
-//    public void observe(EditOutputsTabPresenter presenter) {
-//        this.presenter = presenter;
-//    }
-    
     public void display() {
         super.removeAll();
         CaseOutput[] outputs = new CaseOutput[0];
@@ -146,9 +144,9 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
             }
         });
         layoutGenerator.addLabelWidgetPair("Job: ", jobCombo, panel);
-layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-        150, 15, // initialX, initialY
-        5, 15);// xPad, yPad
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+                150, 15, // initialX, initialY
+                5, 15);// xPad, yPad
         return panel;
     }
 
@@ -176,8 +174,8 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         JPanel container = new JPanel();
         Insets insets = new Insets(1, 2, 1, 2);
         
-//        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
-//        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
 
         Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -195,21 +193,10 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
             }
         });
         remove.setMargin(insets);
- //       remove.setEnabled(false);
         container.add(remove);
 
-        Button edit = new EditButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    clearMessage();
-                    editOutput();
-                } catch (EmfException e1) {
-                    messagePanel.setError(e1.getMessage());
-                }
-            }
-        });
+        SelectAwareButton edit = new SelectAwareButton("Edit", editAction(), table, confirmDialog);
         edit.setMargin(insets);
-//        edit.setEnabled(false);
         container.add(edit);
         
         Button view = new ViewButton("View Dataset", new AbstractAction() {
@@ -238,7 +225,22 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         panel.add(container, BorderLayout.WEST);
         return panel;
     }
-    protected void doNewOutput(EditOutputsTabPresenter presenter) {
+ 
+    private Action editAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    clearMessage();
+                    editOutput();
+                } catch (EmfException ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        };
+        return action; 
+    }
+    
+    private void doNewOutput(EditOutputsTabPresenter presenter) {
         NewOutputDialog view = new NewOutputDialog(parentConsole);
         try {
             CaseOutput newOutput = new CaseOutput();
@@ -255,7 +257,7 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
         }
         for (Iterator iter = outputs.iterator(); iter.hasNext();) {
             CaseOutput output = (CaseOutput) iter.next();
-            String title = "Edit Case Output: " + output.getName() + " (" + caseObj.getName() + ")";
+            String title = "Edit Case Output: " + output.getName()+"("+output.getId()+ ")(" + caseObj.getName() + ")";
             EditCaseOutputView outputEditor = new EditCaseOutputWindow(title, desktopManager);
             presenter.editOutput(output, outputEditor);
         }
@@ -312,13 +314,7 @@ layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
             }catch (EmfException e){
                 messagePanel.setError(e.getMessage());
             }
-//            finally{
-//                doRefresh();
-//            }
         }
-//        clearMessage();
-//        setCursor(Cursor.getDefaultCursor());
-//        messagePanel.setMessage("Finished removing outputs.");
     }
     public void refresh(){
         // note that this will get called when the case is save

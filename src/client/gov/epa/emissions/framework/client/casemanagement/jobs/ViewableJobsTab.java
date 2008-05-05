@@ -1,11 +1,12 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.RunButton;
-import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -26,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -167,19 +169,11 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
 
     private JPanel controlPanel() {
         Insets insets = new Insets(1, 2, 1, 2);
-
         JPanel container = new JPanel();
-
-        Button view = new ViewButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                clearMessage();
-                try {
-                    viewJobs();
-                } catch (EmfException ex) {
-                    messagePanel.setError(ex.getMessage());
-                }
-            }
-        });
+        
+        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+        SelectAwareButton view = new SelectAwareButton("View", viewAction(), table, confirmDialog);
         view.setMargin(insets);
         container.add(view);
 
@@ -224,7 +218,20 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
 
         return panel;
     }
-
+    
+    private Action viewAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    clearMessage();
+                    viewJobs();
+                } catch (EmfException ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        };
+        return action; 
+    }
 
     private void viewJobs() throws EmfException {
         List jobs = getSelectedJobs();
@@ -356,7 +363,6 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
         TextArea message = new TextArea("msgArea", msg, width, height);
         message.setEditable(false);
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(message);
-        //descScrollableTextArea.setMinimumSize(new Dimension(width * 3, height * 2));
         return descScrollableTextArea;
     }
 
@@ -398,14 +404,6 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
         } catch (RuntimeException e) {
             throw new EmfException(e.getMessage());
         }
-    }
-    
-    public void setStatusField(){
-//        List jobs = getSelectedJobs();
-//        for (Iterator iter = jobs.iterator(); iter.hasNext();) {
-//            CaseJob job = (CaseJob) iter.next();
-//            job.setRunstatus(runstatus);
-//        }
     }
     
 }

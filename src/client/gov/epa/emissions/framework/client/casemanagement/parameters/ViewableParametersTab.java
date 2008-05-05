@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.client.casemanagement.parameters;
 
 import gov.epa.emissions.commons.data.Sector;
-import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
-import gov.epa.emissions.commons.gui.buttons.ViewButton;
+import gov.epa.emissions.commons.gui.ConfirmDialog;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -169,19 +170,12 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
 
     private JPanel controlPanel() {
         Insets insets = new Insets(1, 2, 1, 2);
-
         JPanel container = new JPanel();
-
-        Button view = new ViewButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    clearMessage();
-                    viewParameter();
-                } catch (EmfException ex) {
-                    setMessage(ex.getMessage());
-                }
-            }
-        });
+        
+        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+        
+        SelectAwareButton view = new SelectAwareButton("View", viewAction(), table, confirmDialog);
         view.setMargin(insets);
         container.add(view);
 
@@ -204,6 +198,19 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
         return panel;
     }
 
+    private Action viewAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    clearMessage();
+                    viewParameter();
+                } catch (EmfException ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        };
+        return action; 
+    }
 
     private void viewParameter() throws EmfException {
         List params = getSelectedParameters();
@@ -215,7 +222,7 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
 
         for (Iterator iter = params.iterator(); iter.hasNext();) {
             CaseParameter param = (CaseParameter) iter.next();
-            String title = "Edit Parameter: " + param.getName() + "(" + param.getId() + ")(" + caseObj.getName() + ")";
+            String title = param.getName() + "(" + param.getId() + ")(" + caseObj.getName() + ")";
             EditCaseParameterView parameterEditor = new EditCaseParameterWindow(title, desktopManager);
             presenter.editParameter(param, parameterEditor);
             parameterEditor.viewOnly(title);
