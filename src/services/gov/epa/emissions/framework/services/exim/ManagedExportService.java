@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
@@ -188,6 +189,20 @@ public class ManagedExportService {
 
         Iterator<CaseInput> iter = inputs.iterator();
 
+        // get expanded input directory name
+        String fileSeparator = System.getProperty("file.separator");
+        CaseDAO caseDao = new CaseDAO(this.sessionFactory);
+        String inputDir = caseObj.getInputFileDir();
+        String inputDirExpanded;
+        try {
+            inputDirExpanded = caseDao.replaceEnvVars(inputDir, fileSeparator, caseObj.getId(), job.getId());
+        } catch (RuntimeException e1) {
+            // NOTE Auto-generated catch block
+            e1.printStackTrace();
+            throw new EmfException("Input folder: " + e1.getMessage());
+        }
+        
+        // Make parent directory if doesn't exist
         while (iter.hasNext()) {
             CaseInput caseIp = iter.next();
             EmfDataset dataset = caseIp.getDataset();
@@ -199,10 +214,10 @@ public class ManagedExportService {
             if (DebugLevels.DEBUG_9)
                 System.out.println("CleanDataset Name: " + fullPath);
             if ((subdir != null) && !(subdir.toString()).equals("")) {
-                fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator") + subdir
+                fullPath = inputDirExpanded + fileSeparator + subdir
                         + System.getProperty("file.separator");
             } else {
-                fullPath = caseObj.getInputFileDir() + System.getProperty("file.separator");
+                fullPath = inputDirExpanded + fileSeparator;
             }
 
             // FIXME: Verify at team meeting Test if subpath exists. If not create subpath
@@ -214,7 +229,7 @@ public class ManagedExportService {
             
             if (!toSubDir.exists()) {
                 toSubDir.mkdirs();
-                setDirsWritable(new File(caseObj.getInputFileDir()), toSubDir);
+                setDirsWritable(new File(inputDirExpanded), toSubDir);
             }
 
             if (isExportable(dataset, version, services, user)) {
@@ -275,6 +290,8 @@ public class ManagedExportService {
         while (dir != null) {
             try {
                 dir.setWritable(true, false);
+                if (dir.compareTo(base) == 0)
+                    return;
             } catch (Exception e) {
                 return;
             }
