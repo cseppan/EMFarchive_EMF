@@ -234,7 +234,6 @@ public class ViewableOutputsTab extends JPanel implements RefreshObserver {
         List outputs = table.selected();
         if (outputs.size() == 0) {
             messagePanel.setMessage("Please select output(s) to edit.");
-            System.out.println("selected : " + outputs.size());
             return;
         }
         for (Iterator iter = outputs.iterator(); iter.hasNext();) {
