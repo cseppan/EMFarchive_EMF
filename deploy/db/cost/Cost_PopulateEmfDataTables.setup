@@ -3,6 +3,7 @@ insert into emf.strategy_types values(DEFAULT,'Max Emissions Reduction','Max Emi
 insert into emf.strategy_types values(DEFAULT,'Least Cost','Least Cost', '', 'gov.epa.emissions.framework.services.cost.analysis.leastcost.StrategyTask');
 insert into emf.strategy_types values(DEFAULT,'Least Cost Curve','Least Cost Curve', '', 'gov.epa.emissions.framework.services.cost.analysis.leastcostcurve.StrategyTask');
 insert into emf.strategy_types (name, description, default_sortorder, strategy_classname) values ('Apply Measures In Series', 'Apply Measures In Series', '''''', 'gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries.StrategyTask');
+insert into emf.strategy_types values(DEFAULT,'Annotate Inventory','Annotate Inventory', '', 'gov.epa.emissions.framework.services.cost.analysis.annotateinventory.StrategyTask');
 -- emf.strategy_types
 
 -- emf.strategy_result_types
@@ -11,6 +12,7 @@ insert into emf.strategy_result_types (name) select 'Strategy Summary';
 insert into emf.strategy_result_types (name) select 'Least Cost Control Measure Worksheet';
 insert into emf.strategy_result_types (name) select 'Controlled Inventory';
 insert into emf.strategy_result_types (name) select 'Least Cost Curve Summary';
+insert into emf.strategy_result_types (name) select 'Annotated Inventory';
 -- emf.strategy_result_types
 
 --emf.control_technologies

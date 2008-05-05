@@ -61,3 +61,8 @@ CREATE INDEX invtable_names
   ON reference.invtable
   USING btree
   (name);
+CREATE INDEX invtable_cas
+  ON reference.invtable
+  USING btree
+  (cas);
+  

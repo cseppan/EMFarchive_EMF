@@ -26,6 +26,8 @@ public class ControlStrategyConstraint implements Serializable {
     
     private Double domainWidePctReductionEnd;
     
+    private Double replacementControlMinEfficiencyDiff;
+    
     public ControlStrategyConstraint() {
         //
     }
@@ -123,5 +125,13 @@ public class ControlStrategyConstraint implements Serializable {
 
     public Double getDomainWidePctReductionEnd() {
         return domainWidePctReductionEnd;
+    }
+
+    public void setReplacementControlMinEfficiencyDiff(Double replacementControlMinEfficiencyDiff) {
+        this.replacementControlMinEfficiencyDiff = replacementControlMinEfficiencyDiff;
+    }
+
+    public Double getReplacementControlMinEfficiencyDiff() {
+        return replacementControlMinEfficiencyDiff;
     }
 }

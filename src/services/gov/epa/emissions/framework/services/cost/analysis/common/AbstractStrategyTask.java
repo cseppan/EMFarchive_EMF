@@ -6,7 +6,10 @@ import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.TableFormat;
+import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -259,7 +262,23 @@ public abstract class AbstractStrategyTask implements Strategy {
         }
     }
 
-    private boolean isRunStatusCancelled() throws EmfException {
+    protected void populateSourcesTable() throws EmfException {
+        ControlStrategyInputDataset[] datasets = controlStrategy.getControlStrategyInputDatasets();
+        String filter = getFilterForSourceQuery();
+        if (datasets.length > 0) {
+            for (int i = 0; i < datasets.length; i++) {
+                String sql = "select public.populate_sources_table('" + emissionTableName(datasets[i].getInputDataset()) + "'," + (filter.length() == 0 ? "null::text" : "'" + filter.replaceAll("'", "''") + "'") + ");vacuum analyze emf.sources;";
+                System.out.println( sql);
+                try {
+                    datasource.query().execute(sql);
+                } catch (SQLException e) {
+                    throw new EmfException("Error occured when populating the sources table " + "\n" + e.getMessage());
+                }
+            }
+        }
+    }
+
+    protected boolean isRunStatusCancelled() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             return controlStrategyDAO.getControlStrategyRunStatus(controlStrategy.getId(), session).equals("Cancelled");
@@ -481,4 +500,64 @@ public abstract class AbstractStrategyTask implements Strategy {
 
         statusDAO.add(endStatus);
     }
+    
+    public String getFilterForSourceQuery() {
+        String filterForSourceQuery = "";
+        String sqlFilter = getFilterFromRegionDataset();
+        String filter = controlStrategy.getFilter();
+        
+        //get and build strategy filter...
+        if (filter == null || filter.trim().length() == 0)
+            sqlFilter = "";
+        else 
+            sqlFilter = " and (" + filter + ") "; 
+
+        filterForSourceQuery = sqlFilter;
+        return filterForSourceQuery;
+    }
+
+    private String getFilterFromRegionDataset() {
+        if (controlStrategy.getCountyDataset() == null) return "";
+        String sqlFilter = "";
+        String versionedQuery = new VersionedQuery(version(controlStrategy.getCountyDataset().getId(), controlStrategy.getCountyDatasetVersion())).query();
+        String query = "SELECT distinct fips "
+            + " FROM " + qualifiedEmissionTableName(controlStrategy.getCountyDataset()) 
+            + " where " + versionedQuery;
+//        ResultSet rs = null;
+//        try {
+//            rs = datasource.query().executeQuery(query);
+//            while (rs.next()) {
+//                if (sqlFilter.length() > 0) {
+//                    sqlFilter += ",'" + rs.getString(1) + "'";
+//                } else {
+//                    sqlFilter = "'" + rs.getString(1) + "'";
+//                }
+//            }
+//        } catch (SQLException e) {
+//            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+//        } finally {
+//            if (rs != null)
+//                try {
+//                    rs.close();
+//                } catch (SQLException e) {
+//                    //
+//                }
+//        }
+        return sqlFilter.length() > 0 ? " and fips in (" + query + ")" : "" ;
+    }
+
+    protected Version version(ControlStrategyInputDataset controlStrategyInputDataset) {
+        return version(controlStrategyInputDataset.getInputDataset().getId(), controlStrategyInputDataset.getVersion());
+    }
+
+    private Version version(int datasetId, int version) {
+        Session session = sessionFactory.getSession();
+        try {
+            Versions versions = new Versions();
+            return versions.get(datasetId, version, session);
+        } finally {
+            session.close();
+        }
+    }
+
 }

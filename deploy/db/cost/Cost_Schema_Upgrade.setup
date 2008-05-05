@@ -531,3 +531,9 @@ ALTER TABLE emf.control_strategy_constraints ADD COLUMN domain_wide_pct_reductio
 
 ALTER TABLE emf.control_strategies ADD COLUMN merge_inventories boolean DEFAULT false;
    
+-- 5/1/08 add new strategy --  Annotated Inventory
+insert into emf.strategy_result_types (name) select 'Annotated Inventory';
+insert into emf.strategy_types values(DEFAULT,'Annotate Inventory','Annotate Inventory', '', 'gov.epa.emissions.framework.services.cost.analysis.annotateinventory.StrategyTask');
+
+ALTER TABLE emf.control_strategy_constraints
+   ADD COLUMN replacement_control_min_eff_diff double precision;

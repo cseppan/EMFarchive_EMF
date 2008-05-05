@@ -415,7 +415,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     public void makeSureInventoryDatasetHasIndexes(ControlStrategyInputDataset controlStrategyInputDataset) {
-        String query = "SELECT public.create_orl_table_indexes('" + emissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + "')";
+        String query = "SELECT public.create_orl_table_indexes('" + emissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + "');vacuum analyze " + emissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + ";";
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {
@@ -494,6 +494,29 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
                 controlStrategyResult.setRecordCount(recordCount);
                 controlStrategyResult.setTotalCost(rs.getDouble(2));
                 controlStrategyResult.setTotalReduction(rs.getDouble(3));
+            }
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    //
+                }
+        }
+    }
+
+    protected void setResultCount(ControlStrategyResult controlStrategyResult) throws EmfException {
+        String query = "SELECT count(1) as record_count "
+            + " FROM " + qualifiedEmissionTableName(controlStrategyResult.getDetailedResultDataset());
+        ResultSet rs = null;
+        System.out.println(System.currentTimeMillis() + " " + query);
+        try {
+            rs = datasource.query().executeQuery(query);
+            while (rs.next()) {
+                recordCount = rs.getInt(1);
+                controlStrategyResult.setRecordCount(recordCount);
             }
         } catch (SQLException e) {
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
