@@ -175,15 +175,17 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
                 });
         try {
             presenter.display(null);
-            EmfDataset[] inputDatasets = presenter.getDatasets();
-            ControlStrategyInputDataset[] controlStrategyInputDatasets = new ControlStrategyInputDataset[inputDatasets.length];
-            for (int i = 0; i < inputDatasets.length; i++) {
-                controlStrategyInputDatasets[i] = new ControlStrategyInputDataset(inputDatasets[i]);
-                controlStrategyInputDatasets[i].setVersion(inputDatasets[i].getDefaultVersion());
+            if (view.shouldCreate()){
+                EmfDataset[] inputDatasets = presenter.getDatasets();
+                ControlStrategyInputDataset[] controlStrategyInputDatasets = new ControlStrategyInputDataset[inputDatasets.length];
+                for (int i = 0; i < inputDatasets.length; i++) {
+                    controlStrategyInputDatasets[i] = new ControlStrategyInputDataset(inputDatasets[i]);
+                    controlStrategyInputDatasets[i].setVersion(inputDatasets[i].getDefaultVersion());
+                }
+                tableData.add(controlStrategyInputDatasets);
+                if (inputDatasets.length > 0) editControlStrategyPresenter.fireTracking();
+                refresh();
             }
-            tableData.add(controlStrategyInputDatasets);
-            if (inputDatasets.length > 0) editControlStrategyPresenter.fireTracking();
-            refresh();
         } catch (Exception exp) {
             messagePanel.setError(exp.getMessage());
         }

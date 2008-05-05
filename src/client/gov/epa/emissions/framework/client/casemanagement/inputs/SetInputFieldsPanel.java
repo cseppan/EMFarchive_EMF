@@ -34,7 +34,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
-public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView, ManageChangeables {
+public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView{
 
     private ListWidget dataset;
 
@@ -148,7 +148,7 @@ public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView,
         if (type == null)
             throw new EmfException("Dataset Type doesn't exist. ");
         DatasetType[] datasetTypes = new DatasetType[]{type};
-        InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, this);
+        InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, changeablesList);
         InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypes);
         if (datasetTypes.length == 1)
             presenter.display(datasetTypes[0]);

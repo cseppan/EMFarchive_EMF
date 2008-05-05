@@ -268,12 +268,14 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
                 presenter.getSession(), datasetTypes);
         srcDSPresenter.display(datasetTypes[0]);
         // get sourceDataset from light dataset
-        EmfDataset[] datasets = view.getDatasets();
-        sourceDataset = (datasets == null || datasets.length == 0) ? null : presenter.getDataset(datasets[0].getId());
+        if (view.shouldCreate()){
+            EmfDataset[] datasets = view.getDatasets();
+            sourceDataset = (datasets == null || datasets.length == 0) ? null : presenter.getDataset(datasets[0].getId());
 
-        if (sourceDataset != null) {
-            sourceDatasetField.setText(sourceDataset == null ? "" : sourceDataset.getName());
-            sourceVersionBox.resetModel(presenter.getVersions(sourceDataset.getId()));
+            if (sourceDataset != null) {
+                sourceDatasetField.setText(sourceDataset == null ? "" : sourceDataset.getName());
+                sourceVersionBox.resetModel(presenter.getVersions(sourceDataset.getId()));
+            }
         }
     }
 

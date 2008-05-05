@@ -227,7 +227,8 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
                 presenter.display(datasetTypes[0]);
             else
                 presenter.display(null);
-            setDatasets(presenter.getDatasets());
+            if (view.shouldCreate())
+                setDatasets(presenter.getDatasets());
         } catch (Exception e) {
              messagePanel.setError(e.getMessage());
         }
