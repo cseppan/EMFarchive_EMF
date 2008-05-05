@@ -804,6 +804,22 @@ public class CaseDAO {
         return hibernateFacade.get(CaseParameter.class, crits, session);
     }
 
+    public List<CaseParameter> getCaseParametersFromEnv(int caseId, ParameterEnvVar envVar, Session session) {
+        // Get parameters based on environment variable
+        Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
+        Criterion crit2 = Restrictions.eq("envVar", envVar);
+        Criterion[] crits = {crit1, crit2};
+
+        return hibernateFacade.get(CaseParameter.class, crits, session);
+    }
+
+    public ParameterEnvVar getParameterEnvVar(String envName, Session session) {
+        // Get parameter environmental variables from name
+        Criterion crit1 =  Restrictions.eq("name", envName);
+ 
+        return (ParameterEnvVar) hibernateFacade.load(ParameterEnvVar.class, crit1, session);
+    }
+
     private List<CaseParameter> getCaseParametersWithNullSector(boolean showAll, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.isNull("sector");
