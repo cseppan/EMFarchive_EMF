@@ -174,7 +174,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
                     editControlStrategyPresenter.getDatasetType(DatasetType.orlOnroadInventory)
                 });
         try {
-            presenter.display(null, true);
+            presenter.display(null, false);
             if (view.shouldCreate()){
                 EmfDataset[] inputDatasets = presenter.getDatasets();
                 ControlStrategyInputDataset[] controlStrategyInputDatasets = new ControlStrategyInputDataset[inputDatasets.length];
