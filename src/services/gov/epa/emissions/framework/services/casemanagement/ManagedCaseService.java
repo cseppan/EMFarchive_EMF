@@ -50,6 +50,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
@@ -1304,6 +1305,102 @@ public class ManagedCaseService {
         }
     }
 
+    public CaseParameter[] getCaseParametersFromEnvName(int caseId, String envName) throws EmfException{
+    // Get case parameters that match a specific environment variables name 
+        Session session = sessionFactory.getSession();
+        try{
+            // Get environmental variable corresponding to this name
+            ParameterEnvVar envVar = dao.getParameterEnvVar(envName, session);
+            if (envVar == null) {
+                throw new EmfException("Could not get parameter environmental variable for " + envName);
+                
+            }
+            // Get parameters corresponding to this environmental variable
+            List<CaseParameter> parameters = dao.getCaseParametersFromEnv(caseId, envVar, session);
+            if (parameters == null) {
+                throw new EmfException("Could not get parameters for " + envName);                
+            }
+            return parameters.toArray(new CaseParameter[0]);
+
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new EmfException("Could not get case parameters for " + envName);
+
+        } finally {
+            if (session != null || !session.isConnected()) {
+                session.close();
+            }
+        }
+    } 
+    
+    private String[] findEnvVars(String input){
+        // Find any environmental variables that are in a string
+        List<String> envVars  = new ArrayList<String>() ;
+        if (input.contains("$")){
+            // Split the string at spaces
+            StringTokenizer st = new StringTokenizer(input, " ");
+            
+            // loop over substrings 
+            while(st.hasMoreTokens()) {
+                String temp = st.nextToken();
+                // add variable if starts w/ $, but remove the dollar
+                if(temp.startsWith("$") && temp.length() > 1){
+                    envVars.add(temp.substring(1));
+                }
+            }    
+        }
+        return envVars.toArray(new String[0]);
+    }
+
+    private String replaceEnvVars(String input, int caseId, int jobId) throws EmfException{
+        // replace any environemental variables with their values
+        try {
+            if (input.contains("$")){
+                String[] envVarsStrs = findEnvVars(input);
+                if (envVarsStrs.length > 0){
+                    for (String envName: envVarsStrs){
+                        // loop over env variable names, get the parameter,
+                        // and replace the env name in input string w/ that value
+                        CaseParameter envVar = getUniqueCaseParametersFromEnvName(caseId, envName, jobId);
+                        input = input.replace("$"+envName, envVar.getValue());
+                    }
+                }
+            }
+            return input;
+        }  catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+    }
+    public CaseParameter getUniqueCaseParametersFromEnvName(int caseId, String envName, int jobId) throws EmfException{
+        // Get case parameters that match a specific environment variables name
+        // If more than 1 matches the environmental variable name, uses the job Id to find unique one
+        try{
+            CaseParameter[] tempParams = getCaseParametersFromEnvName(caseId, envName);
+            List<CaseParameter> params = new ArrayList<CaseParameter>();
+            if (tempParams.length == 1) {
+                params.add(tempParams[0]);
+            } else if (tempParams.length > 1) {
+                // loop over params and find any that match jobId
+                for (CaseParameter param: tempParams) {
+                    if (param.getJobId() == jobId){
+                        params.add(param);
+                    }
+                }
+            } 
+            
+            if (params.size() > 1 || params.size() == 0){
+                throw new EmfException ("Could not find a unique case parameter for " + envName + ", jobId" + jobId);
+
+            }
+            // return the matching param
+            return params.get(0);
+            
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new EmfException("Could not get unique case parameters for " + envName);
+        }
+    }
+
     public synchronized CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll)
             throws EmfException {
         Session session = sessionFactory.getSession();
@@ -1913,14 +2010,31 @@ public class ManagedCaseService {
                 }
 
                 cjt.setJobFile(jobFileName);
-                cjt.setLogFile(this.getLog(jobFileName));
+                String jobLogFile = this.getLog(jobFileName); 
+                cjt.setLogFile(jobLogFile);
                 cjt.setJobName(caseJob.getName());
                 if (DebugLevels.DEBUG_6)
                     System.out.println("set Host Name");
                 cjt.setHostName(caseJob.getHost().getName());
                 if (DebugLevels.DEBUG_6)
                     System.out.println("getQueOptions");
-                cjt.setQueueOptions(caseJob.getQueOptions());
+               
+                String queueOptions = caseJob.getQueOptions();
+
+                // replace joblog in queue options
+                queueOptions = queueOptions.replace("$EMF_JOBLOG", jobLogFile);
+
+                // If other parameters are in the queue options, translate them to their
+                // string values in the queue
+                try {
+                    queueOptions = replaceEnvVars(queueOptions, caseId, jobId);
+                } catch (Exception e){
+                    throw new EmfException("Job (" +  cjt.getJobName() +"): " + e.getMessage());
+                }
+                if (DebugLevels.DEBUG_6)
+                    System.out.println("Queue options: " + queueOptions);
+                cjt.setQueueOptions(queueOptions);
+                
                 if (DebugLevels.DEBUG_6)
                     System.out.println("Completed setting the CaseJobTask");
 
