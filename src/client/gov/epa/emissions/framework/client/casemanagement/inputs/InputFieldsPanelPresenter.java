@@ -31,14 +31,6 @@ public class InputFieldsPanelPresenter {
 
     private InputFieldsPanelView view;
 
-//    private CaseInputNames caseInputNames;
-//    
-//    private CaseInputEnvtVars caseInputEnvtVars;
-    
-//    private Programs programs;
-
-//    private SubDirs subdirs;
-    
     private int caseId;
     
     public static final String ALL_FOR_SECTOR = "All jobs for sector";
@@ -55,7 +47,7 @@ public class InputFieldsPanelPresenter {
 
     public void display(CaseInput input, JComponent container) throws EmfException {
         view.observe(this);
-        view.display(input, container);
+        view.display(input, container, session);
     }
 
 //    public CaseInputNames getCaseInputNames() throws EmfException {

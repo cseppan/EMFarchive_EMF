@@ -29,10 +29,13 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
 
     private InputFieldsPanel inputFieldsPanel;
     
-    public NewInputDialog(EmfConsole parent) {
-        super("Add input to case", parent);
+    private EmfConsole parentConsole;
+    
+    public NewInputDialog(EmfConsole parentConsole) {
+        super("Add input to case", parentConsole);
         super.setSize(new Dimension(610, 520));
         super.center();
+        this.parentConsole = parentConsole;
     }
 
     public void display(int caseId, CaseInput newInput) {
@@ -52,7 +55,7 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.inputFieldsPanel = new InputFieldsPanel(messagePanel, this);
+        this.inputFieldsPanel = new InputFieldsPanel(messagePanel, this, parentConsole);
 
         try {
             presenter.doAddInputFields(panel, inputFieldsPanel, newInput);

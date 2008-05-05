@@ -266,7 +266,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
         InputDatasetSelectionDialog view = new InputDatasetSelectionDialog(parentConsole, this);
         InputDatasetSelectionPresenter srcDSPresenter = new InputDatasetSelectionPresenter(view,
                 presenter.getSession(), datasetTypes);
-        srcDSPresenter.display(datasetTypes[0]);
+        srcDSPresenter.display(datasetTypes[0], true);
         // get sourceDataset from light dataset
         if (view.shouldCreate()){
             EmfDataset[] datasets = view.getDatasets();

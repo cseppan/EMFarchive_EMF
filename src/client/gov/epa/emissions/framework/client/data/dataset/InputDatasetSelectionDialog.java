@@ -55,15 +55,15 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     }
 
     public void display(DatasetType[] datasetTypes) {
-        display(datasetTypes, null);
+        display(datasetTypes, null, false); //
     }
     
-    public void display(DatasetType[] datasetTypes, DatasetType defaultType) {
+    public void display(DatasetType[] datasetTypes, DatasetType defaultType, boolean selectSingle) {
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout(5, 5));
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.add(buildTopPanel(datasetTypes, defaultType), BorderLayout.NORTH);
-        panel.add(buildDatasetsPanel(), BorderLayout.CENTER);
+        panel.add(buildDatasetsPanel(selectSingle), BorderLayout.CENTER);
         panel.add(buttonPanel(), BorderLayout.SOUTH);
         contentPane.add(panel);
         if (datasetTypes.length == 1)
@@ -142,9 +142,12 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
         }
     }
     
-    private JPanel buildDatasetsPanel() {
+    private JPanel buildDatasetsPanel(boolean selectSingle) {
         datasetList = new JList();
-        datasetList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        if (selectSingle)
+            datasetList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        else
+            datasetList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         JScrollPane scrollPane = new JScrollPane(datasetList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setPreferredSize(new Dimension(500, 300));

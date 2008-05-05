@@ -7,7 +7,7 @@ public interface InputDatasetSelectionView {
 
     void display(DatasetType[] datasetTypes);
 
-    void display(DatasetType[] datasetTypes, DatasetType defaultType);
+    void display(DatasetType[] datasetTypes, DatasetType defaultType, boolean selectSingle);
 
     void observe(InputDatasetSelectionPresenter presenter);
 

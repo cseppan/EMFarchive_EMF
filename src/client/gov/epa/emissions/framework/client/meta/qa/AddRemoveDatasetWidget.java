@@ -154,7 +154,7 @@ public class AddRemoveDatasetWidget extends JPanel {
             // to that of the datasets retrieved from the presenter.
             InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, changeables);
             InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypeList.toArray(new DatasetType[0]));
-            presenter.display(getDatasetType(0));
+            presenter.display(getDatasetType(0), false);
             setDatasets(presenter.getDatasets());
 
         } catch (Exception e) {

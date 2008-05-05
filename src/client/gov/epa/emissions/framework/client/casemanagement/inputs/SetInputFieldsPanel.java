@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.gui.Changeable;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EmptyStrings;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -16,7 +17,6 @@ import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPres
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
@@ -27,51 +27,32 @@ import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
-public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView{
+public class SetInputFieldsPanel extends InputFieldsPanel{
 
-    private ListWidget dataset;
+    private TextField dataset;
 
-    private ComboBox version;
+    //private InputFieldsPanelPresenter presenter;
 
-    private MessagePanel messagePanel;
-
-    private ManageChangeables changeablesList;
-
-    private InputFieldsPanelPresenter presenter;
-
-    private CaseInput input;
-    
     private Dimension preferredSize = new Dimension(380, 20);
     
-    private EmfSession session;
-    
-    private EmfConsole parentConsole;
-
     public SetInputFieldsPanel(MessagePanel messagePanel, ManageChangeables changeablesList,
-            EmfSession session, EmfConsole parentConsole) {
-        this.changeablesList = changeablesList;
-        this.messagePanel = messagePanel;
-        this.session = session; 
-        this.parentConsole = parentConsole;
+            EmfConsole parentConsole) {
+        super(messagePanel, changeablesList, parentConsole);
     }
 
-    public void display(CaseInput input, JComponent container) throws EmfException {
+    public void display(CaseInput input, JComponent container, EmfSession session) throws EmfException {
         this.input = input;
+        this.session=session; 
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         String width = EmptyStrings.create(125);
         JLabel inputName = new JLabel(input.getInputName().toString());
         layoutGenerator.addLabelWidgetPair("Input Name:", inputName, panel);
-
-//        JLabel program = new JLabel(input.getProgram().toString());
-//        layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
         JLabel envtVar = new JLabel(input.getEnvtVars()==null? "":input.getEnvtVars().toString());
         layoutGenerator.addLabelWidgetPair("Envt. Variable:", envtVar, panel);
@@ -87,7 +68,7 @@ public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView{
         
         layoutGenerator.addLabelWidgetPair("Dataset:", datasetPanel(), panel);
 
-        version = new ComboBox(new Version[] { input.getVersion() });
+        version = new ComboBox(new Version[]  { input.getVersion() });
         fillVersions(input.getDataset());
         
         if (input.getVersion() != null)
@@ -112,21 +93,20 @@ public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView{
 
     private JPanel datasetPanel() {
 
-        dataset = new ListWidget(new EmfDataset[0]);
-        if(input.getDataset() != null )
-            dataset.addElement(input.getDataset());
-
+        dataset = new TextField("dataset", 29);
+        dataset.setEditable(false);
+        EmfDataset inputDataset = input.getDataset();
+        if(inputDataset!= null )
+            dataset.setText(input.getDataset().getName());
+        
         changeablesList.addChangeable(dataset);
-        JScrollPane pane = new JScrollPane(dataset);
-        pane.setPreferredSize(new Dimension(330, 20));
         dataset.setToolTipText("Press select button to choose from a dataset list.");
-
         Button selectButton = new AddButton("Select", selectAction());
         selectButton.setMargin(new Insets(1, 2, 1, 2));
 
         JPanel invPanel = new JPanel(new BorderLayout(5,0));
 
-        invPanel.add(pane, BorderLayout.LINE_START);
+        invPanel.add(dataset, BorderLayout.LINE_START);
         invPanel.add(selectButton);
         return invPanel;
     }
@@ -142,7 +122,6 @@ public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView{
             }
         };
     }
-
     protected void doAddWindow() throws Exception {
         DatasetType type = input.getDatasetType();
         if (type == null)
@@ -151,83 +130,24 @@ public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView{
         InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, changeablesList);
         InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypes);
         if (datasetTypes.length == 1)
-            presenter.display(datasetTypes[0]);
+            presenter.display(datasetTypes[0], true);
         else
-            presenter.display(null);
+            presenter.display(null, true);
         if (view.shouldCreate())
             setDatasets(presenter.getDatasets());
     }
-
+    
     private void setDatasets(EmfDataset [] datasets) {
-        dataset.removeAllElements();
-        for (int i = 0; i < datasets.length; i++) {
-           //System.out.println(" Inv dataset is: " + datasets[i]);
-            dataset.addElement(datasets[i]);
-        }
+        dataset.setText(datasets[0].getName());
+        updateDataset(datasets[0]);
         fillVersions(datasets[0]);
     }
 
-
-    private void fillVersions(EmfDataset dataset) {
-        version.setEnabled(true);
-        try {
-            Version[] versions = presenter.getVersions(dataset);
-            version.removeAllItems();
-            version.setModel(new DefaultComboBoxModel(versions));
-            version.revalidate();
-            if (versions.length > 0)
-                version.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
-    }
-
-    private int getDefaultVersionIndex(Version[] versions, EmfDataset dataset) {
-        int defaultversion = dataset.getDefaultVersion();
-
-        for (int i = 0; i < versions.length; i++)
-            if (defaultversion == versions[i].getVersion())
-                return i;
-
-        return 0;
-    }
-
     public CaseInput setFields() throws EmfException {
-        updateDataset();
+        //updateDataset();
         updateVersion();
         input.setLastModifiedDate(new Date());
         return input;
-    }
-
-
-    private void updateDataset() {
-        EmfDataset selected = (EmfDataset) dataset.getAllElements()[0];
-        if (selected != null && selected.getName().equalsIgnoreCase("Not selected")) {
-            input.setDataset(null);
-            return;
-        }
-
-        input.setDataset(selected);
-    }
-
-    private void updateVersion() throws EmfException {
-        EmfDataset ds = (EmfDataset) dataset.getAllElements()[0];
-        Version ver = (Version) version.getSelectedItem();
-
-        if (ds == null || ds.getName().equalsIgnoreCase("Not selected")) {
-            input.setVersion(null);
-            return;
-        }
-
-        String type = ds.getDatasetType().getName();
-        if (ds.getName() != null && ver == null && type.indexOf("External") < 0)
-            throw new EmfException("Please select a dataset version.");
-
-        input.setVersion(ver);
-    }
-
-    public void observe(InputFieldsPanelPresenter presenter) {
-        this.presenter = presenter;
     }
 
     public CaseInput getInput() {
@@ -248,8 +168,4 @@ public class SetInputFieldsPanel extends JPanel implements InputFieldsPanelView{
         
     }
 
-//    public void validateFields() {
-//        setFields();
-//    }
-    
 }

@@ -53,4 +53,10 @@ public class EditCaseInputPresenterImpl implements EditInputPresenter {
         parentView.refresh();
     }
 
+    public EmfSession getSession() {
+        return session;
+    }
+    
+    
+
 }

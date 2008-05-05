@@ -381,7 +381,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = iter.next();
             String title = "Edit Case Input: "+input.getName() + "(" + input.getId() + ")(" + caseObj.getName() + ")";
-            EditCaseInputView inputEditor = new EditCaseInputWindow(title, desktopManager);
+            EditCaseInputView inputEditor = new EditCaseInputWindow(title, desktopManager, parentConsole);
             presenter.doEditInput(input, inputEditor);
         }
     }

@@ -210,9 +210,9 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
             InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, this);
             InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypeList.toArray(new DatasetType[0]));
             if (datasetTypes.length == 1)
-                presenter.display(datasetTypes[0]);
+                presenter.display(datasetTypes[0], true);
             else
-                presenter.display(null);
+                presenter.display(null, true);
             if (view.shouldCreate())
                 setDatasets(presenter.getDatasets());
         } catch (Exception e) {
