@@ -129,10 +129,7 @@ public class SetInputFieldsPanel extends InputFieldsPanel{
         DatasetType[] datasetTypes = new DatasetType[]{type};
         InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, changeablesList);
         InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypes);
-        if (datasetTypes.length == 1)
-            presenter.display(datasetTypes[0], true);
-        else
-            presenter.display(null, true);
+        presenter.display(datasetTypes[0], true);
         if (view.shouldCreate())
             setDatasets(presenter.getDatasets());
     }
