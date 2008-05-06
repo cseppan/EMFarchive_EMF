@@ -332,7 +332,7 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
         String finalMsg = validationMsg + ls + "ARE YOU SURE YOU WANT TO RUN THE SELECTED JOB" + 
                     (jobs.length > 1 ? "S" : "") + "?";
         int width = 50;
-        int height = validationMsg.length() / 50;
+        int height = (validationMsg.length() / 50)+3;
         ScrollableComponent msgArea = createMsgScrollPane(finalMsg, width, height);
         
         return showDialog(msgArea, "Confirm Running Jobs");
