@@ -150,8 +150,8 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Output Folder:", getFolderChooserPanel(outputDir,
-                "Select the base Output Folder for the Case"), panel);
+        layoutGenerator.addLabelWidgetPair("Output Job Scripts Folder:", getFolderChooserPanel(outputDir,
+                "Select the base Output Job Scripts Folder for the Case"), panel);
         layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
