@@ -15,6 +15,8 @@ public class OutputsTableData extends ChangeableTableData {
     private List rows;
 
     private CaseOutput[] values;
+    
+    private boolean changes = false;
 
     private EmfSession session;
 
@@ -40,8 +42,9 @@ public class OutputsTableData extends ChangeableTableData {
     public void add(CaseOutput output) {
         Row row = row(output);
         if (!rows.contains(row)) {
+            this.changes = true; 
             rows.add(row);
-            notifyChanges();
+            //notifyChanges();
             refresh();
         }
         return;
@@ -87,6 +90,8 @@ public class OutputsTableData extends ChangeableTableData {
     }
 
     public void remove(CaseOutput[] values) {
+        if (values.length > 0)
+            this.changes = true;
         for (int i = 0; i < values.length; i++)
             removeFromList(values[i]);
         refresh();
@@ -96,7 +101,7 @@ public class OutputsTableData extends ChangeableTableData {
         CaseOutput[] outputs = sources();
         this.rows = createRows(outputs);
     }
-
+    
     public CaseOutput[] sources() {
         List sources = sourcesList();
         return (CaseOutput[]) sources.toArray(new CaseOutput[0]);
@@ -114,8 +119,14 @@ public class OutputsTableData extends ChangeableTableData {
             ViewableRow row = (ViewableRow) iter.next();
             sources.add(row.source());
         }
-
         return sources;
     }
-
+    
+    public boolean hasChanges() {
+        return this.changes;
+    }
+    
+    public void setChanges(boolean changes) {
+        this.changes = changes;
+    }
 }
