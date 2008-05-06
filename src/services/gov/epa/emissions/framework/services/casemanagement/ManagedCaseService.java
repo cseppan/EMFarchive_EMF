@@ -2616,6 +2616,8 @@ public class ManagedCaseService {
         // Expand output director, ie. remove env variables
         String delimeter = System.getProperty("file.separator");
         String outputFileDir = caseObj.getOutputFileDir();
+        if (outputFileDir==null||(outputFileDir.length()==0))
+            throw new EmfException("The Output Job Scripts folder has not been specified");
         try {
             String outputDirExpanded = dao.replaceEnvVars(outputFileDir, delimeter, caseObj.getId(), job.getId());
             sbuf.append(shellSetenv("EMF_SCRIPTDIR", outputDirExpanded));
