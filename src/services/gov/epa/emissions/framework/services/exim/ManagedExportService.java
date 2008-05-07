@@ -187,12 +187,13 @@ public class ManagedExportService {
         // FIXME: Moved here to see if session problem is solved.
         Services services = services();
 
-        Iterator<CaseInput> iter = inputs.iterator();
-
         // get expanded input directory name
         String fileSeparator = System.getProperty("file.separator");
         CaseDAO caseDao = new CaseDAO(this.sessionFactory);
         String inputDir = caseObj.getInputFileDir();
+        if ((inputDir ==null) || (inputDir.length()==0))
+            throw new EmfException("Please specify an Input Folder on the Inputs tab"); 
+            
         String inputDirExpanded;
         try {
             inputDirExpanded = caseDao.replaceEnvVars(inputDir, fileSeparator, caseObj.getId(), job.getId());
@@ -202,6 +203,8 @@ public class ManagedExportService {
             throw new EmfException("Input folder: " + e1.getMessage());
         }
         
+        Iterator<CaseInput> iter = inputs.iterator();
+
         // Make parent directory if doesn't exist
         while (iter.hasNext()) {
             CaseInput caseIp = iter.next();
