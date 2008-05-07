@@ -1023,7 +1023,14 @@ public class CaseDAO {
         Session session = sessionFactory.getSession();
 
         try {
-            // FIXME: should remove the old one if pesistedWaitTask already exists
+            //NOTE: Remove the old one if pesistedWaitTask already exists
+            Criterion crit1 = Restrictions.eq("caseId", new Integer(persistedWaitTask.getCaseId()));
+            Criterion crit2 = Restrictions.eq("jobId", new Integer(persistedWaitTask.getJobId()));
+            PersistedWaitTask existedTask = (PersistedWaitTask)hibernateFacade.load(PersistedWaitTask.class, new Criterion[]{crit1, crit2}, session);
+            
+            if (existedTask != null)
+                hibernateFacade.remove(existedTask, session);
+            
             hibernateFacade.add(persistedWaitTask, session);
             if (DebugLevels.DEBUG_15)
                 System.out.println("Adding job to persisted table, jobID: " + persistedWaitTask.getJobId());
