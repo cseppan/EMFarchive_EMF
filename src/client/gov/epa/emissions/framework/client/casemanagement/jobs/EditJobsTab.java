@@ -240,9 +240,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         edit.setMargin(insets);
         container.add(edit);
 
-        String message2 = "You have asked to copy too many jobs. Do you wish to proceed?";
-        ConfirmDialog confirmDialog2 = new ConfirmDialog(message2, "Warning", this);
-        SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(), table, confirmDialog2);
+        Button copy = new Button("Copy", copyAction());
         copy.setMargin(insets);
         container.add(copy);
 
