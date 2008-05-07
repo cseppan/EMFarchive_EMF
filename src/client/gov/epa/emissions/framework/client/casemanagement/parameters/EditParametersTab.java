@@ -179,7 +179,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         Insets insets = new Insets(1, 2, 1, 2);
         JPanel container = new JPanel();
         
-        String message = "You have asked to copy too many parameters. Do you wish to proceed?";
+        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
 
         Button add = new AddButton(new AbstractAction() {
@@ -208,7 +208,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         edit.setMargin(insets);
         container.add(edit);
 
-        SelectAwareButton copy = new SelectAwareButton("Copy", copyAction(presenter), table, confirmDialog);
+        Button copy = new Button("Copy", copyAction(presenter));
         copy.setMargin(insets);
         container.add(copy);
 
