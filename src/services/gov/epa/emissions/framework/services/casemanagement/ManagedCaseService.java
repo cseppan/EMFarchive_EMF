@@ -494,23 +494,61 @@ public class ManagedCaseService {
             CaseJobKey[] keys = getJobsKeys(jobs, session);
             JobMessage[] msgs = getJobsMessages(jobs, session);
             CaseOutput[] outputs = getJobsOutputs(jobs, session);
-            dao.removeObjects(persistedJobs, session);
-            dao.removeObjects(outputQs, session);
-            dao.removeObjects(keys, session);
-            dao.removeObjects(msgs, session);
-            dao.removeObjects(outputs, session);
-            dao.removeCaseJobs(jobs.toArray(new CaseJob[0]), session);
+            
+            try {
+                dao.removeObjects(persistedJobs, session);
+            } catch (RuntimeException e) {
+                throw new EmfException("Cannot remove persisted jobs from db table.");
+            }
+            
+            try {
+                dao.removeObjects(keys, session);
+            } catch (RuntimeException e) {
+                throw new EmfException("Cannot remove job keys from db table.");
+            }
+            
+            try {
+                dao.removeObjects(msgs, session);
+            } catch (RuntimeException e) {
+                throw new EmfException("Cannot remove job messages from db table.");
+            }
+            
+            try {
+                dao.removeObjects(outputs, session);
+            } catch (RuntimeException e) {
+                throw new EmfException("Cannot remove case outputs from db table.");
+            }
+            
+            try {
+                dao.removeCaseJobs(jobs.toArray(new CaseJob[0]), session);
+            } catch (RuntimeException e) {
+                throw new EmfException("Cannot remove jobs from db table.");
+            }
 
             List<CaseParameter> parameters = dao.getCaseParameters(caseObj.getId(), session);
-            dao.removeCaseParameters(parameters.toArray(new CaseParameter[0]), session);
+            try {
+                dao.removeCaseParameters(parameters.toArray(new CaseParameter[0]), session);
+            } catch (RuntimeException e) {
+                throw new EmfException("Cannot remove case parameters from db table.");
+            }
 
-            dao.remove(caseObj, session);
-            dao.removeObject(caseObj.getAbbreviation(), session);
+            try {
+                dao.remove(caseObj, session);
+            } catch (RuntimeException e) {
+                throw new EmfException("Cannot remove case objects: " + caseObj.getName() + " from db table.");
+            }
+            
+            try {
+                dao.removeObject(caseObj.getAbbreviation(), session);
+            } catch (RuntimeException e) {
+                throw new EmfException("Cannot remove case abbreviation: " + caseObj.getAbbreviation().getName() + " from db table.");
+            }
+            
             setStatus(caseObj.getLastModifiedBy(), "Finished removing case " + caseObj.getName() + ".", "Remove Case");
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not remove Case: " + caseObj, e);
-            throw new EmfException("Could not remove Case: " + caseObj.getName() + ". Reason: " + e.getMessage());
+            throw new EmfException(e.getMessage());
         } finally {
             session.close();
         }
