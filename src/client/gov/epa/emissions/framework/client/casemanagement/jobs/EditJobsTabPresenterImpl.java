@@ -23,8 +23,12 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     private Case caseObj;
 
     private EditJobsTabView view;
-    
+
     private CaseObjectManager caseObjectManager = null;
+
+    private CaseInput[] inputsBySelectedJobs;
+
+    private CaseParameter[] parametersBySelectedJobs;
 
     private EmfSession session;
 
@@ -75,25 +79,27 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         if (jobs.length == 0)
             return false;
 
-        int caseId = jobs[0].getCaseId();
-        CaseInput[] inputs = service().getCaseInputs(caseId);
-        CaseParameter[] params = service().getCaseParameters(caseId);
+        int[] jobIds = new int[jobs.length];
 
-        for (int i = 0; i < jobs.length; i++) {
-            for (int j = 0; j < inputs.length; j++)
-                if (inputs[j].getCaseJobID() == jobs[i].getId())
-                    return true;
+        for (int i = 0; i < jobs.length; i++)
+            jobIds[i] = jobs[i].getId();
 
-            for (int k = 0; k < params.length; k++)
-                if (params[k].getJobId() == jobs[i].getId())
-                    return true;
-        }
+        inputsBySelectedJobs = service().getCaseInputs(jobs[0].getCaseId(), jobIds);
+        parametersBySelectedJobs = service().getCaseParameters(jobs[0].getCaseId(), jobIds);
 
-        return false;
+        return (inputsBySelectedJobs != null && inputsBySelectedJobs.length > 0)
+                || (parametersBySelectedJobs != null && parametersBySelectedJobs.length > 0);
     }
 
     public void removeJobs(CaseJob[] jobs) throws EmfException {
+        if (inputsBySelectedJobs != null && inputsBySelectedJobs.length > 0)
+            service().removeCaseInputs(inputsBySelectedJobs);
+        
+        if (parametersBySelectedJobs != null && parametersBySelectedJobs.length > 0)
+            service().removeCaseParameters(parametersBySelectedJobs);
+        
         service().removeCaseJobs(jobs);
+        this.caseObjectManager.refreshJobList();
     }
 
     public void editJob(CaseJob job, EditCaseJobView jobEditor) throws EmfException {
@@ -120,10 +126,10 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
                 copyJob2CurrentCase(caseId, job, null);
         } else {
             CaseJob[] jobsArray = jobs.toArray(new CaseJob[0]);
-            
+
             for (int i = 0; i < jobs.size(); i++)
                 jobsArray[i].setParentCaseId(this.caseObj.getId());
-            
+
             service().addCaseJobs(session.user(), caseId, jobsArray);
         }
     }

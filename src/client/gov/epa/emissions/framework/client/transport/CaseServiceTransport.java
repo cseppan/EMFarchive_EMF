@@ -412,6 +412,17 @@ public class CaseServiceTransport implements CaseService {
 
         return (CaseInput[]) call.requestResponse(new Object[] { new Integer(caseId) });
     }
+    
+    public synchronized CaseInput[] getCaseInputs(int caseId, int[] jobIds) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getCaseInputs");
+        call.addParam("caseId", dataMappings.integer());
+        call.addIntArrayParam();
+        call.setReturnType(caseMappings.caseinputs());
+
+        return (CaseInput[]) call.requestResponse(new Object[] { new Integer(caseId), jobIds});
+    }
 
     public synchronized CaseInput[] getCaseInputs(int pageSize, int caseId, Sector sector, boolean showAll)
             throws EmfException {
@@ -659,6 +670,17 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.caseParameters());
 
         return (CaseParameter[]) call.requestResponse(new Object[] { new Integer(caseId) });
+    }
+
+    public CaseParameter[] getCaseParameters(int caseId, int[] jobIds) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getCaseParameters");
+        call.addIntegerParam("caseId");
+        call.addIntArrayParam();
+        call.setReturnType(caseMappings.caseParameters());
+
+        return (CaseParameter[]) call.requestResponse(new Object[] { new Integer(caseId), jobIds });
     }
 
     public synchronized CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll)

@@ -257,7 +257,7 @@ public class CaseDAO {
     public void removeObject(Object object, Session session) {
         hibernateFacade.remove(object, session);
     }
-    
+
     public void removeObjects(Object[] objects, Session session) {
         hibernateFacade.remove(objects, session);
     }
@@ -351,8 +351,8 @@ public class CaseDAO {
 
     public CaseInput loadCaseInput(int caseId, CaseInput input, Session session) {
         Criterion[] criterions = uniqueCaseInputCriteria(caseId, input);
-        
-        return (CaseInput)hibernateFacade.load(CaseInput.class, criterions, session);
+
+        return (CaseInput) hibernateFacade.load(CaseInput.class, criterions, session);
     }
 
     public List<CaseInput> getCaseInputs(int caseId, Session session) {
@@ -362,18 +362,21 @@ public class CaseDAO {
     }
 
     public List<CaseInput> getCaseInputsByJobIds(int caseId, int[] jobIds, Session session) {
-        List<?> ids = session.createQuery("SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = "
-                        + caseId + " AND (obj.caseJobID = 0 OR obj.caseJobID = " + getAndOrClause(jobIds, "obj.caseJobID") + ")").list();
+        List<?> ids = session
+                .createQuery(
+                        "SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = "
+                                + caseId + " AND (obj.caseJobID = 0 OR obj.caseJobID = "
+                                + getAndOrClause(jobIds, "obj.caseJobID") + ")").list();
         List<CaseInput> inputs = new ArrayList<CaseInput>();
-        
+
         for (Iterator<?> iter = ids.iterator(); iter.hasNext();) {
-            Integer id = (Integer)iter.next();
+            Integer id = (Integer) iter.next();
             inputs.add(this.getCaseInput(id, session));
         }
 
         return inputs;
     }
-    
+
     public List<CaseInput> getCaseInputs(int pageSize, int caseId, Sector sector, boolean showAll, Session session) {
         if (sector == null)
             return getAllInputs(pageSize, caseId, showAll, session);
@@ -401,7 +404,7 @@ public class CaseDAO {
     private List<CaseInput> getCaseInputsWithLocal(boolean showAll, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("local", true);
-        Criterion[] crits = (showAll) ? new Criterion[]{crit1} : new Criterion[]{crit1, crit2};
+        Criterion[] crits = (showAll) ? new Criterion[] { crit1 } : new Criterion[] { crit1, crit2 };
 
         return hibernateFacade.get(CaseInput.class, crits, session);
     }
@@ -410,7 +413,7 @@ public class CaseDAO {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.isNull("sector");
         Criterion crit3 = Restrictions.eq("local", true);
-        Criterion[] crits = (showAll) ? new Criterion[]{crit1, crit2} : new Criterion[]{crit1, crit2, crit3};
+        Criterion[] crits = (showAll) ? new Criterion[] { crit1, crit2 } : new Criterion[] { crit1, crit2, crit3 };
 
         return hibernateFacade.get(CaseInput.class, crits, session);
     }
@@ -419,7 +422,7 @@ public class CaseDAO {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("sector", sector);
         Criterion crit3 = Restrictions.eq("local", true);
-        Criterion[] crits = (showAll) ? new Criterion[]{crit1, crit2} : new Criterion[]{crit1, crit2, crit3};
+        Criterion[] crits = (showAll) ? new Criterion[] { crit1, crit2 } : new Criterion[] { crit1, crit2, crit3 };
 
         return hibernateFacade.get(CaseInput.class, crits, session);
     }
@@ -709,18 +712,19 @@ public class CaseDAO {
 
     public CaseParameter loadCaseParameter(int caseId, CaseParameter param, Session session) {
         Criterion[] criterions = sensitivityCaseParameterCriteria(caseId, param, session);
-        
-        return (CaseParameter)hibernateFacade.load(CaseParameter.class, criterions, session);
+
+        return (CaseParameter) hibernateFacade.load(CaseParameter.class, criterions, session);
     }
-    
-    //NOTE: this method is soly for creating sensitivity case. The questions without clear answers include the following:
+
+    // NOTE: this method is soly for creating sensitivity case. The questions without clear answers include the
+    // following:
     // What if the job does exist in the parent case, but the parameter to copy has a different job?
     private Criterion[] sensitivityCaseParameterCriteria(int caseId, CaseParameter param, Session session) {
         ParameterName paramname = param.getParameterName();
         Sector sector = param.getSector();
         CaseProgram program = param.getProgram();
         Integer jobID = new Integer(param.getJobId());
-        
+
         CaseJob job = this.getCaseJob(jobID);
         CaseJob parentJob = (job == null) ? null : this.getCaseJob(caseId, job, session);
 
@@ -730,7 +734,7 @@ public class CaseDAO {
         Criterion c3 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
         Criterion c4 = (program == null) ? Restrictions.isNull("program") : Restrictions.eq("program", program);
         Criterion c5 = null;
-        
+
         if (parentJob != null)
             c5 = Restrictions.eq("jobId", parentJob.getId());
         else
@@ -754,7 +758,7 @@ public class CaseDAO {
 
         return new Criterion[] { c1, c2, c3, c4, c5 };
     }
-    
+
     public List<CaseParameter> getCaseParameters(int caseId, Session session) {
         Criterion crit = Restrictions.eq("caseID", new Integer(caseId));
 
@@ -762,18 +766,20 @@ public class CaseDAO {
     }
     
     public List<CaseParameter> getCaseParametersByJobIds(int caseId, int[] jobIds, Session session) {
-        List<?> ids = session.createQuery("SELECT obj.id from " + CaseParameter.class.getSimpleName() + " as obj WHERE obj.caseID = "
-                        + caseId + " AND (obj.jobId = 0 OR obj.jobId = " + getAndOrClause(jobIds, "obj.jobId") + ")").list();
-        
+        List<?> ids = session.createQuery(
+                "SELECT obj.id from " + CaseParameter.class.getSimpleName() + " as obj WHERE obj.caseID = " + caseId
+                        + " AND (obj.jobId = 0 OR obj.jobId = " + getAndOrClause(jobIds, "obj.jobId") + ")").list();
+
         List<CaseParameter> params = new ArrayList<CaseParameter>();
-        
+
         for (Iterator<?> iter = ids.iterator(); iter.hasNext();)
-            params.add(this.getCaseParameter((Integer)iter.next(), session));
+            params.add(this.getCaseParameter((Integer) iter.next(), session));
 
         return params;
     }
 
-    public List<CaseParameter> getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll, Session session) {
+    public List<CaseParameter> getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll,
+            Session session) {
         if (sector == null)
             return getAllParameters(pageSize, caseId, showAll, session);
 
@@ -800,7 +806,7 @@ public class CaseDAO {
     private List<CaseParameter> getCaseParametersWithLocal(boolean showAll, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("local", true);
-        Criterion[] crits = (showAll) ? new Criterion[]{crit1} : new Criterion[]{crit1, crit2};
+        Criterion[] crits = (showAll) ? new Criterion[] { crit1 } : new Criterion[] { crit1, crit2 };
 
         return hibernateFacade.get(CaseParameter.class, crits, session);
     }
@@ -809,15 +815,15 @@ public class CaseDAO {
         // Get parameters based on environment variable
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("envVar", envVar);
-        Criterion[] crits = {crit1, crit2};
+        Criterion[] crits = { crit1, crit2 };
 
         return hibernateFacade.get(CaseParameter.class, crits, session);
     }
 
     public ParameterEnvVar getParameterEnvVar(String envName, Session session) {
         // Get parameter environmental variables from name
-        Criterion crit1 =  Restrictions.eq("name", envName);
- 
+        Criterion crit1 = Restrictions.eq("name", envName);
+
         return (ParameterEnvVar) hibernateFacade.load(ParameterEnvVar.class, crit1, session);
     }
 
@@ -825,7 +831,7 @@ public class CaseDAO {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.isNull("sector");
         Criterion crit3 = Restrictions.eq("local", true);
-        Criterion[] crits = (showAll) ? new Criterion[]{crit1, crit2} : new Criterion[]{crit1, crit2, crit3};
+        Criterion[] crits = (showAll) ? new Criterion[] { crit1, crit2 } : new Criterion[] { crit1, crit2, crit3 };
 
         return hibernateFacade.get(CaseParameter.class, crits, session);
     }
@@ -834,7 +840,7 @@ public class CaseDAO {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("sector", sector);
         Criterion crit3 = Restrictions.eq("local", true);
-        Criterion[] crits = (showAll) ? new Criterion[]{crit1, crit2} : new Criterion[]{crit1, crit2, crit3};
+        Criterion[] crits = (showAll) ? new Criterion[] { crit1, crit2 } : new Criterion[] { crit1, crit2, crit3 };
 
         return hibernateFacade.get(CaseParameter.class, crits, session);
     }
@@ -966,6 +972,13 @@ public class CaseDAO {
         if (DebugLevels.DEBUG_9)
             System.out.println("CaseDAO::getPersistedWaitTasks End method");
         return null;
+    }
+
+    public synchronized List getPersistedWaitTasks(int caseId, int jobId, Session session) {
+        Criterion crit1 = Restrictions.eq("caseId", new Integer(caseId));
+        Criterion crit2 = Restrictions.eq("jobId", new Integer(jobId));
+        
+        return hibernateFacade.get(PersistedWaitTask.class, new Criterion[]{crit1, crit2}, session);
     }
 
     public List getDistinctUsersOfPersistedWaitTasks() {
@@ -1180,6 +1193,13 @@ public class CaseDAO {
         return hibernateFacade.getAll(QueueCaseOutput.class, Order.asc("createDate"), session);
     }
 
+    public List<QueueCaseOutput> getQueueCaseOutputs(int caseId, int jobId, Session session) {
+        Criterion c1 = Restrictions.eq("caseId", new Integer(caseId));
+        Criterion c2 = Restrictions.eq("jobId", new Integer(jobId));
+
+        return hibernateFacade.get(QueueCaseOutput.class, new Criterion[] { c1, c2 }, session);
+    }
+
     public void addQueueCaseOutput(QueueCaseOutput output, Session session) {
         hibernateFacade.add(output, session);
     }
@@ -1205,7 +1225,7 @@ public class CaseDAO {
 
         return nameIDStrings;
     }
-    
+
     private String getAndOrClause(int[] ids, String attrName) {
         StringBuffer sb = new StringBuffer();
         int numIDs = ids.length;
@@ -1220,102 +1240,102 @@ public class CaseDAO {
 
         return sb.toString();
     }
-    
-    public CaseParameter[] getCaseParametersFromEnvName(int caseId, String envName) throws EmfException{
-        // Get case parameters that match a specific environment variables name 
-            Session session = sessionFactory.getSession();
-            try{
-                // Get environmental variable corresponding to this name
-                ParameterEnvVar envVar = getParameterEnvVar(envName, session);
-                if (envVar == null) {
-                    throw new EmfException("Could not get parameter environmental variable for " + envName);
-                    
-                }
-                // Get parameters corresponding to this environmental variable
-                List<CaseParameter> parameters = getCaseParametersFromEnv(caseId, envVar, session);
-                if (parameters == null) {
-                    throw new EmfException("Could not get parameters for " + envName);                
-                }
-                return parameters.toArray(new CaseParameter[0]);
 
-            } catch (Exception e){
-                e.printStackTrace();
-                throw new EmfException("Could not get case parameters for " + envName);
+    public CaseParameter[] getCaseParametersFromEnvName(int caseId, String envName) throws EmfException {
+        // Get case parameters that match a specific environment variables name
+        Session session = sessionFactory.getSession();
+        try {
+            // Get environmental variable corresponding to this name
+            ParameterEnvVar envVar = getParameterEnvVar(envName, session);
+            if (envVar == null) {
+                throw new EmfException("Could not get parameter environmental variable for " + envName);
 
-            } finally {
-                if (session != null || !session.isConnected()) {
-                    session.close();
-                }
             }
-        } 
-        
-        private String[] findEnvVars(String input, String delimiter){
-            // Find any environmental variables that are in a string
-            List<String> envVars  = new ArrayList<String>() ;
-            if (input.contains("$")){
-                // Split the string at spaces
-                StringTokenizer st = new StringTokenizer(input, delimiter);
-                
-                // loop over substrings 
-                while(st.hasMoreTokens()) {
-                    String temp = st.nextToken();
-                    // add variable if starts w/ $, but remove the dollar
-                    if(temp.startsWith("$") && temp.length() > 1){
-                        envVars.add(temp.substring(1));
-                    }
-                }    
+            // Get parameters corresponding to this environmental variable
+            List<CaseParameter> parameters = getCaseParametersFromEnv(caseId, envVar, session);
+            if (parameters == null) {
+                throw new EmfException("Could not get parameters for " + envName);
             }
-            return envVars.toArray(new String[0]);
-        }
+            return parameters.toArray(new CaseParameter[0]);
 
-        public String replaceEnvVars(String input, String delimiter, int caseId, int jobId) throws EmfException{
-            // replace any environemental variables with their values
-            // use the delimiter to separate out environment variables
-            try {
-                if (input.contains("$")){
-                    String[] envVarsStrs = findEnvVars(input, delimiter);
-                    if (envVarsStrs.length > 0){
-                        for (String envName: envVarsStrs){
-                            // loop over env variable names, get the parameter,
-                            // and replace the env name in input string w/ that value
-                            CaseParameter envVar = getUniqueCaseParametersFromEnvName(caseId, envName, jobId);
-                            input = input.replace("$"+envName, envVar.getValue());
-                        }
-                    }
-                }
-                return input;
-            }  catch (Exception e) {
-                throw new EmfException(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException("Could not get case parameters for " + envName);
+
+        } finally {
+            if (session != null || !session.isConnected()) {
+                session.close();
             }
         }
-        
-        public CaseParameter getUniqueCaseParametersFromEnvName(int caseId, String envName, int jobId) throws EmfException{
-            // Get case parameters that match a specific environment variables name
-            // If more than 1 matches the environmental variable name, uses the job Id to find unique one
-            try{
-                CaseParameter[] tempParams = getCaseParametersFromEnvName(caseId, envName);
-                List<CaseParameter> params = new ArrayList<CaseParameter>();
-                if (tempParams.length == 1) {
-                    params.add(tempParams[0]);
-                } else if (tempParams.length > 1) {
-                    // loop over params and find any that match jobId
-                    for (CaseParameter param: tempParams) {
-                        if (param.getJobId() == jobId){
-                            params.add(param);
-                        }
-                    }
-                } 
-                
-                if (params.size() > 1 || params.size() == 0){
-                    throw new EmfException ("Could not find a unique case parameter for " + envName + ", jobId" + jobId);
+    }
 
+    private String[] findEnvVars(String input, String delimiter) {
+        // Find any environmental variables that are in a string
+        List<String> envVars = new ArrayList<String>();
+        if (input.contains("$")) {
+            // Split the string at spaces
+            StringTokenizer st = new StringTokenizer(input, delimiter);
+
+            // loop over substrings
+            while (st.hasMoreTokens()) {
+                String temp = st.nextToken();
+                // add variable if starts w/ $, but remove the dollar
+                if (temp.startsWith("$") && temp.length() > 1) {
+                    envVars.add(temp.substring(1));
                 }
-                // return the matching param
-                return params.get(0);
-                
-            } catch (Exception e){
-                e.printStackTrace();
-                throw new EmfException("Could not get unique case parameters for " + envName);
             }
         }
+        return envVars.toArray(new String[0]);
+    }
+
+    public String replaceEnvVars(String input, String delimiter, int caseId, int jobId) throws EmfException {
+        // replace any environemental variables with their values
+        // use the delimiter to separate out environment variables
+        try {
+            if (input.contains("$")) {
+                String[] envVarsStrs = findEnvVars(input, delimiter);
+                if (envVarsStrs.length > 0) {
+                    for (String envName : envVarsStrs) {
+                        // loop over env variable names, get the parameter,
+                        // and replace the env name in input string w/ that value
+                        CaseParameter envVar = getUniqueCaseParametersFromEnvName(caseId, envName, jobId);
+                        input = input.replace("$" + envName, envVar.getValue());
+                    }
+                }
+            }
+            return input;
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+    }
+
+    public CaseParameter getUniqueCaseParametersFromEnvName(int caseId, String envName, int jobId) throws EmfException {
+        // Get case parameters that match a specific environment variables name
+        // If more than 1 matches the environmental variable name, uses the job Id to find unique one
+        try {
+            CaseParameter[] tempParams = getCaseParametersFromEnvName(caseId, envName);
+            List<CaseParameter> params = new ArrayList<CaseParameter>();
+            if (tempParams.length == 1) {
+                params.add(tempParams[0]);
+            } else if (tempParams.length > 1) {
+                // loop over params and find any that match jobId
+                for (CaseParameter param : tempParams) {
+                    if (param.getJobId() == jobId) {
+                        params.add(param);
+                    }
+                }
+            }
+
+            if (params.size() > 1 || params.size() == 0) {
+                throw new EmfException("Could not find a unique case parameter for " + envName + ", jobId" + jobId);
+
+            }
+            // return the matching param
+            return params.get(0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException("Could not get unique case parameters for " + envName);
+        }
+    }
 }

@@ -227,6 +227,10 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getCaseInputs(caseId);
     }
     
+    public CaseInput[] getCaseInputs(int caseId, int[] jobIds) throws EmfException {
+        return getCaseService().getCaseInputs(caseId, jobIds);
+    }
+    
     public CaseInput[] getCaseInputs(int pageSize, int caseId, Sector sector, boolean showAll) throws EmfException {
         return getCaseService().getCaseInputs(pageSize, caseId, sector, showAll);
     }
@@ -359,6 +363,10 @@ public class CaseServiceImpl implements CaseService {
 
     public CaseParameter[] getCaseParameters(int caseId) throws EmfException {
         return getCaseService().getCaseParameters(caseId);
+    }
+    
+    public CaseParameter[] getCaseParameters(int caseId, int[] jobIds) throws EmfException {
+        return getCaseService().getCaseParameters(caseId, jobIds);
     }
     
     public CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll) throws EmfException {

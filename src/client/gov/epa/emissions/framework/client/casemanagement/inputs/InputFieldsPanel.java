@@ -210,6 +210,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
+                    clearMsgPanel();
                     doAddWindow();
                 } catch (Exception e1) {
                     messagePanel.setError(e1.getMessage());
@@ -220,8 +221,10 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     
     private void doAddWindow() throws Exception {
         DatasetType type = (DatasetType) dsType.getSelectedItem();
+        
         if (type == null)
-            throw new EmfException("Dataset Type doesn't exist. ");
+            throw new EmfException("Please select a valid dataset type.");
+        
         DatasetType[] datasetTypes = new DatasetType[]{type};
         InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, changeablesList);
         InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypes);
@@ -251,6 +254,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
             public void popupMenuWillBecomeVisible(PopupMenuEvent event) {
                 try {
+                    clearMsgPanel();
                     Object selected = box.getSelectedItem();
                     box.setModel(new DefaultComboBoxModel(getAllObjects(toget)));
                     box.setSelectedItem(selected);
@@ -425,6 +429,10 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         return this.input;
     }
 
+    private void clearMsgPanel() {
+        this.messagePanel.clear();
+    }
+    
     public void validateFields() throws EmfException {
         Object selectedProg = program.getSelectedItem();
         if (inputName.getSelectedItem() == null)

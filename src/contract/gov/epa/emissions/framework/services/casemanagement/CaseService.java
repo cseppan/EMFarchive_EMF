@@ -94,6 +94,8 @@ public interface CaseService {
     
     CaseInput[] getCaseInputs(int caseId) throws EmfException;
     
+    CaseInput[] getCaseInputs(int caseId, int[] jobIds) throws EmfException;
+    
     CaseInput[] getCaseInputs(int defaultPageSize, int caseId, Sector sector, boolean showAll) throws EmfException;
     
     Case[] copyCaseObject(int[] toCopy, User user) throws EmfException;
@@ -141,6 +143,8 @@ public interface CaseService {
     void removeCaseParameters(CaseParameter[] params) throws EmfException;
     
     CaseParameter[] getCaseParameters(int caseId) throws EmfException;
+    
+    CaseParameter[] getCaseParameters(int caseId, int[] jobIds) throws EmfException;
 
     CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll) throws EmfException;
     

@@ -327,7 +327,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
         if (presenter.jobsUsed(jobs)) {
             int selection1 = showDialog("Selected job(s) are used by case inputs or parameters.\n "
-                    + "Are you sure you want to remove the selected job(s)?", title);
+                    + "Would you like to remove the selected job(s) and the associated inputs or parameters?", title);
 
             if (selection1 != JOptionPane.YES_OPTION)
                 return;

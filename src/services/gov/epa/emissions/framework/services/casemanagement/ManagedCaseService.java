@@ -25,6 +25,7 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
+import gov.epa.emissions.framework.services.casemanagement.outputs.QueueCaseOutput;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
@@ -483,8 +484,19 @@ public class ManagedCaseService {
             dao.removeCaseInputs(inputs.toArray(new CaseInput[0]), session);
 
             List<CaseJob> jobs = dao.getCaseJobs(caseObj.getId(), session);
+            checkJobsStatuses(jobs, caseObj);
+            PersistedWaitTask[] persistedJobs = getPersistedJobs(jobs, session);
+            QueueCaseOutput[] outputQs = getQedOutputs(jobs, session);
+            
+            if (outputQs.length > 0)
+                throw new EmfException("Selected case: " + caseObj.getName() + " has " + outputQs.length + " pending outputs to register.");
+            
+            CaseJobKey[] keys = getJobsKeys(jobs, session);
             JobMessage[] msgs = getJobsMessages(jobs, session);
             CaseOutput[] outputs = getJobsOutputs(jobs, session);
+            dao.removeObjects(persistedJobs, session);
+            dao.removeObjects(outputQs, session);
+            dao.removeObjects(keys, session);
             dao.removeObjects(msgs, session);
             dao.removeObjects(outputs, session);
             dao.removeCaseJobs(jobs.toArray(new CaseJob[0]), session);
@@ -502,6 +514,63 @@ public class ManagedCaseService {
         } finally {
             session.close();
         }
+    }
+
+    private PersistedWaitTask[] getPersistedJobs(List<CaseJob> jobs, Session session2) {
+        List<PersistedWaitTask> persistedJobs = new ArrayList<PersistedWaitTask>();
+        
+        for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
+            CaseJob job = iter.next();
+            persistedJobs.addAll(dao.getPersistedWaitTasks(job.getCaseId(), job.getId(), session));
+        }
+            
+        return persistedJobs.toArray(new PersistedWaitTask[0]);
+    }
+
+    private QueueCaseOutput[] getQedOutputs(List<CaseJob> jobs, Session session) {
+        List<QueueCaseOutput> outputs = new ArrayList<QueueCaseOutput>();
+        
+        for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
+            CaseJob job = iter.next();
+            outputs.addAll(dao.getQueueCaseOutputs(job.getCaseId(), job.getId(), session));
+        }
+            
+        return outputs.toArray(new QueueCaseOutput[0]);
+    }
+
+    private CaseJobKey[] getJobsKeys(List<CaseJob> jobs, Session session2) {
+        List<CaseJobKey> keys = new ArrayList<CaseJobKey>();
+        
+        for(Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
+            CaseJob job = iter.next();
+            keys.addAll(dao.getCaseJobKey(job.getId(), session));
+        }
+        
+        return keys.toArray(new CaseJobKey[0]);
+    }
+
+    private void checkJobsStatuses(List<CaseJob> jobs, Case caseObj) throws EmfException {
+        for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
+            CaseJob job = iter.next();
+            JobRunStatus status = job.getRunstatus();
+            boolean active = false;
+
+            if (status != null && status.getName().toUpperCase().equals("RUNNING"))
+                active = true;
+
+            if (status != null && status.getName().toUpperCase().equals("SUBMITTED"))
+                active = true;
+            
+            if (status != null && status.getName().toUpperCase().equals("EXPORTING"))
+                active = true;
+
+            if (status != null && status.getName().toUpperCase().equals("WAITING"))
+                active = true;
+            
+            if (active)
+                throw new EmfException("Job: " + job.getName() + " in case: " + caseObj.getName() + " has an active status.");
+        }
+
     }
 
     private CaseOutput[] getJobsOutputs(List<CaseJob> jobs, Session session) {
@@ -892,6 +961,20 @@ public class ManagedCaseService {
         }
     }
 
+    public synchronized CaseInput[] getCaseInputs(int caseId, int[] jobIds) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            List<CaseInput> inputs = dao.getCaseInputsByJobIds(caseId, jobIds, session);
+            
+            return inputs.toArray(new CaseInput[0]);
+        } catch (Exception e) {
+            throw new EmfException("Error retrieving case inputs: " + e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+    
     public synchronized CaseInput[] getCaseInputs(int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
 
@@ -1304,101 +1387,118 @@ public class ManagedCaseService {
         }
     }
 
-//    public CaseParameter[] getCaseParametersFromEnvName(int caseId, String envName) throws EmfException{
-//    // Get case parameters that match a specific environment variables name 
-//        Session session = sessionFactory.getSession();
-//        try{
-//            // Get environmental variable corresponding to this name
-//            ParameterEnvVar envVar = dao.getParameterEnvVar(envName, session);
-//            if (envVar == null) {
-//                throw new EmfException("Could not get parameter environmental variable for " + envName);
-//                
-//            }
-//            // Get parameters corresponding to this environmental variable
-//            List<CaseParameter> parameters = dao.getCaseParametersFromEnv(caseId, envVar, session);
-//            if (parameters == null) {
-//                throw new EmfException("Could not get parameters for " + envName);                
-//            }
-//            return parameters.toArray(new CaseParameter[0]);
-//
-//        } catch (Exception e){
-//            e.printStackTrace();
-//            throw new EmfException("Could not get case parameters for " + envName);
-//
-//        } finally {
-//            if (session != null || !session.isConnected()) {
-//                session.close();
-//            }
-//        }
-//    } 
-//    
-//    private String[] findEnvVars(String input){
-//        // Find any environmental variables that are in a string
-//        List<String> envVars  = new ArrayList<String>() ;
-//        if (input.contains("$")){
-//            // Split the string at spaces
-//            StringTokenizer st = new StringTokenizer(input, " ");
-//            
-//            // loop over substrings 
-//            while(st.hasMoreTokens()) {
-//                String temp = st.nextToken();
-//                // add variable if starts w/ $, but remove the dollar
-//                if(temp.startsWith("$") && temp.length() > 1){
-//                    envVars.add(temp.substring(1));
-//                }
-//            }    
-//        }
-//        return envVars.toArray(new String[0]);
-//    }
-//
-//    private String replaceEnvVars(String input, int caseId, int jobId) throws EmfException{
-//        // replace any environemental variables with their values
-//        try {
-//            if (input.contains("$")){
-//                String[] envVarsStrs = findEnvVars(input);
-//                if (envVarsStrs.length > 0){
-//                    for (String envName: envVarsStrs){
-//                        // loop over env variable names, get the parameter,
-//                        // and replace the env name in input string w/ that value
-//                        CaseParameter envVar = getUniqueCaseParametersFromEnvName(caseId, envName, jobId);
-//                        input = input.replace("$"+envName, envVar.getValue());
-//                    }
-//                }
-//            }
-//            return input;
-//        }  catch (Exception e) {
-//            throw new EmfException(e.getMessage());
-//        }
-//    }
-//    public CaseParameter getUniqueCaseParametersFromEnvName(int caseId, String envName, int jobId) throws EmfException{
-//        // Get case parameters that match a specific environment variables name
-//        // If more than 1 matches the environmental variable name, uses the job Id to find unique one
-//        try{
-//            CaseParameter[] tempParams = getCaseParametersFromEnvName(caseId, envName);
-//            List<CaseParameter> params = new ArrayList<CaseParameter>();
-//            if (tempParams.length == 1) {
-//                params.add(tempParams[0]);
-//            } else if (tempParams.length > 1) {
-//                // loop over params and find any that match jobId
-//                for (CaseParameter param: tempParams) {
-//                    if (param.getJobId() == jobId){
-//                        params.add(param);
-//                    }
-//                }
-//            } 
-//            
-//            if (params.size() > 1 || params.size() == 0){
-//                throw new EmfException ("Could not find a unique case parameter for " + envName + ", jobId" + jobId);
-//
-//            }
-//            // return the matching param
-//            return params.get(0);
-//            
-//        } catch (Exception e){
-//            e.printStackTrace();
-//            throw new EmfException("Could not get unique case parameters for " + envName);
-//        }
-//    }
+    public synchronized CaseParameter[] getCaseParameters(int caseId, int[] jobIds) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            List<CaseParameter> params = dao.getCaseParametersByJobIds(caseId, jobIds, session);
+
+            return params.toArray(new CaseParameter[0]);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get all parameters for case (id=" + caseId + ").\n" + e.getMessage());
+            throw new EmfException("Could not get all parameters for case (id=" + caseId + ").\n");
+        } finally {
+            session.close();
+        }
+    }
+    
+    // public CaseParameter[] getCaseParametersFromEnvName(int caseId, String envName) throws EmfException{
+    // // Get case parameters that match a specific environment variables name
+    // Session session = sessionFactory.getSession();
+    // try{
+    // // Get environmental variable corresponding to this name
+    // ParameterEnvVar envVar = dao.getParameterEnvVar(envName, session);
+    // if (envVar == null) {
+    // throw new EmfException("Could not get parameter environmental variable for " + envName);
+    //                
+    // }
+    // // Get parameters corresponding to this environmental variable
+    // List<CaseParameter> parameters = dao.getCaseParametersFromEnv(caseId, envVar, session);
+    // if (parameters == null) {
+    // throw new EmfException("Could not get parameters for " + envName);
+    // }
+    // return parameters.toArray(new CaseParameter[0]);
+    //
+    // } catch (Exception e){
+    // e.printStackTrace();
+    // throw new EmfException("Could not get case parameters for " + envName);
+    //
+    // } finally {
+    // if (session != null || !session.isConnected()) {
+    // session.close();
+    // }
+    // }
+    // }
+    //    
+    // private String[] findEnvVars(String input){
+    // // Find any environmental variables that are in a string
+    // List<String> envVars = new ArrayList<String>() ;
+    // if (input.contains("$")){
+    // // Split the string at spaces
+    // StringTokenizer st = new StringTokenizer(input, " ");
+    //            
+    // // loop over substrings
+    // while(st.hasMoreTokens()) {
+    // String temp = st.nextToken();
+    // // add variable if starts w/ $, but remove the dollar
+    // if(temp.startsWith("$") && temp.length() > 1){
+    // envVars.add(temp.substring(1));
+    // }
+    // }
+    // }
+    // return envVars.toArray(new String[0]);
+    // }
+    //
+    // private String replaceEnvVars(String input, int caseId, int jobId) throws EmfException{
+    // // replace any environemental variables with their values
+    // try {
+    // if (input.contains("$")){
+    // String[] envVarsStrs = findEnvVars(input);
+    // if (envVarsStrs.length > 0){
+    // for (String envName: envVarsStrs){
+    // // loop over env variable names, get the parameter,
+    // // and replace the env name in input string w/ that value
+    // CaseParameter envVar = getUniqueCaseParametersFromEnvName(caseId, envName, jobId);
+    // input = input.replace("$"+envName, envVar.getValue());
+    // }
+    // }
+    // }
+    // return input;
+    // } catch (Exception e) {
+    // throw new EmfException(e.getMessage());
+    // }
+    // }
+    // public CaseParameter getUniqueCaseParametersFromEnvName(int caseId, String envName, int jobId) throws
+    // EmfException{
+    // // Get case parameters that match a specific environment variables name
+    // // If more than 1 matches the environmental variable name, uses the job Id to find unique one
+    // try{
+    // CaseParameter[] tempParams = getCaseParametersFromEnvName(caseId, envName);
+    // List<CaseParameter> params = new ArrayList<CaseParameter>();
+    // if (tempParams.length == 1) {
+    // params.add(tempParams[0]);
+    // } else if (tempParams.length > 1) {
+    // // loop over params and find any that match jobId
+    // for (CaseParameter param: tempParams) {
+    // if (param.getJobId() == jobId){
+    // params.add(param);
+    // }
+    // }
+    // }
+    //            
+    // if (params.size() > 1 || params.size() == 0){
+    // throw new EmfException ("Could not find a unique case parameter for " + envName + ", jobId" + jobId);
+    //
+    // }
+    // // return the matching param
+    // return params.get(0);
+    //            
+    // } catch (Exception e){
+    // e.printStackTrace();
+    // throw new EmfException("Could not get unique case parameters for " + envName);
+    // }
+    // }
 
     public synchronized CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll)
             throws EmfException {
@@ -2009,7 +2109,7 @@ public class ManagedCaseService {
                 }
 
                 cjt.setJobFile(jobFileName);
-                String jobLogFile = this.getLog(jobFileName); 
+                String jobLogFile = this.getLog(jobFileName);
                 cjt.setLogFile(jobLogFile);
                 cjt.setJobName(caseJob.getName());
                 if (DebugLevels.DEBUG_6)
@@ -2017,7 +2117,7 @@ public class ManagedCaseService {
                 cjt.setHostName(caseJob.getHost().getName());
                 if (DebugLevels.DEBUG_6)
                     System.out.println("getQueOptions");
-               
+
                 String queueOptions = caseJob.getQueOptions();
 
                 // replace joblog in queue options
@@ -2027,13 +2127,13 @@ public class ManagedCaseService {
                 // string values in the queue
                 try {
                     queueOptions = dao.replaceEnvVars(queueOptions, " ", caseId, jobId);
-                } catch (Exception e){
-                    throw new EmfException("Job (" +  cjt.getJobName() +"): " + e.getMessage());
+                } catch (Exception e) {
+                    throw new EmfException("Job (" + cjt.getJobName() + "): " + e.getMessage());
                 }
                 if (DebugLevels.DEBUG_6)
                     System.out.println("Queue options: " + queueOptions);
                 cjt.setQueueOptions(queueOptions);
-                
+
                 if (DebugLevels.DEBUG_6)
                     System.out.println("Completed setting the CaseJobTask");
 
@@ -2268,9 +2368,10 @@ public class ManagedCaseService {
 
             String delimeter = System.getProperty("file.separator");
             String exportDir = caseObj.getInputFileDir() + delimeter + subDir;
-            String exportDirExpanded = dao.replaceEnvVars(exportDir, delimeter, caseInput.getCaseID(), caseInput.getCaseJobID());
-            getExportService().exportForClient(user, new EmfDataset[] { ds }, new Version[] { version }, exportDirExpanded,
-                    purpose, false);
+            String exportDirExpanded = dao.replaceEnvVars(exportDir, delimeter, caseInput.getCaseID(), caseInput
+                    .getCaseJobID());
+            getExportService().exportForClient(user, new EmfDataset[] { ds }, new Version[] { version },
+                    exportDirExpanded, purpose, false);
 
         }
 
@@ -2295,10 +2396,11 @@ public class ManagedCaseService {
 
             String delimeter = System.getProperty("file.separator");
             String exportDir = caseObj.getInputFileDir() + delimeter + subDir;
-            String exportDirExpanded = dao.replaceEnvVars(exportDir, delimeter, caseInput.getCaseID(), caseInput.getCaseJobID());
+            String exportDirExpanded = dao.replaceEnvVars(exportDir, delimeter, caseInput.getCaseID(), caseInput
+                    .getCaseJobID());
 
-            getExportService().exportForClient(user, new EmfDataset[] { ds }, new Version[] { version }, exportDirExpanded,
-                    purpose, true);
+            getExportService().exportForClient(user, new EmfDataset[] { ds }, new Version[] { version },
+                    exportDirExpanded, purpose, true);
         }
 
     }
@@ -2386,15 +2488,15 @@ public class ManagedCaseService {
         return exclInputs;
     }
 
-    private String setenvInput(CaseInput input, Case caseObj, CaseJob job, ManagedExportService expSvc) throws EmfException {
+    private String setenvInput(CaseInput input, Case caseObj, CaseJob job, ManagedExportService expSvc)
+            throws EmfException {
         /**
          * Creates a line of the run job file. Sets the env variable to the value input file.
          * 
          * For eg. If the env variable is GRIDDESC, and the shell type is csh, this will return "setenv GRIDDESC
          * /home/azubrow/smoke/ge_dat/griddesc_12Apr2007_vo.txt"
          * 
-         * Will replace any environmental variables in the input director 
-         * with their value, i.e. will expand the path.
+         * Will replace any environmental variables in the input director with their value, i.e. will expand the path.
          * 
          * Note: this could be bash or tcsh format, could easily modify for other languages, for example python, perl,
          * etc.
@@ -2425,8 +2527,7 @@ public class ManagedCaseService {
             // Create a full path to the input file
             fullPath = expSvc.getCleanDatasetName(input.getDataset(), input.getVersion());
             if ((subdir != null) && !(subdir.toString()).equals("")) {
-                fullPath = caseObj.getInputFileDir() + delimeter + input.getSubdirObj()
-                        + delimeter + fullPath;
+                fullPath = caseObj.getInputFileDir() + delimeter + input.getSubdirObj() + delimeter + fullPath;
             } else {
                 fullPath = caseObj.getInputFileDir() + delimeter + fullPath;
             }
@@ -2438,14 +2539,13 @@ public class ManagedCaseService {
         } else {
             setenvLine = shellSetenv(envvar.getName(), fullPath);
         }
-        
 
         // Expand input director, ie. remove env variables
         try {
             setenvLine = dao.replaceEnvVars(setenvLine, delimeter, caseObj.getId(), job.getId());
             return setenvLine;
         } catch (Exception e) {
-            throw new EmfException("Input folder: "+ e.getMessage());
+            throw new EmfException("Input folder: " + e.getMessage());
         }
     }
 
@@ -2610,9 +2710,9 @@ public class ManagedCaseService {
         sbuf.append(shellSetenv("EMF_JOBID", String.valueOf(jobId)));
         sbuf.append(shellSetenv("EMF_JOBNAME", jobName));
         sbuf.append(shellSetenv("EMF_USER", user.getUsername()));
- 
+
         // name of this job script and script directory
-        
+
         // Expand output director, ie. remove env variables
         String delimeter = System.getProperty("file.separator");
         String outputFileDir = caseObj.getOutputFileDir();
@@ -2621,7 +2721,7 @@ public class ManagedCaseService {
         try {
             String outputDirExpanded = dao.replaceEnvVars(outputFileDir, delimeter, caseObj.getId(), job.getId());
             sbuf.append(shellSetenv("EMF_SCRIPTDIR", outputDirExpanded));
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new EmfException("Output folder: " + e.getMessage());
         }
         sbuf.append(shellSetenv("EMF_SCRIPTNAME", jobFileName));
@@ -2850,17 +2950,17 @@ public class ManagedCaseService {
         String outputFileDir = caseObj.getOutputFileDir();
         try {
             String outputDirExpanded = dao.replaceEnvVars(outputFileDir, delimeter, caseObj.getId(), job.getId());
-        
 
             // Test output directory to place job script
             if ((outputDirExpanded == null) || (outputDirExpanded.equals(""))) {
                 throw new EmfException("Output job script directory must be set to run job: " + job.getName());
             }
 
-            String fileName = replaceNonDigitNonLetterChars(jobName + "_" + caseAbbrev + "_" + dateStamp + this.runSuffix);
+            String fileName = replaceNonDigitNonLetterChars(jobName + "_" + caseAbbrev + "_" + dateStamp
+                    + this.runSuffix);
             fileName = outputDirExpanded + delimeter + fileName;
             return fileName;
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new EmfException("Output folder: " + e.getMessage());
         }
     }
@@ -3635,6 +3735,10 @@ public class ManagedCaseService {
             addCaseInputs(user, targetId, inputs);
             addCaseParameters(user, targetId, params);
             copySummaryInfo(lockedPC, lockedSC);
+            
+            //NOTE: copy input/output folder from template case
+            lockedSC.setInputFileDir(lockedTC.getInputFileDir());
+            lockedSC.setOutputFileDir(lockedTC.getOutputFileDir());
 
             if (abbr == null)
                 lockedSC.setAbbreviation(new Abbreviation(lockedSC.getId() + ""));
