@@ -119,6 +119,8 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
                 }
             }
         }
+        //create just in case these don't exist, maybe the strategy type was changed...
+        if (leastCostCMWorksheetResult == null) leastCostCMWorksheetResult = loader.loadLeastCostCMWorksheetResult();
         mergeInventoryDatasets();
     }
 }

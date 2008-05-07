@@ -52,7 +52,7 @@ public class TableToString {
                     if (value != null) {
                         if (value.indexOf(",") > 0) value = "\"" + value + "\"";
                     }
-                    row += (i > 1 ? delimiter : "") + (!rs.wasNull() ? value : "");
+                    row += (i > 1 ? delimiter : "") + (!rs.wasNull() ? value : "\"\"");
                 }
                 output.append(row + lineFeeder);
             }

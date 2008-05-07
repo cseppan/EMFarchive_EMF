@@ -65,6 +65,7 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
             leastCostPanelContainer.add(leastCostCurvePanel, BorderLayout.NORTH);
         }
         this.add(leastCostPanelContainer, BorderLayout.CENTER);
+        notifyStrategyTypeChange(controlStrategy.getStrategyType());
     }
 
     private JPanel getBorderedPanel(JPanel component, String border) {
@@ -245,14 +246,14 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         leastCostPanelContainer.removeAll();
         if (strategyType != null && strategyType.getName().equals(StrategyType.leastCost)) {
             leastCostPanelContainer.add(leastCostPanel, BorderLayout.NORTH);
-            replacementControlMinEfficiencyDiff.setVisible(true);
+            replacementControlMinEfficiencyDiff.setEnabled(true);
         } else if (strategyType != null && strategyType.getName().equals(StrategyType.leastCostCurve)) {
             leastCostPanelContainer.add(leastCostCurvePanel, BorderLayout.NORTH);
-            replacementControlMinEfficiencyDiff.setVisible(true);
+            replacementControlMinEfficiencyDiff.setEnabled(true);
         } else if (strategyType != null && strategyType.getName().equals(StrategyType.maxEmissionsReduction)) {
-            replacementControlMinEfficiencyDiff.setVisible(true);
+            replacementControlMinEfficiencyDiff.setEnabled(true);
         } else {
-            replacementControlMinEfficiencyDiff.setVisible(false);
+            replacementControlMinEfficiencyDiff.setEnabled(false);
         }
     }
 }

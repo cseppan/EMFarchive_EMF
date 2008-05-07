@@ -110,6 +110,9 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
                 }
             }
         }
+        //create just in case these don't exist, maybe the strategy type was changed...
+        if (leastCostCMWorksheetResult == null) leastCostCMWorksheetResult = loader.loadLeastCostCMWorksheetResult();
+        if (leastCostCurveSummaryResult == null) leastCostCurveSummaryResult = loader.loadLeastCostCurveSummaryResult();
         
         //if there is more than one input inventory, then merge these into one dataset, 
         //then we use that as the input to the strategy run

@@ -435,7 +435,7 @@ where name in ('ORL Merged Inventory');
 
 -- Compare CoST to NEI measures - 'ORL Point Inventory (PTINV)','ORL Merged Inventory'
 insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
-select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Compare CoST to NEI measures', 1, 'select e.scc, scc_description, fips, plantid, pointid, stackid, segment, poll, ann_emis, avd_emis,
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Compare CoST to NEI measures', 1, 'select e.scc, fips, plantid, pointid, stackid, segment, poll, ann_emis, avd_emis,
 	ceff as inv_ceff,
 	(string_to_array(e.control_measures::text, ''&''))[array_upper(string_to_array(e.control_measures::text, ''&''), 1)] as measure_abbreviation,
 	cm.name as measure_name,
@@ -444,7 +444,8 @@ select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa
 	e.cpri,
 	cd.control_device_desc as pri_control_device,
 	e.csec,
-	cd2.control_device_desc as sec_control_device
+	cd2.control_device_desc as sec_control_device, 
+	scc_description
 
 from $TABLE[1] e
 
@@ -463,20 +464,21 @@ where coalesce(ceff, 0.0) > 0
 	or length(control_measures) > 0
 order by abs(ceff - (string_to_array(pct_reduction::text, ''&''))[array_upper(string_to_array(pct_reduction::text, ''&''), 1)]::double precision)', false, 1, ''
 from emf.dataset_types dt
-where name in ('ORL Point Inventory (PTINV)','ORL Merged Inventory');
+where name in ('ORL Point Inventory (PTINV)');
 
 -- Compare CoST to NEI measures - 'ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)'
 insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
-select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Compare CoST to NEI measures', 1, 'select e.scc, scc_description, fips, poll, ann_emis, avd_emis,
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Compare CoST to NEI measures', 1, 'select e.scc, fips, poll, ann_emis, avd_emis,
 	ceff as inv_ceff,
 	(string_to_array(e.control_measures::text, ''&''))[array_upper(string_to_array(e.control_measures::text, ''&''), 1)] as measure_abbreviation,
 	cm.name as measure_name,
 	(string_to_array(pct_reduction::text, ''&''))[array_upper(string_to_array(pct_reduction::text, ''&''), 1)] as measure_ceff,
 	abs(ceff - (string_to_array(pct_reduction::text, ''&''))[array_upper(string_to_array(pct_reduction::text, ''&''), 1)]::double precision) as ceff_abs_diff,
-	e.cpri,
+	e.PRIMARY_DEVICE_TYPE_CODE as cpri,
 	cd.control_device_desc as pri_control_device,
-	e.csec,
-	cd2.control_device_desc as sec_control_device
+	e.SECONDARY_DEVICE_TYPE_CODE as csec,
+	cd2.control_device_desc as sec_control_device, 
+	scc_description
 
 from $TABLE[1] e
 
@@ -484,10 +486,10 @@ from $TABLE[1] e
 	on cm.abbreviation = (string_to_array(e.control_measures::text, ''&''))[array_upper(string_to_array(e.control_measures::text, ''&''), 1)]
 
 	left outer join reference.control_device cd2
-	on cd2.control_device_code::integer = e.csec
+	on cd2.control_device_code::integer = e.SECONDARY_DEVICE_TYPE_CODE
 
 	left outer join reference.control_device cd
-	on cd.control_device_code::integer = e.cpri
+	on cd.control_device_code::integer = e.PRIMARY_DEVICE_TYPE_CODE
 
 	left outer join reference.scc sccs
 	on sccs.scc = e.scc
@@ -495,5 +497,89 @@ where coalesce(ceff, 0.0) > 0
 	or length(control_measures) > 0
 order by abs(ceff - (string_to_array(pct_reduction::text, ''&''))[array_upper(string_to_array(pct_reduction::text, ''&''), 1)]::double precision)', false, 1, ''
 from emf.dataset_types dt
-where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)');
+where name in ('ORL Nonpoint Inventory (ARINV)');
+
+
+-- Compare CoST to NEI measures - 'ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)'
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Compare CoST to NEI measures', 1, 'select e.scc, fips, poll, ann_emis, avd_emis,
+	ceff as inv_ceff,
+	(string_to_array(e.control_measures::text, ''&''))[array_upper(string_to_array(e.control_measures::text, ''&''), 1)] as measure_abbreviation,
+	cm.name as measure_name,
+	(string_to_array(pct_reduction::text, ''&''))[array_upper(string_to_array(pct_reduction::text, ''&''), 1)] as measure_ceff,
+	abs(ceff - (string_to_array(pct_reduction::text, ''&''))[array_upper(string_to_array(pct_reduction::text, ''&''), 1)]::double precision) as ceff_abs_diff, 
+	scc_description
+
+from $TABLE[1] e
+
+	left outer join emf.control_measures cm
+	on cm.abbreviation = (string_to_array(e.control_measures::text, ''&''))[array_upper(string_to_array(e.control_measures::text, ''&''), 1)]
+
+	left outer join reference.scc sccs
+	on sccs.scc = e.scc
+where coalesce(ceff, 0.0) > 0 
+	or length(control_measures) > 0
+order by abs(ceff - (string_to_array(pct_reduction::text, ''&''))[array_upper(string_to_array(pct_reduction::text, ''&''), 1)]::double precision)', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)');
+
+-- Compare CoST to NEI measures - 'ORL Point Inventory (PTINV)','ORL Merged Inventory'
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Roll Up CoST and NEI measures', 1, 'select distinct e.cpri as inv_pri_control_device_code,
+	cd.control_device_desc as inv_pri_control_device,
+	(string_to_array(e.control_measures::text, ''&''))[array_upper(string_to_array(e.control_measures::text, ''&''), 1)] as cost_measure_abbreviation,
+	cm.name as cost_measure_name,
+	ct."name" as cost_control_technology
+	
+from $TABLE[1] e
+
+	left outer join emf.control_measures cm
+	on cm.abbreviation = (string_to_array(e.control_measures::text, ''&''))[array_upper(string_to_array(e.control_measures::text, ''&''), 1)]
+
+	left outer join emf.control_technologies ct
+	on ct.id = cm.control_technology
+
+	left outer join reference.control_device cd
+	on cd.control_device_code::integer = e.cpri
+
+	left outer join reference.scc sccs
+	on sccs.scc = e.scc
+where coalesce(ceff, 0.0) > 0 
+	and length(control_measures) > 0
+order by e.cpri,
+	cd.control_device_desc,
+	cm.name,
+	ct."name"', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Point Inventory (PTINV)');
+
+-- Compare CoST to NEI measures - 'ORL Nonpoint Inventory (ARINV)'
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Roll Up CoST and NEI measures', 1, 'select distinct e.PRIMARY_DEVICE_TYPE_CODE as inv_pri_control_device_code,
+	cd.control_device_desc as inv_pri_control_device,
+	(string_to_array(e.control_measures::text, ''&''))[array_upper(string_to_array(e.control_measures::text, ''&''), 1)] as cost_measure_abbreviation,
+	cm.name as cost_measure_name,
+	ct."name" as cost_control_technology
+	
+from $TABLE[1] e
+
+	left outer join emf.control_measures cm
+	on cm.abbreviation = (string_to_array(e.control_measures::text, ''&''))[array_upper(string_to_array(e.control_measures::text, ''&''), 1)]
+
+	left outer join emf.control_technologies ct
+	on ct.id = cm.control_technology
+
+	left outer join reference.control_device cd
+	on cd.control_device_code::integer = e.PRIMARY_DEVICE_TYPE_CODE
+
+	left outer join reference.scc sccs
+	on sccs.scc = e.scc
+where coalesce(ceff, 0.0) > 0 
+	and length(control_measures) > 0
+order by e.cpri,
+	cd.control_device_desc,
+	cm.name,
+	ct."name"', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)');
 
