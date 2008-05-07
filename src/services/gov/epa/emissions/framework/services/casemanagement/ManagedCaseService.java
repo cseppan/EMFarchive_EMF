@@ -581,7 +581,7 @@ public class ManagedCaseService {
         
         for(Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = iter.next();
-            keys.addAll(dao.getCaseJobKey(job.getId(), session));
+            keys.addAll(dao.getCaseJobKey(job.getId(), session2));
         }
         
         return keys.toArray(new CaseJobKey[0]);
