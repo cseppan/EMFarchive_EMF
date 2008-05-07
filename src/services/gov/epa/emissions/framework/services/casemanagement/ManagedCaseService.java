@@ -2991,7 +2991,7 @@ public class ManagedCaseService {
 
             // Test output directory to place job script
             if ((outputDirExpanded == null) || (outputDirExpanded.equals(""))) {
-                throw new EmfException("Output job script directory must be set to run job: " + job.getName());
+                throw new EmfException("The output job scripts directory must be set on the Jobs tab prior to running any jobs");
             }
 
             String fileName = replaceNonDigitNonLetterChars(jobName + "_" + caseAbbrev + "_" + dateStamp
