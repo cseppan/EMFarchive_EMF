@@ -559,7 +559,7 @@ public class ManagedCaseService {
         
         for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = iter.next();
-            persistedJobs.addAll(dao.getPersistedWaitTasks(job.getCaseId(), job.getId(), session));
+            persistedJobs.addAll(dao.getPersistedWaitTasks(job.getCaseId(), job.getId(), session2));
         }
             
         return persistedJobs.toArray(new PersistedWaitTask[0]);
