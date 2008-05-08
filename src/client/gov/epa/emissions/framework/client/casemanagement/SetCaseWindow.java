@@ -105,12 +105,12 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         setCaseObjects = new ArrayList<SetCaseObject>();
         CaseInput[] inputList = presenter.getCaseInput(caseObj.getId(), new Sector("All", "All"), false);
         for (CaseInput input :inputList){
-            SetCaseObject obj = new SetCaseObject(input, true);
+            SetCaseObject obj = new SetCaseObject(input, SetCaseObject.WIZARD_2);
             setCaseObjects.add(obj);
         }
         CaseParameter[] paraList = presenter.getCaseParameters(caseObj.getId(), new Sector("All", "All"), false);
         for (CaseParameter par :paraList){
-            SetCaseObject obj = new SetCaseObject(par, false);
+            SetCaseObject obj = new SetCaseObject(par, SetCaseObject.WIZARD_3);
             setCaseObjects.add(obj);
         }
         if (setCaseObjects.size()==0)
@@ -122,10 +122,10 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         mainPanel = new JPanel(new BorderLayout());
         //get first setCaseObjects
         currentObject = setCaseObjects.get(currentIndex);
-        if (!currentObject.isInput())
-            mainPanel.add(displayParam((CaseParameter)currentObject.getObject()));
-        else
+        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2))
             mainPanel.add(displayInput((CaseInput)currentObject.getObject()));
+        else if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3))
+            mainPanel.add(displayParam((CaseParameter)currentObject.getObject()));
         return mainPanel;
     }
     
@@ -139,10 +139,10 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     
     private void panelRefresh() throws EmfException {
         mainPanel.removeAll();
-        if (!currentObject.isInput())
-            mainPanel.add(displayParam((CaseParameter)currentObject.getObject()));
-        else
+        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2))
             mainPanel.add(displayInput((CaseInput)currentObject.getObject()));
+        else if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3))
+                mainPanel.add(displayParam((CaseParameter)currentObject.getObject()));
         super.validate();
     }
     
@@ -295,15 +295,14 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         return panel;
     }
 
-
     private void doSave() {
         clearMessage();
         try {
             validateFields();
-            if (!currentObject.isInput())
-                presenter.doSaveParam((CaseParameter)currentObject.getObject());
-            else
+            if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2))
                 presenter.doSaveInput((CaseInput)currentObject.getObject());
+            else if(currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3))
+                presenter.doSaveParam((CaseParameter)currentObject.getObject());
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -327,22 +326,17 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     }
     
     private void validateFields() throws EmfException {
-        if (!currentObject.isInput()){
+        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2))
+            setInputFieldsPanel.setFields();
+        else if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3)){
             CaseParameter para = (CaseParameter) currentObject.getObject();
             para.setValue(envValue.getText() == null ? "" : envValue.getText().trim());
-        }else{
-            setInputFieldsPanel.setFields();
         }
     }
     
     public void signalChanges() {
         clearMessage();
         super.signalChanges();
-    }
-
-    public void display(CaseInput input) {
-        // NOTE Auto-generated method stub
-        
     }
 
     public void notifyLockFailure(Case caseObj) {
@@ -355,6 +349,5 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     private String format(Date lockDate) {
         return CustomDateFormat.format_YYYY_MM_DD_HH_MM(lockDate);
     }
-
 
 }

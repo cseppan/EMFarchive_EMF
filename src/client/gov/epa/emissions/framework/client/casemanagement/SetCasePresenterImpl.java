@@ -102,11 +102,6 @@ public class SetCasePresenterImpl implements SetCasePresenter {
         return this.session;
     }
 
-    public void doSave() {
-        // NOTE Auto-generated method stub
-        
-    }
-    
     public String getJobName(int jobId) throws EmfException {
         if (jobId == 0)
             return "All jobs for sector";
@@ -115,6 +110,11 @@ public class SetCasePresenterImpl implements SetCasePresenter {
         if (job == null)
             throw new EmfException("Cannot retrieve job (id = " + jobId + ").");
         return job.getName();
+    }
+
+    public void doSave() {
+        // NOTE Auto-generated method stub
+        
     }
 
 }
