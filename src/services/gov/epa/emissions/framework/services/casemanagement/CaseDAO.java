@@ -1302,15 +1302,93 @@ public class CaseDAO {
             if (input.contains("$")) {
                 String[] envVarsStrs = findEnvVars(input, delimiter);
                 if (envVarsStrs.length > 0) {
+                    
+                    String cleanedInput = input;
                     for (String envName : envVarsStrs) {
                         // loop over env variable names, get the parameter,
                         // and replace the env name in input string w/ that value
                         CaseParameter envVar = getUniqueCaseParametersFromEnvName(caseId, envName, jobId);
-                        input = input.replace("$" + envName, envVar.getValue());
-                    }
+                        
+                        // Replace exact matches of environmental variable name
+                                
+                        // Split the string at delimeter
+                        StringTokenizer st = new StringTokenizer(cleanedInput, delimiter);
+
+                        String tempInput = "";
+                        // loop over substrings
+                        while (st.hasMoreTokens()) {
+                            String temp = st.nextToken();
+                            // check if temp = environemental variable name, if so replace
+                            if (temp.equals("$" + envName))
+                                temp = envVar.getValue();
+ 
+                            // reconstruct new input string, if first time through don't add preceding delimiter
+                            if (tempInput.equals("")){
+                                tempInput = tempInput + temp;
+                            }else {
+                                tempInput = tempInput + delimiter + temp; 
+                            }
+                               
+                        } 
+                        // reset the cleaned input to the latest tempInput
+                        cleanedInput = tempInput;
+                    } // end loop over environmental variables
+                    
+                    // check if input starts or ends with delimiter
+                    if (input.startsWith(delimiter))
+                        cleanedInput = delimiter + cleanedInput;
+                    if (input.endsWith(delimiter))
+                        cleanedInput = cleanedInput + delimiter;
+                    
+                    // replace input w/ cleaned input
+                    input = cleanedInput;
                 }
-            }
+            }   
             return input;
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+    }
+
+    public String replaceEnvVarsCase(String input, String delimiter, Case caseObj, int jobId) throws EmfException {
+        // replace any environemental variables with their values
+        // use the delimiter to separate out environment variables
+        // If $CASE is found, replace it from the case summary abbreviation
+        try {
+            String tempInput = "";
+            if (!input.contains("$"))
+                return input;
+            if (input.contains("$CASE")){
+                // Replace exact matches of CASE
+                if (input.startsWith(delimiter))
+                    tempInput = delimiter;
+                // Split the string at delimeter
+                StringTokenizer st = new StringTokenizer(input, delimiter);
+
+                // loop over substrings
+                while (st.hasMoreTokens()) {
+                    String temp = st.nextToken();
+                    // check if temp = $CASE, if so replace
+                    if (temp.equals("$CASE"))
+                        temp = caseObj.getAbbreviation().getName();
+                    // reconstruct new input string, if first time through don't add preceding delimiter
+                    if (tempInput.equals(delimiter) || tempInput.equals("")){
+                        tempInput = tempInput + temp;
+                    }else {
+                        tempInput = tempInput + delimiter + temp; 
+                    }
+                }   
+                // check if input ends with delimiter
+                if (input.endsWith(delimiter))
+                    tempInput = tempInput + delimiter;
+            } else 
+                tempInput = input;
+            
+            // replace any remaining environmental variables
+            int caseId = caseObj.getId();
+            tempInput = replaceEnvVars(tempInput, delimiter, caseId, jobId);
+            return tempInput;
+            
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }

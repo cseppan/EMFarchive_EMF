@@ -20,6 +20,7 @@ import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJobKey;
+import gov.epa.emissions.framework.services.casemanagement.jobs.DependentJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
@@ -47,6 +48,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -487,40 +489,49 @@ public class ManagedCaseService {
             checkJobsStatuses(jobs, caseObj);
             PersistedWaitTask[] persistedJobs = getPersistedJobs(jobs, session);
             QueueCaseOutput[] outputQs = getQedOutputs(jobs, session);
-            
+
             if (outputQs.length > 0)
-                throw new EmfException("Selected case: " + caseObj.getName() + " has " + outputQs.length + " pending outputs to register.");
-            
+                throw new EmfException("Selected case: " + caseObj.getName() + " has " + outputQs.length
+                        + " pending outputs to register.");
+
             CaseJobKey[] keys = getJobsKeys(jobs, session);
             JobMessage[] msgs = getJobsMessages(jobs, session);
             CaseOutput[] outputs = getJobsOutputs(jobs, session);
-            
+
             try {
                 dao.removeObjects(persistedJobs, session);
             } catch (RuntimeException e) {
                 throw new EmfException("Cannot remove persisted jobs from db table.");
             }
-            
+
             try {
                 dao.removeObjects(keys, session);
             } catch (RuntimeException e) {
                 throw new EmfException("Cannot remove job keys from db table.");
             }
-            
+
             try {
                 dao.removeObjects(msgs, session);
             } catch (RuntimeException e) {
                 throw new EmfException("Cannot remove job messages from db table.");
             }
-            
+
             try {
                 dao.removeObjects(outputs, session);
             } catch (RuntimeException e) {
                 throw new EmfException("Cannot remove case outputs from db table.");
             }
-            
-            try {
-                dao.removeCaseJobs(jobs.toArray(new CaseJob[0]), session);
+
+            try {  
+                CaseJob[] toRemove = jobs.toArray(new CaseJob[0]);
+                
+                //NOTE: cannot remove jobs without first reset the job dependencies
+                for(CaseJob job : toRemove) {
+                    job.setDependentJobs(null);
+                    dao.updateCaseJob(job);
+                }
+                
+                dao.removeCaseJobs(toRemove, session);
             } catch (RuntimeException e) {
                 throw new EmfException("Cannot remove jobs from db table.");
             }
@@ -537,13 +548,14 @@ public class ManagedCaseService {
             } catch (RuntimeException e) {
                 throw new EmfException("Cannot remove case objects: " + caseObj.getName() + " from db table.");
             }
-            
+
             try {
                 dao.removeObject(caseObj.getAbbreviation(), session);
             } catch (RuntimeException e) {
-                throw new EmfException("Cannot remove case abbreviation: " + caseObj.getAbbreviation().getName() + " from db table.");
+                throw new EmfException("Cannot remove case abbreviation: " + caseObj.getAbbreviation().getName()
+                        + " from db table.");
             }
-            
+
             setStatus(caseObj.getLastModifiedBy(), "Finished removing case " + caseObj.getName() + ".", "Remove Case");
         } catch (Exception e) {
             e.printStackTrace();
@@ -556,34 +568,34 @@ public class ManagedCaseService {
 
     private PersistedWaitTask[] getPersistedJobs(List<CaseJob> jobs, Session session2) {
         List<PersistedWaitTask> persistedJobs = new ArrayList<PersistedWaitTask>();
-        
+
         for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = iter.next();
             persistedJobs.addAll(dao.getPersistedWaitTasks(job.getCaseId(), job.getId(), session2));
         }
-            
+
         return persistedJobs.toArray(new PersistedWaitTask[0]);
     }
 
     private QueueCaseOutput[] getQedOutputs(List<CaseJob> jobs, Session session) {
         List<QueueCaseOutput> outputs = new ArrayList<QueueCaseOutput>();
-        
+
         for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = iter.next();
             outputs.addAll(dao.getQueueCaseOutputs(job.getCaseId(), job.getId(), session));
         }
-            
+
         return outputs.toArray(new QueueCaseOutput[0]);
     }
 
     private CaseJobKey[] getJobsKeys(List<CaseJob> jobs, Session session2) {
         List<CaseJobKey> keys = new ArrayList<CaseJobKey>();
-        
-        for(Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
+
+        for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = iter.next();
             keys.addAll(dao.getCaseJobKey(job.getId(), session2));
         }
-        
+
         return keys.toArray(new CaseJobKey[0]);
     }
 
@@ -598,15 +610,16 @@ public class ManagedCaseService {
 
             if (status != null && status.getName().toUpperCase().equals("SUBMITTED"))
                 active = true;
-            
+
             if (status != null && status.getName().toUpperCase().equals("EXPORTING"))
                 active = true;
 
             if (status != null && status.getName().toUpperCase().equals("WAITING"))
                 active = true;
-            
+
             if (active)
-                throw new EmfException("Job: " + job.getName() + " in case: " + caseObj.getName() + " has an active status.");
+                throw new EmfException("Job: " + job.getName() + " in case: " + caseObj.getName()
+                        + " has an active status.");
         }
 
     }
@@ -1001,10 +1014,10 @@ public class ManagedCaseService {
 
     public synchronized CaseInput[] getCaseInputs(int caseId, int[] jobIds) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             List<CaseInput> inputs = dao.getCaseInputsByJobIds(caseId, jobIds, session);
-            
+
             return inputs.toArray(new CaseInput[0]);
         } catch (Exception e) {
             throw new EmfException("Error retrieving case inputs: " + e.getMessage());
@@ -1012,7 +1025,7 @@ public class ManagedCaseService {
             session.close();
         }
     }
-    
+
     public synchronized CaseInput[] getCaseInputs(int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
 
@@ -1276,9 +1289,19 @@ public class ManagedCaseService {
 
     private synchronized void copyCaseJobs(int toCopyCaseId, int copiedCaseId, User user) throws Exception {
         CaseJob[] tocopy = getCaseJobs(toCopyCaseId);
+        CaseJob[] copiedJobs = new CaseJob[tocopy.length];
 
         for (int i = 0; i < tocopy.length; i++)
-            copySingleJob(tocopy[i], copiedCaseId, user);
+            copiedJobs[i] = copySingleJob(tocopy[i], copiedCaseId, user);
+
+        CaseJob[] depencyUpdated = resetDependentJobIds(copiedJobs, tocopy);
+
+        try {
+            for (CaseJob job : depencyUpdated)
+                dao.updateCaseJob(job);
+        } catch (Exception e) {
+            log.error("Cannot update copied jobs with their dependent jobs.", e);
+        }
     }
 
     private synchronized CaseJob copySingleJob(CaseJob job, int copiedCaseId, User user) throws Exception {
@@ -1293,6 +1316,35 @@ public class ManagedCaseService {
         copied.setRunCompletionDate(null);
 
         return addCaseJob(user, copied, true);
+    }
+
+    private synchronized CaseJob[] resetDependentJobIds(CaseJob[] copiedJobs, CaseJob[] toCopyJobs) {
+        HashMap<String, String> origJobMap = new HashMap<String, String>();
+        HashMap<String, String> copiedJobMap = new HashMap<String, String>();
+
+        int size = copiedJobs.length;
+
+        for (int i = 0; i < size; i++) {
+            origJobMap.put(toCopyJobs[i].getId() + "", toCopyJobs[i].getName());
+            copiedJobMap.put(copiedJobs[i].getName(), copiedJobs[i].getId() + "");
+        }
+
+        for (int j = 0; j < size; j++) {
+            DependentJob[] depJobs = copiedJobs[j].getDependentJobs();
+
+            if (depJobs != null && depJobs.length > 0) {
+                for (int k = 0; k < depJobs.length; k++) {
+                    String jobName = origJobMap.get(depJobs[k].getJobId() + "");
+                    String jobId = copiedJobMap.get(jobName);
+
+                    depJobs[k].setJobId(Integer.parseInt(jobId));
+                }
+            }
+
+            copiedJobs[j].setDependentJobs(depJobs);
+        }
+
+        return copiedJobs;
     }
 
     public synchronized ParameterName[] getParameterNames() throws EmfException {
@@ -1440,103 +1492,6 @@ public class ManagedCaseService {
             session.close();
         }
     }
-    
-    // public CaseParameter[] getCaseParametersFromEnvName(int caseId, String envName) throws EmfException{
-    // // Get case parameters that match a specific environment variables name
-    // Session session = sessionFactory.getSession();
-    // try{
-    // // Get environmental variable corresponding to this name
-    // ParameterEnvVar envVar = dao.getParameterEnvVar(envName, session);
-    // if (envVar == null) {
-    // throw new EmfException("Could not get parameter environmental variable for " + envName);
-    //                
-    // }
-    // // Get parameters corresponding to this environmental variable
-    // List<CaseParameter> parameters = dao.getCaseParametersFromEnv(caseId, envVar, session);
-    // if (parameters == null) {
-    // throw new EmfException("Could not get parameters for " + envName);
-    // }
-    // return parameters.toArray(new CaseParameter[0]);
-    //
-    // } catch (Exception e){
-    // e.printStackTrace();
-    // throw new EmfException("Could not get case parameters for " + envName);
-    //
-    // } finally {
-    // if (session != null || !session.isConnected()) {
-    // session.close();
-    // }
-    // }
-    // }
-    //    
-    // private String[] findEnvVars(String input){
-    // // Find any environmental variables that are in a string
-    // List<String> envVars = new ArrayList<String>() ;
-    // if (input.contains("$")){
-    // // Split the string at spaces
-    // StringTokenizer st = new StringTokenizer(input, " ");
-    //            
-    // // loop over substrings
-    // while(st.hasMoreTokens()) {
-    // String temp = st.nextToken();
-    // // add variable if starts w/ $, but remove the dollar
-    // if(temp.startsWith("$") && temp.length() > 1){
-    // envVars.add(temp.substring(1));
-    // }
-    // }
-    // }
-    // return envVars.toArray(new String[0]);
-    // }
-    //
-    // private String replaceEnvVars(String input, int caseId, int jobId) throws EmfException{
-    // // replace any environemental variables with their values
-    // try {
-    // if (input.contains("$")){
-    // String[] envVarsStrs = findEnvVars(input);
-    // if (envVarsStrs.length > 0){
-    // for (String envName: envVarsStrs){
-    // // loop over env variable names, get the parameter,
-    // // and replace the env name in input string w/ that value
-    // CaseParameter envVar = getUniqueCaseParametersFromEnvName(caseId, envName, jobId);
-    // input = input.replace("$"+envName, envVar.getValue());
-    // }
-    // }
-    // }
-    // return input;
-    // } catch (Exception e) {
-    // throw new EmfException(e.getMessage());
-    // }
-    // }
-    // public CaseParameter getUniqueCaseParametersFromEnvName(int caseId, String envName, int jobId) throws
-    // EmfException{
-    // // Get case parameters that match a specific environment variables name
-    // // If more than 1 matches the environmental variable name, uses the job Id to find unique one
-    // try{
-    // CaseParameter[] tempParams = getCaseParametersFromEnvName(caseId, envName);
-    // List<CaseParameter> params = new ArrayList<CaseParameter>();
-    // if (tempParams.length == 1) {
-    // params.add(tempParams[0]);
-    // } else if (tempParams.length > 1) {
-    // // loop over params and find any that match jobId
-    // for (CaseParameter param: tempParams) {
-    // if (param.getJobId() == jobId){
-    // params.add(param);
-    // }
-    // }
-    // }
-    //            
-    // if (params.size() > 1 || params.size() == 0){
-    // throw new EmfException ("Could not find a unique case parameter for " + envName + ", jobId" + jobId);
-    //
-    // }
-    // // return the matching param
-    // return params.get(0);
-    //            
-    // } catch (Exception e){
-    // e.printStackTrace();
-    // throw new EmfException("Could not get unique case parameters for " + envName);
-    // }
-    // }
 
     public synchronized CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll)
             throws EmfException {
@@ -2071,6 +2026,8 @@ public class ManagedCaseService {
         CaseJobTask[] caseJobsTasksInSubmission = null;
         ArrayList<CaseJobTask> caseJobsTasksList = new ArrayList<CaseJobTask>();
 
+        Case jobCase = this.getCase(caseId);
+
         if (DebugLevels.DEBUG_15) {
             // logNumDBConn("beginning of job submitter");
         }
@@ -2080,7 +2037,12 @@ public class ManagedCaseService {
         try {
             String caseJobExportSubmitterId = null;
             String caseJobSubmitterId = caseJobSubmitter.getSubmitterId();
-
+         
+            // Test input directory is not empty
+            
+            if ((jobCase.getInputFileDir() == null) || (jobCase.getInputFileDir().equals(""))) {
+                throw new EmfException("Input directory must be set to run job(s).");
+            }
             if (DebugLevels.DEBUG_0)
                 System.out.println("Is CaseJobSubmitterId null? " + (caseJobSubmitterId == null));
             // FIXME: Does this need to be done in a new DAO method???
@@ -2160,11 +2122,10 @@ public class ManagedCaseService {
 
                 // replace joblog in queue options
                 queueOptions = queueOptions.replace("$EMF_JOBLOG", jobLogFile);
-
                 // If other parameters are in the queue options, translate them to their
                 // string values in the queue
                 try {
-                    queueOptions = dao.replaceEnvVars(queueOptions, " ", caseId, jobId);
+                    queueOptions = dao.replaceEnvVarsCase(queueOptions, " ", jobCase, jobId);
                 } catch (Exception e) {
                     throw new EmfException("Job (" + cjt.getJobName() + "): " + e.getMessage());
                 }
@@ -2202,7 +2163,7 @@ public class ManagedCaseService {
 
                 // now get the Case (called jobCase since case is a reserved word in Java) using
                 // the caseId sent in from the GUI
-                Case jobCase = this.getCase(caseId, session);
+                // Case jobCase = this.getCase(caseId, session);
                 cjt.setCaseName(jobCase.getName());
 
                 String purpose = "Used by job: " + caseJob.getName() + " of Case: " + jobCase.getName();
@@ -2406,8 +2367,7 @@ public class ManagedCaseService {
 
             String delimeter = System.getProperty("file.separator");
             String exportDir = caseObj.getInputFileDir() + delimeter + subDir;
-            String exportDirExpanded = dao.replaceEnvVars(exportDir, delimeter, caseInput.getCaseID(), caseInput
-                    .getCaseJobID());
+            String exportDirExpanded = dao.replaceEnvVarsCase(exportDir, delimeter, caseObj, caseInput.getCaseJobID());
             getExportService().exportForClient(user, new EmfDataset[] { ds }, new Version[] { version },
                     exportDirExpanded, purpose, false);
 
@@ -2434,8 +2394,7 @@ public class ManagedCaseService {
 
             String delimeter = System.getProperty("file.separator");
             String exportDir = caseObj.getInputFileDir() + delimeter + subDir;
-            String exportDirExpanded = dao.replaceEnvVars(exportDir, delimeter, caseInput.getCaseID(), caseInput
-                    .getCaseJobID());
+            String exportDirExpanded = dao.replaceEnvVarsCase(exportDir, delimeter, caseObj, caseInput.getCaseJobID());
 
             getExportService().exportForClient(user, new EmfDataset[] { ds }, new Version[] { version },
                     exportDirExpanded, purpose, true);
@@ -2580,7 +2539,7 @@ public class ManagedCaseService {
 
         // Expand input director, ie. remove env variables
         try {
-            setenvLine = dao.replaceEnvVars(setenvLine, delimeter, caseObj.getId(), job.getId());
+            setenvLine = dao.replaceEnvVarsCase(setenvLine, delimeter, caseObj, job.getId());
             return setenvLine;
         } catch (Exception e) {
             throw new EmfException("Input folder: " + e.getMessage());
@@ -2754,10 +2713,10 @@ public class ManagedCaseService {
         // Expand output director, ie. remove env variables
         String delimeter = System.getProperty("file.separator");
         String outputFileDir = caseObj.getOutputFileDir();
-        if (outputFileDir==null||(outputFileDir.length()==0))
+        if (outputFileDir == null || (outputFileDir.length() == 0))
             throw new EmfException("The Output Job Scripts folder has not been specified");
         try {
-            String outputDirExpanded = dao.replaceEnvVars(outputFileDir, delimeter, caseObj.getId(), job.getId());
+            String outputDirExpanded = dao.replaceEnvVarsCase(outputFileDir, delimeter, caseObj, job.getId());
             sbuf.append(shellSetenv("EMF_SCRIPTDIR", outputDirExpanded));
         } catch (Exception e) {
             throw new EmfException("Output folder: " + e.getMessage());
@@ -2987,7 +2946,7 @@ public class ManagedCaseService {
         String delimeter = System.getProperty("file.separator");
         String outputFileDir = caseObj.getOutputFileDir();
         try {
-            String outputDirExpanded = dao.replaceEnvVars(outputFileDir, delimeter, caseObj.getId(), job.getId());
+            String outputDirExpanded = dao.replaceEnvVarsCase(outputFileDir, delimeter, caseObj, job.getId());
 
             // Test output directory to place job script
             if ((outputDirExpanded == null) || (outputDirExpanded.equals(""))) {
@@ -3773,8 +3732,8 @@ public class ManagedCaseService {
             addCaseInputs(user, targetId, inputs);
             addCaseParameters(user, targetId, params);
             copySummaryInfo(lockedPC, lockedSC);
-            
-            //NOTE: copy input/output folder from template case
+
+            // NOTE: copy input/output folder from template case
             lockedSC.setInputFileDir(lockedTC.getInputFileDir());
             lockedSC.setOutputFileDir(lockedTC.getOutputFileDir());
 
