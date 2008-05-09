@@ -308,6 +308,10 @@
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasureMonth"
 		qname="ns1:ControlMeasureMonth" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasureNEIDevice"
+		qname="ns1:ControlMeasureNEIDevice" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
 	<arrayMapping qname="ns1:ControlMeasureEquations" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasureEquation[]"
 		innerType="ns1:ControlMeasureEquation"
@@ -387,6 +391,11 @@
 	<arrayMapping qname="ns1:ControlMeasureMonths" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasureMonth[]"
 		innerType="ns1:ControlMeasureMonth"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		
+	<arrayMapping qname="ns1:ControlMeasureNEIDevices" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasureNEIDevice[]"
+		innerType="ns1:ControlMeasureNEIDevice"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 		
 	<beanMapping

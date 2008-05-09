@@ -537,3 +537,30 @@ insert into emf.strategy_types values(DEFAULT,'Annotate Inventory','Annotate Inv
 
 ALTER TABLE emf.control_strategy_constraints
    ADD COLUMN replacement_control_min_eff_diff double precision;
+
+-- 5/7/08 add new table to help map measure to nei device code
+CREATE TABLE emf.control_measure_nei_devices
+(
+  id SERIAL PRIMARY KEY,
+  list_index integer NOT NULL,
+  control_measure_id integer NOT NULL,
+  nei_device_code integer NOT NULL,
+  CONSTRAINT control_measure_nei_devices_control_measure_id_fkey FOREIGN KEY (control_measure_id)
+      REFERENCES emf.control_measures (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT control_measure_months_control_measure_id_key UNIQUE (control_measure_id, nei_device_code)
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.control_measure_nei_devices OWNER TO emf;
+
+CREATE INDEX control_measure_nei_devices_measure_id
+  ON emf.control_measure_nei_devices
+  USING btree
+  (control_measure_id);
+
+CREATE INDEX control_measure_nei_devices_nei_device_code
+  ON emf.control_measure_nei_devices
+  USING btree
+  (nei_device_code);
+  
+  
