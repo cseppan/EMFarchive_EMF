@@ -110,9 +110,9 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         
         replacementControlMinEfficiencyDiff = new TextField("replacementControlMinEfficiencyDiff", 10);
         replacementControlMinEfficiencyDiff.setText(constraint != null ? (constraint.getReplacementControlMinEfficiencyDiff() != null ? constraint.getReplacementControlMinEfficiencyDiff() + "" : "10.0") : "10.0");
-        replacementControlMinEfficiencyDiff.setToolTipText("Enter the minimum difference in control efficiency to use for replacement controls.");
+        replacementControlMinEfficiencyDiff.setToolTipText("Enter the minimum control percent reduction difference to use for replacement controls.");
         changeables.addChangeable(replacementControlMinEfficiencyDiff);
-        layoutGenerator.addLabelWidgetPair("Replacement control control efficiency minimum difference (%)", replacementControlMinEfficiencyDiff, panel);
+        layoutGenerator.addLabelWidgetPair("Minimum Control Percent Reduction Difference for Replacement Control (%)", replacementControlMinEfficiencyDiff, panel);
         
 
         layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols

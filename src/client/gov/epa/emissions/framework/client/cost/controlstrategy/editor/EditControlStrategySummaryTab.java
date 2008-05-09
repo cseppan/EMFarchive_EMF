@@ -81,7 +81,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private ComboBox strategyTypeCombo;
 
-    protected JCheckBox useCostEquationCheck, useSQLApproachCheck;
+    protected JCheckBox useCostEquationCheck;
 
     private ControlStrategyResult[] controlStrategyResults;
 
@@ -143,9 +143,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         SpringLayoutGenerator layoutGenerator1 = new SpringLayoutGenerator();
 
         layoutGenerator1.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), panelBottom);
-        layoutGenerator1.addLabelWidgetPair("Use SQL Approach:", useSQLApproach(), panelBottom);
         // Lay out the panel.
-        layoutGenerator1.makeCompactGrid(panelBottom, 1, 4, // rows, cols
+        layoutGenerator1.makeCompactGrid(panelBottom, 1, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -216,12 +215,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         useCostEquationCheck = new JCheckBox(" ", null, controlStrategy.getUseCostEquations());
         return useCostEquationCheck;
-    }
-
-    private JCheckBox useSQLApproach() {
-
-        useSQLApproachCheck = new JCheckBox(" ", null, true);
-        return useSQLApproachCheck;
     }
 
     private IntTextField costYearTextField() {

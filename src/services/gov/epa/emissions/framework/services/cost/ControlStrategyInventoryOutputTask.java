@@ -48,7 +48,8 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
             ControlStrategyInventoryOutputFactory factory = new ControlStrategyInventoryOutputFactory(user, controlStrategy,
                     sessionFactory, dbServerFactory);
             for (int i = 0; i < controlStrategyResults.length; i++) {
-                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)
+                        || controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.annotatedInventoryResult)) {
                     ControlStrategyInventoryOutput output = factory.get(controlStrategyResults[i]);
                     output.create();
                     ++count;
@@ -92,7 +93,8 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
             for (int i = 0; i < controlStrategyResults.length; i++) {
-                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)
+                        || controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.annotatedInventoryResult)) {
                     Dataset detailedResultDataset = controlStrategyResults[i].getDetailedResultDataset();
                     if (detailedResultDataset == null)
                         throw new EmfException("You should run the control strategy first before creating the inventory, input inventory - " + controlStrategyResults[i].getInputDataset().getName());

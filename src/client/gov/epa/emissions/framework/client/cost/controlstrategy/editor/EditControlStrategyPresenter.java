@@ -28,7 +28,7 @@ public interface EditControlStrategyPresenter {
 
     void set(ControlStrategyConstraintsTabView view);
 
-    void runStrategy(boolean useSQLApproach) throws EmfException;
+    void runStrategy() throws EmfException;
 
     void setResults(ControlStrategy controlStrategy);
 

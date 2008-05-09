@@ -31,7 +31,7 @@ public interface ControlStrategyService extends EMFService {
     
     ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException;
     
-    void runStrategy (User user, int controlStrategyId, boolean useSQLApproach) throws EmfException;
+    void runStrategy (User user, int controlStrategyId) throws EmfException;
     
     List<ControlStrategy> getControlStrategiesByRunStatus(String runStatus) throws EmfException;
     

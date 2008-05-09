@@ -20,6 +20,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlMeasureMonth;
+import gov.epa.emissions.framework.services.cost.ControlMeasureNEIDevice;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.NumberFieldVerifier;
@@ -122,7 +123,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         cmClass.setSelectedItem(measure.getCmClass());
 //        cmClass.setSelectedItem(getText(measure.getCmClass()));
         // costYear.setText(measure.getCostYear() + "");
-        deviceCode.setText(measure.getDeviceCode() + "");
+        deviceCode.setText(getNEIDevices());
         equipmentLife.setText(measure.getEquipmentLife() + "");
         if (modifiedTime != null)
             lastModifiedTime.setText(CustomDateFormat.format_YYYY_MM_DD_HH_MM(modifiedTime));
@@ -134,6 +135,19 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         monthsWidget.setMonths(measure.getMonths());
     }
 
+    private String getNEIDevices() {
+        String neiDeviceList = "";
+        ControlMeasureNEIDevice[] neiDevices = measure.getNeiDevices();
+        if (neiDevices != null && neiDevices.length > 0) {
+            for (ControlMeasureNEIDevice neiDevice : neiDevices) 
+                if (neiDeviceList.length() > 0) 
+                    neiDeviceList += ", " + neiDevice.getNeiDeviceCode();
+                else
+                    neiDeviceList = neiDevice.getNeiDeviceCode() + "";
+        }
+        return neiDeviceList;
+    }
+    
     private String formatDateReviewed() {
         return CustomDateFormat.format_MM_DD_YYYY(measure.getDateReviewed());
     }
@@ -270,8 +284,9 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         layoutGenerator.addLabelWidgetPair("Source Group:", sourceGroup, panel);
 
         deviceCode = new TextField("NEI Device code", 20);
+        deviceCode.setEditable(false);
         changeablesList.addChangeable(deviceCode);
-        layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
+        layoutGenerator.addLabelWidgetPair("NEI Device code(s):", deviceCode, panel);
         
 //       layoutGenerator.addLabelWidgetPair("Sectors:", sectors(), panel);
 
@@ -370,8 +385,9 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         measure.setName(name.getText());
         measure.setDescription(description.getText());
         measure.setCreator(session.user());
-        if (deviceCode.getText().length() > 0)
-            measure.setDeviceCode(deviceId);
+//TODO
+//        if (deviceCode.getText().length() > 0)
+//            measure.setDeviceCode(deviceId);
         if (equipmentLife.getText().length() > 0)
             measure.setEquipmentLife(life);
         updatePollutant();

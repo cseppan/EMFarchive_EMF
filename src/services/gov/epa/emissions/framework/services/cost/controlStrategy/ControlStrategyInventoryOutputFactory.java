@@ -29,6 +29,10 @@ public class ControlStrategyInventoryOutputFactory {
             return new MergedControlStrategyInventoryOutput(user, controlStrategy, 
                     controlStrategyResult, sessionFactory, 
                     dbServerFactory);
+        if (controlStrategyResult.getStrategyResultType().getName().equals(StrategyResultType.annotatedInventoryResult))
+            return new AnnotatedControlStrategyInventoryOutput(user, controlStrategy, 
+                    controlStrategyResult, sessionFactory, 
+                    dbServerFactory);
         return new AbstractControlStrategyInventoryOutput(user, controlStrategy, 
                 controlStrategyResult, sessionFactory, 
                 dbServerFactory);

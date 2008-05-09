@@ -36,23 +36,11 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractStrategyTask
     protected ControlStrategyResult leastCostCurveSummaryResult;
     
     public LeastCostAbstractStrategyTask(ControlStrategy controlStrategy, User user, 
-            DbServerFactory dbServerFactory, Integer batchSize,
-            HibernateSessionFactory sessionFactory) throws EmfException {
+            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) throws EmfException {
         super(controlStrategy, user, 
                 dbServerFactory, sessionFactory);
         this.loader = new StrategyLoader(user, dbServerFactory, 
-                sessionFactory, controlStrategy, 
-                batchSize);
-    }
-
-    public LeastCostAbstractStrategyTask(ControlStrategy controlStrategy, User user, 
-            DbServerFactory dbServerFactory, Integer batchSize,
-            HibernateSessionFactory sessionFactory, Boolean useSQLApproach) throws EmfException {
-        super(controlStrategy, user, 
-                dbServerFactory, sessionFactory);
-        this.loader = new StrategyLoader(user, dbServerFactory, 
-                sessionFactory, controlStrategy, 
-                batchSize, useSQLApproach);
+                sessionFactory, controlStrategy);
     }
 
     protected void compareInventoriesTemporalResolution() {

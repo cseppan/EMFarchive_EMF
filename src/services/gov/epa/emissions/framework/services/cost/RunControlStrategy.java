@@ -31,16 +31,6 @@ public class RunControlStrategy {
 
     private DbServerFactory dbServerFactory;
 
-    private boolean useSQLApproach;
-    
-    public RunControlStrategy(StrategyFactory factory, HibernateSessionFactory sessionFactory, 
-            DbServerFactory dbServerFactory, PooledExecutor threadPool,
-            boolean useSQLApproach) {
-        this(factory, sessionFactory, 
-                dbServerFactory, threadPool);
-        this.useSQLApproach = useSQLApproach;
-    }
-
     public RunControlStrategy(StrategyFactory factory, HibernateSessionFactory sessionFactory, 
             DbServerFactory dbServerFactory, PooledExecutor threadPool) {
         this.factory = factory;
@@ -54,8 +44,7 @@ public class RunControlStrategy {
         currentLimitations(controlStrategy);
         try {
             Strategy strategy = factory.create(controlStrategy, user, 
-                    sessionFactory, dbServerFactory,
-                    useSQLApproach);
+                    sessionFactory, dbServerFactory);
             StrategyTask task = new StrategyTask(strategy, user, 
                     services, service, 
                     sessionFactory);

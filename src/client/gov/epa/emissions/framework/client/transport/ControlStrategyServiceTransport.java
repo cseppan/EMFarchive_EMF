@@ -124,18 +124,15 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.request(new Object[] { ids, user });
     }
 
-    public synchronized void runStrategy(User user, int controlStrategyId,
-            boolean useSQLApproach) throws EmfException {
+    public synchronized void runStrategy(User user, int controlStrategyId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("runStrategy");
         call.addParam("user", mappings.user());
         call.addIntegerParam("controlStrategyId");
-        call.addBooleanParameter("useSQLApproach");
         call.setVoidReturnType();
 
-        call.request(new Object[] { user, new Integer(controlStrategyId), 
-                useSQLApproach });
+        call.request(new Object[] { user, new Integer(controlStrategyId) });
     }
 
     public synchronized StrategyType[] getStrategyTypes() throws EmfException {

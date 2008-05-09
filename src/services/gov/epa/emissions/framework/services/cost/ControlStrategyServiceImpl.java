@@ -4,13 +4,11 @@ import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
@@ -277,8 +275,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public synchronized void runStrategy(User user, int controlStrategyId,
-            boolean useSQLApproach) throws EmfException {
+    public synchronized void runStrategy(User user, int controlStrategyId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             //first see if the strategy has been canceled, is so don't run it...
@@ -290,11 +287,10 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             
             ControlStrategy strategy = getById(controlStrategyId);
             
-            StrategyFactory factory = new StrategyFactory(batchSize());
+            StrategyFactory factory = new StrategyFactory();
             validatePath(strategy.getExportDirectory());
             RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, 
-                    dbServerFactory, threadPool,
-                    useSQLApproach);
+                    dbServerFactory, threadPool);
             runStrategy.run(user, strategy, this);
         } catch (EmfException e) {
             throw new EmfException(e.getMessage());
@@ -354,16 +350,6 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         } catch (HibernateException e) {
             LOG.error("could not retrieve all control strategy types. " + e.getMessage());
             throw new EmfException("could not retrieve all control strategy types. " + e.getMessage());
-        } finally {
-            session.close();
-        }
-    }
-
-    private synchronized int batchSize() {
-        Session session = sessionFactory.getSession();
-        try {
-            EmfProperty property = new EmfPropertiesDAO().getProperty("export-batch-size", session);
-            return Integer.parseInt(property.getValue());
         } finally {
             session.close();
         }

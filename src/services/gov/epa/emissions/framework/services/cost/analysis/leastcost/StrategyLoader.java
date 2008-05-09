@@ -14,19 +14,9 @@ import org.hibernate.Session;
 public class StrategyLoader extends LeastCostAbstractStrategyLoader {
     
     public StrategyLoader(User user, DbServerFactory dbServerFactory, 
-            HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
-            int batchSize, boolean useSQLApproach) throws EmfException {
+            HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy) throws EmfException {
         super(user, dbServerFactory, 
-                sessionFactory, controlStrategy, 
-                batchSize, useSQLApproach);
-    }
-
-    public StrategyLoader(User user, DbServerFactory dbServerFactory, 
-            HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
-            int batchSize) throws EmfException {
-        super(user, dbServerFactory, 
-                sessionFactory, controlStrategy, 
-                batchSize);
+                sessionFactory, controlStrategy);
     }
 
     public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {

@@ -12,23 +12,11 @@ public class StrategyTask extends AbstractStrategyTask {
     private StrategyLoader loader;
     
     public StrategyTask(ControlStrategy controlStrategy, User user, 
-            DbServerFactory dbServerFactory, Integer batchSize,
-            HibernateSessionFactory sessionFactory) throws EmfException {
+            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) throws EmfException {
         super(controlStrategy, user, 
                 dbServerFactory, sessionFactory);
         this.loader = new StrategyLoader(user, dbServerFactory, 
-                sessionFactory, controlStrategy, 
-                batchSize);
-    }
-
-    public StrategyTask(ControlStrategy controlStrategy, User user, 
-            DbServerFactory dbServerFactory, Integer batchSize,
-            HibernateSessionFactory sessionFactory, Boolean useSQLApproach) throws EmfException {
-        super(controlStrategy, user, 
-                dbServerFactory, sessionFactory);
-        this.loader = new StrategyLoader(user, dbServerFactory, 
-                sessionFactory, controlStrategy, 
-                batchSize, useSQLApproach);
+                sessionFactory, controlStrategy);
     }
 
     public void run() throws EmfException {

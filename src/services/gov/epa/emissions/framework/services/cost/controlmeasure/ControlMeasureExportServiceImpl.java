@@ -98,7 +98,7 @@ public class ControlMeasureExportServiceImpl implements ControlMeasureExportServ
 
     private synchronized void validateExportFile(File path, String prefix, boolean overwrite) throws EmfException {
         File[] files = new File[] { new File(path, prefix + "_summary.csv"), new File(path, prefix + "_efficiencies.csv"),
-                new File(path, prefix + "_SCCs.csv") };
+                new File(path, prefix + "_SCCs.csv"), new File(path, prefix + "_equations.csv") };
 
         if (!overwrite) {
             for (int i = 0; i < files.length; i++)

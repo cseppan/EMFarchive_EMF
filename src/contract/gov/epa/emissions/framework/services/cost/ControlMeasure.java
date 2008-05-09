@@ -26,7 +26,7 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private String description;
 
-    private int deviceCode;
+//    private int deviceCode;
 
     private int costYear;
 
@@ -76,6 +76,8 @@ public class ControlMeasure implements Lockable, Serializable {
     private Integer regionDatasetVersion;
 
     private ControlMeasureMonth[] months = new ControlMeasureMonth[] {};
+
+    private ControlMeasureNEIDevice[] neiDevices = new ControlMeasureNEIDevice[] {};
     
     public ControlMeasure() {
         this.lock = new Mutex();
@@ -124,13 +126,13 @@ public class ControlMeasure implements Lockable, Serializable {
         this.description = description;
     }
 
-    public int getDeviceCode() {
-        return deviceCode;
-    }
-
-    public void setDeviceCode(int deviceCode) {
-        this.deviceCode = deviceCode;
-    }
+//    public int getDeviceCode() {
+//        return deviceCode;
+//    }
+//
+//    public void setDeviceCode(int deviceCode) {
+//        this.deviceCode = deviceCode;
+//    }
 
     public float getEquipmentLife() {
         return equipmentLife;
@@ -406,5 +408,13 @@ public class ControlMeasure implements Lockable, Serializable {
 
     public void setMonths(ControlMeasureMonth[] months) {
         this.months = months;
+    }
+
+    public ControlMeasureNEIDevice[] getNeiDevices() {
+        return neiDevices;
+    }
+
+    public void setNeiDevices(ControlMeasureNEIDevice[] neiDevices) {
+        this.neiDevices = neiDevices;
     }
 }

@@ -276,7 +276,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
     
     protected void runStrategy(ControlStrategy strategy) throws EmfException {
         StrategyTask strategyTask = new StrategyTask(strategy, emfUser(), dbServerFactory,
-                new Integer(500), sessionFactory);
+                sessionFactory);
         strategyTask.run();
     }
     

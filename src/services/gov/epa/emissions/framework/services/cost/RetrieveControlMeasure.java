@@ -96,7 +96,7 @@ public class RetrieveControlMeasure {
                     cm.setName(rs.getString(2));
                     cm.setAbbreviation(rs.getString(3));
                     cm.setDescription(rs.getString(4));
-                    cm.setDeviceCode(rs.getInt(5));
+                    //cm.setDeviceCode(rs.getInt(5));
                     cm.setMajorPollutant(new Pollutant(rs.getInt(6), rs.getString(7)));
                     cm.setCostYear(rs.getInt(8));
                     cm.setLastModifiedTime(rs.getTimestamp(9));
@@ -140,7 +140,7 @@ public class RetrieveControlMeasure {
         //Keep the sort order, this dictates how the list is built for the measure mgr!!!
         String query = "select cm.id, cm.name, " +
                 "cm.abbreviation, cm.description, " +
-                "cm.device_code, cm.major_pollutant, mp.name, " +
+                "null as device_code/*cm.device_code*/, cm.major_pollutant, mp.name, " +
                 "cm.cost_year, cm.last_modified_time, " +
                 "cm.date_reviewed, cm.last_modified_by, " +
                 "cm.creator, u.name, " +
@@ -202,7 +202,7 @@ public class RetrieveControlMeasure {
         //Keep the sort order, this dictates how the list is built for the measure mgr!!!
         String query = "select cm.id, cm.name, " +
         "cm.abbreviation, cm.description, " +
-        "cm.device_code, cm.major_pollutant, mp.name, " +
+        "null as device_code/*cm.device_code*/, cm.major_pollutant, mp.name, " +
         "cm.cost_year, cm.last_modified_time, " +
         "cm.date_reviewed, cm.last_modified_by, " +
         "cm.creator, u.name, " +

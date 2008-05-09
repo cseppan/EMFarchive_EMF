@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlMeasureMonth;
+import gov.epa.emissions.framework.services.cost.ControlMeasureNEIDevice;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -81,7 +82,7 @@ public class CMSummaryRecordReader {
             sector(cm, tokens[5], sb);
             cmClass(cm, tokens[6], sb);
             equipLife(cm, tokens[7], sb);
-            deviceCode(cm, tokens[8], sb);
+            neiDeviceCodes(cm, tokens[8], sb);
             dateReviewed(cm, tokens[9], sb);
             datasource(cm, tokens[10]);
             if (tokens.length > 12) {
@@ -257,16 +258,21 @@ public class CMSummaryRecordReader {
         }
     }
 
-    private void deviceCode(ControlMeasure cm, String code, StringBuffer sb) {
-        try {
-            int deviceCode = 0;
-            if (code.length() != 0)
-                deviceCode = Integer.parseInt(code);
-
-            cm.setDeviceCode(deviceCode);
-        } catch (NumberFormatException e) {
-            sb.append(format("device code is an int value: " + code));
+    private void neiDeviceCodes(ControlMeasure cm, String neiDeviceCodeList, StringBuffer sb) {
+        List<ControlMeasureNEIDevice> neiDeviceList = new ArrayList<ControlMeasureNEIDevice>();
+        if (neiDeviceCodeList.length() > 0) {
+            StringTokenizer stringTokenizer = new StringTokenizer(neiDeviceCodeList, "|");
+            while (stringTokenizer.hasMoreTokens()) {
+                try {
+                    int neiDeviceCode = Integer.parseInt(stringTokenizer.nextToken());
+                    ControlMeasureNEIDevice neiDevice = new ControlMeasureNEIDevice();
+                    neiDevice.setNeiDeviceCode(neiDeviceCode);
+                  } catch (NumberFormatException e) {
+                      sb.append(format("device code(s) must be integer values: " + neiDeviceCodeList));
+                  }
+            }
         }
+        cm.setNeiDevices(neiDeviceList.toArray(new ControlMeasureNEIDevice[0]));
     }
 
     private void dateReviewed(ControlMeasure cm, String date, StringBuffer sb) {

@@ -183,14 +183,16 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                 messagePanel.setError("Please select at least one item.");
                 return;
             }
-            if (controlStrategyResults.length == 1 && !controlStrategyResults[0].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+            if (controlStrategyResults.length == 1 && (!controlStrategyResults[0].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult) 
+                    && !controlStrategyResults[0].getStrategyResultType().getName().equals(StrategyResultType.annotatedInventoryResult))) {
                 messagePanel.setError("Please select at least one item that has a controlled inventory.");
                 return;
             }
             //see if selected items can produce a controlled inventory.
             boolean hasControllableInventory = false;
             for (ControlStrategyResult result : controlStrategyResults) {
-                if (result.getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+                if (result.getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)
+                        || result.getStrategyResultType().getName().equals(StrategyResultType.annotatedInventoryResult)) {
                     hasControllableInventory = true;
                 }
                 if (hasControllableInventory) break;
@@ -204,7 +206,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             for (ControlStrategyResult result : controlStrategyResults) {
                 if (result.getStrategyResultType().getName().equals(StrategyResultType.controlledInventoryResult)) {
                     hasControlledInventories = true;
-                } else if (result.getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult) && result.getControlledInventoryDataset() != null) {
+                } else if ((result.getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult) || result.getStrategyResultType().getName().equals(StrategyResultType.annotatedInventoryResult)) && result.getControlledInventoryDataset() != null) {
                     hasControlledInventories = true;
                 }
                 if (hasControlledInventories) break;
@@ -398,7 +400,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         };
     }
 
-        private void toggleRadioButtons() {
+    private void toggleRadioButtons() {
         if (buttonGroup.getSelection().equals(invButton.getModel()) ||buttonGroup.getSelection().equals(detailButton.getModel()) ){
             createButton.setEnabled(false);
             view.setEnabled(true);
@@ -419,10 +421,12 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             for (ControlStrategyResult result : controlStrategyResults) {
                 if (result.getStrategyResultType().getName().equals(StrategyResultType.controlledInventoryResult)) {
                     hasControlledInventories = true;
-                } else if (result.getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult) && result.getControlledInventoryDataset() != null) {
+                } else if ((result.getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)
+                        || result.getStrategyResultType().getName().equals(StrategyResultType.annotatedInventoryResult)) && result.getControlledInventoryDataset() != null) {
                     hasControlledInventories = true;
                 }
-                if (result.getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+                if (result.getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)
+                        || result.getStrategyResultType().getName().equals(StrategyResultType.annotatedInventoryResult)) {
                     hasControllableInventory = true;
                 }
                 if (hasControllableInventory && hasControlledInventories) break;

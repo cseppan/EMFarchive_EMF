@@ -315,7 +315,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     
     protected void runStrategy(ControlStrategy strategy) throws EmfException {
         MaxEmsRedStrategy strategyTask = new MaxEmsRedStrategy(strategy, emfUser(), dbServerFactory,
-                new Integer(500), sessionFactory);
+                sessionFactory);
         strategyTask.run();
     }
     

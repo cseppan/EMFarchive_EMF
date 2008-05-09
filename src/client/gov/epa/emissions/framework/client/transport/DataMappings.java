@@ -28,6 +28,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 import gov.epa.emissions.framework.services.cost.ControlMeasureMonth;
+import gov.epa.emissions.framework.services.cost.ControlMeasureNEIDevice;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.ControlStrategyMeasure;
@@ -135,6 +136,7 @@ public class DataMappings extends Mappings {
         bean(call, EquationTypeVariable.class, equationTypeVariable());
         bean(call, ControlMeasureEquation.class, controlMeasureEquation());
         bean(call, ControlMeasureMonth.class, controlMeasureMonth());
+        bean(call, ControlMeasureNEIDevice.class, controlMeasureNEIDevice());
     }
 
     private void registerArrays(Call call) {
@@ -193,6 +195,7 @@ public class DataMappings extends Mappings {
         array(call, EquationTypeVariable[].class, equationTypeVariables());
         array(call, ControlMeasureEquation[].class, controlMeasureEquations());
         array(call, ControlMeasureMonth[].class, controlMeasureMonths());
+        array(call, ControlMeasureNEIDevice[].class, controlMeasureNEIDevices());
         
         array(call, EmfFileInfo[].class, emfFileInfos());
     }
@@ -441,6 +444,14 @@ public class DataMappings extends Mappings {
         return qname("ControlMeasureMonth");
     }
 
+    public QName controlMeasureNEIDevices() {
+        return qname("ControlMeasureNEIDevices");
+    }
+
+    public QName controlMeasureNEIDevice() {
+        return qname("ControlMeasureNEIDevice");
+    }
+    
     public QName controlStrategy() {
         return qname("ControlStrategy");
     }

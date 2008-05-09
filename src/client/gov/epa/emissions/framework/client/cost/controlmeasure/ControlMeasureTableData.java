@@ -53,7 +53,7 @@ public class ControlMeasureTableData extends AbstractTableData {
                 "Avg CPT", "Avg CE", "Min CE", 
                 "Max CE", "Min CPT", "Max CPT", 
                 "Avg Rule Eff.", "Avg Rule Pen.", "Control Technology", 
-                "Source Group", "Equipment Life", "NEI Device Code", 
+                "Source Group", "Equipment Life", 
                 "Sectors", "Class", "Last Modified Time", 
                 "Last Modified By", "Date Reviewed", "Creator", 
                 "Data Source", "Description" };
@@ -91,7 +91,7 @@ public class ControlMeasureTableData extends AbstractTableData {
                             getCostPerTon(aper.getAvgCPT()), new Double(aper.getAvgCE()), new Double(aper.getMinCE()), 
                             new Double(aper.getMaxCE()), getCostPerTon(aper.getMinCPT()), getCostPerTon(aper.getMaxCPT()), 
                             new Double(aper.getAvgRE()), new Double(aper.getAvgRP()), getControlTechnology(measure), 
-                            getSourceGroup(measure), new Double(measure.getEquipmentLife()), "" + measure.getDeviceCode(), 
+                            getSourceGroup(measure), new Double(measure.getEquipmentLife()),  
                             getSectors(measure), measureClass(measure.getCmClass()), getLastModifiedTime(measure), 
                             measure.getLastModifiedBy(), getDateReviewed(measure), measure.getCreator().getName(), 
                             measure.getDataSouce(), measure.getDescription() };
@@ -104,7 +104,7 @@ public class ControlMeasureTableData extends AbstractTableData {
                             getCostPerTon(aper.getAvgCPT()), new Double(aper.getAvgCE()), new Double(aper.getMinCE()), 
                             new Double(aper.getMaxCE()), getCostPerTon(aper.getMinCPT()), getCostPerTon(aper.getMaxCPT()), 
                             new Double(aper.getAvgRE()), new Double(aper.getAvgRP()), getControlTechnology(measure), 
-                            getSourceGroup(measure), new Double(measure.getEquipmentLife()), "" + measure.getDeviceCode(), 
+                            getSourceGroup(measure), new Double(measure.getEquipmentLife()),  
                             getSectors(measure), measureClass(measure.getCmClass()), getLastModifiedTime(measure), 
                             measure.getLastModifiedBy(), getDateReviewed(measure), measure.getCreator().getName(), 
                             measure.getDataSouce(), measure.getDescription() };
@@ -119,7 +119,7 @@ public class ControlMeasureTableData extends AbstractTableData {
                         NAN_VALUE, NAN_VALUE, NAN_VALUE, 
                         NAN_VALUE, NAN_VALUE, NAN_VALUE, 
                         NAN_VALUE, NAN_VALUE, getControlTechnology(measure), 
-                        getSourceGroup(measure), new Double(measure.getEquipmentLife()), "" + measure.getDeviceCode(), 
+                        getSourceGroup(measure), new Double(measure.getEquipmentLife()),  
                         getSectors(measure), measureClass(measure.getCmClass()), getLastModifiedTime(measure), 
                         measure.getLastModifiedBy(), getDateReviewed(measure), measure.getCreator().getName(), 
                         measure.getDataSouce(), measure.getDescription() };

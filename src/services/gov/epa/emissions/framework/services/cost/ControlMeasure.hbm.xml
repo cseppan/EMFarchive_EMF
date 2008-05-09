@@ -13,7 +13,7 @@
         <property name="description" column="description" type="java.lang.String" not-null="false"/>
         <property name="abbreviation" column="abbreviation" type="java.lang.String" not-null="false"/>
         <property name="dataSouce" column="data_souce" type="java.lang.String" not-null="false"/>
-        <property name="deviceCode" column="device_code" type="integer" not-null="false"/>
+<!--        <property name="deviceCode" column="device_code" type="integer" not-null="false"/>-->
         <property name="costYear" column="cost_year" type="integer" not-null="false"/>
         <property name="equipmentLife" column="equipment_life" type="float" not-null="false"/>
         <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
@@ -80,6 +80,15 @@
 		        <property name="month" column="month" type="short"/>
 	    	</composite-element>
   		</array>
+  		
+ 		<array name="neiDevices" table="control_measure_nei_devices">
+    		<key column="control_measure_id" not-null="true"/>
+    		<list-index column="list_index"/>
+	    	<composite-element class="gov.epa.emissions.framework.services.cost.ControlMeasureNEIDevice">
+		        <property name="neiDeviceCode" column="nei_device_code" type="integer"/>
+	    	</composite-element>
+  		</array>
+  		
 
     </class>
 </hibernate-mapping>

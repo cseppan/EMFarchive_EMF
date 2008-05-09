@@ -155,8 +155,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         view.stopRun();
     }
 
-    public void runStrategy(boolean useSQLApproach) throws EmfException {
-        service().runStrategy(session.user(), controlStrategy.getId(), useSQLApproach);
+    public void runStrategy() throws EmfException {
+        service().runStrategy(session.user(), controlStrategy.getId());
     }
 
     public void doRefresh() throws EmfException {

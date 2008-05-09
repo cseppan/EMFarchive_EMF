@@ -53,8 +53,6 @@ public abstract class AbstractStrategyTask implements Strategy {
 
     protected User user;
     
-    protected int batchSize;
-    
     protected int recordCount;
     
     protected int controlStrategyInputDatasetCount;

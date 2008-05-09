@@ -36,19 +36,9 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
     protected double uncontrolledEmis;
 
     public LeastCostAbstractStrategyLoader(User user, DbServerFactory dbServerFactory, 
-            HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
-            int batchSize, boolean useSQLApproach) throws EmfException {
+            HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy) throws EmfException {
         super(user, dbServerFactory, 
-                sessionFactory, controlStrategy, 
-                batchSize, useSQLApproach);
-    }
-
-    public LeastCostAbstractStrategyLoader(User user, DbServerFactory dbServerFactory, 
-            HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy, 
-            int batchSize) throws EmfException {
-        super(user, dbServerFactory, 
-                sessionFactory, controlStrategy, 
-                batchSize);
+                sessionFactory, controlStrategy);
     }
 
     public ControlStrategyResult loadLeastCostCMWorksheetResult() throws EmfException {

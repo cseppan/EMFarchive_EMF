@@ -189,7 +189,7 @@ public class ControlMeasuresExporter implements Exporter {
         summaryRecord += addQuote(formatSectors(measure.getSectors())) + delimiter;
         summaryRecord += measure.getCmClass() + delimiter;
         summaryRecord += measure.getEquipmentLife() + delimiter;
-        summaryRecord += measure.getDeviceCode() + delimiter;
+        summaryRecord += /*TODO measure.getDeviceCode()*/ "" + delimiter;
         Date dateRev = measure.getDateReviewed();
         summaryRecord += (dateRev == null ? "" : dateRev.toString()) + delimiter;
         summaryRecord += addQuote(measure.getDataSouce()) + delimiter;
