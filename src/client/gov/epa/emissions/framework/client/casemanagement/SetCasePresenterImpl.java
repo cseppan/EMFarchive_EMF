@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
+import java.util.Date;
+
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.inputs.InputFieldsPanelPresenter;
@@ -57,7 +59,10 @@ public class SetCasePresenterImpl implements SetCasePresenter {
     }
 
     public void checkIfLockedByCurrentUser() throws EmfException {
-        throw new EmfException("under construction");
+        Case reloaded = service().reloadCase(caseObj.getId());
+
+        if (!reloaded.isLocked(session.user()))
+            throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner() + " has it now.");
     }
 
     public void doSaveParam(CaseParameter param) throws EmfException {
@@ -112,9 +117,12 @@ public class SetCasePresenterImpl implements SetCasePresenter {
         return job.getName();
     }
 
-    public void doSave() {
-        // NOTE Auto-generated method stub
-        
+    public void doSave() throws EmfException {
+        checkIfLockedByCurrentUser();
+
+        caseObj.setLastModifiedBy(session.user());
+        caseObj.setLastModifiedDate(new Date());
+        service().updateCaseWithLock(caseObj);
     }
 
 }

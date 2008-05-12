@@ -66,6 +66,8 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     
     private SetInputFieldsPanel setInputFieldsPanel;
     
+    private SetCaseFoldersPanel setCaseFoldersPanel; 
+    
     public SetCaseWindow(String title, EmfConsole parentConsole, 
             DesktopManager desktopManager) {
         super(title, new Dimension(520, 370), desktopManager);
@@ -103,6 +105,9 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     private void setupObjects() throws EmfException {
         // add parameters to setCaseObjects
         setCaseObjects = new ArrayList<SetCaseObject>();
+        SetCaseObject folderObj = new SetCaseObject(caseObj.getName(), SetCaseObject.WIZARD_1);
+        setCaseObjects.add(folderObj);
+        
         CaseInput[] inputList = presenter.getCaseInput(caseObj.getId(), new Sector("All", "All"), false);
         for (CaseInput input :inputList){
             SetCaseObject obj = new SetCaseObject(input, SetCaseObject.WIZARD_2);
@@ -122,11 +127,20 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         mainPanel = new JPanel(new BorderLayout());
         //get first setCaseObjects
         currentObject = setCaseObjects.get(currentIndex);
+        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_1))
+            mainPanel.add(displayFolders());
         if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2))
             mainPanel.add(displayInput((CaseInput)currentObject.getObject()));
         else if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3))
             mainPanel.add(displayParam((CaseParameter)currentObject.getObject()));
         return mainPanel;
+    }
+    
+    private JPanel displayFolders(){
+        JPanel panel = new JPanel(); 
+        this.setCaseFoldersPanel = new SetCaseFoldersPanel(caseObj, messagePanel, this, parentConsole);
+        setCaseFoldersPanel.display(panel, presenter.getSession());
+        return panel; 
     }
     
     private JPanel displayInput(CaseInput input) throws EmfException {
@@ -139,6 +153,8 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     
     private void panelRefresh() throws EmfException {
         mainPanel.removeAll();
+        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_1))
+            mainPanel.add(displayFolders());
         if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2))
             mainPanel.add(displayInput((CaseInput)currentObject.getObject()));
         else if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3))
@@ -299,6 +315,8 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         clearMessage();
         try {
             validateFields();
+            if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_1))
+                presenter.doSave();
             if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2))
                 presenter.doSaveInput((CaseInput)currentObject.getObject());
             else if(currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3))
@@ -326,6 +344,8 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     }
     
     private void validateFields() throws EmfException {
+        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_1))
+            setCaseFoldersPanel.setFields();
         if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2))
             setInputFieldsPanel.setFields();
         else if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3)){

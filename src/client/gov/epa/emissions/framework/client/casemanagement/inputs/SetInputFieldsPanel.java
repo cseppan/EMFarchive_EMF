@@ -36,8 +36,6 @@ public class SetInputFieldsPanel extends InputFieldsPanel{
 
     private TextField dataset;
 
-    //private InputFieldsPanelPresenter presenter;
-
     private Dimension preferredSize = new Dimension(380, 20);
     
     public SetInputFieldsPanel(MessagePanel messagePanel, ManageChangeables changeablesList,
@@ -149,15 +147,6 @@ public class SetInputFieldsPanel extends InputFieldsPanel{
 
     public CaseInput getInput() {
         return this.input;
-    }
-
-    public void validateFields() {
-        // NOTE Auto-generated method stub
-        
-    }
-
-    public void addChangeable(ManageChangeables changeable) {
-        //
     }
 
     public void addChangeable(Changeable changeable) {
