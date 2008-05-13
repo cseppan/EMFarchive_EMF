@@ -365,7 +365,7 @@ public class CaseDAO {
         List<?> ids = session
                 .createQuery(
                         "SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = "
-                                + caseId + " AND (obj.caseJobID = 0 OR obj.caseJobID = "
+                                + caseId + " AND (obj.caseJobID = "
                                 + getAndOrClause(jobIds, "obj.caseJobID") + ")").list();
         List<CaseInput> inputs = new ArrayList<CaseInput>();
 
@@ -768,7 +768,7 @@ public class CaseDAO {
     public List<CaseParameter> getCaseParametersByJobIds(int caseId, int[] jobIds, Session session) {
         List<?> ids = session.createQuery(
                 "SELECT obj.id from " + CaseParameter.class.getSimpleName() + " as obj WHERE obj.caseID = " + caseId
-                        + " AND (obj.jobId = 0 OR obj.jobId = " + getAndOrClause(jobIds, "obj.jobId") + ")").list();
+                        + " AND (obj.jobId = " + getAndOrClause(jobIds, "obj.jobId") + ")").list();
 
         List<CaseParameter> params = new ArrayList<CaseParameter>();
 
