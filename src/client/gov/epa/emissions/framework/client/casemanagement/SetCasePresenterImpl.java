@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
-import java.util.Date;
-
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.inputs.InputFieldsPanelPresenter;
@@ -13,13 +11,14 @@ import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 
+import java.util.Date;
+
 import javax.swing.JPanel;
 
 public class SetCasePresenterImpl implements SetCasePresenter {
     
     private SetCaseView view;
     private CaseManagerPresenter managerPresenter;
-    private InputFieldsPanelPresenter inputFieldsPresenter;
     private EmfSession session;
     private int defaultPageSize = 20;
     
@@ -50,7 +49,7 @@ public class SetCasePresenterImpl implements SetCasePresenter {
     }
 
     public void doAddInputFields(CaseInput input, JPanel container, SetInputFieldsPanel setInputFieldsPanel) throws EmfException {
-        inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj.getId(), setInputFieldsPanel, session);
+        InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj.getId(), setInputFieldsPanel, session);
         inputFieldsPresenter.display(input, container);
     }
 
@@ -124,5 +123,12 @@ public class SetCasePresenterImpl implements SetCasePresenter {
         caseObj.setLastModifiedDate(new Date());
         service().updateCaseWithLock(caseObj);
     }
+
+//    public void doAddParameterFields(CaseParameter param, JPanel container, SetCaseParameterPanel setCaseParameterPanel)
+//            throws EmfException {
+//        ParameterFieldsPanelPresenter paramPresenter = new ParameterFieldsPanelPresenter(caseObj.getId(), setCaseParameterPanel, session);
+//        inputFieldsPresenter.display(input, container);
+//        
+//    }
 
 }

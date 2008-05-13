@@ -4,11 +4,9 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
-import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
-import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditor;
 import gov.epa.emissions.framework.client.casemanagement.inputs.SetInputFieldsPanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -20,6 +18,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParame
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -32,9 +31,8 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
-import javax.swing.JLabel;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.SpringLayout;
 
 public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView {
 
@@ -50,10 +48,6 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
 
     private MessagePanel messagePanel;
     
-    private TextField envValue;
-    
-    private TextArea purpose;
-
     private List<SetCaseObject> setCaseObjects; 
    
     private Case caseObj;
@@ -67,6 +61,10 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     private SetInputFieldsPanel setInputFieldsPanel;
     
     private SetCaseFoldersPanel setCaseFoldersPanel; 
+    
+    private SetCaseParameterPanel setCaseParameterPanel;
+    
+    private boolean hasValues = false; 
     
     public SetCaseWindow(String title, EmfConsole parentConsole, 
             DesktopManager desktopManager) {
@@ -143,6 +141,13 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         return panel; 
     }
     
+    private JPanel displayParam(CaseParameter param) throws EmfException{
+        JPanel panel = new JPanel(); 
+        this.setCaseParameterPanel = new SetCaseParameterPanel(messagePanel, this, parentConsole);
+        setCaseParameterPanel.display(param, panel, presenter.getSession(), presenter.getJobName(param.getJobId()));
+        return panel; 
+    }
+    
     private JPanel displayInput(CaseInput input) throws EmfException {
         JPanel panel = new JPanel();
         this.setInputFieldsPanel = new SetInputFieldsPanel(messagePanel, this, parentConsole);
@@ -158,7 +163,7 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2))
             mainPanel.add(displayInput((CaseInput)currentObject.getObject()));
         else if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3))
-                mainPanel.add(displayParam((CaseParameter)currentObject.getObject()));
+            mainPanel.add(displayParam((CaseParameter)currentObject.getObject()));
         super.validate();
     }
     
@@ -195,6 +200,10 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
                         doSave();
                         resetChanges();
                     }
+                    String validationMsg = validateValues();
+                    if (hasValues){
+                        showMessageDialog(validationMsg);
+                    }
                     CaseEditor view = new CaseEditor(parentConsole, presenter.getSession(), desktopManager);
                     managerPresenter.doEdit(view, caseObj);
                     disposeView();
@@ -204,8 +213,65 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
                 }
             }
         };
-
         return action;
+    }
+    
+    private void showMessageDialog(String msg) throws EmfException {
+        String validationMsg = validateValues();
+        int width = 50;
+        int height = (validationMsg.length() / 50)+3;
+        String title = "Jobs in the case may not run until the following items are corrected:";
+        JDialog dialog =new JDialog(parentConsole, title, false);
+        dialog.getContentPane().add(createMsgScrollPane(msg, width, height));
+        dialog.setLocation(ScreenUtils.getPointToCenter(this));
+        dialog.pack();
+        dialog.setPreferredSize(new Dimension(400, 300));
+        dialog.setModal(false);
+        dialog.setVisible(true);
+    }
+    
+    private ScrollableComponent createMsgScrollPane(String msg, int width, int height) {
+        TextArea message = new TextArea("msgArea", msg, width, height);
+        message.setEditable(false);
+        ScrollableComponent descScrollableTextArea = new ScrollableComponent(message);
+        return descScrollableTextArea;
+    }
+    
+    private String validateValues() throws EmfException{
+        String noLocalValues = "";
+        CaseInput[] inputList = presenter.getCaseInput(caseObj.getId(), new Sector("All", "All"), true);
+        noLocalValues += "The following non-local inputs do not have datasets specified: \n";
+        for (CaseInput input :inputList){
+            if ( !input.isLocal() && input.getDataset()==null){
+                hasValues = true; 
+                noLocalValues += getInputValues(input) +"\n";
+            }
+        }
+        CaseParameter[] paraList = presenter.getCaseParameters(caseObj.getId(), new Sector("All", "All"), true);
+        noLocalValues += "\nThe following non-local parameters do not have values: \n"; 
+        for (CaseParameter par :paraList){
+            if ( !par.isLocal() && par.getValue().trim().isEmpty()){
+                noLocalValues += getParamValues(par) + "\n";
+                hasValues = true; 
+            }
+        }
+        return noLocalValues;
+    }
+    
+    private String getInputValues(CaseInput input) throws EmfException{
+        String Value = (input.getEnvtVars() == null ? "" : input.getEnvtVars().getName()) + "; " 
+                     + (input.getSector() == null ? "All sectors" : input.getSector().getName())+ "; "
+                     + presenter.getJobName(input.getCaseJobID()) + "; "
+                     + input.getName();
+        return Value; 
+    }
+    
+    private String getParamValues(CaseParameter parameter) throws EmfException{
+        String Value = (parameter.getEnvVar() == null ? "" : parameter.getEnvVar().getName()) + "; " 
+                     + (parameter.getSector() == null ? "All sectors" : parameter.getSector().getName())+ "; " 
+                     + presenter.getJobName(parameter.getJobId()) + "; "
+                     + parameter.getName();
+        return Value; 
     }
 
     private Action prevsAction() {
@@ -229,13 +295,11 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
                 }
             }
         };
-
         return action;
     }
     
     private Action nextAction() {
         Action action = new AbstractAction() {
-
             public void actionPerformed(ActionEvent event) {
                 clearMessage();
                 if (hasChanges()){
@@ -269,58 +333,22 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         }
     }
     
-    private JPanel displayParam(CaseParameter param) throws EmfException {
-        JPanel panel = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        Dimension preferredSize = new Dimension(380, 25);
-        
-        JLabel parameterName = new JLabel(param.getParameterName().toString());
-        layoutGenerator.addLabelWidgetPair("Parameter Name:", parameterName, panel);
-
-        JLabel envtVar = new JLabel(param.getEnvVar()==null? "":param.getEnvVar().toString());
-        layoutGenerator.addLabelWidgetPair("Envt. Variable:", envtVar, panel);
-        
-        JLabel sector = new JLabel(param.getSector()==null? "All jobs for sector" :param.getSector().toString());
-        layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
-        
-        JLabel job = new JLabel(presenter.getJobName(param.getJobId()));
-        layoutGenerator.addLabelWidgetPair("Job:", job, panel);
-        
-        JLabel varTypes = new JLabel(param.getType()==null? "":param.getType().toString());
-        layoutGenerator.addLabelWidgetPair("Type:", varTypes, panel);
-        
-        envValue = new TextField("value", param.getValue(), 34);
-        envValue.setPreferredSize(preferredSize);
-        addChangeable(envValue);
-        layoutGenerator.addLabelWidgetPair("Value:", envValue, panel);
-        
-        purpose = new TextArea("Information", param.getPurpose(), 34, 3);
-        purpose.setEditable(false);
-        ScrollableComponent scrolpane = new ScrollableComponent(purpose);
-        scrolpane.setPreferredSize(new Dimension(380, 100));
-        layoutGenerator.addLabelWidgetPair("Information:", scrolpane, panel);
-
-        JLabel required = new JLabel(param.isRequired()? "True" : "False" );
-        layoutGenerator.addLabelWidgetPair("Required?", required, panel);
-
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 8, 2, // rows, cols
-                10, 10, // initialX, initialY
-                10, 10);// xPad, yPad
-
-        return panel;
-    }
 
     private void doSave() {
         clearMessage();
         try {
-            validateFields();
-            if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_1))
+            if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_1)){
+                setCaseFoldersPanel.setFields();
                 presenter.doSave();
-            if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2))
+            }
+            if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2)){
+                setInputFieldsPanel.setFields();
                 presenter.doSaveInput((CaseInput)currentObject.getObject());
-            else if(currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3))
+            }
+            else if(currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3)){
+                setCaseParameterPanel.setFields();
                 presenter.doSaveParam((CaseParameter)currentObject.getObject());
+            }
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -340,17 +368,6 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
                 presenter.doClose();
         } catch (EmfException e) {
             messagePanel.setMessage("Could not close: " + e.getMessage());
-        }
-    }
-    
-    private void validateFields() throws EmfException {
-        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_1))
-            setCaseFoldersPanel.setFields();
-        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2))
-            setInputFieldsPanel.setFields();
-        else if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3)){
-            CaseParameter para = (CaseParameter) currentObject.getObject();
-            para.setValue(envValue.getText() == null ? "" : envValue.getText().trim());
         }
     }
     
