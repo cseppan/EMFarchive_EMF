@@ -482,11 +482,12 @@ public class ManagedCaseService {
         try {
             setStatus(caseObj.getLastModifiedBy(), "Started removing case " + caseObj.getName() + ".", "Remove Case");
 
+            List<CaseJob> jobs = dao.getCaseJobs(caseObj.getId(), session);
+            checkJobsStatuses(jobs, caseObj);
+            
             List<CaseInput> inputs = dao.getCaseInputs(caseObj.getId(), session);
             dao.removeCaseInputs(inputs.toArray(new CaseInput[0]), session);
 
-            List<CaseJob> jobs = dao.getCaseJobs(caseObj.getId(), session);
-            checkJobsStatuses(jobs, caseObj);
             PersistedWaitTask[] persistedJobs = getPersistedJobs(jobs, session);
             QueueCaseOutput[] outputQs = getQedOutputs(jobs, session);
 
@@ -1796,6 +1797,7 @@ public class ManagedCaseService {
     public synchronized void removeCaseJobs(CaseJob[] jobs) throws EmfException {
         Session session = sessionFactory.getSession();
 
+        checkJobsStatuses(Arrays.asList(jobs), dao.getCase(jobs[0].getCaseId(), session));
         checkJobOutputItems(jobs, session);
         checkJobHistoryItems(jobs, session);
         resetRelatedJobsField(jobs);
