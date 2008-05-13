@@ -360,7 +360,23 @@ public class CaseDAO {
 
         return hibernateFacade.get(CaseInput.class, crit1, session);
     }
+    
+    public List<CaseInput> getJobSpecNonSpecCaseInputs(int caseId, int[] jobIds, Session session) {
+        List<?> ids = session
+                .createQuery(
+                        "SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = "
+                                + caseId + " AND (obj.caseJobID = 0 OR obj.caseJobID = "
+                                + getAndOrClause(jobIds, "obj.caseJobID") + ")").list();
+        List<CaseInput> inputs = new ArrayList<CaseInput>();
 
+        for (Iterator<?> iter = ids.iterator(); iter.hasNext();) {
+            Integer id = (Integer) iter.next();
+            inputs.add(this.getCaseInput(id, session));
+        }
+
+        return inputs;
+    }
+    
     public List<CaseInput> getCaseInputsByJobIds(int caseId, int[] jobIds, Session session) {
         List<?> ids = session
                 .createQuery(
@@ -763,6 +779,19 @@ public class CaseDAO {
         Criterion crit = Restrictions.eq("caseID", new Integer(caseId));
 
         return hibernateFacade.get(CaseParameter.class, crit, session);
+    }
+    
+    public List<CaseParameter> getJobSpecNonSpecCaseParameters(int caseId, int[] jobIds, Session session) {
+        List<?> ids = session.createQuery(
+                "SELECT obj.id from " + CaseParameter.class.getSimpleName() + " as obj WHERE obj.caseID = " + caseId
+                        + " AND (obj.jobId = 0 OR obj.jobId = " + getAndOrClause(jobIds, "obj.jobId") + ")").list();
+
+        List<CaseParameter> params = new ArrayList<CaseParameter>();
+
+        for (Iterator<?> iter = ids.iterator(); iter.hasNext();)
+            params.add(this.getCaseParameter((Integer) iter.next(), session));
+
+        return params;
     }
     
     public List<CaseParameter> getCaseParametersByJobIds(int caseId, int[] jobIds, Session session) {

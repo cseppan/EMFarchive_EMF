@@ -3732,9 +3732,9 @@ public class ManagedCaseService {
                         + " has the lock for case '" + template.getName() + "'");
 
             CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), getJobs2Copy(jobIds));
-            CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), dao.getCaseInputsByJobIds(
+            CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), dao.getJobSpecNonSpecCaseInputs(
                     template.getId(), jobIds, session).toArray(new CaseInput[0]), session);
-            CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao.getCaseParametersByJobIds(
+            CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao.getJobSpecNonSpecCaseParameters(
                     template.getId(), jobIds, session).toArray(new CaseParameter[0]), session);
 
             addCaseJobs(user, targetId, jobs);
