@@ -1336,8 +1336,15 @@ public class ManagedCaseService {
                 for (int k = 0; k < depJobs.length; k++) {
                     String jobName = origJobMap.get(depJobs[k].getJobId() + "");
                     String jobId = copiedJobMap.get(jobName);
+                    int id = 0;
+                    
+                    try {
+                        id = Integer.parseInt(jobId);
+                    } catch (Exception e) {
+                        //NOTE: will discard the dependency if the job depended on doesn't exist.
+                    }
 
-                    depJobs[k].setJobId(Integer.parseInt(jobId));
+                    depJobs[k].setJobId(id);
                 }
             }
 
