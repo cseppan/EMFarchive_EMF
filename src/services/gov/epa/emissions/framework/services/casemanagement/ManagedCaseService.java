@@ -484,7 +484,7 @@ public class ManagedCaseService {
 
             List<CaseJob> jobs = dao.getCaseJobs(caseObj.getId(), session);
             checkJobsStatuses(jobs, caseObj);
-            
+
             List<CaseInput> inputs = dao.getCaseInputs(caseObj.getId(), session);
             dao.removeCaseInputs(inputs.toArray(new CaseInput[0]), session);
 
@@ -523,15 +523,15 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot remove case outputs from db table.");
             }
 
-            try {  
+            try {
                 CaseJob[] toRemove = jobs.toArray(new CaseJob[0]);
-                
-                //NOTE: cannot remove jobs without first reset the job dependencies
-                for(CaseJob job : toRemove) {
+
+                // NOTE: cannot remove jobs without first reset the job dependencies
+                for (CaseJob job : toRemove) {
                     job.setDependentJobs(null);
                     dao.updateCaseJob(job);
                 }
-                
+
                 dao.removeCaseJobs(toRemove, session);
             } catch (RuntimeException e) {
                 throw new EmfException("Cannot remove jobs from db table.");
@@ -1338,11 +1338,11 @@ public class ManagedCaseService {
                     String jobName = origJobMap.get(depJobs[k].getJobId() + "");
                     String jobId = copiedJobMap.get(jobName);
                     int id = 0;
-                    
+
                     try {
                         id = Integer.parseInt(jobId);
                     } catch (Exception e) {
-                        //NOTE: will discard the dependency if the job depended on doesn't exist.
+                        // NOTE: will discard the dependency if the job depended on doesn't exist.
                     }
 
                     depJobs[k].setJobId(id);
@@ -1808,7 +1808,7 @@ public class ManagedCaseService {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not remove case job " + jobs[0].getName() + " etc.\n" + e.getMessage());
-            throw new EmfException("Could not remove case job " + jobs[0].getName() + " etc. -- " + e.getMessage());
+            throw new EmfException("Could not remove case job " + jobs[0].getName() + " etc. -- please check if it is depended on by other jobs.");
         } finally {
             session.close();
         }
@@ -2046,9 +2046,9 @@ public class ManagedCaseService {
         try {
             String caseJobExportSubmitterId = null;
             String caseJobSubmitterId = caseJobSubmitter.getSubmitterId();
-         
+
             // Test input directory is not empty
-            
+
             if ((jobCase.getInputFileDir() == null) || (jobCase.getInputFileDir().equals(""))) {
                 throw new EmfException("Input directory must be set to run job(s).");
             }
@@ -2959,7 +2959,8 @@ public class ManagedCaseService {
 
             // Test output directory to place job script
             if ((outputDirExpanded == null) || (outputDirExpanded.equals(""))) {
-                throw new EmfException("The output job scripts directory must be set on the Jobs tab prior to running any jobs");
+                throw new EmfException(
+                        "The output job scripts directory must be set on the Jobs tab prior to running any jobs");
             }
 
             String fileName = replaceNonDigitNonLetterChars(jobName + "_" + caseAbbrev + "_" + dateStamp
@@ -3734,8 +3735,9 @@ public class ManagedCaseService {
             CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), getJobs2Copy(jobIds));
             CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), dao.getJobSpecNonSpecCaseInputs(
                     template.getId(), jobIds, session).toArray(new CaseInput[0]), session);
-            CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao.getJobSpecNonSpecCaseParameters(
-                    template.getId(), jobIds, session).toArray(new CaseParameter[0]), session);
+            CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao
+                    .getJobSpecNonSpecCaseParameters(template.getId(), jobIds, session).toArray(new CaseParameter[0]),
+                    session);
 
             addCaseJobs(user, targetId, jobs);
             addCaseInputs(user, targetId, inputs);
