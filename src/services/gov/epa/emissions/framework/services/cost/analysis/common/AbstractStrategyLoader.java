@@ -219,7 +219,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     public void makeSureInventoryDatasetHasIndexes(ControlStrategyInputDataset controlStrategyInputDataset) {
-        String query = "SELECT public.create_orl_table_indexes('" + emissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + "');vacuum analyze " + emissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + ";";
+        String query = "SELECT public.create_orl_table_indexes('" + emissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + "');vacuum analyze " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + ";";
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {

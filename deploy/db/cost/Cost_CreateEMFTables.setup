@@ -604,7 +604,7 @@ CREATE TABLE emf.control_measure_nei_devices
   CONSTRAINT control_measure_nei_devices_control_measure_id_fkey FOREIGN KEY (control_measure_id)
       REFERENCES emf.control_measures (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT control_measure_months_control_measure_id_key UNIQUE (control_measure_id, nei_device_code)
+  CONSTRAINT control_measure_nei_devices_control_measure_id_key UNIQUE (control_measure_id, nei_device_code)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.control_measure_nei_devices OWNER TO emf;

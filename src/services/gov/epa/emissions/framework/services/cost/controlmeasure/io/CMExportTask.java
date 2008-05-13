@@ -55,7 +55,7 @@ public class CMExportTask implements Runnable {
             session.setFlushMode(FlushMode.NEVER);
 //            prepare();
             String[] selectedAbbrevAndSCCs = getSelectedAbbrevAndSCCs(controlMeasureIds);
-            ControlMeasuresExporter exporter = new ControlMeasuresExporter(folder, prefix, getControlMeasures(controlMeasureIds, session), selectedAbbrevAndSCCs, user, sessionFactory);
+            ControlMeasuresExporter exporter = new ControlMeasuresExporter(folder, prefix, getControlMeasures(controlMeasureIds, session), selectedAbbrevAndSCCs, user, sessionFactory, dbServerFactory);
             exporter.run();
         } catch (Exception e) {
             e.printStackTrace();
