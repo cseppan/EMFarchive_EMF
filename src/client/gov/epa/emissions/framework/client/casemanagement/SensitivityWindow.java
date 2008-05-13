@@ -255,7 +255,6 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         sensitivityCase.setName(senName.getText());
         sensitivityCase.setAbbreviation(new Abbreviation(senAbrev.getText()));
         
-        //sensitivityCase.setCaseTemplate(true);
         sensitivityCase.setCaseCategory((CaseCategory) categoryCombox.getSelectedItem());
         return sensitivityCase;
     }

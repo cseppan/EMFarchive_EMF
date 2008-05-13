@@ -2,8 +2,6 @@ package gov.epa.emissions.framework.client.casemanagement;
 
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableComponent;
-import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -18,7 +16,6 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParame
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
-import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -31,7 +28,6 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
-import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView {
@@ -63,8 +59,6 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     private SetCaseFoldersPanel setCaseFoldersPanel; 
     
     private SetCaseParameterPanel setCaseParameterPanel;
-    
-    private boolean hasValues = false; 
     
     public SetCaseWindow(String title, EmfConsole parentConsole, 
             DesktopManager desktopManager) {
@@ -200,10 +194,10 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
                         doSave();
                         resetChanges();
                     }
-                    String validationMsg = validateValues();
-                    if (hasValues){
-                        showMessageDialog(validationMsg);
-                    }
+//                    String validationMsg = validateValues();
+//                    if (hasValues){
+//                        showMessageDialog(validationMsg);
+//                    }
                     CaseEditor view = new CaseEditor(parentConsole, presenter.getSession(), desktopManager);
                     managerPresenter.doEdit(view, caseObj);
                     disposeView();
@@ -216,63 +210,63 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         return action;
     }
     
-    private void showMessageDialog(String msg) throws EmfException {
-        String validationMsg = validateValues();
-        int width = 50;
-        int height = (validationMsg.length() / 50)+3;
-        String title = "Jobs in the case may not run until the following items are corrected:";
-        JDialog dialog =new JDialog(parentConsole, title, false);
-        dialog.getContentPane().add(createMsgScrollPane(msg, width, height));
-        dialog.setLocation(ScreenUtils.getPointToCenter(this));
-        dialog.pack();
-        dialog.setPreferredSize(new Dimension(400, 300));
-        dialog.setModal(false);
-        dialog.setVisible(true);
-    }
+//    private void showMessageDialog(String msg) throws EmfException {
+//        String validationMsg = validateValues();
+//        int width = 50;
+//        int height = (validationMsg.length() / 50)+3;
+//        String title = "Jobs in the case may not run until the following items are corrected:";
+//        JDialog dialog =new JDialog(parentConsole, title, false);
+//        dialog.getContentPane().add(createMsgScrollPane(msg, width, height));
+//        dialog.setLocation(ScreenUtils.getPointToCenter(this));
+//        dialog.pack();
+//        dialog.setPreferredSize(new Dimension(400, 300));
+//        dialog.setModal(false);
+//        dialog.setVisible(true);
+//    }
+//    
+//    private ScrollableComponent createMsgScrollPane(String msg, int width, int height) {
+//        TextArea message = new TextArea("msgArea", msg, width, height);
+//        message.setEditable(false);
+//        ScrollableComponent descScrollableTextArea = new ScrollableComponent(message);
+//        return descScrollableTextArea;
+//    }
     
-    private ScrollableComponent createMsgScrollPane(String msg, int width, int height) {
-        TextArea message = new TextArea("msgArea", msg, width, height);
-        message.setEditable(false);
-        ScrollableComponent descScrollableTextArea = new ScrollableComponent(message);
-        return descScrollableTextArea;
-    }
-    
-    private String validateValues() throws EmfException{
-        String noLocalValues = "";
-        CaseInput[] inputList = presenter.getCaseInput(caseObj.getId(), new Sector("All", "All"), true);
-        noLocalValues += "The following non-local inputs do not have datasets specified: \n";
-        for (CaseInput input :inputList){
-            if ( !input.isLocal() && input.getDataset()==null){
-                hasValues = true; 
-                noLocalValues += getInputValues(input) +"\n";
-            }
-        }
-        CaseParameter[] paraList = presenter.getCaseParameters(caseObj.getId(), new Sector("All", "All"), true);
-        noLocalValues += "\nThe following non-local parameters do not have values: \n"; 
-        for (CaseParameter par :paraList){
-            if ( !par.isLocal() && par.getValue().trim().isEmpty()){
-                noLocalValues += getParamValues(par) + "\n";
-                hasValues = true; 
-            }
-        }
-        return noLocalValues;
-    }
-    
-    private String getInputValues(CaseInput input) throws EmfException{
-        String Value = (input.getEnvtVars() == null ? "" : input.getEnvtVars().getName()) + "; " 
-                     + (input.getSector() == null ? "All sectors" : input.getSector().getName())+ "; "
-                     + presenter.getJobName(input.getCaseJobID()) + "; "
-                     + input.getName();
-        return Value; 
-    }
-    
-    private String getParamValues(CaseParameter parameter) throws EmfException{
-        String Value = (parameter.getEnvVar() == null ? "" : parameter.getEnvVar().getName()) + "; " 
-                     + (parameter.getSector() == null ? "All sectors" : parameter.getSector().getName())+ "; " 
-                     + presenter.getJobName(parameter.getJobId()) + "; "
-                     + parameter.getName();
-        return Value; 
-    }
+//    private String validateValues() throws EmfException{
+//        String noLocalValues = "";
+//        CaseInput[] inputList = presenter.getCaseInput(caseObj.getId(), new Sector("All", "All"), true);
+//        noLocalValues += "The following non-local inputs do not have datasets specified: \n";
+//        for (CaseInput input :inputList){
+//            if ( !input.isLocal() && input.getDataset()==null){
+//                hasValues = true; 
+//                noLocalValues += getInputValues(input) +"\n";
+//            }
+//        }
+//        CaseParameter[] paraList = presenter.getCaseParameters(caseObj.getId(), new Sector("All", "All"), true);
+//        noLocalValues += "\nThe following non-local parameters do not have values: \n"; 
+//        for (CaseParameter par :paraList){
+//            if ( !par.isLocal() && par.getValue().trim().isEmpty()){
+//                noLocalValues += getParamValues(par) + "\n";
+//                hasValues = true; 
+//            }
+//        }
+//        return noLocalValues;
+//    }
+//    
+//    private String getInputValues(CaseInput input) throws EmfException{
+//        String Value = (input.getEnvtVars() == null ? "" : input.getEnvtVars().getName()) + "; " 
+//                     + (input.getSector() == null ? "All sectors" : input.getSector().getName())+ "; "
+//                     + presenter.getJobName(input.getCaseJobID()) + "; "
+//                     + input.getName();
+//        return Value; 
+//    }
+//    
+//    private String getParamValues(CaseParameter parameter) throws EmfException{
+//        String Value = (parameter.getEnvVar() == null ? "" : parameter.getEnvVar().getName()) + "; " 
+//                     + (parameter.getSector() == null ? "All sectors" : parameter.getSector().getName())+ "; " 
+//                     + presenter.getJobName(parameter.getJobId()) + "; "
+//                     + parameter.getName();
+//        return Value; 
+//    }
 
     private Action prevsAction() {
         Action action = new AbstractAction() {

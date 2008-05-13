@@ -28,8 +28,6 @@ public interface SetCasePresenter extends CaseEditorTabPresenter {
 
     void doAddInputFields(CaseInput input, JPanel container, SetInputFieldsPanel setInputFieldsPanel) throws EmfException;
 
-    //void doAddParameterFields(CaseParameter param, JPanel container, SetCaseParameterPanel setCaseParameterPanel) throws EmfException;
-    
     String getJobName(int jobId) throws EmfException;
     
 }

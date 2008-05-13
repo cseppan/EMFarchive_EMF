@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenter;
 import gov.epa.emissions.framework.client.casemanagement.history.ShowHistoryTabPresenter;
@@ -18,7 +19,10 @@ import gov.epa.emissions.framework.client.casemanagement.parameters.EditParamete
 import gov.epa.emissions.framework.client.casemanagement.parameters.EditParametersTabPresenterImpl;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -204,4 +208,30 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
             outputsLoaded = true;
         }
     }
+    
+    public CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException {
+        return service().getCaseInputs(20, caseId, sector, showAll);
+    }
+    
+    public CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
+        if (sector == null)
+            return new CaseParameter[0];
+
+        if (sector.compareTo(new Sector("All", "All")) == 0)
+            sector = null; // to trigger select all on the server side
+
+        return service().getCaseParameters(20, caseId, sector, showAll);
+
+    }
+    
+    public String getJobName(int jobId) throws EmfException {
+        if (jobId == 0)
+            return "All jobs for sector";
+        
+        CaseJob job = session.caseService().getCaseJob(jobId);
+        if (job == null)
+            throw new EmfException("Cannot retrieve job (id = " + jobId + ").");
+        return job.getName();
+    }
+    
 }

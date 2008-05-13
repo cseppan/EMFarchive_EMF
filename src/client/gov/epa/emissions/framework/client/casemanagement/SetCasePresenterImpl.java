@@ -124,11 +124,4 @@ public class SetCasePresenterImpl implements SetCasePresenter {
         service().updateCaseWithLock(caseObj);
     }
 
-//    public void doAddParameterFields(CaseParameter param, JPanel container, SetCaseParameterPanel setCaseParameterPanel)
-//            throws EmfException {
-//        ParameterFieldsPanelPresenter paramPresenter = new ParameterFieldsPanelPresenter(caseObj.getId(), setCaseParameterPanel, session);
-//        inputFieldsPresenter.display(input, container);
-//        
-//    }
-
 }
