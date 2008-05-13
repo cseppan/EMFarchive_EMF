@@ -1332,6 +1332,7 @@ public class ManagedCaseService {
 
         for (int j = 0; j < size; j++) {
             DependentJob[] depJobs = copiedJobs[j].getDependentJobs();
+            ArrayList jobsToKeep = new ArrayList(); //AME: added per Qun
 
             if (depJobs != null && depJobs.length > 0) {
                 for (int k = 0; k < depJobs.length; k++) {
@@ -1341,16 +1342,17 @@ public class ManagedCaseService {
 
                     try {
                         id = Integer.parseInt(jobId);
+                        depJobs[k].setJobId(id);
+                        jobsToKeep.add(depJobs[k]);
                     } catch (Exception e) {
-                        // NOTE: will discard the dependency if the job depended on doesn't exist.
-                    }
+                        // NOTE:  discard the dependency if the job depended on doesn't exist.
+                   }
 
-                    depJobs[k].setJobId(id);
                 }
             }
-
-            copiedJobs[j].setDependentJobs(depJobs);
+            copiedJobs[j].setDependentJobs((DependentJob[])jobsToKeep.toArray());
         }
+        
 
         return copiedJobs;
     }
