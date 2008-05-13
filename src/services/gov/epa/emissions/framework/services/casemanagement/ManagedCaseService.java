@@ -1350,7 +1350,9 @@ public class ManagedCaseService {
 
                 }
             }
-            copiedJobs[j].setDependentJobs((DependentJob[])jobsToKeep.toArray());
+            DependentJob[] remainingJobs = new DependentJob[jobsToKeep.size()];
+            jobsToKeep.toArray(remainingJobs);
+            copiedJobs[j].setDependentJobs(remainingJobs);
         }
         
 
