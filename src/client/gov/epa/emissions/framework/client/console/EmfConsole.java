@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.ui.Dimensions;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.emissions.framework.ui.YesNoDialog;
+import gov.epa.mims.analysisengine.table.TableApp;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -106,6 +107,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         menubar.add(createFileMenu(session, messagePanel));
         menubar.add(createManageMenu(session, messagePanel));
         menubar.add(windowMenu);
+        menubar.add(createToolMenu());
         menubar.add(createHelpMenu());
 
         menubar.add(messagePanel);
@@ -147,6 +149,21 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         new ManageMenuPresenter(manageMenu, session).observe();
 
         return manageMenu;
+    }
+    
+    private JMenu createToolMenu() {
+        JMenu menu = new JMenu("Tools");
+        addClearAction(menu);
+
+
+        JMenuItem about = new JMenuItem("Analysis Engine");
+        about.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                TableApp.main(new String[0]);
+            }
+        });
+        menu.add(about);
+        return menu; 
     }
 
     private JMenu createHelpMenu() {
