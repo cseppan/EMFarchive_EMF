@@ -98,6 +98,10 @@ public interface CaseService {
     
     CaseInput[] getCaseInputs(int defaultPageSize, int caseId, Sector sector, boolean showAll) throws EmfException;
     
+    String validateNLInputs(int caseId) throws EmfException;
+    
+    String validateNLParameters(int caseId) throws EmfException;
+    
     Case[] copyCaseObject(int[] toCopy, User user) throws EmfException;
     
     CaseJob addCaseJob(User user, CaseJob job) throws EmfException;

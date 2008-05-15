@@ -204,7 +204,7 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
                     managerPresenter.doEdit(view, caseObj);
                     disposeView();
                 } catch (EmfException e) {
-                    //e.printStackTrace();
+                    e.printStackTrace();
                     messagePanel.setError(e.getMessage());
                 }
             }

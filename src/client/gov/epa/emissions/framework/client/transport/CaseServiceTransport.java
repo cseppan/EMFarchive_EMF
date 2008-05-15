@@ -1037,4 +1037,24 @@ public class CaseServiceTransport implements CaseService {
         return (String) call.requestResponse(new Object[]{caseObj});
     }
 
+    public synchronized String validateNLInputs(int caseId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("validateNLInputs");
+        call.addIntegerParam("caseId");
+        call.setStringReturnType();
+
+        return (String) call.requestResponse(new Object[] { new Integer(caseId) });
+    }
+    
+    public synchronized String validateNLParameters(int caseId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("validateNLParameters");
+        call.addIntegerParam("caseId");
+        call.setStringReturnType();
+
+        return (String) call.requestResponse(new Object[] { new Integer(caseId) });
+    }
+
 }

@@ -22,6 +22,10 @@ public interface SetCasePresenter extends CaseEditorTabPresenter {
     
     CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException;
     
+    String validateNLInputs(int caseId) throws EmfException;
+    
+    String validateNLParameters(int caseId) throws EmfException;
+    
     CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException; 
    
     EmfSession getSession();

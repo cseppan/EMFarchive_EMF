@@ -57,7 +57,15 @@ public class SetCasePresenterImpl implements SetCasePresenter {
     public CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException {
         return service().getCaseInputs(defaultPageSize, caseId, sector, showAll);
     }
-
+    
+    public String validateNLInputs(int caseId) throws EmfException{
+        return service().validateNLInputs(caseId);
+    }
+    
+    public String validateNLParameters(int caseId) throws EmfException{
+        return service().validateNLParameters(caseId);
+    }
+    
     public void checkIfLockedByCurrentUser() throws EmfException {
         Case reloaded = service().reloadCase(caseObj.getId());
 

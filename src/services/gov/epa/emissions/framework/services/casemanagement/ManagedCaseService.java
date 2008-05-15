@@ -110,7 +110,7 @@ public class ManagedCaseService {
 
     private final int ALL_JOB_ID = 0;
 
-    protected Session session = null;
+//    protected Session session = null;
 
     // private Session getSession() {
     // if (session == null) {
@@ -3123,7 +3123,7 @@ public class ManagedCaseService {
     }
 
     public synchronized void finalize() throws Throwable {
-        this.session = null;
+//        this.session = null;
         super.finalize();
     }
 
@@ -3939,5 +3939,59 @@ public class ManagedCaseService {
         //
         // return uniqueParameters.toArray(new CaseParameter[0]);
         return params2Target.toArray(new CaseParameter[0]);
+    }
+    
+    public synchronized String validateNLInputs(int caseId) throws EmfException{
+        String noLocalValues = "";
+        try {
+            CaseInput[] inputList = getCaseInputs(caseId);
+            if (inputList == null)
+                return noLocalValues;
+            
+            for (CaseInput input :inputList){
+                if ( !input.isLocal() && input.getDataset()==null){
+                    noLocalValues += getInputValues(input) +"\n";
+                }
+            }
+        } catch (RuntimeException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+        return noLocalValues;
+    }
+    
+    public synchronized String validateNLParameters(int caseId) throws EmfException{
+        String noLocalValues = "";
+        CaseParameter[] paraList = getCaseParameters(caseId);
+        for (CaseParameter par :paraList){
+            if ( !par.isLocal() && par.getValue().trim().isEmpty()){
+                noLocalValues += getParamValues(par) + "\n";
+            }
+        }
+        return noLocalValues;
+    }
+    
+    private String getInputValues(CaseInput input){
+        String Value = (input.getEnvtVars() == null ? "" : input.getEnvtVars().getName()) + "; " 
+        + (input.getSector() == null ? "All sectors" : input.getSector().getName())+ "; "
+        + getJobName(input.getCaseJobID()) + "; "
+        + input.getName();
+        return Value; 
+    }
+
+    private String getParamValues(CaseParameter parameter){
+        String Value = (parameter.getEnvVar() == null ? "" : parameter.getEnvVar().getName()) + "; " 
+        + (parameter.getSector() == null ? "All sectors" : parameter.getSector().getName())+ "; " 
+        + getJobName(parameter.getJobId()) + "; "
+        + parameter.getName();
+        return Value; 
+    }
+    
+    private String getJobName(int jobId){
+        CaseJob job = dao.getCaseJob(jobId);
+        if (job == null)
+            return "";
+        
+        return job.getName(); 
     }
 }

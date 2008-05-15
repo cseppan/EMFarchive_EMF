@@ -645,5 +645,13 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().checkParentCase(caseObj);
     }
 
+    public String validateNLInputs(int caseId) throws EmfException {
+        return getCaseService().validateNLInputs(caseId);
+    }
+
+    public String validateNLParameters(int caseId) throws EmfException {
+        return getCaseService().validateNLParameters(caseId);
+    }
+
 
 }
