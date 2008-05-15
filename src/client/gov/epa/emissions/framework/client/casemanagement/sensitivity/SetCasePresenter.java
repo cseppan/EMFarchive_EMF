@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.casemanagement;
+package gov.epa.emissions.framework.client.casemanagement.sensitivity;
 
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;

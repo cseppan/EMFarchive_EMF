@@ -1,14 +1,11 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
-import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.casemanagement.history.ShowHistoryTabView;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabView;
 import gov.epa.emissions.framework.client.casemanagement.jobs.EditJobsTabView;
 import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTabView;
 import gov.epa.emissions.framework.client.casemanagement.parameters.EditCaseParametersTabView;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.casemanagement.CaseInput;
-import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 
 public interface CaseEditorPresenter {
 
@@ -36,10 +33,4 @@ public interface CaseEditorPresenter {
     
     void checkIfLockedByCurrentUser() throws EmfException;
     
-    CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException;
-    
-    CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException; 
-   
-    String getJobName(int jobId) throws EmfException;
-
 }

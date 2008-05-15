@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditor;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewer;
+import gov.epa.emissions.framework.client.casemanagement.sensitivity.SensitivityWindow;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;

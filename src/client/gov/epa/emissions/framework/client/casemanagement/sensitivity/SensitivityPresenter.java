@@ -1,6 +1,7 @@
-package gov.epa.emissions.framework.client.casemanagement;
+package gov.epa.emissions.framework.client.casemanagement.sensitivity;
 
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenterImpl;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorView;

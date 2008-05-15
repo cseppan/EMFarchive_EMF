@@ -1,7 +1,8 @@
-package gov.epa.emissions.framework.client.casemanagement;
+package gov.epa.emissions.framework.client.casemanagement.sensitivity;
 
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenter;
 import gov.epa.emissions.framework.client.casemanagement.inputs.InputFieldsPanelPresenter;
 import gov.epa.emissions.framework.client.casemanagement.inputs.SetInputFieldsPanel;
 import gov.epa.emissions.framework.services.EmfException;

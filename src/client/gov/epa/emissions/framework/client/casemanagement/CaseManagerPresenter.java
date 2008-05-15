@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.casemanagement;
 
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorView;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewerView;
+import gov.epa.emissions.framework.client.casemanagement.sensitivity.SensitivityView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;

@@ -7,6 +7,8 @@ import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorView;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewerView;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewerPresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewerPresenterImpl;
+import gov.epa.emissions.framework.client.casemanagement.sensitivity.SensitivityPresenter;
+import gov.epa.emissions.framework.client.casemanagement.sensitivity.SensitivityView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;

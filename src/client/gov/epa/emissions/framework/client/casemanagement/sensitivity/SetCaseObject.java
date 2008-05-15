@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.casemanagement;
+package gov.epa.emissions.framework.client.casemanagement.sensitivity;
 
 
 public class SetCaseObject{
