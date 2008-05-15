@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
-//import gov.epa.emissions.commons.gui.EmptyStrings;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
@@ -29,12 +28,14 @@ import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
-import java.awt.Insets;
-import java.awt.GridLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -587,7 +588,14 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             jobNames = presenter.getExistedJobs();
             dependentJobNames = new String[0];
         }
-        
+        Arrays.sort(jobNames,new Comparator()
+         {
+            public final int compare ( Object a, Object b) 
+            {
+               return (((String)a).compareToIgnoreCase((String)b)); 
+            }
+         });
+        Arrays.sort(dependentJobNames);
         dependentJobsList = new AddRemoveWidget(jobNames, changeablesList, parent, false, true);
         dependentJobsList.setObjects(dependentJobNames);
         dependentJobsList.setPreferredSize(new Dimension(190,120));
