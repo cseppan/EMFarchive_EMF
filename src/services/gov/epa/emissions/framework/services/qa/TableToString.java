@@ -62,7 +62,7 @@ public class TableToString {
     }
 
     private void writeHeaderRow(ResultSetMetaData md, int columnCount) throws SQLException {
-        String colTypes = "#TYPES=";
+        String colTypes = "#COLUMN_TYPES=";
         String colNames = ""; 
         
         for (int i = 1; i <= columnCount; i++) {
