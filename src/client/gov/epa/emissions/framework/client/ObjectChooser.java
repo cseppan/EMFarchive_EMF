@@ -58,7 +58,7 @@ public class ObjectChooser extends JDialog {
         contentPane.add(panel);
 
         pack();
-        setSize(300, 300);
+        setSize(500, 300);
         setLocation(ScreenUtils.getPointToCenter(this));
         setModal(true);
         setVisible(true);
