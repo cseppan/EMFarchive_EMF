@@ -1,3 +1,4 @@
+#TYPES=varchar(6)|varchar(255)|varchar(50)|varchar(50)|varchar(1)|varchar(1)
 "NAICS_CODE","NAICS_DESCRIPTION","BEGIN_DATE","END_DATE","VALID_V20","VALID_V30"
 "11","Agriculture, Forestry, Fishing and Hunting","19981119",,,"Y"
 "111","Crop Production","19981119",,,"Y"

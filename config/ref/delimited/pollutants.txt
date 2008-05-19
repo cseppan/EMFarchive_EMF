@@ -1,3 +1,4 @@
+#TYPES=varchar(20)|varchar(155)
 Pollutant_Code, Pollutant_Name
 CO, CO
 NOX,NOX

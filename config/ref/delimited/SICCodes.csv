@@ -1,3 +1,4 @@
+#TYPES=varchar(4)|varchar(255)|varchar(255)
 "SIC","Description","Description_short"
 "01","Agricultural Production - Crops","Agricultural Production - Crops"
 "0100","Agricultural production- crops","Agricultural production- crops"

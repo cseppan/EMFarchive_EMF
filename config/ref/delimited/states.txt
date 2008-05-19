@@ -1,3 +1,4 @@
+#TYPES=varchar(2)|varchar(2)|varchar(2)|varchar(100)
 Country_Code,State_Code,State_Abbr,State_Name
 01,1,AL  ,Alabama  
 01,2,AK ,Alaska 

@@ -1,3 +1,4 @@
+#TYPES=varchar(128)|varchar(3)|varchar(11)|varchar(11)|varchar(54)|varchar(54)|varchar(70)|varchar(70)|timestamp(29)|timestamp(29)|varchar(128)|varchar(128)
 "Sector","Active","MapTo","SCC","SCC_L1","SCC_L2","SCC_L3","SCC_L4","CREATED","REVISED","REV_WHAT","COMMENT"
 "POINT",,,"101","External Combustion Boilers",,,,,,,"Added 3 Digit SCC"
 "POINT",,,"101001","External Combustion Boilers","Electric Generation","Anthracite Coal",,,,,"Added 6 Digit SCC"
@@ -4830,7 +4831,7 @@
 "POINT",,,"30201998","Industrial Processes","Food and Agriculture","Vegetable Oil Processing","Soybean Oil Production: Complete Process-Solvent Loss (average)",,,,
 "POINT",,,"30201999","Industrial Processes","Food and Agriculture","Vegetable Oil Processing","Other Not Classified",,,,
 "POINT",,,"302020","Industrial Processes","Food and Agriculture","Beef Cattle Feedlots",,,,,"Added 6 Digit SCC"
-"POINT",,,"30202000","Industrial Processes","Food and Agriculture","Beef Cattle Feedlots","Hogs and Swines","Yes",11/14/2005 9:51:01,,"Added"
+"POINT",,,"30202000","Industrial Processes","Food and Agriculture","Beef Cattle Feedlots","Hogs and Swines",,11/14/2005 9:51:01,,"Added"
 "POINT",,,"30202001","Industrial Processes","Food and Agriculture","Beef Cattle Feedlots","Feedlots: General",,,,
 "POINT",,,"30202002","Industrial Processes","Food and Agriculture","Beef Cattle Feedlots","Feedlots: General",,,,
 "POINT",,,"302021","Industrial Processes","Food and Agriculture","Eggs and Poultry Production",,,,,"Added 6 Digit SCC"

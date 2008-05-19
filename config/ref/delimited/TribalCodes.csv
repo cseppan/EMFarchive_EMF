@@ -1,3 +1,4 @@
+#TYPES=varchar(3)|varchar(255)|varchar(1)|varchar(1)|timestamp(29)|varchar(255)
 "Tribal Code","Tribe Name","VALID_V20","VALID_V30","LAST MOD DATE","COMMENT"
 "204","Fort Belknap Indian Community of the Fort Belknap Reservation of Montana","N","Y",,
 "205","Chippewa-Cree Indians of the Rocky Boy's Reservation, Montana","N","Y",,

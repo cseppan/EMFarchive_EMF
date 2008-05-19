@@ -1,3 +1,4 @@
+#TYPES=varchar(4)|varchar(6)|varchar(25)|varchar(255)|varchar(255)|int4(10)|varchar(50)|varchar(25)|int4(10)
 "SIC","MACT_CODE","MACT_CODE_ASSIGNMENT","DESCRIPTION","FIXED_DESCRIPTION","Delete Flag","status","change","Area_112K"
 "2835","1201","SIC-DEFAULT","Chemicals And Allied Products, Drugs, Diagnostic substances","Chemicals And Allied Products, Drugs, Diagnostic substances",0,,"add",1
 "2836","1201","SIC-DEFAULT","Chemicals And Allied Products, Drugs, Biological products exc. diagnostic","Chemicals And Allied Products, Drugs, Biological products exc. diagnostic",0,,"add",1

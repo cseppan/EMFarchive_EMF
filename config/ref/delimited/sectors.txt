@@ -1,15 +1,16 @@
-Sector
-Point
-Non-Point
-Area
-Point IPM
-Point Non-IPM
-Point Fugitive Dust
-Fire
-Average Fire
-Agricultural
-Area Fugitive Dust
-Other Area
-Nonroad
-On Road
-Biogenic
+#TYPES=varchar(128)|varchar(128)
+Sector,Comment
+Point,
+Non-Point,
+Area,
+Point IPM,
+Point Non-IPM,
+Point Fugitive Dust,
+Fire,
+Average Fire,
+Agricultural,
+Area Fugitive Dust,
+Other Area,
+Nonroad,
+On Road,
+Biogenic,

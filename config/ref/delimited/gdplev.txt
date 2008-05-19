@@ -1,3 +1,4 @@
+#TYPES=int4(10)||float4(8)|float4(8)
 Annual,Current_GDP,Chained_GDP
 1929,103.6,865.2
 1930,91.2,790.7

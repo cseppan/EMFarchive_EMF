@@ -1,3 +1,4 @@
+#TYPES=varchar(150)|varchar(6)|int4(10)|int4(10)|varchar(50)|int4(10)|int4(10)|varchar(50)|varchar(50)|timestamp(29)|timestamp(29)|varchar(2)|varchar(2)|varchar(150)
 "MACT Source Category","MACT Code","proposed new code","area source category 112k","Groups","Ten year MACT","Residual Risk","Contact","Contact Email","Promulgation Date","Implementation Date","MajorSourceComplianceCode","AreaSourceComplianceCode","Comment"
 "Ferroalloys Production","0304",0,0,"MG",0,0,"Conrad Chin","conrad.chin@epa.gov",5/20/1999 0:00:00,5/20/2001 0:00:00,"02","06","Email could be chin.conrad@epa.gov"
 "Integrated Iron & Steel Manufacturing","0305",0,0,"MG",1,0,"Phil Mulrine","mulrine.phil@epa.gov",5/20/2003 0:00:00,5/20/2006 0:00:00,"01","06",

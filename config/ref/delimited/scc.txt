@@ -1,3 +1,4 @@
+#TYPES=varchar(11)|varchar(248)
 SCC,SCC_Description
 10100101,External Combustion Boilers;Electric Generation;Anthracite Coal;Pulverized Coal
 10100102,External Combustion Boilers;Electric Generation;Anthracite Coal;Traveling Grate (Overfeed) Stoker

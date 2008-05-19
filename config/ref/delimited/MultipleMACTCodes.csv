@@ -1,3 +1,4 @@
+#TYPES=varchar(6)|varchar(6)|varchar(6)|varchar(6)|varchar(6)|varchar(6)|varchar(6)|varchar(50)
 "MACTCode1","MACTCode2","MACTCode3","MACTCode4","MACTCode5","MACTCode6","MACTCode7","MULTIMACT"
 "0101-1","0101-2",,,,,,"MLT201"
 "0101-1","0415",,,,,,"MLT202"
