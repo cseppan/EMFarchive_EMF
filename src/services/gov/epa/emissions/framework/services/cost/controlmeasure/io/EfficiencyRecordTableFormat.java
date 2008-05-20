@@ -80,4 +80,14 @@ public class EfficiencyRecordTableFormat implements TableFormat {
                 cap_ann_ratio, incremental_cost_per_ton};
     }
 
+    public int getBaseLength() {
+        // NOTE Auto-generated method stub
+        return 0;
+    }
+
+    public int getOffset() {
+        // NOTE Auto-generated method stub
+        return 0;
+    }
+
 }

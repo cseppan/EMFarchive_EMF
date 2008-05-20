@@ -126,4 +126,14 @@ public class StrategyLeastCostCMWorksheetTableFormat implements TableFormat {
                 marginal, cumAnnualCost, cumEmisReduction, remove, status, originalDatasetId, sector, source, comment };
     }
 
+    public int getBaseLength() {
+        // NOTE Auto-generated method stub
+        return 0;
+    }
+
+    public int getOffset() {
+        // NOTE Auto-generated method stub
+        return 0;
+    }
+
 }

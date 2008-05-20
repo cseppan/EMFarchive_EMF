@@ -88,4 +88,14 @@ public class StrategySummaryResultTableFormat implements TableFormat {
                 comment 
                 };
     }
+
+    public int getBaseLength() {
+        // NOTE Auto-generated method stub
+        return 0;
+    }
+
+    public int getOffset() {
+        // NOTE Auto-generated method stub
+        return 0;
+    }
 }

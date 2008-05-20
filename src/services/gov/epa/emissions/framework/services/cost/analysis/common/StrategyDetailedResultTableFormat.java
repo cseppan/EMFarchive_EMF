@@ -113,4 +113,14 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         return cols.toArray(new Column[0]);
     }
 
+    public int getBaseLength() {
+        // NOTE Auto-generated method stub
+        return 0;
+    }
+
+    public int getOffset() {
+        // NOTE Auto-generated method stub
+        return 0;
+    }
+
 }
