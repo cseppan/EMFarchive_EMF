@@ -282,7 +282,7 @@ WITHOUT OIDS;
 -- 2/21/2008 to add a new property to emf.properties table
 insert into emf.properties values(DEFAULT, 'USE_IMPORT_TASK_MANAGER', 'false');
 
--- emf.qa_programs  03/07/08 by Dongmei Yang
+-- emf.qa_programs  03/07/08 
 insert into emf.qa_programs values(DEFAULT,'Multi-inventory sum','gov.epa.emissions.framework.services.qa.MultiInvSumProgramRunner');
 insert into emf.qa_programs values(DEFAULT,'Multi-inventory column report','gov.epa.emissions.framework.services.qa.NInvDiffProgramRunner');
 insert into emf.qa_programs values(DEFAULT,'Multi-inventory difference report','gov.epa.emissions.framework.services.qa.MultiInvDiffProgramRunner');
@@ -327,4 +327,7 @@ exporter_classname = 'gov.epa.emissions.commons.io.orl.ORLMergedExporter'
 where name = 'ORL CoST Point Inventory (PTINV)';
 
 insert into emf.dataset_types values(DEFAULT,'Control Strategy Least Cost Curve Summary','Control Strategy Least Cost Curve Summary', '1', '1', false,'', '', 'gov.epa.emissions.commons.io.csv.CSVExporter');
+
+-- 5/17/200 add one key word for csv file header line control
+insert INTO emf.keywords VALUES (DEFAULT, 'COLUMN_TYPES');
 
