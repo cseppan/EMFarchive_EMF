@@ -2826,7 +2826,14 @@ public class ManagedCaseService {
             String endString = caseObj.getEndDate().toString();
             sbuf.append(shellSetenv("EPI_ENDATE_TIME", endString));
         }
-
+        
+        // Add sector from job
+        sbuf.append(eolString);
+        sbuf.append(this.runComment + " Parameters -- SECTOR from job" + eolString);
+        if (job.getSector() != null) {
+            sbuf.append(shellSetenv("SECTOR", job.getSector().getName()));
+        }
+        
         // All sectors, all jobs
         sbuf.append(eolString);
         sbuf.append(this.runComment + " Parameters -- all sectors, all jobs " + eolString);
