@@ -59,6 +59,8 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     
     private boolean local;
     
+    private String jobGroup; 
+    
     private DependentJob[] dependentJobs = new DependentJob[] {};
 
     public CaseJob() {
@@ -294,4 +296,11 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
         this.local = local;
     }
 
+    public void setJobGroup(String abbrev){
+        this.jobGroup =abbrev; 
+    }
+    
+    public String getJobGroup(){
+        return jobGroup;
+    }
 }

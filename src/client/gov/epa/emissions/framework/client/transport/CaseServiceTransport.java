@@ -1011,7 +1011,8 @@ public class CaseServiceTransport implements CaseService {
         return (String[]) call.requestResponse(new Object[] {});
     }
 
-    public synchronized Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, Case sensitivityCase)
+    public synchronized Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, 
+            String jobGroup, Case sensitivityCase)
             throws EmfException {
         EmfCall call = call();
 
@@ -1020,11 +1021,12 @@ public class CaseServiceTransport implements CaseService {
         call.addIntegerParam("parentCaseId");
         call.addIntegerParam("templateCaseId");
         call.addIntArrayParam();
+        call.addStringParam(jobGroup);
         call.addParam("sensitivityCase", caseMappings.caseObject());
         call.setReturnType(caseMappings.caseObject());
 
         return (Case) call.requestResponse(new Object[] { user, new Integer(parentCaseId), new Integer(templateCaseId),
-                jobIds, sensitivityCase });
+                jobIds, jobGroup, sensitivityCase });
     }
 
     public synchronized String checkParentCase(Case caseObj) throws EmfException {

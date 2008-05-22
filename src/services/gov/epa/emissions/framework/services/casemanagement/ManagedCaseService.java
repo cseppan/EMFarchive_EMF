@@ -3704,7 +3704,7 @@ public class ManagedCaseService {
     }
 
     public synchronized Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds,
-            Case sensitivityCase) throws EmfException {
+            String jobGroup, Case sensitivityCase) throws EmfException {
         Session session = sessionFactory.getSession();
         Case lockedSC = null;
         Case lockedPC = null;
@@ -3743,7 +3743,7 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot obtain lock for merging case to happen: User " + template.getLockOwner()
                         + " has the lock for case '" + template.getName() + "'");
 
-            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), getJobs2Copy(jobIds));
+            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, getJobs2Copy(jobIds));
             CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), dao.getJobSpecNonSpecCaseInputs(
                     template.getId(), jobIds, session).toArray(new CaseInput[0]), session);
             CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao
@@ -3829,13 +3829,14 @@ public class ManagedCaseService {
         }
     }
 
-    private CaseJob[] cloneCaseJobs(int targetCaseId, int parentCaseId, CaseJob[] objects) throws Exception {
+    private CaseJob[] cloneCaseJobs(int targetCaseId, int parentCaseId, String jobGroup, CaseJob[] objects) throws Exception {
         List<CaseJob> copied = new ArrayList<CaseJob>();
 
         for (int i = 0; i < objects.length; i++) {
             CaseJob job = (CaseJob) DeepCopy.copy(objects[i]);
             job.setCaseId(targetCaseId);
             job.setParentCaseId(parentCaseId);
+            job.setJobGroup(jobGroup);
             copied.add(job);
         }
 

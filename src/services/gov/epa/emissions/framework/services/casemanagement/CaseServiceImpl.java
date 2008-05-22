@@ -637,8 +637,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getAllCaseNameIDs();
     }
 
-    public Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, Case sensitivityCase) throws EmfException {
-        return getCaseService().mergeCases(user, parentCaseId, templateCaseId, jobIds, sensitivityCase);
+    public Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case sensitivityCase) throws EmfException {
+        return getCaseService().mergeCases(user, parentCaseId, templateCaseId, jobIds, jobGroup, sensitivityCase);
     }
     
     public String checkParentCase(Case caseObj) throws EmfException {
