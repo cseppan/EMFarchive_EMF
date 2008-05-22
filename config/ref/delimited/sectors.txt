@@ -1,4 +1,4 @@
-#TYPES=varchar(128)|varchar(128)
+#TYPES=varchar(64)|varchar(128)
 Sector,Comment
 Point,
 Non-Point,
