@@ -361,7 +361,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
         for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = iter.next();
-            String title = "Edit Case Job: " + job.getName() + "(" + job.getId() + ")(" + caseObj.getName() + ")";
+            String title = "Edit Case Job: " + job.getName() + " (" + job.getId() + ") (" + caseObj.getName() + ")";
             EditCaseJobView jobEditor = new EditCaseJobWindow(title, desktopManager, parentConsole, session);
             presenter.editJob(job, jobEditor);
         }

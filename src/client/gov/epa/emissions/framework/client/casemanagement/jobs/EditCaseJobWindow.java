@@ -71,7 +71,15 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
 
         ok = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doSave();
+                if(hasChanges()){
+                    try{
+                        validateFields();
+                        presenter.saveJob();
+                        disposeView();
+                    }catch(EmfException e1) {
+                        messagePanel.setError(e1.getMessage());
+                    }
+                }
             }
         });
         getRootPane().setDefaultButton(ok);
@@ -89,31 +97,27 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
         return panel;
     }
 
-    private void doSave() {
-        clearMessage();
-        try {
-            validateFields();
-            presenter.saveJob();
-            disposeView();
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
-    }
+//    private void doSave() {
+//        clearMessage();
+//        try {
+//                validateFields();
+//                presenter.saveJob();
+//            }
+//        } catch (EmfException e) {
+//            messagePanel.setError(e.getMessage());
+//        }
+//    }
     
-    private void validateFields() {
-        try {
+    private void validateFields() throws EmfException {
+        //try {
             jobFieldsPanel.validateFields();
-        } catch (EmfException e) {
-            setError(e.getMessage());
-        }
+//        } catch (EmfException e) {
+//            messagePanel.setError(e.getMessage());
+//        }
     }
     
     private void clearMessage() {
         messagePanel.clear();
-    }
-
-    private void setError(String msg) {
-        messagePanel.setError(msg);
     }
 
     public void windowClosing() {

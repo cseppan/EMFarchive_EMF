@@ -81,6 +81,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     private EditableComboBox host;
 
     private TextField qoption;
+    
+    private TextField jobGroup;
 
     private MessagePanel messagePanel;
 
@@ -217,9 +219,9 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
         // temporarily leave this there
         oldJobOrder = new TextField("oldJobOrder", job.getOrder() + "", charsWide);
-//        jobOrder.setMaximumSize(new Dimension(300, 15));
-//        changeablesList.addChangeable(jobOrder);
-//        layoutGenerator.addLabelWidgetPair("Job Order:", jobOrder, panel);
+        jobGroup = new TextField("jobGroup", job.getJobGroup(), charsWide);
+        changeablesList.addChangeable(jobGroup);
+        layoutGenerator.addLabelWidgetPair("Job Group:", jobGroup, panel);
 
         qoption = new TextField("qoption", job.getQueOptions(), charsWide);
         changeablesList.addChangeable(qoption);
@@ -233,7 +235,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("Parent case ID: ", parentCase, panel);
         
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 10);// xPad, yPad
 
@@ -414,6 +416,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
         args.setText(job.getArgs());
         jobOrder.setText(job.getJobNo() + "");
+        jobGroup.setText(job.getJobGroup());
         oldJobOrder.setText(job.getOrder() + "");
         this.qoption.setText(job.getQueOptions());
         this.version.setText(job.getVersion() + "");
@@ -445,6 +448,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         job.setVersion(Integer.parseInt(version.getText().trim()));
         job.setQueOptions(qoption.getText().trim());
         job.setLocal(localBox.isSelected());
+        job.setJobGroup(jobGroup.getText().trim());
         Object[] objects = dependentJobsList.getObjects();
         String[] jobNames = new String[objects.length];
         
@@ -551,15 +555,24 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         if (selected == null || selected.toString().trim().equals(""))
             throw new EmfException("Please enter a valid host name.");
 
-        // if (absolute == null || absolute.trim().equals("") || !execFile.isFile())
-        // throw new EmfException("Please select an executable file.");
-
+        validateJobGroup(jobGroup.getText().trim());
+        
         try {
             Integer.parseInt(version.getText().trim());
         } catch (NumberFormatException e) {
             throw new EmfException("Please enter an integer that is the version of the executable.");
         }
     }
+    
+    private void validateJobGroup(String abbrev) throws EmfException{
+        String underscore="_";
+        for (int i = 0; i < abbrev.length(); i++) {
+            if (!(Character.isLetterOrDigit(abbrev.charAt(i)) 
+                    || underscore.equalsIgnoreCase(abbrev.charAt(i)+"")))
+                throw new EmfException ("Job group must contain only letters, digits, and underscores. ");
+        }
+    }
+
 
     private void showRemind() throws EmfException {
         String title = "Warning";
@@ -609,6 +622,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     private void setError(String error) {
         messagePanel.setError(error);
     }
+    
 
     public void viewOnly() {
         browseButton.setVisible(false);
@@ -625,11 +639,11 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         jobOrder.setEditable(false);
         host.setEnabled(false);
         qoption.setEditable(false);
+        jobGroup.setEditable(false);
         
         lastMsg.setEnabled(false);
         lastMsg.setEditable(false);
         runNote.setEditable(false);
         runNote.setEnabled(false);
     }
-
 }
