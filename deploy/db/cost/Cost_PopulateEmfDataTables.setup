@@ -67,8 +67,12 @@ insert into emf.control_measure_classes values (DEFAULT, 'Hypothetical', 'Hypoth
 insert into emf.control_measure_classes values (DEFAULT, 'Obsolete', 'Obsolete');
 --emf.control_measure_classes
 
+--emf.control_program_types
+insert into emf.control_program_types values (DEFAULT, 'Plant Closure', 'Plant Closure');
+--emf.control_program_types
+
 --emf.equation_types
--- Add Eqautions
+-- Add Equations
 insert into emf.equation_types (name, description)
 select 'Type 1', 'Type 1';
 insert into emf.equation_types (name, description)

@@ -555,6 +555,97 @@ CREATE INDEX control_measure_equations_cost_year
   USING btree
   (cost_year);
 
+
+
+-- emf.control_program_types
+CREATE TABLE emf.control_program_types
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE,
+  description text
+)
+WITHOUT OIDS;
+ALTER TABLE emf.control_program_types OWNER TO emf;
+CREATE INDEX control_program_types_id
+  ON emf.control_program_types
+  USING btree
+  (id);
+ALTER TABLE emf.control_program_types CLUSTER ON control_program_types_id;
+-- emf.control_program_types
+
+-- emf.control_programs
+CREATE TABLE emf.control_programs
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE,
+  description text,
+  start_date timestamp,
+  end_date timestamp,
+  control_program_type_id int4 REFERENCES emf.control_program_types (id),
+  dataset_id int4 REFERENCES emf.datasets (id),
+  dataset_version int4,
+  creator_id int4 REFERENCES emf.users(id),
+  last_modified_date timestamp,
+  lock_owner varchar(255),
+  lock_date timestamp
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.control_programs OWNER TO emf;
+CREATE INDEX control_programs_id
+  ON emf.control_programs
+  USING btree
+  (id);
+ALTER TABLE emf.control_programs CLUSTER ON control_programs_id;
+CREATE INDEX control_programs_dataset
+  ON emf.control_programs
+  USING btree
+  (dataset_id);
+-- emf.control_programs
+
+-- emf.control_program_control_technologies
+CREATE TABLE emf.control_program_technologies
+(
+  id SERIAL PRIMARY KEY,
+  list_index int4,
+  control_program_id int4 NOT NULL REFERENCES emf.control_programs(id) ,
+  control_technology_id int4 REFERENCES emf.control_technologies (id),
+  UNIQUE (control_program_id,control_technology_id) 
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.control_program_technologies OWNER TO emf;
+CREATE INDEX control_program_technologies_program_id
+  ON emf.control_program_technologies
+  USING btree
+  (control_program_id);
+
+CREATE INDEX ontrol_program_technologies_control_technology_id
+  ON emf.control_program_technologies
+  USING btree
+  (control_technology_id);
+-- emf.control_program_technologies
+
+-- emf.control_program_measures
+CREATE TABLE emf.control_program_measures
+(
+  id SERIAL PRIMARY KEY,
+  list_index int4 NOT NULL,
+  control_program_id int4 NOT NULL REFERENCES emf.control_programs(id) ,
+  control_measure_id int4 NOT NULL REFERENCES emf.control_measures (id),
+  UNIQUE (control_program_id,control_measure_id) 
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.control_program_measures OWNER TO emf;
+CREATE INDEX control_program_measures_program_id
+  ON emf.control_program_measures
+  USING btree
+  (control_program_id);
+CREATE INDEX control_program_measures_measure_id
+  ON emf.control_program_measures
+  USING btree
+  (control_measure_id);
+-- emf.control_program_measures
+
+
 -- 9/12/2007 - DCD add user-defined functionm and aggreagte function to help build a comma-delimted list from a set
 create function public.join_with_ampersand(text,text)
   returns text
