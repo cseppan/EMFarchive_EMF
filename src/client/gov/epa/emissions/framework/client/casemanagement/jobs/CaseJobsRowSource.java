@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.casemanagement.jobs;
 
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.DependentJob;
 import gov.epa.emissions.framework.ui.RowSource;
 
 public class CaseJobsRowSource implements RowSource {
@@ -13,15 +14,15 @@ public class CaseJobsRowSource implements RowSource {
     }
 
     public Object[] values() {
-        return new Object[] { getJobName(job), getJobNum(job), 
+        return new Object[] { getJobName(), getJobNum(job), 
                 getSectorName(job), getRunStatus(job), getRunningUser(job), getRunLog(job), 
                 getStartDate(job), getCompleteDate(job), getExecutableName(job),  
                 getArgs(job), getVersion(job), getOrder(job),
-                getPath(job), getQOpt(job),  isLocal(job), getIDInQ(job), 
-                getUser(job), getHost(job), getPurpose(job) };
+                getPath(job), getQOpt(job), getJobAbbrev(), isLocal(job), getIDInQ(job), 
+                getUser(job), getHost(job), getPurpose(job), getDependOn() };
     }
     
-    private String getJobName(CaseJob job) {
+    private String getJobName() {
         return (job.getName() == null) ? "" : job.getName();
     }
     
@@ -65,6 +66,10 @@ public class CaseJobsRowSource implements RowSource {
         return job.getQueOptions();
     }
     
+    private String getJobAbbrev(){
+        return (job.getJobGroup() == null)? "": job.getJobGroup();
+    }
+    
     private String getStartDate(CaseJob job) {
         return (job.getRunStartDate() == null) ? "" : CustomDateFormat.format_YYYY_MM_DD_HH_MM(job.getRunStartDate());
     }
@@ -95,6 +100,16 @@ public class CaseJobsRowSource implements RowSource {
     
     private String isLocal(CaseJob job) {
         return (job == null) ? "" : job.isLocal() + "";
+    }
+    
+    private String getDependOn(){
+        String d="";
+        DependentJob [] dependJobs =job.getDependentJobs();
+        if (dependJobs != null || dependJobs.length >0){
+            for (DependentJob dJob : dependJobs)
+                d += dJob.getJobId() + ", ";
+        }
+        return d; 
     }
     
     public Object source() {
