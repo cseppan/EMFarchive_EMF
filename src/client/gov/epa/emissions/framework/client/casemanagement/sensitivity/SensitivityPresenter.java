@@ -41,7 +41,7 @@ public class SensitivityPresenter {
         view.disposeView();
     }
 
-    public Case doSave(int parentCaseId, int templateCaseId, int[] jobIds, Case newCase) throws EmfException {
+    public Case doSave(int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case newCase) throws EmfException {
         if (isDuplicate(newCase))
             throw new EmfException("A Case named '" + newCase.getName() + "' already exists.");
 
@@ -49,7 +49,7 @@ public class SensitivityPresenter {
         newCase.setLastModifiedBy(session.user());
         newCase.setLastModifiedDate(new Date());
         
-        Case loaded = service().mergeCases(session.user(), parentCaseId, templateCaseId, jobIds, newCase);
+        Case loaded = service().mergeCases(session.user(), parentCaseId, templateCaseId, jobIds, jobGroup, newCase);
         //closeView();
         managerPresenter.addNewCaseToTableData(loaded);
         return loaded;
