@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.LoggingService;
 import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.services.cost.ControlProgramService;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureExportService;
@@ -110,5 +111,9 @@ public class DefaultEmfSession implements EmfSession {
 
     public ControlMeasureExportService controlMeasureExportService() {
         return serviceLocator.controlMeasureExportService();
+    }
+
+    public ControlProgramService controlProgramService() {
+        return serviceLocator.controlProgramService();
     }
 }

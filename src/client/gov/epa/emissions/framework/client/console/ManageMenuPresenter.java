@@ -7,6 +7,8 @@ import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenterImp
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerView;
 import gov.epa.emissions.framework.client.cost.controlmeasure.ControlMeasuresManagerPresenter;
 import gov.epa.emissions.framework.client.cost.controlmeasure.ControlMeasuresManagerView;
+import gov.epa.emissions.framework.client.cost.controlprogram.ControlProgramManagerPresenter;
+import gov.epa.emissions.framework.client.cost.controlprogram.ControlProgramManagerView;
 import gov.epa.emissions.framework.client.cost.controlstrategy.ControlStrategiesManagerPresenter;
 import gov.epa.emissions.framework.client.cost.controlstrategy.ControlStrategiesManagerPresenterImpl;
 import gov.epa.emissions.framework.client.cost.controlstrategy.ControlStrategyManagerView;
@@ -64,6 +66,11 @@ public class ManageMenuPresenter {
 
     public void doDisplayControlStrategies(ControlStrategyManagerView view) throws EmfException {
         ControlStrategiesManagerPresenter presenter = new ControlStrategiesManagerPresenterImpl(session,view);
+        presenter.display();
+    }
+
+    public void doDisplayControlPrograms(ControlProgramManagerView view) throws EmfException {
+        ControlProgramManagerPresenter presenter = new ControlProgramManagerPresenter(session,view);
         presenter.display();
     }
 

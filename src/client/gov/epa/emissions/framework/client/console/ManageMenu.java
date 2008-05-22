@@ -14,6 +14,8 @@ import gov.epa.emissions.framework.client.casemanagement.CaseManagerView;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerWindow;
 import gov.epa.emissions.framework.client.cost.controlmeasure.ControlMeasuresManagerView;
 import gov.epa.emissions.framework.client.cost.controlmeasure.ControlMeasuresManagerWindow;
+import gov.epa.emissions.framework.client.cost.controlprogram.ControlProgramManagerView;
+import gov.epa.emissions.framework.client.cost.controlprogram.ControlProgramManagerWindow;
 import gov.epa.emissions.framework.client.cost.controlstrategy.ControlStrategyManagerView;
 import gov.epa.emissions.framework.client.cost.controlstrategy.ControlStrategyManagerWindow;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserView;
@@ -59,6 +61,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         super.addSeparator();
         super.add(createControlMeasures(parent, messagePanel));
         super.add(createControlStrategies(parent, messagePanel));
+        super.add(createControlPrograms(parent, messagePanel));
         super.addSeparator();
 
         manageUsers(session.user(), messagePanel);
@@ -171,6 +174,18 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         return menuItem;
     }
 
+    private JMenuItem createControlPrograms(final EmfConsole parent, final MessagePanel messagePanel) {
+        JMenuItem menuItem = new JMenuItem("Control Programs");
+        menuItem.setName("controlPrograms");
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                doManageControlPrograms(parent, messagePanel);
+            }
+        });
+
+        return menuItem;
+    }
+
     private void displayMyProfile(EmfSession session, MessagePanel messagePanel) {
         UpdateUserWindow updatable = new UpdateUserWindow(new AddAdminOption(false), desktopManager);
         UserView viewable = new ViewUserWindow(desktopManager);
@@ -246,6 +261,15 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         ControlStrategyManagerView view = new ControlStrategyManagerWindow(parent, session, desktopManager);
         try {
             presenter.doDisplayControlStrategies(view);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
+    private void doManageControlPrograms(final EmfConsole parent, final MessagePanel messagePanel) {
+        ControlProgramManagerView view = new ControlProgramManagerWindow(parent, session, desktopManager);
+        try {
+            presenter.doDisplayControlPrograms(view);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

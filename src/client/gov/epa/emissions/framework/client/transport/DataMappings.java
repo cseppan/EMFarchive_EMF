@@ -29,6 +29,8 @@ import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 import gov.epa.emissions.framework.services.cost.ControlMeasureMonth;
 import gov.epa.emissions.framework.services.cost.ControlMeasureNEIDevice;
+import gov.epa.emissions.framework.services.cost.ControlProgram;
+import gov.epa.emissions.framework.services.cost.ControlProgramType;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.ControlStrategyMeasure;
@@ -121,6 +123,8 @@ public class DataMappings extends Mappings {
         bean(call, LightControlMeasure.class, lightControlMeasure());
         bean(call, ControlTechnology.class, controlTechnology());
         bean(call, ControlStrategy.class, controlStrategy());
+        bean(call, ControlProgram.class, controlProgram());
+        bean(call, ControlProgramType.class, controlProgramType());
         bean(call, ControlStrategyInputDataset.class, controlStrategyInputDataset());
         bean(call, StrategyType.class, strategyType());
         bean(call, ControlStrategyResult.class, controlStrategyResult());
@@ -183,6 +187,8 @@ public class DataMappings extends Mappings {
         array(call, LightControlMeasure[].class, lightControlMeasures());
         
         array(call, ControlTechnology[].class, controlTechnologies());
+        array(call, ControlProgram[].class, controlPrograms());
+        array(call, ControlProgramType[].class, controlProgramTypes());
         array(call, ControlStrategy[].class, controlStrategies());
         array(call, ControlStrategyInputDataset[].class, controlStrategyInputDatasets());
         array(call, StrategyType[].class, strategyTypes());
@@ -452,6 +458,22 @@ public class DataMappings extends Mappings {
         return qname("ControlMeasureNEIDevice");
     }
     
+    public QName controlProgram() {
+        return qname("ControlProgram");
+    }
+
+    public QName controlPrograms() {
+        return qname("ControlPrograms");
+    }
+
+    public QName controlProgramType() {
+        return qname("ControlProgramType");
+    }
+
+    public QName controlProgramTypes() {
+        return qname("ControlProgramTypes");
+    }
+
     public QName controlStrategy() {
         return qname("ControlStrategy");
     }

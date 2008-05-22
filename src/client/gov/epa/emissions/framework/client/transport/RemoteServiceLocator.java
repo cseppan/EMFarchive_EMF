@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.services.basic.LoggingService;
 import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.casemanagement.CaseAssistService;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.services.cost.ControlProgramService;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureExportService;
@@ -41,6 +42,8 @@ public class RemoteServiceLocator implements ServiceLocator {
     private ControlMeasureService controlMeasureService;
     
     private ControlStrategyService controlStrategyService;
+    
+    private ControlProgramService controlProgramService;
     
     private ControlMeasureImportService controlMeasureImportService;
     
@@ -127,6 +130,13 @@ public class RemoteServiceLocator implements ServiceLocator {
         return controlStrategyService;
     }
     
+    public ControlProgramService controlProgramService() {
+        if (controlProgramService == null)
+            controlProgramService = new ControlProgramServiceTransport(baseUrl + "/gov.epa.emissions.framework.services.cost.ControlProgramService");
+        
+        return controlProgramService;
+    }
+
     public ControlMeasureImportService controlMeasureImportService() {
         if (controlMeasureImportService == null)
             controlMeasureImportService = new ControlMeasureImportServiceTransport(baseUrl + "/gov.epa.emf.services.cost.controlmeasure.ControlMeasureImportService");

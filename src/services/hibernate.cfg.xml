@@ -87,6 +87,8 @@
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/IntegerHolder.hbm.xml"/>
 
 		<!-- Mappings : CoST -->
+	   	<mapping resource="gov/epa/emissions/framework/services/cost/ControlProgram.hbm.xml"/>
+	   	<mapping resource="gov/epa/emissions/framework/services/cost/ControlProgramType.hbm.xml"/>
 	   	<mapping resource="gov/epa/emissions/framework/services/cost/ControlStrategy.hbm.xml"/>
 		<mapping resource="gov/epa/emissions/framework/services/cost/ControlMeasure.hbm.xml"/>
 		<mapping resource="gov/epa/emissions/framework/services/cost/EquationType.hbm.xml"/>
