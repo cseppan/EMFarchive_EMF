@@ -374,7 +374,7 @@ public class CaseServiceTest2 extends ServiceTestCase {
             
             parent.setDescription("Test parent case in merge cases test.");
             
-            service.mergeCases(user, parent.getId(), template.getId(), new int[] {job.getId()}, sensitivity);
+            service.mergeCases(user, parent.getId(), template.getId(), new int[] {job.getId()}, "test", sensitivity);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
