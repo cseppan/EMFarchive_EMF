@@ -141,6 +141,14 @@
 			value="gov.epa.emissions.framework.services.cost.ControlStrategyServiceImpl"/>
 	</service>
 	
+	<service name="gov.epa.emissions.framework.services.cost.ControlProgramService" provider="java:RPC"
+		style="RPC" use="encoded">
+		<parameter name="allowedMethods" value="*"/>
+		<parameter name="scope" value="session"/>
+		<parameter name="className"
+			value="gov.epa.emissions.framework.services.cost.ControlProgramServiceImpl"/>
+	</service>
+	
 	<service name="gov.epa.emf.services.cost.controlmeasure.ControlMeasureImportService" provider="java:RPC"
 		style="RPC" use="encoded">
 		<parameter name="allowedMethods" value="*"/>
@@ -345,6 +353,14 @@
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlStrategy"
 		qname="ns1:ControlStrategy" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlProgram"
+		qname="ns1:ControlProgram" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlProgramType"
+		qname="ns1:ControlProgramType" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset"
@@ -827,6 +843,18 @@
 		xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlStrategy[]"
 		innerType="ns1:ControlStrategy"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<arrayMapping qname="ns1:ControlPrograms"
+		xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlProgram[]"
+		innerType="ns1:ControlProgram"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<arrayMapping qname="ns1:ControlProgramTypes"
+		xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlProgramType[]"
+		innerType="ns1:ControlProgramType"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<arrayMapping qname="ns1:ControlStrategyInputDatasets"
