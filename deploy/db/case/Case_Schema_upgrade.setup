@@ -188,3 +188,21 @@ ALTER TABLE cases.cases_parameters ADD COLUMN parent_case_id int4 DEFAULT 0;
 ALTER TABLE cases.cases_caseinputs RENAME COLUMN show TO local;
 ALTER TABLE cases.cases_parameters RENAME COLUMN is_show TO local;
 ALTER TABLE cases.cases_casejobs ADD COLUMN local bool DEFAULT true;
+
+-- 5/17/2008 add new column to cases.cases_casejobs
+ALTER TABLE cases.cases_casejobs
+   ADD COLUMN job_abbrev character varying(255);
+   
+-- 5/21/2008 cases.cases_sens
+CREATE TABLE cases.cases_sens
+(
+  id SERIAL PRIMARY KEY,
+  parent_case_id integer NOT NULL REFERENCES cases.cases(id),
+  sen_case_id integer NOT NULL REFERENCES cases.cases(id),
+  UNIQUE(parent_case_id, sen_case_id)
+) 
+WITHOUT OIDS;
+-- cases.cases_sens
+
+-- 5/23/08  cases.cases_casejobs
+ALTER TABLE ALTER TABLE cases.cases_casejobs RENAME COLUMN job_abbrev TO job_group;

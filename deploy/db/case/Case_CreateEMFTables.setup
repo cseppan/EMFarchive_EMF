@@ -226,6 +226,7 @@ CREATE TABLE cases.cases_casejobs
   path varchar(255),
   q_id varchar(255) ,
   local bool DEFAULT true,
+  job_group varchar(255),
   UNIQUE (case_id, name)
 )
 WITHOUT OIDS;
@@ -396,3 +397,15 @@ CREATE TABLE cases.casesjobkeys
 ) 
 WITHOUT OIDS;
 -- cases.casesjobkeys
+
+-- cases.cases_sens
+CREATE TABLE cases.cases_sens
+(
+  id SERIAL PRIMARY KEY,
+  parent_case_id integer NOT NULL REFERENCES cases.cases(id),
+  sen_case_id integer NOT NULL REFERENCES cases.cases(id),
+  UNIQUE(parent_case_id, sen_case_id)
+) 
+WITHOUT OIDS;
+-- cases.cases_sens
+
