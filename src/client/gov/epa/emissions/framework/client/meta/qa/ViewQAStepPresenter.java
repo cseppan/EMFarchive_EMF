@@ -122,7 +122,7 @@ public class ViewQAStepPresenter {
         }
         header +=lineFeeder;
         //arguments.replaceAll(lineFeeder, "#");
-        System.out.println("after replace  \n" + header);
+        //System.out.println("after replace  \n" + header);
         return header;
     }
     public QAStepResult getStepResult(QAStep step) throws EmfException {
