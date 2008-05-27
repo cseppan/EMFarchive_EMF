@@ -55,6 +55,7 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
     
     private void setupLayout(ManageChangeables changeables) {
         this.setLayout(new BorderLayout());
+        this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5)); 
         this.add(getBorderedPanel(createAllStrategiesPanel(changeables), "All Strategies"), BorderLayout.NORTH);
         leastCostPanelContainer = new JPanel(new BorderLayout());
         leastCostPanel = getBorderedPanel(createLeastCostPanel(changeables), "Least Cost");
@@ -112,7 +113,7 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         replacementControlMinEfficiencyDiff.setText(constraint != null ? (constraint.getReplacementControlMinEfficiencyDiff() != null ? constraint.getReplacementControlMinEfficiencyDiff() + "" : "10.0") : "10.0");
         replacementControlMinEfficiencyDiff.setToolTipText("Enter the minimum control percent reduction difference to use for replacement controls.");
         changeables.addChangeable(replacementControlMinEfficiencyDiff);
-        layoutGenerator.addLabelWidgetPair("Minimum Control Percent Reduction Difference for Replacement Control (%)", replacementControlMinEfficiencyDiff, panel);
+        layoutGenerator.addLabelWidgetPair("Minimum Percent Reduction Difference for Replacement Control (%)", replacementControlMinEfficiencyDiff, panel);
         
 
         layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
@@ -124,12 +125,14 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
 
     private JPanel createLeastCostPanel(ManageChangeables changeables) {
         ControlStrategyConstraint constraint = presenter.getConstraint();
-        JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10)); //100,80));
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Constraints for Target Pollutant:", new JLabel(), panel);
-        layoutGenerator.addLabelWidgetPair("Specify either an emission reduction (tons) or percent reduction (%).", new JLabel(), panel);
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(5,10,10,10)); 
+        mainPanel.add(new JLabel("Specify EITHER an emission reduction (tons) or percent reduction (%) for the Target Pollutant:"),
+           BorderLayout.WEST);
+
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         domainWideEmisReduction = new TextField("domain wide emission reduction", 10);
         domainWideEmisReduction.setText(constraint != null ? (constraint.getDomainWideEmisReduction() != null ? constraint.getDomainWideEmisReduction() + "" : "") : "");
@@ -143,45 +146,52 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         changeables.addChangeable(domainWidePctReduction);
         layoutGenerator.addLabelWidgetPair("Domain Wide Percent Reduction (%)", domainWidePctReduction, panel);
 
-        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 10, 10, // initialX, initialY
                 10, 10); // xPad, yPad
 
-        return panel;
+        mainPanel.add(panel,BorderLayout.SOUTH);
+        return mainPanel;
     }
 
     private JPanel createLeastCostCurvePanel(ManageChangeables changeables) {
         ControlStrategyConstraint constraint = presenter.getConstraint();
-        JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10)); //100,80));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+       //layoutGenerator.addLabelWidgetPair("Constraints for Target Pollutant:", new JLabel(), panel);
 
-        layoutGenerator.addLabelWidgetPair("Constraints for Target Pollutant:", new JLabel(), panel);
-        layoutGenerator.addLabelWidgetPair("Specify an increment, start and end percent reduction (%).", new JLabel(), panel);
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(5,10,10,10)); 
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(new JLabel("Specify an increment, starting and ending percent reduction (%) for the Target Pollutant:"),
+                BorderLayout.WEST);
+        mainPanel.add(topPanel,BorderLayout.NORTH);
 
+        JPanel panel = new JPanel(new SpringLayout());
         domainWidePctReductionIncrement = new TextField("domain wide percent reduction increment", 10);
         domainWidePctReductionIncrement.setText(constraint != null ? (constraint.getDomainWidePctReductionIncrement() != null ? constraint.getDomainWidePctReductionIncrement() + "" : "25") : "25");
         domainWidePctReductionIncrement.setToolTipText("Enter the domain wide percent reduction increment.");
         changeables.addChangeable(domainWidePctReductionIncrement);
-        layoutGenerator.addLabelWidgetPair("Domain Wide Percent Reduction Increment (%)", domainWidePctReductionIncrement, panel);
+        layoutGenerator.addLabelWidgetPair("   Domain-wide Percent Reduction Increment (%)                                ", domainWidePctReductionIncrement, panel);
 
         domainWidePctReductionStart = new TextField("domain wide percent reduction start", 10);
         domainWidePctReductionStart.setText(constraint != null ? (constraint.getDomainWidePctReductionStart() != null ? constraint.getDomainWidePctReductionStart() + "" : "0") : "0");
         domainWidePctReductionStart.setToolTipText("Enter the domain wide percent reduction start precentage.");
         changeables.addChangeable(domainWidePctReductionStart);
-        layoutGenerator.addLabelWidgetPair("Domain Wide Percent Reduction Start (%)", domainWidePctReductionStart, panel);
+        layoutGenerator.addLabelWidgetPair("   Domain-wide Percent Reduction Start (%)", domainWidePctReductionStart, panel);
 
         domainWidePctReductionEnd = new TextField("domain wide percent reduction end", 10);
         domainWidePctReductionEnd.setText(constraint != null ? (constraint.getDomainWidePctReductionEnd() != null ? constraint.getDomainWidePctReductionEnd() + "" : "100") : "100");
         domainWidePctReductionEnd.setToolTipText("Enter the domain wide percent reduction end precentage.");
         changeables.addChangeable(domainWidePctReductionEnd);
-        layoutGenerator.addLabelWidgetPair("Domain Wide Percent Reduction End (%)", domainWidePctReductionEnd, panel);
+        layoutGenerator.addLabelWidgetPair("   Domain-wide Percent Reduction End (%)", domainWidePctReductionEnd, panel);
 
-        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 10, 10, // initialX, initialY
                 10, 10); // xPad, yPad
+        
+        mainPanel.add(panel,BorderLayout.CENTER);
 
-        return panel;
+        return mainPanel;
     }
 
     public void save(ControlStrategy controlStrategy) throws EmfException {

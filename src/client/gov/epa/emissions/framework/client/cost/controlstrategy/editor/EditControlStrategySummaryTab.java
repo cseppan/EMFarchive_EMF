@@ -132,23 +132,13 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         
         layoutGenerator.addLabelWidgetPair("Project:", projects(), panelTop);
         layoutGenerator.addLabelWidgetPair("Creator:", creator(), panelTop);
-        layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panelTop);
+        layoutGenerator.addLabelWidgetPair("Last Modified Date: ", lastModifiedDate(), panelTop);
         layoutGenerator.addLabelWidgetPair("Copied From:", new JLabel("   "), panelTop);
-        layoutGenerator.makeCompactGrid(panelTop, 6, 2, // rows, cols
+        layoutGenerator.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), panelTop);
+        layoutGenerator.makeCompactGrid(panelTop, 7, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
         panel.add(panelTop);
-        
-        JPanel panelBottom = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator1 = new SpringLayoutGenerator();
-
-        layoutGenerator1.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), panelBottom);
-        // Lay out the panel.
-        layoutGenerator1.makeCompactGrid(panelBottom, 1, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
-
-        panel.add(panelBottom);
         return panel;
     }
 
