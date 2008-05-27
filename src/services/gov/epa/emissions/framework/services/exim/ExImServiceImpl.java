@@ -269,10 +269,10 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     // Export NO overwrite using default dataset version
     public void exportDatasetids(User user, Integer[] datasetIds, String folder, String purpose) throws EmfException {
         // if Vservion[] is not specified, get the default versions from datasets themselves
-        //if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_4)
             System.out.println("ExImService:exportDatasetids() called.");
         exportDatasetids(user, datasetIds, null, folder, purpose);
-        //if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_4)
             System.out.println("ExImService:exportDatasetids() exited.");
     }
 
