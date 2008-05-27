@@ -80,6 +80,11 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
                         messagePanel.setError(e1.getMessage());
                     }
                 }
+                else
+                {
+                   disposeView();
+                }   
+
             }
         });
         getRootPane().setDefaultButton(ok);
