@@ -205,4 +205,4 @@ WITHOUT OIDS;
 -- cases.cases_sens
 
 -- 5/23/08  cases.cases_casejobs
-ALTER TABLE ALTER TABLE cases.cases_casejobs RENAME COLUMN job_abbrev TO job_group;
+ALTER TABLE cases.cases_casejobs RENAME COLUMN job_abbrev TO job_group;
