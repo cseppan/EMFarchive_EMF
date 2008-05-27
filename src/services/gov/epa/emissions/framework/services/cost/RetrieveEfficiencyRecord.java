@@ -132,7 +132,7 @@ public class RetrieveEfficiencyRecord {
             + "inner join emf.pollutants p "
             + "on p.id = er.pollutant_id "
             + "WHERE er.control_measures_id=" + controlMeasureId
-            + ((filter.length() > 0) ? " and " + filter : "")
+            + ((filter.length() > 0) ? " and (" + filter + ")": "")
             + " order by p.name, er.locale "
             + "LIMIT " + recordLimit;
 

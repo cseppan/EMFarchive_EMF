@@ -29,11 +29,8 @@ public class RetrieveControlMeasure {
         ControlMeasure[] controlMeasures = {};
         try {
             String sql = query(whereFilter);
-            log.error("exec query");
             ResultSet set = dbServer.getEmfDatasource().query().executeQuery(sql);
-            log.error("populate measures from query");
             controlMeasures = values(set);
-            log.error("done populate measures from query");
         } catch (SQLException e) {
             throw e;
         }
@@ -61,11 +58,8 @@ public class RetrieveControlMeasure {
         ControlMeasure[] controlMeasures = {};
         try {
             String sql = query(majorPollutantId, whereFilter);
-            log.error("exec query");
             ResultSet set = dbServer.getEmfDatasource().query().executeQuery(sql);
-            log.error("populate measures from query");
             controlMeasures = values(set);
-            log.error("done populate measures from query");
         } catch (SQLException e) {
             throw e;
         }
@@ -254,7 +248,7 @@ public class RetrieveControlMeasure {
 //        if (whereFilter.trim().equals("") )
          "where cm.major_pollutant = " + majorPollutantId + " " +
             //don't include filter if no sccs
-        (whereFilter.length() > 0 ? " and " + whereFilter : "") + 
+        (whereFilter.length() > 0 ? " and (" + whereFilter + ")": "") + 
          " order by cm.name, cm.id, s.name, p.name";
 //        log.error(query);
 
