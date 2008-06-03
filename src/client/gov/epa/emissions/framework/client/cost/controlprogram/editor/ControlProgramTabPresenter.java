@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlProgram;
 import gov.epa.emissions.framework.services.cost.ControlProgramType;
 
-public interface EditControlProgramTabPresenter {
+public interface ControlProgramTabPresenter {
 
     void doSave(ControlProgram controlProgram) throws EmfException;
 

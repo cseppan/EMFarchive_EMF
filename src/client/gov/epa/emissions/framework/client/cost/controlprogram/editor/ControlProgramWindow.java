@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.cost.controlprogram.editor;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
-import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -10,9 +9,8 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlProgram;
-import gov.epa.emissions.framework.services.cost.ControlStrategy;
-import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -31,35 +29,39 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-public class EditControlProgramWindow extends DisposableInteralFrame implements EditControlProgramView {
+public class ControlProgramWindow extends DisposableInteralFrame implements ControlProgramView {
 
-    private EditControlProgramPresenter presenter;
+    protected ControlProgramPresenter presenter;
 
-    private SingleLineMessagePanel messagePanel;
+    protected SingleLineMessagePanel messagePanel;
 
-    private EmfSession session;
+    protected EmfSession session;
 
-    private EmfConsole parentConsole;
+    protected EmfConsole parentConsole;
 
 //    private ControlProgram controlProgram;
 //
 //    private DesktopManager desktopManager;
 
-    private Button saveButton;
+    protected Button saveButton;
 
-    private EditControlProgramMeasuresTab measuresTabView;
+    protected ControlProgramMeasuresTab measuresTabView;
 
-    private EditControlProgramSummaryTab summaryTabView;
-
-    public EditControlProgramWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
+    protected ControlProgramSummaryTab summaryTabView;
+    
+    protected ControlProgramTechnologiesTab technologiesTabView;
+    protected ControlMeasure[] controlMeasures;
+    
+    public ControlProgramWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole, ControlMeasure[] controlMeasures) {
         super("Edit Control Program", new Dimension(700, 580), desktopManager);
 //        this.setMinimumSize(new Dimension(700, 300));
         this.session = session;
         this.desktopManager = desktopManager;
         this.parentConsole = parentConsole;
+        this.controlMeasures = controlMeasures;
     }
 
-    public void observe(EditControlProgramPresenter presenter) {
+    public void observe(ControlProgramPresenter presenter) {
         this.presenter = presenter;
 
     }
@@ -96,12 +98,13 @@ public class EditControlProgramWindow extends DisposableInteralFrame implements 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbedPane.addTab("Summary", createSummaryTab(controlProgram));
         tabbedPane.addTab("Measures", createMeasuresTab(controlProgram));
+        tabbedPane.addTab("Technologies", createTechnologiesTab(controlProgram));
         return tabbedPane;
     }
 
     private JPanel createSummaryTab(ControlProgram controlProgram) {
         try {
-            summaryTabView = new EditControlProgramSummaryTab(controlProgram, session,
+            summaryTabView = new ControlProgramSummaryTab(controlProgram, session,
                     this, messagePanel, parentConsole);
             this.presenter.set(summaryTabView);
             return summaryTabView;
@@ -113,15 +116,28 @@ public class EditControlProgramWindow extends DisposableInteralFrame implements 
 
     private JPanel createMeasuresTab(ControlProgram controlProgram) {
         try {
-            measuresTabView = new EditControlProgramMeasuresTab(controlProgram, this,  
+            measuresTabView = new ControlProgramMeasuresTab(controlProgram, this,  
                     messagePanel, parentConsole, 
-                    session);
+                    session, controlMeasures);
             this.presenter.set(measuresTabView);
         } catch (EmfException e) {
             showError("Could not create Measures tab.");
         }
         
         return measuresTabView;
+    }
+    
+    private JPanel createTechnologiesTab(ControlProgram controlProgram) {
+        try {
+            technologiesTabView = new ControlProgramTechnologiesTab(controlProgram, this,  
+                    messagePanel, parentConsole, 
+                    session);
+            this.presenter.set(technologiesTabView);
+        } catch (EmfException e) {
+            showError("Could not create Measures tab.");
+        }
+        
+        return technologiesTabView;
     }
     
     private JPanel createErrorTab(String message) {
@@ -148,10 +164,6 @@ public class EditControlProgramWindow extends DisposableInteralFrame implements 
 
         saveButton = new SaveButton(saveAction());
         container.add(saveButton);
-
-        Button copyButton = new CopyButton(null);
-        copyButton.setEnabled(false);
-        container.add(copyButton);
 
         Button closeButton = new CloseButton(closeAction());
         container.add(closeButton);
@@ -223,7 +235,7 @@ public class EditControlProgramWindow extends DisposableInteralFrame implements 
         doClose();
     }
 
-    private void clearMessage() {
+    protected void clearMessage() {
         messagePanel.clear();
     }
 
@@ -237,17 +249,9 @@ public class EditControlProgramWindow extends DisposableInteralFrame implements 
             measuresTabView.startControlMeasuresRefresh();
     }
 
-    public void endControlMeasuresRefresh() {
+    public void signalControlMeasuresAreLoaded(ControlMeasure[] controlMeasures) {
         if (measuresTabView != null)
-            measuresTabView.endControlMeasuresRefresh();
-    }
-
-    public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
-        //
-    }
-
-    public void stopRun()  {
-        //
+            measuresTabView.signalControlMeasuresAreLoaded(controlMeasures);
     }
 
     public void refresh(ControlProgram controlProgram) {

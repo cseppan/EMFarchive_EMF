@@ -579,12 +579,12 @@ CREATE TABLE emf.control_programs
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE,
   description text,
-  start_date timestamp,
-  end_date timestamp,
-  control_program_type_id int4 REFERENCES emf.control_program_types (id),
-  dataset_id int4 REFERENCES emf.datasets (id),
-  dataset_version int4,
-  creator_id int4 REFERENCES emf.users(id),
+  start_date timestamp NOT NULL,
+  end_date timestamp NOT NULL,
+  control_program_type_id int4 NOT NULL REFERENCES emf.control_program_types (id),
+  dataset_id int4 NOT NULL REFERENCES emf.datasets (id),
+  dataset_version int4 NOT NULL,
+  creator_id int4 REFERENCES emf.users(id) NOT NULL,
   last_modified_date timestamp,
   lock_owner varchar(255),
   lock_date timestamp
@@ -644,6 +644,29 @@ CREATE INDEX control_program_measures_measure_id
   USING btree
   (control_measure_id);
 -- emf.control_program_measures
+
+
+-- emf.control_strategy_programs
+CREATE TABLE emf.control_strategy_programs
+(
+  id SERIAL PRIMARY KEY,
+  list_index int4,
+  control_strategy_id int4 REFERENCES emf.control_strategies (id),
+  control_program_id int4 NOT NULL REFERENCES emf.control_programs(id) ,
+  UNIQUE (control_strategy_id,control_program_id) 
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.control_program_technologies OWNER TO emf;
+CREATE INDEX control_strategy_programs_program_id
+  ON emf.control_strategy_programs
+  USING btree
+  (control_program_id);
+
+CREATE INDEX control_strategy_programs_control_strategy_id
+  ON emf.control_strategy_programs
+  USING btree
+  (control_strategy_id);
+-- emf.control_strategy_programs
 
 
 -- 9/12/2007 - DCD add user-defined functionm and aggreagte function to help build a comma-delimted list from a set

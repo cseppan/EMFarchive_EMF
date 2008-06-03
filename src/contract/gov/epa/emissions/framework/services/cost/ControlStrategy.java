@@ -77,6 +77,8 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private Boolean mergeInventories;
     
+    private ControlProgram[] controlPrograms = new ControlProgram[] {};
+
     public ControlStrategy() {
         this.lock = new Mutex();
 //        this.controlStrategyInputDatasets = new ArrayList();
@@ -406,5 +408,13 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public Boolean getMergeInventories() {
         return mergeInventories;
+    }
+
+    public void setControlPrograms(ControlProgram[] controlPrograms) {
+        this.controlPrograms = controlPrograms;
+    }
+
+    public ControlProgram[] getControlPrograms() {
+        return controlPrograms;
     }
 }

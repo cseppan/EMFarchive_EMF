@@ -10,8 +10,9 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.client.cost.controlprogram.editor.EditControlProgramView;
-import gov.epa.emissions.framework.client.cost.controlprogram.editor.EditControlProgramWindow;
+import gov.epa.emissions.framework.client.cost.controlprogram.editor.ControlProgramView;
+import gov.epa.emissions.framework.client.cost.controlprogram.editor.ControlProgramWindow;
+import gov.epa.emissions.framework.client.cost.controlprogram.editor.NewControlProgramWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlProgram;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -27,6 +28,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -57,7 +59,7 @@ public class ControlProgramManagerWindow extends ReusableInteralFrame implements
 
     private EmfSession session;
     
-    private EditControlProgramView[] editControlProgramViews = {};
+    private List<ControlProgramView> editControlProgramViewList;
 
     private volatile Thread populateThread;
 
@@ -69,6 +71,7 @@ public class ControlProgramManagerWindow extends ReusableInteralFrame implements
 
         layout = new JPanel();
         this.getContentPane().add(layout);
+        this.editControlProgramViewList = new ArrayList<ControlProgramView>();
     }
 
     public void observe(ControlProgramManagerPresenter presenter) {
@@ -84,16 +87,21 @@ public class ControlProgramManagerWindow extends ReusableInteralFrame implements
     }
 
     public void run() {
+        //refresh Edit Control Program windows...
+        for (int i = 0; i < editControlProgramViewList.size(); i++) {
+            ControlProgramView view = editControlProgramViewList.get(i);
+            view.startControlMeasuresRefresh();
+        }
         try {
             presenter.loadControlMeasures();
         } catch (Exception e) {
             messagePanel.setError("Cannot retrieve all control measures.");
         }
         //refresh Edit Control Program windows...
-//        for (int i = 0; i < editControlProgramViews.length; i++) {
-//            EditControlProgramView view = editControlProgramViews[i];
-//            view.endControlMeasuresRefresh();
-//        }
+        for (int i = 0; i < editControlProgramViewList.size(); i++) {
+            ControlProgramView view = editControlProgramViewList.get(i);
+            view.signalControlMeasuresAreLoaded(presenter.getControlMeasures());
+        }
         this.populateThread = null;
     }
 
@@ -104,13 +112,6 @@ public class ControlProgramManagerWindow extends ReusableInteralFrame implements
         panelRefresh();
         super.refreshLayout();
         setCursor(Cursor.getDefaultCursor());
-        //refresh Edit Control Program windows...
-//        for (int i = 0; i < editControlProgramViews.length; i++) {
-//            EditControlProgramView view = editControlProgramViews[i];
-//            if (editControlProgramViews != null) {
-//                view.startControlMeasuresRefresh();
-//            }
-//        }
         //refresh control measures...
         this.populateThread = new Thread(this);
         populateThread.start();
@@ -263,11 +264,10 @@ public class ControlProgramManagerWindow extends ReusableInteralFrame implements
             messagePanel.setMessage("Please select one or more Control Programs");
             return;
         }
-        editControlProgramViews = new EditControlProgramView[controlPrograms.size()]; 
         for (int i = 0; i < controlPrograms.size(); i++) {
             ControlProgram controlProgram = (ControlProgram) controlPrograms.get(i);
-            EditControlProgramView view = new EditControlProgramWindow(desktopManager, session, parentConsole);
-            editControlProgramViews[i] = view;
+            ControlProgramView view = new ControlProgramWindow(desktopManager, session, parentConsole, presenter.getControlMeasures());
+            editControlProgramViewList.add(view);
             try {
                 presenter.doEdit(view, controlProgram);
             } catch (EmfException e) {
@@ -340,8 +340,9 @@ public class ControlProgramManagerWindow extends ReusableInteralFrame implements
     }
 
     private void createNewProgram() {
-//        ControlProgramView view = new ControlProgramWindow(parentConsole, session, desktopManager);
-//        presenter.doNew(view);   
+        ControlProgramView view = new NewControlProgramWindow(desktopManager, session, parentConsole, presenter.getControlMeasures());
+        editControlProgramViewList.add(view);
+        presenter.doNew(view);   
     }
 
     public EmfConsole getParentConsole() {

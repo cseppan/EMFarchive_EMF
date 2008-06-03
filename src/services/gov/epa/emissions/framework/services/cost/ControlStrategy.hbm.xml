@@ -108,5 +108,11 @@
     	</composite-element>
 	</array>
 
+	<array name="controlPrograms" table="control_strategy_programs">
+    	<key column="control_strategy_id" not-null="true"/>
+    	<list-index column="list_index"/>
+    	<many-to-many class="gov.epa.emissions.framework.services.cost.ControlProgram" column="control_program_id" />
+	</array>
+
   </class> 
 </hibernate-mapping>  

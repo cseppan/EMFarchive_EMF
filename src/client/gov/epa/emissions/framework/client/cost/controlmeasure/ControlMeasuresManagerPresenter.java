@@ -14,10 +14,6 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 public class ControlMeasuresManagerPresenter implements RefreshObserver {
 
     private ControlMeasuresManagerView view;
@@ -96,46 +92,10 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         exportPresenter.display(exportView);
     }
 
-    public void doSaveCopiedControlMeasure(ControlMeasure coppied, ControlMeasure original) throws EmfException {
-        coppied.setAbbreviation(getRandomString());
-        
-        if (isDuplicate(coppied))
-            throw new EmfException("A control measure with the same name or abbreviation already exists.");
-
-        coppied.setCreator(session.user());
-        coppied.setLastModifiedTime(new Date());
-        service().addMeasure(coppied, getSCCs(original.getId()));
-    }
-
     public void doSaveCopiedControlMeasure(int controlMeasureId) throws EmfException {
         service().copyMeasure(controlMeasureId, session.user());
     }
 
-    private String getRandomString() {
-        return Math.round(Math.random() * 1000000000) % 1000000000 + "";
-    }
-    
-    private boolean isDuplicate(ControlMeasure newControlMeasure) throws EmfException {
-        ControlMeasure[] controlMeasures = service().getMeasures();
-        String[] cmAbbrevs = getAllAbbreviations(controlMeasures);
-        for (int i = 0; i < controlMeasures.length; i++) {
-            if (controlMeasures[i].getName().equals(newControlMeasure.getName()) 
-                    || newControlMeasure.getAbbreviation().equals(cmAbbrevs[i]))
-                return true;
-        }
-
-        return false;
-    }
-
-    private String[] getAllAbbreviations(ControlMeasure[] controlMeasures) {
-        List abbrevs = new ArrayList();
-        
-        for (int i = 0; i < controlMeasures.length; i++)
-            abbrevs.add(controlMeasures[i].getAbbreviation());
-        
-        return (String[])abbrevs.toArray(new String[0]);
-    }
-    
     public Scc[] getSCCs(int controlMeasureId) throws EmfException {
         return service().getSccs(controlMeasureId);
     }

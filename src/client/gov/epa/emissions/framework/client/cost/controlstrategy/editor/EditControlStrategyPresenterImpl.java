@@ -37,6 +37,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     private EditControlStrategyMeasuresTabPresenter measuresTabPresenter;
 
+    private ControlStrategyProgramsTabPresenter programsTabPresenter;
+
     private EditControlStrategyPollutantsTabPresenter pollutantsTabPresenter;
 
     private EditControlStrategyConstraintsTabPresenter constraintsTabPresenter;
@@ -179,6 +181,13 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         presenters.add(measuresTabPresenter);
     }
 
+    public void set(ControlStrategyProgramsTab view) {
+        programsTabPresenter = new ControlStrategyProgramsTabPresenter(view,
+                controlStrategy, session);
+        programsTabPresenter.doDisplay();
+        presenters.add(programsTabPresenter);
+    }
+
     public void set(ControlStrategyPollutantsTabView view) {
         pollutantsTabPresenter = new EditControlStrategyPollutantsTabPresenter(view,
                 controlStrategy, session);
@@ -241,7 +250,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
             constraintsTabPresenter.doChangeStrategyType(strategyType);
         if (inventoryTabPresenter != null)
             inventoryTabPresenter.doChangeStrategyType(strategyType);
-        
+        view.notifyStrategyTypeChange(strategyType);
     }
 
 }

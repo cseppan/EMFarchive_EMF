@@ -500,7 +500,7 @@ public class ControlMeasureDAO {
     public List getControlMeasures(int majorPollutantId, Session session, String whereFilter) {
         return session.createQuery("select new ControlMeasure(cM.id, cM.name, " +
                 "cM.abbreviation, cM.majorPollutant.name) " +
-                "from ControlMeasure cM where cM.majorPollutant.id=" + majorPollutantId + (whereFilter.length() > 0 ? " and " + whereFilter: "") + " order by cM.name").list();
+                "from ControlMeasure cM where cM.majorPollutant.id=" + majorPollutantId + (whereFilter.length() > 0 ? " and (" + whereFilter + ")": "") + " order by cM.name").list();
     }
 
     private void updateAggregateEfficiencyRecords(int controlMeasureId, DbServer dbServer) throws EmfException {

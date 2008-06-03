@@ -16,9 +16,9 @@
 	<many-to-one
         name="controlProgramType" 
         class="gov.epa.emissions.framework.services.cost.ControlProgramType"
-        column="control_program_type_id" />
+        column="control_program_type_id" not-null="true" />
 
-	<many-to-one name="dataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id"/>
+	<many-to-one name="dataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id" not-null="true"/>
 	<property name="datasetVersion" column="dataset_version" type="integer" not-null="true"/>
 
 	<many-to-one 

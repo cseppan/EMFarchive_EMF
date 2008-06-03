@@ -19,8 +19,10 @@ public class StrategyType implements Serializable, Comparable {
     public static final String leastCostCurve = "Least Cost Curve";
 
     public static final String maxEmissionsReduction = "Max Emissions Reduction";
-//    private Mutex lock;
 
+    public static final String projectFutureYearInventory = "Project Future Year Inventory";
+//    private Mutex lock;
+    
     public StrategyType() {
 //        lock = new Mutex();
     }

@@ -1,6 +1,6 @@
-package gov.epa.emissions.framework.client.cost.controlprogram.editor;
+package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
-import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlProgram;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -9,39 +9,38 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ControlProgramMeasureTableData extends AbstractTableData {
+public class ControlStrategyProgramTableData extends AbstractTableData {
 
-    private List rows;
+    private List<Row> rows;
 
-    public ControlProgramMeasureTableData(ControlMeasure[] cm) {
-        rows = createRows(cm);
+    public ControlStrategyProgramTableData(ControlProgram[] controlPrograms) {
+        rows = createRows(controlPrograms);
     }
 
-    private List createRows(ControlMeasure[] cm) {
-        List rows = new ArrayList();
-        for (int i = 0; i < cm.length; i++) {
-            Row row = row(cm[i]);
+    private List<Row> createRows(ControlProgram[] controlPrograms) {
+        List<Row> rows = new ArrayList<Row>();
+        for (int i = 0; i < controlPrograms.length; i++) {
+            Row row = row(controlPrograms[i]);
             rows.add(row);
         }
         return rows;
     }
 
-    private Row row(ControlMeasure cm) {
-        Object[] values = { cm.getAbbreviation(), 
-        cm.getName()};
-        return new ViewableRow(cm, values);
+    private Row row(ControlProgram controlTechnology) {
+        Object[] values = { controlTechnology.getName(), controlTechnology.getDescription() };
+        return new ViewableRow(controlTechnology, values);
     }
 
    
     public String[] columns() {
-        return new String[] { "Abbrev", "Name" };
+        return new String[] { "Name", "Desc" };
     }
 
     public Class getColumnClass(int col) {
         return String.class;
     }
 
-    public List rows() {
+    public List<Row> rows() {
         return rows;
     }
 
@@ -49,7 +48,7 @@ public class ControlProgramMeasureTableData extends AbstractTableData {
         return false;
     }
 
-    public void add(ControlMeasure[] cm) {
+    public void add(ControlProgram[] cm) {
         for (int i = 0; i < cm.length; i++) {
             Row row = row(cm[i]);
             if (!rows.contains(row))
@@ -62,9 +61,9 @@ public class ControlProgramMeasureTableData extends AbstractTableData {
         this.rows = createRows(sources());
     }
 
-    public ControlMeasure[] sources() {
+    public ControlProgram[] sources() {
         List sources = sourcesList();
-        return (ControlMeasure[]) sources.toArray(new ControlMeasure[0]);
+        return (ControlProgram[]) sources.toArray(new ControlProgram[0]);
     }
 
     private List sourcesList() {
@@ -77,10 +76,10 @@ public class ControlProgramMeasureTableData extends AbstractTableData {
         return sources;
     }
 
-    private void remove(ControlMeasure record) {
+    private void remove(ControlProgram record) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             ViewableRow row = (ViewableRow) iter.next();
-            ControlMeasure source = (ControlMeasure) row.source();
+            ControlProgram source = (ControlProgram) row.source();
             if (source == record) {
                 rows.remove(row);
                 return;
@@ -88,7 +87,7 @@ public class ControlProgramMeasureTableData extends AbstractTableData {
         }
     }
 
-    public void remove(ControlMeasure[] records) {
+    public void remove(ControlProgram[] records) {
         for (int i = 0; i < records.length; i++)
             remove(records[i]);
 

@@ -1,11 +1,12 @@
 package gov.epa.emissions.framework.client.cost.controlprogram.editor;
 
 import gov.epa.emissions.framework.client.ManagedView;
+import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlProgram;
 
-public interface EditControlProgramView extends ManagedView {
+public interface ControlProgramView extends ManagedView {
 
-    void observe(EditControlProgramPresenter presenter);
+    void observe(ControlProgramPresenter presenter);
 
     void display(ControlProgram controlProgram);
     
@@ -15,7 +16,7 @@ public interface EditControlProgramView extends ManagedView {
 
     public void startControlMeasuresRefresh();
 
-    public void endControlMeasuresRefresh();
+    public void signalControlMeasuresAreLoaded(ControlMeasure[] controlMeasures);
     
     void signalChanges();    
 }

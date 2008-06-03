@@ -4,6 +4,7 @@ insert into emf.strategy_types values(DEFAULT,'Least Cost','Least Cost', '', 'go
 insert into emf.strategy_types values(DEFAULT,'Least Cost Curve','Least Cost Curve', '', 'gov.epa.emissions.framework.services.cost.analysis.leastcostcurve.StrategyTask');
 insert into emf.strategy_types (name, description, default_sortorder, strategy_classname) values ('Apply Measures In Series', 'Apply Measures In Series', '''''', 'gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries.StrategyTask');
 insert into emf.strategy_types values(DEFAULT,'Annotate Inventory','Annotate Inventory', '', 'gov.epa.emissions.framework.services.cost.analysis.annotateinventory.StrategyTask');
+insert into emf.strategy_types values(DEFAULT,'Project Future Year Inventory','Project Future Year Inventory');
 -- emf.strategy_types
 
 -- emf.strategy_result_types

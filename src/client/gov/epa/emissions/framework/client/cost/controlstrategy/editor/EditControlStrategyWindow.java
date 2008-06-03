@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
 import gov.epa.emissions.framework.ui.InfoDialog;
@@ -58,9 +59,15 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     
     private EditControlStrategyMeasuresTab measuresTabView;
 
+    private ControlStrategyProgramsTab programsTabView;
+
     private EditControlStrategyOutputTabView outputTabView;
 
     private EditControlStrategySummaryTab summaryTabView;
+    
+    private JPanel programsTab;
+    
+    final private JTabbedPane tabbedPane = new JTabbedPane();
 
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
         super("Edit Control Strategy", new Dimension(700, 580), desktopManager);
@@ -105,7 +112,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
 
     private JTabbedPane createTabbedPane(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
-        final JTabbedPane tabbedPane = new JTabbedPane();
+//        tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Summary", createSummaryTab(controlStrategy, controlStrategyResults));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -113,9 +120,13 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         tabbedPane.addTab("Inventories", createInventoryFilterTab(controlStrategy));
 //        tabbedPane.addTab("Pollutants", createPollutantsTab(controlStrategy));
         tabbedPane.addTab("Measures", createMeasuresTab(controlStrategy));
+        programsTab = createProgramsTab(controlStrategy);
+        if (controlStrategy.getStrategyType().getName().equals(StrategyType.projectFutureYearInventory)) {
+            tabbedPane.addTab("Programs", programsTab);
+        }
         tabbedPane.addTab("Constraints", createAppliedMeasuresTab(controlStrategy));
         tabbedPane.addTab("Outputs", outputPanel(controlStrategyResults));
-
+//        tabbedPane.removeTabAt(3);
         tabbedPane.addChangeListener(new ChangeListener(){
             public void stateChanged(ChangeEvent e) {
                 messagePanel.clear();
@@ -187,6 +198,13 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         }
         
         return measuresTabView;
+    }
+    
+    private JPanel createProgramsTab(ControlStrategy controlStrategy) {
+        programsTabView = new ControlStrategyProgramsTab(controlStrategy, this,  messagePanel, parentConsole, session);
+        this.presenter.set(programsTabView);
+        programsTabView.setEnabled(false);
+        return programsTabView;
     }
     
 //    private JPanel createPollutantsTab(ControlStrategy controlStrategy) {
@@ -443,5 +461,19 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     public void stopRun()  {
         stopButton.setEnabled(false);
+    }
+
+    public void notifyStrategyTypeChange(StrategyType strategyType) {
+        if (strategyType != null) {
+            if (strategyType.getName().equals(strategyType.projectFutureYearInventory)) {
+                if (tabbedPane.getTabCount() == 5) {
+                    tabbedPane.setTabComponentAt(3, programsTab);
+                }
+            } else {
+                if (tabbedPane.getTabCount() == 6) {
+                    tabbedPane.removeTabAt(3);
+                }
+            }
+        }
     }
 }

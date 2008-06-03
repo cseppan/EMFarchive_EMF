@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.framework.client.ManagedView;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 
 public interface EditControlStrategyView extends ManagedView {
@@ -13,6 +14,8 @@ public interface EditControlStrategyView extends ManagedView {
     void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults);
     
     void notifyLockFailure(ControlStrategy controlStrategy);
+
+    void notifyStrategyTypeChange(StrategyType strategyType);
 
     public void startControlMeasuresRefresh();
 

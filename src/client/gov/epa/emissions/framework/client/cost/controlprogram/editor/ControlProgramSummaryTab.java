@@ -28,6 +28,7 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -38,9 +39,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class EditControlProgramSummaryTab extends JPanel implements EditControlProgramTabView {
+public class ControlProgramSummaryTab extends JPanel implements ControlProgramTabView {
 
-    private EditControlProgramSummaryTabPresenter presenter;
+    private ControlProgramSummaryTabPresenter presenter;
 
     private ControlProgram controlProgram;
 
@@ -74,7 +75,7 @@ public class EditControlProgramSummaryTab extends JPanel implements EditControlP
 
     private Button selectButton;
 
-    public EditControlProgramSummaryTab(ControlProgram controlProgram, EmfSession session, 
+    public ControlProgramSummaryTab(ControlProgram controlProgram, EmfSession session, 
             ManageChangeables changeablesList, MessagePanel messagePanel, 
             EmfConsole parentConsole) {
         super.setName("summary");
@@ -129,11 +130,11 @@ public class EditControlProgramSummaryTab extends JPanel implements EditControlP
         
         
         dsType = new ComboBox(presenter.getDatasetTypes());
-        dsType.setSelectedItem(controlProgram.getDataset().getDatasetType());
+        if (controlProgram.getDataset() != null) dsType.setSelectedItem(controlProgram.getDataset().getDatasetType());
         dsType.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 dataset.setText("");
-                fillVersions(null);
+                fillVersions(null, new Version[] {});
             }
         });
         changeablesList.addChangeable(dsType);
@@ -141,12 +142,16 @@ public class EditControlProgramSummaryTab extends JPanel implements EditControlP
         layoutGenerator.addLabelWidgetPair("Dataset Type:", dsType, panelBottom);
 
         layoutGenerator.addLabelWidgetPair("Dataset:", datasetPanel(), panelBottom);
-
-        version = new ComboBox(new Version[] { /*controlProgram.getVersion()*/ });
-        fillVersions(controlProgram.getDataset());
+        Version[] versions = getVersions(controlProgram.getDataset());
+        version = new ComboBox(versions);
+        fillVersions(controlProgram.getDataset(), versions);
         
-        if (controlProgram.getDatasetVersion() != null)
-            version.setSelectedItem(null/*controlProgram.getVersion()*/);
+        if (controlProgram.getDatasetVersion() != null) {
+            for (Version v : versions) {
+                if (v.getVersion() == controlProgram.getDatasetVersion())
+                    version.setSelectedItem(v);
+            }
+        }
         
         changeablesList.addChangeable(version);
         version.setPreferredSize(preferredSize);
@@ -192,7 +197,7 @@ public class EditControlProgramSummaryTab extends JPanel implements EditControlP
                 presenter.doChangeControlProgramType(controlProgramType);
             }
         });
-        controlProgramTypeCombo.setSelectedItem(controlProgram.getControlProgramType());
+        if (controlProgram.getControlProgramType() != null) controlProgramTypeCombo.setSelectedItem(controlProgram.getControlProgramType());
         changeablesList.addChangeable(controlProgramTypeCombo);
         
         return controlProgramTypeCombo;
@@ -208,15 +213,15 @@ public class EditControlProgramSummaryTab extends JPanel implements EditControlP
 
 
     private JLabel lastModifiedDate() {
-        return createLeftAlignedLabel(CustomDateFormat.format_MM_DD_YYYY_HH_mm(controlProgram.getLastModifiedDate()));
+        return createLeftAlignedLabel(controlProgram.getLastModifiedDate() != null ? CustomDateFormat.format_MM_DD_YYYY_HH_mm(controlProgram.getLastModifiedDate()) : "");
     }
 
     private JLabel creator() {
-        return createLeftAlignedLabel(controlProgram.getCreator().getName());
+        return createLeftAlignedLabel(controlProgram.getCreator() != null ? controlProgram.getCreator().getName() : "");
     }
 
     private TextArea description() {
-        description = new TextArea("description", controlProgram.getDescription(), 40, 3);
+        description = new TextArea("description", controlProgram.getDescription() != null ? controlProgram.getDescription() : "", 40, 3);
         changeablesList.addChangeable(description);
 
         return description;
@@ -224,7 +229,7 @@ public class EditControlProgramSummaryTab extends JPanel implements EditControlP
 
     private TextField name() {
         name = new TextField("name", 40);
-        name.setText(controlProgram.getName());
+        name.setText(controlProgram.getLastModifiedDate() != null ? controlProgram.getName() : "");
         name.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(name);
 
@@ -233,7 +238,7 @@ public class EditControlProgramSummaryTab extends JPanel implements EditControlP
 
     private TextField start() {
         startDate = new TextField("start", 40);
-        startDate.setText(CustomDateFormat.format_YYYY_MM_DD_HH_MM(controlProgram.getStartDate()));
+        startDate.setText(controlProgram.getStartDate() != null ? CustomDateFormat.format_YYYY_MM_DD_HH_MM(controlProgram.getStartDate()) : "");
         startDate.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(startDate);
 
@@ -242,7 +247,7 @@ public class EditControlProgramSummaryTab extends JPanel implements EditControlP
 
     private TextField end() {
         endDate = new TextField("end", 40);
-        endDate.setText(CustomDateFormat.format_YYYY_MM_DD_HH_MM(controlProgram.getEndDate()));
+        endDate.setText(controlProgram.getEndDate() != null ? CustomDateFormat.format_YYYY_MM_DD_HH_MM(controlProgram.getEndDate()) : "");
         endDate.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(endDate);
 
@@ -256,21 +261,30 @@ public class EditControlProgramSummaryTab extends JPanel implements EditControlP
         return label;
     }
 
-    public void save(ControlProgram controlProgram) {
+    public void save(ControlProgram controlProgram) throws EmfException {
         messagePanel.clear();
         controlProgram.setName(name.getText());
         controlProgram.setDescription(description.getText());
+        Version v = (Version)version.getSelectedItem();
+        if (v != null)
+            controlProgram.setDatasetVersion(v.getVersion());
+        else
+            controlProgram.setDatasetVersion(null);
+        controlProgram.setControlProgramType((ControlProgramType)controlProgramTypeCombo.getSelectedItem());
+        controlProgram.setStartDate(getDate(startDate));
+        controlProgram.setEndDate(getDate(endDate));
+    }
 
-        // isDatasetSelected(controlProgram);
-//        controlProgram.setCostYear(new YearValidation("Cost Year").value(costYear.getText(), costYearTable
-//                .getStartYear(), costYearTable.getEndYear()));
-//        controlProgram.setInventoryYear(new YearValidation("Inventory Year").value(inventoryYear.getText()));
-//        updateRegion();
-//        controlProgram.setTargetPollutant(checkMajorPollutant());
-//
-//        controlProgram.setDiscountRate(checkDiscountRate());
-//        controlProgram.setProgramType(checkProgramType());
-//        controlProgram.setUseCostEquations(useCostEquationCheck.isSelected());
+    private Date getDate(TextField date) throws EmfException {
+        try {
+            String dateAsString = date.getText().trim();
+            if (dateAsString.length() == 0) {
+                return null;
+            }
+            return CustomDateFormat.parse_MMddyyyy(dateAsString);
+        } catch (Exception e) {
+            throw new EmfException("Please Correct the Date Format(MM/dd/yyyy)");
+        }
     }
 
     public void notifyControlProgramTypeChange(ControlProgramType controlProgramType) {
@@ -278,27 +292,27 @@ public class EditControlProgramSummaryTab extends JPanel implements EditControlP
         
     }
     
-    public void observe(EditControlProgramSummaryTabPresenter presenter) {
+    public void observe(ControlProgramSummaryTabPresenter presenter) {
         this.presenter = presenter;
     }
 
-    protected void fillVersions(EmfDataset dataset) {
-        version.setEnabled(true);
-//        version.removeAllItems();
-//        if (dataset == null ){
-//            version.removeAllItems();
-//            return; 
-//        }
+    private Version[] getVersions(EmfDataset dataset) {
+        Version[] versions = new Version[] {};
         try {
-            Version[] versions = presenter.getVersions(dataset);
-            version.removeAllItems();
-            version.setModel(new DefaultComboBoxModel(versions));
-            version.revalidate();
-            if (versions.length > 0)
-                version.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
+            versions = presenter.getVersions(dataset);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
+        return versions;
+    }
+
+    protected void fillVersions(EmfDataset dataset, Version[] versions) {
+        version.setEnabled(true);
+        version.removeAllItems();
+        version.setModel(new DefaultComboBoxModel(versions));
+        version.revalidate();
+        if (versions.length > 0)
+            version.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
     }
 
     private int getDefaultVersionIndex(Version[] versions, EmfDataset dataset) {
@@ -344,6 +358,6 @@ public class EditControlProgramSummaryTab extends JPanel implements EditControlP
     private void setDatasets(EmfDataset [] datasets) {
         dataset.setText(datasets[0].getName());
         controlProgram.setDataset(datasets[0]);
-        fillVersions(datasets[0]);
+        fillVersions(datasets[0], getVersions(datasets[0]));
     }
 }

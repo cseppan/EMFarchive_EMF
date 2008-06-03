@@ -563,4 +563,26 @@ CREATE INDEX control_measure_nei_devices_nei_device_code
   USING btree
   (nei_device_code);
   
-  
+  -- emf.control_strategy_programs
+CREATE TABLE emf.control_strategy_programs
+(
+  id SERIAL PRIMARY KEY,
+  list_index int4,
+  control_strategy_id int4 REFERENCES emf.control_strategies (id),
+  control_program_id int4 NOT NULL REFERENCES emf.control_programs(id) ,
+  UNIQUE (control_strategy_id,control_program_id) 
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.control_program_technologies OWNER TO emf;
+CREATE INDEX control_strategy_programs_program_id
+  ON emf.control_strategy_programs
+  USING btree
+  (control_program_id);
+
+CREATE INDEX control_strategy_programs_control_strategy_id
+  ON emf.control_strategy_programs
+  USING btree
+  (control_strategy_id);
+-- emf.control_strategy_programs
+
+insert into emf.strategy_result_types (name) select 'Project Future Year Inventory';

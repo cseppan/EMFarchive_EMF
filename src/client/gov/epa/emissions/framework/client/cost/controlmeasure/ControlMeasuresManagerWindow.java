@@ -555,35 +555,6 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         return table.selected();
     }
 
-    protected void doDisplayPropertiesViewer() {
-
-        List measures = updateSelectedMeasures(getSelectedMeasures());
-        if (measures.isEmpty()) {
-            messagePanel.setMessage("Please select one or more Control Measures");
-            return;
-        }
-    }
-
-    private List updateSelectedMeasures(List selectedMeasures) {
-        // FIXME: update only control measures that user selected
-        List updatedMeasures = new ArrayList();
-        try {
-            ControlMeasure[] updatedAllMeasures1 = session.controlMeasureService().getMeasures();
-            for (int i = 0; i < selectedMeasures.size(); i++) {
-                ControlMeasure selMeasure = (ControlMeasure) selectedMeasures.get(i);
-                for (int j = 0; j < updatedAllMeasures1.length; j++) {
-                    if (selMeasure.getId() == updatedAllMeasures1[j].getId()) {
-                        updatedMeasures.add(updatedAllMeasures1[j]);
-                        break;
-                    }
-                }
-            }
-        } catch (EmfException e) {
-            showError(e.getMessage());
-        }
-        return updatedMeasures;
-    }
-
     public void showError(String message) {
         messagePanel.setError(message);
         super.refreshLayout();

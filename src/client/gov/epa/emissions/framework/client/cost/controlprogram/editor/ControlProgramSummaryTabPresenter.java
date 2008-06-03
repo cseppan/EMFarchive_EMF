@@ -3,28 +3,23 @@ package gov.epa.emissions.framework.client.cost.controlprogram.editor;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.cost.controlprogram.ControlProgramManagerPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlProgram;
 import gov.epa.emissions.framework.services.cost.ControlProgramType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
-public class EditControlProgramSummaryTabPresenter  implements EditControlProgramTabPresenter {
-    private EditControlProgramSummaryTab view;
+public class ControlProgramSummaryTabPresenter  implements ControlProgramTabPresenter {
+    private ControlProgramSummaryTab view;
     
     private EmfSession session;
     
     private ControlProgram controlProgram;
 
-//    private ControlProgramManagerPresenter controlProgramManagerPresenter;
-
-    public EditControlProgramSummaryTabPresenter(EditControlProgramSummaryTab view, 
-            ControlProgram controlProgram, EmfSession session, 
-            ControlProgramManagerPresenter controlProgramManagerPresenter) {
+    public ControlProgramSummaryTabPresenter(ControlProgramSummaryTab view, 
+            ControlProgram controlProgram, EmfSession session) {
         this.controlProgram = controlProgram;
         this.session = session;
         this.view = view;
-//        this.controlProgramManagerPresenter = controlProgramManagerPresenter;
     }
     
     public void doDisplay() throws EmfException  {
@@ -32,7 +27,7 @@ public class EditControlProgramSummaryTabPresenter  implements EditControlProgra
         view.display(this.controlProgram);
     }
 
-    public void doSave(ControlProgram controlProgram) {
+    public void doSave(ControlProgram controlProgram) throws EmfException {
         view.save(controlProgram);
     }
 

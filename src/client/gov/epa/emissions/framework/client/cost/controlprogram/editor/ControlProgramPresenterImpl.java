@@ -15,35 +15,34 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-public class EditControlProgramPresenterImpl implements EditControlProgramPresenter {
+public class ControlProgramPresenterImpl implements ControlProgramPresenter {
 
     private EmfSession session;
 
-    private EditControlProgramView view;
-
-    private ControlProgramManagerPresenter managerPresenter;
+    private ControlProgramView view;
 
     private ControlProgram controlProgram;
 
-    private List presenters;
+    private List<ControlProgramTabPresenter> presenters;
 
-    private EditControlProgramMeasuresTabPresenter measuresTabPresenter;
+    private ControlProgramMeasuresTabPresenter measuresTabPresenter;
 
-    private EditControlProgramSummaryTabPresenter summaryTabPresenter;
+    private ControlProgramTechnologiesTabPresenter technologiesTabPresenter;
 
+    private ControlProgramSummaryTabPresenter summaryTabPresenter;
+    
 //    private EditControlProgramMeasuresTabPresenter measuresTabPresenter;
 //
 //    private boolean inputsLoaded = false;
     
     private boolean hasResults = false;
     
-    public EditControlProgramPresenterImpl(ControlProgram controlProgram, EmfSession session, 
-            EditControlProgramView view, ControlProgramManagerPresenter controlProgramManagerPresenter) {
+    public ControlProgramPresenterImpl(ControlProgram controlProgram, EmfSession session, 
+            ControlProgramView view, ControlProgramManagerPresenter controlProgramManagerPresenter) {
         this.controlProgram = controlProgram;
         this.session = session;
         this.view = view;
-        this.managerPresenter = controlProgramManagerPresenter;
-        this.presenters = new ArrayList();
+        this.presenters = new ArrayList<ControlProgramTabPresenter>();
     }
 
     public void doDisplay() throws EmfException {
@@ -58,12 +57,20 @@ public class EditControlProgramPresenterImpl implements EditControlProgramPresen
         view.display(controlProgram);
     }
 
+    public void doDisplayNew()  {
+        view.observe(this);
+        
+        view.display(controlProgram);
+    }
+
     public ControlProgram getControlProgram(int id) throws EmfException {
         return service().getControlProgram(id);
     }
 
     public void doClose() throws EmfException {
-        service().releaseLocked(session.user(), controlProgram.getId());
+        //only release if its an existing program
+        if (controlProgram.getId() != 0)
+            service().releaseLocked(session.user(), controlProgram.getId());
         closeView();
     }
 
@@ -73,15 +80,28 @@ public class EditControlProgramPresenterImpl implements EditControlProgramPresen
 
     public void doSave() throws EmfException {
         saveTabs();
-        controlProgram.setCreator(session.user());
         controlProgram.setLastModifiedDate(new Date());
         controlProgram = service().updateControlProgramWithLock(controlProgram);
 //        managerPresenter.doRefresh();
     }
 
-    private void saveTabs() throws EmfException {
-        for (Iterator iter = presenters.iterator(); iter.hasNext();) {
-            EditControlProgramTabPresenter element = (EditControlProgramTabPresenter) iter.next();
+    public void doAdd() throws EmfException {
+        saveTabs();
+        controlProgram.setCreator(session.user());
+        controlProgram.setLastModifiedDate(new Date());
+        if (controlProgram.getId() == 0) {
+            int id = service().addControlProgram(controlProgram);
+            //now lock this control program, so it can be further edited...
+            controlProgram = service().obtainLocked(session.user(), id);
+        } else {
+            service().updateControlProgramWithLock(controlProgram);
+        }
+//        managerPresenter.doRefresh();
+    }
+
+    protected void saveTabs() throws EmfException {
+        for (Iterator<ControlProgramTabPresenter> iter = presenters.iterator(); iter.hasNext();) {
+            ControlProgramTabPresenter element = iter.next();
             element.doSave(controlProgram);
         }
     }
@@ -90,19 +110,25 @@ public class EditControlProgramPresenterImpl implements EditControlProgramPresen
         return session.controlProgramService();
     }
 
-    public void set(EditControlProgramSummaryTab view) throws EmfException {
-        this.summaryTabPresenter = new EditControlProgramSummaryTabPresenter(view, controlProgram, 
-                session, managerPresenter);
+    public void set(ControlProgramSummaryTab view) throws EmfException {
+        this.summaryTabPresenter = new ControlProgramSummaryTabPresenter(view, controlProgram, 
+                session);
         summaryTabPresenter.doDisplay();
         presenters.add(summaryTabPresenter);
     }
 
-    public void set(EditControlProgramMeasuresTab view) throws EmfException {
-        measuresTabPresenter = new EditControlProgramMeasuresTabPresenter(view,
-                controlProgram, session, 
-                managerPresenter);
+    public void set(ControlProgramMeasuresTab view) {
+        measuresTabPresenter = new ControlProgramMeasuresTabPresenter(view,
+                controlProgram, session);
         measuresTabPresenter.doDisplay();
         presenters.add(measuresTabPresenter);
+    }
+
+    public void set(ControlProgramTechnologiesTab view) throws EmfException {
+        technologiesTabPresenter = new ControlProgramTechnologiesTabPresenter(view,
+                controlProgram, session);
+        technologiesTabPresenter.doDisplay();
+        presenters.add(technologiesTabPresenter);
     }
 
 //    public void doLoad(String tabTitle) throws EmfException {

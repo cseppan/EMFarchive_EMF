@@ -9,32 +9,30 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ControlProgramMeasureTableData extends AbstractTableData {
+public class ControlMeasureTableData extends AbstractTableData {
 
     private List rows;
 
-    public ControlProgramMeasureTableData(ControlMeasure[] cm) {
-        rows = createRows(cm);
+    public ControlMeasureTableData(ControlMeasure[] controlMeasures) {
+        rows = createRows(controlMeasures);
     }
 
-    private List createRows(ControlMeasure[] cm) {
+    private List createRows(ControlMeasure[] controlMeasures) {
         List rows = new ArrayList();
-        for (int i = 0; i < cm.length; i++) {
-            Row row = row(cm[i]);
+        for (int i = 0; i < controlMeasures.length; i++) {
+            Row row = row(controlMeasures[i]);
             rows.add(row);
         }
         return rows;
     }
 
-    private Row row(ControlMeasure cm) {
-        Object[] values = { cm.getAbbreviation(), 
-        cm.getName()};
-        return new ViewableRow(cm, values);
+    private Row row(ControlMeasure controlMeasure) {
+        String[] values = { controlMeasure.getName(), controlMeasure.getAbbreviation(), controlMeasure.getMajorPollutant().getName() };
+        return new ViewableRow(controlMeasure, values);
     }
 
-   
     public String[] columns() {
-        return new String[] { "Abbrev", "Name" };
+        return new String[] { "Name", "Abbreviation", "Major Pollutant" };
     }
 
     public Class getColumnClass(int col) {
@@ -49,9 +47,9 @@ public class ControlProgramMeasureTableData extends AbstractTableData {
         return false;
     }
 
-    public void add(ControlMeasure[] cm) {
-        for (int i = 0; i < cm.length; i++) {
-            Row row = row(cm[i]);
+    public void add(ControlMeasure[] sccs) {
+        for (int i = 0; i < sccs.length; i++) {
+            Row row = row(sccs[i]);
             if (!rows.contains(row))
                 rows.add(row);
         }
