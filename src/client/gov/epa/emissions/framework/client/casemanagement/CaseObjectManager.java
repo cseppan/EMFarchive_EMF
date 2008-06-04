@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.services.casemanagement.CasesSens;
 import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
 import gov.epa.emissions.framework.services.casemanagement.Grid;
 import gov.epa.emissions.framework.services.casemanagement.GridResolution;
@@ -54,6 +55,8 @@ public class CaseObjectManager {
     private static Sector allSectors = null;
 
     private static CaseJob allJobsForSector = null;
+    
+    private CasesSens[] casesSens = null; 
 
     private int lastCaseId = -1;
 
@@ -861,4 +864,15 @@ public class CaseObjectManager {
         return addGrid(grid);
     }
 
+    public synchronized CasesSens[] getCasesSens(int parentCaseId) {
+        if (this.lastCaseId == parentCaseId) // if the same as the last case,
+        {
+            return this.casesSens;
+        }
+        if (casesSens ==null){
+            
+            //casesSens = caseService.getCaseSens();
+        }
+        return casesSens;
+    }
 }

@@ -603,6 +603,11 @@ public class CaseDAO {
         Criterion criterion = Restrictions.eq("jobId", new Integer(jobId));
         return hibernateFacade.get(CaseJobKey.class, criterion, session);
     }
+    
+    public List getCasesSens(int parentId, Session session) {
+        Criterion criterion = Restrictions.eq("parentId", new Integer(parentId));
+        return hibernateFacade.get(CasesSens.class, criterion, session);
+    }
 
     public CaseJob getCaseJobFromKey(String key) {
         Session session = sessionFactory.getSession();

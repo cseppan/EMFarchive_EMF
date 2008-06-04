@@ -1,16 +1,22 @@
 package gov.epa.emissions.framework.client.data.dataset;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
+import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.client.meta.EmfImageTool;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
@@ -31,7 +37,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 
-public class InputDatasetSelectionDialog extends JDialog implements InputDatasetSelectionView {
+public class DatasetSelectionWindow extends JDialog implements InputDatasetSelectionView {
 
 //    private EmfConsole parent;
 
@@ -46,12 +52,21 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     private EmfDataset[] datasets = new EmfDataset[] {};
     
     private boolean shouldCreate = false;  
+    
+    private MessagePanel messagePanel = new SingleLineMessagePanel();
+    
+    private DesktopManager desktopManager;
+    
+    private EmfConsole parent;
 
-    public InputDatasetSelectionDialog(EmfConsole parent, ManageChangeables changeables) {
+    public DatasetSelectionWindow(EmfConsole parent, ManageChangeables changeables, DesktopManager desktopManager) {
+        
         super(parent);
         super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
 //        this.parent = parent;
-        setModal(true);
+        setModal(false);
+        this.desktopManager = desktopManager;
+        this.parent = parent; 
     }
 
     public void display(DatasetType[] datasetTypes) {
@@ -91,6 +106,7 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     private JPanel buildTopPanel(DatasetType[] datasetTypes, DatasetType defaultType){
         JPanel panel = new JPanel ();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.add(messagePanel);
         panel.add(buildNameContains());
         panel.add(buildDatasetTypeCombo(datasetTypes, defaultType));
         return panel; 
@@ -160,6 +176,12 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     private JPanel buttonPanel() {
         JPanel panel = new JPanel();
         panel.add(new OKButton(okAction()));
+        Button view = new ViewButton("View Dataset", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doDisplayInputDatasetsPropertiesViewer();
+            }
+        });
+        panel.add(view);
         panel.add(new CancelButton(cancelAction()));
         return panel;
     }
@@ -179,11 +201,7 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
                 if (datasetList.getSelectedValues() == null || datasetList.getSelectedValues().length == 0) 
                     datasets = new EmfDataset[]{}; 
                 else {
-                    // get selected datasets
-                    List<EmfDataset> list = new ArrayList<EmfDataset>(datasetList.getSelectedValues().length);
-                    for (int i = 0; i < datasetList.getSelectedValues().length; i++)
-                        list.add((EmfDataset) datasetList.getSelectedValues()[i]);
-                    datasets = list.toArray(new EmfDataset[0]);
+                    setDatasets();
                 }
                 if (datasets.length>0)
                     shouldCreate = true; 
@@ -200,11 +218,35 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     public boolean shouldCreate() {
         return shouldCreate;
     }
-
-    public void clearMessage() {
-        // NOTE Auto-generated method stub
-        
+    
+    private void setDatasets(){
+        List<EmfDataset> list = new ArrayList<EmfDataset>(datasetList.getSelectedValues().length);
+        for (int i = 0; i < datasetList.getSelectedValues().length; i++)
+            list.add((EmfDataset) datasetList.getSelectedValues()[i]);
+        datasets = list.toArray(new EmfDataset[0]);
     }
 
+    private void doDisplayInputDatasetsPropertiesViewer() {
+            // get selected datasets
+            setDatasets();
+        if (datasets.length ==0) {
+            messagePanel.setMessage("Please select one or more inputs with datasets specified to view.");
+            return;
+        }
+        try {
+            for (EmfDataset dataset : datasets) {
+                EmfDataset fullDataset = presenter.getDatasets(dataset.getId());
+                DatasetPropertiesViewer view = new DatasetPropertiesViewer(presenter.getSession(), parent, desktopManager);
+                presenter.doDisplayPropertiesView(view, fullDataset);
+            }
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void clearMessage() {
+        messagePanel.clear();
+    }
 
 }

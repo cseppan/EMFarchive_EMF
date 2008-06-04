@@ -85,6 +85,7 @@
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/parameters/CaseParameter.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/PersistedWaitTask.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/IntegerHolder.hbm.xml"/>
+    	<mapping resource="gov/epa/emissions/framework/services/casemanagement/CasesSens.hbm.xml"/>
 
 		<!-- Mappings : CoST -->
 	   	<mapping resource="gov/epa/emissions/framework/services/cost/ControlProgram.hbm.xml"/>

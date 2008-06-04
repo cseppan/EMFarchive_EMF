@@ -16,4 +16,6 @@ public interface InputDatasetSelectionView {
     EmfDataset[] getDatasets();
 
     boolean shouldCreate();
+    
+    void clearMessage();
 }
