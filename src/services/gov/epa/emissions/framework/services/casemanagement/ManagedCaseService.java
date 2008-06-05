@@ -3708,7 +3708,118 @@ public class ManagedCaseService {
 
     public synchronized Case addSensitivity2Case(User user, int parentCaseId, int templateCaseId, int[] jobIds,
             String jobGroup, Case sensitivityCase) throws EmfException {
-        throw new EmfException("add sensitivity to sensitivity case is currently under construction...");
+        Session session = sessionFactory.getSession();
+        Case lockedSC = null;
+        Case lockedPC = null;
+        Case lockedTC = null;
+
+        try {
+            lockedSC = dao.obtainLocked(user, sensitivityCase, session);
+            int targetId = sensitivityCase.getId();
+
+            Case parent = dao.getCase(parentCaseId, session);
+            lockedPC = dao.obtainLocked(user, parent, session);
+
+            Case template = dao.getCase(templateCaseId, session);
+            lockedTC = dao.obtainLocked(user, template, session);
+
+            if (lockedSC == null)
+                throw new EmfException("Cannot obtain lock for adding sensitivity to happen: User "
+                        + sensitivityCase.getLockOwner() + " has the lock for case '" + sensitivityCase.getName() + "'");
+
+            if (lockedPC == null)
+                throw new EmfException("Cannot obtain lock for adding sensitivity to happen: User "
+                        + parent.getLockOwner() + " has the lock for case '" + parent.getName() + "'");
+
+            if (lockedTC == null)
+                throw new EmfException("Cannot obtain lock for adding sensitivity to happen: User "
+                        + template.getLockOwner() + " has the lock for case '" + template.getName() + "'");
+
+            List<CaseJob> existingJobs = dao.getCaseJobs(targetId, session);
+            List<CaseInput> existingInputs = dao.getCaseInputs(targetId, session);
+            List<CaseParameter> existingParams = dao.getCaseParameters(targetId, session);
+            CaseJob[] jobs2copy = getJobs2Copy(jobIds);
+
+            checkJobsDuplication(existingJobs, jobs2copy, jobGroup);
+
+            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, getJobs2Copy(jobIds));
+            CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), dao.getJobSpecNonSpecCaseInputs(
+                    template.getId(), jobIds, session).toArray(new CaseInput[0]), session);
+            CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao
+                    .getJobSpecNonSpecCaseParameters(template.getId(), jobIds, session).toArray(new CaseParameter[0]),
+                    session);
+
+            addCaseJobs(user, targetId, jobs);
+            addCaseInputs(user, targetId, removeRedundantInputs(inputs, existingInputs));
+            addCaseParameters(user, targetId, removeRedundantParams(params, existingParams));
+
+            updateCase(lockedSC);
+
+            return lockedSC;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not add sensitivity to sensitivity case.", e);
+            throw new EmfException(e.getMessage());
+        } finally {
+            try {
+                if (lockedSC != null)
+                    dao.releaseLocked(user, lockedSC, session);
+
+                session.clear();
+                if (lockedPC != null)
+                    dao.releaseLocked(user, lockedPC, session);
+
+                session.clear();
+                if (lockedTC != null)
+                    dao.releaseLocked(user, lockedTC, session);
+
+                session.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void checkJobsDuplication(List<CaseJob> existingJobs, CaseJob[] jobs2copy, String jobGroup)
+            throws EmfException {
+        for (Iterator<CaseJob> iter = existingJobs.iterator(); iter.hasNext();) {
+            for (CaseJob job : jobs2copy)
+                if (iter.next().getName().equalsIgnoreCase(jobGroup + "_" + job.getName()))
+                    throw new EmfException("Job (" + job.getName() + ") plus job group (" + jobGroup
+                            + ") has been used.");
+        }
+    }
+
+    private CaseInput[] removeRedundantInputs(CaseInput[] inputs, List<CaseInput> existingInputs) {
+        List<CaseInput> uniqueInputs = Arrays.asList(inputs);
+
+        for (CaseInput input : inputs) {
+            for (Iterator<CaseInput> iter = existingInputs.iterator(); iter.hasNext();) {
+                CaseInput next = iter.next();
+
+                if (input.getInputName().equals(next.getInputName()) && input.getSector().equals(next.getSector())
+                        && input.getProgram().equals(next.getProgram()))
+                    uniqueInputs.remove(input);
+            }
+        }
+        
+        return uniqueInputs.toArray(new CaseInput[0]);
+    }
+
+    private CaseParameter[] removeRedundantParams(CaseParameter[] params, List<CaseParameter> existingParams) {
+        List<CaseParameter> uniqueParams = Arrays.asList(params);
+
+        for (CaseParameter param : params) {
+            for (Iterator<CaseParameter> iter = existingParams.iterator(); iter.hasNext();) {
+                CaseParameter next = iter.next();
+
+                if (param.getParameterName().equals(next.getParameterName()) && param.getSector().equals(next.getSector())
+                        && param.getProgram().equals(next.getProgram()) && (param.getJobId() == next.getJobId()))
+                    uniqueParams.remove(param);
+            }
+        }
+        
+        return uniqueParams.toArray(new CaseParameter[0]);
     }
 
     public synchronized Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup,
@@ -3844,6 +3955,7 @@ public class ManagedCaseService {
 
         for (int i = 0; i < objects.length; i++) {
             CaseJob job = (CaseJob) DeepCopy.copy(objects[i]);
+            job.setName(jobGroup + "_" + job.getName());
             job.setCaseId(targetCaseId);
             job.setParentCaseId(parentCaseId);
             job.setJobGroup(jobGroup);
@@ -4015,7 +4127,7 @@ public class ManagedCaseService {
         Session session = sessionFactory.getSession();
         Exception exc = null;
         Case parent = null;
-        
+
         try {
             List<Case> cases = dao.getSensitivityCases(parentCaseId, session);
             return cases.toArray(new Case[0]);
@@ -4024,14 +4136,15 @@ public class ManagedCaseService {
             parent = dao.getCase(parentCaseId, session);
         } finally {
             session.close();
-            
+
             if (exc != null) {
                 exc.printStackTrace();
                 log.error("Could not get all sensitivity cases.", exc);
-                throw new EmfException("Could not get all sensitivity cases for parent case" + (parent == null ? "." :  " (" + parent.getName() + ")."));
+                throw new EmfException("Could not get all sensitivity cases for parent case"
+                        + (parent == null ? "." : " (" + parent.getName() + ")."));
             }
         }
-        
+
         return null;
     }
 }
