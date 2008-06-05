@@ -40,6 +40,13 @@ public class SensitivityPresenter {
     private void closeView() {
         view.disposeView();
     }
+    
+    public Case addSensitivities(int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case setSensitivityCase) throws EmfException {
+        setSensitivityCase.setLastModifiedBy(session.user());
+        setSensitivityCase.setLastModifiedDate(new Date());
+        
+        return service().addSensitivity2Case(session.user(), parentCaseId, templateCaseId, jobIds, jobGroup, setSensitivityCase);
+    }
 
     public Case doSave(int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case newCase) throws EmfException {
         if (isDuplicate(newCase))
@@ -107,4 +114,8 @@ public class SensitivityPresenter {
         presenter.display();
     }
     
+    public Case[] getSensitivityCases(int parentCaseId) throws EmfException {
+        return service().getSensitivityCases(parentCaseId);
+    }
+
 }

@@ -33,7 +33,6 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -51,7 +50,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     private JRadioButton newRadioButton;
 
     private JRadioButton existRadioButton;
-    
+
     private ButtonGroup buttonGroup;
 
     private ComboBox senName;
@@ -59,21 +58,23 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     private TextField senCaseAbrev, jobGroup;
 
     private EmfConsole parentConsole;
-    
+
     private Case parentCase;
-    
+
     private List<CaseCategory> categories = new ArrayList<CaseCategory>();
-    
+
     private List<Case> templateCases;
-    
+
     private JList templateJobsList;
-    
+
     private CaseManagerPresenter parentPresenter;
-    
+
     private ComboBox senTypeCombox;
+
     private ComboBox categoryCombox;
-    //private JPanel casePanel; 
-    
+
+    // private JPanel casePanel;
+
     private Dimension preferredSize = new Dimension(276, 20);
 
     public SensitivityWindow(DesktopManager desktopManager, EmfConsole parentConsole, List<CaseCategory> categories) {
@@ -89,18 +90,18 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
     public void observe(SensitivityPresenter presenter, CaseManagerPresenter parentPresenter) {
         this.presenter = presenter;
-        this.parentPresenter = parentPresenter; 
+        this.parentPresenter = parentPresenter;
     }
 
     public void display(Case case1) {
-        super.setLabel("Add Sensitivity for Case: " + case1.getName() );
+        super.setLabel("Add Sensitivity for Case: " + case1.getName());
         layout.removeAll();
         doLayout(case1);
         super.display();
         super.resetChanges();
-        
+
     }
-    
+
     private void doLayout(Case parentCase) {
         this.parentCase = parentCase;
         messagePanel = new SingleLineMessagePanel();
@@ -119,7 +120,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         layoutGenerator.addLabelWidgetPair("Parent Case:", caseNameNAbbr, panel);
 
         layoutGenerator.addLabelWidgetPair("Sensitivity Case:", newOrExistRadios(), panel);
-       
+
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
@@ -127,7 +128,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
         return panel;
     }
-    
+
     private JPanel createCasePanel(Case case1) {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Case"));
@@ -143,7 +144,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
             }
         });
         layoutGenerator.addLabelWidgetPair("Name:", senName, panel);
-        
+
         senCaseAbrev = new TextField("CaseAbbreviation", 25);
         addChangeable(senCaseAbrev);
         layoutGenerator.addLabelWidgetPair("Abbreviation:", senCaseAbrev, panel);
@@ -160,7 +161,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
         return panel;
     }
-    
+
     private JPanel createSenPanel(Case case1) {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Sensitivity"));
@@ -172,7 +173,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         } catch (EmfException e) {
             messagePanel.setError("Couldn't get Senstivity Template Cases: " + e.getMessage());
         }
-        
+
         senTypeCombox = new ComboBox("Select One", templateCases.toArray(new Case[0]));
         senTypeCombox.setPreferredSize(preferredSize);
         senTypeCombox.addActionListener(new AbstractAction() {
@@ -194,7 +195,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
         return panel;
     }
-    
+
     private JPanel createButtonsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
@@ -203,7 +204,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         layout.setHgap(15);
         layout.setVgap(10);
         container.setLayout(layout);
-        
+
         Button wizardButton = new Button("Wizard", setAction());
         container.add(wizardButton);
         Button editButton = new OKButton("Edit Case", editAction());
@@ -215,22 +216,21 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
         return panel;
     }
-    
-    
-    private CaseCategory getSenTemCategory(String name){
-        for ( CaseCategory cat : categories){
+
+    private CaseCategory getSenTemCategory(String name) {
+        for (CaseCategory cat : categories) {
             if (cat.getName().trim().equalsIgnoreCase(name))
-            return cat; 
+                return cat;
         }
-        return null; 
+        return null;
     }
-    
-    private void getAllSenTemplateCases(CaseCategory category) throws EmfException{
+
+    private void getAllSenTemplateCases(CaseCategory category) throws EmfException {
         this.templateCases = new ArrayList<Case>();
         templateCases.addAll(Arrays.asList(presenter.getCases(category)));
         Collections.sort(templateCases);
     }
-    
+
     private JScrollPane buildjobsPanel() {
         templateJobsList = new JList();
         templateJobsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -240,22 +240,22 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         return scrollPane;
     }
 
-    private void refresh(){
+    private void refresh() {
         try {
-            if (senTypeCombox.getSelectedItem() == null ){
+            if (senTypeCombox.getSelectedItem() == null) {
                 refreshjobs(new CaseJob[] {});
-                return; 
+                return;
             }
             refreshjobs(presenter.getCaseJobs((Case) senTypeCombox.getSelectedItem()));
         } catch (EmfException e1) {
             e1.printStackTrace();
         }
     }
-    
+
     public void refreshjobs(CaseJob[] jobs) {
         templateJobsList.setListData(jobs);
     }
-    
+
     private JPanel newOrExistRadios() {
         newRadioButton = new JRadioButton("Create new case");
         newRadioButton.setSelected(true);
@@ -270,13 +270,18 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         buttonGroup.add(existRadioButton);
         existRadioButton.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                existRadioButtonAction();
+                messagePanel.clear();
+                try {
+                    existRadioButtonAction();
+                } catch (EmfException e1) {
+                    messagePanel.setError(e1.getMessage());
+                }
             }
         });
 
         JPanel radioPanel = new JPanel();
         radioPanel.add(newRadioButton);
-        
+
         radioPanel.add(existRadioButton);
         return radioPanel;
     }
@@ -288,10 +293,24 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
                 messagePanel.clear();
                 try {
                     validateFields();
-                    Case newCase = presenter.doSave(parentCase.getId(), ((Case)senTypeCombox.getSelectedItem()).getId(), jobIds(), getJobGroup(), setSensitivityCase());
+                    Case sensitivityCase = null;
+
+                    if (newRadioButton.isSelected())
+                        sensitivityCase = presenter.doSave(parentCase.getId(), ((Case) senTypeCombox.getSelectedItem())
+                                .getId(), jobIds(), getJobGroup(), setSensitivityCase());
+                    else
+                        sensitivityCase = presenter.addSensitivities(parentCase.getId(), ((Case) senTypeCombox.getSelectedItem())
+                                .getId(), jobIds(), getJobGroup(), (Case)senName.getSelectedItem());
+                    
+                    if (sensitivityCase == null) {
+                        messagePanel.setError("Failed processing sensitivity case.");
+                        return;
+                    }
+                    
                     resetChanges();
+                    
                     CaseEditor view = new CaseEditor(parentConsole, presenter.getSession(), desktopManager);
-                    parentPresenter.doEdit(view, newCase);
+                    parentPresenter.doEdit(view, sensitivityCase);
                     disposeView();
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
@@ -301,93 +320,93 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
         return action;
     }
-    
-    private String getJobGroup(){
+
+    private String getJobGroup() {
         return jobGroup.getText().trim();
     }
-    
-    private void newRadioButtonAction(){
-        System.out.println("begin ....");
+
+    private void newRadioButtonAction() {
         senName.setEnabled(true);
         senName.removeAllItems();
         senName.clear();
-        senName.setModel(new DefaultComboBoxModel(new Case[0]));
+        senName.resetModel(new Case[0]);
         senName.setEditable(true);
         senName.validate();
+        senCaseAbrev.setEditable(true);
         senCaseAbrev.setText("");
     }
-    
-    private void existRadioButtonAction(){
-            // TODO: should get sensitivity cases from cases_sens table. 
-            Case test1 =new Case("test1");
-            test1.setAbbreviation(new Abbreviation("tes_abbrev"));
-            test1.setCaseCategory(new CaseCategory("Sensitivity"));
-            Case test2 =new Case("test2");
-            test1.setAbbreviation(new Abbreviation("test2_abbrev"));
-            test2.setCaseCategory(new CaseCategory("Sensitivity template"));
-            Case[] cases = new Case[]{null, test1, test2};
-            System.out.println(cases[1].getName());
-            senName.removeAllItems();
-            senName.setModel(new DefaultComboBoxModel(cases));
-            senName.setEditable(false);
-            senName.validate();
-            senCaseAbrev.setText("");
-            categoryCombox.setSelectedIndex(0);
+
+    private void existRadioButtonAction() throws EmfException {
+        senName.removeAllItems();
+        senName.resetModel(presenter.getSensitivityCases(parentCase.getId()));
+        senName.setEditable(false);
+        senName.validate();
+
+        Case selected = (Case) senName.getSelectedItem();
+        senCaseAbrev.setEditable(false);
+        senCaseAbrev.setText(selected == null ? "" : selected.getAbbreviation().getName());
+        categoryCombox.setSelectedItem(selected == null ? 0 : selected.getCaseCategory());
     }
-    
-    private void updateCaseInfo(){
-        Case selectedCase = (Case) senName.getSelectedItem();
-        if (selectedCase!=null){
-            senCaseAbrev.setText(selectedCase.getAbbreviation().getName());
-            CaseCategory category = getSenTemCategory(selectedCase.getCaseCategory().getName());
+
+    private void updateCaseInfo() {
+        Object selected = senName.getSelectedItem();
+        
+        if (selected == null || selected  instanceof String) {
+            if (existRadioButton.isSelected()) {
+                senCaseAbrev.setText("");
+                categoryCombox.setSelectedIndex(0);
+            }
             
-            categoryCombox.setSelectedItem(category);
-            categoryCombox.validate();
-        }else
-            senCaseAbrev.setText("");
+            return;
+        }
+        
+        Case selectedCase = (Case) selected;
+
+        if (selectedCase != null) {
+            senCaseAbrev.setText(selectedCase.getAbbreviation().getName());
+            categoryCombox.setSelectedItem(selectedCase.getCaseCategory());
+        }
     }
-    
-    private Case setSensitivityCase(){
+
+    private Case setSensitivityCase() {
         Case sensitivityCase = new Case();
         sensitivityCase.setName(senName.getSelectedItem().toString());
         sensitivityCase.setAbbreviation(new Abbreviation(senCaseAbrev.getText()));
-        
+
         sensitivityCase.setCaseCategory((CaseCategory) categoryCombox.getSelectedItem());
         return sensitivityCase;
     }
-    
-    private void validateFields() throws EmfException{
-        if ( senName.getSelectedItem() == null )
+
+    private void validateFields() throws EmfException {
+        if (senName.getSelectedItem() == null)
             throw new EmfException("Please specify a name. ");
-        
+
         validateJobGroup(jobGroup.getText().trim());
-        
-        if ( senTypeCombox.getSelectedItem() == null )
+
+        if (senTypeCombox.getSelectedItem() == null)
             throw new EmfException("Please specify sensitivity type. ");
     }
-    
-   private void validateJobGroup(String group) throws EmfException{
-       String underscore ="_";
-       if (jobGroup.getText() == null || jobGroup.getText().length() == 0)
-           return; 
-       for (int i = 0; i < group.length(); i++) {
-           if (!(Character.isLetterOrDigit(group.charAt(i)) 
-                   || underscore.equals(group.charAt(i)+"_")))
-               throw new EmfException ("Job group must contain only letters, digits, and underscores. ");
-       }
-   }
 
-   private int[] jobIds() throws EmfException {
-        int jobsNumber = templateJobsList.getSelectedValues().length;
-        //System.out.println("selectedJobs length="+ templateJobsList.getSelectedValues().length);    
+    private void validateJobGroup(String group) throws EmfException {
+        if (jobGroup.getText() == null || jobGroup.getText().trim().isEmpty())
+            return;
         
+        for (int i = 0; i < group.length(); i++) {
+            if (!Character.isLetterOrDigit(group.charAt(i)) && (group.charAt(i) != '_'))
+                throw new EmfException("Job group must contain only letters, digits, and underscores. ");
+        }
+    }
+
+    private int[] jobIds() throws EmfException {
+        int jobsNumber = templateJobsList.getSelectedValues().length;
+
         if (jobsNumber == 0)
             throw new EmfException("Please select one or more jobs.");
-        
+
         int[] selectedIndexes = new int[jobsNumber];
         for (int i = 0; i < jobsNumber; i++)
-            selectedIndexes[i] =((CaseJob)templateJobsList.getSelectedValues()[i]).getId();
-        
+            selectedIndexes[i] = ((CaseJob) templateJobsList.getSelectedValues()[i]).getId();
+
         return selectedIndexes;
     }
 
@@ -404,14 +423,15 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
         return action;
     }
-    
+
     private Action setAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 messagePanel.clear();
                 try {
                     validateFields();
-                    Case newCase = presenter.doSave(parentCase.getId(), ((Case)senTypeCombox.getSelectedItem()).getId(), jobIds(), getJobGroup(), setSensitivityCase());
+                    Case newCase = presenter.doSave(parentCase.getId(), ((Case) senTypeCombox.getSelectedItem())
+                            .getId(), jobIds(), getJobGroup(), setSensitivityCase());
                     resetChanges();
                     setCaseView(newCase);
                 } catch (EmfException e) {
@@ -428,14 +448,13 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
             presenter.doClose();
     }
 
-
-    private void setCaseView(Case newCase) throws EmfException{
+    private void setCaseView(Case newCase) throws EmfException {
         if (newCase == null)
-            throw new EmfException ("The new sensitivity case is null.");
-        
+            throw new EmfException("The new sensitivity case is null.");
+
         String title = "Sensitivity Wizard: " + newCase.getName();
         presenter.doDisplaySetCaseWindow(newCase, title, parentConsole, desktopManager, parentPresenter);
         presenter.doClose();
     }
-    
+
 }

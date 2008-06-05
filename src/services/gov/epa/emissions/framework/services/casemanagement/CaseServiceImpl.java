@@ -641,6 +641,10 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().mergeCases(user, parentCaseId, templateCaseId, jobIds, jobGroup, sensitivityCase);
     }
     
+    public Case addSensitivity2Case(User user, int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case sensitivityCase) throws EmfException {
+        return getCaseService().addSensitivity2Case(user, parentCaseId, templateCaseId, jobIds, jobGroup, sensitivityCase);
+    }
+    
     public String checkParentCase(Case caseObj) throws EmfException {
         return getCaseService().checkParentCase(caseObj);
     }
@@ -651,6 +655,10 @@ public class CaseServiceImpl implements CaseService {
 
     public String validateNLParameters(int caseId) throws EmfException {
         return getCaseService().validateNLParameters(caseId);
+    }
+
+    public Case[] getSensitivityCases(int parentCaseId) throws EmfException {
+        return getCaseService().getSensitivityCases(parentCaseId);
     }
 
 

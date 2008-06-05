@@ -110,7 +110,7 @@ public class ManagedCaseService {
 
     private final int ALL_JOB_ID = 0;
 
-//    protected Session session = null;
+    // protected Session session = null;
 
     // private Session getSession() {
     // if (session == null) {
@@ -1332,7 +1332,7 @@ public class ManagedCaseService {
 
         for (int j = 0; j < size; j++) {
             DependentJob[] depJobs = copiedJobs[j].getDependentJobs();
-            ArrayList jobsToKeep = new ArrayList(); //AME: added per Qun
+            ArrayList jobsToKeep = new ArrayList(); // AME: added per Qun
 
             if (depJobs != null && depJobs.length > 0) {
                 for (int k = 0; k < depJobs.length; k++) {
@@ -1345,8 +1345,8 @@ public class ManagedCaseService {
                         depJobs[k].setJobId(id);
                         jobsToKeep.add(depJobs[k]);
                     } catch (Exception e) {
-                        // NOTE:  discard the dependency if the job depended on doesn't exist.
-                   }
+                        // NOTE: discard the dependency if the job depended on doesn't exist.
+                    }
 
                 }
             }
@@ -1354,7 +1354,6 @@ public class ManagedCaseService {
             jobsToKeep.toArray(remainingJobs);
             copiedJobs[j].setDependentJobs(remainingJobs);
         }
-        
 
         return copiedJobs;
     }
@@ -1812,7 +1811,8 @@ public class ManagedCaseService {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not remove case job " + jobs[0].getName() + " etc.\n" + e.getMessage());
-            throw new EmfException("Could not remove case job " + jobs[0].getName() + " etc. -- please check if it is depended on by other jobs.");
+            throw new EmfException("Could not remove case job " + jobs[0].getName()
+                    + " etc. -- please check if it is depended on by other jobs.");
         } finally {
             session.close();
         }
@@ -2826,7 +2826,7 @@ public class ManagedCaseService {
             String endString = caseObj.getEndDate().toString();
             sbuf.append(shellSetenv("EPI_ENDATE_TIME", endString));
         }
-        
+
         // Add Parameters from job tab
         sbuf.append(eolString);
         sbuf.append(this.runComment + " Parameters -- from job tab" + eolString);
@@ -2836,7 +2836,7 @@ public class ManagedCaseService {
         if (job.getJobGroup() != null) {
             sbuf.append(shellSetenv("JOB_GROUP", job.getJobGroup()));
         }
-        
+
         // All sectors, all jobs
         sbuf.append(eolString);
         sbuf.append(this.runComment + " Parameters -- all sectors, all jobs " + eolString);
@@ -3133,7 +3133,7 @@ public class ManagedCaseService {
     }
 
     public synchronized void finalize() throws Throwable {
-//        this.session = null;
+        // this.session = null;
         super.finalize();
     }
 
@@ -3706,8 +3706,13 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds,
+    public synchronized Case addSensitivity2Case(User user, int parentCaseId, int templateCaseId, int[] jobIds,
             String jobGroup, Case sensitivityCase) throws EmfException {
+        throw new EmfException("add sensitivity to sensitivity case is currently under construction...");
+    }
+
+    public synchronized Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup,
+            Case sensitivityCase) throws EmfException {
         Session session = sessionFactory.getSession();
         Case lockedSC = null;
         Case lockedPC = null;
@@ -3766,6 +3771,7 @@ public class ManagedCaseService {
                 lockedSC.setAbbreviation(new Abbreviation(lockedSC.getId() + ""));
 
             updateCase(lockedSC);
+            dao.add(new CasesSens(parentCaseId, lockedSC.getId()));
 
             return lockedSC;
         } catch (Exception e) {
@@ -3832,7 +3838,8 @@ public class ManagedCaseService {
         }
     }
 
-    private CaseJob[] cloneCaseJobs(int targetCaseId, int parentCaseId, String jobGroup, CaseJob[] objects) throws Exception {
+    private CaseJob[] cloneCaseJobs(int targetCaseId, int parentCaseId, String jobGroup, CaseJob[] objects)
+            throws Exception {
         List<CaseJob> copied = new ArrayList<CaseJob>();
 
         for (int i = 0; i < objects.length; i++) {
@@ -3951,17 +3958,17 @@ public class ManagedCaseService {
         // return uniqueParameters.toArray(new CaseParameter[0]);
         return params2Target.toArray(new CaseParameter[0]);
     }
-    
-    public synchronized String validateNLInputs(int caseId) throws EmfException{
+
+    public synchronized String validateNLInputs(int caseId) throws EmfException {
         String noLocalValues = "";
         try {
             CaseInput[] inputList = getCaseInputs(caseId);
             if (inputList == null)
                 return noLocalValues;
-            
-            for (CaseInput input :inputList){
-                if ( !input.isLocal() && input.getDataset()==null){
-                    noLocalValues += getInputValues(input) +"\n";
+
+            for (CaseInput input : inputList) {
+                if (!input.isLocal() && input.getDataset() == null) {
+                    noLocalValues += getInputValues(input) + "\n";
                 }
             }
         } catch (RuntimeException e) {
@@ -3970,39 +3977,61 @@ public class ManagedCaseService {
         }
         return noLocalValues;
     }
-    
-    public synchronized String validateNLParameters(int caseId) throws EmfException{
+
+    public synchronized String validateNLParameters(int caseId) throws EmfException {
         String noLocalValues = "";
         CaseParameter[] paraList = getCaseParameters(caseId);
-        for (CaseParameter par :paraList){
-            if ( !par.isLocal() && par.getValue().trim().isEmpty()){
+        for (CaseParameter par : paraList) {
+            if (!par.isLocal() && par.getValue().trim().isEmpty()) {
                 noLocalValues += getParamValues(par) + "\n";
             }
         }
         return noLocalValues;
     }
-    
-    private String getInputValues(CaseInput input){
-        String Value = (input.getEnvtVars() == null ? "" : input.getEnvtVars().getName()) + "; " 
-        + (input.getSector() == null ? "All sectors" : input.getSector().getName())+ "; "
-        + getJobName(input.getCaseJobID()) + "; "
-        + input.getName();
-        return Value; 
+
+    private String getInputValues(CaseInput input) {
+        String Value = (input.getEnvtVars() == null ? "" : input.getEnvtVars().getName()) + "; "
+                + (input.getSector() == null ? "All sectors" : input.getSector().getName()) + "; "
+                + getJobName(input.getCaseJobID()) + "; " + input.getName();
+        return Value;
     }
 
-    private String getParamValues(CaseParameter parameter){
-        String Value = (parameter.getEnvVar() == null ? "" : parameter.getEnvVar().getName()) + "; " 
-        + (parameter.getSector() == null ? "All sectors" : parameter.getSector().getName())+ "; " 
-        + getJobName(parameter.getJobId()) + "; "
-        + parameter.getName();
-        return Value; 
+    private String getParamValues(CaseParameter parameter) {
+        String Value = (parameter.getEnvVar() == null ? "" : parameter.getEnvVar().getName()) + "; "
+                + (parameter.getSector() == null ? "All sectors" : parameter.getSector().getName()) + "; "
+                + getJobName(parameter.getJobId()) + "; " + parameter.getName();
+        return Value;
     }
-    
-    private String getJobName(int jobId){
+
+    private String getJobName(int jobId) {
         CaseJob job = dao.getCaseJob(jobId);
         if (job == null)
             return "";
+
+        return job.getName();
+    }
+
+    public synchronized Case[] getSensitivityCases(int parentCaseId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        Exception exc = null;
+        Case parent = null;
         
-        return job.getName(); 
+        try {
+            List<Case> cases = dao.getSensitivityCases(parentCaseId, session);
+            return cases.toArray(new Case[0]);
+        } catch (Exception e) {
+            exc = e;
+            parent = dao.getCase(parentCaseId, session);
+        } finally {
+            session.close();
+            
+            if (exc != null) {
+                exc.printStackTrace();
+                log.error("Could not get all sensitivity cases.", exc);
+                throw new EmfException("Could not get all sensitivity cases for parent case" + (parent == null ? "." :  " (" + parent.getName() + ")."));
+            }
+        }
+        
+        return null;
     }
 }

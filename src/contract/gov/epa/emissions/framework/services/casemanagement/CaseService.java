@@ -194,8 +194,10 @@ public interface CaseService {
     
     Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case sensitivityCase) throws EmfException;
     
-    String checkParentCase(Case caseObj) throws EmfException;
+    Case addSensitivity2Case(User user, int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case sensitivityCase) throws EmfException;
     
-    //CasesSens[] getSenCases(int parentCaseId);
+    String checkParentCase(Case caseObj) throws EmfException;
+
+    Case[] getSensitivityCases(int parentCaseId) throws EmfException;
 
  }

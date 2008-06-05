@@ -1021,7 +1021,7 @@ public class CaseServiceTransport implements CaseService {
         call.addIntegerParam("parentCaseId");
         call.addIntegerParam("templateCaseId");
         call.addIntArrayParam();
-        call.addStringParam(jobGroup);
+        call.addStringParam("jobGroup");
         call.addParam("sensitivityCase", caseMappings.caseObject());
         call.setReturnType(caseMappings.caseObject());
 
@@ -1057,6 +1057,33 @@ public class CaseServiceTransport implements CaseService {
         call.setStringReturnType();
 
         return (String) call.requestResponse(new Object[] { new Integer(caseId) });
+    }
+
+    public synchronized Case addSensitivity2Case(User user, int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup,
+            Case sensitivityCase) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("addSensitivity2Case");
+        call.addParam("user", dataMappings.user());
+        call.addIntegerParam("parentCaseId");
+        call.addIntegerParam("templateCaseId");
+        call.addIntArrayParam();
+        call.addStringParam("jobGroup");
+        call.addParam("sensitivityCase", caseMappings.caseObject());
+        call.setReturnType(caseMappings.caseObject());
+
+        return (Case) call.requestResponse(new Object[] { user, new Integer(parentCaseId), new Integer(templateCaseId),
+                jobIds, jobGroup, sensitivityCase });
+    }
+
+    public synchronized Case[] getSensitivityCases(int parentCaseId) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getSensitivityCases");
+        call.addIntegerParam("parentCaseId");
+        call.setReturnType(caseMappings.cases());
+        
+        return (Case[]) call.requestResponse(new Object[] {new Integer(parentCaseId)});
     }
 
 }

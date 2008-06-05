@@ -80,6 +80,18 @@ public class CaseDAO {
             session.close();
         }
     }
+    
+    public void add(Object obj) throws Exception {
+        Session session = sessionFactory.getSession();
+
+        try {
+            hibernateFacade.add(obj, session);
+        } catch (Exception ex) {
+            throw new Exception("Problem adding object: " + obj.toString() + ". " + ex.getMessage());
+        } finally {
+            session.close();
+        }
+    }
 
     public CaseOutput updateCaseOutput(CaseOutput output) {
         Session session = sessionFactory.getSession();
@@ -1456,5 +1468,16 @@ public class CaseDAO {
             e.printStackTrace();
             throw new EmfException("Could not get unique case parameters for " + envName);
         }
+    }
+
+    public List<Case> getSensitivityCases(int parentCaseId, Session session) {
+        Criterion crit = Restrictions.eq("parentCaseid", parentCaseId);
+        List<CasesSens> caseIds = hibernateFacade.get(CasesSens.class, crit, session);
+        List<Case> sensitivityCases = new ArrayList<Case>();
+        
+        for (Iterator<CasesSens> iter = caseIds.iterator(); iter.hasNext();)
+            sensitivityCases.add(this.getCase(iter.next().getSensCaseId(), session));
+        
+        return sensitivityCases;
     }
 }
