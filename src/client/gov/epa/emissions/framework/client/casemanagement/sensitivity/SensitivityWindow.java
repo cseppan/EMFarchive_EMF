@@ -430,10 +430,22 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
                 messagePanel.clear();
                 try {
                     validateFields();
-                    Case newCase = presenter.doSave(parentCase.getId(), ((Case) senTypeCombox.getSelectedItem())
+                    Case sensCase = null;
+                    
+                    if (newRadioButton.isSelected())
+                        sensCase = presenter.doSave(parentCase.getId(), ((Case) senTypeCombox.getSelectedItem())
                             .getId(), jobIds(), getJobGroup(), setSensitivityCase());
+                    else
+                        sensCase = presenter.addSensitivities(parentCase.getId(), ((Case) senTypeCombox.getSelectedItem())
+                                .getId(), jobIds(), getJobGroup(), (Case)senName.getSelectedItem());
+                    
+                    if (sensCase == null) {
+                        messagePanel.setError("Failed processing sensitivity case.");
+                        return;
+                    }
+                        
                     resetChanges();
-                    setCaseView(newCase);
+                    setCaseView(sensCase);
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
                 }

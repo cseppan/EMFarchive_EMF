@@ -942,6 +942,39 @@ public class ManagedCaseService {
             session.close();
         }
     }
+    
+    private synchronized void addCaseInputs(User user, int caseId, CaseInput[] inputs, String jobPrefix) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            for (int i = 0; i < inputs.length; i++) {
+                inputs[i].setCaseID(caseId);
+                CaseJob job = dao.getCaseJob(inputs[i].getCaseJobID());
+
+                if (job != null) {
+                    CaseJob targetJob = dao.getCaseJob(caseId, jobPrefix + job.getName(), session);
+
+                    if (targetJob == null)
+                        throw new EmfException("Required case job: " + jobPrefix + job.getName() + " doesn't exist in target case.");
+
+                    inputs[i].setCaseJobID(targetJob.getId());
+                }
+
+                if (dao.caseInputExists(inputs[i], session))
+                    throw new EmfException("Case input: " + inputs[i].getName() + " already exists in target case.");
+            }
+
+            for (CaseInput input : inputs) {
+                dao.add(input, session);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not add new case input '" + inputs[0].getName() + "' etc.\n" + e.getMessage());
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
 
     public synchronized CaseInput addCaseInput(User user, CaseInput input, boolean copyingCase) throws EmfException {
         Session session = sessionFactory.getSession();
@@ -1407,6 +1440,39 @@ public class ManagedCaseService {
         }
     }
 
+    private synchronized void addCaseParameters(User user, int caseId, CaseParameter[] params, String jobPrefix) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            for (int i = 0; i < params.length; i++) {
+                params[i].setCaseID(caseId);
+
+                CaseJob job = dao.getCaseJob(params[i].getJobId());
+
+                if (job != null) {
+                    CaseJob targetJob = dao.getCaseJob(caseId, jobPrefix + job.getName(), session);
+
+                    if (targetJob == null)
+                        throw new EmfException("Required case job: " + jobPrefix + job.getName() + " doesn't exist in target case.");
+
+                    params[i].setJobId(targetJob.getId());
+                }
+
+                if (dao.caseParameterExists(params[i], session))
+                    throw new EmfException("Case parameter: " + params[i].getName() + " already exists in target case.");
+            }
+
+            for (CaseParameter param : params)
+                dao.addParameter(param, session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not add new case parameter '" + params[0].getName() + "' etc.\n" + e.getMessage());
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+    
     public synchronized CaseParameter addCaseParameter(User user, CaseParameter param, boolean copyingCase)
             throws EmfException {
         Session session = sessionFactory.getSession();
@@ -3712,6 +3778,7 @@ public class ManagedCaseService {
         Case lockedSC = null;
         Case lockedPC = null;
         Case lockedTC = null;
+        String jobPrefix = (jobGroup == null || jobGroup.trim().isEmpty()) ? "" : jobGroup + "_";
 
         try {
             lockedSC = dao.obtainLocked(user, sensitivityCase, session);
@@ -3740,9 +3807,9 @@ public class ManagedCaseService {
             List<CaseParameter> existingParams = dao.getCaseParameters(targetId, session);
             CaseJob[] jobs2copy = getJobs2Copy(jobIds);
 
-            checkJobsDuplication(existingJobs, jobs2copy, jobGroup);
+            checkJobsDuplication(existingJobs, jobs2copy, jobPrefix);
 
-            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, getJobs2Copy(jobIds));
+            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix, getJobs2Copy(jobIds));
             CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), dao.getJobSpecNonSpecCaseInputs(
                     template.getId(), jobIds, session).toArray(new CaseInput[0]), session);
             CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao
@@ -3750,8 +3817,8 @@ public class ManagedCaseService {
                     session);
 
             addCaseJobs(user, targetId, jobs);
-            addCaseInputs(user, targetId, removeRedundantInputs(inputs, existingInputs));
-            addCaseParameters(user, targetId, removeRedundantParams(params, existingParams));
+            addCaseInputs(user, targetId, removeRedundantInputs(inputs, existingInputs), jobPrefix);
+            addCaseParameters(user, targetId, removeRedundantParams(params, existingParams, jobPrefix), jobPrefix);
 
             updateCase(lockedSC);
 
@@ -3780,25 +3847,34 @@ public class ManagedCaseService {
         }
     }
 
-    private void checkJobsDuplication(List<CaseJob> existingJobs, CaseJob[] jobs2copy, String jobGroup)
+    private void checkJobsDuplication(List<CaseJob> existingJobs, CaseJob[] jobs2copy, String jobPrefix)
             throws EmfException {
         for (Iterator<CaseJob> iter = existingJobs.iterator(); iter.hasNext();) {
+            String jobName = iter.next().getName();
+            
             for (CaseJob job : jobs2copy)
-                if (iter.next().getName().equalsIgnoreCase(jobGroup + "_" + job.getName()))
-                    throw new EmfException("Job (" + job.getName() + ") plus job group (" + jobGroup
+                if (jobName.equalsIgnoreCase(jobPrefix + job.getName()))
+                    throw new EmfException("Job (" + job.getName() + ") plus job prefix (" + jobPrefix
                             + ") has been used.");
         }
     }
 
     private CaseInput[] removeRedundantInputs(CaseInput[] inputs, List<CaseInput> existingInputs) {
-        List<CaseInput> uniqueInputs = Arrays.asList(inputs);
+        List<CaseInput> uniqueInputs = new ArrayList<CaseInput>();
+        uniqueInputs.addAll(Arrays.asList(inputs));
 
         for (CaseInput input : inputs) {
             for (Iterator<CaseInput> iter = existingInputs.iterator(); iter.hasNext();) {
                 CaseInput next = iter.next();
+                Sector inputSector = input.getSector();
+                Sector nextSector = next.getSector();
+                boolean sectorExists = (inputSector == null && nextSector == null) || (inputSector != null && inputSector.equals(nextSector));
+                
+                CaseProgram inputProgram = input.getProgram();
+                CaseProgram nextProgram = next.getProgram();
+                boolean programExists = (inputProgram == null && nextProgram == null) || (inputProgram != null && inputProgram.equals(nextProgram));
 
-                if (input.getInputName().equals(next.getInputName()) && input.getSector().equals(next.getSector())
-                        && input.getProgram().equals(next.getProgram()))
+                if (input.getInputName().equals(next.getInputName()) && sectorExists && programExists)
                     uniqueInputs.remove(input);
             }
         }
@@ -3806,18 +3882,47 @@ public class ManagedCaseService {
         return uniqueInputs.toArray(new CaseInput[0]);
     }
 
-    private CaseParameter[] removeRedundantParams(CaseParameter[] params, List<CaseParameter> existingParams) {
-        List<CaseParameter> uniqueParams = Arrays.asList(params);
+    private CaseParameter[] removeRedundantParams(CaseParameter[] params, List<CaseParameter> existingParams, String jobPrefix) throws EmfException {
+        List<CaseParameter> uniqueParams = new ArrayList<CaseParameter>();
+        uniqueParams.addAll(Arrays.asList(params));
+        Session session = this.sessionFactory.getSession();
 
         for (CaseParameter param : params) {
             for (Iterator<CaseParameter> iter = existingParams.iterator(); iter.hasNext();) {
                 CaseParameter next = iter.next();
+                String paramJobName = "";
+                String nextJobName = "";
 
-                if (param.getParameterName().equals(next.getParameterName()) && param.getSector().equals(next.getSector())
-                        && param.getProgram().equals(next.getProgram()) && (param.getJobId() == next.getJobId()))
+                try {
+                    CaseJob paramJob = dao.getCaseJob(param.getJobId(), session);
+                    CaseJob nextJob = dao.getCaseJob(next.getJobId(), session);
+                    
+                    if (paramJob != null)
+                        paramJobName = jobPrefix + paramJob.getName();
+                    
+                    if (nextJob != null)
+                        nextJobName = nextJob.getName();
+                } catch (Exception e) {
+                    session.close();
+                    throw new EmfException("Cannot get jobs for comparisons in removing dedundant case parameters. " + e.getMessage());
+                } 
+                
+                Sector paramSector = param.getSector();
+                Sector nextSector = next.getSector();
+                boolean sectorExists = (paramSector == null && nextSector == null) || (paramSector != null && paramSector.equals(nextSector));
+                
+                CaseProgram paramProgram = param.getProgram();
+                CaseProgram nextProgram = next.getProgram();
+                boolean programExists = (paramProgram == null && nextProgram == null) || (paramProgram != null && paramProgram.equals(nextProgram));
+                
+                if (param.getParameterName().equals(next.getParameterName()) && sectorExists
+                        && programExists && (paramJobName.equals(nextJobName)))
                     uniqueParams.remove(param);
             }
         }
+        
+        if (session != null && session.isConnected())
+            session.close();
         
         return uniqueParams.toArray(new CaseParameter[0]);
     }
@@ -3828,6 +3933,7 @@ public class ManagedCaseService {
         Case lockedSC = null;
         Case lockedPC = null;
         Case lockedTC = null;
+        String jobPrefix = (jobGroup == null || jobGroup.trim().isEmpty()) ? "" : jobGroup + "_";
 
         try {
             Abbreviation abbr = sensitivityCase.getAbbreviation();
@@ -3862,7 +3968,7 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot obtain lock for merging case to happen: User " + template.getLockOwner()
                         + " has the lock for case '" + template.getName() + "'");
 
-            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, getJobs2Copy(jobIds));
+            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix, getJobs2Copy(jobIds));
             CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), dao.getJobSpecNonSpecCaseInputs(
                     template.getId(), jobIds, session).toArray(new CaseInput[0]), session);
             CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao
@@ -3870,8 +3976,8 @@ public class ManagedCaseService {
                     session);
 
             addCaseJobs(user, targetId, jobs);
-            addCaseInputs(user, targetId, inputs);
-            addCaseParameters(user, targetId, params);
+            addCaseInputs(user, targetId, inputs, jobPrefix);
+            addCaseParameters(user, targetId, params, jobPrefix);
             copySummaryInfo(lockedPC, lockedSC);
 
             // NOTE: copy input/output folder from template case
@@ -3949,13 +4055,13 @@ public class ManagedCaseService {
         }
     }
 
-    private CaseJob[] cloneCaseJobs(int targetCaseId, int parentCaseId, String jobGroup, CaseJob[] objects)
+    private CaseJob[] cloneCaseJobs(int targetCaseId, int parentCaseId, String jobGroup, String jobPrefix, CaseJob[] objects)
             throws Exception {
         List<CaseJob> copied = new ArrayList<CaseJob>();
 
         for (int i = 0; i < objects.length; i++) {
             CaseJob job = (CaseJob) DeepCopy.copy(objects[i]);
-            job.setName(jobGroup + "_" + job.getName());
+            job.setName(jobPrefix + job.getName());
             job.setCaseId(targetCaseId);
             job.setParentCaseId(parentCaseId);
             job.setJobGroup(jobGroup);
