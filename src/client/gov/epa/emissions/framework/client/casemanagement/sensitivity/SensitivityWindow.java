@@ -55,7 +55,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     private ButtonGroup buttonGroup;
 
     private ComboBox senName;
-    
+
     private ComboBox jobGroup;
 
     private TextField senCaseAbrev;
@@ -78,7 +78,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
     // private JPanel casePanel;
 
-    private Dimension preferredSize = new Dimension(276, 20);
+    private Dimension preferredSize = new Dimension(300, 20);
 
     public SensitivityWindow(DesktopManager desktopManager, EmfConsole parentConsole, List<CaseCategory> categories) {
         super("Sensitivity", new Dimension(540, 490), desktopManager);
@@ -153,7 +153,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         });
         layoutGenerator.addLabelWidgetPair("Name:", senName, panel);
 
-        senCaseAbrev = new TextField("CaseAbbreviation", 25);
+        senCaseAbrev = new TextField("CaseAbbreviation", 27);
         addChangeable(senCaseAbrev);
         layoutGenerator.addLabelWidgetPair("Abbreviation:", senCaseAbrev, panel);
 
@@ -192,10 +192,15 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         });
         layoutGenerator.addLabelWidgetPair("Sensitivity Type:", senTypeCombox, panel);
 
-        jobGroup = new ComboBox("", new String[] {""});
+        jobGroup = new ComboBox(new String[] { "" });
         jobGroup.setPreferredSize(preferredSize);
         jobGroup.setEditable(true);
         addChangeable(jobGroup);
+        jobGroup.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                messagePanel.clear();
+            }
+        });
         layoutGenerator.addLabelWidgetPair("Job Group:", jobGroup, panel);
 
         layoutGenerator.addLabelWidgetPair("Sensitivity Jobs: ", buildjobsPanel(), panel);
@@ -247,7 +252,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         templateJobsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         JScrollPane scrollPane = new JScrollPane(templateJobsList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setPreferredSize(new Dimension(280, 100));
+        scrollPane.setPreferredSize(new Dimension(300, 100));
         return scrollPane;
     }
 
@@ -305,7 +310,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
                 messagePanel.clear();
                 window.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 messagePanel.setMessage("Server is processing sensitivity case...");
-                
+
                 try {
                     validateFields();
                     Case sensitivityCase = null;
@@ -314,16 +319,16 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
                         sensitivityCase = presenter.doSave(parentCase.getId(), ((Case) senTypeCombox.getSelectedItem())
                                 .getId(), jobIds(), getJobGroup(), setSensitivityCase());
                     else
-                        sensitivityCase = presenter.addSensitivities(parentCase.getId(), ((Case) senTypeCombox.getSelectedItem())
-                                .getId(), jobIds(), getJobGroup(), (Case)senName.getSelectedItem());
-                    
+                        sensitivityCase = presenter.addSensitivities(parentCase.getId(), ((Case) senTypeCombox
+                                .getSelectedItem()).getId(), jobIds(), getJobGroup(), (Case) senName.getSelectedItem());
+
                     if (sensitivityCase == null) {
                         messagePanel.setError("Failed processing sensitivity case.");
                         return;
                     }
-                    
+
                     resetChanges();
-                    
+
                     CaseEditor view = new CaseEditor(parentConsole, presenter.getSession(), desktopManager);
                     parentPresenter.doEdit(view, sensitivityCase);
                     disposeView();
@@ -340,7 +345,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     }
 
     private String getJobGroup() {
-        return (String)jobGroup.getSelectedItem();
+        return (String) jobGroup.getSelectedItem();
     }
 
     private void newRadioButtonAction() {
@@ -353,6 +358,9 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         senCaseAbrev.setEditable(true);
         senCaseAbrev.setText("");
         categoryCombox.setEnabled(true);
+        jobGroup.removeAllItems();
+        jobGroup.resetModel(new String[]{""});
+        jobGroup.validate();
     }
 
     private void existRadioButtonAction() throws EmfException {
@@ -370,22 +378,24 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
     private void updateCaseInfo() throws EmfException {
         Object selected = senName.getSelectedItem();
-        
-        if (selected == null || selected  instanceof String) {
+
+        if (selected == null || selected instanceof String) {
             if (existRadioButton.isSelected()) {
                 senCaseAbrev.setText("");
                 categoryCombox.setSelectedIndex(0);
             }
-            
+
             return;
         }
-        
+
         Case selectedCase = (Case) selected;
 
         if (selectedCase != null) {
             senCaseAbrev.setText(selectedCase.getAbbreviation().getName());
             categoryCombox.setSelectedItem(selectedCase.getCaseCategory());
+            jobGroup.removeAllItems();
             jobGroup.resetModel(presenter.getJobGroups(selectedCase));
+            senName.validate();
         }
     }
 
@@ -411,7 +421,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     private void validateJobGroup(String group) throws EmfException {
         if (group == null || group.trim().isEmpty())
             return;
-        
+
         for (int i = 0; i < group.length(); i++) {
             if (!Character.isLetterOrDigit(group.charAt(i)) && (group.charAt(i) != '_'))
                 throw new EmfException("Job group must contain only letters, digits, and underscores. ");
@@ -452,23 +462,23 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
                 messagePanel.clear();
                 view.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 messagePanel.setMessage("Server is processing sensitivity case...");
-                
+
                 try {
                     validateFields();
                     Case sensCase = null;
-                    
+
                     if (newRadioButton.isSelected())
                         sensCase = presenter.doSave(parentCase.getId(), ((Case) senTypeCombox.getSelectedItem())
-                            .getId(), jobIds(), getJobGroup(), setSensitivityCase());
+                                .getId(), jobIds(), getJobGroup(), setSensitivityCase());
                     else
-                        sensCase = presenter.addSensitivities(parentCase.getId(), ((Case) senTypeCombox.getSelectedItem())
-                                .getId(), jobIds(), getJobGroup(), (Case)senName.getSelectedItem());
-                    
+                        sensCase = presenter.addSensitivities(parentCase.getId(), ((Case) senTypeCombox
+                                .getSelectedItem()).getId(), jobIds(), getJobGroup(), (Case) senName.getSelectedItem());
+
                     if (sensCase == null) {
                         messagePanel.setError("Failed processing sensitivity case.");
                         return;
                     }
-                        
+
                     resetChanges();
                     setCaseView(sensCase);
                     messagePanel.clear();
