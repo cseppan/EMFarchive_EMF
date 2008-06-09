@@ -4297,4 +4297,19 @@ public class ManagedCaseService {
 
         return null;
     }
+
+    public synchronized String[] getJobGroups(int caseId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            return dao.getJobGroups(caseId, session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get all job groups info.", e);
+            throw new EmfException("Could not get all job groups info.");
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
+    }
 }

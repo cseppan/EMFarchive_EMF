@@ -1086,4 +1086,14 @@ public class CaseServiceTransport implements CaseService {
         return (Case[]) call.requestResponse(new Object[] {new Integer(parentCaseId)});
     }
 
+    public synchronized String[] getJobGroups(int caseId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getJobGroups");
+        call.addIntegerParam("caseId");
+        call.setStringArrayReturnType();
+
+        return (String[]) call.requestResponse(new Object[] { new Integer(caseId) });
+    }
+
 }

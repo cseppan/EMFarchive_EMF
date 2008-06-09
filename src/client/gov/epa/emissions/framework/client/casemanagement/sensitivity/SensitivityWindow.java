@@ -54,8 +54,10 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     private ButtonGroup buttonGroup;
 
     private ComboBox senName;
+    
+    private ComboBox jobGroup;
 
-    private TextField senCaseAbrev, jobGroup;
+    private TextField senCaseAbrev;
 
     private EmfConsole parentConsole;
 
@@ -140,7 +142,12 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         addChangeable(senName);
         senName.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                updateCaseInfo();
+                try {
+                    messagePanel.clear();
+                    updateCaseInfo();
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
             }
         });
         layoutGenerator.addLabelWidgetPair("Name:", senName, panel);
@@ -178,12 +185,15 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         senTypeCombox.setPreferredSize(preferredSize);
         senTypeCombox.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
                 refresh();
             }
         });
         layoutGenerator.addLabelWidgetPair("Sensitivity Type:", senTypeCombox, panel);
 
-        jobGroup = new TextField("JobGroup", 25);
+        jobGroup = new ComboBox("", new String[] {""});
+        jobGroup.setPreferredSize(preferredSize);
+        jobGroup.setEditable(true);
         addChangeable(jobGroup);
         layoutGenerator.addLabelWidgetPair("Job Group:", jobGroup, panel);
 
@@ -248,7 +258,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
             }
             refreshjobs(presenter.getCaseJobs((Case) senTypeCombox.getSelectedItem()));
         } catch (EmfException e1) {
-            e1.printStackTrace();
+            messagePanel.setError(e1.getMessage());
         }
     }
 
@@ -264,6 +274,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         buttonGroup.add(newRadioButton);
         newRadioButton.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
                 newRadioButtonAction();
             }
         });
@@ -322,7 +333,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     }
 
     private String getJobGroup() {
-        return jobGroup.getText().trim();
+        return (String)jobGroup.getSelectedItem();
     }
 
     private void newRadioButtonAction() {
@@ -334,6 +345,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         senName.validate();
         senCaseAbrev.setEditable(true);
         senCaseAbrev.setText("");
+        categoryCombox.setEnabled(true);
     }
 
     private void existRadioButtonAction() throws EmfException {
@@ -346,9 +358,10 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         senCaseAbrev.setEditable(false);
         senCaseAbrev.setText(selected == null ? "" : selected.getAbbreviation().getName());
         categoryCombox.setSelectedItem(selected == null ? 0 : selected.getCaseCategory());
+        categoryCombox.setEnabled(false);
     }
 
-    private void updateCaseInfo() {
+    private void updateCaseInfo() throws EmfException {
         Object selected = senName.getSelectedItem();
         
         if (selected == null || selected  instanceof String) {
@@ -365,6 +378,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         if (selectedCase != null) {
             senCaseAbrev.setText(selectedCase.getAbbreviation().getName());
             categoryCombox.setSelectedItem(selectedCase.getCaseCategory());
+            jobGroup.resetModel(presenter.getJobGroups(selectedCase));
         }
     }
 
@@ -381,14 +395,14 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         if (senName.getSelectedItem() == null)
             throw new EmfException("Please specify a name. ");
 
-        validateJobGroup(jobGroup.getText().trim());
+        validateJobGroup(getJobGroup());
 
         if (senTypeCombox.getSelectedItem() == null)
             throw new EmfException("Please specify sensitivity type. ");
     }
 
     private void validateJobGroup(String group) throws EmfException {
-        if (jobGroup.getText() == null || jobGroup.getText().trim().isEmpty())
+        if (group == null || group.trim().isEmpty())
             return;
         
         for (int i = 0; i < group.length(); i++) {
@@ -417,6 +431,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     private Action closeAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
+                messagePanel.clear();
                 doClose();
             }
         };

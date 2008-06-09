@@ -118,4 +118,8 @@ public class SensitivityPresenter {
         return service().getSensitivityCases(parentCaseId);
     }
 
+    public Object[] getJobGroups(Case selectedCase) throws EmfException {
+        return service().getJobGroups(selectedCase.getId());
+    }
+
 }

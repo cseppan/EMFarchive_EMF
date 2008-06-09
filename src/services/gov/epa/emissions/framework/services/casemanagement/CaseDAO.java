@@ -80,7 +80,7 @@ public class CaseDAO {
             session.close();
         }
     }
-    
+
     public void add(Object obj) throws Exception {
         Session session = sessionFactory.getSession();
 
@@ -372,7 +372,7 @@ public class CaseDAO {
 
         return hibernateFacade.get(CaseInput.class, crit1, session);
     }
-    
+
     public List<CaseInput> getJobSpecNonSpecCaseInputs(int caseId, int[] jobIds, Session session) {
         List<?> ids = session
                 .createQuery(
@@ -388,13 +388,11 @@ public class CaseDAO {
 
         return inputs;
     }
-    
+
     public List<CaseInput> getCaseInputsByJobIds(int caseId, int[] jobIds, Session session) {
-        List<?> ids = session
-                .createQuery(
-                        "SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = "
-                                + caseId + " AND (obj.caseJobID = "
-                                + getAndOrClause(jobIds, "obj.caseJobID") + ")").list();
+        List<?> ids = session.createQuery(
+                "SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = " + caseId
+                        + " AND (obj.caseJobID = " + getAndOrClause(jobIds, "obj.caseJobID") + ")").list();
         List<CaseInput> inputs = new ArrayList<CaseInput>();
 
         for (Iterator<?> iter = ids.iterator(); iter.hasNext();) {
@@ -622,7 +620,7 @@ public class CaseDAO {
         Criterion criterion = Restrictions.eq("jobId", new Integer(jobId));
         return hibernateFacade.get(CaseJobKey.class, criterion, session);
     }
-    
+
     public List getCasesSens(int parentId, Session session) {
         Criterion criterion = Restrictions.eq("parentId", new Integer(parentId));
         return hibernateFacade.get(CasesSens.class, criterion, session);
@@ -804,7 +802,7 @@ public class CaseDAO {
 
         return hibernateFacade.get(CaseParameter.class, crit, session);
     }
-    
+
     public List<CaseParameter> getJobSpecNonSpecCaseParameters(int caseId, int[] jobIds, Session session) {
         List<?> ids = session.createQuery(
                 "SELECT obj.id from " + CaseParameter.class.getSimpleName() + " as obj WHERE obj.caseID = " + caseId
@@ -817,7 +815,7 @@ public class CaseDAO {
 
         return params;
     }
-    
+
     public List<CaseParameter> getCaseParametersByJobIds(int caseId, int[] jobIds, Session session) {
         List<?> ids = session.createQuery(
                 "SELECT obj.id from " + CaseParameter.class.getSimpleName() + " as obj WHERE obj.caseID = " + caseId
@@ -1030,8 +1028,8 @@ public class CaseDAO {
     public synchronized List getPersistedWaitTasks(int caseId, int jobId, Session session) {
         Criterion crit1 = Restrictions.eq("caseId", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("jobId", new Integer(jobId));
-        
-        return hibernateFacade.get(PersistedWaitTask.class, new Criterion[]{crit1, crit2}, session);
+
+        return hibernateFacade.get(PersistedWaitTask.class, new Criterion[] { crit1, crit2 }, session);
     }
 
     public List getDistinctUsersOfPersistedWaitTasks() {
@@ -1076,14 +1074,15 @@ public class CaseDAO {
         Session session = sessionFactory.getSession();
 
         try {
-            //NOTE: Remove the old one if pesistedWaitTask already exists
+            // NOTE: Remove the old one if pesistedWaitTask already exists
             Criterion crit1 = Restrictions.eq("caseId", new Integer(persistedWaitTask.getCaseId()));
             Criterion crit2 = Restrictions.eq("jobId", new Integer(persistedWaitTask.getJobId()));
-            PersistedWaitTask existedTask = (PersistedWaitTask)hibernateFacade.load(PersistedWaitTask.class, new Criterion[]{crit1, crit2}, session);
-            
+            PersistedWaitTask existedTask = (PersistedWaitTask) hibernateFacade.load(PersistedWaitTask.class,
+                    new Criterion[] { crit1, crit2 }, session);
+
             if (existedTask != null)
                 hibernateFacade.remove(existedTask, session);
-            
+
             hibernateFacade.add(persistedWaitTask, session);
             if (DebugLevels.DEBUG_15)
                 System.out.println("Adding job to persisted table, jobID: " + persistedWaitTask.getJobId());
@@ -1355,15 +1354,15 @@ public class CaseDAO {
             if (input.contains("$")) {
                 String[] envVarsStrs = findEnvVars(input, delimiter);
                 if (envVarsStrs.length > 0) {
-                    
+
                     String cleanedInput = input;
                     for (String envName : envVarsStrs) {
                         // loop over env variable names, get the parameter,
                         // and replace the env name in input string w/ that value
                         CaseParameter envVar = getUniqueCaseParametersFromEnvName(caseId, envName, jobId);
-                        
+
                         // Replace exact matches of environmental variable name
-                                
+
                         // Split the string at delimeter
                         StringTokenizer st = new StringTokenizer(cleanedInput, delimiter);
 
@@ -1374,29 +1373,29 @@ public class CaseDAO {
                             // check if temp = environemental variable name, if so replace
                             if (temp.equals("$" + envName))
                                 temp = envVar.getValue();
- 
+
                             // reconstruct new input string, if first time through don't add preceding delimiter
-                            if (tempInput.equals("")){
+                            if (tempInput.equals("")) {
                                 tempInput = tempInput + temp;
-                            }else {
-                                tempInput = tempInput + delimiter + temp; 
+                            } else {
+                                tempInput = tempInput + delimiter + temp;
                             }
-                               
-                        } 
+
+                        }
                         // reset the cleaned input to the latest tempInput
                         cleanedInput = tempInput;
                     } // end loop over environmental variables
-                    
+
                     // check if input starts or ends with delimiter
                     if (input.startsWith(delimiter))
                         cleanedInput = delimiter + cleanedInput;
                     if (input.endsWith(delimiter))
                         cleanedInput = cleanedInput + delimiter;
-                    
+
                     // replace input w/ cleaned input
                     input = cleanedInput;
                 }
-            }   
+            }
             return input;
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
@@ -1411,7 +1410,7 @@ public class CaseDAO {
             String tempInput = "";
             if (!input.contains("$"))
                 return input;
-            if (input.contains("$CASE")){
+            if (input.contains("$CASE")) {
                 // Replace exact matches of CASE
                 if (input.startsWith(delimiter))
                     tempInput = delimiter;
@@ -1425,23 +1424,23 @@ public class CaseDAO {
                     if (temp.equals("$CASE"))
                         temp = caseObj.getAbbreviation().getName();
                     // reconstruct new input string, if first time through don't add preceding delimiter
-                    if (tempInput.equals(delimiter) || tempInput.equals("")){
+                    if (tempInput.equals(delimiter) || tempInput.equals("")) {
                         tempInput = tempInput + temp;
-                    }else {
-                        tempInput = tempInput + delimiter + temp; 
+                    } else {
+                        tempInput = tempInput + delimiter + temp;
                     }
-                }   
+                }
                 // check if input ends with delimiter
                 if (input.endsWith(delimiter))
                     tempInput = tempInput + delimiter;
-            } else 
+            } else
                 tempInput = input;
-            
+
             // replace any remaining environmental variables
             int caseId = caseObj.getId();
             tempInput = replaceEnvVars(tempInput, delimiter, caseId, jobId);
             return tempInput;
-            
+
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
@@ -1481,10 +1480,18 @@ public class CaseDAO {
         Criterion crit = Restrictions.eq("parentCaseid", parentCaseId);
         List<CasesSens> caseIds = hibernateFacade.get(CasesSens.class, crit, session);
         List<Case> sensitivityCases = new ArrayList<Case>();
-        
+
         for (Iterator<CasesSens> iter = caseIds.iterator(); iter.hasNext();)
             sensitivityCases.add(this.getCase(iter.next().getSensCaseId(), session));
-        
+
         return sensitivityCases;
+    }
+
+    public String[] getJobGroups(int caseId, Session session) {
+        List<?> groups = session.createQuery(
+                "SELECT DISTINCT obj.jobGroup from " + CaseJob.class.getSimpleName() + " as obj WHERE obj.caseId = " + caseId
+                        + " ORDER BY obj.jobGroup").list();
+
+        return groups.toArray(new String[0]);
     }
 }

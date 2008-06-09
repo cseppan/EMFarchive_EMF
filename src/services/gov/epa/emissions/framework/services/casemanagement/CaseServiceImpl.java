@@ -661,5 +661,9 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getSensitivityCases(parentCaseId);
     }
 
+    public String[] getJobGroups(int caseId) throws EmfException {
+        return getCaseService().getJobGroups(caseId);
+    }
+
 
 }

@@ -199,5 +199,7 @@ public interface CaseService {
     String checkParentCase(Case caseObj) throws EmfException;
 
     Case[] getSensitivityCases(int parentCaseId) throws EmfException;
+    
+    String[] getJobGroups(int caseId) throws EmfException;
 
  }
