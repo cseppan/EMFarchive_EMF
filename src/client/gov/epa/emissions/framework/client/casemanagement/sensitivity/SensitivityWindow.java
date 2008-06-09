@@ -20,6 +20,7 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -80,7 +81,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     private Dimension preferredSize = new Dimension(276, 20);
 
     public SensitivityWindow(DesktopManager desktopManager, EmfConsole parentConsole, List<CaseCategory> categories) {
-        super("Sensitivity", new Dimension(490, 490), desktopManager);
+        super("Sensitivity", new Dimension(560, 490), desktopManager);
         super.setName(title);
         this.parentConsole = parentConsole;
         this.categories.addAll(categories);
@@ -215,9 +216,9 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         layout.setVgap(10);
         container.setLayout(layout);
 
-        Button wizardButton = new Button("Wizard", setAction());
+        Button wizardButton = new Button("Wizard", setAction(this));
         container.add(wizardButton);
-        Button editButton = new OKButton("Edit Case", editAction());
+        Button editButton = new OKButton("Edit Case", editAction(this));
         container.add(editButton);
         container.add(new CancelButton(closeAction()));
         getRootPane().setDefaultButton(wizardButton);
@@ -297,11 +298,14 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         return radioPanel;
     }
 
-    private Action editAction() {
+    private Action editAction(final SensitivityWindow window) {
         Action action = new AbstractAction() {
 
             public void actionPerformed(ActionEvent event) {
                 messagePanel.clear();
+                window.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                messagePanel.setMessage("Server is processing sensitivity case...");
+                
                 try {
                     validateFields();
                     Case sensitivityCase = null;
@@ -323,8 +327,11 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
                     CaseEditor view = new CaseEditor(parentConsole, presenter.getSession(), desktopManager);
                     parentPresenter.doEdit(view, sensitivityCase);
                     disposeView();
+                    messagePanel.clear();
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
+                } finally {
+                    window.setCursor(Cursor.getDefaultCursor());
                 }
             }
         };
@@ -439,10 +446,13 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         return action;
     }
 
-    private Action setAction() {
+    private Action setAction(final SensitivityWindow view) {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 messagePanel.clear();
+                view.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                messagePanel.setMessage("Server is processing sensitivity case...");
+                
                 try {
                     validateFields();
                     Case sensCase = null;
@@ -461,8 +471,11 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
                         
                     resetChanges();
                     setCaseView(sensCase);
+                    messagePanel.clear();
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
+                } finally {
+                    view.setCursor(Cursor.getDefaultCursor());
                 }
             }
         };
