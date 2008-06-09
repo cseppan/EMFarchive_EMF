@@ -438,6 +438,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         job.setCaseId(this.caseObj.getId());
         job.setName(name.getText().trim());
         job.setPurpose(purpose.getText().trim());
+        
+        //NOTE: order is being stored as job number and order should be a float number
         job.setJobNo(Float.parseFloat(jobOrder.getText().trim()));
         job.setOrder(Integer.parseInt(oldJobOrder.getText().trim()));
         job.setArgs(args.getText().trim());

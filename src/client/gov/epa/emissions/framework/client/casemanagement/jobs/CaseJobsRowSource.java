@@ -14,10 +14,10 @@ public class CaseJobsRowSource implements RowSource {
     }
 
     public Object[] values() {
-        return new Object[] { getJobName(), getJobNum(job), 
+        return new Object[] { getJobName(), getJobOrder(job), 
                 getSectorName(job), getRunStatus(job), getRunningUser(job), getRunLog(job), 
                 getStartDate(job), getCompleteDate(job), getExecutableName(job),  
-                getArgs(job), getVersion(job), getOrder(job),
+                getArgs(job), getVersion(job), getJobId(job),
                 getPath(job), getQOpt(job), getJobAbbrev(), isLocal(job), getIDInQ(job), 
                 getUser(job), getHost(job), getPurpose(job), getDependOn() };
     }
@@ -26,7 +26,8 @@ public class CaseJobsRowSource implements RowSource {
         return (job.getName() == null) ? "" : job.getName();
     }
     
-    private Float getJobNum(CaseJob job) {
+    //NOTE: order is being stored in the job number field
+    private Float getJobOrder(CaseJob job) {
         return new Float(job.getJobNo());
     }
     
@@ -46,8 +47,8 @@ public class CaseJobsRowSource implements RowSource {
         return job.getArgs();
     }
     
-    private Integer getOrder(CaseJob job) {
-        return new Integer(job.getOrder());
+    private Integer getJobId(CaseJob job) {
+        return new Integer(job.getId());
     }
     
     private String getRunStatus(CaseJob job) {
