@@ -81,7 +81,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     private Dimension preferredSize = new Dimension(276, 20);
 
     public SensitivityWindow(DesktopManager desktopManager, EmfConsole parentConsole, List<CaseCategory> categories) {
-        super("Sensitivity", new Dimension(560, 490), desktopManager);
+        super("Sensitivity", new Dimension(540, 490), desktopManager);
         super.setName(title);
         this.parentConsole = parentConsole;
         this.categories.addAll(categories);
