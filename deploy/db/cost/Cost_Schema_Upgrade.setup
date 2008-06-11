@@ -563,7 +563,9 @@ CREATE INDEX control_measure_nei_devices_nei_device_code
   USING btree
   (nei_device_code);
   
-  -- emf.control_strategy_programs
+
+-- new database stuff for Project Future Year Inventory strategy type
+-- emf.control_strategy_programs
 CREATE TABLE emf.control_strategy_programs
 (
   id SERIAL PRIMARY KEY,
@@ -585,4 +587,5 @@ CREATE INDEX control_strategy_programs_control_strategy_id
   (control_strategy_id);
 -- emf.control_strategy_programs
 
-insert into emf.strategy_result_types (name) select 'Project Future Year Inventory';
+insert into emf.strategy_types values(DEFAULT,'Project Future Year Inventory','Project Future Year Inventory', '', 'gov.epa.emissions.framework.services.cost.analysis.projectFutureYearInventory.StrategyTask');
+insert into emf.strategy_result_types (name) select 'Projected Future Year Inventory';
