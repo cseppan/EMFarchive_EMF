@@ -203,7 +203,6 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private JPanel createProgramsTab(ControlStrategy controlStrategy) {
         programsTabView = new ControlStrategyProgramsTab(controlStrategy, this,  messagePanel, parentConsole, session);
         this.presenter.set(programsTabView);
-        programsTabView.setEnabled(false);
         return programsTabView;
     }
     
@@ -467,7 +466,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         if (strategyType != null) {
             if (strategyType.getName().equals(strategyType.projectFutureYearInventory)) {
                 if (tabbedPane.getTabCount() == 5) {
-                    tabbedPane.setTabComponentAt(3, programsTab);
+                    //tabbedPane.setTabComponentAt(3, programsTab);
+                    tabbedPane.insertTab("Programs", null, programsTab, null, 3);
                 }
             } else {
                 if (tabbedPane.getTabCount() == 6) {
