@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
             if (!user.getEncryptedPassword().equals(password))
                 throw new AuthenticationException("Incorrect Password");
         } catch (RuntimeException e) {
-            LOG.error("Unable to authenticate due to data access failure" + username, e);
+            LOG.error("Unable to authenticate due to data access failure for user " + username, e);
             throw new EmfException("Unable to authenticate due to data access failure");
         }
     }
