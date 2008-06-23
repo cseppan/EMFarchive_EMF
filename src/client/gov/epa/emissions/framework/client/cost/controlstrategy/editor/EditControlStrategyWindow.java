@@ -121,7 +121,9 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 //        tabbedPane.addTab("Pollutants", createPollutantsTab(controlStrategy));
         tabbedPane.addTab("Measures", createMeasuresTab(controlStrategy));
         programsTab = createProgramsTab(controlStrategy);
-        if (controlStrategy.getStrategyType().getName().equals(StrategyType.projectFutureYearInventory)) {
+        if (controlStrategy.getStrategyType()!= null && 
+           controlStrategy.getStrategyType().getName().equals(StrategyType.projectFutureYearInventory)) 
+        {
             tabbedPane.addTab("Programs", programsTab);
         }
         tabbedPane.addTab("Constraints", createAppliedMeasuresTab(controlStrategy));
