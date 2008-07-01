@@ -36,11 +36,9 @@ BEGIN
 		and sources.stackid = inv.stackid
 		and sources.segment = inv.segment
 		' end || '
-	where 	sources.id is null ' || coalesce(replace(replace(replace(replace(replace(replace(inv_filter, 'scc', 'inv.scc'), 'fips', 'inv.fips'), 'plantid', 'inv.plantid'),  'pointid', 'inv.pointid'), 'stackid', 'inv.stackid'), 'segment', 'inv.segment'), '') || '
+	where 	sources.id is null ' || coalesce(replace(replace(replace(replace(replace(replace(lower(inv_filter), 'scc', 'inv.scc'), 'fips', 'inv.fips'), 'plantid', 'inv.plantid'),  'pointid', 'inv.pointid'), 'stackid', 'inv.stackid'), 'segment', 'inv.segment'), '') || '
 		';
 
 	return;
 END;
 $$ LANGUAGE plpgsql;
-
-select public.populate_sources_table('DS_ptinv_ptnonipm_2020cc_1068478967',' and (ann_emis > 0.5 and fips like ''37%'') ');vacuum analyze emf.sources;
