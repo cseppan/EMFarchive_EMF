@@ -315,7 +315,7 @@ public abstract class AbstractStrategyTask implements Strategy {
 
     private String emissionTableName(Dataset dataset) {
         InternalSource[] internalSources = dataset.getInternalSources();
-        return internalSources[0].getTable();
+        return internalSources[0].getTable().toLowerCase();
     }
 
     private String qualifiedName(String table) {
