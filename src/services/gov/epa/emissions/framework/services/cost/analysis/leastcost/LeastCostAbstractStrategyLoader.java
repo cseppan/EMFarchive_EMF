@@ -267,12 +267,12 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
     protected void addDetailedResultSummaryDatasetKeywords(EmfDataset dataset,
             double emisReduction) throws EmfException {
         String query = "select TO_CHAR(sum(annual_cost), 'FM999999999999999990.09')::double precision as total_annual_cost, "
-            + "TO_CHAR(sum(annual_cost) / sum(emis_reduction), 'FM999999999999999990.09')::double precision as average_ann_cost_per_ton, "
+            + "TO_CHAR(case when sum(emis_reduction) <> 0 then sum(annual_cost) / sum(emis_reduction) else null::double precision end, 'FM999999999999999990.09')::double precision as average_ann_cost_per_ton, "
             + "TO_CHAR(sum(annual_oper_maint_cost), 'FM999999999999999990.09')::double precision as Total_Annual_Oper_Maint_Cost, "
             + "TO_CHAR(sum(annualized_capital_cost), 'FM999999999999999990.09')::double precision as Total_Annualized_Capital_Cost, "
             + "TO_CHAR(sum(total_capital_cost), 'FM999999999999999990.09')::double precision as Total_Capital_Cost, "
-            + "TO_CHAR(" + emisReduction + " / " + uncontrolledEmis + " * 100, 'FM990.099')::double precision as Target_Percent_Reduction, " 
-            + "TO_CHAR(sum(emis_reduction) / " + uncontrolledEmis + " * 100, 'FM990.099')::double precision as Actual_Percent_Reduction, "
+            + "TO_CHAR(case when " + uncontrolledEmis + " <> 0 then " + emisReduction + " / " + uncontrolledEmis + " * 100 else null::double precision end, 'FM990.099')::double precision as Target_Percent_Reduction, " 
+            + "TO_CHAR(case when " + uncontrolledEmis + " <> 0 then sum(emis_reduction) / " + uncontrolledEmis + " * 100 else null::double precision end, 'FM990.099')::double precision as Actual_Percent_Reduction, "
             + "sum(emis_reduction) as Total_Emis_Reduction " 
             + "FROM " + qualifiedEmissionTableName(dataset)
             + " where poll='" + controlStrategy.getTargetPollutant().getName() + "'"
