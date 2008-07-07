@@ -1,12 +1,12 @@
-select public.narrow_in_on_least_cost_target('cslcm__measure_worksheet_nc_ptnonipm_20080420_20080420054230884', 
-	'NOX', 
-	36797.935745);
+--select public.narrow_in_on_least_cost_target('cslcm__measure_worksheet_nc_ptnonipm_20080420_20080420054230884', 
+--	'NOX', 
+--	36797.935745);
 
 --select count(1) from emissions.cslcm__measure_worksheet_nc_ptnonipm_20080420_20080420054230884
 
 --select public.get_least_cost_worksheet_emis_reduction('CSLCM__ptnonipm_MeasureWorksheet_200804182204_20080418220454967', 'NOX', 20305);
 
-SELECT public.populate_least_cost_strategy_detailed_result(9, 2474, 0, 224, 36797.935745::double precision);
+--SELECT public.populate_least_cost_strategy_detailed_result(9, 2474, 0, 224, 36797.935745::double precision);
 
 CREATE OR REPLACE FUNCTION public.narrow_in_on_least_cost_target(worksheet_table_name varchar(63), 
 	target_pollutant varchar, 

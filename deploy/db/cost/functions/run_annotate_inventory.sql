@@ -240,13 +240,13 @@ BEGIN
 	END IF;
 
 	-- get gdp chained values
-	SELECT cast(chained_gdp as double precision)
+	SELECT chained_gdp
 	FROM reference.gdplev
-	where annual::integer = cost_year
+	where annual = cost_year
 	INTO cost_year_chained_gdp;
-	SELECT cast(chained_gdp as double precision)
+	SELECT chained_gdp
 	FROM reference.gdplev
-	where annual::integer = ref_cost_year
+	where annual = ref_cost_year
 	INTO ref_cost_year_chained_gdp;
 
 	chained_gdp_adjustment_factor := cost_year_chained_gdp / ref_cost_year_chained_gdp;
