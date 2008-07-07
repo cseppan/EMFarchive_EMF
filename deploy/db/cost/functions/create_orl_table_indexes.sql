@@ -2,12 +2,14 @@
 
 -- DROP FUNCTION emf.create_orl_table_indexes(table_name character varying);
 
-CREATE OR REPLACE FUNCTION public.create_orl_table_indexes(table_name character varying)
+CREATE OR REPLACE FUNCTION create_orl_table_indexes(table_name character varying)
   RETURNS void AS
 $BODY$
 DECLARE
 	index_name varchar(63) := '';
 	is_point_table boolean := false;
+	has_poll_column boolean := false;
+	has_scc_column boolean := false;
 BEGIN
 
 	-- see if there are point specific columns to be indexed
@@ -22,6 +24,30 @@ BEGIN
 		AND a.attnum > 0
 	into is_point_table;
 
+	-- see if there are poll column to be indexed
+	SELECT count(1) = 1
+	FROM pg_class c
+		inner join pg_attribute a
+		on a.attrelid = c.oid
+		inner join pg_type t
+		on t.oid = a.atttypid
+	WHERE c.relname = lower(table_name)
+		and a.attname in ('poll')
+		AND a.attnum > 0
+	into has_poll_column;
+
+	-- see if there are scc column to be indexed
+	SELECT count(1) = 1
+	FROM pg_class c
+		inner join pg_attribute a
+		on a.attrelid = c.oid
+		inner join pg_type t
+		on t.oid = a.atttypid
+	WHERE c.relname = lower(table_name)
+		and a.attname in ('scc')
+		AND a.attnum > 0
+	into has_scc_column;
+
 	-- Create Indexes....
 
 	-- create fips btree index
@@ -35,27 +61,31 @@ BEGIN
 			USING btree
 			(fips)';
 
-	-- create poll btree index
-	IF length('poll_' || table_name) >= 63 - 5 THEN
-		index_name := 'poll_' || substr(table_name, 6, 63);
-	ELSE
-		index_name := 'poll_' || table_name;
+	IF has_poll_column THEN
+		-- create poll btree index
+		IF length('poll_' || table_name) >= 63 - 5 THEN
+			index_name := 'poll_' || substr(table_name, 6, 63);
+		ELSE
+			index_name := 'poll_' || table_name;
+		END IF;
+		execute 'CREATE INDEX ' || index_name || '
+				ON emissions.' || table_name || '
+				USING btree
+				(poll)';
 	END IF;
-	execute 'CREATE INDEX ' || index_name || '
-			ON emissions.' || table_name || '
-			USING btree
-			(poll)';
 
-	-- create scc btree index
-	IF length('scc_' || table_name) >= 63 - 4 THEN
-		index_name := 'scc_' || substr(table_name, 5, 63);
-	ELSE
-		index_name := 'scc_' || table_name;
+	IF has_scc_column THEN
+		-- create scc btree index
+		IF length('scc_' || table_name) >= 63 - 4 THEN
+			index_name := 'scc_' || substr(table_name, 5, 63);
+		ELSE
+			index_name := 'scc_' || table_name;
+		END IF;
+		execute 'CREATE INDEX ' || index_name || '
+				ON emissions.' || table_name || '
+				USING btree
+				(scc)';
 	END IF;
-	execute 'CREATE INDEX ' || index_name || '
-			ON emissions.' || table_name || '
-			USING btree
-			(scc)';
 
 	-- add point specific indexes--plantid, pointid, stackid, segment
 	IF is_point_table THEN
