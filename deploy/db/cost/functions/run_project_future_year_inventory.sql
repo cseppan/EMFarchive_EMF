@@ -14,7 +14,7 @@ DECLARE
 	county_dataset_id integer := null;
 	county_dataset_version integer := null;
 	region RECORD;
-	control_program_type RECORD;
+	control_program RECORD;
 	target_pollutant_id integer := 0;
 	measures_count integer := 0;
 	measure_with_region_count integer := 0;
@@ -240,13 +240,13 @@ BEGIN
 	END IF;
 
 	-- get gdp chained values
-	SELECT cast(chained_gdp as double precision)
+	SELECT chained_gdp
 	FROM reference.gdplev
-	where annual::integer = cost_year
+	where annual = cost_year
 	INTO cost_year_chained_gdp;
-	SELECT cast(chained_gdp as double precision)
+	SELECT chained_gdp
 	FROM reference.gdplev
-	where annual::integer = ref_cost_year
+	where annual = ref_cost_year
 	INTO ref_cost_year_chained_gdp;
 
 	chained_gdp_adjustment_factor := cost_year_chained_gdp / ref_cost_year_chained_gdp;
@@ -371,14 +371,6 @@ BEGIN
 		ELSIF column_name = 'version' THEN
 			select_column_list_sql := select_column_list_sql || ',0 as version';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
-		ELSIF column_name = 'control_measures' THEN
-			select_column_list_sql := select_column_list_sql || ', case when control_measures is null or length(control_measures) = 0 then abbreviation else control_measures || ''&'' || abbreviation end as control_measures';
-			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
-			has_control_measures_col := true;
-		ELSIF column_name = 'pct_reduction' THEN
-			select_column_list_sql := select_column_list_sql || ', case when pct_reduction is null or length(pct_reduction) = 0 then efficiency::text else pct_reduction || ''&'' || efficiency::text end as pct_reduction';
-			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
-			has_pct_reduction_col := true;
 		ELSE
 			select_column_list_sql := select_column_list_sql || ',' || column_name;
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
@@ -386,179 +378,58 @@ BEGIN
 	
 	END LOOP;
 
-	IF has_control_measures_col = false or has_pct_reduction_col = false THEN 
-		IF has_control_measures_col = false THEN
-			select_column_list_sql := select_column_list_sql || ', abbreviation as control_measures';
-			insert_column_list_sql := insert_column_list_sql || ',control_measures';
-		END IF;
-		IF has_pct_reduction_col = false THEN
-			select_column_list_sql := select_column_list_sql || ', efficiency::text as pct_reduction';
-			insert_column_list_sql := insert_column_list_sql || ',pct_reduction';
-		END IF;
-	END IF;
+	select_column_list_sql := replace(replace(replace(replace(replace(replace(replace(select_column_list_sql, 'scc', 'inv.scc'), 'fips', 'inv.fips'), 'comments', 'inv.comments'),  'pointid', 'inv.pointid'), 'stackid', 'inv.stackid'), 'segment', 'inv.segment'), 'plant', 'inv.plant');
 
-	-- need to process based on processing_order of the program, i.e., first do plant closures, next do growth, then apply control 
-	-- to various sources
-
-  	FOR control_program_type IN EXECUTE 
-		'select id, "name", processing_order
-		emf.control_program_types
-		order by processing_order'
-	LOOP
-		column_name := region.attname;
---		control_program_type.
-		
-		IF column_name = 'record_id' THEN
-			select_column_list_sql := select_column_list_sql || 'inv.record_id';
-			insert_column_list_sql := insert_column_list_sql || column_name;
-		ELSIF column_name = 'dataset_id' THEN
-			select_column_list_sql := select_column_list_sql || ',' || detailed_result_dataset_id || ' as dataset_id';
-			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
-		ELSIF column_name = 'delete_versions' THEN
-			select_column_list_sql := select_column_list_sql || ','''' as delete_versions';
-			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
-		ELSIF column_name = 'version' THEN
-			select_column_list_sql := select_column_list_sql || ',0 as version';
-			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
-		ELSIF column_name = 'control_measures' THEN
-			select_column_list_sql := select_column_list_sql || ', case when control_measures is null or length(control_measures) = 0 then abbreviation else control_measures || ''&'' || abbreviation end as control_measures';
-			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
-			has_control_measures_col := true;
-		ELSIF column_name = 'pct_reduction' THEN
-			select_column_list_sql := select_column_list_sql || ', case when pct_reduction is null or length(pct_reduction) = 0 then efficiency::text else pct_reduction || ''&'' || efficiency::text end as pct_reduction';
-			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
-			has_pct_reduction_col := true;
-		ELSE
-			select_column_list_sql := select_column_list_sql || ',' || column_name;
-			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
-		END IF;
-	
-	END LOOP;
-
-
-	execute 'insert into emissions.' || detailed_result_table_name || ' 
+	-- populate the new inventory...work off of new data
+	execute 
+	--raise notice '%', 
+	'insert into emissions.' || detailed_result_table_name || ' 
 		(
 		' || insert_column_list_sql || ' 
 		)
 	select 
 		' || select_column_list_sql || ' 
-	FROM emissions.' || inv_table_name || ' inv
+	from emissions.' || inv_table_name || ' inv
+	where ' || replace(replace(inv_filter, 'version', 'inv.version'), 'dataset_id', 'inv.dataset_id') || coalesce(county_dataset_filter_sql, '');
 
-		left outer join (
-			-- second pass, gets rid of ties for a paticular source
-			select DISTINCT ON (inv.record_id) 
-				inv.record_id,
-				m.abbreviation,
-				er.efficiency
+	-- need to process based on processing_order of the program, i.e., first do plant closures, next do growth, then apply control 
+	-- to various sources
 
-			FROM emissions.' || inv_table_name || ' inv
+  	FOR control_program IN EXECUTE 
+		'select cpt."name" as type, lower(i.table_name) as table_name, 
+			cp.start_date, cp.end_date, 
+			cp.dataset_id, cp.dataset_version
+		 from emf.control_strategy_programs csp
 
-				inner join emf.pollutants p
-				on p.name = inv.poll
-				
-				inner join emf.control_measure_sccs scc
-				on scc.name = inv.scc
-				
-				' || case when measures_count > 0 then '
-				inner join emf.control_strategy_measures csm
-				on csm.control_measure_id = scc.control_measures_id
-				and csm.control_strategy_id = ' || control_strategy_id || '
-				' else '' end || '
+			inner join emf.control_programs cp
+			on cp.id = csp.control_program_id
 
-				inner join emf.control_measures m
-				on m.id = scc.control_measures_id
+			inner join emf.control_program_types cpt
+			on cpt.id = cp.control_program_type_id
 
-				inner join emf.control_measure_months ms
-				on ms.control_measure_id = m.id
-				and ms.month in (0' || case when dataset_month != 0 then ',' || dataset_month else '' end || ')
+			inner join emf.internal_sources i
+			on i.dataset_id = cp.dataset_id
+		where csp.control_strategy_id = ' || control_strategy_id || '
+		order by processing_order'
+	LOOP
+		IF control_program.type = 'Plant Closure' THEN
+			execute 
+			--raise notice '%', 
+			'delete from emissions.' || detailed_result_table_name || ' as inv
+			using emissions.' || control_program.table_name || ' pc
+			where pc.fips = inv.fips
+				and pc.plantid = inv.plantid
+				and coalesce(pc.pointid, inv.pointid) = inv.pointid
+				and coalesce(pc.stackid, inv.stackid) = inv.stackid
+				and coalesce(pc.segment, inv.segment) = inv.segment
+				and pc.effective_date < ''12/31/' || inventory_year || '''
+				and ' || replace(replace(replace(public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version), 'version ', 'pc.version '), 'delete_versions ', 'pc.delete_versions '), 'dataset_id', 'pc.dataset_id');
+		END IF;
+		
+	
+	END LOOP;
 
-				left outer join emf.control_measure_equations eq
-				on eq.control_measure_id = m.id
-				and eq.pollutant_id = p.id
 
-				left outer join emf.equation_types et
-				on et.id = eq.equation_type_id
-
-				left outer join reference.gdplev
-				on gdplev.annual = eq.cost_year
-
-				left outer join emf.control_measure_nei_devices cmnd
-				on cmnd.control_measure_id = m.id
-				'  || 
-				case 
-					when has_cpri_column or has_primary_device_type_code_column then 
-						case 
-							when has_cpri_column then 'and cmnd.nei_device_code = inv.cpri'
-							else 'and cmnd.nei_device_code = inv.primary_device_type_code'
-						end
-					else ''
-				end || '
-				
-				inner join emf.control_measure_efficiencyrecords er
-				on er.control_measures_id = scc.control_measures_id
-				-- pollutant filter
-				and er.pollutant_id = p.id
-				-- min and max emission filter
-				and ' || annualized_emis_sql || ' between coalesce(er.min_emis, -1E+308) and coalesce(er.max_emis, 1E+308)
-				-- locale filter
-				and (er.locale = inv.fips or er.locale = substr(inv.fips, 1, 2) or er.locale = '''')
-				-- effecive date filter
-				and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)		
-
-				' || case when measures_count = 0 and measure_classes_count > 0 then '
-				inner join emf.control_strategy_classes csc
-				on csc.control_measure_class_id = m.cm_class_id
-				and csc.control_strategy_id = ' || control_strategy_id || '
-				' else '' end || '
-
-			where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
-				and p.id = ' ||  target_pollutant_id || '
-				and inv.ceff > 0.0
-				-- measure region filter
-				' || case when measure_with_region_count > 0 then '
-				and 
-				(
-					csm.region_dataset_id is null 
-					or
-					(
-						csm.region_dataset_id is not null 
-						and exists (
-							select 1
-							from measures mr
-								inner join measure_regions r
-								on r.region_id = mr.region_id
-								and r.region_version = mr.region_version
-							where mr.control_measure_id = m.id
-								and r.fips = inv.fips
-						)
-						and exists (
-							select 1 
-							from measures mr
-							where mr.control_measure_id = m.id
-						)
-					)
-				)					
-				' else '' end || '
-				-- constraints filter
-				' || case when has_constraints then '
-				and (
-						' || percent_reduction_sql || ' >= ' || coalesce(min_control_efficiency_constraint, -100.0) || '
-						' || coalesce(' and ' || percent_reduction_sql || ' / 100 * ' || annualized_emis_sql || ' >= ' || min_emis_reduction_constraint, '')  || '
-						' || coalesce(' and coalesce(' || chained_gdp_adjustment_factor || '
-							* ' || get_strategt_cost_inner_sql || '.computed_cost_per_ton, -1E+308) <= ' || max_cost_per_ton_constraint, '')  || '
-						' || coalesce(' and coalesce(' || percent_reduction_sql || ' / 100 * ' || annualized_emis_sql || ' * ' || chained_gdp_adjustment_factor || '
-							* ' || get_strategt_cost_inner_sql || '.computed_cost_per_ton, -1E+308) <= ' || max_ann_cost_constraint, '')  || '
-				)' else '' end || '
-
-			order by inv.record_id,
-				case when length(er.locale) = 5 then 0 when length(er.locale) = 2 then 1 else 2 end, 	
-				case when cmnd.id is not null then 0 else 1 end,
-				abs(inv.ceff - er.efficiency)
-		) tbl
-		on tbl.record_id = inv.record_id
-		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
-			and inv.ceff > 0.0
-		order by inv.record_id';
 
 END;
 $BODY$
