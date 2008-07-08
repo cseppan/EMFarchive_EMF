@@ -256,7 +256,7 @@ public class ManagedCaseService {
             session.close();
         }
     }
-
+    
     private CaseJob getCaseJob(int jobId, Session session) throws EmfException {
         try {
             return dao.getCaseJob(jobId, session);
@@ -265,6 +265,18 @@ public class ManagedCaseService {
             log.error("Could not get job for job id " + jobId + ".\n" + e.getMessage());
             throw new EmfException("Could not get job for job id " + jobId + ".\n");
         }
+    }
+    
+    public synchronized Sector[] getSectorsUsedbyJobs(int caseId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            List<Sector> sectors = dao.getSectorsUsedbyJobs(caseId, session);
+            return sectors.toArray(new Sector[0]);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not get sectors for case id " + caseId + ".\n" + e.getMessage());
+            throw new EmfException("Could not get sectors for case id " + caseId + ".\n");
+        } 
     }
 
     public synchronized Abbreviation[] getAbbreviations() throws EmfException {

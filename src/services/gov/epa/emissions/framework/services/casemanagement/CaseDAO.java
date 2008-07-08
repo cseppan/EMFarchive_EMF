@@ -567,7 +567,12 @@ public class CaseDAO {
         Criterion crit = Restrictions.eq("id", new Integer(jobId));
         return (CaseJob) hibernateFacade.load(CaseJob.class, crit, session);
     }
-
+    
+    public List<Sector> getSectorsUsedbyJobs(int caseId, Session session){
+        Criterion crit = Restrictions.eq("caseId", new Integer(caseId));
+        return hibernateFacade.get(Sector.class, crit, session);
+    }
+ 
     public CaseJob getCaseJob(int jobId) {
         CaseJob caseJob = null;
         Session session = sessionFactory.getSession();

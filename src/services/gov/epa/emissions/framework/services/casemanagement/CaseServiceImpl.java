@@ -254,6 +254,10 @@ public class CaseServiceImpl implements CaseService {
     public CaseJob getCaseJob(int jobId) throws EmfException {
         return getCaseService().getCaseJob(jobId);
     }
+    
+//    public Sector[] getSectorsUsedbyJobs(int caseId) throws EmfException {
+//        return getCaseService().getSectorsUsedbyJobs(caseId);
+//    }
 
     public JobRunStatus[] getJobRunStatuses() throws EmfException {
         return getCaseService().getJobRunStatuses();

@@ -4,9 +4,9 @@ package gov.epa.emissions.framework.client.casemanagement.sensitivity;
 public class SetCaseObject{
     private Object object; 
     private String wizardType;
-    public static final String WIZARD_1 = "PATH";
-    public static final String WIZARD_2 = "INPUT";
-    public static final String WIZARD_3 = "PARAMETER";
+    public static final String WIZARD_PATH = "PATH";
+    public static final String WIZARD_INPUT = "INPUT";
+    public static final String WIZARD_PARA = "PARAMETER";
     public SetCaseObject(Object object, String wizardType){
         this.object=object;
         this.wizardType=wizardType;

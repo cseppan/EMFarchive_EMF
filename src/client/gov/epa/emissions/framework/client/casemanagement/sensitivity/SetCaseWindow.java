@@ -98,17 +98,17 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     private void setupObjects() throws EmfException {
         // add parameters to setCaseObjects
         setCaseObjects = new ArrayList<SetCaseObject>();
-        SetCaseObject folderObj = new SetCaseObject(caseObj.getName(), SetCaseObject.WIZARD_1);
+        SetCaseObject folderObj = new SetCaseObject(caseObj.getName(), SetCaseObject.WIZARD_PATH);
         setCaseObjects.add(folderObj);
         
         CaseInput[] inputList = presenter.getCaseInput(caseObj.getId(), new Sector("All", "All"), false);
         for (CaseInput input :inputList){
-            SetCaseObject obj = new SetCaseObject(input, SetCaseObject.WIZARD_2);
+            SetCaseObject obj = new SetCaseObject(input, SetCaseObject.WIZARD_INPUT);
             setCaseObjects.add(obj);
         }
         CaseParameter[] paraList = presenter.getCaseParameters(caseObj.getId(), new Sector("All", "All"), false);
         for (CaseParameter par :paraList){
-            SetCaseObject obj = new SetCaseObject(par, SetCaseObject.WIZARD_3);
+            SetCaseObject obj = new SetCaseObject(par, SetCaseObject.WIZARD_PARA);
             setCaseObjects.add(obj);
         }
         if (setCaseObjects.size()==0)
@@ -120,11 +120,11 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         mainPanel = new JPanel(new BorderLayout());
         //get first setCaseObjects
         currentObject = setCaseObjects.get(currentIndex);
-        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_1))
+        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_PATH))
             mainPanel.add(displayFolders());
-        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2))
+        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_INPUT))
             mainPanel.add(displayInput((CaseInput)currentObject.getObject()));
-        else if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3))
+        else if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_PARA))
             mainPanel.add(displayParam((CaseParameter)currentObject.getObject()));
         return mainPanel;
     }
@@ -153,11 +153,11 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     
     private void panelRefresh() throws EmfException {
         mainPanel.removeAll();
-        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_1))
+        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_PATH))
             mainPanel.add(displayFolders());
-        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2))
+        if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_INPUT))
             mainPanel.add(displayInput((CaseInput)currentObject.getObject()));
-        else if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3))
+        else if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_PARA))
             mainPanel.add(displayParam((CaseParameter)currentObject.getObject()));
         super.validate();
     }
@@ -276,15 +276,15 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     private void doSave() {
         clearMessage();
         try {
-            if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_1)){
+            if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_PATH)){
                 setCaseFoldersPanel.setFields();
                 presenter.doSave();
             }
-            if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_2)){
+            if (currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_INPUT)){
                 setInputFieldsPanel.setFields();
                 presenter.doSaveInput((CaseInput)currentObject.getObject());
             }
-            else if(currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_3)){
+            else if(currentObject.getWizardType().equalsIgnoreCase(SetCaseObject.WIZARD_PARA)){
                 setCaseParameterPanel.setFields();
                 presenter.doSaveParam((CaseParameter)currentObject.getObject());
             }

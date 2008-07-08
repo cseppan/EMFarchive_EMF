@@ -110,6 +110,8 @@ public interface CaseService {
     
     CaseJob[] getCaseJobs(int caseId) throws EmfException;
     
+    //Sector[] getSectorsUsedbyJobs(int caseId) throws EmfException;
+    
     int[] getJobIds(int caseId, String[] jobNames) throws EmfException;
     
     String[] getDependentJobs(int jobId) throws EmfException;

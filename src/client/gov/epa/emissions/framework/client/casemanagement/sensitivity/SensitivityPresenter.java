@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.sensitivity;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
@@ -11,9 +12,13 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.services.casemanagement.Grid;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class SensitivityPresenter {
     private SensitivityView view;
@@ -103,7 +108,37 @@ public class SensitivityPresenter {
     public CaseJob[] getCaseJobs(Case caseObj) throws EmfException {
         return service().getCaseJobs(caseObj.getId());
     }
-
+    
+    public CaseJob[] getCaseJobs(Case caseObj, Grid[] grids, Sector[] sectors) throws EmfException{
+        CaseJob[] jobs = getCaseJobs(caseObj);
+        List<CaseJob> filteredJobs1 = new ArrayList<CaseJob>();
+        //Find jobs contain selected grids
+        if ( sectors != null && grids.length > 0 ){
+            for (Grid grid : grids){
+                for (CaseJob job : jobs){
+                    if ((job.getName().toLowerCase()).contains(grid.toString().toLowerCase()))
+                        filteredJobs1.add(job);
+                }
+            }
+            
+        }else
+            filteredJobs1.addAll(new ArrayList(Arrays.asList(jobs)));
+        
+        
+        //Find jobs contain selected sectors
+        List<CaseJob> filteredJobs2 = new ArrayList<CaseJob>();
+        if ( filteredJobs1.size()>0 && sectors != null && sectors.length > 0){
+            for (Sector sector: sectors){
+                for (CaseJob job : filteredJobs1){
+                    if (job.getSector().equals(sector))
+                        filteredJobs2.add(job);
+                }
+            }
+            return filteredJobs2.toArray(new CaseJob[0]); 
+        }
+        return filteredJobs1.toArray(new CaseJob[0]); 
+    }
+    
     public EmfSession getSession() {
         return this.session;
     }
