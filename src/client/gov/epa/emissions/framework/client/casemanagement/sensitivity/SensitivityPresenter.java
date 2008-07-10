@@ -11,9 +11,11 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
+import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.Grid;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +28,8 @@ public class SensitivityPresenter {
     private EmfSession session;
 
     private CaseManagerPresenter managerPresenter;
+    
+    private int defaultPageSize = 20;
     
     public SensitivityPresenter(EmfSession session, SensitivityView view, CaseManagerPresenter managerPresenter) {
         this.session = session;
@@ -143,8 +147,10 @@ public class SensitivityPresenter {
         return this.session;
     }
     
-    public void doDisplaySetCaseWindow(Case newCase, String title, EmfConsole parentConsole, DesktopManager desktopManager, CaseManagerPresenter parentPresenter) throws EmfException {
-        SetCaseView view = new SetCaseWindow(title, parentConsole, desktopManager);
+    public void doDisplaySetCaseWindow(Case newCase, String title, EmfConsole parentConsole, 
+            DesktopManager desktopManager, CaseManagerPresenter parentPresenter,
+            List<CaseInput> existingInputs, List<CaseParameter> existingParas) throws EmfException {
+        SetCaseView view = new SetCaseWindow(title, parentConsole, desktopManager, existingInputs, existingParas);
         SetCasePresenter presenter= new SetCasePresenterImpl(newCase, view, session, parentPresenter);
         presenter.display();
     }
@@ -155,6 +161,23 @@ public class SensitivityPresenter {
 
     public Object[] getJobGroups(Case selectedCase) throws EmfException {
         return service().getJobGroups(selectedCase.getId());
+    }
+    
+    public CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException {
+        return service().getCaseInputs(defaultPageSize, caseId, sector, showAll);
+    }
+    
+    public CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
+        //return service().getCaseParameters(defaultPageSize, caseId, sector, showAll);
+        if (sector == null)
+            return new CaseParameter[0];
+
+        if (sector.compareTo(new Sector("All", "All")) == 0)
+            sector = null; // to trigger select all on the server side
+
+        //return service().getcasgetCaseParameters(caseId, sector, showAll);
+        return service().getCaseParameters(defaultPageSize, caseId, sector, showAll);
+
     }
 
 }

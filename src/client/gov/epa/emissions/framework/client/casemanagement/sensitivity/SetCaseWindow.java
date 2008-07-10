@@ -61,10 +61,16 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     
     private SetCaseParameterPanel setCaseParameterPanel;
     
+    private List<CaseInput> existingInputs; 
+    
+    private List<CaseParameter> existingParas; 
+    
     public SetCaseWindow(String title, EmfConsole parentConsole, 
-            DesktopManager desktopManager) {
-        super(title, new Dimension(520, 370), desktopManager);
+            DesktopManager desktopManager, List<CaseInput> existingInputs, List<CaseParameter> existingParas) {
+        super(title, new Dimension(520, 450), desktopManager);
         this.parentConsole = parentConsole;
+        this.existingInputs = existingInputs;
+        this.existingParas = existingParas;
     }
 
     public void display(Case caseObj) throws EmfException {
@@ -100,17 +106,40 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         setCaseObjects = new ArrayList<SetCaseObject>();
         SetCaseObject folderObj = new SetCaseObject(caseObj.getName(), SetCaseObject.WIZARD_PATH);
         setCaseObjects.add(folderObj);
+//        System.out.println(existingInputs==null? "inputs is null, ": "existing input " + existingInputs.size()); 
+//        System.out.println(existingParas==null? "parameterss is null," : "existing para " + existingParas.size());
+       
         
         CaseInput[] inputList = presenter.getCaseInput(caseObj.getId(), new Sector("All", "All"), false);
-        for (CaseInput input :inputList){
-            SetCaseObject obj = new SetCaseObject(input, SetCaseObject.WIZARD_INPUT);
-            setCaseObjects.add(obj);
+        if (existingInputs == null || existingInputs.size() == 0){
+            for (CaseInput input :inputList){
+                SetCaseObject obj = new SetCaseObject(input, SetCaseObject.WIZARD_INPUT);
+                setCaseObjects.add(obj);
+            }
+        }else { // only edit new inputs
+            for (CaseInput input :inputList){
+                if (!existingInputs.contains(input)){
+                    SetCaseObject obj = new SetCaseObject(input, SetCaseObject.WIZARD_INPUT);
+                    setCaseObjects.add(obj);
+                }
+            }
         }
+        
         CaseParameter[] paraList = presenter.getCaseParameters(caseObj.getId(), new Sector("All", "All"), false);
-        for (CaseParameter par :paraList){
-            SetCaseObject obj = new SetCaseObject(par, SetCaseObject.WIZARD_PARA);
-            setCaseObjects.add(obj);
+        if (existingParas == null || existingParas.size() == 0 ){
+            for (CaseParameter par :paraList){
+                SetCaseObject obj = new SetCaseObject(par, SetCaseObject.WIZARD_PARA);
+                setCaseObjects.add(obj);
+            }
+        }else{  // only edit new parameters
+            for (CaseParameter par :paraList){
+                if (!existingParas.contains(par)){
+                    SetCaseObject obj = new SetCaseObject(par, SetCaseObject.WIZARD_PARA);
+                    setCaseObjects.add(obj);
+                }
+            }
         }
+        
         if (setCaseObjects.size()==0)
             throw new EmfException("No input or parameter to edit");  
     }
