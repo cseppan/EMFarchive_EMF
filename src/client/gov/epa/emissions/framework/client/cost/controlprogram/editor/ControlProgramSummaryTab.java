@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlprogram.editor;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
@@ -12,9 +13,12 @@ import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPresenter;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
+import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlProgram;
 import gov.epa.emissions.framework.services.cost.ControlProgramType;
@@ -74,16 +78,19 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
     private Dimension preferredSize = new Dimension(450, 25);
 
     private Button selectButton;
+    
+    private DesktopManager desktopManager;
 
     public ControlProgramSummaryTab(ControlProgram controlProgram, EmfSession session, 
             ManageChangeables changeablesList, MessagePanel messagePanel, 
-            EmfConsole parentConsole) {
+            EmfConsole parentConsole, DesktopManager desktopManager) {
         super.setName("summary");
         this.controlProgram = controlProgram;
         this.session = session;
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
         this.parentConsole = parentConsole;
+        this.desktopManager = desktopManager;
 //        this.decFormat = new DecimalFormat("0.###E0");
 //        this.verifier = new NumberFieldVerifier("Summary tab: ");
 //        setLayout();
@@ -170,7 +177,7 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
 
     private JPanel datasetPanel() {
 
-        dataset = new TextField("dataset", 38);
+        dataset = new TextField("dataset", 35);
         dataset.setEditable(false);
         EmfDataset inputDataset = controlProgram.getDataset();
         if(inputDataset!= null )
@@ -180,11 +187,12 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
         dataset.setToolTipText("Press select button to choose from a dataset list.");
         selectButton = new AddButton("Select", selectAction());
         selectButton.setMargin(new Insets(1, 2, 1, 2));
-
+        Button viewButton = new BorderlessButton("View", viewDatasetAction()); 
         JPanel invPanel = new JPanel(new BorderLayout(5,0));
 
         invPanel.add(dataset, BorderLayout.LINE_START);
         invPanel.add(selectButton);
+        invPanel.add(viewButton, BorderLayout.LINE_END );
         return invPanel;
     }
     
@@ -338,6 +346,18 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
         };
     }
     
+    private Action viewDatasetAction() {
+        return new AbstractAction(){
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    viewAction();
+                } catch (EmfException e) {
+                    messagePanel.setError("Error viewing dataset: " + e.getMessage());
+                }
+            }
+        };
+    }
+    
     private void doAddWindow() throws Exception {
         DatasetType type = (DatasetType) dsType.getSelectedItem();
         
@@ -359,5 +379,19 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
         dataset.setText(datasets[0].getName());
         controlProgram.setDataset(datasets[0]);
         fillVersions(datasets[0], getVersions(datasets[0]));
+    }
+    
+    protected void viewAction() throws EmfException {
+        messagePanel.clear();
+
+        if (controlProgram.getDataset() == null) {
+            messagePanel.setMessage("Dataset is not available.");
+            return;
+        }
+
+        PropertiesViewPresenter datasetViewPresenter = new PropertiesViewPresenter(
+                presenter.getDataset(controlProgram.getDataset().getId()), session);
+        DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
+        datasetViewPresenter.doDisplay(view);
     }
 }

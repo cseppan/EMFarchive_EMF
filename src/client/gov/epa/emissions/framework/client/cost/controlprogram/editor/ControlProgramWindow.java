@@ -105,7 +105,7 @@ public class ControlProgramWindow extends DisposableInteralFrame implements Cont
     private JPanel createSummaryTab(ControlProgram controlProgram) {
         try {
             summaryTabView = new ControlProgramSummaryTab(controlProgram, session,
-                    this, messagePanel, parentConsole);
+                    this, messagePanel, parentConsole, desktopManager);
             this.presenter.set(summaryTabView);
             return summaryTabView;
         } catch (EmfException e) {

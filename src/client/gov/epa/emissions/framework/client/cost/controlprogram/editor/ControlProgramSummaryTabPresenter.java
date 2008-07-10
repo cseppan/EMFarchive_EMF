@@ -54,4 +54,8 @@ public class ControlProgramSummaryTabPresenter  implements ControlProgramTabPres
          }
          return session.dataEditorService().getVersions(dataset.getId());
      }
+     
+     public EmfDataset getDataset(int id) throws EmfException {
+         return session.dataService().getDataset(id);
+     }
 }
