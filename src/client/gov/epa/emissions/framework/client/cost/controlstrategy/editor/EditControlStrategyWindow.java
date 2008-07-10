@@ -25,6 +25,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -349,6 +350,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                         }
                     }
                     
+                    validatePath(outputTabView.getExportFolder());
                     controlStrategy.setDeleteResults(deleteResults);
                     controlStrategy.setExportDirectory(outputTabView.getExportFolder());
                     save();
@@ -365,6 +367,14 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                 }
             }
         };
+    }
+    
+    private void validatePath(String folderPath) throws EmfException {
+        File file = new File(folderPath);
+
+        if (!file.exists() || !file.isDirectory()) {
+            throw new EmfException ("Export folder does not exist: " + folderPath);
+        }
     }
 
     private void enableButtons(boolean enable) {

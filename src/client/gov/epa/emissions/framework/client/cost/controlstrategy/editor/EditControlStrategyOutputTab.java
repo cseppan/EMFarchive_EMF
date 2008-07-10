@@ -410,10 +410,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             
 //                editButton.setEnabled(false);
         }
+        
         else if (buttonGroup.getSelection().equals(contInvButton.getModel())){
             ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
-
-            
             
             //see if there is already a controlled inventory for this strategy.
             boolean hasControlledInventories = false;
