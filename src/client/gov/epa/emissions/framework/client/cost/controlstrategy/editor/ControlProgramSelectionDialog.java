@@ -51,7 +51,7 @@ public class ControlProgramSelectionDialog extends JDialog implements ControlPro
         contentPane.add(panel, BorderLayout.CENTER);
         contentPane.add(buttonPanel(), BorderLayout.SOUTH);
 
-        setTitle("Select Control Technologies");
+        setTitle("Select Control Programs");
         this.pack();
         this.setSize(900,600);
         this.setLocation(ScreenUtils.getPointToCenter(parent));

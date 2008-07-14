@@ -179,7 +179,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         // layoutGenerator.addLabelWidgetPair("Discount Rate:", discountRateTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Cost Year:", costYearTextField(), panel);
-        layoutGenerator.addLabelWidgetPair("Inventory Year:", inventoryYearTextField(), panel);
+        layoutGenerator.addLabelWidgetPair("Target Year:", inventoryYearTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Region:", regions(), panel);
         layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutants(), panel);
         layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate(), panel);
@@ -195,7 +195,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private DoubleTextField discountRate() {
         discountRate = new DoubleTextField("discount rate", 1, 20, 10);
-        discountRate.setValue((controlStrategy.getDiscountRate()));
+        discountRate.setValue(controlStrategy.getDiscountRate() != null ? controlStrategy.getDiscountRate() : 7.0);
         discountRate.setToolTipText("This value is only used for point sources");
         changeablesList.addChangeable(discountRate);
         return discountRate;
@@ -203,7 +203,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private JCheckBox useCostEquation() {
 
-        useCostEquationCheck = new JCheckBox(" ", null, controlStrategy.getUseCostEquations());
+        useCostEquationCheck = new JCheckBox(" ", null, controlStrategy.getUseCostEquations() != null ? controlStrategy.getUseCostEquations() : true);
         return useCostEquationCheck;
     }
 
@@ -214,7 +214,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private IntTextField inventoryYearTextField() {
-        inventoryYear = new IntTextField("Inventory year", 0, Integer.MAX_VALUE, 10);
+        inventoryYear = new IntTextField("Target year", 0, Integer.MAX_VALUE, 10);
+        inventoryYear.setToolTipText("This is the target year for the strategy run.");
         if (controlStrategy.getInventoryYear() != 0)
             inventoryYear.setValue(controlStrategy.getInventoryYear());
         return inventoryYear;
@@ -334,10 +335,11 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
                 .getStartYear(), costYearTable.getEndYear()));
         controlStrategy.setInventoryYear(new YearValidation("Inventory Year").value(inventoryYear.getText()));
         updateRegion();
-        controlStrategy.setTargetPollutant(checkMajorPollutant());
 
         controlStrategy.setDiscountRate(checkDiscountRate());
-        controlStrategy.setStrategyType(checkStrategyType());
+        StrategyType strategyType = checkStrategyType();
+        controlStrategy.setStrategyType(strategyType);
+        controlStrategy.setTargetPollutant(checkMajorPollutant(!strategyType.getName().equals(StrategyType.projectFutureYearInventory)));
         controlStrategy.setUseCostEquations(useCostEquationCheck.isSelected());
     }
 
@@ -363,9 +365,9 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return strategyType;
     }
 
-    private Pollutant checkMajorPollutant() throws EmfException {
+    private Pollutant checkMajorPollutant(boolean required) throws EmfException {
         Pollutant pollutant = (Pollutant) majorPollutant.getSelectedItem();
-        if (pollutant == null) {
+        if (pollutant == null && required) {
             throw new EmfException("Please select a target pollutant");
         }
         return pollutant;

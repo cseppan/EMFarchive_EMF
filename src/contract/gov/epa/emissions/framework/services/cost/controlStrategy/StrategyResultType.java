@@ -20,7 +20,7 @@ public class StrategyResultType implements Serializable {
     
     public static final String annotatedInventoryResult = "Annotated Inventory";
     
-    public static final String projectedFutureYearInventoryResult = "Projected Future Year Inventor";
+    public static final String strategyMessagesResult = "Strategy Messages";
     
     public StrategyResultType(){
         //

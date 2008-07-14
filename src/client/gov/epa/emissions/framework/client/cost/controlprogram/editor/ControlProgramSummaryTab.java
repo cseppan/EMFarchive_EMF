@@ -38,7 +38,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -62,8 +61,6 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
     protected EmfConsole parentConsole;
 
     private ComboBox controlProgramTypeCombo;
-
-    protected JCheckBox useCostEquationCheck;
 
 //    private DecimalFormat decFormat;
 //
@@ -246,7 +243,7 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
 
     private TextField start() {
         startDate = new TextField("start", 40);
-        startDate.setText(controlProgram.getStartDate() != null ? CustomDateFormat.format_YYYY_MM_DD_HH_MM(controlProgram.getStartDate()) : "");
+        startDate.setText(controlProgram.getStartDate() != null ? CustomDateFormat.format_MM_DD_YYYY(controlProgram.getStartDate()) : "");
         startDate.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(startDate);
 
@@ -255,7 +252,8 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
 
     private TextField end() {
         endDate = new TextField("end", 40);
-        endDate.setText(controlProgram.getEndDate() != null ? CustomDateFormat.format_YYYY_MM_DD_HH_MM(controlProgram.getEndDate()) : "");
+        endDate.setText(controlProgram.getEndDate() != null ? CustomDateFormat.format_MM_DD_YYYY(controlProgram.getEndDate()) : "");
+        endDate.setToolTipText("The end date defines the cut-off date for the control program.  The end date is not required.");
         endDate.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(endDate);
 
@@ -279,13 +277,16 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
         else
             controlProgram.setDatasetVersion(null);
         controlProgram.setControlProgramType((ControlProgramType)controlProgramTypeCombo.getSelectedItem());
-        controlProgram.setStartDate(getDate(startDate));
-        controlProgram.setEndDate(getDate(endDate));
+        controlProgram.setStartDate(getDate(startDate, true));
+        controlProgram.setEndDate(getDate(endDate, false));
     }
 
-    private Date getDate(TextField date) throws EmfException {
+    private Date getDate(TextField date, boolean required) throws EmfException {
+        String dateAsString = date.getText().trim();
+        if (required && dateAsString.length() == 0) {
+            throw new EmfException("The " + date.getName() + " date is missing.");
+        }
         try {
-            String dateAsString = date.getText().trim();
             if (dateAsString.length() == 0) {
                 return null;
             }

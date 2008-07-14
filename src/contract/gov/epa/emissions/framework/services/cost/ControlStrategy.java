@@ -27,7 +27,7 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private Project project;
 
-    private double discountRate;
+    private Double discountRate;
 
     private int costYear;
 
@@ -65,7 +65,7 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private ControlStrategyConstraint constraint;
 
-    private boolean useCostEquations;
+    private Boolean useCostEquations;
 
     private Double totalCost;
     
@@ -186,11 +186,11 @@ public class ControlStrategy implements Lockable, Serializable {
         this.description = description;
     }
 
-    public double getDiscountRate() {
+    public Double getDiscountRate() {
         return discountRate;
     }
 
-    public void setDiscountRate(double discountRate) {
+    public void setDiscountRate(Double discountRate) {
         this.discountRate = discountRate;
     }
 
@@ -362,11 +362,11 @@ public class ControlStrategy implements Lockable, Serializable {
         return name;
     }
 
-    public void setUseCostEquations(boolean useCostEquations) {
+    public void setUseCostEquations(Boolean useCostEquations) {
         this.useCostEquations = useCostEquations;
     }
 
-    public boolean getUseCostEquations() {
+    public Boolean getUseCostEquations() {
         return useCostEquations;
     }
 
