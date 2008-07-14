@@ -118,7 +118,7 @@ BEGIN
 
 	-- get target pollutant, inv filter, and county dataset info if specified
 	SELECT cs.pollutant_id,
-		case when length(trim(cs.filter)) > 0 then '(' || replace(replace(replace(replace(replace(replace(lower(cs.filter), 'scc', 'inv.scc'), 'fips', 'inv.fips'), 'plantid', 'inv.plantid'),  'pointid', 'inv.pointid'), 'stackid', 'inv.stackid'), 'segment', 'inv.segment') || ')' else null end,
+		case when length(trim(cs.filter)) > 0 then '(' || public.alias_inventory_filter(cs.filter, 'inv') || ')' else null end,
 		cs.cost_year,
 		cs.analysis_year,
 		cs.county_dataset_id,
@@ -155,7 +155,7 @@ BEGIN
 	into is_point_table;
 
 	-- see if there is a sic column in the inventory
-	SELECT true
+	SELECT count(1) = 1
 	FROM pg_class c
 		inner join pg_attribute a
 		on a.attrelid = c.oid
@@ -167,7 +167,7 @@ BEGIN
 	into has_sic_column;
 
 	-- see if there is a naics column in the inventory
-	SELECT true
+	SELECT count(1) = 1
 	FROM pg_class c
 		inner join pg_attribute a
 		on a.attrelid = c.oid
@@ -179,7 +179,7 @@ BEGIN
 	into has_naics_column;
 
 	-- see if there is a rpen column in the inventory
-	SELECT true
+	SELECT count(1) = 1
 	FROM pg_class c
 		inner join pg_attribute a
 		on a.attrelid = c.oid

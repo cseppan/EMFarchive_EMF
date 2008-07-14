@@ -14,7 +14,7 @@ insert into emf.strategy_result_types (name) select 'Least Cost Control Measure 
 insert into emf.strategy_result_types (name) select 'Controlled Inventory';
 insert into emf.strategy_result_types (name) select 'Least Cost Curve Summary';
 insert into emf.strategy_result_types (name) select 'Annotated Inventory';
-insert into emf.strategy_result_types (name) select 'Projected Future Year Inventory';
+insert into emf.strategy_result_types (name) select 'Strategy Messages';
 -- emf.strategy_result_types
 
 --emf.control_technologies

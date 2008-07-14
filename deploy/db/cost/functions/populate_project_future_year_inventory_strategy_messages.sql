@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.run_project_future_year_inventory(
+CREATE OR REPLACE FUNCTION public.populate_project_future_year_inventory_strategy_messages(
 	control_strategy_id integer, 
 	input_dataset_id integer, 
 	input_dataset_version integer, 
@@ -9,8 +9,8 @@ DECLARE
 	inv_table_name varchar(64) := '';
 	inv_filter varchar := '';
 	inv_fips_filter text := '';
-	detailed_result_dataset_id integer := null;
-	detailed_result_table_name varchar(64) := '';
+	strategy_messages_dataset_id integer := null;
+	strategy_messages_table_name varchar(64) := '';
 	county_dataset_id integer := null;
 	county_dataset_version integer := null;
 	region RECORD;
@@ -69,8 +69,8 @@ BEGIN
 		inner join emf.internal_sources i
 		on i.dataset_id = sr.detailed_result_dataset_id
 	where sr.id = strategy_result_id
-	into detailed_result_dataset_id,
-		detailed_result_table_name;
+	into strategy_messages_dataset_id,
+		strategy_messages_table_name;
 
 	-- see if control strategy has only certain measures specified
 	SELECT count(id), 
@@ -363,7 +363,7 @@ BEGIN
 			select_column_list_sql := select_column_list_sql || 'inv.record_id';
 			insert_column_list_sql := insert_column_list_sql || column_name;
 		ELSIF column_name = 'dataset_id' THEN
-			select_column_list_sql := select_column_list_sql || ',' || detailed_result_dataset_id || ' as dataset_id';
+			select_column_list_sql := select_column_list_sql || ',' || strategy_messages_dataset_id || ' as dataset_id';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'delete_versions' THEN
 			select_column_list_sql := select_column_list_sql || ','''' as delete_versions';
@@ -388,7 +388,7 @@ BEGIN
 /*
 	execute 
 	--raise notice '%', 
-	'insert into emissions.' || detailed_result_table_name || ' 
+	'insert into emissions.' || strategy_messages_table_name || ' 
 		(
 		' || insert_column_list_sql || ' 
 		)
@@ -422,7 +422,7 @@ BEGIN
 /*
 			execute 
 			--raise notice '%', 
-			'delete from emissions.' || detailed_result_table_name || ' as inv
+			'delete from emissions.' || strategy_messages_table_name || ' as inv
 			using emissions.' || control_program.table_name || ' pc
 			where pc.fips = inv.fips
 				and pc.plantid = inv.plantid
@@ -435,95 +435,45 @@ BEGIN
 */
 
 
+
 			execute
 			--raise notice '%',
-			 'insert into emissions.' || detailed_result_table_name || ' 
+			 'insert into emissions.' || strategy_messages_table_name || ' 
 				(
-				dataset_id,
-				cm_abbrev,
-				poll,
-				scc,
-				fips,
-				' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
-				annual_oper_maint_cost,
-				annualized_capital_cost,
-				total_capital_cost,
-				annual_cost,
-				ann_cost_per_ton,
-				control_eff,
-				rule_pen,
-				rule_eff,
-				percent_reduction,
-				inv_ctrl_eff,
-				inv_rule_pen,
-				inv_rule_eff,
-				final_emissions,
-				emis_reduction,
-				inv_emissions,
-				input_emis,
-				output_emis,
-				apply_order,
-				fipsst,
-				fipscty,
-				sic,
-				naics,
-				source_id,
-				input_ds_id,
-				cs_id,
-				cm_id,
-				equation_type,
-				control_program,
-				"comment"
+				dataset_id, 
+				fips, 
+				scc, 
+				' || case when not is_point_table then '' else 'plantid, pointid, stackid, segment, ' end || '
+				poll, 
+				message
 				)
 			select 
-				' || detailed_result_dataset_id || '::integer,
-				''PLTCLOSURE'' as abbreviation,
-				inv.poll,
-				inv.scc,
-				inv.fips,
-				' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
-				null::double precision as operation_maintenance_cost,
-				null::double precision as annualized_capital_cost,
-				null::double precision as capital_cost,
-				null::double precision as ann_cost,
-				null::double precision as computed_cost_per_ton,
-				100.0 as efficiency,
-				100.0 as rule_pen,
-				100.0 as rule_eff,
-				100.0 as percent_reduction,
-				inv.ceff,
-				' || case when is_point_table = false then 'inv.rpen' else '100' end || ',
-				inv.reff,
-				0.0 as final_emissions,
-				' || annual_emis_sql || ' as emis_reduction,
-				' || annual_emis_sql || ' as inv_emissions,
-				' || annual_emis_sql || ' as input_emis,
-				0.0 as output_emis,
-				1,
-				substr(inv.fips, 1, 2),
-				substr(inv.fips, 3, 3),
-				' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
-				' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
-				inv.record_id::integer as source_id,
-				' || input_dataset_id || '::integer,
-				' || control_strategy_id || '::integer,
-				null::integer as control_measures_id,
-				null::varchar(255) as equation_type,
-				' || quote_literal(control_program.control_program_name) || ',
-				''''
-			FROM emissions.' || inv_table_name || ' inv
+				' || strategy_messages_dataset_id || '::integer,
+				pc.fips,
+				null::character varying(10) as scc,
+				pc.plantid, 
+				pc.pointid, 
+				pc.stackid, 
+				pc.segment, 
+				null::character varying(16) as poll,
+				''Plant'' || coalesce('', '' || pc.plant || '','', '''') || '' is missing from inventory.'' as "comment"
+			FROM emissions.' || control_program.table_name || ' pc
 
-				inner join emissions.' || control_program.table_name || ' pc
+				left outer join emissions.' || inv_table_name || ' inv
 				on pc.fips = inv.fips
+				' || case when not is_point_table then '' else '
 				and pc.plantid = inv.plantid
 				and coalesce(pc.pointid, inv.pointid) = inv.pointid
 				and coalesce(pc.stackid, inv.stackid) = inv.stackid
 				and coalesce(pc.segment, inv.segment) = inv.segment
-				and pc.effective_date::timestamp without time zone < ''12/31/' || inventory_year || '''::timestamp without time zone
+				' end || '
+				and ' || replace(replace(replace(inv_filter, 'version ', 'inv.version '), 'delete_versions ', 'inv.delete_versions '), 'dataset_id', 'inv.dataset_id') || coalesce(county_dataset_filter_sql, '') || '
+
+
+			where 	
+				pc.effective_date::timestamp without time zone < ''12/31/' || inventory_year || '''::timestamp without time zone
 				and ' || replace(replace(replace(public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version), 'version ', 'pc.version '), 'delete_versions ', 'pc.delete_versions '), 'dataset_id', 'pc.dataset_id') || '
-
-
-			where 	' || replace(replace(replace(inv_filter, 'version ', 'inv.version '), 'delete_versions ', 'inv.delete_versions '), 'dataset_id', 'inv.dataset_id') || coalesce(county_dataset_filter_sql, '') || '';
+				and inv.record_id is null';
 
 		END IF;
 		

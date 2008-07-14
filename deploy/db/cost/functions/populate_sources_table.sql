@@ -36,7 +36,7 @@ BEGIN
 		and sources.stackid = inv.stackid
 		and sources.segment = inv.segment
 		' end || '
-	where 	sources.id is null ' || coalesce(replace(replace(replace(replace(replace(replace(lower(inv_filter), 'scc', 'inv.scc'), 'fips', 'inv.fips'), 'plantid', 'inv.plantid'),  'pointid', 'inv.pointid'), 'stackid', 'inv.stackid'), 'segment', 'inv.segment'), '') || '
+	where 	sources.id is null ' || coalesce(public.alias_inventory_filter(inv_filter, 'inv'), '') || '
 		';
 
 	return;

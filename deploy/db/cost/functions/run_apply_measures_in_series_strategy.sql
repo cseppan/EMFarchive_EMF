@@ -1,212 +1,3 @@
---delete from emissions.csdr_test5;
---vacuum emissions.csdr_test5;
---ANALYZE verbose emissions.csdr_test5;
-
---select * from emissions.csdr_test5 order by source_id, record_id limit 1000;
-
-CREATE OR REPLACE FUNCTION public.run_apply_measures_in_series_strategy_batch_by_state(control_strategy_id integer, 
-	input_dataset_id integer, 
-	inv_table_name varchar(63), 
-	inv_filter varchar, 
-	detailed_result_dataset_id integer, 
-	detailed_result_table_name varchar(63), 
-	strfipsst varchar(2), 
-	measures_count integer, 
-	measure_classes_count integer, 
-	target_pollutant_id integer,
-	inventory_year integer, 
-	county_dataset_filter_sql text,
-	is_point_table boolean,
-	has_sic_column boolean, 
-	has_naics_column boolean) RETURNS integer AS $$
-DECLARE
-	dataset_month smallint := 0;
-	no_days_in_month smallint := 31;
-	run_status character varying;
-BEGIN
-	-- see if the strategy has been canceled, is so get out of procedure...
-	select control_strategies.run_status 
-	from emf.control_strategies
-	where id = control_strategy_id
-	into run_status;
-
-	IF run_status = 'Cancelled' THEN
-		RAISE EXCEPTION 'Strategy was cancelled';
-		return 0;
-	END IF;
-
-	SET enable_seqscan TO 'off';
-	SET work_mem TO '512MB';
---	SET enable_nestloop TO 'off';
-
-	-- get month of the dataset, 0 (Zero) indicates an annual inventory
-	select public.get_dataset_month(input_dataset_id)
-	into dataset_month;
-
-	IF dataset_month = 1 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 2 THEN
-		no_days_in_month := 29;
-	ELSIF dataset_month = 3 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 4 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 5 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 6 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 7 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 8 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 9 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 10 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 11 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 12 THEN
-		no_days_in_month := 31;
-	END IF;
-
-	raise notice '%', 'start ' || strfipsst || ' ' || clock_timestamp();
-
---	EXECUTE 
-	EXECUTE 'insert into emissions.' || detailed_result_table_name || ' 
-		(
-		dataset_id,
-		cm_abbrev,
-		poll,
-		scc,
-		fips,
-		' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
-		annual_cost,
-		ann_cost_per_ton,
-		control_eff,
-		rule_pen,
-		rule_eff,
-		percent_reduction,
-		inv_ctrl_eff,
-		inv_rule_pen,
-		inv_rule_eff,
-		final_emissions,
-		emis_reduction,
-		inv_emissions,
-		fipsst,
-		fipscty,
-		sic,
-		naics,
-		source_id,
-		input_ds_id,
-		cs_id,
-		cm_id
-		)
-	select 	' || detailed_result_dataset_id || '::integer,
-		abbreviation,
-		poll,
-		scc,
-		fips,
-		' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
-		ann_cost,
-		ref_yr_cost_per_ton,
-		efficiency,
-		rule_pen,
-		rule_eff,
-		percent_reduction,
-		ceff,
-		rpen,
-		reff,
-		final_emissions,
-		emis_reduction,
-		inv_emissions,
-		fipsst,
-		fipscty,
-		sic,
-		naics,
-		source_id,
-		' || input_dataset_id || '::integer,
-		' || control_strategy_id || '::integer,
-		cm_id
-	from (
-		select DISTINCT ON (inv.scc, inv.fips, ' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || 'er.pollutant_id, er.control_measures_id) 
-			m.abbreviation,
-			inv.poll,
-			inv.scc,
-			inv.fips,
-			' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
-			ref_yr_cost_per_ton * coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) * efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' / 100 / 100 / 100 as ann_cost,
-			ref_yr_cost_per_ton,
-			efficiency,
-			' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' as rule_pen,
-			' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' as rule_eff,
-			efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' / 100 / 100 as percent_reduction,
-			inv.ceff,
-			' || case when is_point_table = false then 'inv.rpen' else '100' end || ' as rpen,
-			inv.reff,
-			' || case when dataset_month != 0 then 'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' else 'inv.ann_emis' end || ' * (1 - efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' / 100 / 100 / 100) as final_emissions,
-			' || case when dataset_month != 0 then 'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' else 'inv.ann_emis' end || ' * efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' / 100 / 100 / 100 as emis_reduction,
-			' || case when dataset_month != 0 then 'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' else 'inv.ann_emis' end || ' as inv_emissions,
-			substr(inv.fips, 1, 2) as fipsst,
-			substr(inv.fips, 3, 3) as fipscty,
-			' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ' as sic,
-			' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ' as naics,
-			inv.record_id::integer as source_id,
-			er.control_measures_id as cm_id,
-			' || case when measures_count > 0 then 'csm.apply_order ' else '1.0' end || ' as apply_order
-		FROM emissions.' || inv_table_name || ' inv
-
-			inner join emf.pollutants p
-			on p.name = inv.poll
-
-			inner join emf.control_measure_sccs scc
-			on scc.name = inv.scc
-
-			' || case when measures_count > 0 then '
-			inner join emf.control_strategy_measures csm
-			on csm.control_measure_id = scc.control_measures_id
-			and csm.control_strategy_id = ' || control_strategy_id || '
-			' else '' end || '
-
-			inner join emf.control_measures m
-			on m.id = scc.control_measures_id
-
-			inner join emf.control_measure_months ms
-			on ms.control_measure_id = m.id
-			and ms.month in (0' || case when dataset_month != 0 then ',' || dataset_month else '' end || ')
-
-			inner join emf.control_measure_efficiencyrecords er
-			on er.control_measures_id = scc.control_measures_id
-			-- pollutant filter
-			and er.pollutant_id = p.id
-			-- min and max emission filter
-			and ' || case when dataset_month != 0 then 'coalesce(inv.avd_emis * 365, inv.ann_emis)' else 'inv.ann_emis' end || ' / (1 - coalesce(inv.ceff / 100 * inv.reff / 100 * ' || case when is_point_table = false then 'inv.rpen' else '100' end || ' / 100, 0)) between coalesce(er.min_emis, -1E+308) and coalesce(er.max_emis, 1E+308)
-			-- locale filter
-			and (er.locale = inv.fips or er.locale = substr(inv.fips, 1, 2) or er.locale = '''')
-			-- effecive date filter
-			and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)
-
-			' || case when measures_count = 0 and measure_classes_count > 0 then '
-			inner join emf.control_strategy_classes csc
-			on csc.control_measure_class_id = m.cm_class_id
-			and csc.control_strategy_id = ' || control_strategy_id || '
-			' else '' end || '
-
-		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
-			and inv.fips like ' ||  quote_literal(strfipsst || '%') || '
-
-		order by inv.scc, inv.fips, ' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || 'er.pollutant_id, 
-			er.control_measures_id, case when length(locale) = 5 then 0 when length(locale) = 2 then 1 else 2 end, ref_yr_cost_per_ton, efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' desc
-		) as tbl
-	order by scc, fips, ' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || 'poll, apply_order, coalesce(ref_yr_cost_per_ton, 0), percent_reduction desc';
-	
-	raise notice '%', 'end ' || strfipsst || ' ' || clock_timestamp();
-
-	RETURN 1;
-END;
-$$ LANGUAGE plpgsql;
-
-
-
 CREATE OR REPLACE FUNCTION public.run_apply_measures_in_series_strategy(control_strategy_id integer, 
 	input_dataset_id integer, 
 	input_dataset_version integer, 
@@ -226,12 +17,28 @@ DECLARE
 	county_dataset_filter_sql text := '';
 	cost_year integer := null;
 	inventory_year integer := null;
+	ref_cost_year integer := 2006;
+	cost_year_chained_gdp double precision := null;
+	ref_cost_year_chained_gdp double precision := null;
+	chained_gdp_adjustment_factor double precision := null;
 	is_point_table boolean := false;
+	use_cost_equations boolean := false;
+	discount_rate double precision;
+	has_design_capacity_columns boolean := false; 
 	has_sic_column boolean := false; 
 	has_naics_column boolean := false;
+	has_rpen_column boolean := false;
+	dataset_month smallint := 0;
+	no_days_in_month smallint := 31;
+	run_status character varying;
+	get_strategt_cost_sql character varying;
+	get_strategt_cost_inner_sql character varying;
+	annualized_emis_sql character varying;
+	annual_emis_sql character varying;
+	percent_reduction_sql character varying;
 BEGIN
-	SET work_mem TO '512MB';
-	SET enable_seqscan TO 'off';
+--	SET work_mem TO '512MB';
+--	SET enable_seqscan TO 'off';
 
 	-- get the input dataset info
 	select lower(i.table_name)
@@ -265,11 +72,13 @@ BEGIN
 
 	-- get target pollutant, inv filter, and county dataset info if specified
 	SELECT cs.pollutant_id,
-		case when length(trim(cs.filter)) > 0 then '(' || cs.filter || ')' else null end,
+		case when length(trim(cs.filter)) > 0 then '(' || public.alias_inventory_filter(cs.filter, 'inv') || ')' else null end,
 		cs.cost_year,
 		cs.analysis_year,
 		cs.county_dataset_id,
-		cs.county_dataset_version
+		cs.county_dataset_version,
+		cs.use_cost_equations,
+		cs.discount_rate / 100
 	FROM emf.control_strategies cs
 	where cs.id = control_strategy_id
 	INTO target_pollutant_id,
@@ -277,9 +86,11 @@ BEGIN
 		cost_year,
 		inventory_year,
 		county_dataset_id,
-		county_dataset_version;
+		county_dataset_version,
+		use_cost_equations,
+		discount_rate;
 
-	-- see if there are point specific columns in the inventory
+	-- see if there are point specific columns to be indexed
 	SELECT count(1) = 4
 	FROM pg_class c
 		inner join pg_attribute a
@@ -292,7 +103,7 @@ BEGIN
 	into is_point_table;
 
 	-- see if there is a sic column in the inventory
-	SELECT true
+	SELECT count(1) = 1
 	FROM pg_class c
 		inner join pg_attribute a
 		on a.attrelid = c.oid
@@ -304,7 +115,7 @@ BEGIN
 	into has_sic_column;
 
 	-- see if there is a naics column in the inventory
-	SELECT true
+	SELECT count(1) = 1
 	FROM pg_class c
 		inner join pg_attribute a
 		on a.attrelid = c.oid
@@ -315,6 +126,32 @@ BEGIN
 		AND a.attnum > 0
 	into has_naics_column;
 
+	-- see if there is a rpen column in the inventory
+	SELECT count(1) = 1
+	FROM pg_class c
+		inner join pg_attribute a
+		on a.attrelid = c.oid
+		inner join pg_type t
+		on t.oid = a.atttypid
+	WHERE c.relname = inv_table_name
+		and a.attname = 'rpen'
+		AND a.attnum > 0
+	into has_rpen_column;
+
+	IF is_point_table THEN
+		-- see if there is a design capacity columns in the inventory
+		SELECT count(1) = 3
+		FROM pg_class c
+			inner join pg_attribute a
+			on a.attrelid = c.oid
+			inner join pg_type t
+			on t.oid = a.atttypid
+		WHERE c.relname = inv_table_name
+			and a.attname in ('design_capacity','design_capacity_unit_numerator','design_capacity_unit_denominator')
+			AND a.attnum > 0
+		into has_design_capacity_columns;
+	END IF;
+	
 	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
 	IF county_dataset_id is not null THEN
 		county_dataset_filter_sql := ' and fips in (SELECT fips
@@ -325,39 +162,245 @@ BEGIN
 	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version) || ')' || coalesce(' and ' || inv_filter, '');
 
 	raise notice '%', 'start call_batch_state ' || clock_timestamp();
+	-- get month of the dataset, 0 (Zero) indicates an annual inventory
+	select public.get_dataset_month(input_dataset_id)
+	into dataset_month;
 
-        BEGIN
-		execute 'select public.run_apply_measures_in_series_strategy_batch_by_state(' || control_strategy_id || ', 
-			' || input_dataset_id  || ', 
-			' || quote_literal(inv_table_name) || ', 
-			' || quote_literal(inv_filter) || ', 
-			' || detailed_result_dataset_id || ', 
-			' || quote_literal(detailed_result_table_name) || ', 
-			fipsst, 
-			' || measures_count || ', 
-			' || measure_classes_count || ', 
-			' || target_pollutant_id || ', 
-			' || inventory_year || ', 
-			' || quote_literal(coalesce(county_dataset_filter_sql, '')) || ',
-			' || case when is_point_table then 'true' else 'false' end || '::boolean,
-			' || case when has_sic_column then 'true' else 'false' end || '::boolean, 
-			' || case when has_naics_column then 'true' else 'false' end || '::boolean
-			)
-		from (
-			SELECT DISTINCT ON (substring(fips, 1, 2)) substring(fips, 1, 2) as fipsst
-			FROM emissions.' || inv_table_name || ' as inv
-			where ' || inv_filter || county_dataset_filter_sql || '
-			order by substring(fips, 1, 2) 
-	--		limit 1
-		) fips';
-            RETURN 1;
-        EXCEPTION when raise_exception then
-		--update the strategy result to cancelled
-		update emf.strategy_results
-		set run_status = 'Cancelled'
-		where id = strategy_result_id;
-		RAISE EXCEPTION 'Strategy was cancelled';
-        END;
+	IF dataset_month = 1 THEN
+		no_days_in_month := 31;
+	ELSIF dataset_month = 2 THEN
+		no_days_in_month := 29;
+	ELSIF dataset_month = 3 THEN
+		no_days_in_month := 31;
+	ELSIF dataset_month = 4 THEN
+		no_days_in_month := 30;
+	ELSIF dataset_month = 5 THEN
+		no_days_in_month := 31;
+	ELSIF dataset_month = 6 THEN
+		no_days_in_month := 30;
+	ELSIF dataset_month = 7 THEN
+		no_days_in_month := 31;
+	ELSIF dataset_month = 8 THEN
+		no_days_in_month := 31;
+	ELSIF dataset_month = 9 THEN
+		no_days_in_month := 30;
+	ELSIF dataset_month = 10 THEN
+		no_days_in_month := 31;
+	ELSIF dataset_month = 11 THEN
+		no_days_in_month := 30;
+	ELSIF dataset_month = 12 THEN
+		no_days_in_month := 31;
+	END IF;
+
+	raise notice '%', 'start ' || clock_timestamp();
+
+	-- get gdp chained values
+	SELECT chained_gdp
+	FROM reference.gdplev
+	where annual = cost_year
+	INTO cost_year_chained_gdp;
+	SELECT chained_gdp
+	FROM reference.gdplev
+	where annual = ref_cost_year
+	INTO ref_cost_year_chained_gdp;
+
+	chained_gdp_adjustment_factor := cost_year_chained_gdp / ref_cost_year_chained_gdp;
+
+	annual_emis_sql := 
+			case 
+				when dataset_month != 0 then 
+					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
+				else 
+					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
+			end;
+	annualized_emis_sql := 
+			case 
+				when dataset_month != 0 then 
+					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * 365, inv.ann_emis) / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
+				else 
+					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
+			end;
+	percent_reduction_sql := 'er.efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' / 100 / 100';
+	get_strategt_cost_sql := '(public.get_strategy_costs(' || case when use_cost_equations then 'true' else 'false' end || '::boolean, m.control_measures_id, 
+			abbreviation, ' || discount_rate|| ', 
+			m.equipment_life, er.cap_ann_ratio, 
+			er.cap_rec_factor, er.ref_yr_cost_per_ton, 
+			' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100, ' || ref_cost_year_chained_gdp || ' / cast(chained_gdp as double precision), 
+			' || case when use_cost_equations then 
+			'et.name, 
+			eq.value1, eq.value2, 
+			eq.value3, eq.value4, 
+			eq.value5, eq.value6, 
+			eq.value7, eq.value8, 
+			eq.value9, eq.value10, 
+			' || case when not is_point_table then 'null' else 'inv.stkflow' end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity' end end || ', 
+			' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_numerator' end end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_denominator' end end 
+			else
+			'null, 
+			null, null, 
+			null, null, 
+			null, null, 
+			null, null, 
+			null, null, 
+			null, null, 
+			null, null'
+			end
+			|| '))';
+	get_strategt_cost_inner_sql := replace(get_strategt_cost_sql,'m.control_measures_id','m.id');
+
+--	EXECUTE 
+	EXECUTE 'insert into emissions.' || detailed_result_table_name || ' 
+		(
+		dataset_id,
+		cm_abbrev,
+		poll,
+		scc,
+		fips,
+		' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
+
+		annual_oper_maint_cost,
+		annualized_capital_cost,
+		total_capital_cost,
+		annual_cost,
+		ann_cost_per_ton,
+		control_eff,
+		rule_pen,
+		rule_eff,
+		percent_reduction,
+		inv_ctrl_eff,
+		inv_rule_pen,
+		inv_rule_eff,
+
+		final_emissions,
+		emis_reduction,
+		inv_emissions,
+		fipsst,
+		fipscty,
+		sic,
+		naics,
+		source_id,
+		input_ds_id,
+		cs_id,
+		cm_id
+		)
+	select 	' || detailed_result_dataset_id || '::integer,
+		abbreviation,
+		poll,
+		scc,
+		fips,
+		' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
+
+		operation_maintenance_cost,
+		annualized_capital_cost,
+		capital_cost,
+		ann_cost,
+		computed_cost_per_ton,
+		efficiency,
+		rule_pen,
+		rule_eff,
+		percent_reduction,
+		ceff,
+		rpen,
+		reff,
+
+		final_emissions,
+		emis_reduction,
+		inv_emissions,
+		fipsst,
+		fipscty,
+		sic,
+		naics,
+		source_id,
+		' || input_dataset_id || '::integer,
+		' || control_strategy_id || '::integer,
+		cm_id
+	from (
+		select DISTINCT ON (inv.scc, inv.fips, ' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || 'er.pollutant_id, er.control_measures_id) 
+			m.abbreviation,
+			inv.poll,
+			inv.scc,
+			inv.fips,
+			' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
+
+			TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.operation_maintenance_cost, ''FM999999999999999990'')::double precision as operation_maintenance_cost,
+			TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.annualized_capital_cost, ''FM999999999999999990'')::double precision as annualized_capital_cost,
+			TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.capital_cost, ''FM999999999999999990'')::double precision as capital_cost,
+			TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.annual_cost, ''FM999999999999999990'')::double precision as ann_cost,
+			TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.computed_cost_per_ton, ''FM999999999999999990'')::double precision as computed_cost_per_ton,
+			TO_CHAR(er.efficiency, ''FM990.099'')::double precision as efficiency,
+			TO_CHAR(' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ', ''FM990.099'')::double precision as rule_pen,
+			TO_CHAR(' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ', ''FM990.099'')::double precision as rule_eff,
+			TO_CHAR(' || percent_reduction_sql || ', ''FM990.099'')::double precision as percent_reduction,
+			inv.ceff,
+			' || case when is_point_table = false then 'inv.rpen' else '100' end || ' as rpen,
+			inv.reff,
+
+			' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as final_emissions,
+			' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100 as emis_reduction,
+			' || annual_emis_sql || ' as inv_emissions,
+
+			substr(inv.fips, 1, 2) as fipsst,
+			substr(inv.fips, 3, 3) as fipscty,
+			' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ' as sic,
+			' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ' as naics,
+			inv.record_id::integer as source_id,
+			er.control_measures_id as cm_id,
+			' || case when measures_count > 0 then 'csm.apply_order ' else '1.0' end || ' as apply_order
+		FROM emissions.' || inv_table_name || ' inv
+
+			inner join emf.pollutants p
+			on p.name = inv.poll
+
+			inner join emf.control_measure_sccs scc
+			on scc.name = inv.scc
+
+			' || case when measures_count > 0 then '
+			inner join emf.control_strategy_measures csm
+			on csm.control_measure_id = scc.control_measures_id
+			and csm.control_strategy_id = ' || control_strategy_id || '
+			' else '' end || '
+
+			inner join emf.control_measures m
+			on m.id = scc.control_measures_id
+
+			inner join emf.control_measure_months ms
+			on ms.control_measure_id = m.id
+			and ms.month in (0' || case when dataset_month != 0 then ',' || dataset_month else '' end || ')
+
+			left outer join emf.control_measure_equations eq
+			on eq.control_measure_id = m.id
+			and eq.pollutant_id = p.id
+
+			left outer join emf.equation_types et
+			on et.id = eq.equation_type_id
+
+			left outer join reference.gdplev
+			on gdplev.annual = eq.cost_year
+
+			inner join emf.control_measure_efficiencyrecords er
+			on er.control_measures_id = scc.control_measures_id
+			-- pollutant filter
+			and er.pollutant_id = p.id
+			-- min and max emission filter
+			and ' || annualized_emis_sql || ' between coalesce(er.min_emis, -1E+308) and coalesce(er.max_emis, 1E+308)
+			-- locale filter
+			and (er.locale = inv.fips or er.locale = substr(inv.fips, 1, 2) or er.locale = '''')
+			-- effecive date filter
+			and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)
+
+			' || case when measures_count = 0 and measure_classes_count > 0 then '
+			inner join emf.control_strategy_classes csc
+			on csc.control_measure_class_id = m.cm_class_id
+			and csc.control_strategy_id = ' || control_strategy_id || '
+			' else '' end || '
+
+		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+		order by inv.scc, inv.fips, ' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || 'er.pollutant_id, 
+			er.control_measures_id, case when length(locale) = 5 then 0 when length(locale) = 2 then 1 else 2 end, coalesce(' || get_strategt_cost_inner_sql || '.computed_cost_per_ton, 0), ' || percent_reduction_sql || ' desc
+		) as tbl
+	order by scc, fips, ' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || 'poll, apply_order, coalesce(computed_cost_per_ton, 0), percent_reduction desc';
+	
 
 	raise notice '%', 'end call_batch_state ' || clock_timestamp();
 
@@ -392,8 +435,8 @@ DECLARE
 	is_point_table boolean := false;
 	gimme_count integer := 0;
 BEGIN
-	SET work_mem TO '512MB';
-	SET enable_seqscan TO 'off';
+--	SET work_mem TO '512MB';
+--	SET enable_seqscan TO 'off';
 
 	-- get the input dataset info
 	select lower(i.table_name)
@@ -604,6 +647,9 @@ BEGIN
 		annual_cost = inv.ann_cost_per_ton * inv.inv_emissions * inv.percent_reduction / 100 * coalesce((select public.times(1 - inv2.percent_reduction / 100) from emissions.' || detailed_result_table_name || ' as inv2 where inv2.source_id = inv.source_id and inv2.record_id < inv.record_id), 1),
 		apply_order = (select count(1) from emissions.' || detailed_result_table_name || ' as inv2 where inv2.source_id = inv.source_id and inv2.record_id <= inv.record_id)';
 */
+
+	-- NOTE:   currently, the assumption is cost equations don't need to be used...and that the computed cpt calculated early should be sufficienct.
+	-- discuss with alison...
 	EXECUTE	'update emissions.' || detailed_result_table_name || ' as inv
 	set 	emis_reduction = inv.inv_emissions * inv.percent_reduction / 100 * coalesce((select public.times(1 - inv2.percent_reduction / 100) from emissions.' || detailed_result_table_name || ' as inv2 where inv2.source_id = inv.source_id and inv2.record_id < inv.record_id), 1),
 		annual_cost = ' || cost_year_chained_gdp || ' / ' || ref_cost_year_chained_gdp || ' * inv.ann_cost_per_ton * inv.inv_emissions * inv.percent_reduction / 100 * coalesce((select public.times(1 - inv2.percent_reduction / 100) from emissions.' || detailed_result_table_name || ' as inv2 where inv2.source_id = inv.source_id and inv2.record_id < inv.record_id), 1),
@@ -688,55 +734,3 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
---95.3 mins...
-
---select public.run_apply_measures_in_series_strategy(25672, 284);
-
--- delete from emissions.CSDR_1082_V0_20080105060526onroad_2020cc_jan_06jun2007_v0
--- vacuum verbose emissions.CSDR_1082_V0_20080105060526onroad_2020cc_jan_06jun2007_v0
--- select count(*) from emissions.CSDR_1082_V0_20080105060526onroad_2020cc_jan_06jun2007_v0
--- select distinct cm_abbrev from emissions.CSDR_1082_V0_20080105060526onroad_2020cc_jan_06jun2007_v0 order by cm_abbrev
---select * from emissions.DS_ptinv_ny_36_orl_txt_314836372 --CSDR_1065_V0_20080110140407ptinv_ny_36_orl_txt
---SELECT public.run_apply_measures_in_series_strategy(25694, 300);
-
-
---SELECT public.create_strategy_detailed_result_table_indexes('CSDR_842_V0_20071229041920onal_Controls_w_NLEV_Crxns_OnRoad_txt');
---SELECT public.run_apply_measures_in_series_strategy(25694, 304);
---SELECT public.create_strategy_detailed_result_table_indexes('CSDR_842_V0_20071231034701onal_Controls_w_NLEV_Crxns_OnRoad_txt');SELECT public.run_apply_measures_in_series_strategy(25694, 316)
--- SELECT public.create_strategy_detailed_result_table_indexes('CSDR_1082_V0_20080105060526onroad_2020cc_jan_06jun2007_v0');
---SELECT public.run_apply_measures_in_series_strategy(11, 1082, 0, 51);
---SELECT public.run_apply_measures_in_series_strategy(50, 1065, 0, 367)
-/*
-select *
-from emissions.CSDR_1315_V0_20080115222850onroad_2020cc_nov_06jun2007_v0 inv
-where not exists (
-select 1
-from emissions.CSDR_1315_V0_20080115222850onroad_2020cc_nov_06jun2007_v0 inv2
-	inner join measure_region mr
-	on mr.control_measure_id = inv2.cm_id
-	and mr.fips = inv2.fips
-where 	inv2.record_id = inv.record_id
-)
-and inv.cm_id in (select distinct control_measure_id from measure_region)
-
---	left outer join measure_region mr
---	on mr.control_measure_id = inv.cm_id
---	and mr.fips = inv.fips
-where inv.cm_id in (select distinct control_measure_id from measure_region)
---and mr.fips is null
-
-select *
-from emissions.CSDR_1315_V0_20080115222850onroad_2020cc_nov_06jun2007_v0 inv
-	left outer join measure_region mr
-	on mr.control_measure_id = inv.cm_id
-	and mr.fips = inv.fips
-where inv.cm_id in (select distinct control_measure_id from measure_region)
-and mr.control_measure_id is null and mr.fips is null
-
-
-SELECT public.run_apply_measures_in_series_strategy(67, 1315, 0, 419);
---SELECT public.create_strategy_detailed_result_table_indexes('CSDR_1315_V0_20080115232119onroad_2020cc_nov_06jun2007_v0');analyze emissions.CSDR_1315_V0_20080115232119onroad_2020cc_nov_06jun2007_v0;
-SELECT public.run_apply_measures_in_series_strategy_finalize(67, 1315, 0, 419);
---delete from emissions.CSDR_1315_V0_20080115232119onroad_2020cc_nov_06jun2007_v0
-
-*/

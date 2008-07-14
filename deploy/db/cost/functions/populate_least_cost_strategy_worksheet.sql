@@ -104,7 +104,7 @@ BEGIN
 
 	-- get target pollutant, inv filter, and county dataset info if specified
 	SELECT cs.pollutant_id,
-		case when length(trim(cs.filter)) > 0 then '(' || replace(replace(replace(replace(replace(replace(lower(cs.filter), 'scc', 'inv.scc'), 'fips', 'inv.fips'), 'plantid', 'inv.plantid'),  'pointid', 'inv.pointid'), 'stackid', 'inv.stackid'), 'segment', 'inv.segment') || ')' else null end,
+		case when length(trim(cs.filter)) > 0 then '(' || public.alias_inventory_filter(cs.filter, 'inv') || ')' else null end,
 		cs.cost_year,
 		cs.analysis_year,
 		cs.county_dataset_id,
@@ -145,7 +145,7 @@ BEGIN
 	into is_point_table;
 
 	-- see if there is a sic column in the inventory
-	SELECT true
+	SELECT count(1) = 1
 	FROM pg_class c
 		inner join pg_attribute a
 		on a.attrelid = c.oid
@@ -157,7 +157,7 @@ BEGIN
 	into has_sic_column;
 
 	-- see if there is a naics column in the inventory
-	SELECT true
+	SELECT count(1) = 1
 	FROM pg_class c
 		inner join pg_attribute a
 		on a.attrelid = c.oid
@@ -169,7 +169,7 @@ BEGIN
 	into has_naics_column;
 
 	-- see if there is a rpen column in the inventory
-	SELECT true
+	SELECT count(1) = 1
 	FROM pg_class c
 		inner join pg_attribute a
 		on a.attrelid = c.oid
@@ -389,16 +389,16 @@ BEGIN
 	annual_emis_sql := 
 			case 
 				when dataset_month != 0 then 
-					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column = false then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column = false then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
+					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
 				else 
-					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column = false then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column = false then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
+					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
 			end;
 	annualized_emis_sql := 
 			case 
 				when dataset_month != 0 then 
-					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column = false then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * 365, inv.ann_emis) / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column = false then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
+					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * 365, inv.ann_emis) / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
 				else 
-					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column = false then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column = false then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
+					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
 			end;
 	percent_reduction_sql := 'er.efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' / 100 / 100';
 	get_strategt_cost_sql := '(public.get_strategy_costs(' || case when use_cost_equations then 'true' else 'false' end || '::boolean, m.control_measures_id, 
@@ -468,9 +468,9 @@ BEGIN
 			scc,
 			fips,
 			' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
---			annual_oper_maint_cost,
---			annualized_capital_cost,
---			total_capital_cost,
+			annual_oper_maint_cost,
+			annualized_capital_cost,
+			total_capital_cost,
 			annual_cost,
 			ann_cost_per_ton,
 			control_eff,
@@ -486,7 +486,7 @@ BEGIN
 			input_ds_id,
 			cm_id,
 			marginal,
---			equation_type,
+			equation_type,
 			original_dataset_id,
 			sector,
 			source) 
@@ -499,7 +499,7 @@ BEGIN
 			inv.scc,
 			inv.fips,
 			' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
-/*			' || chained_gdp_adjustment_factor || ' * 
+			' || chained_gdp_adjustment_factor || ' * 
 			case 
 				when eq.equation_type_id is null then
 					(' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton - ' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton * er.cap_ann_ratio * er.cap_rec_factor)
@@ -518,7 +518,7 @@ BEGIN
 				else
 					' || get_strategt_cost_inner_sql || '.capital_cost
 			end as total_capital_cost,
-*/			' || chained_gdp_adjustment_factor || ' * case 
+			' || chained_gdp_adjustment_factor || ' * case 
 				when eq.equation_type_id is null then
 					' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton
 				else
@@ -543,7 +543,7 @@ BEGIN
 			' || input_dataset_id || '::integer as input_ds_id,
 			er.control_measures_id as cm_id,
 			case when coalesce(' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100, 0) != 0 then coalesce(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.annual_cost / (' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100), 0.0) else 0.0 end as marginal,
-/*			' || get_strategt_cost_inner_sql || '.actual_equation_type as equation_type,*/
+			' || get_strategt_cost_inner_sql || '.actual_equation_type as equation_type,
 			' || case when not has_merged_columns then 'null::integer as original_dataset_id, ' || quote_literal(sector) || '::text as sector' else 'inv.original_dataset_id, inv.sector' end || '
 			,
 			sources.id as source
@@ -628,7 +628,7 @@ BEGIN
 
 		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 			and p.id = ' || target_pollutant_id || '::integer
-			and coalesce(100 * inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column = false then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0) <> 100.0
+			and coalesce(100 * inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0) <> 100.0
 			and er.efficiency - coalesce(inv.ceff, 0) >= ' || replacement_control_min_eff_diff_constraint || '
 			and ' || annual_emis_sql || ' <> 0.0
 			-- measure region filter
@@ -683,9 +683,9 @@ BEGIN
 			scc,
 			fips,
 			' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
---			annual_oper_maint_cost,
---			annualized_capital_cost,
---			total_capital_cost,
+			annual_oper_maint_cost,
+			annualized_capital_cost,
+			total_capital_cost,
 			annual_cost,
 			ann_cost_per_ton,
 			control_eff,
@@ -701,7 +701,7 @@ BEGIN
 			input_ds_id,
 			cm_id,
 			marginal,
---			equation_type,
+			equation_type,
 			original_dataset_id,
 			sector,
 			source) 
@@ -712,7 +712,7 @@ BEGIN
 		inv.scc,
 		inv.fips,
 		' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
-/*		' || chained_gdp_adjustment_factor || ' * 
+		' || chained_gdp_adjustment_factor || ' * 
 		case 
 			when eq.equation_type_id is null then
 				(' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton - ' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton * er.cap_ann_ratio * er.cap_rec_factor)
@@ -731,7 +731,7 @@ BEGIN
 			else
 				' || get_strategt_cost_inner_sql || '.capital_cost
 		end as total_capital_cost,
-*/		' || chained_gdp_adjustment_factor || ' * case 
+		' || chained_gdp_adjustment_factor || ' * case 
 			when eq.equation_type_id is null then
 				' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton
 			else
@@ -756,8 +756,8 @@ BEGIN
 		' || input_dataset_id || '::integer as input_ds_id,
 		er.control_measures_id as cm_id,
 		case when coalesce(' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100, 0) != 0 then coalesce(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.annual_cost / ' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100, 0.0) else 0.0 end as marginal,
-/*		' || get_strategt_cost_inner_sql || '.actual_equation_type as equation_type,
-*/		' || case when not has_merged_columns then 'null::integer as original_dataset_id, ' || quote_literal(sector) || '::character varying as sector' else 'inv.original_dataset_id, inv.sector' end || ',
+		' || get_strategt_cost_inner_sql || '.actual_equation_type as equation_type,
+		' || case when not has_merged_columns then 'null::integer as original_dataset_id, ' || quote_literal(sector) || '::character varying as sector' else 'inv.original_dataset_id, inv.sector' end || ',
 		/*null::integer*/sources.id as source
 	FROM emissions.' || inv_table_name || ' inv
 		inner join emf.sources
@@ -820,7 +820,7 @@ BEGIN
 
 	where 	p.id <> ' || target_pollutant_id || '
 		and ' || annual_emis_sql || ' <> 0.0
-		and coalesce(100 * inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column = false then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0) <> 100.0
+		and coalesce(100 * inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0) <> 100.0
 
 	order by inv.record_id, 
 		er.control_measures_id, case when length(locale) = 5 then 0 when length(locale) = 2 then 1 else 2 end, ' || percent_reduction_sql || ' desc, ' || get_strategt_cost_inner_sql || '.computed_cost_per_ton

@@ -1,12 +1,17 @@
-CREATE OR REPLACE FUNCTION public.run_project_future_year_inventory(
+
+--select public.create_projected_future_year_inventory(81, 399, 0, 2750, 2822)
+
+CREATE OR REPLACE FUNCTION public.create_projected_future_year_inventory(
 	control_strategy_id integer, 
 	input_dataset_id integer, 
 	input_dataset_version integer, 
-	strategy_result_id integer
+	strategy_result_id integer, 
+	output_dataset_id integer
 	) RETURNS void AS
 $BODY$
 DECLARE
 	inv_table_name varchar(64) := '';
+	cont_inv_table_name varchar(64) := '';
 	inv_filter varchar := '';
 	inv_fips_filter text := '';
 	detailed_result_dataset_id integer := null;
@@ -54,6 +59,8 @@ DECLARE
 	get_strategt_cost_inner_sql character varying;
 	has_control_measures_col boolean := false;
 	has_pct_reduction_col boolean := false;
+	has_current_cost_col boolean := false;
+	has_cumulative_cost_col boolean := false;
 BEGIN
 
 	-- get the input dataset info
@@ -61,6 +68,12 @@ BEGIN
 	from emf.internal_sources i
 	where i.dataset_id = input_dataset_id
 	into inv_table_name;
+
+	-- get the cont inv dataset info
+	select lower(i.table_name)
+	from emf.internal_sources i
+	where i.dataset_id = output_dataset_id
+	into cont_inv_table_name;
 
 	-- get the detailed result dataset info
 	select sr.detailed_result_dataset_id,
@@ -190,6 +203,54 @@ BEGIN
 		and a.attname in ('design_capacity','design_capacity_unit_numerator','design_capacity_unit_denominator')
 		AND a.attnum > 0
 	into has_design_capacity_columns;
+
+	-- see if there is a pct_reduction column in the inventory
+	SELECT count(1) = 1
+	FROM pg_class c
+		inner join pg_attribute a
+		on a.attrelid = c.oid
+		inner join pg_type t
+		on t.oid = a.atttypid
+	WHERE c.relname = inv_table_name
+		and a.attname = 'pct_reduction'
+		AND a.attnum > 0
+	into has_pct_reduction_col;
+
+	-- see if there is a control_measures column in the inventory
+	SELECT count(1) = 1
+	FROM pg_class c
+		inner join pg_attribute a
+		on a.attrelid = c.oid
+		inner join pg_type t
+		on t.oid = a.atttypid
+	WHERE c.relname = inv_table_name
+		and a.attname = 'control_measures'
+		AND a.attnum > 0
+	into has_control_measures_col;
+
+	-- see if there is a current_cost column in the inventory
+	SELECT count(1) = 1
+	FROM pg_class c
+		inner join pg_attribute a
+		on a.attrelid = c.oid
+		inner join pg_type t
+		on t.oid = a.atttypid
+	WHERE c.relname = inv_table_name
+		and a.attname = 'current_cost'
+		AND a.attnum > 0
+	into has_current_cost_col;
+
+	-- see if there is a cumulative_cost column in the inventory
+	SELECT count(1) = 1
+	FROM pg_class c
+		inner join pg_attribute a
+		on a.attrelid = c.oid
+		inner join pg_type t
+		on t.oid = a.atttypid
+	WHERE c.relname = inv_table_name
+		and a.attname = 'cumulative_cost'
+		AND a.attnum > 0
+	into has_cumulative_cost_col;
 
 	-- get strategy constraints
 	SELECT max_emis_reduction,
@@ -354,22 +415,45 @@ BEGIN
 		on a.attrelid = c.oid
 		inner join pg_type t
 		on t.oid = a.atttypid
-	WHERE c.relname = ' || quote_literal(inv_table_name) || '
+	WHERE c.relname = ' || quote_literal(cont_inv_table_name) || '
 		AND a.attnum > 0'
 	LOOP
 		column_name := region.attname;
 		
 		IF column_name = 'record_id' THEN
-			select_column_list_sql := select_column_list_sql || 'inv.record_id';
-			insert_column_list_sql := insert_column_list_sql || column_name;
+--			select_column_list_sql := select_column_list_sql || 'inv.record_id';
+--			insert_column_list_sql := insert_column_list_sql || column_name;
 		ELSIF column_name = 'dataset_id' THEN
-			select_column_list_sql := select_column_list_sql || ',' || detailed_result_dataset_id || ' as dataset_id';
-			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+			select_column_list_sql := select_column_list_sql || '' || output_dataset_id || ' as dataset_id';
+			insert_column_list_sql := insert_column_list_sql || '' || column_name;
 		ELSIF column_name = 'delete_versions' THEN
 			select_column_list_sql := select_column_list_sql || ','''' as delete_versions';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'version' THEN
 			select_column_list_sql := select_column_list_sql || ',0 as version';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'design_capacity' THEN
+			select_column_list_sql := select_column_list_sql || ',' || case when has_design_capacity_columns then 'design_capacity' else 'null::double precision as design_capacity' end;
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'design_capacity_unit_numerator' THEN
+			select_column_list_sql := select_column_list_sql || ',' || case when has_design_capacity_columns then 'design_capacity_unit_numerator' else 'null::character varying(10) as design_capacity_unit_numerator' end;
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'design_capacity_unit_denominator' THEN
+			select_column_list_sql := select_column_list_sql || ',' || case when has_design_capacity_columns then 'design_capacity_unit_denominator' else 'null::character varying(10) as design_capacity_unit_denominator' end;
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'current_cost' THEN
+			select_column_list_sql := select_column_list_sql || ',' || case when has_current_cost_col then 'current_cost' else 'null::double precision as current_cost' end;
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'cumulative_cost' THEN
+			select_column_list_sql := select_column_list_sql || ',' || case when has_cumulative_cost_col then 'cumulative_cost' else 'null::double precision as cumulative_cost' end;
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'control_measures' THEN
+			select_column_list_sql := select_column_list_sql || ',' || case when has_control_measures_col then 'case when control_measures is null or length(control_measures) = 0 then abbreviation else control_measures || ''&'' || abbreviation end as control_measures' else '''''::text as control_measures' end;
+--			select_column_list_sql := select_column_list_sql || ', case when control_measures is null or length(control_measures) = 0 then abbreviation else control_measures || ''&'' || abbreviation end as control_measures';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'pct_reduction' THEN
+			select_column_list_sql := select_column_list_sql || ',' || case when has_pct_reduction_col then 'case when pct_reduction is null or length(pct_reduction) = 0 then efficiency::text else pct_reduction || ''&'' || efficiency::text end as pct_reduction' else '''''::text as pct_reduction' end;
+--			select_column_list_sql := select_column_list_sql || ', case when pct_reduction is null or length(pct_reduction) = 0 then efficiency::text else pct_reduction || ''&'' || efficiency::text end as pct_reduction';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSE
 			select_column_list_sql := select_column_list_sql || ',' || column_name;
@@ -378,159 +462,54 @@ BEGIN
 	
 	END LOOP;
 
-	select_column_list_sql := replace(replace(replace(replace(replace(replace(replace(select_column_list_sql, 'scc', 'inv.scc'), 'fips', 'inv.fips'), 'comments', 'inv.comments'),  'pointid', 'inv.pointid'), 'stackid', 'inv.stackid'), 'segment', 'inv.segment'), 'plant', 'inv.plant');
+	select_column_list_sql := replace(
+	replace(
+	replace(
+	replace(
+	replace(
+	replace(
+	replace(
+	replace(
+	replace(
+	replace(
+		select_column_list_sql, 
+	'scc', 'inv.scc'), 
+	'fips', 'inv.fips'), 
+	'comments', 'inv.comments'),  
+	'pointid', 'inv.pointid'), 
+	'stackid', 'inv.stackid'), 
+	'segment', 'inv.segment'), 
+	'poll', 'inv.poll'), 
+	'naics', 'inv.naics'), 
+	'sic', 'inv.sic'), 
+	'plant', 'inv.plant');
 
 	-- populate the new inventory...work off of new data
 
 
 
 
-/*
+
 	execute 
 	--raise notice '%', 
-	'insert into emissions.' || detailed_result_table_name || ' 
+	'insert into emissions.' || cont_inv_table_name|| ' 
 		(
 		' || insert_column_list_sql || ' 
 		)
 	select 
 		' || select_column_list_sql || ' 
 	from emissions.' || inv_table_name || ' inv
-	where ' || replace(replace(inv_filter, 'version', 'inv.version'), 'dataset_id', 'inv.dataset_id') || coalesce(county_dataset_filter_sql, '');
-*/
-
-	-- need to process based on processing_order of the program, i.e., first do plant closures, next do growth, then apply control 
-	-- to various sources
-
-  	FOR control_program IN EXECUTE 
-		'select cp."name" as control_program_name, cpt."name" as type, lower(i.table_name) as table_name, 
-			cp.start_date, cp.end_date, 
-			cp.dataset_id, cp.dataset_version
-		 from emf.control_strategy_programs csp
-
-			inner join emf.control_programs cp
-			on cp.id = csp.control_program_id
-
-			inner join emf.control_program_types cpt
-			on cpt.id = cp.control_program_type_id
-
-			inner join emf.internal_sources i
-			on i.dataset_id = cp.dataset_id
-		where csp.control_strategy_id = ' || control_strategy_id || '
-		order by processing_order'
-	LOOP
-		IF control_program.type = 'Plant Closure' THEN
-/*
-			execute 
-			--raise notice '%', 
-			'delete from emissions.' || detailed_result_table_name || ' as inv
-			using emissions.' || control_program.table_name || ' pc
-			where pc.fips = inv.fips
-				and pc.plantid = inv.plantid
-				and coalesce(pc.pointid, inv.pointid) = inv.pointid
-				and coalesce(pc.stackid, inv.stackid) = inv.stackid
-				and coalesce(pc.segment, inv.segment) = inv.segment
-				and pc.effective_date <  ''12/31/' || inventory_year || '''
-				and ' || replace(replace(replace(public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version), 'version ', 'pc.version '), 'delete_versions ', 'pc.delete_versions '), 'dataset_id', 'pc.dataset_id');
-
-*/
-
-
-			execute
-			--raise notice '%',
-			 'insert into emissions.' || detailed_result_table_name || ' 
-				(
-				dataset_id,
-				cm_abbrev,
-				poll,
-				scc,
-				fips,
-				' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
-				annual_oper_maint_cost,
-				annualized_capital_cost,
-				total_capital_cost,
-				annual_cost,
-				ann_cost_per_ton,
-				control_eff,
-				rule_pen,
-				rule_eff,
-				percent_reduction,
-				inv_ctrl_eff,
-				inv_rule_pen,
-				inv_rule_eff,
-				final_emissions,
-				emis_reduction,
-				inv_emissions,
-				input_emis,
-				output_emis,
-				apply_order,
-				fipsst,
-				fipscty,
-				sic,
-				naics,
-				source_id,
-				input_ds_id,
-				cs_id,
-				cm_id,
-				equation_type,
-				control_program,
-				"comment"
-				)
-			select 
-				' || detailed_result_dataset_id || '::integer,
-				''PLTCLOSURE'' as abbreviation,
-				inv.poll,
-				inv.scc,
-				inv.fips,
-				' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
-				null::double precision as operation_maintenance_cost,
-				null::double precision as annualized_capital_cost,
-				null::double precision as capital_cost,
-				null::double precision as ann_cost,
-				null::double precision as computed_cost_per_ton,
-				100.0 as efficiency,
-				100.0 as rule_pen,
-				100.0 as rule_eff,
-				100.0 as percent_reduction,
-				inv.ceff,
-				' || case when is_point_table = false then 'inv.rpen' else '100' end || ',
-				inv.reff,
-				0.0 as final_emissions,
-				' || annual_emis_sql || ' as emis_reduction,
-				' || annual_emis_sql || ' as inv_emissions,
-				' || annual_emis_sql || ' as input_emis,
-				0.0 as output_emis,
-				1,
-				substr(inv.fips, 1, 2),
-				substr(inv.fips, 3, 3),
-				' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
-				' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
-				inv.record_id::integer as source_id,
-				' || input_dataset_id || '::integer,
-				' || control_strategy_id || '::integer,
-				null::integer as control_measures_id,
-				null::varchar(255) as equation_type,
-				' || quote_literal(control_program.control_program_name) || ',
-				''''
-			FROM emissions.' || inv_table_name || ' inv
-
-				inner join emissions.' || control_program.table_name || ' pc
-				on pc.fips = inv.fips
-				and pc.plantid = inv.plantid
-				and coalesce(pc.pointid, inv.pointid) = inv.pointid
-				and coalesce(pc.stackid, inv.stackid) = inv.stackid
-				and coalesce(pc.segment, inv.segment) = inv.segment
-				and pc.effective_date::timestamp without time zone < ''12/31/' || inventory_year || '''::timestamp without time zone
-				and ' || replace(replace(replace(public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version), 'version ', 'pc.version '), 'delete_versions ', 'pc.delete_versions '), 'dataset_id', 'pc.dataset_id') || '
-
-
-			where 	' || replace(replace(replace(inv_filter, 'version ', 'inv.version '), 'delete_versions ', 'inv.delete_versions '), 'dataset_id', 'inv.dataset_id') || coalesce(county_dataset_filter_sql, '') || '';
-
-		END IF;
+		left outer join emissions.' || detailed_result_table_name || ' dr
+		on inv.record_id = dr.source_id
 		
-	
-	END LOOP;
+	where ' || replace(replace(replace(inv_filter, 'version', 'inv.version'), 'dataset_id', 'inv.dataset_id'), 'delete_versions ', 'inv.delete_versions ') || coalesce(county_dataset_filter_sql, '') || '
 
-
+		-- get rid of plant closures records
+		and not exists (
+			select 1 
+			from emissions.' || detailed_result_table_name || ' dr
+			where inv.record_id = dr.source_id
+				and cm_abbrev = ''PLTCLOSURE'')';
 
 END;
 $BODY$
