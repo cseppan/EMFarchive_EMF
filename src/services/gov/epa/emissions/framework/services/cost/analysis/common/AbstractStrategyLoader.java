@@ -425,4 +425,16 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return uncontrolledEmission;
     }
 
+    protected void createDetailedResultTableIndexes(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
+        String query = "SELECT public.create_strategy_detailed_result_table_indexes('" + emissionTableName(controlStrategyResult.getDetailedResultDataset()) + "');analyze emissions." + emissionTableName(controlStrategyResult.getDetailedResultDataset()) + ";";
+        
+        System.out.println(System.currentTimeMillis() + " " + query);
+        try {
+            datasource.query().execute(query);
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            //
+        }
+    }
 }

@@ -65,19 +65,6 @@ public class StrategyLoader extends AbstractStrategyLoader {
         }
     }
 
-    private void createDetailedResultTableIndexes(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
-        String query = "SET work_mem TO '128MB';SELECT public.create_strategy_detailed_result_table_indexes('" + emissionTableName(controlStrategyResult.getDetailedResultDataset()) + "');analyze emissions." + emissionTableName(controlStrategyResult.getDetailedResultDataset()) + ";";
-        
-        System.out.println(System.currentTimeMillis() + " " + query);
-        try {
-            datasource.query().execute(query);
-        } catch (SQLException e) {
-            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
-        } finally {
-            //
-        }
-    }
-
     private void runStrategyFinalize(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
         String query = "SELECT public.run_apply_measures_in_series_strategy_finalize("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
         

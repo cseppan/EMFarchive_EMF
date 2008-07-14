@@ -330,4 +330,15 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
         status.setTimestamp(new Date());
         return status;
     }
+
+    protected void createDetailedResultTableIndexes(ControlStrategyResult controlStrategyResult) throws EmfException {
+        String query = "SELECT public.create_strategy_detailed_result_table_indexes('" + getDatasetTableName(controlStrategyResult.getDetailedResultDataset()) + "');analyze emissions." + getDatasetTableName(controlStrategyResult.getDetailedResultDataset()) + ";";
+        try {
+            datasource.query().execute(query);
+        } catch (SQLException e) {
+            //
+        } finally {
+            //
+        }
+    }
 }
