@@ -256,7 +256,7 @@ public class ManagedCaseService {
             session.close();
         }
     }
-    
+
     private CaseJob getCaseJob(int jobId, Session session) throws EmfException {
         try {
             return dao.getCaseJob(jobId, session);
@@ -266,7 +266,7 @@ public class ManagedCaseService {
             throw new EmfException("Could not get job for job id " + jobId + ".\n");
         }
     }
-    
+
     public synchronized Sector[] getSectorsUsedbyJobs(int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -276,7 +276,7 @@ public class ManagedCaseService {
             e.printStackTrace();
             log.error("Could not get sectors for case id " + caseId + ".\n" + e.getMessage());
             throw new EmfException("Could not get sectors for case id " + caseId + ".\n");
-        } 
+        }
     }
 
     public synchronized Abbreviation[] getAbbreviations() throws EmfException {
@@ -442,7 +442,7 @@ public class ManagedCaseService {
         Session session = sessionFactory.getSession();
         try {
             dao.checkParentChildRelationship(caseObj, session);
-            
+
             List<?> list1 = session.createQuery(
                     "SELECT obj.caseId FROM CaseJob as obj WHERE obj.parentCaseId = " + caseObj.getId()).list();
             List<?> list2 = session.createQuery(
@@ -492,22 +492,22 @@ public class ManagedCaseService {
 
     public synchronized void removeCase(Case caseObj) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             if (DebugLevels.DEBUG_18)
                 log.warn("Started removing case: " + new Date());
-            
+
             setStatus(caseObj.getLastModifiedBy(), "Started removing case " + caseObj.getName() + ".", "Remove Case");
 
             List<CaseJob> jobs = dao.getCaseJobs(caseObj.getId(), session);
             checkJobsStatuses(jobs, caseObj);
-            
+
             if (DebugLevels.DEBUG_18)
                 log.warn("Removing case: finished checking job statuses: " + new Date());
 
             List<CaseInput> inputs = dao.getCaseInputs(caseObj.getId(), session);
             dao.removeCaseInputs(inputs.toArray(new CaseInput[0]), session);
-            
+
             if (DebugLevels.DEBUG_18)
                 log.warn("Removing case: finished removing case inputs: " + new Date());
 
@@ -530,7 +530,7 @@ public class ManagedCaseService {
 
             if (DebugLevels.DEBUG_18)
                 log.warn("Removing case: finished removing persisted jobs: " + new Date());
-            
+
             try {
                 dao.removeObjects(keys, session);
             } catch (RuntimeException e) {
@@ -539,7 +539,7 @@ public class ManagedCaseService {
 
             if (DebugLevels.DEBUG_18)
                 log.warn("Removing case: finished removing job keys from job-key table: " + new Date());
-            
+
             try {
                 dao.removeObjects(msgs, session);
             } catch (RuntimeException e) {
@@ -548,7 +548,7 @@ public class ManagedCaseService {
 
             if (DebugLevels.DEBUG_18)
                 log.warn("Removing case: finished removing job messages: " + new Date());
-            
+
             try {
                 dao.removeObjects(outputs, session);
             } catch (RuntimeException e) {
@@ -557,7 +557,7 @@ public class ManagedCaseService {
 
             if (DebugLevels.DEBUG_18)
                 log.warn("Removing case: finished removing outputs: " + new Date());
-            
+
             try {
                 CaseJob[] toRemove = jobs.toArray(new CaseJob[0]);
 
@@ -574,7 +574,7 @@ public class ManagedCaseService {
 
             if (DebugLevels.DEBUG_18)
                 log.warn("Removing case: finished removing jobs: " + new Date());
-            
+
             List<CaseParameter> parameters = dao.getCaseParameters(caseObj.getId(), session);
             try {
                 dao.removeCaseParameters(parameters.toArray(new CaseParameter[0]), session);
@@ -584,16 +584,16 @@ public class ManagedCaseService {
 
             if (DebugLevels.DEBUG_18)
                 log.warn("Removing case: finished removing case parameters: " + new Date());
-            
+
             try {
                 dao.removeChildCase(caseObj.getId(), session);
             } catch (Exception e) {
                 throw new EmfException("Cannot remove case: " + e.getMessage());
             }
-            
+
             if (DebugLevels.DEBUG_18)
                 log.warn("Removing case: finished removing items from parent-sensitivity cases table: " + new Date());
-            
+
             try {
                 dao.remove(caseObj, session);
             } catch (RuntimeException e) {
@@ -602,7 +602,7 @@ public class ManagedCaseService {
 
             if (DebugLevels.DEBUG_18)
                 log.warn("Removing case: finished removing case objects: " + new Date());
-            
+
             try {
                 dao.removeObject(caseObj.getAbbreviation(), session);
             } catch (RuntimeException e) {
@@ -611,7 +611,7 @@ public class ManagedCaseService {
             }
 
             setStatus(caseObj.getLastModifiedBy(), "Finished removing case " + caseObj.getName() + ".", "Remove Case");
-            
+
             if (DebugLevels.DEBUG_18)
                 log.warn("Removing case: finished removing case abbreviation: " + new Date());
         } catch (Exception e) {
@@ -3869,8 +3869,7 @@ public class ManagedCaseService {
 
             checkJobsDuplication(existingJobs, jobs2copy, jobPrefix);
 
-            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix,
-                    getJobs2Copy(jobIds));
+            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix, jobs2copy);
             CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), dao.getJobSpecNonSpecCaseInputs(
                     template.getId(), jobIds, session).toArray(new CaseInput[0]), session);
             CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao
@@ -3880,6 +3879,10 @@ public class ManagedCaseService {
             addCaseJobs(user, targetId, jobs);
             addCaseInputs(user, targetId, removeRedundantInputs(inputs, existingInputs, jobPrefix), jobPrefix);
             addCaseParameters(user, targetId, removeRedundantParams(params, existingParams, jobPrefix), jobPrefix);
+
+            // NOTE: add sectors to sensitivity case from the selected jobs
+            existingJobs.addAll(Arrays.asList(jobs));
+            lockedSC.setSectors(getSectorsFromJobs(existingJobs.toArray(new CaseJob[0])));
 
             updateCase(lockedSC);
 
@@ -4017,8 +4020,8 @@ public class ManagedCaseService {
                 boolean programExists = (paramProgram == null && nextProgram == null)
                         || (paramProgram != null && paramProgram.equals(nextProgram));
 
-                if (params[m].getParameterName().equals(existingParamsArray[n].getParameterName()) && sectorExists && programExists
-                        && (paramJobName.equals(nextJobName)))
+                if (params[m].getParameterName().equals(existingParamsArray[n].getParameterName()) && sectorExists
+                        && programExists && (paramJobName.equals(nextJobName)))
                     uniqueParams.remove(params[m]);
             }
         }
@@ -4084,6 +4087,9 @@ public class ManagedCaseService {
             lockedSC.setInputFileDir(lockedTC.getInputFileDir());
             lockedSC.setOutputFileDir(lockedTC.getOutputFileDir());
 
+            // NOTE: set sectors from the selected jobs
+            lockedSC.setSectors(getSectorsFromJobs(jobs));
+
             if (abbr == null)
                 lockedSC.setAbbreviation(new Abbreviation(lockedSC.getId() + ""));
 
@@ -4115,6 +4121,22 @@ public class ManagedCaseService {
         }
     }
 
+    private Sector[] getSectorsFromJobs(CaseJob[] jobs) {
+        List<Sector> sectors = new ArrayList<Sector>();
+
+        for (CaseJob job : jobs) {
+            Sector sctr = job.getSector();
+
+            if (sctr != null)
+                sectors.add(sctr);
+        }
+
+        TreeSet<Sector> set = new TreeSet<Sector>(sectors);
+        List<Sector> uniqueSectors = new ArrayList<Sector>(set);
+
+        return uniqueSectors.toArray(new Sector[0]);
+    }
+
     private void copySummaryInfo(Case parent, Case sensitivityCase) {
         sensitivityCase.setAirQualityModel(parent.getAirQualityModel());
         sensitivityCase.setBaseYear(parent.getBaseYear());
@@ -4129,7 +4151,7 @@ public class ManagedCaseService {
         sensitivityCase.setModel(parent.getModel());
         sensitivityCase.setModelingRegion(parent.getModelingRegion());
         sensitivityCase.setProject(parent.getProject());
-        sensitivityCase.setSectors(parent.getSectors());
+        // sensitivityCase.setSectors(parent.getSectors()); // this get set by the sectors list in the selected jobs
         sensitivityCase.setSpeciation(parent.getSpeciation());
         sensitivityCase.setStartDate(parent.getStartDate());
         sensitivityCase.setEndDate(parent.getEndDate());
@@ -4356,7 +4378,7 @@ public class ManagedCaseService {
 
     public synchronized String[] getJobGroups(int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             return dao.getJobGroups(caseId, session);
         } catch (Exception e) {
