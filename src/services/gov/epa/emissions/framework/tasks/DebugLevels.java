@@ -19,5 +19,5 @@ public class DebugLevels {
     public static final boolean DEBUG_15 = false; //to trace export job submitter issues
     public static final boolean DEBUG_16 = false; //to trace dataset deletion
     public static final boolean DEBUG_17 = false; //to trace new method for case output registration
-    public static final boolean DEBUG_18 = true; //to trace timing in various functions
+    public static final boolean DEBUG_18 = false; //to trace timing in various functions
 }
