@@ -441,6 +441,8 @@ public class ManagedCaseService {
     public synchronized String checkParentCase(Case caseObj) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
+            dao.checkParentChildRelationship(caseObj, session);
+            
             List<?> list1 = session.createQuery(
                     "SELECT obj.caseId FROM CaseJob as obj WHERE obj.parentCaseId = " + caseObj.getId()).list();
             List<?> list2 = session.createQuery(
@@ -481,9 +483,8 @@ public class ManagedCaseService {
             return "";
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("Could not check whether case: " + caseObj.getName() + " is a parent case of anything.", e);
-            throw new EmfException("Could not check whether case: " + caseObj.getName()
-                    + " is a parent case of anything. Reason: " + e.getMessage());
+            log.error("Checking case " + caseObj.getName() + ": " + e.getMessage());
+            throw new EmfException(e.getMessage());
         } finally {
             session.close();
         }
@@ -491,14 +492,24 @@ public class ManagedCaseService {
 
     public synchronized void removeCase(Case caseObj) throws EmfException {
         Session session = sessionFactory.getSession();
+        
         try {
+            if (DebugLevels.DEBUG_18)
+                log.warn("Started removing case: " + new Date());
+            
             setStatus(caseObj.getLastModifiedBy(), "Started removing case " + caseObj.getName() + ".", "Remove Case");
 
             List<CaseJob> jobs = dao.getCaseJobs(caseObj.getId(), session);
             checkJobsStatuses(jobs, caseObj);
+            
+            if (DebugLevels.DEBUG_18)
+                log.warn("Removing case: finished checking job statuses: " + new Date());
 
             List<CaseInput> inputs = dao.getCaseInputs(caseObj.getId(), session);
             dao.removeCaseInputs(inputs.toArray(new CaseInput[0]), session);
+            
+            if (DebugLevels.DEBUG_18)
+                log.warn("Removing case: finished removing case inputs: " + new Date());
 
             PersistedWaitTask[] persistedJobs = getPersistedJobs(jobs, session);
             QueueCaseOutput[] outputQs = getQedOutputs(jobs, session);
@@ -517,24 +528,36 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot remove persisted jobs from db table.");
             }
 
+            if (DebugLevels.DEBUG_18)
+                log.warn("Removing case: finished removing persisted jobs: " + new Date());
+            
             try {
                 dao.removeObjects(keys, session);
             } catch (RuntimeException e) {
                 throw new EmfException("Cannot remove job keys from db table.");
             }
 
+            if (DebugLevels.DEBUG_18)
+                log.warn("Removing case: finished removing job keys from job-key table: " + new Date());
+            
             try {
                 dao.removeObjects(msgs, session);
             } catch (RuntimeException e) {
                 throw new EmfException("Cannot remove job messages from db table.");
             }
 
+            if (DebugLevels.DEBUG_18)
+                log.warn("Removing case: finished removing job messages: " + new Date());
+            
             try {
                 dao.removeObjects(outputs, session);
             } catch (RuntimeException e) {
                 throw new EmfException("Cannot remove case outputs from db table.");
             }
 
+            if (DebugLevels.DEBUG_18)
+                log.warn("Removing case: finished removing outputs: " + new Date());
+            
             try {
                 CaseJob[] toRemove = jobs.toArray(new CaseJob[0]);
 
@@ -549,6 +572,9 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot remove jobs from db table.");
             }
 
+            if (DebugLevels.DEBUG_18)
+                log.warn("Removing case: finished removing jobs: " + new Date());
+            
             List<CaseParameter> parameters = dao.getCaseParameters(caseObj.getId(), session);
             try {
                 dao.removeCaseParameters(parameters.toArray(new CaseParameter[0]), session);
@@ -556,12 +582,27 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot remove case parameters from db table.");
             }
 
+            if (DebugLevels.DEBUG_18)
+                log.warn("Removing case: finished removing case parameters: " + new Date());
+            
+            try {
+                dao.removeChildCase(caseObj.getId(), session);
+            } catch (Exception e) {
+                throw new EmfException("Cannot remove case: " + e.getMessage());
+            }
+            
+            if (DebugLevels.DEBUG_18)
+                log.warn("Removing case: finished removing items from parent-sensitivity cases table: " + new Date());
+            
             try {
                 dao.remove(caseObj, session);
             } catch (RuntimeException e) {
                 throw new EmfException("Cannot remove case objects: " + caseObj.getName() + " from db table.");
             }
 
+            if (DebugLevels.DEBUG_18)
+                log.warn("Removing case: finished removing case objects: " + new Date());
+            
             try {
                 dao.removeObject(caseObj.getAbbreviation(), session);
             } catch (RuntimeException e) {
@@ -570,6 +611,9 @@ public class ManagedCaseService {
             }
 
             setStatus(caseObj.getLastModifiedBy(), "Finished removing case " + caseObj.getName() + ".", "Remove Case");
+            
+            if (DebugLevels.DEBUG_18)
+                log.warn("Removing case: finished removing case abbreviation: " + new Date());
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not remove Case: " + caseObj, e);

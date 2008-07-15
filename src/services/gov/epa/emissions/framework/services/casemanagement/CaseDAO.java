@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -1494,9 +1495,49 @@ public class CaseDAO {
 
     public String[] getJobGroups(int caseId, Session session) {
         List<?> groups = session.createQuery(
-                "SELECT DISTINCT obj.jobGroup from " + CaseJob.class.getSimpleName() + " as obj WHERE obj.caseId = " + caseId
-                        + " ORDER BY obj.jobGroup").list();
+                "SELECT DISTINCT obj.jobGroup from " + CaseJob.class.getSimpleName() + " as obj WHERE obj.caseId = "
+                        + caseId + " ORDER BY obj.jobGroup").list();
 
         return groups.toArray(new String[0]);
+    }
+
+    public void checkParentChildRelationship(Case caseObj, Session session) throws EmfException {
+        int caseId = caseObj.getId();
+        
+        List<?> parentCases = session.createQuery(
+                "SELECT obj.sensCaseId FROM " + CasesSens.class.getSimpleName() + " as obj WHERE obj.parentCaseid = " + caseId
+                        + " ORDER BY obj.parentCaseid").list();
+        
+        if (parentCases.size() == 1)
+            throw new EmfException("Case " + caseObj.getName() + " is the parent case of " + getCase(Integer.parseInt(parentCases.get(0).toString()), session).getName() + ".");
+        
+        if (parentCases.size() > 1)
+            throw new EmfException("Case " + caseObj.getName() + " is the parent case of multiple cases: " + getCase(Integer.parseInt(parentCases.get(0).toString()), session).getName() + ", etc.");
+        
+    }
+    
+    public void removeChildCase(int caseId, Session session) {  
+        List<?> childrenCases = session.createQuery(
+                "SELECT obj.id FROM " + CasesSens.class.getSimpleName() + " as obj WHERE obj.sensCaseId = " + caseId
+                        + " ORDER BY obj.id").list();
+             
+        int numOfChildren = childrenCases.size();
+            
+        if (numOfChildren == 0)
+            return;
+        
+        String clause = " obj.id = ";
+        
+        for (int i = 0; i < numOfChildren; i++) {
+            if (i < numOfChildren - 1)
+                clause += Integer.parseInt(childrenCases.get(i).toString()) + " AND obj.id = ";
+            else
+                clause += Integer.parseInt(childrenCases.get(i).toString());
+        }
+        
+        Transaction tx = session.beginTransaction();
+        String hqlDelete = "DELETE FROM " + CasesSens.class.getSimpleName() + " obj WHERE " + clause;
+        session.createQuery(hqlDelete).executeUpdate();
+        tx.commit();
     }
 }
