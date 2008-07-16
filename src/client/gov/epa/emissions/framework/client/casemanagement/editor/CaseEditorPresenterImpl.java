@@ -185,7 +185,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         }
 
         if (!jobsLoaded && tabTitle.equalsIgnoreCase("Jobs")) {
-            jobsPresenter.display();
+            jobsPresenter.display(this);
             jobsLoaded = true;
         }
 
@@ -204,5 +204,10 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
             outputsLoaded = true;
         }
     }
-    
+
+    public void resetSectors() {
+        if (summaryPresenter != null)
+            summaryPresenter.resetSectors();
+    }
+
 }

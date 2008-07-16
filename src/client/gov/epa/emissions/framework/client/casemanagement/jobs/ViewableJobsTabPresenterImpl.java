@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.casemanagement.jobs;
 
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseObjectManager;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
@@ -167,6 +168,16 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
     }
 
     public void copyJobs(int caseId, List<CaseJob> jobs) throws Exception {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    public void addNewSectorToSummary(CaseJob job) {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    public void display(CaseEditorPresenter parentPresenter) {
         // NOTE Auto-generated method stub
         
     }

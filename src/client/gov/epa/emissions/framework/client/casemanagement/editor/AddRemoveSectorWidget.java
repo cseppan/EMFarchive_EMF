@@ -42,7 +42,8 @@ public class AddRemoveSectorWidget extends JPanel {
     }
     public void setSectors(Sector[] sectors) {
         for (int i = 0; i < sectors.length; i++) {
-            sectorsList.addElement(sectors[i]);
+            if (!sectorsList.contains(sectors[i]))
+                sectorsList.addElement(sectors[i]);
         }
     }
 

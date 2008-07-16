@@ -29,4 +29,9 @@ public class EditableCaseSummaryTabPresenterImpl implements EditableCaseSummaryT
         //
     }
 
+    public void resetSectors() {
+        view.resetSectors();
+        
+    }
+
 }

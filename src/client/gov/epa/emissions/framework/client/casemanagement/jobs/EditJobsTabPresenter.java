@@ -2,17 +2,20 @@ package gov.epa.emissions.framework.client.casemanagement.jobs;
 
 import java.util.List;
 
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorTabPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 
 public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
 
-    void display() throws EmfException;
+    void display(CaseEditorPresenter parentPresenter) throws EmfException;
     
     void addNewJobDialog(NewJobView view) throws EmfException;
     
     CaseJob addNewJob(CaseJob job) throws EmfException;
+    
+    void addNewSectorToSummary(CaseJob job);
 
     void editJob(CaseJob job, EditCaseJobView jobEditor) throws EmfException;
     

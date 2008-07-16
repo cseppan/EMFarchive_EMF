@@ -33,4 +33,6 @@ public interface CaseEditorPresenter {
     
     void checkIfLockedByCurrentUser() throws EmfException;
     
+    void resetSectors();
+    
 }

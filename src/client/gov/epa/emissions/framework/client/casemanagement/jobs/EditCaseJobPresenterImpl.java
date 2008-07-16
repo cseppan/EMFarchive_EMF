@@ -50,8 +50,10 @@ public class EditCaseJobPresenterImpl implements EditJobPresenter {
     }
     
     public void saveJob() throws EmfException {
-        jobFieldsPresenter.doSave();
+        parentPresenter.addNewSectorToSummary(jobFieldsPresenter.doSave());
         parentView.refresh();
     }
+    
+    
 
 }

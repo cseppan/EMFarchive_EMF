@@ -13,6 +13,7 @@ import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.commons.gui.buttons.RunButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -66,6 +67,8 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     private EmfSession session;
 
     private DesktopManager desktopManager;
+    
+    private CaseEditorPresenter parentPresenter; 
 
     public EditJobsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager, EmfSession session) {
@@ -79,14 +82,14 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         super.setLayout(new BorderLayout());
     }
 
-    public void display(EmfSession session, Case caseObj, EditJobsTabPresenter presenter) {
+    public void display(EmfSession session, Case caseObj, EditJobsTabPresenter presenter, CaseEditorPresenter parentPresenter) {
         super.removeAll();
         this.outputDir = new TextField("outputdir", 50);
         outputDir.setText(caseObj.getOutputFileDir());
         this.changeables.addChangeable(outputDir);
         this.caseObj = caseObj;
         this.presenter = presenter;
-
+        this.parentPresenter = parentPresenter;
         try {
             super.add(createLayout(new CaseJob[0], parentConsole), BorderLayout.CENTER);
         } catch (Exception e) {
@@ -571,6 +574,10 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         } catch (RuntimeException e) {
             throw new EmfException(e.getMessage());
         }
+    }
+
+    public void resetSectors() {
+        parentPresenter.resetSectors();
     }
 
 }

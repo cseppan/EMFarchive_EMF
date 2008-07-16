@@ -19,5 +19,5 @@ public interface CaseEditorView extends ManagedView {
     void showRemindingMessage(String msg);
     
     void showLockingMsg(String msg);
-
+    
 }

@@ -113,7 +113,8 @@ public class NewJobDialog extends Dialog implements NewJobView, ManageChangeable
         }
         
         shouldCreate = true;
-        presenter.addNewJob(jobFieldsPanel.setFields());
+        CaseJob job = jobFieldsPanel.setFields();
+        presenter.addNewJob(job);
         close();
     }
 

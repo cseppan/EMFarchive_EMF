@@ -561,4 +561,10 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
                     + " has it now.");
     }
 
+    public void resetSectors() {
+        //sectorsWidget.removeAll();
+        sectorsWidget.setSectors(caseObj.getSectors());
+        //sectorsWidget.validate();
+    }
+
 }

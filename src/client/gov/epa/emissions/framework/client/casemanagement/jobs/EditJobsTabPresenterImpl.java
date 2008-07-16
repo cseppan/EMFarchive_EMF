@@ -1,8 +1,10 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseObjectManager;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
@@ -39,8 +41,8 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         this.caseObjectManager = CaseObjectManager.getCaseObjectManager(session);
     }
 
-    public void display() {
-        view.display(session, caseObj, this);
+    public void display(CaseEditorPresenter parentPresenter) {
+        view.display(session, caseObj, this, parentPresenter);
     }
 
     public void doSave() {
@@ -62,6 +64,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         if (newJob.getCaseId() == caseObj.getId()) {
             view.addJob(newJob);
             refreshView();
+            addNewSectorToSummary(job);
         }
 
         return newJob;
@@ -267,6 +270,19 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         if (!reloaded.isLocked(session.user()))
             throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner()
                     + " has it now.");
+    }
+
+    public void addNewSectorToSummary(CaseJob job) {
+
+        Sector sector = job.getSector();
+        List<Sector> sectors = new ArrayList<Sector>();
+        sectors.addAll(Arrays.asList(caseObj.getSectors()));
+        if ( sector != null && !sectors.contains(sector)){
+            sectors.add(sector);
+            caseObj.setSectors(sectors.toArray(new Sector[0]));
+            view.resetSectors();
+        }
+
     }
 
 }
