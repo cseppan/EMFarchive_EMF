@@ -79,8 +79,10 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     
     protected ControlStrategyResult[] results;
 
-    private ControlStrategyDAO controlStrategyDAO;
+    protected ControlStrategyDAO controlStrategyDAO;
     
+    protected ControlStrategyResult strategyMessagesResult;
+
     public AbstractStrategyLoader(User user, DbServerFactory dbServerFactory, 
             HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy) throws EmfException {
         this.user = user;
@@ -136,10 +138,20 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     protected void saveControlStrategyResult(ControlStrategyResult strategyResult) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            ControlStrategyDAO dao = new ControlStrategyDAO();
-            dao.updateControlStrategyResult(strategyResult, session);
+            controlStrategyDAO.updateControlStrategyResult(strategyResult, session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not save control strategy results: " + e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+
+    protected void deleteDatasets(EmfDataset[] datasets) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            controlStrategyDAO.removeResultDatasets(datasets, user, session, dbServer);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not delete control strategy result dataset(s): " + e.getMessage());
         } finally {
             session.close();
         }
@@ -149,7 +161,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         if (detailedStrategyResultType == null) {
             Session session = sessionFactory.getSession();
             try {
-                detailedStrategyResultType = new ControlStrategyDAO().getDetailedStrategyResultType(session);
+                detailedStrategyResultType = controlStrategyDAO.getDetailedStrategyResultType(session);
             } catch (RuntimeException e) {
                 throw new EmfException("Could not get detailed strategy result type");
             } finally {
@@ -436,5 +448,24 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         } finally {
             //
         }
+    }
+
+    protected void removeControlStrategyResult(int resultId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            controlStrategyDAO.removeControlStrategyResult(controlStrategy.getId(), resultId, session);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not remove previous control strategy result(s)");
+        } finally {
+            session.close();
+        }
+    }
+    
+    public int getMessageDatasetRecordCount() {
+        return strategyMessagesResult != null ? strategyMessagesResult.getRecordCount() : 0;
+    }
+    
+    public ControlStrategyResult getStrategyMessagesResult() {
+        return strategyMessagesResult;
     }
 }

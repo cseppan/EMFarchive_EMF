@@ -77,4 +77,9 @@ public class StrategyLoader extends AbstractStrategyLoader {
             //
         }
     }
+
+    public int getMessageDatasetRecordCount() {
+        // NOTE Auto-generated method stub
+        return 0;
+    }
 }

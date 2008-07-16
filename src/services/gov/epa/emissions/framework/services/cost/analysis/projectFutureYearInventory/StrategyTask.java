@@ -73,7 +73,7 @@ public class StrategyTask extends AbstractStrategyTask {
                     }
                 }
             }
-            
+//            deleteStrategyResults();
         } catch (Exception e) {
             status = "Failed. Error processing input dataset";
             e.printStackTrace();
@@ -91,6 +91,7 @@ public class StrategyTask extends AbstractStrategyTask {
                 disconnectDbServer();
             }
         }
+        //if (loader.getMessageDatasetRecordCount() == 0) deleteStrategyMessageResult();
     }
 
     public void afterRun() {

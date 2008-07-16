@@ -649,6 +649,19 @@ public class DatasetDAO {
             throw new EmfException("Dataset used by control strategy " + list.get(0) + ".");
     }
 
+    public void checkIfUsedByControlPrograms(int[] datasetIDs, Session session) throws EmfException {
+        List list = null;
+
+        // check if dataset is an input inventory for some control program (via the control_programs table)
+        list = session.createQuery(
+                "select cP.name from ControlProgram as cP inner join cP.dataset as d with (d.id = "
+                        + getAndOrClause(datasetIDs, "d.id") + ")").list();
+
+        if (list != null && list.size() > 0)
+            throw new EmfException("Error: dataset used by control program " + list.get(0) + ".");
+
+    }
+
     private void deleteFromEmfTables(int[] datasetIDs, TableCreator tableTool, Session session) throws EmfException {
         Exception exception = null;
 

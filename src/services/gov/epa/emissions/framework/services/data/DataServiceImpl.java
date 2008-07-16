@@ -220,6 +220,7 @@ public class DataServiceImpl implements DataService {
 
         checkCase(dsIDs);
         checkControlStrategy(dsIDs);
+        checkControlProgram(dsIDs);
 
         return true;
     }
@@ -236,7 +237,11 @@ public class DataServiceImpl implements DataService {
 
         try {
             dao.checkIfUsedByCases(datasetIDs, session);
-        } finally {
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new EmfException(ex.getMessage());
+        }
+        finally {
             session.close();
         }
     }
@@ -246,6 +251,16 @@ public class DataServiceImpl implements DataService {
 
         try {
             dao.checkIfUsedByStrategies(datasetIDs, session);
+        } finally {
+            session.close();
+        }
+    }
+
+    private synchronized void checkControlProgram(int[] datasetIDs) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            dao.checkIfUsedByControlPrograms(datasetIDs, session);
         } finally {
             session.close();
         }
@@ -300,6 +315,7 @@ public class DataServiceImpl implements DataService {
         try {
             dao.checkIfUsedByCases(new int[] { datasetID }, session);
             dao.checkIfUsedByStrategies(new int[] { datasetID }, session);
+            dao.checkIfUsedByControlPrograms(new int[] { datasetID }, session);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         } finally {

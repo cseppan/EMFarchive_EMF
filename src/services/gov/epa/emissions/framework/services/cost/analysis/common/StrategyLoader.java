@@ -14,5 +14,7 @@ public interface StrategyLoader {
     public void disconnectDbServer() throws EmfException;
 
     public int getRecordCount();
+    
+    public int getMessageDatasetRecordCount();
 
 }

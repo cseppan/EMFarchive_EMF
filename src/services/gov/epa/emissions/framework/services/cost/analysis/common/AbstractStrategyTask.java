@@ -59,7 +59,7 @@ public abstract class AbstractStrategyTask implements Strategy {
     
     private StatusDAO statusDAO;
     
-    private ControlStrategyDAO controlStrategyDAO;
+    protected ControlStrategyDAO controlStrategyDAO;
     
     protected DatasetCreator creator;
     
@@ -342,7 +342,7 @@ public abstract class AbstractStrategyTask implements Strategy {
         StrategyResultType resultType = null;
         Session session = sessionFactory.getSession();
         try {
-            resultType = new ControlStrategyDAO().getSummaryStrategyResultType(session);
+            resultType = controlStrategyDAO.getSummaryStrategyResultType(session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not get detailed strategy result type");
         } finally {
@@ -388,8 +388,7 @@ public abstract class AbstractStrategyTask implements Strategy {
     protected void saveControlStrategyResult(ControlStrategyResult strategyResult) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            ControlStrategyDAO dao = new ControlStrategyDAO();
-            dao.updateControlStrategyResult(strategyResult, session);
+            controlStrategyDAO.updateControlStrategyResult(strategyResult, session);
             if (controlStrategyInputDatasetCount < 2) {
 //                runQASteps(strategyResult);
             }
@@ -403,8 +402,7 @@ public abstract class AbstractStrategyTask implements Strategy {
     protected void saveControlStrategy(ControlStrategy strategy) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            ControlStrategyDAO dao = new ControlStrategyDAO();
-            dao.update(strategy, session);
+            controlStrategyDAO.update(strategy, session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not save control strategy: " + e.getMessage());
         } finally {
@@ -415,8 +413,7 @@ public abstract class AbstractStrategyTask implements Strategy {
     protected void saveControlStrategySummaryResult(ControlStrategyResult strategyResult) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            ControlStrategyDAO dao = new ControlStrategyDAO();
-            dao.updateControlStrategyResult(strategyResult, session);
+            controlStrategyDAO.updateControlStrategyResult(strategyResult, session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not save control strategy results: " + e.getMessage());
         } finally {
@@ -425,10 +422,9 @@ public abstract class AbstractStrategyTask implements Strategy {
     }
 
     private void removeControlStrategyResults() throws EmfException {
-        ControlStrategyDAO dao = new ControlStrategyDAO();
         Session session = sessionFactory.getSession();
         try {
-            dao.removeControlStrategyResults(controlStrategy.getId(), session);
+            controlStrategyDAO.removeControlStrategyResults(controlStrategy.getId(), session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not remove previous control strategy result(s)");
         } finally {
@@ -437,10 +433,9 @@ public abstract class AbstractStrategyTask implements Strategy {
     }
 
     private void removeControlStrategyResult(int resultId) throws EmfException {
-        ControlStrategyDAO dao = new ControlStrategyDAO();
         Session session = sessionFactory.getSession();
         try {
-            dao.removeControlStrategyResult(controlStrategy.getId(), resultId, session);
+            controlStrategyDAO.removeControlStrategyResult(controlStrategy.getId(), resultId, session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not remove previous control strategy result(s)");
         } finally {

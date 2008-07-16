@@ -25,7 +25,6 @@ import java.util.Date;
 import org.hibernate.Session;
 
 public class StrategyLoader extends AbstractStrategyLoader {
-    
     public StrategyLoader(User user, DbServerFactory dbServerFactory, 
             HibernateSessionFactory sessionFactory, ControlStrategy controlStrategy) throws EmfException {
         super(user, dbServerFactory, 
@@ -48,18 +47,43 @@ public class StrategyLoader extends AbstractStrategyLoader {
         populateInventory(controlStrategyInputDataset, result);
         
         //create strategy messages result
-        ControlStrategyResult strategyMessagesResult = createStrategyMessagesResult(inputDataset, controlStrategyInputDataset.getVersion());
+        strategyMessagesResult = createStrategyMessagesResult(inputDataset, controlStrategyInputDataset.getVersion());
         populateStrategyMessagesDataset(controlStrategyInputDataset, strategyMessagesResult);
         setResultCount(strategyMessagesResult);
-        strategyMessagesResult.setCompletionTime(new Date());
-        strategyMessagesResult.setRunStatus("Completed.");
-        saveControlStrategyResult(strategyMessagesResult);
+        
+        //if the messages dataset is empty (no records) then remove the dataset and strategy result, there
+        //is no point and keeping it around.
+        if (strategyMessagesResult.getRecordCount() == 0) {
+            deleteStrategyMessageResult(strategyMessagesResult);
+        } else {
+            strategyMessagesResult.setCompletionTime(new Date());
+            strategyMessagesResult.setRunStatus("Completed.");
+            saveControlStrategyResult(strategyMessagesResult);
+        }
 
         //do this after updating the previous result, else it will override it...
         //still need to set the record count...
         setResultCount(result);
 
         return result;
+    }
+
+    protected void deleteStrategyMessageResult(ControlStrategyResult strategyMessagesResult) throws EmfException {
+        //get rid of strategy results...
+        Session session = sessionFactory.getSession();
+        try {
+            EmfDataset[] ds = controlStrategyDAO.getResultDatasets(controlStrategy.getId(), strategyMessagesResult.getId(), session);
+            
+            //get rid of old strategy results...
+            controlStrategyDAO.removeControlStrategyResult(controlStrategy.getId(), strategyMessagesResult.getId(), session);
+            //delete and purge datasets
+            controlStrategyDAO.removeResultDatasets(ds, user, session, dbServer);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw new EmfException("Could not remove control strategy message result.");
+        } finally {
+            session.close();
+        }
     }
 
     private void populateInventory(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
@@ -125,10 +149,10 @@ public class StrategyLoader extends AbstractStrategyLoader {
                 datasetType, 
                 tableFormat, 
 //                new NonVersionedDataFormatFactory().tableFormat(new StrategyMessagesFileFormat(dbServer.getSqlDataTypes()), dbServer.getSqlDataTypes()), 
-                exceptionsDatasetDescription());
+                strategyMessagesDatasetDescription());
     }
     
-    private String exceptionsDatasetDescription() {
+    private String strategyMessagesDatasetDescription() {
         return "#Strategy Messages\n" + 
             "#Implements control strategy: " + controlStrategy.getName() + "\n#";
         }
