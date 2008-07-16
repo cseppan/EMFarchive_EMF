@@ -331,3 +331,49 @@ insert into emf.dataset_types values(DEFAULT,'Control Strategy Least Cost Curve 
 -- 5/17/200 add one key word for csv file header line control
 insert INTO emf.keywords VALUES (DEFAULT, 'COLUMN_TYPES');
 
+
+-- 7/16/08 DCD -- updated qa steps to handle control programs.
+-- Summarize by Control Measure and Pollutant - Control Strategy Detailed Result
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select e.sector, cm.name as Measure_Name, e.cm_abbrev as Measure_Abbreviation, sg.name as Source_Group, ct.name as Control_Technology, e.POLL, case when coalesce(sum(e.Emis_Reduction),0) <> 0 then sum(e.Annual_Cost) / sum(e.Emis_Reduction) else null end as avg_cost_per_ton, sum(e.Annual_Cost) as Annual_Cost, sum(e.Final_emissions) as Final_emissions, sum(e.Emis_Reduction) as Emis_Reduction, sum(e.Inv_emissions) as Inv_emissions from $TABLE[1] e left outer join emf.control_measures cm on cm.abbreviation = e.cm_abbrev left outer join emf.source_groups sg on sg.id = cm.source_group left outer join emf.control_technologies ct on ct.id = cm.control_technology group by e.sector, cm.name, e.cm_abbrev, sg.name, ct.name, e.POLL order by e.sector, cm.name, POLL'
+where dataset_type_id in (
+	select id 
+	from emf.dataset_types dt
+	where name in ('Control Strategy Detailed Result')
+	)
+	and "name" = 'Summarize by Control Measure and Pollutant';
+
+
+-- Summarize by Source Group and Pollutant - Control Strategy Detailed Result
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select sector, sg.name as Source_Group, e.POLL, case when coalesce(sum(e.Emis_Reduction),0) <> 0 then sum(e.Annual_Cost) / sum(e.Emis_Reduction) else null end as avg_cost_per_ton, sum(e.Annual_Cost) as Annual_Cost, sum(e.Final_emissions) as Final_emissions, sum(e.Emis_Reduction) as Emis_Reduction, sum(e.Inv_emissions) as Inv_emissions from $TABLE[1] e left outer join emf.control_measures cm on cm.abbreviation = e.cm_abbrev left outer join emf.source_groups sg on sg.id = cm.source_group group by sector, sg.name, e.POLL order by sector, sg.name, POLL'
+where dataset_type_id in (
+	select id 
+	from emf.dataset_types dt
+	where name in ('Control Strategy Detailed Result')
+	)
+	and "name" = 'Summarize by Source Group and Pollutant';
+
+-- Summarize by Control Technology and Pollutant - Control Strategy Detailed Result
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select sector, ct.name as Control_Technology, e.POLL, case when coalesce(sum(e.Emis_Reduction),0) <> 0 then sum(e.Annual_Cost) / sum(e.Emis_Reduction) else null end as avg_cost_per_ton, sum(e.Annual_Cost) as Annual_Cost, sum(e.Final_emissions) as Final_emissions, sum(e.Emis_Reduction) as Emis_Reduction, sum(e.Inv_emissions) as Inv_emissions from $TABLE[1] e left outer join emf.control_measures cm on cm.abbreviation = e.cm_abbrev left outer join emf.control_technologies ct on ct.id = cm.control_technology group by sector, ct.name, e.POLL order by sector, ct.name, e.POLL'
+where dataset_type_id in (
+	select id 
+	from emf.dataset_types dt
+	where name in ('Control Strategy Detailed Result')
+	)
+	and "name" = 'Summarize by Control Technology and Pollutant';
+
+-- Summarize by State, SCC, and Control Technology - Control Strategy Detailed Result
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select e.sector, ct.name as Control_Technology, e.POLL, e.fipsst, e.scc, case when coalesce(sum(e.Emis_Reduction),0) <> 0 then sum(e.Annual_Cost) / sum(e.Emis_Reduction) else null end as avg_cost_per_ton, sum(e.Annual_Cost) as Annual_Cost, sum(e.Final_emissions) as Final_emissions, sum(e.Emis_Reduction) as Emis_Reduction, sum(e.Inv_emissions) as Inv_emissions from $TABLE[1] e left outer join emf.control_measures cm on cm.abbreviation = e.cm_abbrev left outer join emf.control_technologies ct on ct.id = cm.control_technology group by e.sector, ct.name, e.POLL, e.fipsst, e.scc order by e.sector, ct.name, e.POLL, e.fipsst, e.scc'
+where dataset_type_id in (
+	select id 
+	from emf.dataset_types dt
+	where name in ('Control Strategy Detailed Result')
+	)
+	and "name" = 'Summarize by State, SCC, and Control Technology';
+
+
+
+

@@ -209,13 +209,13 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private IntTextField costYearTextField() {
         costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 10);
-        costYear.setValue(controlStrategy.getCostYear());
+        costYear.setValue(controlStrategy.getCostYear() != 0 ? controlStrategy.getCostYear() : CostYearTable.REFERENCE_COST_YEAR);
         return costYear;
     }
 
     private IntTextField inventoryYearTextField() {
         inventoryYear = new IntTextField("Target year", 0, Integer.MAX_VALUE, 10);
-        inventoryYear.setToolTipText("This is the target year for the strategy run.");
+        inventoryYear.setToolTipText("This is the target year for the strategy run, often this is the year of the inventory.");
         if (controlStrategy.getInventoryYear() != 0)
             inventoryYear.setValue(controlStrategy.getInventoryYear());
         return inventoryYear;

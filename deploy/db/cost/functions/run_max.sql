@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION run_max(double precision, text, text)
+CREATE OR REPLACE FUNCTION public.run_max(double precision, text, text)
   RETURNS numeric AS
 $BODY$
 	if {![info exists GD(max.$2.$3)]} {

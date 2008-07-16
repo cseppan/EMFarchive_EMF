@@ -346,6 +346,8 @@ BEGIN
 			|| '))';
 	get_strategt_cost_inner_sql := replace(get_strategt_cost_sql,'m.control_measures_id','m.id');
 
+/*
+
 	-- build insert column list and select column list
 	FOR region IN EXECUTE 
 		'SELECT a.attname
@@ -385,7 +387,6 @@ BEGIN
 
 
 
-/*
 	execute 
 	--raise notice '%', 
 	'insert into emissions.' || detailed_result_table_name || ' 
@@ -397,6 +398,42 @@ BEGIN
 	from emissions.' || inv_table_name || ' inv
 	where ' || replace(replace(inv_filter, 'version', 'inv.version'), 'dataset_id', 'inv.dataset_id') || coalesce(county_dataset_filter_sql, '');
 */
+
+	-- validate that all inputs look fine, before actually running the projection.
+
+  	FOR control_program IN EXECUTE 
+		'select cp."name" as control_program_name, cpt."name" as type, lower(i.table_name) as table_name, 
+			cp.start_date, cp.end_date, 
+			cp.dataset_id, cp.dataset_version
+		 from emf.control_strategy_programs csp
+
+			inner join emf.control_programs cp
+			on cp.id = csp.control_program_id
+
+			inner join emf.control_program_types cpt
+			on cpt.id = cp.control_program_type_id
+
+			inner join emf.internal_sources i
+			on i.dataset_id = cp.dataset_id
+		where csp.control_strategy_id = ' || control_strategy_id || '
+		order by processing_order'
+	LOOP
+		-- look at the closure control program inputs
+		IF control_program.type = 'Plant Closure' THEN
+
+			-- make sire the 
+			execute 'select count(1) from emissions.' || control_program.table_name || ' where not public.isdate(effective_date)'
+			into gimme_count;
+			IF gimme_count > 0 THEN
+				RAISE EXCEPTION 'Control program, %, plant closure dataset has % effective date(s) that are not in the correct date format.', control_program.control_program_name, gimme_count;
+				return;
+			END IF;
+
+
+		END IF;
+		
+	
+	END LOOP;
 
 	-- need to process based on processing_order of the program, i.e., first do plant closures, next do growth, then apply control 
 	-- to various sources
@@ -418,22 +455,8 @@ BEGIN
 		where csp.control_strategy_id = ' || control_strategy_id || '
 		order by processing_order'
 	LOOP
+		-- apply plant closure control program
 		IF control_program.type = 'Plant Closure' THEN
-/*
-			execute 
-			--raise notice '%', 
-			'delete from emissions.' || detailed_result_table_name || ' as inv
-			using emissions.' || control_program.table_name || ' pc
-			where pc.fips = inv.fips
-				and pc.plantid = inv.plantid
-				and coalesce(pc.pointid, inv.pointid) = inv.pointid
-				and coalesce(pc.stackid, inv.stackid) = inv.stackid
-				and coalesce(pc.segment, inv.segment) = inv.segment
-				and pc.effective_date <  ''12/31/' || inventory_year || '''
-				and ' || replace(replace(replace(public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version), 'version ', 'pc.version '), 'delete_versions ', 'pc.delete_versions '), 'dataset_id', 'pc.dataset_id');
-
-*/
-
 
 			execute
 			--raise notice '%',
@@ -460,8 +483,8 @@ BEGIN
 				final_emissions,
 				emis_reduction,
 				inv_emissions,
-				input_emis,
-				output_emis,
+--				input_emis,
+--				output_emis,
 				apply_order,
 				fipsst,
 				fipscty,
@@ -497,8 +520,8 @@ BEGIN
 				0.0 as final_emissions,
 				' || annual_emis_sql || ' as emis_reduction,
 				' || annual_emis_sql || ' as inv_emissions,
-				' || annual_emis_sql || ' as input_emis,
-				0.0 as output_emis,
+--				' || annual_emis_sql || ' as input_emis,
+--				0.0 as output_emis,
 				1,
 				substr(inv.fips, 1, 2),
 				substr(inv.fips, 3, 3),

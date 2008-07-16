@@ -445,6 +445,8 @@ BEGIN
 				scc, 
 				' || case when not is_point_table then '' else 'plantid, pointid, stackid, segment, ' end || '
 				poll, 
+				status,
+				control_program,
 				message
 				)
 			select 
@@ -456,7 +458,9 @@ BEGIN
 				pc.stackid, 
 				pc.segment, 
 				null::character varying(16) as poll,
-				''Plant'' || coalesce('', '' || pc.plant || '','', '''') || '' is missing from inventory.'' as "comment"
+				''Warning''::character varying(11) as status,
+				' || quote_literal(control_program.control_program_name) || '::character varying(255) as control_program,
+				''Plant'' || coalesce('', '' || pc.plant || '','', '''') || '' is missing from the inventory.'' as "comment"
 			FROM emissions.' || control_program.table_name || ' pc
 
 				left outer join emissions.' || inv_table_name || ' inv

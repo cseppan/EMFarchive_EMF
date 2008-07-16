@@ -116,8 +116,8 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
         layoutGenerator.addLabelWidgetPair("Name:", name(), panelTop);
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description()), panelTop);
         
-        layoutGenerator.addLabelWidgetPair("Start:", start(), panelTop);
-        layoutGenerator.addLabelWidgetPair("End:", end(), panelTop);
+        layoutGenerator.addLabelWidgetPair("Start Date:", start(), panelTop);
+        layoutGenerator.addLabelWidgetPair("End Date:", end(), panelTop);
         layoutGenerator.addLabelWidgetPair("Last Modified Date:", lastModifiedDate(), panelTop);
         layoutGenerator.addLabelWidgetPair("Creator:", creator(), panelTop);
         layoutGenerator.makeCompactGrid(panelTop, 6, 2, // rows, cols
@@ -253,7 +253,7 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
     private TextField end() {
         endDate = new TextField("end", 40);
         endDate.setText(controlProgram.getEndDate() != null ? CustomDateFormat.format_MM_DD_YYYY(controlProgram.getEndDate()) : "");
-        endDate.setToolTipText("The end date defines the cut-off date for the control program.  The end date is not required.");
+        endDate.setToolTipText("Optional, the date efter which the control program no longer applies.");
         endDate.setMaximumSize(new Dimension(300, 15));
         changeablesList.addChangeable(endDate);
 

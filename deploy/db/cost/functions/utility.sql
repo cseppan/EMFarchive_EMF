@@ -19,6 +19,14 @@ $BODY$select $1||'|'||$2$BODY$
   COST 100;
 ALTER FUNCTION public.join_with_pipe(text, text) OWNER TO emf;
 
+CREATE OR REPLACE FUNCTION public."add"(double precision, double precision)
+  RETURNS double precision AS
+'select $1 + $2'
+  LANGUAGE 'sql' IMMUTABLE STRICT
+  COST 100;
+ALTER FUNCTION public."add"(double precision, double precision) OWNER TO emf;
+
+
 -- USER DEFINED Aggregates
 
 DROP AGGREGATE public.concatenate_with_pipe("text");
