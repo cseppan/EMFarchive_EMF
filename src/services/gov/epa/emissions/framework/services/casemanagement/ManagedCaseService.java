@@ -4070,13 +4070,12 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot obtain lock for merging case to happen: User " + template.getLockOwner()
                         + " has the lock for case '" + template.getName() + "'");
 
-            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix,
-                    getJobs2Copy(jobIds));
-            CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), dao.getJobSpecNonSpecCaseInputs(
-                    template.getId(), jobIds, session).toArray(new CaseInput[0]), session);
-            CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao
-                    .getJobSpecNonSpecCaseParameters(template.getId(), jobIds, session).toArray(new CaseParameter[0]),
-                    session);
+            CaseJob[] jobs2copy = getJobs2Copy(jobIds);
+            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix, jobs2copy);
+            CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), 
+                    getValidCaseInputs4SensitivityCase(template.getId(), jobIds, jobs2copy, session), session);
+            CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(),
+                    getValidCaseParameters4SensitivityCase(template.getId(), jobIds, jobs2copy, session), session);
 
             addCaseJobs(user, targetId, jobs);
             addCaseInputs(user, targetId, inputs, jobPrefix);
@@ -4151,7 +4150,6 @@ public class ManagedCaseService {
         sensitivityCase.setModel(parent.getModel());
         sensitivityCase.setModelingRegion(parent.getModelingRegion());
         sensitivityCase.setProject(parent.getProject());
-        // sensitivityCase.setSectors(parent.getSectors()); // this get set by the sectors list in the selected jobs
         sensitivityCase.setSpeciation(parent.getSpeciation());
         sensitivityCase.setStartDate(parent.getStartDate());
         sensitivityCase.setEndDate(parent.getEndDate());
@@ -4390,4 +4388,82 @@ public class ManagedCaseService {
                 session.close();
         }
     }
+
+    private CaseInput[] getValidCaseInputs4SensitivityCase(int caseId, int[] jobIds, CaseJob[] jobs, Session session) {
+        String query = "SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = " + caseId
+                + " AND ((obj.caseJobID = 0 AND obj.sector.id is null)"
+                + getAndOrClause(jobIds, "obj.caseJobID", getSectorIds(jobs), "obj.sector.id") + ")";
+
+        if (DebugLevels.DEBUG_9)
+            log.warn(query);
+
+        List<?> ids = session.createQuery(query).list();
+        List<CaseInput> inputs = new ArrayList<CaseInput>();
+
+        for (Iterator<?> iter = ids.iterator(); iter.hasNext();) {
+            Integer id = (Integer) iter.next();
+            inputs.add(dao.getCaseInput(id, session));
+        }
+
+        return inputs.toArray(new CaseInput[0]);
+    }
+
+    private CaseParameter[] getValidCaseParameters4SensitivityCase(int caseId, int[] jobIds, CaseJob[] jobs,
+            Session session) {
+        String query = "SELECT obj.id from " + CaseParameter.class.getSimpleName() + " as obj WHERE obj.caseID = "
+                + caseId + " AND ((obj.jobId = 0 AND obj.sector.id is null)"
+                + getAndOrClause(jobIds, "obj.jobId", getSectorIds(jobs), "obj.sector.id") + ")";
+
+        if (DebugLevels.DEBUG_9)
+            log.warn(query);
+
+        List<?> ids = session.createQuery(query).list();
+
+        List<CaseParameter> params = new ArrayList<CaseParameter>();
+
+        for (Iterator<?> iter = ids.iterator(); iter.hasNext();)
+            params.add(dao.getCaseParameter((Integer) iter.next(), session));
+
+        return params.toArray(new CaseParameter[0]);
+    }
+
+    private int[] getSectorIds(CaseJob[] jobs) {
+        int[] sectorIds = new int[jobs.length];
+
+        for (int i = 0; i < jobs.length; i++) {
+            Sector sector = jobs[i].getSector();
+
+            if (sector == null)
+                sectorIds[i] = -1;
+            else
+                sectorIds[i] = sector.getId();
+        }
+
+        return sectorIds;
+    }
+
+    private String getAndOrClause(int[] jobIds, String jobIdString, int[] sectorIds, String sectorIdString) {
+        StringBuffer sb = new StringBuffer();
+        int numIDs = jobIds.length;
+
+        if (numIDs < 1)
+            return "";
+
+        //NOTE: the following implementation reflects this logic:
+        //      If you select job1 which is sector1, the logic for selecting the appropriate parameters from the template is:
+        //      (All job AND All sectors) OR (all jobs AND sector = sector1) OR (job = job1 AND All sectors) OR (job=job1 AND sector = sector1)
+        //      You have to also make sure this doesn't fail if the sector of the job is All sectors. 
+        
+        for (int i = 0; i < numIDs; i++) {
+            if (sectorIds[i] != -1)
+                sb.append(" OR (" + jobIdString + " = 0 AND " + sectorIdString + " = " + sectorIds[i] + ")" +
+                        " OR (" + jobIdString + " = " + jobIds[i] + " AND " + sectorIdString + " is null)" +
+                        " OR (" + jobIdString + " = " + jobIds[i] + " AND " + sectorIdString + " = " + sectorIds[i] + ")");
+            else 
+                sb.append(" OR (" + jobIdString + " = " + jobIds[i] + " AND " + sectorIdString + " is null)");
+        }
+
+        return sb.toString();
+    }
+
 }
